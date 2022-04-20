@@ -34,5 +34,13 @@ a {
 }
 
 .a_redirecion_principal{
-  color: #000
+  color: #fff
+}
+
+.btn{
+  border: #fff;
+}
+
+.btn:hover{
+  background-color: rgb(150, 10, 10);
 }
