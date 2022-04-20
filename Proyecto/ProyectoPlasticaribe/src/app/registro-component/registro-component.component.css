@@ -1,0 +1,33 @@
+.contenedorRegistro {
+  width: 400px;
+  padding: 2%;
+  margin: 0 auto;
+
+  border-radius: 1%;
+  border-color: rgb(240, 240, 240);
+  border-style: solid;
+
+}
+
+.tituloRojo {
+  color: rgb(158, 1, 1);
+  text-align: center;
+}
+
+.textoPequeno{
+  text-align: center;
+  font-size: small;
+}
+
+
+a {
+  text-decoration: none;
+  color: rgb(158, 1, 1);
+}
+
+
+.container-fluid{
+  display: flex;
+  align-items: center;
+
+}
