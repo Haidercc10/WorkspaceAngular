@@ -1,9 +1,18 @@
 
+.titulo{
+  margin: 0 auto;
+  text-align: center;
+}
+
+.titulo h1{
+  padding: 5%;
+  color: #a23;
+}
+
 .contenedorRegistro {
   width: 400px;
   padding: 2%;
-  margin: 0 auto;
-
+  margin: auto;
   border-radius: 1%;
   border-color: rgb(240, 240, 240);
   border-style: solid;
@@ -32,6 +41,11 @@ a {
   align-items: center;
 
 }
+
+.mb-3{
+  text-align: center;
+}
+
 
 .a_redirecion_principal{
   color: #fff
