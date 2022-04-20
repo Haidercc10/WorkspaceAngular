@@ -1,3 +1,4 @@
+
 .contenedorRegistro {
   width: 400px;
   padding: 2%;
@@ -30,4 +31,8 @@ a {
   display: flex;
   align-items: center;
 
+}
+
+.a_redirecion_principal{
+  color: #000
 }
