@@ -1,3 +1,9 @@
+<<<<<<< Updated upstream
+=======
+
+
+
+>>>>>>> Stashed changes
 //Conexión con la base de datos.
 const rest = new (require('rest-mssql-nodejs'))({
     user: 'sa',

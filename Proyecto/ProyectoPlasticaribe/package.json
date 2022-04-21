@@ -22,6 +22,7 @@
     "bootstrap": "^5.1.3",
     "font-awesome": "^4.7.0",
     "jquery": "^3.6.0",
+    "rest-mssql-nodejs": "^1.0.10",
     "rxjs": "~7.5.0",
     "tedious": "^14.4.0",
     "tslib": "^2.3.0",
