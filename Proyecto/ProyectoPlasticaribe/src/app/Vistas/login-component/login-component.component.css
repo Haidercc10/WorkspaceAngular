@@ -1,3 +1,13 @@
+.titulo{
+  margin: 0 auto;
+  text-align: center;
+}
+
+.titulo h1{
+  padding: 5%;
+  color: #a23;
+}
+
 .contenedorLogin {
   width: 400px;
   padding: 2%;
@@ -10,11 +20,13 @@
 .tituloRojo {
   color: rgb(158, 1, 1);
   text-align: center;
+  padding: 5% 0 5% 0;
 }
 
 .textoPequeno{
   text-align: center;
   font-size: small;
+  margin-top: 5%;
 }
 
 
@@ -28,4 +40,25 @@ a {
   display: flex;
   align-items: center;
 
+}
+
+.mb-3{
+  text-align: center;
+  width: 100%;
+}
+
+
+.a_redirecion_principal{
+  color: #fff;
+  width: 100%;
+}
+
+.btn{
+  border: #fff;
+  width: 60%;
+  margin-top: 5%;
+}
+
+.btn:hover{
+  background-color: rgb(150, 10, 10);
 }

@@ -1,6 +1,6 @@
 
 .titulo{
-  margin: 0 auto;
+  margin: 2% auto;
   text-align: center;
 }
 
@@ -22,6 +22,7 @@
 .tituloRojo {
   color: rgb(158, 1, 1);
   text-align: center;
+  margin: 5%;
 }
 
 .textoPequeno{
@@ -44,15 +45,19 @@ a {
 
 .mb-3{
   text-align: center;
+  width: 100%;
 }
 
 
 .a_redirecion_principal{
-  color: #fff
+  color: #fff;
+  width: 100%;
 }
 
 .btn{
   border: #fff;
+  width: 60%;
+  margin-top: 5%;
 }
 
 .btn:hover{
