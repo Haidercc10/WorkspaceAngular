@@ -8,12 +8,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class RegistroComponentComponent implements OnInit {
 
-  /*form: FormGroup;*/
+  form: FormGroup;
 
 
 
-  constructor(/*private frmBuilder: FormBuilder*/) {
-    /*this.form = this.frmBuilder.group({
+  constructor(private frmBuilder: FormBuilder) {
+    this.form = this.frmBuilder.group({
       usuId:['', [Validators.required, Validators.maxLength(10), Validators.minLength(6)]],
       usuNombre:['', Validators.required],
       usuTipo:['', Validators.required],
@@ -24,7 +24,7 @@ export class RegistroComponentComponent implements OnInit {
       usuEps:['', Validators.required],
       usuFondoP:['', Validators.required],
       usuCajaComp:['', Validators.required],
-    })*/
+    })
   }
 
   ngOnInit(): void {
@@ -33,7 +33,7 @@ export class RegistroComponentComponent implements OnInit {
   mostrarFormulario(){
     //console.log(this.form);
 
-   /* const datosUsuario: any = {
+    const datosUsuario: any = {
       usuId: this.form.get('usuId')?.value,
       usuNombre: this.form.get('usuNombre')?.value,
       usuTipo: this.form.get('usuTipo')?.value,
@@ -44,6 +44,6 @@ export class RegistroComponentComponent implements OnInit {
       usuFondoP: this.form.get('usuFondoP')?.value,
       usuCajaComp: this.form.get('usuCajaComp')?.value
     }
-    alert('Usuario registrado');*/
+    alert('Usuario registrado');
   }
 }

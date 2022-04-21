@@ -1,5 +1,4 @@
 <<<<<<< HEAD
-<<<<<<< HEAD
 var Connection = require('tedious').Connection;  
     var config = {  
         server: '192.168.0.250', 
@@ -26,8 +25,6 @@ var Connection = require('tedious').Connection;
     
     connection.connect();
 =======
-=======
->>>>>>> 3105bda35c236ac1c782e16715c4dee5dea1b8f0
 //Conexión con la base de datos.
 const rest = new (require('rest-mssql-nodejs'))({
     user: 'sa',
@@ -40,9 +37,5 @@ const rest = new (require('rest-mssql-nodejs'))({
     }
  });
 
-<<<<<<< HEAD
  module.exports = {rest}
 >>>>>>> 239d2cf5c50c7a2bea9f29dd6b8d00abd7f5e1f7
-=======
- module.exports = {rest}
->>>>>>> 3105bda35c236ac1c782e16715c4dee5dea1b8f0
