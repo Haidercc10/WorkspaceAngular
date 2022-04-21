@@ -57,10 +57,14 @@ a {
 .btn{
   border: #fff;
   width: 60%;
+<<<<<<< HEAD
 <<<<<<<< HEAD:Proyecto/ProyectoPlasticaribe/src/app/Vista/registro-component/registro-component.component.css
 ========
   margin-top: 5%;
 >>>>>>>> 239d2cf5c50c7a2bea9f29dd6b8d00abd7f5e1f7:Proyecto/ProyectoPlasticaribe/src/app/Vistas/registro-component/registro-component.component.css
+=======
+  margin-top: 5%;
+>>>>>>> 3105bda35c236ac1c782e16715c4dee5dea1b8f0
 }
 
 .btn:hover{
