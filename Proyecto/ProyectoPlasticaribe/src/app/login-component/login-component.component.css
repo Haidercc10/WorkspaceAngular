@@ -42,6 +42,7 @@ a {
 
 .mb-3{
   text-align: center;
+  width: 100%;
 }
 
 
@@ -51,6 +52,7 @@ a {
 
 .btn{
   border: #fff;
+  width: 60%;
 }
 
 .btn:hover{
