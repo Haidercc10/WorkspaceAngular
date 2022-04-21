@@ -38,3 +38,46 @@ a {
 
   font-size: small;
 }
+
+
+/*** notificacion ***/
+:root {
+	--icon: #afc2e2;
+}
+
+input { display: none; }
+
+label:before,
+label:after {
+	content: "";
+	position: absolute;
+	box-sizing: border-box;
+	transition: all 0.5s ease 0s;
+
+
+
+
+}
+
+
+input:checked + label {
+	color: var(--sel);
+	text-shadow: 0 0 5px var(--sel), 0 0 10px var(--sel);
+}
+
+
+input:checked + label[for=m-notification] {
+	--sel:  #f76565;
+}
+
+/* tablas */
+table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  border: 3px solid rgb(19, 18, 19);
+}
+
+th, td {
+  padding: 10px;
+}
