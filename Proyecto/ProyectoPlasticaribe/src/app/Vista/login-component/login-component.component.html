@@ -1,5 +1,3 @@
-
-<script src="/Proyecto/ProyectoPlasticaribe/src/app/Modelo/conexion.js"></script>
 <div class="titulo">
   <h1>Plasticaribe S.A.S</h1>
 </div>
@@ -15,13 +13,13 @@
     </div>
     <!--Formulario-->
     <div class="mb-3">
-      <input class="form-control form-control-sm" type="number" placeholder="Identificación" aria-label=".form-control-sm example">
+      <input id="identificación" class="form-control form-control-sm" type="number" placeholder="Identificación" aria-label=".form-control-sm example" value="4654564">
     </div>
     <div class="mb-3">
-      <input class="form-control form-control-sm" type="password" placeholder="Contraseña" aria-label=".form-control-sm example">
+      <input id="contrasena" class="form-control form-control-sm" type="password" placeholder="Contraseña" aria-label=".form-control-sm example" value="dsaddad">
     </div>
     <div class="mb-3">
-      <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+      <select id="empresa" class="form-select form-select-sm" aria-label=".form-select-sm example">
         <option selected>Selecciona empresa</option>
         <option value="1">One</option>
         <option value="2">Two</option>
@@ -30,7 +28,7 @@
     </div>
     <!--Boton Ingresar al sistema-->
     <div class="mb-3">
-      <button class="btn btn-danger btn-danger-sm" ><a class="a_redirecion_principal" href="/principal">Ingresar</a></button>
+      <button class="btn btn-danger btn-danger-sm"><a class="a_redirecion_principal" href="/principal" onclick=ingresar()>Ingresar</a></button>
     </div>
     <div class="mb-3">
       <p class="textoPequeno">No tienes una cuenta, <a href="/registro">Registrate aquí</a></p>
@@ -39,6 +37,7 @@
   </div>
 </div>
 
-<!-- <script src="/Proyecto/ProyectoPlasticaribe/src/app/Modelo/conexion.js"></script> -->
+<script src="/Proyecto/ProyectoPlasticaribe/src/app/Modelo/conexion.js"></script>
+<script src="/Proyecto/ProyectoPlasticaribe/src/app/Controlador/validacionLogin.js"></script>
 <!--Fin Contenedor Principal-->
 
