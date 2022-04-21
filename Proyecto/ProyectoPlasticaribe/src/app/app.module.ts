@@ -4,9 +4,9 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginComponentComponent } from './login-component/login-component.component';
-import { RegistroComponentComponent } from './registro-component/registro-component.component';
-import { PrincipalComponent } from './principal/principal.component';
+import { LoginComponentComponent } from './Vista/login-component/login-component.component';
+import { RegistroComponentComponent } from './Vista/registro-component/registro-component.component';
+import { PrincipalComponent } from './Vista/principal/principal.component';
 
 
 export const routes: Routes = [
