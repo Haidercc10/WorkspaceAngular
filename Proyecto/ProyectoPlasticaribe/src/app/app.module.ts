@@ -8,14 +8,17 @@ import { LoginComponentComponent } from './Vista/login-component/login-component
 import { RegistroComponentComponent } from './Vista/registro-component/registro-component.component';
 import { PrincipalComponent } from './Vista/principal/principal.component';
 import { ReactiveFormsModule } from '@angular/forms';
+<<<<<<< Updated upstream
 
 
 
 
+=======
+>>>>>>> Stashed changes
 
 export const routes: Routes = [
 
-  {path: '', component: LoginComponentComponent},
+  {path: 'login', component: LoginComponentComponent},
   {path: 'registro', component: RegistroComponentComponent},
   {path: 'principal', component: PrincipalComponent},
 

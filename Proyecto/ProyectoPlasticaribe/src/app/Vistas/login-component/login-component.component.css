@@ -56,16 +56,9 @@ a {
 .btn{
   border: #fff;
   width: 60%;
-<<<<<<<< HEAD:Proyecto/ProyectoPlasticaribe/src/app/Vista/login-component/login-component.component.css
-========
   margin-top: 5%;
->>>>>>>> 239d2cf5c50c7a2bea9f29dd6b8d00abd7f5e1f7:Proyecto/ProyectoPlasticaribe/src/app/Vistas/login-component/login-component.component.css
 }
 
 .btn:hover{
   background-color: rgb(150, 10, 10);
-<<<<<<<< HEAD:Proyecto/ProyectoPlasticaribe/src/app/Vista/login-component/login-component.component.css
 }
-========
-}
->>>>>>>> 239d2cf5c50c7a2bea9f29dd6b8d00abd7f5e1f7:Proyecto/ProyectoPlasticaribe/src/app/Vistas/login-component/login-component.component.css
