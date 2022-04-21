@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 var Connection = require('tedious').Connection;  
     var config = {  
         server: '192.168.0.250', 
@@ -23,3 +24,18 @@ var Connection = require('tedious').Connection;
     });
     
     connection.connect();
+=======
+//Conexión con la base de datos.
+const rest = new (require('rest-mssql-nodejs'))({
+    user: 'sa',
+    password: '123581321',
+    server: '192.168.0.250', 
+    database: 'PlasticaribeBD',
+    "options": {
+      "encrypt": true,
+      "enableArithAbort": true
+    }
+ });
+
+ module.exports = {rest}
+>>>>>>> 239d2cf5c50c7a2bea9f29dd6b8d00abd7f5e1f7

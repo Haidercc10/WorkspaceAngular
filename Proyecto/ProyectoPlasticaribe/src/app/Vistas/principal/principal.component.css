@@ -1,0 +1,83 @@
+.contain{
+  width: 100%;
+}
+
+.col-1{
+width: 12%;
+background-color: rgb(252, 252, 252);
+padding: 1%;
+}
+
+.col-2{
+width: 88%;
+}
+
+.nombreEmpresa {
+
+  text-align: center;
+}
+
+
+.navbar {
+  -webkit-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+  -moz-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+  box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+}
+
+a {
+  text-decoration: none;
+  color: #5D6D7E;
+}
+
+.fst-normal{
+  font-size: small;
+}
+
+
+.textoBarraNav{
+
+  font-size: small;
+}
+
+
+/*** notificacion ***/
+:root {
+	--icon: #afc2e2;
+}
+
+input { display: none; }
+
+label:before,
+label:after {
+	content: "";
+	position: absolute;
+	box-sizing: border-box;
+	transition: all 0.5s ease 0s;
+
+
+
+
+}
+
+
+input:checked + label {
+	color: var(--sel);
+	text-shadow: 0 0 5px var(--sel), 0 0 10px var(--sel);
+}
+
+
+input:checked + label[for=m-notification] {
+	--sel:  #f76565;
+}
+
+/* tablas */
+table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  border: 3px solid rgb(19, 18, 19);
+}
+
+th, td {
+  padding: 10px;
+}
