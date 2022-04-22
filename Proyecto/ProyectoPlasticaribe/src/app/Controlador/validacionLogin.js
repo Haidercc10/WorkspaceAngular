@@ -16,10 +16,11 @@ function validarCampos() {
     alert('Todo está bien')
   } else {
     alert('Debe llenar los campos vacios')
-}
+  }
 
   /*return identificacion + contrasena + empresa;*/
 }
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 =======
 
@@ -32,7 +33,11 @@ function validar (){
         const resultado = await rest.executeQuery ('SELECT * FROM areas');
         console.log(resultado.data);
     },50);
+=======
+>>>>>>> Stashed changes
 
+function validar (){
+  const {consultaBD} = require('../Modelo/consultaLogin.js');
 }
 
 validar();
