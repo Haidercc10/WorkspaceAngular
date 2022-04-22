@@ -53,12 +53,7 @@ label:after {
 	position: absolute;
 	box-sizing: border-box;
 	transition: all 0.5s ease 0s;
-
-
-
-
 }
-
 
 input:checked + label {
 	color: var(--sel);
@@ -70,14 +65,19 @@ input:checked + label[for=m-notification] {
 	--sel:  #f76565;
 }
 
-/* tablas */
-table {
-  table-layout: fixed;
-  width: 100%;
-  border-collapse: collapse;
-  border: 3px solid rgb(19, 18, 19);
+
+
+.btn{
+  border: #fff;
+  width: 10%;
+  margin-top: 5%;
+  margin-top: 5%;
+
+
 }
 
-th, td {
-  padding: 10px;
+.btn:hover{
+  background-color: rgb(150, 10, 10);
 }
+
+
