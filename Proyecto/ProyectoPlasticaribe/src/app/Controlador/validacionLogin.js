@@ -20,10 +20,6 @@ function validarCampos() {
 
   /*return identificacion + contrasena + empresa;*/
 }
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 function validar (){
 
     const { rest } = require('../Modelo/conexion.js'); //Llamado del archivo que contiene la conexión a la base de datos.
