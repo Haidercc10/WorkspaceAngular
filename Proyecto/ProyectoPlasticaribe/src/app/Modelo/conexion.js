@@ -1,6 +1,6 @@
-
-//Conexión con la base de datos.
-const rest = new (require('rest-mssql-nodejs'))({
+try {
+   //Conexión con la base de datos.
+  const rest = new (require('rest-mssql-nodejs'))({
     user: 'sa',
     password: '123581321',
     server: '192.168.0.250',
@@ -9,7 +9,13 @@ const rest = new (require('rest-mssql-nodejs'))({
       "encrypt": true,
       "enableArithAbort": true
     }
- });
+  });
 
- module.exports = {rest}
+  module.exports = {rest}
+
+} catch (error) {
+  console.log(error)
+}
+
+
 

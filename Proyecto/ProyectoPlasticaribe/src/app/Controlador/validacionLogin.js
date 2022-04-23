@@ -1,38 +1,21 @@
 
-let identificacion = document.getElementById("identificacion");
-let contrasena = document.getElementById("contrasena");
-let empresa = document.getElementById("empresa");
-
-function ingresar(identificacion,contrasena,empresa) {
-
-    return identificacion + contrasena + empresa;
-}
-
 function validarCampos() {
 
-  if ( $(identificacion).val().trim().length > 0 &&
-       $(contrasena).val().trim().length > 0 &&
-       $(empresa).val().trim().length > 0)  {
-    alert('Todo está bien')
-  } else {
-    alert('Debe llenar los campos vacios')
-  }
+  let identificacion = document.getElementById("identificacion");
+  let contrasena = document.getElementById("contrasena");
+  let empresa = document.getElementById("empresa");
 
-  /*return identificacion + contrasena + empresa;*/
+  if ( $(identificacion).val().trim().length > 0 && $(contrasena).val().trim().length > 0 && $(empresa).val().trim().length > 0){
+
+    alert('Todo está bien');
+    validar(identificacion, contrasena, empresa);
+
+  } else alert('Debe llenar los campos vacios');
 }
-function validar (){
 
-  const { rest } = require('../Modelo/conexion.js'); //Llamado del archivo que contiene la conexión a la base de datos.
-
-  setTimeout(async () => {
-      const resultado = await rest.executeQuery ('SELECT * FROM areas');
-      console.log(resultado.data);
-  },50);
-
-  function validar (){
-    const {consultaBD} = require('../Modelo/consultaLogin.js');
-  }
-
-  validar();
-
+//FUNCION PARA LLAMAR A LA CONSULTA NECESARIA PARA VALIDAR EL LOGIN
+function validar (identificacion, contrasena, empresa){
+  const {consultaBD} = require('../Modelo/consultaLogin.js');
 }
+
+validarCampos();
