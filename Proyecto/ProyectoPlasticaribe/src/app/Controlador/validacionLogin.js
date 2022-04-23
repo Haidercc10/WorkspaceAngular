@@ -20,25 +20,19 @@ function validarCampos() {
 
   /*return identificacion + contrasena + empresa;*/
 }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 function validar (){
 
-    const { rest } = require('../Modelo/conexion.js'); //Llamado del archivo que contiene la conexión a la base de datos.
+  const { rest } = require('../Modelo/conexion.js'); //Llamado del archivo que contiene la conexión a la base de datos.
 
-    setTimeout(async () => {
-        const resultado = await rest.executeQuery ('SELECT * FROM areas');
-        console.log(resultado.data);
-    },50);
-=======
->>>>>>> Stashed changes
+  setTimeout(async () => {
+      const resultado = await rest.executeQuery ('SELECT * FROM areas');
+      console.log(resultado.data);
+  },50);
 
-function validar (){
-  const {consultaBD} = require('../Modelo/consultaLogin.js');
+  function validar (){
+    const {consultaBD} = require('../Modelo/consultaLogin.js');
+  }
+
+  validar();
+
 }
-
-validar();
-
