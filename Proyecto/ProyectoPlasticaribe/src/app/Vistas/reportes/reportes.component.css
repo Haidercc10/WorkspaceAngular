@@ -1,3 +1,38 @@
+.contain{
+  width: 100%;
+}
+
+.col-1{
+width: 12%;
+background-color: rgb(252, 252, 252);
+padding: 1%;
+}
+
+.col-2{
+width: 88%;
+}
+
+.nombreEmpresa {
+
+  text-align: center;
+}
+
+
+.navbar {
+  -webkit-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+  -moz-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+  box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+}
+
+a {
+  text-decoration: none;
+  color: #5D6D7E;
+}
+
+.fst-normal{
+  font-size: small;
+}
+
 .reportes {
   position: relative;
   width: 90%;
@@ -8,87 +43,16 @@
     width: 40%;
     display: block;
 }
-.reportes .dateField {
-  width: 45%;
-  display: inline-block;
-}
-.reportes .dateField label {
-    display: block;
-  margin: 1em 1em 1em 0;
-}
-.reportes input {
-  width: 60%;
-  display: inline-block;
-  padding: 0.5em;
-  border-radius: 5px;
-}
-.reportes #dropModules {
-    padding: .5em;
-    width: 40%;
-    border-radius: 5px;
-    margin: 2em 0;
-    display: block;
-}
-.reportes .button {
-  cursor: pointer;
-  width: 150px;
-  padding: 1em;
-  color: #fff;
-  border-radius: 5px;
-  text-align: center;
-  display: inline-block;
-  margin: 1em auto 0 auto;
-}
-.reportes #excel {
-  background: #262974;
-}
-.reportes #excel:hover, .reportes #report:hover {
-  background: #6d6e72;
-}
-.reportes #report {
-  background: #a42c16;
-  left: 0;
-}
-.reportes h3 {
-    margin: 3em 0 0 0;
+
+.col-xs-3{
+
+  width: 20%;
+
+
 }
 
-.reportes table {
-    border-collapse: collapse;
-    margin: 1em 0 3em 0;
-    width: 100%;
-}
-.reportes table, .reportes th, .reportes tr, .reportes td {
-    border:1px solid;
-}
-.reportes table td, .reportes table th {
-    padding: 1em;
-}
-
-.reportes table td {
-    text-align:center;
+.form {
+  width: 450px;
 }
 
 
-@media screen and (max-width: 480px) {
-    .reportes #dropModules, .reportes .dateField {
-        width: 100%;
-    }
-    .reportes .dateField input {
-        width: 95%;
-    }
-    .reportes .button {
-        display: block;
-        width: 80%;
-        margin: 1em auto;
-    }
-    .reportes #search {
-
-        width: 100%;
-    }
-    .reportes .tabla {
-        overflow-x: auto;
-        font-size: 14px;
-    }
-
-}
