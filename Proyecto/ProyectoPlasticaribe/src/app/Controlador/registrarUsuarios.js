@@ -1,0 +1,1 @@
+const {consultaBD} = require('../Modelo/InsercionUsuarios');

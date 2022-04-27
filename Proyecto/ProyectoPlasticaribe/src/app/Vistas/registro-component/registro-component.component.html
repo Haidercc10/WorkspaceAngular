@@ -1,7 +1,6 @@
 
 <!--Contenedor Principal-->
 <div class="container-fluid">
-
   <!--Contenedor Login-->
   <div class="contenedorRegistro">
      <!--Titulo-->
@@ -10,78 +9,115 @@
     </div>
     <!--Formulario-->
     <form>
+       <!--Identificación-->
       <div class="mb-3">
         <input id="usuId" class="form-control form-control-sm" type="number" placeholder="Identificación Usuario" aria-label=".form-control-sm example">
       </div>
+
+      <!--Nombre-->
       <div class="mb-3">
         <input id="usuNombre" class="form-control form-control-sm" type="text" placeholder="Nombre y apellido" aria-label=".form-control-sm example">
       </div>
 
+      <!--Tipo-->
       <div class="mb-3">
-        <select id="usuTipo" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona tipo</option>
-          <option>One</option>
-
+          <option value="1">One</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
         </select>
       </div>
+
+      <!--area-->
       <div class="mb-3">
-        <select id="usuArea" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona área</option>
           <option value="1">One</option>
           <option value="2">Two</option>
           <option value="3">Three</option>
         </select>
       </div>
+
+       <!--rol-->
       <div class="mb-3">
         <select id="usuRol" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona rol</option>
           <option value="1">One</option>
           <option value="2">Two</option>
           <option value="3">Three</option>
         </select>
+        </select>
       </div>
+
+
+      <!--Correo-->
       <div class="mb-3">
         <input id="usuCorreo" class="form-control form-control-sm" type="email" placeholder="Correo" aria-label=".form-control-sm example">
       </div>
+
+      <!-- Password  -->
       <div class="mb-3">
         <input class="form-control form-control-sm" type="password" placeholder="Contraseña" aria-label=".form-control-sm example" >
       </div>
+
+       <!-- EPS  -->
       <div class="mb-3">
-        <select id="usuEps" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+
           <option selected>Selecciona EPS</option>
           <option value="1">One</option>
           <option value="2">Two</option>
           <option value="3">Three</option>
         </select>
       </div>
+
+
+       <!-- Fondo Pensional  -->
       <div class="mb-3">
         <select id="usuFondoP" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option selected>Selecciona Fondo Pensional</option>
-          <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
-        </select>
+          <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+              <option selected>Selecciona Fondo Pensional</option>
+              <option value="1">One</option>
+              <option value="2">Two</option>
+              <option value="3">Three</option>
+          </select>
+      </select>
       </div>
+
+
+       <!-- Caja de compensacion  -->
       <div class="mb-3">
         <select id="usuCajaComp" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona caja de compensación</option>
           <option value="1">One</option>
           <option value="2">Two</option>
           <option value="3">Three</option>
         </select>
-      </div>
+        </select>
+        </div>
+
+
       <!--Boton Ingresar al sistema-->
       <div class="mb-3">
-        <button class="btn btn-danger btn-danger-sm" ><a class="a_redirecion_principal" href="/principal" onclick="validarCampos()">¡Listo!</a></button>
+          <button class="btn btn-danger btn-danger-sm" ><a class="a_redirecion_principal" href="/principal" onclick="validarCampos()">¡Listo!</a></button>
       </div>
+
       <div class="mb-3">
         <p class="textoPequeno">Ya tienes una cuenta, <a href="">accede aquí</a></p>
       </div>
-  </form>
+
+      <div class="mb-3">
+        <p class="textoPequeno">Ya tienes una cuenta, <a href=" ">accede aquí</a></p>
+      </div>
+
+    </form>
+
   <!--Fin Formulario-->
   </div>
-
   <!--Contenedor Registro-->
 </div>
 <!--Fin Contenedor Principal-->
-<script></script>
+

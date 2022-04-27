@@ -3,7 +3,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-
 import { LoginComponentComponent } from './Vistas/login-component/login-component.component';
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
 import { PrincipalComponent } from './Vistas/principal/principal.component';
@@ -11,6 +10,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { AreasComponentComponent } from './Vistas/areas-component/areas-component.component';
 import { ServicioAreasService } from './Servicios/servicio-areas.service';
+import { ReportesComponent } from './Vistas/reportes/reportes.component';
+import { InicioComponent } from './Vistas/inicio/inicio.component';
+
+
 
 
 export const routes: Routes = [
@@ -19,6 +22,8 @@ export const routes: Routes = [
   {path: 'registro', component: RegistroComponentComponent},
   {path: 'principal', component: PrincipalComponent},
   {path: 'areas', component: AreasComponentComponent},
+  {path: 'inicio', component: InicioComponent},
+  {path: 'reportes', component: ReportesComponent},
 
 
 ]
@@ -29,7 +34,11 @@ export const routes: Routes = [
     RegistroComponentComponent,
     LoginComponentComponent,
     PrincipalComponent,
-    AreasComponentComponent],
+    AreasComponentComponent,
+    InicioComponent
+  ],
+
+
 
 
   imports: [

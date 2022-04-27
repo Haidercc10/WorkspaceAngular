@@ -1,0 +1,82 @@
+
+<a href="http://localhost:4200/principal/reportes" ></a>
+
+ <!--Superior-->
+<div class="contain">
+  <nav class="navbar navbar-expand-lg ">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Plasticaribe SAS</span>
+      <form class="d-flex">
+        <div class="textoBarraNav">Usuario Administrador</div>
+      </form>
+    </div>
+  </nav>
+
+
+<!-- centro de la pagina-->
+<div class="reportes">
+  <h1>Reportes</h1>
+  <h4>Consulta de Reporte</h4>
+  <nav class="center-nav"></nav>
+  <select name="modulos" id="dropModules">
+      <option value="" disabled selected>Areas</option>
+      <option value="">Cortes</option>
+      <option value="">Laminado</option>
+      <option value="">estrucion</option>
+      <option value="">Almacen</option>
+      <option value="">rotrograbado</option>
+      <option value="">Diseño</option>
+  </select>
+  <select name="modulos" id="dropModules">
+    <option value="" disabled selected>Tipo de Reportes</option>
+    <option value="">Reporte de ventas</option>
+    <option value="">Reporte de actividades</option>
+</select>
+
+
+    <!-- Fecha / Programar en javascritp-->
+    <div class="dateField">
+      <label>De</label>
+      <input type="date" />
+    </div>
+    <div class="dateField">
+      <label>Hasta</label>
+      <input type="date" />
+    </div>
+    <div class="col-xs-3">Codigo<input type="text" class="form-control" placeholder=""></div>
+
+
+
+<!--Botones-->
+
+
+
+<br>
+  <h3>Datos del reporte</h3>
+<br>
+
+
+    <!--Formulario -->
+
+          <table class="table">
+            <thead>
+              <tr>
+
+                <th scope="col">Id Reporte</th>
+                <th scope="col">Producto</th>
+                <th scope="col">Vendedor</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Usuario</th>
+                <th scope="col">Archivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">#</th>
+                <td> <input type="text" class="form-control" placeholder="">
+                <td> <input type="text" class="form-control" placeholder="">
+                <td> <input type="text" class="form-control" placeholder="">
+                <td> <input type="text" class="form-control" placeholder="">
+                <td> <input type="text" class="form-control" placeholder="">
+                <td> Descargar</td>
