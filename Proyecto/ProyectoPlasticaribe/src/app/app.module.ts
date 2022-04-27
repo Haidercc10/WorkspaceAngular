@@ -9,6 +9,7 @@ import { PrincipalComponent } from './Vistas/principal/principal.component';
 import { ReportesComponent } from './Vistas/reportes/reportes.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { InicioComponent } from './Vistas/inicio/inicio.component';
+import { PprincipalComponent } from './Vistas/pprincipal/pprincipal.component';
 
 
 export const routes: Routes = [
@@ -18,6 +19,7 @@ export const routes: Routes = [
   {path: 'principal', component: PrincipalComponent},
   {path: 'inicio', component: InicioComponent},
   {path: 'reportes', component: ReportesComponent},
+  {path: 'pprincipal', component: PprincipalComponent},
 
 ]
 
@@ -27,8 +29,8 @@ export const routes: Routes = [
     RegistroComponentComponent,
     LoginComponentComponent,
     PrincipalComponent,
-    InicioComponent],
-
+    InicioComponent,
+    PprincipalComponent],
 
   imports: [
     BrowserModule,
