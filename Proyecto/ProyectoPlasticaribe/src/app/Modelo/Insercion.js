@@ -19,9 +19,10 @@ setTimeout(async () => {
         value: 'Secretaria'
     },{
         name: 'descripcion',
-        type: 'nvarchar', 
+        type: 'nvarchar',
         value: `${decripcion}`
     }]);
     console.log(result.data);
 
 },2000);
+

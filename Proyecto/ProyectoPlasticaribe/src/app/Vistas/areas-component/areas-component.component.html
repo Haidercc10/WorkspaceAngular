@@ -1,0 +1,45 @@
+<p>areas-component works!</p>
+
+<div class="container-fluid">
+
+  <div class="mb-3">
+    <h4 class="tituloRojo">Áreas</h4>
+  </div>
+  <div class="mb-5">
+    <hr class="colorLinea">
+  </div>
+
+  <div class="container">
+    <div class="mb-4">
+      <h4 class="tituloRojo">Registrar/Consultar áreas</h4>
+    </div>
+
+  <!--Inicio formulario-->
+  <form [formGroup]="formularioAreas" (ngSubmit)="validarCamposVacios()">
+  <div class="row g-4">
+    <div class="col-md">
+      <input type="number" class="form-control form-control-sm" id="" aria-describedby="" placeholder="Identificador">
+  </div>
+    <div class="col-md">
+        <input [(ngModel)]="areaCodigo" type="number" minlength="6" maxlength="10" class="form-control form-control-sm" id="validationDefault01"  placeholder="Código" name="Codigo" required >
+    </div>
+    <div class="col-md">
+        <input [(ngModel)]="areaNombre"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre" name="Nombre" required maxlength="50">
+    </div>
+    <div class="col-md">
+        <textarea  [(ngModel)]="areaDescripcion"  class="form-control form-control-sm" placeholder="Descripción" name="Descripcion" required maxlength="200"></textarea>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <br>
+  </div>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+    <button class="btn btn-danger btn-danger-sm" type="submit" (click)="agregarAreas()">Guardar</button>
+    <button class="btn btn-secondary btn-secondary-sm" type="button" >Limpiar campos</button>
+  </div>
+</form>
+
+  <!--Fin formulario-->
+</div>
+</div>

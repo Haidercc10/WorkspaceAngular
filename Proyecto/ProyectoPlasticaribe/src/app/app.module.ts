@@ -7,13 +7,18 @@ import { AppComponent } from './app.component';
 import { LoginComponentComponent } from './Vistas/login-component/login-component.component';
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
 import { PrincipalComponent } from './Vistas/principal/principal.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { AreasComponentComponent } from './Vistas/areas-component/areas-component.component';
+import { ServicioAreasService } from './Servicios/servicio-areas.service';
+
 
 export const routes: Routes = [
 
   {path: '', component: LoginComponentComponent},
   {path: 'registro', component: RegistroComponentComponent},
   {path: 'principal', component: PrincipalComponent},
+  {path: 'areas', component: AreasComponentComponent},
 
 
 ]
@@ -23,19 +28,22 @@ export const routes: Routes = [
     AppComponent,
     RegistroComponentComponent,
     LoginComponentComponent,
-    PrincipalComponent],
+    PrincipalComponent,
+    AreasComponentComponent],
 
 
   imports: [
     BrowserModule,
     ReactiveFormsModule,
     AppRoutingModule,
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes),
+    HttpClientModule,
+    FormsModule
 
 
 
   ],
-  providers: [],
+  providers: [ServicioAreasService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

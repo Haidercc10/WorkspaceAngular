@@ -11,22 +11,21 @@
     <!--Formulario-->
     <form>
       <div class="mb-3">
-        <input formControlName="usuId" class="form-control form-control-sm" type="number" placeholder="Identificación Usuario" aria-label=".form-control-sm example">
+        <input id="usuId" class="form-control form-control-sm" type="number" placeholder="Identificación Usuario" aria-label=".form-control-sm example">
       </div>
       <div class="mb-3">
-        <input formControlName="usuNombre" class="form-control form-control-sm" type="text" placeholder="Nombre y apellido" aria-label=".form-control-sm example">
+        <input id="usuNombre" class="form-control form-control-sm" type="text" placeholder="Nombre y apellido" aria-label=".form-control-sm example">
       </div>
 
       <div class="mb-3">
-        <select formControlName="usuTipo" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select id="usuTipo" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona tipo</option>
-          <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
+          <option>One</option>
+
         </select>
       </div>
       <div class="mb-3">
-        <select formControlName="usuArea" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select id="usuArea" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona área</option>
           <option value="1">One</option>
           <option value="2">Two</option>
@@ -34,7 +33,7 @@
         </select>
       </div>
       <div class="mb-3">
-        <select formControlName="usuRol" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select id="usuRol" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona rol</option>
           <option value="1">One</option>
           <option value="2">Two</option>
@@ -42,13 +41,13 @@
         </select>
       </div>
       <div class="mb-3">
-        <input formControlName="usuCorreo" class="form-control form-control-sm" type="email" placeholder="Correo" aria-label=".form-control-sm example">
+        <input id="usuCorreo" class="form-control form-control-sm" type="email" placeholder="Correo" aria-label=".form-control-sm example">
       </div>
       <div class="mb-3">
-        <input formControlName="usuContrasena" class="form-control form-control-sm" type="password" placeholder="Contraseña" aria-label=".form-control-sm example">
+        <input class="form-control form-control-sm" type="password" placeholder="Contraseña" aria-label=".form-control-sm example" >
       </div>
       <div class="mb-3">
-        <select formControlName="usuEps" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select id="usuEps" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona EPS</option>
           <option value="1">One</option>
           <option value="2">Two</option>
@@ -56,7 +55,7 @@
         </select>
       </div>
       <div class="mb-3">
-        <select formControlName="usuFondoP" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select id="usuFondoP" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona Fondo Pensional</option>
           <option value="1">One</option>
           <option value="2">Two</option>
@@ -64,7 +63,7 @@
         </select>
       </div>
       <div class="mb-3">
-        <select formControlName="usuCajaComp" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select id="usuCajaComp" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona caja de compensación</option>
           <option value="1">One</option>
           <option value="2">Two</option>
@@ -73,10 +72,10 @@
       </div>
       <!--Boton Ingresar al sistema-->
       <div class="mb-3">
-        <button class="btn btn-danger btn-danger-sm" ><a class="a_redirecion_principal" href="/principal">¡Listo!</a></button>
+        <button class="btn btn-danger btn-danger-sm" ><a class="a_redirecion_principal" href="/principal" onclick="validarCampos()">¡Listo!</a></button>
       </div>
       <div class="mb-3">
-        <p class="textoPequeno">Ya tienes una cuenta, <a href=" ">accede aquí</a></p>
+        <p class="textoPequeno">Ya tienes una cuenta, <a href="">accede aquí</a></p>
       </div>
   </form>
   <!--Fin Formulario-->
@@ -85,3 +84,4 @@
   <!--Contenedor Registro-->
 </div>
 <!--Fin Contenedor Principal-->
+<script></script>

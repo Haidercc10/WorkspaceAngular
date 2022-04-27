@@ -17,7 +17,7 @@ setTimeout(async () => {
     console.log("");
     console.log(resultado2['rol_nombre']);
 
-},2000); 
+},2000);
 
 
 
