@@ -18,11 +18,11 @@ import { InicioComponent } from './Vistas/inicio/inicio.component';
 
 export const routes: Routes = [
 
-  {path: '', component: LoginComponentComponent},
+  {path: '', component: InicioComponent},
   {path: 'registro', component: RegistroComponentComponent},
   {path: 'principal', component: PrincipalComponent},
   {path: 'areas', component: AreasComponentComponent},
-  {path: 'inicio', component: InicioComponent},
+  {path: 'login', component: LoginComponentComponent},
   {path: 'reportes', component: ReportesComponent},
 
 
