@@ -20,34 +20,33 @@
   Ej: dar el mismo valor en el formControlName = "areaCodigo" y en el formularioAreas
   en areasComponent.ts areaCodigo : ...
   -->
-  <form [formGroup]="formularioAreas" (ngSubmit)="agregarAreas2()">
-  <div class="row g-3">
+  <form [formGroup]="formularioAreas" (ngSubmit)="validarCamposVacios()">
+    <div class="row g-3">
 
-    <!--[(ngModel)]="areaCodigo" codigo utilizado en otro metodo, no borrar-->
-    <div class="col-md">
-        <input formControlName="areaCodigo"  id=""  class="form-control form-control-sm" placeholder="Código" minlength="6" maxlength="10" name="Codigo" required>
+      <!--[(ngModel)]="areaCodigo" codigo utilizado en otro metodo, no borrar-->
+      <div class="col-md">
+          <input formControlName="areaCodigo"  id=""  class="form-control form-control-sm" placeholder="Código" minlength="6" maxlength="10" name="Codigo" required>
+      </div>
+      <!--[(ngModel)]="areaNombre" codigo utilizado en otro metodo, no borrar-->
+      <div class="col-md">
+
+          <input formControlName="areaNombre" id="" type="text" class="form-control form-control-sm" minlength="3" maxlength="50"   placeholder="Nombre" name="Nombre" required>
+      </div>
+      <!--[(ngModel)]="areaDescripcion" codigo utilizado en otro metodo, no borrar-->
+      <div class="col-md">
+
+          <textarea formControlName="areaDescripcion" id="" type="text" class="form-control form-control-sm"  maxlength="200" placeholder="Descripción" name="Descripcion" ></textarea>
+      </div>
     </div>
-    <!--[(ngModel)]="areaNombre" codigo utilizado en otro metodo, no borrar-->
-    <div class="col-md">
 
-        <input formControlName="areaNombre" id="" type="text" class="form-control form-control-sm" minlength="3" maxlength="50"   placeholder="Nombre" name="Nombre" required>
+    <div class="mb-3">
+      <br>
     </div>
-    <!--[(ngModel)]="areaDescripcion" codigo utilizado en otro metodo, no borrar-->
-    <div class="col-md">
-
-        <textarea formControlName="areaDescripcion" id="" type="text" class="form-control form-control-sm"  maxlength="200" placeholder="Descripción" name="Descripcion" ></textarea>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button class="btn btn-danger btn-danger-sm" type="submit" >Agregar área</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar campos</button>
     </div>
-  </div>
-
-  <div class="mb-3">
-    <br>
-  </div>
-  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-    <button class="btn btn-danger btn-danger-sm" type="submit" >Agregar área</button>
-    <button class="btn btn-secondary btn-secondary-sm" type="button" >Limpiar campos</button>
-  </div>
-</form>
-
+  </form>
   <!--Fin formulario-->
-</div>
+  </div>
 </div>

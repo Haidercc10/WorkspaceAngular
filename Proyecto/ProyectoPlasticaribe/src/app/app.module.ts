@@ -13,6 +13,7 @@ import { ServicioAreasService } from './Servicios/servicio-areas.service';
 import { ReportesComponent } from './Vistas/reportes/reportes.component';
 import { InicioComponent } from './Vistas/inicio/inicio.component';
 import { PprincipalComponent } from './Vistas/pprincipal/pprincipal.component';
+import { RolesComponentComponent } from './Vistas/roles-component/roles-component.component';
 
 
 
@@ -25,6 +26,7 @@ export const routes: Routes = [
   {path: 'areas', component: AreasComponentComponent},
   {path: 'login', component: LoginComponentComponent},
   {path: 'reportes', component: ReportesComponent},
+  {path: 'roles', component: RolesComponentComponent},
   {path: 'pprincipal', component: PprincipalComponent},
 
 
@@ -39,7 +41,8 @@ export const routes: Routes = [
     InicioComponent,
     PprincipalComponent,
     AreasComponentComponent,
-    InicioComponent],
+    InicioComponent,
+    RolesComponentComponent],
 
 
 
