@@ -7,9 +7,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class RegistroComponentComponent implements OnInit {
 
-  constructor() { }
+  constructor() {}
+
 
   ngOnInit(): void {
+
   }
+
+
+
+
 
 }

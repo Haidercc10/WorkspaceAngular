@@ -1,13 +1,149 @@
 <header>
-	<div class="contenedor">
-		<h1 class="icon-dog">Nombre Sitio</h1>
-		<input type="checkbox" id="menu-bar">
-		<label class="fontawesome-align-justify" for="menu-bar"></label>
-
-   <nav class="menu">
-          <a class="nav-link" href="#">Inicio</a>
-					<a class="nav-link" > Somos</a>
-          <a class="nav-link" >Contacto</a>
-				</nav>
+	<div class="contenedorNavbar">
+		<nav class="navbar navbar-expand-lg navbar-light sticky">
+			<div class="container-fluid">
+			  <a class=" titulo navbar-brand" href="#home">Plastic<span>aribe S.A.S.</span></a>
+			  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			  <span class="navbar-toggler-icon"></span>
+			  </button>
+			  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<li class="nav-item">
+						<a class="nav-link active" href="#home">Inicio</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#about-us">Sobre nostros</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#services">Servicios</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#contact-us">Contactanos</a>
+					</li>
+					<li class="nav-item">
+						<a href="/login" target="_blanck" class="nav-link">Log in</a>
+					</li>
+				</ul>
+    		 </div>  
 			</div>
+		</nav>
+	</div>
 </header>
+<!-- Creacion de Boton para subir al inicio -->
+<div class="scroll-up-btn">
+	<i class="fas fa-angle-up"></i>
+</div>
+
+<!-- Creacion del inicio -->
+<section class="home" id="home">
+	<div class="max-width">
+		<div class="home-content">
+			<div class="text-1">Somos </div>
+			<div class="text-2">Plasticaribe S.A.S</div>
+			<a href="#contact-us">Contactanos</a>
+		</div>
+	</div>
+</section>
+
+<!-- Creacion de seccion "Sobre nosotros" -->
+<section class="about" id="about-us">
+	<div class="max-width">
+		<h2 class="title">Sobre nosotros</h2>
+		<div class="about-content">
+			<div class="column left">
+				<img src="https://www.ubico.me/assets/img_empresa/p/plasticaribe-s-a27293013.gif" alt="Plasticaribe" title="Plasticaribe">
+			</div>
+			<div class="column right">
+				<div class="text">Somos Plasticaribe S.A.S <span class="typing-2"></span></div>
+				<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor dolorum facilis,
+					 officiis deserunt explicabo minus soluta molestiae laborum laboriosam nemo ad tempore culpa, 
+					 cupiditate iusto dignissimos omnis, excepturi debitis recusandae? Lorem ipsum dolor sit amet consectetur adipisicing elit. E
+					 um doloribus consectetur perspiciatis id fugiat icabo sunt. Similique praesentium quia autem quas rerum minima. Fugit sunt rem laborum, officia sequi ipsum.
+				</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- Creacion de seccion "Servicios" -->
+<section class="services" id="services">
+	<div class="max-width">
+		<h2 class="title">Nuestros servicios</h2>
+		<div class="serv-content">
+			<div class="card">
+				<div class="box">
+					<i class="fas fa-paint-brush"></i>
+					<div class="text">Bolsas Plasticas</div>
+					<p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Commodi labore soluta facilis tempora beatae. 
+						Corrupti ea reprehenderit consectetur voluptas tempora soluta repellendus culpa consequatur quae impedit nesciunt, iste veritatis eum?
+					</p>
+				</div>
+			</div>
+			<div class="card">
+				<div class="box">
+					<i class="fas fa-cloud"></i>
+					<div class="text">Bolsas Plasticas</div>
+					<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque tempore minima nostrum inventore sapiente modi, 
+						ipsam incidunt iste quaerat eligendi, accusantium nam perferendis nulla debitis aliquam consequuntur voluptatum? Minus, velit.
+					</p>
+				</div>
+			</div>
+			<div class="card">
+				<div class="box">
+					<i class="fas fa-code"></i>
+					<div class="text">Bolsas Plasticas</div>
+					<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque tempore minima nostrum inventore sapiente modi, 
+						ipsam incidunt iste quaerat eligendi, accusantium nam perferendis nulla debitis aliquam consequuntur voluptatum? Minus, velit.
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- Creacion de seccion "Contactanos" -->
+<section class="contact" id="contact-us">
+	<div class="max-width">
+		<h2 class="title">Contactanos</h2>
+		<div class="contact-content">
+			<div class="column left">
+				<h3>Para poder contactarnos <br><br></h3>
+				<div class="icons">
+					<div class="row">
+						<i class="fas fa-user"></i>
+						<div class="info">
+							<div class="head">Nombre</div>
+							<div class="sub-title">Plasticaribe S.A.S <br><br></div>
+						</div>
+					</div>
+					<div class="row">
+						<i class="fas fa-map-marker-alt"></i>
+						<div class="info">
+							<div class="head">Direccion</div>
+							<div class="sub-title">Calle 42 #52-105 Barranquilla, Colombia <br><br></div>
+						</div>
+					</div>
+					<div class="row">
+						<i class="fas fa-envelope"></i>
+						<div class="info">
+							<div class="head">E-mail</div>
+							<div class="sub-title">example@gmail.com <br><br></div>
+						</div>
+					</div>
+					<div class="row">
+						<i class="fas fa-phone"></i>
+						<div class="info">
+							<div class="head">Telefono</div>
+							<div class="sub-title">example</div>
+						</div>
+					</div>
+				</div>
+			</div>          
+		</div>
+	</div>
+</section>
+<!-- footer section start -->
+<footer>
+	   <span> Lorem ipsum dolor ore, voluptate, temporibus, cumque ut  <span class="far fa-copyright"></span>  Lorem ipsum dolor ore, voluptate, temporibus, cumque ut </span>
+	<br>
+</footer>
