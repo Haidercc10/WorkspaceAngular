@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { modelAreas } from '../Modelo/modelAreas';
 
 
 @Injectable({
@@ -31,6 +32,10 @@ export class ServicioAreasService {
 //Metodo eliminar areas
   srvEliminarAreas(id:number|String) {
     return this.httpAreas.delete(this.rutaPlasticaribeAPI + `/Areas/${id}`);
+  }
+
+  srvGuardarArea(Area : modelAreas): Observable<any> {
+    return this.httpAreas.post(this.rutaPlasticaribeAPI + '/Areas', Area)
   }
 
 }
