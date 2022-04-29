@@ -32,6 +32,9 @@ export const routes: Routes = [
   {path: 'reportes', component: ReportesComponent},
   {path: 'roles', component: RolesComponentComponent},
   {path: 'pprincipal', component: PprincipalComponent},
+  {path: 'eps', component: EpsComponent},
+  {path: 'fpension', component: FpensionComponent},
+  {path: 'cajacompensacion', component: CajacompensacionComponent},
 
 
 ]
@@ -54,6 +57,7 @@ export const routes: Routes = [
 
 
   imports: [
+
     BrowserModule,
     ReactiveFormsModule,
     AppRoutingModule,
