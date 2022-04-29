@@ -13,7 +13,11 @@ import { ServicioAreasService } from './Servicios/servicio-areas.service';
 import { ReportesComponent } from './Vistas/reportes/reportes.component';
 import { InicioComponent } from './Vistas/inicio/inicio.component';
 import { PprincipalComponent } from './Vistas/pprincipal/pprincipal.component';
+<<<<<<< Updated upstream
 import { RolesComponentComponent } from './Vistas/roles-component/roles-component.component';
+=======
+import { CajacompensacionComponent } from './Vistas/cajacompensacion/cajacompensacion.component';
+>>>>>>> Stashed changes
 
 
 
@@ -42,7 +46,11 @@ export const routes: Routes = [
     PprincipalComponent,
     AreasComponentComponent,
     InicioComponent,
+<<<<<<< Updated upstream
     RolesComponentComponent],
+=======
+    CajacompensacionComponent],
+>>>>>>> Stashed changes
 
 
 

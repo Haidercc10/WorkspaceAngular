@@ -14,3 +14,4 @@ export class ReportesComponent implements OnInit {
 
 }
 
+console.log ('reportes.component');
