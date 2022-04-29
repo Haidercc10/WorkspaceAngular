@@ -24,6 +24,7 @@ export class EpsComponent implements OnInit {
       areaDireccion: [, Validators.required],
       areaTelefono: [, Validators.required],
       areaEmail: [, Validators.required],
+
       // areaDescripcion: [, Validators.required],
     });
   }
