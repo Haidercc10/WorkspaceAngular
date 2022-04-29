@@ -1,0 +1,126 @@
+<!--Configuracion-->
+<div class="contain">
+  <nav class="navbar navbar-expand-lg ">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Plasticaribe SAS</span>
+      <form class="d-flex">
+
+        <nav>
+          <ul>
+          <li class="perfil">
+          <a href= "#">Perfil</a>
+          <div class="dropdownContain">
+          <div class="dropOut">
+          <div class="triangle"></div>
+          <ul>
+          <li>Cambiar clave</li>
+          <li>Configurar</li>
+          </ul>
+          </div>
+          </div>
+          </li>
+          <li class="salir"><a href="http://localhost:4200/inicio">Salir</a></li>
+          </ul>
+          </nav>
+
+      </form>
+      </div>
+      </nav>
+         <div class=" contenedorSecundario container-fluid">
+         <div class="row justify-content-start">
+         <div class="navLateral col-1">
+<!-- Fin de Configuracion-->
+
+
+<!--Inicio formulario-->
+ <!-- <form [formGroup]="formularioOpedido" (ngSubmit)="validarCamposVacios()"> -->
+
+  <div class="container">
+    <div class="mb-4">
+      <h4 class="tituloRojo">Orden de Pedidos Registrar/Consultar </h4>
+
+  <!-- boton de busqueda -->
+  <form>
+    <h1></h1>
+    <input type="search" placeholder="Buscar">
+  </form>
+</div>
+
+<!-- boton de busqueda fin -->
+
+
+<!-- fecha -->
+<div class="row g-4"></div>
+<div class="mb-2">
+  <label class="col-md-2 control-label" for="">Fecha Pedido</label>
+  <div class="col-md-3">
+  <input id="FechaPedido" name="FechaPedido" type="date" class="form-control form-control-sm">
+  </div>
+</div>
+<div class="mb-2">
+  <label class="col-md-2 control-label" for="">Fecha Entrega</label>
+  <div class="col-md-3">
+  <input id="FechaEntrga" name="FechaEntrga" type="date" class="form-control form-control-sm">
+  </div>
+</div>
+<br>
+  <!-- fin fecha -->
+
+
+
+    <div class="mb-1">
+      <select id="Estado" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+        <option value="" disabled selected>Estado Pedido</option>
+        <option value="1">Activo</option>
+        <option value="2">Desactivo</option>
+        <option value="3">En Proceso</option>
+      </select>
+    </div>
+    <div class="mb-1">
+      <select id="Vendedor" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+        <option value="" disabled selected>Vendedor</option>
+        <option value="1">Vendedor #1</option>
+        <option value="2">Vendedor #2</option>
+        <option value="3">Vendedor #3</option>
+      </select>
+    </div>
+
+<div class="mb-1">
+    <select id="IDcliente" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+      <option value="" disabled selected>ID Cliente</option>
+      <option value="1">#</option>
+      <option value="2">#</option>
+      <option value="3">#</option>
+    </select>
+</div>
+
+<div class="mb-1">
+  <select id="Sedecliente" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+    <option value="" disabled selected>Sede Cliente</option>
+    <option value="1">#1</option>
+    <option value="2">#2</option>
+    <option value="3">#3</option>
+  </select>
+<br>
+
+  <div class="col-md">
+    <input formControlName="Cliente"  type="text" class="form-control form-control-sm" id=""  placeholder="Cliente" name="Cliente" required maxlength="80">
+</div>
+</div>
+<br>
+<div class="col-md">
+  <textarea formControlName="observacion" id="" type="text" class="form-control form-control-sm"  maxlength="200" placeholder="observacion" name="Observacion" ></textarea>
+</div>
+</div>
+
+   <div class="mb-3">
+    <br>
+  </div>
+  <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
+    <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Guardar</button>
+    <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" >Limpiar campos</button>
+    <!-- expand="full" (click)="clear()"> -->
+  </div>
+  </div>
+ <!-- </form> -->
+<!--Fin formulario-->
