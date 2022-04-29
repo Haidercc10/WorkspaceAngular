@@ -19,11 +19,11 @@ export class EpsComponent implements OnInit {
 
   initForms() {
     this.formularioEps = this.frmBuilderEps.group({
-      areaCodigo: [, Validators.required],
-      areaNombre: [, Validators.required],
-      areaDireccion: [, Validators.required],
-      areaTelefono: [, Validators.required],
-      areaEmail: [, Validators.required],
+      Codigo: [, Validators.required],
+      Nombre: [, Validators.required],
+      Direccion: [, Validators.required],
+      Telefono: [, Validators.required],
+      Email: [, Validators.required],
 
       // areaDescripcion: [, Validators.required],
     });
