@@ -3,14 +3,14 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app.cajacompensacion.component',
-  templateUrl: './cajacompensacion.component.html',
-  styleUrls: ['./cajacompensacion.component.css']
+  selector: 'app.eps.component',
+  templateUrl: './eps.component.html',
+  styleUrls: ['./eps.component.css']
 })
-export class CajacompensacionComponent implements OnInit {
+export class EpsComponent implements OnInit {
 
-  public formularioCajacompensacion !: FormGroup;
-  constructor( private frmBuilderCajacompensacion : FormBuilder) { }
+  public formularioEps !: FormGroup;
+  constructor( private frmBuilderEps : FormBuilder) { }
 
 
   ngOnInit(): void {
@@ -18,7 +18,7 @@ export class CajacompensacionComponent implements OnInit {
   }
 
   initForms() {
-    this.formularioCajacompensacion = this.frmBuilderCajacompensacion.group({
+    this.formularioEps = this.frmBuilderEps.group({
       areaCodigo: [, Validators.required],
       areaNombre: [, Validators.required],
       areaDireccion: [, Validators.required],
@@ -30,7 +30,7 @@ export class CajacompensacionComponent implements OnInit {
 
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios() : any{
-      if(this.formularioCajacompensacion.valid){
+      if(this.formularioEps.valid){
         alert("Los datos se enviaron correctamente");
 
         this.clear();
@@ -43,7 +43,8 @@ export class CajacompensacionComponent implements OnInit {
 
   clear() {
     console.log("clear clicked")
-    this.formularioCajacompensacion.reset();
+    this.formularioEps.reset();
   }
 
 }
+

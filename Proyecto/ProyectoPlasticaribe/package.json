@@ -24,6 +24,7 @@
     "jquery": "^3.6.0",
     "rest-mssql-nodejs": "^1.0.10",
     "rxjs": "~7.5.0",
+    "sweetalert2": "^11.4.10",
     "tedious": "^14.4.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

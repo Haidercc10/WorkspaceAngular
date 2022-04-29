@@ -1,9 +1,7 @@
-
-
 <div class="container-fluid">
 
   <div class="contenedor_titulo mb-3">
-    <h2 class="tituloRojo">Caja de Compensaciones</h2>
+    <h2 class="tituloRojo">Fondo de pensiones</h2>
   </div>
   <div class="mb-5">
     <hr class="colorLinea">
@@ -11,11 +9,11 @@
 
   <div class="container">
     <div class="mb-4">
-      <h4 class="tituloRojo">Registrar/Consultar Caja de Compensaciones </h4>
+      <h4 class="tituloRojo">Registrar/Consultar Fondo de pension </h4>
     </div>
 
     <!--Inicio formulario-->
-    <form [formGroup]="formularioCajacompensacion" (ngSubmit)="validarCamposVacios()">
+    <form [formGroup]="formularioFpension" (ngSubmit)="validarCamposVacios()">
       <div class="row g-4">
         <div class="col-md">
           <input class="identificador" type="number" class="form-control form-control-sm" id="" aria-describedby="" placeholder="Identificador">
@@ -36,6 +34,7 @@
     <div class="col-md">
       <input formControlName="areaEmail"  type="text" class="form-control form-control-sm" id=""  placeholder="Email" name="Email" required maxlength="50">
   </div>
+
   <div class="mb-3">
     <select id="empresa" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
       <option selected>Cuidad</option>
@@ -44,6 +43,7 @@
       <option value="3">Bogota</option>
     </select>
   </div>
+
 
       </div>
       <div class="mb-3">
