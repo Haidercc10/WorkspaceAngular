@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
-
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-roles-component',
   templateUrl: './roles-component.component.html',
@@ -33,7 +33,7 @@ export class RolesComponentComponent implements OnInit {
 
 
       }else{
-       alert("HAY CAMPOS VACIOS");
+        Swal.fire("HAY CAMPOS VACIOS");
       }
   }
 
