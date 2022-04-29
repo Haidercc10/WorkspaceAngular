@@ -17,6 +17,7 @@ import { RolesComponentComponent } from './Vistas/roles-component/roles-componen
 import { FpensionComponent } from './Vistas/fpension/fpension.component';
 import { EpsComponent } from './Vistas/eps/eps.component';
 import { CajacompensacionComponent } from './Vistas/cajacompensacion/cajacompensacion.component';
+import { OpedidoComponent } from './Vistas/opedido/opedido.component';
 
 
 
@@ -35,7 +36,7 @@ export const routes: Routes = [
   {path: 'eps', component: EpsComponent},
   {path: 'fpension', component: FpensionComponent},
   {path: 'cajacompensacion', component: CajacompensacionComponent},
-
+  {path: 'opedido', component: OpedidoComponent},
 
 ]
 
@@ -52,7 +53,8 @@ export const routes: Routes = [
     RolesComponentComponent,
     FpensionComponent,
     EpsComponent,
-    CajacompensacionComponent],
+    CajacompensacionComponent,
+    OpedidoComponent],
 
 
 
@@ -66,8 +68,8 @@ export const routes: Routes = [
     FormsModule
 
 
-
   ],
+
   providers: [ServicioAreasService],
   bootstrap: [AppComponent]
 })

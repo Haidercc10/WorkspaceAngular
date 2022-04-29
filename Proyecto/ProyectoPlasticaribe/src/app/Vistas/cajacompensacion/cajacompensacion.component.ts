@@ -33,7 +33,7 @@ export class CajacompensacionComponent implements OnInit {
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios() : any{
       if(this.formularioCajacompensacion.valid){
-        alert("Los datos se enviaron correctamente");
+       Swal.fire("Los datos se enviaron correctamente");
 
         this.clear();
 

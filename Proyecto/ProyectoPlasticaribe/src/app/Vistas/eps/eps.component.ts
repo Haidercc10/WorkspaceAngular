@@ -32,7 +32,7 @@ export class EpsComponent implements OnInit {
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios() : any{
       if(this.formularioEps.valid){
-        alert("Los datos se enviaron correctamente");
+        Swal.fire("Los datos se enviaron correctamente");
 
         this.clear();
 

@@ -27,7 +27,7 @@ export class RolesComponentComponent implements OnInit {
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios() : any{
       if(this.formularioRoles.valid){
-        alert("Los datos se enviaron correctamente");
+        Swal.fire("Los datos se enviaron correctamente");
 
         this.clear();
 

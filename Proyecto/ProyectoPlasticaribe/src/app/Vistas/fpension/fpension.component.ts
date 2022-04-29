@@ -32,7 +32,7 @@ export class FpensionComponent implements OnInit {
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios() : any{
       if(this.formularioFpension.valid){
-        alert("Los datos se enviaron correctamente");
+        Swal.fire("Los datos se enviaron correctamente");
 
         this.clear();
 
