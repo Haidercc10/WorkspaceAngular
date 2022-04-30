@@ -196,7 +196,7 @@ input[type=search] {
 
  border: solid 1px #ccc;
  padding: 9px 10px 9px 32px;
- width: 55px;
+ width: 150px;
  -webkit-border-radius: 10em;
  -moz-border-radius: 10em;
  border-radius: 10em;
@@ -237,7 +237,7 @@ input[type=search]:focus {
 
 textarea{
  height: 80px;
- width: 800px;
+ width: 100px;
 
 }
 

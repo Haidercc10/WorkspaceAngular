@@ -19,6 +19,7 @@ import { EpsComponent } from './Vistas/eps/eps.component';
 import { CajacompensacionComponent } from './Vistas/cajacompensacion/cajacompensacion.component';
 import { OpedidoComponent } from './Vistas/opedido/opedido.component';
 import { OpedidoproductoComponent } from './Vistas/opedidoproducto/opedidoproducto.component';
+import { OcompraComponent } from './Vistas/ocompra/ocompra.component';
 
 
 
@@ -39,6 +40,7 @@ export const routes: Routes = [
   {path: 'cajacompensacion', component: CajacompensacionComponent},
   {path: 'opedido', component: OpedidoComponent},
   {path: 'opedidoproducto', component: OpedidoproductoComponent},
+  {path: 'ocompra', component: OcompraComponent},
 
 ]
 
@@ -57,7 +59,8 @@ export const routes: Routes = [
     EpsComponent,
     CajacompensacionComponent,
     OpedidoComponent,
-    OpedidoproductoComponent],
+    OpedidoproductoComponent,
+    OcompraComponent],
 
 
 
