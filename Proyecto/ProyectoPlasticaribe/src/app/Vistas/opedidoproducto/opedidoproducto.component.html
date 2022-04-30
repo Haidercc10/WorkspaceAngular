@@ -1,0 +1,231 @@
+<!-- parte superior -->
+<div class="contain">
+  <nav class="navbar navbar-expand-lg ">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Plasticaribe SAS</span>
+      <form class="d-flex">
+
+        <!-- USUARIOS -->
+        <div class="mb-2">
+          <div class="usaurios">
+            <div class="imagen">
+              <img src="#" alt="Usuarios" title="Usuario">
+              <div class="info_usua">
+                <span class="nombre_usuario">Usuario</span>
+                <span class="tipo_usuario">Administrador</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--Configuracion-->
+        <nav>
+          <ul>
+            <li class="perfil">
+              <a href= "#">Perfil</a>
+              <div class="dropdownContain">
+                <div class="dropOut">
+                  <div class="triangle"></div>
+                  <ul>
+                    <li>Cambiar clave</li>
+                    <li>Configurar</li>
+                  </ul>
+                </div>
+              </div>
+
+            </li>
+            <li class="salir"><a href="http://localhost:4200/inicio">Salir</a></li>
+          </ul>
+        </nav>
+
+      </form>
+    </div>
+  </nav>
+  <div class=" contenedorSecundario container-fluid">
+    <div class="row justify-content-start">
+      <div class="navLateral col-1">
+
+
+        <!-- fin de parte superior -->
+
+        <!-- principal -->
+        <div class="container-fluid">
+
+          <div class="contenedor_titulo mb-3">
+            <h2 class="tituloRojo">Orden de Pedido</h2>
+          </div>
+          <div class="mb-5">
+            <hr class="colorLinea">
+          </div>
+
+          <div class="container">
+            <div class="mb-4">
+              <h4 class="tituloRojo">Agregar Producto</h4>
+            </div>
+<!-- fin principal -->
+  <!-- boton de busqueda -->
+
+    <div class="container">
+      <div class="row">
+     <input type="search" placeholder="Buscar">
+      </div>
+    </div>
+<br>
+<!-- boton de busqueda fin -->
+
+<!-- <form [formGroup]="formularioRoles" (ngSubmit)="validarCamposVacios()"> -->
+
+  <!-- Agregar producto -->
+  <div class="row g-4">
+
+    <div class="col-md">
+        <input formControlName="Ancho"  type="text" class="form-control form-control-sm" id=""  placeholder="Ancho" name="Ancho" required maxlength="50">
+    </div>
+
+    <div class="col-md">
+      <input formControlName="Fuelle"  type="text" class="form-control form-control-sm" id=""  placeholder="Fuelle" name="Fuelle" required maxlength="50">
+  </div>
+  <div class="col-md">
+    <input formControlName="Calibre"  type="text" class="form-control form-control-sm" id=""  placeholder="Calibre" name="Calibre" required maxlength="50">
+</div>
+
+<div class="col-md">
+  <select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+    <option selected>Unidad Medida</option>
+    <option value="1">#1</option>
+    <option value="2">#2</option>
+  </select>
+</div>
+<div class="col-md">
+  <input formControlName="Cantidad"  type="text" class="form-control form-control-sm" id=""  placeholder="Cantidad" name="Cantidad" required maxlength="50">
+</div>
+
+<div class="col-md">
+  <select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+    <option selected>Unidad Medida</option>
+    <option value="1">#1</option>
+    <option value="2">#2</option>
+  </select>
+</div>
+<br>
+<div class="col-md">
+  <input formControlName="PrecioUnidad"  type="text" class="form-control form-control-sm" id=""  placeholder="PrecioUnidad" name="PrecioUnidad" required maxlength="50">
+</div>
+<div class="col-md">
+  <input formControlName="Stock"  type="text" class="form-control form-control-sm" id=""  placeholder="Stock" name="Stock" required maxlength="50">
+</div>
+<div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
+  <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Agregar Producto</button>
+  <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button">Limpiar campos</button>
+</div>
+<!-- Fin Agregar producto -->
+<!-- Fin Creacion producto -->
+<div class="mb-5">
+  <hr class="colorLinea">
+</div>
+<div class="container">
+  <div class="mb-4">
+    <h4 class="tituloRojo">Creacion de Producto</h4>
+  </div>
+  <div class="row g-4">
+
+    <div class="col-md">
+      <input formControlName="Nombre"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre" name="Nombre" required maxlength="50">
+    </div>
+
+<div class="col-md">
+  <input formControlName="Ancho"  type="text" class="form-control form-control-sm" id=""  placeholder="Ancho" name="Ancho" required maxlength="50">
+</div>
+
+<div class="col-md">
+<input formControlName="Fuelle"  type="text" class="form-control form-control-sm" id=""  placeholder="Fuelle" name="Fuelle" required maxlength="50">
+</div>
+<div class="col-md">
+<input formControlName="Calibre"  type="text" class="form-control form-control-sm" id=""  placeholder="Calibre" name="Calibre" required maxlength="50">
+</div>
+
+<div class="col">
+<select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+<option selected>Unidad Medida</option>
+<option value="1">#1</option>
+<option value="2">#2</option>
+</select>
+</div>
+<div class="col-md">
+<input formControlName="Cantidad"  type="text" class="form-control form-control-sm" id=""  placeholder="Cantidad" name="Cantidad" required maxlength="50">
+</div>
+
+<div class="col">
+<select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+<option selected>Unidad Medida</option>
+<option value="1">#1</option>
+<option value="2">#2</option>
+</select>
+</div>
+<br>
+<div class="col-md">
+<input formControlName="PrecioUnidad"  type="text" class="form-control form-control-sm" id=""  placeholder="PrecioUnidad" name="PrecioUnidad" required maxlength="50">
+</div>
+<div class="col-md">
+<input formControlName="Stock"  type="text" class="form-control form-control-sm" id=""  placeholder="Stock" name="Stock" required maxlength="50">
+</div>
+  </div>
+  <div class="col">
+    <select id="TipoProducto" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+    <option selected>Tipo Producto</option>
+    <option value="1">#1</option>
+    <option value="2">#2</option>
+    </select>
+    </div>
+<!-- Fin Creacion producto -->
+
+<!-- tabla producto -->
+<br>
+<div class="mb-5">
+  <hr class="colorLinea">
+</div>
+
+<div class="container">
+  <div class="mb-4">
+    <h4 class="tituloRojo"> Producto</h4>
+  </div>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Ancho</th>
+        <th scope="col">Fuelle</th>
+        <th scope="col">Calibre</th>
+        <th scope="col">Unidad Medida</th>
+        <th scope="col">Cantidad</th>
+        <th scope="col">Unidad Medida</th>
+        <th scope="col">Precio Unitario</th>
+        <th scope="col">Stock</th>
+        <th scope="col">Tipo Producto</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row"></th>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
+    <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Crear Pedido</button>
+    <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button">Cancelar</button>
+  </div>
+  <br>

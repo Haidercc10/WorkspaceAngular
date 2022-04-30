@@ -1,49 +1,48 @@
-/* diseño configuracion */
+/*** configuraciones ***/
 
 .container{
-    width: 100%;
-  }
+   width: 100%;
+}
 
-  .col-1{
-  width: 100%;
-  background-color: rgb(252, 252, 252);
-  padding: 1%;
-  }
+.col-1{
+width: 100%;
+padding: -10%;
+Max-height: 100%;
+}
 
-  .col-2{
-  width: 85%;
-  margin: auto;
-  }
+.col-2{
+width: 85%;
+margin: auto;
+}
 
-  .nombreEmpresa {
+.nombreEmpresa {
 
-    text-align: center;
-  }
-
-
-  .navbar {
-    -webkit-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
-    -moz-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
-    box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
-  }
-
-  a {
-    text-decoration: none;
-    color: #5D6D7E;
-  }
-
-  .fst-normal{
-    font-size: small;
-  }
+  text-align: center;
+}
 
 
-  .textoBarraNav{
+.navbar {
+  -webkit-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+  -moz-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+  box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+}
 
-    font-size: small;
-  }
+a {
+  text-decoration: none;
+  color: #5D6D7E;
+}
+
+.fst-normal{
+  font-size: small;
+}
 
 
-/*** configuraciones ***/
+.textoBarraNav{
+
+  font-size: small;
+}
+
+
 
 
 a {
@@ -179,60 +178,20 @@ ul li:hover .dropOut {
   margin-top: 8px;
 }
 
-.plasticaribe_resaltado{
-  color: #f11;
-}
-/* fin diseño configuracion */
+/*** Fin configuraciones ***/
 
 
-.espacioLinea {
-  margin-bottom: 1%;
-}
-
-.tituloRojo{
-  color: rgb(158, 1, 1);;
-}
-
-.colorLinea{
-  color: #b6bac2;
-}
-
-
-.mb-2{
-  width: 50%;
-}
-
-.mb-3{
-  width: 100%;
-}
-
-
-
-.mb-1{
-  width: 50%;
-}
-
-/* funcion de buscar */
-
-form {
-  background: #fff;
-  color:rgb(158, 1, 1);
-  border: 1px solid;
-  border-color: #e5e6e9 #dfe0e4 #d0d1d5;
-  margin-top: 10px;
-  padding: 10px;
-}
-input {
-	outline: none;
-}
 input[type=search] {
 	-webkit-appearance: textfield;
-  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
 	font-family: inherit;
 	font-size: 100%;
 }
 
-/* search input field */
+/* search input */
+input {
+	outline: none;
+}
 input[type=search] {
 
 	border: solid 1px #ccc;
@@ -252,3 +211,36 @@ input[type=search]:focus {
 
 
 /* fin de funcion buscar */
+
+
+
+.espacioLinea {
+  margin-bottom: 1%;
+}
+
+.contenedor_titulo{
+  margin: 30px 0 2% 10px;
+  text-align: center;
+}
+
+.tituloRojo{
+  color: rgb(158, 1, 1);;
+}
+
+.colorLinea{
+  color: #b6bac2;
+  height: 3px;
+}
+.identificador{
+  width: 150px;
+}
+
+textarea{
+  height: 80px;
+  width: 800px;
+
+}
+
+.row{
+  width: 100%;
+}

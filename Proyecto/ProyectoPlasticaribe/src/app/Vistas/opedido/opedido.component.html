@@ -1,126 +1,160 @@
-<!--Configuracion-->
+<!-- parte superior -->
 <div class="contain">
   <nav class="navbar navbar-expand-lg ">
     <div class="container-fluid">
       <span class="navbar-brand mb-0 h1">Plasticaribe SAS</span>
       <form class="d-flex">
 
+        <!-- USUARIOS -->
+        <div class="mb-2">
+          <div class="usaurios">
+            <div class="imagen">
+              <img src="#" alt="Usuarios" title="Usuario">
+              <div class="info_usua">
+                <span class="nombre_usuario">Usuario</span>
+                <span class="tipo_usuario">Administrador</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--Configuracion-->
         <nav>
           <ul>
-          <li class="perfil">
-          <a href= "#">Perfil</a>
-          <div class="dropdownContain">
-          <div class="dropOut">
-          <div class="triangle"></div>
-          <ul>
-          <li>Cambiar clave</li>
-          <li>Configurar</li>
+            <li class="perfil">
+              <a href= "#">Perfil</a>
+              <div class="dropdownContain">
+                <div class="dropOut">
+                  <div class="triangle"></div>
+                  <ul>
+                    <li>Cambiar clave</li>
+                    <li>Configurar</li>
+                  </ul>
+                </div>
+              </div>
+
+            </li>
+            <li class="salir"><a href="http://localhost:4200/inicio">Salir</a></li>
           </ul>
-          </div>
-          </div>
-          </li>
-          <li class="salir"><a href="http://localhost:4200/inicio">Salir</a></li>
-          </ul>
-          </nav>
+        </nav>
 
       </form>
-      </div>
-      </nav>
-         <div class=" contenedorSecundario container-fluid">
-         <div class="row justify-content-start">
-         <div class="navLateral col-1">
-<!-- Fin de Configuracion-->
+    </div>
+  </nav>
+  <div class=" contenedorSecundario container-fluid">
+    <div class="row justify-content-start">
+      <div class="navLateral col-1">
 
 
-<!--Inicio formulario-->
- <!-- <form [formGroup]="formularioOpedido" (ngSubmit)="validarCamposVacios()"> -->
+        <!-- fin de parte superior -->
 
-  <div class="container">
-    <div class="mb-4">
-      <h4 class="tituloRojo">Orden de Pedidos Registrar/Consultar </h4>
+        <!-- principal -->
+        <div class="container-fluid">
 
+          <div class="contenedor_titulo mb-3">
+            <h2 class="tituloRojo">Orden de Pedido</h2>
+          </div>
+          <div class="mb-5">
+            <hr class="colorLinea">
+          </div>
+
+          <div class="container">
+            <div class="mb-4">
+              <h4 class="tituloRojo">Registrar/Consultar Orden de Pedido</h4>
+            </div>
+<!-- fin principal -->
   <!-- boton de busqueda -->
   <form>
-    <h1></h1>
-    <input type="search" placeholder="Buscar">
+    <h5></h5> <input type="search" placeholder="Buscar">
   </form>
-</div>
-
+<br>
 <!-- boton de busqueda fin -->
 
-
-<!-- fecha -->
-<div class="row g-4"></div>
-<div class="mb-2">
-  <label class="col-md-2 control-label" for="">Fecha Pedido</label>
-  <div class="col-md-3">
-  <input id="FechaPedido" name="FechaPedido" type="date" class="form-control form-control-sm">
-  </div>
-</div>
-<div class="mb-2">
-  <label class="col-md-2 control-label" for="">Fecha Entrega</label>
-  <div class="col-md-3">
-  <input id="FechaEntrga" name="FechaEntrga" type="date" class="form-control form-control-sm">
-  </div>
+ <!-- <form [formGroup]="formularioRoles" (ngSubmit)="validarCamposVacios()"> -->
+<div class="container">
+  <div class="row">
+<div class="col ">
+  <select id="EstadoPedido" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+    <option selected>Estado Pedido</option>
+    <option value="1">Activo</option>
+    <option value="2">En Proceso</option>
+    <option value="3">Entregado</option>
+  </select>
 </div>
 <br>
-  <!-- fin fecha -->
-
-
-
-    <div class="mb-1">
-      <select id="Estado" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-        <option value="" disabled selected>Estado Pedido</option>
-        <option value="1">Activo</option>
-        <option value="2">Desactivo</option>
-        <option value="3">En Proceso</option>
-      </select>
-    </div>
-    <div class="mb-1">
-      <select id="Vendedor" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-        <option value="" disabled selected>Vendedor</option>
-        <option value="1">Vendedor #1</option>
-        <option value="2">Vendedor #2</option>
-        <option value="3">Vendedor #3</option>
-      </select>
-    </div>
-
-<div class="mb-1">
-    <select id="IDcliente" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-      <option value="" disabled selected>ID Cliente</option>
-      <option value="1">#</option>
-      <option value="2">#</option>
-      <option value="3">#</option>
-    </select>
+<div class="col">
+  <select id="Vendedor" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+    <option selected>Vendedor</option>
+    <option value="1">#1</option>
+    <option value="2">#1</option>
+    <option value="3">#1</option>
+  </select>
 </div>
-
-<div class="mb-1">
-  <select id="Sedecliente" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-    <option value="" disabled selected>Sede Cliente</option>
+</div>
+</div>
+<br>
+<div class="container">
+  <div class="row">
+<div class="col">
+  <select id="IDCliente" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+    <option selected>ID Cliente</option>
     <option value="1">#1</option>
     <option value="2">#2</option>
     <option value="3">#3</option>
   </select>
-<br>
-
-  <div class="col-md">
-    <input formControlName="Cliente"  type="text" class="form-control form-control-sm" id=""  placeholder="Cliente" name="Cliente" required maxlength="80">
-</div>
 </div>
 <br>
-<div class="col-md">
-  <textarea formControlName="observacion" id="" type="text" class="form-control form-control-sm"  maxlength="200" placeholder="observacion" name="Observacion" ></textarea>
+<div class="col">
+  <select id="Cliente" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+    <option selected>Cliente</option>
+    <option value="1">#1</option>
+    <option value="2">#2</option>
+    <option value="3">#3</option>
+  </select>
 </div>
-</div>
+<div class="col">
+  <input formControlName="Codigo"  type="text" class="form-control form-control-sm" id=""  placeholder="Codigo" name="COdigo" required maxlength="50">
+  </div>
+  </div>
+  </div>
+  <br>
+<!-- fecha -->
 
-   <div class="mb-3">
+<div class="container">
+  <div class="row">
+  <label class="col-md-1 control-label" for="">Pedido</label>
+  <div class="col">
+  <input id="FechaPedido" name="FechaPedido" type="date" class="form-control form-control-sm">
+  </div>
+
+
+  <label class="col-md-1 control-label" for=""> Entrega</label>
+  <div class="col">
+  <input id="FechaEntrga" name="FechaEntrga" type="date" class="form-control form-control-sm">
+  </div>
+    </div>
+    </div>
     <br>
+  <!-- fin fecha -->
+    <div class="col">
+      <h6>OBSERVACION</h6>
+      <textarea formControlName="Descripcion"  class="form-control form-control-sm" placeholder="Descripción" name="Descripcion" required maxlength="200"></textarea>
+    </div>
+    </div>
+    <br>
+        <div class="mb-3">
+          <br>
+        </div>
+        <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Guardar</button>
+          <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button">Limpiar campos</button>
+          <button class="btn btn-danger btn-danger-sm" ><a class="" href="/opedidoproducto">Agregar Producto</a></button>
+
+        </div>
+      <!-- </form>  expand="full" (click)="clear()" -->
+    <!--Fin formulario-->
+    </div>
   </div>
-  <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
-    <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Guardar</button>
-    <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" >Limpiar campos</button>
-    <!-- expand="full" (click)="clear()"> -->
-  </div>
-  </div>
- <!-- </form> -->
-<!--Fin formulario-->
+
+
+
