@@ -67,13 +67,13 @@
 
     <div class="container">
       <div class="row">
-     <input type="search" placeholder="Buscar">
+      <input type="search" placeholder="Buscar">
       </div>
     </div>
 <br>
 <!-- boton de busqueda fin -->
 
-<!-- <form [formGroup]="formularioRoles" (ngSubmit)="validarCamposVacios()"> -->
+ <form [formGroup]="formularioOpedidoproducto" (ngSubmit)="validarCamposVacios()">
 
   <!-- Agregar producto -->
   <div class="row g-4">
@@ -116,10 +116,14 @@
 </div>
 <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
   <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Agregar Producto</button>
-  <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button">Limpiar campos</button>
+  <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" expand="full" (click)="clear()">Limpiar campos</button>
 </div>
+  </div>
+ </form>
 <!-- Fin Agregar producto -->
 <!-- Fin Creacion producto -->
+
+
 <div class="mb-5">
   <hr class="colorLinea">
 </div>
@@ -234,3 +238,7 @@
     <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button">Cancelar</button>
   </div>
   <br>
+
+</div>
+</div>
+  </div>

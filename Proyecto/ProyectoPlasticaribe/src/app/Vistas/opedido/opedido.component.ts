@@ -14,6 +14,39 @@ export class OpedidoComponent implements OnInit {
 
 
   ngOnInit(): void {
-
+    this.initForms();
   }
+
+
+initForms() {
+  this.formularioOpedido= this.frmBuilderOpedido.group({
+
+
+    OpedidoCodigo: [, Validators.required],
+    OpedidoDescripcion: [, Validators.required],
+
+    // areaDescripcion: [, Validators.required],
+  });
+}
+
+// VALIDACION PARA CAMPOS VACIOS
+validarCamposVacios() : any{
+    if(this.formularioOpedido.valid){
+      Swal.fire("Los datos se enviaron correctamente");
+
+      this.clear();
+
+
+    }
+
+    else{
+      Swal.fire("HAY CAMPOS VACIOS");
+    }
+}
+
+clear() {
+  console.log("clear clicked")
+  this.formularioOpedido.reset();
+}
+
 }

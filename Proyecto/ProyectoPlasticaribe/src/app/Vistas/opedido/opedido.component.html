@@ -65,16 +65,16 @@
 <!-- fin principal -->
   <!-- boton de busqueda -->
   <form>
-    <h5></h5> <input type="search" placeholder="Buscar">
+    <input type="search" placeholder="Buscar">
   </form>
 <br>
 <!-- boton de busqueda fin -->
 
- <!-- <form [formGroup]="formularioRoles" (ngSubmit)="validarCamposVacios()"> -->
+ <form [formGroup]="formularioOpedido" (ngSubmit)="validarCamposVacios()">
 <div class="container">
   <div class="row">
 <div class="col ">
-  <select id="EstadoPedido" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+  <select id="OpedidoEstadoPedido" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
     <option selected>Estado Pedido</option>
     <option value="1">Activo</option>
     <option value="2">En Proceso</option>
@@ -83,7 +83,7 @@
 </div>
 <br>
 <div class="col">
-  <select id="Vendedor" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+  <select id="OpedidoVendedor" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
     <option selected>Vendedor</option>
     <option value="1">#1</option>
     <option value="2">#1</option>
@@ -96,7 +96,7 @@
 <div class="container">
   <div class="row">
 <div class="col">
-  <select id="IDCliente" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+  <select id="OpedidoIDCliente" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
     <option selected>ID Cliente</option>
     <option value="1">#1</option>
     <option value="2">#2</option>
@@ -105,7 +105,7 @@
 </div>
 <br>
 <div class="col">
-  <select id="Cliente" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+  <select id="OpedidoCliente" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
     <option selected>Cliente</option>
     <option value="1">#1</option>
     <option value="2">#2</option>
@@ -113,7 +113,7 @@
   </select>
 </div>
 <div class="col">
-  <input formControlName="Codigo"  type="text" class="form-control form-control-sm" id=""  placeholder="Codigo" name="COdigo" required maxlength="50">
+  <input formControlName="OpedidoCodigo"  type="text" class="form-control form-control-sm" id=""  placeholder="Codigo" name="COdigo" required maxlength="50">
   </div>
   </div>
   </div>
@@ -124,13 +124,13 @@
   <div class="row">
   <label class="col-md-1 control-label" for="">Pedido</label>
   <div class="col">
-  <input id="FechaPedido" name="FechaPedido" type="date" class="form-control form-control-sm">
+  <input id="OpedidoFechaPedido" name="FechaPedido" type="date" class="form-control form-control-sm">
   </div>
 
 
   <label class="col-md-1 control-label" for=""> Entrega</label>
   <div class="col">
-  <input id="FechaEntrga" name="FechaEntrga" type="date" class="form-control form-control-sm">
+  <input id="OpedidoFechaEntrega" name="FechaEntrega" type="date" class="form-control form-control-sm">
   </div>
     </div>
     </div>
@@ -138,23 +138,31 @@
   <!-- fin fecha -->
     <div class="col">
       <h6>OBSERVACION</h6>
-      <textarea formControlName="Descripcion"  class="form-control form-control-sm" placeholder="Descripción" name="Descripcion" required maxlength="200"></textarea>
+      <textarea formControlName="OpedidoDescripcion"  class="form-control form-control-sm" placeholder="Descripción" name="Descripcion" required maxlength="200"></textarea>
     </div>
-    </div>
+
     <br>
         <div class="mb-3">
           <br>
         </div>
         <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
           <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Guardar</button>
-          <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button">Limpiar campos</button>
-          <button class="btn btn-danger btn-danger-sm" ><a class="" href="/opedidoproducto">Agregar Producto</a></button>
+          <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()"  type="button">Limpiar campos</button>
+          <button class="btn btn-danger btn-danger-sm" ><a class=""  href="/opedidoproducto">Agregar Producto</a></button>
 
         </div>
-      <!-- </form>  expand="full" (click)="clear()" -->
-    <!--Fin formulario-->
+
+      </form>
+          </div>
+        </div>
+      </div>
+    </div>
     </div>
   </div>
+
+    <!--Fin formulario-->
+
+
 
 
 
