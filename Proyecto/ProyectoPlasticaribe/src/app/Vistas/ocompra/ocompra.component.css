@@ -1,5 +1,7 @@
 /*** configuraciones ***/
-
+*{
+  text-decoration: none;
+}
 .container{
   width: 100%;
 }
@@ -40,13 +42,6 @@ a {
 .textoBarraNav{
 
  font-size: small;
-}
-
-
-
-
-a {
- text-decoration: none;
 }
 
 
@@ -180,6 +175,46 @@ ul li:hover .dropOut {
 
 /*** Fin configuraciones ***/
 
+.contenedorBusqueda{
+  width: 100%;
+  margin-top: 2%;
+}
+
+h5{
+  color: #a23;
+}
+
+.buscarPedidoArea {
+  width: 15%;
+}
+
+#Areas{
+  width: 100%;
+}
+
+.fechaPedidoLabel{
+  width: 10%;
+}
+
+.FechaPedido{
+  width: 20%;
+}
+
+.fechaEntregaLabel{
+  width: 10%;
+}
+
+.FechaEntrga{
+  width: 20%;
+}
+
+.Estado{
+  width: 20%;
+}
+
+#Estado{
+  width: 100%;
+}
 
 input[type=search] {
  -webkit-appearance: textfield;
@@ -191,26 +226,144 @@ input[type=search] {
 /* search input */
 input {
  outline: none;
+
 }
 input[type=search] {
 
  border: solid 1px #ccc;
  padding: 9px 10px 9px 32px;
- width: 150px;
+ width: 200px;
  -webkit-border-radius: 10em;
  -moz-border-radius: 10em;
  border-radius: 10em;
 }
 
+input[type=search]:hover{
+  border-color: rgb(158, 1, 1);
+}
+
 input[type=search]:focus {
- width: 130px;
+ width: 200px;
  background-color: #fff;
  border-color: rgb(158, 1, 1);
 
 }
 
+.boton_consultar{
+  margin: 5px 55% 10px 45%;
+}
 
+.boton_consultar:hover{
+  background-color: #a23;
+  color: #ddd;
+}
 /* fin de funcion buscar */
+
+
+/* ESTILOS DE LA ORDEN DE COMPRA  */
+
+.idOC{
+  width: 12%;
+}
+
+.fechaOrdenCompralabel{
+  width: 16%;
+}
+
+.fechaOrdenCompra {
+  width: 15%;
+}
+
+.proveedorId{
+  width: 12%;
+}
+
+.estadoOC{
+  width: 15%;
+}
+
+.contenedorIdUsuario{
+  width: 21%;
+}
+
+.contenedorNombreUsuario{
+  width: 30%;
+}
+
+
+.ContenedorArea{
+  width: 15%;
+}
+
+.ContenedorArea2{
+  width: 100%;
+}
+
+.contenedorObservacionOC{
+  width: 34%;
+}
+
+/* MATERIA PRIMA */
+.ContenedorMateriaPrima{
+  width: 100%;
+}
+
+.ContenedorNombreMateriaPrima{
+  width: 30%;
+}
+
+#NombreMateriaPrima{
+  width: 100%;
+  height: 32px;
+  padding: 0;
+  padding-left: 3%;
+  color: #555;
+  font-size: smaller;
+}
+
+.ContenedorCantidadMateriaPrima{
+  width: 20%;
+}
+
+#CantidadMateriaPrima{
+  width: 100%;
+}
+
+.ContenedorUnidadMedidaMateriaPrima{
+  width: 15%;
+}
+
+#UnidadMedida{
+  width: 100%;
+}
+
+.ContenedorStockMateriaPrima{
+  width: 15%;
+}
+
+.ContenedorTipoMateriaPrima{
+  width: 20%;
+}
+
+#TipoMateria{
+  width: 100%;
+}
+
+.nuevaMP{
+  margin-top: 35px;
+}
+
+.ParrafoMP{
+  width: 18%;
+  color: #000;
+}
+
+.boton_agregarMP{
+  width: 10%;
+}
+
+
+
 
 
 
@@ -241,8 +394,6 @@ textarea{
 
 }
 
-
-
 .form-select{
   width: 50%;
 }
@@ -253,3 +404,7 @@ textarea{
   width: 30%;
 }
 
+a{
+  text-decoration: none;
+  color: #fff;
+}
