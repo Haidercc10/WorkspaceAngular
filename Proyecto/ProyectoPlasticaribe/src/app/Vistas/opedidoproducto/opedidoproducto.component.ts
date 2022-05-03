@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 export class OpedidoproductoComponent implements OnInit {
 
   public formularioOpedidoproducto !: FormGroup;
+
   constructor( private frmBuilderOpedidoproducto : FormBuilder) { }
 
 
@@ -19,6 +20,8 @@ export class OpedidoproductoComponent implements OnInit {
 
   initForms() {
     this.formularioOpedidoproducto = this.frmBuilderOpedidoproducto.group({
+
+
       Fuelle: [, Validators.required],
       Calibre: [, Validators.required],
       Cantidad: [, Validators.required],
@@ -46,6 +49,10 @@ export class OpedidoproductoComponent implements OnInit {
   clear() {
     console.log("clear clicked")
     this.formularioOpedidoproducto.reset();
+  }
+
+  Alerta(){
+    alert('Dime Hola');
   }
 
 }

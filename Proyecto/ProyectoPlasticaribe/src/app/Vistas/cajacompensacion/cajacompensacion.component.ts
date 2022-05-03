@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import Swal from 'sweetalert2';
 
+
 @Component({
   selector: 'app.cajacompensacion.component',
   templateUrl: './cajacompensacion.component.html',
