@@ -9,38 +9,45 @@ import Swal from 'sweetalert2';
 })
 export class OcompraComponent implements OnInit {
 
-  public formularioOcompra !: FormGroup;
-  constructor( private frmBuilderOcompra : FormBuilder) { }
+  public formularioOC !: FormGroup;
+  public formularioBuscarPedido !: FormGroup;
+  public formularioCreacionMateriaPrima !: FormGroup;
 
+  constructor( private frmBuilderOcompra : FormBuilder) { 
 
-  ngOnInit(): void {
-    this.initForms();
-  }
-
-  initForms() {
-    this.formularioOcompra = this.frmBuilderOcompra.group({
-      Codigo: [, Validators.required],
-      Nombre: [, Validators.required],
-      CantidadM: [, Validators.required],
-      NombreM: [, Validators.required],
-      ID: [, Validators.required],
-      Stock: [, Validators.required],
-      Cantidad: [, Validators.required],
-      IDUsuario: [, Validators.required],
-      Usuario: [, Validators.required],
+    this.formularioOC = this.frmBuilderOcompra.group({
+      IdDetalleOc: [, Validators.required],
+      fechaOrdenCompra: [, Validators.required],
+      IdProveedor: [, Validators.required],
       NombreProveedor: [, Validators.required],
-      IDProveedor: [, Validators.required],
-
-
-      // areaDescripcion: [, Validators.required],
+      estadoOC: [, Validators.required],
+      IdUsuario: [, Validators.required],
+      NombreUsuario: [, Validators.required],
+      NombreMateriaPrima: [, Validators.required],
+      CantidadMateriaPrima: [, Validators.required],
+      UnidadMedidaMateriaPrima: [, Validators.required],
+      StockMateriaPrima: [, Validators.required],
+      TipoMateriaPrima: [, Validators.required],
     });
+
+    this.formularioBuscarPedido = this.frmBuilderOcompra.group({
+      buscarPedidoId: [, Validators.required],
+    });
+
+
   }
 
-  // VALIDACION PARA CAMPOS VACIOS
-  validarCamposVacios() : any{
-      if(this.formularioOcompra.valid){
-        Swal.fire("Los datos se enviaron correctamente");
+  ngOnInit(): void { }
 
+  clear() {
+      this.formularioOC.reset();
+      this.formularioBuscarPedido.reset();
+    }
+
+  // VALIDACION PARA CAMPOS VACIOS Y ENVIO DE DATOS 
+  validarCamposVacios_Guardar() : any{
+      if(this.formularioOC.valid){
+        Swal.fire("Los datos se enviaron correctamente");
         this.clear();
 
 
@@ -49,10 +56,15 @@ export class OcompraComponent implements OnInit {
       }
   }
 
-  clear() {
-    console.log("clear clicked")
-    this.formularioOcompra.reset();
-  }
+  validarCamposVacios_Consultar() : any{
+    if(this.formularioBuscarPedido.valid){
+      Swal.fire("Consulta Exitosa");
+      this.clear();
 
+
+    }else{
+      Swal.fire("HAY CAMPOS VACIOS");
+    }
+  }
 }
 
