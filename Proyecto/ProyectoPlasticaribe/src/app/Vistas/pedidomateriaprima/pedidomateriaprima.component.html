@@ -70,7 +70,7 @@
 <br>
 <!-- boton de busqueda fin -->
 
-<!-- <form [formGroup]="formularioOcompra" (ngSubmit)="validarCamposVacios()"> -->
+<form [formGroup]="formularioPedidomateriaprima" (ngSubmit)="validarCamposVacios()">
   <div class="row g-4">
   <div class="container">
     <div class="row">
@@ -78,7 +78,7 @@
         <input formControlName="IDCliente"  type="text" class="form-control form-control-sm" id=""  placeholder="ID Cliente" name="ID Cliente" required maxlength="50">
         </div>
   <div class="col">
-    <input formControlName="nombreCliente"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre Cliente" name="Nombre Cliente" required maxlength="50">
+    <input formControlName="NombreCliente"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre Cliente" name="Nombre Cliente" required maxlength="50">
      </div>
   <div class="col">
     <input formControlName="SedeCliente"  type="text" class="form-control form-control-sm" id=""  placeholder="Sede Cliente" name="Sede Cliente" required maxlength="50">
@@ -231,11 +231,11 @@
           </div>
 
           <div class="col">
-            <input formControlName="NombreM"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre" name="Nombre" required maxlength="50">
+            <input formControlName="Nombre"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre" name="Nombre" required maxlength="50">
           </div>
 
           <div class="col">
-            <input formControlName="CantidadM"  type="text" class="form-control form-control-sm" id=""  placeholder="Cantidad" name="Cantidad" required maxlength="50">
+            <input formControlName="Cantidad"  type="text" class="form-control form-control-sm" id=""  placeholder="Cantidad" name="Cantidad" required maxlength="50">
            </div>
 
           <div class="col-md-3">
@@ -261,15 +261,9 @@
           </div>
           <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
             <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Agregar</button>
-            <!-- <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()" type="button">Limpiar campos</button> -->
+             <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()" type="button">Limpiar campos</button>
           </div>
         </div>
-      </div>
-
-
-
-
-
 
 
 
@@ -320,13 +314,13 @@
   </div>
   <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
     <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Solicitar</button>
-    <!-- <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()" type="button">Limpiar Tabla</button> -->
+    <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()" type="button">Limpiar Tabla</button>
     <button class="btn btn-danger btn-danger-sm" ><a class="" href="/principal">Cancelar</a></button>
   </div>
 </div>
   </div>
-  </div>
 
-      <!-- </form> -->
+
+    </form>
 
 <br>
