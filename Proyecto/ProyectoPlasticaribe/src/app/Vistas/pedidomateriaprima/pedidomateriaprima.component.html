@@ -1,0 +1,332 @@
+<!-- parte superior -->
+<div class="contain">
+  <nav class="navbar navbar-expand-lg ">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Plasticaribe SAS</span>
+      <form class="d-flex">
+
+        <!-- USUARIOS -->
+        <div class="mb-2">
+          <div class="usaurios">
+            <div class="imagen">
+              <img src="#" alt="Usuarios" title="Usuario">
+              <div class="info_usua">
+                <span class="nombre_usuario">Usuario</span>
+                <span class="tipo_usuario">Administrador</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--Configuracion-->
+        <nav>
+          <ul>
+            <li class="perfil">
+              <a href= "#">Perfil</a>
+              <div class="dropdownContain">
+                <div class="dropOut">
+                  <div class="triangle"></div>
+                  <ul>
+                    <li>Cambiar clave</li>
+                    <li>Configurar</li>
+                  </ul>
+                </div>
+              </div>
+
+            </li>
+            <li class="salir"><a href="/inicio">Salir</a></li>
+          </ul>
+        </nav>
+
+      </form>
+    </div>
+  </nav>
+  <div class=" contenedorSecundario container-fluid">
+    <div class="row justify-content-start">
+      <div class="navLateral col-1">
+
+
+        <!-- fin de parte superior -->
+
+        <!-- principal -->
+        <div class="container-fluid">
+
+          <div class="contenedor_titulo mb-3">
+            <h2 class="tituloRojo">Pedido Interno</h2>
+          </div>
+          <div class="mb-5">
+            <hr class="colorLinea">
+          </div>
+
+          <div class="container">
+            <div class="mb-4">
+              <h4 class="tituloRojo"></h4>
+            </div>
+<!-- fin principal -->
+  <!-- boton de busqueda -->
+  <form>
+    <h5>Buscar</h5><input type="search" placeholder="N.Orden de Trabajo">
+  </form>
+<br>
+<!-- boton de busqueda fin -->
+
+<!-- <form [formGroup]="formularioOcompra" (ngSubmit)="validarCamposVacios()"> -->
+  <div class="row g-4">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <input formControlName="IDCliente"  type="text" class="form-control form-control-sm" id=""  placeholder="ID Cliente" name="ID Cliente" required maxlength="50">
+        </div>
+  <div class="col">
+    <input formControlName="nombreCliente"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre Cliente" name="Nombre Cliente" required maxlength="50">
+     </div>
+  <div class="col">
+    <input formControlName="SedeCliente"  type="text" class="form-control form-control-sm" id=""  placeholder="Sede Cliente" name="Sede Cliente" required maxlength="50">
+    </div>
+      <div class="col">
+      <input formControlName="Turno"  type="text" class="form-control form-control-sm" id=""  placeholder="Turno" name="Turno" required maxlength="50">
+    </div>
+    <br>
+    <br>
+    <br>
+    <!-- Tabla de Producto -->
+<div class="container"></div>
+<div class="mb-4">
+  <h6 class="tituloRojo">Tabla de Producto</h6>
+</div>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Produto</th>
+        <th scope="col">Ancho</th>
+        <th scope="col">Largo</th>
+        <th scope="col">Fuelle</th>
+        <th scope="col">Ud</th>
+        <th scope="col">Calibre</th>
+        <th scope="col">Cantidad</th>
+        <th scope="col">Tipo Prodcuto</th>
+        <th scope="col">Bruto</th>
+        <th scope="col">Neto</th>
+        <th scope="col">Tara</th>
+        <th scope="col">Und</th>
+        <th scope="col">Diseño</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row"></th>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>Ver<a href="" download=""></a></td>
+      </tr>
+
+    </tbody>
+  </table>
+  </div>
+<!-- Fin Tabla producto -->
+
+<!-- Detalle de pedidos Internos -->
+<div class="mb-5">
+  <hr class="colorLinea">
+</div>
+<div class="container"></div>
+ <div class="mb-4">
+<h4 class="tituloRojo"> Detalle de Pedido Internos</h4>
+</div>
+<div class="row g-4">
+<div class="col">
+  <input formControlName="IDDetallePedido"  type="text" class="form-control form-control-sm" id=""  placeholder="ID Detalle Pedido" name="ID Detalle Pedido" required maxlength="50">
+</div>
+<!-- fecha  -->
+  <label class="col-md-1 control-label" for="">Pedido</label>
+  <div class="col">
+  <input id="FechaPedido" name="FechaPedido" type="date" class="form-control form-control-sm">
+  </div>
+<!-- fin de fecha -->
+
+<div class="col">
+  <input formControlName="IDUsuario"  type="text" class="form-control form-control-sm" id=""  placeholder="ID Usuario" name="ID Usuario" required maxlength="50">
+  </div>
+
+  <div class="col">
+    <input formControlName="Nombre"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre" name="Nombre" required maxlength="50">
+    </div>
+
+  <div class="col">
+    <input formControlName="NombreArea"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre Area" name="NombreA rea" required maxlength="50">
+    </div>
+
+    <div class="col">
+      <textarea formControlName="Descripcion"  class="form-control form-control-sm" placeholder="Descripción" name="Descripcion" required maxlength="200"></textarea>
+    </div>
+  </div>
+  </div>
+</div>
+  <!-- pedido -->
+  <div class="mb-5">
+    <hr class="colorLinea">
+  </div>
+  <div class="container"></div>
+   <div class="mb-4">
+  <h4 class="tituloRojo">Pedido</h4>
+</div>
+<div class="row g-4">
+
+  <div class="col-md-3">
+    <select id="IDNombreMateriaPrima" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+      <option  disabled selected>ID- Nombre Materia Prima</option>
+      <option value="1">#1</option>
+      <option value="2">#2</option>
+      <option value="3">#3</option>
+    </select>
+  </div>
+  <div class="col">
+    <input formControlName="Cantidad"  type="text" class="form-control form-control-sm" id=""  placeholder="Cantidad" name="Cantidad" required maxlength="50">
+    </div>
+  <div class="col-md-3">
+    <select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+      <option  disabled selected>Unidad Medida</option>
+      <option value="1">#1</option>
+      <option value="2">#2</option>
+      <option value="3">#3</option>
+    </select>
+  </div>
+  <div class="col">
+    <input formControlName="Stock"  type="text" class="form-control form-control-sm" id=""  placeholder="Stock" name="Stock" required maxlength="50">
+    </div>
+  <div class="col-md-3">
+    <select id="TipoMateria" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+      <option  disabled selected>Tipo Materia</option>
+      <option value="1">#1</option>
+      <option value="2">#2</option>
+      <option value="3">#3</option>
+    </select>
+  </div>
+  </div>
+<!-- fin pedido -->
+
+      <!-- Crear materia prima -->
+      <div class="mb-5">
+        <hr class="colorLinea">
+      </div>
+      <div class="container"></div>
+       <div class="mb-4">
+      <h4 class="tituloRojo"> Crear Materia Prima</h4>
+    </div>
+    <div class="row g-4">
+
+            <div class="col">
+            <input formControlName="ID"  type="text" class="form-control form-control-sm" id=""  placeholder="ID" name="ID" required maxlength="50">
+          </div>
+
+          <div class="col">
+            <input formControlName="NombreM"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre" name="Nombre" required maxlength="50">
+          </div>
+
+          <div class="col">
+            <input formControlName="CantidadM"  type="text" class="form-control form-control-sm" id=""  placeholder="Cantidad" name="Cantidad" required maxlength="50">
+           </div>
+
+          <div class="col-md-3">
+            <select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <option  disabled selected>Unidad Medida</option>
+              <option value="1">#1</option>
+              <option value="2">#2</option>
+              <option value="3">#3</option>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <select id="CategoriaMateriaprima" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <option  disabled selected>Categoria Materia prima</option>
+              <option value="1">#1</option>
+              <option value="2">#2</option>
+              <option value="3">#3</option>
+            </select>
+          </div>
+
+          <div class="mb">
+            <br>
+          </div>
+          <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
+            <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Agregar</button>
+            <!-- <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()" type="button">Limpiar campos</button> -->
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+
+
+
+      <!--  Fin Crear materia prima -->
+
+  <!--  Materia prima a solicitar -->
+
+  <div class="mb-5">
+    <hr class="colorLinea">
+  </div>
+    <div class="container">
+      <div class="row">
+      <div class="mb-4">
+        <h4 class="tituloRojo">Materia Prima a Solicitar</h4>
+      </div>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">ID</th>
+        <th scope="col">Materia Prima</th>
+        <th scope="col">Cantidad</th>
+        <th scope="col">Unidad Medida</th>
+        <th scope="col">Tipo Materia</th>
+        <th scope="col">Opciones</th>
+
+
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row"></th>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>#</td>
+        <td>Editar/Eliminar</td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <div class="mb-3">
+    <br>
+  </div>
+  <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
+    <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Solicitar</button>
+    <!-- <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()" type="button">Limpiar Tabla</button> -->
+    <button class="btn btn-danger btn-danger-sm" ><a class="" href="/principal">Cancelar</a></button>
+  </div>
+</div>
+  </div>
+  </div>
+
+      <!-- </form> -->
+
+<br>
