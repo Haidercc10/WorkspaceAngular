@@ -1,0 +1,255 @@
+/*** configuraciones ***/
+
+.container{
+  width: 100%;
+}
+
+.col-1{
+width: 100%;
+padding: -10%;
+Max-height: 100%;
+}
+
+.col-2{
+width: 85%;
+margin: auto;
+}
+
+.nombreEmpresa {
+
+ text-align: center;
+}
+
+
+.navbar {
+ -webkit-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+ -moz-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+ box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+}
+
+a {
+ text-decoration: none;
+ color: #5D6D7E;
+}
+
+.fst-normal{
+ font-size: small;
+}
+
+
+.textoBarraNav{
+
+ font-size: small;
+}
+
+
+
+
+a {
+ text-decoration: none;
+}
+
+
+
+nav {
+ width: 100%;
+ height: 65px;
+}
+
+
+
+ul li {
+ font: 13px Verdana, 'Lucida Grande';
+ cursor: pointer;
+ -webkit-transition: padding .05s linear;
+ -moz-transition: padding .05s linear;
+ -ms-transition: padding .05s linear;
+ -o-transition: padding .05s linear;
+ transition: padding .05s linear;
+}
+
+ul li.perfil {
+
+ background-position: 2px 0px;
+ padding-top: 10px;
+ position: relative;
+}
+
+ul li.salir {
+
+ background-position: 0px 0px;
+ padding-top: 10px;
+ position: relative;
+}
+
+ul > li {
+ display: inline-block;
+}
+
+ul li a {
+ font: 16px 'Oswald';
+ line-height: 80px;
+ padding: 0 6px;
+ color: #777;
+ -webkit-transition: all .1s ease-out;
+ -moz-transition: all .1s ease-out;
+ -ms-transition: all .1s ease-out;
+ -o-transition: all .1s ease-out;
+ transition: all .1s ease-out;
+}
+
+ul li a:hover {
+ color: #eee;
+}
+
+.dropOut .triangle {
+ width: 0;
+ height: 0;
+ position: absolute;
+ border-bottom: 8px solid white;
+ top: -8px;
+ left: 50%;
+ margin-left: -8px;
+}
+
+.dropdownContain {
+ width: 130px;
+ position: absolute;
+ z-index: 2;
+ left: 50%;
+ margin-left: -65px;
+ top: -400px;
+}
+
+.dropOut {
+ width: 120px;
+ background: white;
+ float: left;
+ position: relative;
+ margin-top: 0px;
+ opacity: 0;
+ -webkit-border-radius: 4px;
+ -moz-border-radius: 4px;
+ border-radius: 4px;
+ -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, .15);
+ -moz-box-shadow: 0 1px 6px rgba(0, 0, 0, .15);
+ box-shadow: 0 1px 6px rgba(0, 0, 0, .15);
+
+}
+
+.dropOut ul {
+ float: left;
+ padding: 10px 0;
+}
+
+.dropOut ul li {
+ text-align: left;
+ font: 14px 'Oswald';
+ float: left;
+ width: 100px;
+ padding: 6px 0 5px 7px;
+ margin: 0px 10px;
+ color: #777;
+ -webkit-border-radius: 4px;
+ -moz-border-radius: 4px;
+ border-radius: 4px;
+
+}
+
+.dropOut ul li:hover {
+ background: rgb(245, 153, 153);
+ color: black;
+}
+
+ul li:hover a {
+ color: black;
+}
+
+ul li:hover .dropdownContain {
+ top: 60px;
+}
+
+ul li:hover .underline {
+ border-bottom-color: #777;
+}
+
+ul li:hover .dropOut {
+ opacity: 1;
+ margin-top: 8px;
+}
+
+/*** Fin configuraciones ***/
+
+
+input[type=search] {
+ -webkit-appearance: textfield;
+ box-sizing: content-box;
+ font-family: inherit;
+ font-size: 100%;
+}
+
+/* search input */
+input {
+ outline: none;
+}
+input[type=search] {
+
+ border: solid 1px #ccc;
+ padding: 9px 10px 9px 32px;
+ width: 150px;
+ -webkit-border-radius: 10em;
+ -moz-border-radius: 10em;
+ border-radius: 10em;
+}
+
+input[type=search]:focus {
+ width: 130px;
+ background-color: #fff;
+ border-color: rgb(158, 1, 1);
+
+}
+
+
+/* fin de funcion buscar */
+
+
+
+.espacioLinea {
+ margin-bottom: 1%;
+}
+
+.contenedor_titulo{
+ margin: 30px 0 2% 10px;
+ text-align: center;
+}
+
+.tituloRojo{
+ color: rgb(158, 1, 1);;
+}
+
+.colorLinea{
+ color: #b6bac2;
+ height: 3px;
+}
+.identificador{
+ width: 150px;
+}
+
+textarea{
+ height: 80px;
+ width: 100px;
+
+}
+
+
+
+.form-select{
+  width: 50%;
+}
+
+
+
+.col{
+  width: 30%;
+}
+

@@ -20,6 +20,8 @@ import { CajacompensacionComponent } from './Vistas/cajacompensacion/cajacompens
 import { OpedidoComponent } from './Vistas/opedido/opedido.component';
 import { OpedidoproductoComponent } from './Vistas/opedidoproducto/opedidoproducto.component';
 import { OcompraComponent } from './Vistas/ocompra/ocompra.component';
+import { UsuarioComponent } from './Vistas/usuario/usuario.component';
+
 
 
 
@@ -41,7 +43,7 @@ export const routes: Routes = [
   {path: 'opedido', component: OpedidoComponent},
   {path: 'opedidoproducto', component: OpedidoproductoComponent},
   {path: 'ocompra', component: OcompraComponent},
-
+  {path: 'usuario',component:UsuarioComponent},
 ]
 
 @NgModule({
@@ -60,7 +62,8 @@ export const routes: Routes = [
     CajacompensacionComponent,
     OpedidoComponent,
     OpedidoproductoComponent,
-    OcompraComponent],
+    OcompraComponent,
+    UsuarioComponent],
 
 
 

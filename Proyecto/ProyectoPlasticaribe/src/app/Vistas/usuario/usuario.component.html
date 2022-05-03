@@ -1,0 +1,203 @@
+<!-- parte superior -->
+<div class="contain">
+  <nav class="navbar navbar-expand-lg ">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Plasticaribe SAS</span>
+      <form class="d-flex">
+
+        <!-- USUARIOS -->
+        <div class="mb-2">
+          <div class="usaurios">
+            <div class="imagen">
+              <img src="#" alt="Usuarios" title="Usuario">
+              <div class="info_usua">
+                <span class="nombre_usuario">Usuario</span>
+                <span class="tipo_usuario">Administrador</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--Configuracion-->
+        <nav>
+          <ul>
+            <li class="perfil">
+              <a href= "#">Perfil</a>
+              <div class="dropdownContain">
+                <div class="dropOut">
+                  <div class="triangle"></div>
+                  <ul>
+                    <li>Cambiar clave</li>
+                    <li>Configurar</li>
+                  </ul>
+                </div>
+              </div>
+
+            </li>
+            <li class="salir"><a href="/inicio">Salir</a></li>
+          </ul>
+        </nav>
+
+      </form>
+    </div>
+  </nav>
+  <div class=" contenedorSecundario container-fluid">
+    <div class="row justify-content-start">
+      <div class="navLateral col-1">
+
+
+        <!-- fin de parte superior -->
+
+<div class="container-fluid">
+
+  <div class="contenedor_titulo mb-3">
+    <h2 class="tituloRojo">Usuarios</h2>
+  </div>
+  <div class="mb-5">
+    <hr class="colorLinea">
+  </div>
+
+  <div class="container">
+    <div class="mb-4">
+      <h4 class="tituloRojo">Crear / Editar Usuario </h4>
+    </div>
+
+    <!--Inicio formulario-->
+
+ <!-- boton de busqueda -->
+ <form>
+  <h5>Buscar</h5><input type="search" placeholder="Usuario Existente">
+</form>
+<br>
+<!-- boton de busqueda fin -->
+
+<!-- <form [formGroup]="formularioOcompra" (ngSubmit)="validarCamposVacios()"> -->
+  <div class="container">
+    <div class="row">
+
+    <!--Identificación-->
+   <div class="col-md-3">
+     <input id="usuId" class="form-control form-control-sm" type="number" placeholder="Identificación Usuario" aria-label=".form-control-sm example">
+   </div>
+   <br>
+   <!--Nombre-->
+   <div class="col-md-3">
+     <input id="usuNombre" class="form-control form-control-sm" type="text" placeholder="Nombre y apellido" aria-label=".form-control-sm example">
+   </div>
+   <br>
+
+
+   <br>
+   <!--Correo-->
+   <div class="col-md-3">
+     <input id="usuCorreo" class="form-control form-control-sm" type="email" placeholder="Correo" aria-label=".form-control-sm example">
+   </div>
+
+   <br>
+   <!--telefono-->
+   <div class="col-md-3">
+    <input id="usuTelefono" class="form-control form-control-sm" type="number" placeholder="Numero de contacto" aria-label=".form-control-sm example">
+  </div>
+
+  <br>
+
+   <!--telefono-->
+   <div class="col-md-3">
+    <input id="usuTelefono" class="form-control form-control-sm" type="number" placeholder="Numero de contacto 2" aria-label=".form-control-sm example">
+  </div>
+
+  <br>
+
+   <!--Direccion-->
+   <div class="col-md-3">
+    <input id="usuDireccion" class="form-control form-control-sm" type="text" placeholder="Direccion" aria-label=".form-control-sm example">
+  </div>
+  <br>
+  <br>
+    <!--Tipo-->
+    <div class="col-md-3">
+      <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <option selected>Selecciona tipo</option>
+        <option value="1">One</option>
+        <option value="2">Two</option>
+        <option value="3">Three</option>
+      </select>
+    </div>
+    <br>
+    <br>
+   <!--area-->
+   <div class="col-md-3">
+    <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+      <option selected>Selecciona área</option>
+      <option value="1">One</option>
+      <option value="2">Two</option>
+      <option value="3">Three</option>
+    </select>
+  </div>
+  <br>
+  <br>
+    <!-- EPS  -->
+   <div class="col-md-3">
+     <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+       <option selected>Selecciona EPS</option>
+       <option value="1">One</option>
+       <option value="2">Two</option>
+       <option value="3">Three</option>
+     </select>
+   </div>
+
+   <br>
+   <br>
+
+  <!--rol-->
+ <div class="col-md-3">
+        <select id="usuRol" class="form-select form-select-sm" aria-label=".form-select-sm example">
+          <option selected>Selecciona rol</option>
+          <option value="1">One</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
+        </select>
+      </div>
+      <br>
+      <br>
+<!-- Fondo Pensional  -->
+<div class="col-md-3">
+ <select id="usuFondoP" class="form-select form-select-sm" aria-label=".form-select-sm example">
+       <option selected>Selecciona Fondo Pensional</option>
+       <option value="1">One</option>
+       <option value="2">Two</option>
+       <option value="3">Three</option>
+</select>
+</div>
+<br>
+<br>
+    <!-- Caja de compensacion  -->
+   <div class="col-md-3">
+     <select id="usuCajaComp" class="form-select form-select-sm" aria-label=".form-select-sm example">
+       <option selected>Selecciona caja de compensación</option>
+       <option value="1">One</option>
+       <option value="2">Two</option>
+       <option value="3">Three</option>
+     </select>
+     </div>
+     <br>
+    <br>
+
+   <!--Boton Ingresar al sistema-->
+   <div class="mb-3">
+  <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
+    <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Actualizar</button>
+    <!-- <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()" type="button">Limpiar Tabla</button> -->
+    <button class="btn btn-danger btn-danger-sm" ><a class="" href="/principal">Cancelar</a></button>
+  </div>
+</div>
+
+
+
+
+
+<!--Fin Formulario-->
+</div>
+<!--Contenedor Registro-->
+</div>
+<!--Fin Contenedor Principal-->
