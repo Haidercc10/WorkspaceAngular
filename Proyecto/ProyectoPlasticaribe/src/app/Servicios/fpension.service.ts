@@ -13,29 +13,27 @@ export class FpensionService {
   readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
 //Encapsular httpclient en el constructor
-  constructor(private httpFpension : HttpClient) {
+  constructor(private http : HttpClient) { }
 
-
-  }
 //Metodo buscar lista de Eps
   srvObtenerListaFpension():Observable<any[]> {
-      return this.httpFpension.get<any>(this.rutaPlasticaribeAPI + '/Fpension')
+      return this.http.get<any>(this.rutaPlasticaribeAPI + '/Fpension')
   }
 //Metodo agregar Eps
   srvAgregarFpension(data:any) {
-    return this.httpFpension.post(this.rutaPlasticaribeAPI + '/Fpension', data)
+    return this.http.post(this.rutaPlasticaribeAPI + '/Fpension', data)
   }
 //Metodo actualzar Eps
   srvActualizarFpension(id:number|String, data:any) {
-    return this.httpFpension.put(this.rutaPlasticaribeAPI + `/Fpension/${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/Fpension/${id}`, data);
   }
 //Metodo eliminar Eps
   srvEliminarFpension(id:number|String) {
-    return this.httpFpension.delete(this.rutaPlasticaribeAPI + `/Fpension/${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Fpension/${id}`);
   }
 
  srvGuardarvFpension(Fpension : modelFpension): Observable<any> {
-    return this.httpFpension.post(this.rutaPlasticaribeAPI + '/Fpension', Fpension)
+    return this.http.post(this.rutaPlasticaribeAPI + '/Fpension', Fpension)
    }
 
 }

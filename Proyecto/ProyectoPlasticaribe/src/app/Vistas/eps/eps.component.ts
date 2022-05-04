@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { modelEps } from 'src/app/Modelo/modelEps';
+import { EpsService } from 'src/app/Servicios/eps.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -10,7 +12,7 @@ import Swal from 'sweetalert2';
 export class EpsComponent implements OnInit {
 
   public formularioEps !: FormGroup;
-  constructor( private frmBuilderEps : FormBuilder) { }
+  constructor(private EpsService : EpsService, private frmBuilderEps : FormBuilder) { }
 
 
   ngOnInit(): void {
@@ -19,33 +21,51 @@ export class EpsComponent implements OnInit {
 
   initForms() {
     this.formularioEps = this.frmBuilderEps.group({
-      Codigo: [, Validators.required],
+      Identificacion: [, Validators.required],
       Nombre: [, Validators.required],
       Direccion: [, Validators.required],
       Telefono: [, Validators.required],
+      CuentaBancaria: [, Validators.required],
       Email: [, Validators.required],
-
-      // areaDescripcion: [, Validators.required],
+      Ciudad: [, Validators.required],
     });
   }
 
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios() : any{
-      if(this.formularioEps.valid){
-        Swal.fire("Los datos se enviaron correctamente");
-
-        this.clear();
-
-
-      }else{
-        Swal.fire("HAY CAMPOS VACIOS");
-      }
+    if(this.formularioEps.valid){
+      Swal.fire("Los datos se enviaron correctamente");
+      this.clear();
+      this.agregar();
+    }else{
+      Swal.fire("HAY CAMPOS VACIOS");
+    }
   }
 
   clear() {
-    console.log("clear clicked")
     this.formularioEps.reset();
   }
 
-}
+  agregar(){
+    const campoCajaCompensacion : modelEps= {
+      eps_Codigo: 0,
+      eps_Id: this.formularioEps.get('Identificacion')?.value,
+      eps_Nombre: this.formularioEps.get('Nombre')?.value,
+      eps_Email: this.formularioEps.get('Email')?.value,
+      eps_Telefono: this.formularioEps.get('Telefono')?.value,
+      eps_CuentaBancaria: this.formularioEps.get('CuentaBancaria')?.value,
+      eps_Direccion: this.formularioEps.get('Direccion')?.value,
+      eps_Ciudad: this.formularioEps.get('Ciudad')?.value,
+    }
 
+    this.EpsService.srvGuardar(campoCajaCompensacion).subscribe(data=>{
+      console.log(data);
+      Swal.fire('Registro exitoso');
+      this.clear();
+    }, error =>{
+        Swal.fire('Ocurrió un error');
+        console.log(error);
+    });
+  }
+
+}

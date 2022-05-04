@@ -66,5 +66,9 @@ export class OcompraComponent implements OnInit {
       Swal.fire("HAY CAMPOS VACIOS");
     }
   }
+
+  modalRegistroMateriaPrima(){
+    
+  }
 }
 

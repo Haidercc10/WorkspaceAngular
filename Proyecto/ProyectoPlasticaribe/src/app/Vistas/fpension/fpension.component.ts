@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { modelEps } from 'src/app/Modelo/modelEps';
+import { EpsService } from 'src/app/Servicios/eps.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -10,41 +12,58 @@ import Swal from 'sweetalert2';
 export class FpensionComponent implements OnInit {
 
   public formularioFpension !: FormGroup;
-  constructor( private frmBuilderFpension : FormBuilder) { }
+
+  constructor(private EpsService : EpsService, private frmBuilderFpension : FormBuilder) { 
+    this.formularioFpension = this.frmBuilderFpension.group({
+      Codigo: ['',],
+      Identificacion: [, Validators.required],
+      Nombre: [, Validators.required],
+      Email: [, Validators.required],
+      Telefono: [, Validators.required],
+      CuentaBancaria: [, Validators.required],
+      Ciudad: [, Validators.required]
+    });
+  }
 
 
   ngOnInit(): void {
-    this.initForms();
-  }
-
-  initForms() {
-    this.formularioFpension = this.frmBuilderFpension.group({
-      Codigo: [, Validators.required],
-      Nombre: [, Validators.required],
-      Direccion: [, Validators.required],
-      Telefono: [, Validators.required],
-      Email: [, Validators.required],
-
-      // areaDescripcion: [, Validators.required],
-    });
   }
 
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios() : any{
-      if(this.formularioFpension.valid){
-        Swal.fire("Los datos se enviaron correctamente");
-
-        this.clear();
-
-
-      }else{
-        Swal.fire("HAY CAMPOS VACIOS");
-      }
+    if(this.formularioFpension.valid){
+      Swal.fire("Los datos se enviaron correctamente");
+      this.clear();
+      this.agregar();
+    }else{
+      Swal.fire("HAY CAMPOS VACIOS");
+    }
   }
 
   clear() {
-    console.log("clear clicked")
     this.formularioFpension.reset();
+  }
+
+  agregar(){
+    const campoCajaCompensacion : modelEps = {
+      eps_Codigo: this.formularioFpension.get('Codigo')?.value,
+      eps_Id : this.formularioFpension.get('Identificacion')?.value,
+      eps_Nombre: this.formularioFpension.get('Nombre')?.value,
+      eps_Email: this.formularioFpension.get('Email')?.value,
+      eps_Telefono: this.formularioFpension.get('Telefono')?.value,
+      eps_CuentaBancaria: this.formularioFpension.get('CuentaBancaria')?.value,
+      eps_Direccion: this.formularioFpension.get('Direccion')?.value,
+      eps_Ciudad: this.formularioFpension.get('Ciudad')?.value
+    }
+
+    this.EpsService.srvGuardar(campoCajaCompensacion).subscribe(data=>{
+      console.log(data);
+      Swal.fire('Registro exitoso');
+      this.clear();
+    }, error =>{
+        Swal.fire('Ocurrió un error');
+        console.log(error);
+    });
   }
 
 }

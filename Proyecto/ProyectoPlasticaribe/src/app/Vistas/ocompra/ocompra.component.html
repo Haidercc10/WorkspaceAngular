@@ -1,42 +1,10 @@
-<!-- parte superior -->
-<!-- <nav class="navbar navbar-expand-lg ">
+<!-- BARRA INCIAL DE LA PANTALLA -->
+<div class="contain">
+  <nav class="navbar navbar-expand-lg ">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">Plasticaribe SAS</span>
-      <form class="d-flex">
-        <!-- USUARIOS 
-        <div class="mb-2">
-          <div class="usaurios">
-            <div class="imagen">
-              <img src="#" alt="Usuarios" title="Usuario">
-              <div class="info_usua">
-                <span class="nombre_usuario">Usuario</span>
-                <span class="tipo_usuario">Administrador</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!--Configuracion
-        <nav>
-          <ul>
-            <li class="perfil">
-              <a href= "#">Perfil</a>
-              <div class="dropdownContain">
-                <div class="dropOut">
-                  <div class="triangle"></div>
-                  <ul>
-                    <li>Cambiar clave</li>
-                    <li>Configurar</li>
-                  </ul>
-                </div>
-              </div>
-            </li>
-            <li class="salir"><a href="/inicio">Salir</a></li>
-          </ul>
-        </nav>
-      </form>
+      <p class="titulo">Plasti<span>caribe S.A.S</span></p>
     </div>
-  </nav> -->
-<!-- fin de parte superior -->
+  </nav>
 
 <!-- principal -->
 <div class="contenedor_titulo mb-3">
@@ -49,6 +17,7 @@
   <div class="mb-4">
     <h4 class="tituloRojo"></h4>
   </div>
+
   <!-- fin principal -->
 
   <!--FORMULARIO CON BOTIN DE BUSQUEDA DE PEDIDOS EXTERNOS  -->
@@ -91,28 +60,29 @@
       <input class="boton_consultar btn btn-danger btn-danger-sm" type="submit" value="Buscar Pedido">
     </div>
   </form>
+  
   <!-- Tabla de Pedidos Internos -->
   <div class="mb-4">
     <h4 class="tituloRojo">Tabla de Pedidos Internos</h4>
   </div>
+
   <!-- tabla producto -->
-  <table class="table table-bordered">
+  <div class="table-responsive">
+    <table class="table table-bordered">
     <thead>
       <tr>
-        <th scope="col">#</th>
+        <th scope="col">N°</th>
         <th scope="col">Fecha Creacion</th>
         <th scope="col">Estado</th>
         <th scope="col">Ot</th>
         <th scope="col">Area</th>
         <th scope="col">Observacion</th>
         <th scope="col">Archivos</th>
-
-
       </tr>
     </thead>
     <tbody>
       <tr>
-        <th scope="row"></th>
+        <th scope="row">#</th>
         <td>#</td>
         <td>#</td>
         <td>#</td>
@@ -120,13 +90,14 @@
         <td>#</td>
         <td>Ver<a href="" download=""></a></td>
       </tr>
-
     </tbody>
   </table>
+</div>
 
   <div class="mb-5">
     <hr class="colorLinea">
   </div>
+
   <!-- FORMULARIO DE ENVIO DE INFORMACION DETALLADA DE LA ORDEN DE COMPRA -->
   <form [formGroup]="formularioOC" (ngSubmit)="validarCamposVacios_Guardar()">
     <div class="container">
@@ -160,7 +131,7 @@
       <div class="container">
         <div class="row fila_contenedora">
           <div class="contenedorIdUsuario">
-            <input formControlName="IdUsuario"  type="text" class="IdUsuario form-control form-control-sm" id=""  placeholder="ID Usuario que Registra la Orden" name="ID Usuario" required maxlength="50">
+            <input formControlName="IdUsuario"  type="text" class="IdUsuario form-control form-control-sm" id=""  placeholder="ID Usuario " name="ID Usuario" required maxlength="50">
           </div>
 
           <div class="contenedorNombreUsuario">
@@ -177,7 +148,7 @@
             </div>
           </div>
           <div class="contenedorObservacionOC">
-            <input formControlName="ObservacionOC" class="ObservacionOC form-control form-control-sm" type="text" placeholder="Observación">
+            <textarea formControlName="Observacion" id="observacion" type="text" class="observacion form-control form-control-sm"  maxlength="200" placeholder="Observacion" name="Descripcion"></textarea>
           </div>
         </div>
       </div>
@@ -292,30 +263,33 @@
             <div class="mb-4">
               <h4 class="tituloRojo">Materia Prima a Solicitar</h4>
             </div>
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">ID</th>
-                  <th scope="col">Materia Prima</th>
-                  <th scope="col">Cantidad</th>
-                  <th scope="col">Unidad Medida</th>
-                  <th scope="col">Tipo Materia</th>
-                  <th scope="col">Opciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row"></th>
-                  <td>#</td>
-                  <td>#</td>
-                  <td>#</td>
-                  <td>#</td>
-                  <td>#</td>
-                  <td>Editar/Eliminar</td>
-                </tr>
-              </tbody>
-            </table>
+
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th scope="col">N°</th>
+                    <th scope="col">ID</th>
+                    <th scope="col">Materia Prima</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Unidad Medida</th>
+                    <th scope="col">Tipo Materia</th>
+                    <th scope="col">Opciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">#</th>
+                    <td>#</td>
+                    <td>#</td>
+                    <td>#</td>
+                    <td>#</td>
+                    <td>#</td>
+                    <td>Editar/Eliminar</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             <div class="mb-3">
               <br>
             </div>

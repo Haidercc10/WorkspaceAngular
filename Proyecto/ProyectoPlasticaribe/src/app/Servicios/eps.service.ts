@@ -3,39 +3,36 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelEps } from '../Modelo/modelEps';
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class EpsService {
 
-  //Ruta del API
-  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
+ //Ruta del API
+ readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
-//Encapsular httpclient en el constructor
-  constructor(private httpEps : HttpClient) {
-
-
-  }
-//Metodo buscar lista de Eps
-  srvObtenerListaEps():Observable<any[]> {
-      return this.httpEps.get<any>(this.rutaPlasticaribeAPI + '/Eps')
-  }
-//Metodo agregar Eps
-  srvAgregarAreas(data:any) {
-    return this.httpEps.post(this.rutaPlasticaribeAPI + '/Eps', data)
-  }
-//Metodo actualzar Eps
-  srvActualizarEps(id:number|String, data:any) {
-    return this.httpEps.put(this.rutaPlasticaribeAPI + `/Eps/${id}`, data);
-  }
-//Metodo eliminar Eps
-  srvEliminarEps(id:number|String) {
-    return this.httpEps.delete(this.rutaPlasticaribeAPI + `/Eps/${id}`);
-  }
-
-  srvGuardarEps(Eps : modelEps): Observable<any> {
-   return this.httpEps.post(this.rutaPlasticaribeAPI + '/Eps', Eps)
- }
+ //Encapsular httpclient en el constructor
+   constructor(private http : HttpClient) { }
+   
+ //Metodo buscar lista de Cajacompensacion
+   srvObtenerLista():Observable<any[]> {
+       return this.http.get<any>(this.rutaPlasticaribeAPI + '/EPS')
+   }
+ //Metodo agregar Cajacompensacion
+   srvAgregar(data:any) {
+     return this.http.post(this.rutaPlasticaribeAPI + '/EPS', data)
+   }
+ //Metodo actualzar Cajacompensacion
+   srvActualizar(id:number|String, data:any) {
+     return this.http.put(this.rutaPlasticaribeAPI + `/EPS/${id}`, data);
+   }
+ //Metodo eliminar Cajacompensacion
+   srvEliminar(id:number|String) {
+     return this.http.delete(this.rutaPlasticaribeAPI + `/EPS/${id}`);
+   }
+ 
+   srvGuardar(eps: modelEps): Observable<any> {
+    return this.http.post(this.rutaPlasticaribeAPI + '/EPS', eps)
+   }
 
 }
