@@ -71,133 +71,118 @@
 <br>
 <!-- boton de busqueda fin -->
 
-<!-- <form [formGroup]="formularioOcompra" (ngSubmit)="validarCamposVacios()"> -->
-  <div class="container">
-    <div class="row">
+<!--Inicio formulario-->
 
-    <!--Identificación-->
-   <div class="col-md-3">
-     <input id="usuId" class="form-control form-control-sm" type="number" placeholder="Identificación Usuario" aria-label=".form-control-sm example">
-   </div>
-   <br>
-   <!--Nombre-->
-   <div class="col-md-3">
-     <input id="usuNombre" class="form-control form-control-sm" type="text" placeholder="Nombre y apellido" aria-label=".form-control-sm example">
-   </div>
-   <br>
+<div class="container">
+<form [formGroup]="formularioUsuario" (ngSubmit)="validarCamposVacios()">
 
 
-   <br>
-   <!--Correo-->
-   <div class="col-md-3">
-     <input id="usuCorreo" class="form-control form-control-sm" type="email" placeholder="Correo" aria-label=".form-control-sm example">
-   </div>
-
-   <br>
-   <!--telefono-->
-   <div class="col-md-3">
-    <input id="usuTelefono" class="form-control form-control-sm" type="number" placeholder="Numero de contacto" aria-label=".form-control-sm example">
-  </div>
-
-  <br>
-
-   <!--telefono-->
-   <div class="col-md-3">
-    <input id="usuTelefono" class="form-control form-control-sm" type="number" placeholder="Numero de contacto 2" aria-label=".form-control-sm example">
-  </div>
-
-  <br>
-
-   <!--Direccion-->
-   <div class="col-md-3">
-    <input id="usuDireccion" class="form-control form-control-sm" type="text" placeholder="Direccion" aria-label=".form-control-sm example">
-  </div>
-  <br>
-  <br>
-    <!--Tipo-->
-    <div class="col-md-3">
-      <select class="form-select form-select-sm" aria-label=".form-select-sm example">
-        <option selected>Selecciona tipo</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
-      </select>
+  <div class="row g-4">
+    <div class="col-md">
+      <input class="identificador" type="number" class="form-control form-control-sm" id="" aria-describedby="" placeholder="Identificador">
     </div>
-    <br>
-    <br>
-   <!--area-->
-   <div class="col-md-3">
+    <div class="col-md">
+        <input formControlName="Codigo" type="number" minlength="6" maxlength="10" class="form-control form-control-sm" id="validationDefault01"  placeholder="Código" name="Codigo" required >
+    </div>
+    <div class="col-md">
+        <input formControlName="Nombre"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre y Apellido" name="Nombre y Apellido" required maxlength="50">
+    </div>
+    <div class="col-md">
+      <input formControlName="Direccion"  type="text" class="form-control form-control-sm" id=""  placeholder="Direccion" name="Direccion" required maxlength="50">
+  </div>
+  <div class="col-md">
+    <input formControlName="Telefono"  type="text" class="form-control form-control-sm" id=""  placeholder="Numero de contacto" name="Numero de contacto" required maxlength="50">
+</div>
+
+<div class="col-md">
+  <input formControlName="Telefono"  type="text" class="form-control form-control-sm" id=""  placeholder="Numero de contacto" name="Numero de contacto" required maxlength="50">
+</div>
+
+<div class="col-md">
+  <input formControlName="Email"  type="text" class="form-control form-control-sm" id=""  placeholder="Email" name="Email" required maxlength="50">
+</div>
+</div>
+
+<br>
+ <!--Tipo-->
+ <div class="row g-4">
+ <div class="col-md-3">
+  <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+    <option selected>Selecciona tipo</option>
+    <option value="1">One</option>
+    <option value="2">Two</option>
+    <option value="3">Three</option>
+  </select>
+</div>
+
+<!--area-->
+<div class="col-md-3">
+  <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+    <option selected>Selecciona área</option>
+    <option value="1">One</option>
+    <option value="2">Two</option>
+    <option value="3">Three</option>
+  </select>
+</div>
+
+ <!--rol-->
+<div class="col-md-3">
+  <select id="usuRol" class="form-select form-select-sm" aria-label=".form-select-sm example">
+    <option selected>Selecciona rol</option>
+    <option value="1">One</option>
+    <option value="2">Two</option>
+    <option value="3">Three</option>
+  </select>
+</div>
+<!-- EPS  -->
+
+  <div class="col-md-3">
     <select class="form-select form-select-sm" aria-label=".form-select-sm example">
-      <option selected>Selecciona área</option>
+      <option selected>Selecciona EPS</option>
       <option value="1">One</option>
       <option value="2">Two</option>
       <option value="3">Three</option>
     </select>
   </div>
-  <br>
-  <br>
-    <!-- EPS  -->
-   <div class="col-md-3">
-     <select class="form-select form-select-sm" aria-label=".form-select-sm example">
-       <option selected>Selecciona EPS</option>
-       <option value="1">One</option>
-       <option value="2">Two</option>
-       <option value="3">Three</option>
-     </select>
-   </div>
 
-   <br>
-   <br>
-
-  <!--rol-->
- <div class="col-md-3">
-        <select id="usuRol" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option selected>Selecciona rol</option>
-          <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
-        </select>
-      </div>
-      <br>
-      <br>
 <!-- Fondo Pensional  -->
+
 <div class="col-md-3">
- <select id="usuFondoP" class="form-select form-select-sm" aria-label=".form-select-sm example">
-       <option selected>Selecciona Fondo Pensional</option>
-       <option value="1">One</option>
-       <option value="2">Two</option>
-       <option value="3">Three</option>
+<select id="usuFondoP" class="form-select form-select-sm" aria-label=".form-select-sm example">
+      <option selected>Selecciona Fondo Pensional</option>
+      <option value="1">One</option>
+      <option value="2">Two</option>
+      <option value="3">Three</option>
 </select>
 </div>
-<br>
-<br>
-    <!-- Caja de compensacion  -->
-   <div class="col-md-3">
-     <select id="usuCajaComp" class="form-select form-select-sm" aria-label=".form-select-sm example">
-       <option selected>Selecciona caja de compensación</option>
-       <option value="1">One</option>
-       <option value="2">Two</option>
-       <option value="3">Three</option>
-     </select>
-     </div>
-     <br>
-    <br>
 
-   <!--Boton Ingresar al sistema-->
-   <div class="mb-3">
-  <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
-    <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Actualizar</button>
-    <!-- <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()" type="button">Limpiar Tabla</button> -->
-    <button class="btn btn-danger btn-danger-sm" ><a class="" href="/principal">Cancelar</a></button>
+<br>
+   <!-- Caja de compensacion  -->
+  <div class="col-md-3">
+    <select id="usuCajaComp" class="form-select form-select-sm" aria-label=".form-select-sm example">
+      <option selected>Selecciona caja de compensación</option>
+      <option value="1">One</option>
+      <option value="2">Two</option>
+      <option value="3">Three</option>
+    </select>
+
   </div>
+  </div>
+<br>
+
+
+
+
+
+  <div class="col-md">
+    <br>
+  </div>
+  <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
+    <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Guardar</button>
+    <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" expand="full" (click)="clear()">Limpiar campos</button>
+  </div>
+
+</form>
+<!--Fin formulario-->
 </div>
-
-
-
-
-
-<!--Fin Formulario-->
 </div>
-<!--Contenedor Registro-->
-</div>
-<!--Fin Contenedor Principal-->
