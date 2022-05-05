@@ -169,7 +169,7 @@
           <div class="row">
             <div class="ContenedorNombreMateriaPrima">
               <select formControlName="NombreMateriaPrima" id="NombreMateriaPrima" class="NombreMateriaPrima form-select" aria-label=".form-select-sm example" required>
-                <option  disabled selected>ID Nombre Materia prima</option>
+                <option [ngValue]="null" disabled>ID Nombre Materia prima</option>
                 <option value="1">#1</option>
                 <option value="2">#2</option>
                 <option value="3">#3</option>
@@ -180,7 +180,7 @@
             </div>
             <div class="ContenedorUnidadMedidaMateriaPrima">
               <select formControlName="UnidadMedidaMateriaPrima" id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option  disabled selected>Unidad Medida</option>
+                <option  [ngValue]="null" disabled>Unidad Medida</option>
                 <option value="1">#1</option>
                 <option value="2">#2</option>
                 <option value="3">#3</option>
@@ -191,7 +191,7 @@
             </div>
             <div class="ContenedorTipoMateriaPrima">
               <select formControlName="TipoMateriaPrima" id="TipoMateria" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option  disabled selected>Tipo Materia</option>
+                <option   [ngValue]="null" disabled>Tipo Materia</option>
                 <option value="1">#1</option>
                 <option value="2">#2</option>
                 <option value="3">#3</option>
