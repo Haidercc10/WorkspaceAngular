@@ -1,6 +1,6 @@
 export interface modelProducto{
     Prod_Id: number;
-    Prod_Nomber: string;
+    Prod_Nombre: string;
     Prod_Descripcion: string;
     TpProd_Id: number;
     Prod_Peso_Bruto: number;

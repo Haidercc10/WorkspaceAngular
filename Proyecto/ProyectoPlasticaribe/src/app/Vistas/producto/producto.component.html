@@ -1,0 +1,147 @@
+<!--Navegador parte superior -->
+<div class="contain">
+    <nav class="navbar navbar-expand-lg ">
+      <div class="container-fluid">
+        <p class="titulo">Plasti<span>caribe S.A.S</span></p>
+      </div>
+    </nav>
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+        <h2 class="tituloRojo">Productos</h2>
+    </div>
+    <div class="mb-5">
+        <hr class="colorLinea">
+    </div>
+    <div class="mb-4">
+        <h4 class="tituloRojo">Crear/Consultar Productos</h4>
+    </div>
+    <!-- FORMULARIO DE PRODUCTOS -->
+    <form [formGroup]="formularioProducto" (ngSubmit)="validarCamposVacios()">
+        <!-- Inicio fila 1 de campos -->
+        <div class="mb-4">
+            <div class="row g-3">
+                <!-- Producto ID-->
+                <div class="col-md">
+                    <input formControlName="ProductoID"  type="text" class="form-control form-control-sm" id=""  placeholder="Id del Producto" name="ProductoID" required>
+                </div>
+                <!-- Producto Nombre -->
+                <div class="col-md">
+                    <input formControlName="ProductoNombre"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre del producto" name="ProductoNombre" required>
+                </div>
+                <!-- Producto Descripción -->
+                <div class="col-md">
+                    <textarea formControlName="ProductoDescripcion" id="" type="text" class="form-control form-control-sm" placeholder="Descripcion" name="Descripcion" style="width: 100%;"></textarea>
+                </div>
+                <!-- Tipo de Producto -->
+                <div class="col-md">
+                    <select formControlName="ProductoTipo" id="TipoProducto" id="TipoProducto" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                        <option  disabled selected>Tipo Producto</option>
+                        <option value="1">Tipo Producto #1</option>
+                        <option value="2">Tipo Producto #2</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="mb-4">
+            <div class="row g-3">
+                <!-- Peso Bruto del Producto -->
+                <div class="col-md">
+                    <input formControlName="PesoBrutoProducto" type="text" class="form-control form-control-sm" id="" placeholder="Peso Bruto del producto" name="PesoBrutoProducto" required>
+                </div>
+                <!-- Peso Neto del Producto -->
+                <div class="col-md">
+                    <input formControlName="PesoNetoProducto" type="text" class="form-control form-control-sm" id="" placeholder="Peso Neto del producto" name="PesoNetoProducto" required>
+                </div>
+                <!-- Unidad de Medida Peso -->
+                <div class="col-md">
+                    <select formControlName="ProductoUndPeso" id="UndMedPesoProducto" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option  disabled selected>Und. Medida de Pesos</option>
+                    <option value="Kg">Kg #1</option>
+                    <option value="2">Tn #2</option>
+                    </select>
+                </div>
+                <!-- Fuelle Producto-->
+                <div class="col-md">
+                    <input formControlName="FuelleProducto"  type="text" class="form-control form-control-sm" id=""  placeholder="Fuelle del Producto" name="FeulleProducto" required>
+                </div>
+                <!-- Ancho Producto -->
+                <div class="col-md">
+                    <input formControlName="AnchoProducto"  type="text" class="form-control form-control-sm" id=""  placeholder="Ancho del producto" name="AnchoProducto" required>
+                </div>
+                <!-- Calibre Producto-->
+                <div class="col-md">
+                    <input formControlName="CalibreProducto"  type="text" class="form-control form-control-sm" id=""  placeholder="Calibre del producto" name="CalibreProducto" required>
+                </div>
+                <!-- Unidad de Medida F.A.C -->
+                <div class="col-md">
+                    <select formControlName="ProductoUndFAC" id="UndMedFACProducto" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option  disabled selected>Und. Medida F.A.C</option>
+                    <option value="Kg">Kg #1</option>
+                    <option value="2">Tn #2</option>
+                    </select>
+                </div>
+                <!-- Precio Producto -->
+                <div class="col-md">
+                    <input formControlName="PrecioProducto"  type="text" class="form-control form-control-sm" id=""  placeholder="Precio del producto" name="precioProducto" required>
+                </div>
+            </div>
+        </div>
+        <!-- Botones para agregar productos -->
+        <div class="mb-3">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Agregar Producto</button>
+                <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" expand="full" (click)="clear()">Limpiar campos</button>
+            </div>
+        </div>
+        <div class="mb-5">
+            <hr class="colorLinea">
+        </div>
+        <div class="mb-4">
+            <h4 class="tituloRojo">Listado de Productos</h4>
+        </div>
+        <!-- Tabla donde se mostrarán los producto existentes -->
+        <div class="mb-4">
+            <div class="row g-3">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="TitulosTabla">
+                            <tr>
+                            <th scope="col" class="idProducto">ID</th>
+                            <th id="nombre" scope="col">Nombre</th>
+                            <th id="ancho" scope="col" class="">Ancho</th>
+                            <th id="fuelle" scope="col">Fuelle</th>
+                            <th id="calibre" scope="col">Calibre</th>
+                            <th id="undMedidaPeso" scope="col">Unidad Medida</th>
+                            <th id="stock" scope="col">Stock</th>
+                            <th id="cantidadDisponible" scope="col">Cantidad Disponible</th>
+                            <th id="undMedidaCantidad" scope="col">Unidad Medida</th>
+                            <th id="precioUnitario" scope="col">Precio Unitario</th>
+                            <th id="precioCantidadTotal" scope="col">Precio Total en Stock</th>
+                            <th id="tipoProducto" scope="col">Tipo Producto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                            <th id="id" class="TextosInfoTabla">#</th>
+                            <td id="nombre" >#</td>
+                            <td id="ancho" >#</td>
+                            <td id="fuelle" >#</td>
+                            <td id="calibre" >#</td>
+                            <td id="undMedidaPeso" >#</td>
+                            <td id="stock" >#</td>
+                            <td id="cantidadDisponible" >#</td>
+                            <td id="undMedidaCantidad">#</td>
+                            <td id="precioUnitario">#</td>
+                            <td id="precioCantidadTotal">#</td>
+                            <td id="tipoProducto">#</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+  </div>
+</div>

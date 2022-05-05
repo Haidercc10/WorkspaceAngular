@@ -25,11 +25,7 @@ import { PedidomateriaprimaComponent } from './Vistas/pedidomateriaprima/pedidom
 import { CrearProductoComponent } from './Vistas/crear-producto/crear-producto.component';
 import { ClientesComponent } from './Vistas/crear-clientes/crear-clientes.component';
 import { CrearSedesClientesComponent } from './Vistas/crear-sedes-clientes/crear-sedes-clientes.component';
-
-
-
-
-
+import { ProductoComponent } from './Vistas/producto/producto.component';
 
 
 export const routes: Routes = [
@@ -52,6 +48,7 @@ export const routes: Routes = [
   {path: 'pedidomateriaprima',component:PedidomateriaprimaComponent},
   {path: 'crearproducto',component:CrearProductoComponent},
   {path: 'crear-clientes',component:ClientesComponent},
+  {path: 'producto',component:ProductoComponent}
 ]
 
 @NgModule({
@@ -76,9 +73,7 @@ export const routes: Routes = [
     CrearProductoComponent,
     ClientesComponent,
     CrearSedesClientesComponent,
-   ],
-
-
+    ProductoComponent,],
 
   imports: [
 

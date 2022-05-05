@@ -1,0 +1,62 @@
+.TextosInfoTabla {
+    font-size: smaller;
+}
+
+.titulo span{
+    color: #a23;
+}
+
+.TitulosTabla {
+    font-size: smaller;
+}
+
+.d-grid {
+    padding-bottom: 5%;
+}
+
+.Linea {
+    color: #777;
+}
+
+.container{
+    width: 100%;
+}
+
+.navbar {
+    -webkit-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+    -moz-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+    box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+}
+
+a {
+    text-decoration: none;
+    color: #5D6D7E;
+}
+
+
+.textoBarraNav{
+    font-size: small;
+}
+
+
+a {
+    text-decoration: none;
+}
+
+.Titulo{
+    margin-top: 2%;
+    text-align: center;
+}
+
+.tituloRojo{
+    color: rgb(158, 1, 1);;
+}
+
+.colorLinea{
+    color: #b6bac2;
+    height: 2px;
+}
+
+.form-select {
+    width: 100%;
+}

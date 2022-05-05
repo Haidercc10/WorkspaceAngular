@@ -46,7 +46,7 @@ export class OpedidoproductoComponent implements OnInit {
        ProdPrecioUnd: new FormControl(),
        ProdTipoMoneda: new FormControl(),
        ProdStock: new FormControl()
-     })
+     });
    }
 
   //Cargar al iniciar.
@@ -78,8 +78,8 @@ export class OpedidoproductoComponent implements OnInit {
          ProdUnidadMedidaCant: ['', Validators.required],
          ProdPrecioUnd: ['', Validators.required],
          ProdTipoMoneda: ['', Validators.required],
-         ProdStock: ['', Validators.required]
-       })
+         ProdStock: ['', Validators.required],
+       });
 
 
   }

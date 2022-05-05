@@ -41,7 +41,6 @@ export class AreasComponentComponent implements OnInit {
     }
   }
 
-
   agregar(){
     const campoArea : modelAreas = {
       /*las variables hacen referencia al modelo de areas y lo que esta entre parentesis
@@ -52,16 +51,11 @@ export class AreasComponentComponent implements OnInit {
     }
 
     this.servicioAreasTS.srvGuardarArea(campoArea).subscribe(data=>{
-
-    Swal.fire('Registro exitoso'); //Muestra mensaje de confirmación
-    this.limpiarCampos(); //Limpia los campos
-
+      Swal.fire('Registro exitoso'); //Muestra mensaje de confirmación
+      this.limpiarCampos(); //Limpia los campos
     }, error =>{
-
         Swal.fire('Ocurrió un error');
         console.log(error);
-        
     });
   }
 }
- 
