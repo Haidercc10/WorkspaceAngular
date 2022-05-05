@@ -3,51 +3,62 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app.usuario.component',
-  templateUrl: './usuario.component.html',
-  styleUrls: ['./usuario.component.css']
+  selector: 'app.Usuario.component',
+  templateUrl: './Usuario.component.html',
+  styleUrls: ['./Usuario.component.css']
 })
 export class UsuarioComponent implements OnInit {
 
   public formularioUsuario !: FormGroup;
-  constructor( private frmBuilderUsuario : FormBuilder) { }
 
 
-  ngOnInit(): void {
-    this.initForms();
+
+  constructor( private frmBuilderUsuario: FormBuilder) {
+
+    this.formularioUsuario = this.frmBuilderUsuario.group({
+      identificador: [, Validators.required],
+      Codigo: [, Validators.required],
+      Nombre: [, Validators.required],
+      Direccion: [, Validators.required],
+      Telefono: [, Validators.required],
+      Email: [, Validators.required],
+      TipoIdentificacion_Id: [, Validators.required],
+      usuTipo: [, Validators.required],
+      Empresa_Id: [, Validators.required],
+      Estado_Id: [, Validators.required],
+      usuArea: [, Validators.required],
+      usuRol: [, Validators.required],
+      usuEps: [, Validators.required],
+      usuFondoP: [, Validators.required],
+      usuCajaComp: [, Validators.required],
+    });
+
+
+
+
+  }
+
+  ngOnInit(): void { }
+
+  clear() {
+      this.formularioUsuario.reset();
+
+    }
+
+  // VALIDACION PARA CAMPOS VACIOS Y ENVIO DE DATOS
+  validarCamposVacios() : any{
+      if(this.formularioUsuario.valid){
+        Swal.fire("Los datos se enviaron correctamente");
+        this.clear();
+
+
+      }else{
+        Swal.fire("HAY CAMPOS VACIOS");
+      }
   }
 
 
-initForms() {
-  this.formularioUsuario= this.frmBuilderUsuario.group({
-
-    Id: [,Validators.required],
-    Nombre: [,Validators.required],
-    Correo: [,Validators.required],
-    Telefono: [,Validators.required],
-    Direccion: [,Validators.required],
-
-  });
-}
-
-// VALIDACION PARA CAMPOS VACIOS
-validarCamposVacios() : any{
-    if(this.formularioUsuario.valid){
-      Swal.fire("Los datos se enviaron correctamente");
-      this.clear();
-
-
-    }
-
-    else{
-      Swal.fire("HAY CAMPOS VACIOS");
-    }
-}
-
-clear() {
-  console.log("clear clicked")
-  this.formularioUsuario.reset();
-}
 
 }
+
 
