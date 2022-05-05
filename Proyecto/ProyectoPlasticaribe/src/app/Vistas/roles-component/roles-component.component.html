@@ -1,6 +1,5 @@
 
 <div class="container-fluid">
-
   <div class="contenedor_titulo mb-3">
     <h2 class="tituloRojo">Roles</h2>
   </div>
@@ -17,16 +16,13 @@
     <form [formGroup]="formularioRoles" (ngSubmit)="validarCamposVacios()">
       <div class="row g-4">
         <div class="col-md">
-          <input class="identificador" type="number" class="form-control form-control-sm" id="" aria-describedby="" placeholder="Identificador">
+          <input formControlName="rolId" class="identificador" type="number" class="form-control form-control-sm" id="" aria-describedby="" placeholder="ID Rol">
         </div>
         <div class="col-md">
-            <input formControlName="areaCodigo" type="number" minlength="6" maxlength="10" class="form-control form-control-sm" id="validationDefault01"  placeholder="Código" name="Codigo" required >
+            <input formControlName="rolNombre"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre" name="Nombre" required maxlength="50">
         </div>
         <div class="col-md">
-            <input formControlName="areaNombre"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre" name="Nombre" required maxlength="50">
-        </div>
-        <div class="col-md">
-            <textarea  formControlName="areaDescripcion"  class="form-control form-control-sm" placeholder="Descripción" name="Descripcion" required maxlength="200"></textarea>
+            <textarea  formControlName="rolDescripcion"  class="form-control form-control-sm" placeholder="Descripción" name="Descripcion" maxlength="200" ></textarea>
         </div>
       </div>
       <div class="mb-3">

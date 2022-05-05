@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { modelAreas } from 'src/app/Modelo/modelAreas';
 import { ServicioAreasService } from 'src/app/Servicios/servicio-areas.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-areas-component',
@@ -16,7 +17,7 @@ export class AreasComponentComponent implements OnInit {
   //Instancia el servicio en el contructor, además Inyeccion de dependencias formBuilder.
   constructor(private servicioAreasTS : ServicioAreasService, private frmBuilderAreas : FormBuilder) { 
     this.formularioAreas = this.frmBuilderAreas.group({
-      areaCodigo: [, Validators.required],
+      areaId: ['',],
       areaNombre: [, Validators.required],
       areaDescripcion: ['',]
     });
@@ -33,30 +34,33 @@ export class AreasComponentComponent implements OnInit {
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios() : any{
     if(this.formularioAreas.valid){
-      alert("Los datos se enviaron correctamente");
-      this.agregarAreas();
+      this.agregar();
+      Swal.fire("Los datos se enviaron correctamente");
     }else{
-     alert("¡HAY CAMPOS VACIOS!");
+     Swal.fire("¡HAY CAMPOS VACIOS!");
     }
   }
 
 
-  agregarAreas(){
+  agregar(){
     const campoArea : modelAreas = {
       /*las variables hacen referencia al modelo de areas y lo que esta entre parentesis
       viene de las propiedades y valores del formulario*/
-      area_Codigo : this.formularioAreas.get('areaCodigo')?.value,
+      area_Id : this.formularioAreas.get('areaCodigo')?.value,
       area_Nombre : this.formularioAreas.get('areaNombre')?.value,
       area_Descripcion : this.formularioAreas.get('areaDescripcion')?.value
     }
 
     this.servicioAreasTS.srvGuardarArea(campoArea).subscribe(data=>{
-    console.log(data);
-    alert('Registro exitoso con exito'); //Muestra mensaje de confirmación
+
+    Swal.fire('Registro exitoso'); //Muestra mensaje de confirmación
     this.limpiarCampos(); //Limpia los campos
+
     }, error =>{
-        alert('Ocurrió un error');
+
+        Swal.fire('Ocurrió un error');
         console.log(error);
+        
     });
   }
 }

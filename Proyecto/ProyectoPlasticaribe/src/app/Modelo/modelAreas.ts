@@ -2,7 +2,7 @@
 las variables se llaman en la función agregar areas*/
 
 export interface modelAreas {
-  area_Codigo : number;
+  area_Id : number;
   area_Nombre : string;
   area_Descripcion : string;
 }

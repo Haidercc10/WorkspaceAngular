@@ -1,4 +1,16 @@
 /*** configuraciones ***/
+*{
+  text-decoration: none;
+}
+
+.titulo{
+  padding-left: 90px;
+  font-size: 25px;
+}
+
+.titulo span{
+  color: #a23;
+}
 
 .container{
   width: 100%;
@@ -20,7 +32,6 @@ margin: auto;
  text-align: center;
 }
 
-
 .navbar {
  -webkit-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
  -moz-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
@@ -36,27 +47,15 @@ a {
  font-size: small;
 }
 
-
 .textoBarraNav{
 
  font-size: small;
 }
 
-
-
-
-a {
- text-decoration: none;
-}
-
-
-
 nav {
  width: 100%;
  height: 65px;
 }
-
-
 
 ul li {
  font: 13px Verdana, 'Lucida Grande';
@@ -134,7 +133,6 @@ ul li a:hover {
  -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, .15);
  -moz-box-shadow: 0 1px 6px rgba(0, 0, 0, .15);
  box-shadow: 0 1px 6px rgba(0, 0, 0, .15);
-
 }
 
 .dropOut ul {
@@ -153,7 +151,6 @@ ul li a:hover {
  -webkit-border-radius: 4px;
  -moz-border-radius: 4px;
  border-radius: 4px;
-
 }
 
 .dropOut ul li:hover {
@@ -180,6 +177,46 @@ ul li:hover .dropOut {
 
 /*** Fin configuraciones ***/
 
+.contenedorBusqueda{
+  width: 100%;
+  margin-top: 2%;
+}
+
+h5{
+  color: #a23;
+}
+
+.buscarPedidoArea {
+  width: 15%;
+}
+
+#Areas{
+  width: 100%;
+}
+
+.fechaPedidoLabel{
+  width: 10%;
+}
+
+.FechaPedido{
+  width: 20%;
+}
+
+.fechaEntregaLabel{
+  width: 10%;
+}
+
+.FechaEntrga{
+  width: 20%;
+}
+
+.Estado{
+  width: 20%;
+}
+
+#Estado{
+  width: 100%;
+}
 
 input[type=search] {
  -webkit-appearance: textfield;
@@ -191,28 +228,144 @@ input[type=search] {
 /* search input */
 input {
  outline: none;
+
 }
 input[type=search] {
 
  border: solid 1px #ccc;
  padding: 9px 10px 9px 32px;
- width: 150px;
+ width: 200px;
  -webkit-border-radius: 10em;
  -moz-border-radius: 10em;
  border-radius: 10em;
 }
 
-input[type=search]:focus {
- width: 130px;
- background-color: #fff;
- border-color: rgb(158, 1, 1);
-
+input[type=search]:hover{
+  border-color: rgb(158, 1, 1);
 }
 
+input[type=search]:focus {
+ width: 200px;
+ background-color: #fff;
+ border-color: rgb(158, 1, 1);
+}
 
+.boton_consultar{
+  margin: 5px 55% 10px 45%;
+  width: 150px;
+}
+
+.boton_consultar:hover{
+  background-color: #a23;
+  color: #ddd;
+}
 /* fin de funcion buscar */
 
 
+/* ESTILOS DE LA ORDEN DE COMPRA  */
+
+.idOC{
+  width: 12%;
+}
+
+.fechaOrdenCompralabel{
+  width: 16%;
+}
+
+.fechaOrdenCompra {
+  width: 15%;
+}
+
+.proveedorId{
+  width: 12%;
+}
+
+.estadoOC{
+  width: 15%;
+}
+
+.contenedorIdUsuario{
+  width: 21%;
+}
+
+.contenedorNombreUsuario{
+  width: 30%;
+}
+
+.ContenedorArea{
+  width: 15%;
+}
+
+.ContenedorArea2{
+  width: 100%;
+}
+
+.contenedorObservacionOC{
+  width: 34%;
+}
+
+#observacion{
+  width: 100%;
+}
+
+/* MATERIA PRIMA */
+.ContenedorMateriaPrima{
+  width: 100%;
+}
+
+.ContenedorNombreMateriaPrima{
+  width: 30%;
+}
+
+#NombreMateriaPrima{
+  width: 100%;
+  height: 32px;
+  padding: 0;
+  padding-left: 3%;
+  color: #555;
+  font-size: smaller;
+}
+
+.ContenedorCantidadMateriaPrima{
+  width: 20%;
+}
+
+#CantidadMateriaPrima{
+  width: 100%;
+}
+
+.ContenedorUnidadMedidaMateriaPrima{
+  width: 15%;
+}
+
+#UnidadMedida{
+  width: 100%;
+}
+
+.ContenedorStockMateriaPrima{
+  width: 15%;
+}
+
+.ContenedorTipoMateriaPrima{
+  width: 20%;
+}
+
+#TipoMateria{
+  width: 100%;
+}
+
+.nuevaMP{
+  margin-top: 35px;
+}
+
+.ParrafoMP{
+  width: 18%;
+  color: #000;
+}
+
+.boton_agregarMP{
+  width: 10%;
+}
 
 .espacioLinea {
  margin-bottom: 1%;
@@ -241,15 +394,162 @@ textarea{
 
 }
 
-
-
 .form-select{
   width: 50%;
 }
-
-
 
 .col{
   width: 30%;
 }
 
+a{
+  text-decoration: none;
+  color: #fff;
+}
+
+@media (max-width: 1200px){
+
+  .boton_agregarMP{
+    width: 15%;
+    height: 35px;
+  }
+}
+
+@media (max-width: 800px){
+  
+/* BUSQUEDA DE PEDIDOS DE MATERIA PRIMA */
+
+  * label{
+    color: #a23;
+  }
+
+  .buscarPedidoArea {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .fechaPedidoLabel{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .FechaPedido{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .fechaEntregaLabel{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .FechaEntrga{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .Estado{
+    width: 100%;
+    margin-bottom: 10px;
+    margin-top: 5px;
+  }
+  
+/* REGISTRO DE ORDEN DE COMPRA */
+
+  .idOC{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .fechaOrdenCompralabel{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .fechaOrdenCompra {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .proveedorId{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .estadoOC{
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .contenedorIdUsuario{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .contenedorNombreUsuario{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .ContenedorArea{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .contenedorObservacionOC{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+/* MATERIA PRIMA */
+  .ContenedorMateriaPrima{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .ContenedorNombreMateriaPrima{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .ContenedorCantidadMateriaPrima{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .ContenedorUnidadMedidaMateriaPrima{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .ContenedorStockMateriaPrima{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .ContenedorTipoMateriaPrima{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .nuevaMP{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .ParrafoMP{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .nuevarMP{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .boton_agregarMP{
+    width: 50%;
+    margin-left: 30%;
+  }
+
+}

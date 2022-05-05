@@ -1,4 +1,4 @@
-<form method="POST" action="../principal/principal.component.html">
+<form [formGroup]="formularioUsuario" (ngSubmit)="validarCamposVacios()">
   <div class="titulo">
     <h1>Plasticaribe S.A.S</h1>
   </div>
@@ -12,27 +12,21 @@
       </div>
       <!--Formulario-->
       <div class="mb-3">
-        <input id="identificacion" class="form-control form-control-sm" type="number" placeholder="Identificación" aria-label=".form-control-sm example" required>
+        <input formControlName="Identificacion" id="identificacion" class="form-control form-control-sm" type="number" placeholder="Identificación" aria-label=".form-control-sm example" required>
       </div>
       <div class="mb-3">
-        <input id="contrasena" class="form-control form-control-sm" type="password" placeholder="Contraseña" aria-label=".form-control-sm example" required>
+        <input formControlName="Contrasena" id="contrasena" class="form-control form-control-sm" type="password" placeholder="Contraseña" aria-label=".form-control-sm example" required>
       </div>
       <div class="mb-3">
-        <select id="empresa" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-          <option selected>Selecciona empresa</option>
-          <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
+        <select formControlName="Empresa" id="empresa" class="form-select form-select-sm" aria-label=".form-select-sm example">
+          <option value="0" disabled selected>Selecciona empresa</option>
+          <option value="1">Plasticaribe S.A.S</option>
         </select>
       </div>
       <!--Boton Ingresar al sistema-->
       <div class="mb-3">
         <input class="btn btn-danger btn-danger-sm" type="submit" value="¡Ingresar!">
       </div>
-      <div class="mb-3">
-        <p class="textoPequeno">No tienes una cuenta, <a href="/registro" target="_blanck">Registrate aquí</a></p>
-      </div>
-    <!--Fin Formulario-->
     </div>
     <!--Contenedor Login-->
   </div>

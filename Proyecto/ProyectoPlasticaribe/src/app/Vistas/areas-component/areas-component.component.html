@@ -1,4 +1,3 @@
-<p>areas-component works!</p>
 
 <div class="container-fluid">
 
@@ -26,17 +25,15 @@
 
       <!--[(ngModel)]="areaCodigo" codigo utilizado en otro metodo, no borrar-->
       <div class="col-md">
-          <input formControlName="areaCodigo"  id=""  class="form-control form-control-sm" placeholder="Código" minlength="6" maxlength="10" name="Codigo" required>
+          <input formControlName="areaId"  id=""  class="form-control form-control-sm" placeholder="Id Area"  name="Id">
       </div>
       <!--[(ngModel)]="areaNombre" codigo utilizado en otro metodo, no borrar-->
       <div class="col-md">
-
-          <input formControlName="areaNombre" id="" type="text" class="form-control form-control-sm" minlength="3" maxlength="50"   placeholder="Nombre" name="Nombre" required>
+          <input formControlName="areaNombre" id="" type="text" class="form-control form-control-sm" placeholder="Nombre" name="Nombre">
       </div>
       <!--[(ngModel)]="areaDescripcion" codigo utilizado en otro metodo, no borrar-->
       <div class="col-md">
-
-          <textarea formControlName="areaDescripcion" id="" type="text" class="form-control form-control-sm"  maxlength="200" placeholder="Descripción" name="Descripcion" ></textarea>
+          <textarea formControlName="areaDescripcion" id="" type="text" class="form-control form-control-sm" placeholder="Descripción" name="Descripcion" ></textarea>
       </div>
     </div>
   </div>

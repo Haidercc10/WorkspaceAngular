@@ -13,29 +13,27 @@ export class CajacompensacionService {
   readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
 //Encapsular httpclient en el constructor
-  constructor(private httpCajacompensacion : HttpClient) {
-
-
-  }
+  constructor(private http : HttpClient) { }
+  
 //Metodo buscar lista de Cajacompensacion
-  srvObtenerListaCajacompensacion():Observable<any[]> {
-      return this.httpCajacompensacion.get<any>(this.rutaPlasticaribeAPI + '/Cajacompensacion')
+  srvObtenerLista():Observable<any[]> {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + '/Cajacompensacion')
   }
 //Metodo agregar Cajacompensacion
-  srvAgregarCajacompensacion(data:any) {
-    return this.httpCajacompensacion.post(this.rutaPlasticaribeAPI + '/Cajacompensacion', data)
+  srvAgregar(data:any) {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Cajacompensacion', data)
   }
 //Metodo actualzar Cajacompensacion
-  srvActualizarCajacompensacion(id:number|String, data:any) {
-    return this.httpCajacompensacion.put(this.rutaPlasticaribeAPI + `/Cajacompensacion/${id}`, data);
+  srvActualizar(id:number|String, data:any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/Cajacompensacion/${id}`, data);
   }
 //Metodo eliminar Cajacompensacion
-  srvEliminarCajacompensacion(id:number|String) {
-    return this.httpCajacompensacion.delete(this.rutaPlasticaribeAPI + `/Cajacompensacion/${id}`);
+  srvEliminar(id:number|String) {
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Cajacompensacion/${id}`);
   }
 
-  srvGuardarCajacompensacion(Cajacompensacion: modelCajacompensacion): Observable<any> {
-   return this.httpCajacompensacion.post(this.rutaPlasticaribeAPI + '/Cajacompensacion', Cajacompensacion)
+  srvGuardar(Cajacompensacion: modelCajacompensacion): Observable<any> {
+   return this.http.post(this.rutaPlasticaribeAPI + '/Cajacompensacion', Cajacompensacion)
   }
 
 }

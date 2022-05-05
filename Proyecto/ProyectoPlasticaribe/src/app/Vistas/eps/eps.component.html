@@ -18,33 +18,31 @@
     <form [formGroup]="formularioEps" (ngSubmit)="validarCamposVacios()">
       <div class="row g-4">
         <div class="col-md">
-          <input class="identificador" type="number" class="form-control form-control-sm" id="" aria-describedby="" placeholder="Identificador">
+          <input formControlName="Identificacion" class="cajaComId" type="number" class="form-control form-control-sm" id="" aria-describedby="" placeholder="Identificador">
         </div>
         <div class="col-md">
-            <input formControlName="Codigo" type="number" minlength="6" maxlength="10" class="form-control form-control-sm" id="validationDefault01"  placeholder="Código" name="Codigo" required >
+            <input formControlName="Nombre"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre" name="Nombre" required >
         </div>
         <div class="col-md">
-            <input formControlName="Nombre"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre" name="Nombre" required maxlength="50">
+          <input formControlName= "Direccion"  type="text" class="form-control form-control-sm" id=""  placeholder="Direccion" name="Direccion" required >
         </div>
         <div class="col-md">
-          <input formControlName="Direccion"  type="text" class="form-control form-control-sm" id=""  placeholder="Direccion" name="Direccion" required maxlength="50">
-      </div>
-      <div class="col-md">
-        <input formControlName="Telefono"  type="text" class="form-control form-control-sm" id=""  placeholder="Telefono" name="Telefono" required maxlength="50">
-    </div>
-
-    <div class="col-md">
-      <input formControlName="Email"  type="text" class="form-control form-control-sm" id=""  placeholder="Email" name="Email" required maxlength="50">
-  </div>
-  <div class="mb-3">
-    <select id="empresa" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-      <option value="" disabled selected>Cuidad</option>
-      <option value="1">Barranquilla</option>
-      <option value="2">Medellin</option>
-      <option value="3">Bogota</option>
-    </select>
-  </div>
-
+          <input formControlName="Email"  type="text" class="form-control form-control-sm" id=""  placeholder="Email" name="Email" required>
+        </div>
+        <div class="col-md">
+          <input formControlName="Telefono"  type="text" class="form-control form-control-sm" id=""  placeholder="Telefono" name="Telefono" required>
+        </div>
+        <div class="col-md">
+          <input formControlName="CuentaBancaria"  type="number" class="form-control form-control-sm" id=""  placeholder="Cuenta Bancaria" name="cuentaBancaria" required >
+        </div>
+        <div class="mb-3">
+          <select formControlName="Ciudad" id="ciudad" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option value="" disabled selected>Cuidad</option>
+            <option value="1">Barranquilla</option>
+            <option value="2">Medellin</option>
+            <option value="3">Bogota</option>
+          </select>
+        </div>
       </div>
       <div class="mb-3">
         <br>
