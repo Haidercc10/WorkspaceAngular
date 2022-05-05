@@ -1,0 +1,80 @@
+<!--Inicio formulario crear clientes -->
+<form [formGroup]="FormCrearClientes" (ngSubmit)="validarCamposVacios()">
+  <!-- Inicio Fila 1 Crear clientes -->
+          <div class="row g-3">
+            <!-- ID Cliente -->
+            <div class="col-md-2">
+              <input formControlName="CliId" type="number" class="form-control form-control-sm" id="ClienteId"  placeholder="ID Cliente" name="ClienteId" required maxlength="19">
+            </div>
+
+          <!-- Tipo ID Cliente-->
+          <div class="col-md-1">
+            <select formControlName="TipoIdCliente" type="text" id="TpIdCliente" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo ID" name="TpIdCliente" required >
+              <option  disabled selected>Tipo ID</option>
+              <option>fff1</option>
+              <option>hhhh2</option>
+            </select>
+          </div>
+
+            <!-- Nombre Cliente-->
+          <div class="col-md">
+            <input formControlName="CliNombre"  type="text" class="form-control form-control-sm" id="ClienteNombre"  placeholder="Nombre" name="ClienteNombre" required maxlength="50">
+          </div>
+
+            <!-- Direccion Cliente -->
+            <div class="col-md">
+              <input formControlName="CliDireccion"  type="text" class="form-control form-control-sm" id="ClienteDireccion"  placeholder="Direccion" name="ClienteDireccion" required maxlength="60">
+            </div>
+        </div>
+      <!-- Fin Fila 1 Crear Cliente -->
+
+
+      <!-- Inicio Fila 2 Crear Cliente -->
+        <div class="row g-3">
+
+          <!-- Telefono Cliente -->
+          <div class="col-md-2">
+            <input  formControlName="CliTelefono"  type="number" class="form-control form-control-sm" id="ClienteTelefono"  placeholder="Teléfono" name="ClienteTelefono" required maxlength="14">
+          </div>
+
+            <!-- Email cliente -->
+          <div class="col-md">
+            <input formControlName="CliEmail"  type="text" class="form-control form-control-sm" id="ClienteEmail"  placeholder="Email" name="ClienteEmail" required maxlength="60">
+          </div>
+
+          <!-- Tipo cliente -->
+            <div class="col-md-2">
+              <select formControlName="TipoClienteId" type="text" id="TipoCliente" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo cliente" name="TipoCliente" required >
+                <option  disabled selected>Tipo cliente</option>
+                <option>h1</option>
+                <option>b2</option>
+              </select>
+          </div>
+
+           <!-- ID/Nombre Usuario -->
+          <div class="col-md-4">
+            <select formControlName="UsuIdNombre" type="text" id="usuarioIdNombre" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Usuario/Vendedor" name="usuarioIdNombre" required >
+              <option  disabled selected>Usuario</option>
+              <option value="1"> #1</option>
+              <option value="2"> #2</option>
+            </select>
+        </div>
+
+        </div>
+
+
+      <!-- Fin Fila 2 Crear Cliente -->
+
+
+      <!-- Inicio botones -->
+      <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button class="btn btn-danger btn-danger-sm" type="submit">Crear cliente</button>
+            <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
+        </div>
+      </div>
+<!-- Fin botones -->
+</form>
+<!--Fin Formulario crear Cliente -->
+
+

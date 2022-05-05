@@ -1,6 +1,8 @@
+import { ThisReceiver } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { FormBuilder, Validators, FormGroup, FormControl, MinLengthValidator } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { CrearSedesClientesComponent } from '../crear-sedes-clientes/crear-sedes-clientes.component';
 
 @Component({
   selector: 'app.opedidoproducto.component',
@@ -9,51 +11,116 @@ import Swal from 'sweetalert2';
 })
 export class OpedidoproductoComponent implements OnInit {
 
-  public formularioOpedidoproducto !: FormGroup;
+  public FormPedidoExterno !: FormGroup; //Formulario de pedidos
+  public FormSedesClientes !: FormGroup;
 
-  constructor( private frmBuilderOpedidoproducto : FormBuilder) { }
+  //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
+  public ModalCrearProductos: boolean = false;
+  public ModalCrearCliente: boolean = false;
+  public ModalSedesClientes: boolean= false;
+  public TituloSedes = "";
 
+  constructor(private frmBuilderPedExterno : FormBuilder) {
 
-  ngOnInit(): void {
+  this.FormPedidoExterno = this.frmBuilderPedExterno.group({
+
+       //Instanciar campos que vienen del formulario
+       //Pedidos
+       PedClienteId: new FormControl(),
+       PedSedeCli_Id: new FormControl(),
+       PedUsuarioId: new FormControl(),
+       PedFecha: new FormControl(),
+       PedFechaEnt: new FormControl(),
+       PedEstadoId: new FormControl(),
+       PedObservacion: new FormControl(),
+       //Productos
+       ProdId: new FormControl(),
+       ProdNombre: new FormControl(),
+       ProdAncho: new FormControl(),
+       ProdFuelle: new FormControl(),
+       ProdCalibre: new FormControl(),
+       ProdUnidadMedidaACF: new FormControl(),
+       ProdTipo: new FormControl(),
+       ProdCantidad: new FormControl(),
+       ProdUnidadMedidaCant: new FormControl(),
+       ProdPrecioUnd: new FormControl(),
+       ProdTipoMoneda: new FormControl(),
+       ProdStock: new FormControl()
+     })
+   }
+
+  //Cargar al iniciar.
+   ngOnInit(): void {
     this.initForms();
+
   }
 
   initForms() {
-    this.formularioOpedidoproducto = this.frmBuilderOpedidoproducto.group({
+      //Campos que vienen del formulario
+      this.FormPedidoExterno = this.frmBuilderPedExterno.group({
+        //Datos para la tabla de pedidos.
+         PedClienteId: ['', Validators.required],
+         PedSedeCli_Id: ['', Validators.required],
+         PedUsuarioId: ['', Validators.required],
+         PedFecha: ['', Validators.required],
+         PedFechaEnt: ['', Validators.required],
+         PedEstadoId: ['', Validators.required],
+         PedObservacion: [''],
+        //Datos para la tabla de productos.
+         ProdId:['',  Validators.required],
+         ProdNombre: ['', Validators.required],
+         ProdAncho: ['', Validators.required],
+         ProdFuelle: ['', Validators.required],
+         ProdCalibre: ['', Validators.required],
+         ProdUnidadMedidaACF: ['', Validators.required],
+         ProdTipo: ['', Validators.required],
+         ProdCantidad: ['', Validators.required],
+         ProdUnidadMedidaCant: ['', Validators.required],
+         ProdPrecioUnd: ['', Validators.required],
+         ProdTipoMoneda: ['', Validators.required],
+         ProdStock: ['', Validators.required]
+       })
 
 
-      Fuelle: [, Validators.required],
-      Calibre: [, Validators.required],
-      Cantidad: [, Validators.required],
-      PrecioUnidad: [, Validators.required],
-      Stock: [, Validators.required],
-      Ancho: [, Validators.required],
-      Nombre: [, Validators.required],
+  }
 
-    });
+  //Cargar modal de crear producto
+  LlamarModalCrearProducto() {
+    this.ModalCrearProductos = true;
+  }
+
+  LlamarModalCrearCliente() {
+    this.ModalCrearCliente = true;
+  }
+
+  LlamarModalSedesClientes(){
+    this.ModalSedesClientes = true;
+    this.TituloSedes = "Crear sedes clientes"
+    //this.crearSedes.initFormsSedes();
   }
 
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios() : any{
-      if(this.formularioOpedidoproducto.valid){
+      if(this.FormPedidoExterno.valid){
+
         Swal.fire("Los datos se enviaron correctamente");
-
-        this.clear();
-
-
+        //this.LimpiarCampos();
+        console.log(this.FormPedidoExterno);
       }else{
-        Swal.fire("HAY CAMPOS VACIOS");
+        Swal.fire("Hay campos vacios");
+        console.log(this.FormPedidoExterno);
       }
   }
 
-  clear() {
-    console.log("clear clicked")
-    this.formularioOpedidoproducto.reset();
+  LimpiarCampos() {
+    this.FormPedidoExterno.reset();
   }
 
   Alerta(){
     alert('Dime Hola');
   }
+
+
 
 }
 

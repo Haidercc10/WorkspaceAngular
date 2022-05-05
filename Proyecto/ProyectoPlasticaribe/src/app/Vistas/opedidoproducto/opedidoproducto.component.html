@@ -1,7 +1,7 @@
 <!--Navegador parte superior -->
 
-
 <div class="contain">
+
   <nav class="navbar navbar-expand-lg ">
     <div class="container-fluid">
       <span class="navbar-brand mb-0 h1">Plasticaribe SAS</span>
@@ -18,11 +18,34 @@
           <h2 class="tituloRojo">Ordenes de Pedidos</h2>
       </div>
 
-      <div class="mb-5">
+      <div class="mb-4">
         <hr class="colorLinea">
       </div>
 <!-- fin principal -->
 <div class="container">
+
+
+
+<!-- Inicio Botones que llama el modal de crear Cliente y producto-->
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
+    (click)="LlamarModalCrearCliente()" title="Si no encuentras el cliente consultado, ¡Crealo aquí!">
+      Crear clientes
+    </button>
+
+    <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop3"
+    (click)="LlamarModalSedesClientes()" title="Si no encuentras la sede del cliente, ¡Creala aquí!">
+      Sedes clientes
+    </button>
+
+    <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+    (click)="LlamarModalCrearProducto()" title="Si no encuentras el producto solicitado, ¡Crealo aquí!">
+      Crear productos
+    </button>
+  </div>
+
+<!-- Fin Botones que llama el modal de crear cliente y producto-->
 
 
 
@@ -33,85 +56,86 @@
 <!-- Fin titulo -->
 
                                                   <!--Inicio Crear Pedidos-->
-<form [formGroup]="formularioOpedidoproducto" (ngSubmit)="validarCamposVacios()">
 
+<form [formGroup]="FormPedidoExterno" (ngSubmit)="validarCamposVacios()">
   <!-- Inicio fila 1 de campos -->
-        <div class="mb-4">
+
+    <div class="mb-3">
           <div class="row g-3">
 
               <!-- Cliente -->
               <div class="col-md">
-                <select id="PedCliente" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <select formControlName="PedClienteId" type="text" id="PextClienteId" name="PextClienteId"  class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                   <option  disabled selected>Cliente</option>
-                  <option value="1">Cliente #1</option>
-                  <option value="2">Cliente #2</option>
+                  <option>Cliente</option>
+                  <option>Cliente</option>
                 </select>
               </div>
 
               <!-- Sede Cliente -->
               <div class="col-md">
-                <select id="PedSedeCli" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <select formControlName="PedSedeCli_Id" type="text" id="PSedeCli_Id" name="PSedeCli_Id" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                   <option  disabled selected>Sede Cliente</option>
-                  <option value="1">Cliente #1</option>
-                  <option value="2">Cliente #2</option>
+                  <option>Cliente</option>
+                  <option>Cliente</option>
                 </select>
               </div>
 
               <!-- Usuario -->
               <div class="col-md">
-                <select id="PedUsuario" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <select formControlName="PedUsuarioId" type="text" id="PextUsuarioId" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                   <option  disabled selected>Usuario/Vendedor</option>
-                  <option value="1">Usuario #1</option>
-                  <option value="2">Usuario #2</option>
+                  <option>Usuario1</option>
+                  <option>Usuario</option>
                 </select>
               </div>
 
               <!-- Fecha pedido -->
               <div class="col-md">
-                <input formControlName="PedFecha" type="date" class="form-control form-control-sm" id="" placeholder="Fecha pedido" name="PexFecha" required maxlength="50">
+                <input formControlName="PedFecha"  type="date" class="form-control form-control-sm" id="PextFecha" placeholder="Fecha pedido" name="PextFecha" required maxlength="50" title="Fecha Pedido">
               </div>
 
               <!-- Fecha entrega -->
               <div class="col-md">
-                <input formControlName="PedFechaEnt" type="date" class="form-control form-control-sm" id="PexFechaEnt"  placeholder="Fecha entrega" name="PexFechaEnt" required maxlength="50">
+                <input formControlName="PedFechaEnt" type="date" class="form-control form-control-sm" id="PextFechaEnt"  placeholder="Fecha entrega" name="PextFechaEnt" required maxlength="50" title="Fecha Entrega">
               </div>
 
               <!-- Estado -->
               <div class="col-md">
-                <select id="PedEstadoID" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <select formControlName="PedEstadoId" id="PextEstadoId" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                   <option  disabled selected>Estado</option>
-                  <option value="1">Estado #1</option>
-                  <option value="2">Estado #2</option>
+                  <option>Estado</option>
+                  <option>Estado</option>
                 </select>
               </div>
 
           </div>
+    </div>
 
-        </div>
         <!-- Fin fila 1 de campos -->
 
 
         <!-- Inicio Observacion -->
-        <div class="mb-5">
-            <div class="row">
+    <div class="mb-5">
+            <div class="row g-3">
                 <!-- Campo Observacion -->
                 <div class="col-md">
-                  <textarea formControlName="Observacion" id="" type="text" class="form-control form-control-sm"  maxlength="200" placeholder="Observacion" name="Descripcion" style="width: 50%;"></textarea>
+                  <textarea formControlName="PedObservacion"  id="PextObservacion" type="text" class="form-control form-control-sm campoObservacion"  maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
                 </div>
             </div>
-        </div>
+    </div>
+
         <!-- Fin Observacion -->
                                                           <!--Fin Crear Pedidos-->
 
         <!-- Linea -->
-        <div class="mb-5">
+        <div class="mb-4">
 
             <hr class="Linea">
         </div>
         <!-- Fin Linea -->
 
-
-                                                          <!--Inicio tabla productos agregados-->
+                                                     <!--Inicio tabla productos agregados-->
 
         <!-- Inicio Titulo Agregar Productos al pedido -->
         <div class="mb-4">
@@ -119,287 +143,163 @@
         </div>
         <!-- Fin Titulo Agregar Productos al pedido -->
 
+
           <!-- Inicio Fila 1 Agregar producto -->
-
-
-            <!-- Inicio ID/Nombre Producto -->
-              <div class="mb-4">
+        <div class="mb-3">
                 <div class="row g-3">
 
                     <!-- ID Producto -->
-                    <div class="col-md-1">
-                      <input formControlName="ProductoID"  type="text" class="form-control form-control-sm" id=""  placeholder="Producto" name="ProductoID" required maxlength="50">
+                    <div class="col-md-2">
+                      <input formControlName="ProdId" type="number" class="form-control form-control-sm" id="PrdId"  placeholder="ID Producto" name="PrdId" required >
                     </div>
 
                     <!-- ID/Nombre Producto -->
-                  <div class="col-md">
-                        <select id="Producto" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                          <option  disabled selected>Producto</option>
-                          <option value="1">Producto #1</option>
-                          <option value="2">Producto #2</option>
+                    <div class="col-md">
+                        <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
+                          <option ngValue="null" disabled selected>ID Nombre Producto</option>
+                          <option>Producto</option>
+                          <option>Producto</option>
                         </select>
                     </div>
 
                     <!-- Ancho Producto -->
                     <div class="col-md-1">
-                      <input formControlName="Ancho"  type="text" class="form-control form-control-sm" id=""  placeholder="Ancho" name="Ancho" required maxlength="50">
+                      <input formControlName="ProdAncho" type="number" class="form-control form-control-sm" id="PrdAncho"  placeholder="Ancho" name="PrdAncho" required maxlength="14">
                     </div>
 
                     <!-- Fuelle Producto -->
                   <div class="col-md-1">
-                    <input formControlName="Fuelle"  type="text" class="form-control form-control-sm" id=""  placeholder="Fuelle" name="Fuelle" required maxlength="50">
+                    <input formControlName="ProdFuelle" type="number" class="form-control form-control-sm" id="PrdFuelle"  placeholder="Fuelle" name="PrdFuelle" required maxlength="14">
                   </div>
 
                     <!-- Calibre Producto -->
                   <div class="col-md-1">
-                    <input formControlName="Calibre"  type="text" class="form-control form-control-sm" id=""  placeholder="Calibre" name="Calibre" required maxlength="50">
+                    <input formControlName="ProdCalibre" type="number" class="form-control form-control-sm" id="PrdCalibre"  placeholder="Calibre" name="PrdCalibre" required maxlength="14">
                   </div>
 
                   <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
-                    <div class="col-md-2">
-                      <select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="UnidadMedida" style= "width: 100%" required >
-                        <option  disabled selected>Unidad medida</option>
-                        <option value="1">UnidadMedida #1</option>
-                        <option value="2">UnidadMedida #2</option>
+                    <div class="col-md-1">
+                      <select  formControlName="ProdUnidadMedidaACF" id="PrdUnidadMedidaACF" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida"  name="PrdUnidadMedidaACF" required >
+                        <option  disabled selected>Medida</option>
+                        <option>UnidadMedida</option>
+                        <option>UnidadMedida</option>
                       </select>
                   </div>
 
                 </div>
-            </div>
+        </div>
+
             <!-- Fin Fila 1 Agregar Producto -->
 
-
+        <div class="mb-3">
             <!-- Inicio Fila 2 Agregar Producto -->
             <div class="mb-4">
               <div class="row g-3">
 
                   <!-- Tipo Producto -->
                   <div class="col-md-2">
-                    <select id="TipoProducto" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="TipoProducto" style= "width: 100%" required >
+                    <select  formControlName="ProdTipo" id="PrdTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrdTipo" required >
                         <option  disabled selected>Tipo Producto</option>
-                        <option value="1">TipoProducto #1</option>
-                        <option value="2">TipoProducto #2</option>
+                        <option>TipoProducto1</option>
+                        <option>TipoProducto2</option>
                     </select>
                   </div>
 
-                <!-- Cantidad Producto -->
+                <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
                 <div class="col-md-2">
-                  <input formControlName="Cantidad"  type="text" class="form-control form-control-sm" id=""  placeholder="Cantidad" name="Cantidad" required maxlength="50">
+                  <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm"  placeholder="Cantidad" id="PrdCantidad"  name="PrdCantidad" required maxlength="14">
                 </div>
 
                 <!-- UM Cantidad Producto -->
                 <div class="col-md-2">
-                  <select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="UnidadMedida" style= "width: 100%" required >
+                  <select formControlName="ProdUnidadMedidaCant" id="PrdUnidadMedidaCant" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdUnidadMedidaCant" required >
                     <option  disabled selected>Unidad medida</option>
-                    <option value="1">UnidadMedida #1</option>
-                    <option value="2">UnidadMedida #2</option>
+                    <option>UnidadMedida1</option>
+                    <option>UnidadMedida2</option>
                   </select>
                 </div>
 
                 <!-- Precio Producto -->
                 <div class="col-md">
-                  <input formControlName="PrecioUnidad"  type="text" class="form-control form-control-sm" id=""  placeholder="PrecioUnidad" name="PrecioUnidad" required maxlength="50">
+                  <input  formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="PrdPrecioUnd"  placeholder="Precio unidad" name="PrdPrecioUnd" required maxlength="18">
                 </div>
 
                 <!-- Tipo Moneda -->
                 <div class="col-md-2">
-                  <select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="UnidadMedida" style= "width: 100%" required >
+                  <select formControlName="ProdTipoMoneda" id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda" required >
                     <option  disabled selected>Moneda</option>
-                    <option value="1">Moneda #1</option>
-                    <option value="2">Moneda #2</option>
+                    <option>Moneda1</option>
+                    <option>Moneda2</option>
                   </select>
                 </div>
 
                     <!-- Stock Producto -->
                 <div class="col-md">
-                  <input formControlName="Stock"  type="text" class="form-control form-control-sm" id=""  placeholder="Stock" name="Stock" required maxlength="50">
+                  <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock" name="PrdStock" required maxlength="18">
                 </div>
-
               </div>
-
             </div>
+          </div>
             <!-- Fin Fila 2 Agregar Producto -->
 
 
             <!-- Inicio botones -->
-            <div class="mb-3">
+            <div class="mb-4">
               <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                  <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Agregar Producto</button>
-                  <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" expand="full" (click)="clear()">Limpiar campos</button>
+                  <button class="btn btn-danger btn-danger-sm" type="submit" >Agregar Producto</button>
+                  <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
               </div>
             </div>
         <!-- Fin botones -->
-
-</form>
-<!-- Fin formulario agregar producto -->
+      </form>
 
                                                       <!--Fin agregar productos -->
 
-<div class="mb-5">
-  <hr class="Linea">
-</div>
-
-                                                       <!--Inicio crear productos -->
-
-<!-- Inicio Creacion producto -->
-<form [formGroup]="formularioOpedidoproducto" (ngSubmit)="validarCamposVacios()">
-  <div class="mb-4">
-    <h4 class="tituloRojo">Creacion de Producto</h4>
-  </div>
-
-  <!-- Inicio Fila 1 Crear producto -->
-  <div class="mb-4">
-
-    <div class="row g-3">
-
-       <!-- ID Producto -->
-      <div class="col-md-1">
-        <input formControlName="ProductoID"  type="text" class="form-control form-control-sm" id=""  placeholder="Producto" name="ProductoID" required maxlength="50">
-      </div>
-
-      <!-- ID/Nombre Producto -->
-    <div class="col-md">
-          <select id="Producto" class="form-select form-select-sm" aria-label=".form-select-sm example" required style= "width: 100%">
-            <option  disabled selected>Producto</option>
-            <option value="1">Producto #1</option>
-            <option value="2">Producto #2</option>
-          </select>
-      </div>
-
-      <!-- Ancho Producto -->
-      <div class="col-md-1">
-        <input formControlName="Ancho"  type="text" class="form-control form-control-sm" id=""  placeholder="Ancho" name="Ancho" required maxlength="50">
-      </div>
-
-       <!-- Fuelle Producto -->
-    <div class="col-md-1">
-      <input formControlName="Fuelle"  type="text" class="form-control form-control-sm" id=""  placeholder="Fuelle" name="Fuelle" required maxlength="50">
-    </div>
-
-      <!-- Calibre Producto -->
-    <div class="col-md-1">
-      <input formControlName="Calibre"  type="text" class="form-control form-control-sm" id=""  placeholder="Calibre" name="Calibre" required maxlength="50">
-    </div>
-
-    <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
-      <div class="col-md-2">
-        <select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="UnidadMedida" style= "width: 100%" required >
-          <option  disabled selected>Unidad medida</option>
-          <option value="1">UnidadMedida #1</option>
-          <option value="2">UnidadMedida #2</option>
-        </select>
-    </div>
-
-  </div>
-  </div>
-
-  <!-- Fin Fila 1 Crear Producto -->
-
-
-<!-- Inicio Fila 2 Crear Producto -->
-<div class="mb-4">
-  <div class="row g-3">
-
-      <!-- Tipo Producto -->
-      <div class="col-md-2">
-        <select id="TipoProducto" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="TipoProducto" style= "width: 100%" required >
-            <option  disabled selected>Tipo Producto</option>
-            <option value="1">TipoProducto #1</option>
-            <option value="2">TipoProducto #2</option>
-        </select>
-      </div>
-
-    <!-- Cantidad Producto -->
-    <div class="col-md-2">
-      <input formControlName="Cantidad"  type="text" class="form-control form-control-sm" id=""  placeholder="Cantidad" name="Cantidad" required maxlength="50">
-    </div>
-
-    <!-- UM Cantidad Producto -->
-    <div class="col-md-2">
-      <select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="UnidadMedida" style= "width: 100%" required >
-        <option  disabled selected>Unidad medida</option>
-        <option value="1">UnidadMedida #1</option>
-        <option value="2">UnidadMedida #2</option>
-      </select>
-    </div>
-
-    <!-- Precio Producto -->
-    <div class="col-md">
-      <input formControlName="PrecioUnidad"  type="text" class="form-control form-control-sm" id=""  placeholder="PrecioUnidad" name="PrecioUnidad" required maxlength="50">
-    </div>
-
-     <!-- Tipo Moneda -->
-    <div class="col-md-2">
-      <select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="UnidadMedida" style= "width: 100%" required >
-        <option  disabled selected>Moneda</option>
-        <option value="1">Moneda #1</option>
-        <option value="2">Moneda #2</option>
-      </select>
-    </div>
-
-        <!-- Stock Producto -->
-    <div class="col-md">
-      <input formControlName="Stock"  type="text" class="form-control form-control-sm" id=""  placeholder="Stock" name="Stock" required maxlength="50">
-    </div>
-
-  </div>
-
-</div>
-<!-- Fin Fila 2 Crear Producto -->
-
-
-<!-- Inicio botones -->
-<div class="mb-3">
-  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="submit" >Crear Producto</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" expand="full" (click)="clear()">Limpiar campos</button>
-  </div>
-</div>
-<!-- Fin botones -->
-</form>
-                                                      <!--Fin crear productos -->
 
 <div class="mb-5">
   <hr class="Linea">
 </div>
-
 
                                                       <!--Inicio tabla productos -->
 
-  <!-- Inicio titulo producto -->
+  <!-- Inicio titulo tabla producto -->
   <div class="mb-4">
     <h4 class="tituloRojo">Tabla de Productos</h4>
   </div>
   <!-- Fin titulo producto -->
 
-  <form [formGroup]="formularioOpedidoproducto" (ngSubmit)="Alerta()">
+
  <!-- Inicio tabla producto -->
   <div class="mb-4">
 
     <div class="row g-3">
 
-            <div class="table-responsive">
+        <div class="table-responsive">
               <table class="table table-bordered">
+                <!--Inicio encabezado tabla-->
                 <thead class="TitulosTabla">
                   <tr>
-                    <th scope="col">#</th>
+                    <th scope="col">ID</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Ancho</th>
                     <th scope="col">Fuelle</th>
                     <th scope="col">Calibre</th>
                     <th scope="col">Unidad Medida</th>
+                    <th scope="col">Tipo Producto</th>
                     <th scope="col">Cantidad</th>
                     <th scope="col">Unidad Medida</th>
-                    <th scope="col">Precio Unitario</th>
+                    <th scope="col">Precio Und</th>
+                    <th scope="col">Moneda</th>
                     <th scope="col">Stock</th>
-                    <th scope="col">Tipo Producto</th>
-
                   </tr>
                 </thead>
+                <!--Fin encabezado tabla-->
+
+                <!--Inicio cuerpo tabla-->
                 <tbody>
                   <tr>
-                    <th scope="row"></th>
-                    <td class="TextosInfoTabla">Hola Como vas</td>
+                    <th scope="row" ></th>
+                    <td>#</td>
                     <td>#</td>
                     <td>#</td>
                     <td>#</td>
@@ -411,6 +311,7 @@
                     <td>#</td>
                   </tr>
                 </tbody>
+                <!--Fin cuerpo tabla-->
               </table>
 
         </div>
@@ -420,33 +321,70 @@
   <!-- Fin tabla producto -->
 
   <!-- Inicio Botones -->
-  <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
-    <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Crear Pedido</button>
-    <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button">Cancelar</button>
-  </div>
+<div class="bajarPagina">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button class=" btn btn-danger btn-danger-sm" type="submit" >Crear Pedido</button>
+      <button class=" btn btn-secondary btn-secondary-sm" type="button">Cancelar</button>
+    </div>
+</div>
  <!-- Fin Botones -->
- </form>
+
                                                       <!--Fin tabla productos -->
 
-<button class="boton_guardar btn btn-danger btn-danger-sm" type="button" (click)="Alerta()">Llamar modal</button>
 
-      <div class="modal" tabindex="-1">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Modal title</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <p>Modal body text goes here.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-          </div>
+
+<!-- Modal de crear producto -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+              <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Crear productos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+                <div class="modal-body">
+                  <!--Carga componente crear producto-->
+                    <app-crear-producto></app-crear-producto>
+              </div>
         </div>
-      </div>
+  </div>
+</div>
+<!-- Fin Modal de crear producto -->
+
+
+<!-- Modal de crear cliente -->
+<div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+              <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel2">Crear clientes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+                <div class="modal-body">
+                  <!--Carga componente crear cliente-->
+                    <app-crear-clientes></app-crear-clientes>
+              </div>
+        </div>
+  </div>
+</div>
+<!-- Fin Modal de crear cliente -->
+
+
+<!-- Modal de sedes clientes -->
+<div class="modal fade" id="staticBackdrop3" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+              <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel3">{{TituloSedes}}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+                <div class="modal-body">
+                  <!--Carga componente crear cliente-->
+                    <app-crear-sedes-clientes></app-crear-sedes-clientes>
+              </div>
+        </div>
+  </div>
+</div>
+<!-- Fin Modal de sedes clientes -->
 
   </div>
 </div>

@@ -22,6 +22,10 @@ import { OpedidoproductoComponent } from './Vistas/opedidoproducto/opedidoproduc
 import { OcompraComponent } from './Vistas/ocompra/ocompra.component';
 import { UsuarioComponent } from './Vistas/usuario/usuario.component';
 import { PedidomateriaprimaComponent } from './Vistas/pedidomateriaprima/pedidomateriaprima.component';
+import { CrearProductoComponent } from './Vistas/crear-producto/crear-producto.component';
+import { ClientesComponent } from './Vistas/crear-clientes/crear-clientes.component';
+import { CrearSedesClientesComponent } from './Vistas/crear-sedes-clientes/crear-sedes-clientes.component';
+
 
 
 
@@ -46,6 +50,8 @@ export const routes: Routes = [
   {path: 'ocompra', component: OcompraComponent},
   {path: 'usuario',component:UsuarioComponent},
   {path: 'pedidomateriaprima',component:PedidomateriaprimaComponent},
+  {path: 'crearproducto',component:CrearProductoComponent},
+  {path: 'crear-clientes',component:ClientesComponent},
 ]
 
 @NgModule({
@@ -66,7 +72,11 @@ export const routes: Routes = [
     OpedidoproductoComponent,
     OcompraComponent,
     UsuarioComponent,
-    PedidomateriaprimaComponent,],
+    PedidomateriaprimaComponent,
+    CrearProductoComponent,
+    ClientesComponent,
+    CrearSedesClientesComponent,
+   ],
 
 
 

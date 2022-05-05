@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 })
 export class CajacompensacionComponent implements OnInit {
 
-  public formularioCajacompensacion !: FormGroup;
+   formularioCajacompensacion !: FormGroup;
   constructor( private frmBuilderCajacompensacion : FormBuilder) { }
 
 

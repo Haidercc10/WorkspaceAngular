@@ -1,0 +1,115 @@
+<!--Inicio formulario crear productos -->
+<form [formGroup]="FormCrearProducto" (ngSubmit)="validarCamposVacios()">
+              <!-- Inicio Fila 1 Crear producto -->
+                    <div class="mb-4">
+
+                      <div class="row g-3">
+
+                        <!-- ID Producto -->
+                        <div class="col-md-2">
+                          <input formControlName="ProduId" type="number" class="form-control form-control-sm" id="PrId"  placeholder="Producto" name="PrId" required maxlength="19">
+                        </div>
+
+                        <!-- ID/Nombre Producto -->
+                      <div class="col-md">
+                            <select formControlName="ProduNombre" type="text" id="PrdNombre" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrNombre" required>
+                              <option  disabled selected>Producto</option>
+                              <option>Producto1</option>
+                              <option>Producto2</option>
+                            </select>
+                        </div>
+
+                        <!-- Ancho Producto -->
+                        <div class="col-md-1">
+                          <input formControlName="ProduAncho" type="number" class="form-control form-control-sm" id="PrAncho"  placeholder="Ancho" name="PrAncho" required maxlength="14">
+                        </div>
+
+                        <!-- Fuelle Producto -->
+                      <div class="col-md-1">
+                        <input formControlName="ProduFuelle" type="number" class="form-control form-control-sm" id="PrFuelle"  placeholder="Fuelle" name="PrFuelle" required maxlength="14">
+                      </div>
+
+                        <!-- Calibre Producto -->
+                      <div class="col-md-1">
+                        <input formControlName="ProduCalibre" type="number" class="form-control form-control-sm" id="PrCalibre"  placeholder="Calibre" name="PrCalibre" required maxlength="14">
+                      </div>
+
+                      <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
+                        <div class="col-md-2">
+                          <select formControlName="ProduUnidadMedidaACF" type="text" id="PrUnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrUnidadMedida" required >
+                            <option  disabled selected>Unidad medida</option>
+                            <option value="1">UnidadMedida #1</option>
+                            <option value="2">UnidadMedida #2</option>
+                          </select>
+                      </div>
+
+                    </div>
+                    </div>
+
+                    <!-- Fin Fila 1 Crear Producto -->
+
+
+                  <!-- Inicio Fila 2 Crear Producto -->
+
+                  <div class="mb-4">
+                    <div class="row g-3">
+
+                        <!-- Tipo Producto -->
+                        <div class="col-md-2">
+                          <select formControlName="ProduTipo" id="PrTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrTipo" required >
+                              <option  disabled selected>Tipo Producto</option>
+                              <option>TipoProducto #1</option>
+                              <option>TipoProducto #2</option>
+                          </select>
+                        </div>
+
+                      <!-- Cantidad Producto -->
+                      <div class="col-md-2">
+                        <input formControlName="ProduCantidad" type="number" class="form-control form-control-sm" id="PrCantidad"  placeholder="Cantidad" name="PrCantidad" required maxlength="14">
+                      </div>
+
+                      <!-- UM Cantidad Producto -->
+                      <div class="col-md-2">
+                        <select formControlName="ProduUnidadMedidaCant" type="text" id="PrUnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="PrUnidad Medida" name="UnidadMedida" required >
+                          <option  disabled selected>Unidad medida</option>
+                          <option>UnidadMedida #1</option>
+                          <option>UnidadMedida #2</option>
+                        </select>
+                      </div>
+
+                      <!-- Precio Producto -->
+                      <div class="col-md">
+                        <input formControlName="ProduPrecioUnd" type="number" class="form-control form-control-sm" id="PrPrecioUnidad" placeholder="Precio Und" name="PrPrecioUnidad" required maxlength="18">
+                      </div>
+
+                      <!-- Tipo Moneda -->
+                      <div class="col-md-2">
+                        <select formControlName="ProduTipoMoneda" type="text" id="PrTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Moneda" name="PrTipoMoneda" required >
+                          <option  disabled selected>Moneda</option>
+                          <option>Moneda #1</option>
+                          <option>Moneda #2</option>
+                        </select>
+                      </div>
+
+                          <!-- Stock Producto -->
+                      <div class="col-md">
+                        <input formControlName="ProduStock" type="number" class="form-control form-control-sm" id="PrStock"  placeholder="Stock" name="Stock" required maxlength="18">
+                      </div>
+
+                    </div>
+
+                  </div>
+                  <!-- Fin Fila 2 Crear Producto -->
+
+
+                  <!-- Inicio botones -->
+                  <div class="mb-3">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <button class="btn btn-danger btn-danger-sm" type="submit">Crear Producto</button>
+                        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
+                    </div>
+                  </div>
+            <!-- Fin botones -->
+ </form>
+<!--Fin Formulario crear productos -->
+

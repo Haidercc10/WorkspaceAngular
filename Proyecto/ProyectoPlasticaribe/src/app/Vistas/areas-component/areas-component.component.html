@@ -21,7 +21,8 @@
   en areasComponent.ts areaCodigo : ...
   -->
   <form [formGroup]="formularioAreas" (ngSubmit)="validarCamposVacios()">
-    <div class="row g-3">
+    <div class="mb-5">
+      <div class="row g-3">
 
       <!--[(ngModel)]="areaCodigo" codigo utilizado en otro metodo, no borrar-->
       <div class="col-md">
@@ -38,10 +39,8 @@
           <textarea formControlName="areaDescripcion" id="" type="text" class="form-control form-control-sm"  maxlength="200" placeholder="Descripción" name="Descripcion" ></textarea>
       </div>
     </div>
+  </div>
 
-    <div class="mb-3">
-      <br>
-    </div>
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button class="btn btn-danger btn-danger-sm" type="submit">Agregar área</button>
       <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar campos</button>

@@ -1,0 +1,43 @@
+<!--Inicio formulario crear sede cliente -->
+        <form [formGroup]="FormSedesClientes" (ngSubmit)="validarCamposVacios()">
+              <!-- Inicio Fila 1 Crear sede cliente -->
+              <div class="mb-4">
+
+                <div class="row g-3">
+
+                  <!-- ID sede cliente -->
+                  <div class="col-md-2">
+                    <input formControlName="SedeCli_Id" type="number" class="form-control form-control-sm" id="SdCli_Id"  placeholder="ID sede cliente" name="SdCli_Id" required maxlength="19">
+                  </div>
+
+                  <!-- Ciudad sede cliente -->
+                <div class="col-md-3">
+                  <input formControlName="SedeCli_Ciudad" type="text" class="form-control form-control-sm" id="SdCli_Ciudad"  placeholder="Ciudad" name="SdCli_Ciudad" required maxlength="19">
+                  </div>
+
+                   <!-- Nombre del cliente -->
+                <div class="col-md">
+                  <input formControlName="CliNombre" type="text" class="form-control form-control-sm" id="ClienteNombre"  placeholder="ID/Nombre cliente" name="ClienteNombre" required maxlength="14">
+                </div>
+
+                  <!-- Codigo postal -->
+                  <div class="col-md-2">
+                    <input formControlName="SedeCli_Postal" type="number" class="form-control form-control-sm" id="SdCli_Postal"  placeholder="Código postal" name="SdCli_Postal" required maxlength="14">
+                  </div>
+              </div>
+            </div>
+
+              <!-- Fin Fila 1 Crear sedes clientes -->
+
+            <!-- Inicio botones -->
+            <div class="mb-3">
+              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                  <button class="btn btn-danger btn-danger-sm" type="submit">Crear sede</button>
+                  <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
+              </div>
+            </div>
+      <!-- Fin botones -->
+    </form>
+<!--Fin Formulario crear sedes clientes -->
+
+
