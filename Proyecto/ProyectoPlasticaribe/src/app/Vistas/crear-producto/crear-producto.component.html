@@ -13,7 +13,7 @@
                         <!-- ID/Nombre Producto -->
                       <div class="col-md">
                             <select formControlName="ProduNombre" type="text" id="PrdNombre" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrNombre" required>
-                              <option  disabled selected>Producto</option>
+                              <option [ngValue]="null" disabled>Producto</option>
                               <option>Producto1</option>
                               <option>Producto2</option>
                             </select>
@@ -37,7 +37,7 @@
                       <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
                         <div class="col-md-2">
                           <select formControlName="ProduUnidadMedidaACF" type="text" id="PrUnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrUnidadMedida" required >
-                            <option  disabled selected>Unidad medida</option>
+                            <option  [ngValue]="null" disabled>Unidad medida</option>
                             <option value="1">UnidadMedida #1</option>
                             <option value="2">UnidadMedida #2</option>
                           </select>
@@ -57,7 +57,7 @@
                         <!-- Tipo Producto -->
                         <div class="col-md-2">
                           <select formControlName="ProduTipo" id="PrTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrTipo" required >
-                              <option  disabled selected>Tipo Producto</option>
+                              <option [ngValue]="null" disabled>Tipo Producto</option>
                               <option>TipoProducto #1</option>
                               <option>TipoProducto #2</option>
                           </select>
@@ -71,7 +71,7 @@
                       <!-- UM Cantidad Producto -->
                       <div class="col-md-2">
                         <select formControlName="ProduUnidadMedidaCant" type="text" id="PrUnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="PrUnidad Medida" name="UnidadMedida" required >
-                          <option  disabled selected>Unidad medida</option>
+                          <option [ngValue]="null" disabled>Unidad medida</option>
                           <option>UnidadMedida #1</option>
                           <option>UnidadMedida #2</option>
                         </select>
@@ -85,7 +85,7 @@
                       <!-- Tipo Moneda -->
                       <div class="col-md-2">
                         <select formControlName="ProduTipoMoneda" type="text" id="PrTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Moneda" name="PrTipoMoneda" required >
-                          <option  disabled selected>Moneda</option>
+                          <option  [ngValue]="null" disabled>Moneda</option>
                           <option>Moneda #1</option>
                           <option>Moneda #2</option>
                         </select>

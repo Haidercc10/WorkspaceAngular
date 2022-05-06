@@ -10,7 +10,7 @@
           <!-- Tipo ID Cliente-->
           <div class="col-md-1">
             <select formControlName="TipoIdCliente" type="text" id="TpIdCliente" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo ID" name="TpIdCliente" required >
-              <option  disabled selected>Tipo ID</option>
+              <option [ngValue]="null" disabled>Tipo ID</option>
               <option>fff1</option>
               <option>hhhh2</option>
             </select>
@@ -45,7 +45,7 @@
           <!-- Tipo cliente -->
             <div class="col-md-2">
               <select formControlName="TipoClienteId" type="text" id="TipoCliente" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo cliente" name="TipoCliente" required >
-                <option  disabled selected>Tipo cliente</option>
+                <option  [ngValue]="null" disabled>Tipo cliente</option>
                 <option>h1</option>
                 <option>b2</option>
               </select>
@@ -54,7 +54,7 @@
            <!-- ID/Nombre Usuario -->
           <div class="col-md-4">
             <select formControlName="UsuIdNombre" type="text" id="usuarioIdNombre" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Usuario/Vendedor" name="usuarioIdNombre" required >
-              <option  disabled selected>Usuario</option>
+              <option [ngValue]="null" disabled>Usuario</option>
               <option value="1"> #1</option>
               <option value="2"> #2</option>
             </select>

@@ -67,6 +67,8 @@
   </div>
 
   <!-- tabla producto -->
+  <div class="container">
+  <div id="pdf">
   <div class="table-responsive">
     <table class="table table-bordered">
     <thead>
@@ -88,10 +90,11 @@
         <td>#</td>
         <td>#</td>
         <td>#</td>
-        <td>Ver<a href="" download=""></a></td>
+        <td>descargar</td>
       </tr>
     </tbody>
   </table>
+</div>
 </div>
 
   <div class="mb-5">
@@ -191,7 +194,7 @@
             </div>
             <div class="ContenedorTipoMateriaPrima">
               <select formControlName="TipoMateriaPrima" id="TipoMateria" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option   [ngValue]="null" disabled>Tipo Materia</option>
+                <option [ngValue]="null" disabled>Tipo Materia</option>
                 <option value="1">#1</option>
                 <option value="2">#2</option>
                 <option value="3">#3</option>
@@ -303,7 +306,7 @@
       </div>
     </div>
   </form>
-    <!-- </form>  expand="full" (click)="clear()" -->
+  
     <!--  Materia prima a solicitar -->
   <br>
 

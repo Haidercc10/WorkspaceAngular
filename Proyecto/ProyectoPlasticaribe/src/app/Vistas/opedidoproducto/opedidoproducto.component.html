@@ -65,7 +65,7 @@
               <!-- Cliente -->
               <div class="col-md">
                 <select formControlName="PedClienteId" type="text" id="PextClienteId" name="PextClienteId"  class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                  <option [ngValue]="null" disabled selected>Cliente</option>
+                  <option  [ngValue]="null" disabled>Cliente</option>
                   <option>Cliente</option>
                   <option>Cliente</option>
                 </select>
@@ -74,7 +74,7 @@
               <!-- Sede Cliente -->
               <div class="col-md">
                 <select formControlName="PedSedeCli_Id" type="text" id="PSedeCli_Id" name="PSedeCli_Id" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                  <option [ngValue]="null" disabled selected>Sede Cliente</option>
+                  <option  [ngValue]="null" disabled>Sede Cliente</option>
                   <option>Cliente</option>
                   <option>Cliente</option>
                 </select>
@@ -83,7 +83,7 @@
               <!-- Usuario -->
               <div class="col-md">
                 <select formControlName="PedUsuarioId" type="text" id="PextUsuarioId" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                  <option [ngValue]="null" disabled selected>Usuario/Vendedor</option>
+                  <option  [ngValue]="null" disabled>Usuario/Vendedor</option>
                   <option>Usuario1</option>
                   <option>Usuario</option>
                 </select>
@@ -102,7 +102,7 @@
               <!-- Estado -->
               <div class="col-md">
                 <select formControlName="PedEstadoId" id="PextEstadoId" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                  <option [ngValue]="null" disabled selected>Estado</option>
+                  <option  [ngValue]="null" disabled>Estado</option>
                   <option>Estado</option>
                   <option>Estado</option>
                 </select>
@@ -155,7 +155,7 @@
                     <!-- ID/Nombre Producto -->
                     <div class="col-md">
                         <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
-                          <option ngValue="null" disabled selected>ID Nombre Producto</option>
+                          <option  [ngValue]="null" disabled>ID Nombre Producto</option>
                           <option>Producto</option>
                           <option>Producto</option>
                         </select>
@@ -179,7 +179,7 @@
                   <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
                     <div class="col-md-1">
                       <select  formControlName="ProdUnidadMedidaACF" id="PrdUnidadMedidaACF" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida"  name="PrdUnidadMedidaACF" required >
-                        <option [ngValue]="null" disabled selected>Medida</option>
+                        <option [ngValue]="null" disabled>Medida</option>
                         <option>UnidadMedida</option>
                         <option>UnidadMedida</option>
                       </select>
@@ -198,7 +198,7 @@
                   <!-- Tipo Producto -->
                   <div class="col-md-2">
                     <select  formControlName="ProdTipo" id="PrdTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrdTipo" required >
-                        <option [ngValue]="null" disabled selected>Tipo Producto</option>
+                        <option [ngValue]="null" disabled>Tipo Producto</option>
                         <option>TipoProducto1</option>
                         <option>TipoProducto2</option>
                     </select>
@@ -212,7 +212,7 @@
                 <!-- UM Cantidad Producto -->
                 <div class="col-md-2">
                   <select formControlName="ProdUnidadMedidaCant" id="PrdUnidadMedidaCant" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdUnidadMedidaCant" required >
-                    <option [ngValue]="null" disabled selected>Unidad medida</option>
+                    <option  [ngValue]="null" disabled>Unidad medida</option>
                     <option>UnidadMedida1</option>
                     <option>UnidadMedida2</option>
                   </select>
@@ -226,7 +226,7 @@
                 <!-- Tipo Moneda -->
                 <div class="col-md-2">
                   <select formControlName="ProdTipoMoneda" id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda" required >
-                    <option [ngValue]="null" disabled selected>Moneda</option>
+                    <option  [ngValue]="null" disabled>Moneda</option>
                     <option>Moneda1</option>
                     <option>Moneda2</option>
                   </select>
