@@ -4,7 +4,6 @@ import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import { EmpresaService } from 'src/app/Servicios/empresa.service';
 import Swal from 'sweetalert2';
 
-
 @Component({
   selector: 'app-Vista-login-component',
   templateUrl: './login-component.component.html',
@@ -14,6 +13,10 @@ import Swal from 'sweetalert2';
 export class LoginComponentComponent implements OnInit {
 
   public formularioUsuario !: FormGroup;
+
+  /* SE INSTANCIA LA VARIABLE "empresas" QUE VA A SER DE TIPO "EmpresaService" Y TAMBIEN SERÁ UN ARRAY.
+  AQUÍ SE GUARDARÁN LOS NOMBRES DE LAS EMPRESAS QUE HAY EN LA BASE DE DATOS */
+  empresas:EmpresaService[]=[];
 
   constructor(private usuarioServices : UsuarioService, private empresaServices : EmpresaService, private frmBuilderUsuario : FormBuilder) { 
     this.formularioUsuario = this.frmBuilderUsuario.group({
@@ -28,12 +31,11 @@ export class LoginComponentComponent implements OnInit {
   // FUNCION PARA CARGAR LOS DATOS DE LAS EMPRESAS EN EL COMBOBOX DEL HTML
   cargaDatosComboBox(){
     this.empresaServices.srvObtenerLista().subscribe(datos_empresa=>{
-      this.formularioUsuario.value.Empresa;
-
-      for (let i = 0; i < datos_empresa.length; i++) {
-        document.getElementById('empresa')?.innerHTML; String = datos_empresa[i].empresa_Nombre ;
+      for (let index = 0; index < datos_empresa.length; index++) {
+        /* LA SIGUIENTE LINEA DE CODIGO HARÁ QUE SE CONSULTEN LOS DATOS DE LAS EMPRESAS PARA FINALMENTE SOLO GUARDAR EL NOMBRE DE LA EMPRESA
+        EN LA VARIABLE "empresas" Y ESTA VARIABLE SE LE PASARÁ EN EL HTML AL COMBOBOX QUE MOSTRARÁ LAS EMPRESAS */
+        this.empresas.push(datos_empresa[index].empresa_Nombre);
       }
-
     }, error =>{ Swal.fire('Ocurrió un error, intentelo de nuevo'); });
   }
 
@@ -66,5 +68,4 @@ export class LoginComponentComponent implements OnInit {
       }
     }, error =>{ Swal.fire('Ocurrió un error, intentelo de nuevo'); });
   }
-
 }

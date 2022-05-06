@@ -1,5 +1,6 @@
 export interface modelOpedidoproducto {
 
+  PedExt_Id: number,
   PedExt_Codigo : number;
   PedExt_FechaCreacion: Date;
   PedExt_FechaEntrega: Date;
