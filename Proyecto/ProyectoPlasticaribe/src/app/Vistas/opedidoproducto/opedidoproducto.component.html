@@ -23,13 +23,11 @@
 <!-- fin principal -->
 <div class="container">
 
-
-
 <!-- Inicio Botones que llama el modal de crear Cliente y producto-->
 
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
     <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
-    (click)="LlamarModalCrearCliente()" title="Si no encuentras el cliente consultado, ¡Crealo aquí!">
+    (click)= "LlamarModalCrearCliente()" title="Si no encuentras el cliente consultado, ¡Crealo aquí!">
       Crear clientes
     </button>
 
@@ -66,6 +64,9 @@
               <div class="col-md">
                 <select formControlName="PedClienteId" type="text" id="PextClienteId" name="PextClienteId"  class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                   <option  [ngValue]="null" disabled>Cliente</option>
+
+                  <option disabled selected>Cliente</option>
+
                   <option>Cliente</option>
                   <option>Cliente</option>
                 </select>
@@ -74,7 +75,11 @@
               <!-- Sede Cliente -->
               <div class="col-md">
                 <select formControlName="PedSedeCli_Id" type="text" id="PSedeCli_Id" name="PSedeCli_Id" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+
                   <option  [ngValue]="null" disabled>Sede Cliente</option>
+
+                  <option  disabled selected>Sede Cliente</option>
+
                   <option>Cliente</option>
                   <option>Cliente</option>
                 </select>
@@ -83,7 +88,11 @@
               <!-- Usuario -->
               <div class="col-md">
                 <select formControlName="PedUsuarioId" type="text" id="PextUsuarioId" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+
                   <option  [ngValue]="null" disabled>Usuario/Vendedor</option>
+
+                  <option  disabled selected>Usuario/Vendedor</option>
+
                   <option>Usuario1</option>
                   <option>Usuario</option>
                 </select>
@@ -180,6 +189,7 @@
                     <div class="col-md-1">
                       <select  formControlName="ProdUnidadMedidaACF" id="PrdUnidadMedidaACF" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida"  name="PrdUnidadMedidaACF" required >
                         <option [ngValue]="null" disabled>Medida</option>
+
                         <option>UnidadMedida</option>
                         <option>UnidadMedida</option>
                       </select>
@@ -226,7 +236,10 @@
                 <!-- Tipo Moneda -->
                 <div class="col-md-2">
                   <select formControlName="ProdTipoMoneda" id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda" required >
+
                     <option  [ngValue]="null" disabled>Moneda</option>
+
+
                     <option>Moneda1</option>
                     <option>Moneda2</option>
                   </select>
@@ -268,56 +281,48 @@
   <!-- Fin titulo producto -->
 
 
- <!-- Inicio tabla producto -->
+  <!-- Inicio tabla producto -->
   <div class="mb-4">
-
     <div class="row g-3">
-
         <div class="table-responsive">
-              <table class="table table-bordered">
-                <!--Inicio encabezado tabla-->
+            <table class="table table-bordered">
                 <thead class="TitulosTabla">
-                  <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Ancho</th>
-                    <th scope="col">Fuelle</th>
-                    <th scope="col">Calibre</th>
-                    <th scope="col">Unidad Medida</th>
-                    <th scope="col">Tipo Producto</th>
-                    <th scope="col">Cantidad</th>
-                    <th scope="col">Unidad Medida</th>
-                    <th scope="col">Precio Und</th>
-                    <th scope="col">Moneda</th>
-                    <th scope="col">Stock</th>
-                  </tr>
+                    <tr>
+                    <th scope="col" class="idProducto">ID</th>
+                    <th id="nombre" scope="col">Nombre</th>
+                    <th id="ancho" scope="col" class="">Ancho</th>
+                    <th id="fuelle" scope="col">Fuelle</th>
+                    <th id="calibre" scope="col">Calibre</th>
+                    <th id="undMedidaPeso" scope="col">Unidad Medida</th>
+                    <th id="stock" scope="col">Stock</th>
+                    <th id="cantidadDisponible" scope="col">Cantidad Disponible</th>
+                    <th id="undMedidaCantidad" scope="col">Unidad Medida</th>
+                    <th id="precioUnitario" scope="col">Precio Unitario</th>
+                    <th id="precioCantidadTotal" scope="col">Precio Total en Stock</th>
+                    <th id="tipoProducto" scope="col">Tipo Producto</th>
+                    </tr>
                 </thead>
-                <!--Fin encabezado tabla-->
-
-                <!--Inicio cuerpo tabla-->
                 <tbody>
-                  <tr>
-                    <th scope="row" ></th>
-                    <td>#</td>
-                    <td>#</td>
-                    <td>#</td>
-                    <td>#</td>
-                    <td>#</td>
-                    <td>#</td>
-                    <td>#</td>
-                    <td>#</td>
-                    <td>#</td>
-                    <td>#</td>
-                  </tr>
+                    <tr>
+                    <th id="id" class="TextosInfoTabla">{{llenarTabla()}}</th>
+                    <td id="nombre" >#</td>
+                    <td id="ancho" >#</td>
+                    <td id="fuelle" >#</td>
+                    <td id="calibre" >#</td>
+                    <td id="undMedidaPeso" >#</td>
+                    <td id="stock" >#</td>
+                    <td id="cantidadDisponible" >#</td>
+                    <td id="undMedidaCantidad">#</td>
+                    <td id="precioUnitario">#</td>
+                    <td id="precioCantidadTotal">#</td>
+                    <td id="tipoProducto">#</td>
+                    </tr>
                 </tbody>
-                <!--Fin cuerpo tabla-->
-              </table>
-
+            </table>
         </div>
     </div>
-
   </div>
-  <!-- Fin tabla producto -->
+    <!-- Fin tabla producto -->
 
   <!-- Inicio Botones -->
 <div class="bajarPagina">
