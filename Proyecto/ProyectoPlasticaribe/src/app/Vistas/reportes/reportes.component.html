@@ -1,94 +1,138 @@
+<!--Navegador parte superior -->
 
-<a href="http://localhost:4200/principal/reportes" ></a>
-
- <!--Superior-->
 <div class="contain">
+
   <nav class="navbar navbar-expand-lg ">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">Plasticaribe SAS</span>
-      <form class="d-flex">
-        <div class="textoBarraNav">Usuario Administrador</div>
-      </form>
+      <p>Plasti<span>caribe S.A.S</span></p>
     </div>
   </nav>
 
-
-<!-- centro de la pagina-->
-<div class="reportes">
-  <h1 class="tituloRojo">Reportes</h1>
-
-  <nav class="center-nav"></nav>
-  <select name="modulos" id="dropModules">
-      <option value="" disabled selected>Areas</option>
-      <option value="">Cortes</option>
-      <option value="">Laminado</option>
-      <option value="">Extrusion</option>
-      <option value="">Almacen</option>
-      <option value="">Rotrograbado</option>
-      <option value="">Diseño</option>
-  </select>
-  <select name="modulos" id="dropModules">
-    <option value="" disabled selected>Tipo de Reportes</option>
-    <option value="">Reporte de ventas</option>
-    <option value="">Reporte de actividades</option>
-</select>
-
-
-    <!-- Fecha / Programar en javascritp-->
-    <div class="dateField">
-      <label>De</label>
-      <input type="date" />
-    </div>
-    <div class="dateField">
-      <label>Hasta</label>
-      <input type="date" />
-    </div>
-    <div class="col-xs-3">Codigo<input type="text" class="form-control" placeholder=""></div>
-
-
-
-<!--Botones-->
-<div class="mb-3">
-  <br>
-</div>
-<div class="d-grid gap-2 d-md-flex justify-content-md-center">
-  <button class="btn btn-danger " type="button" >Consultar</button>
-  <button class="btn btn-danger " type="button" >Limpiar Campos</button>
-</div>
-
+<!-- Navegador fin de parte superior -->
 
 <br>
-<h4 class="tituloRojo">Datos Del Reporte</h4>
-<br>
+<div class="container-fluid">
+  <div class="container">
+    <div class="mb-4">
+      <h4 class="tituloRojo">Reportes</h4>
+    </div>
 
+
+
+  <!-- boton de busqueda -->
+  
+    <input formControlName="buscar" class="buscar" type="search" placeholder="Buscar Reporte">
+    <!-- boton de busqueda fin -->
+
+    <br>
+    <br>
+    <br>
+    <div class="container">
+<form [formGroup]="formularioReportes" (ngSubmit)="validarCamposVacios()">
+
+
+    <!-- centro de la pagina-->
+    <div class="row g-3">
+    <div class="col-md">
+      <select formControlName="Areas" id="Areas" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+        <option [ngValue]="null" disabled>Areas</option>
+        <option value="1">Lamiando</option>
+        <option value="2">Estrucion</option>
+        <option value="3">Diseño</option>
+        <option value="4">Corte</option>
+        <option value="5">Almacen</option>
+      </select>
+    </div>
+
+          <div class="col-md">
+            <select formControlName="TipoReportes" id="TipoReportes" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <option [ngValue]="null" disabled>Tipo Reportes</option>
+              <option value="1">Reportes de Ventas</option>
+              <option value="2">Reporte de Producto</option>
+              <option value="3">#</option>
+            </select>
+          </div>
+
+
+
+            <!-- fecha -->
+            <label class=" col-md-1 control-label" for=""> Fecha De</label>
+            <div class="col-md">
+              <input  id="FechaDe" name="FechaDe" type="date" class="form-control form-control-sm">
+            </div>
+
+
+            <label class=" col-md-1 control-label" for="">Fecha  Hasta</label>
+            <div class="col-md">
+              <input id="FechaHasta" name="FechaHasta" type="date" class="form-control form-control-sm">
+            </div>
+              <!-- fin fecha -->
+
+            
+              <div class="col-md">
+                <input formControlName="Codigo"  type="number" class="form-control form-control-sm" id=""  placeholder="Codigo" name="Codigo" required maxlength="50">
+            </div>
+
+
+          <!--Botones-->
+          <div class="mb-3">
+            <br>
+          </div>
+          <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
+            <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Consultar</button>
+            <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()" type="button">Limpiar Tabla</button>
+          </div>
+
+
+          <div class="mb-5">
+          <hr class="colorLinea">
+        </div>
+
+          <br>
+          <h4 class="tituloRojo">Datos Del Reporte</h4>
+          <br>
+
+    </div>
 
     <!--Formulario -->
 
-          <table class="table">
-            <thead>
-              <tr>
+          
+                <div class="container">
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th scope="col">ID Reporte</th>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Vendedor</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Archivos</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">#</th>
+                        <td>#</td>
+                        <td>#</td>
+                        <td>#</td>
+                        <td>#</td>
+                        <td>#</td>
+                        <td>Descargar</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                </div>
+</form>
+    </div>
+</div>
+</div>
 
-                <th scope="col">Id Reporte</th>
-                <th scope="col">Producto</th>
-                <th scope="col">Vendedor</th>
-                <th scope="col">Cliente</th>
-                <th scope="col">Fecha</th>
-                <th scope="col">Usuario</th>
-                <th scope="col">Archivo</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">#</th>
-                <td> <input type="text" class="form-control" placeholder="">
-                <td> <input type="text" class="form-control" placeholder="">
-                <td> <input type="text" class="form-control" placeholder="">
-                <td> <input type="text" class="form-control" placeholder="">
-                <td> <input type="text" class="form-control" placeholder="">
-                <td>Descargar</td>
-               </tr></tbody></table>
-
-
+<br>
+<br>
+<!-- paginacion -->
 
                 <nav aria-label="Page navigation example">
                   <ul class="pagination justify-content-center">
@@ -99,7 +143,7 @@
                     <li class="page-item"><a class="page-link" href="0">2</a></li>
                     <li class="page-item"><a class="page-link" href="0">3</a></li>
                     <li class="page-item">
-                      <a class="page-link" href="http://localhost:4200/reportes">Siguiente</a>
+                      <a class="page-link" href="">Siguiente</a>
                     </li>
                   </ul>
                 </nav>

@@ -1,17 +1,54 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-reportes',
-  templateUrl: './reportes.component.html',
-  styleUrls: ['./reportes.component.css']
+  selector: 'app.Reportes.component',
+  templateUrl: './Reportes.component.html',
+  styleUrls: ['./Reportes.component.css']
 })
 export class ReportesComponent implements OnInit {
 
-  constructor () { }
+  public formularioReportes !: FormGroup;
 
-  ngOnInit(): void {
+
+
+  constructor( private frmBuilderReportes: FormBuilder) {
+
+    this.formularioReportes = this.frmBuilderReportes.group({
+     
+      Areas: [, Validators.required],
+      TipoReportes: [, Validators.required],
+      FechaHasta: [, Validators.required],
+      Codigo: [, Validators.required],
+      FechaDe: [, Validators.required],
+    });
+
+
+
+
   }
 
-}
+  ngOnInit(): void { }
 
+  clear() {
+      this.formularioReportes.reset();
+
+    }
+
+  // VALIDACION PARA CAMPOS VACIOS Y ENVIO DE DATOS
+  validarCamposVacios() : any{
+      if(this.formularioReportes.valid){
+        Swal.fire("Los datos se enviaron correctamente");
+        this.clear();
+
+
+      }else{
+        Swal.fire("HAY CAMPOS VACIOS");
+      }
+  }
+
+
+
+}
 

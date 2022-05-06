@@ -28,8 +28,8 @@
     <div class="container contenedorBusqueda">
       <div class="row">
         <div class="buscarPedidoArea col-md-3">
-          <select  id="Areas" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option  disabled selected>Areas</option>
+          <select formControlName="Areas" id="Areas" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="null" disabled>Areas</option>
             <option value="1">Lamiando</option>
             <option value="2">Estrucion</option>
             <option value="3">Diseño</option>
@@ -46,8 +46,8 @@
         </div>
           <!-- fin fecha -->
         <div class="Estado col-md-3">
-          <select  id="Estado" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option  disabled selected>Estado</option>
+          <select  formControlName="Estado" id="Estado" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="null" disabled>Estado</option>
             <option value="1">Activo</option>
             <option value="2">En Procedo</option>
             <option value="3">#</option>
@@ -68,7 +68,6 @@
 
   <!-- tabla producto -->
   <div class="container">
-  <div id="pdf">
   <div class="table-responsive">
     <table class="table table-bordered">
     <thead>
@@ -90,7 +89,7 @@
         <td>#</td>
         <td>#</td>
         <td>#</td>
-        <td>descargar</td>
+       
       </tr>
     </tbody>
   </table>
@@ -123,7 +122,7 @@
         </div>
         <div class="estadoOC col-md-3">
           <select formControlName="estadoOC" id="Estado" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option  disabled selected>Estado</option>
+            <option  [ngValue]="null" disabled>Estado</option>
             <option value="1">Activo</option>
             <option value="2">En Procedo</option>
             <option value="3">#</option>
@@ -143,7 +142,7 @@
           <div class="ContenedorArea">
             <div class="ContenedorArea2 col-md-6">
               <select id="Areas" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option  disabled selected>Areas</option>
+                <option  [ngValue]="null" disabled>Areas</option>
                 <option value="1">Lamiando</option>
                 <option value="2">Estrucion</option>
                 <option value="3">Diseño</option>

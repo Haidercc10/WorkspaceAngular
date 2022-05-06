@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
   selector: 'app.ocompra.component',
   templateUrl: './ocompra.component.html',
   styleUrls: ['./ocompra.component.css']
+  
 })
 export class OcompraComponent implements OnInit {
 
@@ -37,7 +38,12 @@ export class OcompraComponent implements OnInit {
 
   }
 
-  ngOnInit(): void { }
+  ngOnInit(){
+
+  }
+
+
+  
 
   clear() {
       this.formularioOC.reset();
@@ -62,7 +68,8 @@ export class OcompraComponent implements OnInit {
       this.clear();
 
 
-    }else{
+    }
+    else{
       Swal.fire("HAY CAMPOS VACIOS");
     }
   }
@@ -71,4 +78,7 @@ export class OcompraComponent implements OnInit {
     
   }
 }
+
+
+
 
