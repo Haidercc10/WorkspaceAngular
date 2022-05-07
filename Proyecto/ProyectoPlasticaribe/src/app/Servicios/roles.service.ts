@@ -34,8 +34,8 @@ export class RolesService {
   }
 
   //
-  srvGuardar(Roles : modelRol): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Roles_Usuarios', Roles)
+  srvGuardar(data : modelRol): Observable<any> {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Roles_Usuarios', data)
   }
 
 }

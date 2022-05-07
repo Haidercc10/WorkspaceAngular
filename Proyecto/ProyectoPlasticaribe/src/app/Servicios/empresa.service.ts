@@ -29,7 +29,7 @@ export class EmpresaService {
     return this.http.delete(this.rutaPlasticaribeAPI + `/Empresas/${id}`);
   }
 
-  srvGuardar(eps: modelEmpresa): Observable<any> {
-  return this.http.post(this.rutaPlasticaribeAPI + '/Empresas', eps)
+  srvGuardar(data: modelEmpresa): Observable<any> {
+  return this.http.post(this.rutaPlasticaribeAPI + '/Empresas', data)
   }
 }

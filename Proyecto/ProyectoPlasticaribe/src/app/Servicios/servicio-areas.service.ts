@@ -36,8 +36,8 @@ export class ServicioAreasService {
   }
 
   //
-  srvGuardarArea(Area : modelAreas): Observable<any> {
-    return this.httpAreas.post(this.rutaPlasticaribeAPI + '/Areas', Area)
+  srvGuardarArea(data : modelAreas): Observable<any> {
+    return this.httpAreas.post(this.rutaPlasticaribeAPI + '/Areas', data)
   }
 
 }

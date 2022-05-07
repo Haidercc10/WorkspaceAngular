@@ -34,8 +34,8 @@ export class OpedidoService {
     return this.httpOpedido.delete(this.rutaPlasticaribeAPI + `/Opedido/${id}`);
   }
 
-  srvGuardarOpedido(Opedido : modelOpedido): Observable<any> {
-   return this.httpOpedido.post(this.rutaPlasticaribeAPI + '/Opedido', Opedido)
+  srvGuardarOpedido(data : modelOpedido): Observable<any> {
+   return this.httpOpedido.post(this.rutaPlasticaribeAPI + '/Opedido', data)
  }
 
 }

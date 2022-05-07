@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { modelTipoProducto } from '../Modelo/modelTipoProducto';
+import { modelSedesClientes } from '../Modelo/modelSedesClientes';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TipoProductoService {
+export class SedeClienteService {
 
   readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
@@ -14,26 +14,26 @@ export class TipoProductoService {
 
   //Metodo buscar lista de Productos
   srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Producto')
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Clientes')
   }
 
   //Metodo agregar Productos
   srvAgregar(data:any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Tipo_Producto', data)
+    return this.http.post(this.rutaPlasticaribeAPI + '/Clientes', data)
   }
 
   //Metodo actualzar Productos
   srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Tipo_Producto/${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/Clientes/${id}`, data);
   }
 
   //Metodo eliminar Productos
   srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Tipo_Producto/${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Clientes/${id}`);
   }
 
   //
-  srvGuardar(data : modelTipoProducto): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Tipo_Producto', data)
-  }  
+  srvGuardar(data : modelSedesClientes): Observable<any> {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Clientes', data)
+  }
 }

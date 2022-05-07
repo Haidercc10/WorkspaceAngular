@@ -34,8 +34,8 @@ export class OcompraService {
     return this.httpOcompra.delete(this.rutaPlasticaribeAPI + `/Ocompra/${id}`);
   }
 
-  srvGuardarOcompra(Ocompra : modelOcompra): Observable<any> {
-   return this.httpOcompra.post(this.rutaPlasticaribeAPI + '/Ocompra', Ocompra)
+  srvGuardarOcompra(data : modelOcompra): Observable<any> {
+   return this.httpOcompra.post(this.rutaPlasticaribeAPI + '/Ocompra', data)
  }
 
 }

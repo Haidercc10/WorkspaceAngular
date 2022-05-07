@@ -28,14 +28,14 @@
     <br>
     <br>
     <div class="container">
-<form [formGroup]="formularioReportes" (ngSubmit)="validarCamposVacios()">
+<form  (ngSubmit)="validarCamposVacios()">
 
 
     <!-- centro de la pagina-->
     <div class="row g-3">
     <div class="col-md">
       <select formControlName="Areas" id="Areas" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-        <option [ngValue]="null" disabled>Areas</option>
+        <option disabled>Areas</option>
         <option value="1">Lamiando</option>
         <option value="2">Estrucion</option>
         <option value="3">Diseño</option>
@@ -46,7 +46,7 @@
 
           <div class="col-md">
             <select formControlName="TipoReportes" id="TipoReportes" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-              <option [ngValue]="null" disabled>Tipo Reportes</option>
+              <option disabled>Tipo Reportes</option>
               <option value="1">Reportes de Ventas</option>
               <option value="2">Reporte de Producto</option>
               <option value="3">#</option>

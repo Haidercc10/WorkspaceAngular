@@ -34,8 +34,8 @@ export class PedidomateriaprimaService {
     return this.httpPedidomateriaprima.delete(this.rutaPlasticaribeAPI + `/Pedidomateriaprima/${id}`);
   }
 
-  srvGuardarPedidomateriaprima(Pedidomateriaprima : modelPedidomateriaprima): Observable<any> {
-   return this.httpPedidomateriaprima.post(this.rutaPlasticaribeAPI + '/Pedidomateriaprima', Pedidomateriaprima)
+  srvGuardarPedidomateriaprima(data : modelPedidomateriaprima): Observable<any> {
+   return this.httpPedidomateriaprima.post(this.rutaPlasticaribeAPI + '/Pedidomateriaprima', data)
  }
 
 }

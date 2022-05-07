@@ -32,8 +32,8 @@ export class CajacompensacionService {
     return this.http.delete(this.rutaPlasticaribeAPI + `/Cajacompensacion/${id}`);
   }
 
-  srvGuardar(Cajacompensacion: modelCajacompensacion): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/Cajacompensacion', Cajacompensacion)
+  srvGuardar(data: modelCajacompensacion): Observable<any> {
+   return this.http.post(this.rutaPlasticaribeAPI + '/Cajacompensacion', data)
   }
 
 }

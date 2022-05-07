@@ -33,7 +33,7 @@ export class UnidadMedidaService {
   }
 
   //
-  srvGuardar(Roles : modelUnidadMedida): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Unidad_Medida', Roles)
+  srvGuardar(data : modelUnidadMedida): Observable<any> {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Unidad_Medida', data)
   }
 }

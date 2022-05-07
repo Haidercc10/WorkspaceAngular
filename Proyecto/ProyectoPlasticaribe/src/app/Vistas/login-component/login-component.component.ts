@@ -63,7 +63,7 @@ export class LoginComponentComponent implements OnInit {
             Swal.fire('El número de Identificación no concuerda');
           } else if (this.formularioUsuario.value.Contrasena != dato_contrasena) {
             Swal.fire('La contraseña y la Identificación no concuerdan');
-          }
+          } else console.log("Bienvenido");
         }
       }
     }, error =>{ Swal.fire('Ocurrió un error, intentelo de nuevo'); });

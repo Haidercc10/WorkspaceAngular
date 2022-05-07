@@ -1,5 +1,4 @@
 <!--Navegador parte superior -->
-
 <div class="contain">
 
   <nav class="navbar navbar-expand-lg ">
@@ -7,143 +6,204 @@
       <p>Plasti<span>caribe S.A.S</span></p>
     </div>
   </nav>
-
 <!-- Navegador fin de parte superior -->
 
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Ordenes de Pedidos</h2>
+    </div>
 
-<div class="container-fluid">
-<!-- principal -->
-      <div class="mb-4 Titulo">
-          <h2 class="tituloRojo">Ordenes de Pedidos</h2>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+    <!-- fin principal -->
+    <div class="container">
+      <!-- Inicio Botones que llama el modal de crear Cliente y producto-->
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
+        (click)= "LlamarModalCrearCliente()" title="Si no encuentras el cliente consultado, ¡Crealo aquí!">
+          Crear clientes
+        </button>
+
+        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop3"
+        (click)="LlamarModalSedesClientes()" title="Si no encuentras la sede del cliente, ¡Creala aquí!">
+          Sedes clientes
+        </button>
+
+        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+        (click)="LlamarModalCrearProducto()" title="Si no encuentras el producto solicitado, ¡Crealo aquí!">
+          Crear productos
+        </button>
       </div>
+      <!-- Fin Botones que llama el modal de crear cliente y producto-->
+
+      <!-- Inicio titulo -->
+      <div class="mb-4">
+        <h4 class="tituloRojo">Consultar Pedido</h4>
+      </div>
+      <!-- Fin titulo -->
+
+      <!-- INICIO DE CONSULTA DE PEDIDOS DE PRODUCTOS -->
+      <form [formGroup]="FormConsultaPedidoExterno" (ngSubmit)="consultarDatos()">
+        <div class="mb-3">
+          <div class="row g-3">
+            <!-- NUMERO DE IDENTIFICACION DEL PEDIDO DE PRODUCTOS -->
+            <div class="col-md-4">
+              <input formControlName="PedExtIdConsulta"  type="number" class="form-control form-control-sm" id="PedExtId" placeholder="N° del Pedido" name="PedExtId" required title="Consecutivo identificador del Pedido">
+            </div>
+            <!-- FECHA EN QUE SE HIZO EL PEDIDO -->
+            <label class="col-md-2 control-label">Fecha del Pedido</label>
+            <div class="col-md">
+              <input formControlName="PedExtFechaConsulta" type="date" class="form-control form-control-sm" id="PextFecha" placeholder="Fecha pedido" name="PextFecha" required title="Fecha Pedido">
+            </div>
+            <!-- FECHA EN QUE SE TIENE QUE ENTREGAR EL PEDIDO -->
+            <label class="col-md-2 control-label">Fecha del Entrega</label>
+            <div class="col-md">
+              <input formControlName="PedExtFechaEntregaConsulta" type="date" class="form-control form-control-sm" id="PextFechaEntrega" placeholder="Fecha entrega" name="PextFechaEntrega" required title="Fecha Entrega">
+            </div>
+          </div>
+        </div>
+        <!-- FILA 2 -->
+        <div class="mb-5">
+          <div class="row g-3">
+            <!-- Estado -->
+            <div class="col-md-4">
+              <select formControlName="PedExtEstadoConsulta" id="PextEstadoId" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option  [ngValue]="null" disabled>Estado</option>
+                <option>Estado</option>
+                <option>Estado</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <!-- FILA 3 -->
+        <div class="mb-1">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <input class="btn btn-danger btn-danger-sm" type="submit" value="Consultar Pedidos" (click)="consultarDatos()">
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <h4 class="tituloRojo">Tebla Pedido</h4>
+        </div>
+        <!-- TABLA DE PEDIDOS -->
+        <div class="mb-4">
+          <div class="row g-3">
+            <div class="table-responsive">
+              <table class="table table-bordered" *ngIf="pedidosProductos">
+                <thead class="TitulosTabla">
+                  <tr>
+                  <th id="idPedido" scope="col">ID</th>
+                  <th id="fechaPedido" scope="col">Fecha Pedido</th>
+                  <th id="fechaEntrega" scope="col" class="">Fecha Entrega</th>
+                  <th id="cliente" scope="col">Cliente</th>
+                  <th id="estadoPedido" scope="col">Estado</th>
+                  <th id="observacionPedido" scope="col">Observacion</th>
+                  <th id="precioPedido" scope="col">Precio Total</th>
+                  <th id="archivoPedido" scope="col">Archivo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <th *ngFor="let t of " id="idPedido">{{t}}</th>
+                    <td id="fechaPedido" ></td>
+                    <td id="fechaEntrega" ></td>
+                    <td id="cliente" ></td>
+                    <td id="estadoPedido" ></td>
+                    <td id="observacionPedido" ></td>
+                    <td id="precioPedido" ></td>
+                    <td id="archivoPedido"><a href=""></a></td>
+                    </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </form>
 
       <div class="mb-4">
         <hr class="colorLinea">
       </div>
-<!-- fin principal -->
-<div class="container">
 
-<!-- Inicio Botones que llama el modal de crear Cliente y producto-->
+      <!-- Inicio titulo -->
+      <div class="mb-4">
+        <h4 class="tituloRojo">Crear Pedido</h4>
+      </div>
+      <!-- Fin titulo -->
+                                                      <!--Inicio Crear Pedidos-->
 
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
-    (click)= "LlamarModalCrearCliente()" title="Si no encuentras el cliente consultado, ¡Crealo aquí!">
-      Crear clientes
-    </button>
-
-    <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop3"
-    (click)="LlamarModalSedesClientes()" title="Si no encuentras la sede del cliente, ¡Creala aquí!">
-      Sedes clientes
-    </button>
-
-    <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-    (click)="LlamarModalCrearProducto()" title="Si no encuentras el producto solicitado, ¡Crealo aquí!">
-      Crear productos
-    </button>
-  </div>
-
-<!-- Fin Botones que llama el modal de crear cliente y producto-->
-
-
-
-<!-- Inicio titulo -->
-<div class="mb-4">
-  <h4 class="tituloRojo">Crear Pedido</h4>
-</div>
-<!-- Fin titulo -->
-
-                                                  <!--Inicio Crear Pedidos-->
-
-<form [formGroup]="FormPedidoExterno" (ngSubmit)="validarCamposVacios()">
-  <!-- Inicio fila 1 de campos -->
-
-    <div class="mb-3">
+      <form [formGroup]="FormPedidoExterno" (ngSubmit)="validarCamposVacios()">
+        <!-- Inicio fila 1 de campos -->
+        <div class="mb-3">
           <div class="row g-3">
+            <!-- Cliente -->
+            <div class="col-md">
+              <select formControlName="PedClienteId" type="text" id="PextClienteId" name="PextClienteId"  class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
+                <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
+              </select>
+            </div>
 
-              <!-- Cliente -->
-              <div class="col-md">
-                <select formControlName="PedClienteId" type="text" id="PextClienteId" name="PextClienteId"  class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                  <option  [ngValue]="null" disabled>Cliente</option>
+            <!-- Sede Cliente -->
+            <div class="col-md">
+              <select formControlName="PedSedeCli_Id" type="text" id="PSedeCli_Id" name="PSedeCli_Id" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option  [ngValue]="null" disabled selected>Sede Cliente</option>
+                <option>Cliente</option>
+                <option>Cliente</option>
+              </select>
+            </div>
 
-                  <option disabled selected>Cliente</option>
+            <!-- Usuario -->
+            <div class="col-md">
+              <select formControlName="PedUsuarioId" type="text" id="PextUsuarioId" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option [ngValue]="null" disabled selected>Seleccione nombre Vendedor</option>
+                <option [ngValue]="vendedor" *ngFor="let vendedor of usuarioVendedor">{{vendedor}}</option>
+              </select>
+            </div>
 
-                  <option>Cliente</option>
-                  <option>Cliente</option>
-                </select>
-              </div>
+            <!-- Fecha pedido -->
+            <div class="col-md">
+              <input formControlName="PedFecha"  type="date" class="form-control form-control-sm" id="PextFecha" placeholder="Fecha pedido" name="PextFecha" required maxlength="50" title="Fecha Pedido">
+            </div>
 
-              <!-- Sede Cliente -->
-              <div class="col-md">
-                <select formControlName="PedSedeCli_Id" type="text" id="PSedeCli_Id" name="PSedeCli_Id" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <!-- Fecha entrega -->
+            <div class="col-md">
+              <input formControlName="PedFechaEnt" type="date" class="form-control form-control-sm" id="PextFechaEnt"  placeholder="Fecha entrega" name="PextFechaEnt" required maxlength="50" title="Fecha Entrega">
+            </div>
 
-                  <option  [ngValue]="null" disabled>Sede Cliente</option>
-
-                  <option  disabled selected>Sede Cliente</option>
-
-                  <option>Cliente</option>
-                  <option>Cliente</option>
-                </select>
-              </div>
-
-              <!-- Usuario -->
-              <div class="col-md">
-                <select formControlName="PedUsuarioId" type="text" id="PextUsuarioId" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-
-                  <option  [ngValue]="null" disabled>Usuario/Vendedor</option>
-
-                  <option  disabled selected>Usuario/Vendedor</option>
-
-                  <option>Usuario1</option>
-                  <option>Usuario</option>
-                </select>
-              </div>
-
-              <!-- Fecha pedido -->
-              <div class="col-md">
-                <input formControlName="PedFecha"  type="date" class="form-control form-control-sm" id="PextFecha" placeholder="Fecha pedido" name="PextFecha" required maxlength="50" title="Fecha Pedido">
-              </div>
-
-              <!-- Fecha entrega -->
-              <div class="col-md">
-                <input formControlName="PedFechaEnt" type="date" class="form-control form-control-sm" id="PextFechaEnt"  placeholder="Fecha entrega" name="PextFechaEnt" required maxlength="50" title="Fecha Entrega">
-              </div>
-
-              <!-- Estado -->
-              <div class="col-md">
-                <select formControlName="PedEstadoId" id="PextEstadoId" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                  <option  [ngValue]="null" disabled>Estado</option>
-                  <option>Estado</option>
-                  <option>Estado</option>
-                </select>
-              </div>
-
+            <!-- Estado -->
+            <div class="col-md">
+              <select formControlName="PedEstadoId" id="PextEstadoId" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option  [ngValue]="null" disabled>Estado</option>
+                <option>Estado</option>
+                <option>Estado</option>
+              </select>
+            </div>
           </div>
-    </div>
-
+        </div>
         <!-- Fin fila 1 de campos -->
 
-
         <!-- Inicio Observacion -->
-    <div class="mb-5">
-            <div class="row g-3">
-                <!-- Campo Observacion -->
-                <div class="col-md">
-                  <textarea formControlName="PedObservacion"  id="PextObservacion" type="text" class="form-control form-control-sm campoObservacion"  maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
-                </div>
+        <div class="mb-5">
+          <div class="row g-3">
+            <!-- Campo Observacion -->
+            <div class="col-md">
+              <textarea formControlName="PedObservacion"  id="PextObservacion" type="text" class="form-control form-control-sm campoObservacion"  maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
             </div>
-    </div>
+          </div>
+        </div>
 
         <!-- Fin Observacion -->
-                                                          <!--Fin Crear Pedidos-->
+                                                              <!--Fin Crear Pedidos-->
 
         <!-- Linea -->
         <div class="mb-4">
-
-            <hr class="Linea">
+          <hr class="Linea">
         </div>
         <!-- Fin Linea -->
 
-                                                     <!--Inicio tabla productos agregados-->
+                                                        <!--Inicio tabla productos agregados-->
 
         <!-- Inicio Titulo Agregar Productos al pedido -->
         <div class="mb-4">
@@ -152,140 +212,116 @@
         <!-- Fin Titulo Agregar Productos al pedido -->
 
 
-          <!-- Inicio Fila 1 Agregar producto -->
+        <!-- Inicio Fila 1 Agregar producto -->
         <div class="mb-3">
-                <div class="row g-3">
-
-                    <!-- ID Producto -->
-                    <div class="col-md-2">
-                      <input formControlName="ProdId" type="number" class="form-control form-control-sm" id="PrdId"  placeholder="ID Producto" name="PrdId" required >
-                    </div>
-
-                    <!-- ID/Nombre Producto -->
-                    <div class="col-md">
-                        <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
-                          <option  [ngValue]="null" disabled>ID Nombre Producto</option>
-                          <option>Producto</option>
-                          <option>Producto</option>
-                        </select>
-                    </div>
-
-                    <!-- Ancho Producto -->
-                    <div class="col-md-1">
-                      <input formControlName="ProdAncho" type="number" class="form-control form-control-sm" id="PrdAncho"  placeholder="Ancho" name="PrdAncho" required maxlength="14">
-                    </div>
-
-                    <!-- Fuelle Producto -->
-                  <div class="col-md-1">
-                    <input formControlName="ProdFuelle" type="number" class="form-control form-control-sm" id="PrdFuelle"  placeholder="Fuelle" name="PrdFuelle" required maxlength="14">
-                  </div>
-
-                    <!-- Calibre Producto -->
-                  <div class="col-md-1">
-                    <input formControlName="ProdCalibre" type="number" class="form-control form-control-sm" id="PrdCalibre"  placeholder="Calibre" name="PrdCalibre" required maxlength="14">
-                  </div>
-
-                  <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
-                    <div class="col-md-1">
-                      <select  formControlName="ProdUnidadMedidaACF" id="PrdUnidadMedidaACF" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida"  name="PrdUnidadMedidaACF" required >
-                        <option [ngValue]="null" disabled>Medida</option>
-
-                        <option>UnidadMedida</option>
-                        <option>UnidadMedida</option>
-                      </select>
-                  </div>
-
-                </div>
+          <div class="row g-3">
+            <!-- ID Producto -->
+            <div class="col-md-2">
+              <input formControlName="ProdId" type="number" class="form-control form-control-sm" id="PrdId"  placeholder="ID Producto" name="PrdId" required >
+            </div>
+            <!-- ID/Nombre Producto -->
+            <div class="col-md">
+                <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
+                  <option [ngValue]="null" disabled selected>Seleccione Producto</option>
+                  <option [ngValue]="productos" *ngFor="let productos of producto">{{productos}}</option>
+                </select>
+            </div>
+            <!-- Ancho Producto -->
+            <div class="col-md-1">
+              <input formControlName="ProdAncho" type="number" class="form-control form-control-sm" id="PrdAncho"  placeholder="Ancho" name="PrdAncho" required maxlength="14">
+            </div>
+            <!-- Fuelle Producto -->
+            <div class="col-md-1">
+              <input formControlName="ProdFuelle" type="number" class="form-control form-control-sm" id="PrdFuelle"  placeholder="Fuelle" name="PrdFuelle" required maxlength="14">
+            </div>
+              <!-- Calibre Producto -->
+            <div class="col-md-1">
+              <input formControlName="ProdCalibre" type="number" class="form-control form-control-sm" id="PrdCalibre"  placeholder="Calibre" name="PrdCalibre" required maxlength="14">
+            </div>
+            <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
+            <div class="col-md-1">
+              <select  formControlName="ProdUnidadMedidaACF" id="PrdUnidadMedidaACF" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida"  name="PrdUnidadMedidaACF" required >
+                <option [ngValue]="null" disabled selected>Und. Medida</option>
+                <option [ngValue]="undidadMedida" *ngFor="let undidadMedida of undMed">{{undidadMedida}}</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-            <!-- Fin Fila 1 Agregar Producto -->
+        <!-- Fin Fila 1 Agregar Producto -->
 
         <div class="mb-3">
-            <!-- Inicio Fila 2 Agregar Producto -->
-            <div class="mb-4">
-              <div class="row g-3">
-
-                  <!-- Tipo Producto -->
-                  <div class="col-md-2">
-                    <select  formControlName="ProdTipo" id="PrdTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrdTipo" required >
-                        <option [ngValue]="null" disabled>Tipo Producto</option>
-                        <option>TipoProducto1</option>
-                        <option>TipoProducto2</option>
-                    </select>
-                  </div>
-
-                <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
-                <div class="col-md-2">
-                  <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm"  placeholder="Cantidad" id="PrdCantidad"  name="PrdCantidad" required maxlength="14">
-                </div>
-
-                <!-- UM Cantidad Producto -->
-                <div class="col-md-2">
-                  <select formControlName="ProdUnidadMedidaCant" id="PrdUnidadMedidaCant" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdUnidadMedidaCant" required >
-                    <option  [ngValue]="null" disabled>Unidad medida</option>
-                    <option>UnidadMedida1</option>
-                    <option>UnidadMedida2</option>
-                  </select>
-                </div>
-
-                <!-- Precio Producto -->
-                <div class="col-md">
-                  <input  formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="PrdPrecioUnd"  placeholder="Precio unidad" name="PrdPrecioUnd" required maxlength="18">
-                </div>
-
-                <!-- Tipo Moneda -->
-                <div class="col-md-2">
-                  <select formControlName="ProdTipoMoneda" id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda" required >
-
-                    <option  [ngValue]="null" disabled>Moneda</option>
-
-
-                    <option>Moneda1</option>
-                    <option>Moneda2</option>
-                  </select>
-                </div>
-
-                    <!-- Stock Producto -->
-                <div class="col-md">
-                  <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock" name="PrdStock" required maxlength="18">
-                </div>
+          <!-- Inicio Fila 2 Agregar Producto -->
+          <div class="mb-4">
+            <div class="row g-3">
+              <!-- Tipo Producto -->
+              <div class="col-md-2">
+                <select  formControlName="ProdTipo" id="PrdTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrdTipo" required >
+                  <option [ngValue]="null" disabled selected>Seleccione Tipo Producto</option>
+                  <option [ngValue]="tipoProductos" *ngFor="let tipoProductos of tipoProducto">{{tipoProductos}}</option>
+                </select>
+              </div>
+              <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
+              <div class="col-md-2">
+                <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm"  placeholder="Cantidad" id="PrdCantidad"  name="PrdCantidad" required maxlength="14">
+              </div>
+              <!-- UM Cantidad Producto -->
+              <div class="col-md-2">
+                <select formControlName="ProdUnidadMedidaCant" id="PrdUnidadMedidaCant" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdUnidadMedidaCant" required >
+                  <option [ngValue]="null" disabled selected>Und. Medida</option>
+                  <option [ngValue]="undidadMedida" *ngFor="let undidadMedida of undMed">{{undidadMedida}}</option>
+                </select>
+              </div>
+              <!-- Precio Producto -->
+              <div class="col-md">
+                <input  formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="PrdPrecioUnd"  placeholder="Precio unidad" name="PrdPrecioUnd" required maxlength="18">
+              </div>
+              <!-- Tipo Moneda -->
+              <div class="col-md-2">
+                <select formControlName="ProdTipoMoneda" id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda" required >
+                  <option [ngValue]="null" disabled selected>Seleccione Tipo de Moneda</option>
+                  <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas}}</option>
+                </select>
+              </div>
+              <!-- Stock Producto -->
+              <div class="col-md">
+                <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock" name="PrdStock" required maxlength="18">
               </div>
             </div>
           </div>
-            <!-- Fin Fila 2 Agregar Producto -->
+        </div>
+        <!-- Fin Fila 2 Agregar Producto -->
 
-
-            <!-- Inicio botones -->
-            <div class="mb-4">
-              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                  <button class="btn btn-danger btn-danger-sm" type="submit" >Agregar Producto</button>
-                  <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
-              </div>
-            </div>
+        <!-- Inicio botones -->
+        <div class="mb-4">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button class="btn btn-danger btn-danger-sm" type="submit" >Agregar Producto</button>
+              <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
+          </div>
+        </div>
         <!-- Fin botones -->
-      </form>
+          
 
-                                                      <!--Fin agregar productos -->
+                                                          <!--Fin agregar productos -->
+
+        <div class="mb-5">
+          <hr class="Linea">
+        </div>
+
+                                                            <!--Inicio tabla productos -->
+
+        <!-- Inicio titulo tabla producto -->
+        <div class="mb-4">
+          <h4 class="tituloRojo">Tabla de Productos</h4>
+        </div>
+        <!-- Fin titulo producto -->
 
 
-<div class="mb-5">
-  <hr class="Linea">
-</div>
-
-                                                      <!--Inicio tabla productos -->
-
-  <!-- Inicio titulo tabla producto -->
-  <div class="mb-4">
-    <h4 class="tituloRojo">Tabla de Productos</h4>
-  </div>
-  <!-- Fin titulo producto -->
-
-
-  <!-- Inicio tabla producto -->
-  <div class="mb-4">
-    <div class="row g-3">
-        <div class="table-responsive">
-            <table class="table table-bordered">
+        <!-- Inicio tabla producto -->
+        <div class="mb-4">
+          <div class="row g-3">
+            <div class="table-responsive">
+              <table class="table table-bordered">
                 <thead class="TitulosTabla">
                     <tr>
                     <th scope="col" class="idProducto">ID</th>
@@ -304,7 +340,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                    <th id="id" class="TextosInfoTabla">{{llenarTabla()}}</th>
+                    <th id="id" class="TextosInfoTabla"></th>
                     <td id="nombre" >#</td>
                     <td id="ancho" >#</td>
                     <td id="fuelle" >#</td>
@@ -318,79 +354,75 @@
                     <td id="tipoProducto">#</td>
                     </tr>
                 </tbody>
-            </table>
+              </table>
+            </div>
+          </div>
         </div>
+        <!-- Fin tabla producto -->
+
+        <!-- Inicio Botones -->
+        <div class="bajarPagina">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <input class=" btn btn-danger btn-danger-sm" type="submit" value="Crear Pedido">
+              <button class=" btn btn-secondary btn-secondary-sm" type="button" href="/principal">Cancelar</button>
+            </div>
+        </div>
+      </form>
+      <!-- Fin Botones -->
+
+                                                          <!--Fin tabla productos -->
+
+      <!-- Modal de crear producto -->
+      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">Crear productos</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!--Carga componente crear producto-->
+              <app-crear-producto></app-crear-producto>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Fin Modal de crear producto -->
+
+
+      <!-- Modal de crear cliente -->
+      <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel2">Crear clientes</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!--Carga componente crear cliente-->
+              <app-crear-clientes></app-crear-clientes>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Fin Modal de crear cliente -->
+
+      <!-- Modal de sedes clientes -->
+      <div class="modal fade" id="staticBackdrop3" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel3">{{TituloSedes}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!--Carga componente crear cliente-->
+                <app-crear-sedes-clientes></app-crear-sedes-clientes>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Fin Modal de sedes clientes -->
     </div>
   </div>
-    <!-- Fin tabla producto -->
-
-  <!-- Inicio Botones -->
-<div class="bajarPagina">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class=" btn btn-danger btn-danger-sm" type="submit" >Crear Pedido</button>
-      <button class=" btn btn-secondary btn-secondary-sm" type="button">Cancelar</button>
-    </div>
 </div>
- <!-- Fin Botones -->
-
-                                                      <!--Fin tabla productos -->
-
-
-
-<!-- Modal de crear producto -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content">
-              <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Crear productos</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-                <div class="modal-body">
-                  <!--Carga componente crear producto-->
-                    <app-crear-producto></app-crear-producto>
-              </div>
-        </div>
-  </div>
-</div>
-<!-- Fin Modal de crear producto -->
-
-
-<!-- Modal de crear cliente -->
-<div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content">
-              <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel2">Crear clientes</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-                <div class="modal-body">
-                  <!--Carga componente crear cliente-->
-                    <app-crear-clientes></app-crear-clientes>
-              </div>
-        </div>
-  </div>
-</div>
-<!-- Fin Modal de crear cliente -->
-
-
-<!-- Modal de sedes clientes -->
-<div class="modal fade" id="staticBackdrop3" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content">
-              <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel3">{{TituloSedes}}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-                <div class="modal-body">
-                  <!--Carga componente crear cliente-->
-                    <app-crear-sedes-clientes></app-crear-sedes-clientes>
-              </div>
-        </div>
-  </div>
-</div>
-<!-- Fin Modal de sedes clientes -->
-
-  </div>
-</div>
-</div>
-

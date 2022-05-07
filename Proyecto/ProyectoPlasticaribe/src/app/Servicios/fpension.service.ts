@@ -32,8 +32,8 @@ export class FpensionService {
     return this.http.delete(this.rutaPlasticaribeAPI + `/Fpension/${id}`);
   }
 
- srvGuardarvFpension(Fpension : modelFpension): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Fpension', Fpension)
+ srvGuardarvFpension(data : modelFpension): Observable<any> {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Fpension', data)
    }
 
 }

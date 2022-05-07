@@ -31,8 +31,8 @@ export class EpsService {
     return this.http.delete(this.rutaPlasticaribeAPI + `/EPS/${id}`);
   }
 
-  srvGuardar(eps: modelEps): Observable<any> {
-  return this.http.post(this.rutaPlasticaribeAPI + '/EPS', eps)
+  srvGuardar(data: modelEps): Observable<any> {
+  return this.http.post(this.rutaPlasticaribeAPI + '/EPS', data)
   }
 
 }

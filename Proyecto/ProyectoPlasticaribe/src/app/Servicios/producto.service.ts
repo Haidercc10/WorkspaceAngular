@@ -33,7 +33,7 @@ export class ProductoService {
   }
 
   //
-  srvGuardar(Producto : modelProducto): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Productoes', Producto)
+  srvGuardar(data : modelProducto): Observable<any> {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Productoes', data)
   }
 }
