@@ -89,32 +89,30 @@
         </div>
         <!-- TABLA DE PEDIDOS -->
         <div class="mb-4">
-          <div class="row g-3">
+          <div class="row g-1">
             <div class="table-responsive">
               <table class="table table-bordered" *ngIf="pedidosProductos">
                 <thead class="TitulosTabla">
                   <tr>
-                  <th id="idPedido" scope="col">ID</th>
-                  <th id="fechaPedido" scope="col">Fecha Pedido</th>
-                  <th id="fechaEntrega" scope="col" class="">Fecha Entrega</th>
-                  <th id="cliente" scope="col">Cliente</th>
-                  <th id="estadoPedido" scope="col">Estado</th>
-                  <th id="observacionPedido" scope="col">Observacion</th>
-                  <th id="precioPedido" scope="col">Precio Total</th>
-                  <th id="archivoPedido" scope="col">Archivo</th>
+                    <th id="idPedido" scope="col">ID</th>
+                    <th id="fechaPedido" scope="col">Fecha Pedido</th>
+                    <th id="fechaEntrega" scope="col" class="">Fecha Entrega</th>
+                    <th id="cliente" scope="col">Cliente</th>
+                    <th id="estadoPedido" scope="col">Estado</th>
+                    <th id="precioPedido" scope="col">Precio Total</th>
+                    <th id="archivoPedido" scope="col">Archivo</th>
                   </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                    <th *ngFor="let t of " id="idPedido">{{t}}</th>
-                    <td id="fechaPedido" ></td>
-                    <td id="fechaEntrega" ></td>
-                    <td id="cliente" ></td>
-                    <td id="estadoPedido" ></td>
-                    <td id="observacionPedido" ></td>
-                    <td id="precioPedido" ></td>
-                    <td id="archivoPedido"><a href=""></a></td>
-                    </tr>
+                  <tr *ngFor="let item of pedidosProductos; let i=index" >
+                    <td id="idPedido">{{this.pedidosProductos[i].pedExt_Id}}</td>
+                    <td id="fechaPedido">{{this.pedidosProductos[i].pedExt_FechaCreacion}}</td>
+                    <td id="fechaEntrega">{{this.pedidosProductos[i].pedExt_FechaEntrega}}</td>
+                    <td id="cliente">{{this.pedidosProductos[i]}}</td>
+                    <td id="estadoPedido">{{this.pedidosProductos[i].estado}}</td>
+                    <td id="precioPedido">{{this.pedidosProductos[i].pedExt_PrecioTotal}}</td>
+                    <td id="archivoPedido"><a href="">{{this.pedidosProductos[i].pedExt_Archivo}}</a></td>
+                  </tr>
                 </tbody>
               </table>
             </div>

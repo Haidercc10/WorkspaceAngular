@@ -31,14 +31,13 @@ export class OpedidoproductoComponent implements OnInit {
   // VARIABLES PARA PASAR A LOS COMBOBOX
   cliente:ClientesService[]=[];
   sedeCliente:SedeClienteService[]=[];
-  usuarioVendedor:UsuarioService[]=[];
+  usuarioVendedor=[];
   producto:ProductoService[]=[];
   tipoProducto:TipoProductoService[]=[];
   undMed:UnidadMedidaService[]=[];
   tipoMoneda:TipoMonedaService[]=[];
 
-  pedidosProductos:OpedidoproductoService[]=[];
-
+  pedidosProductos=[];
   pedidoID:OpedidoproductoService[]=[];
   pedidoFechaPedido:OpedidoproductoService[]=[];
   pedidoFechaEntrega:OpedidoproductoService[]=[];
@@ -241,16 +240,40 @@ export class OpedidoproductoComponent implements OnInit {
   consultarDatos(){
     this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidosExternos=>{
       for (let i = 0; i < datos_pedidosExternos.length; i++) {
+
+        if (this.FormConsultaPedidoExterno.value.PedExtIdConsulta == datos_pedidosExternos[i].pedExt_Id){
+         
+          this.pedidosProductos.push(datos_pedidosExternos[i]);
+          console.log(this.pedidosProductos);
+
         if (this.FormConsultaPedidoExterno.value.PedExtIdConsulta == datos_pedidosExternos[i].pedExt_Id) {
 
           this.llenarTabla();
 
         }else if(this.FormConsultaPedidoExterno.value.PedExtFechaConsulta == datos_pedidosExternos[i].pedExt_FechaCreacion){
+          
+          this.pedidosProductos.push(datos_pedidosExternos[i]);
+          console.log(this.pedidosProductos);
 
         }else if(this.FormConsultaPedidoExterno.value.PedExtFechaEntregaConsulta == datos_pedidosExternos[i].pedExt_FechaEntrega){
 
+          this.pedidosProductos.push(datos_pedidosExternos[i]);
+          console.log(this.pedidosProductos);
+
         }else if (this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta == datos_pedidosExternos[i].estado) {
 
+<<<<<<< Updated upstream
+=======
+          this.pedidosProductos.push(datos_pedidosExternos[i]);
+          console.log(this.pedidosProductos);
+
+        }else{
+          this.pedidosProductos.push(datos_pedidosExternos[i]);
+          console.log(this.pedidosProductos);
+        }
+          
+
+>>>>>>> Stashed changes
         } else {
 
         }
@@ -267,16 +290,7 @@ export class OpedidoproductoComponent implements OnInit {
     }, error =>{ Swal.fire('Ocurrió un error, intentelo de nuevo'); });
   }
 
-  /* FUNCIÓN PARA LLENAR LOS CAMPOS DE LA TABLA DE PRODUCTOS, DEPENDIENDO DE LA CONSULTA HECHA */
-  llenarTabla(){
-    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos=>{
-      for (let index = 0; index < datos_pedidos.length; index++) {
-        this.pedidosProductos.push(datos_pedidos[index]);
-        console.log(this.pedidosProductos);
-      }
-    });
-  }
-
+ 
   /* CONSULTAR EN LA TABLA DE USUARIOS EL NOMBRE ESTÁ DIGITADO EN EL COMBOBOX DE USUARIOS Y BUSCAR EL ID DE ESE NOMBRE PARA PASARSELO A LA TABLA DE PEDIDOS
     DE PRODUCTOS */
   consultarNombreUsuario(){
