@@ -242,19 +242,19 @@ export class OpedidoproductoComponent implements OnInit {
     this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidosExternos=>{
       for (let i = 0; i < datos_pedidosExternos.length; i++) {
         if (this.FormConsultaPedidoExterno.value.PedExtIdConsulta == datos_pedidosExternos[i].pedExt_Id) {
-          
+
           this.llenarTabla();
-          
+
         }else if(this.FormConsultaPedidoExterno.value.PedExtFechaConsulta == datos_pedidosExternos[i].pedExt_FechaCreacion){
 
         }else if(this.FormConsultaPedidoExterno.value.PedExtFechaEntregaConsulta == datos_pedidosExternos[i].pedExt_FechaEntrega){
 
         }else if (this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta == datos_pedidosExternos[i].estado) {
-          
+
         } else {
-          
+
         }
-        
+
 
         /* FORMA PARA QUE AL MOMENTO DE CONSULTAR UN PEDIDO, SE LLENEN EL RESTO DE DATOS DEL PEDIDO CONSULTADO.
         ESTO SE HARIA LLAMANDO AL DOM EN EL TS Y LUEGO SE LE ASIGNAN LOS VALORES QUE SE VAN A MOSTRAR.
@@ -287,7 +287,7 @@ export class OpedidoproductoComponent implements OnInit {
           let dato_id: string = datos_usuarios[i].usua_Id;
           console.log(`El número de identificacion del Usuario ${dato_nombre} es ${dato_id}`);
           break;
-        } 
+        }
       }
     }, error =>{ Swal.fire('Ocurrió un error, intentelo de nuevo'); });
   }
