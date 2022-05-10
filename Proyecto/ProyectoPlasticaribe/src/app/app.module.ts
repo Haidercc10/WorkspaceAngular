@@ -26,6 +26,8 @@ import { CrearProductoComponent } from './Vistas/crear-producto/crear-producto.c
 import { ClientesComponent } from './Vistas/crear-clientes/crear-clientes.component';
 import { CrearSedesClientesComponent } from './Vistas/crear-sedes-clientes/crear-sedes-clientes.component';
 import { ProductoComponent } from './Vistas/producto/producto.component';
+import { PdfComponent } from './Vistas/pdf/pdf.component'; 
+
 
 
 export const routes: Routes = [
@@ -48,7 +50,9 @@ export const routes: Routes = [
   {path: 'pedidomateriaprima',component:PedidomateriaprimaComponent},
   {path: 'crearproducto',component:CrearProductoComponent},
   {path: 'crear-clientes',component:ClientesComponent},
-  {path: 'producto',component:ProductoComponent}
+  {path: 'producto',component:ProductoComponent},
+  {path: 'pdf',component:PdfComponent},
+  
 ]
 
 @NgModule({
@@ -73,7 +77,9 @@ export const routes: Routes = [
     CrearProductoComponent,
     ClientesComponent,
     CrearSedesClientesComponent,
-    ProductoComponent,],
+    ProductoComponent,
+    ReportesComponent,
+    PdfComponent],
 
   imports: [
 

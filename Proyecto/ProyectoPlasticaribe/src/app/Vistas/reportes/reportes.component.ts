@@ -16,7 +16,7 @@ export class ReportesComponent implements OnInit {
   constructor( private frmBuilderReportes: FormBuilder) {
 
     this.formularioReportes = this.frmBuilderReportes.group({
-     
+
       Areas: [, Validators.required],
       TipoReportes: [, Validators.required],
       FechaHasta: [, Validators.required],
