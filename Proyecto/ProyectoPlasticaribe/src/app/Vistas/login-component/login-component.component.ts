@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import { EmpresaService } from 'src/app/Servicios/empresa.service';
 import Swal from 'sweetalert2';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -18,7 +19,7 @@ export class LoginComponentComponent implements OnInit {
   AQUÍ SE GUARDARÁN LOS NOMBRES DE LAS EMPRESAS QUE HAY EN LA BASE DE DATOS */
   empresas:EmpresaService[]=[];
 
-  constructor(private usuarioServices : UsuarioService, private empresaServices : EmpresaService, private frmBuilderUsuario : FormBuilder) { 
+  constructor(private usuarioServices : UsuarioService, private empresaServices : EmpresaService, private frmBuilderUsuario : FormBuilder, private cookieServices : CookieService) { 
     this.formularioUsuario = this.frmBuilderUsuario.group({
       Identificacion: [, Validators.required],
       Contrasena: [, Validators.required],
@@ -26,7 +27,7 @@ export class LoginComponentComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void { this.cargaDatosComboBox()}
+  ngOnInit(): void { this.cargaDatosComboBox(); }
 
   // FUNCION PARA CARGAR LOS DATOS DE LAS EMPRESAS EN EL COMBOBOX DEL HTML
   cargaDatosComboBox(){
@@ -52,20 +53,26 @@ export class LoginComponentComponent implements OnInit {
   // FUNCION PARA HACER LA VALIDACION DE LA ENTRADA DE USUARIOS, SE VERIFICAN LOS CAMPOS DIGITADOS CON LA BASE DE DATOS. 
   Consulta(){
     // FUNCION QUE CONSULTA LOS DATOS EN LA BASE DE DATOS
-    this.usuarioServices.srvObtenerListaUsuario().subscribe(datos_usuarios=>{
-      for (let i = 0; i < datos_usuarios.length; i++) {
-        let dato_id: number = datos_usuarios[i].usua_Id;
-        let dato_contrasena: string = datos_usuarios[i].usua_Contrasena;
-        if (this.formularioUsuario.value.Identificacion == dato_id && this.formularioUsuario.value.Contrasena == dato_contrasena) {
+    try {
+      this.usuarioServices.srvObtenerListaPorId(this.formularioUsuario.value.Identificacion).subscribe(datos_usuarios=>{
+        if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena == datos_usuarios.usua_Contrasena) {
+          /*// CREACIÓN DE COOKIES PARA MANTENER EL ROL DEL USUARIO Y MOSTRAR CIERTOS COMPONENTES
+          let nombre: string = datos_usuarios.usua_Nombre;
+          let rol: string = datos_usuarios.rolUsu_Id;
+          let fechaExpiracion : Date = new Date(2022, 5, 10, 14, 58);
+          console.log(fechaExpiracion);
+          this.cookieServices.set('Nombre', `${nombre}`, {expires: fechaExpiracion} );
+          this.cookieServices.set('Rol', `${rol}`, {expires: fechaExpiracion});
+          
+          console.log(this.cookieServices.get('Nombre'));
+          console.log(this.cookieServices.get('Rol'));*/
+
+          this.clear();
           window.location.href = "./principal";
-        } else {
-          if (this.formularioUsuario.value.Identificacion != dato_id){
-            Swal.fire('El número de Identificación no concuerda');
-          } else if (this.formularioUsuario.value.Contrasena != dato_contrasena) {
-            Swal.fire('La contraseña y la Identificación no concuerdan');
-          } else console.log("Bienvenido");
-        }
-      }
-    }, error =>{ Swal.fire('Ocurrió un error, intentelo de nuevo'); });
+        } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena) Swal.fire("EL número de identificacion no coincide con la contraseña"); 
+      }, error =>{ Swal.fire('El número de identificación no se encuentra registrado'); });        
+    } catch (error) {
+      console.log(error);
+    }    
   }
 }
