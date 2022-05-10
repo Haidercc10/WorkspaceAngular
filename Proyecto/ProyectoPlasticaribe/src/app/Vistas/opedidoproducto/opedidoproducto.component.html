@@ -26,10 +26,10 @@
           Crear clientes
         </button>
 
-        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop3"
+        <!--<button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop3"
         (click)="LlamarModalSedesClientes()" title="Si no encuentras la sede del cliente, ¡Creala aquí!">
           Sedes clientes
-        </button>
+        </button>-->
 
         <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
         (click)="LlamarModalCrearProducto()" title="Si no encuentras el producto solicitado, ¡Crealo aquí!">
@@ -140,7 +140,7 @@
             <!-- Cliente -->
             <div class="col-md">
               <select formControlName="PedClienteId" type="text" id="PextClienteId" name="PextClienteId"  class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
+                <option [ngValue]="null" disabled selected>{{selectClientes}}</option>
                 <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
               </select>
             </div>
@@ -149,8 +149,8 @@
             <div class="col-md">
               <select formControlName="PedSedeCli_Id" type="text" id="PSedeCli_Id" name="PSedeCli_Id" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option  [ngValue]="null" disabled selected>Sede Cliente</option>
-                <option>Cliente</option>
-                <option>Cliente</option>
+                <option [ngValue]="sedesClientes" *ngFor="let sedesClientes of sedeCliente">{{sedesClientes}}</option>
+
               </select>
             </div>
 
@@ -175,9 +175,9 @@
             <!-- Estado -->
             <div class="col-md">
               <select formControlName="PedEstadoId" id="PextEstadoId" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option  [ngValue]="null" disabled>Estado</option>
-                <option>Estado</option>
-                <option>Estado</option>
+                <option  [ngValue]="null" disabled selected>Estado</option>
+                <option [ngValue]="estado" *ngFor="let estado of ComboboxEstados">{{estado}}</option>
+              <!-- <option [ngValue]="ultimo" *ngFor="let ultimo of contadorPedidosExternos">{{ultimo.PedExtId}</option> -->
               </select>
             </div>
           </div>
@@ -224,6 +224,7 @@
                 <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
                   <option [ngValue]="null" disabled selected>Seleccione Producto</option>
                   <option [ngValue]="productos" *ngFor="let productos of producto">{{productos}}</option>
+                  <option [ngValue]="null" >Producto</option>
                 </select>
             </div>
             <!-- Ancho Producto -->
@@ -259,6 +260,7 @@
                 <select  formControlName="ProdTipo" id="PrdTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrdTipo" required >
                   <option [ngValue]="null" disabled selected>Seleccione Tipo Producto</option>
                   <option [ngValue]="tipoProductos" *ngFor="let tipoProductos of tipoProducto">{{tipoProductos}}</option>
+                  <option [ngValue]="null" >Tipo1</option>
                 </select>
               </div>
               <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
@@ -281,6 +283,7 @@
                 <select formControlName="ProdTipoMoneda" id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda" required >
                   <option [ngValue]="null" disabled selected>Seleccione Tipo de Moneda</option>
                   <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas}}</option>
+                  <option [ngValue]="null" >TipoMoneda</option>
                 </select>
               </div>
               <!-- Stock Producto -->
@@ -292,6 +295,19 @@
         </div>
         <!-- Fin Fila 2 Agregar Producto -->
 
+         <!-- Inicio Observacion -->
+         <div class="mb-3">
+          <div class="row g-3">
+            <!-- Campo Observacion -->
+            <div class="col-md">
+              <textarea formControlName="ProdDescripcion"  id="PrdDescripcion" type="text" class="form-control form-control-sm campoObservacion"  maxlength="200" placeholder="Descripcion" name="PrdDescripcion"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fin Observacion -->
+
+
         <!-- Inicio botones -->
         <div class="mb-4">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
@@ -300,7 +316,7 @@
           </div>
         </div>
         <!-- Fin botones -->
-          
+
 
                                                           <!--Fin agregar productos -->
 
@@ -321,7 +337,7 @@
         <div class="mb-4">
           <div class="row g-3">
             <div class="table-responsive">
-              <table class="table table-bordered">
+              <table class="table table-bordered table-hover mt-2">
                 <thead class="TitulosTabla">
                     <tr>
                     <th scope="col" class="idProducto">ID</th>
@@ -329,41 +345,51 @@
                     <th id="ancho" scope="col" class="">Ancho</th>
                     <th id="fuelle" scope="col">Fuelle</th>
                     <th id="calibre" scope="col">Calibre</th>
-                    <th id="undMedidaPeso" scope="col">Unidad Medida</th>
-                    <th id="stock" scope="col">Stock</th>
-                    <th id="cantidadDisponible" scope="col">Cantidad Disponible</th>
-                    <th id="undMedidaCantidad" scope="col">Unidad Medida</th>
-                    <th id="precioUnitario" scope="col">Precio Unitario</th>
-                    <th id="precioCantidadTotal" scope="col">Precio Total en Stock</th>
+                    <th id="undMedidaPeso" scope="col">Und. Medida</th>
                     <th id="tipoProducto" scope="col">Tipo Producto</th>
+                    <th id="cantidad" scope="col">Cantidad</th>
+                    <th id="undMedidaCantidad" scope="col">Und. Medida</th>
+                    <th id="precioUnitario" scope="col">Precio Und.</th>
+                    <th id="tipoMoneda" scope="col">tipo Moneda</th>
+                    <th id="stock" scope="col">Stock</th>
+                    <th id="Descripcion" scope="col">Descripcion</th>
+                    <th id="Subtotal" scope="col">Subtotal</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                    <th id="id" class="TextosInfoTabla"></th>
-                    <td id="nombre" >#</td>
-                    <td id="ancho" >#</td>
-                    <td id="fuelle" >#</td>
-                    <td id="calibre" >#</td>
-                    <td id="undMedidaPeso" >#</td>
-                    <td id="stock" >#</td>
-                    <td id="cantidadDisponible" >#</td>
-                    <td id="undMedidaCantidad">#</td>
-                    <td id="precioUnitario">#</td>
-                    <td id="precioCantidadTotal">#</td>
-                    <td id="tipoProducto">#</td>
+                    <tr *ngFor="let listaProductos of ArrayProducto">
+                    <th id="id" class="TextosInfoTabla">{{listaProductos.Produ_Id}}</th>
+                    <td id="nombre">{{listaProductos.Produ_Nombre}}</td>
+                    <td id="ancho">{{listaProductos.Produ_Ancho}}</td>
+                    <td id="fuelle">{{listaProductos.Produ_Fuelle}}</td>
+                    <td id="calibre" >{{listaProductos.Produ_Calibre}}</td>
+                    <td id="undMedidaPeso" >{{listaProductos.UndMedACF}}</td>
+                    <td id="tipoProducto">{{listaProductos.TpProdu_Id}}</td>
+                    <td id="cantidadDisponible">{{listaProductos.Produ_Cantidad}}</td>
+                    <td id="undMedidaCantidad">{{listaProductos.UndMedPeso}}</td>
+                    <td id="precioUnitario">{{listaProductos.PrecioUnd}}</td>
+                    <td id="tipoMoneda">{{listaProductos.TipoMoneda}}</td>
+                    <td id="tipoProducto">{{listaProductos.Stock}}</td>
+                    <td id="Descripcion">{{listaProductos.Produ_Descripcion}}</td>
+                    <td id="Subtotal">{{listaProductos.Subtotal}}</td>
                     </tr>
                 </tbody>
               </table>
             </div>
           </div>
         </div>
+
         <!-- Fin tabla producto -->
 
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <label class=""> <b>Valor Total $</b> </label>
+            <label class="">{{valorTotal}}</label>
+      </div>
         <!-- Inicio Botones -->
         <div class="bajarPagina">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <input class=" btn btn-danger btn-danger-sm" type="submit" value="Crear Pedido">
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="CrearPedidoExterno()">Crear Pedido</button>
               <button class=" btn btn-secondary btn-secondary-sm" type="button" href="/principal">Cancelar</button>
             </div>
         </div>
@@ -399,8 +425,9 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <!--Carga componente crear cliente-->
+              <!--Carga componente crear cliente / Sede -->
               <app-crear-clientes></app-crear-clientes>
+             <!--<app-crear-sedes-clientes></app-crear-sedes-clientes>-->
             </div>
           </div>
         </div>
@@ -408,7 +435,7 @@
       <!-- Fin Modal de crear cliente -->
 
       <!-- Modal de sedes clientes -->
-      <div class="modal fade" id="staticBackdrop3" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+      <!--<div class="modal fade" id="staticBackdrop3" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
           <div class="modal-content">
             <div class="modal-header">
@@ -416,12 +443,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!--Carga componente crear cliente-->
+
                 <app-crear-sedes-clientes></app-crear-sedes-clientes>
             </div>
           </div>
         </div>
-      </div>
+      </div>-->
       <!-- Fin Modal de sedes clientes -->
     </div>
   </div>

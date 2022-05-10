@@ -30,8 +30,10 @@ export class OpedidoproductoService {
     return this.http.delete(this.rutaPlasticaribeAPI + `/PedidoExternoes/${id}`);
   }
 
-  srvGuardarPedidosProductos(data : modelOpedidoproducto): Observable<any> {
+  srvGuardarPedidosProductos(data : any): Observable<any> {
    return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExternoes', data);
   }
+
+
 
 }

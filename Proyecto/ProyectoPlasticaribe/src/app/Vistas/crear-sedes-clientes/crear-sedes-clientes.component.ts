@@ -22,6 +22,7 @@ export class CrearSedesClientesComponent implements OnInit {
       SedeCli_Ciudad: new FormControl(),
       CliNombre: new FormControl(),
       SedeCli_Postal: new FormControl(),
+      SedeCli_Direccion: new FormControl(),
     })
 
   }
@@ -37,7 +38,9 @@ export class CrearSedesClientesComponent implements OnInit {
       SedeCli_Id: ['', Validators.required],
       SedeCli_Ciudad: ['', Validators.required],
       CliNombre: ['', Validators.required],
-      SedeCli_Postal: ['', Validators.required]
+      SedeCli_Postal: ['', Validators.required],
+      SedeCli_Direccion: ['', Validators.required]
+
     })
 
   }
