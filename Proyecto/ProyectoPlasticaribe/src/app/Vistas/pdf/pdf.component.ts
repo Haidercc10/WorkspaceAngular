@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-pdf',
@@ -21,8 +21,56 @@ export class PdfComponent implements OnInit {
     const pdfDefinition: any = {
       content: [
         {
-          text: 'HOLA',
-        }
+         table: {
+          heights: [-5, 20, 20],
+          body: [
+            [
+              'ID',
+              'Nombre',
+              'Ancho',
+              'Fuelle',
+              'Calibre',
+              'Unidad Medida',
+              'Stock',
+              'Cantidad Disponible',
+              'Unidad Medida',
+              'Precio Unitario',
+              'Precio Total en Stock',
+              'Tipo Producto',
+            ],
+            [
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+            ],
+            [
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+            ],
+
+          ]
+      }
+    }
+
       ]
     }
 

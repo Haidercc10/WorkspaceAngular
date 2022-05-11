@@ -45,7 +45,7 @@
       <!-- Fin titulo -->
 
       <!-- INICIO DE CONSULTA DE PEDIDOS DE PRODUCTOS -->
-      <form [formGroup]="FormConsultaPedidoExterno" (ngSubmit)="consultarDatos()">
+      <form [formGroup]="FormConsultaPedidoExterno">
         <div class="mb-3">
           <div class="row g-3">
             <!-- NUMERO DE IDENTIFICACION DEL PEDIDO DE PRODUCTOS -->
@@ -70,9 +70,8 @@
             <!-- Estado -->
             <div class="col-md-4">
               <select formControlName="PedExtEstadoConsulta" id="PextEstadoId" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option  [ngValue]="null" disabled>Estado</option>
-                <option>Estado</option>
-                <option>Estado</option>
+                <option [ngValue]="null" disabled selected>Seleccione Estado</option>
+                <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
               </select>
             </div>
           </div>
@@ -80,12 +79,12 @@
         <!-- FILA 3 -->
         <div class="mb-1">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <input class="btn btn-danger btn-danger-sm" type="submit" value="Consultar Pedidos" (click)="consultarDatos()">
+            <input class="btn btn-danger btn-danger-sm" type="submit" value="Consultar Pedidos" (click)="consultarDatosPedidos()">
           </div>
         </div>
 
         <div class="mb-4">
-          <h4 class="tituloRojo">Tebla Pedido</h4>
+          <h4 class="tituloRojo">Tabla Pedido</h4>
         </div>
         <!-- TABLA DE PEDIDOS -->
         <div class="mb-4">
@@ -137,7 +136,7 @@
           <div class="row g-3">
             <!-- Cliente -->
             <div class="col-md">
-              <select formControlName="PedClienteId" type="text" id="PextClienteId" name="PextClienteId"  class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <select formControlName="PedClienteNombre" type="text" id="PextClienteId" name="PextClienteId" (change)="sedesClientesComboBox()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
                 <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
               </select>
@@ -146,16 +145,15 @@
             <!-- Sede Cliente -->
             <div class="col-md">
               <select formControlName="PedSedeCli_Id" type="text" id="PSedeCli_Id" name="PSedeCli_Id" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option  [ngValue]="null" disabled selected>Sede Cliente</option>
-                <option>Cliente</option>
-                <option>Cliente</option>
+                <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
+                <option [ngValue]="sedesclientes" *ngFor="let sedesclientes of sedeCliente">{{sedesclientes}}</option>
               </select>
             </div>
 
             <!-- Usuario -->
             <div class="col-md">
-              <select formControlName="PedUsuarioId" type="text" id="PextUsuarioId" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="null" disabled selected>Seleccione nombre Vendedor</option>
+              <select formControlName="PedUsuarioNombre" type="text" id="PextUsuarioId" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required OnPush>
+                <option [ngValue]="null" disabled selected>Seleccione Vendedor</option>
                 <option [ngValue]="vendedor" *ngFor="let vendedor of usuarioVendedor">{{vendedor}}</option>
               </select>
             </div>
@@ -173,9 +171,8 @@
             <!-- Estado -->
             <div class="col-md">
               <select formControlName="PedEstadoId" id="PextEstadoId" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option  [ngValue]="null" disabled>Estado</option>
-                <option>Estado</option>
-                <option>Estado</option>
+                <option [ngValue]="null" disabled selected>Seleccione Estado</option>
+                <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
               </select>
             </div>
           </div>
@@ -298,7 +295,7 @@
           </div>
         </div>
         <!-- Fin botones -->
-          
+
 
                                                           <!--Fin agregar productos -->
 
@@ -352,17 +349,19 @@
                     <td id="tipoProducto">#</td>
                     </tr>
                 </tbody>
+                <button (click)="downloadPDF()" class="btn btn-danger btn-danger-sm">Crear PDF</button>
               </table>
             </div>
           </div>
         </div>
+
         <!-- Fin tabla producto -->
 
         <!-- Inicio Botones -->
         <div class="bajarPagina">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <input class=" btn btn-danger btn-danger-sm" type="submit" value="Crear Pedido">
-              <button class=" btn btn-secondary btn-secondary-sm" type="button" href="/principal">Cancelar</button>
+              <button class=" btn btn-secondary btn-secondary-sm" type="button" (click)="confimacionSalida()">Cancelar</button>
             </div>
         </div>
       </form>

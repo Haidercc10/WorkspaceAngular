@@ -27,6 +27,7 @@ import { ClientesComponent } from './Vistas/crear-clientes/crear-clientes.compon
 import { CrearSedesClientesComponent } from './Vistas/crear-sedes-clientes/crear-sedes-clientes.component';
 import { ProductoComponent } from './Vistas/producto/producto.component';
 import { PdfComponent } from './Vistas/pdf/pdf.component'; 
+import { CookieService } from 'ngx-cookie-service';
 
 
 
@@ -92,7 +93,8 @@ export const routes: Routes = [
   ],
 
 
-  providers: [ServicioAreasService],
+  providers: [ServicioAreasService,
+    CookieService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
