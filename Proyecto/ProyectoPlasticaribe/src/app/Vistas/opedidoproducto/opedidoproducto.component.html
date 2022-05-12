@@ -105,13 +105,13 @@
                 </thead>
                 <tbody>
                   <tr *ngFor="let item of pedidosProductos; let i=index" >
-                    <td id="idPedido">{{this.pedidosProductos[i].pedExt_Id}}</td>
-                    <td id="fechaPedido">{{this.pedidosProductos[i].pedExt_FechaCreacion}}</td>
-                    <td id="fechaEntrega">{{this.pedidosProductos[i].pedExt_FechaEntrega}}</td>
+                    <td id="idPedido">{{this.item[i].PedExtId}}</td>
+                    <td id="fechaPedido">{{this.item[i].pedExt_FechaCreacion}}</td>
+                    <td id="fechaEntrega">{{this.item[i].pedExt_FechaEntrega}}</td>
                     <td id="cliente">{{this.pedidosProductos[i]}}</td>
-                    <td id="estadoPedido">{{this.pedidosProductos[i].estado}}</td>
-                    <td id="precioPedido">{{this.pedidosProductos[i].pedExt_PrecioTotal}}</td>
-                    <td id="archivoPedido"><a href="">{{this.pedidosProductos[i].pedExt_Archivo}}</a></td>
+                    <td id="estadoPedido">{{this.item[i].estado}}</td>
+                    <td id="precioPedido">{{this.item[i].pedExt_PrecioTotal}}</td>
+                    <td id="archivoPedido"><a href="">{{this.item[i].pedExt_Archivo}}</a></td>
                   </tr>
                 </tbody>
               </table>

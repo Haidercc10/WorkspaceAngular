@@ -17,6 +17,11 @@ export class OpedidoproductoService {
   srvObtenerListaPedidosProductos() {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoExternoes')
   }
+
+  srvObtenerListaPorId(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExternoes/${id}`);
+  }
+
 //Metodo agregar Pedidos de Productos
   srvAgregarPedidosProductos(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExternoes', data)

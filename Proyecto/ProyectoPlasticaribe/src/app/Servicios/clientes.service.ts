@@ -14,7 +14,11 @@ export class ClientesService {
 
   //Metodo buscar lista de Productos
   srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Clientes')
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Clientes');
+  }
+
+  srvObtenerListaPorId(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Clientes/${id}`);
   }
 
   //Metodo agregar Productos

@@ -14,7 +14,14 @@ export class SedeClienteService {
 
   //Metodo buscar lista de Productos
   srvObtenerLista():Observable<any[]> {
+
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/SedesClientes')
+
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes`);
+  }
+
+  srvObtenerListaPorId(id : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/${id}`);
   }
 
   //Metodo agregar Productos
