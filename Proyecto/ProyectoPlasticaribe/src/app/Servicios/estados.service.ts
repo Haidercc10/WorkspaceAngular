@@ -15,23 +15,23 @@ export class EstadosService {
   constructor(private http: HttpClient) { }
 
 //Metodo buscar lista de Usuario
-  srvObtenerListaUsuario() {
+  srvObtenerListaEstados() {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Estadoes')
   }
 //Metodo agregar Usuario
-  srvAgregarUsuario(data:any) {
+  srvAgregarEstado(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Estadoes', data)
   }
 //Metodo actualzar Usuario
-  srvActualizarUsuario(id:number|String, data:any) {
+  srvActualizarEstado(id:number|String, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Estadoes/${id}`, data);
   }
 //Metodo eliminar Usuario
-  srvEliminarUsuario(id:number|String) {
+  srvEliminarEstado(id:number|String) {
     return this.http.delete(this.rutaPlasticaribeAPI + `/Estadoes/${id}`);
   }
 
-  srvGuardarUsuario(data : modelEstado): Observable<any> {
+  srvGuardarEstado(data : modelEstado): Observable<any> {
    return this.http.post(this.rutaPlasticaribeAPI + '/Estadoes', data);
   }
 

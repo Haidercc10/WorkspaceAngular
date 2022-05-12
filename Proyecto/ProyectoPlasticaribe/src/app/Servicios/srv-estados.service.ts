@@ -22,8 +22,12 @@ export class SrvEstadosService {
         return this.httpEstados.get<any>(this.rutaPlasticaribeAPI + '/Estadoes');
     }
 
-    srvObtenerTiposEstadosDocumentos():Observable<any[]> {
-      return this.httpEstados.get<any>(this.rutaPlasticaribeAPI + '/TiposEstados')
+    srvObtenerTiposEstados():Observable<any[]> {
+      return this.httpEstados.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Estado')
+    }
+
+    srvGuardarEstados(data : modelEstado):Observable<any[]> {
+      return this.httpEstados.post<any>(this.rutaPlasticaribeAPI + '/Estadoes', data)
     }
 
 }

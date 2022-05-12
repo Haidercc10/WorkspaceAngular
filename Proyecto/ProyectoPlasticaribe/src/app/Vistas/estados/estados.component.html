@@ -1,0 +1,57 @@
+
+<div class="container-fluid">
+
+  <div class="mb-3">
+    <h4 class="tituloRojo">Estados</h4>
+  </div>
+  <div class="mb-5">
+    <hr class="colorLinea">
+  </div>
+
+  <div class="container">
+    <div class="mb-4">
+      <h4 class="tituloRojo">Registrar/Consultar Estados</h4>
+    </div>
+
+  <!--Inicio formulario con property binding y ng submit con metodo en el areasComponent.ts-->
+  <!--
+  Bindear inputs con propiedades del formulario en el constructor de areasComponent.
+  Ej: dar el mismo valor en el formControlName = "areaCodigo" y en el formularioAreas
+  en areasComponent.ts areaCodigo : ...
+  -->
+  <form [formGroup]="formEstados" (ngSubmit)="validarCamposVacios()">
+    <div class="mb-5">
+      <div class="row g-3">
+
+      <!--[(ngModel)]="areaCodigo" codigo utilizado en otro metodo, no borrar-->
+
+      <!--[(ngModel)]="areaNombre" codigo utilizado en otro metodo, no borrar-->
+      <div class="col-md-3">
+          <input formControlName="EstadoNombre" id="estNombre" type="text" class="form-control form-control-sm" placeholder="Nombre" name="estNombre">
+      </div>
+
+      <div class="col-md-3">
+        <select formControlName="tipoEstado" id="tpEstado" type="text" name="tpEstado" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+          <option  [ngValue]="null" disabled selected>Seleccione tipo estado</option>
+          <option *ngFor="let ComboTipos of ComboTiposEstados">{{ComboTipos}} </option>
+
+        </select>
+      </div>
+
+      <!--[(ngModel)]="areaDescripcion" codigo utilizado en otro metodo, no borrar-->
+      <div class="col-md">
+          <textarea formControlName="EstadoDescripcion" id="estDescripcion" type="text" class="form-control form-control-sm" placeholder="Descripción" name="estDescripcion" ></textarea>
+      </div>
+
+    </div>
+  </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button class="btn btn-danger btn-danger-sm" type="submit">Agregar estado</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar campos</button>
+    </div>
+  </form>
+  <!--Fin formulario-->
+  </div>
+</div>
+

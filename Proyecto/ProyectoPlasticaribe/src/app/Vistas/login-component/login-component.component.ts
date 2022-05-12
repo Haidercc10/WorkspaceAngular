@@ -19,7 +19,7 @@ export class LoginComponentComponent implements OnInit {
   AQUÍ SE GUARDARÁN LOS NOMBRES DE LAS EMPRESAS QUE HAY EN LA BASE DE DATOS */
   empresas:EmpresaService[]=[];
 
-  constructor(private usuarioServices : UsuarioService, private empresaServices : EmpresaService, private frmBuilderUsuario : FormBuilder, private cookieServices : CookieService) { 
+  constructor(private usuarioServices : UsuarioService, private empresaServices : EmpresaService, private frmBuilderUsuario : FormBuilder, private cookieServices : CookieService) {
     this.formularioUsuario = this.frmBuilderUsuario.group({
       Identificacion: [, Validators.required],
       Contrasena: [, Validators.required],
@@ -43,14 +43,14 @@ export class LoginComponentComponent implements OnInit {
   // FUNCION PARA HACER VALIDACIONES DE CAMPOS VACIOS, QUE DADO ESTE CASO (EN EL QUE HAYAN CAMPOS VACIOS) SE MOSTRARÁ UN MENSAJE INFOMANDO DE ESTO.
   // SI NO HAY CAMPOS VACIOS ENTRARÍA A EL METODO Consulta()
   validarCamposVacios() : any{
-    if(this.formularioUsuario.valid) this.Consulta();    
+    if(this.formularioUsuario.valid) this.Consulta();
     else Swal.fire("HAY CAMPOS VACIOS");
   }
-  
+
   // FUNCION PARA LIMPIAR LOS CAMPOS DEL FORMULARIO.
   clear(){ this.formularioUsuario.reset(); }
 
-  // FUNCION PARA HACER LA VALIDACION DE LA ENTRADA DE USUARIOS, SE VERIFICAN LOS CAMPOS DIGITADOS CON LA BASE DE DATOS. 
+  // FUNCION PARA HACER LA VALIDACION DE LA ENTRADA DE USUARIOS, SE VERIFICAN LOS CAMPOS DIGITADOS CON LA BASE DE DATOS.
   Consulta(){
     // FUNCION QUE CONSULTA LOS DATOS EN LA BASE DE DATOS
     try {
@@ -63,16 +63,16 @@ export class LoginComponentComponent implements OnInit {
           console.log(fechaExpiracion);
           this.cookieServices.set('Nombre', `${nombre}`, {expires: fechaExpiracion} );
           this.cookieServices.set('Rol', `${rol}`, {expires: fechaExpiracion});
-          
+
           console.log(this.cookieServices.get('Nombre'));
           console.log(this.cookieServices.get('Rol'));*/
 
           this.clear();
           window.location.href = "./principal";
-        } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena) Swal.fire("EL número de identificacion no coincide con la contraseña"); 
-      }, error =>{ Swal.fire('El número de identificación no se encuentra registrado'); });        
+        } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena) Swal.fire("EL número de identificacion no coincide con la contraseña");
+      }, error =>{ Swal.fire('El número de identificación no se encuentra registrado'); });
     } catch (error) {
       console.log(error);
-    }    
+    }
   }
 }
