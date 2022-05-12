@@ -17,7 +17,6 @@ export class SedeClienteService {
 
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/SedesClientes')
 
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes`);
   }
 
   srvObtenerListaPorId(id : number){

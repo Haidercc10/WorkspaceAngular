@@ -21,8 +21,56 @@ export class PdfComponent implements OnInit {
     const pdfDefinition: any = {
       content: [
         {
-          text: 'HOLA',
-        }
+         table: {
+          heights: [-5, 20, 20],
+          body: [
+            [
+              'ID',
+              'Nombre',
+              'Ancho',
+              'Fuelle',
+              'Calibre',
+              'Unidad Medida',
+              'Stock',
+              'Cantidad Disponible',
+              'Unidad Medida',
+              'Precio Unitario',
+              'Precio Total en Stock',
+              'Tipo Producto',
+            ],
+            [
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+            ],
+            [
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+            ],
+
+          ]
+      }
+    }
+
       ]
     }
 
