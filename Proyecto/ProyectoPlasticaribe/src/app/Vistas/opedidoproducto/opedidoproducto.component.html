@@ -349,6 +349,7 @@
                     <th id="ancho" scope="col" class="">Ancho</th>
                     <th id="fuelle" scope="col">Fuelle</th>
                     <th id="calibre" scope="col">Calibre</th>
+
                     <th id="undMedidaPeso" scope="col">Und. Medida</th>
                     <th id="tipoProducto" scope="col">Tipo Producto</th>
                     <th id="cantidad" scope="col">Cantidad</th>
@@ -376,8 +377,17 @@
                     <td id="tipoProducto">{{listaProductos.Stock}}</td>
                     <td id="Descripcion">{{listaProductos.Produ_Descripcion}}</td>
                     <td id="Subtotal">{{listaProductos.Subtotal}}</td>
+
+                    <th id="undMedidaACF" scope="col">Unidad Medida</th>
+                    <th id="Tipo" scope="col">Stock</th>
+                    <th id="Cantidad" scope="col">Cantidad Disponible</th>
+                    <th id="UnidadMedidaPeso" scope="col">Unidad Medida</th>
+                    <th id="precioUnitario" scope="col">Precio Unitario</th>
+                    <th id="TipoMoneda" scope="col">Precio Total en Stock</th>
+                    <th id="" scope="col">Tipo Producto</th>
                     </tr>
-                </tbody>
+
+
                 <button (click)="downloadPDF()" class="btn btn-danger btn-danger-sm">Crear PDF</button>
               </table>
             </div>

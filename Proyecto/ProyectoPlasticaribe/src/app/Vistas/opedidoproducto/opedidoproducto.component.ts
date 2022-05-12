@@ -497,6 +497,7 @@ export class OpedidoproductoComponent implements OnInit {
   /* FUNCION PARA LLENAR LOS INPUTS CON LOS DATOS DE LOS PEDIDOS DE PRODUCTOS DEPENDIENDO DE LA CONSULTA HECHA */
 
 
+
   consultarDatos() {
     this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidosExternos => {
       for (let i = 0; i < datos_pedidosExternos.length; i++) {
@@ -523,66 +524,11 @@ export class OpedidoproductoComponent implements OnInit {
     }, error => {
       console.log(error);
     })
+  }
 
     //FORMA NUMERO 2 DE HACER LA CONSULTA DE PEDIDOS DE PRODUCTOS, ESTA FORMA BUSCA DEPENDIENDO DEL O LOS FILTROS QUE SE APLIQUEN
-    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidosExternos=>{
-      for (let i = 0; i < datos_pedidosExternos.length; i++) {
+   // this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidosExternos=>{
 
-        if(this.FormConsultaPedidoExterno.value.PedExtFechaConsulta == datos_pedidosExternos[i].pedExt_FechaCreacion){
-          this.pedidosProductos.push(datos_pedidosExternos[i]);
-
-
-
-        }else if(this.FormConsultaPedidoExterno.value.PedExtFechaEntregaConsulta == datos_pedidosExternos[i].pedExt_FechaEntrega){
-          this.pedidosProductos.push(datos_pedidosExternos[i]);
-
-          if (this.FormConsultaPedidoExterno.value.PedExtIdConsulta == datos_pedidosExternos[i].pedExt_Id) {
-
-            //this.llenarTabla();
-
-
-          } else if (this.FormConsultaPedidoExterno.value.PedExtFechaConsulta == datos_pedidosExternos[i].pedExt_FechaCreacion) {
-
-            this.pedidosProductos.push(datos_pedidosExternos[i]);
-            console.log(this.pedidosProductos);
-
-          } else if (this.FormConsultaPedidoExterno.value.PedExtFechaEntregaConsulta == datos_pedidosExternos[i].pedExt_FechaEntrega) {
-
-            this.pedidosProductos.push(datos_pedidosExternos[i]);
-            console.log(this.pedidosProductos);
-
-          } else if (this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta == datos_pedidosExternos[i].estado) {
-
-
-            this.pedidosProductos.push(datos_pedidosExternos[i]);
-            console.log(this.pedidosProductos);
-
-          } else {
-            this.pedidosProductos.push(datos_pedidosExternos[i]);
-            console.log(this.pedidosProductos);
-          }
-
-
-
-
-
-
-        } else {
-          this.pedidosProductos.push(datos_pedidosExternos[i]);
-
-          console.log(this.pedidosProductos)
-        }
-
-        /* FORMA PARA QUE AL MOMENTO DE CONSULTAR UN PEDIDO, SE LLENEN EL RESTO DE DATOS DEL PEDIDO CONSULTADO.
-        ESTO SE HARIA LLAMANDO AL DOM EN EL TS Y LUEGO SE LE ASIGNAN LOS VALORES QUE SE VAN A MOSTRAR.
-
-        let prueba: string | undefined | any = this.pedidosProductos.push(datos_pedidosExternos[i].pedExt_Observacion)
-        let observacion: HTMLElement = document.getElementById('#PextObservacion');
-        observacion.innerHTML = prueba;
-        */
-      }
-    }, error => { Swal.fire('Ocurrió un error, intentelo de nuevo'); });
-  }
 
 
 
@@ -669,6 +615,16 @@ export class OpedidoproductoComponent implements OnInit {
       this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (productoExt.Produ_Cantidad * productoExt.PrecioUnd), 0)
       console.log(this.valorTotal);
   }
+
+}
+
+
+  cargarDatosTablaProductos(){
+    const producto : any = {
+
+    }
+
+
 
 }
 
@@ -760,6 +716,8 @@ obtenerEmpresa(){
 
 
     }
+
+
 
 
 
