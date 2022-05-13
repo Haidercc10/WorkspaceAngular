@@ -135,8 +135,7 @@
         <div class="mb-3">
           <div class="row g-3">
             <!-- Cliente -->
-            <div class="col-md">
-              <select formControlName="PedClienteNombre" type="text" id="PextClienteId" name="PextClienteId" (change)="sedesClientesComboBox()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <div class="col-md"><select formControlName="PedClienteNombre" type="text" id="PextClienteId" name="PextClienteId" (change)="sedesClientesComboBox()"  class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
                 <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
               </select>
@@ -145,16 +144,15 @@
             <!-- Sede Cliente -->
             <div class="col-md">
               <select formControlName="PedSedeCli_Id" type="text" id="PSedeCli_Id" name="PSedeCli_Id" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
+                <option [ngValue]="null" disabled selected>Seleccione Sede Cliente</option>
                 <option [ngValue]="sedesclientes" *ngFor="let sedesclientes of sedeCliente">{{sedesclientes}}</option>
               </select>
             </div>
 
             <!-- Usuario -->
             <div class="col-md">
-              <select formControlName="PedUsuarioNombre" type="text" id="PextUsuarioId" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required OnPush>
-                <option [ngValue]="null" disabled selected>Seleccione Vendedor</option>
-                <option [ngValue]="vendedor" *ngFor="let vendedor of usuarioVendedor">{{vendedor}}</option>
+              <select formControlName="PedUsuarioNombre" type="text" id="PedUsuarioNombre" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required OnPush>
+                <option [ngValue]="vendedor" *ngFor="let vendedor of usuarioVendedor" selected>{{vendedor}}</option>
               </select>
             </div>
 
@@ -216,28 +214,27 @@
             </div>
             <!-- ID/Nombre Producto -->
             <div class="col-md">
-                <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
+                <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" (change)="llenado()" (change)="existencias()" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
                   <option [ngValue]="null" disabled selected>Seleccione Producto</option>
                   <option [ngValue]="productos" *ngFor="let productos of producto">{{productos}}</option>
                 </select>
             </div>
             <!-- Ancho Producto -->
             <div class="col-md-1">
-              <input formControlName="ProdAncho" type="number" class="form-control form-control-sm" id="PrdAncho"  placeholder="Ancho" name="PrdAncho" required maxlength="14">
+              <input type="number" class="form-control form-control-sm" id="PrdAncho" *ngFor="let productos of productoInfo" value="{{productos.prod_Ancho}}" name="PrdAncho" >
             </div>
             <!-- Fuelle Producto -->
             <div class="col-md-1">
-              <input formControlName="ProdFuelle" type="number" class="form-control form-control-sm" id="PrdFuelle"  placeholder="Fuelle" name="PrdFuelle" required maxlength="14">
+              <input type="number" class="form-control form-control-sm" id="PrdFuelle" *ngFor="let productos of productoInfo" value="{{productos.prod_Fuelle}}" name="PrdFuelle">
             </div>
               <!-- Calibre Producto -->
             <div class="col-md-1">
-              <input formControlName="ProdCalibre" type="number" class="form-control form-control-sm" id="PrdCalibre"  placeholder="Calibre" name="PrdCalibre" required maxlength="14">
+              <input type="number" class="form-control form-control-sm" id="PrdCalibre" *ngFor="let productos of productoInfo" value="{{productos.prod_Calibre}}" name="PrdCalibre">
             </div>
             <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
             <div class="col-md-1">
-              <select  formControlName="ProdUnidadMedidaACF" id="PrdUnidadMedidaACF" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida"  name="PrdUnidadMedidaACF" required >
-                <option [ngValue]="null" disabled selected>Und. Medida</option>
-                <option [ngValue]="undidadMedida" *ngFor="let undidadMedida of undMed">{{undidadMedida}}</option>
+              <select id="PrdUnidadMedidaACF" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida"  name="PrdUnidadMedidaACF" required >
+                <option [ngValue]="productos" *ngFor="let productos of productoInfo" selected>{{productos.undMedACF}}</option>
               </select>
             </div>
           </div>
@@ -251,9 +248,8 @@
             <div class="row g-3">
               <!-- Tipo Producto -->
               <div class="col-md-2">
-                <select  formControlName="ProdTipo" id="PrdTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrdTipo" required >
-                  <option [ngValue]="null" disabled selected>Seleccione Tipo Producto</option>
-                  <option [ngValue]="tipoProductos" *ngFor="let tipoProductos of tipoProducto">{{tipoProductos}}</option>
+                <select id="PrdTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrdTipo" required >
+                  <option [ngValue]="productos" *ngFor="let productos of productoInfo" selected>{{productos.tpProd_Id}}</option>
                 </select>
               </div>
               <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
@@ -262,25 +258,24 @@
               </div>
               <!-- UM Cantidad Producto -->
               <div class="col-md-2">
-                <select formControlName="ProdUnidadMedidaCant" id="PrdUnidadMedidaCant" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdUnidadMedidaCant" required >
-                  <option [ngValue]="null" disabled selected>Und. Medida</option>
-                  <option [ngValue]="undidadMedida" *ngFor="let undidadMedida of undMed">{{undidadMedida}}</option>
+                <select id="PrdUnidadMedidaCant" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdUnidadMedidaCant" required >
+                  <option [ngValue]="null" disabled selected>Seleccione Und. Medida</option>
+                  <option [ngValue]="unidadMedida" *ngFor="let unidadMedida of undMed">{{unidadMedida}}</option>
                 </select>
               </div>
               <!-- Precio Producto -->
               <div class="col-md">
-                <input  formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="PrdPrecioUnd"  placeholder="Precio unidad" name="PrdPrecioUnd" required maxlength="18">
+                <input type="number" class="form-control form-control-sm" id="PrdPrecioUnd"  placeholder="Precio unidad" *ngFor="let existencias of existenciasProductos" value="{{existencias.exProd_Precio}}" name="PrdPrecioUnd" required maxlength="18">
               </div>
               <!-- Tipo Moneda -->
               <div class="col-md-2">
-                <select formControlName="ProdTipoMoneda" id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda" required >
-                  <option [ngValue]="null" disabled selected>Seleccione Tipo de Moneda</option>
-                  <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas}}</option>
+                <select id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda" required >
+                  <option [ngValue]="existencias" *ngFor="let existencias of existenciasProductos" selected>{{existencias.tpMoneda_Id}}</option>
                 </select>
               </div>
               <!-- Stock Producto -->
               <div class="col-md">
-                <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock" name="PrdStock" required maxlength="18">
+                <input type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock" *ngFor="let existencias of existenciasProductos" value="{{existencias.exProd_Cantidad}}" name="PrdStock" required maxlength="18">
               </div>
             </div>
           </div>

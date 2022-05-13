@@ -18,6 +18,7 @@ export class LoginComponentComponent implements OnInit {
   /* SE INSTANCIA LA VARIABLE "empresas" QUE VA A SER DE TIPO "EmpresaService" Y TAMBIEN SERÁ UN ARRAY.
   AQUÍ SE GUARDARÁN LOS NOMBRES DE LAS EMPRESAS QUE HAY EN LA BASE DE DATOS */
   empresas:EmpresaService[]=[];
+  empresa=[];
 
   constructor(private usuarioServices : UsuarioService, private empresaServices : EmpresaService, private frmBuilderUsuario : FormBuilder, private cookieServices : CookieService) { 
     this.formularioUsuario = this.frmBuilderUsuario.group({
@@ -54,22 +55,36 @@ export class LoginComponentComponent implements OnInit {
   Consulta(){
     // FUNCION QUE CONSULTA LOS DATOS EN LA BASE DE DATOS
     try {
+      let empresa : string = this.formularioUsuario.value.Empresa;
       this.usuarioServices.srvObtenerListaPorId(this.formularioUsuario.value.Identificacion).subscribe(datos_usuarios=>{
-        if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena == datos_usuarios.usua_Contrasena) {
-          /*// CREACIÓN DE COOKIES PARA MANTENER EL ROL DEL USUARIO Y MOSTRAR CIERTOS COMPONENTES
-          let nombre: string = datos_usuarios.usua_Nombre;
-          let rol: string = datos_usuarios.rolUsu_Id;
-          let fechaExpiracion : Date = new Date(2022, 5, 10, 14, 58);
-          console.log(fechaExpiracion);
-          this.cookieServices.set('Nombre', `${nombre}`, {expires: fechaExpiracion} );
-          this.cookieServices.set('Rol', `${rol}`, {expires: fechaExpiracion});
-          
-          console.log(this.cookieServices.get('Nombre'));
-          console.log(this.cookieServices.get('Rol'));*/
-
-          this.clear();
-          window.location.href = "./principal";
-        } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena) Swal.fire("EL número de identificacion no coincide con la contraseña"); 
+        this.empresaServices.srvObtenerLista().subscribe(datos_empresa => {
+          for (let index = 0; index < datos_empresa.length; index++) {
+            if (datos_empresa[index].empresa_Nombre == empresa) {
+              if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena == datos_usuarios.usua_Contrasena && datos_usuarios.empresa_Id == datos_empresa[index].empresa_Id) {
+                /*// CREACIÓN DE COOKIES PARA MANTENER EL ROL DEL USUARIO Y MOSTRAR CIERTOS COMPONENTES
+                let nombre: string = datos_usuarios.usua_Nombre;
+                let rol: string = datos_usuarios.rolUsu_Id;
+                let fechaExpiracion : Date = new Date(2022, 5, 10, 14, 58);
+                console.log(fechaExpiracion);
+                this.cookieServices.set('Nombre', `${nombre}`, {expires: fechaExpiracion} );
+                this.cookieServices.set('Rol', `${rol}`, {expires: fechaExpiracion});
+                
+                console.log(this.cookieServices.get('Nombre'));
+                console.log(this.cookieServices.get('Rol'));*/
+                this.clear();
+                window.location.href = "./navbarLateral";
+                break;
+              } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena){
+                Swal.fire("EL número de identificacion no coincide con la contraseña"); 
+                break;
+              } 
+              else{
+                Swal.fire(`El número de identificación ${this.formularioUsuario.value.Identificacion} no se encuentra asociado a la empresa ${empresa}`); 
+                break;
+              } 
+            } 
+          }
+        });       
       }, error =>{ Swal.fire('El número de identificación no se encuentra registrado'); });        
     } catch (error) {
       console.log(error);

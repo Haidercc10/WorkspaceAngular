@@ -15,7 +15,7 @@ export class OpedidoproductoService {
 
 //Metodo buscar lista de Pedidos de Productos
   srvObtenerListaPedidosProductos() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoExternoes')
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoExternoes');
   }
 
   srvObtenerListaPorId(id : any){
@@ -26,11 +26,11 @@ export class OpedidoproductoService {
   srvAgregarPedidosProductos(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExternoes', data)
   }
-//Metodo actualzar Pedidos de Productos
+  //Metodo actualzar Pedidos de Productos
   srvActualizarPedidosProdusctos(id:number|String, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/PedidoExternoes/${id}`, data);
   }
-//Metodo eliminar Pedidos de Productos
+  //Metodo eliminar Pedidos de Productos
   srvEliminarPedidosProductos(id:number|String) {
     return this.http.delete(this.rutaPlasticaribeAPI + `/PedidoExternoes/${id}`);
   }

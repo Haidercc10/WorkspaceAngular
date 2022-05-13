@@ -17,6 +17,10 @@ export class ProductoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Productoes')
   }
 
+  srvObtenerListaPorId(id : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Productoes/${id}`)
+  }
+
   //Metodo agregar Productos
   srvAgregar(datos_Productos:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Productoes', datos_Productos)

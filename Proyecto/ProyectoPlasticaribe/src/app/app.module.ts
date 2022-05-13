@@ -28,6 +28,7 @@ import { CrearSedesClientesComponent } from './Vistas/crear-sedes-clientes/crear
 import { ProductoComponent } from './Vistas/producto/producto.component';
 import { PdfComponent } from './Vistas/pdf/pdf.component'; 
 import { CookieService } from 'ngx-cookie-service';
+import { NavbarLateralComponent } from './Vistas/navbar-lateral/navbar-lateral.component';
 
 
 
@@ -53,7 +54,7 @@ export const routes: Routes = [
   {path: 'crear-clientes',component:ClientesComponent},
   {path: 'producto',component:ProductoComponent},
   {path: 'pdf',component:PdfComponent},
-  
+  {path: 'navbarLateral', component:NavbarLateralComponent},  
 ]
 
 @NgModule({
@@ -80,7 +81,9 @@ export const routes: Routes = [
     CrearSedesClientesComponent,
     ProductoComponent,
     ReportesComponent,
-    PdfComponent],
+    PdfComponent,
+    NavbarLateralComponent,
+  ],
 
   imports: [
 

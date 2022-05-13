@@ -16,7 +16,7 @@ export class SedeClienteService {
   srvObtenerLista():Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes`);
   }
-
+  
   srvObtenerListaPorId(id : number){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/${id}`);
   }

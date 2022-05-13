@@ -10,20 +10,23 @@ import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 import { TipoProductoService } from 'src/app/Servicios/tipo-producto.service'
 import { TipoMonedaService } from 'src/app/Servicios/tipo-moneda.service';
 import { jsPDF } from 'jspdf';
-import  html2canvas from 'html2canvas';
+import { EstadosService } from 'src/app/Servicios/estados.service';
+import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
+import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
+
 @Component({
   selector: 'app.opedidoproducto.component',
   templateUrl: './opedidoproducto.component.html',
   styleUrls: ['./opedidoproducto.component.css']
 })
 
-export class OpedidoproductoComponent implements OnInit {
+export class OpedidoproductoComponent implements OnInit {   
 
   public FormPedidoExterno !: FormGroup; //Formulario de pedidos
   public FormSedesClientes !: FormGroup;
   public FormConsultaPedidoExterno !: FormGroup;
   titulo = 'Generar PDF con Angular JS 5';
-imagen1 = 'assets/img/tc.jpg';
+  imagen1 = 'assets/img/tc.jpg';  
 
   //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
   public ModalCrearProductos: boolean = false;
@@ -32,13 +35,19 @@ imagen1 = 'assets/img/tc.jpg';
   public TituloSedes = "";
 
   // VARIABLES PARA PASAR A LOS COMBOBOX
-  cliente: ClientesService[] = [];
-  sedeCliente: SedeClienteService[] = [];
-  usuarioVendedor = [];
-  producto: ProductoService[] = [];
-  tipoProducto: TipoProductoService[] = [];
-  undMed: UnidadMedidaService[] = [];
-  tipoMoneda: TipoMonedaService[] = [];
+  cliente:ClientesService[]=[];
+  sedeCliente:SedeClienteService[]=[];
+  usuarioVendedor=[];
+  estado=[];
+  tipoEstado=[];
+  producto=[];
+  productoInfo=[];
+  tipoProducto:TipoProductoService[]=[];
+  undMed:UnidadMedidaService[]=[];
+  tipoMoneda:TipoMonedaService[]=[];
+
+  existenciasProductos=[];
+  empresa=[];
 
   pedidosProductos = [];
   pedidoID: OpedidoproductoService[] = [];
@@ -50,23 +59,23 @@ imagen1 = 'assets/img/tc.jpg';
   pedidoPrecioTotal: OpedidoproductoService[] = [];
   pedidoArchivo: OpedidoproductoService[] = [];
 
-  constructor(private pedidoproductoService: OpedidoproductoService,
-    private productosServices: ProductoService,
-    private clientesService: ClientesService,
-    private sedesClientesService: SedeClienteService,
-    private usuarioService: UsuarioService,
-    private unidadMedidaService: UnidadMedidaService,
-    private tiposProductosService: TipoProductoService,
-    private tipoMonedaService: TipoMonedaService,
-    private frmBuilderPedExterno: FormBuilder) {
+  constructor(private pedidoproductoService : OpedidoproductoService,
+    private productosServices : ProductoService,
+      private clientesService :ClientesService,
+        private sedesClientesService: SedeClienteService,
+          private usuarioService: UsuarioService,
+            private tipoEstadoService : TipoEstadosService,
+              private unidadMedidaService : UnidadMedidaService,
+                    private frmBuilderPedExterno : FormBuilder,
+                      private estadosService : EstadosService,
+                        private existenciasProductosServices : ExistenciasProductosService) {
 
     this.FormPedidoExterno = this.frmBuilderPedExterno.group({
-
       //Instanciar campos que vienen del formulario
       //Pedidos
-      PedClienteId: new FormControl(),
       PedSedeCli_Id: new FormControl(),
-      PedUsuarioId: new FormControl(),
+      PedClienteNombre: new FormControl(),
+      PedUsuarioNombre: new FormControl(),
       PedFecha: new FormControl(),
       PedFechaEnt: new FormControl(),
       PedEstadoId: new FormControl(),
@@ -98,22 +107,18 @@ imagen1 = 'assets/img/tc.jpg';
   ngOnInit(): void {
     this.initForms();
     this.clientesComboBox();
-    this.sedesClientesComboBox();
-    this.usuarioVendedorComboBox();
     this.estadoComboBox();
     this.productoComboBox();
     this.undMedidaComboBox();
-    this.tipoProductoComboBox();
-    this.tipoMonedaComboBox();
   }
 
   initForms() {
     //Campos que vienen del formulario
     this.FormPedidoExterno = this.frmBuilderPedExterno.group({
       //Datos para la tabla de pedidos.
-      PedClienteId: ['', Validators.required],
+      PedClienteNombre: ['', Validators.required],
       PedSedeCli_Id: ['', Validators.required],
-      PedUsuarioId: ['', Validators.required],
+      PedUsuarioNombre: ['', Validators.required],
       PedFecha: ['', Validators.required],
       PedFechaEnt: ['', Validators.required],
       PedEstadoId: ['', Validators.required],
@@ -138,8 +143,14 @@ imagen1 = 'assets/img/tc.jpg';
       PedExtFechaConsulta: [, Validators.required],
       PedExtFechaEntregaConsulta: [, Validators.required],
       PedExtEstadoConsulta: [, Validators.required]
-    })
+    });
 
+    this.FormConsultaPedidoExterno = this.frmBuilderPedExterno.group({
+      PedExtIdConsulta:  [, Validators.required],
+      PedExtFechaConsulta: [, Validators.required],
+      PedExtFechaEntregaConsulta: [, Validators.required],
+      PedExtEstadoConsulta: [, Validators.required]
+    });
   }
 
   //Cargar modal de crear producto
@@ -154,14 +165,13 @@ imagen1 = 'assets/img/tc.jpg';
   LlamarModalSedesClientes() {
     this.ModalSedesClientes = true;
     this.TituloSedes = "Crear sedes clientes"
-    //this.crearSedes.initFormsSedes();
   }
 
   // VALIDACION PARA CAMPOS VACIOS
-  validarCamposVacios() {
-    if (this.FormPedidoExterno.valid) {
-      this.consultarDatos();
-    } else {
+  validarCamposVacios(){
+    if(this.FormPedidoExterno.valid){
+
+    }else{
       Swal.fire("Hay campos vacios");
     }
   }
@@ -179,24 +189,46 @@ imagen1 = 'assets/img/tc.jpg';
     });
   }
 
-  sedesClientesComboBox() {
-    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedeCliente => {
-      for (let index = 0; index < datos_sedeCliente.length; index++) {
-        this.sedeCliente.push(datos_sedeCliente[index].sedecli_Nombre);
+
+  sedesClientesComboBox(){
+    //LLENA LA SEDE DEL CLIENTE DEPENDIENDO DEL CLIENTE
+    let clienteNombreBD: string = this.FormPedidoExterno.value.PedClienteNombre;
+    this.clientesService.srvObtenerLista().subscribe(datos_cliente=>{
+      for (let index = 0; index < datos_cliente.length; index++) {
+        if (datos_cliente[index].cli_Nombre == clienteNombreBD){
+          this.sedesClientesService.srvObtenerLista().subscribe(datos_sedesClientes => {
+            this.sedeCliente=[]
+            for (let i = 0; i < datos_sedesClientes.length; i++) {              
+              if (datos_cliente[index].cli_Id == datos_sedesClientes[i].cli_Id) {
+                this.sedeCliente.push(datos_sedesClientes[i].sedeCliente_Direccion);            
+              }             
+            }            
+          });
+        }
+
+        //LLENA EL USUARIO DEPENDIENDO DEL CLIENTE
+        this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarioVendedor => {
+          this.usuarioVendedor = [];
+          for (let j = 0; j < datos_usuarioVendedor.length; j++) {
+            if (datos_cliente[index].usua_Id == datos_usuarioVendedor[j].usua_Id) {
+              this.usuarioVendedor.push(datos_usuarioVendedor[index].usua_Nombre);
+              break;
+            } else this.usuarioVendedor = [];            
+          }
+        });
       }
     });
   }
 
-  usuarioVendedorComboBox() {
-    this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuario => {
-      for (let index = 0; index < datos_usuario.length; index++) {
-        this.usuarioVendedor.push(datos_usuario[index].usua_Nombre);
-      }
+  estadoComboBox(){
+    // FORMA DE HACER QUE SOLO SE RETORNEN LOS ESTADOS CON EL TIPO DE ESTADO "1", QUE ES EL EXCLUSIOVO PARA DOCUMENTOS
+    this.tipoEstadoService.srvObtenerListaPorId(1).subscribe(datos_tiposEstados => {
+      this.estadosService.srvObtenerLista().subscribe(datos_estados=>{
+        for (let index = 0; index < datos_estados.length; index++) {
+          if (datos_tiposEstados.tpEstado_Id == datos_estados[index].tpEstado_Id) this.estado.push(datos_estados[index].estado_Nombre);          
+        }
+      }, error =>{ console.log("error"); });
     });
-  }
-
-  estadoComboBox() {
-
   }
 
   productoComboBox() {
@@ -207,10 +239,16 @@ imagen1 = 'assets/img/tc.jpg';
     });
   }
 
-  tipoProductoComboBox() {
-    this.tiposProductosService.srvObtenerLista().subscribe(datos_tiposProductos => {
-      for (let index = 0; index < datos_tiposProductos[index].length; index++) {
-        this.tipoProducto.push(datos_tiposProductos[index].tpProd_Nombre);
+  llenado(){
+    let productoNombre : string = this.FormPedidoExterno.value.ProdNombre;
+    this.productosServices.srvObtenerLista().subscribe(datos_productos => {
+      this.productoInfo = [];
+      for (let index = 0; index < datos_productos.length; index++) {
+        this.productosServices.srvObtenerLista().subscribe(datos_productosInfo => {
+          if(datos_productos[index].prod_Nombre == productoNombre){                      
+            this.productoInfo.push(datos_productosInfo[index]);      
+          }
+        }, error => { console.log(error); });
       }
     });
   }
@@ -223,107 +261,85 @@ imagen1 = 'assets/img/tc.jpg';
     }, error => { Swal.fire('Ocurrió un error, intentelo de nuevo'); });
   }
 
-  tipoMonedaComboBox() {
-    this.tipoMonedaService.srvObtenerLista().subscribe(datos_tipoMoneda => {
-      for (let index = 0; index < datos_tipoMoneda.length; index++) {
-        this.tipoMoneda.push(datos_tipoMoneda[index].tpMoneda_Id);
+  // FUNCIÓN PARA MOSTRAR LAS EXISTENCIAS DEL PRODUCTO ELEGIDO
+  existencias (){
+    let productoNombre : string = this.FormPedidoExterno.value.ProdNombre;
+    this.productosServices.srvObtenerLista().subscribe(datos_productos => {
+      this.existenciasProductos = [];
+      for (let index = 0; index < datos_productos.length; index++) {
+        if (datos_productos[index].prod_Nombre == productoNombre) {
+          this.existenciasProductosServices.srvObtenerLista().subscribe(datos_existencias => {
+            for (let i = 0; i < datos_existencias.length; i++) {
+              if (datos_productos[index].prod_Id == datos_existencias[i].prod_Id) {
+                this.existenciasProductos.push(datos_existencias[i]);
+              }            
+            }
+          });
+        }        
       }
     });
   }
 
-  usuarioVendedorId() {
-    this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuario => {
-      for (let index = 0; index < datos_usuario.length; index++) {
-        this.usuarioVendedor.push(datos_usuario[index].usua_Nombre);
-      }
-    });
-  }
+  /* FUNCION PARA LLENAR LA TABLA CON LOS DATOS DE LOS PEDIDOS DE PRODUCTOS DEPENDIENDO DE LA CONSULTA HECHA */
+  consultarDatosPedidos(){
+    //FORMA NUMERO 1 DE HACER LA CONSULTA DE PEDIDOS DE PRODUCTOS, ESTA FORMA BUSCA EL PEDIDO UNICAMENTE POR EL ID DE ESTE MISMO.
+    this.pedidoproductoService.srvObtenerListaPorId(this.FormConsultaPedidoExterno.value.PedExtIdConsulta).subscribe(datos_pedidosExternos => {
+      this.pedidosProductos.push(datos_pedidosExternos);
+    }, error => { console.log(error); });
 
-  /* FUNCION PARA LLENAR LOS INPUTS CON LOS DATOS DE LOS PEDIDOS DE PRODUCTOS DEPENDIENDO DE LA CONSULTA HECHA */
-  consultarDatos() {
-    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidosExternos => {
+    //FORMA NUMERO 2 DE HACER LA CONSULTA DE PEDIDOS DE PRODUCTOS, ESTA FORMA BUSCA DEPENDIENDO DEL O LOS FILTROS QUE SE APLIQUEN
+    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidosExternos=>{
       for (let i = 0; i < datos_pedidosExternos.length; i++) {
-
-        if (this.FormConsultaPedidoExterno.value.PedExtIdConsulta == datos_pedidosExternos[i].pedExt_Id) {
-
+        if(this.FormConsultaPedidoExterno.value.PedExtFechaConsulta == datos_pedidosExternos[i].pedExt_FechaCreacion){
           this.pedidosProductos.push(datos_pedidosExternos[i]);
-          console.log(this.pedidosProductos);
 
-          if (this.FormConsultaPedidoExterno.value.PedExtIdConsulta == datos_pedidosExternos[i].pedExt_Id) {
-
-            this.llenarTabla();
-
-          } else if (this.FormConsultaPedidoExterno.value.PedExtFechaConsulta == datos_pedidosExternos[i].pedExt_FechaCreacion) {
-
-            this.pedidosProductos.push(datos_pedidosExternos[i]);
-            console.log(this.pedidosProductos);
-
-          } else if (this.FormConsultaPedidoExterno.value.PedExtFechaEntregaConsulta == datos_pedidosExternos[i].pedExt_FechaEntrega) {
-
-            this.pedidosProductos.push(datos_pedidosExternos[i]);
-            console.log(this.pedidosProductos);
-
-          } else if (this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta == datos_pedidosExternos[i].estado) {
-
-
-            this.pedidosProductos.push(datos_pedidosExternos[i]);
-            console.log(this.pedidosProductos);
-
-          } else {
-            this.pedidosProductos.push(datos_pedidosExternos[i]);
-            console.log(this.pedidosProductos);
-          }
-
-
-
-        } else {
-
+        }else if(this.FormConsultaPedidoExterno.value.PedExtFechaEntregaConsulta == datos_pedidosExternos[i].pedExt_FechaEntrega){
+          this.pedidosProductos.push(datos_pedidosExternos[i]);
+        }else if (this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta == datos_pedidosExternos[i].estado) {
+          this.pedidosProductos.push(datos_pedidosExternos[i]);
+        }else{
+          this.pedidosProductos.push(datos_pedidosExternos[i]);
         }
-
-
-        /* FORMA PARA QUE AL MOMENTO DE CONSULTAR UN PEDIDO, SE LLENEN EL RESTO DE DATOS DEL PEDIDO CONSULTADO.
-        ESTO SE HARIA LLAMANDO AL DOM EN EL TS Y LUEGO SE LE ASIGNAN LOS VALORES QUE SE VAN A MOSTRAR.
-
-        let prueba: string | undefined | any = this.pedidosProductos.push(datos_pedidosExternos[i].pedExt_Observacion)
-        let observacion: HTMLElement = document.getElementById('#PextObservacion');
-        observacion.innerHTML = prueba;
-        */
       }
     }, error => { Swal.fire('Ocurrió un error, intentelo de nuevo'); });
-  }
-  llenarTabla() {
-    throw new Error('Method not implemented.');
-  }
 
-
+  }
 
   /* CONSULTAR EN LA TABLA DE USUARIOS EL NOMBRE ESTÁ DIGITADO EN EL COMBOBOX DE USUARIOS Y BUSCAR EL ID DE ESE NOMBRE PARA PASARSELO A LA TABLA DE PEDIDOS
     DE PRODUCTOS */
   consultarNombreUsuario() {
     this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
       for (let i = 0; i < datos_usuarios.length; i++) {
-        let dato_nombre: number = datos_usuarios[i].usua_Nombre;
-        if (this.FormPedidoExterno.value.PedUsuarioId == dato_nombre) {
-          let dato_id: string = datos_usuarios[i].usua_Id;
+        let dato_nombre: string = datos_usuarios[i].usua_Nombre;
+        if (this.FormPedidoExterno.value.PedUsuarioNombre == dato_nombre) {
+          let dato_id: number = datos_usuarios[i].usua_Id;
           console.log(`El número de identificacion del Usuario ${dato_nombre} es ${dato_id}`);
+          break;
+        }else if (this.FormPedidoExterno.value.PedUsuarioNombre == "") {
+          console.log("selecciona un vendedor");
           break;
         }
       }
+
     }, error => { Swal.fire('Ocurrió un error, intentelo de nuevo'); });
   }
 
-
-
-    public downloadPDF(...args: []): void {
-      const doc = new jsPDF();
-
-
-     doc.text('¡Hello world!');
-     doc.save('hello-world.pdf');
-     console.log('Generanado PDF');
+  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA DE LA VISTA */
+  confimacionSalida(){
+    let salir: string = prompt("¿Seguro que desea salir?\n Digite S para si o N para no");
+    if(salir == "s" || salir == "S" || salir == "si" || salir == "Si" || salir == "SI" || salir == "sI") {
+      window.location.href = "./principal";
+    }else if (salir == "n" || salir == "N" || salir == "no" || salir == "No" || salir == "NO" || salir == "nO"){
+      console.log("continúe");
+    }else {
+      console.log("Digite valores validaos");
     }
+  }
 
-
-
-
+  downloadPDF(...args: []): void {
+    const doc = new jsPDF();
+    doc.save('hello-world.pdf');
+    console.log('Generanado PDF');
+  }
 }
+    
