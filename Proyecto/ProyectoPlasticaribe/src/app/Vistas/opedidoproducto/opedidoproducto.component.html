@@ -115,7 +115,7 @@
                   </tr>
                 </tbody>
               </table>
-               <button  (click)= "generatePdf()"> PDF</button>
+           
             </div>
           </div>
         </div>
@@ -312,9 +312,9 @@
         <!-- Inicio tabla producto -->
         <div class="mb-4">
           <div class="row g-3">
-            <div id="html2Pdf"> 
+            
             <div class="table-responsive">
-              <table class="table table-bordered">
+              <table id="table" class="table table-striped">
                 <thead class="TitulosTabla">
                     <tr>
                     <th scope="col" class="idProducto">ID</th>
@@ -348,13 +348,13 @@
                     </tr>
 
                 </tbody>
-                <button  (click)= "generatePdf()"> PDF</button>
+                <button (click)="download()">Download PDF</button>
 
               </table>
             </div>
             </div>
           </div>
-        </div>
+        
 
         <!-- Fin tabla producto -->
 

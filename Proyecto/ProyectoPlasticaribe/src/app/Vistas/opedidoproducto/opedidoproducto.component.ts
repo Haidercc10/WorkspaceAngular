@@ -9,12 +9,11 @@ import { SedeClienteService } from 'src/app/Servicios/sede-cliente.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 import { TipoProductoService } from 'src/app/Servicios/tipo-producto.service'
 import { TipoMonedaService } from 'src/app/Servicios/tipo-moneda.service';
-import { jsPDF } from 'jspdf';
-import  html2canvas from 'html2canvas';
 import { EstadosService } from 'src/app/Servicios/estados.service';
 import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
 import { EmpresaService } from 'src/app/Servicios/empresa.service';
+import * as html2pdf from 'html2pdf.js'
 
 @Component({
   selector: 'app.opedidoproducto.component',
@@ -347,31 +346,21 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // FUNCION  DEL PDF
-  generatePdf() {
-    const div = document.getElementById("html2Pdf");
-    const options = {background: "white", height: div.clientHeight, width: div.clientWidth};
-  
-    html2canvas(div, options).then((canvas) => {
-        // JSPDF
-        let doc = new jsPDF("p", "mm", "a4");
-        
-    
-        let pdfOutput = doc.output();
-        // usar ArrayBuffer permitirá poner una imagen dentro de PDF
-        let buffer = new ArrayBuffer(pdfOutput.length);
-        let array = new Uint8Array(buffer);
-        for (let i = 0; i < pdfOutput.length; i++) {
-            array[i] = pdfOutput.charCodeAt(i);
-        }
-  
-        //Nombre del  pdf
-        const fileName = "Reporte.pdf";
-  
-        // Make file
-        doc.save(fileName);
-  
-    });
+  download(){
+    var element = document.getElementById('table');
+    var opt = {
+      margin:       1,
+      filename:     'Reporte.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+};
+ 
+// New Promise-based usage
+html2pdf().from(element).set(opt).save();
   }
+
+
 
   ObtenerUltimoPedido() {
     this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(dataPedExternos =>{
@@ -467,3 +456,5 @@ export class OpedidoproductoComponent implements OnInit {
     }, error => { console.log(error); })
   }
 }
+
+// 
