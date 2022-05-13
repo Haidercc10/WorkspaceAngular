@@ -87,9 +87,12 @@
         <!-- TABLA DE PEDIDOS -->
         <div class="mb-4">
           <div class="row g-1">
+           
             <div class="table-responsive">
+              <div id="html2Pdf">
               <table class="table table-bordered" *ngIf="pedidosProductos">
                 <thead class="TitulosTabla">
+                
                   <tr>
                     <th id="idPedido" scope="col">ID</th>
                     <th id="fechaPedido" scope="col">Fecha Pedido</th>
@@ -99,7 +102,7 @@
                     <th id="precioPedido" scope="col">Precio Total</th>
                     <th id="archivoPedido" scope="col">Archivo</th>
                   </tr>
-                </thead>
+        
                 <tbody>
                   <tr *ngFor="let item of pedidosProductos; let i=index" >
                     <td id="idPedido">{{this.item[i].PedExtId}}</td>
@@ -112,10 +115,11 @@
                   </tr>
                 </tbody>
               </table>
+               <button  (click)= "generatePdf()"> PDF</button>
             </div>
           </div>
         </div>
-      </form>
+     
 
       <div class="mb-4">
         <hr class="colorLinea">
@@ -308,6 +312,7 @@
         <!-- Inicio tabla producto -->
         <div class="mb-4">
           <div class="row g-3">
+            <div id="html2Pdf"> 
             <div class="table-responsive">
               <table class="table table-bordered">
                 <thead class="TitulosTabla">
@@ -341,9 +346,12 @@
                     <td id="precioCantidadTotal">#</td>
                     <td id="tipoProducto">#</td>
                     </tr>
+
                 </tbody>
-                <button (click)="downloadPDF()" class="btn btn-danger btn-danger-sm">Crear PDF</button>
+                <button  (click)= "generatePdf()"> PDF</button>
+
               </table>
+            </div>
             </div>
           </div>
         </div>
@@ -414,5 +422,5 @@
       </div>
       <!-- Fin Modal de sedes clientes -->
     </div>
-  </div>
-</div>
+ 
+

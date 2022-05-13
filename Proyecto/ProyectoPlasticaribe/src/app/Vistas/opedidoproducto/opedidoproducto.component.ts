@@ -10,6 +10,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 import { TipoProductoService } from 'src/app/Servicios/tipo-producto.service'
 import { TipoMonedaService } from 'src/app/Servicios/tipo-moneda.service';
 import { jsPDF } from 'jspdf';
+import  html2canvas from 'html2canvas';
 import { EstadosService } from 'src/app/Servicios/estados.service';
 import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
@@ -345,12 +346,31 @@ export class OpedidoproductoComponent implements OnInit {
     }
   }
 
-  downloadPDF(...args: []): void {
-    const doc = new jsPDF();
-    doc.save('hello-world.pdf');
-    console.log('Generanado PDF');
+  generatePdf() {
+    const div = document.getElementById("html2Pdf");
+    const options = {background: "white", height: div.clientHeight, width: div.clientWidth};
+  
+    html2canvas(div, options).then((canvas) => {
+        // JSPDF
+        let doc = new jsPDF("p", "mm", "a4");
+        
+    
+        let pdfOutput = doc.output();
+        // usar ArrayBuffer permitirá poner una imagen dentro de PDF
+        let buffer = new ArrayBuffer(pdfOutput.length);
+        let array = new Uint8Array(buffer);
+        for (let i = 0; i < pdfOutput.length; i++) {
+            array[i] = pdfOutput.charCodeAt(i);
+        }
+  
+        //Nombre del  pdf
+        const fileName = "Reporte.pdf";
+  
+        // Make file
+        doc.save(fileName);
+  
+    });
   }
-
 
   ObtenerUltimoPedido() {
     this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(dataPedExternos =>{
