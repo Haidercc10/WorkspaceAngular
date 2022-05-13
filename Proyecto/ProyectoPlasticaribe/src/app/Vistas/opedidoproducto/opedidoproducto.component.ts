@@ -346,6 +346,7 @@ export class OpedidoproductoComponent implements OnInit {
     }
   }
 
+  // FUNCION  DEL PDF
   generatePdf() {
     const div = document.getElementById("html2Pdf");
     const options = {background: "white", height: div.clientHeight, width: div.clientWidth};
