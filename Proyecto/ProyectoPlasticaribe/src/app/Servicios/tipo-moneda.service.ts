@@ -12,22 +12,22 @@ export class TipoMonedaService {
 
   constructor(private http : HttpClient) { }
 
-  //Metodo buscar lista 
+  //Metodo buscar lista
   srvObtenerLista():Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Moneda')
   }
 
-  //Metodo agregar 
-  srvAgregar(data:any) {
+  //Metodo agregar
+  srvAgregar(data: any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Tipo_Moneda', data)
   }
 
-  //Metodo actualzar 
+  //Metodo actualzar
   srvActualizar(id:number|String, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Tipo_Moneda/${id}`, data);
   }
 
-  //Metodo eliminar 
+  //Metodo eliminar
   srvEliminar(id:number|String) {
     return this.http.delete(this.rutaPlasticaribeAPI + `/Tipo_Moneda/${id}`);
   }
@@ -35,5 +35,5 @@ export class TipoMonedaService {
   //
   srvGuardar(data : modelTipoMoneda): Observable<any> {
     return this.http.post(this.rutaPlasticaribeAPI + '/Tipo_Moneda', data)
-  }  
+  }
 }

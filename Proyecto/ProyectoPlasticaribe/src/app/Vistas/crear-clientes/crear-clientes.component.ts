@@ -15,13 +15,20 @@ export class ClientesComponent implements OnInit {
 
     this.FormCrearClientes = this.formBuilderCrearClientes.group({
       CliId: new FormControl,
-      TipoIdCliente: new FormControl,
-      CliNombre:  new FormControl,
-      CliDireccion:  new FormControl,
-      CliTelefono:  new FormControl,
-      CliEmail:  new FormControl,
-      TipoClienteId: new FormControl,
-      UsuIdNombre: new FormControl
+      TipoIdCliente: new FormControl(),
+      CliNombre:  new FormControl(),
+      CliDireccion:  new FormControl(),
+      CliTelefono:  new FormControl(),
+      CliEmail:  new FormControl(),
+      TipoClienteId: new FormControl(),
+      UsuIdNombre: new FormControl(),
+
+      SedeCli_Id: new FormControl(),
+      SedeCli_Ciudad: new FormControl(),
+      CliId2: new FormControl(),
+      SedeCli_Postal: new FormControl(),
+      SedeCli_Direccion: new FormControl(),
+
     })
 
    }
@@ -39,7 +46,13 @@ export class ClientesComponent implements OnInit {
        CliTelefono: ['', Validators.required],
        CliEmail: ['', Validators.required],
        TipoClienteId: ['', Validators.required],
-       UsuIdNombre: ['', Validators.required]
+       UsuIdNombre: ['', Validators.required],
+
+       SedeCli_Id: ['', Validators.required],
+       SedeCli_Ciudad: ['', Validators.required],
+       CliId2: ['', Validators.required],
+       SedeCli_Postal: ['', Validators.required],
+       SedeCli_Direccion: ['', Validators.required]
     })
   }
 
@@ -57,6 +70,26 @@ export class ClientesComponent implements OnInit {
 
 LimpiarCampos() {
   this.FormCrearClientes.reset();
+}
+
+
+guardarClientes(){
+  const camposClientes : any = {
+    ClieId: this.FormCrearClientes.get('')?.value,
+    TpIdCliente: this.FormCrearClientes.get('')?.value,
+    ClieNombre: this.FormCrearClientes.get('')?.value,
+    ClieDireccion: this.FormCrearClientes.get('')?.value,
+    ClieTelefono: this.FormCrearClientes.get('')?.value,
+    ClieEmail: this.FormCrearClientes.get('')?.value,
+    TpClienteId: this.FormCrearClientes.get('')?.value,
+    UsuIdNombre: this.FormCrearClientes.get('')?.value,
+
+    SedeClie_Id: this.FormCrearClientes.get('')?.value,
+    SedeClie_Ciudad: this.FormCrearClientes.get('')?.value,
+    ClieId2: this.FormCrearClientes.get('')?.value,
+    SedeClie_Postal: this.FormCrearClientes.get('')?.value,
+    SedeClie_Direccion: this.FormCrearClientes.get('')?.value
+  }
 }
 
 

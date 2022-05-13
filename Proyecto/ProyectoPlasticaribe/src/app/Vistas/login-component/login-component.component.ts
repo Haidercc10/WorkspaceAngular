@@ -20,7 +20,10 @@ export class LoginComponentComponent implements OnInit {
   empresas:EmpresaService[]=[];
   empresa=[];
 
-  constructor(private usuarioServices : UsuarioService, private empresaServices : EmpresaService, private frmBuilderUsuario : FormBuilder, private cookieServices : CookieService) { 
+
+  constructor(private usuarioServices : UsuarioService, private empresaServices : EmpresaService, private frmBuilderUsuario : FormBuilder, private cookieServices : CookieService) {
+
+
     this.formularioUsuario = this.frmBuilderUsuario.group({
       Identificacion: [, Validators.required],
       Contrasena: [, Validators.required],
@@ -44,14 +47,14 @@ export class LoginComponentComponent implements OnInit {
   // FUNCION PARA HACER VALIDACIONES DE CAMPOS VACIOS, QUE DADO ESTE CASO (EN EL QUE HAYAN CAMPOS VACIOS) SE MOSTRARÁ UN MENSAJE INFOMANDO DE ESTO.
   // SI NO HAY CAMPOS VACIOS ENTRARÍA A EL METODO Consulta()
   validarCamposVacios() : any{
-    if(this.formularioUsuario.valid) this.Consulta();    
+    if(this.formularioUsuario.valid) this.Consulta();
     else Swal.fire("HAY CAMPOS VACIOS");
   }
-  
+
   // FUNCION PARA LIMPIAR LOS CAMPOS DEL FORMULARIO.
   clear(){ this.formularioUsuario.reset(); }
 
-  // FUNCION PARA HACER LA VALIDACION DE LA ENTRADA DE USUARIOS, SE VERIFICAN LOS CAMPOS DIGITADOS CON LA BASE DE DATOS. 
+  // FUNCION PARA HACER LA VALIDACION DE LA ENTRADA DE USUARIOS, SE VERIFICAN LOS CAMPOS DIGITADOS CON LA BASE DE DATOS.
   Consulta(){
     // FUNCION QUE CONSULTA LOS DATOS EN LA BASE DE DATOS
     try {
@@ -85,9 +88,9 @@ export class LoginComponentComponent implements OnInit {
             } 
           }
         });       
-      }, error =>{ Swal.fire('El número de identificación no se encuentra registrado'); });        
+      }, error =>{ Swal.fire('El número de identificación no se encuentra registrado'); });
     } catch (error) {
       console.log(error);
-    }    
+    }
   }
 }

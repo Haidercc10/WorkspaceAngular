@@ -21,7 +21,10 @@
     "@angular/router": "~13.3.0",
     "@popperjs/core": "^2.11.4",
     "@syncfusion/ej2-angular-dropdowns": "^20.1.52",
+
+
     "@types/html2canvas": "^1.0.0",
+
     "@types/js-cookie": "^3.0.2",
     "bootstrap": "^5.1.3",
     "dom-to-image": "^2.6.0",

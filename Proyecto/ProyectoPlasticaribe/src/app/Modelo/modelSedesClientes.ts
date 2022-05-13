@@ -3,5 +3,8 @@ export interface modelSedesClientes{
     SedesCli_Ciudad: string;
     SedesCli_CodPostal: number;
     Cli_Id: number;
-    SedesCli_Direccion: string;
+    SedeCliente_Direccion : string;
+
 }
+
+

@@ -13,6 +13,7 @@ import { jsPDF } from 'jspdf';
 import { EstadosService } from 'src/app/Servicios/estados.service';
 import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
+import { EmpresaService } from 'src/app/Servicios/empresa.service';
 
 @Component({
   selector: 'app.opedidoproducto.component',
@@ -59,6 +60,11 @@ export class OpedidoproductoComponent implements OnInit {
   pedidoPrecioTotal: OpedidoproductoService[] = [];
   pedidoArchivo: OpedidoproductoService[] = [];
 
+  contadorPedidosExternos=[];
+  ArrayProducto=[];
+  valorTotal=[];
+  EmpresaVendedora=[];
+
   constructor(private pedidoproductoService : OpedidoproductoService,
     private productosServices : ProductoService,
       private clientesService :ClientesService,
@@ -66,9 +72,12 @@ export class OpedidoproductoComponent implements OnInit {
           private usuarioService: UsuarioService,
             private tipoEstadoService : TipoEstadosService,
               private unidadMedidaService : UnidadMedidaService,
-                    private frmBuilderPedExterno : FormBuilder,
-                      private estadosService : EstadosService,
-                        private existenciasProductosServices : ExistenciasProductosService) {
+                private frmBuilderPedExterno : FormBuilder,
+                  private estadosService : EstadosService,
+                    private existenciasProductosServices : ExistenciasProductosService,                
+                      private tiposProductosService : TipoProductoService,
+                        private tipoMonedaService : TipoMonedaService,
+                          private SrvEmpresa : EmpresaService,) {
 
     this.FormPedidoExterno = this.frmBuilderPedExterno.group({
       //Instanciar campos que vienen del formulario
@@ -223,7 +232,7 @@ export class OpedidoproductoComponent implements OnInit {
   estadoComboBox(){
     // FORMA DE HACER QUE SOLO SE RETORNEN LOS ESTADOS CON EL TIPO DE ESTADO "1", QUE ES EL EXCLUSIOVO PARA DOCUMENTOS
     this.tipoEstadoService.srvObtenerListaPorId(1).subscribe(datos_tiposEstados => {
-      this.estadosService.srvObtenerLista().subscribe(datos_estados=>{
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estados=>{
         for (let index = 0; index < datos_estados.length; index++) {
           if (datos_tiposEstados.tpEstado_Id == datos_estados[index].tpEstado_Id) this.estado.push(datos_estados[index].estado_Nombre);          
         }
@@ -341,5 +350,99 @@ export class OpedidoproductoComponent implements OnInit {
     doc.save('hello-world.pdf');
     console.log('Generanado PDF');
   }
+
+
+  ObtenerUltimoPedido() {
+    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(dataPedExternos =>{
+      for (let index = 0; index < dataPedExternos.length; index++) {
+        this.contadorPedidosExternos.find(dataPedExternos[index].pedExt_Id)
+        console.log(dataPedExternos);
+        console.log(this.contadorPedidosExternos);
+      }
+    });
+  }
+
+  cargarFormProductoEnTablas(){
+    let productoExt : any = {
+      Produ_Id : this.FormPedidoExterno.get('ProdId')?.value,
+      Produ_Nombre : this.FormPedidoExterno.get('ProdNombre')?.value,
+      Produ_Ancho : this.FormPedidoExterno.get('ProdAncho')?.value,
+      Produ_Fuelle : this.FormPedidoExterno.get('ProdFuelle')?.value,
+      Produ_Calibre : this.FormPedidoExterno.get('ProdCalibre')?.value,
+      UndMedACF : this.FormPedidoExterno.get('ProdUnidadMedidaACF')?.value,
+      TpProdu_Id : this.FormPedidoExterno.get('ProdTipo')?.value,
+      Produ_Cantidad : this.FormPedidoExterno.get('ProdCantidad')?.value,
+      UndMedPeso : this.FormPedidoExterno.get('ProdUnidadMedidaCant')?.value,
+      PrecioUnd : this.FormPedidoExterno.get('ProdPrecioUnd')?.value,
+      TipoMoneda : this.FormPedidoExterno.get('ProdTipoMoneda')?.value,
+      Stock : this.FormPedidoExterno.get('ProdStock')?.value,
+      Produ_Descripcion : this.FormPedidoExterno.get('ProdDescripcion')?.value,
+      Subtotal : this.FormPedidoExterno.get('ProdCantidad')?.value * this.FormPedidoExterno.get('ProdPrecioUnd')?.value
+    }
+      if(this.ArrayProducto.length == 0){
+      console.log(this.ArrayProducto)
+      this.ArrayProducto.push(productoExt);
+    } else {
+      for (let index = 0; index < this.ArrayProducto.length; index++) {
+        if(this.FormPedidoExterno.value.ProdId == this.ArrayProducto[index].Produ_Id) {
+            Swal.fire('No se pueden cargar datos identicos a la tabla.')
+        } else {
+          this.ArrayProducto.push(productoExt);
+          console.log('Llegue hasta aqui.')
+          //this.valorTotal = this.valorTotal +
+        }
+        break;
+      }
+    }
+    for (let index = 0; index < this.ArrayProducto.length; index++) {
+      this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (productoExt.Produ_Cantidad * productoExt.PrecioUnd), 0)
+      console.log(this.valorTotal);
+    }
+
+  }
+
+  cargarDatosTablaProductos(){  
+    const producto : any = {
+    }
+  }
+
+  CrearPedidoExterno() {
+    const camposPedido : any = {
+      PedExt_Codigo: 1,
+      PedExt_FechaCreacion: this.FormPedidoExterno.get('PedFecha')?.value,
+      PedExt_FechaEntrega: this.FormPedidoExterno.get('PedFechaEnt')?.value,
+      Empresa_Id: this.EmpresaVendedora,
+      SedeCli_Id: this.FormPedidoExterno.get('PedSedeCli_Id')?.value,
+      Estado_Id: this.FormPedidoExterno.get('PedEstadoId')?.value,
+      PedExt_Observacion: this.FormPedidoExterno.get('PedObservacion')?.value,
+      PedExt_PrecioTotal: this.valorTotal,
+      PedExt_Archivo: 1  
+    }
+  
+    console.log(camposPedido.Empresa_Id);
+    console.log(camposPedido.SedeCli_Id);
+    console.log(camposPedido.Estado_Id);
+
+    if(this.ArrayProducto.length == 0){
+      Swal.fire('Debe cargar al menos un producto en la tabla.')
+    } else {
+      this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data=> {
+        Swal.fire('¡Pedido guardado con éxito!');
+      }, error => {
+        console.log(error);
+        /*console.log(camposPedido.Empresa_Id);
+        console.log(camposPedido.SedeCli_Id);
+        console.log(camposPedido.Estado_Id);*/
+      });
+    }
+  }
+
+  obtenerEmpresa(){
+    this.SrvEmpresa.srvObtenerLista().subscribe((dataEmpresa) => {  
+      for (let index = 0; index < dataEmpresa.length; index++) {
+          this.EmpresaVendedora = dataEmpresa[1].empresa_Id;
+          //console.log(dataEmpresa[1].empresa_Id);
+      }  
+    }, error => { console.log(error); })
+  }
 }
-    
