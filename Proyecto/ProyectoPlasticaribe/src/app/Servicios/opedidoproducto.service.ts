@@ -18,8 +18,8 @@ export class OpedidoproductoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoExternoes');
   }
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExternoes/${id}`);
+  srvObtenerListaPorId(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExternoes/${dato}`);
   }
 
 //Metodo agregar Pedidos de Productos
@@ -35,10 +35,8 @@ export class OpedidoproductoService {
     return this.http.delete(this.rutaPlasticaribeAPI + `/PedidoExternoes/${id}`);
   }
 
-  srvGuardarPedidosProductos(data : any): Observable<any> {
+  srvGuardarPedidosProductos(data : modelOpedidoproducto): Observable<any> {
    return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExternoes', data);
   }
-
-
 
 }

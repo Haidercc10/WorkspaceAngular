@@ -86,18 +86,17 @@
         </div>
         <!-- TABLA DE PEDIDOS -->
         <div class="mb-4">
-          <div class="row g-1">
-           
+          <div class="row g-1">           
             <div class="table-responsive">
               <div id="html2Pdf">
               <table class="table table-bordered" *ngIf="pedidosProductos">
-                <thead class="TitulosTabla">
-                
+                <thead class="TitulosTabla">                
                   <tr>
                     <th id="idPedido" scope="col">ID</th>
                     <th id="fechaPedido" scope="col">Fecha Pedido</th>
-                    <th id="fechaEntrega" scope="col" class="">Fecha Entrega</th>
+                    <th id="fechaEntrega" scope="col">Fecha Entrega</th>
                     <th id="cliente" scope="col">Cliente</th>
+                    <th id="vendedor" scope="col">Vendedor</th>
                     <th id="estadoPedido" scope="col">Estado</th>
                     <th id="precioPedido" scope="col">Precio Total</th>
                     <th id="archivoPedido" scope="col">Archivo</th>
@@ -115,7 +114,19 @@
                   </tr>
                 </tbody>
               </table>
-           
+              <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item disabled">
+                    <a class="page-link" href="" tabindex="-1">Anterior</a>
+                  </li>
+                  <li class="page-item"><a class="page-link" href="">1</a></li>
+                  <li class="page-item"><a class="page-link" href="">2</a></li>
+                  <li class="page-item"><a class="page-link" href="">3</a></li>
+                  <li class="page-item">
+                    <a class="page-link" href="">Siguiente</a>
+                  </li>
+                </ul>
+              </nav>
             </div>
           </div>
         </div>
@@ -154,7 +165,8 @@
             <!-- Usuario -->
             <div class="col-md">
               <select formControlName="PedUsuarioNombre" type="text" id="PedUsuarioNombre" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required OnPush>
-                <option [ngValue]="vendedor" *ngFor="let vendedor of usuarioVendedor" selected>{{vendedor}}</option>
+                <option [ngValue]="null" disabled selected>Seleccione Vendedor</option>
+                <option [ngValue]="vendedor" *ngFor="let vendedor of usuarioVendedor">{{vendedor}}</option>
               </select>
             </div>
 
@@ -216,32 +228,31 @@
             </div>
             <!-- ID/Nombre Producto -->
             <div class="col-md">
-                <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" (change)="llenado()" (change)="existencias()" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
+                <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" (change)="llenado()" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
                   <option [ngValue]="null" disabled selected>Seleccione Producto</option>
                   <option [ngValue]="productos" *ngFor="let productos of producto">{{productos}}</option>
                 </select>
             </div>
             <!-- Ancho Producto -->
             <div class="col-md-1">
-              <input type="number" class="form-control form-control-sm" id="PrdAncho" *ngFor="let productos of productoInfo" value="{{productos.prod_Ancho}}" name="PrdAncho" >
+              <input formControlName="ProdAncho" placeholder="Ancho" type="number" class="form-control form-control-sm" >
             </div>
             <!-- Fuelle Producto -->
             <div class="col-md-1">
-              <input type="number" class="form-control form-control-sm" id="PrdFuelle" *ngFor="let productos of productoInfo" value="{{productos.prod_Fuelle}}" name="PrdFuelle">
+              <input formControlName="ProdFuelle" type="number" class="form-control form-control-sm" id="PrdFuelle" placeholder="Fuelle">
             </div>
               <!-- Calibre Producto -->
             <div class="col-md-1">
-              <input type="number" class="form-control form-control-sm" id="PrdCalibre" *ngFor="let productos of productoInfo" value="{{productos.prod_Calibre}}" name="PrdCalibre">
+              <input formControlName="ProdCalibre" type="number" class="form-control form-control-sm" id="PrdCalibre" placeholder="Calibre" name="PrdCalibre">
             </div>
             <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
             <div class="col-md-1">
-              <select id="PrdUnidadMedidaACF" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida"  name="PrdUnidadMedidaACF" required >
-                <option [ngValue]="productos" *ngFor="let productos of productoInfo" selected>{{productos.undMedACF}}</option>
+              <select  id="PrdUnidadMedidaACF" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida"  name="PrdUnidadMedidaACF" readonly onmousedown="return false;">
+                <option [ngValue]="productos.undMedACF" *ngFor="let productos of productoInfo" selected>{{productos.undMedACF}}</option>
               </select>
             </div>
           </div>
         </div>
-
         <!-- Fin Fila 1 Agregar Producto -->
 
         <div class="mb-3">
@@ -250,8 +261,8 @@
             <div class="row g-3">
               <!-- Tipo Producto -->
               <div class="col-md-2">
-                <select id="PrdTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrdTipo" required >
-                  <option [ngValue]="productos" *ngFor="let productos of productoInfo" selected>{{productos.tpProd_Id}}</option>
+                <select  id="PrdTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrdTipo" readonly onmousedown="return false;">
+                  <option [ngValue]="tipoproductos" *ngFor="let tipoproductos of tipoProducto" selected>{{tipoproductos}}</option>
                 </select>
               </div>
               <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
@@ -260,24 +271,24 @@
               </div>
               <!-- UM Cantidad Producto -->
               <div class="col-md-2">
-                <select id="PrdUnidadMedidaCant" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdUnidadMedidaCant" required >
+                <select formControlName="ProdUnidadMedidaCant" id="PrdUnidadMedidaCant" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdUnidadMedidaCant" required >
                   <option [ngValue]="null" disabled selected>Seleccione Und. Medida</option>
                   <option [ngValue]="unidadMedida" *ngFor="let unidadMedida of undMed">{{unidadMedida}}</option>
                 </select>
               </div>
               <!-- Precio Producto -->
               <div class="col-md">
-                <input type="number" class="form-control form-control-sm" id="PrdPrecioUnd"  placeholder="Precio unidad" *ngFor="let existencias of existenciasProductos" value="{{existencias.exProd_Precio}}" name="PrdPrecioUnd" required maxlength="18">
+                <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="PrdPrecioUnd"  placeholder="Precio Unidad" name="PrdPrecioUnd">
               </div>
               <!-- Tipo Moneda -->
               <div class="col-md-2">
-                <select id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda" required >
-                  <option [ngValue]="existencias" *ngFor="let existencias of existenciasProductos" selected>{{existencias.tpMoneda_Id}}</option>
+                <select id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda" readonly onmousedown="return false;">
+                  <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda" selected>{{tiposMonedas}}</option>
                 </select>
               </div>
               <!-- Stock Producto -->
               <div class="col-md">
-                <input type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock" *ngFor="let existencias of existenciasProductos" value="{{existencias.exProd_Cantidad}}" name="PrdStock" required maxlength="18">
+                <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock"  name="PrdStock" >
               </div>
             </div>
           </div>
@@ -311,8 +322,7 @@
 
         <!-- Inicio tabla producto -->
         <div class="mb-4">
-          <div class="row g-3">
-            
+          <div class="row g-3">            
             <div class="table-responsive">
               <table id="table" class="table table-striped">
                 <thead class="TitulosTabla">
@@ -346,23 +356,18 @@
                     <td id="precioCantidadTotal">#</td>
                     <td id="tipoProducto">#</td>
                     </tr>
-
                 </tbody>
-                <button (click)="download()">Download PDF</button>
-
               </table>
             </div>
             </div>
           </div>
-        
-
         <!-- Fin tabla producto -->
 
         <!-- Inicio Botones -->
         <div class="bajarPagina">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <input class=" btn btn-danger btn-danger-sm" type="submit" value="Crear Pedido">
-              <button class=" btn btn-secondary btn-secondary-sm" type="button" (click)="confimacionSalida()">Cancelar</button>
+              <input class=" btn btn-danger btn-danger-sm" type="submit" value="Crear Pedido" (click)="download()">
+              <button class=" btn btn-secondary btn-secondary-sm" type="button" (click)="confimacionSalida()" >Cancelar</button>
             </div>
         </div>
       </form>
