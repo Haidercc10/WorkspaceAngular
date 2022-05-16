@@ -21,13 +21,13 @@ import * as html2pdf from 'html2pdf.js'
   styleUrls: ['./opedidoproducto.component.css']
 })
 
-export class OpedidoproductoComponent implements OnInit {   
+export class OpedidoproductoComponent implements OnInit {
 
   public FormPedidoExterno !: FormGroup; //Formulario de pedidos
   public FormSedesClientes !: FormGroup;
   public FormConsultaPedidoExterno !: FormGroup;
   titulo = 'Generar PDF con Angular JS 5';
-  imagen1 = 'assets/img/tc.jpg';  
+  imagen1 = 'assets/img/tc.jpg';
 
   //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
   public ModalCrearProductos: boolean = false;
@@ -74,7 +74,7 @@ export class OpedidoproductoComponent implements OnInit {
               private unidadMedidaService : UnidadMedidaService,
                 private frmBuilderPedExterno : FormBuilder,
                   private estadosService : EstadosService,
-                    private existenciasProductosServices : ExistenciasProductosService,                
+                    private existenciasProductosServices : ExistenciasProductosService,
                       private tiposProductosService : TipoProductoService,
                         private tipoMonedaService : TipoMonedaService,
                           private SrvEmpresa : EmpresaService,) {
@@ -101,7 +101,8 @@ export class OpedidoproductoComponent implements OnInit {
       ProdUnidadMedidaCant: new FormControl(),
       ProdPrecioUnd: new FormControl(),
       ProdTipoMoneda: new FormControl(),
-      ProdStock: new FormControl()
+      ProdStock: new FormControl(),
+      ProdDescripcion: new FormControl()
     });
 
     this.FormConsultaPedidoExterno = this.frmBuilderPedExterno.group({
@@ -119,6 +120,7 @@ export class OpedidoproductoComponent implements OnInit {
     this.estadoComboBox();
     this.productoComboBox();
     this.undMedidaComboBox();
+    //this.LimpiarCampos();
   }
 
   initForms() {
@@ -145,6 +147,7 @@ export class OpedidoproductoComponent implements OnInit {
       ProdPrecioUnd: ['', Validators.required],
       ProdTipoMoneda: ['', Validators.required],
       ProdStock: ['', Validators.required],
+      ProdDescripcion: [''],
     });
 
     this.FormConsultaPedidoExterno = this.frmBuilderPedExterno.group({
@@ -173,6 +176,8 @@ export class OpedidoproductoComponent implements OnInit {
   validarCamposVacios(){
     if(this.FormPedidoExterno.valid){
       console.log(this.FormPedidoExterno);
+      this.cargarFormProductoEnTablas();
+
     }else{
       Swal.fire("Hay campos vacios");
       console.log(this.FormPedidoExterno);
@@ -201,11 +206,11 @@ export class OpedidoproductoComponent implements OnInit {
         if (datos_cliente[index].cli_Nombre == clienteNombreBD){
           this.sedesClientesService.srvObtenerLista().subscribe(datos_sedesClientes => {
             this.sedeCliente=[]
-            for (let i = 0; i < datos_sedesClientes.length; i++) {              
+            for (let i = 0; i < datos_sedesClientes.length; i++) {
               if (datos_cliente[index].cli_Id == datos_sedesClientes[i].cli_Id) {
-                this.sedeCliente.push(datos_sedesClientes[i].sedeCliente_Direccion);            
-              }             
-            }            
+                this.sedeCliente.push(datos_sedesClientes[i].sedeCliente_Direccion);
+              }
+            }
           });
         }
 
@@ -216,7 +221,7 @@ export class OpedidoproductoComponent implements OnInit {
             if (datos_cliente[index].usua_Id == datos_usuarioVendedor[j].usua_Id) {
               this.usuarioVendedor.push(datos_usuarioVendedor[index].usua_Nombre);
               break;
-            } else this.usuarioVendedor = [];            
+            } else this.usuarioVendedor = [];
           }
         });
       }
@@ -228,7 +233,7 @@ export class OpedidoproductoComponent implements OnInit {
     this.tipoEstadoService.srvObtenerListaPorId(1).subscribe(datos_tiposEstados => {
       this.estadosService.srvObtenerListaEstados().subscribe(datos_estados=>{
         for (let index = 0; index < datos_estados.length; index++) {
-          if (datos_tiposEstados.tpEstado_Id == datos_estados[index].tpEstado_Id) this.estado.push(datos_estados[index].estado_Nombre);          
+          if (datos_tiposEstados.tpEstado_Id == datos_estados[index].tpEstado_Id) this.estado.push(datos_estados[index].estado_Nombre);
         }
       }, error =>{ console.log("error"); });
     });
@@ -248,9 +253,9 @@ export class OpedidoproductoComponent implements OnInit {
       this.productoInfo = [];
       for (let index = 0; index < datos_productos.length; index++) {
         this.productosServices.srvObtenerLista().subscribe(datos_productosInfo => {
-          if(datos_productos[index].prod_Nombre == productoNombre){                      
+          if(datos_productos[index].prod_Nombre == productoNombre){
             this.productoInfo.push(datos_productosInfo[index]);
-            
+
             // PARA MOSTRAR LAS EXISTENCIAS Y DEMAS INFORMACION DELP RODUCTO ELEGIDO
             this.existenciasProductos = [];
             for (let index = 0; index < datos_productos.length; index++) {
@@ -267,7 +272,7 @@ export class OpedidoproductoComponent implements OnInit {
                           if (datos_existencias[i].tpMoneda_Id == datos_tiposMondedas[j].tpMoneda_Id) {
                             this.tipoMoneda.push(datos_tiposMondedas[j].tpMoneda_Id);
 
-                            //PARA MOSTRAR EL NOMBRE DEL TIPO DE PRODUCTO          
+                            //PARA MOSTRAR EL NOMBRE DEL TIPO DE PRODUCTO
                             this.tiposProductosService.srvObtenerLista().subscribe(datos_tiposProductos => {
                               this.tipoProducto=[];
                               for (let k = 0; k < datos_tiposProductos.length; k++) {
@@ -286,37 +291,38 @@ export class OpedidoproductoComponent implements OnInit {
                                               if (usuarioItem == this.FormPedidoExterno.value.PedUsuarioNombre) {
                                                 // estado
                                                 for (let estadoItem of this.estado) {
-                                                  if (estadoItem == this.FormPedidoExterno.value.PedEstadoId) {    
-                                                    
+                                                  if (estadoItem == this.FormPedidoExterno.value.PedEstadoId) {
+
                                                     // Llenado de formulario
                                                     this.FormPedidoExterno.setValue({
                                                       PedClienteNombre: `${clienteItem}`,
                                                       PedSedeCli_Id: `${sedeCliItem}`,
-                                                      PedUsuarioNombre:`${usuarioItem}`, 
-                                                      PedFecha: `${this.FormPedidoExterno.value.PedFecha}`, 
-                                                      PedFechaEnt: `${this.FormPedidoExterno.value.PedFechaEnt}`, 
-                                                      PedEstadoId: `${estadoItem}`, 
+                                                      PedUsuarioNombre:`${usuarioItem}`,
+                                                      PedFecha: `${this.FormPedidoExterno.value.PedFecha}`,
+                                                      PedFechaEnt: `${this.FormPedidoExterno.value.PedFechaEnt}`,
+                                                      PedEstadoId: `${estadoItem}`,
                                                       PedObservacion: `${this.FormPedidoExterno.value.PedObservacion}`,
                                                       ProdId: `${datos_productosInfo[index].prod_Id}`,
                                                       ProdNombre: `${datos_productosInfo[index].prod_Nombre}`,
                                                       ProdAncho: `${datos_productosInfo[index].prod_Ancho}`,
-                                                      ProdFuelle: `${datos_productosInfo[index].prod_Fuelle}`, 
+                                                      ProdFuelle: `${datos_productosInfo[index].prod_Fuelle}`,
                                                       ProdCalibre: `${datos_productosInfo[index].prod_Calibre}`,
                                                       ProdUnidadMedidaACF: `${datos_productosInfo[index].undMedACF}`,
                                                       ProdTipo: `${datos_tiposProductos[k].tpProd_Nombre}`,
                                                       ProdCantidad: `${this.FormPedidoExterno.value.ProdCantidad}`,
                                                       ProdUnidadMedidaCant: `${this.FormPedidoExterno.value.ProdUnidadMedidaCant}`,
-                                                      ProdPrecioUnd: `${datos_existencias[i].exProd_Precio}`, 
-                                                      ProdTipoMoneda: `${datos_tiposMondedas[j].tpMoneda_Id}`, 
+                                                      ProdPrecioUnd: `${datos_existencias[i].exProd_Precio}`,
+                                                      ProdTipoMoneda: `${datos_tiposMondedas[j].tpMoneda_Id}`,
                                                       ProdStock: `${datos_existencias[i].exProd_Cantidad}`,
+                                                      ProdDescripcion: `${datos_productosInfo[index].prod_Descripcion}`,
                                                     });
                                                     break;
                                                   }
                                                 }
-                                              }            
+                                              }
                                             }
                                           }
-                                        }        
+                                        }
                                       }
                                     }
                                   break;
@@ -325,16 +331,16 @@ export class OpedidoproductoComponent implements OnInit {
                             });
                           }
                         }
-                      });               
-                    }            
+                      });
+                    }
                   }
                 });
               }
             }
           }
-        });        
-      }      
-    });    
+        });
+      }
+    });
   }
 
   undMedidaComboBox() {
@@ -377,7 +383,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   /* CONSULTAR EN LA TABLA DE USUARIOS EL NOMBRE QUE ESTÁ DIGITADO EN EL COMBOBOX DE USUARIOS Y BUSCAR EL ID DE ESE NOMBRE PARA PASARSELO A LA TABLA DE PEDIDOS
-    DE PRODUCTOS 
+    DE PRODUCTOS
     SE PUEDE OMITIR */
   consultarNombreUsuario() {
     this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
@@ -402,7 +408,7 @@ export class OpedidoproductoComponent implements OnInit {
     if(salir == "s" || salir == "S" || salir == "si" || salir == "Si" || salir == "SI" || salir == "sI") {
       window.location.href = "./navbarLateral";
     }else if (salir == "n" || salir == "N" || salir == "no" || salir == "No" || salir == "NO" || salir == "nO"){
-      
+
     }else {
       Swal.fire("Digite datos validos")
     }
@@ -418,7 +424,7 @@ export class OpedidoproductoComponent implements OnInit {
       html2canvas:  { scale: 2 },
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
   }
- 
+
   // New Promise-based usage
   html2pdf().from(element).set(opt).save();
   }
@@ -449,7 +455,7 @@ export class OpedidoproductoComponent implements OnInit {
       Stock : this.FormPedidoExterno.get('ProdStock').value,
       Produ_Descripcion : this.FormPedidoExterno.get('ProdDescripcion').value,
       Subtotal : this.FormPedidoExterno.get('ProdCantidad').value * this.FormPedidoExterno.get('ProdPrecioUnd')?.value
-      
+
     }
       if(this.ArrayProducto.length == 0){
       console.log(this.ArrayProducto)
@@ -473,7 +479,7 @@ export class OpedidoproductoComponent implements OnInit {
 
   }
 
-  cargarDatosTablaProductos(){  
+  cargarDatosTablaProductos(){
     const producto : any = {
     }
   }
@@ -488,9 +494,9 @@ export class OpedidoproductoComponent implements OnInit {
       Estado_Id: this.FormPedidoExterno.get('PedEstadoId')?.value,
       PedExt_Observacion: this.FormPedidoExterno.get('PedObservacion')?.value,
       PedExt_PrecioTotal: this.valorTotal,
-      PedExt_Archivo: 1  
+      PedExt_Archivo: 1
     }
-  
+
     console.log(camposPedido.Empresa_Id);
     console.log(camposPedido.SedeCli_Id);
     console.log(camposPedido.Estado_Id);
@@ -510,11 +516,32 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   obtenerEmpresa(){
-    this.SrvEmpresa.srvObtenerLista().subscribe((dataEmpresa) => {  
+    this.SrvEmpresa.srvObtenerLista().subscribe((dataEmpresa) => {
       for (let index = 0; index < dataEmpresa.length; index++) {
           this.EmpresaVendedora = dataEmpresa[1].empresa_Id;
           //console.log(dataEmpresa[1].empresa_Id);
-      }  
+      }
     }, error => { console.log(error); })
   }
+
+//Funcion para validar que la fecha de entrega del pedido no sea menor o igual a la fecha de creación.
+validarFechas(){
+
+  let FechaCreacion : any;
+  let FechaEntrega : any;
+
+  FechaCreacion = this.FormPedidoExterno.get('PedFecha')?.value;
+  FechaEntrega = this.FormPedidoExterno.get('PedFechaEnt')?.value;
+
+  if (FechaEntrega <= FechaCreacion) {
+    Swal.fire('La fecha de creación no puede ser menor o igual a la fecha de entrega.');
+  } else {
+    this.CrearPedidoExterno();
+    console.log('Correcto');
+  }
+
 }
+
+}
+
+
