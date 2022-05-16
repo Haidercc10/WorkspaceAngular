@@ -86,11 +86,11 @@
         </div>
         <!-- TABLA DE PEDIDOS -->
         <div class="mb-4">
-          <div class="row g-1">           
+          <div class="row g-1">
             <div class="table-responsive">
               <div id="html2Pdf">
               <table class="table table-bordered" *ngIf="pedidosProductos">
-                <thead class="TitulosTabla">                
+                <thead class="TitulosTabla">
                   <tr>
                     <th id="idPedido" scope="col">ID</th>
                     <th id="fechaPedido" scope="col">Fecha Pedido</th>
@@ -101,7 +101,7 @@
                     <th id="precioPedido" scope="col">Precio Total</th>
                     <th id="archivoPedido" scope="col">Archivo</th>
                   </tr>
-        
+
                 <tbody>
                   <tr *ngFor="let item of pedidosProductos; let i=index" >
                     <td id="idPedido">{{this.item[i].PedExtId}}</td>
@@ -130,7 +130,7 @@
             </div>
           </div>
         </div>
-     
+
 
       <div class="mb-4">
         <hr class="colorLinea">
@@ -255,9 +255,9 @@
         </div>
         <!-- Fin Fila 1 Agregar Producto -->
 
-        <div class="mb-3">
+
           <!-- Inicio Fila 2 Agregar Producto -->
-          <div class="mb-4">
+          <div class="mb-3">
             <div class="row g-3">
               <!-- Tipo Producto -->
               <div class="col-md-2">
@@ -292,11 +292,30 @@
               </div>
             </div>
           </div>
-        </div>
+
         <!-- Fin Fila 2 Agregar Producto -->
 
+        <!--Fila 3 Inicio-->
+
+
+         <!-- Inicio Descripción producto -->
+         <div class="mb-4">
+          <div class="row g-3">
+            <!-- Campo Descripción producto -->
+            <div class="col-md">
+              <textarea formControlName="ProdDescripcion"  id="PrdDescripcion" type="text" class="form-control form-control-sm campoObservacion"
+              maxlength="200" placeholder="Descripción Producto" name="PrdDescripcion"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fin Descripción producto -->
+
+
+        <!--Fila 3 Fin -->
+
         <!-- Inicio botones -->
-        <div class="mb-4">
+        <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <button class="btn btn-danger btn-danger-sm" type="submit" >Agregar Producto</button>
               <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
@@ -307,7 +326,7 @@
 
                                                           <!--Fin agregar productos -->
 
-        <div class="mb-5">
+        <div class="mb-4">
           <hr class="Linea">
         </div>
 
@@ -322,54 +341,69 @@
 
         <!-- Inicio tabla producto -->
         <div class="mb-4">
-          <div class="row g-3">            
+          <div class="row g-3">
             <div class="table-responsive">
-              <table id="table" class="table table-striped">
+              <table class="table table-bordered">
                 <thead class="TitulosTabla">
                     <tr>
-                    <th scope="col" class="idProducto">ID</th>
-                    <th id="nombre" scope="col">Nombre</th>
-                    <th id="ancho" scope="col" class="">Ancho</th>
-                    <th id="fuelle" scope="col">Fuelle</th>
-                    <th id="calibre" scope="col">Calibre</th>
-                    <th id="undMedidaPeso" scope="col">Unidad Medida</th>
-                    <th id="stock" scope="col">Stock</th>
-                    <th id="cantidadDisponible" scope="col">Cantidad Disponible</th>
-                    <th id="undMedidaCantidad" scope="col">Unidad Medida</th>
-                    <th id="precioUnitario" scope="col">Precio Unitario</th>
-                    <th id="precioCantidadTotal" scope="col">Precio Total en Stock</th>
-                    <th id="tipoProducto" scope="col">Tipo Producto</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                    <th id="id" class="TextosInfoTabla"></th>
-                    <td id="nombre" >#</td>
-                    <td id="ancho" >#</td>
-                    <td id="fuelle" >#</td>
-                    <td id="calibre" >#</td>
-                    <td id="undMedidaPeso" >#</td>
-                    <td id="stock" >#</td>
-                    <td id="cantidadDisponible" >#</td>
-                    <td id="undMedidaCantidad">#</td>
-                    <td id="precioUnitario">#</td>
-                    <td id="precioCantidadTotal">#</td>
-                    <td id="tipoProducto">#</td>
+                      <th scope="col" class="idProducto">ID</th>
+                      <th id="nombre" scope="col">Nombre</th>
+                      <th id="ancho" scope="col" class="">Ancho</th>
+                      <th id="fuelle" scope="col">Fuelle</th>
+                      <th id="calibre" scope="col">Calibre</th>
+                      <th id="undMedidaPeso" scope="col">Und. Medida</th>
+                      <th id="tipoProducto" scope="col">Tipo Producto</th>
+                      <th id="cantidad" scope="col">Cantidad</th>
+                      <th id="undMedidaCantidad" scope="col">Und. Medida</th>
+                      <th id="precioUnitario" scope="col">Precio Und.</th>
+                      <th id="tipoMoneda" scope="col">tipo Moneda</th>
+                      <th id="stock" scope="col">Stock</th>
+                      <th id="Descripcion" scope="col">Descripcion</th>
+                      <th id="Subtotal" scope="col">Subtotal</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngFor="let listaProductos of ArrayProducto">
+                      <th id="id" class="TextosInfoTabla">{{listaProductos.Produ_Id}}</th>
+                      <td id="nombre">{{listaProductos.Produ_Nombre}}</td>
+                      <td id="ancho">{{listaProductos.Produ_Ancho}}</td>
+                      <td id="fuelle">{{listaProductos.Produ_Fuelle}}</td>
+                      <td id="calibre" >{{listaProductos.Produ_Calibre}}</td>
+                      <td id="undMedidaPeso" >{{listaProductos.UndMedACF}}</td>
+                      <td id="tipoProducto">{{listaProductos.TpProdu_Id}}</td>
+                      <td id="cantidadDisponible">{{listaProductos.Produ_Cantidad}}</td>
+                      <td id="undMedidaCantidad">{{listaProductos.UndMedPeso}}</td>
+                      <td id="precioUnitario">{{listaProductos.PrecioUnd}}</td>
+                      <td id="precioUnitario">{{listaProductos.TipoMoneda}}</td>
+                      <td id="stock">{{listaProductos.Stock}}</td>
+                      <td id="Descripcion">{{listaProductos.Produ_Descripcion}}</td>
+                      <td id="Subtotal">{{listaProductos.Subtotal}}</td>
                     </tr>
                 </tbody>
+
               </table>
             </div>
-            </div>
           </div>
+        </div>
         <!-- Fin tabla producto -->
+
+        <!--Inicio valor total-->
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <label for=""><b>Valor total: $</b></label>
+          <label for="">{{valorTotal}}</label>
+        </div>
+        <!--Fin valor total-->
 
         <!-- Inicio Botones -->
         <div class="bajarPagina">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <input class=" btn btn-danger btn-danger-sm" type="submit" value="Crear Pedido" (click)="download()">
+              <button class=" btn btn-danger btn-danger-sm" type="button" value=""  (click)="validarFechas()">Crear Pedido</button><!--(click)="download()"-->
               <button class=" btn btn-secondary btn-secondary-sm" type="button" (click)="confimacionSalida()" >Cancelar</button>
             </div>
         </div>
+
+
+
       </form>
       <!-- Fin Botones -->
 
@@ -427,5 +461,5 @@
       </div>
       <!-- Fin Modal de sedes clientes -->
     </div>
- 
+
 
