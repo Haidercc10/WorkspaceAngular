@@ -156,7 +156,7 @@
 
             <!-- Sede Cliente -->
             <div class="col-md">
-              <select formControlName="PedSedeCli_Id" type="text" id="PSedeCli_Id" name="PSedeCli_Id" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <select formControlName="PedSedeCli_Id" type="text" id="PSedeCli_Id" name="PSedeCli_Id" (change)="captarSedeSeleccionada()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="null" disabled selected>Seleccione Sede Cliente</option>
                 <option [ngValue]="sedesclientes" *ngFor="let sedesclientes of sedeCliente">{{sedesclientes}}</option>
               </select>
@@ -164,7 +164,7 @@
 
             <!-- Usuario -->
             <div class="col-md">
-              <select formControlName="PedUsuarioNombre" type="text" id="PedUsuarioNombre" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required OnPush>
+              <select formControlName="PedUsuarioNombre" type="text" id="PedUsuarioNombre" (change)="CaptarUsuarioSeleccionado()" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required><!--OnPush-->
                 <option [ngValue]="null" disabled selected>Seleccione Vendedor</option>
                 <option [ngValue]="vendedor" *ngFor="let vendedor of usuarioVendedor">{{vendedor}}</option>
               </select>
@@ -182,7 +182,7 @@
 
             <!-- Estado -->
             <div class="col-md">
-              <select formControlName="PedEstadoId" id="PextEstadoId" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <select formControlName="PedEstadoId" id="PextEstadoId" type="text" name="PextEstadoId" (change)="captarEstadoSeleccionado()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="null" disabled selected>Seleccione Estado</option>
                 <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
               </select>
@@ -340,10 +340,10 @@
 
 
         <!-- Inicio tabla producto -->
-        <div class="mb-4">
+        <div class="mb-3">
           <div class="row g-3">
             <div class="table-responsive">
-              <table class="table table-bordered">
+              <table class="table table-bordered table-hover mt-2">
                 <thead class="TitulosTabla">
                     <tr>
                       <th scope="col" class="idProducto">ID</th>
@@ -360,11 +360,12 @@
                       <th id="stock" scope="col">Stock</th>
                       <th id="Descripcion" scope="col">Descripcion</th>
                       <th id="Subtotal" scope="col">Subtotal</th>
+                      <th id="acciones" scope="col">Acciones</th>
                       </tr>
                   </thead>
                   <tbody>
                       <tr *ngFor="let listaProductos of ArrayProducto">
-                      <th id="id" class="TextosInfoTabla">{{listaProductos.Produ_Id}}</th>
+                      <td id="id" class="TextosInfoTabla">{{listaProductos.Produ_Id}}</td>
                       <td id="nombre">{{listaProductos.Produ_Nombre}}</td>
                       <td id="ancho">{{listaProductos.Produ_Ancho}}</td>
                       <td id="fuelle">{{listaProductos.Produ_Fuelle}}</td>
@@ -378,6 +379,7 @@
                       <td id="stock">{{listaProductos.Stock}}</td>
                       <td id="Descripcion">{{listaProductos.Produ_Descripcion}}</td>
                       <td id="Subtotal">{{listaProductos.Subtotal}}</td>
+                      <td id="Acciones"><i class="fa-solid fa-pen"></i></td>
                     </tr>
                 </tbody>
 

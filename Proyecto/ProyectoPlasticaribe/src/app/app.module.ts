@@ -30,6 +30,11 @@ import { PdfComponent } from './Vistas/pdf/pdf.component';
 import { CookieService } from 'ngx-cookie-service';
 import { NavbarLateralComponent } from './Vistas/navbar-lateral/navbar-lateral.component';
 import { EstadosComponent } from './Vistas/estados/estados.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
+
+
+
 
 
 export const routes: Routes = [
@@ -54,7 +59,7 @@ export const routes: Routes = [
   {path: 'crear-clientes',component:ClientesComponent},
   {path: 'producto',component:ProductoComponent},
   {path: 'pdf',component:PdfComponent},
-  {path: 'navbarLateral', component:NavbarLateralComponent}, 
+  {path: 'navbarLateral', component:NavbarLateralComponent},
   {path: 'estados',component: EstadosComponent},
 ]
 
@@ -85,7 +90,7 @@ export const routes: Routes = [
     PdfComponent,
     NavbarLateralComponent,
     EstadosComponent
-  ],    
+  ],
 
   imports: [
 
@@ -94,7 +99,11 @@ export const routes: Routes = [
     AppRoutingModule,
     RouterModule.forRoot(routes),
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    FontAwesomeModule,
+
+
+
   ],
 
 

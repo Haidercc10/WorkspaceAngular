@@ -7,6 +7,7 @@ export interface modelOpedidoproducto {
   Empresa_Id: number;
   SedeCli_Id: number;
   Estado_Id: number;
+  Usua_Id: number;
   PedExt_Observacion: string;
   PedExt_PrecioTotal: number;
   PedExt_Archivo: number;

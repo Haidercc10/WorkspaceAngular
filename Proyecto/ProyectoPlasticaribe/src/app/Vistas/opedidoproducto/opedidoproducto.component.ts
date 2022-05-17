@@ -15,6 +15,7 @@ import { ExistenciasProductosService } from 'src/app/Servicios/existencias-produ
 import { EmpresaService } from 'src/app/Servicios/empresa.service';
 import * as html2pdf from 'html2pdf.js'
 
+
 @Component({
   selector: 'app.opedidoproducto.component',
   templateUrl: './opedidoproducto.component.html',
@@ -60,16 +61,26 @@ export class OpedidoproductoComponent implements OnInit {
   pedidoPrecioTotal: OpedidoproductoService[] = [];
   pedidoArchivo: OpedidoproductoService[] = [];
 
-  contadorPedidosExternos=[];
-  ArrayProducto=[];
+  contadorPedidosExternos : number;
+  ArrayProducto : any [] = [];
+  ArrayProductoNuevo : any =  {};
+
+/* Vaiables para rescatar los ID de estado, sedes, empresa, valorTotal */
   valorTotal=[];
   EmpresaVendedora=[];
+  EstadoDocumentos= [];
+  EstadoDeDocumentos : any;
+  SedeSeleccionada: any;
+  IDSedeSeleccionada : any;
+  UsuarioSeleccionado : any;
+
+
 
   constructor(private pedidoproductoService : OpedidoproductoService,
     private productosServices : ProductoService,
       private clientesService :ClientesService,
         private sedesClientesService: SedeClienteService,
-          private usuarioService: UsuarioService,
+          private   usuarioService: UsuarioService,
             private tipoEstadoService : TipoEstadosService,
               private unidadMedidaService : UnidadMedidaService,
                 private frmBuilderPedExterno : FormBuilder,
@@ -120,6 +131,8 @@ export class OpedidoproductoComponent implements OnInit {
     this.estadoComboBox();
     this.productoComboBox();
     this.undMedidaComboBox();
+    this.obtenerEmpresa();
+    this.ObtenerUltimoPedido();
     //this.LimpiarCampos();
   }
 
@@ -133,7 +146,7 @@ export class OpedidoproductoComponent implements OnInit {
       PedFecha: ['', Validators.required],
       PedFechaEnt: ['', Validators.required],
       PedEstadoId: ['', Validators.required],
-      PedObservacion: [''],
+      PedObservacion: ['', Validators.required],
       //Datos para la tabla de productos.
       ProdId: ['', Validators.required],
       ProdNombre: ['', Validators.required],
@@ -233,7 +246,10 @@ export class OpedidoproductoComponent implements OnInit {
     this.tipoEstadoService.srvObtenerListaPorId(1).subscribe(datos_tiposEstados => {
       this.estadosService.srvObtenerListaEstados().subscribe(datos_estados=>{
         for (let index = 0; index < datos_estados.length; index++) {
-          if (datos_tiposEstados.tpEstado_Id == datos_estados[index].tpEstado_Id) this.estado.push(datos_estados[index].estado_Nombre);
+          if (datos_tiposEstados.tpEstado_Id == datos_estados[index].tpEstado_Id) {
+            this.estado.push(datos_estados[index].estado_Nombre);
+
+          }
         }
       }, error =>{ console.log("error"); });
     });
@@ -248,6 +264,8 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   llenado(){
+
+
     let productoNombre : string = this.FormPedidoExterno.value.ProdNombre;
     this.productosServices.srvObtenerLista().subscribe(datos_productos => {
       this.productoInfo = [];
@@ -341,6 +359,7 @@ export class OpedidoproductoComponent implements OnInit {
         });
       }
     });
+
   }
 
   undMedidaComboBox() {
@@ -428,18 +447,26 @@ export class OpedidoproductoComponent implements OnInit {
   // New Promise-based usage
   html2pdf().from(element).set(opt).save();
   }
-
+//Se obtiene el ultimo codigo del pedido y se incrementa en 1. (Contador)
   ObtenerUltimoPedido() {
+    let ultimoCodigoPedido : number;
+
     this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(dataPedExternos =>{
       for (let index = 0; index < dataPedExternos.length; index++) {
-        this.contadorPedidosExternos.find(dataPedExternos[index].pedExt_Id)
-        console.log(dataPedExternos);
-        console.log(this.contadorPedidosExternos);
+
+        ultimoCodigoPedido = dataPedExternos[index].pedExt_Codigo;
+        this.contadorPedidosExternos = ultimoCodigoPedido + 1
+
+        console.log('Ultimo codigo pedido: ' + ultimoCodigoPedido );
+        console.log('Ultimo codigo Pedido a guardar: ' + this.contadorPedidosExternos);
+        //console.log(this.contadorPedidosExternos);
       }
     });
   }
 
   cargarFormProductoEnTablas(){
+
+    let data = []
     let productoExt : any = {
       Produ_Id : this.FormPedidoExterno.get('ProdId')?.value,
       Produ_Nombre : this.FormPedidoExterno.get('ProdNombre').value,
@@ -455,22 +482,32 @@ export class OpedidoproductoComponent implements OnInit {
       Stock : this.FormPedidoExterno.get('ProdStock').value,
       Produ_Descripcion : this.FormPedidoExterno.get('ProdDescripcion').value,
       Subtotal : this.FormPedidoExterno.get('ProdCantidad').value * this.FormPedidoExterno.get('ProdPrecioUnd')?.value
-
     }
+
       if(this.ArrayProducto.length == 0){
-      console.log(this.ArrayProducto)
-      this.ArrayProducto.push(productoExt);
-    } else {
+        //console.log(this.ArrayProducto);
+        this.ArrayProducto.push(productoExt);
+      } else {
+
       for (let index = 0; index < this.ArrayProducto.length; index++) {
-        if(this.FormPedidoExterno.value.ProdId == this.ArrayProducto[index].Produ_Id) {
-            Swal.fire('No se pueden cargar datos identicos a la tabla.')
-        } else {
-          this.ArrayProducto.push(productoExt);
-          console.log('Llegue hasta aqui.')
-          //this.valorTotal = this.valorTotal +
-        }
+        //console.log(this.ArrayProducto)
+       /**/
+
+       data = Object.values(productoExt.Produ_Id);
+
+        console.log(data);
+        console.log(productoExt.Produ_Id)
+
+        if(data == this.ArrayProducto[index].Produ_Id) {
+          Swal.fire('No se pueden cargar datos identicos a la tabla.')
+      } else {
+        this.ArrayProducto.push(productoExt);
+        console.log('Llegue hasta aqui.')
+      }
+
         break;
       }
+
     }
     for (let index = 0; index < this.ArrayProducto.length; index++) {
       this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (productoExt.Produ_Cantidad * productoExt.PrecioUnd), 0)
@@ -485,41 +522,55 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   CrearPedidoExterno() {
+//    this.CaptarUsuarioSeleccionado();
+//    this.captarSedeSeleccionada();
+
     const camposPedido : any = {
-      PedExt_Codigo: 1,
+      PedExt_Codigo: this.contadorPedidosExternos,
       PedExt_FechaCreacion: this.FormPedidoExterno.get('PedFecha')?.value,
       PedExt_FechaEntrega: this.FormPedidoExterno.get('PedFechaEnt')?.value,
       Empresa_Id: this.EmpresaVendedora,
-      SedeCli_Id: this.FormPedidoExterno.get('PedSedeCli_Id')?.value,
-      Estado_Id: this.FormPedidoExterno.get('PedEstadoId')?.value,
+      SedeCli_Id: this.IDSedeSeleccionada,
+      Usua_Id: this.UsuarioSeleccionado,
+      Estado_Id: this.EstadoDocumentos,
       PedExt_Observacion: this.FormPedidoExterno.get('PedObservacion')?.value,
       PedExt_PrecioTotal: this.valorTotal,
       PedExt_Archivo: 1
     }
 
-    console.log(camposPedido.Empresa_Id);
-    console.log(camposPedido.SedeCli_Id);
-    console.log(camposPedido.Estado_Id);
+    let campoEstado = this.FormPedidoExterno.get('PedEstadoId')?.value
+    //console.log(camposPedido);
 
     if(this.ArrayProducto.length == 0){
       Swal.fire('Debe cargar al menos un producto en la tabla.')
-    } else {
+
+    } else if(campoEstado == "Finalizado" || campoEstado == "Cancelado" || campoEstado == "Anulado") {
+      Swal.fire('No puede crear un pedido con el estado seleccionado. Por favor verifique.')
+
+    }else{
+
       this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data=> {
         Swal.fire('¡Pedido guardado con éxito!');
+        setTimeout(() => {
+          this.LimpiarCampos();
+          this.LimpiarTablaTotal();
+          console.log(camposPedido.Usuario_Id);
+        }, 2000);
+
       }, error => {
         console.log(error);
-        /*console.log(camposPedido.Empresa_Id);
-        console.log(camposPedido.SedeCli_Id);
-        console.log(camposPedido.Estado_Id);*/
+
       });
     }
   }
-
+//Función para obtener el ID de la empresa, apartir de la posición
+/*La idea es que al iniciar sesión se deje en algún lado del programa el ID
+de la empresa y se capte de ahí su Identificación*/
   obtenerEmpresa(){
     this.SrvEmpresa.srvObtenerLista().subscribe((dataEmpresa) => {
       for (let index = 0; index < dataEmpresa.length; index++) {
           this.EmpresaVendedora = dataEmpresa[1].empresa_Id;
-          //console.log(dataEmpresa[1].empresa_Id);
+          console.log(dataEmpresa[1].empresa_Nombre);
       }
     }, error => { console.log(error); })
   }
@@ -537,9 +588,75 @@ validarFechas(){
     Swal.fire('La fecha de creación no puede ser menor o igual a la fecha de entrega.');
   } else {
     this.CrearPedidoExterno();
-    console.log('Correcto');
+    //console.log('Correcto');
   }
 
+}
+//Función para captar el ID del estado según el nombre del estado seleccionado.
+captarEstadoSeleccionado(){
+  this.EstadoDeDocumentos = this.FormPedidoExterno.get('PedEstadoId')?.value;
+
+  this.estadosService.srvObtenerListaEstados().subscribe(data=>{
+    for (let index = 0; index < data.length; index++) {
+      if(this.EstadoDeDocumentos == data[index].estado_Nombre) {
+        console.log('Estado ' + data[index].estado_Id + ' - ' + data[index].estado_Nombre);
+        this.EstadoDocumentos = data[index].estado_Id;
+      }
+
+    }
+  }, error => {
+    console.log(error);
+  })
+}
+/*Función para captar el ID de la sede seleccionada según su nombre, dato que se pasa a
+la tabla de pedidos al insertar el dato.*/
+captarSedeSeleccionada(){
+  this.SedeSeleccionada = this.FormPedidoExterno.get('PedSedeCli_Id')?.value;
+
+  this.sedesClientesService.srvObtenerLista().subscribe(data=>{
+    for (let index = 0; index < data.length; index++) {
+      if(this.SedeSeleccionada == data[index].sedeCliente_Direccion) {
+        console.log(data[index].sedeCli_Id);
+
+        this.IDSedeSeleccionada = data[index].sedeCli_Id;
+      }
+
+    }
+  }, error => {
+    console.log(error);
+  })
+}
+
+/*Función para captar el ID de usuario según su nombre, dato que se pasa a
+la tabla de pedidos al insertar el dato.*/
+CaptarUsuarioSeleccionado() {
+  let usuarioCombo = this.FormPedidoExterno.get('PedUsuarioNombre')?.value;
+
+  this.usuarioService.srvObtenerListaUsuario().subscribe(dataUsuario => {
+    for (let index = 0; index < dataUsuario.length; index++) {
+      if(usuarioCombo == dataUsuario[index].usua_Nombre) {
+
+        this.UsuarioSeleccionado = dataUsuario[index].usua_Id;
+        console.log('Usuario: ' + this.UsuarioSeleccionado);
+      }
+
+    }
+  }, error => {
+    console.log(error);
+  })
+}
+
+LimpiarTablaTotal(){
+  this.ArrayProducto = [];
+  this.valorTotal = []
+}
+
+validarEstados(){
+  let Estado = this.FormPedidoExterno.get('PedEstadoId')?.value
+
+  if (Estado == "Finalizado" || Estado == "Anulado" || Estado == "Cancelado") {
+    Swal.fire('No puede crear un pedido con el estado seleccionado. Por favor verifique.')
+  }
 }
 
 }
