@@ -43,6 +43,7 @@
       <!-- Fin titulo -->
 
       <!-- INICIO DE CONSULTA DE PEDIDOS DE PRODUCTOS -->
+      <!-- Inicio formulario -->
       <form [formGroup]="FormConsultaPedidoExterno">
         <div class="mb-3">
           <div class="row g-3">
@@ -80,6 +81,8 @@
             <input class="btn btn-danger btn-danger-sm" type="submit" value="Consultar Pedidos" (click)="consultarDatosPedidos()">
           </div>
         </div>
+      </form>
+      <!--Cierre formulario-->
 
         <div class="mb-4">
           <h4 class="tituloRojo">Tabla Pedido</h4>
@@ -110,11 +113,11 @@
                     <td id="cliente">{{this.pedidosProductos[i]}}</td>
                     <td id="estadoPedido">{{this.item[i].estado}}</td>
                     <td id="precioPedido">{{this.item[i].pedExt_PrecioTotal}}</td>
-                    <td id="archivoPedido"><a href="">{{this.item[i].pedExt_Archivo}}</a></td>
+                    <td id="archivoPedido"><a download='documento' href={{this.item[i].pedExt_Archivo}} title='Descargar' >Ver</a></td>
                   </tr>
                 </tbody>
               </table>
-              <nav aria-label="Page navigation example">
+              <!-- <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-center">
                   <li class="page-item disabled">
                     <a class="page-link" href="" tabindex="-1">Anterior</a>
@@ -126,10 +129,12 @@
                     <a class="page-link" href="">Siguiente</a>
                   </li>
                 </ul>
-              </nav>
+              </nav> -->
             </div>
           </div>
         </div>
+        </div>
+
 
 
       <div class="mb-4">
@@ -143,7 +148,7 @@
       <!-- Fin titulo -->
                                                       <!--Inicio Crear Pedidos-->
 
-      <form [formGroup]="FormPedidoExterno" (ngSubmit)="validarCamposVacios()">
+      <form [formGroup]="FormPedidoExternoClientes">
         <!-- Inicio fila 1 de campos -->
         <div class="mb-3">
           <div class="row g-3">
@@ -211,15 +216,16 @@
         <!-- Fin Linea -->
 
                                                         <!--Inicio tabla productos agregados-->
-
+      </form>
         <!-- Inicio Titulo Agregar Productos al pedido -->
-        <div class="mb-4">
-          <h4 class="tituloRojo">Agregar Productos</h4>
-        </div>
+      <div class="mb-4">
+        <h4 class="tituloRojo">Agregar Productos</h4>
+      </div>
         <!-- Fin Titulo Agregar Productos al pedido -->
 
-
+      <form [formGroup]="FormPedidoExternoProductos" (ngSubmit)="validarCamposVacios()">
         <!-- Inicio Fila 1 Agregar producto -->
+
         <div class="mb-3">
           <div class="row g-3">
             <!-- ID Producto -->
@@ -228,7 +234,7 @@
             </div>
             <!-- ID/Nombre Producto -->
             <div class="col-md">
-                <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" (change)="llenado()" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
+                <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" (change)="llenadoProducto()" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
                   <option [ngValue]="null" disabled selected>Seleccione Producto</option>
                   <option [ngValue]="productos" *ngFor="let productos of producto">{{productos}}</option>
                 </select>
@@ -247,22 +253,26 @@
             </div>
             <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
             <div class="col-md-1">
-              <select  id="PrdUnidadMedidaACF" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida"  name="PrdUnidadMedidaACF" readonly onmousedown="return false;">
-                <option [ngValue]="productos.undMedACF" *ngFor="let productos of productoInfo" selected>{{productos.undMedACF}}</option>
+              <select formControlName="ProdUnidadMedidaACF" id="PrdUnidadMedidaACF" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida"  name="PrdUnidadMedidaACF">
+                <option [ngValue]="null" disabled selected>Seleccione Und. Medida</option>
+                <option [ngValue]="unidadMedida" *ngFor="let unidadMedida of undMed">{{unidadMedida}}</option>
               </select>
             </div>
           </div>
         </div>
+
         <!-- Fin Fila 1 Agregar Producto -->
 
 
           <!-- Inicio Fila 2 Agregar Producto -->
+
           <div class="mb-3">
             <div class="row g-3">
               <!-- Tipo Producto -->
               <div class="col-md-2">
-                <select  id="PrdTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrdTipo" readonly onmousedown="return false;">
-                  <option [ngValue]="tipoproductos" *ngFor="let tipoproductos of tipoProducto" selected>{{tipoproductos}}</option>
+                <select formControlName="ProdTipo" id="PrdTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrdTipo">
+                  <option [ngValue]="null" disabled selected>Seleccione Tipo Producto</option>
+                  <option [ngValue]="tipoproductos" *ngFor="let tipoproductos of tipoProducto">{{tipoproductos}}</option>
                 </select>
               </div>
               <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
@@ -282,8 +292,9 @@
               </div>
               <!-- Tipo Moneda -->
               <div class="col-md-2">
-                <select id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda" readonly onmousedown="return false;">
-                  <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda" selected>{{tiposMonedas}}</option>
+                <select formControlName="ProdTipoMoneda" id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda">
+                  <option [ngValue]="null" disabled selected>Seleccione Tipo Moneda</option>
+                  <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas}}</option>
                 </select>
               </div>
               <!-- Stock Producto -->
@@ -311,13 +322,12 @@
 
         <!-- Fin Descripción producto -->
 
-
         <!--Fila 3 Fin -->
 
         <!-- Inicio botones -->
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class="btn btn-danger btn-danger-sm" type="submit" >Agregar Producto</button>
+              <button class="btn btn-danger btn-danger-sm" type="submit">Agregar Producto</button>
               <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
           </div>
         </div>
@@ -365,8 +375,8 @@
                   </thead>
                   <tbody>
                       <tr *ngFor="let listaProductos of ArrayProducto">
-                      <td id="id" class="TextosInfoTabla">{{listaProductos.Produ_Id}}</td>
-                      <td id="nombre">{{listaProductos.Produ_Nombre}}</td>
+                      <th id="id" class="TextosInfoTabla">{{listaProductos.Produ_Id}}</th>
+                      <td id="nombreCampo">{{listaProductos.Produ_Nombre}}</td>
                       <td id="ancho">{{listaProductos.Produ_Ancho}}</td>
                       <td id="fuelle">{{listaProductos.Produ_Fuelle}}</td>
                       <td id="calibre" >{{listaProductos.Produ_Calibre}}</td>
@@ -382,12 +392,13 @@
                       <td id="Acciones"><i class="fa-solid fa-pen"></i></td>
                     </tr>
                 </tbody>
-
               </table>
             </div>
           </div>
         </div>
         <!-- Fin tabla producto -->
+
+        <button class=" btn btn-danger btn-danger-sm" type="button" value=""  (click)="crearpdf()">Crear Pedido</button>
 
         <!--Inicio valor total-->
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -399,7 +410,7 @@
         <!-- Inicio Botones -->
         <div class="bajarPagina">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class=" btn btn-danger btn-danger-sm" type="button" value=""  (click)="validarFechas()">Crear Pedido</button><!--(click)="download()"-->
+              <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="validarFechas()">Crear Pedido</button><!--(click)="download()"-->
               <button class=" btn btn-secondary btn-secondary-sm" type="button" (click)="confimacionSalida()" >Cancelar</button>
             </div>
         </div>
@@ -462,6 +473,6 @@
         </div>
       </div>
       <!-- Fin Modal de sedes clientes -->
-    </div>
+
 
 

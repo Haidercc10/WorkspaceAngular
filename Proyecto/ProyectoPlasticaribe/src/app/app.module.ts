@@ -100,7 +100,9 @@ export const routes: Routes = [
     RouterModule.forRoot(routes),
     HttpClientModule,
     FormsModule,
+
     FontAwesomeModule,
+
 
 
 
