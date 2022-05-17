@@ -110,11 +110,11 @@
                     <td id="cliente">{{this.pedidosProductos[i]}}</td>
                     <td id="estadoPedido">{{this.item[i].estado}}</td>
                     <td id="precioPedido">{{this.item[i].pedExt_PrecioTotal}}</td>
-                    <td id="archivoPedido"><a href="">{{this.item[i].pedExt_Archivo}}</a></td>
+                    <td id="archivoPedido"><a download='documento' href={{this.item[i].pedExt_Archivo}} title='Descargar' >Ver</a></td>
                   </tr>
                 </tbody>
               </table>
-              <nav aria-label="Page navigation example">
+              <!-- <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-center">
                   <li class="page-item disabled">
                     <a class="page-link" href="" tabindex="-1">Anterior</a>
@@ -126,7 +126,7 @@
                     <a class="page-link" href="">Siguiente</a>
                   </li>
                 </ul>
-              </nav>
+              </nav> -->
             </div>
           </div>
         </div>
@@ -143,7 +143,7 @@
       <!-- Fin titulo -->
                                                       <!--Inicio Crear Pedidos-->
 
-      <form [formGroup]="FormPedidoExterno" (ngSubmit)="validarCamposVacios()">
+      <form [formGroup]="FormPedidoExternoClientes">
         <!-- Inicio fila 1 de campos -->
         <div class="mb-3">
           <div class="row g-3">
@@ -211,14 +211,14 @@
         <!-- Fin Linea -->
 
                                                         <!--Inicio tabla productos agregados-->
-
+      </form>
         <!-- Inicio Titulo Agregar Productos al pedido -->
-        <div class="mb-4">
-          <h4 class="tituloRojo">Agregar Productos</h4>
-        </div>
+      <div class="mb-4">
+        <h4 class="tituloRojo">Agregar Productos</h4>
+      </div>
         <!-- Fin Titulo Agregar Productos al pedido -->
 
-
+      <form [formGroup]="FormPedidoExternoProductos" (ngSubmit)="validarCamposVacios()">
         <!-- Inicio Fila 1 Agregar producto -->
         <div class="mb-3">
           <div class="row g-3">
@@ -228,7 +228,7 @@
             </div>
             <!-- ID/Nombre Producto -->
             <div class="col-md">
-                <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" (change)="llenado()" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
+                <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" (change)="llenadoProducto()" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
                   <option [ngValue]="null" disabled selected>Seleccione Producto</option>
                   <option [ngValue]="productos" *ngFor="let productos of producto">{{productos}}</option>
                 </select>
@@ -314,13 +314,12 @@
 
         <!-- Fin Descripción producto -->
 
-
         <!--Fila 3 Fin -->
 
         <!-- Inicio botones -->
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class="btn btn-danger btn-danger-sm" type="submit" >Agregar Producto</button>
+              <button class="btn btn-danger btn-danger-sm" type="submit">Agregar Producto</button>
               <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
           </div>
         </div>
@@ -368,7 +367,7 @@
                   <tbody>
                       <tr *ngFor="let listaProductos of ArrayProducto">
                       <th id="id" class="TextosInfoTabla">{{listaProductos.Produ_Id}}</th>
-                      <td id="nombre">{{listaProductos.Produ_Nombre}}</td>
+                      <td id="nombreCampo">{{listaProductos.Produ_Nombre}}</td>
                       <td id="ancho">{{listaProductos.Produ_Ancho}}</td>
                       <td id="fuelle">{{listaProductos.Produ_Fuelle}}</td>
                       <td id="calibre" >{{listaProductos.Produ_Calibre}}</td>
@@ -383,12 +382,13 @@
                       <td id="Subtotal">{{listaProductos.Subtotal}}</td>
                     </tr>
                 </tbody>
-
               </table>
             </div>
           </div>
         </div>
         <!-- Fin tabla producto -->
+
+        <button class=" btn btn-danger btn-danger-sm" type="button" value=""  (click)="crearpdf()">Crear Pedido</button>
 
         <!--Inicio valor total-->
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -466,3 +466,4 @@
     </div>
 
 
+    

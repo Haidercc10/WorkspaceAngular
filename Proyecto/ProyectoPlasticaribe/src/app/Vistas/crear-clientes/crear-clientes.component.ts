@@ -4,6 +4,7 @@ import { TipoClienteService } from 'src/app/Servicios/tipo-cliente.service';
 import { TipoIdentificacionService } from 'src/app/Servicios/tipo-identificacion.service';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
+import {OpedidoproductoComponent} from 'src/app/Vistas/opedidoproducto/opedidoproducto.component'
 
 @Component({
   selector: 'app-crear-clientes',
@@ -21,13 +22,13 @@ export class ClientesComponent implements OnInit {
   constructor(private formBuilderCrearClientes : FormBuilder,
                 private tiposClientesService : TipoClienteService,
                   private tipoIdentificacionService : TipoIdentificacionService,
-                    private usuarioService : UsuarioService) {
+                    private usuarioService : UsuarioService,
+                      private pedidoCliente : OpedidoproductoComponent,) {
 
     this.FormCrearClientes = this.formBuilderCrearClientes.group({
       CliId: new FormControl,
       TipoIdCliente: new FormControl(),
       CliNombre:  new FormControl(),
-      CliDireccion:  new FormControl(),
       CliTelefono:  new FormControl(),
       CliEmail:  new FormControl(),
       TipoClienteId: new FormControl(),
@@ -54,7 +55,6 @@ export class ClientesComponent implements OnInit {
        CliId: ['', Validators.required],
        TipoIdCliente: ['', Validators.required],
        CliNombre: ['', Validators.required],
-       CliDireccion: ['', Validators.required],
        CliTelefono: ['', Validators.required],
        CliEmail: ['', Validators.required],
        TipoClienteId: ['', Validators.required],
@@ -71,9 +71,10 @@ export class ClientesComponent implements OnInit {
 
   validarCamposVacios() : any{
     if(this.FormCrearClientes.valid){
-
+      this.crearCliente();
       Swal.fire("Los datos se enviaron correctamente");
       console.log(this.FormCrearClientes);
+      this.LimpiarCampos();
     }else{
       Swal.fire("Hay campos vacios");
       console.log(this.FormCrearClientes);
@@ -82,26 +83,6 @@ export class ClientesComponent implements OnInit {
 
   LimpiarCampos() {
     this.FormCrearClientes.reset();
-  }
-
-
-  guardarClientes(){
-    const camposClientes : any = {
-      ClieId: this.FormCrearClientes.get('')?.value,
-      TpIdCliente: this.FormCrearClientes.get('')?.value,
-      ClieNombre: this.FormCrearClientes.get('')?.value,
-      ClieDireccion: this.FormCrearClientes.get('')?.value,
-      ClieTelefono: this.FormCrearClientes.get('')?.value,
-      ClieEmail: this.FormCrearClientes.get('')?.value,
-      TpClienteId: this.FormCrearClientes.get('')?.value,
-      UsuIdNombre: this.FormCrearClientes.get('')?.value,
-
-      SedeClie_Id: this.FormCrearClientes.get('')?.value,
-      SedeClie_Ciudad: this.FormCrearClientes.get('')?.value,
-      ClieId2: this.FormCrearClientes.get('')?.value,
-      SedeClie_Postal: this.FormCrearClientes.get('')?.value,
-      SedeClie_Direccion: this.FormCrearClientes.get('')?.value
-    }
   }
 
   tipoIdntificacion() {
@@ -125,7 +106,22 @@ export class ClientesComponent implements OnInit {
       for (let index = 0; index < datos_usuarios.length; index++) {
         this.usuario.push(datos_usuarios[index].usua_Nombre);        
       }
-    })
+    });
+  }
+
+  crearCliente(){
+    let id : any = this.FormCrearClientes.value.CliId;
+    let tipoId : any = this.FormCrearClientes.value.TipoIdCliente;
+    let nombreCliente : any = this.FormCrearClientes.value.CliNombre;
+    let telefono : any = this.FormCrearClientes.value.CliTelefono;
+    let email : any = this.FormCrearClientes.value.CliEmail;
+    let tipoCliente : any = this.FormCrearClientes.value.TipoClienteId;
+    let ciudadsedeCliente : any = this.FormCrearClientes.value.SedeCli_Ciudad;
+    let vendedor : any = this. FormCrearClientes.value.UsuIdNombre;
+    let codigoPostal : any = this.FormCrearClientes.value.SedeCli_Postal;
+    let direccionSede : any = this.FormCrearClientes.value.SedeCli_Direccion;
+
+    this.pedidoCliente.llenarClientesCreado(id, tipoId, nombreCliente, telefono, email, tipoCliente, ciudadsedeCliente, vendedor, codigoPostal, direccionSede);
   }
 
 }

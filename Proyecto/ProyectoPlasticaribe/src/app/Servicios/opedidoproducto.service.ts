@@ -15,28 +15,28 @@ export class OpedidoproductoService {
 
 //Metodo buscar lista de Pedidos de Productos
   srvObtenerListaPedidosProductos() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoExternoes');
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoExterno');
   }
 
   srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExternoes/${dato}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/${dato}`);
   }
 
 //Metodo agregar Pedidos de Productos
   srvAgregarPedidosProductos(data:any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExternoes', data)
+    return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExterno', data)
   }
   //Metodo actualzar Pedidos de Productos
   srvActualizarPedidosProdusctos(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/PedidoExternoes/${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/PedidoExterno/${id}`, data);
   }
   //Metodo eliminar Pedidos de Productos
   srvEliminarPedidosProductos(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/PedidoExternoes/${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/PedidoExterno/${id}`);
   }
 
   srvGuardarPedidosProductos(data : modelOpedidoproducto): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExternoes', data);
+   return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExterno', data);
   }
 
 }
