@@ -1,5 +1,4 @@
 export interface modelExistenciaProductos{
-    ExProd_Id: number;
     Prod_Id: number;
     ExProd_Cantidad: number;
     TpBod_Id: number;    
@@ -7,6 +6,6 @@ export interface modelExistenciaProductos{
     ExProd_Precio: number;
     ExProd_PrecioExistencia: number;
     ExProd_PrecioSinInflacion: number;
-    ExProd_PrecioTotalFinal: number;
+    ExProd_PrecioTotalFinal: string;
     TpMoneda_Id: string;
 }

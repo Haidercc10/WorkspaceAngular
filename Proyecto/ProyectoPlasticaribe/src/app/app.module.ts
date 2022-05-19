@@ -88,7 +88,6 @@ export const routes: Routes = [
     CrearSedesClientesComponent,
     ProductoComponent,
     ReportesComponent,
-    PdfComponent,
     NavbarLateralComponent,
     EstadosComponent
   ],

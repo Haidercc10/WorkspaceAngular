@@ -1,9 +1,10 @@
 export interface modelCliente{
     Cli_Id: number;
+    TipoIdentificacion_Id : string;
     Cli_Nombre: string;
-    Cli_Direccion: string;
     Cli_Telefono: number;
     Cli_Email: string;
     TPCli_Id: number;
-    Usua: number;
+    Usua_Id: number;
+    Estado_Id : number
 }
