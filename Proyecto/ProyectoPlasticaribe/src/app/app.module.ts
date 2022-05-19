@@ -87,7 +87,6 @@ export const routes: Routes = [
     CrearSedesClientesComponent,
     ProductoComponent,
     ReportesComponent,
-    PdfComponent,
     NavbarLateralComponent,
     EstadosComponent
   ],
@@ -100,12 +99,7 @@ export const routes: Routes = [
     RouterModule.forRoot(routes),
     HttpClientModule,
     FormsModule,
-
     FontAwesomeModule,
-
-
-
-
   ],
 
 

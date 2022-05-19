@@ -1,9 +1,9 @@
 export interface modelSedesClientes{
-    SedesCli_Id: number;
-    SedesCli_Ciudad: string;
-    SedesCli_CodPostal: number;
-    Cli_Id: number;
-    SedeCliente_Direccion : string;
+    SedeCli_Id: number;
+    SedeCliente_Ciudad: string;
+    SedeCliente_Direccion: number;
+    SedeCli_CodPostal: number;
+    Cli_Id : string;
 
 }
 

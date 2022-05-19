@@ -44,93 +44,80 @@
 
       <!-- INICIO DE CONSULTA DE PEDIDOS DE PRODUCTOS -->
       <!-- Inicio formulario -->
-      <form [formGroup]="FormConsultaPedidoExterno">
+      <form [formGroup]="FormConsultaPedidoExterno" (ngSubmit)="validarCamposVaciosConsulta()">
         <div class="mb-3">
           <div class="row g-3">
             <!-- NUMERO DE IDENTIFICACION DEL PEDIDO DE PRODUCTOS -->
             <div class="col-md-4">
-              <input formControlName="PedExtIdConsulta"  type="number" class="form-control form-control-sm" id="PedExtId" placeholder="N° del Pedido" name="PedExtId" required title="Consecutivo identificador del Pedido">
+              <input formControlName="PedExtIdConsulta"  type="number" class="form-control form-control-sm" id="PedExtId" placeholder="N° del Pedido" name="PedExtId" title="Consecutivo identificador del Pedido">
             </div>
             <!-- FECHA EN QUE SE HIZO EL PEDIDO -->
-            <label class="col-md-2 control-label">Fecha del Pedido</label>
+            <!-- <label class="col-md-2 control-label">Fecha del Pedido</label>
             <div class="col-md">
-              <input formControlName="PedExtFechaConsulta" type="date" class="form-control form-control-sm" id="PextFecha" placeholder="Fecha pedido" name="PextFecha" required title="Fecha Pedido">
+              <input formControlName="PedExtFechaConsulta" type="date" class="form-control form-control-sm" id="PextFecha" placeholder="Fecha pedido" name="PextFecha" title="Fecha Pedido">
             </div>
             <!-- FECHA EN QUE SE TIENE QUE ENTREGAR EL PEDIDO -->
-            <label class="col-md-2 control-label">Fecha del Entrega</label>
+            <!-- <label class="col-md-2 control-label">Fecha del Entrega</label>
             <div class="col-md">
-              <input formControlName="PedExtFechaEntregaConsulta" type="date" class="form-control form-control-sm" id="PextFechaEntrega" placeholder="Fecha entrega" name="PextFechaEntrega" required title="Fecha Entrega">
-            </div>
+              <input formControlName="PedExtFechaEntregaConsulta" type="date" class="form-control form-control-sm" id="PextFechaEntrega" placeholder="Fecha entrega" name="PextFechaEntrega" title="Fecha Entrega">
+            </div> -->
           </div>
         </div>
         <!-- FILA 2 -->
-        <div class="mb-5">
-          <div class="row g-3">
+        <!-- <div class="mb-5">
+          <div class="row g-3"> -->
             <!-- Estado -->
-            <div class="col-md-4">
+            <!-- <div class="col-md-4">
               <select formControlName="PedExtEstadoConsulta" id="PextEstadoId" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="null" disabled selected>Seleccione Estado</option>
                 <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
               </select>
             </div>
           </div>
-        </div>
+        </div> -->
         <!-- FILA 3 -->
         <div class="mb-1">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <input class="btn btn-danger btn-danger-sm" type="submit" value="Consultar Pedidos" (click)="consultarDatosPedidos()">
+            <input class="btn btn-danger btn-danger-sm" type="submit" value="Consultar">
           </div>
         </div>
       </form>
       <!--Cierre formulario-->
 
-        <div class="mb-4">
-          <h4 class="tituloRojo">Tabla Pedido</h4>
-        </div>
-        <!-- TABLA DE PEDIDOS -->
-        <div class="mb-4">
-          <div class="row g-1">
-            <div class="table-responsive">
-              <div id="html2Pdf">
-              <table class="table table-bordered" *ngIf="pedidosProductos">
-                <thead class="TitulosTabla">
-                  <tr>
-                    <th id="idPedido" scope="col">ID</th>
-                    <th id="fechaPedido" scope="col">Fecha Pedido</th>
-                    <th id="fechaEntrega" scope="col">Fecha Entrega</th>
-                    <th id="cliente" scope="col">Cliente</th>
-                    <th id="vendedor" scope="col">Vendedor</th>
-                    <th id="estadoPedido" scope="col">Estado</th>
-                    <th id="precioPedido" scope="col">Precio Total</th>
-                    <th id="archivoPedido" scope="col">Archivo</th>
-                  </tr>
+      <div class="mb-4">
+        <h4 class="tituloRojo">Tabla Pedido</h4>
+      </div>
+      <!-- TABLA DE PEDIDOS -->
+      <div class="mb-4">
+        <div class="row g-1">
+          <div class="table-responsive">
+            <div id="html2Pdf">
+            <table class="table table-bordered">
+              <thead class="TitulosTabla">
+                <tr>
+                  <th id="idPedido" scope="col">ID</th>
+                  <th id="fechaPedido" scope="col">Fecha Pedido</th>
+                  <th id="fechaEntrega" scope="col">Fecha Entrega</th>
+                  <th id="cliente" scope="col">Cliente</th>
+                  <th id="vendedor" scope="col">Id Vendedor</th>
+                  <th id="estadoPedido" scope="col">Estado</th>
+                  <th id="precioPedido" scope="col">Precio Total</th>
+                  <th id="archivoPedido" scope="col">Archivo</th>
+                </tr>
 
-                <tbody>
-                  <tr *ngFor="let item of pedidosProductos; let i=index" >
-                    <td id="idPedido">{{this.item[i].PedExtId}}</td>
-                    <td id="fechaPedido">{{this.item[i].pedExt_FechaCreacion}}</td>
-                    <td id="fechaEntrega">{{this.item[i].pedExt_FechaEntrega}}</td>
-                    <td id="cliente">{{this.pedidosProductos[i]}}</td>
-                    <td id="estadoPedido">{{this.item[i].estado}}</td>
-                    <td id="precioPedido">{{this.item[i].pedExt_PrecioTotal}}</td>
-                    <td id="archivoPedido"><a download='documento' href={{this.item[i].pedExt_Archivo}} title='Descargar' >Ver</a></td>
-                  </tr>
-                </tbody>
-              </table>
-              <!-- <nav aria-label="Page navigation example">
-                <ul class="pagination justify-content-center">
-                  <li class="page-item disabled">
-                    <a class="page-link" href="" tabindex="-1">Anterior</a>
-                  </li>
-                  <li class="page-item"><a class="page-link" href="">1</a></li>
-                  <li class="page-item"><a class="page-link" href="">2</a></li>
-                  <li class="page-item"><a class="page-link" href="">3</a></li>
-                  <li class="page-item">
-                    <a class="page-link" href="">Siguiente</a>
-                  </li>
-                </ul>
-              </nav> -->
-            </div>
+              <tbody>
+                <tr *ngFor="let item of pedidosProductos; let i=index">
+                  <td id="idPedido">{{item.pedExt_Id}}</td>
+                  <td id="fechaPedido">{{item.pedExt_FechaCreacion}}</td>
+                  <td id="fechaEntrega">{{item.pedExt_FechaEntrega}}</td>
+                  <td id="cliente">{{item.sedeCli_Id}}</td>
+                  <td id="vendedor">ID: {{item.usua_Id}}</td>
+                  <td id="estadoPedido">{{item.estado_Id}}</td>
+                  <td id="precioPedido">{{item.pedExt_PrecioTotal}}</td>
+                  <td id="archivoPedido"><input class="btn btn-danger btn-danger-sm" type="button" (click)="llenarPDFConBD()" value="Ver"></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
         </div>
@@ -153,7 +140,8 @@
         <div class="mb-3">
           <div class="row g-3">
             <!-- Cliente -->
-            <div class="col-md"><select formControlName="PedClienteNombre" type="text" id="PextClienteId" name="PextClienteId" (change)="sedesClientesComboBox()"  class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <div class="col-md">
+              <select formControlName="PedClienteNombre" type="text" id="PextClienteId" name="PextClienteId" (change)="sedesClientesComboBox()"  class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
                 <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
               </select>
@@ -291,16 +279,16 @@
                 <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="PrdPrecioUnd"  placeholder="Precio Unidad" name="PrdPrecioUnd">
               </div>
               <!-- Tipo Moneda -->
-              <div class="col-md-2">
+              <div class="col-md-3">
                 <select formControlName="ProdTipoMoneda" id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda">
                   <option [ngValue]="null" disabled selected>Seleccione Tipo Moneda</option>
                   <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas}}</option>
                 </select>
               </div>
-              <!-- Stock Producto -->
+              <!-- Stock Producto
               <div class="col-md">
                 <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock"  name="PrdStock" >
-              </div>
+              </div> -->
             </div>
           </div>
 
@@ -367,7 +355,6 @@
                       <th id="undMedidaCantidad" scope="col">Und. Medida</th>
                       <th id="precioUnitario" scope="col">Precio Und.</th>
                       <th id="tipoMoneda" scope="col">tipo Moneda</th>
-                      <th id="stock" scope="col">Stock</th>
                       <th id="Descripcion" scope="col">Descripcion</th>
                       <th id="Subtotal" scope="col">Subtotal</th>
                       <th id="acciones" scope="col">Acciones</th>
@@ -375,20 +362,19 @@
                   </thead>
                   <tbody>
                       <tr *ngFor="let listaProductos of ArrayProducto">
-                      <th id="id" class="TextosInfoTabla">{{listaProductos.Produ_Id}}</th>
-                      <td id="nombreCampo">{{listaProductos.Produ_Nombre}}</td>
-                      <td id="ancho">{{listaProductos.Produ_Ancho}}</td>
-                      <td id="fuelle">{{listaProductos.Produ_Fuelle}}</td>
-                      <td id="calibre" >{{listaProductos.Produ_Calibre}}</td>
-                      <td id="undMedidaPeso" >{{listaProductos.UndMedACF}}</td>
-                      <td id="tipoProducto">{{listaProductos.TpProdu_Id}}</td>
-                      <td id="cantidadDisponible">{{listaProductos.Produ_Cantidad}}</td>
-                      <td id="undMedidaCantidad">{{listaProductos.UndMedPeso}}</td>
+                      <th id="id" class="TextosInfoTabla">{{listaProductos.Id}}</th>
+                      <td id="nombreCampo">{{listaProductos.Nombre}}</td>
+                      <td id="ancho">{{listaProductos.Ancho}}</td>
+                      <td id="fuelle">{{listaProductos.Fuelle}}</td>
+                      <td id="calibre" >{{listaProductos.Cal}}</td>
+                      <td id="undMedidaPeso" >{{listaProductos.Und}}</td>
+                      <td id="tipoProducto">{{listaProductos.Tipo}}</td>
+                      <td id="cantidadDisponible">{{listaProductos.Cant}}</td>
+                      <td id="undMedidaCantidad">{{listaProductos.UndCant}}</td>
                       <td id="precioUnitario">{{listaProductos.PrecioUnd}}</td>
-                      <td id="precioUnitario">{{listaProductos.TipoMoneda}}</td>
-                      <td id="stock">{{listaProductos.Stock}}</td>
+                      <td id="precioUnitario">{{listaProductos.TpMoneda}}</td>
                       <td id="Descripcion">{{listaProductos.Produ_Descripcion}}</td>
-                      <td id="Subtotal">{{listaProductos.Subtotal}}</td>
+                      <td id="Subtotal">{{listaProductos.SubTotal}}</td>
                       <td id="Acciones"><i class="fa-solid fa-pen"></i></td>
                     </tr>
                 </tbody>
@@ -398,12 +384,13 @@
         </div>
         <!-- Fin tabla producto -->
 
-        <button class=" btn btn-danger btn-danger-sm" type="button" value=""  (click)="crearpdf()">Crear Pedido</button>
-
         <!--Inicio valor total-->
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <label for=""><b>Valor total: $</b></label>
           <label for="">{{valorTotal}}</label>
+        </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+          <label id="file"></label>
         </div>
         <!--Fin valor total-->
 
@@ -414,9 +401,6 @@
               <button class=" btn btn-secondary btn-secondary-sm" type="button" (click)="confimacionSalida()" >Cancelar</button>
             </div>
         </div>
-
-
-
       </form>
       <!-- Fin Botones -->
 
@@ -465,14 +449,10 @@
                 <h5 class="modal-title" id="staticBackdropLabel3">{{TituloSedes}}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <!--Carga componente crear cliente-->
-                <app-crear-sedes-clientes></app-crear-sedes-clientes>
-            </div>
           </div>
         </div>
       </div>
       <!-- Fin Modal de sedes clientes -->
-
+    </div>
 
 

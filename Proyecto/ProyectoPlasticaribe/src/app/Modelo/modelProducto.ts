@@ -10,4 +10,5 @@ export interface modelProducto{
     Prod_Ancho: number;
     Prod_Calibre: number;
     UndMedACF: string;
+    Estado_Id: number;
 }
