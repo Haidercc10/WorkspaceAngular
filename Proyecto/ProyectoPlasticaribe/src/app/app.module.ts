@@ -31,7 +31,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { NavbarLateralComponent } from './Vistas/navbar-lateral/navbar-lateral.component';
 import { EstadosComponent } from './Vistas/estados/estados.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-
+import { NgxPaginationModule } from 'ngx-pagination';
+//import {  } from '../../node_modules/font-awesome/css/font-awesome.css';
 
 
 
@@ -100,8 +101,8 @@ export const routes: Routes = [
     RouterModule.forRoot(routes),
     HttpClientModule,
     FormsModule,
-
     FontAwesomeModule,
+    NgxPaginationModule,
 
 
 

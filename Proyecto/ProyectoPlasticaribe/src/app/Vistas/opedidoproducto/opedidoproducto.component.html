@@ -78,7 +78,7 @@
         <!-- FILA 3 -->
         <div class="mb-1">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <input class="btn btn-danger btn-danger-sm" type="submit" value="Consultar Pedidos" (click)="consultarDatosPedidos()">
+            <input class="btn btn-danger btn-danger-sm" type="submit" value="Consultar Pedidos" (click)="validarCamposVaciosConsulta()">
           </div>
         </div>
       </form>
@@ -98,25 +98,32 @@
                     <th id="idPedido" scope="col">ID</th>
                     <th id="fechaPedido" scope="col">Fecha Pedido</th>
                     <th id="fechaEntrega" scope="col">Fecha Entrega</th>
-                    <th id="cliente" scope="col">Cliente</th>
-                    <th id="vendedor" scope="col">Vendedor</th>
+                    <th id="sede" scope="col">Cliente</th>
+                    <th id="sedecliente" scope="col">Vendedor</th>
                     <th id="estadoPedido" scope="col">Estado</th>
                     <th id="precioPedido" scope="col">Precio Total</th>
                     <th id="archivoPedido" scope="col">Archivo</th>
                   </tr>
 
                 <tbody>
-                  <tr *ngFor="let item of pedidosProductos; let i=index" >
-                    <td id="idPedido">{{this.item[i].PedExtId}}</td>
-                    <td id="fechaPedido">{{this.item[i].pedExt_FechaCreacion}}</td>
-                    <td id="fechaEntrega">{{this.item[i].pedExt_FechaEntrega}}</td>
-                    <td id="cliente">{{this.pedidosProductos[i]}}</td>
-                    <td id="estadoPedido">{{this.item[i].estado}}</td>
-                    <td id="precioPedido">{{this.item[i].pedExt_PrecioTotal}}</td>
-                    <td id="archivoPedido"><a download='documento' href={{this.item[i].pedExt_Archivo}} title='Descargar' >Ver</a></td>
+                  <!--Carga los productos en la tabla y pagina por 2-->
+                  <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" >
+                    <td id="idPedido">{{item.pedExt_Id}}</td>
+                    <td id="fechaPedido">{{item.pedExt_FechaCreacion}}</td>
+                    <td id="fechaEntrega">{{item.pedExt_FechaEntrega}}</td>
+                    <td id="sede">{{item.sedeCli_Id}}</td>
+                    <td id="Vendedor">{{item.usua_Id}}</td>
+                    <td id="estadoPedido">{{item.estado_Id}}</td>
+                    <td id="precioPedido">{{item.pedExt_PrecioTotal}}</td>
+                    <td id="archivoPedido"><a download='documento' href="" title='Descargar' >Ver</a></td>
                   </tr>
                 </tbody>
               </table>
+              <div class="mb-3">
+                  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                  </div>
+              </div>
               <!-- <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-center">
                   <li class="page-item disabled">
@@ -171,7 +178,7 @@
             <div class="col-md">
               <select formControlName="PedUsuarioNombre" type="text" id="PedUsuarioNombre" (change)="CaptarUsuarioSeleccionado()" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required><!--OnPush-->
                 <option [ngValue]="null" disabled selected>Seleccione Vendedor</option>
-                <option [ngValue]="vendedor" *ngFor="let vendedor of usuarioVendedor">{{vendedor}}</option>
+                <option [ngValue]="vendedor" *ngFor="let vendedor of usuarioVende">{{vendedor}}</option>
               </select>
             </div>
 
@@ -348,48 +355,51 @@
         </div>
         <!-- Fin titulo producto -->
 
-
         <!-- Inicio tabla producto -->
         <div class="mb-3">
           <div class="row g-3">
             <div class="table-responsive">
-              <table class="table table-bordered table-hover mt-2">
+              <table class="table table-bordered table-hover mt-2" >
                 <thead class="TitulosTabla">
-                    <tr>
-                      <th scope="col" class="idProducto">ID</th>
-                      <th id="nombre" scope="col">Nombre</th>
-                      <th id="ancho" scope="col" class="">Ancho</th>
-                      <th id="fuelle" scope="col">Fuelle</th>
-                      <th id="calibre" scope="col">Calibre</th>
-                      <th id="undMedidaPeso" scope="col">Und. Medida</th>
-                      <th id="tipoProducto" scope="col">Tipo Producto</th>
-                      <th id="cantidad" scope="col">Cantidad</th>
-                      <th id="undMedidaCantidad" scope="col">Und. Medida</th>
-                      <th id="precioUnitario" scope="col">Precio Und.</th>
-                      <th id="tipoMoneda" scope="col">tipo Moneda</th>
-                      <th id="stock" scope="col">Stock</th>
-                      <th id="Descripcion" scope="col">Descripcion</th>
-                      <th id="Subtotal" scope="col">Subtotal</th>
-                      <th id="acciones" scope="col">Acciones</th>
+                    <tr *ngFor="let columnas of titulosTabla let i = index">
+                      <th scope="col" class="idProducto">{{columnas.pID}}</th>
+                      <th id="nombre" scope="col">{{columnas.pNombre}}</th>
+                      <th id="ancho" scope="col" class="">{{columnas.pAncho}}</th>
+                      <th id="fuelle" scope="col">{{columnas.pFuelle}}</th>
+                      <th id="calibre" scope="col">{{columnas.pCalibre}}</th>
+                      <th id="undMedidaPeso" scope="col">{{columnas.pUndMedACF}}</th>
+                      <th id="tipoProducto" scope="col">{{columnas.pTipoProd}}</th>
+                      <th id="cantidad" scope="col">{{columnas.pCantidad}}</th>
+                      <th id="undMedidaCantidad" scope="col">{{columnas.pUndMedCant}}</th>
+                      <th id="precioUnitario" scope="col">{{columnas.pPrecioU}}.</th>
+                      <th id="tipoMoneda" scope="col">{{columnas.pMoneda}}</th>
+                      <th id="stock" scope="col">{{columnas.pStock}}</th>
+                      <th id="Descripcion" scope="col">{{columnas.pDescripcion}}</th>
+                      <th id="Subtotal" scope="col">{{columnas.pSubtotal}}</th>
+                      <th id="acciones" scope="col"></th>
+                      <th id="acciones" scope="col"></th>
                       </tr>
                   </thead>
                   <tbody>
-                      <tr *ngFor="let listaProductos of ArrayProducto">
+                      <tr *ngFor="let listaProductos of ArrayProducto; let j = index">
+
                       <th id="id" class="TextosInfoTabla">{{listaProductos.Produ_Id}}</th>
-                      <td id="nombreCampo">{{listaProductos.Produ_Nombre}}</td>
-                      <td id="ancho">{{listaProductos.Produ_Ancho}}</td>
-                      <td id="fuelle">{{listaProductos.Produ_Fuelle}}</td>
-                      <td id="calibre" >{{listaProductos.Produ_Calibre}}</td>
-                      <td id="undMedidaPeso" >{{listaProductos.UndMedACF}}</td>
-                      <td id="tipoProducto">{{listaProductos.TpProdu_Id}}</td>
-                      <td id="cantidadDisponible">{{listaProductos.Produ_Cantidad}}</td>
-                      <td id="undMedidaCantidad">{{listaProductos.UndMedPeso}}</td>
-                      <td id="precioUnitario">{{listaProductos.PrecioUnd}}</td>
-                      <td id="precioUnitario">{{listaProductos.TipoMoneda}}</td>
-                      <td id="stock">{{listaProductos.Stock}}</td>
-                      <td id="Descripcion">{{listaProductos.Produ_Descripcion}}</td>
-                      <td id="Subtotal">{{listaProductos.Subtotal}}</td>
-                      <td id="Acciones"><i class="fa-solid fa-pen"></i></td>
+                      <td id="nombreCampo" class="TextosInfoTabla">{{listaProductos.Produ_Nombre}}</td>
+                      <td id="ancho" class="TextosInfoTabla">{{listaProductos.Produ_Ancho}}</td>
+                      <td id="fuelle" class="TextosInfoTabla">{{listaProductos.Produ_Fuelle}}</td>
+                      <td id="calibre" class="TextosInfoTabla">{{listaProductos.Produ_Calibre}}</td>
+                      <td id="undMedidaPeso" class="TextosInfoTabla">{{listaProductos.UndMedACF}}</td>
+                      <td id="tipoProducto" class="TextosInfoTabla">{{listaProductos.TpProdu_Id}}</td>
+                      <td id="cantidadDisponible" class="TextosInfoTabla">{{listaProductos.Produ_Cantidad}}</td>
+                      <td id="undMedidaCantidad" class="TextosInfoTabla">{{listaProductos.UndMedPeso}}</td>
+                      <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.PrecioUnd}}</td>
+                      <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.TipoMoneda}}</td>
+                      <td id="stock" class="TextosInfoTabla">{{listaProductos.Stock}}</td>
+                      <td id="Descripcion" class="TextosInfoTabla"class="TextosInfoTabla">{{listaProductos.Produ_Descripcion}}</td>
+                      <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.Subtotal}}</td>
+                      <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(j, listaProductos.value)" aria-hidden="true"></i></a></td>
+                      <td id="Eliminar" ><a><i class="fa fa-trash" (click)="QuitarProductoTabla(j)" aria-hidden="true"></i></a></td>
+
                     </tr>
                 </tbody>
               </table>
@@ -398,7 +408,8 @@
         </div>
         <!-- Fin tabla producto -->
 
-        <button class=" btn btn-danger btn-danger-sm" type="button" value=""  (click)="crearpdf()">Crear Pedido</button>
+
+        <!--<button class=" btn btn-danger btn-danger-sm" type="button" value=""  (click)="crearpdf()">Crear Pedido</button>-->
 
         <!--Inicio valor total-->
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -457,7 +468,7 @@
       </div>
       <!-- Fin Modal de crear cliente -->
 
-      <!-- Modal de sedes clientes -->
+      <!--
       <div class="modal fade" id="staticBackdrop3" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
           <div class="modal-content">
@@ -466,13 +477,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!--Carga componente crear cliente-->
+
                 <app-crear-sedes-clientes></app-crear-sedes-clientes>
             </div>
           </div>
         </div>
       </div>
-      <!-- Fin Modal de sedes clientes -->
+      Fin Modal de sedes clientes -->
 
 
 

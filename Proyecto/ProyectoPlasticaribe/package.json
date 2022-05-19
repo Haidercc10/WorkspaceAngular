@@ -37,6 +37,7 @@
     "js-cookie": "^3.0.1",
     "jspdf": "^2.5.1",
     "ngx-cookie-service": "^13.2.0",
+    "ngx-pagination": "^5.1.1",
     "pdfmake": "^0.2.5",
     "rest-mssql-nodejs": "^1.0.10",
     "rxjs": "~7.5.0",

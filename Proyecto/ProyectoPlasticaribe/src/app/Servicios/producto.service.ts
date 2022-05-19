@@ -14,30 +14,30 @@ export class ProductoService {
 
   //Metodo buscar lista de Productos
   srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Productoes')
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Producto')
   }
 
   srvObtenerListaPorId(id : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Productoes/${id}`)
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/${id}`)
   }
 
   //Metodo agregar Productos
   srvAgregar(datos_Productos:any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Productoes', datos_Productos)
+    return this.http.post(this.rutaPlasticaribeAPI + '/Producto', datos_Productos)
   }
 
   //Metodo actualzar Productos
   srvActualizar(id:number|String, datos_Productos:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Productoes/${id}`, datos_Productos);
+    return this.http.put(this.rutaPlasticaribeAPI + `/Producto/${id}`, datos_Productos);
   }
 
   //Metodo eliminar Productos
   srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Productoes/${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Producto/${id}`);
   }
 
   //
   srvGuardar(data : modelProducto): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Productoes', data)
+    return this.http.post(this.rutaPlasticaribeAPI + '/Producto', data)
   }
 }
