@@ -40,4 +40,11 @@ export class ProductoService {
   srvGuardar(data : modelProducto): Observable<any> {
     return this.http.post(this.rutaPlasticaribeAPI + '/Producto', data)
   }
+
+
+  srvObtenerListado(id : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Productoes/${id}`)
+  }
+
+
 }

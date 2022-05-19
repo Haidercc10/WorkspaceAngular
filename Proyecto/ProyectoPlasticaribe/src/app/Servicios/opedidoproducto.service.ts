@@ -39,4 +39,11 @@ export class OpedidoproductoService {
    return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExterno', data);
   }
 
+
+
+  srvObtenerUltimoCodigoPedido(){
+     return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoExternoes');
+  }
+
+
 }

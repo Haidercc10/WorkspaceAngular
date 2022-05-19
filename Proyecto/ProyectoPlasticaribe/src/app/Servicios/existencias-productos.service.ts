@@ -12,7 +12,7 @@ export class ExistenciasProductosService {
 
   constructor(private http : HttpClient) { }
 
-  //Metodo buscar lista 
+  //Metodo buscar lista
   srvObtenerLista():Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Existencia_Productos')
   }
@@ -21,17 +21,17 @@ export class ExistenciasProductosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/${id}`)
   }
 
-  //Metodo agregar 
+  //Metodo agregar
   srvAgregar(datos_Productos:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Existencia_Productos', datos_Productos)
   }
 
-  //Metodo actualzar 
+  //Metodo actualzar
   srvActualizar(id:number|String, datos_Productos:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/${id}`, datos_Productos);
   }
 
-  //Metodo eliminar 
+  //Metodo eliminar
   srvEliminar(id:number|String) {
     return this.http.delete(this.rutaPlasticaribeAPI + `/Existencia_Productos/${id}`);
   }
