@@ -79,8 +79,6 @@
         <div class="mb-1">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
 
-            <input class="btn btn-danger btn-danger-sm" type="submit" value="Consultar Pedidos" (click)="validarCamposVaciosConsulta()">
-
             <input class="btn btn-danger btn-danger-sm" type="submit" value="Consultar">
 
           </div>
@@ -93,7 +91,7 @@
           <h4 class="tituloRojo">Tabla Pedido</h4>
         </div>
         <!-- TABLA DE PEDIDOS -->
-        <div class="mb-4">
+        <div class="mb-2">
           <div class="row g-1">
             <div class="table-responsive">
               <div id="html2Pdf">
@@ -124,7 +122,7 @@
                   </tr>
                 </tbody>
               </table>
-              <div class="mb-3">
+              <div class="mb-2">
                   <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                     <pagination-controls (pageChange)="page = $event"></pagination-controls>
                   </div>
@@ -143,6 +141,9 @@
                 </ul>
               </nav> -->
             </div>
+          </div>
+        </div>
+      </div>
 
       <!--<div class="mb-4">
         <h4 class="tituloRojo">Tabla Pedido</h4>
@@ -376,7 +377,7 @@
         <!-- Inicio botones -->
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class="btn btn-danger btn-danger-sm" type="submit">Agregar Producto</button>
+              <button class="btn btn-danger btn-danger-sm" type="submit">{{AccionBoton}} Producto</button>
               <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
           </div>
         </div>
@@ -426,21 +427,21 @@
                   <tbody>
                       <tr *ngFor="let listaProductos of ArrayProducto; let j = index">
 
-                      <th id="id" class="TextosInfoTabla">{{listaProductos.Produ_Id}}</th>
-                      <td id="nombreCampo" class="TextosInfoTabla">{{listaProductos.Produ_Nombre}}</td>
-                      <td id="ancho" class="TextosInfoTabla">{{listaProductos.Produ_Ancho}}</td>
-                      <td id="fuelle" class="TextosInfoTabla">{{listaProductos.Produ_Fuelle}}</td>
-                      <td id="calibre" class="TextosInfoTabla">{{listaProductos.Produ_Calibre}}</td>
-                      <td id="undMedidaPeso" class="TextosInfoTabla">{{listaProductos.UndMedACF}}</td>
-                      <td id="tipoProducto" class="TextosInfoTabla">{{listaProductos.TpProdu_Id}}</td>
-                      <td id="cantidadDisponible" class="TextosInfoTabla">{{listaProductos.Produ_Cantidad}}</td>
-                      <td id="undMedidaCantidad" class="TextosInfoTabla">{{listaProductos.UndMedPeso}}</td>
+                      <th id="id" class="TextosInfoTabla">{{listaProductos.Id}}</th>
+                      <td id="nombreCampo" class="TextosInfoTabla">{{listaProductos.Nombre}}</td>
+                      <td id="ancho" class="TextosInfoTabla">{{listaProductos.Ancho}}</td>
+                      <td id="fuelle" class="TextosInfoTabla">{{listaProductos.Fuelle}}</td>
+                      <td id="calibre" class="TextosInfoTabla">{{listaProductos.Cal}}</td>
+                      <td id="undMedidaPeso" class="TextosInfoTabla">{{listaProductos.Und}}</td>
+                      <td id="tipoProducto" class="TextosInfoTabla">{{listaProductos.Tipo}}</td>
+                      <td id="cantidadDisponible" class="TextosInfoTabla">{{listaProductos.Cant}}</td>
+                      <td id="undMedidaCantidad" class="TextosInfoTabla">{{listaProductos.UndCant}}</td>
                       <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.PrecioUnd}}</td>
-                      <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.TipoMoneda}}</td>
+                      <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.TpMoneda}}</td>
                       <td id="stock" class="TextosInfoTabla">{{listaProductos.Stock}}</td>
                       <td id="Descripcion" class="TextosInfoTabla"class="TextosInfoTabla">{{listaProductos.Produ_Descripcion}}</td>
-                      <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.Subtotal}}</td>
-                      <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(j, listaProductos.value)" aria-hidden="true"></i></a></td>
+                      <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.SubTotal}}</td>
+                      <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true"></i></a></td>
                       <td id="Eliminar" ><a><i class="fa fa-trash" (click)="QuitarProductoTabla(j)" aria-hidden="true"></i></a></td>
 
 
@@ -463,6 +464,7 @@
           <label for=""><b>Valor total: $</b></label>
           <label for="">{{valorTotal}}</label>
         </div>
+
         <div class="d-grid gap-2 d-md-flex justify-content-md-start">
           <label id="file"></label>
         </div>
@@ -471,7 +473,7 @@
         <!-- Inicio Botones -->
         <div class="bajarPagina">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="validarFechas()">Crear Pedido</button><!--(click)="download()"-->
+              <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="validarInputsVacios()">Crear Pedido</button><!--(click)="download()"-->
               <button class=" btn btn-secondary btn-secondary-sm" type="button" (click)="confimacionSalida()" >Cancelar</button>
             </div>
         </div>
@@ -534,10 +536,10 @@
       Fin Modal de sedes clientes -->
 
 
-          </div>
-        </div>
-      </div>
+
       <!-- Fin Modal de sedes clientes -->
+    </div>
+    </div>
     </div>
 
 

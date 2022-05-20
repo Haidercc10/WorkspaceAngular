@@ -20,6 +20,8 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 
 import { stringify } from 'querystring';
+import { Console } from 'console';
+import { ThisReceiver } from '@angular/compiler';
 
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -40,6 +42,10 @@ export class OpedidoproductoComponent implements OnInit {
   public page : number;
   titulo = 'Generar PDF con Angular JS 5';
   imagen1 = 'assets/img/tc.jpg';
+
+  AccionBoton = "Agregar";
+  Ide : number | undefined;
+
 
   //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
   public ModalCrearProductos: boolean = false;
@@ -588,6 +594,11 @@ export class OpedidoproductoComponent implements OnInit {
     });
   }
 
+  eventoEnterInput(dato : any) {
+    dato = "Mundo"
+
+    console.log("Hola " + dato);
+  }
 
   ColumnasTabla(){
     this.titulosTabla = [];
@@ -624,8 +635,7 @@ PruebaInsercion() {
 //  this.titulosTabla = []
 }
 
-//Carga productos en tabla.
-  cargarFormProductoEnTablas(){
+ /* cargarFormProductoEnTablas(){
       let productoExt : any = {
         Produ_Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
         Produ_Nombre : this.FormPedidoExternoProductos.get('ProdNombre').value,
@@ -643,6 +653,45 @@ PruebaInsercion() {
         Subtotal : this.FormPedidoExternoProductos.get('ProdCantidad').value * this.FormPedidoExternoProductos.get('ProdPrecioUnd')?.value
     }
 
+      if(!this.ArrayProducto.length) { //Está vacio?
+        console.log('Hola, estoy vacio.');
+
+        this.ArrayProducto.push(productoExt); //Agrega un dato
+        console.log('Te coloque un dato');
+
+
+        productoExt = []; //Vaciar lo que viene del formulario.
+        console.log(productoExt);
+
+      } else if (this.ArrayProducto.length) { //Si el array que llena la tabla no esta vacío.
+
+        for (let index = 0; index < this.ArrayProducto.length; index++) {
+
+          if(productoExt.Produ_Id === this.ArrayProducto[index].Produ_Id) { //Verifico si campo y form en posicion ID son iguales
+
+            console.log('Estan repetidos ' + productoExt.Produ_Id + ' - ' +  this.ArrayProducto[index].Produ_Id);
+            console.log(index)
+            break;
+          } else {
+
+            console.log('No Estan repetidos ' + productoExt.Produ_Id + ' - ' +  this.ArrayProducto[index].Produ_Id)
+            this.ArrayProducto.push(productoExt);
+
+            productoExt = []; //Vaciar lo que viene del formulario.
+            console.log(productoExt);
+            console.log(index)
+            break;
+          }
+          //console.log(productoExt.Produ_Id);
+          //console.log(this.ArrayProducto[length])
+          //console.log('Hola');
+
+        }
+
+      } else {
+        console.log('Me sali de eso.');
+
+      }
 
 
       //console.log(this.ArrayProducto.length)
@@ -670,19 +719,19 @@ PruebaInsercion() {
             }
 
           }
-      //}
+      } */
 
-      for (let index = 0; index < this.ArrayProducto.length; index++) {
+     /* for (let index = 0; index < this.ArrayProducto.length; index++) {
         this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (productoExt.Produ_Cantidad * productoExt.PrecioUnd), 0)
         console.log(this.valorTotal);
       }
 
-  }
+  }*/
 
 
 
   //Carga productos en tabla.
-  /*cargarFormProductoEnTablas(){
+  cargarFormProductoEnTablas(){
 
     let productoExt : any = {
       Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
@@ -701,7 +750,48 @@ PruebaInsercion() {
       SubTotal : this.FormPedidoExternoProductos.get('ProdCantidad').value * this.FormPedidoExternoProductos.get('ProdPrecioUnd')?.value
     }
 
-    if(this.ArrayProducto.length == 0){
+
+    if(this.ArrayProducto.length == 0) { //Está vacio?
+      console.log('Hola, estoy vacio.');
+
+      this.ArrayProducto.push(productoExt); //Agrega un dato
+      console.log('Te coloque un dato');
+      this.LimpiarCamposProductos();
+
+      productoExt = []; //Vaciar lo que viene del formulario.
+      console.log(productoExt);
+
+    } else { //Si el array que llena la tabla no esta vacío.
+
+      for (let index = 0; index < this.ArrayProducto.length; index++) {
+
+        if(productoExt.Id === this.ArrayProducto[index].Id) { //Verifico si campo y form en posicion ID son iguales
+          Swal.fire('Evite cargar datos duplicados a la tabla. Verifique!');
+          console.log('Estan repetidos ' + productoExt.Id + ' - ' +  this.ArrayProducto[index].Id);
+          console.log(index)
+          break;
+        } else {
+
+          console.log('No Estan repetidos ' + productoExt.Id + ' - ' +  this.ArrayProducto[index].Id)
+          this.ArrayProducto.push(productoExt);
+
+          productoExt = []; //Vaciar lo que viene del formulario.
+          this.LimpiarCampos();
+          console.log(productoExt);
+          console.log(index)
+          break;
+        }
+      }
+
+
+    }
+
+    for (let index = 0; index < this.ArrayProducto.length; index++) {
+      this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (productoExt.Cant * productoExt.PrecioUnd), 0)
+      console.log(this.valorTotal);
+    }
+
+    /*if(this.ArrayProducto.length == 0){
 
       this.ArrayProducto.push(productoExt);
       console.log(productoExt)
@@ -728,8 +818,8 @@ PruebaInsercion() {
     for (let index = 0; index < this.ArrayProducto.length; index++) {
       this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (productoExt.Cant * productoExt.PrecioUnd), 0)
       console.log(this.valorTotal);
-    }
-  }*/
+    }*/
+  }
 
 
   // Funcion para crear los pedidos de productos y añadirlos a la base de datos
@@ -747,24 +837,26 @@ PruebaInsercion() {
       PedExt_Archivo: this.datosPDF
     }
 
-    let campoEstado = this.FormPedidoExternoProductos.get('PedEstadoId')?.value
+    let campoEstado = this.FormPedidoExternoClientes.get('PedEstadoId')?.value
 
-    if(this.ArrayProducto.length == 0){
+    if(!this.ArrayProducto.length){
       Swal.fire('Debe cargar al menos un producto en la tabla.');
-    } else if(campoEstado == "Finalizado" || campoEstado == "Cancelado" || campoEstado == "Anulado") {
+
+    } else if (campoEstado == "Finalizado" || campoEstado == "Cancelado" || campoEstado == "Anulado") {
       Swal.fire('No puede crear un pedido con el estado seleccionado. Por favor verifique.');
+
+    } else if (camposPedido.PedExt_FechaEntrega <= camposPedido.PedExt_FechaCreacion){
+      Swal.fire('La fecha de creación no puede ser menor o igual a la fecha de entrega.');
+
     }else{
-
-
-
       this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data=> {
         Swal.fire('¡Pedido guardado con éxito!');
-        this.crearpdf();
-        setTimeout(() => {
+          this.crearpdf();
+          setTimeout(() => {
           this.LimpiarCampos();
-        }, 1500);
+        }, 1000);
 
-      }, error => { console.log(error); });
+     }, error => { console.log(error); });
     }
   }
 
@@ -783,26 +875,16 @@ PruebaInsercion() {
     }, error => { console.log(error); })
   }
 
-  //Funcion para validar que la fecha de entrega del pedido no sea menor o igual a la fecha de creación.
-  validarFechas(){
-    let FechaCreacion : any;
-    let FechaEntrega : any;
+  //Funcion para validar que los campos de crear pedidos no esten vacios.
+  validarInputsVacios(){
 
-    FechaCreacion = this.FormPedidoExternoProductos.get('PedFecha')?.value;
-    FechaEntrega = this.FormPedidoExternoProductos.get('PedFechaEnt')?.value;
-
-
-  FechaCreacion = this.FormPedidoExternoProductos.get('PedFecha')?.value;
-  FechaEntrega = this.FormPedidoExternoProductos.get('PedFechaEnt')?.value;
-
-  if (FechaEntrega <= FechaCreacion){
-    Swal.fire('La fecha de creación no puede ser menor o igual a la fecha de entrega.');
-    console.log('Salgo');
-  } else {
-    this.CrearPedidoExterno();
-    console.log('Entro y creo pedido');
-    //console.log('Correcto');
+  if (this.FormPedidoExternoClientes.valid){
+      this.CrearPedidoExterno();
+  }  else {
+    Swal.fire('Debe llenar los campos vacios en la sección "Crear pedido"');
   }
+
+
 
 }
 //Función para captar el ID del estado según el nombre del estado seleccionado.
@@ -1330,31 +1412,33 @@ LimpiarTablaTotal(){
 
   QuitarProductoTabla(index : number) {
     this.ArrayProducto.splice(index, 1);
+
+
   }
 
-  EditarProductoTabla(i:number, formulario : any) {
+  EditarProductoTabla(formulario : any) {
 
-    for (let i = 0; i < this.ArrayProducto.length; i++) {
+
+    this.Ide = formulario.Id;
+    this.AccionBoton = "Editar";
 
       this.FormPedidoExternoProductos.patchValue({
-        ProdId : formulario.Produ_Id[i],
-        ProdNombre : formulario.Produ_Nombre[i],
-        ProdAncho : formulario.Produ_Ancho[i],
-        ProdFuelle : formulario.Produ_Fuelle[i],
-        ProdCalibre : formulario.Produ_Calibre[i],
-        ProdUnidadMedidaACF : formulario.UndMedACF[i],
-        ProdCantidad : formulario.Produ_Cantidad[i],
-        ProdUnidadMedidaCant : formulario.UndMedPeso[i],
-        ProdPrecioUnd : formulario.PrecioUnd[i],
-        ProdTipoMoneda : formulario.TipoMoneda[i],
-        ProdStock : formulario.Stock[i],
-        ProdDescripcion : formulario.Produ_Descripcion[i],
+        ProdId : formulario.Id,
+        ProdNombre: formulario.Nombre,
+        ProdAncho : formulario.Ancho,
+        ProdFuelle : formulario.Fuelle,
+        ProdCalibre : formulario.Cal,
+        ProdUnidadMedidaACF : formulario.Und,
+        ProdTipo : formulario.Tipo,
+        ProdCantidad : formulario.Cant,
+        ProdUnidadMedidaCant : formulario.UndCant,
+        ProdPrecioUnd : formulario.PrecioUnd,
+        ProdTipoMoneda : formulario.TpMoneda,
+        ProdStock : formulario.Stock,
+        ProdDescripcion : formulario.Produ_Descripcion
       });
 
-      //console.log(this.ArrayProducto[index].prod);
-      //const element = [index];
-    }
-  }
+   }
 
 
 
