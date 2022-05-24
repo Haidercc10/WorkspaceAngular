@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ViewChild  } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl} from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpedidoproductoService } from 'src/app/Servicios/opedidoproducto.service';
@@ -15,14 +15,10 @@ import { ExistenciasProductosService } from 'src/app/Servicios/existencias-produ
 import { EmpresaService } from 'src/app/Servicios/empresa.service';
 import * as html2pdf from 'html2pdf.js'
 import { PedidoProductosService } from 'src/app/Servicios/pedidoProductos.service'
-
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-
-import { stringify } from 'querystring';
-import { Console } from 'console';
-import { ThisReceiver } from '@angular/compiler';
-
+import { MatTableDataSource } from '@angular/material/table';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -33,6 +29,10 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
   styleUrls: ['./opedidoproducto.component.css']
 })
 
+
+
+
+
 export class OpedidoproductoComponent implements OnInit {
 
   public FormPedidoExternoClientes !: FormGroup; //Formulario de pedidos
@@ -42,9 +42,10 @@ export class OpedidoproductoComponent implements OnInit {
   public page : number;
   titulo = 'Generar PDF con Angular JS 5';
   imagen1 = 'assets/img/tc.jpg';
-
   AccionBoton = "Agregar";
   Ide : number | undefined;
+  criteria = ''
+  
 
 
   //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
@@ -190,6 +191,7 @@ export class OpedidoproductoComponent implements OnInit {
     //this.obtenerEmpresa();
     this.ColumnasTabla();
     this.PruebaInsercion();
+    
   }
 
   initForms() {
@@ -1589,5 +1591,9 @@ LimpiarTablaTotal(){
   }
 
 
+
+
 }
+
+
 

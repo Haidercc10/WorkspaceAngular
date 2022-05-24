@@ -47,11 +47,15 @@
       <form [formGroup]="FormConsultaPedidoExterno" (ngSubmit)="validarCamposVaciosConsulta()">
         <div class="mb-3">
           <div class="row g-3">
+            <!-- <div class="col-md-4">
+              <input type="text" class="form-control" placeholder="Filter...."[(ngModel)] ="criteria">
+            </div> -->
             <!-- NUMERO DE IDENTIFICACION DEL PEDIDO DE PRODUCTOS -->
             <div class="col-md-4">
-              <input formControlName="PedExtIdConsulta"  type="number" class="form-control form-control-sm" id="PedExtId" placeholder="N° del Pedido" name="PedExtId" title="Consecutivo identificador del Pedido">
+              <input formControlName="PedExtIdConsulta"  type="string" class="form-control form-control-sm" id="PedExtId" placeholder="N° del Pedido" name="PedExtId" title="Consecutivo identificador del Pedido" [(ngModel)] ="criteria">
             </div>
             <!-- FECHA EN QUE SE HIZO EL PEDIDO -->
+
             <!-- <label class="col-md-2 control-label">Fecha del Pedido</label>
             <div class="col-md">
               <input formControlName="PedExtFechaConsulta" type="date" class="form-control form-control-sm" id="PextFecha" placeholder="Fecha pedido" name="PextFecha" title="Fecha Pedido">
@@ -61,20 +65,23 @@
             <div class="col-md">
               <input formControlName="PedExtFechaEntregaConsulta" type="date" class="form-control form-control-sm" id="PextFechaEntrega" placeholder="Fecha entrega" name="PextFechaEntrega" title="Fecha Entrega">
             </div> -->
+                    
+                              
           </div>
         </div>
         <!-- FILA 2 -->
         <!-- <div class="mb-5">
           <div class="row g-3"> -->
             <!-- Estado -->
-            <!-- <div class="col-md-4">
+             <div class="col-md-4">
               <select formControlName="PedExtEstadoConsulta" id="PextEstadoId" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="null" disabled selected>Seleccione Estado</option>
                 <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
+              
               </select>
             </div>
-          </div>
-        </div> -->
+      
+   
         <!-- FILA 3 -->
         <div class="mb-1">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
@@ -83,14 +90,11 @@
 
           </div>
         </div>
-      </form>
+     
       <!--Cierre formulario-->
+      
 
-
-        <div class="mb-4">
-          <h4 class="tituloRojo">Tabla Pedido</h4>
-        </div>
-        <!-- TABLA DE PEDIDOS -->
+         TABLA DE PEDIDOS 
         <div class="mb-2">
           <div class="row g-1">
             <div class="table-responsive">
@@ -109,8 +113,9 @@
                   </tr>
 
                 <tbody>
-                  <!--Carga los productos en la tabla y pagina por 2-->
-                  <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" >
+                  <!-- Carga los productos en la tabla y pagina por 2 -->
+                  <tr *ngFor=" let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index " >
+                    
                     <td id="idPedido">{{item.pedExt_Id}}</td>
                     <td id="fechaPedido">{{item.pedExt_FechaCreacion}}</td>
                     <td id="fechaEntrega">{{item.pedExt_FechaEntrega}}</td>
@@ -123,10 +128,16 @@
                 </tbody>
               </table>
               <div class="mb-2">
+                
                   <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                     <pagination-controls (pageChange)="page = $event"></pagination-controls>
                   </div>
               </div>
+              </div>
+            </div>
+          </div>
+        </div> 
+
               <!-- <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-center">
                   <li class="page-item disabled">
@@ -140,10 +151,7 @@
                   </li>
                 </ul>
               </nav> -->
-            </div>
-          </div>
-        </div>
-      </div>
+            
 
       <!--<div class="mb-4">
         <h4 class="tituloRojo">Tabla Pedido</h4>
@@ -538,9 +546,7 @@
 
 
       <!-- Fin Modal de sedes clientes -->
-    </div>
-    </div>
-    </div>
+  
 
 
 

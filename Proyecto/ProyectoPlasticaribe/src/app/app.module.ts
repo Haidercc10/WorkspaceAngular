@@ -32,6 +32,12 @@ import { NavbarLateralComponent } from './Vistas/navbar-lateral/navbar-lateral.c
 import { EstadosComponent } from './Vistas/estados/estados.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { FiltroPipe } from './Vistas/filtros/filtro.pipe';
+import { MatTableModule } from '@angular/material/table';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatInputModule } from '@angular/material/input';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import { FiltrovendedorPipe } from './Vistas/filtros/filtrovendedor.pipe';
 //import {  } from '../../node_modules/font-awesome/css/font-awesome.css';
 
 
@@ -89,7 +95,10 @@ export const routes: Routes = [
     ProductoComponent,
     ReportesComponent,
     NavbarLateralComponent,
-    EstadosComponent
+    EstadosComponent,
+    FiltroPipe,
+    FiltrovendedorPipe
+    
   ],
 
   imports: [
@@ -102,15 +111,18 @@ export const routes: Routes = [
     FormsModule,
     FontAwesomeModule,
     NgxPaginationModule,
-
+    BrowserModule,
+    MatTableModule,
+    BrowserAnimationsModule,
+    MatInputModule,
+    MatDatepickerModule
 
 
 
   ],
 
 
-  providers: [ServicioAreasService,
-    CookieService],
+  providers: [ServicioAreasService,CookieService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
