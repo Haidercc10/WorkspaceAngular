@@ -3,7 +3,10 @@
 
   <nav class="navbar navbar-expand-lg ">
     <div class="container-fluid">
-      <p>Plasti<span>caribe S.A.S</span></p>
+      <p>Plasti<span>caribe S.A.S</span> </p>
+    </div>
+    <div class="">
+      <p>{{storage_Nombre}} {{storage_Rol}}</p>
     </div>
   </nav>
 <!-- Navegador fin de parte superior -->
@@ -106,8 +109,9 @@
                     <th id="estadoPedido" scope="col">Estado</th>
                     <th id="precioPedido" scope="col">Precio Total</th>
                     <th id="archivoPedido" scope="col">Archivo</th>
+                    <th id="editarPedido" scope="col">Editar</th>
+                    
                   </tr>
-
                 <tbody>
                   <!--Carga los productos en la tabla y pagina por 2-->
                   <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" >
@@ -118,7 +122,8 @@
                     <td id="Vendedor">{{item.usua_Id}}</td>
                     <td id="estadoPedido">{{item.estado_Id}}</td>
                     <td id="precioPedido">{{item.pedExt_PrecioTotal}}</td>
-                    <td id="archivoPedido"><input class="btn btn-danger btn-danger-sm" type="button" (click)="llenarPDFConBD()" value="Ver"></td>
+                    <td id="archivoPedido"><input class="btn btn-danger btn-danger-sm" type="button" (click)="llenarProductoPedido(item)" value="Ver"></td>
+                    <td id="Editar" ><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Pedido" (click)="EditarPedido(item)"></i></a></td>
                   </tr>
                 </tbody>
               </table>
@@ -127,67 +132,9 @@
                     <pagination-controls (pageChange)="page = $event"></pagination-controls>
                   </div>
               </div>
-              <!-- <nav aria-label="Page navigation example">
-                <ul class="pagination justify-content-center">
-                  <li class="page-item disabled">
-                    <a class="page-link" href="" tabindex="-1">Anterior</a>
-                  </li>
-                  <li class="page-item"><a class="page-link" href="">1</a></li>
-                  <li class="page-item"><a class="page-link" href="">2</a></li>
-                  <li class="page-item"><a class="page-link" href="">3</a></li>
-                  <li class="page-item">
-                    <a class="page-link" href="">Siguiente</a>
-                  </li>
-                </ul>
-              </nav> -->
             </div>
           </div>
         </div>
-      </div>
-
-      <!--<div class="mb-4">
-        <h4 class="tituloRojo">Tabla Pedido</h4>
-      </div>
-
-      <div class="mb-4">
-        <div class="row g-1">
-          <div class="table-responsive">
-            <div id="html2Pdf">
-            <table class="table table-bordered">
-              <thead class="TitulosTabla">
-                <tr>
-                  <th id="idPedido" scope="col">ID</th>
-                  <th id="fechaPedido" scope="col">Fecha Pedido</th>
-                  <th id="fechaEntrega" scope="col">Fecha Entrega</th>
-                  <th id="cliente" scope="col">Cliente</th>
-                  <th id="vendedor" scope="col">Id Vendedor</th>
-                  <th id="estadoPedido" scope="col">Estado</th>
-                  <th id="precioPedido" scope="col">Precio Total</th>
-                  <th id="archivoPedido" scope="col">Archivo</th>
-                </tr>
-
-              <tbody>
-                <tr *ngFor="let item of pedidosProductos; let i=index">
-                  <td id="idPedido">{{item.pedExt_Id}}</td>
-                  <td id="fechaPedido">{{item.pedExt_FechaCreacion}}</td>
-                  <td id="fechaEntrega">{{item.pedExt_FechaEntrega}}</td>
-                  <td id="cliente">{{item.sedeCli_Id}}</td>
-                  <td id="vendedor">ID: {{item.usua_Id}}</td>
-                  <td id="estadoPedido">{{item.estado_Id}}</td>
-                  <td id="precioPedido">{{item.pedExt_PrecioTotal}}</td>
-                  <td id="archivoPedido"><input class="btn btn-danger btn-danger-sm" type="button" (click)="llenarPDFConBD()" value="Ver"></td>
-                </tr>
-              </tbody>
-            </table>
-
-          </div>
-        </div>
-        </div>
-        -->
-
-
-      <div class="mb-4">
-        <hr class="colorLinea">
       </div>
 
       <!-- Inicio titulo -->
@@ -341,16 +288,16 @@
                 <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="PrdPrecioUnd"  placeholder="Precio Unidad" name="PrdPrecioUnd">
               </div>
               <!-- Tipo Moneda -->
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <select formControlName="ProdTipoMoneda" id="PrdTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdTipoMoneda">
                   <option [ngValue]="null" disabled selected>Seleccione Tipo Moneda</option>
                   <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas}}</option>
                 </select>
               </div>
-              <!-- Stock Producto
+              <!-- Stock Producto -->
               <div class="col-md">
                 <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock"  name="PrdStock" >
-              </div> -->
+              </div>
             </div>
           </div>
 
@@ -417,8 +364,6 @@
                       <th id="undMedidaCantidad" scope="col">{{columnas.pUndMedCant}}</th>
                       <th id="precioUnitario" scope="col">{{columnas.pPrecioU}}.</th>
                       <th id="tipoMoneda" scope="col">{{columnas.pMoneda}}</th>
-                      <th id="stock" scope="col">{{columnas.pStock}}</th>
-                      <th id="Descripcion" scope="col">{{columnas.pDescripcion}}</th>
                       <th id="Subtotal" scope="col">{{columnas.pSubtotal}}</th>
                       <th id="acciones" scope="col"></th>
                       <th id="acciones" scope="col"></th>
@@ -438,13 +383,9 @@
                       <td id="undMedidaCantidad" class="TextosInfoTabla">{{listaProductos.UndCant}}</td>
                       <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.PrecioUnd}}</td>
                       <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.TpMoneda}}</td>
-                      <td id="stock" class="TextosInfoTabla">{{listaProductos.Stock}}</td>
-                      <td id="Descripcion" class="TextosInfoTabla"class="TextosInfoTabla">{{listaProductos.Produ_Descripcion}}</td>
                       <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.SubTotal}}</td>
-                      <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true"></i></a></td>
-                      <td id="Eliminar" ><a><i class="fa fa-trash" (click)="QuitarProductoTabla(j)" aria-hidden="true"></i></a></td>
-
-
+                      <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true" title="Editar Producto"></i></a></td>
+                      <td id="Eliminar" ><a><i class="fa fa-trash" (click)="QuitarProductoTabla(j)" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
                     </tr>
                 </tbody>
               </table>

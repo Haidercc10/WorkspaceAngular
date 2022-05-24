@@ -72,8 +72,8 @@ export class ClientesComponent implements OnInit {
 
   validarCamposVacios() : any{
     if(this.FormCrearClientes.valid){
-      this.crearCliente();
-      Swal.fire("Los datos se enviaron correctamente");
+      this.crearCliente_Sede();
+      console.log("Los datos se enviaron correctamente");
       console.log(this.FormCrearClientes);
       this.LimpiarCampos();
     }else{
@@ -110,30 +110,24 @@ export class ClientesComponent implements OnInit {
     });
   }
 
-  crearCliente(){
-    
-    this.tiposClientesService.srvObtenerLista().subscribe(datos_tipoCliente => {
-      for (let index = 0; index < datos_tipoCliente.length; index++) {
-        if (datos_tipoCliente[index].tpCli_Nombre == this.FormCrearClientes.value.TipoClienteId) {
-          this.tipo_cliente = datos_tipoCliente[index].tpCli_Id;
-        }        
-      }
-    });
+  crearCliente_Sede(){
 
     let id : any = this.FormCrearClientes.value.CliId;
     let tipoId : any = this.FormCrearClientes.value.TipoIdCliente;
     let nombreCliente : any = this.FormCrearClientes.value.CliNombre;
     let telefono : any = this.FormCrearClientes.value.CliTelefono;
     let email : any = this.FormCrearClientes.value.CliEmail;
-    let tipoCliente : any = this.tipo_cliente;
-    let ciudadsedeCliente : any = this.FormCrearClientes.value.SedeCli_Ciudad;
+    let tipoCliente : string = this.FormCrearClientes.value.TipoClienteId;
     let vendedor : any = this. FormCrearClientes.value.UsuIdNombre;
+
+    let sedeCLiID : any = this.FormCrearClientes.value.CliId2;
+    let ciudadsedeCliente : any = this.FormCrearClientes.value.SedeCli_Ciudad;    
     let codigoPostal : any = this.FormCrearClientes.value.SedeCli_Postal;
     let direccionSede : any = this.FormCrearClientes.value.SedeCli_Direccion;
 
-    this.pedidoCliente.llenarClientesCreado(id, tipoId, nombreCliente, telefono, email, tipoCliente, ciudadsedeCliente, vendedor, codigoPostal, direccionSede);
-    this.pedidoCliente.insertarClientes(id, tipoId, nombreCliente, telefono, email, tipoCliente, ciudadsedeCliente, vendedor, codigoPostal, direccionSede);
-
+    this.pedidoCliente.llenarClientesCreado(id, tipoId, nombreCliente, telefono, email, tipoCliente, ciudadsedeCliente, vendedor, codigoPostal, direccionSede, sedeCLiID);
+    this.pedidoCliente.insertarClientes(id, tipoId, nombreCliente, telefono, email, tipoCliente, ciudadsedeCliente, vendedor, codigoPostal, direccionSede, sedeCLiID);
   }
+
 
 }

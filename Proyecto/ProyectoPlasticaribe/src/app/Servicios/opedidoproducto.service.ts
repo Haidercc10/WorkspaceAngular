@@ -27,19 +27,17 @@ export class OpedidoproductoService {
     return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExterno', data)
   }
   //Metodo actualzar Pedidos de Productos
-  srvActualizarPedidosProdusctos(id:number|String, data:any) {
+  srvActualizarPedidosProdusctos(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/PedidoExterno/${id}`, data);
   }
   //Metodo eliminar Pedidos de Productos
-  srvEliminarPedidosProductos(id:number|String) {
+  srvEliminarPedidosProductos(id:number|string) {
     return this.http.delete(this.rutaPlasticaribeAPI + `/PedidoExterno/${id}`);
   }
 
   srvGuardarPedidosProductos(data : modelOpedidoproducto): Observable<any> {
    return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExterno', data);
   }
-
-
 
   srvObtenerUltimoCodigoPedido(){
      return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoExternoes');

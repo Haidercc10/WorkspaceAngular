@@ -27,12 +27,12 @@ export class PedidoProductosService {
   }
 
   //Metodo actualzar Pedidos
-  srvActualizar(id:number|String, datos_Pedidos:any) {
+  srvActualizar(id:number|string, datos_Pedidos:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/PedidoProductoes/${id}`, datos_Pedidos);
   }
 
   //Metodo eliminar Pedidos
-  srvEliminar(id:number|String) {
+  srvEliminar(id:number|string) {
     return this.http.delete(this.rutaPlasticaribeAPI + `/PedidoProductoes/${id}`);
   }
 

@@ -32,36 +32,35 @@ import { NavbarLateralComponent } from './Vistas/navbar-lateral/navbar-lateral.c
 import { EstadosComponent } from './Vistas/estados/estados.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { ValidacionLoginGuard } from './Guards/validacion-login.guard';
+import { StorageServiceModule} from 'ngx-webstorage-service';
 //import {  } from '../../node_modules/font-awesome/css/font-awesome.css';
-
-
-
 
 
 export const routes: Routes = [
 
   {path: '', component: InicioComponent},
   {path: 'registro', component: RegistroComponentComponent},
-  {path: 'principal', component: PrincipalComponent},
-  {path: 'areas', component: AreasComponentComponent},
+  {path: 'principal', canActivate: [ValidacionLoginGuard], component: PrincipalComponent},
+  {path: 'areas', canActivate: [ValidacionLoginGuard], component: AreasComponentComponent},
   {path: 'login', component: LoginComponentComponent},
-  {path: 'reportes', component: ReportesComponent},
-  {path: 'roles', component: RolesComponentComponent},
+  {path: 'reportes', canActivate: [ValidacionLoginGuard], component: ReportesComponent},
+  {path: 'roles', canActivate: [ValidacionLoginGuard], component: RolesComponentComponent},
   {path: 'pprincipal', component: PprincipalComponent},
-  {path: 'eps', component: EpsComponent},
-  {path: 'fpension', component: FpensionComponent},
-  {path: 'cajacompensacion', component: CajacompensacionComponent},
-  {path: 'opedido', component: OpedidoComponent},
-  {path: 'opedidoproducto', component: OpedidoproductoComponent},
-  {path: 'ocompra', component: OcompraComponent},
-  {path: 'usuario',component:UsuarioComponent},
-  {path: 'pedidomateriaprima',component:PedidomateriaprimaComponent},
-  {path: 'crearproducto',component:CrearProductoComponent},
-  {path: 'crear-clientes',component:ClientesComponent},
-  {path: 'producto',component:ProductoComponent},
+  {path: 'eps', canActivate: [ValidacionLoginGuard], component: EpsComponent},
+  {path: 'fpension', canActivate: [ValidacionLoginGuard], component: FpensionComponent},
+  {path: 'cajacompensacion', canActivate: [ValidacionLoginGuard], component: CajacompensacionComponent},
+  {path: 'opedido', canActivate: [ValidacionLoginGuard], component: OpedidoComponent},
+  {path: 'opedidoproducto', canActivate: [ValidacionLoginGuard], component: OpedidoproductoComponent},
+  {path: 'ocompra', canActivate: [ValidacionLoginGuard], component: OcompraComponent},
+  {path: 'usuario', canActivate: [ValidacionLoginGuard], component:UsuarioComponent},
+  {path: 'pedidomateriaprima', canActivate: [ValidacionLoginGuard], component:PedidomateriaprimaComponent},
+  {path: 'crearproducto', canActivate: [ValidacionLoginGuard], component:CrearProductoComponent},
+  {path: 'crear-clientes', canActivate: [ValidacionLoginGuard], component:ClientesComponent},
+  {path: 'producto', canActivate: [ValidacionLoginGuard], component:ProductoComponent},
   {path: 'pdf',component:PdfComponent},
-  {path: 'navbarLateral', component:NavbarLateralComponent},
-  {path: 'estados',component: EstadosComponent},
+  {path: 'navbarLateral',canActivate: [ValidacionLoginGuard], component:NavbarLateralComponent},
+  {path: 'estados', canActivate: [ValidacionLoginGuard], component: EstadosComponent},
 ]
 
 @NgModule({
@@ -102,15 +101,14 @@ export const routes: Routes = [
     FormsModule,
     FontAwesomeModule,
     NgxPaginationModule,
-
-
-
-
+    StorageServiceModule,
   ],
 
+  providers: [
+    ServicioAreasService,
+    CookieService,
+  ],
 
-  providers: [ServicioAreasService,
-    CookieService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -15,27 +15,31 @@ export class RolesService {
 
   //Metodo buscar lista de roles
   srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Roles_Usuarios')
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Rol_Usuario')
+  }
+
+  srvObtenerListaPorId(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rol_Usuario/${id}`);
   }
 
   //Metodo agregar roles
   srvAgregar(data:any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Roles_Usuarios', data)
+    return this.http.post(this.rutaPlasticaribeAPI + '/Rol_Usuario', data)
   }
 
   //Metodo actualzar roles
   srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Roles_Usuarios/${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/Rol_Usuario/${id}`, data);
   }
 
   //Metodo eliminar roles
   srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Roles_Usuarios/${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Rol_Usuario/${id}`);
   }
 
   //
   srvGuardar(data : modelRol): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Roles_Usuarios', data)
+    return this.http.post(this.rutaPlasticaribeAPI + '/Rol_Usuario', data)
   }
 
 }

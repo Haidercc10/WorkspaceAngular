@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import { EmpresaService } from 'src/app/Servicios/empresa.service';
 import Swal from 'sweetalert2';
 import { CookieService } from 'ngx-cookie-service';
+import {SESSION_STORAGE, WebStorageService} from 'ngx-webstorage-service';
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -14,15 +15,18 @@ import { CookieService } from 'ngx-cookie-service';
 export class LoginComponentComponent implements OnInit {
 
   public formularioUsuario !: FormGroup;
+  public data:any=[];
 
   /* SE INSTANCIA LA VARIABLE "empresas" QUE VA A SER DE TIPO "EmpresaService" Y TAMBIEN SERÁ UN ARRAY.
   AQUÍ SE GUARDARÁN LOS NOMBRES DE LAS EMPRESAS QUE HAY EN LA BASE DE DATOS */
   empresas:EmpresaService[]=[];
   empresa=[];
 
-
-  constructor(private usuarioServices : UsuarioService, private empresaServices : EmpresaService, private frmBuilderUsuario : FormBuilder, private cookieServices : CookieService) {
-
+  constructor(private usuarioServices : UsuarioService,
+                private empresaServices : EmpresaService,
+                  private frmBuilderUsuario : FormBuilder,
+                    private cookieServices : CookieService,
+                      @Inject(SESSION_STORAGE) private storage: WebStorageService) {
 
     this.formularioUsuario = this.frmBuilderUsuario.group({
       Identificacion: [, Validators.required],
@@ -33,6 +37,12 @@ export class LoginComponentComponent implements OnInit {
 
   ngOnInit(): void { this.cargaDatosComboBox(); }
 
+  
+  saveInLocal(key, val): void {
+    this.storage.set(key, val);
+    this.data[key]= this.storage.get(key);
+  }
+  
   // FUNCION PARA CARGAR LOS DATOS DE LAS EMPRESAS EN EL COMBOBOX DEL HTML
   cargaDatosComboBox(){
     this.empresaServices.srvObtenerLista().subscribe(datos_empresa=>{
@@ -64,16 +74,20 @@ export class LoginComponentComponent implements OnInit {
           for (let index = 0; index < datos_empresa.length; index++) {
             if (datos_empresa[index].empresa_Nombre == empresa) {
               if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena == datos_usuarios.usua_Contrasena && datos_usuarios.empresa_Id == datos_empresa[index].empresa_Id) {
-                /*// CREACIÓN DE COOKIES PARA MANTENER EL ROL DEL USUARIO Y MOSTRAR CIERTOS COMPONENTES
+                // CREACIÓN DE COOKIES PARA MANTENER EL ROL DEL USUARIO Y MOSTRAR CIERTOS COMPONENTES
+                let idUsuario : number = datos_usuarios.usua_Id;
                 let nombre: string = datos_usuarios.usua_Nombre;
-                let rol: string = datos_usuarios.rolUsu_Id;
-                let fechaExpiracion : Date = new Date(2022, 5, 10, 14, 58);
-                console.log(fechaExpiracion);
-                this.cookieServices.set('Nombre', `${nombre}`, {expires: fechaExpiracion} );
-                this.cookieServices.set('Rol', `${rol}`, {expires: fechaExpiracion});
+                let rol: number = datos_usuarios.rolUsu_Id;
+                var medianoche = new Date();
+                // medianoche.setHours(23,59,59,0);
+                // console.log(medianoche);
+                // this.cookieServices.set('Id', `${idUsuario}`, {expires: medianoche} );
+                // this.cookieServices.set('Nombre', `${nombre}`, {expires: medianoche} );
+                // this.cookieServices.set('Rol', `${rol}`, {expires: medianoche});
                 
-                console.log(this.cookieServices.get('Nombre'));
-                console.log(this.cookieServices.get('Rol'));*/
+                this.saveInLocal('Id', idUsuario);
+                this.saveInLocal('Nombre', nombre);
+                this.saveInLocal('Rol', rol);
                 this.clear();
                 window.location.href = "./navbarLateral";
                 break;

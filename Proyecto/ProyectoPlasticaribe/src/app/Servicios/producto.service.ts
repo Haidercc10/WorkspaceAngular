@@ -42,9 +42,4 @@ export class ProductoService {
   }
 
 
-  srvObtenerListado(id : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Productoes/${id}`)
-  }
-
-
 }
