@@ -39,11 +39,11 @@ import { StorageServiceModule} from 'ngx-webstorage-service';
 
 export const routes: Routes = [
 
-  {path: '', component: InicioComponent},
+  {path: 'principal', component: InicioComponent},
   {path: 'registro', component: RegistroComponentComponent},
-  {path: 'principal', canActivate: [ValidacionLoginGuard], component: PrincipalComponent},
+  {path: 'principal_secundaria', canActivate: [ValidacionLoginGuard], component: PrincipalComponent},
   {path: 'areas', canActivate: [ValidacionLoginGuard], component: AreasComponentComponent},
-  {path: 'login', component: LoginComponentComponent},
+  {path: '', component: LoginComponentComponent},
   {path: 'reportes', canActivate: [ValidacionLoginGuard], component: ReportesComponent},
   {path: 'roles', canActivate: [ValidacionLoginGuard], component: RolesComponentComponent},
   {path: 'pprincipal', component: PprincipalComponent},

@@ -76,6 +76,13 @@
                 <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
               </select>
             </div>
+
+            <div class="col-md-4">
+              <select formControlName="PedExtUsuarioConsulta" id="PextUsuarioId" type="text" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option [ngValue]="null" disabled selected>Seleccione Vendedor</option>
+                <option [ngValue]="vendedor" *ngFor="let vendedor of usuarios">{{vendedor}}</option>
+              </select>
+            </div>
           </div>
         </div> -->
         <!-- FILA 3 -->
@@ -123,7 +130,7 @@
                     <td id="estadoPedido">{{item.estado_Id}}</td>
                     <td id="precioPedido">{{item.pedExt_PrecioTotal}}</td>
                     <td id="archivoPedido"><input class="btn btn-danger btn-danger-sm" type="button" (click)="llenarProductoPedido(item)" value="Ver"></td>
-                    <td id="Editar" ><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Pedido" (click)="EditarPedido(item)"></i></a></td>
+                    <td id="Editar" ><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Pedido" (click)="MostrarPedido(item)"></i></a></td>
                   </tr>
                 </tbody>
               </table>
@@ -150,9 +157,17 @@
           <div class="row g-3">
             <!-- Cliente -->
             <div class="col-md">
-              <select formControlName="PedClienteNombre" type="text" id="PextClienteId" name="PextClienteId" (change)="sedesClientesComboBox()"  class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <select formControlName="PedClienteNombre" type="text" id="PextClienteId" name="PextClienteId" (change)="ciudadClienteComboBox()" (change)="productoCliente()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
                 <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
+              </select>
+            </div>
+
+            <!-- Ciudad -->
+            <div class="col-md">
+              <select formControlName="ciudad_sede" type="text" id="ciudad_sede" name="ciudad_sede" (change)="sedesClientesComboBox()" (change)="captarSedeSeleccionada()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option [ngValue]="null" disabled selected>Seleccione Ciudad Sede</option>
+                <option [ngValue]="ciudades" *ngFor="let ciudades of ciudad">{{ciudades}}</option>
               </select>
             </div>
 
@@ -181,21 +196,22 @@
             <div class="col-md">
               <input formControlName="PedFechaEnt" type="date" class="form-control form-control-sm" id="PextFechaEnt"  placeholder="Fecha entrega" name="PextFechaEnt" required maxlength="50" title="Fecha Entrega">
             </div>
-
-            <!-- Estado -->
-            <div class="col-md">
-              <select formControlName="PedEstadoId" id="PextEstadoId" type="text" name="PextEstadoId" (change)="captarEstadoSeleccionado()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="null" disabled selected>Seleccione Estado</option>
-                <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
-              </select>
-            </div>
           </div>
         </div>
         <!-- Fin fila 1 de campos -->
 
         <!-- Inicio Observacion -->
+
+        
         <div class="mb-5">
           <div class="row g-3">
+            <!-- Estado -->
+            <div class="col-md-2">
+              <select formControlName="PedEstadoId" id="PextEstadoId" type="text" name="PextEstadoId" (change)="captarEstadoSeleccionado()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option [ngValue]="null" disabled selected>Seleccione Estado</option>
+                <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
+              </select>
+            </div>
             <!-- Campo Observacion -->
             <div class="col-md">
               <textarea formControlName="PedObservacion"  id="PextObservacion" type="text" class="form-control form-control-sm campoObservacion"  maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
@@ -231,9 +247,9 @@
             </div>
             <!-- ID/Nombre Producto -->
             <div class="col-md">
-                <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" (change)="llenadoProducto()" type="text" aria-label=".form-select-sm example" name="PrdNombre" required minlength="1" maxlength="20">
+                <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" (change)="llenadoProducto()" type="text" aria-label=".form-select-sm example" name="PrdNombre" required>
                   <option [ngValue]="null" disabled selected>Seleccione Producto</option>
-                  <option [ngValue]="productos" *ngFor="let productos of producto">{{productos}}</option>
+                  <option [ngValue]="productos.prod_Nombre" *ngFor="let productos of producto">{{productos.prod_Nombre}}</option>
                 </select>
             </div>
             <!-- Ancho Producto -->
@@ -274,7 +290,7 @@
               </div>
               <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
               <div class="col-md-2">
-                <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm"  placeholder="Cantidad" id="PrdCantidad"  name="PrdCantidad" required maxlength="14">
+                <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm"  placeholder="Cantidad" id="PrdCantidad"  name="PrdCantidad" required>
               </div>
               <!-- UM Cantidad Producto -->
               <div class="col-md-2">
@@ -296,7 +312,7 @@
               </div>
               <!-- Stock Producto -->
               <div class="col-md">
-                <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock"  name="PrdStock" >
+                <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock" name="PrdStock">
               </div>
             </div>
           </div>
@@ -311,8 +327,7 @@
           <div class="row g-3">
             <!-- Campo Descripción producto -->
             <div class="col-md">
-              <textarea formControlName="ProdDescripcion"  id="PrdDescripcion" type="text" class="form-control form-control-sm campoObservacion"
-              maxlength="200" placeholder="Descripción Producto" name="PrdDescripcion"></textarea>
+              <textarea formControlName="ProdDescripcion" id="PrdDescripcion" type="text" class="form-control form-control-sm campoObservacion" placeholder="Descripción Producto" name="PrdDescripcion"></textarea>
             </div>
           </div>
         </div>
@@ -325,6 +340,7 @@
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <button class="btn btn-danger btn-danger-sm" type="submit">{{AccionBoton}} Producto</button>
+              <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarProducto()">{{AccionBoton}} y Actualizar Producto</button>
               <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
           </div>
         </div>
@@ -414,8 +430,9 @@
         <!-- Inicio Botones -->
         <div class="bajarPagina">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="validarInputsVacios()">Crear Pedido</button><!--(click)="download()"-->
-              <button class=" btn btn-secondary btn-secondary-sm" type="button" (click)="confimacionSalida()" >Cancelar</button>
+              <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="validarInputsVacios()">Crear Pedido</button>
+              <button class="btn btn-danger btn-danger-sm" type="button" (click)="editarPedido()">{{AccionBoton}} y Actualizar Pedido</button>
+              <button class=" btn btn-secondary btn-secondary-sm" type="button" (click)="confimacionSalida()">Cancelar</button>
             </div>
         </div>
       </form>

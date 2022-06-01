@@ -27,7 +27,7 @@ export class ProductoService {
   }
 
   //Metodo actualzar Productos
-  srvActualizar(id:number|String, datos_Productos:any) {
+  srvActualizar(id:any, datos_Productos:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Producto/${id}`, datos_Productos);
   }
 

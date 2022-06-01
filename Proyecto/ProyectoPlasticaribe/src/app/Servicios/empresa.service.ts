@@ -16,6 +16,10 @@ export class EmpresaService {
   srvObtenerLista():Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Empresas')
   }
+
+  srvObtenerListaPorId(id : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Empresas/${id}`)
+  }
   //Metodo agregar Cajacompensacion
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Empresas', data)

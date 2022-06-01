@@ -89,7 +89,7 @@ export class LoginComponentComponent implements OnInit {
                 this.saveInLocal('Nombre', nombre);
                 this.saveInLocal('Rol', rol);
                 this.clear();
-                window.location.href = "./navbarLateral";
+                window.location.href = "./opedidoproducto";
                 break;
               } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena){
                 Swal.fire("EL número de identificacion no coincide con la contraseña"); 

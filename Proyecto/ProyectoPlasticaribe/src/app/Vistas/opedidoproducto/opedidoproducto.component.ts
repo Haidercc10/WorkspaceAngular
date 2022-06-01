@@ -20,6 +20,8 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { TipoClienteService } from 'src/app/Servicios/tipo-cliente.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { ThisReceiver } from '@angular/compiler';
+import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.service';
 
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -62,7 +64,9 @@ export class OpedidoproductoComponent implements OnInit {
   clienteDatos = [];
   sedeCliente:SedeClienteService[]=[];
   sedeClientesDatos = [];
+  ciudad :SedeClienteService[]=[];
   usuarioVendedor=[];
+  usuarios=[];
   estado=[];
   tipoEstado=[];
   producto=[];
@@ -130,14 +134,15 @@ export class OpedidoproductoComponent implements OnInit {
                           private SrvEmpresa : EmpresaService,
                             private PedidoProductosService : PedidoProductosService,
                               private tipoClientService : TipoClienteService,
-                                private cookieServices : CookieService,
                                   private rolService : RolesService,
-                                    @Inject(SESSION_STORAGE) private storage: WebStorageService,) {
+                                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                                    private ClientesProductosService : ClientesProductosService) {
 
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
       //Instanciar campos que vienen del formulario
       //Pedidos
       PedSedeCli_Id: new FormControl(),
+      ciudad_sede: new FormControl(),
       PedClienteNombre: new FormControl(),
       PedUsuarioNombre: new FormControl(),
       PedFecha: new FormControl(),
@@ -161,14 +166,14 @@ export class OpedidoproductoComponent implements OnInit {
       ProdTipoMoneda: new FormControl(),
       ProdStock: new FormControl(),
       ProdDescripcion: new FormControl(),
-      pdf:new FormControl(),
     });
 
     this.FormConsultaPedidoExterno = this.frmBuilderPedExterno.group({
       PedExtIdConsulta: new FormControl(),
       PedExtFechaConsulta: new FormControl(),
       PedExtFechaEntregaConsulta: new FormControl(),
-      PedExtEstadoConsulta: new FormControl()
+      // PedExtEstadoConsulta: new FormControl(),
+      // PedExtUsuarioConsulta: new FormControl(),
     });
   }
 
@@ -177,7 +182,6 @@ export class OpedidoproductoComponent implements OnInit {
     this.initForms();
     this.clientesComboBox();
     this.estadoComboBox();
-    this.productoComboBox();
     this.undMedidaComboBox();
     this.obtenerEmpresa();
     this.ObtenerUltimoPedido();
@@ -186,6 +190,7 @@ export class OpedidoproductoComponent implements OnInit {
     this.ColumnasTabla();
     this.PruebaInsercion();
     this.lecturaStorage();
+    this.usuarioComboBox();
   }
 
   lecturaStorage(){
@@ -207,6 +212,7 @@ export class OpedidoproductoComponent implements OnInit {
       //Datos para la tabla de pedidos.
       PedClienteNombre: ['', Validators.required],
       PedSedeCli_Id: ['', Validators.required],
+      ciudad_sede: ['', Validators.required],
       PedUsuarioNombre: ['', Validators.required],
       PedFecha: ['', Validators.required],
       PedFechaEnt: ['', Validators.required],
@@ -217,19 +223,19 @@ export class OpedidoproductoComponent implements OnInit {
 
     this.FormPedidoExternoProductos = this.frmBuilderPedExterno.group({
        //Datos para la tabla de productos.
-       ProdId: ['', Validators.required],
-       ProdNombre: ['', Validators.required],
-       ProdAncho: ['', Validators.required],
-       ProdFuelle: ['', Validators.required],
-       ProdCalibre: ['', Validators.required],
-       ProdUnidadMedidaACF: ['', Validators.required],
-       ProdTipo: ['', Validators.required],
+       ProdId: [,''],
+       ProdNombre: [,''],
+       ProdAncho: [,''],
+       ProdFuelle: [,''],
+       ProdCalibre: [,''],
+       ProdUnidadMedidaACF: [,''],
+       ProdTipo: [,''],
        ProdCantidad: ['', Validators.required],
        ProdUnidadMedidaCant: ['', Validators.required],
        ProdPrecioUnd: ['', Validators.required],
        ProdTipoMoneda: ['', Validators.required],
        ProdStock: ['', Validators.required],
-       ProdDescripcion: [''],
+       ProdDescripcion: [,''],
 
 
     });
@@ -239,6 +245,7 @@ export class OpedidoproductoComponent implements OnInit {
       // PedExtFechaConsulta: [, Validators.required],
       // PedExtFechaEntregaConsulta: [, Validators.required],
       // PedExtEstadoConsulta: [, Validators.required],
+      // PedExtUsuarioConsulta : ['',],
     });
   }
 
@@ -276,23 +283,46 @@ export class OpedidoproductoComponent implements OnInit {
     this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
       this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
         for (let index = 0; index < datos_clientes.length; index++) {
-          if (datos_usuarios.rolUsu_Id == 2) {
-            if (datos_clientes[index].usua_Id == datos_usuarios.usua_Id) {
+          if (datos_clientes[index].estado_Id == 1) {
+            if (datos_usuarios.rolUsu_Id == 2) {
+              if (datos_clientes[index].usua_Id == datos_usuarios.usua_Id) {
+                this.cliente.push(datos_clientes[index].cli_Nombre);
+                this.clienteDatos.push(datos_clientes[index]);
+                continue;
+              }
+            }else {
               this.cliente.push(datos_clientes[index].cli_Nombre);
               this.clienteDatos.push(datos_clientes[index]);
-              continue;
-            }
-          }else {
-            this.cliente.push(datos_clientes[index].cli_Nombre);
-            this.clienteDatos.push(datos_clientes[index]);
+            }            
           }
         }
       });
     });
   }
 
+  ciudadClienteComboBox(){
+    this.ciudad = [];
+    this.sedeCliente=[];
+    let clienteNombreBD: string = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    this.clientesService.srvObtenerLista().subscribe(datos_cliente=>{
+      for (let index = 0; index < datos_cliente.length; index++) {
+        this.ciudad = [];
+        if (datos_cliente[index].cli_Nombre == clienteNombreBD){
+          this.sedesClientesService.srvObtenerLista().subscribe(datos_sedesClientes => {            
+            // Llena los datos de las sedes de dependiendo del cliente
+            for (let i = 0; i < datos_sedesClientes.length; i++) {
+              if (datos_cliente[index].cli_Id == datos_sedesClientes[i].cli_Id){ 
+                this.ciudad.push(datos_sedesClientes[i].sedeCliente_Ciudad);
+              } 
+            }
+          });
+        }
+      }
+    });
+  }
+
   // Funcion para llenar el comboBox de sedes y usuarios dependiendo del cliente seleccionado
-  sedesClientesComboBox(){
+  sedesClientesComboBox(){    
     //LLENA LA SEDE DEL CLIENTE DEPENDIENDO DEL CLIENTE
     let clienteNombreBD: string = this.FormPedidoExternoClientes.value.PedClienteNombre;
     this.clientesService.srvObtenerLista().subscribe(datos_cliente=>{
@@ -302,7 +332,11 @@ export class OpedidoproductoComponent implements OnInit {
             this.sedeCliente=[];
             // Llena los datos de las sedes de dependiendo del cliente
             for (let i = 0; i < datos_sedesClientes.length; i++) {
-              if (datos_cliente[index].cli_Id == datos_sedesClientes[i].cli_Id) this.sedeCliente.push(datos_sedesClientes[i].sedeCliente_Direccion);
+              if (datos_cliente[index].cli_Id == datos_sedesClientes[i].cli_Id){
+                if (datos_sedesClientes[i].sedeCliente_Ciudad == this.FormPedidoExternoClientes.value.ciudad_sede){
+                  this.sedeCliente.push(datos_sedesClientes[i].sedeCliente_Direccion);                 
+                }                
+              } 
             }
 
             //Llena datos de usuarios segun cliente seleccionado.
@@ -321,6 +355,15 @@ export class OpedidoproductoComponent implements OnInit {
     });
   }
 
+  usuarioComboBox(){
+    this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+      for (let index = 0; index < datos_usuarios.length; index++) {
+        this.usuarios.push(datos_usuarios[index].usua_Nombre);
+        
+      }
+    });
+  }
+  
   // Funcion para llenar el comboBox de estados
   estadoComboBox(){
     // FORMA DE HACER QUE SOLO SE RETORNEN LOS ESTADOS CON EL TIPO DE ESTADO "1", QUE ES EL EXCLUSIOVO PARA DOCUMENTOS
@@ -336,13 +379,28 @@ export class OpedidoproductoComponent implements OnInit {
     });
   }
 
-  // Función para llenar el comboBox de productos con todos los productos
-  productoComboBox() {
-    this.productosServices.srvObtenerLista().subscribe(datos_productos => {
-      for (let index = 0; index < datos_productos.length; index++) {
-        this.producto.push(datos_productos[index].prod_Nombre);
+  // Funcion para cargar los productos de un solo cliente
+  productoCliente(){
+    this.producto = [];
+    let nombre_Cliente : string = this.FormPedidoExternoClientes.value.PedClienteNombre
+    let id_cliente : number;
+    this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
+      for (let i = 0; i < datos_clientes.length; i++) {
+        if (datos_clientes[i].cli_Nombre == nombre_Cliente) {
+          id_cliente = datos_clientes[i].cli_Id;
+        }        
       }
+      this.ClientesProductosService.srvObtenerLista().subscribe(datos_clientesProductos => {
+        for (let index = 0; index < datos_clientesProductos.length; index++) {
+          if (datos_clientesProductos[index].cli_Id == id_cliente) {
+            this.productosServices.srvObtenerListaPorId(datos_clientesProductos[index].prod_Id).subscribe(datos_productos => {
+              this.producto.push(datos_productos);
+            });
+          }          
+        }
+      });
     });
+    
   }
 
   // Funcion para llenar el comboBox de tipos de Productos con los tipos de productos
@@ -366,7 +424,6 @@ export class OpedidoproductoComponent implements OnInit {
   // Funcion para llenar los datos de los productos en cada uno de los campos
   llenadoProducto(){
     this.productoInfo = [];
-    this.undMed = [];
 
     // Producto
     let nombreProducto : string = this.FormPedidoExternoProductos.value.ProdNombre;
@@ -381,6 +438,22 @@ export class OpedidoproductoComponent implements OnInit {
             for (let tpProdu = 0; tpProdu < datos_tiposProductos.length; tpProdu++) {
               if (datos_tiposProductos[tpProdu].tpProd_Id == datos_productos[p].tpProd_Id) {
                 this.tipoProducto.push(datos_tiposProductos[tpProdu].tpProd_Nombre);
+
+                this.FormPedidoExternoProductos.setValue({
+                  ProdId: `${datos_productos[p].prod_Id}`,
+                  ProdNombre: `${this.FormPedidoExternoProductos.value.ProdNombre}`,
+                  ProdAncho: `${datos_productos[p].prod_Ancho}`,
+                  ProdFuelle: `${datos_productos[p].prod_Fuelle}`,
+                  ProdCalibre: `${datos_productos[p].prod_Calibre}`,
+                  ProdUnidadMedidaACF: `${datos_productos[p].undMedACF}`,
+                  ProdTipo: `${datos_tiposProductos[tpProdu].tpProd_Nombre}`,
+                  ProdCantidad: `${this.FormPedidoExternoProductos.value.ProdCantidad}`,
+                  ProdUnidadMedidaCant: `${this.FormPedidoExternoProductos.value.ProdUnidadMedidaCant}`,
+                  ProdPrecioUnd: ``,
+                  ProdTipoMoneda: ``,
+                  ProdStock: ``,
+                  ProdDescripcion: `${datos_productos[p].prod_Descripcion}`,
+                });
 
                 // Existencias
                 this.existenciasProductosServices.srvObtenerLista().subscribe(datos_existencias => {
@@ -419,7 +492,7 @@ export class OpedidoproductoComponent implements OnInit {
                                   break;
                                 }else {
                                   this.undMed = [];
-                                  this.undMedidaComboBox();
+                                  
                                 }
                               }
                             });
@@ -457,23 +530,85 @@ export class OpedidoproductoComponent implements OnInit {
 
   // Funcion para validar los campos vacios de las consultas
   validarCamposVaciosConsulta(){
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-      }
-    })
-    
-    Toast.fire({
-      icon: 'success',
-      title: 'Consulta exitosa'
-    })
 
+    // if (this.FormConsultaPedidoExterno.valid) {
+      
+    // } else if (this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta != null) {
+    //   console.log(2)
+    //   this.pedidosProductos = [];
+    //   this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+    //     for (let index = 0; index < datos_pedidos.length; index++) {
+    //       this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
+    //         for (let i = 0; i < datos_estados.length; i++) {
+    //           if (datos_estados[i].estado_Nombre == this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta) {
+    //             this.sedesClientesService.srvObtenerListaPorId(datos_pedidos[index].sedeCli_Id).subscribe(datos_sedes => {
+    //               this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
+    //                 this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
+    //                   if (datos_usuarios.rolUsu_Id == 2) {
+    //                     if (datos_usuarios.usua_Nombre == this.storage_Nombre) {
+    //                       if (datos_pedidos[index].usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(datos_pedidos[index]);
+    //                       else Swal.fire("No tiene acceso a este pedido");
+    //                     }
+    //                   } else if (datos_usuarios.rolUsu_Id == 1) this.pedidosProductos.push(datos_pedidos[index]);
+    //                 });
+    //               });
+    //             });
+    //             break;
+    //           }
+    //         }
+    //       });
+    //     }
+    //   });
+    // }
+    // else if (this.FormConsultaPedidoExterno.value.PedExtIdConsulta != "") {
+    //   console.log(1)
+    //   this.pedidosProductos = [];
+    //   this.pedidoproductoService.srvObtenerListaPorId(this.FormConsultaPedidoExterno.value.PedExtIdConsulta).subscribe(datos_pedidos => {
+    //     this.sedesClientesService.srvObtenerListaPorId(datos_pedidos.sedeCli_Id).subscribe(datos_sedes => {
+    //       this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
+    //         this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
+    //           if (datos_usuarios.rolUsu_Id == 2) {
+    //             if (datos_usuarios.usua_Nombre == this.storage_Nombre) {
+    //               if (datos_pedidos.usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(datos_pedidos);
+    //               else Swal.fire("No tiene acceso a este pedido");
+    //             }
+    //           } else if (datos_usuarios.rolUsu_Id == 1) this.pedidosProductos.push(datos_pedidos);
+    //         });
+    //       });
+    //     });
+    //   });
+    // } 
+
+    // this.pedidosProductos = [];
+    // this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+    //   for (let index = 0; index < datos_pedidos.length; index++) {
+    //     this.sedesClientesService.srvObtenerListaPorId(datos_pedidos[index].sedeCli_Id).subscribe(datos_sedes => {          
+    //       this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
+    //         this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
+    //           this.estadosService.srvObtenerListaPorId(datos_pedidos[index].estado_Id).subscribe(datos_estados => {
+    //               if (this.FormConsultaPedidoExterno.valid) {
+                      
+    //               } else if (this.FormConsultaPedidoExterno.value.PedExtIdConsulta == datos_pedidos[index].pedExt_Id){      
+    //                 // Consulta por el ID del pedido
+    //                 if (datos_usuarios.rolUsu_Id == 2) {
+    //                   if (datos_pedidos[index].usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(datos_pedidos[index]);
+    //                   else Swal.fire("No tiene acceso a este pedido");
+    //                 }else if (datos_usuarios.rolUsu_Id == 1) {
+    //                   this.pedidosProductos.push(datos_pedidos[index]);
+    //                   console.log(datos_pedidos[index])
+    //                 }
+
+    //               } else if (this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta == datos_pedidos[index].estado_Id){
+    //                 // Consulta por el Estado del pedido
+                    
+    //               }
+    //           })
+    //         });
+    //       }, error => { console.log(error)});
+          
+    //     }, error => { console.log(error)});
+    //   }
+    // }, error => { console.log(error)});
     if(this.FormConsultaPedidoExterno.valid) {
       this.pedidosProductos = [];
       this.pedidoproductoService.srvObtenerListaPorId(this.FormConsultaPedidoExterno.value.PedExtIdConsulta).subscribe(datos_pedidos => {
@@ -483,15 +618,48 @@ export class OpedidoproductoComponent implements OnInit {
               if (datos_usuarios.rolUsu_Id == 2) {
                 if (datos_usuarios.usua_Nombre == this.storage_Nombre) {
                   if (datos_pedidos.usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(datos_pedidos);
-                  else Swal.fire("No tiene acceso a este pedido");
+                  else {
+                    const Toast = Swal.mixin({
+                      toast: true,
+                      position: 'center',
+                      showConfirmButton: false,
+                      timer: 1000,
+                      timerProgressBar: true,
+                      didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                      }
+                    })
+                    
+                    Toast.fire({
+                      icon: 'error',
+                      title: 'Usted no tiene acceso a este pedido'
+                    });
+                  }
                 }
               } else if (datos_usuarios.rolUsu_Id == 1) this.pedidosProductos.push(datos_pedidos);
             });
           });
         });
+      }, error => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 1000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+          }
+        });        
+        Toast.fire({
+          icon: 'error',
+          title: 'El pedido no existe'
+        });
       });
     }else {
-      this.pedidosProductos = [];    
+      this.pedidosProductos = [];
       this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
           this.sedesClientesService.srvObtenerListaPorId(datos_pedidos[index].sedeCli_Id).subscribe(datos_sedes => {
@@ -501,16 +669,19 @@ export class OpedidoproductoComponent implements OnInit {
                   if (datos_usuarios.usua_Nombre == this.storage_Nombre) {
                     if (datos_pedidos[index].usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(datos_pedidos[index]);
                   }
-                } else if (datos_usuarios.rolUsu_Id == 1) this.pedidosProductos.push(datos_pedidos[index]);
+                } else if (datos_usuarios.rolUsu_Id == 1){
+                  this.pedidosProductos.push(datos_pedidos[index]);
+                } 
+                this.pedidosProductos.sort();
               });
             });
           });
         }
-      }, error => { Swal.fire(`Ocurrió un error, intentelo de nuevo ${error}`); });
+      });
     }
   }
 
-  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA DE LA VISTA */
+  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
   confimacionSalida(){
     Swal.fire({
       title: '¿Seguro que desea salir?',
@@ -521,7 +692,7 @@ export class OpedidoproductoComponent implements OnInit {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        window.location.href = "./navbarLateral";
+        window.location.href = "./";
       } else if (result.isDenied) {
         
       }
@@ -541,7 +712,7 @@ export class OpedidoproductoComponent implements OnInit {
         //console.log('Ultimo codigo pedido: ' + ultimoCodigoPedido );
         //console.log('Ultimo codigo Pedido a guardar: ' + this.contadorPedidosExternos);
         //console.log(this.contadorPedidosExternos);
-      }
+  }
     });
   }
 
@@ -612,7 +783,6 @@ export class OpedidoproductoComponent implements OnInit {
       this.LimpiarCamposProductos();
 
       productoExt = []; //Vaciar lo que viene del formulario.
-      console.log(productoExt);
 
     } else { //Si el array que llena la tabla no esta vacío.
 
@@ -621,7 +791,6 @@ export class OpedidoproductoComponent implements OnInit {
         if(productoExt.Id === this.ArrayProducto[index].Id) { //Verifico si campo y form en posicion ID son iguales
           Swal.fire('Evite cargar datos duplicados a la tabla. Verifique!');
           console.log('Estan repetidos ' + productoExt.Id + ' - ' +  this.ArrayProducto[index].Id);
-          console.log(index)
           break;
         } else {
 
@@ -629,9 +798,6 @@ export class OpedidoproductoComponent implements OnInit {
           this.ArrayProducto.push(productoExt);
 
           productoExt = []; //Vaciar lo que viene del formulario.
-          this.LimpiarCampos();
-          console.log(productoExt);
-          console.log(index)
           break;
         }
       }
@@ -725,7 +891,7 @@ export class OpedidoproductoComponent implements OnInit {
   obtenerEmpresa(){
     this.SrvEmpresa.srvObtenerLista().subscribe((dataEmpresa) => {
       for (let index = 0; index < dataEmpresa.length; index++) {
-        this.EmpresaVendedora = dataEmpresa[1].empresa_Id;
+        this.EmpresaVendedora = dataEmpresa[0].empresa_Id;
         break
         //this.EmpresaVendedora = dataEmpresa[1].empresa_Nombre;
       }
@@ -788,6 +954,7 @@ export class OpedidoproductoComponent implements OnInit {
     })
   }
 
+  // Función para limpiar la tabla en la que se muestran los productos del pedido
   LimpiarTablaTotal(){
     this.ArrayProducto = [];
     this.valorTotal = []
@@ -1013,7 +1180,7 @@ export class OpedidoproductoComponent implements OnInit {
                             if (datos_estados[j].estado_Id == datos_pedidos.estado_Id) {
                               this.usuarioService.srvObtenerListaPorId(datos_pedidos.usua_Id).subscribe(datos_usuarios => {                                
                                 this.sedesClientesService.srvObtenerListaPorId(datos_pedidos.sedeCli_Id).subscribe(datos_sedes => {
-                                  this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
+                                  this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {console.log(id)
                                     for (let k = 0; k < this.productosPedidos.length; k++) {
                                       const pdfDefinicion : any = {
                                         info: {
@@ -1166,7 +1333,7 @@ export class OpedidoproductoComponent implements OnInit {
                             Stock : datos_existencias[e].exProd_Cantidad,
                             SubTotal : datos_pedidos_productos[index].pedExtProd_Cantidad * datos_existencias[e].exProd_Precio,
                           }
-                          this.productosPedidos.push(producto);                        
+                          this.productosPedidos.push(producto);
                         });
                       }
                     }
@@ -1181,6 +1348,7 @@ export class OpedidoproductoComponent implements OnInit {
     this.llenarPDFConBD(formulario);
   }
 
+  // Función para quitar un producto de la tabla
   QuitarProductoTabla(index : number) {
 
     Swal.fire({
@@ -1198,6 +1366,7 @@ export class OpedidoproductoComponent implements OnInit {
     });
   }
 
+  // Función para editar uno de los productos de la tabla
   EditarProductoTabla(formulario : any) {
     this.Ide = formulario.Id;
     this.AccionBoton = "Editar";
@@ -1268,12 +1437,24 @@ export class OpedidoproductoComponent implements OnInit {
   llenarSedeCliente(id : number, ciudadSede : any, codigoPostal : number, direccionSede : any, sedeCLiID :any){
     
     this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-      let sedeID = [];
+      let sedes_id = [];
+      let nuevoID : any;
       for (let index = 0; index < datos_sedes.length; index++) {
-        sedeID.push(datos_sedes[index].sedeCli_Id);        
+        if (datos_sedes[index].cli_Id == sedeCLiID) {
+          sedes_id.push(datos_sedes[index].sedeCli_Id);
+        }
       }
-      console.log(sedeID)
-      let nuevoID = `${id}_`;
+
+      if (sedes_id.length == 0) {
+        
+        nuevoID = id +""+ 1;
+        console.log(nuevoID);
+      } else {
+        console.log(sedes_id);
+        let ultimoId = Math.max.apply(null, sedes_id);
+        nuevoID = ultimoId + 1;
+        console.log(nuevoID);
+      }
 
       const datosSedes : any = {
         sedeCli_Id: nuevoID,
@@ -1311,20 +1492,14 @@ export class OpedidoproductoComponent implements OnInit {
             Prod_Ancho: ancho,
             Prod_Calibre: calibre,
             UndMedACF: undMed,
-            Estado_Id: 9
+            Estado_Id: 9,
+            Prod_Largo: 0,
           };
-
-          this.productosServices.srvObtenerLista().subscribe(datos_productos => {
-            for (let index = 0; index < datos_productos.length; index++) {
-              if (datos_productos[index].prod_Id != id) {
-                // Productos
-                this.productosServices.srvGuardar(datosProductos).subscribe(datos => {
-                  Swal.fire('Producto guardado con éxito!');
-                }, error => { console.log("Error de conexión")});
-                break;
-              }
-            }
-          });
+          
+          console.log(datosProductos)
+          this.productosServices.srvGuardar(datosProductos).subscribe(datos => {
+            Swal.fire('Producto guardado con éxito!');
+          }, error => {console.log(error)});
           break;
         }
       }
@@ -1344,6 +1519,8 @@ export class OpedidoproductoComponent implements OnInit {
         ExProd_PrecioTotalFinal: precioFinal,
         TpMoneda_Id: moneda,
       }
+
+      console.log(datosExistencias)
       this.existenciasProductosServices.srvGuardar(datosExistencias).subscribe(datos_existencias => {
         console.log('Existencias guardada con éxito!');
       }, error => { console.log(error)});
@@ -1353,7 +1530,6 @@ export class OpedidoproductoComponent implements OnInit {
   actualizarProducto(){
     Swal.fire({
       title: '¿Está seguro de actualizar este producto?',
-      text: "You won't be able to revert this!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -1361,39 +1537,69 @@ export class OpedidoproductoComponent implements OnInit {
       confirmButtonText: 'Si, actualizar!'
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire('Producto actualizado');
-        let id : number = this.FormPedidoExternoProductos.value.Prod_Id;
+        let id : number = this.FormPedidoExternoProductos.value.ProdId;
+        let tipo_Id : number;
 
-        const datosProducto = {
-          Prod_Nombre: this.FormPedidoExternoProductos.value.Prod_Nombre,
-          Prod_Descripcion: this.FormPedidoExternoProductos.value,
-          TpProd_Id: this.FormPedidoExternoProductos.value,
-          UndMedPeso: this.FormPedidoExternoProductos.value,
-          Prod_Fuelle: this.FormPedidoExternoProductos.value,
-          Prod_Ancho: this.FormPedidoExternoProductos.value,
-          Prod_Calibre: this.FormPedidoExternoProductos.value,
-          UndMedACF: this.FormPedidoExternoProductos.value,
-          Estado_Id: 10
-        }
+        let codigo : number;
+        let CodigosProductos = [];
+        this.tiposProductosService.srvObtenerLista().subscribe(datos_tipos => {
+          for (let index = 0; index < datos_tipos.length; index++) {
+            if (datos_tipos[index].tpProd_Nombre == this.FormPedidoExternoProductos.value.ProdTipo) {
+              tipo_Id = datos_tipos[index].tpProd_Id
+            }            
+          }
+        });
+        
+        this.productosServices.srvObtenerLista().subscribe(datos_productos => {
+          this.existenciasProductosServices.srvObtenerLista().subscribe(datos_existencias => {
+            for (let i = 0; i < datos_existencias.length; i++) {
+              if (datos_existencias[i].prod_Id == id) {
+      
+                const datosProducto = {
+                  Prod_Id : id,
+                  Prod_Nombre: this.FormPedidoExternoProductos.value.ProdNombre,
+                  Prod_Descripcion: this.FormPedidoExternoProductos.value.ProdDescripcion,
+                  TpProd_Id: tipo_Id,
+                  Prod_Peso_Bruto: 0,
+                  Prod_Peso_Neto: 0,
+                  UndMedPeso: this.FormPedidoExternoProductos.value.ProdUnidadMedidaACF,
+                  Prod_Fuelle: this.FormPedidoExternoProductos.value.ProdFuelle,
+                  Prod_Ancho: this.FormPedidoExternoProductos.value.ProdAncho,
+                  Prod_Calibre: this.FormPedidoExternoProductos.value.ProdCalibre,
+                  UndMedACF: this.FormPedidoExternoProductos.value.ProdUnidadMedidaACF,
+                  Estado_Id: 10
+                }      
+        
+                const datosExistencias = {
+                  Prod_Id: id,
+                  exProd_Id: datos_existencias[i].exProd_Id,
+                  ExProd_Cantidad: this.FormPedidoExternoProductos.value.ProdStock,
+                  UndMed_Id: this.FormPedidoExternoProductos.value.ProdUnidadMedidaACF,
+                  TpBod_Id: datos_existencias[i].tpBod_Id,
+                  ExProd_Precio: this.FormPedidoExternoProductos.value.ProdPrecioUnd,
+                  ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
+                  ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
+                  ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
+                  TpMoneda_Id: this.FormPedidoExternoProductos.value.ProdTipoMoneda,
+                }
 
-        const datosExistencias : any = {
-          UndMed_Id: this.FormPedidoExternoProductos.value.ProdUnidadMedidaACF,
-          ExProd_Precio: this.FormPedidoExternoProductos.value.ProdPrecioUnd,
-          TpMoneda_Id: this.FormPedidoExternoProductos.value.ProdTipoMoneda,
-        }
-
-        this.productosServices.srvActualizar(id, datosProducto).subscribe(datos_productos => {
-          console.log(datos_productos);
-          this.existenciasProductosServices.srvActualizar(id, datosExistencias).subscribe(datos_existencias => {
-            Swal.fire("¡Producto actualizado con exito!");
-            console.log(datos_existencias);
+                this.productosServices.srvActualizar(id, datosProducto).subscribe(datos_productos => {
+                  this.existenciasProductosServices.srvActualizar(datos_existencias[i].exProd_Id, datosExistencias).subscribe(datos_existencias => {      
+                    Swal.fire("¡Producto actualizado con exito!");              
+                  }, error => {console.log(error)});
+                });
+                break;
+              }
+            }
           });
-        }); 
+        });
       }
-    })
+    });
+    
   }
 
-  EditarPedido(formulario : any) {
+  // Funcion para editar un pedido
+  MostrarPedido(formulario : any) {
     this.Ide = formulario.pedExt_Id;
     this.AccionBoton = "Editar";
     this.ArrayProducto = [];
@@ -1435,9 +1641,9 @@ export class OpedidoproductoComponent implements OnInit {
                                         let precio = datos_existencias[e].exProd_Precio;
                                         let moneda = datos_existencias[e].tpMoneda_Id;
                                         let descripcion = datos_productos[i].prod_Descripcion
-                                        this.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, undMed, tpProduct, cantidad, undMed2, precio, moneda, descripcion)
+                                        this.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, undMed, tpProduct, cantidad, undMed2, precio, moneda, descripcion);
                                       });
-                                    });
+                                  });
                                 });
                               });
                             }
@@ -1450,6 +1656,105 @@ export class OpedidoproductoComponent implements OnInit {
               }
             });
           }
+        }
+      });
+    });
+  }
+
+  // Función para editar uno de los pedidos
+  editarPedido() {
+    this.Ide;
+    this.AccionBoton = "Editar";
+    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+      this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+        for (let i = 0; i < datos_usuarios.length; i++) {
+          if (datos_usuarios[i].usua_Nombre == this.FormPedidoExternoClientes.value.PedUsuarioNombre) {
+            
+            let pedidosID = [];
+            let idProducto : any;
+            let cantidadProducto : any;
+            let unidadMedida : any;
+            let campoEstado = this.FormPedidoExternoClientes.get('PedEstadoId')?.value
+            let idEstado : number;
+
+            this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+              for (let index = 0; index < datos_estado.length; index++) {
+                if (datos_estado[index].estado_Nombre == campoEstado) {
+                  idEstado = datos_estado[index].estado_Id;
+                  break;
+                }          
+              }
+
+              for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                pedidosID.push(datos_pedidos[ped].pedExt_Id);        
+              }
+  
+              let ultimoId = Math.max.apply(null, pedidosID);
+              let idPedido;
+        
+              const camposPedido : any = {
+                PedExt_Id : this.Ide,
+                PedExt_Codigo : this.contadorPedidosExternos,
+                PedExt_FechaCreacion:  this.FormPedidoExternoClientes.get('PedFecha')?.value,
+                PedExt_FechaEntrega: this.FormPedidoExternoClientes.get('PedFechaEnt')?.value,
+                Empresa_Id: this.EmpresaVendedora,
+                SedeCli_Id: this.IDSedeSeleccionada,
+                Estado_Id: idEstado,
+                Usua_Id: datos_usuarios[i].usua_Id,
+                PedExt_Observacion: this.FormPedidoExternoClientes.get('PedObservacion')?.value,
+                PedExt_PrecioTotal: this.valorTotal,
+                PedExt_Archivo: this.datosPDF
+              }
+  
+              if(!this.ArrayProducto.length) Swal.fire('Debe cargar al menos un producto en la tabla.');
+              else if (camposPedido.PedExt_FechaEntrega <= camposPedido.PedExt_FechaCreacion) Swal.fire('La fecha de creación no puede ser menor o igual a la fecha de entrega.');
+              else{
+                this.pedidoproductoService.srvActualizarPedidosProdusctos(this.Ide, camposPedido).subscribe(datos_pedido_Actualizado => {
+        
+                  for (let index = 0; index < this.ArrayProducto.length; index++) {
+                    idProducto = this.ArrayProducto[index].Id;
+                    cantidadProducto = this.ArrayProducto[index].Cant;
+                    unidadMedida = this.ArrayProducto[index].UndCant;
+        
+                    const productosPerdidos : any = {
+                      Prod_Id: idProducto,
+                      PedExt_Id: idPedido,
+                      PedExtProd_Cantidad : cantidadProducto,
+                      UndMed_Id : unidadMedida,
+                    }
+                    let idPedidoProductos : any = (idProducto +""+ this.Ide);
+                    console.log(idPedidoProductos)
+                    this.PedidoProductosService.srvObtenerListaPorId(this.Ide).subscribe(datos_pedido_Actualizado => {
+                      console.log(datos_pedido_Actualizado)
+                    }, error => {console.log(error); });
+                    this.PedidoProductosService.srvActualizar(this.Ide, productosPerdidos).subscribe(datos_pedido_Actualizado => {
+                    }, error => {console.log(error); });
+                  }
+                  const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                      toast.addEventListener('mouseenter', Swal.stopTimer)
+                      toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                  })
+                  
+                  Toast.fire({
+                    icon: 'success',
+                    title: 'Pedido actualizado satisfactoriamente'
+                  })
+        
+                  this.crearpdf();
+                  setTimeout(() => {
+                    this.LimpiarCampos();
+                  }, 1000);
+                }, error => { console.log(error); });
+              }
+            });
+          }          
         }
       });
     });

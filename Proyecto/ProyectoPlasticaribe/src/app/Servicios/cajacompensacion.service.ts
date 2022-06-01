@@ -17,23 +17,23 @@ export class CajacompensacionService {
   
 //Metodo buscar lista de Cajacompensacion
   srvObtenerLista():Observable<any[]> {
-      return this.http.get<any>(this.rutaPlasticaribeAPI + '/Cajacompensacion')
+      return this.http.get<any>(this.rutaPlasticaribeAPI + '/cajaCompensacions')
   }
 //Metodo agregar Cajacompensacion
   srvAgregar(data:any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/Cajacompensacion', data)
+    return this.http.post(this.rutaPlasticaribeAPI + '/cajaCompensacions', data)
   }
 //Metodo actualzar Cajacompensacion
   srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Cajacompensacion/${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/cajaCompensacions/${id}`, data);
   }
 //Metodo eliminar Cajacompensacion
   srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Cajacompensacion/${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/cajaCompensacions/${id}`);
   }
 
   srvGuardar(data: modelCajacompensacion): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/Cajacompensacion', data)
+   return this.http.post(this.rutaPlasticaribeAPI + '/cajaCompensacions', data)
   }
 
 }

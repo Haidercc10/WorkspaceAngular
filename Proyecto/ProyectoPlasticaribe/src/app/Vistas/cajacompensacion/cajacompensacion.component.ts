@@ -45,14 +45,14 @@ export class CajacompensacionComponent implements OnInit {
 
   agregar(){
     const campoCajaCompensacion : modelCajacompensacion = {
-      cajComp_Codigo: this.formularioCajacompensacion.get('Codigo')?.value,
       cajComp_Id : this.formularioCajacompensacion.get('Identificacion')?.value,
       cajComp_Nombre: this.formularioCajacompensacion.get('Nombre')?.value,
       cajComp_Email: this.formularioCajacompensacion.get('Email')?.value,
       cajComp_Telefono: this.formularioCajacompensacion.get('Telefono')?.value,
       cajComp_CuentaBancaria: this.formularioCajacompensacion.get('CuentaBancaria')?.value,
       cajComp_Direccion: this.formularioCajacompensacion.get('Direccion')?.value,
-      cajComp_Ciudad: this.formularioCajacompensacion.get('Ciudad')?.value
+      cajComp_Ciudad: this.formularioCajacompensacion.get('Ciudad')?.value,
+      TipoIdentificacion_Id: '',
     }
 
     this.cajComService.srvGuardar(campoCajaCompensacion).subscribe(data=>{

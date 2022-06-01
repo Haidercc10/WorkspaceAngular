@@ -80,7 +80,8 @@ export class ProductoComponent implements OnInit {
       Prod_Ancho: this.formularioProducto.get('AnchoProducto')?.value,
       Prod_Calibre: this.formularioProducto.get('CalibreProducto')?.value,
       UndMedACF: this.formularioProducto.get('ProductoUndFAC')?.value,
-      Estado_Id: this.formularioProducto.get('')?.value
+      Estado_Id: this.formularioProducto.get('')?.value,
+      Prod_Largo: 0,      
     }
 
     this.productoServices.srvGuardar(campo).subscribe(datos_Productos=>{

@@ -1,5 +1,4 @@
 export interface modelCajacompensacion {
-  cajComp_Codigo: number;
   cajComp_Id : number;
   cajComp_Nombre : string;
   cajComp_Email : string;
@@ -7,4 +6,5 @@ export interface modelCajacompensacion {
   cajComp_CuentaBancaria : number;
   cajComp_Direccion: string;
   cajComp_Ciudad: string;
+  TipoIdentificacion_Id: string;
 }
