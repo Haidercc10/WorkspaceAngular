@@ -8,7 +8,7 @@ import { modelCliente } from '../Modelo/modelCliente';
 })
 export class ClientesService {
 
-  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
+  readonly rutaPlasticaribeAPI = "https://192.168.0.153:7137/api";
 
   constructor(private http : HttpClient) { }
 

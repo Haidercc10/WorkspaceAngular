@@ -295,7 +295,7 @@
               <!-- UM Cantidad Producto -->
               <div class="col-md-2">
                 <select formControlName="ProdUnidadMedidaCant" id="PrdUnidadMedidaCant" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdUnidadMedidaCant" required >
-                  <option [ngValue]="null" disabled selected>Seleccione Und. Medida</option>
+                  <option [ngValue]="null" disabled selected>Seleccione Presentación</option>
                   <option [ngValue]="unidadMedida" *ngFor="let unidadMedida of undMed">{{unidadMedida}}</option>
                 </select>
               </div>
@@ -340,7 +340,7 @@
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <button class="btn btn-danger btn-danger-sm" type="submit">{{AccionBoton}} Producto</button>
-              <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarProducto()">{{AccionBoton}} y Actualizar Producto</button>
+              <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarProducto()">Actualizar Producto</button>
               <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
           </div>
         </div>
@@ -431,7 +431,7 @@
         <div class="bajarPagina">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="validarInputsVacios()">Crear Pedido</button>
-              <button class="btn btn-danger btn-danger-sm" type="button" (click)="editarPedido()">{{AccionBoton}} y Actualizar Pedido</button>
+              <button class="btn btn-danger btn-danger-sm" type="button" (click)="editarPedido()">Actualizar Pedido</button>
               <button class=" btn btn-secondary btn-secondary-sm" type="button" (click)="confimacionSalida()">Cancelar</button>
             </div>
         </div>

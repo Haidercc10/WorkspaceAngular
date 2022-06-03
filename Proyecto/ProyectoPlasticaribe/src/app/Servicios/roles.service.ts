@@ -9,7 +9,7 @@ import { modelRol } from '../Modelo/modelRol';
 export class RolesService {
 
   //Ruta del API
-  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
+  readonly rutaPlasticaribeAPI = "https://192.168.0.153:7137/api";
 
   constructor(private http : HttpClient) { }
 
