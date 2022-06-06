@@ -6,8 +6,11 @@
       <p>Plasti<span>caribe S.A.S</span> </p>
     </div>
     <div class="">
-      <p>{{storage_Nombre}} {{storage_Rol}}</p>
+     <p>{{storage_Nombre}} {{storage_Rol}}</p> 
     </div>
+  
+    <a  (click)="confimacionSalida()"><i class="fa fa-fw fa-sign-out"></i>Cerrar Seccion</a>
+ 
   </nav>
 <!-- Navegador fin de parte superior -->
 
@@ -159,7 +162,7 @@
             <div class="col-md">
               <select formControlName="PedClienteNombre" type="text" id="PextClienteId" name="PextClienteId" (change)="ciudadClienteComboBox()" (change)="productoCliente()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
-                <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
+                <option [ngValue]="clientes" *ngFor="let clientes of cliente ">{{clientes}}</option>
               </select>
             </div>
 
@@ -222,7 +225,7 @@
         <!-- Fin Observacion -->
                                                               <!--Fin Crear Pedidos-->
 
-        <!-- Linea -->
+        <!-- Linea --> 
         <div class="mb-4">
           <hr class="Linea">
         </div>
