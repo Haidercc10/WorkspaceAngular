@@ -45,6 +45,7 @@ export class OpedidoproductoComponent implements OnInit {
 
   AccionBoton = "Agregar";
   Ide : number | undefined;
+  id_pedido : number;
 
 
   //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
@@ -136,7 +137,7 @@ export class OpedidoproductoComponent implements OnInit {
                               private tipoClientService : TipoClienteService,
                                   private rolService : RolesService,
                                     @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                    private ClientesProductosService : ClientesProductosService) {
+                                      private ClientesProductosService : ClientesProductosService) {
 
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
       //Instanciar campos que vienen del formulario
@@ -191,6 +192,7 @@ export class OpedidoproductoComponent implements OnInit {
     this.PruebaInsercion();
     this.lecturaStorage();
     this.usuarioComboBox();
+    this.LimpiarCampos();
   }
 
   lecturaStorage(){
@@ -300,7 +302,8 @@ export class OpedidoproductoComponent implements OnInit {
     });
   }
 
-  ciudadClienteComboBox(){
+  ciudadClienteComboBox(){    
+    this.LimpiarCamposProductos();
     this.ciudad = [];
     this.sedeCliente=[];
     let clienteNombreBD: string = this.FormPedidoExternoClientes.value.PedClienteNombre;
@@ -439,22 +442,6 @@ export class OpedidoproductoComponent implements OnInit {
               if (datos_tiposProductos[tpProdu].tpProd_Id == datos_productos[p].tpProd_Id) {
                 this.tipoProducto.push(datos_tiposProductos[tpProdu].tpProd_Nombre);
 
-                this.FormPedidoExternoProductos.setValue({
-                  ProdId: `${datos_productos[p].prod_Id}`,
-                  ProdNombre: `${this.FormPedidoExternoProductos.value.ProdNombre}`,
-                  ProdAncho: `${datos_productos[p].prod_Ancho}`,
-                  ProdFuelle: `${datos_productos[p].prod_Fuelle}`,
-                  ProdCalibre: `${datos_productos[p].prod_Calibre}`,
-                  ProdUnidadMedidaACF: `${datos_productos[p].undMedACF}`,
-                  ProdTipo: `${datos_tiposProductos[tpProdu].tpProd_Nombre}`,
-                  ProdCantidad: `${this.FormPedidoExternoProductos.value.ProdCantidad}`,
-                  ProdUnidadMedidaCant: `${this.FormPedidoExternoProductos.value.ProdUnidadMedidaCant}`,
-                  ProdPrecioUnd: ``,
-                  ProdTipoMoneda: ``,
-                  ProdStock: ``,
-                  ProdDescripcion: `${datos_productos[p].prod_Descripcion}`,
-                });
-
                 // Existencias
                 this.existenciasProductosServices.srvObtenerLista().subscribe(datos_existencias => {
                   for (let e = 0; e < datos_existencias.length; e++) {
@@ -468,35 +455,22 @@ export class OpedidoproductoComponent implements OnInit {
                           if (datos_existencias[e].tpMoneda_Id == datos_tiposMoneda[index].tpMoneda_Id) {
                             this.tipoMoneda.push(datos_tiposMoneda[index].tpMoneda_Id);
 
-                            this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadMedida => {
-                              for (let und = 0; und < datos_unidadMedida.length; und++) {
-                                if (datos_productos[p].undMedACF == datos_unidadMedida[und].undMed_Id) {
-                                  this.undMed.push(datos_unidadMedida[und].undMed_Id);
-
-                                  // Llenado de formulario
-                                  this.FormPedidoExternoProductos.setValue({
-                                    ProdId: `${datos_productos[p].prod_Id}`,
-                                    ProdNombre: `${this.FormPedidoExternoProductos.value.ProdNombre}`,
-                                    ProdAncho: `${datos_productos[p].prod_Ancho}`,
-                                    ProdFuelle: `${datos_productos[p].prod_Fuelle}`,
-                                    ProdCalibre: `${datos_productos[p].prod_Calibre}`,
-                                    ProdUnidadMedidaACF: `${datos_productos[p].undMedACF}`,
-                                    ProdTipo: `${datos_tiposProductos[tpProdu].tpProd_Nombre}`,
-                                    ProdCantidad: `${this.FormPedidoExternoProductos.value.ProdCantidad}`,
-                                    ProdUnidadMedidaCant: `${this.FormPedidoExternoProductos.value.ProdUnidadMedidaCant}`,
-                                    ProdPrecioUnd: `${datos_existencias[e].exProd_Precio}`,
-                                    ProdTipoMoneda: `${datos_tiposMoneda[index].tpMoneda_Id}`,
-                                    ProdStock: `${datos_existencias[e].exProd_Cantidad}`,
-                                    ProdDescripcion: `${datos_productos[p].prod_Descripcion}`,
-                                  });
-                                  break;
-                                }else {
-                                  this.undMed = [];
-                                  
-                                }
-                              }
+                            // Llenado de formulario
+                            this.FormPedidoExternoProductos.setValue({
+                              ProdId: `${datos_productos[p].prod_Id}`,
+                              ProdNombre: `${this.FormPedidoExternoProductos.value.ProdNombre}`,
+                              ProdAncho: `${datos_productos[p].prod_Ancho}`,
+                              ProdFuelle: `${datos_productos[p].prod_Fuelle}`,
+                              ProdCalibre: `${datos_productos[p].prod_Calibre}`,
+                              ProdUnidadMedidaACF: `${datos_productos[p].undMedACF}`,
+                              ProdTipo: `${datos_tiposProductos[tpProdu].tpProd_Nombre}`,
+                              ProdCantidad: `${this.FormPedidoExternoProductos.value.ProdCantidad}`,
+                              ProdUnidadMedidaCant: `${this.FormPedidoExternoProductos.value.ProdUnidadMedidaCant}`,
+                              ProdPrecioUnd: `${datos_existencias[e].exProd_Precio}`,
+                              ProdTipoMoneda: `${datos_tiposMoneda[index].tpMoneda_Id}`,
+                              ProdStock: `${datos_existencias[e].exProd_Cantidad}`,
+                              ProdDescripcion: `${datos_productos[p].prod_Descripcion}`,
                             });
-                            continue;
                           }else{
                             this.tipoMoneda = [];
                             this.tipoMonedaComboBox();
@@ -1115,7 +1089,6 @@ export class OpedidoproductoComponent implements OnInit {
                     }
                     const pdf = pdfMake.createPdf(pdfDefinicion);
                     pdf.open();
-                    console.log(pdf);
                     break;
                   }            
                 }
@@ -1600,71 +1573,86 @@ export class OpedidoproductoComponent implements OnInit {
 
   // Funcion para editar un pedido
   MostrarPedido(formulario : any) {
-    this.Ide = formulario.pedExt_Id;
-    this.AccionBoton = "Editar";
-    this.ArrayProducto = [];
-    this.pedidoproductoService.srvObtenerListaPorId(this.Ide).subscribe(datos_pedidos => {
-      this.PedidoProductosService.srvObtenerLista().subscribe(datos_pedidos_productos => {
-        for (let index = 0; index < datos_pedidos_productos.length; index++) {
-          if (datos_pedidos.pedExt_Id == datos_pedidos_productos[index].pedExt_Id) {
-            this.productosServices.srvObtenerLista().subscribe(datos_productos => {
-              for (let i = 0; i < datos_productos.length; i++) {
-                if (datos_productos[i].prod_Id == datos_pedidos_productos[index].prod_Id) {
-                  this.existenciasProductosServices.srvObtenerLista().subscribe(datos_existencias => {
-                    for (let e = 0; e < datos_existencias.length; e++) {
-                      if (datos_productos[i].prod_Id == datos_existencias[e].prod_Id) {
-                        this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
-                          for (let j = 0; j < datos_estados.length; j++) {
-                            if (datos_estados[j].estado_Id == datos_pedidos.estado_Id) {
-                              this.usuarioService.srvObtenerListaPorId(datos_pedidos.usua_Id).subscribe(datos_usuarios => {                                
-                                this.sedesClientesService.srvObtenerListaPorId(datos_pedidos.sedeCli_Id).subscribe(datos_sedes => {
-                                  this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
-                                      this.FormPedidoExternoClientes.patchValue({
-                                        PedClienteNombre: datos_clientes.cli_Nombre,
-                                        PedSedeCli_Id: datos_sedes.sedeCliente_Direccion,                                        
-                                        PedUsuarioNombre: datos_usuarios.usua_Nombre,
-                                        PedFecha: formulario.pedExt_FechaCreacion.split("T"),
-                                        PedFechaEnt: formulario.pedExt_FechaEntrega,
-                                        PedEstadoId: datos_estados[j].estado_Nombre,
-                                        PedObservacion: datos_pedidos.pedExt_Observacion,
+
+    Swal.fire({
+      title: '¿Está seguro de editar este pedido?',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Si, editar pedido',
+      denyButtonText: `No, no editar`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        this.id_pedido = formulario.pedExt_Id;
+        this.ArrayProducto = [];
+        this.pedidoproductoService.srvObtenerListaPorId(this.id_pedido).subscribe(datos_pedidos => {
+          this.PedidoProductosService.srvObtenerLista().subscribe(datos_pedidos_productos => {
+            for (let index = 0; index < datos_pedidos_productos.length; index++) {
+              if (datos_pedidos.pedExt_Id == datos_pedidos_productos[index].pedExt_Id) {
+                this.productosServices.srvObtenerLista().subscribe(datos_productos => {
+                  for (let i = 0; i < datos_productos.length; i++) {
+                    if (datos_productos[i].prod_Id == datos_pedidos_productos[index].prod_Id) {
+                      this.existenciasProductosServices.srvObtenerLista().subscribe(datos_existencias => {
+                        for (let e = 0; e < datos_existencias.length; e++) {
+                          if (datos_productos[i].prod_Id == datos_existencias[e].prod_Id) {
+                            this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
+                              for (let j = 0; j < datos_estados.length; j++) {
+                                if (datos_estados[j].estado_Id == datos_pedidos.estado_Id) {
+                                  this.usuarioService.srvObtenerListaPorId(datos_pedidos.usua_Id).subscribe(datos_usuarios => {                                
+                                    this.sedesClientesService.srvObtenerListaPorId(datos_pedidos.sedeCli_Id).subscribe(datos_sedes => {
+                                      this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
+                                          this.FormPedidoExternoClientes.patchValue({
+                                            PedClienteNombre: datos_clientes.cli_Nombre,
+                                            PedSedeCli_Id: datos_sedes.sedeCliente_Direccion,                                        
+                                            PedUsuarioNombre: datos_usuarios.usua_Nombre,
+                                            PedFecha: formulario.pedExt_FechaCreacion.split("T"),
+                                            PedFechaEnt: formulario.pedExt_FechaEntrega,
+                                            PedEstadoId: datos_estados[j].estado_Nombre,
+                                            PedObservacion: datos_pedidos.pedExt_Observacion,
+                                          });
+                                          this.tiposProductosService.srvObtenerListaPorId(datos_productos[i].tpProd_Id).subscribe(datos_tipo_producto => {
+                                            let id = datos_productos[i].prod_Id;
+                                            let nombre = datos_productos[i].prod_Nombre;
+                                            let ancho = datos_productos[i].prod_Ancho;
+                                            let fuelle = datos_productos[i].prod_Fuelle;
+                                            let calibre = datos_productos[i].prod_Calibre;
+                                            let undMed = datos_productos[i].undMedACF;
+                                            let tpProduct = datos_tipo_producto.tpProd_Nombre;
+                                            let cantidad = datos_pedidos_productos[index].pedExtProd_Cantidad;
+                                            let undMed2 = datos_pedidos_productos[index].undMed_Id;
+                                            let precio = datos_existencias[e].exProd_Precio;
+                                            let moneda = datos_existencias[e].tpMoneda_Id;
+                                            let descripcion = datos_productos[i].prod_Descripcion
+                                            this.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, undMed, tpProduct, cantidad, undMed2, precio, moneda, descripcion);
+                                          });
                                       });
-                                      this.tiposProductosService.srvObtenerListaPorId(datos_productos[i].tpProd_Id).subscribe(datos_tipo_producto => {
-                                        let id = datos_productos[i].prod_Id;
-                                        let nombre = datos_productos[i].prod_Nombre;
-                                        let ancho = datos_productos[i].prod_Ancho;
-                                        let fuelle = datos_productos[i].prod_Fuelle;
-                                        let calibre = datos_productos[i].prod_Calibre;
-                                        let undMed = datos_productos[i].undMedACF;
-                                        let tpProduct = datos_tipo_producto.tpProd_Nombre;
-                                        let cantidad = datos_pedidos_productos[index].pedExtProd_Cantidad;
-                                        let undMed2 = datos_pedidos_productos[index].undMed_Id;
-                                        let precio = datos_existencias[e].exProd_Precio;
-                                        let moneda = datos_existencias[e].tpMoneda_Id;
-                                        let descripcion = datos_productos[i].prod_Descripcion
-                                        this.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, undMed, tpProduct, cantidad, undMed2, precio, moneda, descripcion);
-                                      });
+                                    });
                                   });
-                                });
-                              });
-                            }
+                                }
+                              }
+                            });
                           }
-                        });
-                      }
+                        }
+                      });
                     }
-                  });
-                }
+                  }
+                });
               }
-            });
-          }
-        }
-      });
-    });
+            }
+          });
+        });
+      } else if (result.isDenied) {
+        
+      }
+    })
+
+    
   }
 
   // Función para editar uno de los pedidos
   editarPedido() {
-    this.Ide;
-    this.AccionBoton = "Editar";
+   
+    this.id_pedido;
     this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
       this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
         for (let i = 0; i < datos_usuarios.length; i++) {
@@ -1684,16 +1672,9 @@ export class OpedidoproductoComponent implements OnInit {
                   break;
                 }          
               }
-
-              for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                pedidosID.push(datos_pedidos[ped].pedExt_Id);        
-              }
-  
-              let ultimoId = Math.max.apply(null, pedidosID);
-              let idPedido;
         
               const camposPedido : any = {
-                PedExt_Id : this.Ide,
+                PedExt_Id : this.id_pedido,
                 PedExt_Codigo : this.contadorPedidosExternos,
                 PedExt_FechaCreacion:  this.FormPedidoExternoClientes.get('PedFecha')?.value,
                 PedExt_FechaEntrega: this.FormPedidoExternoClientes.get('PedFechaEnt')?.value,
@@ -1709,7 +1690,7 @@ export class OpedidoproductoComponent implements OnInit {
               if(!this.ArrayProducto.length) Swal.fire('Debe cargar al menos un producto en la tabla.');
               else if (camposPedido.PedExt_FechaEntrega <= camposPedido.PedExt_FechaCreacion) Swal.fire('La fecha de creación no puede ser menor o igual a la fecha de entrega.');
               else{
-                this.pedidoproductoService.srvActualizarPedidosProdusctos(this.Ide, camposPedido).subscribe(datos_pedido_Actualizado => {
+                this.pedidoproductoService.srvActualizarPedidosProdusctos(this.id_pedido, camposPedido).subscribe(datos_pedido_Actualizado => {
         
                   for (let index = 0; index < this.ArrayProducto.length; index++) {
                     idProducto = this.ArrayProducto[index].Id;
@@ -1718,16 +1699,16 @@ export class OpedidoproductoComponent implements OnInit {
         
                     const productosPerdidos : any = {
                       Prod_Id: idProducto,
-                      PedExt_Id: idPedido,
+                      PedExt_Id: this.id_pedido,
                       PedExtProd_Cantidad : cantidadProducto,
                       UndMed_Id : unidadMedida,
                     }
-                    let idPedidoProductos : any = (idProducto +""+ this.Ide);
-                    console.log(idPedidoProductos)
-                    this.PedidoProductosService.srvObtenerListaPorId(this.Ide).subscribe(datos_pedido_Actualizado => {
-                      console.log(datos_pedido_Actualizado)
-                    }, error => {console.log(error); });
-                    this.PedidoProductosService.srvActualizar(this.Ide, productosPerdidos).subscribe(datos_pedido_Actualizado => {
+
+                    this.PedidoProductosService.srvObtenerListaPorId(idProducto, this.id_pedido).subscribe(datos_pedidoProductos => {
+                      console.log(datos_pedidoProductos);
+                    })
+
+                    this.PedidoProductosService.srvActualizar(idProducto, this.id_pedido, productosPerdidos).subscribe(datos_pedido_Actualizado => {
                     }, error => {console.log(error); });
                   }
                   const Toast = Swal.mixin({
