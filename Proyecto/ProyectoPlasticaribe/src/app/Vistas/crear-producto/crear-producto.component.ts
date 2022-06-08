@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ProductoService } from 'src/app/Servicios/producto.service';
 import { SrvModalCrearProductosService } from 'src/app/Servicios/srv-modal-crear-productos.service';
@@ -8,6 +8,10 @@ import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 import Swal from 'sweetalert2';
 import {OpedidoproductoComponent} from 'src/app/Vistas/opedidoproducto/opedidoproducto.component'
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
+import { ClientesService } from 'src/app/Servicios/clientes.service';
+import { UsuarioService } from 'src/app/Servicios/usuario.service';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { RolesService } from 'src/app/Servicios/roles.service';
 
 @Component({
   selector: 'app-crear-producto',
@@ -23,6 +27,11 @@ export class CrearProductoComponent implements OnInit {
   tipoMoneda = [];
   producto = [];
   pedidosID = [];
+  cliente = [];
+  clienteDatos = [];
+  storage_Id : number;
+  storage_Nombre : any;
+  storage_Rol : any;
 
   constructor(private frmBuilderCrearProducto : FormBuilder,  
                 private unidadMedidaService : UnidadMedidaService,
@@ -30,7 +39,11 @@ export class CrearProductoComponent implements OnInit {
                     private tipoMonedaService : TipoMonedaService,
                       private productoService : ProductoService,
                         private pedidosProducto : OpedidoproductoComponent,
-                         private existenciasService : ExistenciasProductosService) {
+                         private existenciasService : ExistenciasProductosService, 
+                          private clientesService : ClientesService,
+                            private usuarioService : UsuarioService,
+                              @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                                private rolService : RolesService) {
 
     this.FormCrearProducto = this.frmBuilderCrearProducto.group({
 
@@ -46,7 +59,8 @@ export class CrearProductoComponent implements OnInit {
       ProduUnidadMedidaCant: new FormControl(),
       ProduPrecioUnd: new FormControl(),
       ProduTipoMoneda: new FormControl(),
-      ProdDescripcion: new FormControl()
+      ProdDescripcion: new FormControl(),
+      ClienteNombre: new FormControl(),
     })
 
   }
@@ -56,6 +70,8 @@ export class CrearProductoComponent implements OnInit {
     this.undMedidaComboBox();
     this.tipoProductoComboBox();
     this.tipoMondedaComboBox();
+    this.lecturaStorage();
+    this.clientesComboBox();
   }
 
   initFormsCrearProducto() {
@@ -74,7 +90,21 @@ export class CrearProductoComponent implements OnInit {
        ProduPrecioUnd: ['', Validators.required],
        ProduTipoMoneda: ['', Validators.required],
        ProdDescripcion: ['',],
+       ClienteNombre: ['', Validators.required],
      })
+  }
+
+  lecturaStorage(){
+    this.storage_Id = this.storage.get('Id');
+    this.storage_Nombre = this.storage.get('Nombre');
+    let rol = this.storage.get('Rol');
+    this.rolService.srvObtenerLista().subscribe(datos_roles => {
+      for (let index = 0; index < datos_roles.length; index++) {
+        if (datos_roles[index].rolUsu_Id == rol) {
+          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
+        }        
+      }      
+    });
   }
 
   validarCamposVacios() : any{
@@ -90,6 +120,27 @@ export class CrearProductoComponent implements OnInit {
 
   LimpiarCampos() {
   this.FormCrearProducto.reset();
+  }
+
+  clientesComboBox() {
+    this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
+      this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
+        for (let index = 0; index < datos_clientes.length; index++) {
+          if (datos_clientes[index].estado_Id == 1) {
+            if (datos_usuarios.rolUsu_Id == 2) {
+              if (datos_clientes[index].usua_Id == datos_usuarios.usua_Id) {
+                this.cliente.push(datos_clientes[index].cli_Nombre);
+                this.clienteDatos.push(datos_clientes[index]);
+                continue;
+              }
+            }else {
+              this.cliente.push(datos_clientes[index].cli_Nombre);
+              this.clienteDatos.push(datos_clientes[index]);
+            }            
+          }
+        }
+      });
+    });
   }
 
   undMedidaComboBox() {
@@ -130,9 +181,10 @@ export class CrearProductoComponent implements OnInit {
     let precioFinal : string = this.FormCrearProducto.value.ProduPrecioUnd;
     let moneda : any = this.FormCrearProducto.value.ProduTipoMoneda;
     let descripcion : any = this.FormCrearProducto.value.ProdDescripcion;
+    let cliente : any = this.FormCrearProducto.value.ClienteNombre;
    
     this.pedidosProducto.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, undMed, tpProducto, cantidad, undMed2, precio, moneda, descripcion);
-    this.pedidosProducto.registrarProducto(id, nombre, ancho, fuelle, calibre, undMed, tpProducto, descripcion);
+    this.pedidosProducto.registrarProducto(id, nombre, ancho, fuelle, calibre, undMed, tpProducto, descripcion, cliente);
     setTimeout(() => {
       this.pedidosProducto.registrarExistenciaProducto(id, cantidad, undMed2, precio, precioFinal, moneda);
     }, 3000);    

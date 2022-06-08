@@ -126,8 +126,8 @@
                   <!--Carga los productos en la tabla y pagina por 2-->
                   <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" >
                     <td id="idPedido">{{item.pedExt_Id}}</td>
-                    <td id="fechaPedido">{{item.pedExt_FechaCreacion}}</td>
-                    <td id="fechaEntrega">{{item.pedExt_FechaEntrega}}</td>
+                    <td id="fechaPedido">{{fechaCreacionCortada[i]}}</td>
+                    <td id="fechaEntrega">{{fechaEntregaCortada[i]}}</td>
                     <td id="sede">{{item.sedeCli_Id}}</td>
                     <td id="Vendedor">{{item.usua_Id}}</td>
                     <td id="estadoPedido">{{item.estado_Id}}</td>
@@ -177,7 +177,7 @@
             <!-- Sede Cliente -->
             <div class="col-md">
               <select formControlName="PedSedeCli_Id" type="text" id="PSedeCli_Id" name="PSedeCli_Id" (change)="captarSedeSeleccionada()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="null" disabled selected>Seleccione Sede Cliente</option>
+                <option [ngValue]="null" disabled selected>Seleccione Direccion</option>
                 <option [ngValue]="sedesclientes" *ngFor="let sedesclientes of sedeCliente">{{sedesclientes}}</option>
               </select>
             </div>
@@ -342,7 +342,7 @@
         <!-- Inicio botones -->
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class="btn btn-danger btn-danger-sm" type="submit">{{AccionBoton}} Producto</button>
+              <button class="btn btn-danger btn-danger-sm" type="submit"> Agregar Producto </button>
               <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarProducto()">Actualizar Producto</button>
               <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
           </div>
