@@ -68,7 +68,7 @@ export class ProductoComponent implements OnInit {
 
   /*FUNCION PARA AGREGAR A LA BASE DE DATOS LOS DATOS (VALGA LA REDUNDANCIA) QUE SE DIGISTAN EN LOS INPUTS*/
   agregar(){
-    const campo : modelProducto = {
+    const campo = {
       Prod_Id: this.formularioProducto.get('ProductoID')?.value,
       Prod_Nombre: this.formularioProducto.get('ProductoNombre')?.value,
       Prod_Descripcion: this.formularioProducto.get('ProductoDescripcion')?.value,
@@ -81,7 +81,8 @@ export class ProductoComponent implements OnInit {
       Prod_Calibre: this.formularioProducto.get('CalibreProducto')?.value,
       UndMedACF: this.formularioProducto.get('ProductoUndFAC')?.value,
       Estado_Id: this.formularioProducto.get('')?.value,
-      Prod_Largo: 0,      
+      Prod_Largo: 0,
+      Prod_Cod: 0
     }
 
     this.productoServices.srvGuardar(campo).subscribe(datos_Productos=>{

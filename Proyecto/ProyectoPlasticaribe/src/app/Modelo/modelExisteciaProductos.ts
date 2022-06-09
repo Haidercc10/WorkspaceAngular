@@ -8,4 +8,5 @@ export interface modelExistenciaProductos{
     ExProd_PrecioExistencia: number;
     ExProd_PrecioSinInflacion: number;
     TpMoneda_Id: string;
+    ExProd_PrecioVenta: number;
 }

@@ -83,9 +83,16 @@
   <div class="mb-4">
     <div class="row g-3">
       <!-- Campo Descripción producto -->
-      <div class="col-md">
+      <div class="col-md-7">
         <textarea formControlName="ProdDescripcion"  id="PrdDescripcion" type="text" class="form-control form-control-sm campoObservacion"
         maxlength="200" placeholder="Descripción Producto" name="PrdDescripcion"></textarea>
+      </div>
+
+      <div class="col-md">
+        <select formControlName="ClienteNombre" type="text" id="tClienteId" name="ClienteId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+          <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
+          <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
+        </select>
       </div>
     </div>
   </div>

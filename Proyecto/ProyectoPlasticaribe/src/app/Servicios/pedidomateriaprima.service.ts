@@ -10,7 +10,7 @@ import { modelPedidomateriaprima } from '../Modelo/modelPedidomateriaprima';
 export class PedidomateriaprimaService {
 
   //Ruta del API
-  readonly rutaPlasticaribeAPI = "https://192.168.0.153:7137/api";
+  readonly rutaPlasticaribeAPI = "http://192.168.0.153:9085/api";
 
 //Encapsular httpclient en el constructor
   constructor(private httpPedidomateriaprima : HttpClient) {

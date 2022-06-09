@@ -10,7 +10,7 @@ import { modelFpension} from '../Modelo/modelFpension';
 export class FpensionService {
 
   //Ruta del API
-  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
+  readonly rutaPlasticaribeAPI = "http://192.168.0.153:9085/api";
 
 //Encapsular httpclient en el constructor
   constructor(private http : HttpClient) { }
