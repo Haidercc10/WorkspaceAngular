@@ -8,17 +8,13 @@ import { modelTipoMoneda } from '../Modelo/modelTipoMoneda';
 })
 export class TipoMonedaService {
 
-  readonly rutaPlasticaribeAPI = "http://192.168.0.153:9085/api";
+  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
   constructor(private http : HttpClient) { }
 
   //Metodo buscar lista
   srvObtenerLista():Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Moneda')
-  }
-
-  srvObtenerListaPorId(id : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_Moneda/${id}`)
   }
 
   //Metodo agregar

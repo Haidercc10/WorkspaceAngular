@@ -8,7 +8,7 @@ import { modelTipoProducto } from '../Modelo/modelTipoProducto';
 })
 export class TipoProductoService {
 
-  readonly rutaPlasticaribeAPI = "http://192.168.0.153:9085/api";
+  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
   constructor(private http : HttpClient) { }
 
@@ -38,5 +38,5 @@ export class TipoProductoService {
   //
   srvGuardar(data : modelTipoProducto): Observable<any> {
     return this.http.post(this.rutaPlasticaribeAPI + '/Tipo_Producto', data)
-  }  
+  }
 }

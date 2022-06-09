@@ -10,7 +10,7 @@ import { modelAreas } from '../Modelo/modelAreas';
 export class ServicioAreasService {
 
   //Ruta del API
-  readonly rutaPlasticaribeAPI = "http://192.168.0.153:9085/api";
+  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
 //Encapsular httpclient en el constructor
   constructor(private httpAreas : HttpClient) {  }

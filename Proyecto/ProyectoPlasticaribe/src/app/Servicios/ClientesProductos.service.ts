@@ -8,7 +8,7 @@ import { modelClienteProductos } from '../Modelo/modelClientesProductos';
 })
 export class ClientesProductosService {
 
-  readonly rutaPlasticaribeAPI = "http://192.168.0.153:9085/api";
+  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
   constructor(private http : HttpClient) { }
 
@@ -17,8 +17,8 @@ export class ClientesProductosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Cliente_Producto');
   }
 
-  srvObtenerListaPorId(cli_id : any, prod_id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Cliente_Producto/ ?cli_Id=${cli_id}&prod_Id=${prod_id}`);
+  srvObtenerListaPorId(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Cliente_Producto/${id}`);
   }
 
   //Metodo agregar Productos

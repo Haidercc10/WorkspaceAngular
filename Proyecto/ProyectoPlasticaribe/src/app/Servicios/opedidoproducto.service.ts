@@ -8,7 +8,7 @@ import { modelOpedidoproducto } from '../Modelo/modelOpedidoproducto';
 })
 export class OpedidoproductoService {
 
-  readonly rutaPlasticaribeAPI = "http://192.168.0.153:9085/api";
+  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
 //Encapsular httpclient en el constructor
   constructor(private http: HttpClient) { }
@@ -27,7 +27,7 @@ export class OpedidoproductoService {
     return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExterno', data)
   }
   //Metodo actualzar Pedidos de Productos
-  srvActualizarPedidosProdusctos(id:any, data:any) {
+  srvActualizarPedidosProdusctos(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/PedidoExterno/${id}`, data);
   }
   //Metodo eliminar Pedidos de Productos
@@ -40,8 +40,7 @@ export class OpedidoproductoService {
   }
 
   srvObtenerUltimoCodigoPedido(){
-     return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoExternoes');
+     return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoExterno');
   }
-
 
 }

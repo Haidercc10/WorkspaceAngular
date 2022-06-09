@@ -6,11 +6,8 @@
       <p>Plasti<span>caribe S.A.S</span> </p>
     </div>
     <div class="">
-     <p>{{storage_Nombre}} {{storage_Rol}}</p> 
+      <p>{{storage_Nombre}} {{storage_Rol}}</p>
     </div>
-  
-    <a  (click)="confimacionSalida()"><i class="fa fa-fw fa-sign-out"></i>Cerrar Seccion</a>
- 
   </nav>
 <!-- Navegador fin de parte superior -->
 
@@ -50,7 +47,7 @@
 
       <!-- INICIO DE CONSULTA DE PEDIDOS DE PRODUCTOS -->
       <!-- Inicio formulario -->
-      <form [formGroup]="FormConsultaPedidoExterno" (ngSubmit)="validarCamposVaciosConsulta()">
+      <form [formGroup]="FormConsultaPedidoExterno" (ngSubmit)="validarCamposVaciosConsulta()"> <!---->
         <div class="mb-3">
           <div class="row g-3">
             <!-- NUMERO DE IDENTIFICACION DEL PEDIDO DE PRODUCTOS -->
@@ -58,15 +55,15 @@
               <input formControlName="PedExtIdConsulta"  type="number" class="form-control form-control-sm" id="PedExtId" placeholder="N° del Pedido" name="PedExtId" title="Consecutivo identificador del Pedido">
             </div>
             <!-- FECHA EN QUE SE HIZO EL PEDIDO -->
-            <!-- <label class="col-md-2 control-label">Fecha del Pedido</label>
+             <label class="col-md-2 control-label">Fecha del Pedido</label>
             <div class="col-md">
               <input formControlName="PedExtFechaConsulta" type="date" class="form-control form-control-sm" id="PextFecha" placeholder="Fecha pedido" name="PextFecha" title="Fecha Pedido">
-            </div>-->
+            </div>
             <!-- FECHA EN QUE SE TIENE QUE ENTREGAR EL PEDIDO -->
-            <!-- <label class="col-md-2 control-label">Fecha del Entrega</label>
+             <label class="col-md-2 control-label">Fecha del Entrega</label>
             <div class="col-md">
               <input formControlName="PedExtFechaEntregaConsulta" type="date" class="form-control form-control-sm" id="PextFechaEntrega" placeholder="Fecha entrega" name="PextFechaEntrega" title="Fecha Entrega">
-            </div> -->
+            </div>
           </div>
         </div>
         <!-- FILA 2 -->
@@ -120,7 +117,7 @@
                     <th id="precioPedido" scope="col">Precio Total</th>
                     <th id="archivoPedido" scope="col">Archivo</th>
                     <th id="editarPedido" scope="col">Editar</th>
-                    
+
                   </tr>
                 <tbody>
                   <!--Carga los productos en la tabla y pagina por 2-->
@@ -162,7 +159,7 @@
             <div class="col-md">
               <select formControlName="PedClienteNombre" type="text" id="PextClienteId" name="PextClienteId" (change)="ciudadClienteComboBox()" (change)="productoCliente()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
-                <option [ngValue]="clientes" *ngFor="let clientes of cliente ">{{clientes}}</option>
+                <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
               </select>
             </div>
 
@@ -177,7 +174,7 @@
             <!-- Sede Cliente -->
             <div class="col-md">
               <select formControlName="PedSedeCli_Id" type="text" id="PSedeCli_Id" name="PSedeCli_Id" (change)="captarSedeSeleccionada()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="null" disabled selected>Seleccione Direccion</option>
+                <option [ngValue]="null" disabled selected>Seleccione Sede Cliente</option>
                 <option [ngValue]="sedesclientes" *ngFor="let sedesclientes of sedeCliente">{{sedesclientes}}</option>
               </select>
             </div>
@@ -205,7 +202,7 @@
 
         <!-- Inicio Observacion -->
 
-        
+
         <div class="mb-5">
           <div class="row g-3">
             <!-- Estado -->
@@ -225,7 +222,7 @@
         <!-- Fin Observacion -->
                                                               <!--Fin Crear Pedidos-->
 
-        <!-- Linea --> 
+        <!-- Linea -->
         <div class="mb-4">
           <hr class="Linea">
         </div>
