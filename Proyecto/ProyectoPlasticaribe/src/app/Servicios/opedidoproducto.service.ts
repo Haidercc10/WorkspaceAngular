@@ -8,7 +8,7 @@ import { modelOpedidoproducto } from '../Modelo/modelOpedidoproducto';
 })
 export class OpedidoproductoService {
 
-  readonly rutaPlasticaribeAPI = "https://192.168.0.153:7137/api";
+  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
 //Encapsular httpclient en el constructor
   constructor(private http: HttpClient) { }
@@ -40,8 +40,7 @@ export class OpedidoproductoService {
   }
 
   srvObtenerUltimoCodigoPedido(){
-     return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoExternoes');
+     return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoExterno');
   }
-
 
 }

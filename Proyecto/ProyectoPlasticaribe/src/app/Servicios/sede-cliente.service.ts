@@ -8,7 +8,7 @@ import { modelSedesClientes } from '../Modelo/modelSedesClientes';
 })
 export class SedeClienteService {
 
-  readonly rutaPlasticaribeAPI = "https://192.168.0.153:7137/api";
+  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
   constructor(private http : HttpClient) { }
 
@@ -18,7 +18,7 @@ export class SedeClienteService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/SedesClientes')
 
   }
-  
+
   srvObtenerListaPorId(id : number){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/${id}`);
   }

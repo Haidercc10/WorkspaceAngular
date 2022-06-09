@@ -14,7 +14,7 @@ export class CajacompensacionService {
 
 //Encapsular httpclient en el constructor
   constructor(private http : HttpClient) { }
-  
+
 //Metodo buscar lista de Cajacompensacion
   srvObtenerLista():Observable<any[]> {
       return this.http.get<any>(this.rutaPlasticaribeAPI + '/cajaCompensacions')

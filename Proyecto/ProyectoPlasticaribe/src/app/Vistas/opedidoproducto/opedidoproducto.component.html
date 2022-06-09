@@ -47,7 +47,7 @@
 
       <!-- INICIO DE CONSULTA DE PEDIDOS DE PRODUCTOS -->
       <!-- Inicio formulario -->
-      <form [formGroup]="FormConsultaPedidoExterno" (ngSubmit)="validarCamposVaciosConsulta()">
+      <form [formGroup]="FormConsultaPedidoExterno" (ngSubmit)="validarCamposVaciosConsulta()"> <!---->
         <div class="mb-3">
           <div class="row g-3">
             <!-- NUMERO DE IDENTIFICACION DEL PEDIDO DE PRODUCTOS -->
@@ -55,15 +55,15 @@
               <input formControlName="PedExtIdConsulta"  type="number" class="form-control form-control-sm" id="PedExtId" placeholder="N° del Pedido" name="PedExtId" title="Consecutivo identificador del Pedido">
             </div>
             <!-- FECHA EN QUE SE HIZO EL PEDIDO -->
-            <!-- <label class="col-md-2 control-label">Fecha del Pedido</label>
+             <label class="col-md-2 control-label">Fecha del Pedido</label>
             <div class="col-md">
               <input formControlName="PedExtFechaConsulta" type="date" class="form-control form-control-sm" id="PextFecha" placeholder="Fecha pedido" name="PextFecha" title="Fecha Pedido">
-            </div>-->
+            </div>
             <!-- FECHA EN QUE SE TIENE QUE ENTREGAR EL PEDIDO -->
-            <!-- <label class="col-md-2 control-label">Fecha del Entrega</label>
+             <label class="col-md-2 control-label">Fecha del Entrega</label>
             <div class="col-md">
               <input formControlName="PedExtFechaEntregaConsulta" type="date" class="form-control form-control-sm" id="PextFechaEntrega" placeholder="Fecha entrega" name="PextFechaEntrega" title="Fecha Entrega">
-            </div> -->
+            </div>
           </div>
         </div>
         <!-- FILA 2 -->
@@ -117,14 +117,14 @@
                     <th id="precioPedido" scope="col">Precio Total</th>
                     <th id="archivoPedido" scope="col">Archivo</th>
                     <th id="editarPedido" scope="col">Editar</th>
-                    
+
                   </tr>
                 <tbody>
                   <!--Carga los productos en la tabla y pagina por 2-->
                   <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" >
                     <td id="idPedido">{{item.pedExt_Id}}</td>
-                    <td id="fechaPedido">{{item.pedExt_FechaCreacion}}</td>
-                    <td id="fechaEntrega">{{item.pedExt_FechaEntrega}}</td>
+                    <td id="fechaPedido">{{item.pedExt_FechaCreacion | date: 'yyyy-MM-dd'}}</td>
+                    <td id="fechaEntrega">{{item.pedExt_FechaEntrega | date: 'yyyy-MM-dd'}}</td>
                     <td id="sede">{{item.sedeCli_Id}}</td>
                     <td id="Vendedor">{{item.usua_Id}}</td>
                     <td id="estadoPedido">{{item.estado_Id}}</td>
@@ -202,7 +202,7 @@
 
         <!-- Inicio Observacion -->
 
-        
+
         <div class="mb-5">
           <div class="row g-3">
             <!-- Estado -->
