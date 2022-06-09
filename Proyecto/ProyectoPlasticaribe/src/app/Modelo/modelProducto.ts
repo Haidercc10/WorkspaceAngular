@@ -1,4 +1,5 @@
 export interface modelProducto{
+      Prod_Cod: number;
       Prod_Id: number;
       Prod_Nombre: string;
       Prod_Descripcion: string;

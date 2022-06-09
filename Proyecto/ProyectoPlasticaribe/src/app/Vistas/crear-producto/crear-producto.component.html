@@ -53,6 +53,40 @@
         </select>
       </div>
 
+      <!-- Campo Descripción producto -->
+      <div class="col-md-7">
+        <textarea formControlName="ProdDescripcion"  id="PrdDescripcion" type="text" class="form-control form-control-sm campoObservacion"
+        maxlength="200" placeholder="Descripción Producto" name="PrdDescripcion"></textarea>
+      </div>
+
+      <div class="col-md">
+        <select formControlName="ClienteNombre" type="text" id="tClienteId" name="ClienteId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+          <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
+          <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="btn btn-danger btn-danger-sm" type="submit">Crear Producto</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
+    </div>
+  </div>
+</form>
+
+<div class="mb-4">
+  <hr>
+</div>
+
+<div class="mb-4">
+  <h5 class="tituloRojo">Crear Presentación de productos</h5>
+</div>
+
+<form [formGroup]="FormCrearPresentacionProducto" (ngSubmit)="validarCamposVacios()">
+  <div class="mb-4">
+    <div class="row g-3">
       <!-- Cantidad Producto -->
       <div class="col-md-2">
         <input formControlName="ProduCantidad" type="number" class="form-control form-control-sm" id="PrCantidad"  placeholder="Cantidad" name="PrCantidad" required maxlength="14">
@@ -80,28 +114,11 @@
       </div>
     </div>
   </div>
-  <div class="mb-4">
-    <div class="row g-3">
-      <!-- Campo Descripción producto -->
-      <div class="col-md-7">
-        <textarea formControlName="ProdDescripcion"  id="PrdDescripcion" type="text" class="form-control form-control-sm campoObservacion"
-        maxlength="200" placeholder="Descripción Producto" name="PrdDescripcion"></textarea>
-      </div>
-
-      <div class="col-md">
-        <select formControlName="ClienteNombre" type="text" id="tClienteId" name="ClienteId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-          <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
-          <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
-        </select>
-      </div>
-    </div>
-  </div>
-  <!-- Fin Fila 2 Crear Producto -->
 
   <!-- Inicio botones -->
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="submit">Crear Producto</button>
+        <button class="btn btn-danger btn-danger-sm" type="submit">Crear Presentación de Producto</button>
         <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
     </div>
   </div>

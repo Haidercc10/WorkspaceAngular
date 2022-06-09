@@ -126,8 +126,8 @@
                   <!--Carga los productos en la tabla y pagina por 2-->
                   <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" >
                     <td id="idPedido">{{item.pedExt_Id}}</td>
-                    <td id="fechaPedido">{{fechaCreacionCortada[i]}}</td>
-                    <td id="fechaEntrega">{{fechaEntregaCortada[i]}}</td>
+                    <td id="fechaPedido">{{item.pedExt_FechaCreacion | date : 'yyyy-MM-dd'}}</td>
+                    <td id="fechaEntrega">{{item.pedExt_FechaEntrega | date : 'yyyy-MM-dd'}}</td>
                     <td id="sede">{{item.sedeCli_Id}}</td>
                     <td id="Vendedor">{{item.usua_Id}}</td>
                     <td id="estadoPedido">{{item.estado_Id}}</td>
@@ -342,7 +342,7 @@
         <!-- Inicio botones -->
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class="btn btn-danger btn-danger-sm" type="submit"> Agregar Producto </button>
+              <button class="btn btn-danger btn-danger-sm" type="submit"> {{AccionBoton}} Producto </button>
               <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarProducto()">Actualizar Producto</button>
               <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
           </div>
@@ -404,7 +404,7 @@
                       <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.TpMoneda}}</td>
                       <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.SubTotal}}</td>
                       <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true" title="Editar Producto"></i></a></td>
-                      <td id="Eliminar" ><a><i class="fa fa-trash" (click)="QuitarProductoTabla(j)" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
+                      <td id="Eliminar" ><a><i class="fa fa-trash" (click)="QuitarProductoTabla(j, listaProductos)" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
                     </tr>
                 </tbody>
               </table>

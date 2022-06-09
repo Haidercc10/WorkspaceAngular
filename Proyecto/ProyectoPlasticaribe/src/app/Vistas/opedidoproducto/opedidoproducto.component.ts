@@ -22,6 +22,7 @@ import { TipoClienteService } from 'src/app/Servicios/tipo-cliente.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.service';
 import { ThisReceiver } from '@angular/compiler';
+import { modelCliente } from 'src/app/Modelo/modelCliente';
 
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -101,7 +102,7 @@ export class OpedidoproductoComponent implements OnInit {
   productosPedidos = [];
 
 /* Vaiables para rescatar los ID de estado, sedes, empresa, valorTotal */
-  valorTotal=[];
+  valorTotal : any;
   EmpresaVendedora=[];
   EstadoDocumentos= [];
   EstadoDeDocumentos : any;
@@ -234,19 +235,19 @@ export class OpedidoproductoComponent implements OnInit {
 
     this.FormPedidoExternoProductos = this.frmBuilderPedExterno.group({
        //Datos para la tabla de productos.
-       ProdId: [,''],
-       ProdNombre: [,''],
-       ProdAncho: [,''],
-       ProdFuelle: [,''],
-       ProdCalibre: [,''],
-       ProdUnidadMedidaACF: [,''],
-       ProdTipo: [,''],
+       ProdId: ['', Validators.required],
+       ProdNombre: ['', Validators.required],
+       ProdAncho: ['', Validators.required],
+       ProdFuelle: ['', Validators.required],
+       ProdCalibre: ['', Validators.required],
+       ProdUnidadMedidaACF: ['', Validators.required],
+       ProdTipo: ['', Validators.required],
        ProdCantidad: ['', Validators.required],
        ProdUnidadMedidaCant: ['', Validators.required],
        ProdPrecioUnd: ['', Validators.required],
        ProdTipoMoneda: ['', Validators.required],
        ProdStock: ['', Validators.required],
-       ProdDescripcion: [,''],
+       ProdDescripcion: ['', Validators.required],
 
 
     });
@@ -280,8 +281,8 @@ export class OpedidoproductoComponent implements OnInit {
   LimpiarCampos() {
     this.FormPedidoExternoClientes.reset();
     this.FormPedidoExternoProductos.reset();
-    // this.ArrayProducto = [];
-    // this.valorTotal = [];
+    this.ArrayProducto = [];
+    this.valorTotal = [];
   }
 
   // Funcion para limpiar los campos de el apartado de productos
@@ -304,7 +305,7 @@ export class OpedidoproductoComponent implements OnInit {
             }else {
               this.cliente.push(datos_clientes[index].cli_Nombre);
               this.clienteDatos.push(datos_clientes[index]);
-            }            
+            }      
           }
         }
       });
@@ -371,7 +372,6 @@ export class OpedidoproductoComponent implements OnInit {
     this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
       for (let index = 0; index < datos_usuarios.length; index++) {
         this.usuarios.push(datos_usuarios[index].usua_Nombre);
-        
       }
     });
   }
@@ -407,9 +407,7 @@ export class OpedidoproductoComponent implements OnInit {
     let id_cliente : number;
     this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
       for (let i = 0; i < datos_clientes.length; i++) {
-        if (datos_clientes[i].cli_Nombre == nombre_Cliente) {
-          id_cliente = datos_clientes[i].cli_Id;
-        }        
+        if (datos_clientes[i].cli_Nombre == nombre_Cliente) id_cliente = datos_clientes[i].cli_Id;
       }
       this.ClientesProductosService.srvObtenerLista().subscribe(datos_clientesProductos => {
         for (let index = 0; index < datos_clientesProductos.length; index++) {
@@ -421,7 +419,8 @@ export class OpedidoproductoComponent implements OnInit {
           }          
         }
       });
-    });    
+    });
+    this.producto.sort((a,b)=> Number(a.prod_Id) - Number(b.prod_Id));
   }
 
   // Funcion para llenar el comboBox de tipos de Productos con los tipos de productos
@@ -454,7 +453,6 @@ export class OpedidoproductoComponent implements OnInit {
           this.productoInfo.push(datos_productos);
           for (let producto = 0; producto < this.productoInfo.length; producto++) {
             this.tiposProductosService.srvObtenerListaPorId(this.productoInfo[producto].tpProd_Id).subscribe(datos_tipoProducto => {
-
               this.existenciasProductosServices.srvObtenerLista().subscribe(datos_existencias => {
                 for (let index = 0; index < datos_existencias.length; index++) {
                   if (datos_existencias[index].prod_Id == this.productoInfo[producto].prod_Id) {
@@ -466,7 +464,7 @@ export class OpedidoproductoComponent implements OnInit {
                   }
                 }
               });
-            });            
+            });
           }
         });
       }
@@ -688,28 +686,19 @@ export class OpedidoproductoComponent implements OnInit {
       denyButtonText: `No Salir`,
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
-      if (result.isConfirmed) {
-        window.location.href = "./";
-      } else if (result.isDenied) {
-        
-      }
+      if (result.isConfirmed) window.location.href = "./";
+      else if (result.isDenied) true
     })
   }
 
   //Se obtiene el ultimo codigo del pedido y se incrementa en 1. (Contador)
   ObtenerUltimoPedido() {
     let ultimoCodigoPedido : number;
-
     this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(dataPedExternos =>{
       for (let index = 0; index < dataPedExternos.length; index++) {
-
         ultimoCodigoPedido = dataPedExternos[index].pedExt_Codigo;
         this.contadorPedidosExternos = ultimoCodigoPedido + 1
-
-        //console.log('Ultimo codigo pedido: ' + ultimoCodigoPedido );
-        //console.log('Ultimo codigo Pedido a guardar: ' + this.contadorPedidosExternos);
-        //console.log(this.contadorPedidosExternos);
-  }
+      }
     });
   }
 
@@ -793,7 +782,7 @@ export class OpedidoproductoComponent implements OnInit {
                 if(productoExt.Id === this.ArrayProducto[index].Id) { //Verifico si campo y form en posicion ID son iguales
                   Swal.fire('Evite cargar datos duplicados a la tabla. Verifique!');
                   break;
-                } else {
+                } else if (productoExt.Id != this.ArrayProducto[index].Id){
                   this.ArrayProducto.push(productoExt);
                   productoExt = []; //Vaciar lo que viene del formulario.
                   break;
@@ -803,12 +792,10 @@ export class OpedidoproductoComponent implements OnInit {
           } else Swal.fire(`El precio digitado no puede ser menor al que tiene el producto estipulado ${datos_existencias[index].exProd_PrecioVenta}`);          
         } else continue;
       }
+      for (let index = 0; index < this.ArrayProducto.length; index++) {
+        this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (productoExt.Cant * productoExt.PrecioUnd), 0)
+      }
     });
-
-
-    for (let index = 0; index < this.ArrayProducto.length; index++) {
-      this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (productoExt.Cant * productoExt.PrecioUnd), 0)
-    }
   }
 
   // Funcion para crear los pedidos de productos y añadirlos a la base de datos
@@ -894,7 +881,6 @@ export class OpedidoproductoComponent implements OnInit {
       for (let index = 0; index < dataEmpresa.length; index++) {
         this.EmpresaVendedora = dataEmpresa[0].empresa_Id;
         break
-        //this.EmpresaVendedora = dataEmpresa[1].empresa_Nombre;
       }
     }, error => { console.log(error); })
   }
@@ -911,49 +897,37 @@ export class OpedidoproductoComponent implements OnInit {
   //Función para captar el ID del estado según el nombre del estado seleccionado.
   captarEstadoSeleccionado(){
     this.EstadoDeDocumentos = this.FormPedidoExternoClientes.get('PedEstadoId')?.value;
-
     this.estadosService.srvObtenerListaEstados().subscribe(data=>{
       for (let index = 0; index < data.length; index++) {
         if(this.EstadoDeDocumentos == data[index].estado_Nombre) {
           this.EstadoDocumentos = data[index].estado_Id;
         }
-
       }
-    }, error => {
-      console.log(error);
-    })
+    }, error => {console.log(error);})
   }
   
-
   /*Función para captar el ID de la sede seleccionada según su nombre, dato que se pasa a
   la tabla de pedidos al insertar el dato.*/
   captarSedeSeleccionada(){
     this.SedeSeleccionada = this.FormPedidoExternoClientes.get('PedSedeCli_Id')?.value;
-
     this.sedesClientesService.srvObtenerLista().subscribe(data=>{
       for (let index = 0; index < data.length; index++) {
         if(this.SedeSeleccionada == data[index].sedeCliente_Direccion) {
           this.IDSedeSeleccionada = data[index].sedeCli_Id;
         }
-
       }
-    }, error => {
-      console.log(error);
-    })
+    }, error => {console.log(error);})
   }
 
   /*Función para captar el ID de usuario según su nombre, dato que se pasa a
   la tabla de pedidos al insertar el dato.*/
   CaptarUsuarioSeleccionado() {
     let usuarioCombo = this.FormPedidoExternoClientes.get('PedUsuarioNombre')?.value;
-
     this.usuarioService.srvObtenerListaUsuario().subscribe(dataUsuario => {
       for (let index = 0; index < dataUsuario.length; index++) {
         if(usuarioCombo == dataUsuario[index].usua_Nombre) this.UsuarioSeleccionado = dataUsuario[index].usua_Id;
       }
-    }, error => {
-      console.log(error);
-    })
+    }, error => { console.log(error);})
   }
 
   // Función para limpiar la tabla en la que se muestran los productos del pedido
@@ -963,9 +937,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para llenar la tabla de productos con la informacion que se inserte en los modales
-  llenarTablaProductosCreador(id : any, nombre : string, ancho : any, fuelle : any,
-    calibre : any, undMed : string, tpProducto : string, cantidad : any, undMed2 : string, precio : any, moneda : string, descripcion : string){
-
+  llenarTablaProductosCreador(id : any, nombre : string, ancho : any, fuelle : any, calibre : any, undMed : string, tpProducto : string, cantidad : any, undMed2 : string, precio : any, moneda : string, descripcion : string){
     let productoExt : any = {
       Id : id,
       Nombre : nombre,
@@ -986,13 +958,13 @@ export class OpedidoproductoComponent implements OnInit {
     if(this.ArrayProducto.length == 0) this.ArrayProducto.push(productoExt);
     else {
       for (let index = 0; index < this.ArrayProducto.length; index++) {
-        if(this.FormPedidoExternoProductos.value.ProdId == this.ArrayProducto[index].Id) Swal.fire('No se pueden cargar datos identicos a la tabla.')
+        if(this.FormPedidoExternoProductos.value.ProdId == this.ArrayProducto[index].Id) Swal.fire('No se pueden cargar datos identicos a la tabla.');
         else this.ArrayProducto.push(productoExt);
         break;
       }
     }
     for (let index = 0; index < this.ArrayProducto.length; index++) {
-      this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (productoExt.Cant * productoExt.PrecioUnd), 0)
+      this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (productoExt.Cant * productoExt.PrecioUnd), 0);
     }
   }
 
@@ -1160,7 +1132,6 @@ export class OpedidoproductoComponent implements OnInit {
 
   // Funcion para llenar el pdf con información de la base de datos dependiendo el pedido
   llenarPDFConBD(formulario : any){
-
     let id : any = formulario.pedExt_Id
 
     this.pedidoproductoService.srvObtenerListaPorId(id).subscribe(datos_pedidos => {
@@ -1347,7 +1318,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Función para quitar un producto de la tabla
-  QuitarProductoTabla(index : number) {
+  QuitarProductoTabla(index : number, formulario : any) {
 
     Swal.fire({
       title: '¿Estás seguro de eliminar el producto del pedido?',
@@ -1359,6 +1330,7 @@ export class OpedidoproductoComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.ArrayProducto.splice(index, 1);
+        this.valorTotal = this.valorTotal - formulario.SubTotal;
         Swal.fire('Producto eliminado');
       }
     });
@@ -1389,42 +1361,31 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para guardar clientes en la base de datos
-  insertarClientes(id : any, tipoId : any, nombre : any, telefono : any, email : any, tipoCliente : string, ciudadSede : any, vendedor : any, codigoPostal : number, direccionSede : any, sedeCLiID : any){
+  insertarClientes(id : any, tipoId : any, nombre : any, telefono : string, email : any, tipoCliente : string, ciudadSede : any, vendedor : any, codigoPostal : number, direccionSede : any, sedeCLiID : any){
     let usuario : number;
-    let Id_TipoCliente : number
-
+    let Id_TipoCliente : number;
     this.tipoClientService.srvObtenerLista().subscribe(datos_tipoCliente => {
       for (let index = 0; index < datos_tipoCliente.length; index++) {
         if (datos_tipoCliente[index].tpCli_Nombre == tipoCliente) {
           Id_TipoCliente = datos_tipoCliente[index].tpCli_Id;
-
           this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuario => {
             for (let index = 0; index < datos_usuario.length; index++) {
               if (datos_usuario[index].usua_Nombre == vendedor) {
                 usuario = datos_usuario[index].usua_Id;
-
-                const datosClientes : any = {
+                const datosClientes : modelCliente = {
                   Cli_Id: id,
                   TipoIdentificacion_Id : tipoId,
                   Cli_Nombre: nombre,
                   Cli_Telefono: telefono,
                   Cli_Email: email,
-                  tpCli_Id: Id_TipoCliente,
+                  TPCli_Id: Id_TipoCliente,
                   Usua_Id: usuario,
-                  Estado_Id : 9
+                  Estado_Id : 8 
                 }
-
-                this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
-                  for (let index = 0; index < datos_clientes.length; index++) {
-                    if (datos_clientes[index].cli_Nombre != id) {
-                      this.clientesService.srvGuardar(datosClientes).subscribe(datos => {
-                        Swal.fire('Cliente guardado con éxito!');
-                        this.llenarSedeCliente(id, ciudadSede, codigoPostal, direccionSede, sedeCLiID);
-                      }, error => { console.log(error); });
-                      break;
-                    }else continue;
-                  }
-                });
+                this.clientesService.srvGuardar(datosClientes).subscribe(datos => {
+                  Swal.fire('Cliente guardado con éxito!');
+                }, error => { console.log(error); });
+                break;  
               }      
             }
           });
@@ -1434,45 +1395,48 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para guardar en la base de datos las sede de clientes
-  llenarSedeCliente(id : number, ciudadSede : any, codigoPostal : number, direccionSede : any, sedeCLiID :any){
+  llenarSedeCliente(id : number, ciudadSede : any, codigoPostal : number, direccionSede : any){
+    let sedes_id = [];
+    let nuevoID : any;
     
-    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-      let sedes_id = [];
-      let nuevoID : any;
-      for (let index = 0; index < datos_sedes.length; index++) {
-        if (datos_sedes[index].cli_Id == sedeCLiID) {
-          sedes_id.push(datos_sedes[index].sedeCli_Id);
+    this.sedesClientesService.srvObtenerListaPorId(id+1).subscribe(datos_sedePorID => {
+      this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+        for (let index = 0; index < datos_sedes.length; index++) {
+          if (datos_sedes[index].cli_Id == id) sedes_id.push(datos_sedes[index].sedeCli_Id);
         }
-      }
 
-      if (sedes_id.length == 0) {
-        
-        nuevoID = id +""+ 1;
-        console.log(nuevoID);
-      } else {
-        console.log(sedes_id);
         let ultimoId = Math.max.apply(null, sedes_id);
         nuevoID = ultimoId + 1;
-        console.log(nuevoID);
-      }
-
-      const datosSedes : any = {
+        const datosSedes : any = {
+          sedeCli_Id: nuevoID,
+          SedeCliente_Ciudad: ciudadSede,
+          SedeCliente_Direccion: direccionSede,
+          SedeCli_CodPostal: codigoPostal,
+          Cli_Id : id,
+        }
+        this.sedesClientesService.srvGuardar(datosSedes).subscribe(datos_sede => {
+          Swal.fire('Sede de cliente guardada con éxito!');
+        }, error => { console.log(error); });
+  
+      });
+    }, error => {
+      nuevoID = id +""+ 1;
+      console.log(nuevoID);
+      const datosSedess : any = {
         sedeCli_Id: nuevoID,
         SedeCliente_Ciudad: ciudadSede,
         SedeCliente_Direccion: direccionSede,
         SedeCli_CodPostal: codigoPostal,
-        Cli_Id : sedeCLiID,
+        Cli_Id : id,
       }
-
-      this.sedesClientesService.srvGuardar(datosSedes).subscribe(datos_sede => {
-        console.log('Sede de cliente guardada con éxito!');
+      this.sedesClientesService.srvGuardar(datosSedess).subscribe(datos_sede => {
+        Swal.fire('Sede de cliente guardada con éxito!');
       }, error => { console.log(error); });
     });
   }
 
   // Funcion para guardar productos en la base de datos
   registrarProducto(id : any, nombre : any, ancho : any, fuelle : any, calibre : any, undMed : any, tpProducto : any, descripcion : any, cliente : any){
-
     let tipoProductos_nombre = tpProducto;
     let tipoProducto_Id : number;
     let clienteId : number;
@@ -1480,7 +1444,6 @@ export class OpedidoproductoComponent implements OnInit {
       for (let index = 0; index < datos_tipoProducto.length; index++) {
         if (tipoProductos_nombre == datos_tipoProducto[index].tpProd_Nombre) {
           tipoProducto_Id = datos_tipoProducto[index].tpProd_Id;
-
           const datosProductos : any = {
             Prod_Id: id,
             Prod_Nombre: nombre,
@@ -1496,7 +1459,6 @@ export class OpedidoproductoComponent implements OnInit {
             Estado_Id: 9,
             Prod_Largo: 0,
           };
-
           this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
             for (let i = 0; i < datos_clientes.length; i++) {
               if (datos_clientes[i].cli_Nombre == cliente) {
@@ -1505,10 +1467,23 @@ export class OpedidoproductoComponent implements OnInit {
                   Cli_Id: clienteId,
                   Prod_Id: id
                 }
-                
                 this.productosServices.srvGuardar(datosProductos).subscribe(datos => {
                   this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
-                    Swal.fire('Producto guardado con éxito!');
+                    const Toast = Swal.mixin({
+                      toast: true,
+                      position: 'center',
+                      showConfirmButton: false,
+                      timer: 3500,
+                      timerProgressBar: true,
+                      didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                      }
+                    });
+                    Toast.fire({
+                      icon: 'success',
+                      title: `Producto creado con exito` 
+                    });
                   });
                 }, error => {console.log(error)});
                 break;
@@ -1528,86 +1503,103 @@ export class OpedidoproductoComponent implements OnInit {
         TpBod_Id: 2,
         UndMed_Id: undMed2,
         ExProd_Precio: precio,
-        ExProd_PrecioExistencia: precio,
+        ExProd_PrecioExistencia: precio * 0,
         ExProd_PrecioSinInflacion: 0,
-        ExProd_PrecioTotalFinal: precioFinal,
         TpMoneda_Id: moneda,
         ExProd_PrecioVenta: precio,
-      }
-
-      console.log(datosExistencias)
+      };
       this.existenciasProductosServices.srvGuardar(datosExistencias).subscribe(datos_existencias => {
-        console.log('Existencias guardada con éxito!');
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 3500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'success',
+          title: `La existencia del producto ${id} ha sido creada correctamente` 
+        });
       }, error => { console.log(error)});
   }
 
   // Funcion para actualizar un producto
   actualizarProducto(){
-    Swal.fire({
-      title: '¿Está seguro de actualizar este producto?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      confirmButtonText: 'Si, actualizar!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        let id : number = this.FormPedidoExternoProductos.value.ProdId;
-        let tipo_Id : number;
-        let codigo : number;
-        let CodigosProductos = [];
-        this.tiposProductosService.srvObtenerLista().subscribe(datos_tipos => {
-          for (let index = 0; index < datos_tipos.length; index++) {
-            if (datos_tipos[index].tpProd_Nombre == this.FormPedidoExternoProductos.value.ProdTipo) {
-              tipo_Id = datos_tipos[index].tpProd_Id
-            }            
-          }
-        });
-        
-        this.productosServices.srvObtenerLista().subscribe(datos_productos => {
-          this.existenciasProductosServices.srvObtenerLista().subscribe(datos_existencias => {
-            for (let i = 0; i < datos_existencias.length; i++) {
-              if (datos_existencias[i].prod_Id == id) {
-      
-                const datosProducto = {
-                  Prod_Id : id,
-                  Prod_Nombre: this.FormPedidoExternoProductos.value.ProdNombre,
-                  Prod_Descripcion: this.FormPedidoExternoProductos.value.ProdDescripcion,
-                  TpProd_Id: tipo_Id,
-                  Prod_Peso_Bruto: 0,
-                  Prod_Peso_Neto: 0,
-                  UndMedPeso: this.FormPedidoExternoProductos.value.ProdUnidadMedidaACF,
-                  Prod_Fuelle: this.FormPedidoExternoProductos.value.ProdFuelle,
-                  Prod_Ancho: this.FormPedidoExternoProductos.value.ProdAncho,
-                  Prod_Calibre: this.FormPedidoExternoProductos.value.ProdCalibre,
-                  UndMedACF: this.FormPedidoExternoProductos.value.ProdUnidadMedidaACF,
-                  Estado_Id: 10
-                }          
-        
-                const datosExistencias = {
-                  Prod_Id: id,
-                  exProd_Id: datos_existencias[i].exProd_Id,
-                  ExProd_Cantidad: this.FormPedidoExternoProductos.value.ProdStock,
-                  UndMed_Id: this.FormPedidoExternoProductos.value.ProdUnidadMedidaACF,
-                  TpBod_Id: datos_existencias[i].tpBod_Id,
-                  ExProd_Precio: this.FormPedidoExternoProductos.value.ProdPrecioUnd,
-                  ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
-                  ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
-                  ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
-                  TpMoneda_Id: this.FormPedidoExternoProductos.value.ProdTipoMoneda,
+    this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
+      this.tipoEstadoService.srvObtenerListaPorId(1).subscribe(datos_tiposEstados => {
+        if (datos_usuarios.rolUsu_Id == 2){
+          Swal.fire("No tine acceso a esta función");
+        } else if (datos_usuarios.rolUsu_Id == 1){
+          Swal.fire({
+            title: '¿Está seguro de actualizar este producto?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Si, actualizar!'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              let id : number = this.FormPedidoExternoProductos.value.ProdId;
+              let tipo_Id : number;
+              this.tiposProductosService.srvObtenerLista().subscribe(datos_tipos => {
+                for (let index = 0; index < datos_tipos.length; index++) {
+                  if (datos_tipos[index].tpProd_Nombre == this.FormPedidoExternoProductos.value.ProdTipo) {
+                    tipo_Id = datos_tipos[index].tpProd_Id
+                  }            
                 }
-                this.productosServices.srvActualizar(id, datosProducto).subscribe(datos_productos => {
-                  this.existenciasProductosServices.srvActualizar(datos_existencias[i].exProd_Id, datosExistencias).subscribe(datos_existencias => {      
-                    Swal.fire("¡Producto actualizado con exito!");              
-                  }, error => {console.log(error)});
+              });
+              
+              this.productosServices.srvObtenerLista().subscribe(datos_productos => {
+                this.existenciasProductosServices.srvObtenerLista().subscribe(datos_existencias => {
+                  for (let i = 0; i < datos_existencias.length; i++) {
+                    if (datos_existencias[i].prod_Id == id) {
+                      
+                      const datosProducto = {
+                        Prod_Id : id,
+                        Prod_Nombre: this.FormPedidoExternoProductos.value.ProdNombre,
+                        Prod_Descripcion: this.FormPedidoExternoProductos.value.ProdDescripcion,
+                        TpProd_Id: tipo_Id,
+                        Prod_Peso_Bruto: 0,
+                        Prod_Peso_Neto: 0,
+                        UndMedPeso: this.FormPedidoExternoProductos.value.ProdUnidadMedidaACF,
+                        Prod_Fuelle: this.FormPedidoExternoProductos.value.ProdFuelle,
+                        Prod_Ancho: this.FormPedidoExternoProductos.value.ProdAncho,
+                        Prod_Calibre: this.FormPedidoExternoProductos.value.ProdCalibre,
+                        UndMedACF: this.FormPedidoExternoProductos.value.ProdUnidadMedidaACF,
+                        Estado_Id: 10,
+                        Prod_Largo: 0,
+                      }          
+              
+                      const datosExistencias = {
+                        Prod_Id: id,
+                        exProd_Id: datos_existencias[i].exProd_Id,
+                        ExProd_Cantidad: this.FormPedidoExternoProductos.value.ProdStock,
+                        UndMed_Id: this.FormPedidoExternoProductos.value.ProdUnidadMedidaACF,
+                        TpBod_Id: datos_existencias[i].tpBod_Id,
+                        ExProd_Precio: this.FormPedidoExternoProductos.value.ProdPrecioUnd,
+                        ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
+                        ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
+                        ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
+                        TpMoneda_Id: this.FormPedidoExternoProductos.value.ProdTipoMoneda,
+                      }
+                      this.productosServices.srvActualizar(id, datosProducto).subscribe(datos_productos => {
+                        this.existenciasProductosServices.srvActualizar(datos_existencias[i].exProd_Id, datosExistencias).subscribe(datos_existencias => {      
+                          Swal.fire("¡Producto actualizado con exito!");              
+                        });
+                      });
+                      break;
+                    }
+                  }
                 });
-                break;
-              }
+              });
             }
           });
-        });
-      }
+        }    
+      });
     });
-    
   }
 
   // Funcion para editar un pedido
@@ -1623,6 +1615,7 @@ export class OpedidoproductoComponent implements OnInit {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         this.id_pedido = formulario.pedExt_Id;
+        
         this.ArrayProducto = [];
         this.pedidoproductoService.srvObtenerListaPorId(this.id_pedido).subscribe(datos_pedidos => {
           this.PedidoProductosService.srvObtenerLista().subscribe(datos_pedidos_productos => {
@@ -1640,7 +1633,6 @@ export class OpedidoproductoComponent implements OnInit {
                                   this.usuarioService.srvObtenerListaPorId(datos_pedidos.usua_Id).subscribe(datos_usuarios => {                                
                                     this.sedesClientesService.srvObtenerListaPorId(datos_pedidos.sedeCli_Id).subscribe(datos_sedes => {
                                       this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
-
                                         let FechaCreacionDatetime = datos_pedidos.pedExt_FechaCreacion
                                         let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T")
                                         this.fechaCreacion = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
@@ -1648,10 +1640,10 @@ export class OpedidoproductoComponent implements OnInit {
                                         let FechaEntregaDatetime = datos_pedidos.pedExt_FechaEntrega;
                                         let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
                                         this.fechaEntrega = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
                                         this.FormPedidoExternoClientes.patchValue({
                                           PedClienteNombre: datos_clientes.cli_Nombre,
-                                          PedSedeCli_Id: datos_sedes.sedeCliente_Direccion,                                        
+                                          ciudad_sede: datos_sedes.sedeCliente_Ciudad,
+                                          PedSedeCli_Id: datos_sedes.sedeCliente_Direccion,
                                           PedUsuarioNombre: datos_usuarios.usua_Nombre,
                                           PedFecha: this.fechaCreacion,
                                           PedFechaEnt: this.fechaEntrega,
@@ -1694,7 +1686,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Función para editar uno de los pedidos
-  editarPedido() {   
+  editarPedido() {
     this.id_pedido;
     this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
       this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
@@ -1707,6 +1699,7 @@ export class OpedidoproductoComponent implements OnInit {
             let campoEstado = this.FormPedidoExternoClientes.get('PedEstadoId')?.value
             let idEstado : number;
             let producto = [];
+            let datoscliente = [];
 
             this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
               for (let index = 0; index < datos_estado.length; index++) {
@@ -1732,7 +1725,6 @@ export class OpedidoproductoComponent implements OnInit {
               if(!this.ArrayProducto.length) Swal.fire('Debe cargar al menos un producto en la tabla.');
               else if (camposPedido.PedExt_FechaEntrega <= camposPedido.PedExt_FechaCreacion) Swal.fire('La fecha de creación no puede ser menor o igual a la fecha de entrega.');
               else{
-                console.log(1)
                 this.pedidoproductoService.srvActualizarPedidosProdusctos(this.id_pedido, camposPedido).subscribe(datos_pedido_Actualizado => {
                   
                   for (let index = 0; index < this.ArrayProducto.length; index++) {
@@ -1749,34 +1741,52 @@ export class OpedidoproductoComponent implements OnInit {
 
                     this.pedidoproductoService.srvObtenerListaPorId(this.id_pedido).subscribe(datos_pedido => {
                       if (datos_pedido.estado_Id == 2 || datos_pedido.estado_Id == 5 || datos_pedido.estado_Id == 6) {
-                        this.productosServices.srvObtenerListaPorId(idProducto).subscribe(datos_productos => {
-                          producto.push(datos_productos);
-                          for (const item of producto) {
-                            const datosProducto : any = {
-                              Prod_Id : item.prod_Id,
-                              Prod_Cod : item.prod_Cod,
-                              Prod_Nombre: item.prod_Nombre,
-                              Prod_Descripcion: item.prod_Descripcion,
-                              TpProd_Id: item.tpProd_Id,
-                              Prod_Peso_Bruto: 0,
-                              Prod_Peso_Neto: 0,
-                              UndMedPeso: item.undMedPeso,
-                              Prod_Fuelle: item.rod_Fuelle,
-                              Prod_Ancho: item.prod_Ancho,
-                              Prod_Calibre: item.prod_Calibre,
-                              UndMedACF: item.undMedACF,
-                              Estado_Id: 10,
-                              Prod_Largo: 0
-                            }
+                        this.sedesClientesService.srvObtenerListaPorId(datos_pedido.sedeCli_Id).subscribe(datos_sedeCliente => {
+                          this.clientesService.srvObtenerListaPorId(datos_sedeCliente.cli_Id).subscribe(datos_cliente => {
 
-                            this.productosServices.srvActualizar(idProducto, datosProducto).subscribe(datos_producto_actualizado => {
-                              console.log("actualizado")
-                            }, error => {console.log(error)});
+                            datoscliente.push(datos_cliente);
+                            for (const cliente of datoscliente) {
+                              const datosClienteActualizado : any = {
+                                Cli_Id: cliente.cli_Id,
+                                TipoIdentificacion_Id : 'C.C',
+                                Cli_Nombre: cliente.cli_Nombre,
+                                Cli_Telefono: cliente.cli_Telefono,
+                                Cli_Email: cliente.cli_Email,
+                                TPCli_Id: cliente.tpCli_Id,
+                                Usua_Id: cliente.usua_Id,
+                                Estado_Id : 1
+                              }
+                              this.clientesService.srvActualizar(datos_cliente.cli_Id, datosClienteActualizado).subscribe(datos_cliente_actualizado => {}, error => {console.log(error)})
+                            }
+                          });
+
+                          this.productosServices.srvObtenerListaPorId(idProducto).subscribe(datos_productos => {
                             
-                          }
+                            producto.push(datos_productos);
+                            for (const item of producto) {
+                              const datosProducto : any = {
+                                Prod_Id : item.prod_Id,
+                                Prod_Nombre: item.prod_Nombre,
+                                Prod_Descripcion: item.prod_Descripcion,
+                                TpProd_Id: item.tpProd_Id,
+                                Prod_Peso_Bruto: 0,
+                                Prod_Peso_Neto: 0,
+                                UndMedPeso: item.undMedPeso,
+                                Prod_Fuelle: item.rod_Fuelle,
+                                Prod_Ancho: item.prod_Ancho,
+                                Prod_Calibre: item.prod_Calibre,
+                                UndMedACF: item.undMedACF,
+                                Estado_Id: 10,
+                                Prod_Largo: 0
+                              }
+
+                              this.productosServices.srvActualizar(idProducto, datosProducto).subscribe(datos_producto_actualizado => {}, error => {console.log(error)});
+                            }
+                          });
                         });
+                        
                       } else if (datos_pedido.estado_Id == 3 || datos_pedido.estado_Id == 4){
-                          this.ClientesProductosService.srvObtenerListaPorId
+                          
                       }
                     });
                   }
@@ -1797,7 +1807,7 @@ export class OpedidoproductoComponent implements OnInit {
                     title: 'Pedido actualizado satisfactoriamente'
                   })
         
-                  this.crearpdf();
+                  this.crearpdfPedidoActualizado(this.id_pedido);
                   setTimeout(() => {
                     this.LimpiarCampos();
                   }, 1000);
@@ -1805,6 +1815,123 @@ export class OpedidoproductoComponent implements OnInit {
               }
             });
           }          
+        }
+      });
+    });
+  }
+
+  crearpdfPedidoActualizado(idPedido : number){
+    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+      
+      this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
+        for (let cli = 0; cli < datos_clientes.length; cli++) {
+          if (datos_clientes[cli].cli_Nombre == this.FormPedidoExternoClientes.value.PedClienteNombre) {
+            for (let index = 0; index < this.ArrayProducto.length; index++) {
+              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedeCliente => {
+                for (let sede = 0; sede < datos_sedeCliente.length; sede++) {
+                  if (datos_sedeCliente[sede].sedeCliente_Direccion == this.FormPedidoExternoClientes.value.PedSedeCli_Id) {
+                    const pdfDefinicion : any = {
+                      info: {
+                        title: `${idPedido}`
+                      },
+                      content : [
+                        {
+                          text: `Plasticaribe S.A.S ---- Orden de Pedidos de Productos`,
+                          alignment: 'center',
+                          style: 'header',
+                        },
+                        '\n \n',
+                        {
+                          text: `Fecha de pedido: ${this.FormPedidoExternoClientes.value.PedFecha}`,
+                          style: 'header',
+                          alignment: 'right',
+                        },
+        
+                        {
+                          text: `Fecha de entrega: ${this.FormPedidoExternoClientes.value.PedFechaEnt} `,
+                          style: 'header',
+                          alignment: 'right',
+                        },
+                        {
+                          text: `Vendedor: ${this.FormPedidoExternoClientes.value.PedUsuarioNombre}\n`,
+                          alignment: 'right',
+                          style: 'header',
+                        }, 
+                        {
+                          text: `Estado del pedido: ${this.FormPedidoExternoClientes.value.PedEstadoId}\n \n`,
+                          alignment: 'right',
+                          style: 'header',
+                        },
+                        {
+                          text: `\n Información detallada del cliente \n \n`,
+                          alignment: 'center',
+                          style: 'header'
+                        },
+                        {
+                          style: 'tablaCliente',
+                          table: {
+                            widths: ['*', '*', '*'],
+                            style: 'header',
+                            body: [
+                              [
+                                `ID: ${datos_clientes[cli].cli_Id}`, 
+                                `Tipo de ID: ${datos_clientes[cli].tipoIdentificacion_Id}`, 
+                                `Tipo de Cliente: ${datos_clientes[cli].tpCli_Id}`
+                              ],
+                              [
+                                `Nombre: ${this.FormPedidoExternoClientes.value.PedClienteNombre}`,                        
+                                `Telefono: ${datos_clientes[cli].cli_Telefono}`,
+                                `Ciudad: ${datos_sedeCliente[sede].sedeCliente_Ciudad}`
+                              ],
+                              [                          
+                                `Dirección: ${datos_sedeCliente[sede].sedeCliente_Direccion}`, 
+                                `Codigo Postal: ${datos_sedeCliente[sede].sedeCli_CodPostal}`,
+                                ``
+                              ]
+                            ]
+                          },
+                          layout: 'lightHorizontalLines',
+                          fontSize: 9,
+                        },         
+                        {
+                          text: `\n \nObervación sobre el pedido: \n ${this.FormPedidoExternoClientes.value.PedObservacion}\n`,
+                          style: 'header',
+                        },
+                        {
+                          text: `\n Información detallada de producto(s) pedido(s) \n `,
+                          alignment: 'center',
+                          style: 'header'
+                        },
+
+                        this.table(this.ArrayProducto, ['Id', 'Nombre', 'Ancho', 'Fuelle', 'Cal', 'Und', 'Tipo', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                        
+                        {
+                          text: `\n\nValor Total Pedido: $${this.valorTotal}`,
+                          alignment: 'right',
+                          style: 'header',
+                        },
+                        {
+                          text: `Tipo de moneda: ${this.ArrayProducto[index].TpMoneda}`,
+                          alignment: 'right',
+                          style: 'header',
+                        }  
+                      ],
+                      styles: {
+                        header: {
+                          fontSize: 9,
+                          bold: true
+                        },
+                      }
+                    }
+                    const pdf = pdfMake.createPdf(pdfDefinicion);
+                    pdf.open();
+                    break;
+                  }            
+                }
+              });
+              break;
+            }
+          }       
         }
       });
     });

@@ -21,6 +21,7 @@ import { RolesService } from 'src/app/Servicios/roles.service';
 export class CrearProductoComponent implements OnInit {
 
   public FormCrearProducto : FormGroup;
+  public FormCrearPresentacionProducto : FormGroup;
 
   unidadMedida = [];
   tipoProducto = [];
@@ -55,13 +56,16 @@ export class CrearProductoComponent implements OnInit {
       ProduCalibre: new FormControl(),
       ProduUnidadMedidaACF: new FormControl(),
       ProduTipo: new FormControl(),
+      ProdDescripcion: new FormControl(),
+      ClienteNombre: new FormControl(),
+    });
+
+    this.FormCrearPresentacionProducto = this.frmBuilderCrearProducto.group({
       ProduCantidad: new FormControl(),
       ProduUnidadMedidaCant: new FormControl(),
       ProduPrecioUnd: new FormControl(),
       ProduTipoMoneda: new FormControl(),
-      ProdDescripcion: new FormControl(),
-      ClienteNombre: new FormControl(),
-    })
+    });
 
   }
 
@@ -191,6 +195,15 @@ export class CrearProductoComponent implements OnInit {
     this.LimpiarCampos();
   }
 
+  llenarTablaPresentacion(){
+    let id : any = this.FormCrearProducto.value.ProduId;
+    let cantidad : any = this.FormCrearProducto.value.ProduCantidad;
+    let undMed2 : any = this.FormCrearProducto.value.ProduUnidadMedidaCant;
+    let precio : any = this.FormCrearProducto.value.ProduPrecioUnd;
+    let precioFinal : string = this.FormCrearProducto.value.ProduPrecioUnd;
+    let moneda : any = this.FormCrearProducto.value.ProduTipoMoneda;
+    this.pedidosProducto.registrarExistenciaProducto(id, cantidad, undMed2, precio, precioFinal, moneda);
+  }
   
 
 }

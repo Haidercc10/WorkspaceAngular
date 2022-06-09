@@ -1,5 +1,5 @@
 <!--Inicio formulario crear clientes -->
-<form [formGroup]="FormCrearClientes" (ngSubmit)="crearCliente_Sede()">
+<form [formGroup]="FormCrearClientes" (ngSubmit)="validarCamposVaciosClientes()">
   <!-- Inicio Fila 1 Crear clientes -->
   <div class="row g-3">
     <!-- ID Cliente -->
@@ -27,7 +27,7 @@
 
     <!-- Telefono Cliente -->
     <div class="col-md-2">
-      <input  formControlName="CliTelefono"  type="number" class="form-control form-control-sm" id="ClienteTelefono"  placeholder="Teléfono" name="ClienteTelefono" required>
+      <input formControlName="CliTelefono"  type="text" class="form-control form-control-sm" id="ClienteTelefono"  placeholder="Teléfono" name="ClienteTelefono" required>
     </div>
 
       <!-- Email cliente -->
@@ -52,41 +52,45 @@
     </div>
   </div>
 
+  <div class="mb-3">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="btn btn-danger btn-danger-sm" type="submit">Crear cliente</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
+    </div>
+  </div>
+</form>
   <div class="mb-4">
     <hr>
   </div>
 
   <div class="mb-4">
-    <h5 class="tituloRojo">Crear sedes clientes</h5>
+    <h5 class="tituloRojo">Crear sedes a clientes</h5>
   </div>
   <!--Inicio formulario crear sede cliente -->
 
+
+<form [formGroup]="FormCrearSedeClientes" (ngSubmit)="validarCamposVaciosSedes()">
   <!-- Inicio Fila 1 Crear sede cliente -->
   <div class="mb-4">
     <div class="row g-3">
-
-      <!-- ID sede cliente -->
-      <div class="col-md-2">
-        <input formControlName="SedeCli_Id" type="number" class="form-control form-control-sm" id="SdCli_Id"  placeholder="ID sede" name="SdCli_Id">
-      </div>
-
-      <!-- Ciudad sede cliente -->
-      <div class="col-md-2">
-        <input formControlName="SedeCli_Ciudad" type="text" class="form-control form-control-sm" id="SdCli_Ciudad"  placeholder="Ciudad" name="SdCli_Ciudad">
-      </div>
 
       <!-- Nombre del cliente -->
       <div class="col-md">
         <input formControlName="CliId2" type="number" class="form-control form-control-sm" id="ClienteNombre"  placeholder="ID del cliente" name="ClienteNombre">
       </div>
 
-      <!-- Codigo postal -->
-      <div class="col-md-2">
-        <input formControlName="SedeCli_Postal" type="number" class="form-control form-control-sm" id="SdCli_Postal"  placeholder="Código postal" name="SdCli_Postal">
+      <!-- Ciudad sede cliente -->
+      <div class="col-md">
+        <input formControlName="SedeCli_Ciudad" type="text" class="form-control form-control-sm" id="SdCli_Ciudad"  placeholder="Ciudad" name="SdCli_Ciudad">
       </div>
 
-      <div class="col-md-2">
+      <div class="col-md">
         <input formControlName="SedeCli_Direccion" type="text" class="form-control form-control-sm" id="SdCli_Direccion"  placeholder="Direccion" name="SdCli_Direccion">
+      </div>
+
+      <!-- Codigo postal -->
+      <div class="col-md">
+        <input formControlName="SedeCli_Postal" type="number" class="form-control form-control-sm" id="SdCli_Postal"  placeholder="Código postal" name="SdCli_Postal">
       </div>
     </div>
   </div>
@@ -96,8 +100,8 @@
   <!-- Inicio botones -->
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="submit">Crear cliente/sede</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
+        <button class="btn btn-danger btn-danger-sm" type="submit">Crear Sede de Cliente</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCamposSede()">Limpiar campos</button>
     </div>
   </div>
 </form>

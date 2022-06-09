@@ -14,6 +14,7 @@ import {OpedidoproductoComponent} from 'src/app/Vistas/opedidoproducto/opedidopr
 export class ClientesComponent implements OnInit {
 
   public FormCrearClientes : FormGroup;
+  public FormCrearSedeClientes : FormGroup
 
   tipoIdentificacion = [];
   tiposClientes = [];
@@ -34,14 +35,15 @@ export class ClientesComponent implements OnInit {
       CliEmail:  new FormControl(),
       TipoClienteId: new FormControl(),
       UsuIdNombre: new FormControl(),
+    });
 
+    this.FormCrearSedeClientes = this.formBuilderCrearClientes.group({
       SedeCli_Id: new FormControl(),
       SedeCli_Ciudad: new FormControl(),
       CliId2: new FormControl(),
       SedeCli_Postal: new FormControl(),
       SedeCli_Direccion: new FormControl(),
-
-    })
+    });
 
    }
 
@@ -60,30 +62,38 @@ export class ClientesComponent implements OnInit {
        CliEmail: ['', Validators.required],
        TipoClienteId: ['', Validators.required],
        UsuIdNombre: ['', Validators.required],
+    });
 
-       SedeCli_Id: ['', Validators.required],
+    this.FormCrearSedeClientes = this.formBuilderCrearClientes.group({
+      SedeCli_Id: ['', Validators.required],
        SedeCli_Ciudad: ['', Validators.required],
        CliId2: ['', Validators.required],
        SedeCli_Postal: ['', Validators.required],
        SedeCli_Direccion: ['', Validators.required]
-    })
+    });
   }
 
 
-  validarCamposVacios() : any{
+  validarCamposVaciosClientes() : any{
     if(this.FormCrearClientes.valid){
-      this.crearCliente_Sede();
-      console.log("Los datos se enviaron correctamente");
-      console.log(this.FormCrearClientes);
+      this.crearCliente();
       this.LimpiarCampos();
-    }else{
-      Swal.fire("Hay campos vacios");
-      console.log(this.FormCrearClientes);
-    }
+    }else Swal.fire("Hay campos vacios"); 
+  }
+
+  validarCamposVaciosSedes(){
+    if(this.FormCrearSedeClientes.valid){
+      this.crearSede();
+      this.LimpiarCamposSede();
+    }else Swal.fire("Hay campos vacios");
   }
 
   LimpiarCampos() {
     this.FormCrearClientes.reset();
+  }
+
+  LimpiarCamposSede(){
+    this.FormCrearSedeClientes.reset();
   }
 
   tipoIdntificacion() {
@@ -99,7 +109,7 @@ export class ClientesComponent implements OnInit {
       for (let index = 0; index < datos_tiposClientes.length; index++) {
         this.tiposClientes.push(datos_tiposClientes[index].tpCli_Nombre);
       }
-    }, error => { Swal.fire('Ocurrió un error, intentelo de nuevo'); });
+    });
   }
 
   usuarioComboBox() {
@@ -110,12 +120,12 @@ export class ClientesComponent implements OnInit {
     });
   }
 
-  crearCliente_Sede(){
+  crearCliente(){
 
     let id : any = this.FormCrearClientes.value.CliId;
     let tipoId : any = this.FormCrearClientes.value.TipoIdCliente;
     let nombreCliente : any = this.FormCrearClientes.value.CliNombre;
-    let telefono : any = this.FormCrearClientes.value.CliTelefono;
+    let telefono : string = this.FormCrearClientes.value.CliTelefono;
     let email : any = this.FormCrearClientes.value.CliEmail;
     let tipoCliente : string = this.FormCrearClientes.value.TipoClienteId;
     let vendedor : any = this. FormCrearClientes.value.UsuIdNombre;
@@ -125,9 +135,15 @@ export class ClientesComponent implements OnInit {
     let codigoPostal : any = this.FormCrearClientes.value.SedeCli_Postal;
     let direccionSede : any = this.FormCrearClientes.value.SedeCli_Direccion;
 
-    this.pedidoCliente.llenarClientesCreado(id, tipoId, nombreCliente, telefono, email, tipoCliente, ciudadsedeCliente, vendedor, codigoPostal, direccionSede, sedeCLiID);
     this.pedidoCliente.insertarClientes(id, tipoId, nombreCliente, telefono, email, tipoCliente, ciudadsedeCliente, vendedor, codigoPostal, direccionSede, sedeCLiID);
   }
 
+  crearSede(){
+    let id : any = this.FormCrearSedeClientes.value.CliId2;
+    let ciudadsedeCliente : any = this.FormCrearSedeClientes.value.SedeCli_Ciudad;    
+    let codigoPostal : any = this.FormCrearSedeClientes.value.SedeCli_Postal;
+    let direccionSede : any = this.FormCrearSedeClientes.value.SedeCli_Direccion;
+    this.pedidoCliente.llenarSedeCliente(id, ciudadsedeCliente, codigoPostal, direccionSede);
+  }
 
 }
