@@ -47,6 +47,8 @@
  */
 import 'zone.js';  // Included with Angular CLI.
 
+export let rutaPlasticaribeAPI = "http://192.168.0.153:9085/api";
+
 
 /***************************************************************************************************
  * APPLICATION IMPORTS

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { rutaPlasticaribeAPI } from 'src/polyfills';
 import { modelTiposClientes } from '../Modelo/modelTiposClientes';
 
 @Injectable({
@@ -8,7 +9,7 @@ import { modelTiposClientes } from '../Modelo/modelTiposClientes';
 })
 export class TipoClienteService {
 
-  readonly rutaPlasticaribeAPI = "http://192.168.0.153:9085/api";
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
 //Encapsular httpclient en el constructor
   constructor(private http: HttpClient) { }
