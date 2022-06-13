@@ -14,7 +14,7 @@ export class ValidacionLoginGuard implements CanActivate {
 
   redirect(flag : boolean) : any{
     if (!flag) {
-      this.router.navigate(['/', '']);
+      this.router.navigate(['/', 'Login']);
     }
   }
 

@@ -236,20 +236,20 @@
       </div>
         <!-- Fin Titulo Agregar Productos al pedido -->
 
-      <form [formGroup]="FormPedidoExternoProductos" (ngSubmit)="validarCamposVacios()">
+      <form [formGroup]="FormPedidoExternoProductos">
         <!-- Inicio Fila 1 Agregar producto -->
 
         <div class="mb-3">
           <div class="row g-3">
             <!-- ID Producto -->
             <div class="col-md-2">
-              <input formControlName="ProdId" type="number" class="form-control form-control-sm" id="PrdId"  placeholder="ID Producto" name="PrdId" required >
+              <input formControlName="ProdId" type="search" (search)="buscarProducto()" class="form-control form-control-sm" id="PrdId"  placeholder="ID Producto" name="PrdId" required >
             </div>
             <!-- ID/Nombre Producto -->
             <div class="col-md">
                 <select formControlName="ProdNombre" id="PrdNombre" class="form-select form-select-sm" (change)="llenadoProducto()" type="text" aria-label=".form-select-sm example" name="PrdNombre" required>
                   <option [ngValue]="null" disabled selected>Seleccione Producto</option>
-                  <option [ngValue]="productos.prod_Nombre" *ngFor="let productos of producto">{{productos.prod_Nombre}}</option>
+                  <option [ngValue]="productos.prod_Id" *ngFor="let productos of producto">{{productos.prod_Nombre}}</option>
                 </select>
             </div>
             <!-- Ancho Producto -->
@@ -339,7 +339,7 @@
         <!-- Inicio botones -->
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class="btn btn-danger btn-danger-sm" type="submit"> {{AccionBoton}} Producto </button>
+              <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVacios()"> {{AccionBoton}} Producto </button>
               <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarProducto()">Actualizar Producto</button>
               <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
           </div>

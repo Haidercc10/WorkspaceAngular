@@ -61,6 +61,7 @@ export class CrearProductoComponent implements OnInit {
     });
 
     this.FormCrearPresentacionProducto = this.frmBuilderCrearProducto.group({
+      ProdId: new FormControl(),
       ProduCantidad: new FormControl(),
       ProduUnidadMedidaCant: new FormControl(),
       ProduPrecioUnd: new FormControl(),
@@ -82,20 +83,25 @@ export class CrearProductoComponent implements OnInit {
     //Campos que vienen del formulario
     this.FormCrearProducto = this.frmBuilderCrearProducto.group({
       //Datos para la tabla de productos. (Iguala el valor del campo en la vista)
-       ProduId:['',],
+       ProduId:['', Validators.required],
        ProduNombre: ['', Validators.required],
        ProduAncho: ['', Validators.required],
        ProduFuelle: ['', Validators.required],
        ProduCalibre: ['', Validators.required],
        ProduUnidadMedidaACF: ['', Validators.required],
        ProduTipo: ['', Validators.required],
+       ProdDescripcion: ['',],
+       ClienteNombre: ['', Validators.required],
+     });
+
+     this.FormCrearPresentacionProducto = this.frmBuilderCrearProducto.group({
+      //Datos para la tabla de productos. (Iguala el valor del campo en la vista)
+       ProdId:['', Validators.required],
        ProduCantidad: ['', Validators.required],
        ProduUnidadMedidaCant: ['', Validators.required],
        ProduPrecioUnd: ['', Validators.required],
        ProduTipoMoneda: ['', Validators.required],
-       ProdDescripcion: ['',],
-       ClienteNombre: ['', Validators.required],
-     })
+     });
   }
 
   lecturaStorage(){
@@ -112,18 +118,21 @@ export class CrearProductoComponent implements OnInit {
   }
 
   validarCamposVacios() : any{
-    if(this.FormCrearProducto.valid){
-      Swal.fire("Los datos se enviaron correctamente");
-      console.log(this.FormCrearProducto);
-      this.llenarTabla();
-    }else{
-      Swal.fire("Hay campos vacios");
-      console.log(this.FormCrearProducto);
-    }
+    if(this.FormCrearProducto.valid) this.llenarTabla();
+    else Swal.fire("Hay campos vacios");
+  }
+
+  validarCamposVaciosPresentacion() : any{
+    if(this.FormCrearPresentacionProducto.valid) this.llenarTablaPresentacion();
+    else Swal.fire("Hay campos vacios");
   }
 
   LimpiarCampos() {
-  this.FormCrearProducto.reset();
+    this.FormCrearProducto.reset();
+  }
+
+  LimpiarCamposPresentacion() {
+    this.FormCrearPresentacionProducto.reset();
   }
 
   clientesComboBox() {
@@ -152,7 +161,7 @@ export class CrearProductoComponent implements OnInit {
       for (let index = 0; index < datos_undMed.length; index++) {
         this.unidadMedida.push(datos_undMed[index].undMed_Id);
       }
-    }, error => { Swal.fire('Ocurrió un error, intentelo de nuevo'); });
+    });
   }
 
   tipoProductoComboBox(){
@@ -188,21 +197,19 @@ export class CrearProductoComponent implements OnInit {
     let cliente : any = this.FormCrearProducto.value.ClienteNombre;
    
     this.pedidosProducto.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, undMed, tpProducto, cantidad, undMed2, precio, moneda, descripcion);
-    this.pedidosProducto.registrarProducto(id, nombre, ancho, fuelle, calibre, undMed, tpProducto, descripcion, cliente);
-    setTimeout(() => {
-      this.pedidosProducto.registrarExistenciaProducto(id, cantidad, undMed2, precio, precioFinal, moneda);
-    }, 3000);    
+    this.pedidosProducto.registrarProducto(id, nombre, ancho, fuelle, calibre, undMed, tpProducto, descripcion, cliente);  
     this.LimpiarCampos();
   }
 
   llenarTablaPresentacion(){
-    let id : any = this.FormCrearProducto.value.ProduId;
-    let cantidad : any = this.FormCrearProducto.value.ProduCantidad;
-    let undMed2 : any = this.FormCrearProducto.value.ProduUnidadMedidaCant;
-    let precio : any = this.FormCrearProducto.value.ProduPrecioUnd;
-    let precioFinal : string = this.FormCrearProducto.value.ProduPrecioUnd;
-    let moneda : any = this.FormCrearProducto.value.ProduTipoMoneda;
+    let id : any = this.FormCrearPresentacionProducto.value.ProdId;
+    let cantidad : any = this.FormCrearPresentacionProducto.value.ProduCantidad;
+    let undMed2 : any = this.FormCrearPresentacionProducto.value.ProduUnidadMedidaCant;
+    let precio : any = this.FormCrearPresentacionProducto.value.ProduPrecioUnd;
+    let precioFinal : string = this.FormCrearPresentacionProducto.value.ProduPrecioUnd;
+    let moneda : any = this.FormCrearPresentacionProducto.value.ProduTipoMoneda;
     this.pedidosProducto.registrarExistenciaProducto(id, cantidad, undMed2, precio, precioFinal, moneda);
+    this.LimpiarCamposPresentacion();
   }
   
 

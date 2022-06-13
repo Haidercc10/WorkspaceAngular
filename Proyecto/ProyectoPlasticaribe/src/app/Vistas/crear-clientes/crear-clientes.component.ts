@@ -78,7 +78,7 @@ export class ClientesComponent implements OnInit {
     if(this.FormCrearClientes.valid){
       this.crearCliente();
       this.LimpiarCampos();
-    }else Swal.fire("Hay campos vacios"); 
+    }else Swal.fire("Hay campos vacios");
   }
 
   validarCamposVaciosSedes(){
@@ -115,7 +115,9 @@ export class ClientesComponent implements OnInit {
   usuarioComboBox() {
     this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
       for (let index = 0; index < datos_usuarios.length; index++) {
-        this.usuario.push(datos_usuarios[index].usua_Nombre);        
+        if (datos_usuarios[index].rolUsu_Id == 2) {
+          this.usuario.push(datos_usuarios[index].usua_Nombre);
+        }
       }
     });
   }
@@ -131,7 +133,7 @@ export class ClientesComponent implements OnInit {
     let vendedor : any = this. FormCrearClientes.value.UsuIdNombre;
 
     let sedeCLiID : any = this.FormCrearClientes.value.CliId2;
-    let ciudadsedeCliente : any = this.FormCrearClientes.value.SedeCli_Ciudad;    
+    let ciudadsedeCliente : any = this.FormCrearClientes.value.SedeCli_Ciudad;
     let codigoPostal : any = this.FormCrearClientes.value.SedeCli_Postal;
     let direccionSede : any = this.FormCrearClientes.value.SedeCli_Direccion;
 
@@ -140,7 +142,7 @@ export class ClientesComponent implements OnInit {
 
   crearSede(){
     let id : any = this.FormCrearSedeClientes.value.CliId2;
-    let ciudadsedeCliente : any = this.FormCrearSedeClientes.value.SedeCli_Ciudad;    
+    let ciudadsedeCliente : any = this.FormCrearSedeClientes.value.SedeCli_Ciudad;
     let codigoPostal : any = this.FormCrearSedeClientes.value.SedeCli_Postal;
     let direccionSede : any = this.FormCrearSedeClientes.value.SedeCli_Direccion;
     this.pedidoCliente.llenarSedeCliente(id, ciudadsedeCliente, codigoPostal, direccionSede);

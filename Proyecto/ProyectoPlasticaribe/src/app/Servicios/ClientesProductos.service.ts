@@ -8,7 +8,7 @@ import { modelClienteProductos } from '../Modelo/modelClientesProductos';
 })
 export class ClientesProductosService {
 
-  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
+  readonly rutaPlasticaribeAPI = "http://192.168.0.153:9085/api";
 
   constructor(private http : HttpClient) { }
 
@@ -17,8 +17,8 @@ export class ClientesProductosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Cliente_Producto');
   }
 
-  srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Cliente_Producto/${id}`);
+  srvObtenerListaPorId(cli_id : any, prod_id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Cliente_Producto/ ?cli_Id=${cli_id}&prod_Id=${prod_id}`);
   }
 
   //Metodo agregar Productos
@@ -27,13 +27,13 @@ export class ClientesProductosService {
   }
 
   //Metodo actualzar Productos
-  srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Cliente_Producto/${id}`, data);
+  srvActualizar(cli_id : any, prod_id : any, data : any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/Cliente_Producto/ ?cli_Id=${cli_id}&prod_Id=${prod_id}`, data);
   }
 
   //Metodo eliminar Productos
-  srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/Cliente_Producto/${id}`);
+  srvEliminar(cli_id : any, prod_id : any) {
+    return this.http.delete(this.rutaPlasticaribeAPI +`/Cliente_Producto/ ?cli_Id=${cli_id}&prod_Id=${prod_id}`);
   }
 
   //

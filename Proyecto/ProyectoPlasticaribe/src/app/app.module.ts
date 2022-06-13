@@ -26,7 +26,6 @@ import { CrearProductoComponent } from './Vistas/crear-producto/crear-producto.c
 import { ClientesComponent } from './Vistas/crear-clientes/crear-clientes.component';
 import { CrearSedesClientesComponent } from './Vistas/crear-sedes-clientes/crear-sedes-clientes.component';
 import { ProductoComponent } from './Vistas/producto/producto.component';
-import { PdfComponent } from './Vistas/pdf/pdf.component';
 import { CookieService } from 'ngx-cookie-service';
 import { NavbarLateralComponent } from './Vistas/navbar-lateral/navbar-lateral.component';
 import { EstadosComponent } from './Vistas/estados/estados.component';
@@ -43,6 +42,7 @@ export const routes: Routes = [
   {path: 'registro', component: RegistroComponentComponent},
   {path: 'principal_secundaria', canActivate: [ValidacionLoginGuard], component: PrincipalComponent},
   {path: 'areas', canActivate: [ValidacionLoginGuard], component: AreasComponentComponent},
+  {path: 'Login', component: LoginComponentComponent},
   {path: '', component: LoginComponentComponent},
   {path: 'reportes', canActivate: [ValidacionLoginGuard], component: ReportesComponent},
   {path: 'roles', canActivate: [ValidacionLoginGuard], component: RolesComponentComponent},
@@ -58,7 +58,6 @@ export const routes: Routes = [
   {path: 'crearproducto', canActivate: [ValidacionLoginGuard], component:CrearProductoComponent},
   {path: 'crear-clientes', canActivate: [ValidacionLoginGuard], component:ClientesComponent},
   {path: 'producto', canActivate: [ValidacionLoginGuard], component:ProductoComponent},
-  {path: 'pdf',component:PdfComponent},
   {path: 'navbarLateral',canActivate: [ValidacionLoginGuard], component:NavbarLateralComponent},
   {path: 'estados', canActivate: [ValidacionLoginGuard], component: EstadosComponent},
 ]
