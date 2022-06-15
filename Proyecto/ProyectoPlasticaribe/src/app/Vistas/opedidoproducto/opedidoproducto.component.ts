@@ -185,7 +185,6 @@ export class OpedidoproductoComponent implements OnInit {
     this.tipoProductoComboBox();
     this.tipoMonedaComboBox();
     this.ColumnasTabla();
-    this.PruebaInsercion();
     this.lecturaStorage();
     this.usuarioComboBox();
     this.LimpiarCampos();
@@ -742,7 +741,6 @@ export class OpedidoproductoComponent implements OnInit {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) window.location.href = "./";
-      else if (result.isDenied) true
     })
   }
 
@@ -781,21 +779,6 @@ export class OpedidoproductoComponent implements OnInit {
       pDescripcion : "Descripción",
       pSubtotal : "Subtotal",
     }]
-  }
-
-  PruebaInsercion() {
-    let ID : number;
-    let Nombre : string;
-    let Numero : number;
-
-    this.Registro = [
-      {ID : 1, Valores: [Nombre = 'Haider', Numero=5]},
-      {ID : 2, Valores: [Nombre = 'Haidercc', Numero=6]},
-      {ID : 3, Valores: [Nombre = 'Haider10', Numero=10]},
-      {ID : 4, Valores: [Nombre = 'Haider11', Numero=11]}
-    ]
-
-  //  this.titulosTabla = []
   }
 
   // Funcion que envia la informacion de los productos a la tabla.
@@ -2068,11 +2051,12 @@ export class OpedidoproductoComponent implements OnInit {
 
       function reiniciarTiempo() {
           clearTimeout(t);
-          t = setTimeout(tiempoExcedido, 1800000)
+          t = setTimeout(tiempoExcedido, 1800000);
           // 1 minuto son 60000 millisegundos
+          // 30 minutos son 1800000 milisegundos
       }
-  };
-  registrarInactividad();
+    };
+    registrarInactividad();
   }
 
 }

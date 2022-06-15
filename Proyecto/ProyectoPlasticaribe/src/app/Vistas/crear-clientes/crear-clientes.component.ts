@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { TipoClienteService } from 'src/app/Servicios/tipo-cliente.service';
 import { TipoIdentificacionService } from 'src/app/Servicios/tipo-identificacion.service';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
-import {OpedidoproductoComponent} from 'src/app/Vistas/opedidoproducto/opedidoproducto.component'
+import {OpedidoproductoComponent} from 'src/app/Vistas/opedidoproducto/opedidoproducto.component';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 
 @Component({
   selector: 'app-crear-clientes',
@@ -25,7 +26,8 @@ export class ClientesComponent implements OnInit {
                 private tiposClientesService : TipoClienteService,
                   private tipoIdentificacionService : TipoIdentificacionService,
                     private usuarioService : UsuarioService,
-                      private pedidoCliente : OpedidoproductoComponent,) {
+                      private pedidoCliente : OpedidoproductoComponent,
+                        @Inject(SESSION_STORAGE) private storage: WebStorageService, ) {
 
     this.FormCrearClientes = this.formBuilderCrearClientes.group({
       CliId: new FormControl,
@@ -113,11 +115,18 @@ export class ClientesComponent implements OnInit {
   }
 
   usuarioComboBox() {
-    this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-      for (let index = 0; index < datos_usuarios.length; index++) {
-        if (datos_usuarios[index].rolUsu_Id == 2) {
-          this.usuario.push(datos_usuarios[index].usua_Nombre);
-        }
+
+    this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
+      if (datos_usuarios.rolUsu_Id == 2) {
+        this.usuario.push(datos_usuarios.usua_Nombre);
+      }else {
+        this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+          for (let index = 0; index < datos_usuarios.length; index++) {
+            if (datos_usuarios[index].rolUsu_Id == 2) {
+              this.usuario.push(datos_usuarios[index].usua_Nombre);
+            }
+          }
+        });
       }
     });
   }
