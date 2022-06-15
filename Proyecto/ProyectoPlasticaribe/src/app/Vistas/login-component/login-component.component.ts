@@ -37,12 +37,12 @@ export class LoginComponentComponent implements OnInit {
 
   ngOnInit(): void { this.cargaDatosComboBox(); }
 
-  
+
   saveInLocal(key, val): void {
     this.storage.set(key, val);
     this.data[key]= this.storage.get(key);
   }
-  
+
   // FUNCION PARA CARGAR LOS DATOS DE LAS EMPRESAS EN EL COMBOBOX DEL HTML
   cargaDatosComboBox(){
     this.empresaServices.srvObtenerLista().subscribe(datos_empresa=>{
@@ -84,7 +84,7 @@ export class LoginComponentComponent implements OnInit {
                 // this.cookieServices.set('Id', `${idUsuario}`, {expires: medianoche} );
                 // this.cookieServices.set('Nombre', `${nombre}`, {expires: medianoche} );
                 // this.cookieServices.set('Rol', `${rol}`, {expires: medianoche});
-                
+
                 this.saveInLocal('Id', idUsuario);
                 this.saveInLocal('Nombre', nombre);
                 this.saveInLocal('Rol', rol);
@@ -92,16 +92,16 @@ export class LoginComponentComponent implements OnInit {
                 window.location.href = "./opedidoproducto";
                 break;
               } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena){
-                Swal.fire("EL número de identificacion no coincide con la contraseña"); 
+                Swal.fire("EL número de identificacion no coincide con la contraseña");
                 break;
-              } 
+              }
               else{
-                Swal.fire(`El número de identificación ${this.formularioUsuario.value.Identificacion} no se encuentra asociado a la empresa ${empresa}`); 
+                Swal.fire(`El número de identificación ${this.formularioUsuario.value.Identificacion} no se encuentra asociado a la empresa ${empresa}`);
                 break;
-              } 
-            } 
+              }
+            }
           }
-        });       
+        });
       }, error =>{ Swal.fire('El número de identificación no se encuentra registrado'); });
     } catch (error) {
       console.log(error);

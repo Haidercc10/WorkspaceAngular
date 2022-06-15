@@ -24,9 +24,7 @@ import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.se
 import { ThisReceiver } from '@angular/compiler';
 import { modelCliente } from 'src/app/Modelo/modelCliente';
 
-
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
 
 @Component({
   selector: 'app.opedidoproducto.component',
@@ -43,22 +41,18 @@ export class OpedidoproductoComponent implements OnInit {
   public page : number;
   titulo = 'Generar PDF con Angular JS 5';
   imagen1 = 'assets/img/tc.jpg';
-
   AccionBoton = "Agregar";
   Ide : number | undefined;
   id_pedido : number;
-
 
   //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
   public ModalCrearProductos: boolean = false;
   public ModalCrearCliente: boolean = false;
   public ModalSedesClientes: boolean = false;
   public TituloSedes = "";
-
   ID: number;
   Nombre : string;
   Numero : number;
-
 
   // VARIABLES PARA PASAR A LOS COMBOBOX
   cliente:ClientesService[]=[];
@@ -78,12 +72,9 @@ export class OpedidoproductoComponent implements OnInit {
   tipoMoneda:TipoMonedaService[]=[];
   usuarioVende=[] //Nuevo
   Registro = [];
-
   titulosTabla = [];
-
   existenciasProductos=[];
   empresa=[];
-
   pedidosProductos = [];
   pdfPedidoProducto = [];
   pedidoID: OpedidoproductoService[] = [];
@@ -94,11 +85,9 @@ export class OpedidoproductoComponent implements OnInit {
   pedidoObservaion: OpedidoproductoService[] = [];
   pedidoPrecioTotal: OpedidoproductoService[] = [];
   pedidoArchivo: OpedidoproductoService[] = [];
-
   contadorPedidosExternos : number;
   ArrayProducto : any[] =[];
   ArrayProductoNuevo : any =  {};
-
   productosPedidos = [];
 
 /* Vaiables para rescatar los ID de estado, sedes, empresa, valorTotal */
@@ -109,29 +98,21 @@ export class OpedidoproductoComponent implements OnInit {
   SedeSeleccionada: any;
   IDSedeSeleccionada : any;
   UsuarioSeleccionado : any;
-
   pedidosID = [];
-
   datosPDF : any;
-
   pages: number = 1;
   dataset: any[] = ['1','2','3','4','5','6','7','8','9','10'];
-
   storage_Id : number;
   storage_Nombre : any;
   storage_Rol : any;
 
   //variable para almacenar el id del cliente que esta seleccionado
   clienteId : number;
-
   fechaCreacionCortada = [];
   fechaEntregaCortada = [];
-
   fechaCreacion : any;
   fechaEntrega : any;
-
   nombreProducto : string;
-
   productoEliminado : number;
 
   constructor(private pedidoproductoService : OpedidoproductoService,
