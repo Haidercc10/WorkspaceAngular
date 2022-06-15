@@ -1417,6 +1417,7 @@ export class OpedidoproductoComponent implements OnInit {
 
   // Funcion para guardar clientes en la base de datos
   insertarClientes(id : any, tipoId : any, nombre : any, telefono : string, email : any, tipoCliente : string, ciudadSede : any, vendedor : any, codigoPostal : number, direccionSede : any, sedeCLiID : any){
+
     let usuario : number;
     let Id_TipoCliente : number;
     this.tipoClientService.srvObtenerLista().subscribe(datos_tipoCliente => {
@@ -1427,19 +1428,37 @@ export class OpedidoproductoComponent implements OnInit {
             for (let index = 0; index < datos_usuario.length; index++) {
               if (datos_usuario[index].usua_Nombre == vendedor) {
                 usuario = datos_usuario[index].usua_Id;
-                const datosClientes : modelCliente = {
-                  Cli_Id: id,
-                  TipoIdentificacion_Id : tipoId,
-                  Cli_Nombre: nombre,
-                  Cli_Telefono: telefono,
-                  Cli_Email: email,
-                  TPCli_Id: Id_TipoCliente,
-                  Usua_Id: usuario,
-                  Estado_Id : 8
-                }
-                this.clientesService.srvGuardar(datosClientes).subscribe(datos => {
-                  Swal.fire('Cliente guardado con éxito!');
-                }, error => { console.log(error); });
+                this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
+                  if (datos_usuarios.rolUsu_Id == 2) {
+                    const datosClientes : modelCliente = {
+                      Cli_Id: id,
+                      TipoIdentificacion_Id : tipoId,
+                      Cli_Nombre: nombre,
+                      Cli_Telefono: telefono,
+                      Cli_Email: email,
+                      TPCli_Id: Id_TipoCliente,
+                      Usua_Id: usuario,
+                      Estado_Id : 8
+                    }
+                    this.clientesService.srvGuardar(datosClientes).subscribe(datos => {
+                      Swal.fire('Cliente guardado con éxito!');
+                    }, error => { console.log(error); });
+                  }else if (datos_usuarios.rolUsu_Id == 1){
+                    const datosClientes : modelCliente = {
+                      Cli_Id: id,
+                      TipoIdentificacion_Id : tipoId,
+                      Cli_Nombre: nombre,
+                      Cli_Telefono: telefono,
+                      Cli_Email: email,
+                      TPCli_Id: Id_TipoCliente,
+                      Usua_Id: usuario,
+                      Estado_Id : 1
+                    }
+                    this.clientesService.srvGuardar(datosClientes).subscribe(datos => {
+                      Swal.fire('Cliente guardado con éxito!');
+                    }, error => { console.log(error); });
+                  }
+                });
                 break;
               }
             }
@@ -1499,50 +1518,102 @@ export class OpedidoproductoComponent implements OnInit {
       for (let index = 0; index < datos_tipoProducto.length; index++) {
         if (tipoProductos_nombre == datos_tipoProducto[index].tpProd_Nombre) {
           tipoProducto_Id = datos_tipoProducto[index].tpProd_Id;
-          const datosProductos : any = {
-            Prod_Id: id,
-            Prod_Nombre: nombre,
-            Prod_Descripcion: descripcion,
-            TpProd_Id: tipoProducto_Id,
-            Prod_Peso_Bruto: 0,
-            Prod_Peso_Neto: 0,
-            UndMedPeso: undMed,
-            Prod_Fuelle: fuelle,
-            Prod_Ancho: ancho,
-            Prod_Calibre: calibre,
-            UndMedACF: undMed,
-            Estado_Id: 9,
-            Prod_Largo: 0,
-          };
-          this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
-            for (let i = 0; i < datos_clientes.length; i++) {
-              if (datos_clientes[i].cli_Nombre == cliente) {
-                clienteId = datos_clientes[i].cli_Id;
-                const clienteproducto : any = {
-                  Cli_Id: clienteId,
-                  Prod_Id: id
+
+          this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
+            if (datos_usuarios.rolUsu_Id == 2) {
+              const datosProductos : any = {
+                Prod_Id: id,
+                Prod_Nombre: nombre,
+                Prod_Descripcion: descripcion,
+                TpProd_Id: tipoProducto_Id,
+                Prod_Peso_Bruto: 0,
+                Prod_Peso_Neto: 0,
+                UndMedPeso: undMed,
+                Prod_Fuelle: fuelle,
+                Prod_Ancho: ancho,
+                Prod_Calibre: calibre,
+                UndMedACF: undMed,
+                Estado_Id: 9,
+                Prod_Largo: 0,
+              };
+              this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
+                for (let i = 0; i < datos_clientes.length; i++) {
+                  if (datos_clientes[i].cli_Nombre == cliente) {
+                    clienteId = datos_clientes[i].cli_Id;
+                    const clienteproducto : any = {
+                      Cli_Id: clienteId,
+                      Prod_Id: id
+                    }
+                    this.productosServices.srvGuardar(datosProductos).subscribe(datos => {
+                      this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
+                        const Toast = Swal.mixin({
+                          toast: true,
+                          position: 'center',
+                          showConfirmButton: false,
+                          timer: 3500,
+                          timerProgressBar: true,
+                          didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                          }
+                        });
+                        Toast.fire({
+                          icon: 'success',
+                          title: `Producto creado con exito`
+                        });
+                      });
+                    }, error => {console.log(error)});
+                    break;
+                  }
                 }
-                this.productosServices.srvGuardar(datosProductos).subscribe(datos => {
-                  this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
-                    const Toast = Swal.mixin({
-                      toast: true,
-                      position: 'center',
-                      showConfirmButton: false,
-                      timer: 3500,
-                      timerProgressBar: true,
-                      didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
-                      }
-                    });
-                    Toast.fire({
-                      icon: 'success',
-                      title: `Producto creado con exito`
-                    });
-                  });
-                }, error => {console.log(error)});
-                break;
-              }
+              });
+            }else if (datos_usuarios.rolUsu_Id == 1){
+              const datosProductos : any = {
+                Prod_Id: id,
+                Prod_Nombre: nombre,
+                Prod_Descripcion: descripcion,
+                TpProd_Id: tipoProducto_Id,
+                Prod_Peso_Bruto: 0,
+                Prod_Peso_Neto: 0,
+                UndMedPeso: undMed,
+                Prod_Fuelle: fuelle,
+                Prod_Ancho: ancho,
+                Prod_Calibre: calibre,
+                UndMedACF: undMed,
+                Estado_Id: 10,
+                Prod_Largo: 0,
+              };
+              this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
+                for (let i = 0; i < datos_clientes.length; i++) {
+                  if (datos_clientes[i].cli_Nombre == cliente) {
+                    clienteId = datos_clientes[i].cli_Id;
+                    const clienteproducto : any = {
+                      Cli_Id: clienteId,
+                      Prod_Id: id
+                    }
+                    this.productosServices.srvGuardar(datosProductos).subscribe(datos => {
+                      this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
+                        const Toast = Swal.mixin({
+                          toast: true,
+                          position: 'center',
+                          showConfirmButton: false,
+                          timer: 3500,
+                          timerProgressBar: true,
+                          didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                          }
+                        });
+                        Toast.fire({
+                          icon: 'success',
+                          title: `Producto creado con exito`
+                        });
+                      });
+                    }, error => {console.log(error)});
+                    break;
+                  }
+                }
+              });
             }
           });
         }
@@ -2057,6 +2128,35 @@ export class OpedidoproductoComponent implements OnInit {
       }
     };
     registrarInactividad();
+  }
+
+  notifyMe() {
+    //Vamos a comprobar si el navegador es compatible con las notificaciones
+    if (!("Notification" in window)) {
+      alert("No es compatible");
+    }
+    // Vamos a ver si ya se han concedido permisos de notificación
+    else if (Notification.permission === "granted") {
+      // Si está bien vamos a crear una notificación
+      let body = "Hola";
+
+      let title = "Notificación";
+      let notification = new Notification(title);
+
+      notification.onclick = function () {
+          //action
+      };
+      setTimeout(notification.close.bind(notification), 5000);
+    }
+    // De lo contrario, tenemos que pedir permiso al usuario
+    else if (Notification.permission !== 'denied') {
+      Notification.requestPermission(function (permission) {
+        // Si el usuario acepta, vamos a crear una notificación
+        if (permission === "granted") {
+          var notification = new Notification( "Ahora podras recibir notifiaciones");
+        }
+      });
+    }
   }
 
 }
