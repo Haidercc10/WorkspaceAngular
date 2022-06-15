@@ -296,7 +296,7 @@
               <div class="col-md-2">
                 <select formControlName="ProdUnidadMedidaCant" id="PrdUnidadMedidaCant" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrdUnidadMedidaCant" required >
                   <option [ngValue]="null" disabled selected>Seleccione Presentación</option>
-                  <option [ngValue]="unidadMedida" *ngFor="let unidadMedida of undMed">{{unidadMedida}}</option>
+                  <option [ngValue]="presentaciones" *ngFor="let presentaciones of presentacion">{{presentaciones}}</option>
                 </select>
               </div>
               <!-- Precio Producto -->

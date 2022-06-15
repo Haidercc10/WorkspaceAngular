@@ -69,6 +69,7 @@ export class OpedidoproductoComponent implements OnInit {
   productoInfo=[];
   tipoProducto=[];
   undMed:UnidadMedidaService[]=[];
+  presentacion = [];
   tipoMoneda:TipoMonedaService[]=[];
   usuarioVende=[] //Nuevo
   Registro = [];
@@ -188,6 +189,7 @@ export class OpedidoproductoComponent implements OnInit {
     this.lecturaStorage();
     this.usuarioComboBox();
     this.LimpiarCampos();
+    this.inactividad();
   }
 
   lecturaStorage(){
@@ -489,6 +491,7 @@ export class OpedidoproductoComponent implements OnInit {
     this.productoInfo = [];
     this.existenciasProductos = [];
     this.tipoProducto = [];
+    this.presentacion = [];
 
     let nombreProducto : string = this.FormPedidoExternoProductos.value.ProdNombre;
     for (const item of this.producto) {
@@ -506,6 +509,7 @@ export class OpedidoproductoComponent implements OnInit {
                     this.tipoProducto.push(datos_tipoProducto.tpProd_Nombre);
                     this.tipoProductoComboBox();
                     this.informacionProducto();
+                    this.presentacion.push(datos_existencias[index].undMed_Id);
                     break;
                   }
                 }
@@ -522,22 +526,22 @@ export class OpedidoproductoComponent implements OnInit {
     for (const producto of this.productoInfo) {
       for (const tipoProdu of this.tipoProducto) {
         for (const e of this.existenciasProductos) {
-          this.nombreProducto = producto.prod_Nombre;
-          this.FormPedidoExternoProductos.setValue({
-            ProdId: producto.prod_Id,
-            ProdNombre: this.FormPedidoExternoProductos.value.ProdNombre,
-            ProdAncho: producto.prod_Ancho,
-            ProdFuelle: producto.prod_Fuelle,
-            ProdCalibre: producto.prod_Calibre,
-            ProdUnidadMedidaACF: producto.undMedACF,
-            ProdTipo: tipoProdu,
-            ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
-            ProdUnidadMedidaCant: null,
-            ProdPrecioUnd: e.exProd_PrecioVenta,
-            ProdTipoMoneda: e.tpMoneda_Id,
-            ProdStock: e.exProd_Cantidad,
-            ProdDescripcion: producto.prod_Descripcion,
-          });
+            this.nombreProducto = producto.prod_Nombre;
+            this.FormPedidoExternoProductos.setValue({
+              ProdId: producto.prod_Id,
+              ProdNombre: this.FormPedidoExternoProductos.value.ProdNombre,
+              ProdAncho: producto.prod_Ancho,
+              ProdFuelle: producto.prod_Fuelle,
+              ProdCalibre: producto.prod_Calibre,
+              ProdUnidadMedidaACF: producto.undMedACF,
+              ProdTipo: tipoProdu,
+              ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
+              ProdUnidadMedidaCant: e.undMed_Id,
+              ProdPrecioUnd: e.exProd_PrecioVenta,
+              ProdTipoMoneda: e.tpMoneda_Id,
+              ProdStock: e.exProd_Cantidad,
+              ProdDescripcion: producto.prod_Descripcion,
+            });
           break;
         }
         break;
@@ -2040,6 +2044,35 @@ export class OpedidoproductoComponent implements OnInit {
         }
       });
     });
+  }
+
+  //Funcio para verificar la inactividad de un usuario, cunado pasa mas de 30 minutos sin actividad se cierra la sesion
+  inactividad(){
+    let registrarInactividad = function () {
+      let t;
+      window.onload = reiniciarTiempo;
+      // Eventos del DOM
+      document.onmousemove = reiniciarTiempo;
+      document.onkeypress = reiniciarTiempo;
+      document.onload = reiniciarTiempo;
+      document.onmousemove = reiniciarTiempo;
+      document.onmousedown = reiniciarTiempo; // aplica para una pantalla touch
+      document.ontouchstart = reiniciarTiempo;
+      document.onclick = reiniciarTiempo;     // aplica para un clic del touchpad
+      document.onscroll = reiniciarTiempo;    // navegando con flechas del teclado
+      document.onkeypress = reiniciarTiempo;
+
+      function tiempoExcedido() {
+        window.location.href = "./";
+      }
+
+      function reiniciarTiempo() {
+          clearTimeout(t);
+          t = setTimeout(tiempoExcedido, 1800000)
+          // 1 minuto son 60000 millisegundos
+      }
+  };
+  registrarInactividad();
   }
 
 }
