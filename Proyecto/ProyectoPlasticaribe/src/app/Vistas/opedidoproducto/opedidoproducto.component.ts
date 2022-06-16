@@ -23,6 +23,7 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.service';
 import { ThisReceiver } from '@angular/compiler';
 import { modelCliente } from 'src/app/Modelo/modelCliente';
+import moment from 'moment';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -169,8 +170,10 @@ export class OpedidoproductoComponent implements OnInit {
       PedExtIdConsulta: new FormControl(),
       PedExtFechaConsulta: new FormControl(),
       PedExtFechaEntregaConsulta: new FormControl(),
-      // PedExtEstadoConsulta: new FormControl(),
-      // PedExtUsuarioConsulta: new FormControl(),
+      PedExtEstadoConsulta: new FormControl(),
+      PedExtUsuarioConsulta: new FormControl(),
+      PedExtClienteConsulta: new FormControl(),
+      PedExtIdClienteConsulta : new FormControl(),
     });
   }
 
@@ -189,6 +192,7 @@ export class OpedidoproductoComponent implements OnInit {
     this.usuarioComboBox();
     this.LimpiarCampos();
     this.inactividad();
+    this.limpiarCamposConsulta();
   }
 
   lecturaStorage(){
@@ -234,16 +238,16 @@ export class OpedidoproductoComponent implements OnInit {
        ProdTipoMoneda: ['', Validators.required],
        ProdStock: ['', Validators.required],
        ProdDescripcion: ['', Validators.required],
-
-
     });
 
     this.FormConsultaPedidoExterno = this.frmBuilderPedExterno.group({
       PedExtIdConsulta: [, Validators.required],
       PedExtFechaConsulta: [, Validators.required],
       PedExtFechaEntregaConsulta: [, Validators.required],
-      // PedExtEstadoConsulta: [, Validators.required],
-      // PedExtUsuarioConsulta : ['',],
+      PedExtEstadoConsulta: [, Validators.required],
+      PedExtUsuarioConsulta : ['',],
+      PedExtClienteConsulta : ['',],
+      PedExtIdClienteConsulta : ['',],
     });
   }
 
@@ -355,9 +359,17 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   usuarioComboBox(){
-    this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-      for (let index = 0; index < datos_usuarios.length; index++) {
-        this.usuarios.push(datos_usuarios[index].usua_Nombre);
+    this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
+      if (datos_usuarios.rolUsu_Id == 2) {
+        this.usuarios.push(datos_usuarios.usua_Nombre);
+      }else {
+        this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+          for (let index = 0; index < datos_usuarios.length; index++) {
+            if (datos_usuarios[index].rolUsu_Id == 2) {
+              this.usuarios.push(datos_usuarios[index].usua_Nombre);
+            }
+          }
+        });
       }
     });
   }
@@ -560,88 +572,51 @@ export class OpedidoproductoComponent implements OnInit {
 
   // Funcion para validar los campos vacios de las consultas
   validarCamposVaciosConsulta(){
-
-    // if (this.FormConsultaPedidoExterno.valid) {
-
-    // } else if (this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta != null) {
-    //   console.log(2)
-    //   this.pedidosProductos = [];
-    //   this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-    //     for (let index = 0; index < datos_pedidos.length; index++) {
-    //       this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
-    //         for (let i = 0; i < datos_estados.length; i++) {
-    //           if (datos_estados[i].estado_Nombre == this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta) {
-    //             this.sedesClientesService.srvObtenerListaPorId(datos_pedidos[index].sedeCli_Id).subscribe(datos_sedes => {
-    //               this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
-    //                 this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
-    //                   if (datos_usuarios.rolUsu_Id == 2) {
-    //                     if (datos_usuarios.usua_Nombre == this.storage_Nombre) {
-    //                       if (datos_pedidos[index].usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(datos_pedidos[index]);
-    //                       else Swal.fire("No tiene acceso a este pedido");
-    //                     }
-    //                   } else if (datos_usuarios.rolUsu_Id == 1) this.pedidosProductos.push(datos_pedidos[index]);
-    //                 });
-    //               });
-    //             });
-    //             break;
-    //           }
-    //         }
-    //       });
-    //     }
-    //   });
-    // }
-    // else if (this.FormConsultaPedidoExterno.value.PedExtIdConsulta != "") {
-    //   console.log(1)
-    //   this.pedidosProductos = [];
-    //   this.pedidoproductoService.srvObtenerListaPorId(this.FormConsultaPedidoExterno.value.PedExtIdConsulta).subscribe(datos_pedidos => {
-    //     this.sedesClientesService.srvObtenerListaPorId(datos_pedidos.sedeCli_Id).subscribe(datos_sedes => {
-    //       this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
-    //         this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
-    //           if (datos_usuarios.rolUsu_Id == 2) {
-    //             if (datos_usuarios.usua_Nombre == this.storage_Nombre) {
-    //               if (datos_pedidos.usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(datos_pedidos);
-    //               else Swal.fire("No tiene acceso a este pedido");
-    //             }
-    //           } else if (datos_usuarios.rolUsu_Id == 1) this.pedidosProductos.push(datos_pedidos);
-    //         });
-    //       });
-    //     });
-    //   });
-    // }
-
-    // this.pedidosProductos = [];
-    // this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-    //   for (let index = 0; index < datos_pedidos.length; index++) {
-    //     this.sedesClientesService.srvObtenerListaPorId(datos_pedidos[index].sedeCli_Id).subscribe(datos_sedes => {
-    //       this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
-    //         this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
-    //           this.estadosService.srvObtenerListaPorId(datos_pedidos[index].estado_Id).subscribe(datos_estados => {
-    //               if (this.FormConsultaPedidoExterno.valid) {
-
-    //               } else if (this.FormConsultaPedidoExterno.value.PedExtIdConsulta == datos_pedidos[index].pedExt_Id){
-    //                 // Consulta por el ID del pedido
-    //                 if (datos_usuarios.rolUsu_Id == 2) {
-    //                   if (datos_pedidos[index].usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(datos_pedidos[index]);
-    //                   else Swal.fire("No tiene acceso a este pedido");
-    //                 }else if (datos_usuarios.rolUsu_Id == 1) {
-    //                   this.pedidosProductos.push(datos_pedidos[index]);
-    //                   console.log(datos_pedidos[index])
-    //                 }
-
-    //               } else if (this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta == datos_pedidos[index].estado_Id){
-    //                 // Consulta por el Estado del pedido
-
-    //               }
-    //           })
-    //         });
-    //       }, error => { console.log(error)});
-
-    //     }, error => { console.log(error)});
-    //   }
-    // }, error => { console.log(error)});
     this.fechaCreacionCortada = [];
     this.fechaEntregaCortada = [];
-    if(this.FormConsultaPedidoExterno.valid) {
+
+    //Buscará los pedidos por las fechas filtradas
+    if (this.FormConsultaPedidoExterno.value.PedExtFechaConsulta !== null && this.FormConsultaPedidoExterno.value.PedExtFechaEntregaConsulta !== null) {
+      this.pedidosProductos = [];
+      let fechaCreacionPedido : any = this.FormConsultaPedidoExterno.value.PedExtFechaConsulta;
+      let fechaCreacionFinal : any;
+      let fechaEntregaPedido : any = this.FormConsultaPedidoExterno.value.PedExtFechaEntregaConsulta;
+      let fechaEntregaFinal : any;
+      this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          let FechaCreacionDatetime = datos_pedidos[index].pedExt_FechaCreacion;
+          let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
+          fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
+
+          let FechaEntregaDatetime = datos_pedidos[index].pedExt_FechaEntrega;
+          let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+          fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+
+          if (moment(fechaCreacionFinal).isBetween(fechaCreacionPedido, fechaEntregaPedido) && moment(fechaEntregaFinal).isBetween(fechaCreacionPedido, fechaEntregaPedido)) {
+            this.llenadoPedidos(datos_pedidos[index]);
+          }
+        }
+      });
+    }
+    //Buscará los pedidos con el estado que se digitó
+    else if (this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta !== null) {
+      let idEstado : number;
+      this.pedidosProductos = [];
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+        for (let index = 0; index < datos_estado.length; index++) {
+          if (datos_estado[index].estado_Nombre == this.FormConsultaPedidoExterno.value.PedExtEstadoConsulta) {
+            idEstado = datos_estado[index].estado_Id;
+            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+              for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                if (datos_pedidos[ped].estado_Id == idEstado)  this.llenadoPedidos(datos_pedidos[ped]);
+              }
+            });
+          }
+        }
+      });
+    }
+    //Buscará el pedido por el ID que se digitó
+    else if (this.FormConsultaPedidoExterno.value.PedExtIdConsulta !== null) {
       this.pedidosProductos = [];
       this.pedidoproductoService.srvObtenerListaPorId(this.FormConsultaPedidoExterno.value.PedExtIdConsulta).subscribe(datos_pedidos => {
         this.sedesClientesService.srvObtenerListaPorId(datos_pedidos.sedeCli_Id).subscribe(datos_sedes => {
@@ -679,6 +654,28 @@ export class OpedidoproductoComponent implements OnInit {
                   }
                 }
               } else if (datos_usuarios.rolUsu_Id == 1) this.pedidosProductos.push(datos_pedidos);
+
+              for (const item of this.pedidosProductos) {
+                this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+                  for (let index = 0; index < datos_estado.length; index++) {
+                    if (datos_estado[index].estado_Id == item.estado_Id) item.estado_Id = datos_estado[index].estado_Nombre;
+                  }
+                });
+              }
+              for (const vendedor of this.pedidosProductos) {
+                this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuario => {
+                  for (let index = 0; index < datos_usuario.length; index++) {
+                    if (datos_usuario[index].usua_Id == vendedor.usua_Id) vendedor.usua_Id = datos_usuario[index].usua_Nombre;
+                  }
+                });
+              }
+              for (const cliente of this.pedidosProductos) {
+                this.sedesClientesService.srvObtenerListaPorId(cliente.sedeCli_Id).subscribe(datos_sede => {
+                  this.clientesService.srvObtenerListaPorId(datos_sede.cli_Id).subscribe(datos_cliente => {
+                    cliente.sedeCli_Id = datos_cliente.cli_Nombre;
+                  });
+                });
+              }
             });
           });
         });
@@ -699,7 +696,98 @@ export class OpedidoproductoComponent implements OnInit {
           title: 'El pedido no existe'
         });
       });
-    }else {
+
+    }
+    //Buscará los pedidos del usuario que se ha seleccionado
+    else if (this.FormConsultaPedidoExterno.value.PedExtUsuarioConsulta !== null){
+      let idUsuario : number;
+      this.pedidosProductos = [];
+      this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+        for (let index = 0; index < datos_usuarios.length; index++) {
+          if (datos_usuarios[index].usua_Nombre == this.FormConsultaPedidoExterno.value.PedExtUsuarioConsulta) {
+            idUsuario = datos_usuarios[index].usua_Id;
+            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+              for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                if (datos_pedidos[ped].usua_Id == idUsuario) this.llenadoPedidos(datos_pedidos[ped]);
+              }
+            });
+          }
+        }
+      });
+    }
+    //Buscará los pedidos del cliente que se buscó por su Id
+    else if (this.FormConsultaPedidoExterno.value.PedExtIdClienteConsulta !== null){
+      this.pedidosProductos = [];
+      let idCliente : number = this.FormConsultaPedidoExterno.value.PedExtIdClienteConsulta;
+      this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+        for (let index = 0; index < datos_sedes.length; index++) {
+          if (datos_sedes[index].cli_Id == idCliente) {
+            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+              for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                if (datos_pedidos[ped].sedeCli_Id == datos_sedes[index].sedeCli_Id) this.llenadoPedidos(datos_pedidos[ped]);
+              }
+            })
+          }
+        }
+      });
+    }
+    //Buscará los pedidos de los clientes por el que se seleccionó
+    else if (this.FormConsultaPedidoExterno.value.PedExtClienteConsulta !== null){
+      this.pedidosProductos = [];
+      let idCliente : number;
+      this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
+        for (let index = 0; index < datos_cliente.length; index++) {
+          if (datos_cliente[index].cli_Nombre == this.FormConsultaPedidoExterno.value.PedExtClienteConsulta) {
+            idCliente = datos_cliente[index].cli_Id;
+            this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+              for (let i = 0; i < datos_sedes.length; i++) {
+                if (datos_sedes[i].cli_Id == idCliente) {
+                  this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                    for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                      if (datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) this.llenadoPedidos(datos_pedidos[ped]);
+                    }
+                  })
+                }
+              }
+            });
+          }
+        }
+      })
+    }
+    //Buscará los pedidos por la fecha que se selccionó, esta fecha será la fecha de creación del pedido
+    else if (this.FormConsultaPedidoExterno.value.PedExtFechaConsulta !== null) {
+      this.pedidosProductos = [];
+      let fechaCreacionPedido : any = this.FormConsultaPedidoExterno.value.PedExtFechaConsulta;
+      let fechaCreacionFinal : any;
+      this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          let FechaCreacionDatetime = datos_pedidos[index].pedExt_FechaCreacion;
+          let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
+          fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
+          if (moment(fechaCreacionFinal).isBetween(fechaCreacionPedido, undefined)) {
+            this.llenadoPedidos(datos_pedidos[index]);
+          }
+        }
+      });
+    }
+    //Buscará los pedidos por la fecha que se selccionó, esta fecha será la fecha de entrega del pedido
+    else if (this.FormConsultaPedidoExterno.value.PedExtFechaEntregaConsulta !== null) {
+      this.pedidosProductos = [];
+      let fechaEntregaPedido : any = this.FormConsultaPedidoExterno.value.PedExtFechaEntregaConsulta;
+      let fechaEntregaFinal : any;
+      this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          let FechaEntregaDatetime = datos_pedidos[index].pedExt_FechaEntrega;
+          let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+          fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+          if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntregaPedido)) {
+            this.llenadoPedidos(datos_pedidos[index]);
+          }
+        }
+      });
+    }
+    //Bucará todos los pedidos existentes
+    else {
       this.pedidosProductos = [];
       this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
@@ -712,15 +800,36 @@ export class OpedidoproductoComponent implements OnInit {
           let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
           this.fechaEntregaCortada.push(FechaEntregaDatetime.substring(0, FechaEntregaNueva));
 
-
           this.sedesClientesService.srvObtenerListaPorId(datos_pedidos[index].sedeCli_Id).subscribe(datos_sedes => {
             this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
               this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
                 if (datos_usuarios.rolUsu_Id == 2) {
                   if (datos_usuarios.usua_Nombre == this.storage_Nombre) {
-                    if (datos_pedidos[index].usua_Id == datos_usuarios.usua_Id)  this.pedidosProductos.push(datos_pedidos[index]);
+                    if (datos_pedidos[index].usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(datos_pedidos[index]);
                   }
                 } else if (datos_usuarios.rolUsu_Id == 1) this.pedidosProductos.push(datos_pedidos[index]);
+
+                for (const item of this.pedidosProductos) {
+                  this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+                    for (let index = 0; index < datos_estado.length; index++) {
+                      if (datos_estado[index].estado_Id == item.estado_Id) item.estado_Id = datos_estado[index].estado_Nombre;
+                    }
+                  });
+                }
+                for (const vendedor of this.pedidosProductos) {
+                  this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuario => {
+                    for (let index = 0; index < datos_usuario.length; index++) {
+                      if (datos_usuario[index].usua_Id == vendedor.usua_Id) vendedor.usua_Id = datos_usuario[index].usua_Nombre;
+                    }
+                  });
+                }
+                for (const cliente of this.pedidosProductos) {
+                  this.sedesClientesService.srvObtenerListaPorId(cliente.sedeCli_Id).subscribe(datos_sede => {
+                    this.clientesService.srvObtenerListaPorId(datos_sede.cli_Id).subscribe(datos_cliente => {
+                      cliente.sedeCli_Id = datos_cliente.cli_Nombre;
+                    });
+                  });
+                }
                 this.pedidosProductos.sort((a,b)=> Number(a.pedExt_Id) - Number(b.pedExt_Id));
               });
             });
@@ -728,6 +837,114 @@ export class OpedidoproductoComponent implements OnInit {
         }
       });
     }
+
+  }
+
+  // Funcion que llenará la tabla de pedidos con la informacion que viene de la funcion "validarCamposVaciosConsulta"
+  llenadoPedidos(pedido : any){
+    this.sedesClientesService.srvObtenerListaPorId(pedido.sedeCli_Id).subscribe(datos_sedes => {
+      this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
+        this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
+          let FechaCreacionDatetime = pedido.pedExt_FechaCreacion
+          let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T")
+          this.fechaCreacionCortada.push(FechaCreacionDatetime.substring(0, FechaCreacionNueva));
+
+          let FechaEntregaDatetime = pedido.pedExt_FechaEntrega;
+          let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+          this.fechaEntregaCortada.push(FechaEntregaDatetime.substring(0, FechaEntregaNueva));
+
+          if (datos_usuarios.rolUsu_Id == 2) {
+            if (datos_usuarios.usua_Nombre == this.storage_Nombre) {
+              if (pedido.usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(pedido);
+              else {
+                const Toast = Swal.mixin({
+                  toast: true,
+                  position: 'center',
+                  showConfirmButton: false,
+                  timer: 1000,
+                  timerProgressBar: true,
+                  didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                  }
+                })
+
+                Toast.fire({
+                  icon: 'error',
+                  title: 'Usted no tiene acceso a este pedido'
+                });
+              }
+            }
+          } else if (datos_usuarios.rolUsu_Id == 1) this.pedidosProductos.push(pedido);
+
+          for (const item of this.pedidosProductos) {
+            this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+              for (let i = 0; i < datos_estado.length; i++) {
+                if (datos_estado[i].estado_Id == item.estado_Id) item.estado_Id = datos_estado[i].estado_Nombre;
+              }
+            });
+          }
+          for (const vendedor of this.pedidosProductos) {
+            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuario => {
+              for (let i = 0; i < datos_usuario.length; i++) {
+                if (datos_usuario[i].usua_Id == vendedor.usua_Id) vendedor.usua_Id = datos_usuario[i].usua_Nombre;
+              }
+            });
+          }
+          for (const cliente of this.pedidosProductos) {
+            this.sedesClientesService.srvObtenerListaPorId(cliente.sedeCli_Id).subscribe(datos_sede => {
+              this.clientesService.srvObtenerListaPorId(datos_sede.cli_Id).subscribe(datos_cliente => {
+                cliente.sedeCli_Id = datos_cliente.cli_Nombre;
+              });
+            });
+          }
+          this.pedidosProductos.sort((a,b)=> Number(a.pedExt_Id) - Number(b.pedExt_Id));
+          this.pedidosProductos.sort((a,b)=> Number(a.pedExt_FechaCreacion) - Number(b.pedExt_FechaCreacion));
+        });
+      });
+    });
+  }
+
+  organizacionPrecioDblClick(){
+    this.pedidosProductos.sort((a,b)=> Number(b.pedExt_PrecioTotal) - Number(a.pedExt_PrecioTotal));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Precio Total" de mayor a menor'
+    });
+  }
+
+  organizacionPrecio(){
+    this.pedidosProductos.sort((a,b)=> Number(a.pedExt_PrecioTotal) - Number(b.pedExt_PrecioTotal));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Precio Total" de menor a mayor'
+    });
+  }
+
+  limpiarCamposConsulta(){
+    this.FormConsultaPedidoExterno.reset();
   }
 
   /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
@@ -1205,105 +1422,107 @@ export class OpedidoproductoComponent implements OnInit {
                             if (datos_estados[j].estado_Id == datos_pedidos.estado_Id) {
                               this.usuarioService.srvObtenerListaPorId(datos_pedidos.usua_Id).subscribe(datos_usuarios => {
                                 this.sedesClientesService.srvObtenerListaPorId(datos_pedidos.sedeCli_Id).subscribe(datos_sedes => {
-                                  this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {console.log(id)
-                                    for (let k = 0; k < this.productosPedidos.length; k++) {
-                                      const pdfDefinicion : any = {
-                                        info: {
-                                          title: `${datos_pedidos.pedExt_Id}`
-                                        },
-                                        content : [
-                                          {
-                                            text: `Plasticaribe S.A.S ---- Orden de Pedidos de Productos`,
-                                            alignment: 'center',
-                                            style: 'header',
+                                  this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
+                                    this.tipoClientService.srvObtenerListaPorId(datos_clientes.tpCli_Id).subscribe(datos_tipoCliente =>{
+                                      for (let k = 0; k < this.productosPedidos.length; k++) {
+                                        const pdfDefinicion : any = {
+                                          info: {
+                                            title: `${datos_pedidos.pedExt_Id}`
                                           },
-                                          '\n \n',
-                                          {
-                                            text: `Fecha de pedido: ${datos_pedidos.pedExt_FechaCreacion}`,
-                                            style: 'header',
-                                            alignment: 'right',
-                                          },
-
-                                          {
-                                            text: `Fecha de entrega: ${datos_pedidos.pedExt_FechaEntrega} `,
-                                            style: 'header',
-                                            alignment: 'right',
-                                          },
-                                          {
-                                            text: `Vendedor: ${datos_usuarios.usua_Nombre}\n`,
-                                            alignment: 'right',
-                                            style: 'header',
-                                          },
-                                          {
-                                            text: `Estado del pedido: ${datos_estados[j].estado_Nombre}\n \n`,
-                                            alignment: 'right',
-                                            style: 'header',
-                                          },
-                                          {
-                                            text: `\n Información detallada del cliente \n \n`,
-                                            alignment: 'center',
-                                            style: 'header'
-                                          },
-                                          {
-                                            style: 'tablaCliente',
-                                            table: {
-                                              widths: ['*', '*', '*'],
+                                          content : [
+                                            {
+                                              text: `Plasticaribe S.A.S ---- Orden de Pedidos de Productos`,
+                                              alignment: 'center',
                                               style: 'header',
-                                              body: [
-                                                [
-                                                  `ID: ${datos_clientes.cli_Id}`,
-                                                  `Tipo de ID: ${datos_clientes.tipoIdentificacion_Id}`,
-                                                  `Tipo de Cliente: ${datos_clientes.tpCli_Id}`
-                                                ],
-                                                [
-                                                  `Nombre: ${datos_clientes.cli_Nombre}`,
-                                                  `Telefono: ${datos_clientes.cli_Telefono}`,
-                                                  `Ciudad: ${datos_sedes.sedeCliente_Ciudad}`
-                                                ],
-                                                [
-                                                  `Dirección: ${datos_sedes.sedeCliente_Direccion}`,
-                                                  `Codigo Postal: ${datos_sedes.sedeCli_CodPostal}`,
-                                                  ``
-                                                ]
-                                              ]
                                             },
-                                            layout: 'lightHorizontalLines',
-                                            fontSize: 9,
-                                          },
-                                          {
-                                            text: `\n \nObervación sobre el pedido: \n ${datos_pedidos.pedExt_Observacion}\n`,
-                                            style: 'header',
-                                          },
-                                          {
-                                            text: `\n Información detallada de producto(s) pedido(s) \n `,
-                                            alignment: 'center',
-                                            style: 'header'
-                                          },
+                                            '\n \n',
+                                            {
+                                              text: `Fecha de pedido: ${datos_pedidos.pedExt_FechaCreacion}`,
+                                              style: 'header',
+                                              alignment: 'right',
+                                            },
 
-                                          this.table(this.productosPedidos, ['Id', 'Nombre', 'Ancho', 'Fuelle', 'Cal', 'Und', 'Tipo', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                                            {
+                                              text: `Fecha de entrega: ${datos_pedidos.pedExt_FechaEntrega} `,
+                                              style: 'header',
+                                              alignment: 'right',
+                                            },
+                                            {
+                                              text: `Vendedor: ${datos_usuarios.usua_Nombre}\n`,
+                                              alignment: 'right',
+                                              style: 'header',
+                                            },
+                                            {
+                                              text: `Estado del pedido: ${datos_estados[j].estado_Nombre}\n \n`,
+                                              alignment: 'right',
+                                              style: 'header',
+                                            },
+                                            {
+                                              text: `\n Información detallada del cliente \n \n`,
+                                              alignment: 'center',
+                                              style: 'header'
+                                            },
+                                            {
+                                              style: 'tablaCliente',
+                                              table: {
+                                                widths: ['*', '*', '*'],
+                                                style: 'header',
+                                                body: [
+                                                  [
+                                                    `ID: ${datos_clientes.cli_Id}`,
+                                                    `Tipo de ID: ${datos_clientes.tipoIdentificacion_Id}`,
+                                                    `Tipo de Cliente: ${datos_tipoCliente.tpCli_Nombre}`
+                                                  ],
+                                                  [
+                                                    `Nombre: ${datos_clientes.cli_Nombre}`,
+                                                    `Telefono: ${datos_clientes.cli_Telefono}`,
+                                                    `Ciudad: ${datos_sedes.sedeCliente_Ciudad}`
+                                                  ],
+                                                  [
+                                                    `Dirección: ${datos_sedes.sedeCliente_Direccion}`,
+                                                    `Codigo Postal: ${datos_sedes.sedeCli_CodPostal}`,
+                                                    ``
+                                                  ]
+                                                ]
+                                              },
+                                              layout: 'lightHorizontalLines',
+                                              fontSize: 9,
+                                            },
+                                            {
+                                              text: `\n \nObervación sobre el pedido: \n ${datos_pedidos.pedExt_Observacion}\n`,
+                                              style: 'header',
+                                            },
+                                            {
+                                              text: `\n Información detallada de producto(s) pedido(s) \n `,
+                                              alignment: 'center',
+                                              style: 'header'
+                                            },
 
-                                          {
-                                            text: `\n\nValor Total Pedido: $${datos_pedidos.pedExt_PrecioTotal}`,
-                                            alignment: 'right',
-                                            style: 'header',
-                                          },
-                                          {
-                                            text: `Tipo de moneda: ${this.productosPedidos[k].Moneda}`,
-                                            alignment: 'right',
-                                            style: 'header',
+                                            this.table(this.productosPedidos, ['Id', 'Nombre', 'Ancho', 'Fuelle', 'Cal', 'Und', 'Tipo', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+
+                                            {
+                                              text: `\n\nValor Total Pedido: $${datos_pedidos.pedExt_PrecioTotal}`,
+                                              alignment: 'right',
+                                              style: 'header',
+                                            },
+                                            {
+                                              text: `Tipo de moneda: ${this.productosPedidos[k].Moneda}`,
+                                              alignment: 'right',
+                                              style: 'header',
+                                            }
+                                          ],
+                                          styles: {
+                                            header: {
+                                              fontSize: 9,
+                                              bold: true
+                                            },
                                           }
-                                        ],
-                                        styles: {
-                                          header: {
-                                            fontSize: 9,
-                                            bold: true
-                                          },
                                         }
+                                        const pdf = pdfMake.createPdf(pdfDefinicion);
+                                        pdf.open();
+                                        break;
                                       }
-                                      const pdf = pdfMake.createPdf(pdfDefinicion);
-                                      pdf.open();
-                                      break;
-                                    }
+                                    });
                                   });
                                 });
                               });
@@ -2158,5 +2377,6 @@ export class OpedidoproductoComponent implements OnInit {
       });
     }
   }
+
 
 }

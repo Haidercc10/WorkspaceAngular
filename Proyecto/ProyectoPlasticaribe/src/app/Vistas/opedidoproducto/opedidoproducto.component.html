@@ -51,46 +51,56 @@
         <div class="mb-3">
           <div class="row g-3">
             <!-- NUMERO DE IDENTIFICACION DEL PEDIDO DE PRODUCTOS -->
-            <div class="col-md-4">
+            <div class="col-md-2">
               <input formControlName="PedExtIdConsulta"  type="number" class="form-control form-control-sm" id="PedExtId" placeholder="N° del Pedido" name="PedExtId" title="Consecutivo identificador del Pedido">
             </div>
-            <!-- FECHA EN QUE SE HIZO EL PEDIDO
+            <!-- FECHA EN QUE SE HIZO EL PEDIDO -->
              <label class="col-md-2 control-label">Fecha del Pedido</label>
-            <div class="col-md">
+            <div class="col-md-2">
               <input formControlName="PedExtFechaConsulta" type="date" class="form-control form-control-sm" id="PextFecha" placeholder="Fecha pedido" name="PextFecha" title="Fecha Pedido">
             </div>
-            <!-- FECHA EN QUE SE TIENE QUE ENTREGAR EL PEDIDO
+            <!-- FECHA EN QUE SE TIENE QUE ENTREGAR EL PEDIDO -->
              <label class="col-md-2 control-label">Fecha del Entrega</label>
-            <div class="col-md">
+            <div class="col-md-2">
               <input formControlName="PedExtFechaEntregaConsulta" type="date" class="form-control form-control-sm" id="PextFechaEntrega" placeholder="Fecha entrega" name="PextFechaEntrega" title="Fecha Entrega">
-            </div> -->
-          </div>
-        </div>
-        <!-- FILA 2 -->
-        <!-- <div class="mb-5">
-          <div class="row g-3"> -->
+            </div>
             <!-- Estado -->
-            <!-- <div class="col-md-4">
+            <div class="col-md-2">
               <select formControlName="PedExtEstadoConsulta" id="PextEstadoId" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="null" disabled selected>Seleccione Estado</option>
                 <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
               </select>
             </div>
-
-            <div class="col-md-4">
+          </div>
+        </div>
+        <!-- FILA 2 -->
+        <div class="mb-5">
+          <div class="row g-3">
+            <!-- Id CLiente -->
+            <div class="col-md-2">
+              <input formControlName="PedExtIdClienteConsulta"  type="number" class="form-control form-control-sm" id="PedExtId" placeholder="Id del Cliente" name="PedExtId" title="Consecutivo identificador del Pedido">
+            </div>
+            <!-- Nombre Cliente -->
+            <div class="col-md-3">
+              <select formControlName="PedExtClienteConsulta" id="PextUsuarioId" type="text" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
+                <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
+              </select>
+            </div>
+            <!-- Nombre Usuario -->
+            <div class="col-md-3">
               <select formControlName="PedExtUsuarioConsulta" id="PextUsuarioId" type="text" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="null" disabled selected>Seleccione Vendedor</option>
                 <option [ngValue]="vendedor" *ngFor="let vendedor of usuarios">{{vendedor}}</option>
               </select>
             </div>
           </div>
-        </div> -->
+        </div>
         <!-- FILA 3 -->
         <div class="mb-1">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-
             <input class="btn btn-danger btn-danger-sm" type="submit" value="Consultar">
-
+            <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpíar Campos" (click)="limpiarCamposConsulta()">
           </div>
         </div>
       </form>
@@ -114,7 +124,7 @@
                     <th id="sede" scope="col">Cliente</th>
                     <th id="sedecliente" scope="col">Vendedor</th>
                     <th id="estadoPedido" scope="col">Estado</th>
-                    <th id="precioPedido" scope="col">Precio Total</th>
+                    <th id="precioPedido" scope="col"><button class="precios" (dblclick)="organizacionPrecioDblClick()" (click)="organizacionPrecio()"><b>Precio Total</b></button></th>
                     <th id="archivoPedido" scope="col">Archivo</th>
                     <th id="editarPedido" scope="col">Editar</th>
 
@@ -254,15 +264,15 @@
             </div>
             <!-- Ancho Producto -->
             <div class="col-md-1">
-              <input formControlName="ProdAncho" placeholder="Ancho" type="number" class="form-control form-control-sm" >
+              <input formControlName="ProdAncho"  placeholder="Ancho" type="number" class="form-control form-control-sm" title="Ancho">
             </div>
             <!-- Fuelle Producto -->
             <div class="col-md-1">
-              <input formControlName="ProdFuelle" type="number" class="form-control form-control-sm" id="PrdFuelle" placeholder="Fuelle">
+              <input formControlName="ProdFuelle" type="number" class="form-control form-control-sm" id="PrdFuelle" placeholder="Fuelle" title="Fuell">
             </div>
               <!-- Calibre Producto -->
             <div class="col-md-1">
-              <input formControlName="ProdCalibre" type="number" class="form-control form-control-sm" id="PrdCalibre" placeholder="Calibre" name="PrdCalibre">
+              <input formControlName="ProdCalibre" type="number" class="form-control form-control-sm" id="PrdCalibre" placeholder="Calibre" name="PrdCalibre" title="Calibre">
             </div>
             <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
             <div class="col-md-1">
@@ -312,7 +322,7 @@
               </div>
               <!-- Stock Producto -->
               <div class="col-md">
-                <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock" name="PrdStock">
+                <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="PrdStock" placeholder="Stock" name="PrdStock" readonly onmousedown="return false;">
               </div>
             </div>
           </div>
