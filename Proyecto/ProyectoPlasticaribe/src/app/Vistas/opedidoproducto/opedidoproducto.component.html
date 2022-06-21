@@ -5,9 +5,11 @@
     <div class="container-fluid">
       <p>Plasti<span>caribe S.A.S</span> </p>
     </div>
-    <div class="">
-      <p>{{storage_Nombre}} {{storage_Rol}}</p>
-    </div>
+    <ul class="btn-group open">
+      
+      <li class="fa fa-user fa-fw"></li><p>{{storage_Nombre}} {{storage_Rol}} </p>  | <span> <li class="fa fa-sign-out " aria-hidden="true" (click)="confimacionSalida()">Cerrar Seccion</li> </span>
+     
+    </ul>
   </nav>
 <!-- Navegador fin de parte superior -->
 

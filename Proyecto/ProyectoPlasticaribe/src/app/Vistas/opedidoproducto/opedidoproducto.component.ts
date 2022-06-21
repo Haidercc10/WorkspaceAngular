@@ -24,6 +24,7 @@ import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.se
 import { ThisReceiver } from '@angular/compiler';
 import { modelCliente } from 'src/app/Modelo/modelCliente';
 import moment from 'moment';
+import * as XLSX from 'xlsx';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
