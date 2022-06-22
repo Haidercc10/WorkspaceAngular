@@ -5,14 +5,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponentComponent } from './Vistas/login-component/login-component.component';
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
-import { PrincipalComponent } from './Vistas/principal/principal.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { AreasComponentComponent } from './Vistas/areas-component/areas-component.component';
 import { ServicioAreasService } from './Servicios/servicio-areas.service';
 import { ReportesComponent } from './Vistas/reportes/reportes.component';
 import { InicioComponent } from './Vistas/inicio/inicio.component';
-import { PprincipalComponent } from './Vistas/pprincipal/pprincipal.component';
 import { RolesComponentComponent } from './Vistas/roles-component/roles-component.component';
 import { FpensionComponent } from './Vistas/fpension/fpension.component';
 import { EpsComponent } from './Vistas/eps/eps.component';
@@ -27,26 +25,25 @@ import { ClientesComponent } from './Vistas/crear-clientes/crear-clientes.compon
 import { CrearSedesClientesComponent } from './Vistas/crear-sedes-clientes/crear-sedes-clientes.component';
 import { ProductoComponent } from './Vistas/producto/producto.component';
 import { CookieService } from 'ngx-cookie-service';
-import { NavbarLateralComponent } from './Vistas/navbar-lateral/navbar-lateral.component';
 import { EstadosComponent } from './Vistas/estados/estados.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { ValidacionLoginGuard } from './Guards/validacion-login.guard';
 import { StorageServiceModule} from 'ngx-webstorage-service';
-//import {  } from '../../node_modules/font-awesome/css/font-awesome.css';
-
+import { PaginaPrincipalComponent } from './Vistas/PaginaPrincipal/PaginaPrincipal.component'
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MaterialExampleModule} from '../material.module';
+import {MatNativeDateModule} from '@angular/material/core';
 
 export const routes: Routes = [
 
-  {path: 'principal', component: InicioComponent},
+  {path: 'inicio', component: InicioComponent},
   {path: 'registro', component: RegistroComponentComponent},
-  {path: 'principal_secundaria', canActivate: [ValidacionLoginGuard], component: PrincipalComponent},
   {path: 'areas', canActivate: [ValidacionLoginGuard], component: AreasComponentComponent},
   {path: 'Login', component: LoginComponentComponent},
   {path: '', component: LoginComponentComponent},
   {path: 'reportes', canActivate: [ValidacionLoginGuard], component: ReportesComponent},
   {path: 'roles', canActivate: [ValidacionLoginGuard], component: RolesComponentComponent},
-  {path: 'pprincipal', component: PprincipalComponent},
   {path: 'eps', canActivate: [ValidacionLoginGuard], component: EpsComponent},
   {path: 'fpension', canActivate: [ValidacionLoginGuard], component: FpensionComponent},
   {path: 'cajacompensacion', canActivate: [ValidacionLoginGuard], component: CajacompensacionComponent},
@@ -58,8 +55,8 @@ export const routes: Routes = [
   {path: 'crearproducto', canActivate: [ValidacionLoginGuard], component:CrearProductoComponent},
   {path: 'crear-clientes', canActivate: [ValidacionLoginGuard], component:ClientesComponent},
   {path: 'producto', canActivate: [ValidacionLoginGuard], component:ProductoComponent},
-  {path: 'navbarLateral',canActivate: [ValidacionLoginGuard], component:NavbarLateralComponent},
   {path: 'estados', canActivate: [ValidacionLoginGuard], component: EstadosComponent},
+  {path: 'home', canActivate: [ValidacionLoginGuard], component: PaginaPrincipalComponent}
 ]
 
 @NgModule({
@@ -67,9 +64,7 @@ export const routes: Routes = [
     AppComponent,
     RegistroComponentComponent,
     LoginComponentComponent,
-    PrincipalComponent,
     InicioComponent,
-    PprincipalComponent,
     AreasComponentComponent,
     InicioComponent,
     RolesComponentComponent,
@@ -86,8 +81,8 @@ export const routes: Routes = [
     CrearSedesClientesComponent,
     ProductoComponent,
     ReportesComponent,
-    NavbarLateralComponent,
-    EstadosComponent
+    EstadosComponent,
+    PaginaPrincipalComponent,
   ],
 
   imports: [
@@ -98,9 +93,11 @@ export const routes: Routes = [
     RouterModule.forRoot(routes),
     HttpClientModule,
     FormsModule,
-    FontAwesomeModule,
     NgxPaginationModule,
     StorageServiceModule,
+    BrowserAnimationsModule,
+    MatNativeDateModule,
+    MaterialExampleModule,
   ],
 
   providers: [

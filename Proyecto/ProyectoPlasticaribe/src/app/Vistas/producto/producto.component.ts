@@ -6,6 +6,7 @@ import { TipoProductoService } from 'src/app/Servicios/tipo-producto.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 import Swal from 'sweetalert2';
 
+
 @Component({
   selector: 'app-producto',
   templateUrl: './producto.component.html',
@@ -15,6 +16,9 @@ import Swal from 'sweetalert2';
 export class ProductoComponent implements OnInit {
 
   public formularioProducto !: FormGroup;
+
+  titulosTabla = [];
+  ArrayProducto = [];
 
   constructor(private productoServices : ProductoService, private TipoProductoService : TipoProductoService, private UnidadMedidaService : UnidadMedidaService, private frmBuilderProducto : FormBuilder) {
     this.formularioProducto = this.frmBuilderProducto.group({
@@ -33,13 +37,14 @@ export class ProductoComponent implements OnInit {
     });
    }
 
-  ngOnInit(): void { 
+  ngOnInit(): void {
     this.cargarUndMedida();
     this.cargarTipoProducto();
+    this.ColumnasTabla();
     //this.cargarTabla();
   }
 
-  // FUNCION PARA CARGAR LAS UNIDADES DE MEDIDA EN UN COMBOBOX DESDE QUE INCIA LA PAGINA 
+  // FUNCION PARA CARGAR LAS UNIDADES DE MEDIDA EN UN COMBOBOX DESDE QUE INCIA LA PAGINA
   cargarUndMedida(){
     this.UnidadMedidaService.srvObtenerLista().subscribe(datos_undMedida=>{
       console.log(datos_undMedida);
@@ -94,23 +99,19 @@ export class ProductoComponent implements OnInit {
     });
   }
 
-  /* FUNCION PARA CAGAR LA INFORMACION DE LOS PRODUCTOS EN LA TABLA.
-  EVENTUALMENTE SE APLICARA PARA QUE SE MUETREN UNA CANTIDAD PEQUEÑA DE PRODUCTOS Y SE ORGANICE POR PESTAÑAS O PAGINAS*/
-  // cargarTabla(){
-  //   this.productoServices.srvObtenerLista().subscribe(datos_productos=>{
-  //     for (let i = 0; i < datos_productos.length; i++) {
-  //       let productoId: number = datos_productos[i];
-  //       let productoNombre: string = datos_productos[i];
-  //       let ProductoDescripcion: string = datos_productos[i];
-  //       let tipoProducto: number = datos_productos[i];
-  //       let productoPesoBruto: number = datos_productos[i];
-  //       let productosPesoNeto: number = datos_productos[i];
-  //       let undMedidaPeso: string = datos_productos[i];
-  //       let productoFuelle: number = datos_productos[i];
-  //       let productoAncho: number = datos_productos[i];
-  //       let productoCalibre: number = datos_productos[i];
-  //       let undMedidaFAC: string = datos_productos[i];
-  //     }
-  //   }, error =>{ Swal.fire('Ocurrió un error, intentelo de nuevo'); });
-  // }
+  ColumnasTabla(){
+    this.titulosTabla = [];
+    this.titulosTabla = [{
+      cId :   "Id Cliente",
+      cNombre :   "Nombre Cliente",
+      pID : "Id Producto",
+      pNombre : "Nombre Produto",
+      pPrecioUnd : "Precio Und",
+      pStock : "Existencias",
+      pUndMed : "Und. Med",
+      pPrecioTotal : "Precio Total"
+    }]
+  }
+
+
 }

@@ -77,9 +77,9 @@
                 <!-- Unidad de Medida F.A.C -->
                 <div class="col-md">
                     <select formControlName="ProductoUndFAC" id="UndMedFACProducto" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option  disabled selected>Und. Medida F.A.C</option>
-                    <option value="Kg">Kg #1</option>
-                    <option value="2">Tn #2</option>
+                    <option  disabled selected>Und. Medida</option>
+                    <option value="Kg">Kg</option>
+                    <option value="2">Tn</option>
                     </select>
                 </div>
                 <!-- Precio Producto -->
@@ -104,7 +104,7 @@
         <!-- Tabla donde se mostrarán los producto existentes -->
         <div class="mb-4">
             <div class="row g-3">
-                <div class="table-responsive">
+                <!-- <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead class="TitulosTabla">
                             <tr>
@@ -139,7 +139,39 @@
                             </tr>
                         </tbody>
                     </table>
+                </div> -->
+
+
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover mt-2" >
+                    <thead class="TitulosTabla">
+
+                        <tr *ngFor="let columnas of titulosTabla let i = index">
+                          <th scope="col" class="idProducto">{{columnas.cId}}</th>
+                          <th id="nombre" scope="col">{{columnas.cNombre}}</th>
+                          <th id="ancho" scope="col" class="">{{columnas.pID}}</th>
+                          <th id="fuelle" scope="col">{{columnas.pNombre}}</th>
+                          <th id="calibre" scope="col">{{columnas.pPrecioUnd}}</th>
+                          <th id="largo" scope="col">{{columnas.pStock}}</th>
+                          <th id="undMedidaPeso" scope="col">{{columnas.pUndMed}}</th>
+                          <th id="tipoProducto" scope="col">{{columnas.pPrecioTotal}}</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th id="cid" class="TextosInfoTabla"></th>
+                          <td id="cnombre" class="TextosInfoTabla"></td>
+                          <th id="pid" class="TextosInfoTabla"></th>
+                          <td id="pnombre" class="TextosInfoTabla"></td>
+                          <td id="pprecio" class="TextosInfoTabla"></td>
+                          <td id="pstock" class="TextosInfoTabla"></td>
+                          <td id="pundmed" class="TextosInfoTabla"></td>
+                          <td id="ppreciototal" class="TextosInfoTabla"></td>
+                        </tr>
+                    </tbody>
+                  </table>
                 </div>
+
             </div>
         </div>
     </form>

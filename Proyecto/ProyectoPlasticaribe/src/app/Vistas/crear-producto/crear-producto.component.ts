@@ -34,13 +34,13 @@ export class CrearProductoComponent implements OnInit {
   storage_Nombre : any;
   storage_Rol : any;
 
-  constructor(private frmBuilderCrearProducto : FormBuilder,  
+  constructor(private frmBuilderCrearProducto : FormBuilder,
                 private unidadMedidaService : UnidadMedidaService,
                   private tipoProductoService : TipoProductoService,
                     private tipoMonedaService : TipoMonedaService,
                       private productoService : ProductoService,
                         private pedidosProducto : OpedidoproductoComponent,
-                         private existenciasService : ExistenciasProductosService, 
+                         private existenciasService : ExistenciasProductosService,
                           private clientesService : ClientesService,
                             private usuarioService : UsuarioService,
                               @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -112,8 +112,8 @@ export class CrearProductoComponent implements OnInit {
       for (let index = 0; index < datos_roles.length; index++) {
         if (datos_roles[index].rolUsu_Id == rol) {
           this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }        
-      }      
+        }
+      }
     });
   }
 
@@ -149,7 +149,7 @@ export class CrearProductoComponent implements OnInit {
             }else {
               this.cliente.push(datos_clientes[index].cli_Nombre);
               this.clienteDatos.push(datos_clientes[index]);
-            }            
+            }
           }
         }
       });
@@ -167,7 +167,7 @@ export class CrearProductoComponent implements OnInit {
   tipoProductoComboBox(){
     this.tipoProductoService.srvObtenerLista().subscribe(datos_tiposProductos => {
       for (let index = 0; index < datos_tiposProductos.length; index++) {
-        this.tipoProducto.push(datos_tiposProductos[index].tpProd_Nombre);        
+        this.tipoProducto.push(datos_tiposProductos[index].tpProd_Nombre);
       }
     })
   }
@@ -175,7 +175,7 @@ export class CrearProductoComponent implements OnInit {
   tipoMondedaComboBox(){
     this.tipoMonedaService.srvObtenerLista().subscribe(datos_tiposMoneda => {
       for (let index = 0; index < datos_tiposMoneda.length; index++) {
-        this.tipoMoneda.push(datos_tiposMoneda[index].tpMoneda_Id);        
+        this.tipoMoneda.push(datos_tiposMoneda[index].tpMoneda_Id);
       }
     })
   }
@@ -186,6 +186,7 @@ export class CrearProductoComponent implements OnInit {
     let ancho : any = this.FormCrearProducto.value.ProduAncho;
     let fuelle : any = this.FormCrearProducto.value.ProduFuelle;
     let calibre : any = this.FormCrearProducto.value.ProduCalibre;
+    let largo : any
     let undMed : any = this.FormCrearProducto.value.ProduUnidadMedidaACF;
     let tpProducto : any = this.FormCrearProducto.value.ProduTipo;
     let cantidad : any = this.FormCrearProducto.value.ProduCantidad;
@@ -195,9 +196,9 @@ export class CrearProductoComponent implements OnInit {
     let moneda : any = this.FormCrearProducto.value.ProduTipoMoneda;
     let descripcion : any = this.FormCrearProducto.value.ProdDescripcion;
     let cliente : any = this.FormCrearProducto.value.ClienteNombre;
-   
-    this.pedidosProducto.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, undMed, tpProducto, cantidad, undMed2, precio, moneda, descripcion);
-    this.pedidosProducto.registrarProducto(id, nombre, ancho, fuelle, calibre, undMed, tpProducto, descripcion, cliente);  
+
+    this.pedidosProducto.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, largo, undMed, tpProducto, cantidad, undMed2, precio, moneda, descripcion);
+    this.pedidosProducto.registrarProducto(id, nombre, ancho, fuelle, calibre, undMed, tpProducto, descripcion, cliente);
     this.LimpiarCampos();
   }
 
@@ -211,6 +212,6 @@ export class CrearProductoComponent implements OnInit {
     this.pedidosProducto.registrarExistenciaProducto(id, cantidad, undMed2, precio, precioFinal, moneda);
     this.LimpiarCamposPresentacion();
   }
-  
+
 
 }

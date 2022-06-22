@@ -10,6 +10,10 @@
   color: #777;
 }
 
+span{
+  color: #d83542;
+}
+
 .container{
   width: 100%;
   padding-left: 2%;
@@ -69,10 +73,6 @@ a {
   width: 50%;
 }
 
-/*td {
-  font-size: smaller;
-}*/
-
 .bajarPagina{
   padding-bottom: 5%;
 }
@@ -91,4 +91,12 @@ a {
   width: 100%;
   height: 100%;
   border : none;
+ }
+
+.form-floating{
+  font-size: 15px;
+}
+
+ label{
+  font-size: 14px;
  }

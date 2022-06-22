@@ -19,7 +19,7 @@ export class PedidoProductosService {
   }
 
   srvObtenerListaPorId(id_producto:any, id_pedido:any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoProducto/ ?prod_Id=${id_producto}&pedExt_Id=${id_pedido}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoProducto/ ?Prod_Id=${id_producto}&PedExt_Id=${id_pedido}`);
   }
 
   //Metodo agregar Pedidos

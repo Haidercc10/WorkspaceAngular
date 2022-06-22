@@ -1,0 +1,488 @@
+<mat-sidenav-container class="example-container">
+  <mat-sidenav #sidenav [mode]="mode.value || 'over'">
+    <p><button mat-button (click)="sidenav.toggle()">Cerrar Menú</button></p>
+    <nav id="sidebar">
+      <div class="sidebar-header">
+          <h4 class="nombreUsuario">{{storage_Nombre}}</h4>
+          <h6 class="tipoUsuario">{{storage_Rol}}</h6>
+      </div>
+
+      <ul class="list-unstyled components">
+          <p>Plasticaribe S.A.S</p>
+          <!-- PEDIDOS -->
+          <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Pedidos
+              </a>
+              <div class="collapse" id="collapseExample">
+                  <div class="mb-2">
+                      <a class="fst-normal " data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                        Internos
+                      </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="opedidoproducto" role="button" aria-expanded="false" aria-controls="">
+                      Externos
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Cotización
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Orden de compra
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Facturas de compras
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Recepciones
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+              </div>
+          </li>
+          <!-- ORDEN DE TRABAJO -->
+          <!-- <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Orden de trabajo
+              </a>
+              <div class="collapse" id="collapseExample2">
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      OT
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Extrusión
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Impresión
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Laminado
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Corte
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Sellado
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Empaque
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+              </div>
+          </li> -->
+          <!-- PROCESOS -->
+          <!-- <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Procesos
+              </a>
+              <div class="collapse" id="collapseExample3">
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Extrusión
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Impresión
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Laminado
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Corte
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Sellado
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Empaque
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+                </div>
+          </li> -->
+          <!-- DESPERDICIOS -->
+          <!-- <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample4" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Desperdicios
+              </a>
+              <div class="collapse" id="collapseExample4">
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Desperdicios Extrusión
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Desperdicios Impresión
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Desperdicios Laminado
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Desperdicios Corte
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Desperdicios Sellado
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Desperdicios Empaque
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+                </div>
+          </li> -->
+          <!-- FACTURA DE VENTAS -->
+          <!-- <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample5" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Facturas de venta
+              </a>
+              <div class="collapse" id="collapseExample5">
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Facturas
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+              </div>
+          </li> -->
+          <!-- USUARIOS -->
+          <!-- <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample6" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Usuarios
+              </a>
+              <div class="collapse" id="collapseExample6">
+                  <div class="mb-2">
+                      <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                        Usuarios
+                      </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Tipos de usuarios
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Áreas
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Roles
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Turnos
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+              </div>
+          </li> -->
+          <!-- CLIENTES -->
+          <!-- <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Clientes
+              </a>
+              <div class="collapse" id="collapseExample7">
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Clientes
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Tipos de clientes
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Sede de clientes
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Productos por clientes
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+              </div>
+          </li> -->
+          <!-- REPORTES -->
+          <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample8" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Reportes
+              </a>
+              <div class="collapse" id="collapseExample8">
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Reportes
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Tipos de reportes
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+              </div>
+          </li>
+          <!-- PRODUCTOS -->
+          <!-- <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample9" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Productos
+              </a>
+              <div class="collapse" id="collapseExample9">
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="" href="">
+                      Productos
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Tipos de productos
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+              </div>
+          </li> -->
+          <!-- MATERIAS PRIMAS -->
+          <!-- <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample10" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Materias Primas
+              </a>
+              <div class="collapse" id="collapseExample10">
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Materias primas
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Categorias
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Tintas
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Pigmentos
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+              </div>
+          </li> -->
+          <!-- ACTIVOS -->
+          <!-- <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample11" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Activos
+              </a>
+              <div class="collapse" id="collapseExample11">
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Activos
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Tipos de activos
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Camiones
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Tipos de camiones
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Basculas
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      tipos de basculas
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+              </div>
+          </li> -->
+          <!-- PROVEEDORES -->
+          <!-- <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample12" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Proveedores
+              </a>
+              <div class="collapse" id="collapseExample12">
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Proveedores
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Tipos de proveedores
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+              </div>
+          </li> -->
+          <!-- MATENIMIENTO -->
+          <!-- <li>
+              <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample13" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  Mantenimiento
+              </a>
+              <div class="collapse" id="collapseExample13">
+                  <div class="mb-2">
+                      <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                        Empresas
+                      </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Tipos de mantenimiento
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Pedidos de mantenimiento
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Orden de servicio
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Cotización
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
+                      Facturas
+                    </a>
+                  </div>
+                  <div class="mb-2">
+                    <hr>
+                  </div>
+              </div>
+          </li> -->
+          <!-- NOTIFICACIONES -->
+          <!-- <li>
+              <a href=""><label for="m-notification">Notificacion</label></a>
+          </li> -->
+      </ul>
+  </nav>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <p><button mat-button (click)="sidenav.toggle()">Menú</button></p>
+    <div class="row g-3">
+      <div class="col md texto">
+          <div class="textoIntermedio">
+              <p class="fs-3 parrafo">
+                  <b>
+                      ¡Bienvenido al nuevo
+                      <span class="plasticaribe_resaltado"> Plasticaribe S.A.S, </span>
+                  </b>
+                  <br> <br>
+                  <b class="negritaEnRojo"> Usuario ingresa!</b>
+              </p>
+
+              <p class="fs-3 parrafo2">¡Estamos innovando!, te dejamos algunas recomendaciones acerca del uso de <br>
+                  nuestro nuevo sistema de información  basado en la nube, toma nota.
+              </p>
+          </div>
+
+          <div class="mb-3 textoPequeno">
+              <p class="textoPequenoP">  Cuida a Plasticaribe S.A.S, como a ti mismo.</p>
+              <ul>
+                  <li>Evita utilizar letras en campos donde haya que digitar números.</li>
+                  <li>Evita utilizar carácteres especiales como puntos y comas en los formularios.</li>
+                  <li>Sacale el máximo provecho a la herramienta.</li>
+                  <li>Gestiona tus solicitudes de permisos.</li>
+              </ul>
+          </div>
+          <div class="mb-3">
+              <br> <br>
+              <button class="btn btn-danger">Ver tutorial</button>
+          </div>
+      </div>
+  </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+
+<!-- Copyright 2022 Google LLC. All Rights Reserved.
+    Use of this source code is governed by an MIT-style license that
+    can be found in the LICENSE file at https://angular.io/license -->

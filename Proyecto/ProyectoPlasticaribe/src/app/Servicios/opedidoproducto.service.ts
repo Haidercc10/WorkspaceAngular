@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { rutaPlasticaribeAPI } from 'src/polyfills';
 // import { rutaPlasticaribeAPI } from 'src/polyfills';
 import { modelOpedidoproducto } from '../Modelo/modelOpedidoproducto';
 
@@ -9,7 +10,7 @@ import { modelOpedidoproducto } from '../Modelo/modelOpedidoproducto';
 })
 export class OpedidoproductoService {
 
- readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
+ readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
 //Encapsular httpclient en el constructor
   constructor(private http: HttpClient) { }
