@@ -125,6 +125,7 @@ export class OpedidoproductoComponent implements OnInit {
   ultimoPrecio : number = 0;
   Productospedidos : any;
   today : any = new Date();
+  enPedido : string = 'no';
 
   constructor(private pedidoproductoService : OpedidoproductoService,
     private productosServices : ProductoService,
@@ -338,7 +339,7 @@ export class OpedidoproductoComponent implements OnInit {
 
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios(){
-    if(this.FormPedidoExternoProductos.valid) this.cargarFormProductoEnTablas();
+    if(this.FormPedidoExternoProductos.valid) this.cargarFormProductoEnTablas(this.ArrayProducto);
     else Swal.fire("Hay campos vacios en el formulario de producto");
   }
 
@@ -1642,7 +1643,7 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion que envia la informacion de los productos a la tabla.
-  cargarFormProductoEnTablas(){
+  cargarFormProductoEnTablas(formulario : any){
     this.ultimoPrecio = 0;
     let idProducto : number = this.FormPedidoExternoProductos.value.ProdId;
     let precioProducto : number = this.FormPedidoExternoProductos.value.ProdPrecioUnd;
@@ -1675,37 +1676,40 @@ export class OpedidoproductoComponent implements OnInit {
                 SubTotal : this.FormPedidoExternoProductos.get('ProdCantidad').value * this.FormPedidoExternoProductos.get('ProdPrecioUnd')?.value
               }
 
-              this.ArrayProducto.push(productoExt);
-              this.LimpiarCamposProductos();
-              productoExt = [];
+              // this.ArrayProducto.push(productoExt);
+              // this.LimpiarCamposProductos();
+              // productoExt = [];
 
-              // if(this.ArrayProducto.length == 0) {
-              //   this.ArrayProducto.push(productoExt);
-              //   this.LimpiarCamposProductos();
+              let campoId = this.FormPedidoExternoProductos.get('ProdId')?.value;
+              if (this.AccionBoton == "Agregar" && this.ArrayProducto.length == 0) {
+                this.ArrayProducto.push(productoExt);
+                this.LimpiarCamposProductos();
 
-              //   productoExt = []; //Vaciar lo que viene del formulario.
+              } else if (this.AccionBoton == "Agregar" && this.ArrayProducto.length != 0){
+                for (let index = 0; index < formulario.length; index++) {
+                  if(campoId === formulario[index].Id)  Swal.fire('No se puede cargar el mismo producto a la tabla.');
+                  else {
+                    this.ArrayProducto.push(productoExt);
+                    this.LimpiarCamposProductos();
+                  }
+                  break;
+                }
+              } else {
+                for (let index = 0; index < formulario.length; index++) {
+                  if(productoExt.Id == this.ArrayProducto[index].Id) {
+                    this.ArrayProducto.splice(index, 1);
+                    this.ArrayProducto.push(productoExt);
+                    this.AccionBoton = "Agregar";
+                    this.LimpiarCamposProductos();
+                    break;
+                  }
+                }
+              }
 
-              // } else { //Si el array que llena la tabla no esta vacío.
-              //   for (let index = 0; index < this.ArrayProducto.length; index++) {
-              //     if(productoExt.Id === this.ArrayProducto[index].Id) { //Verifico si campo y form en posicion ID son iguales
-              //       Swal.fire('Evite cargar datos duplicados a la tabla. Verifique!');
-              //       break;
-              //     } else if (productoExt.Id != this.ArrayProducto[index].Id) {
-              //       if (this.ArrayProducto.length > 1) {
-              //         if (productoExt.Id != this.ArrayProducto[index+1].Id) {
-              //           this.ArrayProducto.push(productoExt);
-              //           productoExt = []; //Vaciar lo que viene del formulario.
-              //           break;
-              //         }
-              //       } else if (this.ArrayProducto.length <= 1) {
-              //         this.ArrayProducto.push(productoExt);
-              //         productoExt = []; //Vaciar lo que viene del formulario.
-              //         break;
-              //       }
-              //     }
-              //   }
-              // }
-
+              for (let index = 0; index < this.ArrayProducto.length; index++) {
+                this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (productoExt.Cant * productoExt.PrecioUnd), 0)
+                console.log(this.valorTotal);
+              }
             } else Swal.fire(`El precio digitado no puede ser menor al que tiene el producto estipulado $${datos_existencias[index].exProd_PrecioVenta}`);
           } else {
             Swal.fire(`La presentacion seleccionada no esta registrada para este producto`);
@@ -2298,7 +2302,9 @@ export class OpedidoproductoComponent implements OnInit {
       confirmButtonText: 'Eliminar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.eliminarProductoPedido(this.productoEliminado)
+        if (this.enPedido === 'si') {
+          this.eliminarProductoPedido(this.productoEliminado)
+        }
         this.ArrayProducto.splice(index, 1);
         this.formatonumeros(this.valorTotal = this.valorTotal - formulario.SubTotal);
         Swal.fire('Producto eliminado');
@@ -2660,6 +2666,7 @@ export class OpedidoproductoComponent implements OnInit {
 
   // Funcion para editar un pedido
   MostrarPedido(formulario : any) {
+    this.enPedido = 'si';
     this.ArrayProducto = [];
     Swal.fire({
       title: '¿Está seguro de editar este pedido?',
@@ -2746,6 +2753,7 @@ export class OpedidoproductoComponent implements OnInit {
 
   // Función para editar uno de los pedidos
   editarPedido() {
+    this.enPedido = 'no';
     this.id_pedido;
     let estadoNombre : string = this.FormPedidoExternoClientes.value.PedEstadoId;
     let estadoId : number = 0;
@@ -2886,7 +2894,6 @@ export class OpedidoproductoComponent implements OnInit {
 
                           //Si el estado llega a ser (9: En pedido) solo se podrán agregar productos al pedido
                           } else if (estadoId == 11){
-                            console.log(9)
                             for (let prod = 0; prod < this.ArrayProducto.length; prod++) {
                               idProducto.push(this.ArrayProducto[prod].Id);
                               productoArray.push(this.ArrayProducto[prod]);
