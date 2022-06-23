@@ -3,21 +3,24 @@
   <!-- Inicio Fila 1 Crear clientes -->
   <div class="row g-3">
     <!-- ID Cliente -->
-    <div class="col-md-2">
-      <input formControlName="CliId" type="number" class="form-control form-control-sm" id="ClienteId"  placeholder="ID Cliente" name="ClienteId" required>
+    <div class="form-floating col-md-2">
+      <input formControlName="CliId" type="number" class="form-control form-control-sm" id="floatingInput"  required>
+      <label for="floatingInput">Id Cliente</label>
     </div>
 
     <!-- Tipo ID Cliente-->
-    <div class="col-md-1">
-      <select formControlName="TipoIdCliente" type="text" id="TpIdCliente" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo ID" name="TpIdCliente" required >
-        <option [ngValue]="null" disabled selected>Tipo ID</option>
+    <div class="form-floating col-md-1">
+      <select formControlName="TipoIdCliente" type="text" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
+        <!-- <option [ngValue]="null" disabled selected>Tipo ID</option> -->
         <option [ngValue]="tipo_identificacion" *ngFor="let tipo_identificacion of tipoIdentificacion">{{tipo_identificacion}}</option>
       </select>
+      <label for="floatingSelect">Tipo ID</label>
     </div>
 
     <!-- Nombre Cliente-->
-    <div class="col-md">
-      <input formControlName="CliNombre"  type="text" class="form-control form-control-sm" id="ClienteNombre"  placeholder="Nombre" name="ClienteNombre" required>
+    <div class="form-floating col-md">
+      <input formControlName="CliNombre" type="text" class="form-control form-control-sm" id="floatingInput" required>
+      <label for="floatingInput">Nombre Cliente</label>
     </div>
   </div>
   <!-- Fin Fila 1 Crear Cliente -->
@@ -26,29 +29,33 @@
   <div class="row g-3">
 
     <!-- Telefono Cliente -->
-    <div class="col-md-2">
-      <input formControlName="CliTelefono"  type="text" class="form-control form-control-sm" id="ClienteTelefono"  placeholder="Teléfono" name="ClienteTelefono" required>
+    <div class="form-floating col-md-2">
+      <input formControlName="CliTelefono" type="text" class="form-control form-control-sm" id="floatingInput" required>
+      <label for="floatingInput">Telefono Cliente</label>
     </div>
 
       <!-- Email cliente -->
-    <div class="col-md">
-      <input formControlName="CliEmail"  type="text" class="form-control form-control-sm" id="ClienteEmail"  placeholder="Email" name="ClienteEmail" required>
+    <div class="form-floating col-md">
+      <input formControlName="CliEmail" type="text" class="form-control form-control-sm" id="floatingInput" required>
+      <label for="floatingInput">E-mail Cliente</label>
     </div>
 
     <!-- Tipo cliente -->
-    <div class="col-md-2">
-      <select formControlName="TipoClienteId" type="text" id="TipoCliente" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo cliente" name="TipoCliente" required >
-        <option [ngValue]="null" disabled selected>Tipo Cliente</option>
+    <div class="form-floating col-md-2">
+      <select formControlName="TipoClienteId" type="text" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
+        <!-- <option [ngValue]="null" disabled selected>Tipo Cliente</option> -->
         <option [ngValue]="tipo_Cliente" *ngFor="let tipo_Cliente of tiposClientes">{{tipo_Cliente}}</option>
       </select>
+      <label for="floatingSelect">Tipo Cliente</label>
     </div>
 
       <!-- ID/Nombre Usuario -->
-    <div class="col-md-4">
-      <select formControlName="UsuIdNombre" type="text" id="usuarioIdNombre" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Usuario/Vendedor" name="usuarioIdNombre" required >
-        <option [ngValue]="null" disabled selected>Usuario Vendedor</option>
+    <div class="form-floating col-md-4">
+      <select formControlName="UsuIdNombre" type="text" id="usuarioIdNombre" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
+        <!-- <option [ngValue]="null" disabled selected>Usuario Vendedor</option> -->
         <option [ngValue]="usuarios" *ngFor="let usuarios of usuario">{{usuarios}}</option>
       </select>
+      <label for="floatingSelect">Usuario Vendedor</label>
     </div>
   </div>
 
@@ -75,22 +82,26 @@
     <div class="row g-3">
 
       <!-- Nombre del cliente -->
-      <div class="col-md">
-        <input formControlName="CliId2" type="number" class="form-control form-control-sm" id="ClienteNombre"  placeholder="ID del cliente" name="ClienteNombre">
+      <div class="form-floating col-md">
+        <input formControlName="CliId2" type="number" class="form-control form-control-sm" id="floatingInput">
+        <label for="floatingInput">Id cliente</label>
       </div>
 
       <!-- Ciudad sede cliente -->
-      <div class="col-md">
-        <input formControlName="SedeCli_Ciudad" type="text" class="form-control form-control-sm" id="SdCli_Ciudad"  placeholder="Ciudad" name="SdCli_Ciudad">
+      <div class="form-floating col-md">
+        <input formControlName="SedeCli_Ciudad" type="text" class="form-control form-control-sm" id="floatingInput">
+        <label for="floatingInput">Ciudad Sede</label>
       </div>
 
-      <div class="col-md">
-        <input formControlName="SedeCli_Direccion" type="text" class="form-control form-control-sm" id="SdCli_Direccion"  placeholder="Direccion" name="SdCli_Direccion">
+      <div class="form-floating col-md">
+        <input formControlName="SedeCli_Direccion" type="text" class="form-control form-control-sm" id="floatingInput">
+        <label for="floatingInput">Direccion Sede</label>
       </div>
 
       <!-- Codigo postal -->
-      <div class="col-md">
-        <input formControlName="SedeCli_Postal" type="number" class="form-control form-control-sm" id="SdCli_Postal"  placeholder="Código postal" name="SdCli_Postal">
+      <div class="form-floating col-md">
+        <input formControlName="SedeCli_Postal" type="number" class="form-control form-control-sm" id="floatingInput">
+        <label for="floatingInput">Codigo Postal Sede</label>
       </div>
     </div>
   </div>

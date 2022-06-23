@@ -268,7 +268,7 @@
             <div class="form-floating col-md-5">
                 <select formControlName="ProdNombre" class="form-select form-select-sm" id="floatingSelect" (change)="llenadoProducto()" aria-label="Floating label select example" required>
                   <option [ngValue]="null" disabled selected>Seleccione Producto</option>
-                  <option [ngValue]="productos.prod_Id" *ngFor="let productos of producto">{{productos.prod_Nombre}}</option>
+                  <option [ngValue]="productos.prod_Nombre" *ngFor="let productos of producto">{{productos.prod_Nombre}}</option>
                 </select>
                 <label for="floatingSelect">Nombre del Producto</label>
             </div>
@@ -351,6 +351,22 @@
                 </select>
                 <label for="floatingSelect">Tipo de Producto</label>
               </div>
+              <!-- Matrial -->
+              <div class="form-floating col-md-2">
+                <select formControlName="ProdMaterial" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" readonly onmousedown="return false;">
+                  <!-- <option [ngValue]="null" disabled selected>Seleccione Tipo Producto</option> -->
+                  <option [ngValue]="material" *ngFor="let material of materialProducto">{{material}}</option>
+                </select>
+                <label for="floatingSelect">Material del Producto</label>
+              </div>
+              <!-- Pigmento -->
+              <div class="form-floating col-md-2">
+                <select formControlName="ProdPigmento" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" readonly onmousedown="return false;">
+                  <!-- <option [ngValue]="null" disabled selected>Seleccione Tipo Producto</option> -->
+                  <option [ngValue]="pigmantos" *ngFor="let pigmantos of pigmentoProducto">{{pigmantos}}</option>
+                </select>
+                <label for="floatingSelect">Pigmento del Producto</label>
+              </div>
               <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
               <div class="form-floating col-md-2">
                 <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm" id="floatingInput" required>
@@ -369,6 +385,59 @@
                 <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdPrecioUnd">
                 <label for="floatingInput">Precio unitario</label>
               </div>
+            </ng-container>
+            <ng-template #fila2>
+              <!-- Tipo Producto -->
+              <div class="form-floating col-md-2">
+                <select formControlName="ProdTipo" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                  <!-- <option [ngValue]="null" disabled selected>Seleccione Tipo Producto</option> -->
+                  <option [ngValue]="tipoproductos" *ngFor="let tipoproductos of tipoProducto">{{tipoproductos}}</option>
+                </select>
+                <label for="floatingSelect">Tipo de Producto</label>
+              </div>
+              <!-- Matrial -->
+              <div class="form-floating col-md-2">
+                <select formControlName="ProdMaterial" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                  <!-- <option [ngValue]="null" disabled selected>Seleccione Tipo Producto</option> -->
+                  <option [ngValue]="material" *ngFor="let material of materialProducto">{{material}}</option>
+                </select>
+                <label for="floatingSelect">Material del Producto</label>
+              </div>
+              <!-- Pigmento -->
+              <div class="form-floating col-md-2">
+                <select formControlName="ProdPigmento" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                  <!-- <option [ngValue]="null" disabled selected>Seleccione Tipo Producto</option> -->
+                  <option [ngValue]="pigmantos" *ngFor="let pigmantos of pigmentoProducto">{{pigmantos}}</option>
+                </select>
+                <label for="floatingSelect">Pigmento del Producto</label>
+              </div>
+              <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
+              <div class="form-floating col-md-2">
+                <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                <label for="floatingSelect">Cantidad Pedida</label>
+              </div>
+              <!-- UM Cantidad Producto -->
+              <div class="form-floating col-md-2">
+                <select formControlName="ProdUnidadMedidaCant" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdUnidadMedidaCant" required >
+                  <option [ngValue]="null" disabled selected>Seleccione Presentación</option>
+                  <option [ngValue]="presentaciones" *ngFor="let presentaciones of presentacion">{{presentaciones}}</option>
+                </select>
+                <label for="floatingSelect">Presentación</label>
+              </div>
+              <!-- Precio Producto -->
+              <div class="form-floating col-md">
+                <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdPrecioUnd">
+                <label for="floatingInput">Precio unitario</label>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+        <!-- Fin Fila 2 Agregar Producto -->
+        <!--Fila 3 Inicio-->
+         <!-- Inicio Descripción producto -->
+        <div class="mb-4">
+          <ng-container *ngIf="ValidarRol == 2; else fila3">
+            <div class="row g-3">
               <!-- Ultima venta -->
               <div class="form-floating col-md">
                 <input formControlName="ProdUltFacturacion" type="number" class="form-control form-control-sm" id="floatingInput" name="ProdUltFacturacion" readonly onmousedown="return false;">
@@ -382,57 +451,6 @@
                 </select>
                 <label for="floatingSelect">Tipo de Moneda</label>
               </div>
-            </ng-container>
-            <ng-template #fila2>
-              <!-- Tipo Producto -->
-              <div class="form-floating col-md-2">
-                <select formControlName="ProdTipo" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example">
-                  <!-- <option [ngValue]="null" disabled selected>Seleccione Tipo Producto</option> -->
-                  <option [ngValue]="tipoproductos" *ngFor="let tipoproductos of tipoProducto">{{tipoproductos}}</option>
-                </select>
-                <label for="floatingSelect">Tipo de Producto</label>
-              </div>
-              <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
-              <div class="form-floating col-md-2">
-                <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm" id="floatingInput" required>
-                <label for="floatingSelect">Cantidad Pedida</label>
-              </div>
-              <!-- UM Cantidad Producto -->
-              <div class="form-floating col-md-2">
-                <select formControlName="ProdUnidadMedidaCant" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdUnidadMedidaCant" required >
-                  <option [ngValue]="null" disabled selected>Seleccione Presentación</option>
-                  <option [ngValue]="presentaciones" *ngFor="let presentaciones of presentacion">{{presentaciones}}</option>
-                </select>
-                <label for="floatingSelect">Presentación</label>
-              </div>
-              <!-- Precio Producto -->
-              <div class="form-floating col-md">
-                <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdPrecioUnd">
-                <label for="floatingInput">Precio unitario</label>
-              </div>
-
-              <!-- Ultima venta -->
-              <div class="form-floating col-md">
-                <input formControlName="ProdUltFacturacion" type="number" class="form-control form-control-sm" id="floatingInput" name="ProdUltFacturacion" readonly onmousedown="return false;">
-                <label for="floatingInput">Ultimo Precio Facturado</label>
-              </div>
-              <!-- Tipo Moneda -->
-              <div class="form-floating col-md-2">
-                <select formControlName="ProdTipoMoneda" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdTipoMoneda">
-                  <!-- <option [ngValue]="null" disabled selected>Seleccione Tipo Moneda</option> -->
-                  <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas}}</option>
-                </select>
-                <label for="floatingSelect">Tipo de Moneda</label>
-              </div>
-            </ng-template>
-          </div>
-        </div>
-        <!-- Fin Fila 2 Agregar Producto -->
-        <!--Fila 3 Inicio-->
-         <!-- Inicio Descripción producto -->
-        <div class="mb-4">
-          <ng-container *ngIf="ValidarRol == 2; else fila3">
-            <div class="row g-3">
               <!-- Stock Producto -->
               <div class="form-floating col-md-2">
                 <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdStock" readonly onmousedown="return false;">
@@ -447,6 +465,19 @@
           </ng-container>
           <ng-template #fila3>
             <div class="row g-3">
+              <!-- Ultima venta -->
+              <div class="form-floating col-md-2">
+                <input formControlName="ProdUltFacturacion" type="number" class="form-control form-control-sm" id="floatingInput" name="ProdUltFacturacion" readonly onmousedown="return false;">
+                <label for="floatingInput">Ultimo Precio Facturado</label>
+              </div>
+              <!-- Tipo Moneda -->
+              <div class="form-floating col-md-2">
+                <select formControlName="ProdTipoMoneda" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdTipoMoneda">
+                  <!-- <option [ngValue]="null" disabled selected>Seleccione Tipo Moneda</option> -->
+                  <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas}}</option>
+                </select>
+                <label for="floatingSelect">Tipo de Moneda</label>
+              </div>
               <!-- Stock Producto -->
               <div class="form-floating col-md-2">
                 <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdStock" readonly onmousedown="return false;">
@@ -497,10 +528,12 @@
                       <th id="largo" scope="col">{{columnas.pLargo}}</th>
                       <th id="undMedidaPeso" scope="col">{{columnas.pUndMedACF}}</th>
                       <th id="tipoProducto" scope="col">{{columnas.pTipoProd}}</th>
+                      <th id="material" scope="col">{{columnas.pMaterial}}</th>
+                      <th id="pigmento" scope="col">{{columnas.pPigmento}}</th>
                       <th id="cantidad" scope="col">{{columnas.pCantidad}}</th>
                       <th id="undMedidaCantidad" scope="col">{{columnas.pUndMedCant}}</th>
                       <th id="precioUnitario" scope="col">{{columnas.pPrecioU}}</th>
-                      <th id="tipoMoneda" scope="col">{{columnas.pMoneda}}</th>
+                      <!-- <th id="tipoMoneda" scope="col">{{columnas.pMoneda}}</th> -->
                       <th id="Subtotal" scope="col">{{columnas.pSubtotal}}</th>
                       <th id="acciones" scope="col"></th>
                       <th id="acciones" scope="col"></th>
@@ -516,10 +549,12 @@
                       <td id="largo" class="TextosInfoTabla">{{listaProductos.Largo}}</td>
                       <td id="undMedidaPeso" class="TextosInfoTabla">{{listaProductos.Und}}</td>
                       <td id="tipoProducto" class="TextosInfoTabla">{{listaProductos.Tipo}}</td>
+                      <td id="material" class="TextosInfoTabla">{{listaProductos.Material}}</td>
+                      <td id="pigmento" class="TextosInfoTabla">{{listaProductos.Pigmento}}</td>
                       <td id="cantidadDisponible" class="TextosInfoTabla">{{listaProductos.Cant}}</td>
                       <td id="undMedidaCantidad" class="TextosInfoTabla">{{listaProductos.UndCant}}</td>
                       <td id="precioUnitario" class="TextosInfoTabla">$ {{listaProductos.PrecioUnd | currency : 'COP'}}</td>
-                      <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.TpMoneda}}</td>
+                      <!-- <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.TpMoneda}}</td> -->
                       <td id="Subtotal" class="TextosInfoTabla">$ {{listaProductos.SubTotal }}</td>
                       <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true" title="Editar Producto"></i></a></td>
                       <td id="Eliminar" ><a><i class="fa fa-trash" (click)="QuitarProductoTabla(j, listaProductos)" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
@@ -541,7 +576,7 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="validarInputsVacios()">Crear Pedido</button>
               <button class="btn btn-danger btn-danger-sm" type="button" (click)="editarPedido()">Actualizar Pedido</button>
-              <button class=" btn btn-secondary btn-secondary-sm" type="button" (click)="confimacionSalida()">Cancelar</button>
+              <button class=" btn btn-secondary btn-secondary-sm" type="button" (click)="regresar()">Cancelar</button>
             </div>
         </div>
       </form>

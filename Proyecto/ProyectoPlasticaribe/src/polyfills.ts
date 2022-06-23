@@ -50,6 +50,7 @@ import 'zone.js';  // Included with Angular CLI.
 export let rutaPlasticaribeAPI = "http://192.168.0.85:9085/api";
 export let rutaPlasticaribe = "http://192.168.0.153:9085/api";
 export let rutaPlasticaribe2 = "http://localhost:9085/api";
+export let rutaPlasticaribe3 = "https://192.168.0.153:7137/api";
 
 
 /***************************************************************************************************

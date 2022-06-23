@@ -1,3 +1,8 @@
+*{
+  list-style: none;
+  text-decoration: none;
+}
+
 .example-container {
   position: absolute;
   top: 0;
@@ -135,7 +140,6 @@ a[aria-expanded="false"]::before, a[aria-expanded="true"]::before {
 a[aria-expanded="true"]::before {
     content: '\e260';
 }
-
 
 ul ul a {
     font-size: 0.9em !important;

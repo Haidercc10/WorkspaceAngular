@@ -87,7 +87,9 @@ export class ProductoComponent implements OnInit {
       UndMedACF: this.formularioProducto.get('ProductoUndFAC')?.value,
       Estado_Id: this.formularioProducto.get('')?.value,
       Prod_Largo: 0,
-      Prod_Cod: 0
+      Prod_Cod: 0,
+      Pigmt_Id: 0,
+      Material_Id: 0,
     }
 
     this.productoServices.srvGuardar(campo).subscribe(datos_Productos=>{
