@@ -749,14 +749,14 @@ export class OpedidoproductoComponent implements OnInit {
     let nombreVendedor : string = this.FormConsultaPedidoExterno.value.PedExtUsuarioConsulta;
     let idCliente : number = this.FormConsultaPedidoExterno.value.PedExtIdClienteConsulta;
     let nombreCliente : string = this.FormConsultaPedidoExterno.value.PedExtClienteConsulta;
+    let idUsuario : number;
+    let idEstado : number;
+    let fechaCreacionFinal : any;
+    let fechaEntregaFinal : any;
 
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, todos (no es necesario que esten llenos los campos idCliente y nombreCliente, con uno vale)
     if (fechaPedido != null && fechaEntrega != null && estadoNombre != null && nombreVendedor != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      let idUsuario : number;
-      let idEstado : number;
-      let fechaCreacionFinal : any;
-      let fechaEntregaFinal : any;
       this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
         for (let index = 0; index < datos_estado.length; index++) {
           if (datos_estado[index].estado_Nombre == estadoNombre) {
@@ -836,10 +836,6 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, todos excepto el vendedor (no es necesario que esten llenos los campos idCliente y nombreCliente, con uno vale)
     else if (fechaPedido != null && fechaEntrega != null && estadoNombre != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      let idUsuario : number;
-      let idEstado : number;
-      let fechaCreacionFinal : any;
-      let fechaEntregaFinal : any;
       this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
         for (let index = 0; index < datos_estado.length; index++) {
           if (datos_estado[index].estado_Nombre == estadoNombre) {
@@ -909,10 +905,6 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, todos excepto los campos idCliente y nombreCliente
     else if (fechaPedido != null && fechaEntrega != null && estadoNombre != null && nombreVendedor != null) {
       this.pedidosProductos = [];
-      let idUsuario : number;
-      let idEstado : number;
-      let fechaCreacionFinal : any;
-      let fechaEntregaFinal : any;
       this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
         for (let index = 0; index < datos_estado.length; index++) {
           if (datos_estado[index].estado_Nombre == estadoNombre) {
@@ -949,9 +941,6 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, todos exceptuando la fecha de entrega (no es necesario que esten llenos los campos idCliente y nombreCliente, con uno vale)
     else if (fechaPedido != null && estadoNombre != null && nombreVendedor != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      let idUsuario : number;
-      let idEstado : number;
-      let fechaCreacionFinal : any;
       this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
         for (let index = 0; index < datos_estado.length; index++) {
           if (datos_estado[index].estado_Nombre == estadoNombre) {
@@ -1021,9 +1010,6 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, todos exceptuando la fecha de creacion (no es necesario que esten llenos los campos idCliente y nombreCliente, con uno vale)
     else if (fechaEntrega != null && estadoNombre != null && nombreVendedor != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      let idUsuario : number;
-      let idEstado : number;
-      let fechaEntregaFinal : any;
       this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
         for (let index = 0; index < datos_estado.length; index++) {
           if (datos_estado[index].estado_Nombre == estadoNombre) {
@@ -1093,10 +1079,6 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fechas y estado
     else if (fechaPedido != null && fechaEntrega != null && estadoNombre != null) {
       this.pedidosProductos = [];
-      let idUsuario : number;
-      let idEstado : number;
-      let fechaCreacionFinal : any;
-      let fechaEntregaFinal : any;
       this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
         for (let index = 0; index < datos_estado.length; index++) {
           if (datos_estado[index].estado_Nombre == estadoNombre) {
@@ -1125,9 +1107,6 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fechas y cliente (no es necesario que esten llenos los campos idCliente y nombreCliente, con uno vale)
     else if (fechaPedido != null && fechaEntrega != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      let fechaCreacionFinal : any;
-      let fechaEntregaFinal : any;
-
       if (idCliente != null) {
         this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
           for (let sede = 0; sede < datos_sedes.length; sede++) {
@@ -1187,12 +1166,7 @@ export class OpedidoproductoComponent implements OnInit {
     }
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fechas y vendedor
     else if (fechaPedido != null && fechaEntrega != null && nombreVendedor != null) {
-      console.log(1)
       this.pedidosProductos = [];
-      let idUsuario : number;
-      let idEstado : number;
-      let fechaCreacionFinal : any;
-      let fechaEntregaFinal : any;
       this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
         for (let usua = 0; usua < datos_usuarios.length; usua++) {
           if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
@@ -1218,11 +1192,465 @@ export class OpedidoproductoComponent implements OnInit {
         }
       });
     }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha en que se hizo el pedido, estado y cliente
+    else if (fechaPedido != null && estadoNombre != null && (idCliente != null || nombreCliente != null)){
+      this.pedidosProductos = [];
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+        for (let index = 0; index < datos_estado.length; index++) {
+          if (datos_estado[index].estado_Nombre == estadoNombre) {
+            idEstado = datos_estado[index].estado_Id;
+
+            if (idCliente != null) {
+              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                for (let sede = 0; sede < datos_sedes.length; sede++) {
+                  if (datos_sedes[sede].cli_Id == idCliente) {
+                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                        let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
+                        let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
+                        fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
+                        if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
+                          moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
+                          datos_pedidos[ped].estado_Id == idEstado) {
+                          this.llenadoPedidos(datos_pedidos[ped]);
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            } else if (nombreCliente != null) {
+              this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
+                for (let cli = 0; cli < datos_cliente.length; cli++) {
+                  if (datos_cliente[cli].cli_Nombre == nombreCliente) {
+                    idCliente = datos_cliente[cli].cli_Id;
+                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                      for (let i = 0; i < datos_sedes.length; i++) {
+                        if (datos_sedes[i].cli_Id == idCliente) {
+                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                              let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
+                              let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
+                              fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
+
+                              if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
+                                datos_pedidos[ped].estado_Id == idEstado &&
+                                datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
+                                this.llenadoPedidos(datos_pedidos[ped]);
+                              }
+                            }
+                          });
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            }
+          }
+        }
+      });
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha en que se hizo el pedido, estado y vendedor
+    else if (fechaPedido != null && estadoNombre != null && nombreVendedor != null) {
+      this.pedidosProductos = [];
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+        for (let index = 0; index < datos_estado.length; index++) {
+          if (datos_estado[index].estado_Nombre == estadoNombre) {
+            idEstado = datos_estado[index].estado_Id;
+            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+              for (let usua = 0; usua < datos_usuarios.length; usua++) {
+                if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
+                  idUsuario = datos_usuarios[usua].usua_Id;
+
+                  this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                    for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                      let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
+                      let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
+                      fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
+                      if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
+                        datos_pedidos[ped].estado_Id == idEstado &&
+                        datos_pedidos[ped].usua_Id == idUsuario) {
+                        this.llenadoPedidos(datos_pedidos[ped]);
+                      }
+                    }
+                  });
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha en que se hizo el pedido, vendedor y cliente
+    else if (fechaPedido != null && nombreVendedor != null && (idCliente != null || nombreCliente != null)) {
+      this.pedidosProductos = [];
+      this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+        for (let usua = 0; usua < datos_usuarios.length; usua++) {
+          if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
+            idUsuario = datos_usuarios[usua].usua_Id;
+
+            if (idCliente != null) {
+              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                for (let sede = 0; sede < datos_sedes.length; sede++) {
+                  if (datos_sedes[sede].cli_Id == idCliente) {
+                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                        let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
+                        let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
+                        fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
+
+                        if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
+                          moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
+                          datos_pedidos[ped].usua_Id == idUsuario) {
+                          this.llenadoPedidos(datos_pedidos[ped]);
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            } else if (nombreCliente != null) {
+              this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
+                for (let cli = 0; cli < datos_cliente.length; cli++) {
+                  if (datos_cliente[cli].cli_Nombre == nombreCliente) {
+                    idCliente = datos_cliente[cli].cli_Id;
+                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                      for (let i = 0; i < datos_sedes.length; i++) {
+                        if (datos_sedes[i].cli_Id == idCliente) {
+                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                              let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
+                              let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
+                              fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
+
+                              if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
+                                datos_pedidos[ped].usua_Id == idUsuario &&
+                                datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
+                                this.llenadoPedidos(datos_pedidos[ped]);
+                              }
+                            }
+                          });
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            }
+          }
+        }
+      });
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha de entrega, estado y cliente
+    else if (fechaEntrega != null && estadoNombre != null && (idCliente != null || nombreCliente != null)) {
+      this.pedidosProductos = [];
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+        for (let index = 0; index < datos_estado.length; index++) {
+          if (datos_estado[index].estado_Nombre == estadoNombre) {
+            idEstado = datos_estado[index].estado_Id;
+            if (idCliente != null) {
+              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                for (let sede = 0; sede < datos_sedes.length; sede++) {
+                  if (datos_sedes[sede].cli_Id == idCliente) {
+                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                        let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
+                        let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                        fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+
+                        if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
+                          moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
+                          datos_pedidos[ped].estado_Id == idEstado) {
+                          this.llenadoPedidos(datos_pedidos[ped]);
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            } else if (nombreCliente != null) {
+              this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
+                for (let cli = 0; cli < datos_cliente.length; cli++) {
+                  if (datos_cliente[cli].cli_Nombre == nombreCliente) {
+                    idCliente = datos_cliente[cli].cli_Id;
+                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                      for (let i = 0; i < datos_sedes.length; i++) {
+                        if (datos_sedes[i].cli_Id == idCliente) {
+                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                              let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
+                              let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                              fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+
+                              if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
+                                datos_pedidos[ped].estado_Id == idEstado &&
+                                datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
+                                this.llenadoPedidos(datos_pedidos[ped]);
+                              }
+                            }
+                          });
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            }
+          }
+        }
+      });
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha de entrega, estado y vendedor
+    else if (fechaEntrega != null && estadoNombre != null && nombreVendedor != null) {
+      this.pedidosProductos = [];
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+        for (let index = 0; index < datos_estado.length; index++) {
+          if (datos_estado[index].estado_Nombre == estadoNombre) {
+            idEstado = datos_estado[index].estado_Id;
+            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+              for (let usua = 0; usua < datos_usuarios.length; usua++) {
+                if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
+                  idUsuario = datos_usuarios[usua].usua_Id;
+
+                  this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                    for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                      let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
+                      let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                      fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+
+                      if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
+                        datos_pedidos[ped].estado_Id == idEstado &&
+                        datos_pedidos[ped].usua_Id == idUsuario) {
+                        this.llenadoPedidos(datos_pedidos[ped]);
+                      }
+                    }
+                  });
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha de entrega, vendedor y cliente
+    else if (fechaEntrega != null && nombreVendedor != null && (idCliente != null || nombreCliente != null)) {
+      this.pedidosProductos = [];
+      this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+        for (let usua = 0; usua < datos_usuarios.length; usua++) {
+          if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
+            idUsuario = datos_usuarios[usua].usua_Id;
+
+            if (idCliente != null) {
+              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                for (let sede = 0; sede < datos_sedes.length; sede++) {
+                  if (datos_sedes[sede].cli_Id == idCliente) {
+                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                        let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
+                        let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                        fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+
+                        if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
+                          moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
+                          datos_pedidos[ped].usua_Id == idUsuario) {
+                          this.llenadoPedidos(datos_pedidos[ped]);
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            } else if (nombreCliente != null) {
+              this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
+                for (let cli = 0; cli < datos_cliente.length; cli++) {
+                  if (datos_cliente[cli].cli_Nombre == nombreCliente) {
+                    idCliente = datos_cliente[cli].cli_Id;
+                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                      for (let i = 0; i < datos_sedes.length; i++) {
+                        if (datos_sedes[i].cli_Id == idCliente) {
+                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                              let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
+                              let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                              fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+
+                              if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
+                                datos_pedidos[ped].usua_Id == idUsuario &&
+                                datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
+                                this.llenadoPedidos(datos_pedidos[ped]);
+                              }
+                            }
+                          });
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            }
+          }
+        }
+      });
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, estado, vendedor y cliente
+    else if (estadoNombre != null && nombreVendedor != null && (idCliente != null || nombreCliente != null)) {
+      this.pedidosProductos = [];
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+        for (let index = 0; index < datos_estado.length; index++) {
+          if (datos_estado[index].estado_Nombre == estadoNombre) {
+            idEstado = datos_estado[index].estado_Id;
+            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+              for (let usua = 0; usua < datos_usuarios.length; usua++) {
+                if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
+                  idUsuario = datos_usuarios[usua].usua_Id;
+
+                  if (idCliente != null) {
+                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                      for (let sede = 0; sede < datos_sedes.length; sede++) {
+                        if (datos_sedes[sede].cli_Id == idCliente) {
+                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                              if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
+                                datos_pedidos[ped].estado_Id == idEstado &&
+                                datos_pedidos[ped].usua_Id == idUsuario) {
+                                this.llenadoPedidos(datos_pedidos[ped]);
+                              }
+                            }
+                          });
+                        }
+                      }
+                    });
+                  } else if (nombreCliente != null) {
+                    this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
+                      for (let cli = 0; cli < datos_cliente.length; cli++) {
+                        if (datos_cliente[cli].cli_Nombre == nombreCliente) {
+                          idCliente = datos_cliente[cli].cli_Id;
+                          this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                            for (let i = 0; i < datos_sedes.length; i++) {
+                              if (datos_sedes[i].cli_Id == idCliente) {
+                                this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                                  for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                                    if (datos_pedidos[ped].estado_Id == idEstado &&
+                                      datos_pedidos[ped].usua_Id == idUsuario &&
+                                      datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
+                                      this.llenadoPedidos(datos_pedidos[ped]);
+                                    }
+                                  }
+                                });
+                              }
+                            }
+                          });
+                        }
+                      }
+                    });
+                  }
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha del pedido y estado
+    else if (fechaPedido != null && estadoNombre != null) {
+      this.pedidosProductos = [];
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+        for (let index = 0; index < datos_estado.length; index++) {
+          if (datos_estado[index].estado_Nombre == estadoNombre) {
+            idEstado = datos_estado[index].estado_Id;
+            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+              for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
+                let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
+                fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
+                if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
+                  datos_pedidos[ped].estado_Id == idEstado) {
+                  this.llenadoPedidos(datos_pedidos[ped]);
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha del pedido y cliente
+    else if (fechaPedido != null && (idCliente != null || nombreCliente != null)) {
+      this.pedidosProductos = [];
+      if (idCliente != null) {
+        this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+          for (let sede = 0; sede < datos_sedes.length; sede++) {
+            if (datos_sedes[sede].cli_Id == idCliente) {
+              this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                  let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
+                  let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
+                  fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
+
+                  if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
+                    moment(fechaCreacionFinal).isBetween(fechaPedido, undefined)) {
+                    this.llenadoPedidos(datos_pedidos[ped]);
+                  }
+                }
+              });
+            }
+          }
+        });
+      } else if (nombreCliente != null) {
+        this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
+          for (let cli = 0; cli < datos_cliente.length; cli++) {
+            if (datos_cliente[cli].cli_Nombre == nombreCliente) {
+              idCliente = datos_cliente[cli].cli_Id;
+              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                for (let i = 0; i < datos_sedes.length; i++) {
+                  if (datos_sedes[i].cli_Id == idCliente) {
+                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                        let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
+                        let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
+                        fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
+
+                        if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
+                          datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
+                          this.llenadoPedidos(datos_pedidos[ped]);
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            }
+          }
+        });
+      }
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha del pedido y vendedor
+    else if (fechaPedido != null && nombreVendedor != null) {
+      this.pedidosProductos = [];
+      this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+        for (let usua = 0; usua < datos_usuarios.length; usua++) {
+          if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
+            idUsuario = datos_usuarios[usua].usua_Id;
+
+            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+              for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
+                let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
+                fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
+
+                if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
+                  datos_pedidos[ped].usua_Id == idUsuario) {
+                  this.llenadoPedidos(datos_pedidos[ped]);
+                }
+              }
+            });
+          }
+        }
+      });
+    }
     //Buscará los pedidos por las fechas filtradas
     else if (fechaPedido !== null && fechaEntrega !== null) {
       this.pedidosProductos = [];
-      let fechaCreacionFinal : any;
-      let fechaEntregaFinal : any;
       this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
           let FechaCreacionDatetime = datos_pedidos[index].pedExt_FechaCreacion;
@@ -1239,9 +1667,182 @@ export class OpedidoproductoComponent implements OnInit {
         }
       });
     }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha de entrga y estado
+    else if (fechaEntrega != null && estadoNombre != null) {
+      this.pedidosProductos = [];
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+        for (let index = 0; index < datos_estado.length; index++) {
+          if (datos_estado[index].estado_Nombre == estadoNombre) {
+            idEstado = datos_estado[index].estado_Id;
+            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+              for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
+                let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+
+                if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
+                  datos_pedidos[ped].estado_Id == idEstado) {
+                  this.llenadoPedidos(datos_pedidos[ped]);
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha de entrga y cliente
+    else if (fechaEntrega != null && (idCliente != null || nombreCliente != null)) {
+      this.pedidosProductos = [];
+      if (idCliente != null) {
+        this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+          for (let sede = 0; sede < datos_sedes.length; sede++) {
+            if (datos_sedes[sede].cli_Id == idCliente) {
+              this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                  let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
+                  let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                  fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+
+                  if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
+                    moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega)) {
+                    this.llenadoPedidos(datos_pedidos[ped]);
+                  }
+                }
+              });
+            }
+          }
+        });
+      } else if (nombreCliente != null) {
+        this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
+          for (let cli = 0; cli < datos_cliente.length; cli++) {
+            if (datos_cliente[cli].cli_Nombre == nombreCliente) {
+              idCliente = datos_cliente[cli].cli_Id;
+              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                for (let i = 0; i < datos_sedes.length; i++) {
+                  if (datos_sedes[i].cli_Id == idCliente) {
+                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
+
+                        let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
+                        let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                        fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+
+                        if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
+                          datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
+                          this.llenadoPedidos(datos_pedidos[ped]);
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            }
+          }
+        });
+      }
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha de entrga y vendedor
+    else if (fechaEntrega != null && nombreVendedor != null) {
+      this.pedidosProductos = [];
+      this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+        for (let usua = 0; usua < datos_usuarios.length; usua++) {
+          if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
+            idUsuario = datos_usuarios[usua].usua_Id;
+
+            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+              for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
+                let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+
+                if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
+                  datos_pedidos[ped].usua_Id == idUsuario) {
+                  this.llenadoPedidos(datos_pedidos[ped]);
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, estado y cliente
+    else if (estadoNombre != null && (idCliente != null || nombreCliente != null)) {
+      this.pedidosProductos = [];
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+        for (let index = 0; index < datos_estado.length; index++) {
+          if (datos_estado[index].estado_Nombre == estadoNombre) {
+            idEstado = datos_estado[index].estado_Id;
+            if (idCliente != null) {
+              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                for (let sede = 0; sede < datos_sedes.length; sede++) {
+                  if (datos_sedes[sede].cli_Id == idCliente) {
+                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                        if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
+                          datos_pedidos[ped].estado_Id == idEstado) {
+                          this.llenadoPedidos(datos_pedidos[ped]);
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            } else if (nombreCliente != null) {
+              this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
+                for (let cli = 0; cli < datos_cliente.length; cli++) {
+                  if (datos_cliente[cli].cli_Nombre == nombreCliente) {
+                    idCliente = datos_cliente[cli].cli_Id;
+                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
+                      for (let i = 0; i < datos_sedes.length; i++) {
+                        if (datos_sedes[i].cli_Id == idCliente) {
+                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                              if (datos_pedidos[ped].estado_Id == idEstado &&
+                                datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
+                                this.llenadoPedidos(datos_pedidos[ped]);
+                              }
+                            }
+                          });
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            }
+          }
+        }
+      });
+    }
+    //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, estado y vendedor
+    else if (estadoNombre != null && nombreVendedor != null) {
+      this.pedidosProductos = [];
+      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
+        for (let index = 0; index < datos_estado.length; index++) {
+          if (datos_estado[index].estado_Nombre == estadoNombre) {
+            idEstado = datos_estado[index].estado_Id;
+            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+              for (let usua = 0; usua < datos_usuarios.length; usua++) {
+                if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
+                  idUsuario = datos_usuarios[usua].usua_Id;
+
+                  this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                    for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                      if (datos_pedidos[ped].estado_Id == idEstado &&
+                        datos_pedidos[ped].usua_Id == idUsuario) {
+                        this.llenadoPedidos(datos_pedidos[ped]);
+                      }
+                    }
+                  });
+                }
+              }
+            });
+          }
+        }
+      });
+    }
     //Buscará los pedidos con el estado que se digitó
     else if (estadoNombre !== null) {
-      let idEstado : number;
       this.pedidosProductos = [];
       this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
         for (let index = 0; index < datos_estado.length; index++) {
@@ -1341,7 +1942,6 @@ export class OpedidoproductoComponent implements OnInit {
     }
     //Buscará los pedidos del usuario que se ha seleccionado
     else if (nombreVendedor !== null){
-      let idUsuario : number;
       this.pedidosProductos = [];
       this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
         for (let index = 0; index < datos_usuarios.length; index++) {
@@ -1374,7 +1974,6 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará los pedidos de los clientes por el que se seleccionó
     else if (nombreCliente !== null){
       this.pedidosProductos = [];
-      let idCliente : number;
       this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
         for (let index = 0; index < datos_cliente.length; index++) {
           if (datos_cliente[index].cli_Nombre == nombreCliente) {
@@ -1397,7 +1996,6 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará los pedidos por la fecha que se selccionó, esta fecha será la fecha de creación del pedido
     else if (fechaPedido !== null) {
       this.pedidosProductos = [];
-      let fechaCreacionFinal : any;
       this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
           let FechaCreacionDatetime = datos_pedidos[index].pedExt_FechaCreacion;
@@ -1412,7 +2010,6 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará los pedidos por la fecha que se selccionó, esta fecha será la fecha de entrega del pedido
     else if (fechaEntrega !== null) {
       this.pedidosProductos = [];
-      let fechaEntregaFinal : any;
       this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
           let FechaEntregaDatetime = datos_pedidos[index].pedExt_FechaEntrega;
@@ -1676,24 +2273,15 @@ export class OpedidoproductoComponent implements OnInit {
                 SubTotal : this.FormPedidoExternoProductos.get('ProdCantidad').value * this.FormPedidoExternoProductos.get('ProdPrecioUnd')?.value
               }
 
-              // this.ArrayProducto.push(productoExt);
-              // this.LimpiarCamposProductos();
-              // productoExt = [];
-
               let campoId = this.FormPedidoExternoProductos.get('ProdId')?.value;
               if (this.AccionBoton == "Agregar" && this.ArrayProducto.length == 0) {
                 this.ArrayProducto.push(productoExt);
                 this.LimpiarCamposProductos();
 
               } else if (this.AccionBoton == "Agregar" && this.ArrayProducto.length != 0){
-                for (let index = 0; index < formulario.length; index++) {
-                  if(campoId === formulario[index].Id)  Swal.fire('No se puede cargar el mismo producto a la tabla.');
-                  else {
-                    this.ArrayProducto.push(productoExt);
-                    this.LimpiarCamposProductos();
-                  }
-                  break;
-                }
+                this.ArrayProducto.push(productoExt);
+                this.LimpiarCamposProductos();
+                productoExt = [];
               } else {
                 for (let index = 0; index < formulario.length; index++) {
                   if(productoExt.Id == this.ArrayProducto[index].Id) {
@@ -1704,11 +2292,6 @@ export class OpedidoproductoComponent implements OnInit {
                     break;
                   }
                 }
-              }
-
-              for (let index = 0; index < this.ArrayProducto.length; index++) {
-                this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (productoExt.Cant * productoExt.PrecioUnd), 0)
-                console.log(this.valorTotal);
               }
             } else Swal.fire(`El precio digitado no puede ser menor al que tiene el producto estipulado $${datos_existencias[index].exProd_PrecioVenta}`);
           } else {
@@ -1729,87 +2312,99 @@ export class OpedidoproductoComponent implements OnInit {
     let idUsuario : number;
     let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
     let idSede : number;
+    let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
+    let clienteNombre : string = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    let idcliente : number;
+
     this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
       for (let index = 0; index < datos_usuarios.length; index++) {
         if (datos_usuarios[index].usua_Nombre === nombreUsuario){
           idUsuario = datos_usuarios[index].usua_Id;
-          this.sedesClientesService.srvObtenerLista().subscribe(datos_sede =>{
-            for (let sede = 0; sede < datos_sede.length; sede++) {
-              if(direccionSede === datos_sede[sede].sedeCliente_Direccion) {
-                idSede = datos_sede[sede].sedeCli_Id;
+          this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
+            for (let cli = 0; cli < datos_cliente.length; cli++) {
+              if (datos_cliente[cli].cli_Nombre == clienteNombre) {
+                idcliente = datos_cliente[cli].cli_Id;
+                this.sedesClientesService.srvObtenerLista().subscribe(datos_sede =>{
+                  for (let sede = 0; sede < datos_sede.length; sede++) {
 
-                this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                  let pedidosID = [];
-                  let idProducto : any;
-                  let cantidadProducto : any;
-                  let unidadMedida : any;
-                  let precioUnidad : number;
-                  let campoEstado = this.FormPedidoExternoClientes.get('PedEstadoId')?.value
+                    if(direccionSede === datos_sede[sede].sedeCliente_Direccion && ciudad == datos_sede[sede].sedeCliente_Ciudad && datos_sede[sede].cli_Id == idcliente) {
+                      idSede = datos_sede[sede].sedeCli_Id;
 
-                  for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                    pedidosID.push(datos_pedidos[ped].pedExt_Id);
-                  }
+                      this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+                        let pedidosID = [];
+                        let idProducto : any;
+                        let cantidadProducto : any;
+                        let unidadMedida : any;
+                        let precioUnidad : number;
+                        let campoEstado = this.FormPedidoExternoClientes.get('PedEstadoId')?.value
 
-                  let ultimoId = Math.max.apply(null, pedidosID);
-                  let nombrePDf = ultimoId + 1;
-
-                  const camposPedido : any = {
-                    PedExt_FechaCreacion: this.FormPedidoExternoClientes.get('PedFecha')?.value,
-                    PedExt_FechaEntrega: this.FormPedidoExternoClientes.get('PedFechaEnt')?.value,
-                    Empresa_Id: this.EmpresaVendedora,
-                    SedeCli_Id: idSede,
-                    Usua_Id: idUsuario,
-                    Estado_Id: this.EstadoDocumentos,
-                    PedExt_Observacion: this.FormPedidoExternoClientes.get('PedObservacion')?.value,
-                    PedExt_PrecioTotal: this.valorTotal,
-                    PedExt_Archivo: 0
-                  }
-
-                  if(!this.ArrayProducto.length) Swal.fire('Debe cargar al menos un producto en la tabla.');
-                  else if (campoEstado == "Finalizado" || campoEstado == "Cancelado" || campoEstado == "Anulado") Swal.fire('No puede crear un pedido con el estado seleccionado. Por favor verifique.');
-                  else if (camposPedido.PedExt_FechaEntrega <= camposPedido.PedExt_FechaCreacion) Swal.fire('La fecha de creación no puede ser menor o igual a la fecha de entrega.');
-                  else{
-                    this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data=> {
-
-                      for (let index = 0; index < this.ArrayProducto.length; index++) {
-                        idProducto = this.ArrayProducto[index].Id;
-                        cantidadProducto = this.ArrayProducto[index].Cant;
-                        unidadMedida = this.ArrayProducto[index].UndCant;
-                        precioUnidad = this.ArrayProducto[index].PrecioUnd;
-
-                        const productosPerdidos : any = {
-                          Prod_Id: idProducto,
-                          PedExt_Id: nombrePDf,
-                          PedExtProd_Cantidad : cantidadProducto,
-                          UndMed_Id : unidadMedida,
-                          PedExtProd_PrecioUnitario : precioUnidad
+                        for (let ped = 0; ped < datos_pedidos.length; ped++) {
+                          pedidosID.push(datos_pedidos[ped].pedExt_Id);
                         }
 
-                        this.PedidoProductosService.srvGuardar(productosPerdidos).subscribe(registro_pedido_productos => {
-                        }, error => { console.log(error); });
-                      }
-                      const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        didOpen: (toast) => {
-                          toast.addEventListener('mouseenter', Swal.stopTimer)
-                          toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        let ultimoId = Math.max.apply(null, pedidosID);
+                        let nombrePDf = ultimoId + 1;
+
+                        const camposPedido : any = {
+                          PedExt_FechaCreacion: this.FormPedidoExternoClientes.get('PedFecha')?.value,
+                          PedExt_FechaEntrega: this.FormPedidoExternoClientes.get('PedFechaEnt')?.value,
+                          Empresa_Id: this.EmpresaVendedora,
+                          SedeCli_Id: idSede,
+                          Usua_Id: idUsuario,
+                          Estado_Id: this.EstadoDocumentos,
+                          PedExt_Observacion: this.FormPedidoExternoClientes.get('PedObservacion')?.value,
+                          PedExt_PrecioTotal: this.valorTotal,
+                          PedExt_Archivo: 0
                         }
-                      })
 
-                      Toast.fire({
-                        icon: 'success',
-                        title: 'Pedido creado satisfactoriamente'
-                      })
+                        if(!this.ArrayProducto.length) Swal.fire('Debe cargar al menos un producto en la tabla.');
+                        else if (campoEstado == "Finalizado" || campoEstado == "Cancelado" || campoEstado == "Anulado") Swal.fire('No puede crear un pedido con el estado seleccionado. Por favor verifique.');
+                        else if (camposPedido.PedExt_FechaEntrega <= camposPedido.PedExt_FechaCreacion) Swal.fire('La fecha de creación no puede ser menor o igual a la fecha de entrega.');
+                        else{
+                          this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data=> {
 
-                      this.crearpdf();
-                      setTimeout(() => {
-                        this.LimpiarCampos();
-                      }, 1000);
-                    }, error => { console.log(error); });
+                            for (let index = 0; index < this.ArrayProducto.length; index++) {
+                              idProducto = this.ArrayProducto[index].Id;
+                              cantidadProducto = this.ArrayProducto[index].Cant;
+                              unidadMedida = this.ArrayProducto[index].UndCant;
+                              precioUnidad = this.ArrayProducto[index].PrecioUnd;
+
+                              const productosPerdidos : any = {
+                                Prod_Id: idProducto,
+                                PedExt_Id: nombrePDf,
+                                PedExtProd_Cantidad : cantidadProducto,
+                                UndMed_Id : unidadMedida,
+                                PedExtProd_PrecioUnitario : precioUnidad
+                              }
+
+                              this.PedidoProductosService.srvGuardar(productosPerdidos).subscribe(registro_pedido_productos => {
+                              }, error => { console.log(error); });
+                            }
+                            const Toast = Swal.mixin({
+                              toast: true,
+                              position: 'top-end',
+                              showConfirmButton: false,
+                              timer: 3000,
+                              timerProgressBar: true,
+                              didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                              }
+                            })
+
+                            Toast.fire({
+                              icon: 'success',
+                              title: 'Pedido creado satisfactoriamente'
+                            })
+
+                            this.crearpdf();
+                            setTimeout(() => {
+                              this.LimpiarCampos();
+                            }, 1000);
+                          }, error => { console.log(error); });
+                        }
+                      });
+                    }
                   }
                 });
               }
@@ -1993,7 +2588,7 @@ export class OpedidoproductoComponent implements OnInit {
                                   [
                                     `Nombre: ${this.FormPedidoExternoClientes.value.PedClienteNombre}`,
                                     `Telefono: ${datos_clientes[cli].cli_Telefono}`,
-                                    `Ciudad: ${datos_sedeCliente[sede].sedeCliente_Ciudad}`
+                                    `Ciudad: ${this.FormPedidoExternoClientes.value.ciudad_sede}`
                                   ],
                                   [
                                     `Dirección: ${datos_sedeCliente[sede].sedeCliente_Direccion}`,
@@ -2316,13 +2911,14 @@ export class OpedidoproductoComponent implements OnInit {
   EditarProductoTabla(formulario : any) {
     this.Ide = formulario.Id;
     this.AccionBoton = "Editar";
-
+    this.producto = [];
     this.FormPedidoExternoProductos.patchValue({
       ProdId : formulario.Id,
       ProdNombre: formulario.Nombre,
       ProdAncho : formulario.Ancho,
       ProdFuelle : formulario.Fuelle,
       ProdCalibre : formulario.Cal,
+      ProdLargo : formulario.Largo,
       ProdUnidadMedidaACF : formulario.Und,
       ProdTipo : formulario.Tipo,
       ProdCantidad : formulario.Cant,
@@ -2427,16 +3023,6 @@ export class OpedidoproductoComponent implements OnInit {
       }, error => { console.log(error); });
     });
   }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -2807,7 +3393,7 @@ export class OpedidoproductoComponent implements OnInit {
                           //Recorremos la tabla para tomar la informacion que está almacenada ahí
                           for (let prod = 0; prod < this.ArrayProducto.length; prod++) {
                             idProducto.push(this.ArrayProducto[prod].Id);
-                            productoArray.push(this.ArrayProducto[prod]);
+                            productoArray.push(this.ArrayProducto);
                           }
                           //Validamos el estado del pedido (2: En proceso, 5: Finalizado, 6: Iniciado)
                           if (estadoId == 2 || estadoId == 5 || estadoId == 6) {
@@ -2851,9 +3437,7 @@ export class OpedidoproductoComponent implements OnInit {
 
                                     /*Luego se consulta la tabla de Clientes_Productos para saber si los productos que estan en el pedido
                                     tiene una relacion con el cliente, sino es asi entonces se insertará una nueva relacion */
-                                    this.ClientesProductosService.srvObtenerListaPorId(datos_cliente.cli_Id, item).subscribe(datos_clienteProductos => {
-                                      console.log(datos_clienteProductos)
-                                    }, error => {
+                                    this.ClientesProductosService.srvObtenerListaPorId(datos_cliente.cli_Id, item).subscribe(datos_clienteProductos => {}, error => {
                                       const clienteProductos : any = {
                                         Cli_Id: datos_cliente.cli_Id,
                                         Prod_Id: item,
@@ -2864,29 +3448,32 @@ export class OpedidoproductoComponent implements OnInit {
                                     /*Finalmente se procede con la tabla PedidosExternos_Productos en la que se podrá actualizar, eliminar e insertar datos.
                                     Para esto primero consultamos por el producto y el pedido, si estos existen los actualizará, sino existen los gusradará
                                     Pero si un producto de la tabla es eliminado este deberá eliminarse de la base de datos */
-                                    this.PedidoProductosService.srvObtenerListaPorId(item, this.id_pedido).subscribe(datos_productosPedidos => {
-                                      for (const productoPedido of productoArray) {
+                                    for (let prod = 0; prod < this.ArrayProducto.length; prod++) {
+                                      idProducto.push(this.ArrayProducto[prod].Id);
+
+                                      this.PedidoProductosService.srvObtenerListaPorId(this.ArrayProducto[prod].Id, this.id_pedido).subscribe(datos_productosPedidos => {
+
                                         const datosProductosPedidos : any = {
-                                          Prod_Id: item,
+                                          Prod_Id: this.ArrayProducto[prod].Id,
                                           PedExt_Id: this.id_pedido,
-                                          PedExtProd_Cantidad : productoPedido.Cant,
-                                          UndMed_Id : productoPedido.UndCant,
-                                          PedExtProd_PrecioUnitario : productoPedido.PrecioUnd
+                                          PedExtProd_Cantidad : this.ArrayProducto[prod].Cant,
+                                          UndMed_Id : this.ArrayProducto[prod].UndCant,
+                                          PedExtProd_PrecioUnitario : this.ArrayProducto[prod].PrecioUnd
                                         }
-                                        this.PedidoProductosService.srvActualizar(item, this.id_pedido, datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
-                                      }
-                                    }, error => {
-                                      for (const productoPedido of productoArray) {
+                                        this.PedidoProductosService.srvActualizar(this.ArrayProducto[prod].Id, this.id_pedido, datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
+
+                                      }, error => {
                                         const datosProductosPedidos : any = {
-                                          Prod_Id: item,
+                                          Prod_Id: this.ArrayProducto[prod].Id,
                                           PedExt_Id: this.id_pedido,
-                                          PedExtProd_Cantidad : productoPedido.Cant,
-                                          UndMed_Id : productoPedido.UndCant,
-                                          PedExtProd_PrecioUnitario : productoPedido.PrecioUnd
+                                          PedExtProd_Cantidad : this.ArrayProducto[prod].Cant,
+                                          UndMed_Id : this.ArrayProducto[prod].UndCant,
+                                          PedExtProd_PrecioUnitario : this.ArrayProducto[prod].PrecioUnd
                                         }
                                         this.PedidoProductosService.srvGuardar(datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
-                                      }
-                                    });
+
+                                      });
+                                    }
                                   });
                                 }
                               });
@@ -2896,30 +3483,28 @@ export class OpedidoproductoComponent implements OnInit {
                           } else if (estadoId == 11){
                             for (let prod = 0; prod < this.ArrayProducto.length; prod++) {
                               idProducto.push(this.ArrayProducto[prod].Id);
-                              productoArray.push(this.ArrayProducto[prod]);
 
                               this.PedidoProductosService.srvObtenerListaPorId(this.ArrayProducto[prod].Id, this.id_pedido).subscribe(datos_productosPedidos => {
-                                for (const productoPedido of productoArray) {
-                                  const datosProductosPedidos : any = {
-                                    Prod_Id: this.ArrayProducto[prod].Id,
-                                    PedExt_Id: this.id_pedido,
-                                    PedExtProd_Cantidad : productoPedido.Cant,
-                                    UndMed_Id : productoPedido.UndCant,
-                                    PedExtProd_PrecioUnitario : productoPedido.PrecioUnd
-                                  }
-                                  this.PedidoProductosService.srvActualizar(this.ArrayProducto[prod].Id, this.id_pedido, datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
+
+                                const datosProductosPedidos : any = {
+                                  Prod_Id: this.ArrayProducto[prod].Id,
+                                  PedExt_Id: this.id_pedido,
+                                  PedExtProd_Cantidad : this.ArrayProducto[prod].Cant,
+                                  UndMed_Id : this.ArrayProducto[prod].UndCant,
+                                  PedExtProd_PrecioUnitario : this.ArrayProducto[prod].PrecioUnd
                                 }
+                                this.PedidoProductosService.srvActualizar(this.ArrayProducto[prod].Id, this.id_pedido, datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
+
                               }, error => {
-                                for (const productoPedido of productoArray) {
-                                  const datosProductosPedidos : any = {
-                                    Prod_Id: this.ArrayProducto[prod].Id,
-                                    PedExt_Id: this.id_pedido,
-                                    PedExtProd_Cantidad : productoPedido.Cant,
-                                    UndMed_Id : productoPedido.UndCant,
-                                    PedExtProd_PrecioUnitario : productoPedido.PrecioUnd
-                                  }
-                                  this.PedidoProductosService.srvGuardar(datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
+                                const datosProductosPedidos : any = {
+                                  Prod_Id: this.ArrayProducto[prod].Id,
+                                  PedExt_Id: this.id_pedido,
+                                  PedExtProd_Cantidad : this.ArrayProducto[prod].Cant,
+                                  UndMed_Id : this.ArrayProducto[prod].UndCant,
+                                  PedExtProd_PrecioUnitario : this.ArrayProducto[prod].PrecioUnd
                                 }
+                                this.PedidoProductosService.srvGuardar(datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
+
                               });
                             }
                           }
@@ -3082,35 +3667,5 @@ export class OpedidoproductoComponent implements OnInit {
       });
     });
   }
-
-  notifyMe() {
-    //Vamos a comprobar si el navegador es compatible con las notificaciones
-    if (!("Notification" in window)) {
-      alert("No es compatible");
-    }
-    // Vamos a ver si ya se han concedido permisos de notificación
-    else if (Notification.permission === "granted") {
-      // Si está bien vamos a crear una notificación
-      let body = "Hola";
-
-      let title = "Notificación";
-      let notification = new Notification(title);
-
-      notification.onclick = function () {
-          //action
-      };
-      setTimeout(notification.close.bind(notification), 5000);
-    }
-    // De lo contrario, tenemos que pedir permiso al usuario
-    else if (Notification.permission !== 'denied') {
-      Notification.requestPermission(function (permission) {
-        // Si el usuario acepta, vamos a crear una notificación
-        if (permission === "granted") {
-          var notification = new Notification( "Ahora podras recibir notifiaciones");
-        }
-      });
-    }
-  }
-
 
 }

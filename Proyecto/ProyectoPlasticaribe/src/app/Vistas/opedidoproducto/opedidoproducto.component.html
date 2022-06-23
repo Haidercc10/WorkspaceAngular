@@ -518,7 +518,7 @@
                       <td id="tipoProducto" class="TextosInfoTabla">{{listaProductos.Tipo}}</td>
                       <td id="cantidadDisponible" class="TextosInfoTabla">{{listaProductos.Cant}}</td>
                       <td id="undMedidaCantidad" class="TextosInfoTabla">{{listaProductos.UndCant}}</td>
-                      <td id="precioUnitario" class="TextosInfoTabla">$ {{listaProductos.PrecioUnd}}</td>
+                      <td id="precioUnitario" class="TextosInfoTabla">$ {{listaProductos.PrecioUnd | currency : 'COP'}}</td>
                       <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.TpMoneda}}</td>
                       <td id="Subtotal" class="TextosInfoTabla">$ {{listaProductos.SubTotal }}</td>
                       <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true" title="Editar Producto"></i></a></td>
@@ -533,7 +533,7 @@
         <!--Inicio valor total-->
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <label for=""><b>Valor total: $</b></label>
-          <label for="">COP ${{valorTotal}}</label>
+          <label for="">${{valorTotal | currency : 'COP'}}</label>
         </div>
         <!--Fin valor total-->
         <!-- Inicio Botones -->
