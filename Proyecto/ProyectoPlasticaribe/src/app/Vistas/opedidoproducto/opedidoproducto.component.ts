@@ -275,7 +275,7 @@ export class OpedidoproductoComponent implements OnInit {
     });
   }
 
-  //Funcio para verificar la inactividad de un usuario, cunado pasa mas de 30 minutos sin actividad se cierra la sesion
+  //Funcio para verificar la inactividad de un usuario, cuando pasa mas de 30 minutos sin actividad se cierra la sesion
   inactividad(){
     let registrarInactividad = function () {
       let t;

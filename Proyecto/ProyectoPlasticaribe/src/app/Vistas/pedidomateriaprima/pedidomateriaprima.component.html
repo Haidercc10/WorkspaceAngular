@@ -1,328 +1,309 @@
-<!-- parte superior -->
-<div class="contain">
-  <nav class="navbar navbar-expand-lg ">
-    <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">Plasticaribe SAS</span>
-      <form class="d-flex">
-
-        <!-- USUARIOS -->
-        <div class="mb-2">
-          <div class="usaurios">
-            <div class="imagen">
-              <img src="#" alt="Usuarios" title="Usuario">
-              <div class="info_usua">
-                <span class="nombre_usuario">Usuario</span>
-                <span class="tipo_usuario">Administrador</span>
-              </div>
-            </div>
+<!--Navegador parte superior -->
+      <div class="contain">
+        <nav class="navbar navbar-expand-lg">
+          <div class="container-fluid">
+            <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
           </div>
-        </div>
-
-        <!--Configuracion-->
-        <nav>
-          <ul>
-            <li class="perfil">
-              <a href= "#">Perfil</a>
-              <div class="dropdownContain">
-                <div class="dropOut">
-                  <div class="triangle"></div>
-                  <ul>
-                    <li>Cambiar clave</li>
-                    <li>Configurar</li>
-                  </ul>
-                </div>
-              </div>
-
-            </li>
-            <li class="salir"><a href="/inicio">Salir</a></li>
+          <ul class="btn-group open">
+            <p><b> User: {{storage_Nombre}}</b></p>
+            <span><b>Tipo: {{storage_Rol}} </b></span>
+            <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
           </ul>
         </nav>
-
-      </form>
-    </div>
-  </nav>
-  <div class=" contenedorSecundario container-fluid">
-    <div class="row justify-content-start">
-      <div class="navLateral col-1">
-
-
-        <!-- fin de parte superior -->
-
-        <!-- principal -->
+        <!-- Navegador fin de parte superior -->
         <div class="container-fluid">
-
-          <div class="contenedor_titulo mb-3">
-            <h2 class="tituloRojo">Pedido Interno</h2>
+          <!-- principal -->
+          <div class="mb-4 Titulo">
+            <h2 class="tituloRojo"> Materia Prima</h2>
           </div>
-          <div class="mb-5">
+
+          <div class="mb-4">
             <hr class="colorLinea">
           </div>
-
-          <div class="container">
-            <div class="mb-4">
-              <h4 class="tituloRojo"></h4>
-            </div>
-<!-- fin principal -->
-  <!-- boton de busqueda -->
-  <form>
-    <h5>Buscar</h5><input type="search" placeholder="N.Orden de Trabajo">
-  </form>
-<br>
-<!-- boton de busqueda fin -->
-
-<form [formGroup]="formularioPedidomateriaprima" (ngSubmit)="validarCamposVacios()">
-  <div class="row g-4">
-  <div class="container">
-    <div class="row">
-      <div class="col">
-        <input formControlName="IDCliente"  type="text" class="form-control form-control-sm" id=""  placeholder="ID Cliente" name="ID Cliente" required maxlength="50">
+        <!-- fin principal -->
+        
+<!-- Inicio titulo -->
+        <div class="mb-4">
+          <h4 class="tituloRojo">Ingresar Materia Prima</h4>
         </div>
-  <div class="col">
-    <input formControlName="NombreCliente"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre Cliente" name="Nombre Cliente" required maxlength="50">
-     </div>
-  <div class="col">
-    <input formControlName="SedeCliente"  type="text" class="form-control form-control-sm" id=""  placeholder="Sede Cliente" name="Sede Cliente" required maxlength="50">
-    </div>
-      <div class="col">
-      <input formControlName="Turno"  type="text" class="form-control form-control-sm" id=""  placeholder="Turno" name="Turno" required maxlength="50">
-    </div>
-    <br>
-    <br>
-    <br>
-    <!-- Tabla de Producto -->
-<div class="container"></div>
-<div class="mb-4">
-  <h6 class="tituloRojo">Tabla de Producto</h6>
-</div>
-<div class="table-responsive">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Produto</th>
-        <th scope="col">Ancho</th>
-        <th scope="col">Largo</th>
-        <th scope="col">Fuelle</th>
-        <th scope="col">Ud</th>
-        <th scope="col">Calibre</th>
-        <th scope="col">Cantidad</th>
-        <th scope="col">Tipo Prodcuto</th>
-        <th scope="col">Bruto</th>
-        <th scope="col">Neto</th>
-        <th scope="col">Tara</th>
-        <th scope="col">Und</th>
-        <th scope="col">Diseño</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <th scope="row"></th>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>Ver<a href="" download=""></a></td>
-      </tr>
+<!-- Fin titulo -->
+<form [formGroup]="FormMateriaprima">
+  <!-- Inicio Fila 1 Agregar producto -->
+  <div class="mb-3">
+    <div class="row g-3">
 
-    </tbody>
-  </table>
+      <div class="form-floating col-md-1">
+        <input formControlName="Mpid" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+        <label for="floatingSelect">Id</label>
+      </div>
+      <!-- ID/Nombre Producto -->
+      <div class="form-floating col-md-2">
+          <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="llenadoProducto()" aria-label="Floating label select example" required>
+            <option [ngValue]="null" disabled selected>Seleccione Producto</option>
+            <!-- <option [ngValue]="productos.prod_Id" *ngFor="let productos of producto"></option> -->
+          </select>
+          <label for="floatingSelect">Nombre del Producto</label>
+      </div>
+
+   
+    <!-- Operario -->
+    <div class="form-floating col-md-2">
+      <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="llenadoProducto()" aria-label="Floating label select example" required>
+        <option [ngValue]="null" disabled selected>Seleccione Operario</option>
+        <!-- <option [ngValue]="operarios.prod_Id" *ngFor="let operarios of Operario"></option> -->
+      </select>
+      <label for="floatingSelect">Nombre del Operario</label>
   </div>
-    </div>
-<!-- Fin Tabla producto -->
+ <!-- Fecha Ingreso -->
+        <div class="form-floating col-md -2">
+          <input formControlName="MpingresoFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso">
+          <label for="floatingInput">Fecha Ingreso</label>
+        </div>
 
-<!-- Detalle de pedidos Internos -->
-<div class="mb-5">
+   <!-- Estado -->
+   <div class="form-floating col-md-1">
+    <select formControlName="Mpestados" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+      <!-- <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option> -->
+    </select>
+    <label for="floatingSelect">Estado Materia Prima</label>
+  </div>
+
+    <!-- CATEGORIA DE LA MATERIA PRIMERA  -->
+    <div class="form-floating col-md-1">
+      <select formControlName="MpCategoria" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+        <!-- <option [ngValue]="estados" *ngFor="let Categoria of Categoria"></option> -->
+      </select>
+      <label for="floatingSelect">Categoria Materia prima </label>
+    </div>
+
+      <!-- TIPO DE BODEGA  -->
+   <div class="form-floating col-md-1">
+    <select formControlName="Mpbodega" id="floatingSelect" type="text" name="MpbodegaId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+      <!-- <option [ngValue]="estados" *ngFor="let estados of estado"></option> -->
+    </select>
+    <label for="floatingSelect">Tipo de Bodega</label>
+  </div>
+
+  <!-- PRECIO ESTIMADO DE LA MATERIA PRIMA  -->
+  <div class="form-floating col-md-1">
+    <input formControlName="MpPrecio" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" >
+    <label for="floatingInput">Precio Materia Prima</label>
+  </div>
+
+  <!-- Stock Materia Prima -->
+  <div class="form-floating col-md-1">
+    <input formControlName="Mptock" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdStock" >
+    <label for="floatingSelect">En Stock</label>
+  </div>
+     
+        <!-- Unidad medida-->
+        <div class="form-floating col-md-1">
+          <select formControlName="MpunidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" >
+            <!-- <option [ngValue]="unidadMedida" *ngFor="let unidadMedida of undMed"></option> -->
+          </select>
+          <label for="floatingSelect">Und. Medida</label>
+        </div>
+    <!-- Campo Observacion -->
+    <div class="form-floating col-md">
+      <textarea formControlName="MpObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
+      <label for="floatingTextarea">Observación</label>
+    </div>
+  
+    </div>
+  </div>
+</form>
+
+
+                    <!-- BOTONES DE  CONSULTAR Y LIMPIAR CAMPOS -->
+                    <div class="mb-1">
+                      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <input class="btn btn-danger btn-danger-sm" type="submit" value="Agregar">
+                        <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="limpiarCamposConsulta()">
+                      </div>
+                    </div>
+
+                    
+<div class="mb-4">
+  <h4 class="tituloRojo">Tabla Ingreso</h4>
+</div>
+
+<!-- TABLA DE INGRESO -->
+<div class="mb-2">
+    <div class="row g-1">
+      <div class="table-responsive">
+        <!-- <div id="html2Pdf"> -->
+        <table class="table table-bordered" >
+          <thead class="TitulosTabla">
+            <tr>
+              <th id="idProducto" scope="col">ID</th>
+              <!-- <th id="fechaPedido" scope="col">Fecha Pedido</th> -->
+              <th id="fechaingreso" scope="col">Fecha Ingreso</th>
+              <!-- <th id="sede" scope="col">Cliente</th> -->
+              <th id="OperarioMateriaP" scope="col">Operario</th>
+              <th id="estadoIngreso" scope="col">Estado</th>
+              <th id="precioMateriaP" scope="col">Precio</th>
+              <th id="MpStock" scope="col">Stock</th>
+              <th id="UnidadMedida" scope="col">Uni.Med</th>
+              <th id="MpObservacion" scope="col">Observacion</th>
+              <th id="archivoMp" scope="col">Archivo</th>
+              <!-- <th id="editarPedido" scope="col">Editar</th> -->
+            </tr>
+          </thead>
+          <tbody>
+
+            <!-- <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" > -->
+              <!-- <tr *ngFor= "let item of IngresoMateriaP " > -->
+                <tr>
+              <td id="idProducto"></td>
+              <td id="fechaingreso"></td>
+              <!-- <td id="fechaEntrega">{{item.pedExt_FechaEntrega | date : 'yyyy-MM-dd'}}</td> -->
+              
+              <td id="OperarioMateriaP"></td>
+              <td id="estadoIngreso"></td>
+              <td id="precioMateriaP"></td>
+              <td id="MpStock"></td>
+              <td id="UnidadMedida"></td>
+              <td id="MpObservacion"></td>
+              <td id="archivoMp"></td>
+              <!-- <td id="archivoPedido"><input class="btn btn-danger btn-danger-sm" type="button" (click)="llenarProductoPedido(item)" value="Ver"></td> -->
+              <!-- <td id="Editar" ><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Pedido" (click)="MostrarPedido(item)"></i></a></td> -->
+            </tr>
+          </tbody>
+        </table>
+        <!-- <div class="mb-2">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <pagination-controls (pageChange)="page = $event"></pagination-controls>
+            </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fin titulo -->
+
+
+<div class="mb-4">
   <hr class="colorLinea">
 </div>
-<div class="container"></div>
- <div class="mb-4">
-<h4 class="tituloRojo"> Detalle de Pedido Internos</h4>
+<form [formGroup]="FormMateriaprimaretiro">
+<!-- Inicio Fila 1 Agregar producto -->
+<div class="mb-3">
+<div class="row g-3">
+  <div class="mb-4">
+    <h4 class="tituloRojo">Retiro Materia Prima</h4>
+   </div>
+<div class="form-floating col-md-1">
+  <input formControlName="Mpid" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+  <label for="floatingSelect">Id</label>
 </div>
-<div class="row g-4">
-<div class="col">
-  <input formControlName="IDDetallePedido"  type="text" class="form-control form-control-sm" id=""  placeholder="ID Detalle Pedido" name="ID Detalle Pedido" required maxlength="50">
+<!-- ID/Nombre Producto -->
+<div class="form-floating col-md-2">
+  <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="llenadoProducto()" aria-label="Floating label select example" required>
+    <option [ngValue]="null" disabled selected>Seleccione Producto</option>
+    <!-- <option [ngValue]="productos.prod_Id" *ngFor="let productos of producto"></option> -->
+  </select>
+  <label for="floatingSelect">Nombre del Producto</label>
 </div>
-<!-- fecha  -->
-  <label class="col-md-1 control-label" for="">Pedido</label>
-  <div class="col">
-  <input id="FechaPedido" name="FechaPedido" type="date" class="form-control form-control-sm">
-  </div>
-<!-- fin de fecha -->
 
-<div class="col">
-  <input formControlName="IDUsuario"  type="text" class="form-control form-control-sm" id=""  placeholder="ID Usuario" name="ID Usuario" required maxlength="50">
-  </div>
 
-  <div class="col">
-    <input formControlName="Nombre"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre" name="Nombre" required maxlength="50">
-    </div>
 
-  <div class="col">
-    <input formControlName="NombreArea"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre Area" name="NombreA rea" required maxlength="50">
-    </div>
-
-    <div class="col">
-      <textarea formControlName="Descripcion"  class="form-control form-control-sm" placeholder="Descripción" name="Descripcion" required maxlength="200"></textarea>
-    </div>
-  </div>
-  </div>
-</div>
-  <!-- pedido -->
-  <div class="mb-5">
-    <hr class="colorLinea">
-  </div>
-  <div class="container"></div>
-   <div class="mb-4">
-  <h4 class="tituloRojo">Pedido</h4>
-</div>
-<div class="row g-4">
-
-  <div class="col-md-3">
-    <select id="IDNombreMateriaPrima" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-      <option  disabled selected>ID- Nombre Materia Prima</option>
-      <option value="1">#1</option>
-      <option value="2">#2</option>
-      <option value="3">#3</option>
+<!-- Operario -->
+<div class="form-floating col-md-2">
+    <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="llenadoProducto()" aria-label="Floating label select example" required>
+    <option [ngValue]="null" disabled selected>Seleccione Operario</option>
+    <!-- <option [ngValue]="Operario.Mp_Id" *ngFor="let Operario of Operario"></option> -->
     </select>
-  </div>
-  <div class="col">
-    <input formControlName="Cantidad"  type="text" class="form-control form-control-sm" id=""  placeholder="Cantidad" name="Cantidad" required maxlength="50">
-    </div>
-  <div class="col-md-3">
-    <select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-      <option  disabled selected>Unidad Medida</option>
-      <option value="1">#1</option>
-      <option value="2">#2</option>
-      <option value="3">#3</option>
+    <label for="floatingSelect">Nombre del Operario</label>
+</div>
+
+
+<!-- Fecha Retiro -->
+<div class="form-floating col-md -2">
+  <input formControlName="MpRetiroFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro">
+  <label for="floatingInput">Fecha Retiro</label>
+</div>
+
+
+<!-- Stock Materia Prima -->
+<div class="form-floating col-md-1">
+    <input formControlName="Mptock" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdStock" readonly onmousedown="return false;" >
+    <label for="floatingSelect">En Stock</label>
+</div>
+
+<!-- Unidad medida-->
+<div class="form-floating col-md-1">
+    <select formControlName="MpunidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" >
+    <!-- <option [ngValue]="unidadMedida" *ngFor="let unidadMedida of undMed">{{unidadMedida}}</option> -->
     </select>
-  </div>
-  <div class="col">
-    <input formControlName="Stock"  type="text" class="form-control form-control-sm" id=""  placeholder="Stock" name="Stock" required maxlength="50">
-    </div>
-  <div class="col-md-3">
-    <select id="TipoMateria" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-      <option  disabled selected>Tipo Materia</option>
-      <option value="1">#1</option>
-      <option value="2">#2</option>
-      <option value="3">#3</option>
-    </select>
-  </div>
-  </div>
-<!-- fin pedido -->
+    <label for="floatingSelect">Und. Medida</label>
+</div>
 
-      <!-- Crear materia prima -->
-      <div class="mb-5">
-        <hr class="colorLinea">
-      </div>
-      <div class="container"></div>
-       <div class="mb-4">
-      <h4 class="tituloRojo"> Crear Materia Prima</h4>
-    </div>
-    <div class="row g-4">
+<!-- Campo Observacion -->
+<div class="form-floating col-md">
+      <textarea formControlName="MpObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
+      <label for="floatingTextarea">Observación</label>
+</div>
 
-            <div class="col">
-            <input formControlName="ID"  type="text" class="form-control form-control-sm" id=""  placeholder="ID" name="ID" required maxlength="50">
-          </div>
+</div>
+</div>
+</form>
 
-          <div class="col">
-            <input formControlName="Nombre"  type="text" class="form-control form-control-sm" id=""  placeholder="Nombre" name="Nombre" required maxlength="50">
-          </div>
-
-          <div class="col">
-            <input formControlName="Cantidad"  type="text" class="form-control form-control-sm" id=""  placeholder="Cantidad" name="Cantidad" required maxlength="50">
-           </div>
-
-          <div class="col-md-3">
-            <select id="UnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-              <option  disabled selected>Unidad Medida</option>
-              <option value="1">#1</option>
-              <option value="2">#2</option>
-              <option value="3">#3</option>
-            </select>
-          </div>
-
-          <div class="col-md-3">
-            <select id="CategoriaMateriaprima" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-              <option  disabled selected>Categoria Materia prima</option>
-              <option value="1">#1</option>
-              <option value="2">#2</option>
-              <option value="3">#3</option>
-            </select>
-          </div>
-
-          <div class="mb">
-            <br>
-          </div>
-          <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Agregar</button>
-             <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()" type="button">Limpiar campos</button>
+                    <!-- BOTONES DE  CONSULTAR Y LIMPIAR CAMPOS -->
+                    
+        <div class="mb-3">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVacios()"> Agregar  </button>
+              <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarMateriaP()"> Actualizar </button>
+              <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
           </div>
         </div>
 
-
-
-
-      <!--  Fin Crear materia prima -->
-
-  <!--  Materia prima a solicitar -->
-
-  <div class="mb-5">
-    <hr class="colorLinea">
-  </div>
-    <div class="container">
-      <div class="row">
-      <div class="mb-4">
-        <h4 class="tituloRojo">Materia Prima a Solicitar</h4>
-      </div>
-      <div class="table-responsive">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">ID</th>
-        <th scope="col">Materia Prima</th>
-        <th scope="col">Cantidad</th>
-        <th scope="col">Unidad Medida</th>
-        <th scope="col">Tipo Materia</th>
-        <th scope="col">Opciones</th>
-
-
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <th scope="row"></th>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>#</td>
-        <td>Editar/Eliminar</td>
-      </tr>
-
-    </tbody>
-  </table>
-      </div>
-  <div class="mb-3">
-    <br>
-  </div>
-  <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
-    <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Solicitar</button>
-    <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()" type="button">Limpiar Tabla</button>
-    <button class="btn btn-danger btn-danger-sm" ><a class="" href="/principal">Cancelar</a></button>
-  </div>
+  <div class="mb-4">
+ <h4 class="tituloRojo">Tabla Retiro</h4>
 </div>
-  </div>
-
-
-    </form>
-
-<br>
+                    
+          <!-- TABLA DE RETIRO -->
+               <div class="mb-2">
+              <div class="row g-1">
+              <div class="table-responsive">
+              <!-- <div id="html2Pdf"> -->
+              <table class="table table-bordered" >
+              <thead class="TitulosTabla">
+              <tr>
+              <th id="idProducto" scope="col">ID</th>
+              <th id="fechaingreso" scope="col">Fecha Retiro</th>
+              <th id="OperarioMateriaP" scope="col">Operario</th>
+              <th id="MpStock" scope="col">Stock</th>
+              <th id="UnidadMedida" scope="col">Uni.Med</th>
+              <th id="MpObservacion" scope="col">Observacion</th>
+              <th id="archivoMp" scope="col">Archivo</th>
+              <!-- <th id="editarPedido" scope="col">Editar</th> -->
+               </tr>
+              </thead>
+              <tbody>
+           
+              <!-- <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" > -->
+              <!-- <tr *ngFor= "let item of IngresoMateriaP " > -->
+              <tr>
+                 <td id="idProducto"></td>
+                 <td id="fechaingreso"></td>
+                  <td id="OperarioMateriaP"></td>
+                  <td id="MpStock"></td>
+                  <td id="UnidadMedida"></td>
+                  <td id="MpObservacion"></td>
+                  <td id="archivoMp"></td>
+                    <!-- <td id="archivoPedido"><input class="btn btn-danger btn-danger-sm" type="button" (click)="llenarProductoPedido(item)" value="Ver"></td> -->
+                    <!-- <td id="Editar" ><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Pedido" (click)="MostrarPedido(item)"></i></a></td> -->
+                     </tr>
+                    </tbody>
+                    </table>
+                        <!-- <div class="mb-2">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                        </div> -->
+                          </div>
+                        </div>
+                      </div>
+                 
+                 

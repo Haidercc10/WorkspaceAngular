@@ -14,8 +14,8 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 })
 export class ClientesComponent implements OnInit {
 
-  public FormCrearClientes : FormGroup;
-  public FormCrearSedeClientes : FormGroup
+  public FormCrearClientes !: FormGroup;
+  public FormCrearSedeClientes !: FormGroup
 
   tipoIdentificacion = [];
   tiposClientes = [];

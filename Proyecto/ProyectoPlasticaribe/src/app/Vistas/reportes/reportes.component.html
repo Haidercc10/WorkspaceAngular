@@ -9,7 +9,6 @@
                  <div> 
                   <ul class="btn-group open">
                     <li class="fa fa-user fa-fw"></li><p>{{storage_Nombre}} {{storage_Rol}} </p>  | <span> <li class="fa fa-sign-out " aria-hidden="true" (click)="confimacionSalida()">Cerrar Seccion</li> </span>
-                   
                   </ul>
                
                 </div>
@@ -22,7 +21,7 @@
                      <div class="mb-4">
                        <h4 class="tituloRojo">Reportes</h4>
                      </div>
-                 
+          
       
       
   
@@ -50,7 +49,7 @@
                <div class="row g-3">
       
                   <!-- TIPO DE REPORTES -->
-                 <div class="col-md-2">
+                 <div class="col-md-2"> 
                    <select formControlName="ReportesConsulta" id="ReportesId" type="text" name="TipoReportes" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                      <option [ngValue]="null" disabled selected>Seleccione Tipo Reporte</option>
                      <option [ngValue]="tipoReportes" *ngFor="let TipoReportes of tipoReportes">{{tipoReportes}}</option>
@@ -157,27 +156,9 @@
                            </div>  -->
                              <br>
                              <br>
-                   <button class="btn btn-danger btn-danger-sm "  type="submit" (click)="exportToExcel()" >Descargar</button>
+                   <button class="btn btn-danger btn-danger-sm"  type="submit" (click)="exportToExcel()">Descargar</button>
                  </div>
-                 </div>
+                 </div> 
+                
       
                  
-                 <!-- <div>
-                  <button (click)="exportToExcel()">Export to Excel</button>
-                  <table id="season-tble">
-                    <tr>
-                      <th>Id</th>
-                      <th>name</th>
-                      <th>Fruit</th>
-                    </tr>
-                    <tr *ngFor="let season of Seasons">
-                      <td>{{ season.id }}</td>
-                      <td>{{ season.name }}</td>
-                      <td>{{ season.fruit }}</td>
-                    </tr>
-                  </table>
-                </div>
-                <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Descargar</button>-->
-      
-      
-      

@@ -34,6 +34,7 @@ import { PaginaPrincipalComponent } from './Vistas/PaginaPrincipal/PaginaPrincip
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialExampleModule} from '../material.module';
 import {MatNativeDateModule} from '@angular/material/core';
+import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
 
 export const routes: Routes = [
 
@@ -56,7 +57,8 @@ export const routes: Routes = [
   {path: 'crear-clientes', canActivate: [ValidacionLoginGuard], component:ClientesComponent},
   {path: 'producto', canActivate: [ValidacionLoginGuard], component:ProductoComponent},
   {path: 'estados', canActivate: [ValidacionLoginGuard], component: EstadosComponent},
-  {path: 'home', canActivate: [ValidacionLoginGuard], component: PaginaPrincipalComponent}
+  {path: 'home', canActivate: [ValidacionLoginGuard], component: PaginaPrincipalComponent},
+  {path: 'desperdicio', component: DesperdicioComponent},
 ]
 
 @NgModule({
@@ -83,7 +85,9 @@ export const routes: Routes = [
     ReportesComponent,
     EstadosComponent,
     PaginaPrincipalComponent,
+    DesperdicioComponent,
   ],
+
 
   imports: [
 

@@ -106,6 +106,10 @@ export class ReportesComponent implements OnInit {
     
   }
 
+
+
+  // DOCUMENTO EN EXCEL 
+  
   Seasons = [
     
   ];
@@ -117,7 +121,6 @@ export class ReportesComponent implements OnInit {
 
     const book: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(book, worksheet, 'Sheet1');
-
     XLSX.writeFile(book, this.name);
     
   }
@@ -160,6 +163,4 @@ export class ReportesComponent implements OnInit {
     })
   }
 }
-
-
 
