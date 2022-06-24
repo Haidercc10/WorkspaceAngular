@@ -24,7 +24,7 @@
 </div>
 
 <!-- DESPERDICIO  -->
-
+<div class="container">
 
   <!-- Inicio titulo -->
   <div class="mb-4">
@@ -33,12 +33,15 @@
   
   
   
+ 
+  
+ 
   <form [formGroup]="FormDesperdicio">
     <!-- Inicio Fila 1 Agregar producto -->
     <div class="mb-3">
       <div class="row g-3">
   
-        <div class="form-floating col-md-1">
+        <div class="form-floating col-md-2">
           <input formControlName="Mpid" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
           <label for="floatingSelect">Id</label>
         </div>
@@ -48,7 +51,7 @@
           <label for="floatingSelect">OT</label>
         </div>
         <!-- ID/Nombre Producto -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md-3">
             <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="llenadoProducto()" aria-label="Floating label select example" required>
               <option [ngValue]="null" disabled selected>Seleccione Producto</option>
               <!-- <option [ngValue]="productos.prod_Id" *ngFor="let productos of producto"></option> -->
@@ -58,7 +61,7 @@
   
 
            <!-- Operario -->
-      <div class="form-floating col-md-2">
+      <div class="form-floating col-md-3">
         <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="llenadoProducto()" aria-label="Floating label select example" required>
           <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
           <!-- <option [ngValue]="Operario.Mp_Id" *ngFor="let operarios of Operario"></option> -->
@@ -83,38 +86,33 @@
             <label for="floatingInput">Fecha Ingreso</label>
           </div>
   
-         <!-- Ancho-->
-  
-          <div class="form-floating col-md-1">
-            <input formControlName="ProdAncho" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" >
-            <label for="floatingInput">Ancho</label>
-          </div> 
-          <!-- Fuelle  -->
-           <div class="form-floating col-md-1">
-            <input formControlName="ProdFuelle" type="number" class="form-control form-control-sm" id="floatingSelect" title="Fuelle" min="0" >
-            <label for="floatingInput">Fuelle</label>
-          </div> 
-            <!-- Calibre  --> 
-           <div class="form-floating col-md-1">
-            <input formControlName="ProdCalibre" type="number" class="form-control form-control-sm" id="floatingSelect" name="PrdCalibre" title="Calibre" min="0" >
-            <label for="floatingInput">Calibre</label>
-          </div> 
-          <!-- Largo  -->
-          <div class="form-floating col-md-1">
-            <input formControlName="ProdLargo" type="number" class="form-control form-control-sm" id="floatingSelect" title="Largo" min="0" >
-            <label for="floatingInput">Largo</label>
-          </div> 
-  
+         
           <!-- Unidad medida-->
-          <div class="form-floating col-md-1">
+          <div class="form-floating col-md-2">
             <select formControlName="MpunidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" >
               <!-- <option [ngValue]="unidadMedida" *ngFor="let unidadMedida of undMed"></option> -->
             </select>
             <label for="floatingSelect">Und. Medida</label>
           </div>
+        <!-- PROCESO -->
+          <div class="form-floating col-md-2">
+            <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="llenadoProducto()" aria-label="Floating label select example" required>
+              <option [ngValue]="null" disabled selected>Seleccione Proceso</option>
+              <!-- <option [ngValue]="Operario.Mp_Id" *ngFor="let operarios of Operario"></option> -->
+            </select>
+            <label for="floatingSelect">Nombre del Proceso </label>
+        </div>
+        <!-- MAQUINA -->
+        <div class="form-floating col-md-2">
+          <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="llenadoProducto()" aria-label="Floating label select example" required>
+            <option [ngValue]="null" disabled selected>Seleccione Maquina</option>
+            <!-- <option [ngValue]="Operario.Mp_Id" *ngFor="let operarios of Operario"></option> -->
+          </select>
+          <label for="floatingSelect">Nombre de Maquina </label>
+      </div>
       <!-- Campo Observacion -->
-      <div class="form-floating col-md">
-        <textarea formControlName="MpObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
+      <div class="form-floating col-md-4 ml-md-auto">
+        <textarea formControlName="MpObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" maxlength="200" placeholder="Observacion" name="despObservacion"></textarea>
         <label for="floatingTextarea">Observación</label>
       </div>
     
@@ -122,11 +120,11 @@
     </div>
   </form>
   
-  
+</div>
                       <!-- BOTONES DE  CONSULTAR Y LIMPIAR CAMPOS -->
-                      <!-- <div class="mb-1">
+                       <div class="mb-1">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                           <input class="btn btn-danger btn-danger-sm" type="submit" value="Guardar">
                           <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="limpiarCamposConsulta()">
                         </div>
-                      </div> -->
+                      </div> 
