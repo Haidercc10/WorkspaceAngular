@@ -87,6 +87,7 @@ export class OpedidoproductoComponent implements OnInit {
   productosPedidos = []; //Variable que tendrá los productos que se han pedido en un pedido consultado y que se quiere mostrar
 
 
+
 /* Vaiables para rescatar los ID de estado, sedes, empresa, valorTotal */
   valorTotal : number = 0; //Variable que guardará el valor total del pedido
   EmpresaVendedora=[]; //Variable que tendrá la informacion de la empresa vendedora

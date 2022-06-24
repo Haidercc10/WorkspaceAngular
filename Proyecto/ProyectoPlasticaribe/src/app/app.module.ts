@@ -91,7 +91,6 @@ export const routes: Routes = [
     EstadosComponent,
     PaginaPrincipalComponent,
     DesperdicioComponent,
-    PruebasComponent,
   ],
 
 
