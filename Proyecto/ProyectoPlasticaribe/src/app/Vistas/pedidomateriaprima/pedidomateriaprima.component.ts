@@ -21,7 +21,14 @@ export class PedidomateriaprimaComponent implements OnInit {
   public FormularioPedidomateriaprima !: FormGroup;
   public FormMateriaprima!: FormGroup;
   public FormMateriaprimaretiro!: FormGroup;
+ //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
+ public ModalajustesMp: boolean = false;
 
+  public TituloSedes = "";
+  ID: number;
+  Nombre : string;
+  Numero : number;
+ 
 
   constructor( private frmBuilderPedidomateriaprima : FormBuilder,
                  private rolService : RolesService,
@@ -150,6 +157,8 @@ ValidarRol : number;
     console.log("clear clicked")
     this.FormularioPedidomateriaprima.reset();
   }
+
+ 
 
   //Funcion que limpia los campos de consulta
     limpiarCamposConsulta(){

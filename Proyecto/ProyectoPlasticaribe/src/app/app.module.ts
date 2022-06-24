@@ -35,6 +35,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialExampleModule} from '../material.module';
 import {MatNativeDateModule} from '@angular/material/core';
 import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
+import { AjustesMpComponent } from './Vistas/ajustes-mp/ajustes-mp.component';
 
 export const routes: Routes = [
 
@@ -86,6 +87,7 @@ export const routes: Routes = [
     EstadosComponent,
     PaginaPrincipalComponent,
     DesperdicioComponent,
+    AjustesMpComponent,
   ],
 
 
