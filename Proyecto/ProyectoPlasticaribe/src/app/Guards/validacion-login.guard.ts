@@ -23,5 +23,5 @@ export class ValidacionLoginGuard implements CanActivate {
     this.redirect(id);
     return id;
   }
-  
+
 }

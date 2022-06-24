@@ -40,98 +40,71 @@ export class OpedidoproductoComponent implements OnInit {
 
   serializedDate = new FormControl(new Date().toISOString());
 
-  public FormPedidoExternoClientes !: FormGroup; //Formulario de pedidos
-  public FormPedidoExternoProductos!: FormGroup;
-  public FormSedesClientes !: FormGroup;
-  public FormConsultaPedidoExterno !: FormGroup;
-  public page : number;
-  titulo = 'Generar PDF con Angular JS 5';
-  imagen1 = 'assets/img/tc.jpg';
-  AccionBoton = "Agregar";
-  Ide : number | undefined;
-  id_pedido : number;
+  public FormPedidoExternoClientes !: FormGroup; //Formulario de pedidos cliente
+  public FormPedidoExternoProductos!: FormGroup; //Formuladio de pedidos productos
+  public FormConsultaPedidoExterno !: FormGroup; //Formulario de pedidos consultados
+  public page : number; //Variable que tendrá el paginado de la tabla en la que se muestran los pedidos consultados
+  AccionBoton = "Agregar"; //Variable que almanará informacio para saber si un producto está en edicion o no (Se editará un producto cargado en la tabla, no uno en la base de datos)
+  Ide : number | undefined; //Variable para almacenar el ID del producto que está en la tabla y se va a editar
+  id_pedido : number; //Variable que almacenará el ID del pedido que se va a mostrar
 
   //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
   public ModalCrearProductos: boolean = false;
   public ModalCrearCliente: boolean = false;
   public ModalSedesClientes: boolean = false;
-  public TituloSedes = "";
-  ID: number;
-  Nombre : string;
-  Numero : number;
 
   // VARIABLES PARA PASAR A LOS COMBOBOX
-  cliente:ClientesService[]=[];
-  nombreCliente = [];
-  clienteDatos = [];
-  sedeCliente:SedeClienteService[]=[];
-  sedeClientesDatos = [];
-  ciudad :SedeClienteService[]=[];
-  usuarioVendedor=[];
-  usuarios=[];
-  estado=[];
-  tipoEstado=[];
-  producto=[];
-  nombreProd : string;
-  productoInfo=[];
-  tipoProducto=[];
-  materialProducto = [];
-  pigmentoProducto =[];
-  tipoProductoConsultado=[];
-  undMed:UnidadMedidaService[]=[];
-  presentacion = [];
-  tipoMoneda:TipoMonedaService[]=[];
-  usuarioVende=[] //Nuevo
-  Registro = [];
-  titulosTabla = [];
-  existenciasProductos=[];
-  empresa=[];
-  pedidosProductos = [];
-  pdfPedidoProducto = [];
-  pedidoID: OpedidoproductoService[] = [];
-  pedidoFechaPedido: OpedidoproductoService[] = [];
-  pedidoFechaEntrega: OpedidoproductoService[] = [];
-  pedidoCliente: OpedidoproductoService[] = [];
-  pedidoEstado: OpedidoproductoService[] = [];
-  pedidoObservaion: OpedidoproductoService[] = [];
-  pedidoPrecioTotal: OpedidoproductoService[] = [];
-  pedidoArchivo: OpedidoproductoService[] = [];
-  contadorPedidosExternos : number;
-  ArrayProducto : any[] =[];
-  ArrayProductoNuevo : any =  {};
-  productosPedidos = [];
+  cliente:ClientesService[]=[]; //Variable que almacenará el nombre de los clientes para pasarlos en la vista
+  clienteDatos = []; //Variable que almacenará la informacion completa de los clientes
+  sedeCliente:SedeClienteService[]=[]; //Varieble que almacenará las direcciones de las sedes de los cliente
+  ciudad :SedeClienteService[]=[]; //Variable que almacenará las ciudades de los clientes
+  usuarioVendedor=[]; //Variable que almacenara los nombres de los usuarios vendedores
+  usuarios=[]; //Variable que almacenara los nombres de los usuarios vendedores y los mostrará en la vista
+  estado=[]; //Variable que almacenará los estados que se mostrarán en la vista
+  producto=[]; //Varibale que gusradará los productos dependiendo del cliente seleccionado
+  nombreProd : string; // Variable que guardará el nombre del producto que está seleccionado
+  productoInfo=[]; //Variable que almacenará la informacion completa del producto buscado o selccionado
+  tipoProducto=[]; //Variable que almacenará los tipos de productos y los mostrará en la vista
+  materialProducto = []; //Varibale que almacenará los materiables de los producto
+  pigmentoProducto =[]; //Varible que guardará los pigmentos de un producto
+  tipoProductoConsultado=[]; //Variable que guardará el tipo de producto consultado
+  undMed:UnidadMedidaService[]=[]; //Variable que guardará las unidades de medida
+  presentacion = []; //Variable que almacenará la presentacion de unproducto consultado
+  tipoMoneda:TipoMonedaService[]=[]; //Variable que almacenará los tipos de monedas y luego los mostrará en la vista
+  usuarioVende=[] //Variable que almacenará la informacion del vendedor de el cliente seleccionado
+  titulosTabla = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
+  existenciasProductos=[]; //Varible que almacenará las existencias de un producto
+  pedidosProductos = []; //Variable que se va a almacenar los pedidos consultados
+  contadorPedidosExternos : number; //Variable que tendrá el ID de un nuevo pedido, con base al ultimo pedido hecho sumandole 1
+  ArrayProducto : any [] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
+  productosPedidos = []; //Variable que tendrá los productos que se han pedido en un pedido consultado y que se quiere mostrar
 
 /* Vaiables para rescatar los ID de estado, sedes, empresa, valorTotal */
-  valorTotal : number = 0;
-  EmpresaVendedora=[];
-  EstadoDocumentos= [];
-  EstadoDeDocumentos : any;
-  SedeSeleccionada: any;
-  IDSedeSeleccionada : any = 0;
-  UsuarioSeleccionado : any = 0;
-  pedidosID = [];
-  datosPDF : any;
-  pages: number = 1;
-  dataset: any[] = ['1','2','3','4','5','6','7','8','9','10'];
-  storage_Id : number;
-  storage_Nombre : any;
-  storage_Rol : any;
-  ValidarRol : number;
+  valorTotal : number = 0; //Variable que guardará el valor total del pedido
+  EmpresaVendedora=[]; //Variable que tendrá la informacion de la empresa vendedora
+  EstadoDocumentos= []; //Variable que tendrá la informacion del estado que tiene el nuevo pedido
+  EstadoDeDocumentos : any; //Variable que tendrá el ID del estado que tiene el nuevo pedido
+  SedeSeleccionada: any; ////Variable que tendrá la informacion de la sede que tiene el nuevo pedido
+  IDSedeSeleccionada : any = 0; //Variable que tendrá el ID de la sede que tiene el nuevo pedido
+  UsuarioSeleccionado : any = 0; //Variable que tendrá el ID del vendedor que tiene el nuevo pedido
+  pedidosID = []; //variable que va a tener los id de los pedidos que ya se han creado
+  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
 
   //variable para almacenar el id del cliente que esta seleccionado
-  clienteId : number;
-  fechaCreacionCortada = [];
-  fechaEntregaCortada = [];
-  fechaCreacion : any;
-  fechaEntrega : any;
-  nombreProducto : string;
-  productoEliminado : number;
-
-  ultimoPrecio : number = 0;
-  Productospedidos : any;
-  today : any = new Date();
-  enPedido : string = 'no';
-
+  clienteId : number; //Variable que almacenará  el id del cliente sleccionado al momento de crear un producto
+  fechaCreacionCortada = []; //Variable que tendrá la fecha de creacion de pedidos cortada de los pedidos consultados (La fecha en la base de datos de datetime por lo que viene con una hora pero esa hora no se debe mostrar)
+  fechaEntregaCortada = []; //Variable que tendrá la fecha de entrega de pedidos cortada de los pedidos consultados (La fecha en la base de datos de datetime por lo que viene con una hora pero esa hora no se debe mostrar)
+  fechaCreacion : any; //Variable que tendrá la fecha de creacion de pedido de los pedidos consultados
+  fechaEntrega : any; //Variable que tendrá la fecha de creacion de entrega de los pedidos consultados
+  nombreProducto : string; //Varible que almacenará el nombre de un producto consultado o seleccionado
+  productoEliminado : number; //Variable que tendrá el id de un producto que se va a eliminar de la base de datos o de un pedido nuevo
+  ultimoPrecio : number = 0; //Variable que almacenará el ultimo precio por el que se facturó un producto
+  Productospedidos : any; //Variable que tendrá la informacion de un producto buscado o seleccionado
+  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  enPedido : string = 'no'; //Variable que se usará para saber si el cliente se encuentra en una actualizacion de pedido o no
   pigmento : any = ''; //Variable que se usará para almacenar el pigmento del producto consultado o seleccionado
   material : any = ''; //Variable que se usará para almacenar el material del producto consultado o seleccionado
 

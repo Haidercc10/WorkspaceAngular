@@ -35,6 +35,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialExampleModule} from '../material.module';
 import {MatNativeDateModule} from '@angular/material/core';
 import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
+import { PruebasComponent } from './Vistas/pruebas/pruebas.component';
 
 export const routes: Routes = [
 
@@ -58,7 +59,11 @@ export const routes: Routes = [
   {path: 'producto', canActivate: [ValidacionLoginGuard], component:ProductoComponent},
   {path: 'estados', canActivate: [ValidacionLoginGuard], component: EstadosComponent},
   {path: 'home', canActivate: [ValidacionLoginGuard], component: PaginaPrincipalComponent},
-  {path: 'desperdicio', component: DesperdicioComponent},
+  {path: 'desperdicio', canActivate: [ValidacionLoginGuard], component: DesperdicioComponent},
+  {path: 'MateriaPrima', canActivate: [ValidacionLoginGuard], component: PedidomateriaprimaComponent},
+
+
+  {path: 'prueba', component: PruebasComponent}
 ]
 
 @NgModule({
@@ -86,6 +91,7 @@ export const routes: Routes = [
     EstadosComponent,
     PaginaPrincipalComponent,
     DesperdicioComponent,
+    PruebasComponent,
   ],
 
 

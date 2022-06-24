@@ -4,9 +4,11 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { EstadosService } from 'src/app/Servicios/estados.service';
-import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
-import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
+import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
+import { ProveedorService } from 'src/app/Servicios/proveedor.service';
+import { Observable } from 'rxjs/internal/Observable';
+import {map, startWith} from 'rxjs/operators';
+import { MpProveedorService } from 'src/app/Servicios/MpProveedor.service';
 
 
 @Component({
@@ -16,91 +18,65 @@ import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 })
 export class PedidomateriaprimaComponent implements OnInit {
 
-  serializedDate = new FormControl(new Date().toISOString());
-
   public FormularioPedidomateriaprima !: FormGroup;
-  public FormMateriaprima!: FormGroup;
-  public FormMateriaprimaretiro!: FormGroup;
+  public FormMateriaPrima!: FormGroup;
+  public FormMateriaPrimaRetiro!: FormGroup;
 
+  /* Vaiables*/
+  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
 
-  constructor( private frmBuilderPedidomateriaprima : FormBuilder,
-                 private rolService : RolesService,
-                  private tipoEstadoService : TipoEstadosService,
-                    private estadosService : EstadosService,
-                      private frmBuilderMateriaPrima : FormBuilder,
-                       private unidadMedidaService : UnidadMedidaService,
-                 @Inject(SESSION_STORAGE) private storage: WebStorageService
-    
-    
-    ) {
-      this.FormMateriaprima = this.frmBuilderMateriaPrima.group({
-        //MateriaPrima
-        MpunidadMedida: new FormControl(),
-        MpId: new FormControl(),
-        MpNombre: new FormControl(),
-        Mpestados: new FormControl(),
-        MpEstadoConsulta: new FormControl(),
-        Mpbodega: new FormControl(),
-        MpStock: new FormControl(),
-        MpObservacion: new FormControl(),
-        IngresoMateriaP: new FormControl(),
-        MpingresoFecha:new FormControl(),
+  ultimoIdMateriaPrima : number; //Varibale que va a almacenar el id de la ultima materia prima registrada y le va a sumar 1
+  nombresMateriasPrimas = [];
 
-      });
-  
+  constructor(private frmBuilderPedidomateriaprima : FormBuilder,
+                private materiaPrimaService : MateriaPrimaService,
+                  private rolService : RolesService,
+                    private frmBuilderMateriaPrima : FormBuilder,
+                      @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                        private proveedorservices : ProveedorService,
+                          private proveedorMP : MpProveedorService) {
 
-     }
-
- // VARIABLES PARA PASAR A LOS COMBOBOX
-
-  usuarios=[];
-  estado=[];
-  tipoEstado=[];
-  producto=[];
-  EstadosMateriaP=[];
-  Nencargado=[];
-  Encargado=[];
-  MateriaPFechaConsulta=[];
-  cliente=[];
-  undMed:UnidadMedidaService[]=[];
-
-/* Vaiables*/
-
-storage_Id : number;
-storage_Nombre : any;
-storage_Rol : any;
-ValidarRol : number;
-
+    this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
+      //MateriaPrima
+      MpunidadMedida: new FormControl(),
+      MpId: new FormControl(),
+      MpNombre: new FormControl(),
+      Mpestados: new FormControl(),
+      MpEstadoConsulta: new FormControl(),
+      Mpbodega: new FormControl(),
+      MpStock: new FormControl(),
+      MpObservacion: new FormControl(),
+      MpCategoria: new FormControl(),
+      MpingresoFecha:new FormControl(),
+      MpPrecio:new FormControl(),
+    });
+  }
 
   ngOnInit(): void {
     this.initForms();
     this.lecturaStorage();
-    this.limpiarCamposConsulta();
+    this.obtenerUltimoIdRegistrado();
+    this.obtenerNombreMateriasPrimas();
   }
-
 
   initForms() {
-    this.FormularioPedidomateriaprima = this.frmBuilderPedidomateriaprima.group({
-      IDDetallePedido: [, Validators.required],
-      IDUsuario: [, Validators.required],
-      Nombre: [, Validators.required],
-      NombreArea: [, Validators.required],
-      Descripcion: [, Validators.required],
-      Stock: [, Validators.required],
-      Cantidad: [, Validators.required],
-      ID: [, Validators.required],
-      Turno: [, Validators.required],
-      SedeCliente: [, Validators.required],
-      NombreCliente: [, Validators.required],
-      IDCliente: [, Validators.required],
-
-
+    this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
+      MpunidadMedida: [, Validators.required],
+      MpId: [, Validators.required],
+      MpNombre: [, Validators.required],
+      Mpestados: [, Validators.required],
+      MpEstadoConsulta: [, Validators.required],
+      Mpbodega: [, Validators.required],
+      MpStock: [, Validators.required],
+      MpObservacion: [, Validators.required],
+      MpCategoria: [, Validators.required],
+      MpingresoFecha: [, Validators.required],
+      MpPrecio: [, Validators.required],
     });
-
-
-   
   }
-
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
@@ -118,91 +94,116 @@ ValidarRol : number;
   }
 
 
- /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
- confimacionSalida(){
-  Swal.fire({
-    title: '¿Seguro que desea salir?',
-    showDenyButton: true,
-    showCancelButton: true,
-    confirmButtonText: 'Salir',
-    denyButtonText: `No Salir`,
-  }).then((result) => {
-    /* Read more about isConfirmed, isDenied below */
-    if (result.isConfirmed) window.location.href = "./";
-  })
-}
+  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
+  confimacionSalida(){
+    Swal.fire({
+      title: '¿Seguro que desea salir?',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Salir',
+      denyButtonText: `No Salir`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) window.location.href = "./";
+    })
+  }
 
-  // VALIDACION PARA CAMPOS VACIOS
-  validarCamposVacios() : any{
-      if(this.FormularioPedidomateriaprima.valid){
-        Swal.fire("Los datos se enviaron correctamente");
+  // Funcion que limpia los todos los campos de la vista
+  LimpiarCampos() {
 
-        this.clear();
+  }
 
-
-      }else{
-        Swal.fire("HAY CAMPOS VACIOS");
+  //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
+  obtenerNombreMateriasPrimas(){
+    let idMateriasPrimas = [];
+    this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiasPrimas => {
+      for (let index = 0; index < datos_materiasPrimas.length; index++) {
+        this.nombresMateriasPrimas = datos_materiasPrimas[index].matPri_Nombre;
       }
+    });
   }
 
-
-  clear() {
-    console.log("clear clicked")
-    this.FormularioPedidomateriaprima.reset();
+  //Funcion que va a recorrer las materias primas en busca de su ultimo id
+  obtenerUltimoIdRegistrado(){
+    let idMateriasPrimas = [];
+    this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiasPrimas => {
+      for (let index = 0; index < datos_materiasPrimas.length; index++) {
+        idMateriasPrimas = datos_materiasPrimas[index].matPri_Id;
+      }
+      let ultimoId : number = Math.max.apply(null, idMateriasPrimas);
+      this.ultimoIdMateriaPrima = ultimoId + 1;
+    });
   }
 
-  //Funcion que limpia los campos de consulta
-    limpiarCamposConsulta(){
-      this.FormularioPedidomateriaprima.reset();
+  //Funacion que crea una materia prima y la guarda en la base de datos
+  CreacionMateriaPrima(){
+    let nombreMateriaPrima : string;
+    let descripcionMateriaPrima : string;
+    let stockMateriaPrima : number;
+    let undMed : string;
+    let categoriaMateriaPrima : number;
+    let precioMateriaPrima : number;
+    let bodega : number;
+
+    const datosMP : any = {
+      MatPri_Nombre : nombreMateriaPrima,
+      MatPri_Descripcion : descripcionMateriaPrima,
+      MatPri_Stock : stockMateriaPrima,
+      UndMed_Id : undMed,
+      CatMP_Id : categoriaMateriaPrima,
+      MatPri_Precio : precioMateriaPrima,
+      TpBod_Id : bodega,
     }
 
-     // Funcion para validar los campos vacios de las consultas
-  validarCamposVaciosConsulta(){
-    this.MateriaPFechaConsulta = [];
-    
-    
-  }
-
-
-  //Funcion encargada de buscar un producto por el id del producto
-buscarProducto(){
-   }
-  
-
-  // Funcion para llenar los datos de los productos en cada uno de los campos
- llenadoProducto(){
+    this.materiaPrimaService.srvGuardar(datosMP).subscribe(datos_mp_creada => {
+    });
 
   }
 
-    //Funcion que organiza los campos de la tabla de pedidos de menor a mayor
-    organizacionPrecio(){
-    //   this.pedidosProductos.sort((a,b)=> Number(a.pedExt_PrecioTotal) - Number(b.pedExt_PrecioTotal));
-    //   const Toast = Swal.mixin({
-    //     toast: true,
-    //     position: 'top-end',
-    //     showConfirmButton: false,
-    //     timer: 2500,
-    //     timerProgressBar: true,
-    //     didOpen: (toast) => {
-    //       toast.addEventListener('mouseenter', Swal.stopTimer)
-    //       toast.addEventListener('mouseleave', Swal.resumeTimer)
-    //     }
-    //   });
-    //   Toast.fire({
-    //     icon: 'warning',
-    //     title: 'Ordenado por "Precio Total" de menor a mayor'
-    //   });
-  }
+  //Funcion que creará un proveedor y lo guardará en la base de datos
+  CreacionProveedor(){
+    let idProveedor : number;
+    let TipoIdProveedor : string;
+    let nombreProveedor : string;
+    let tipoproveedor : number;
+    let ciudadProveedor : string;
+    let telefonoProveedor : string;
+    let emailProveedor : string;
 
-    // Funcion que limpia los todos los campos de la vista
-LimpiarCampos() {
-      
+    const datosProveedor : any = {
+      Prov_Id : idProveedor,
+      TipoIdentificacion_Id : TipoIdProveedor,
+      Prov_Nombre : nombreProveedor,
+      TpProv_Id : tipoproveedor,
+      Prov_Ciudad : ciudadProveedor,
+      Prov_Telefono : telefonoProveedor,
+      Prov_Email : emailProveedor,
     }
 
+    this.proveedorservices.srvGuardar(datosProveedor).subscribe(datos_nuevoProveedor => {
+      console.log(datos_nuevoProveedor);
+    });
+  }
 
-     // Funcion para actualizar 
-     actualizarMateriaP(){
-    
-}  
+  //Funcion que creará y gusradará la relación de materia prima y proveedores
+  creacionMpProveedor(){
+    let idMateriaPrima : number;
+    let idProveedor : number;
+
+    const datosMpProveedor = {
+      Prov_Id : idProveedor,
+      MatPri_Id : idMateriaPrima,
+    }
+
+    this.proveedorMP.srvGuardar(datosMpProveedor).subscribe(datos_MpProveedorCreado => {
+      console.log(datos_MpProveedorCreado)
+    });
+  }
+
+
+  // Funcion para actualizar
+  actualizarMateriaP(){
+
+  }
 
 }
