@@ -5,37 +5,41 @@
     <div class="row g-3">
 
       <!-- ID Producto -->
-      <div class="col-md-2">
-        <input formControlName="ProduId" type="number" class="form-control form-control-sm" id="PrId" placeholder="Producto Id" name="PrId" required maxlength="19">
+      <div class="form-floating col-md-2">
+        <input formControlName="ProduId" type="search" min="0" class="form-control" id="floatingInput" required >
+        <label for="floatingInput">Id Producto</label>
       </div>
 
       <!-- ID/Nombre Producto -->
-      <div class="col-md">
-        <input formControlName="ProduNombre" type="text" class="form-control form-control-sm" id="PrNombre"  placeholder="Producto Nombre" name="PrNombre" required>
+      <div class="form-floating col-md">
+        <input formControlName="ProduNombre" type="text" class="form-control form-control-sm" id="floatingInput" required>
+        <label for="floatingInput">Nombre Producto</label>
       </div>
 
       <!-- Ancho Producto -->
-      <div class="col-md-1">
-        <input formControlName="ProduAncho" type="number" class="form-control form-control-sm" id="PrAncho"  placeholder="Ancho" name="PrAncho" required maxlength="14">
+      <div class="form-floating col-md-2">
+        <input formControlName="ProduAncho" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
+        <label for="floatingInput">Ancho Producto</label>
       </div>
 
       <!-- Fuelle Producto -->
-      <div class="col-md-1">
-        <input formControlName="ProduFuelle" type="number" class="form-control form-control-sm" id="PrFuelle"  placeholder="Fuelle" name="PrFuelle" required maxlength="14">
+      <div class="form-floating col-md-2">
+        <input formControlName="ProduFuelle" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
+        <label for="floatingInput">Fuelle Producto</label>
       </div>
 
       <!-- Calibre Producto -->
-      <div class="col-md-1">
-        <input formControlName="ProduCalibre" type="number" class="form-control form-control-sm" id="PrCalibre"  placeholder="Calibre" name="PrCalibre" required maxlength="14">
+      <div class="form-floating col-md-2">
+        <input formControlName="ProduCalibre" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
+        <label for="floatingInput">Calibre Producto</label>
       </div>
 
-      <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
-      <div class="col-md-2">
-        <select formControlName="ProduUnidadMedidaACF" type="text" id="PrUnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Unidad Medida" name="PrUnidadMedida" required >
-          <option [ngValue]="null" disabled selected>Und. Medida</option>
-          <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
-        </select>
+      <!-- Largo Producto -->
+      <div class="form-floating col-md-2">
+        <input formControlName="ProduLargo" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
+        <label for="floatingInput">Largo Producto</label>
       </div>
+
     </div>
   </div>
 
@@ -45,32 +49,67 @@
   <div class="mb-4">
     <div class="row g-3">
 
+      <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
+      <div class="form-floating col-md-2">
+        <select formControlName="ProduUnidadMedidaACF" type="text" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
+          <!-- <option [ngValue]="null" disabled selected>Und. Medida</option> -->
+          <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
+        </select>
+        <label for="floatingSelect">Und. Medida</label>
+      </div>
+
       <!-- Tipo Producto -->
-      <div class="col-md-2">
-        <select formControlName="ProduTipo" id="PrTipo" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Tipo Producto" name="PrTipo" required >
-          <option [ngValue]="null" disabled selected>Tipo Producto</option>
+      <div class="form-floating col-md-2">
+        <select formControlName="ProduTipo" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
+          <!-- <option [ngValue]="null" disabled selected>Tipo Producto</option> -->
           <option [ngValue]="tipo_Producto" *ngFor="let tipo_Producto of tipoProducto">{{tipo_Producto}}</option>
         </select>
+        <label for="floatingSelect">Tipo Producto</label>
+      </div>
+
+      <!-- Material -->
+      <div class="form-floating col-md-2">
+        <select formControlName="ProduMaterial" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
+          <!-- <option [ngValue]="null" disabled selected>Tipo Producto</option> -->
+          <option [ngValue]="material" *ngFor="let material of materialProducto">{{material}}</option>
+        </select>
+        <label for="floatingSelect">Material del Producto</label>
+      </div>
+
+      <!-- Pigmento -->
+      <div class="form-floating col-md-2">
+        <select formControlName="ProduPigmento" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
+          <!-- <option [ngValue]="null" disabled selected>Tipo Producto</option> -->
+          <option [ngValue]="pigmento" *ngFor="let pigmento of pigmentoProducto">{{pigmento}}</option>
+        </select>
+        <label for="floatingSelect">Pigmento del Producto</label>
       </div>
 
       <!-- Campo Descripción producto -->
-      <div class="col-md-7">
-        <textarea formControlName="ProdDescripcion"  id="PrdDescripcion" type="text" class="form-control form-control-sm campoObservacion"
-        maxlength="200" placeholder="Descripción Producto" name="PrdDescripcion"></textarea>
+      <div class="form-floating  col-md-4">
+        <textarea formControlName="ProdDescripcion" id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion"></textarea>
+        <label for="floatingTextarea">Descripción del Producto</label>
       </div>
+    </div>
+  </div>
 
-      <div class="col-md">
-        <select formControlName="ClienteNombre" type="text" id="tClienteId" name="ClienteId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-          <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
+  <!-- Inicio fila 3 -->
+  <div class="mb-4">
+    <div class="row g-3">
+      <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
+      <div class="form-floating col-md-4">
+        <select formControlName="ClienteNombre" type="text" id="floatingSelect" name="ClienteId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+          <!-- <option [ngValue]="null" disabled selected>Seleccione Cliente</option> -->
           <option [ngValue]="clientes" *ngFor="let clientes of cliente">{{clientes}}</option>
         </select>
+        <label for="floatingSelect">Seleccione Cliente</label>
       </div>
     </div>
   </div>
 
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="submit">Crear Producto</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVacios()">Crear Producto</button>
         <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
     </div>
   </div>
@@ -88,34 +127,39 @@
   <div class="mb-4">
     <div class="row g-3">
 
-      <div class="col-md">
-        <input formControlName="ProdId" type="number" class="form-control form-control-sm" id="PrId" placeholder="Producto Id" name="PrId" required maxlength="19">
+      <div class="form-floating col-md-2">
+        <input formControlName="ProdId" type="search" min="0" class="form-control" id="floatingInput" required >
+        <label for="floatingInput">Id Producto</label>
       </div>
-      
+
       <!-- Cantidad Producto -->
-      <div class="col-md">
-        <input formControlName="ProduCantidad" type="number" class="form-control form-control-sm" id="PrCantidad"  placeholder="Cantidad" name="PrCantidad" required maxlength="14">
+      <div class="form-floating col-md-2">
+        <input formControlName="ProduCantidad" type="search" min="0" class="form-control" id="floatingInput" required >
+        <label for="floatingInput">Cantidad Producto</label>
       </div>
 
       <!-- UM Cantidad Producto -->
-      <div class="col-md">
-        <select formControlName="ProduUnidadMedidaCant" type="text" id="PrUnidadMedida" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="PrUnidad Medida" name="UnidadMedida" required >
-          <option [ngValue]="null" disabled selected>Presentación</option>
-          <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
+      <div class="form-floating col-md-2">
+        <select formControlName="ProduUnidadMedidaCant" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdUnidadMedidaACF">
+          <!-- <option [ngValue]="null" disabled selected>Seleccione Und. Medida</option> -->
+          <option [ngValue]="und" *ngFor="let und of unidadMedida">{{und}}</option>
         </select>
+        <label for="floatingSelect">Und. Medida</label>
       </div>
 
       <!-- Precio Producto -->
-      <div class="col-md">
-        <input formControlName="ProduPrecioUnd" type="number" class="form-control form-control-sm" id="PrPrecioUnidad" placeholder="Precio Und" name="PrPrecioUnidad" required maxlength="18">
+      <div class="form-floating col-md-2">
+        <input formControlName="ProduPrecioUnd" type="search" min="0" class="form-control" id="floatingInput" required >
+        <label for="floatingInput">Precio Producto</label>
       </div>
 
       <!-- Tipo Moneda -->
-      <div class="col-md">
-        <select formControlName="ProduTipoMoneda" type="text" id="PrTipoMoneda" class="form-select form-select-sm" aria-label=".form-select-sm example" placeholder="Moneda" name="PrTipoMoneda" required >
-          <option [ngValue]="null" disabled selected>Tipo Mondeda</option>
-            <option [ngValue]="tipo_Moneda" *ngFor="let tipo_Moneda of tipoMoneda">{{tipo_Moneda}}</option>
+      <div class="form-floating col-md-3">
+        <select formControlName="ProduTipoMoneda" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdTipoMoneda">
+          <!-- <option [ngValue]="null" disabled selected>Seleccione Tipo Moneda</option> -->
+          <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas}}</option>
         </select>
+        <label for="floatingSelect">Tipo de Moneda</label>
       </div>
     </div>
   </div>

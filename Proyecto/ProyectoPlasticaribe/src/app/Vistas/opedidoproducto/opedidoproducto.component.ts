@@ -25,6 +25,8 @@ import { ThisReceiver } from '@angular/compiler';
 import { modelCliente } from 'src/app/Modelo/modelCliente';
 import moment from 'moment';
 import * as XLSX from 'xlsx';
+import { MaterialProductoService } from 'src/app/Servicios/materialProducto.service';
+import { PigmentoProductoService } from 'src/app/Servicios/pigmentoProducto.service';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -70,8 +72,11 @@ export class OpedidoproductoComponent implements OnInit {
   estado=[];
   tipoEstado=[];
   producto=[];
+  nombreProd : string;
   productoInfo=[];
   tipoProducto=[];
+  materialProducto = [];
+  pigmentoProducto =[];
   tipoProductoConsultado=[];
   undMed:UnidadMedidaService[]=[];
   presentacion = [];
@@ -127,6 +132,9 @@ export class OpedidoproductoComponent implements OnInit {
   today : any = new Date();
   enPedido : string = 'no';
 
+  pigmento : any = ''; //Variable que se usará para almacenar el pigmento del producto consultado o seleccionado
+  material : any = ''; //Variable que se usará para almacenar el material del producto consultado o seleccionado
+
   constructor(private pedidoproductoService : OpedidoproductoService,
     private productosServices : ProductoService,
       private clientesService :ClientesService,
@@ -144,7 +152,9 @@ export class OpedidoproductoComponent implements OnInit {
                               private tipoClientService : TipoClienteService,
                                   private rolService : RolesService,
                                     @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                      private ClientesProductosService : ClientesProductosService) {
+                                      private ClientesProductosService : ClientesProductosService,
+                                        private materialService : MaterialProductoService,
+                                          private pigmentoServices : PigmentoProductoService) {
 
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
       //Instanciar campos que vienen del formulario
@@ -169,6 +179,8 @@ export class OpedidoproductoComponent implements OnInit {
       ProdLargo: new FormControl(),
       ProdUnidadMedidaACF: new FormControl(),
       ProdTipo: new FormControl(),
+      ProdMaterial: new FormControl(),
+      ProdPigmento: new FormControl(),
       ProdCantidad: new FormControl(),
       ProdUnidadMedidaCant: new FormControl(),
       ProdPrecioUnd: new FormControl(),
@@ -198,6 +210,8 @@ export class OpedidoproductoComponent implements OnInit {
     this.obtenerEmpresa();
     this.ObtenerUltimoPedido();
     this.tipoProductoComboBox();
+    this.matrialProductoComboBox();
+    this.pigmentoProductocomboBox();
     this.tipoMonedaComboBox();
     this.ColumnasTabla();
     this.lecturaStorage();
@@ -255,6 +269,8 @@ export class OpedidoproductoComponent implements OnInit {
        ProdLargo: ['', Validators.required],
        ProdUnidadMedidaACF: ['', Validators.required],
        ProdTipo: ['', Validators.required],
+       ProdMaterial: ['', Validators.required],
+       ProdPigmento: ['', Validators.required],
        ProdCantidad: ['', Validators.required],
        ProdUnidadMedidaCant: ['', Validators.required],
        ProdPrecioUnd: ['', Validators.required],
@@ -542,6 +558,24 @@ export class OpedidoproductoComponent implements OnInit {
     });
   }
 
+  // Funcion para llenar el comboBox de material del producto
+  matrialProductoComboBox(){
+    this.materialService.srvObtenerLista().subscribe(datos_material => {
+      for (let index = 0; index < datos_material.length; index++) {
+        this.materialProducto.push(datos_material[index].material_Nombre)
+      }
+    });
+  }
+
+  // Funcion para llenar el comboBox de pigmentos del producto
+  pigmentoProductocomboBox(){
+    this.pigmentoServices.srvObtenerLista().subscribe(datos_pigmentos => {
+      for (let index = 0; index < datos_pigmentos.length; index++) {
+        this.pigmentoProducto.push(datos_pigmentos[index].pigmt_Nombre)
+      }
+    });
+  }
+
   // Funcion para llenar el combobox de tipo de moneda con los tipos de monedas
   tipoMonedaComboBox(){
     this.tipoMonedaService.srvObtenerLista().subscribe(datos_tiposMoneda => {
@@ -563,6 +597,8 @@ export class OpedidoproductoComponent implements OnInit {
     this.Productospedidos = [];
     let pedidosID = [];
     this.ultimoPrecio = 0;
+    this.material = '';
+    this.pigmento = '';
 
     this.productosServices.srvObtenerListaPorId(idProducto).subscribe(datos_productos => {
       this.producto.push(datos_productos);
@@ -578,30 +614,36 @@ export class OpedidoproductoComponent implements OnInit {
                       pedidosID.push(datos_prodPedidos[ped].pedExt_Id);
                     }
                   }
-                  let ultimoId = Math.max.apply(null, pedidosID);
+                  this.pigmentoServices.srvObtenerListaPorId(this.productoInfo[producto].pigmt_Id).subscribe(datos_pigmento => {
+                    this.pigmento = (datos_pigmento.pigmt_Nombre);
+                    this.materialService.srvObtenerListaPorId(this.productoInfo[producto].material_Id).subscribe(datos_material => {
+                      this.material = (datos_material.material_Nombre);
+                      let ultimoId = Math.max.apply(null, pedidosID);
 
-                  if (ultimoId == -Infinity) {
-                    this.existenciasProductos = [];
-                    this.existenciasProductos.push(datos_existencias[index]);
-                    this.tipoProductoConsultado.push(datos_tipoProducto.tpProd_Nombre);
-                    this.tipoProductoComboBox();
-                    this.presentacion.push(datos_existencias[index].undMed_Id);
-                    this.informacionProductoBuscado();
-                  } else {
-                    this.PedidoProductosService.srvObtenerListaPorId(idProducto, ultimoId).subscribe(datos_prodPed => {
-                      this.Productospedidos.push(datos_prodPed);
+                      if (ultimoId == -Infinity) {
+                        this.existenciasProductos = [];
+                        this.existenciasProductos.push(datos_existencias[index]);
+                        this.tipoProductoConsultado.push(datos_tipoProducto.tpProd_Nombre);
+                        this.tipoProductoComboBox();
+                        this.presentacion.push(datos_existencias[index].undMed_Id);
+                        this.informacionProductoBuscado();
+                      } else {
+                        this.PedidoProductosService.srvObtenerListaPorId(idProducto, ultimoId).subscribe(datos_prodPed => {
+                          this.Productospedidos.push(datos_prodPed);
 
-                      for (const precio of this.Productospedidos) {
-                        this.ultimoPrecio = precio.pedExtProd_PrecioUnitario;
+                          for (const precio of this.Productospedidos) {
+                            this.ultimoPrecio = precio.pedExtProd_PrecioUnitario;
+                          }
+                          this.existenciasProductos = [];
+                          this.existenciasProductos.push(datos_existencias[index]);
+                          this.tipoProductoConsultado.push(datos_tipoProducto.tpProd_Nombre);
+                          this.tipoProductoComboBox();
+                          this.presentacion.push(datos_existencias[index].undMed_Id);
+                          this.informacionProductoBuscado();
+                        });
                       }
-                      this.existenciasProductos = [];
-                      this.existenciasProductos.push(datos_existencias[index]);
-                      this.tipoProductoConsultado.push(datos_tipoProducto.tpProd_Nombre);
-                      this.tipoProductoComboBox();
-                      this.presentacion.push(datos_existencias[index].undMed_Id);
-                      this.informacionProductoBuscado();
                     });
-                  }
+                  });
                 });
               }
             }
@@ -626,6 +668,8 @@ export class OpedidoproductoComponent implements OnInit {
             ProdLargo: producto.prod_Largo,
             ProdUnidadMedidaACF: producto.undMedACF,
             ProdTipo: tipoProdu,
+            ProdMaterial: this.material,
+            ProdPigmento: this.pigmento,
             ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
             ProdUnidadMedidaCant: e.undMed_Id,
             ProdPrecioUnd: e.exProd_PrecioVenta,
@@ -649,10 +693,12 @@ export class OpedidoproductoComponent implements OnInit {
     this.Productospedidos = [];
     let pedidosID = [];
     this.ultimoPrecio = 0;
+    this.material = '';
+    this.pigmento = '';
 
     let nombreProducto : string = this.FormPedidoExternoProductos.value.ProdNombre;
     for (const item of this.producto) {
-      if (item.prod_Id == nombreProducto) {
+      if (item.prod_Nombre == nombreProducto) {
         this.productosServices.srvObtenerListaPorId(item.prod_Id).subscribe(datos_productos => {
           this.productoInfo.push(datos_productos);
           for (let producto = 0; producto < this.productoInfo.length; producto++) {
@@ -666,30 +712,38 @@ export class OpedidoproductoComponent implements OnInit {
                           pedidosID.push(datos_prodPedidos[ped].pedExt_Id);
                         }
                       }
-                      let ultimoId = Math.max.apply(null, pedidosID);
 
-                      if (ultimoId == -Infinity) {
-                        this.existenciasProductos = [];
-                        this.existenciasProductos.push(datos_existencias[index]);
-                        this.tipoProductoConsultado.push(datos_tipoProducto.tpProd_Nombre);
-                        this.tipoProductoComboBox();
-                        this.presentacion.push(datos_existencias[index].undMed_Id);
-                        this.informacionProductoBuscado();
-                      } else {
-                        this.PedidoProductosService.srvObtenerListaPorId(item.prod_Id, ultimoId).subscribe(datos_prodPed => {
-                          this.Productospedidos.push(datos_prodPed);
+                      this.pigmentoServices.srvObtenerListaPorId(this.productoInfo[producto].pigmt_Id).subscribe(datos_pigmento => {
+                        this.pigmento = (datos_pigmento.pigmt_Nombre);
+                        this.materialService.srvObtenerListaPorId(this.productoInfo[producto].material_Id).subscribe(datos_material => {
+                          this.material = (datos_material.material_Nombre);
 
-                          for (const precio of this.Productospedidos) {
-                            this.ultimoPrecio = precio.pedExtProd_PrecioUnitario;
+                          let ultimoId = Math.max.apply(null, pedidosID);
+
+                          if (ultimoId == -Infinity) {
+                            this.existenciasProductos = [];
+                            this.existenciasProductos.push(datos_existencias[index]);
+                            this.tipoProductoConsultado.push(datos_tipoProducto.tpProd_Nombre);
+                            this.tipoProductoComboBox();
+                            this.presentacion.push(datos_existencias[index].undMed_Id);
+                            this.informacionProductoBuscado();
+                          } else {
+                            this.PedidoProductosService.srvObtenerListaPorId(item.prod_Id, ultimoId).subscribe(datos_prodPed => {
+                              this.Productospedidos.push(datos_prodPed);
+
+                              for (const precio of this.Productospedidos) {
+                                this.ultimoPrecio = precio.pedExtProd_PrecioUnitario;
+                              }
+                              this.existenciasProductos = [];
+                              this.existenciasProductos.push(datos_existencias[index]);
+                              this.tipoProductoConsultado.push(datos_tipoProducto.tpProd_Nombre);
+                              this.tipoProductoComboBox();
+                              this.presentacion.push(datos_existencias[index].undMed_Id);
+                              this.informacionProductoBuscado();
+                            });
                           }
-                          this.existenciasProductos = [];
-                          this.existenciasProductos.push(datos_existencias[index]);
-                          this.tipoProductoConsultado.push(datos_tipoProducto.tpProd_Nombre);
-                          this.tipoProductoComboBox();
-                          this.presentacion.push(datos_existencias[index].undMed_Id);
-                          this.informacionProductoBuscado();
                         });
-                      }
+                      });
                     });
                   }
                 }
@@ -716,6 +770,8 @@ export class OpedidoproductoComponent implements OnInit {
             ProdLargo: producto.prod_Largo,
             ProdUnidadMedidaACF: producto.undMedACF,
             ProdTipo: tipoProdu,
+            ProdMaterial: this.material,
+            ProdPigmento: this.pigmento,
             ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
             ProdUnidadMedidaCant: e.undMed_Id,
             ProdPrecioUnd: e.exProd_PrecioVenta,
@@ -2198,6 +2254,20 @@ export class OpedidoproductoComponent implements OnInit {
     })
   }
 
+  //Funcion que permitirá al usuario volver al pagina principal
+  regresar(){
+    Swal.fire({
+      title: '¿Seguro que desea salir?',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Salir',
+      denyButtonText: `No Salir`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) window.location.href = "./home";
+    })
+  }
+
   //Se obtiene el ultimo codigo del pedido y se incrementa en 1. (Contador)
   ObtenerUltimoPedido() {
     let ultimoCodigoPedido : number;
@@ -2225,9 +2295,11 @@ export class OpedidoproductoComponent implements OnInit {
       pNombre : "Nombre",
       pAncho :   "Ancho",
       pFuelle : "Fuelle",
-      pCalibre : "Calb.",
+      pCalibre : "Cal",
       pUndMedACF : "Und.",
       pTipoProd : "TipoProd",
+      pMaterial : 'Material',
+      pPigmento : 'Pigmento',
       pCantidad : "Cantidad",
       pLargo : "Largo",
       pUndMedCant : "Und. Cant",
@@ -2263,6 +2335,8 @@ export class OpedidoproductoComponent implements OnInit {
                 Cal : this.FormPedidoExternoProductos.get('ProdCalibre').value,
                 Und : this.FormPedidoExternoProductos.get('ProdUnidadMedidaACF').value,
                 Tipo : this.FormPedidoExternoProductos.get('ProdTipo').value,
+                Material : this.FormPedidoExternoProductos.value.ProdMaterial,
+                Pigmento: this.FormPedidoExternoProductos.value.ProdPigmento,
                 Cant : this.FormPedidoExternoProductos.get('ProdCantidad').value,
                 Largo : this.FormPedidoExternoProductos.get('ProdLargo').value,
                 UndCant : this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
@@ -2480,35 +2554,39 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   // Funcion para llenar la tabla de productos con la informacion que se inserte en los modales
-  llenarTablaProductosCreador(id : any, nombre : string, ancho : any, fuelle : any, calibre : any, largo : any, undMed : string, tpProducto : string, cantidad : any, undMed2 : string, precio : any, moneda : string, descripcion : string){
-    let productoExt : any = {
-      Id : id,
-      Nombre : nombre,
-      Ancho : ancho,
-      Fuelle : fuelle,
-      Cal : calibre,
-      Und : undMed,
-      Tipo : tpProducto,
-      Cant : cantidad,
-      Largo : largo,
-      UndCant : undMed2,
-      PrecioUnd : precio,
-      TpMoneda : moneda,
-      Stock : cantidad,
-      Produ_Descripcion : descripcion,
-      SubTotal : this.formatonumeros(cantidad * precio),
-    }
-
-    if(this.ArrayProducto.length == 0) this.ArrayProducto.push(productoExt);
-    else {
-      for (let index = 0; index < this.ArrayProducto.length; index++) {
-        if(this.FormPedidoExternoProductos.value.ProdId == this.ArrayProducto[index].Id) Swal.fire('No se pueden cargar datos identicos a la tabla.');
-        else this.ArrayProducto.push(productoExt);
-        break;
+  llenarTablaProductosCreador(id : any, nombre : string, ancho : any, fuelle : any, calibre : any, largo : any, undMed : string, tpProducto : string, material : string, pigmento : string, cantidad : any, undMed2 : string, precio : any, moneda : string, descripcion : string){
+    if (precio != null && cantidad != null) {
+      let productoExt : any = {
+        Id : id,
+        Nombre : nombre,
+        Ancho : ancho,
+        Fuelle : fuelle,
+        Cal : calibre,
+        Und : undMed,
+        Tipo : tpProducto,
+        Material : material,
+        Pigmento : pigmento,
+        Cant : cantidad,
+        Largo : largo,
+        UndCant : undMed2,
+        PrecioUnd : precio,
+        TpMoneda : moneda,
+        Stock : cantidad,
+        Produ_Descripcion : descripcion,
+        SubTotal : this.formatonumeros(cantidad * precio),
       }
-    }
-    for (let index = 0; index < this.ArrayProducto.length; index++) {
-      this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (cantidad * precio), 0);
+
+      if(this.ArrayProducto.length == 0) this.ArrayProducto.push(productoExt);
+      else {
+        for (let index = 0; index < this.ArrayProducto.length; index++) {
+          if(this.FormPedidoExternoProductos.value.ProdId == this.ArrayProducto[index].Id) Swal.fire('No se pueden cargar datos identicos a la tabla.');
+          else this.ArrayProducto.push(productoExt);
+          break;
+        }
+      }
+      for (let index = 0; index < this.ArrayProducto.length; index++) {
+        this.valorTotal = this.ArrayProducto.reduce((accion, productoExt,) => accion + (cantidad * precio), 0);
+      }
     }
   }
 
@@ -2540,6 +2618,10 @@ export class OpedidoproductoComponent implements OnInit {
                         const pdfDefinicion : any = {
                           info: {
                             title: `${ultimoId}`
+                          },
+                          pageSize: {
+                            width: 630,
+                            height: 760
                           },
                           content : [
                             {
@@ -2610,7 +2692,7 @@ export class OpedidoproductoComponent implements OnInit {
                               style: 'header'
                             },
 
-                            this.table(this.ArrayProducto, ['Id', 'Nombre', 'Ancho', 'Fuelle', 'Cal', 'Largo', 'Und', 'Tipo', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                            this.table(this.ArrayProducto, ['Id', 'Nombre', 'Ancho', 'Fuelle', 'Cal', 'Largo', 'Und', 'Tipo', 'Material', 'Pigmento', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
 
                             {
                               text: `\n\nValor Total Pedido: $${this.formatonumeros(this.valorTotal)}`,
@@ -2670,10 +2752,10 @@ export class OpedidoproductoComponent implements OnInit {
     return {
         table: {
           headerRows: 1,
-          widths: [35, 65, 28, 28, 20, 25, 20, 45, 30, 17, 28, 60],
+          widths: [18, 60, 20, 20, 20, 20, 20, 40, 45, 38, 30, 15, 25, 55],
           body: this.buildTableBody(data, columns),
         },
-        fontSize: 8,
+        fontSize: 7,
         layout: {
           fillColor: function (rowIndex, node, columnIndex) {
             return (rowIndex == 0) ? '#CCCCCC' : null;
@@ -2716,6 +2798,10 @@ export class OpedidoproductoComponent implements OnInit {
                                         const pdfDefinicion : any = {
                                           info: {
                                             title: `${datos_pedidos.pedExt_Id}`
+                                          },
+                                          pageSize: {
+                                            width: 630,
+                                            height: 760
                                           },
                                           content : [
                                             {
@@ -2786,7 +2872,7 @@ export class OpedidoproductoComponent implements OnInit {
                                               style: 'header'
                                             },
 
-                                            this.table(this.productosPedidos, ['Id', 'Nombre', 'Ancho', 'Fuelle', 'Cal', 'Largo', 'Und', 'Tipo', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                                            this.table(this.productosPedidos, ['Id', 'Nombre', 'Ancho', 'Fuelle', 'Cal', 'Largo', 'Und', 'Tipo', 'Material', 'Pigmento', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
 
                                             {
                                               text: `\n\nValor Total Pedido: $${this.formatonumeros(datos_pedidos.pedExt_PrecioTotal)}`,
@@ -2854,23 +2940,30 @@ export class OpedidoproductoComponent implements OnInit {
                     for (let e = 0; e < datos_existencias.length; e++) {
                       if (datos_productos[i].prod_Id == datos_existencias[e].prod_Id) {
                         this.tiposProductosService.srvObtenerListaPorId(datos_productos[i].tpProd_Id).subscribe(datos_tipo => {
-                          const producto : any = {
-                            Id: datos_productos[i].prod_Id,
-                            Nombre : datos_productos[i].prod_Nombre,
-                            Ancho : datos_productos[i].prod_Ancho,
-                            Fuelle : datos_productos[i].prod_Fuelle,
-                            Largo: datos_productos[i].prod_Largo,
-                            Cal : datos_productos[i].prod_Calibre,
-                            Und : datos_productos[i].undMedACF,
-                            Tipo : datos_tipo.tpProd_Nombre,
-                            Cant : datos_pedidos_productos[index].pedExtProd_Cantidad,
-                            UndCant : datos_pedidos_productos[index].undMed_Id,
-                            PrecioUnd : this.formatonumeros(datos_pedidos_productos[index].pedExtProd_PrecioUnitario),
-                            Moneda : datos_existencias[e].tpMoneda_Id,
-                            Stock : datos_existencias[e].exProd_Cantidad,
-                            SubTotal : this.formatonumeros(datos_pedidos_productos[index].pedExtProd_Cantidad * datos_pedidos_productos[index].pedExtProd_PrecioUnitario),
-                          }
-                          this.productosPedidos.push(producto);
+                          this.pigmentoServices.srvObtenerListaPorId(datos_productos[i].pigmt_Id).subscribe(datos_pigmento => {
+                            this.materialService.srvObtenerListaPorId(datos_productos[i].material_Id).subscribe(datos_material => {
+
+                              const producto : any = {
+                                Id: datos_productos[i].prod_Id,
+                                Nombre : datos_productos[i].prod_Nombre,
+                                Ancho : datos_productos[i].prod_Ancho,
+                                Fuelle : datos_productos[i].prod_Fuelle,
+                                Largo: datos_productos[i].prod_Largo,
+                                Cal : datos_productos[i].prod_Calibre,
+                                Und : datos_productos[i].undMedACF,
+                                Tipo : datos_tipo.tpProd_Nombre,
+                                Material: datos_material.material_Nombre,
+                                Pigmento: datos_pigmento.pigmt_Nombre,
+                                Cant : this.formatonumeros(datos_pedidos_productos[index].pedExtProd_Cantidad),
+                                UndCant : datos_pedidos_productos[index].undMed_Id,
+                                PrecioUnd : this.formatonumeros(datos_pedidos_productos[index].pedExtProd_PrecioUnitario),
+                                Moneda : datos_existencias[e].tpMoneda_Id,
+                                Stock : datos_existencias[e].exProd_Cantidad,
+                                SubTotal : this.formatonumeros(datos_pedidos_productos[index].pedExtProd_Cantidad * datos_pedidos_productos[index].pedExtProd_PrecioUnitario),
+                              }
+                              this.productosPedidos.push(producto);
+                            });
+                          });
                         });
                       }
                     }
@@ -3024,120 +3117,138 @@ export class OpedidoproductoComponent implements OnInit {
     });
   }
 
-
-
-
-
-
-
-
   // Funcion para guardar productos en la base de datos
-  registrarProducto(id : any, nombre : any, ancho : any, fuelle : any, calibre : any, undMed : any, tpProducto : any, descripcion : any, cliente : any){
+  registrarProducto(id : any, nombre : any, ancho : any, fuelle : any, calibre : any, largo : any, undMed : any, tpProducto : any, material : any, pigmento : any, descripcion : any, cliente : any){
     let tipoProductos_nombre = tpProducto;
     let tipoProducto_Id : number;
     let clienteId : number;
+    let idPigmento : number;
+    let idMaterial : any;
     this.tiposProductosService.srvObtenerLista().subscribe(datos_tipoProducto => {
       for (let index = 0; index < datos_tipoProducto.length; index++) {
         if (tipoProductos_nombre == datos_tipoProducto[index].tpProd_Nombre) {
           tipoProducto_Id = datos_tipoProducto[index].tpProd_Id;
 
-          this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
-            if (datos_usuarios.rolUsu_Id == 2) {
-              const datosProductos : any = {
-                Prod_Id: id,
-                Prod_Nombre: nombre,
-                Prod_Descripcion: descripcion,
-                TpProd_Id: tipoProducto_Id,
-                Prod_Peso_Bruto: 0,
-                Prod_Peso_Neto: 0,
-                UndMedPeso: undMed,
-                Prod_Fuelle: fuelle,
-                Prod_Ancho: ancho,
-                Prod_Calibre: calibre,
-                UndMedACF: undMed,
-                Estado_Id: 9,
-                Prod_Largo: 0,
-              };
-              this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
-                for (let i = 0; i < datos_clientes.length; i++) {
-                  if (datos_clientes[i].cli_Nombre == cliente) {
-                    clienteId = datos_clientes[i].cli_Id;
-                    const clienteproducto : any = {
-                      Cli_Id: clienteId,
-                      Prod_Id: id
-                    }
-                    this.productosServices.srvGuardar(datosProductos).subscribe(datos => {
-                      this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
-                        const Toast = Swal.mixin({
-                          toast: true,
-                          position: 'center',
-                          showConfirmButton: false,
-                          timer: 3500,
-                          timerProgressBar: true,
-                          didOpen: (toast) => {
-                            toast.addEventListener('mouseenter', Swal.stopTimer)
-                            toast.addEventListener('mouseleave', Swal.resumeTimer)
-                          }
-                        });
-                        Toast.fire({
-                          icon: 'success',
-                          title: `Producto creado con exito`
-                        });
+          this.pigmentoServices.srvObtenerLista().subscribe(datos_pigmentos => {
+            for (let pigm = 0; pigm < datos_pigmentos.length; pigm++) {
+              if (pigmento == datos_pigmentos[pigm].pigmt_Nombre) {
+                idPigmento = datos_pigmentos[pigm].pigmt_Id;
+
+                this.materialService.srvObtenerLista().subscribe(datos_material => {
+                  for (let mat = 0; mat < datos_material.length; mat++) {
+                    if (material == datos_material[mat].material_Nombre) {
+                      idMaterial = datos_material[mat].material_Id;
+
+                      this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
+                        if (datos_usuarios.rolUsu_Id == 2) {
+                          const datosProductos : any = {
+                            Prod_Id: id,
+                            Prod_Nombre: nombre,
+                            Prod_Descripcion: descripcion,
+                            TpProd_Id: tipoProducto_Id,
+                            Prod_Peso_Bruto: 0,
+                            Prod_Peso_Neto: 0,
+                            UndMedPeso: undMed,
+                            Prod_Fuelle: fuelle,
+                            Prod_Ancho: ancho,
+                            Prod_Calibre: calibre,
+                            UndMedACF: undMed,
+                            Estado_Id: 9,
+                            Prod_Largo: largo,
+                            Pigmt_Id: idPigmento,
+                            Material_Id: idMaterial
+                          };
+                          this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
+                            for (let i = 0; i < datos_clientes.length; i++) {
+                              if (datos_clientes[i].cli_Nombre == cliente) {
+                                clienteId = datos_clientes[i].cli_Id;
+                                const clienteproducto : any = {
+                                  Cli_Id: clienteId,
+                                  Prod_Id: id
+                                }
+                                this.productosServices.srvGuardar(datosProductos).subscribe(datos => {
+                                  this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
+                                    const Toast = Swal.mixin({
+                                      toast: true,
+                                      position: 'center',
+                                      showConfirmButton: false,
+                                      timer: 3500,
+                                      timerProgressBar: true,
+                                      didOpen: (toast) => {
+                                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                      }
+                                    });
+                                    Toast.fire({
+                                      icon: 'success',
+                                      title: `Producto creado con exito`
+                                    });
+                                  });
+                                }, error => {console.log(error)});
+                                break;
+                              }
+                            }
+                          });
+                        }else if (datos_usuarios.rolUsu_Id == 1){
+                          const datosProductos : any = {
+                            Prod_Id: id,
+                            Prod_Nombre: nombre,
+                            Prod_Descripcion: descripcion,
+                            TpProd_Id: tipoProducto_Id,
+                            Prod_Peso_Bruto: 0,
+                            Prod_Peso_Neto: 0,
+                            UndMedPeso: undMed,
+                            Prod_Fuelle: fuelle,
+                            Prod_Ancho: ancho,
+                            Prod_Calibre: calibre,
+                            UndMedACF: undMed,
+                            Estado_Id: 10,
+                            Prod_Largo: largo,
+                            Pigmt_Id: idPigmento,
+                            Material_Id: idMaterial,
+                          };
+                          console.log(datosProductos)
+                          this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
+                            for (let i = 0; i < datos_clientes.length; i++) {
+                              if (datos_clientes[i].cli_Nombre == cliente) {
+                                clienteId = datos_clientes[i].cli_Id;
+                                const clienteproducto : any = {
+                                  Cli_Id: clienteId,
+                                  Prod_Id: id
+                                }
+                                this.productosServices.srvGuardar(datosProductos).subscribe(datos => {
+                                  console.log(datos.material_Id)
+                                  this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
+                                    const Toast = Swal.mixin({
+                                      toast: true,
+                                      position: 'center',
+                                      showConfirmButton: false,
+                                      timer: 3500,
+                                      timerProgressBar: true,
+                                      didOpen: (toast) => {
+                                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                      }
+                                    });
+                                    Toast.fire({
+                                      icon: 'success',
+                                      title: `Producto creado con exito`
+                                    });
+                                  });
+                                }, error => {console.log(error)});
+                                break;
+                              }
+                            }
+                          });
+                        }
                       });
-                    }, error => {console.log(error)});
-                    break;
-                  }
-                }
-              });
-            }else if (datos_usuarios.rolUsu_Id == 1){
-              const datosProductos : any = {
-                Prod_Id: id,
-                Prod_Nombre: nombre,
-                Prod_Descripcion: descripcion,
-                TpProd_Id: tipoProducto_Id,
-                Prod_Peso_Bruto: 0,
-                Prod_Peso_Neto: 0,
-                UndMedPeso: undMed,
-                Prod_Fuelle: fuelle,
-                Prod_Ancho: ancho,
-                Prod_Calibre: calibre,
-                UndMedACF: undMed,
-                Estado_Id: 10,
-                Prod_Largo: 0,
-              };
-              this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
-                for (let i = 0; i < datos_clientes.length; i++) {
-                  if (datos_clientes[i].cli_Nombre == cliente) {
-                    clienteId = datos_clientes[i].cli_Id;
-                    const clienteproducto : any = {
-                      Cli_Id: clienteId,
-                      Prod_Id: id
                     }
-                    this.productosServices.srvGuardar(datosProductos).subscribe(datos => {
-                      this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
-                        const Toast = Swal.mixin({
-                          toast: true,
-                          position: 'center',
-                          showConfirmButton: false,
-                          timer: 3500,
-                          timerProgressBar: true,
-                          didOpen: (toast) => {
-                            toast.addEventListener('mouseenter', Swal.stopTimer)
-                            toast.addEventListener('mouseleave', Swal.resumeTimer)
-                          }
-                        });
-                        Toast.fire({
-                          icon: 'success',
-                          title: `Producto creado con exito`
-                        });
-                      });
-                    }, error => {console.log(error)});
-                    break;
                   }
-                }
-              });
+                });
+              }
             }
           });
+
         }
       }
     });
@@ -3177,6 +3288,10 @@ export class OpedidoproductoComponent implements OnInit {
 
   // Funcion para actualizar un producto
   actualizarProducto(){
+
+    let idPigmento : number;
+    let idMaterial : number;
+    let nombreProd : string = this.FormPedidoExternoProductos.value.ProdNombre;
     this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
       this.tipoEstadoService.srvObtenerListaPorId(1).subscribe(datos_tiposEstados => {
         if (datos_usuarios.rolUsu_Id == 2){
@@ -3199,6 +3314,20 @@ export class OpedidoproductoComponent implements OnInit {
                   }
                 }
               });
+              this.materialService.srvObtenerLista().subscribe(datos_material => {
+                for (let index = 0; index < datos_material.length; index++) {
+                  if (datos_material[index].material_Nombre == this.FormPedidoExternoProductos.value.ProdMaterial) {
+                    idMaterial = datos_material[index].material_Id
+                  }
+                }
+              });
+              this.pigmentoServices.srvObtenerLista().subscribe(datos_pigmentos => {
+                for (let index = 0; index < datos_pigmentos.length; index++) {
+                  if (datos_pigmentos[index].pigmt_Nombre == this.FormPedidoExternoProductos.value.ProdPigmento) {
+                    idPigmento = datos_pigmentos[index].pigmt_Id
+                  }
+                }
+              });
 
               this.productosServices.srvObtenerLista().subscribe(datos_productos => {
                 this.existenciasProductosServices.srvObtenerLista().subscribe(datos_existencias => {
@@ -3207,7 +3336,7 @@ export class OpedidoproductoComponent implements OnInit {
 
                       const datosProducto = {
                         Prod_Id : id,
-                        Prod_Nombre: this.FormPedidoExternoProductos.value.ProdNombre,
+                        Prod_Nombre: nombreProd,
                         Prod_Descripcion: this.FormPedidoExternoProductos.value.ProdDescripcion,
                         TpProd_Id: tipo_Id,
                         Prod_Peso_Bruto: 0,
@@ -3219,6 +3348,8 @@ export class OpedidoproductoComponent implements OnInit {
                         UndMedACF: this.FormPedidoExternoProductos.value.ProdUnidadMedidaACF,
                         Estado_Id: 10,
                         Prod_Largo: this.FormPedidoExternoProductos.value.ProdLargo,
+                        Pigmt_Id: idPigmento,
+                        Material_Id: idMaterial,
                       }
 
                       const datosExistencias = {
@@ -3227,11 +3358,12 @@ export class OpedidoproductoComponent implements OnInit {
                         ExProd_Cantidad: this.FormPedidoExternoProductos.value.ProdStock,
                         UndMed_Id: this.FormPedidoExternoProductos.value.ProdUnidadMedidaACF,
                         TpBod_Id: datos_existencias[i].tpBod_Id,
-                        ExProd_Precio: this.FormPedidoExternoProductos.value.ProdPrecioUnd,
+                        ExProd_Precio: datos_existencias[i].exProd_Precio,
                         ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
                         ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
                         ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
                         TpMoneda_Id: this.FormPedidoExternoProductos.value.ProdTipoMoneda,
+                        exProd_PrecioVenta : this.FormPedidoExternoProductos.value.ProdPrecioUnd
                       }
                       this.productosServices.srvActualizar(id, datosProducto).subscribe(datos_productos => {
                         this.existenciasProductosServices.srvActualizar(datos_existencias[i].exProd_Id, datosExistencias).subscribe(datos_existencias => {
@@ -3302,20 +3434,28 @@ export class OpedidoproductoComponent implements OnInit {
                                         this.ciudadClienteComboBox();
                                         this.sedesClientesComboBox();
                                         this.tiposProductosService.srvObtenerListaPorId(datos_productos[i].tpProd_Id).subscribe(datos_tipo_producto => {
-                                          let id = datos_productos[i].prod_Id;
-                                          let nombre = datos_productos[i].prod_Nombre;
-                                          let ancho = datos_productos[i].prod_Ancho;
-                                          let fuelle = datos_productos[i].prod_Fuelle;
-                                          let calibre = datos_productos[i].prod_Calibre;
-                                          let largo = datos_productos[i].prod_Largo;
-                                          let undMed = datos_productos[i].undMedACF;
-                                          let tpProduct = datos_tipo_producto.tpProd_Nombre;
-                                          let cantidad = datos_pedidos_productos[index].pedExtProd_Cantidad;
-                                          let undMed2 = datos_pedidos_productos[index].undMed_Id;
-                                          let precio = datos_pedidos_productos[index].pedExtProd_PrecioUnitario;
-                                          let moneda = datos_existencias[e].tpMoneda_Id;
-                                          let descripcion = datos_productos[i].prod_Descripcion
-                                          this.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, largo, undMed, tpProduct, cantidad, undMed2, precio, moneda, descripcion);
+
+                                          this.materialService.srvObtenerListaPorId(datos_productos[i].material_Id).subscribe(datos_material => {
+                                            this.pigmentoServices.srvObtenerListaPorId(datos_productos[i].pigmt_Id).subscribe(datos_pigmentos => {
+                                              let id = datos_productos[i].prod_Id;
+                                              let nombre = datos_productos[i].prod_Nombre;
+                                              let ancho = datos_productos[i].prod_Ancho;
+                                              let fuelle = datos_productos[i].prod_Fuelle;
+                                              let calibre = datos_productos[i].prod_Calibre;
+                                              let largo = datos_productos[i].prod_Largo;
+                                              let undMed = datos_productos[i].undMedACF;
+                                              let tpProduct = datos_tipo_producto.tpProd_Nombre;
+                                              let material = datos_material.material_Nombre;
+                                              let pigmento = datos_pigmentos.pigmt_Nombre;
+                                              let cantidad = datos_pedidos_productos[index].pedExtProd_Cantidad;
+                                              let undMed2 = datos_pedidos_productos[index].undMed_Id;
+                                              let precio = datos_pedidos_productos[index].pedExtProd_PrecioUnitario;
+                                              let moneda = datos_existencias[e].tpMoneda_Id;
+                                              let descripcion = datos_productos[i].prod_Descripcion
+                                              this.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, largo, undMed, tpProduct, material, pigmento, cantidad, undMed2, precio, moneda, descripcion);
+
+                                            });
+                                          });
                                         });
                                       });
                                     });
@@ -3560,6 +3700,9 @@ export class OpedidoproductoComponent implements OnInit {
                     const pdfDefinicion : any = {
                       info: {
                         title: `${idPedido}`
+                      },pageSize: {
+                        width: 630,
+                        height: 760
                       },
                       content : [
                         {
@@ -3630,7 +3773,7 @@ export class OpedidoproductoComponent implements OnInit {
                           style: 'header'
                         },
 
-                        this.table(this.ArrayProducto, ['Id', 'Nombre', 'Ancho', 'Fuelle', 'Cal', 'Largo', 'Und', 'Tipo', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                        this.table(this.ArrayProducto, ['Id', 'Nombre', 'Ancho', 'Fuelle', 'Cal', 'Largo', 'Und', 'Tipo', 'Material', 'Pigmento', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
 
                         {
                           text: `\n\nValor Total Pedido: $${this.valorTotal}`,

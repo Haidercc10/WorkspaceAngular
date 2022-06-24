@@ -12,6 +12,8 @@ import { ClientesService } from 'src/app/Servicios/clientes.service';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { RolesService } from 'src/app/Servicios/roles.service';
+import { MaterialProductoService } from 'src/app/Servicios/materialProducto.service';
+import { PigmentoProductoService } from 'src/app/Servicios/pigmentoProducto.service';
 
 @Component({
   selector: 'app-crear-producto',
@@ -25,6 +27,8 @@ export class CrearProductoComponent implements OnInit {
 
   unidadMedida = [];
   tipoProducto = [];
+  materialProducto = [];
+  pigmentoProducto =[];
   tipoMoneda = [];
   producto = [];
   pedidosID = [];
@@ -44,7 +48,9 @@ export class CrearProductoComponent implements OnInit {
                           private clientesService : ClientesService,
                             private usuarioService : UsuarioService,
                               @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                private rolService : RolesService) {
+                                private rolService : RolesService,
+                                  private materialService : MaterialProductoService,
+                                    private pigmentoServices : PigmentoProductoService) {
 
     this.FormCrearProducto = this.frmBuilderCrearProducto.group({
 
@@ -54,8 +60,11 @@ export class CrearProductoComponent implements OnInit {
       ProduAncho: new FormControl(),
       ProduFuelle: new FormControl(),
       ProduCalibre: new FormControl(),
+      ProduLargo : new FormControl(),
       ProduUnidadMedidaACF: new FormControl(),
       ProduTipo: new FormControl(),
+      ProduMaterial: new FormControl(),
+      ProduPigmento: new FormControl(),
       ProdDescripcion: new FormControl(),
       ClienteNombre: new FormControl(),
     });
@@ -74,6 +83,8 @@ export class CrearProductoComponent implements OnInit {
     this.initFormsCrearProducto
     this.undMedidaComboBox();
     this.tipoProductoComboBox();
+    this.matrialProductoComboBox();
+    this.pigmentoProductocomboBox();
     this.tipoMondedaComboBox();
     this.lecturaStorage();
     this.clientesComboBox();
@@ -88,8 +99,11 @@ export class CrearProductoComponent implements OnInit {
        ProduAncho: ['', Validators.required],
        ProduFuelle: ['', Validators.required],
        ProduCalibre: ['', Validators.required],
+       ProduLargo : ['', Validators.required],
        ProduUnidadMedidaACF: ['', Validators.required],
        ProduTipo: ['', Validators.required],
+       ProduMaterial: ['', Validators.required],
+       ProduPigmento: ['', Validators.required],
        ProdDescripcion: ['',],
        ClienteNombre: ['', Validators.required],
      });
@@ -172,6 +186,24 @@ export class CrearProductoComponent implements OnInit {
     })
   }
 
+  // Funcion para llenar el comboBox de material del producto
+  matrialProductoComboBox(){
+    this.materialService.srvObtenerLista().subscribe(datos_material => {
+      for (let index = 0; index < datos_material.length; index++) {
+        this.materialProducto.push(datos_material[index].material_Nombre);
+      }
+    });
+  }
+
+  // Funcion para llenar el comboBox de pigmentos del producto
+  pigmentoProductocomboBox(){
+    this.pigmentoServices.srvObtenerLista().subscribe(datos_pigmentos => {
+      for (let index = 0; index < datos_pigmentos.length; index++) {
+        this.pigmentoProducto.push(datos_pigmentos[index].pigmt_Nombre);
+      }
+    });
+  }
+
   tipoMondedaComboBox(){
     this.tipoMonedaService.srvObtenerLista().subscribe(datos_tiposMoneda => {
       for (let index = 0; index < datos_tiposMoneda.length; index++) {
@@ -186,9 +218,11 @@ export class CrearProductoComponent implements OnInit {
     let ancho : any = this.FormCrearProducto.value.ProduAncho;
     let fuelle : any = this.FormCrearProducto.value.ProduFuelle;
     let calibre : any = this.FormCrearProducto.value.ProduCalibre;
-    let largo : any
+    let largo : any = this.FormCrearProducto.value.ProduLargo;
     let undMed : any = this.FormCrearProducto.value.ProduUnidadMedidaACF;
     let tpProducto : any = this.FormCrearProducto.value.ProduTipo;
+    let material : any = this.FormCrearProducto.value.ProduMaterial;
+    let pigmento : any = this.FormCrearProducto.value.ProduPigmento;
     let cantidad : any = this.FormCrearProducto.value.ProduCantidad;
     let undMed2 : any = this.FormCrearProducto.value.ProduUnidadMedidaCant;
     let precio : any = this.FormCrearProducto.value.ProduPrecioUnd;
@@ -197,8 +231,8 @@ export class CrearProductoComponent implements OnInit {
     let descripcion : any = this.FormCrearProducto.value.ProdDescripcion;
     let cliente : any = this.FormCrearProducto.value.ClienteNombre;
 
-    this.pedidosProducto.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, largo, undMed, tpProducto, cantidad, undMed2, precio, moneda, descripcion);
-    this.pedidosProducto.registrarProducto(id, nombre, ancho, fuelle, calibre, undMed, tpProducto, descripcion, cliente);
+    this.pedidosProducto.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, largo, undMed, tpProducto, material, pigmento, cantidad, undMed2, precio, moneda, descripcion);
+    this.pedidosProducto.registrarProducto(id, nombre, ancho, fuelle, calibre, largo, undMed, tpProducto, material, pigmento, descripcion, cliente);
     this.LimpiarCampos();
   }
 
