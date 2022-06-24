@@ -1,1 +1,132 @@
-<p>desperdicio works!</p>
+<!--Navegador parte superior -->
+<div class="contain">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
+      </div>
+      <ul class="btn-group open">
+        <p><b>User: {{storage_Nombre}}</b></p>
+        <span><b>Tipo: {{storage_Rol}} </b></span>
+        <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
+      </ul>
+    </nav>
+    <!-- Navegador fin de parte superior -->
+    <div class="container-fluid">
+      <!-- principal -->
+      <div class="mb-4 Titulo">
+        <h2 class="tituloRojo">Desperdicio</h2>
+      </div>
+  
+      <div class="mb-4">
+        <hr class="colorLinea">
+      </div>
+    </div>
+</div>
+
+<!-- DESPERDICIO  -->
+
+
+  <!-- Inicio titulo -->
+  <div class="mb-4">
+    <h4 class="tituloRojo">Registro de Desperdicio</h4>
+  </div>
+  
+  
+  
+  <form [formGroup]="FormDesperdicio">
+    <!-- Inicio Fila 1 Agregar producto -->
+    <div class="mb-3">
+      <div class="row g-3">
+  
+        <div class="form-floating col-md-1">
+          <input formControlName="Mpid" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+          <label for="floatingSelect">Id</label>
+        </div>
+
+        <div class="form-floating col-md-2">
+          <input formControlName="Mpid" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+          <label for="floatingSelect">OT</label>
+        </div>
+        <!-- ID/Nombre Producto -->
+        <div class="form-floating col-md-2">
+            <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="llenadoProducto()" aria-label="Floating label select example" required>
+              <option [ngValue]="null" disabled selected>Seleccione Producto</option>
+              <!-- <option [ngValue]="productos.prod_Id" *ngFor="let productos of producto"></option> -->
+            </select>
+            <label for="floatingSelect">Nombre del Producto</label>
+        </div>
+  
+
+           <!-- Operario -->
+      <div class="form-floating col-md-2">
+        <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="llenadoProducto()" aria-label="Floating label select example" required>
+          <option [ngValue]="null" disabled selected>Seleccione Cliente</option>
+          <!-- <option [ngValue]="Operario.Mp_Id" *ngFor="let operarios of Operario"></option> -->
+        </select>
+        <label for="floatingSelect">Nombre del Cliente</label>
+    </div>
+
+
+      <!-- Operario -->
+      <div class="form-floating col-md-2">
+        <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="llenadoProducto()" aria-label="Floating label select example" required>
+          <option [ngValue]="null" disabled selected>Seleccione Operario</option>
+          <!-- <option [ngValue]="Operario.Mp_Id" *ngFor="let operarios of Operario"></option> -->
+        </select>
+        <label for="floatingSelect">Nombre del Operario</label>
+    </div>
+
+
+   <!-- Fecha Ingreso -->
+          <div class="form-floating col-md -2">
+            <input formControlName="MpingresoFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso">
+            <label for="floatingInput">Fecha Ingreso</label>
+          </div>
+  
+         <!-- Ancho-->
+  
+          <div class="form-floating col-md-1">
+            <input formControlName="ProdAncho" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" >
+            <label for="floatingInput">Ancho</label>
+          </div> 
+          <!-- Fuelle  -->
+           <div class="form-floating col-md-1">
+            <input formControlName="ProdFuelle" type="number" class="form-control form-control-sm" id="floatingSelect" title="Fuelle" min="0" >
+            <label for="floatingInput">Fuelle</label>
+          </div> 
+            <!-- Calibre  --> 
+           <div class="form-floating col-md-1">
+            <input formControlName="ProdCalibre" type="number" class="form-control form-control-sm" id="floatingSelect" name="PrdCalibre" title="Calibre" min="0" >
+            <label for="floatingInput">Calibre</label>
+          </div> 
+          <!-- Largo  -->
+          <div class="form-floating col-md-1">
+            <input formControlName="ProdLargo" type="number" class="form-control form-control-sm" id="floatingSelect" title="Largo" min="0" >
+            <label for="floatingInput">Largo</label>
+          </div> 
+  
+          <!-- Unidad medida-->
+          <div class="form-floating col-md-1">
+            <select formControlName="MpunidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" >
+              <!-- <option [ngValue]="unidadMedida" *ngFor="let unidadMedida of undMed"></option> -->
+            </select>
+            <label for="floatingSelect">Und. Medida</label>
+          </div>
+      <!-- Campo Observacion -->
+      <div class="form-floating col-md">
+        <textarea formControlName="MpObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
+        <label for="floatingTextarea">Observación</label>
+      </div>
+    
+      </div>
+    </div>
+  </form>
+  
+  
+                      <!-- BOTONES DE  CONSULTAR Y LIMPIAR CAMPOS -->
+                      <!-- <div class="mb-1">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                          <input class="btn btn-danger btn-danger-sm" type="submit" value="Guardar">
+                          <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="limpiarCamposConsulta()">
+                        </div>
+                      </div> -->
