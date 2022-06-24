@@ -135,13 +135,8 @@ export class OpedidoproductoComponent implements OnInit {
                                   private rolService : RolesService,
                                     @Inject(SESSION_STORAGE) private storage: WebStorageService,
                                       private ClientesProductosService : ClientesProductosService,
-
                                         private materialService : MaterialProductoService,
-                                          private pigmentoServices : PigmentoProductoService,
-
-                                        private InventarioZeus: InventarioZeusService,
-                                          private BagproService: SrvClienteOtItemsService
-                                          ) {
+                                          private pigmentoServices : PigmentoProductoService,) {
 
 
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
@@ -215,9 +210,6 @@ export class OpedidoproductoComponent implements OnInit {
     const exp = /(\d)(?=(\d{3})+(?!\d))/g;
     const rep = '$1,';
     return number.toString().replace(exp,rep);
-
-    //this.limpiarCamposConsulta();
-
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -247,7 +239,6 @@ export class OpedidoproductoComponent implements OnInit {
       PedFechaEnt: ['', Validators.required],
       PedEstadoId: ['', Validators.required],
       PedObservacion: ['', Validators.required],
-
     });
 
     this.FormPedidoExternoProductos = this.frmBuilderPedExterno.group({
@@ -2228,38 +2219,7 @@ export class OpedidoproductoComponent implements OnInit {
 
   //Funcion que limpia los campos de consulta de pedidos
   limpiarCamposConsulta(){
-
-    this.BagproService.srvObtenerItemsBagpro().subscribe(datosItemsBagpro => {
-      for (let index = 0; index < datosItemsBagpro.length; index++) {
-        this.InventarioZeus.srvObtenerArticulosZeus().subscribe(datosArticulosZeus => {
-          for (let indx = 0; indx < datosArticulosZeus.length; indx++) {
-            if(datosItemsBagpro[index].id == datosArticulosZeus[indx].idArticulo) {
-              console.log(datosArticulosZeus[indx]);
-              break;
-            } else continue;
-          }
-        }, error => { console.log(error) });
-      }
-    }, error => { console.log(error) });
-
-    /*this.InventarioZeus.srvObtenerExistenciasZeus().subscribe(datosExistenciasZeus => {
-      for (let index = 0; index < datosExistenciasZeus.length; index++) {
-
-        this.InventarioZeus.srvObtenerArticulosZeus().subscribe(datosArticulosZeus => {
-            for (let ix = 0; ix < datosArticulosZeus.length; ix++) {
-             if(datosExistenciasZeus[index].articulo == datosArticulosZeus[ix].idArticulo &&
-                datosArticulosZeus[ix].tipo == "PRODUCTO TERMINADO" &&
-                datosArticulosZeus[ix].precioVenta > 1.0) {
-                console.log(datosExistenciasZeus[index])
-             }
-
-            }
-
-          })
-
-
-      }
-    })*/
+    this.FormConsultaPedidoExterno.reset();
   }
 
   /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
@@ -2271,7 +2231,6 @@ export class OpedidoproductoComponent implements OnInit {
       confirmButtonText: 'Salir',
       denyButtonText: `No Salir`,
     }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) window.location.href = "./";
     })
   }
@@ -2285,7 +2244,6 @@ export class OpedidoproductoComponent implements OnInit {
       confirmButtonText: 'Salir',
       denyButtonText: `No Salir`,
     }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) window.location.href = "./home";
     })
   }
