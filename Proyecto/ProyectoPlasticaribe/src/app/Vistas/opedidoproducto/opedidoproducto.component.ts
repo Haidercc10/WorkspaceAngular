@@ -24,9 +24,16 @@ import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.se
 import { ThisReceiver } from '@angular/compiler';
 import { modelCliente } from 'src/app/Modelo/modelCliente';
 import moment from 'moment';
-import * as XLSX from 'xlsx';
+
+/*import * as XLSX from 'xlsx';*/
 import { MaterialProductoService } from 'src/app/Servicios/materialProducto.service';
 import { PigmentoProductoService } from 'src/app/Servicios/pigmentoProducto.service';
+
+import { InventarioZeusService } from 'src/app/Servicios/inventario-zeus.service';
+import { Console, log } from 'console';
+import { SrvClienteOtItemsService } from 'src/app/Servicios/srv-cliente-ot-items.service';
+//import * as XLSX from 'xlsx';
+
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -101,6 +108,7 @@ export class OpedidoproductoComponent implements OnInit {
   ArrayProductoNuevo : any =  {};
   productosPedidos = [];
 
+
 /* Vaiables para rescatar los ID de estado, sedes, empresa, valorTotal */
   valorTotal : number = 0;
   EmpresaVendedora=[];
@@ -153,8 +161,14 @@ export class OpedidoproductoComponent implements OnInit {
                                   private rolService : RolesService,
                                     @Inject(SESSION_STORAGE) private storage: WebStorageService,
                                       private ClientesProductosService : ClientesProductosService,
+
                                         private materialService : MaterialProductoService,
-                                          private pigmentoServices : PigmentoProductoService) {
+                                          private pigmentoServices : PigmentoProductoService,
+
+                                        private InventarioZeus: InventarioZeusService,
+                                          private BagproService: SrvClienteOtItemsService
+                                          ) {
+
 
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
       //Instanciar campos que vienen del formulario
@@ -227,6 +241,9 @@ export class OpedidoproductoComponent implements OnInit {
     const exp = /(\d)(?=(\d{3})+(?!\d))/g;
     const rep = '$1,';
     return number.toString().replace(exp,rep);
+
+    //this.limpiarCamposConsulta();
+
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -2237,7 +2254,38 @@ export class OpedidoproductoComponent implements OnInit {
 
   //Funcion que limpia los campos de consulta de pedidos
   limpiarCamposConsulta(){
-    this.FormConsultaPedidoExterno.reset();
+
+    this.BagproService.srvObtenerItemsBagpro().subscribe(datosItemsBagpro => {
+      for (let index = 0; index < datosItemsBagpro.length; index++) {
+        this.InventarioZeus.srvObtenerArticulosZeus().subscribe(datosArticulosZeus => {
+          for (let indx = 0; indx < datosArticulosZeus.length; indx++) {
+            if(datosItemsBagpro[index].id == datosArticulosZeus[indx].idArticulo) {
+              console.log(datosArticulosZeus[indx]);
+              break;
+            } else continue;
+          }
+        }, error => { console.log(error) });
+      }
+    }, error => { console.log(error) });
+
+    /*this.InventarioZeus.srvObtenerExistenciasZeus().subscribe(datosExistenciasZeus => {
+      for (let index = 0; index < datosExistenciasZeus.length; index++) {
+
+        this.InventarioZeus.srvObtenerArticulosZeus().subscribe(datosArticulosZeus => {
+            for (let ix = 0; ix < datosArticulosZeus.length; ix++) {
+             if(datosExistenciasZeus[index].articulo == datosArticulosZeus[ix].idArticulo &&
+                datosArticulosZeus[ix].tipo == "PRODUCTO TERMINADO" &&
+                datosArticulosZeus[ix].precioVenta > 1.0) {
+                console.log(datosExistenciasZeus[index])
+             }
+
+            }
+
+          })
+
+
+      }
+    })*/
   }
 
   /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
@@ -2313,6 +2361,7 @@ export class OpedidoproductoComponent implements OnInit {
 
   // Funcion que envia la informacion de los productos a la tabla.
   cargarFormProductoEnTablas(formulario : any){
+
     this.ultimoPrecio = 0;
     let idProducto : number = this.FormPedidoExternoProductos.value.ProdId;
     let precioProducto : number = this.FormPedidoExternoProductos.value.ProdPrecioUnd;

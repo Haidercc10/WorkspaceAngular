@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
   templateUrl: './Reportes.component.html',
   styleUrls: ['./Reportes.component.css']
 })
+
 export class ReportesComponent implements OnInit {
 
   public formularioReportes !: FormGroup;
@@ -34,7 +35,7 @@ export class ReportesComponent implements OnInit {
   storage_Rol : any;
 
 /* Vaiables para rescatar los ID de estado, sedes, empresa, valorTotal */
- 
+
   pages: number = 1;
 
   constructor( private frmBuilderReportes: FormBuilder,
@@ -61,7 +62,7 @@ export class ReportesComponent implements OnInit {
   }
 
 
-  ngOnInit(): void { 
+  ngOnInit(): void {
     this.lecturaStorage();
     // this.estadoComboBox();
   }
@@ -82,7 +83,7 @@ export class ReportesComponent implements OnInit {
 
    initForms(){ }
 
-  
+
   clear() {
       this.formularioReportes.reset();
 
@@ -99,19 +100,19 @@ export class ReportesComponent implements OnInit {
         Swal.fire("HAY CAMPOS VACIOS");
       }
   }
-   
+
   LimpiarCampos() {
     this.formularioReportes.reset();
     this.FormConsultaReportes.reset();
-    
+
   }
 
 
 
-  // DOCUMENTO EN EXCEL 
-  
+  // DOCUMENTO EN EXCEL
+
   Seasons = [
-    
+
   ];
 
   name = 'ExcelSheet.xlsx';
@@ -122,7 +123,7 @@ export class ReportesComponent implements OnInit {
     const book: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(book, worksheet, 'Sheet1');
     XLSX.writeFile(book, this.name);
-    
+
   }
 
   // estadoComboBox(){

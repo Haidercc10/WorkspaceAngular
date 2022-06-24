@@ -30,8 +30,8 @@ export class PedidomateriaprimaComponent implements OnInit {
                       private frmBuilderMateriaPrima : FormBuilder,
                        private unidadMedidaService : UnidadMedidaService,
                  @Inject(SESSION_STORAGE) private storage: WebStorageService
-    
-    
+
+
     ) {
       this.FormMateriaprima = this.frmBuilderMateriaPrima.group({
         //MateriaPrima
@@ -47,7 +47,7 @@ export class PedidomateriaprimaComponent implements OnInit {
         MpingresoFecha:new FormControl(),
 
       });
-  
+
 
      }
 
@@ -98,7 +98,7 @@ ValidarRol : number;
     });
 
 
-   
+
   }
 
 
@@ -159,15 +159,15 @@ ValidarRol : number;
      // Funcion para validar los campos vacios de las consultas
   validarCamposVaciosConsulta(){
     this.MateriaPFechaConsulta = [];
-    
-    
+
+
   }
 
 
   //Funcion encargada de buscar un producto por el id del producto
 buscarProducto(){
    }
-  
+
 
   // Funcion para llenar los datos de los productos en cada uno de los campos
  llenadoProducto(){
@@ -196,13 +196,13 @@ buscarProducto(){
 
     // Funcion que limpia los todos los campos de la vista
 LimpiarCampos() {
-      
+
     }
 
 
-     // Funcion para actualizar 
+     // Funcion para actualizar
      actualizarMateriaP(){
-    
-}  
+
+}
 
 }

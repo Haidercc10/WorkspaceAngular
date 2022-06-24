@@ -1,4 +1,4 @@
-    
+
            <!--Navegador parte superior -->
            <div class="contain">
 
@@ -6,30 +6,30 @@
              <div class="container-fluid">
              <p>Plasti<span>caribe S.A.S</span> </p>
              </div>
-                 <div> 
+                 <div>
                   <ul class="btn-group open">
                     <li class="fa fa-user fa-fw"></li><p>{{storage_Nombre}} {{storage_Rol}} </p>  | <span> <li class="fa fa-sign-out " aria-hidden="true" (click)="confimacionSalida()">Cerrar Seccion</li> </span>
                   </ul>
-               
+
                 </div>
                  </nav>
                  <!-- Navegador fin de parte superior -->
-                 
+
                  <br>
                  <div class="container-fluid">
                    <div class="container">
                      <div class="mb-4">
                        <h4 class="tituloRojo">Reportes</h4>
                      </div>
-          
-      
-      
-  
-      
-     
-    
-      
-      
+
+
+
+
+
+
+
+
+
       <!-- centro de la pagina-->
       <!-- <div class="row g-3">
       <div class="col-md">
@@ -42,14 +42,14 @@
          <option value="5">Almacen</option>
        </select>
       </div> -->
-      
-      
-          <!-- < !-- Inicio formulario --> 
+
+
+          <!-- < !-- Inicio formulario -->
            <form [formGroup]="FormConsultaReportes" (ngSubmit)="validarCamposVacios()">
                <div class="row g-3">
-      
+
                   <!-- TIPO DE REPORTES -->
-                 <div class="col-md-2"> 
+                 <div class="col-md-2">
                    <select formControlName="ReportesConsulta" id="ReportesId" type="text" name="TipoReportes" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                      <option [ngValue]="null" disabled selected>Seleccione Tipo Reporte</option>
                      <option [ngValue]="tipoReportes" *ngFor="let TipoReportes of tipoReportes">{{tipoReportes}}</option>
@@ -71,7 +71,7 @@
                       <option [ngValue]="Areas" *ngFor="let Areas of Areas">{{Areas}}</option>
                     </select>
                   </div>
-                
+
                  <!-- NUMERO DE IDENTIFICACION DEL PEDIDO DE PRODUCTOS -->
                  <div class="col-md-2">
                    <input formControlName="ReporteIdConsulta"  type="number" class="form-control form-control-sm" id="ReportesId" placeholder="N° del Pedido" name="ReportesId" title="Consecutivo identificador del Pedido">
@@ -84,7 +84,7 @@
                   <label _ngcontent-irk-c59="" for="floatingInput">Fecha de Entrega</label>
                 </div> -->
 
-                   
+
                  <!-- FECHA EN QUE SE TIENE QUE ENTREGAR EL PEDIDO -->
 
                  <div _ngcontent-irk-c59="" class="form-floating col-md-2">
@@ -92,38 +92,38 @@
                   <label _ngcontent-irk-c59="" for="floatingInput">Fecha Pedido</label>
                 </div>
 
-                
-               
+
+
              </div>
-      
+
            <!--Botones-->
            <div class="mb-3">
              <br>
            </div>
-      
+
            <div class="contenedor_botones d-grid gap-2 d-md-flex justify-content-md-center">
              <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Consultar</button>
              <button class="boton_limpiar btn btn-secondary btn-secondary-sm" expand="full" (click)="clear()" type="button">Limpiar Campos</button>
            </div>
-      
-      
+
+
            <div class="mb-5">
            <hr class="colorLinea">
          </div>
-      
+
            <br>
            <h4 class="tituloRojo">Datos Del Reporte</h4>
            <br>
-      
-      
-      
+
+
+
       <!--Formulario -->
-      
-      
+
+
                  <div class="mb-2">
                  <div class="row g-1">
                  <div class="table-responsive">
-                 <!-- <div id="html2Pdf"> --> 
+                 <!-- <div id="html2Pdf"> -->
                    <table class="table table-bordered"  id="season-tble"  >
                    <thead class="TitulosTabla">
                        <tr>
@@ -133,7 +133,7 @@
                        <th  id="Precio" scope="col">Precios </th>
                        <th  id="Existencias" scope="col">Existencias</th>
                        <th  id="Fecha"  scope="col">Fecha</th>
-      
+
                        </tr>
                      </thead>
                      <tbody>
@@ -145,20 +145,20 @@
                         <td>{{ season.Existencias }}</td>
                         <td>{{ season.Fecha }}</td>
                       </tr>
-                      
+
                      </tbody>
                    </table>
                    <!-- paginacion -->
-      
+
                        <!-- <div class="mb-2">
                              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                                <pagination-controls (pageChange)="page = $event"></pagination-controls>
                            </div>  -->
                              <br>
                              <br>
-                   <button class="btn btn-danger btn-danger-sm"  type="submit" (click)="exportToExcel()">Descargar</button>
+                   <button class="btn btn-danger btn-danger-sm"  type="submit" >Descargar</button> <!--(click)="exportToExcel()"-->
                  </div>
-                 </div> 
-                
-      
-                 
+                 </div>
+
+
+
