@@ -185,7 +185,6 @@ export class PedidomateriaprimaComponent implements OnInit {
     });
   }
 
-  //Funcion que creará y gusradará la relación de materia prima y proveedores
   creacionMpProveedor(){
     let idMateriaPrima : number;
     let idProveedor : number;
