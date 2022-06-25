@@ -1,14 +1,20 @@
 import { Component, OnInit,Inject } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
 import Swal from 'sweetalert2';
-import * as XLSX from 'xlsx';
+
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
 import { ProveedorService } from 'src/app/Servicios/proveedor.service';
 import { Observable } from 'rxjs/internal/Observable';
 import {map, startWith} from 'rxjs/operators';
 import { MpProveedorService } from 'src/app/Servicios/MpProveedor.service';
+
+
+import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service'; 
+import * as XLSX from 'xlsx';
+
 
 
 @Component({
@@ -19,6 +25,7 @@ import { MpProveedorService } from 'src/app/Servicios/MpProveedor.service';
 export class PedidomateriaprimaComponent implements OnInit {
 
   public FormularioPedidomateriaprima !: FormGroup;
+
   public FormMateriaPrima!: FormGroup;
   public FormMateriaPrimaRetiro!: FormGroup;
 
@@ -54,6 +61,69 @@ export class PedidomateriaprimaComponent implements OnInit {
       MpPrecio:new FormControl(),
     });
   }
+
+  public FormMateriaprima!: FormGroup;
+  public FormMateriaprimaretiro!: FormGroup;
+
+
+ //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
+  public ModalCrearProveedor: boolean = false;
+  public ModalCrearMateriaPrima: boolean= false;
+
+  public TituloSedes = "";
+  ID: number;
+  Nombre : string;
+  Numero : number;
+ 
+
+  constructor( private frmBuilderPedidomateriaprima : FormBuilder,
+                 private rolService : RolesService,
+                  
+                      private frmBuilderMateriaPrima : FormBuilder,
+                      
+                 @Inject(SESSION_STORAGE) private storage: WebStorageService
+
+
+    ) {
+      this.FormMateriaprima = this.frmBuilderMateriaPrima.group({
+        //MateriaPrima
+        MpunidadMedida: new FormControl(),
+        MpId: new FormControl(),
+        MpNombre: new FormControl(),
+        Mpestados: new FormControl(),
+        MpEstadoConsulta: new FormControl(),
+        Mpbodega: new FormControl(),
+        MpStock: new FormControl(),
+        MpObservacion: new FormControl(),
+        IngresoMateriaP: new FormControl(),
+        MpingresoFecha:new FormControl(),
+
+      });
+
+
+     }
+
+ // VARIABLES PARA PASAR A LOS COMBOBOX
+
+  usuarios=[];
+  estado=[];
+  tipoEstado=[];
+  producto=[];
+  EstadosMateriaP=[];
+  Nencargado=[];
+  Encargado=[];
+  MateriaPFechaConsulta=[];
+  cliente=[];
+  undMed:UnidadMedidaService[]=[];
+
+/* Vaiables*/
+
+storage_Id : number;
+storage_Nombre : any;
+storage_Rol : any;
+ValidarRol : number;
+
+
 
   ngOnInit(): void {
     this.initForms();
@@ -200,9 +270,24 @@ export class PedidomateriaprimaComponent implements OnInit {
   }
 
 
+
   // Funcion para actualizar
   actualizarMateriaP(){
 
+// Funcion para actualizar
+actualizarMateriaP(){
+
+
+  }
+
+  // Funcion para llamar el modal que crea clientes
+  LlamarModalCrearProveedor() {
+    this.ModalCrearProveedor = true;
+  }
+
+// Funcion para llamar el modal que crea clientes
+  LlamarModalCrearMateriaPrima(){
+    this.ModalCrearMateriaPrima = true;
   }
 
 }

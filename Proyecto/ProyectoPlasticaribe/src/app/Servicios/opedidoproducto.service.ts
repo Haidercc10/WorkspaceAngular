@@ -10,7 +10,7 @@ import { modelOpedidoproducto } from '../Modelo/modelOpedidoproducto';
 })
 export class OpedidoproductoService {
 
- readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+ readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
 //Encapsular httpclient en el constructor
   constructor(private http: HttpClient) { }

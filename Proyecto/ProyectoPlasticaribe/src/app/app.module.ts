@@ -35,7 +35,13 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialExampleModule} from '../material.module';
 import {MatNativeDateModule} from '@angular/material/core';
 import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
+
 import { PruebasComponent } from './Vistas/pruebas/pruebas.component';
+
+ import { CrearProveedorComponent } from './Vistas/crear-proveedor/crear-proveedor.component';
+import { CrearMateriaprimaComponent } from './Vistas/crear-materiaprima/crear-materiaprima.component';
+
+
 
 export const routes: Routes = [
 
@@ -61,9 +67,11 @@ export const routes: Routes = [
   {path: 'home', canActivate: [ValidacionLoginGuard], component: PaginaPrincipalComponent},
   {path: 'desperdicio', canActivate: [ValidacionLoginGuard], component: DesperdicioComponent},
   {path: 'MateriaPrima', canActivate: [ValidacionLoginGuard], component: PedidomateriaprimaComponent},
+  {path: 'prueba', component: PruebasComponent},
+  {path: 'desperdicio', component: DesperdicioComponent},
+  {path: 'crear-proveedor', canActivate: [ValidacionLoginGuard], component: CrearProveedorComponent},
+  {path: 'crear-materiaprima', canActivate: [ValidacionLoginGuard], component: CrearMateriaprimaComponent},
 
-
-  {path: 'prueba', component: PruebasComponent}
 ]
 
 @NgModule({
@@ -91,6 +99,10 @@ export const routes: Routes = [
     EstadosComponent,
     PaginaPrincipalComponent,
     DesperdicioComponent,
+    CrearProveedorComponent,
+    CrearMateriaprimaComponent,
+
+
   ],
 
 

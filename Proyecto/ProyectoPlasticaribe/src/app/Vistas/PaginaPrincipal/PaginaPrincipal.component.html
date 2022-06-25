@@ -452,35 +452,45 @@
     <p><button mat-button (click)="sidenav.toggle()">Menú</button></p>
     <div class="row g-3">
       <div class="col md texto">
+        <div class="container">
           <div class="textoIntermedio">
               <p class="fs-3 parrafo">
                   <b>
                       ¡Bienvenido al nuevo
-                      <span class="plasticaribe_resaltado"> Plasticaribe S.A.S, </span>
+                      <span class="plasticaribe_resaltado"> Plasticaribe S.A.S, </span> <b class="negritaEnRojo"> Usuario ingresa!</b>
                   </b>
-                  <br> <br>
-                  <b class="negritaEnRojo"> Usuario ingresa!</b>
-              </p>
+                  <br> 
+              
+            
 
-              <p class="fs-3 parrafo2">¡Estamos innovando!, te dejamos algunas recomendaciones acerca del uso de <br>
-                  nuestro nuevo sistema de información  basado en la nube, toma nota.
-              </p>
+              <p class="fs-3 parrafo2">¡Estamos innovando!, te dejamos algunas recomendaciones acerca del uso de nuestro nuevo sistema de información  basado en la nube, toma nota.
+            
           </div>
-
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
           <div class="mb-3 textoPequeno">
               <p class="textoPequenoP">  Cuida a Plasticaribe S.A.S, como a ti mismo.</p>
               <ul>
-                  <li>Evita utilizar letras en campos donde haya que digitar números.</li>
-                  <li>Evita utilizar carácteres especiales como puntos y comas en los formularios.</li>
-                  <li>Sacale el máximo provecho a la herramienta.</li>
-                  <li>Gestiona tus solicitudes de permisos.</li>
+                  <li  type="disc">Evita utilizar letras en campos donde haya que digitar números.</li>
+                  <li  type="disc">Evita utilizar carácteres especiales como puntos y comas en los formularios.</li>
+                  <li  type="disc">Sacale el máximo provecho a la herramienta.</li>
+                  <li  type="disc">Gestiona tus solicitudes de permisos.</li>
               </ul>
+            </div>
           </div>
-          <div class="mb-3">
+        </div>   
+        <div class="mb-3">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+         
               <br> <br>
-              <button class="btn btn-danger">Ver tutorial</button>
+              <button class="btn btn-danger float-right">Ver tutorial</button>
           </div>
+        </div>
       </div>
     </div>
+
   </mat-sidenav-content>
 </mat-sidenav-container>

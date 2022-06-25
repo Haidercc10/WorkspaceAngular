@@ -11,7 +11,7 @@ import { modelUsuario } from '../Modelo/modelUsuario';
 export class UsuarioService {
 
   //Ruta del API
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
 
 //Encapsular httpclient en el constructor
   constructor(private http: HttpClient) { }
@@ -28,7 +28,7 @@ export class UsuarioService {
   srvAgregarUsuario(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Usuarios', data)
   }
-//Metodo actualzar Usuario
+//Metodo actualizar Usuario
   srvActualizarUsuario(id:number|String, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Usuarios/${id}`, data);
   }

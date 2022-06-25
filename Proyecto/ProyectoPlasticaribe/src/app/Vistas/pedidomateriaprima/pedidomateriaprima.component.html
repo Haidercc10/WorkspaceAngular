@@ -7,7 +7,7 @@
     <ul class="btn-group open">
       <p><b>User: {{storage_Nombre}}</b></p>
       <span><b>Tipo: {{storage_Rol}} </b></span>
-      <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
+      <span><li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li></span>
     </ul>
   </nav>
   <!-- Navegador fin de parte superior -->
@@ -16,19 +16,31 @@
     <div class="mb-4 Titulo">
       <h2 class="tituloRojo">Materia Prima</h2>
     </div>
-
+  </div>
     <div class="mb-4">
       <hr class="colorLinea">
     </div>
-  </div>
+  
 </div>
 
+<div class="container">
+  <!-- Inicio Botones que llama el modal de crear proveerdor y Materia Prima-->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
+    (click)= "LlamarModalCrearProveedor()" title="¡Crealo aquí!">
+      Crear Proveedor
+    </button>
+   <br>
+  
+    <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+    (click)="LlamarModalCrearMateriaPrima()" title="¡Crealo aquí!">
+      Crear Materia Prima
+    </button>
+  </div>
+  <!-- Fin Botones que llama el modal de crear cliente y producto-->
+ 
+<br>
 
- <div class="container">
-<!-- Inicio titulo -->
-        <div class="mb-4">
-          <h4 class="tituloRojo">Ingresar Materia Prima</h4>
-        </div>
 <!-- Fin titulo -->
 <form [formGroup]="FormMateriaPrima">
   <!-- Inicio Fila 1 Agregar producto -->
@@ -312,4 +324,45 @@
                           </div>
                         </div>
                       </div>
+
       </div>
+
+      </div>               
+</form>
+ </div>             
+      <!-- Modal de crear Proveedor -->
+      <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel2">Crear Proveedor</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!--Carga componente crear Proveedor-->
+               
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Fin Modal de crear Crear Proveedor-->      
+      
+      
+      <!-- Modal de crear Materia Prima -->
+      <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel2">Crear Materia Prima</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!--Carga componente crear Proveedor-->
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Fin Modal de crear Crear Proveedor-->  
+   
+
