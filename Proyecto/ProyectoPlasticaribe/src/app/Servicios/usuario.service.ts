@@ -11,7 +11,7 @@ import { modelUsuario } from '../Modelo/modelUsuario';
 export class UsuarioService {
 
   //Ruta del API
-  readonly rutaPlasticaribeAPI = "https://localhost:7137/api";
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
 //Encapsular httpclient en el constructor
   constructor(private http: HttpClient) { }

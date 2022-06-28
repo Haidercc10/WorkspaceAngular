@@ -1,5 +1,5 @@
 export interface modelMateriaPrima{
-  // MatPri_Id : number;
+  MatPri_Id : number;
   MatPri_Nombre : string;
   MatPri_Descripcion : string;
   MatPri_Stock : number;

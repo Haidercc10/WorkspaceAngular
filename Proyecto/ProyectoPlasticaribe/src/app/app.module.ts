@@ -101,8 +101,6 @@ export const routes: Routes = [
     DesperdicioComponent,
     CrearProveedorComponent,
     CrearMateriaprimaComponent,
-
-
   ],
 
 

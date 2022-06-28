@@ -19,6 +19,10 @@ export class ProveedorService {
         return this.http.get<any>(this.rutaPlasticaribeAPI + '/Proveedor')
     }
 
+    srvObtenerListaPorId(id : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Proveedor/${id}`);
+    }
+
   //Metodo agregar proveedor
     srvAgregar(data:any) {
       return this.http.post(this.rutaPlasticaribeAPI + '/Proveedor', data)

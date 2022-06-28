@@ -12,32 +12,35 @@ export class MateriaPrimaService {
 
   readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
 
-  //Encapsular httpclient en el constructor
-    constructor(private http : HttpClient) { }
+  constructor(private http : HttpClient) { }
 
-  //Metodo buscar lista de Materia Prima
-    srvObtenerLista():Observable<any[]> {
-        return this.http.get<any>(this.rutaPlasticaribeAPI + '/Materia_Prima')
-    }
+  //Metodo buscar lista de Productos
+  srvObtenerLista():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Materia_Prima');
+  }
 
-  //Metodo agregar Materia Prima
-    srvAgregar(data:any) {
-      return this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data)
-    }
+  srvObtenerListaPorId(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`);
+  }
 
-  //Metodo actualzar Materia Prima
-    srvActualizar(id:number|String, data:any) {
-      return this.http.put(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`, data);
-    }
+  //Metodo agregar Productos
+  srvAgregar(data:any) {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data)
+  }
 
-  //Metodo eliminar Materia Prima
-    srvEliminar(id:number|String) {
-      return this.http.delete(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`);
-    }
+  //Metodo actualzar Productos
+  srvActualizar(id:number|String, data:any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`, data);
+  }
 
-    //Duardar Materia Prima
-    srvGuardar(data : modelMateriaPrima): Observable<any> {
-     return this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data);
-   }
+  //Metodo eliminar Productos
+  srvEliminar(id:number|String) {
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`);
+  }
+
+  //
+  srvGuardar(data : modelMateriaPrima): Observable<any> {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data)
+  }
 
 }

@@ -20,6 +20,10 @@ export class CategoriaMateriaPrimaService {
         return this.http.get<any>(this.rutaPlasticaribeAPI + '/Categoria_MatPrima')
     }
 
+    srvObtenerListaPorId(dato : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Categoria_MatPrima/${dato}`);
+    }
+
   //Metodo agregar categoria de materia prima
     srvAgregar(data:any) {
       return this.http.post(this.rutaPlasticaribeAPI + '/Categoria_MatPrima', data)
