@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribe3, rutaPlasticaribeAPI } from 'src/polyfills';
+import { rutaPlasticaribe, rutaPlasticaribe3, rutaPlasticaribeAPI } from 'src/polyfills';
 import { modelProveedor } from '../Modelo/modelProveedor';
 
 @Injectable({
@@ -9,7 +9,7 @@ import { modelProveedor } from '../Modelo/modelProveedor';
 })
 export class ProveedorService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribe;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }
@@ -38,7 +38,7 @@ export class ProveedorService {
       return this.http.delete(this.rutaPlasticaribeAPI + `/Proveedor/${id}`);
     }
 
-    //Duardar proveedor
+    //Metodo Guardar proveedor con un modelo
     srvGuardar(data : modelProveedor): Observable<any> {
      return this.http.post(this.rutaPlasticaribeAPI + '/Proveedor', data);
    }

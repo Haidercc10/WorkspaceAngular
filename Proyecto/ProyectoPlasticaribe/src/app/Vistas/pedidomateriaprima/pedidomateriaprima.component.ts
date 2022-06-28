@@ -38,7 +38,11 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   public FormMateriaPrimaFactura !: FormGroup;
   public FormMateriaPrima !: FormGroup;
-  public FormMateriaPrimaRetiro!: FormGroup;
+  public FormMateriaPrimaRetiro !: FormGroup;
+
+  //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
+  public ModalCrearProveedor: boolean = false;
+  public ModalCrearMateriaPrima: boolean= false;
 
   /* Vaiables*/
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -70,9 +74,10 @@ export class PedidomateriaprimaComponent implements OnInit {
   /* CONSULTAS DE MATERIA PRIMA */
   MpConsultada = [];
 
- //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
-  public ModalCrearProveedor: boolean = false;
-  public ModalCrearMateriaPrima: boolean= false;
+
+
+
+
 
   constructor(private frmBuilderPedidomateriaprima : FormBuilder,
                 private materiaPrimaService : MateriaPrimaService,

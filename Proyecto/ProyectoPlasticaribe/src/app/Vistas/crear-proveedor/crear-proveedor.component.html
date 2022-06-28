@@ -1,32 +1,79 @@
-<p>crear-proveedor works!</p>
-<!--Inicio formulario crear clientes -->
-<!-- <form [formGroup]="FormCrearProveedor" (ngSubmit)="validarCamposVaciosProveedor()"> -->
-    <!-- Inicio Fila 1 Crear clientes -->
-    <!-- <div class="row g-3"> -->
-      <!-- ID Cliente -->
-      <!-- <div class="form-floating col-md-2">
-        <input formControlName="CliId" type="number" class="form-control form-control-sm" id="floatingInput"  required>
-        <label for="floatingInput">Id Cliente</label>
-      </div>
+<!--Inicio Formulario-->
+<form>
 
-    </div> -->
-
-    <!-- Inicio Fila 1 Crear clientes -->
+  <!-- Inicio Fila 1 Agregar Proveedor -->
+   <div class="mb-3">
      <div class="row g-3">
-     <!-- ID Cliente -->
-       <div class="form-floating col-md-2">
-        <input formControlName="CliId" type="number" class="form-control form-control-sm" id="floatingInput"  required>
-        <label for="floatingInput">Id Cliente</label>
+
+        <!-- ID Proveedor -->
+        <div class="form-floating col-md-2">
+          <input formControlName="provId" type="number" class="form-control form-control-sm" id="floatingInput" name="PrvId" placeholder="Id">
+          <label for="floatingInput">Id</label>
+        </div>
+
+          <!-- Nombre Proveedor -->
+          <div class="form-floating col-md">
+              <Input formControlName="provNombre" type="text" class="form-control form-control-sm" id="floatingInput" name="PrvNombre" placeholder="Nombre" required>
+                <!-- <option [ngValue]="productos.prod_Id" *ngFor="let productos of producto"></option> -->
+              <label for="floatingInput">Nombre</label>
+          </div>
+
+        <!-- Tipo de Identificacion Proveedor -->
+        <div class="form-floating col-md-2">
+          <select formControlName="provTipoId" type="text" class="form-select form-select-sm" id="floatingSelect" name="prvTipoId" aria-label="Floating label select example" required>
+            <!-- <option [ngValue]="operarios.prod_Id" *ngFor="let operarios of Operario"></option> -->
+          </select>
+          <label for="floatingSelect">Tipo ID</label>
+        </div>
+
+         <!-- Tipo de proveedor -->
+         <div class="form-floating col-md-2">
+          <select formControlName="TipoProv" type="text" class="form-select form-select-sm" id="floatingSelect" name="prvTipoProv" required >
+          </select>
+          <label for="floatingSelect">Tipo Proveedor</label>
+        </div>
+
+     </div>
+   </div>
+ <!-- Fin Fila 1 Agregar Materia Prima -->
+
+ <!--Inicio Fila 2-->
+  <div class="mb-3">
+    <div class="row g-3">
+
+      <!-- Ciudad  -->
+      <div class="form-floating col-md-3">
+        <select formControlName="ProvCiudad" id="floatingSelect" type="text" name="prvCiudad" class="form-select form-select-sm" placeholder="Ciudad" required>
+          <!-- <option [ngValue]="estados" *ngFor="let Categoria of Categoria"></option> -->
+        </select>
+        <label for="floatingSelect">Ciudad</label>
       </div>
 
-    </div>  
-    <!-- Inicio Fila 1 Crear clientes -->
-    <!-- <div class="row g-3"> -->
-      <!-- ID Cliente -->
-      <!-- <div class="form-floating col-md-2">
-        <input formControlName="CliId" type="number" class="form-control form-control-sm" id="floatingInput"  required>
-        <label for="floatingInput">Id Cliente</label>
+       <!-- Telefono -->
+       <div class="form-floating col-md-3">
+        <input formControlName="ProvTelefono" id="floatingInput" type="number" name="prvTelefono" class="form-control form-control-sm" placeholder="Teléfono" required>
+          <!-- <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option> -->
+        <label for="floatingInput">Teléfono</label>
       </div>
+
+        <!-- Email  -->
+      <div class="form-floating col-md">
+        <input formControlName="ProvEmail" id="floatingInput" type="text" name="prvEmail" class="form-control form-control-sm" placeholder="Email" required>
+        <label for="floatingInput">Email</label>
+      </div>
+
     </div>
-</form> 
-   -->
+ </div>
+     <!--Fin Fila 2 -->
+
+    <!--Inicio Fila 3 Botones y Limpiar Campos-->
+        <div class="mb-1">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <input class="btn btn-danger btn-danger-sm" type="submit" value="Agregar">
+            <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos">
+          </div>
+        </div>
+    <!--Fin Fila 3-->
+
+</form>
+<!--Fin Formulario-->

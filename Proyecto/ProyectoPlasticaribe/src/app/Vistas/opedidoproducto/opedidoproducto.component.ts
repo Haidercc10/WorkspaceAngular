@@ -201,7 +201,7 @@ export class OpedidoproductoComponent implements OnInit {
     this.usuarioComboBox();
     this.LimpiarCampos();
     this.inactividad();
-    this.limpiarCamposConsulta();
+    //this.limpiarCamposConsulta();
     this.fecha();
   }
 
