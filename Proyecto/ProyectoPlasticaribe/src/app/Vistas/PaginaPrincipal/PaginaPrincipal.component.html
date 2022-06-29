@@ -265,23 +265,29 @@
             </div>
         </li> -->
         <!-- REPORTES -->
-        <!-- <li>
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <li>
             <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample8" role="button" aria-expanded="false" aria-controls="collapseExample">
-                Reportes
+              Reportes
             </a>
             <div class="collapse" id="collapseExample8">
-                <div class="mb-2">
-                  <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
-                    Reportes
-                  </a>
-                </div>
-                <div class="mb-2">
-                  <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
-                    Tipos de reportes
-                  </a>
-                </div>
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
+                  Reportes Materia Prima
+                </a>
+              </div>
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima-OT" role="button" aria-expanded="false" aria-controls="">
+                  Reporte Materia Prima por OT
+                </a>
+              </div>
+              <div class="mb-2">
+                <hr>
+              </div>
             </div>
-        </li> -->
+          </li>
+        </ng-container>
+
         <!-- PRODUCTOS -->
         <!-- <li>
             <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample9" role="button" aria-expanded="false" aria-controls="collapseExample">

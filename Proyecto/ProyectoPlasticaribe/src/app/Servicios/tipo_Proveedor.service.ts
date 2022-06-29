@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribe3 } from 'src/polyfills';
+import { rutaPlasticaribe3, rutaPlasticaribeAPI } from 'src/polyfills';
 import { modelTipoProveedor } from '../Modelo/modelTipoProveedor';
 
 @Injectable({
@@ -9,7 +9,7 @@ import { modelTipoProveedor } from '../Modelo/modelTipoProveedor';
 })
 export class Tipo_ProveedorService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }

@@ -1,0 +1,93 @@
+<div class="contain">
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
+    </div>
+    <ul class="btn-group open">
+      <p><b>User: {{storage_Nombre}}</b></p>
+      <span><b>Tipo: {{storage_Rol}} </b></span>
+      <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
+    </ul>
+  </nav>
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Materia Prima</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+<div class="container">
+  <form [formGroup]="FormMateriaPrima">
+    <div class="mb-3">
+      <div class="row g-3">
+        <div class="form-floating col-md-3">
+          <input formControlName="ot" type="number" min="0" (keyup.enter)="consultaOTBagPro()" class="form-control" id="floatingInput"required >
+          <label for="floatingInput">Orden de Trabajo</label>
+        </div>
+      </div>
+    </div>
+    <!-- BOTONES -->
+    <div class="mb-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="consultaOTBagPro()">Consultar OT</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="mb-2">
+    <div class="row g-1">
+      <div class="table-responsive">
+        <!-- <div id="html2Pdf"> -->
+        <table class="table table-bordered">
+          <thead class="TitulosTabla">
+            <tr *ngFor="let columnas of titulosTabla let i = index">
+              <th id="ot" scope="col">{{columnas.oT}}</th>
+              <th id="cliente" scope="col">{{columnas.Cliente}}</th>
+              <th id="producto" scope="col">{{columnas.Producto}}</th>
+              <th id="Materia_Prima" scope="col">{{columnas.Materia_Prima}}</th>
+              <th id="Proceso" scope="col" >{{columnas.Proceso}}</th>
+              <th id="mpCant" scope="col" >{{columnas.mpCant}}</th>
+              <th id="valorMp" scope="col" >{{columnas.valorMp}}</th>
+              <th id="porcentajeMp" scope="col" >{{columnas.porcentajeMp}}</th>
+              <!-- <th id="subTotalMateriaPrima" scope="col" (dblclick)="organizacionPrecioDblClick()" (click)="organizacionPrecio()">{{columnas.mpSubTotal}}</th> -->
+            </tr>
+            </thead>
+          <tbody>
+            <tr *ngFor="let materiaPrima of ArrayMateriaPrima | paginate: {itemsPerPage: 30, currentPage: page} let i=index" >
+              <td id="ot">{{materiaPrima.Id}}</td>
+              <td id="cliente">{{clienteOT}}</td>
+              <td id="producto">{{materiaPrima.Cant}}</td>
+              <td id="Materia_Prima">{{materiaPrima.UndCant}}</td>
+              <td id="Proceso">{{materiaPrima.PrecioUnd}}</td>
+              <td id="mpCant">{{materiaPrima.PrecioUnd}}</td>
+              <td id="valorMp">{{materiaPrima.PrecioUnd}}</td>
+              <td id="porcentajeMp">{{materiaPrima.PrecioUnd}}</td>
+              <!-- <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | currency : 'COP '}}</td> -->
+            </tr>
+          </tbody>
+        </table>
+        <div class="mb-2">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <label for=""><b>Valor total OT: $</b></label>
+      <label for="">{{precioOT | currency : 'COP '}}</label>
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <label for=""><b>Porc(%) total: </b></label>
+      <label for="">{{porcentajeTotal}}%</label>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,90 @@
+<div class="contain">
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
+    </div>
+    <ul class="btn-group open">
+      <p><b>User: {{storage_Nombre}}</b></p>
+      <span><b>Tipo: {{storage_Rol}} </b></span>
+      <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
+    </ul>
+  </nav>
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Materia Prima</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+<div class="container">
+  <form [formGroup]="FormMateriaPrima">
+    <div class="mb-3">
+      <div class="row g-3">
+        <div class="form-floating col-md-3">
+          <input formControlName="MpId" type="number" min="0" (keyup.enter)="buscarMpId()" class="form-control" id="floatingInput"required >
+          <label for="floatingInput">Id Materia Prima</label>
+        </div>
+        <!-- ID/Nombre Producto -->
+        <div class="form-floating col-md">
+          <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
+            <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima.matPri_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Nombre de la Materia Prima</label>
+        </div>
+      </div>
+    </div>
+    <!-- BOTONES -->
+    <div class="mb-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarConsulta()">Consultar Materia Prima</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="mb-2">
+    <div class="row g-1">
+      <div class="table-responsive">
+        <!-- <div id="html2Pdf"> -->
+        <table class="table table-bordered">
+          <thead class="TitulosTabla">
+            <tr *ngFor="let columnas of titulosTabla let i = index">
+              <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
+              <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
+              <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
+              <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
+              <th id="precioMateriaPrima" scope="col" >{{columnas.mpPrecioU}}</th>
+              <th id="subTotalMateriaPrima" scope="col" (dblclick)="organizacionPrecioDblClick()" (click)="organizacionPrecio()">{{columnas.mpSubTotal}}</th>
+            </tr>
+            </thead>
+          <tbody>
+            <tr *ngFor="let materiaPrima of ArrayMateriaPrima | paginate: {itemsPerPage: 30, currentPage: page} let i=index" >
+              <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
+              <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
+              <td id="cantidadMateriaPrima">{{materiaPrima.Cant}}</td>
+              <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
+              <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd}}</td>
+              <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | currency : 'COP '}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="mb-2">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <label for=""><b>Valor total: $</b></label>
+      <label for="">${{valorTotal | currency : 'COP '}}</label>
+    </div>
+  </div>
+</div>
+

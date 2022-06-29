@@ -1,10 +1,8 @@
 import { Component, OnInit,Inject } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
 import Swal from 'sweetalert2';
-
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
 import { ProveedorService } from 'src/app/Servicios/proveedor.service';
 import { Observable } from 'rxjs/internal/Observable';
@@ -24,8 +22,8 @@ import { AreaService } from 'src/app/Servicios/area.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
 import moment from 'moment';
 import * as XLSX from 'xlsx';
-
-
+import { BagproService } from 'src/app/Servicios/Bagpro.service';
+import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
 
 @Component({
   selector: 'app.pedidomateriaprima.component',
@@ -34,11 +32,10 @@ import * as XLSX from 'xlsx';
 })
 export class PedidomateriaprimaComponent implements OnInit {
 
-  public FormularioPedidomateriaprima !: FormGroup;
-
   public FormMateriaPrimaFactura !: FormGroup;
   public FormMateriaPrima !: FormGroup;
   public FormMateriaPrimaRetiro !: FormGroup;
+  public FormMateriaPrimaRetirada !: FormGroup;
 
   //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
   public ModalCrearProveedor: boolean = false;
@@ -51,6 +48,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   ultimoIdMateriaPrima : number; //Varibale que va a almacenar el id de la ultima materia prima registrada y le va a sumar 1
   materiasPrimas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
+  materiasPrimasRetiradas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   nombreCategoriasMP = []; //VAriable que va a almacenar el nombre de todas las categorias de materias primas existentes en la empresa
   unidadMedida = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
   usuarios = []; //Variable que va a almacenar todos los usuarios de la empresa
@@ -67,49 +65,54 @@ export class PedidomateriaprimaComponent implements OnInit {
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
   titulosTabla = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
   ArrayMateriaPrima : any [] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
+  ArrayMateriaPrimaRetirada : any [] = []; //Variable que tendrá la informacion de los productos que se piden para uan OT
   AccionBoton = "Agregar"; //Variable que almanará informacio para saber si una materia prima está en edicion o no (Se editará una materia prima cargada en la tabla, no una en la base de datos)
   valorTotal : number = 0; //Variable que guardará el valor total de la factura de entrada de materia prima
   nombreMateriaPrima : string; //Varible que almacenará el nombre de una materia prima consultado o seleccionado
+  precioOT : number; //Variable que va a almacenar el precio de la ot consultada
+  cantidadTotalExt : number; //Variable que va a almacenar el total de la cantidad extruida en una OT
+  cantidadTotalImp : number; //Variable que va a almacenar el total de la cantidad impresa en una OT
+  cantidadTotalDbl : number; //Variable que va a almacenar el total de la cantidad doblada en una OT
+  proceso : string = ''; //Variable ayudará a almacenar el proceso del cuela se está consultando la ot
+  proveedor = [];
+  tipodocuemnto = [];
+  totalPorcentajePerida : number; //Variable que ayudará a calcular el total de perdida en una OT
+
 
   /* CONSULTAS DE MATERIA PRIMA */
   MpConsultada = [];
 
-
-
-
-
-
-  constructor(private frmBuilderPedidomateriaprima : FormBuilder,
-                private materiaPrimaService : MateriaPrimaService,
-                  private categoriMpService : CategoriaMateriaPrimaService,
-                    private tipoBodegaService : TipoBodegaService,
-                      private unidadMedidaService : UnidadMedidaService,
-                        private estadoService : EstadosService,
-                          private tipoEstadoService : TipoEstadosService,
-                            private usuarioService : UsuarioService,
-                              private procesosService : ProcesosService,
-                                private areasService : AreaService,
-                                  private rolService : RolesService,
-                                    private frmBuilderMateriaPrima : FormBuilder,
-                                      @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                        private proveedorservices : ProveedorService,
-                                          private proveedorMPService : MpProveedorService,
-                                            private facturaMpComService : FactuaMpCompradaService,
-                                              private facturaMpService : FacturaMpService,
-                                                  private asignacionMPService : AsignacionMPService,
-                                                    private detallesAsignacionService : DetallesAsignacionService) {
+  constructor(private materiaPrimaService : MateriaPrimaService,
+                private categoriMpService : CategoriaMateriaPrimaService,
+                  private tipoBodegaService : TipoBodegaService,
+                    private unidadMedidaService : UnidadMedidaService,
+                      private estadoService : EstadosService,
+                        private tipoEstadoService : TipoEstadosService,
+                          private usuarioService : UsuarioService,
+                            private procesosService : ProcesosService,
+                              private areasService : AreaService,
+                                private rolService : RolesService,
+                                  private frmBuilderMateriaPrima : FormBuilder,
+                                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                                      private proveedorservices : ProveedorService,
+                                        private proveedorMPService : MpProveedorService,
+                                          private facturaMpComService : FactuaMpCompradaService,
+                                            private facturaMpService : FacturaMpService,
+                                                private asignacionMPService : AsignacionMPService,
+                                                  private detallesAsignacionService : DetallesAsignacionService,
+                                                    private bagProServices : BagproService,
+                                                      private tipoDocumentoService : TipoDocumentoService) {
 
     this.FormMateriaPrimaFactura = this.frmBuilderMateriaPrima.group({
       //MateriaPrima
       MpFactura: new FormControl(),
       MpingresoFecha: new FormControl(),
-      MpingresoFechaVendcimiento : new FormControl(),
       proveedor: new FormControl(),
-      valorTotalFactura : new FormControl(),
-      MpOperario: new FormControl(),
-      MpEstados: new FormControl(),
-      MpCategoria: new FormControl(),
-      MpObservacion:new FormControl(),
+      proveedorNombre: new FormControl(),
+      tipoDocumento: new FormControl(),
+      MpEstados:new FormControl(),
+      MpOperario:new FormControl(),
+      MpObservacion : new FormControl(),
     });
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
@@ -121,19 +124,29 @@ export class PedidomateriaprimaComponent implements OnInit {
     });
 
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
-      MpIdRetiro : new FormControl(),
-      MpNombreRetiro : new FormControl(),
-      MpOperarioRetiro : new FormControl(),
-      MpFechaRetiro : new FormControl(),
-      MpStockRetiro : new FormControl(),
-      MpUnidadMedidaRetiro : new FormControl(),
-      MpObservacionRetiro : new FormControl(),
+      OTRetiro : new FormControl(),
+      FechaRetiro : new FormControl(),
+      UsuarioRetiro : new FormControl(),
+      AreaRetiro : new FormControl(),
+      EstadoRetiro : new FormControl(),
+      ObservacionRetiro : new FormControl(),
+      ProcesoRetiro : new FormControl(),
+    });
+
+    this.FormMateriaPrimaRetirada = this.frmBuilderMateriaPrima.group({
+      MpIdRetirada : new FormControl(),
+      MpNombreRetirada: new FormControl(),
+      MpCantidadRetirada: new FormControl(),
+      MpPrecioRetirada: new FormControl(),
+      MpUnidadMedidaRetirada:new FormControl(),
+      MpStockRetirada : new FormControl(),
     });
   }
 
 
   ngOnInit(): void {
     this.initForms();
+    this.ColumnasTabla();
     this.lecturaStorage();
     this.fecha();
     this.limpiarCamposMP();
@@ -141,23 +154,25 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.obtenerUnidadMedida();
     this.obtenerEstados();
     this.obtenerUsuarios();
-    this.ColumnasTabla();
+    this.obtenerProcesos();
+    this.obtenerMateriasPrimasRetiradas();
+    this.obtenerProveeedor();
+    this.obtenerDocumetno();
   }
 
   initForms() {
     this.FormMateriaPrimaFactura = this.frmBuilderMateriaPrima.group({
       MpFactura: ['', Validators.required],
       MpingresoFecha: ['', Validators.required],
-      MpingresoFechaVendcimiento : ['', Validators.required],
-      proveedor : ['', Validators.required],
-      valorTotalFactura : ['', Validators.required],
-      MpOperario: ['', Validators.required],
-      MpEstados: ['', Validators.required],
-      MpCategoria: ['', Validators.required],
-      MpObservacion: ['', Validators.required],
+      proveedor: ['', Validators.required],
+      proveedorNombre: ['', Validators.required],
+      tipoDocumento: ['', Validators.required],
+      MpEstados:['', Validators.required],
+      MpOperario:['', Validators.required],
+      MpObservacion : ['', Validators.required],
     });
 
-    this.FormMateriaPrima= this.frmBuilderMateriaPrima.group({
+    this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : ['', Validators.required],
       MpNombre: ['', Validators.required],
       MpCantidad : ['', Validators.required],
@@ -166,13 +181,22 @@ export class PedidomateriaprimaComponent implements OnInit {
     });
 
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
-      MpIdRetiro : ['', Validators.required],
-      MpNombreRetiro : ['', Validators.required],
-      MpOperarioRetiro : ['', Validators.required],
-      MpFechaRetiro : ['', Validators.required],
-      MpStockRetiro : ['', Validators.required],
-      MpUnidadMedidaRetiro : ['', Validators.required],
-      MpObservacionRetiro : ['', Validators.required],
+      OTRetiro : ['', Validators.required],
+      FechaRetiro : ['', Validators.required],
+      UsuarioRetiro : ['', Validators.required],
+      AreaRetiro : ['', Validators.required],
+      EstadoRetiro : ['', Validators.required],
+      ObservacionRetiro : ['', Validators.required],
+      ProcesoRetiro : ['', Validators.required],
+    });
+
+    this.FormMateriaPrimaRetirada = this.frmBuilderMateriaPrima.group({
+      MpIdRetirada : ['', Validators.required],
+      MpNombreRetirada: ['', Validators.required],
+      MpCantidadRetirada : ['', Validators.required],
+      MpPrecioRetirada: ['', Validators.required],
+      MpUnidadMedidaRetirada: ['', Validators.required],
+      MpStockRetirada: ['', Validators.required],
     });
   }
 
@@ -189,13 +213,12 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.FormMateriaPrimaFactura.setValue({
       MpFactura: '',
       MpingresoFecha: this.today,
-      MpingresoFechaVendcimiento : '',
-      proveedor : '',
-      valorTotalFactura : '',
-      MpOperario: this.storage_Nombre,
-      MpEstados: '',
-      MpCategoria: '',
-      MpObservacion:'',
+      proveedor: '',
+      proveedorNombre: this.storage_Nombre,
+      tipoDocumento: '',
+      MpEstados:'',
+      MpOperario:'',
+      MpObservacion : '',
     });
   }
 
@@ -243,12 +266,16 @@ export class PedidomateriaprimaComponent implements OnInit {
   //Funcion que limpiará los campos de la materia pirma entrante
   limpiarCamposMP(){
     this.FormMateriaPrima.reset();
+    this.FormMateriaPrimaFactura.reset();
+  }
+
+  limpiarCamposMPRetirada(){
+    this.FormMateriaPrimaRetirada.reset();
   }
 
   //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
   obtenerMateriasPrimas(){
     let idProveedor : number = this.FormMateriaPrimaFactura.value.proveedor;
-
     this.proveedorMPService.srvObtenerLista().subscribe(datos_mpProveedor => {
       for (let index = 0; index < datos_mpProveedor.length; index++) {
         if (datos_mpProveedor[index].prov_Id == idProveedor) {
@@ -256,6 +283,15 @@ export class PedidomateriaprimaComponent implements OnInit {
             this.materiasPrimas.push(datos_materiaPrima);
           });
         }
+      }
+    });
+  }
+
+  //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
+  obtenerMateriasPrimasRetiradas(){
+    this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
+      for (let index = 0; index < datos_materiaPrima.length; index++) {
+        this.materiasPrimasRetiradas.push(datos_materiaPrima[index]);
       }
     });
   }
@@ -287,6 +323,59 @@ export class PedidomateriaprimaComponent implements OnInit {
     });
   }
 
+  obtenerDocumetno(){
+    this.tipoDocumentoService.srvObtenerLista().subscribe(datos_documento => {
+      for (let index = 0; index < datos_documento.length; index++) {
+        this.tipodocuemnto.push(datos_documento[index]);
+      }
+    });
+  }
+
+  obtenerProveeedor(){
+    this.proveedorservices.srvObtenerLista().subscribe(datos_proveedor => {
+      for (let index = 0; index < datos_proveedor.length; index++) {
+        this.proveedor.push(datos_proveedor[index].prov_Nombre);
+      }
+    }); 
+  }
+
+  llenarProveedorSeleccionado(){
+    let proveedorSelccionado : string = this.FormMateriaPrimaFactura.value.proveedorNombre
+    this.proveedorservices.srvObtenerLista().subscribe(datos_proveedores => {
+      for (let index = 0; index < datos_proveedores.length; index++) {
+        if (datos_proveedores[index].prov_Nombre == proveedorSelccionado) {
+          this.FormMateriaPrimaFactura.setValue({
+            MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
+            MpingresoFecha: this.FormMateriaPrimaFactura.value.MpingresoFecha,
+            proveedor : datos_proveedores[index].prov_Id,
+            proveedorNombre: this.FormMateriaPrimaFactura.value.proveedorNombre,
+            tipoDocumento: this.FormMateriaPrimaFactura.value.tipoDocumento,
+            MpEstados: this.FormMateriaPrimaFactura.value.MpEstados,
+            MpOperario: this.FormMateriaPrimaFactura.value.MpOperario,
+            MpObservacion: this.FormMateriaPrimaFactura.value.MpObservacion,
+          });
+        }        
+      }
+    })
+  }
+
+  llenarProvedorId(){
+    let proveedorID : string = this.FormMateriaPrimaFactura.value.proveedor
+    this.proveedorservices.srvObtenerListaPorId(proveedorID).subscribe(datos_proveedores => {
+      this.FormMateriaPrimaFactura.setValue({
+        MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
+        MpingresoFecha: this.FormMateriaPrimaFactura.value.MpingresoFecha,
+        proveedor :this.FormMateriaPrimaFactura.value.proveedor,
+        proveedorNombre:datos_proveedores.prov_Nombre,
+        tipoDocumento: this.FormMateriaPrimaFactura.value.tipoDocumento,
+        MpEstados: this.FormMateriaPrimaFactura.value.MpEstados,
+        MpOperario: this.FormMateriaPrimaFactura.value.MpOperario,
+        MpObservacion: this.FormMateriaPrimaFactura.value.MpObservacion,
+      });    
+      
+    })
+  }
+
   //Funcion que buscará y almacenará todos los estados existententes para documentos
   obtenerEstados(){
     this.tipoEstadoService.srvObtenerListaPorId(1).subscribe(datos_tipoEstados => {
@@ -311,9 +400,15 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   // Funcion que se encargará de obtener todas las areas de la empresa exceptuando ()
   obtenerAreas(){
-    this.areasService.srvObtenerLista().subscribe(datos_areas => {
-      for (let index = 0; index < datos_areas.length; index++) {
-        this.areas.push(datos_areas[index]);
+    this.areas = [];
+    let usuarioSeleccionado : string = this.FormMateriaPrimaRetiro.value.UsuarioRetiro;
+    this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+      for (let index = 0; index < datos_usuarios.length; index++) {
+        if (datos_usuarios[index].usua_Nombre == usuarioSeleccionado) {
+          this.areasService.srvObtenerListaPorId(datos_usuarios[index].area_Id).subscribe(datos_areas => {
+            this.areas.push(datos_areas);
+          });
+        }
       }
     });
   }
@@ -345,14 +440,13 @@ export class PedidomateriaprimaComponent implements OnInit {
   }
 
   //Funcion que creará un proveedor y lo guardará en la base de datos
-  CreacionProveedor(){
-    let idProveedor : number;
-    let TipoIdProveedor : string;
-    let nombreProveedor : string;
-    let tipoproveedor : number;
-    let ciudadProveedor : string;
-    let telefonoProveedor : string;
-    let emailProveedor : string;
+  CreacionProveedor( idProveedor : number,
+     TipoIdProveedor : string,
+     nombreProveedor : string,
+     tipoproveedor : number,
+     ciudadProveedor : string,
+     telefonoProveedor : string,
+     emailProveedor : string){
 
     const datosProveedor : any = {
       Prov_Id : idProveedor,
@@ -416,12 +510,13 @@ export class PedidomateriaprimaComponent implements OnInit {
     let nombreEstado : string = this.FormMateriaPrimaFactura.value.MpEstados;
     let consecutivoFactura : string = this.FormMateriaPrimaFactura.value.MpFactura;
     let fechaEntrada : any = this.FormMateriaPrimaFactura.value.MpingresoFecha;
-    let fechaVencimiento : any = this.FormMateriaPrimaFactura.value.MpingresoFechaVendcimiento;
+    // let fechaVencimiento : any = this.FormMateriaPrimaFactura.value.MpingresoFechaVendcimiento;
     let idProveedor : number = this.FormMateriaPrimaFactura.value.proveedor;
     let valorTotalFactura : number = this.FormMateriaPrimaFactura.value.valorTotalFactura;
     let observacionFactura : string = this.FormMateriaPrimaFactura.value.MpObservacion;
     let idEstadoFactura : number;
     let idUsuario : number = this.storage_Id;
+    let tipoDocumento : number = this.FormMateriaPrimaFactura.value.tipoDocumento;
 
     this.estadoService.srvObtenerListaEstados().subscribe(datos_estados => {
       for (let index = 0; index < datos_estados.length; index++) {
@@ -429,13 +524,14 @@ export class PedidomateriaprimaComponent implements OnInit {
           idEstadoFactura = datos_estados[index].estado_Id;
           const datosFactura : any = {
             Facco_Codigo : consecutivoFactura,
-            Facco_FechaFactura : fechaEntrada,
-            Facco_FechaVencimiento : fechaVencimiento,
+            Facco_FechaFactura : this.today,
+            Facco_FechaVencimiento : this.today,
             Prov_Id : idProveedor,
-            Facco_ValorTotal : valorTotalFactura,
+            Facco_ValorTotal : this.valorTotal,
             Facco_Observacion : observacionFactura,
             Estado_Id : idEstadoFactura,
             Usua_Id : idUsuario,
+            TpDoc_Id : tipoDocumento,
           }
           this.facturaMpComService.srvGuardar(datosFactura).subscribe(datos_facturaCreada => {
             this.obtenerUltimoIdFactura();
@@ -477,7 +573,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     else Swal.fire("Hay campos de la Materi Prima vacios")
   }
 
-  // // Funcion que envia la informacion de los productos a la tabla.
+  //Funcion que envia la informacion de los productos a la tabla.
   cargarFormMpEnTablas(formulario : any){
     let idMateriaPrima : number = this.FormMateriaPrima.value.MpId;
     this.nombreMateriaPrima = this.FormMateriaPrima.value.MpNombre;
@@ -487,6 +583,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     let subtotalProd : number = precioMateriaPrima * cantidad;
 
     this.valorTotal = this.valorTotal + subtotalProd;
+    this.formatonumeros(this.valorTotal);
 
     let productoExt : any = {
       Id : idMateriaPrima,
@@ -494,9 +591,20 @@ export class PedidomateriaprimaComponent implements OnInit {
       Cant : cantidad,
       UndCant : presentacion,
       PrecioUnd : precioMateriaPrima,
-      Stock : this.FormMateriaPrima.value.value,
+      Stock : this.FormMateriaPrima.value,
       SubTotal : subtotalProd
     }
+
+    this.FormMateriaPrimaFactura.setValue({
+      MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
+      MpingresoFecha: this.FormMateriaPrimaFactura.value.MpingresoFecha,
+      proveedor :this.FormMateriaPrimaFactura.value.proveedor,
+      proveedorNombre:this.FormMateriaPrimaFactura.value.proveedorNombre,
+      tipoDocumento: this.FormMateriaPrimaFactura.value.tipoDocumento,
+      MpEstados: this.FormMateriaPrimaFactura.value.MpEstados,
+      MpOperario: this.FormMateriaPrimaFactura.value.MpOperario,
+      MpObservacion: this.FormMateriaPrimaFactura.value.MpObservacion,
+    });
 
     if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length == 0) {
       this.ArrayMateriaPrima.push(productoExt);
@@ -586,30 +694,44 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   //Funcion que asignará la materia prima a una Orden de trabajo y Proceso y lo guardará en la base de datos
   asignacionMateriaPrima(){
-    let idOrdenTrabajo : number;
-    let fechaEntrega : any;
-    let observacion : string;
-    let usuarioSeleccionado : string;
+    let idOrdenTrabajo : number = this.FormMateriaPrimaRetiro.value.OTRetiro;
+    let fechaEntrega : any = this.FormMateriaPrimaRetiro.value.FechaRetiro;
+    let observacion : string = this.FormMateriaPrimaRetiro.value.ObservacionRetiro;
+    let usuarioSeleccionado : string = this.FormMateriaPrimaRetiro.value.UsuarioRetiro;
     let idUsuario : number;
-    let areaSeleccionada : string;
     let idArea : number;
-    let estadoSeleccionado : string;
+    let estadoSeleccionado : string = this.FormMateriaPrimaRetiro.value.EstadoRetiro;
     let idEstado : number;
 
     this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-      for (let index = 0; index < datos_usuarios.length; index++) {
-        if (datos_usuarios[index].usua_Nombre == usuarioSeleccionado && datos_usuarios[index].area_Id == idArea) {
-          idUsuario = datos_usuarios[index].usua_Id;
-          const datosAsignacion : any = {
-            AsigMP_OrdenTrabajo : idOrdenTrabajo,
-            AsigMp_FechaEntrega : fechaEntrega,
-            AsigMp_Observacion : observacion,
-            Usua_Id : idUsuario,
-            Area_Id : idArea,
-            Estado_Id : idEstado,
-          }
-          this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
-            this.obtenerUltimoIdAsignacaion();
+      for (let usu = 0; usu < datos_usuarios.length; usu++) {
+        if (datos_usuarios[usu].usua_Nombre == usuarioSeleccionado) {
+          idUsuario = datos_usuarios[usu].usua_Id;
+          idArea = datos_usuarios[usu].area_Id;
+          this.estadoService.srvObtenerListaEstados().subscribe(datos_estados => {
+            for (let est = 0; est < datos_estados.length; est++) {
+              if (datos_estados[est].estado_Nombre == estadoSeleccionado) {
+                idEstado = datos_estados[est].estado_Id;
+                this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
+                for (let index = 0; index < datos_usuarios.length; index++) {
+                  if (datos_usuarios[index].usua_Nombre == usuarioSeleccionado && datos_usuarios[index].area_Id == idArea) {
+                    idUsuario = datos_usuarios[index].usua_Id;
+                    const datosAsignacion : any = {
+                      AsigMP_OrdenTrabajo : idOrdenTrabajo,
+                      AsigMp_FechaEntrega : fechaEntrega,
+                      AsigMp_Observacion : observacion,
+                      Usua_Id : idUsuario,
+                      Area_Id : idArea,
+                      Estado_Id : idEstado,
+                    }
+                    this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
+                      this.obtenerUltimoIdAsignacaion();
+                    });
+                  }
+                }
+              });
+              }
+            }
           });
         }
       }
@@ -619,7 +741,6 @@ export class PedidomateriaprimaComponent implements OnInit {
   //Funcion que va a buscar y obtener el id de la ultima asignacion
   obtenerUltimoIdAsignacaion(){
     let idsAsignaciones = [];
-    let idUltimaAsignacion : number;
     this.asignacionMPService.srvObtenerLista().subscribe(datos_asignaciones => {
       for (let index = 0; index < datos_asignaciones.length; index++) {
         idsAsignaciones.push(datos_asignaciones[index].asigMp_Id);
@@ -629,12 +750,19 @@ export class PedidomateriaprimaComponent implements OnInit {
     });
   }
 
+  validarCamposVaciosRetirada(){
+    let ot : string = this.FormMateriaPrimaRetiro.value.OTRetiro;
+    if (this.FormMateriaPrimaRetiro.valid) this.asignacionMateriaPrima();
+    else if (ot.length < 6) Swal.fire("La OT debe tener mas de 6 digitos");
+    else Swal.fire("Hay campos de la Materi Prima vacios");
+  }
+
   //Funcion que almacenará de forma detalla la(s) materia prima que se están asignando a una OT y Proceso
   detallesAsignacionMP(idAsignacion : number){
-    let idMateriaPrima : number;
-    let cantidadMateriaPrima : number;
-    let presentacionMateriaPrima : string;
-    let proceso : string;
+    let idMateriaPrima : number = this.FormMateriaPrimaRetirada.value.MpIdRetirada;
+    let cantidadMateriaPrima : number = this.FormMateriaPrimaRetirada.value.MpCantidadRetirada;
+    let presentacionMateriaPrima : string = this.FormMateriaPrimaRetirada.value.MpUnidadMedidaRetirada;
+    let proceso : string = this.FormMateriaPrimaRetiro.value.ProcesoRetiro;
 
     const datosDetallesAsignacion : any = {
       AsigMp_Id : idAsignacion,
@@ -643,21 +771,65 @@ export class PedidomateriaprimaComponent implements OnInit {
       UndMed_Id : presentacionMateriaPrima,
       Proceso_Id : proceso,
     }
+
     this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {
-      this.moverInventarioMpPedida(idMateriaPrima);
+      this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
     });
   }
 
+  validarCamposVaciosMPRetirada(){
+    if (this.FormMateriaPrimaRetirada.valid) this.cargarFormMpRetiradaTablas(this.ArrayMateriaPrimaRetirada)
+    else Swal.fire("Hay campos de la Materi Prima vacios")
+  }
+
+  // // Funcion que envia la informacion de la materia prima pedida a la tabla.
+  cargarFormMpRetiradaTablas(formulario : any){
+    let idMateriaPrima : number = this.FormMateriaPrimaRetirada.value.MpIdRetirada;
+    this.nombreMateriaPrima = this.FormMateriaPrimaRetirada.value.MpNombreRetirada;
+    let precioMateriaPrima : number = this.FormMateriaPrimaRetirada.value.MpPrecioRetirada;
+    let presentacion : string = this.FormMateriaPrimaRetirada.value.MpUnidadMedidaRetirada;
+    let cantidad : number = this.FormMateriaPrimaRetirada.value.MpCantidadRetirada;
+    let subtotalProd : number = precioMateriaPrima * cantidad;
+
+    let productoExt : any = {
+      Id : idMateriaPrima,
+      Nombre : this.nombreMateriaPrima,
+      Cant : cantidad,
+      UndCant : presentacion,
+      PrecioUnd : precioMateriaPrima,
+      Stock : this.FormMateriaPrima.value.value,
+      SubTotal : subtotalProd
+    }
+
+    if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrimaRetirada.length == 0) {
+      this.ArrayMateriaPrimaRetirada.push(productoExt);
+
+    } else if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrimaRetirada.length != 0){
+      this.ArrayMateriaPrimaRetirada.push(productoExt);
+      productoExt = [];
+    } else {
+      for (let index = 0; index < formulario.length; index++) {
+        if(productoExt.Id == this.ArrayMateriaPrimaRetirada[index].Id) {
+          this.ArrayMateriaPrimaRetirada.splice(index, 1);
+          this.ArrayMateriaPrimaRetirada.push(productoExt);
+          break;
+        }
+      }
+    }
+
+    this.ArrayMateriaPrimaRetirada.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
+  }
+
   //Funcion que moverá el inventario de materia prima con base a la materia prima saliente
-  moverInventarioMpPedida(idMateriaPrima : number){
+  moverInventarioMpPedida(idMateriaPrima : number, cantidadMateriaPrima : number){
     let stockMateriaPrimaInicial : number;
-    let stockMateriaPrimaSaliente : number;
     let stockMateriaPrimaFinal : number;
 
     this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
       stockMateriaPrimaInicial = datos_materiaPrima.matPri_Stock;
-      stockMateriaPrimaFinal = stockMateriaPrimaInicial - stockMateriaPrimaSaliente;
+      stockMateriaPrimaFinal = stockMateriaPrimaInicial - cantidadMateriaPrima;
       const datosMP : any = {
+        MatPri_Id : idMateriaPrima,
         MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
         MatPri_Descripcion : datos_materiaPrima.matPri_Descripcion,
         MatPri_Stock : stockMateriaPrimaFinal,
@@ -680,7 +852,7 @@ export class PedidomateriaprimaComponent implements OnInit {
         });
         Toast.fire({
           icon: 'success',
-          title: '¡Registro de asignacion de materia prima creado con exito!'
+          title: '¡Registro de factura creado con exito!'
         });
       });
     });
@@ -734,9 +906,65 @@ export class PedidomateriaprimaComponent implements OnInit {
       this.FormMateriaPrima.setValue({
         MpId : Mp.matPri_Id,
         MpNombre: Mp.matPri_Nombre,
-        MpCantidad: this.FormMateriaPrima.value.MpCantidad,
+        MpCantidad: '',
         MpPrecio: Mp.matPri_Precio,
         MpUnidadMedida : Mp.undMed_Id,
+      });
+    }
+  }
+
+  //Funcion que consultara una materia prima con base a un ID pasado en la vista
+  buscarMpIdRetirada(){
+    let idMateriaPrima : number = this.FormMateriaPrimaRetirada.value.MpIdRetirada;
+    this.materiaPrimaSeleccionada = [];
+    this.categoriaMPBuscadaID = '';
+    this.tipobodegaMPBuscadaId = '';
+
+    this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
+      this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
+        this.tipoBodegaService.srvObtenerListaPorId(datos_materiaPrima.tpBod_Id).subscribe(datos_bodega => {
+          this.materiaPrimaSeleccionada.push(datos_materiaPrima);
+          this.materiasPrimas.push(datos_materiaPrima);
+          this.categoriaMPBuscadaID = datos_categoria.catMP_Nombre;
+          this.tipobodegaMPBuscadaId = datos_bodega.tpBod_Nombre;
+          this.cargarInfoMPRetirada();
+        });
+      });
+    });
+  }
+
+  //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
+  buscarMpSeleccionadaRetirada(){
+    let nombreMateriaPrima : string = this.FormMateriaPrimaRetirada.value.MpNombreRetirada;
+    let idMateriaPrima : number; //En el HTML se pasará el nombre de la materia prima pero el input tendrá como valor el Id de la materia prima
+    this.materiaPrimaSeleccionada = [];
+
+    this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiasPrimas => {
+      for (let index = 0; index < datos_materiasPrimas.length; index++) {
+        if (datos_materiasPrimas[index].matPri_Nombre == nombreMateriaPrima) {
+          this.categoriMpService.srvObtenerListaPorId(datos_materiasPrimas[index].catMP_Id).subscribe(datos_categoria => {
+            this.tipoBodegaService.srvObtenerListaPorId(datos_materiasPrimas[index].tpBod_Id).subscribe(datos_bodega => {
+              this.materiaPrimaSeleccionada.push(datos_materiasPrimas[index]);
+              this.categoriaMPSeleccionada = datos_categoria.catMP_Nombre;
+              this.tipoBodegaMPSeleccionada = datos_bodega.tpBod_Nombre;
+              this.cargarInfoMPRetirada();
+            });
+          });
+        }
+      }
+    });
+  }
+
+  //Funcion que llenará la infomacion de materia prima buscada o seleccionada y pasará la informacion a la vista
+  cargarInfoMPRetirada(){
+    for (const Mp of this.materiaPrimaSeleccionada) {
+      this.FormMateriaPrimaRetirada.setValue({
+        MpIdRetirada : Mp.matPri_Id,
+        MpNombreRetirada: Mp.matPri_Nombre,
+        MpCantidadRetirada: this.FormMateriaPrima.value.MpCantidad,
+        MpPrecioRetirada: Mp.matPri_Precio,
+        MpUnidadMedidaRetirada : Mp.undMed_Id,
+        MpStockRetirada : Mp.matPri_Stock,
       });
     }
   }
@@ -822,7 +1050,6 @@ export class PedidomateriaprimaComponent implements OnInit {
 
     }
   }
-
 
 
   // Funcion para llamar el modal que crea clientes

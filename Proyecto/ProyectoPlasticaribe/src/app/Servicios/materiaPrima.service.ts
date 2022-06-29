@@ -10,7 +10,7 @@ import { modelPedidomateriaprima } from '../Modelo/modelPedidomateriaprima';
 })
 export class MateriaPrimaService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient) { }
 

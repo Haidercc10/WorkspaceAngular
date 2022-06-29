@@ -121,7 +121,7 @@ a, a:hover, a:focus {
 
 #sidebar ul li.active > a, a[aria-expanded="true"] {
     color: #aaa;
-    background: #d00;
+    background: #d40;
 }
 
 

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BagproClientesOTItemService } from 'src/app/Servicios/Bagpro.service';
+import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { InventarioArticuloZeusService } from 'src/app/Servicios/inventarioArticuloZeus.service';
 
 @Component({
@@ -13,7 +13,7 @@ export class PruebasComponent implements OnInit {
   articulos = [];
 
   constructor(private articuloservices : InventarioArticuloZeusService,
-              private BagPro : BagproClientesOTItemService) { }
+              private BagPro : BagproService) { }
 
   ngOnInit() {
     this.consultaDesperdicios();
@@ -22,12 +22,6 @@ export class PruebasComponent implements OnInit {
   consutaArticulo(){
     this.articuloservices.srvObtenerListaPorId(840).subscribe(datos_articulo => {
       console.log(datos_articulo)
-    });
-  }
-
-  consultaClientesOTItems(){
-    this.BagPro.srvObtenerListaPorIdClienteOTItems(1001).subscribe(datos_clienteOTITem => {
-      console.log(datos_clienteOTITem)
     });
   }
 

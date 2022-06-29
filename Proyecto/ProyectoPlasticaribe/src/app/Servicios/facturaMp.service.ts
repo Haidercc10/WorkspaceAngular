@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribe3 } from 'src/polyfills';
+import { rutaPlasticaribe3, rutaPlasticaribeAPI } from 'src/polyfills';
 import { modelFacturaMp } from '../Modelo/modelFacturaMp';
 
 @Injectable({
@@ -9,7 +9,7 @@ import { modelFacturaMp } from '../Modelo/modelFacturaMp';
 })
 export class FacturaMpService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }

@@ -1,5 +1,5 @@
 <!--Inicio Formulario-->
-<form>
+<form [formGroup]="FormCrearProveedor">
 
   <!-- Inicio Fila 1 Agregar Proveedor -->
    <div class="mb-3">
@@ -13,15 +13,14 @@
 
           <!-- Nombre Proveedor -->
           <div class="form-floating col-md">
-              <Input formControlName="provNombre" type="text" class="form-control form-control-sm" id="floatingInput" name="PrvNombre" placeholder="Nombre" required>
-                <!-- <option [ngValue]="productos.prod_Id" *ngFor="let productos of producto"></option> -->
-              <label for="floatingInput">Nombre</label>
+            <input formControlName="ProvNombre" type="text" class="form-control form-control-sm" id="floatingInput">
+            <label for="floatingInput">Nombre</label>
           </div>
 
         <!-- Tipo de Identificacion Proveedor -->
         <div class="form-floating col-md-2">
           <select formControlName="provTipoId" type="text" class="form-select form-select-sm" id="floatingSelect" name="prvTipoId" aria-label="Floating label select example" required>
-            <!-- <option [ngValue]="operarios.prod_Id" *ngFor="let operarios of Operario"></option> -->
+            <option [ngValue]="tipoId" *ngFor="let tipoId of tipoIdentificacion">{{tipoId}}</option>
           </select>
           <label for="floatingSelect">Tipo ID</label>
         </div>
@@ -29,6 +28,7 @@
          <!-- Tipo de proveedor -->
          <div class="form-floating col-md-2">
           <select formControlName="TipoProv" type="text" class="form-select form-select-sm" id="floatingSelect" name="prvTipoProv" required >
+            <option [ngValue]="tipoProv.tpProv_Id" *ngFor="let tipoProv of tiposProveedores">{{tipoProv.tpProv_Nombre}}</option>
           </select>
           <label for="floatingSelect">Tipo Proveedor</label>
         </div>
@@ -42,23 +42,20 @@
     <div class="row g-3">
 
       <!-- Ciudad  -->
-      <div class="form-floating col-md-3">
-        <select formControlName="ProvCiudad" id="floatingSelect" type="text" name="prvCiudad" class="form-select form-select-sm" placeholder="Ciudad" required>
-          <!-- <option [ngValue]="estados" *ngFor="let Categoria of Categoria"></option> -->
-        </select>
-        <label for="floatingSelect">Ciudad</label>
+      <div class="form-floating col-md">
+        <input formControlName="ProvCiudad" type="text" class="form-control form-control-sm" id="floatingInput">
+        <label for="floatingInput">Ciudad</label>
       </div>
 
        <!-- Telefono -->
        <div class="form-floating col-md-3">
-        <input formControlName="ProvTelefono" id="floatingInput" type="number" name="prvTelefono" class="form-control form-control-sm" placeholder="Teléfono" required>
-          <!-- <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option> -->
+        <input formControlName="ProvTelefono" id="floatingInput" type="text" class="form-control form-control-sm" required>
         <label for="floatingInput">Teléfono</label>
       </div>
 
         <!-- Email  -->
       <div class="form-floating col-md">
-        <input formControlName="ProvEmail" id="floatingInput" type="text" name="prvEmail" class="form-control form-control-sm" placeholder="Email" required>
+        <input formControlName="ProvEmail" id="floatingInput" type="email" name="prvEmail" class="form-control form-control-sm" placeholder="Email" required>
         <label for="floatingInput">Email</label>
       </div>
 
@@ -69,8 +66,8 @@
     <!--Inicio Fila 3 Botones y Limpiar Campos-->
         <div class="mb-1">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <input class="btn btn-danger btn-danger-sm" type="submit" value="Agregar">
-            <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos">
+            <button class="btn btn-danger btn-danger-sm" type="submit" (click)="validarCamposVaciosProveedor()">Crear Proveedor</button>
+            <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="LimpiarCampos()">
           </div>
         </div>
     <!--Fin Fila 3-->

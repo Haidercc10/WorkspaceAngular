@@ -35,11 +35,11 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialExampleModule} from '../material.module';
 import {MatNativeDateModule} from '@angular/material/core';
 import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
-
 import { PruebasComponent } from './Vistas/pruebas/pruebas.component';
-
- import { CrearProveedorComponent } from './Vistas/crear-proveedor/crear-proveedor.component';
+import { CrearProveedorComponent } from './Vistas/crear-proveedor/crear-proveedor.component';
 import { CrearMateriaprimaComponent } from './Vistas/crear-materiaprima/crear-materiaprima.component';
+import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
+import { ReporteMpOtComponent } from './Vistas/reporteMpOt/reporteMpOt.component';
 
 
 
@@ -71,7 +71,8 @@ export const routes: Routes = [
   {path: 'desperdicio', component: DesperdicioComponent},
   {path: 'crear-proveedor', canActivate: [ValidacionLoginGuard], component: CrearProveedorComponent},
   {path: 'crear-materiaprima', canActivate: [ValidacionLoginGuard], component: CrearMateriaprimaComponent},
-
+  {path: 'reporte-Materia-Prima', canActivate: [ValidacionLoginGuard], component: ReporteMateriaPrimaComponent},
+  {path: 'reporte-Materia-Prima-OT', canActivate: [ValidacionLoginGuard], component: ReporteMpOtComponent},
 ]
 
 @NgModule({
@@ -101,6 +102,8 @@ export const routes: Routes = [
     DesperdicioComponent,
     CrearProveedorComponent,
     CrearMateriaprimaComponent,
+    ReporteMateriaPrimaComponent,
+    ReporteMpOtComponent,
   ],
 
 

@@ -9,7 +9,7 @@ import { modelProveedor } from '../Modelo/modelProveedor';
 })
 export class ProveedorService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }

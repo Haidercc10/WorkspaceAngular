@@ -1,110 +1,87 @@
-<form>
-
+<form [formGroup]="materiPrima">
   <!-- Inicio Fila 1 Agregar Materia Prima -->
-   <div class="mb-3">
-     <div class="row g-3">
-
-        <!-- ID Materia Prima -->
-        <div class="form-floating col-md-2">
-          <input formControlName="mpId" type="number" class="form-control form-control-sm" id="floatingInput" name="mapId" placeholder="Id" required>
-          <label for="floatingInput">Id</label>
-        </div>
-
-          <!-- Nombre Materia Prima -->
-          <div class="form-floating col-md">
-              <Input formControlName="mpNombre" type="text" class="form-control form-control-sm" id="floatingInput" name="mapNombre" placeholder="Nombre" required>
-                <!-- <option [ngValue]="productos.prod_Id" *ngFor="let productos of producto"></option> -->
-              <label for="floatingInput">Nombre</label>
-          </div>
-
-        <!-- Descripción -->
-        <div class="form-floating col-md">
-          <input formControlName="mpDescripcion" class="form-control form-control-sm" id="floatingInput" name="mapDescripcion" placeholder="Descripción" required>
-            <!-- <option [ngValue]="operarios.prod_Id" *ngFor="let operarios of Operario"></option> -->
-          <label for="floatingInput">Descripción</label>
-        </div>
-
-          <!-- Fecha Ingreso -->
-          <div class="form-floating col-md-2">
-            <input formControlName="mpStock" type="number" class="form-control form-control-sm" id="floatingInput" name="mapStock" placeholder="Stock" required >
-            <label for="floatingInput">Stock</label>
-          </div>
-     </div>
-   </div>
- <!-- Fin Fila 1 -->
-
- <!--Inicio Fila 2-->
   <div class="mb-3">
     <div class="row g-3">
+        <!-- Nombre Materia Prima -->
+        <div class="form-floating col-md">
+          <input formControlName="mpNombre" type="text" class="form-control form-control-sm" id="floatingInput">
+          <label for="floatingInput">Nombre</label>
+        </div>
 
+      <!-- Descripción -->
+      <div class="form-floating col-md">
+        <input formControlName="mpDescripcion" class="form-control form-control-sm" id="floatingInput" name="mapDescripcion" placeholder="Descripción" required>
+          <!-- <option [ngValue]="operarios.prod_Id" *ngFor="let operarios of Operario"></option> -->
+        <label for="floatingInput">Descripción</label>
+      </div>
+
+        <!-- Fecha Ingreso -->
+        <div class="form-floating col-md-2">
+          <input formControlName="mpStock" type="number" class="form-control form-control-sm" id="floatingInput" name="mapStock" placeholder="Stock" required >
+          <label for="floatingInput">Stock</label>
+        </div>
+    </div>
+  </div>
+  <!-- Fin Fila 1 -->
+
+  <!--Inicio Fila 2-->
+  <div class="mb-3">
+    <div class="row g-3">
       <!-- CATEGORIA  -->
       <div class="form-floating col-md-2">
         <select formControlName="mpCategoria" id="floatingSelect" type="text" name="mapCategoria" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-          <!-- <option [ngValue]="estados" *ngFor="let Categoria of Categoria"></option> -->
+          <option [ngValue]="Categoria" *ngFor="let Categoria of nombreCategoriasMP">{{Categoria}}</option>
         </select>
         <label for="floatingSelect">Categoria</label>
       </div>
 
-       <!-- Estado -->
-       <div class="form-floating col-md-2">
-        <select formControlName="mpEstado" id="floatingSelect" type="text" name="mapEstado" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-          <!-- <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option> -->
-        </select>
-        <label for="floatingSelect">Estado</label>
-      </div>
-
-
-        <!-- Bodega  -->
-      <div class="form-floating col-md-2">
-        <select formControlName="mpBodega" id="floatingSelect" type="text" name="mpBodega" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-        </select>
-        <label for="floatingSelect">Bodega</label>
-      </div>
-
       <!-- precio  -->
-      <div class="form-floating col-md-2">
+      <div class="form-floating col-md">
         <input formControlName="mpValor" type="number" id="floatingInput" class="form-control form-control-sm" name="mapValor" placeholder="Valor" required>
         <label for="floatingInput">Valor</label>
       </div>
 
         <!-- Stock  -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="mpStock" type="number" class="form-control form-control-sm" id="floatingInput" name="mapStock" placeholder="Stock" required>
           <label for="floatingInput">Stock</label>
         </div>
 
         <!-- Unidad medida-->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <select formControlName="mpUnidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" name="mapUnidadMedida" aria-label=".form-select-sm example" >
-            <!-- <option [ngValue]="unidadMedida" *ngFor="let unidadMedida of undMed"></option> -->
+            <option [ngValue]="unidadMedidas" *ngFor="let unidadMedidas of unidadMedida">{{unidadMedidas}}</option>
           </select>
           <label for="floatingSelect">Und. Medida</label>
         </div>
       </div>
-    </div>
-     <!--Fin Fila 2 -->
+  </div>
+  <!--Fin Fila 2 -->
 
-     <div class="mb-3">
-      <div class="row g-3">
-        <!-- Campo Observacion -->
-          <div class="form-floating col-md-6">
-            <textarea formControlName="MpObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" maxlength="200" placeholder="Observacion" name="MpObservacion"></textarea>
-            <label for="floatingTextarea">Observación</label>
-          </div>
+  <div class="mb-3">
+    <div class="row g-3">
+      <!-- Campo Observacion -->
+      <div class="form-floating col-md-6">
+        <textarea formControlName="MpObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" maxlength="200" placeholder="Observacion" name="MpObservacion"></textarea>
+        <label for="floatingTextarea">Observación</label>
+      </div>
+
+      <!-- Bodega  -->
+      <div class="form-floating col-md">
+        <select formControlName="mpProveedor" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+          <option [ngValue]="prov.prov_Id" *ngFor="let prov of proveedores">{{prov.prov_Nombre}}</option>
+        </select>
+        <label for="floatingSelect">Proveedor</label>
       </div>
     </div>
+  </div>
 
-
-    <!--Inicio Fila 3 Botones y Limpiar Campos-->
-        <div class="mb-1">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <input class="btn btn-danger btn-danger-sm" type="submit" value="Agregar">
-            <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos">
-          </div>
-        </div>
-    <!--Fin Fila 3-->
-
+  <!--Inicio Fila 3 Botones y Limpiar Campos-->
+  <div class="mb-1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <input class="btn btn-danger btn-danger-sm" type="submit" value="Agregar">
+      <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos">
+    </div>
+  </div>
+  <!--Fin Fila 3-->
 </form>
-
-
-
