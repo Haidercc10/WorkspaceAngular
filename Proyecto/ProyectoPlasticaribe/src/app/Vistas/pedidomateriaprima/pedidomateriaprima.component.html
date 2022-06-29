@@ -80,7 +80,7 @@
         <!-- Tipo Documento -->
         <div class="form-floating col-md-2">
           <select formControlName="tipoDocumento" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="estados.tpDoc_Id" *ngFor="let estados of tipodocuemnto">{{estados.tpDoc_Nombre}}</option>
+            <option [ngValue]="estados.tpDoc_Nombre" *ngFor="let estados of tipodocuemnto">{{estados.tpDoc_Nombre}}</option>
           </select>
           <label for="floatingSelect">Tipo de Documento</label>
         </div>
@@ -221,4 +221,37 @@
     <hr class="colorLinea">
   </div>
 
+  <!-- Modal de crear Proveedor -->
+  <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel2">Crear Proveedor</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!--Carga componente crear Proveedor-->
+          <app-crear-proveedor></app-crear-proveedor>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Fin Modal de crear Crear Proveedor-->
+
+  <!-- Modal de crear Materia Prima -->
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel2">Crear Materia Prima</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!--Carga componente crear Proveedor-->
+          <app-crear-materiaprima></app-crear-materiaprima>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Fin Modal de crear Crear Proveedor-->
 </div>

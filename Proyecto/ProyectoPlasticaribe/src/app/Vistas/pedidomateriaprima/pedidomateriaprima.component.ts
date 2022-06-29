@@ -146,14 +146,11 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForms();
-    this.ColumnasTabla();
     this.lecturaStorage();
     this.fecha();
-    this.limpiarCamposMP();
-    this.obtenerNombreCategoriasMp();
+    this.ColumnasTabla();
     this.obtenerUnidadMedida();
     this.obtenerEstados();
-    this.obtenerUsuarios();
     this.obtenerProcesos();
     this.obtenerMateriasPrimasRetiradas();
     this.obtenerProveeedor();
@@ -211,13 +208,14 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.today = yyyy + '-' + mm + '-' + dd;
 
     this.FormMateriaPrimaFactura.setValue({
+
       MpFactura: '',
       MpingresoFecha: this.today,
       proveedor: '',
-      proveedorNombre: this.storage_Nombre,
+      proveedorNombre: '',
       tipoDocumento: '',
       MpEstados:'',
-      MpOperario:'',
+      MpOperario: this.storage_Nombre,
       MpObservacion : '',
     });
   }
@@ -340,7 +338,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   }
 
   llenarProveedorSeleccionado(){
-    let proveedorSelccionado : string = this.FormMateriaPrimaFactura.value.proveedorNombre
+    let proveedorSelccionado : string = this.FormMateriaPrimaFactura.value.proveedorNombre;
     this.proveedorservices.srvObtenerLista().subscribe(datos_proveedores => {
       for (let index = 0; index < datos_proveedores.length; index++) {
         if (datos_proveedores[index].prov_Nombre == proveedorSelccionado) {
@@ -364,7 +362,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.proveedorservices.srvObtenerListaPorId(proveedorID).subscribe(datos_proveedores => {
       this.FormMateriaPrimaFactura.setValue({
         MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
-        MpingresoFecha: this.FormMateriaPrimaFactura.value.MpingresoFecha,
+        MpingresoFecha: this.today,
         proveedor :this.FormMateriaPrimaFactura.value.proveedor,
         proveedorNombre:datos_proveedores.prov_Nombre,
         tipoDocumento: this.FormMateriaPrimaFactura.value.tipoDocumento,
@@ -597,7 +595,7 @@ export class PedidomateriaprimaComponent implements OnInit {
 
     this.FormMateriaPrimaFactura.setValue({
       MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
-      MpingresoFecha: this.FormMateriaPrimaFactura.value.MpingresoFecha,
+      MpingresoFecha: this.today,
       proveedor :this.FormMateriaPrimaFactura.value.proveedor,
       proveedorNombre:this.FormMateriaPrimaFactura.value.proveedorNombre,
       tipoDocumento: this.FormMateriaPrimaFactura.value.tipoDocumento,

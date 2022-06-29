@@ -9,7 +9,7 @@ import { modelTipoBodega } from '../Modelo/modelTipoBodega';
 })
 export class TipoDocumentoService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }
