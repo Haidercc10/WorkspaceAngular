@@ -40,7 +40,16 @@ import { CrearProveedorComponent } from './Vistas/crear-proveedor/crear-proveedo
 import { CrearMateriaprimaComponent } from './Vistas/crear-materiaprima/crear-materiaprima.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { ReporteMpOtComponent } from './Vistas/reporteMpOt/reporteMpOt.component';
+<<<<<<< Updated upstream
 import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
+=======
+// import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
+import { MpremisionComponent } from './Vistas/mpremision/mpremision.component';
+
+
+
+
+>>>>>>> Stashed changes
 
 
 
@@ -74,7 +83,14 @@ export const routes: Routes = [
   {path: 'crear-materiaprima', canActivate: [ValidacionLoginGuard], component: CrearMateriaprimaComponent},
   {path: 'reporte-Materia-Prima', canActivate: [ValidacionLoginGuard], component: ReporteMateriaPrimaComponent},
   {path: 'reporte-Materia-Prima-OT', canActivate: [ValidacionLoginGuard], component: ReporteMpOtComponent},
+<<<<<<< Updated upstream
   {path: 'asignacionMP', canActivate: [ValidacionLoginGuard], component: AsignacionMateriaPrimaComponent},
+=======
+  {path: 'mpremision', component: MpremisionComponent},
+  // {path: 'asignacion-materia-prima', canActivate: [ValidacionLoginGuard], component: AsignacionMateriaPrimaComponent},
+  // {path: 'asignacionMP', canActivate: [ValidacionLoginGuard], component: AsignacionMateriaPrimaComponent},
+
+>>>>>>> Stashed changes
 ]
 
 @NgModule({
@@ -106,7 +122,15 @@ export const routes: Routes = [
     CrearMateriaprimaComponent,
     ReporteMateriaPrimaComponent,
     ReporteMpOtComponent,
+<<<<<<< Updated upstream
     AsignacionMateriaPrimaComponent,
+=======
+    MpremisionComponent,
+    // AsignacionMateriaPrimaComponent,
+
+
+
+>>>>>>> Stashed changes
   ],
 
 
