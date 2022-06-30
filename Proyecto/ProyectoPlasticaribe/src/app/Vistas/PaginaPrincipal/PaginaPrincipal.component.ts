@@ -4,6 +4,7 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import {FormControl} from '@angular/forms';
 import {MatDrawerMode} from '@angular/material/sidenav';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-PaginaPrincipal',
@@ -38,6 +39,20 @@ export class PaginaPrincipalComponent implements OnInit {
         }
       }
     });
+  }
+
+  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
+  confimacionSalida(){
+    Swal.fire({
+      title: '¿Seguro que desea salir?',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Salir',
+      denyButtonText: `No Salir`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) window.location.href = "./";
+    })
   }
 
 }

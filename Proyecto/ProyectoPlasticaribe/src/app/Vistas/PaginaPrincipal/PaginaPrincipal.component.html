@@ -6,7 +6,7 @@
           <h6 class="tipoUsuario">{{storage_Rol}}</h6>
       </div>
 
-      <ul class="list-unstyled components">
+      <ul>
         <p>Plasticaribe S.A.S</p>
 
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2">
@@ -273,7 +273,12 @@
             <div class="collapse" id="collapseExample8">
               <div class="mb-2">
                 <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
-                  Inventario Materia Prima
+                  Inventario de Materia Prima
+                </a>
+              </div>
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="/reporte-facturas-remisiones-mp" role="button" aria-expanded="false" aria-controls="">
+                  Reporte Fact. Rem. de Materia Prima
                 </a>
               </div>
               <!-- <div class="mb-2">
@@ -319,7 +324,12 @@
             <div class="collapse" id="collapseExample10">
               <div class="mb-2">
                 <a class="fst-normal" data-bs-toggle="" href="/MateriaPrima" role="button" aria-expanded="false" aria-controls="">
-                  Entrada de Materia prima
+                  Entrada Factura de Materia prima
+                </a>
+              </div>
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="/mpremision" role="button" aria-expanded="false" aria-controls="">
+                  Entrada Remisión de Materia prima
                 </a>
               </div>
               <div class="mb-2">
@@ -328,11 +338,6 @@
                 </a>
               </div>
                 <!-- <div class="mb-2">
-                  <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
-                    Tintas
-                  </a>
-                </div>
-                <div class="mb-2">
                   <a class="fst-normal" data-bs-toggle="" href="" role="button" aria-expanded="false" aria-controls="">
                     Pigmentos
                   </a>
@@ -451,11 +456,13 @@
             <a href=""><label for="m-notification">Notificacion</label></a>
         </li> -->
       </ul>
+
+      <button class="btn btn-danger btn-danger-sm boton" type="button"><li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li></button>
     </nav>
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <p><button mat-button (click)="sidenav.toggle()">Menú</button></p>
+    <p><button class="btn btn-danger float-right" mat-button (click)="sidenav.toggle()">Menú</button></p>
     <div class="row g-3">
       <div class="col md texto">
         <div class="container">

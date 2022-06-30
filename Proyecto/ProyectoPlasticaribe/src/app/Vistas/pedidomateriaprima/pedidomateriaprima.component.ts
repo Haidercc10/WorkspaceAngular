@@ -34,6 +34,7 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   public FormMateriaPrimaFactura !: FormGroup;
   public FormMateriaPrima !: FormGroup;
+  public FormRemisiones !: FormGroup;
   public FormMateriaPrimaRetiro !: FormGroup;
   public FormMateriaPrimaRetirada !: FormGroup;
 
@@ -125,6 +126,10 @@ export class PedidomateriaprimaComponent implements OnInit {
       MpUnidadMedida:new FormControl(),
     });
 
+    this.FormRemisiones = this.frmBuilderMateriaPrima.group({
+      idRemision : new FormControl(),
+    });
+
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : new FormControl(),
       FechaRetiro : new FormControl(),
@@ -180,6 +185,10 @@ export class PedidomateriaprimaComponent implements OnInit {
       MpCantidad : ['', Validators.required],
       MpPrecio: ['', Validators.required],
       MpUnidadMedida: ['', Validators.required],
+    });
+
+    this.FormRemisiones = this.frmBuilderMateriaPrima.group({
+      idRemision : ['', Validators.required],
     });
 
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
@@ -697,61 +706,67 @@ export class PedidomateriaprimaComponent implements OnInit {
           FaccoMatPri_ValorUnitario : valorUnitarioMp,
         }
         this.facturaMpService.srvGuardar(datosFacturaMp).subscribe(datos_facturaMpCreada => {
-          this.moverInventarioMpAgregada(idMateriaPrima, cantidadMateriaPrima);
         });
+
+        this.moverInventarioMpAgregada();
       }
     }
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima entrante
-  moverInventarioMpAgregada(idMateriaPrima : number, cantidadMateriaPrima : number){
+  moverInventarioMpAgregada(){
+    let idMateriaPrima : number;
+    let cantidadMateriaPrima : number;
     let stockMateriaPrimaInicial : number;
     let stockMateriaPrimaFinal : number;
 
-    this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
-      stockMateriaPrimaInicial = datos_materiaPrima.matPri_Stock;
-      stockMateriaPrimaFinal = stockMateriaPrimaInicial + cantidadMateriaPrima;
-      const datosMP : any = {
-        MatPri_Id : idMateriaPrima,
-        MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
-        MatPri_Descripcion : datos_materiaPrima.matPri_Descripcion,
-        MatPri_Stock : stockMateriaPrimaFinal,
-        UndMed_Id : datos_materiaPrima.undMed_Id,
-        CatMP_Id : datos_materiaPrima.catMP_Id,
-        MatPri_Precio : datos_materiaPrima.matPri_Precio,
-        TpBod_Id : datos_materiaPrima.tpBod_Id,
-      }
-      this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).subscribe(datos_mp_creada => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 1500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
+    for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
+
+      this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Id).subscribe(datos_materiaPrima => {
+        stockMateriaPrimaInicial = datos_materiaPrima.matPri_Stock;
+        stockMateriaPrimaFinal = stockMateriaPrimaInicial + this.ArrayMateriaPrima[index].Cant;
+        const datosMP : any = {
+          MatPri_Id : this.ArrayMateriaPrima[index].Id,
+          MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
+          MatPri_Descripcion : datos_materiaPrima.matPri_Descripcion,
+          MatPri_Stock : stockMateriaPrimaFinal,
+          UndMed_Id : datos_materiaPrima.undMed_Id,
+          CatMP_Id : datos_materiaPrima.catMP_Id,
+          MatPri_Precio : datos_materiaPrima.matPri_Precio,
+          TpBod_Id : datos_materiaPrima.tpBod_Id,
+        }
+        this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].Id, datosMP).subscribe(datos_mp_creada => {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'center',
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer)
+              toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+          });
+          Toast.fire({
+            icon: 'success',
+            title: '¡Registro de factura creado con exito!'
+          });
+          this.FormMateriaPrimaFactura.setValue({
+            MpFactura: '',
+            MpingresoFecha: this.today,
+            proveedor: '',
+            proveedorNombre: '',
+            // tipoDocumento: '',
+            // MpEstados:'',
+            // MpOperario: this.storage_Nombre,
+            MpObservacion : '',
+          });
+          this.FormMateriaPrima.reset();
+          this.ArrayMateriaPrima = [];
+          this.valorTotal = 0;
         });
-        Toast.fire({
-          icon: 'success',
-          title: '¡Registro de factura creado con exito!'
-        });
-        this.FormMateriaPrimaFactura.setValue({
-          MpFactura: '',
-          MpingresoFecha: this.today,
-          proveedor: '',
-          proveedorNombre: '',
-          // tipoDocumento: '',
-          // MpEstados:'',
-          // MpOperario: this.storage_Nombre,
-          MpObservacion : '',
-        });
-        this.FormMateriaPrima.reset();
-        this.ArrayMateriaPrima = [];
-        this.valorTotal = 0;
       });
-    });
+    }
   }
 
    // Función para quitar un producto de la tabla
@@ -781,6 +796,10 @@ export class PedidomateriaprimaComponent implements OnInit {
       MpPrecio: formulario.PrecioUnd,
       MpUnidadMedida:formulario.UndCant,
     });
+  }
+
+  remisionBuscada(){
+
   }
 
   //Funcion que asignará la materia prima a una Orden de trabajo y Proceso y lo guardará en la base de datos

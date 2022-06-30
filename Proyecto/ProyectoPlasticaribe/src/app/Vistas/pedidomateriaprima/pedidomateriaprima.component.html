@@ -14,7 +14,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Materia Prima</h2>
+      <h2 class="tituloRojo">Facturas de Materia Prima</h2>
     </div>
 
     <div class="mb-4">
@@ -214,6 +214,62 @@
     <label for="">${{valorTotal | currency : 'COP'}}</label>
   </div>
   <!--Fin valor total-->
+
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <form [formGroup]="FormRemisiones">
+    <div class="form-floating col-md-3">
+      <input formControlName="idRemision" (keyup.enter)="llenarProvedorId()"type="number" class="form-control form-control-sm" id="floatingInput">
+      <label for="floatingSelect">ID Remisión</label>
+    </div>
+  </form>
+
+  <div class="mb-4">
+    <h4 class="tituloRojo">Tabla Remisiones</h4>
+  </div>
+
+  <!-- TABLA DE INGRESO -->
+  <div class="mb-2">
+    <div class="row g-1">
+      <div class="table-responsive">
+        <!-- <div id="html2Pdf"> -->
+        <table class="table table-bordered" >
+          <thead class="TitulosTabla">
+            <tr *ngFor="let columnas of titulosTabla let i = index">
+              <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
+              <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
+              <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
+              <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
+              <th id="precioMateriaPrima" scope="col">{{columnas.mpPrecioU}}</th>
+              <th id="subTotalMateriaPrima" scope="col">{{columnas.mpSubTotal}}</th>
+              <th id="editar" scope="col">Editar</th>
+              <th id="eliminar" scope="col">Eliminar</th>
+            </tr>
+            </thead>
+          <tbody>
+            <!-- <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" > -->
+            <!-- <tr *ngFor= "let item of IngresoMateriaP " > -->
+            <tr *ngFor="let materiaPrima of ArrayMateriaPrima let i = index">
+              <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
+              <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
+              <td id="cantidadMateriaPrima">{{materiaPrima.Cant}}</td>
+              <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
+              <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd | currency : 'COP'}}</td>
+              <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | currency : 'COP'}}</td>
+              <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" (click)="EditarProductoTabla(materiaPrima)" title="Editar Materia Prima"></i></a></td>
+              <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" (click)="QuitarProductoTabla(i, materiaPrima)" title="Quitar Materia Prima de la tabla"></i></a></td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- <div class="mb-2">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <pagination-controls (pageChange)="page = $event"></pagination-controls>
+        </div> -->
+      </div>
+    </div>
+  </div>
 
   <!-- BOTONES -->
   <div class="mb-1">

@@ -1,73 +1,76 @@
  <!-- Inicio Contenedor total -->
-
  <div class="contain">
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
+    </div>
+    <ul class="btn-group open">
+      <p><b>User: {{storage_Nombre}}</b></p>
+      <span><b>Tipo: {{storage_Rol}} </b></span>
+      <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
+    </ul>
+  </nav>
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Remisiones de Materia Prima</h2>
+    </div>
 
-    <div class="contain">
-   
-     <nav class="navbar navbar-expand-lg">
-       <div class="container-fluid">
-         <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
-       </div>
-           <!-- FECHA -->
-           <div class="form-floating col">
-                <i class="fila">
-                <input type="date" id="fecha" class="form-control form-control-sm" />
-                <label for="fecha" class="propiedad"></label>
-                </i>
-          </div>
-       <ul class="btn-group open">
-         <p><b>User: {{storage_Nombre}}</b></p>
-         <span><b>Tipo: {{storage_Rol}} </b></span>
-         <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
-       </ul>
-     </nav>
-     <!-- Navegador fin de parte superior -->
-     <div class="container-fluid">
-       <!-- principal -->
-       <div class="mb-4 Titulo">
-         <h2 class="tituloRojo"> Remisión De Materia Prima</h2>
-       </div>
-   
-       <div class="mb-4">
-         <hr class="colorLinea">
-       </div>
-     </div>
-   </div>
-   
-  <!-- Fin Contenedor total -->  
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
 
+<div class="container">
+  <ng-container *ngIf="ValidarRol == 1">
+    <!-- Inicio Botones que llama el modal de crear proveedor y Materia Prima-->
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
+        (click)="LlamarModalCrearProveedor()" title="¡Crealo aquí!">
+        Crear Proveedor
+      </button>
+      <br>
+      <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+        (click)="LlamarModalCrearMateriaPrima()" title="¡Crealo aquí!">
+        Crear Materia Prima
+      </button>
+    </div>
+  </ng-container>
 
+  <!-- Inicio titulo -->
+  <div class="mb-4">
+    <h4 class="tituloRojo">Ingresar Remision de Materia Prima</h4>
+  </div>
+  <!-- Fin titulo -->
   <form [formGroup]="FormMateriaPrimaRemision">
     <!-- Inicio Fila 1 Agregar producto -->
     <div class="mb-3">
       <div class="row g-3">
         <div class="form-floating col-md-2">
-          <input formControlName="MpRemision" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpremisionid" >
-          <label for="floatingSelect">Número Remisión</label>
+          <input formControlName="ConsecutivoRemision" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" readonly onmousedown="return false;">
+          <label for="floatingSelect">Concecutivo Remision</label>
         </div>
-      
-     
-        <!-- ID/Nombre Producto -->
-        <div class="form-floating col-md-4">
-            <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
-
-              <!-- <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimasRetiradas">{{materiaPrima.matPri_Nombre}}</option> -->
-            </select>
-            <label for="floatingSelect">Nombre de la Materia Prima</label>
-          </div>
-          <!-- CANTIDAD DE MATERIA PRIMA  -->
-          <div class="form-floating col-md-2">
-            <input formControlName="MpCantidad" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" >
-            <label for="floatingInput">Cantidad de Materia Prima</label>
-          </div>
-          <!-- Unidad medida-->
-          <div class="form-floating col-md-2">
-            <select formControlName="MpUnidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" >
-              <!-- <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option> -->
-            </select>
-            <label for="floatingSelect">Und. Medida</label>
-          </div>
-
+        <div class="form-floating col-md-2">
+          <input formControlName="MpRemision" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+          <label for="floatingSelect">Número Remision</label>
+        </div>
+        <!-- Remision -->
+        <!-- <div class="form-floating col-md-2">
+          <input formControlName="MpRemision" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+          <label for="floatingSelect">Número Remisión</label>
+        </div> -->
+        <!-- Fecha Ingreso -->
+        <div class="form-floating col-md-2">
+          <input formControlName="MpingresoFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso" readonly onmousedown="return false;">
+          <label for="floatingInput">Fecha Ingreso</label>
+        </div>
+        <!-- Fecha Vencimiento Remision -->
+        <!-- <div class="form-floating col-md -2">
+          <input formControlName="MpingresoFechaVendcimiento" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso">
+          <label for="floatingInput">Fecha Vencimiento</label>
+        </div> -->
         <!-- Proveedor -->
         <div class="form-floating col-md-3">
           <input formControlName="proveedor" (keyup.enter)="llenarProvedorId()"type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
@@ -76,27 +79,92 @@
         <!-- Nombre Proveedor -->
         <div class="form-floating col-md-3">
           <select formControlName="proveedorNombre" id="floatingSelect" type="text" (change)="llenarProveedorSeleccionado()" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <!-- <option [ngValue]="proveedores" *ngFor="let proveedores of proveedor">{{proveedores}}</option> -->
+            <option [ngValue]="proveedores" *ngFor="let proveedores of proveedor">{{proveedores}}</option>
           </select>
           <label for="floatingSelect">Nombre Proveedor</label>
         </div>
+        <!-- Tipo Documento -->
+        <!-- <div class="form-floating col-md-2">
+          <select formControlName="tipoDocumento" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="estados.tpDoc_Nombre" *ngFor="let estados of tipodocuemnto">{{estados.tpDoc_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Tipo de Documento</label>
+        </div> -->
 
-    
+        <!-- Estado -->
+        <!-- <div class="form-floating col-md-3">
+          <select formControlName="MpEstados" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
+          </select>
+          <label for="floatingSelect">Estado Remision</label>
+        </div> -->
+        <!-- Operario -->
+        <!-- <div class="form-floating col-md-3">
+          <input formControlName="MpOperario" type="text" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso" readonly onmousedown="return false;">
+          <label for="floatingInput">Operario</label>
+        </div> -->
         <!-- Campo Observacion -->
         <div class="form-floating col-md">
-          <textarea formControlName="MpremisionObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" name="MpObservacion"></textarea>
+          <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" name="MpObservacion"></textarea>
           <label for="floatingTextarea">Observación</label>
         </div>
+      </div>
+    </div>
+  </form>
 
-  
-  
+  <div class="mb-4">
+    <h4 class="tituloRojo">Materia Prima</h4>
+  </div>
+
+  <form [formGroup]="FormMateriaPrima">
+    <div class="mb-3">
+      <div class="row g-3">
+        <div class="form-floating col-md-2">
+          <input formControlName="MpId" type="number" min="0" (keyup.enter)="buscarMpId()" class="form-control" id="floatingInput"required >
+          <label for="floatingInput">Id Producto</label>
+        </div>
+        <!-- ID/Nombre Producto -->
+        <div class="form-floating col-md-4">
+          <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
+            <!-- <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima.matPri_Nombre}}</option> -->
+            <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimasRetiradas">{{materiaPrima.matPri_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Nombre de la Materia Prima</label>
+        </div>
+        <!-- CANTIDAD DE MATERIA PRIMA  -->
+        <div class="form-floating col-md-2">
+          <input formControlName="MpCantidad" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" >
+          <label for="floatingInput">Cantidad de Materia Prima</label>
+        </div>
+        <!-- Unidad medida-->
+        <div class="form-floating col-md-2">
+          <select formControlName="MpUnidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" >
+            <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
+          </select>
+          <label for="floatingSelect">Und. Medida</label>
+        </div>
+        <!-- PRECIO ESTIMADO DE LA MATERIA PRIMA  -->
+        <div class="form-floating col-md-2">
+          <input formControlName="MpPrecio" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" >
+          <label for="floatingInput">Precio Materia Prima</label>
+        </div>
+      </div>
+    </div>
+    <!-- BOTONES -->
+    <div class="mb-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVaciosMP()">{{AccionBoton}} Materia Prima</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMP()">Limpiar Campos</button>
+      </div>
+    </div>
+  </form>
 
   <div class="mb-4">
     <hr class="Linea">
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Tabla De Remisión</h4>
+    <h4 class="tituloRojo">Tabla Ingreso</h4>
   </div>
 
   <!-- TABLA DE INGRESO -->
@@ -106,11 +174,13 @@
         <!-- <div id="html2Pdf"> -->
         <table class="table table-bordered" >
           <thead class="TitulosTabla">
-            <tr>
-              <th id="idMpRemision" scope="col"> Id Remisión</th>
-              <th id="nombreMpRemision" scope="col"> Nombre Remisión</th>
-              <th id="UnidadMedida" scope="col"> unidad Medida</th>
-              <th id="ObservacionMpremision" scope="col">Observacion</th>
+            <tr *ngFor="let columnas of titulosTabla let i = index">
+              <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
+              <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
+              <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
+              <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
+              <th id="precioMateriaPrima" scope="col">{{columnas.mpPrecioU}}</th>
+              <th id="subTotalMateriaPrima" scope="col">{{columnas.mpSubTotal}}</th>
               <th id="editar" scope="col">Editar</th>
               <th id="eliminar" scope="col">Eliminar</th>
             </tr>
@@ -118,39 +188,39 @@
           <tbody>
             <!-- <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" > -->
             <!-- <tr *ngFor= "let item of IngresoMateriaP " > -->
-            <tr >
-              <td id="idMpRemision"></td>
-              <td id="nombreMpRemision"></td>
-              <td id="UnidadMedida"></td>
-              <td id="ObservacionMpremision"></td>
-              <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Materia Prima"></i></a></td>
-              <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Materia Prima de la tabla"></i></a></td>
+            <tr *ngFor="let materiaPrima of ArrayMateriaPrima let i = index">
+              <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
+              <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
+              <td id="cantidadMateriaPrima">{{materiaPrima.Cant}}</td>
+              <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
+              <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd | currency : 'COP'}}</td>
+              <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | currency : 'COP'}}</td>
+              <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" (click)="EditarProductoTabla(materiaPrima)" title="Editar Materia Prima"></i></a></td>
+              <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" (click)="QuitarProductoTabla(i, materiaPrima)" title="Quitar Materia Prima de la tabla"></i></a></td>
             </tr>
           </tbody>
         </table>
-        <!-- <div class="mb-2">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <pagination-controls (pageChange)="page = $event"></pagination-controls>
-        </div> -->
       </div>
     </div>
   </div>
 
   <!--Inicio valor total-->
-  <!-- <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
     <label for=""><b>Valor total: $</b></label>
     <label for="">${{valorTotal | currency : 'COP'}}</label>
-  </div> -->
+  </div>
   <!--Fin valor total-->
 
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button" (click)="registrarMPremison()">Agregar Remisión</button>
+      <button class="btn btn-danger btn-danger-sm" type="button" (click)="registrarRemisionMP()">Agregar Remision</button>
       <button class="btn btn-secondary btn-secondary-sm" type="button">Limpiar Campos</button>
     </div>
   </div>
 
-      </div>
-    </div>
-  </form>
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+</div>

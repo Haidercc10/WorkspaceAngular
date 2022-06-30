@@ -19,9 +19,6 @@
 }
 
 
-@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
-
-
 body {
     font-family: 'Poppins', sans-serif;
     background: #fafafa;
@@ -61,6 +58,14 @@ a, a:hover, a:focus {
     height: 1px;
     border-bottom: 1px dashed #ddd;
     margin: 40px 0;
+}
+
+.boton{
+  margin-left: 60px;
+}
+
+.boton:hover {
+  background-color: #ff5b68;
 }
 
 /* ---------------------------------------------------
@@ -115,13 +120,13 @@ a, a:hover, a:focus {
     display: block;
 }
 #sidebar ul li a:hover {
-    color: #aaa;
-    background: #a23;
+    color: #fff;
+    background: #ff5b68;
 }
 
 #sidebar ul li.active > a, a[aria-expanded="true"] {
-    color: #aaa;
-    background: #d40;
+    color: #fff;
+    background: #ff5b68;
 }
 
 
