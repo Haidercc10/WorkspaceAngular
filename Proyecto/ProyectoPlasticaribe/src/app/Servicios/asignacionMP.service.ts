@@ -9,7 +9,7 @@ import { modelAsignacionMP } from '../Modelo/modelAsignacionMP';
 })
 export class AsignacionMPService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }

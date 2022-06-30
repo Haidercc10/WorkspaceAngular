@@ -1,224 +1,225 @@
-<!--Titulo Asignación -->
-<div class="mb-3">
-  <h4 class="tituloRojo">Asignación de Materia Prima</h4>
+ <!-- Inicio Contenedor total -->
+ <div class="contain">
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
+    </div>
+    <ul class="btn-group open">
+      <p><b>User: {{storage_Nombre}}</b></p>
+      <span><b>Tipo: {{storage_Rol}} </b></span>
+      <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
+    </ul>
+  </nav>
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Asignacion de Materia Prima</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
 </div>
 
-<!--Inicio Formulario de asignación -->
-<form [formGroup]="FormMateriaPrimaRetiro">
-  <!-- Inicio Fila 1  -->
+<div class="container">
+    <!--Titulo Asignación -->
   <div class="mb-3">
-    <div class="row g-3">
-      <!-- OT -->
-      <div class="form-floating col-md-2">
-        <input formControlName="OTRetiro" class="form-control form-control-sm" id="floatingInput" type="number" min="100000" max="999999" required>
-        <label for="floatingInput">OT</label>
-      </div>
-      <!-- Fecha entrega -->
-      <div class="form-floating col-md -2">
-        <input formControlName="FechaRetiro" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" readonly onmousedown="return false;">
-        <label for="floatingInput">Fecha Retiro</label>
-      </div>
-      <!-- Usuario -->
-      <div class="form-floating col-md">
-        <select formControlName="UsuarioRetiro" id="floatingSelect" (change)="obtenerAreas()" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-          <option [ngValue]="usuario.usua_Nombre" *ngFor="let usuario of usuarios">{{usuario.usua_Nombre}}</option>
-        </select>
-        <label for="floatingSelect">Usuario</label>
-      </div>
-      <!-- Area -->
-      <div class="form-floating col-md">
-        <select formControlName="AreaRetiro" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-          <option [ngValue]="area.area_Nombre" *ngFor="let area of areas">{{area.area_Nombre}}</option>
-        </select>
-        <label for="floatingSelect">Area</label>
-      </div>
-      <!-- Proceso -->
-      <div class="form-floating col-md">
-        <select formControlName="ProcesoRetiro" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-          <option [ngValue]="proceso.proceso_Id" *ngFor="let proceso of procesos">{{proceso.proceso_Nombre}}</option>
-        </select>
-        <label for="floatingSelect">Proceso</label>
-      </div>
-    </div>
-  </div>
-  <!--Fin Fila 1-->
-
-  <!--Inicio Fila 2-->
-  <div class="mb-3">
-    <div class="row g-3">
-      <!-- Estado -->
-      <div class="form-floating col-md-2">
-        <select formControlName="EstadoRetiro" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-          <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
-        </select>
-        <label for="floatingSelect">Estado Materia Prima</label>
-      </div>
-      <!-- Campo Observacion -->
-      <div class="form-floating col-6 col-sm-4">
-        <textarea formControlName="ObservacionRetiro"  id="floatingTextArea" type="text" class="form-control form-control-sm campoObservacion" maxlength="200" ></textarea>
-        <label for="floatingTextArea">Observación</label>
-      </div>
-
-      </div>
-  </div>
-  <!--Fin Fila 2-->
-</form>
-<!--Fin Formulario de asignación -->
-
-<!--Inicio titulo -->
-<div class="mb-3">
-  <h4 class="tituloRojo">Materia Prima</h4>
-</div>
-<!--Fin titulo -->
-
-<!--Inicio de formulario de materia prima a entregar-->
-<form [formGroup]="FormMateriaPrimaRetirada">
-  <div class="mb-3">
-    <div class="row g-3">
-      <div class="form-floating col-md-2">
-        <input formControlName="MpIdRetirada" type="number" min="0" (keyup.enter)="buscarMpIdRetirada()" class="form-control" id="floatingInput" name="MapId" placeholder="Id" required >
-        <label for="floatingInput">Id</label>
-      </div>
-      <!-- Nombre Materia Prima -->
-      <div class="form-floating col-md-4">
-        <select formControlName="MpNombreRetirada" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionadaRetirada()" aria-label="Floating label select example" required>
-          <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimasRetiradas">{{materiaPrima.matPri_Nombre}}</option>
-        </select>
-        <label for="floatingSelect">Nombre de la Materia Prima</label>
-      </div>
-        <!-- stock DE MATERIA PRIMA  -->
-      <div class="form-floating col-md-2">
-        <input formControlName="MpStockRetirada" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapStock" placeholder="Stock" required>
-        <label for="floatingInput">Stock</label>
-      </div>
-      <!-- CANTIDAD A ENTREGAR DE MATERIA PRIMA  -->
-      <div class="form-floating col-md-2">
-        <input formControlName="MpCantidadRetirada" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapCantidad" placeholder="Cantidad" required>
-        <label for="floatingInput">Cantidad</label>
-      </div>
-      <!-- Unidad medida-->
-      <div class="form-floating col-md-2">
-        <select formControlName="MpUnidadMedidaRetirada" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-          <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
-        </select>
-        <label for="floatingSelect">Und. Medida</label>
-      </div>
-      <!-- PRECIO ESTIMADO DE LA MATERIA PRIMA  -->
-      <div class="form-floating col-md-2">
-        <input formControlName="MpPrecioRetirada" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapPrecio" placeholder="Precio">
-        <label for="floatingInput">Precio</label>
-      </div>
-    </div>
+    <h4 class="tituloRojo">Asignación de Materia Prima</h4>
   </div>
 
-  <!-- BOTONES -->
-  <div class="mb-4">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVaciosMPRetirada()">{{AccionBoton}} Materia Prima</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMPRetirada()">Limpiar Campos</button>
-    </div>
-  </div>
-</form>
-<!--Fin Formulario materia prima a entregar-->
-
-<!--Linea -->
-<div class="mb-4">
-  <hr class="colorLinea">
-</div>
-<!--Fin Linea -->
-
-<div class="mb-4">
-  <h4 class="tituloRojo">Tabla de materias primas asignadas</h4>
-</div>
-
-<!-- TABLA DE RETIRO -->
-<div class="mb-2">
-  <div class="row g-1">
-    <div class="table-responsive">
-      <!-- <div id="html2Pdf"> -->
-      <table class="table table-bordered" >
-        <thead class="TitulosTabla">
-
-          <tr *ngFor="let columnas of titulosTabla let i = index">
-            <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
-            <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
-            <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
-            <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
-            <th id="precioMateriaPrima" scope="col">{{columnas.mpPrecioU}}</th>
-            <th id="subTotalMateriaPrima" scope="col">{{columnas.mpSubTotal}}</th>
-            <th id="editar" scope="col">Editar</th>
-            <th id="eliminar" scope="col">Eliminar</th>
-            <!-- <th id="editarPedido" scope="col">Editar</th> -->
-          </tr>
-        </thead>
-        <tbody>
-          <!-- <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" > -->
-          <!-- <tr *ngFor= "let item of IngresoMateriaP " > -->
-            <tr *ngFor="let materiaPrima of ArrayMateriaPrimaRetirada let i = index">
-              <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
-              <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
-              <td id="cantidadMateriaPrima">{{materiaPrima.Cant}}</td>
-              <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
-              <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd}}</td>
-              <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal}}</td>
-              <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Materia Prima"></i></a></td>
-              <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Materia Prima de la tabla"></i></a></td>
-            </tr>
-        </tbody>
-      </table>
-      <!-- <div class="mb-2">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <pagination-controls (pageChange)="page = $event"></pagination-controls>
-      </div> -->
-    </div>
-  </div>
-</div>
-
-<!--Inicio Fila de botones-->
-<div class="mb-3">
-  <div class="row g-3">
-    <!--Inicio botones -->
+  <!--Inicio Formulario de asignación -->
+  <form [formGroup]="FormMateriaPrimaRetiro">
+    <!-- Inicio Fila 1  -->
     <div class="mb-3">
+      <div class="row g-3">
+        <!-- OT -->
+        <div class="form-floating col-md-2">
+          <input formControlName="OTRetiro" class="form-control form-control-sm" id="floatingInput" type="number" min="100000" max="999999" required>
+          <label for="floatingInput">OT</label>
+        </div>
+        <!-- Fecha entrega -->
+        <div class="form-floating col-md -2">
+          <input formControlName="FechaRetiro" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" readonly onmousedown="return false;">
+          <label for="floatingInput">Fecha Retiro</label>
+        </div>
+        <!-- Usuario -->
+        <div class="form-floating col-md -2">
+          <input formControlName="Maquina" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" required title="Maquina">
+          <label for="floatingInput">Maquina</label>
+        </div>
+        <!-- <div class="form-floating col-md">
+          <select formControlName="UsuarioRetiro" id="floatingSelect" (change)="obtenerAreas()" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="usuario.usua_Nombre" *ngFor="let usuario of usuarios">{{usuario.usua_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Maquina</label>
+        </div> -->
+        <!-- Usuario -->
+        <!-- <div class="form-floating col-md">
+          <select formControlName="UsuarioRetiro" id="floatingSelect" (change)="obtenerAreas()" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="usuario.usua_Nombre" *ngFor="let usuario of usuarios">{{usuario.usua_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Usuario</label>
+        </div> -->
+        <!-- Area -->
+        <!-- <div class="form-floating col-md">
+          <select formControlName="AreaRetiro" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="area.area_Nombre" *ngFor="let area of areas">{{area.area_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Area</label>
+        </div> -->
+        <!-- Proceso -->
+        <div class="form-floating col-md">
+          <select formControlName="ProcesoRetiro" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="proceso.proceso_Id" *ngFor="let proceso of procesos">{{proceso.proceso_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Proceso</label>
+        </div>
+      </div>
+    </div>
+    <!--Fin Fila 1-->
+
+    <!--Inicio Fila 2-->
+    <div class="mb-3">
+      <div class="row g-3">
+        <!-- Estado -->
+        <!-- <div class="form-floating col-md-2">
+          <select formControlName="EstadoRetiro" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
+          </select>
+          <label for="floatingSelect">Estado Materia Prima</label>
+        </div> -->
+        <!-- Campo Observacion -->
+        <div class="form-floating col-6 col-md">
+          <textarea formControlName="ObservacionRetiro"  id="floatingTextArea" type="text" class="form-control form-control-sm campoObservacion" maxlength="200" ></textarea>
+          <label for="floatingTextArea">Observación</label>
+        </div>
+
+        </div>
+    </div>
+    <!--Fin Fila 2-->
+  </form>
+  <!--Fin Formulario de asignación -->
+
+  <!--Inicio titulo -->
+  <div class="mb-3">
+    <h4 class="tituloRojo">Materia Prima</h4>
+  </div>
+  <!--Fin titulo -->
+
+  <!--Inicio de formulario de materia prima a entregar-->
+  <form [formGroup]="FormMateriaPrimaRetirada">
+    <div class="mb-3">
+      <div class="row g-3">
+        <div class="form-floating col-md-2">
+          <input formControlName="MpIdRetirada" type="number" min="0" (keyup.enter)="buscarMpId()" class="form-control" id="floatingInput" name="MapId" placeholder="Id" required >
+          <label for="floatingInput">Id</label>
+        </div>
+        <!-- Nombre Materia Prima -->
+        <div class="form-floating col-md-4">
+          <select formControlName="MpNombreRetirada" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
+            <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimasRetiradas">{{materiaPrima.matPri_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Nombre de la Materia Prima</label>
+        </div>
+          <!-- stock DE MATERIA PRIMA  -->
+        <div class="form-floating col-md-2">
+          <input formControlName="MpStockRetirada" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapStock" placeholder="Stock" required>
+          <label for="floatingInput">Stock</label>
+        </div>
+        <!-- CANTIDAD A ENTREGAR DE MATERIA PRIMA  -->
+        <div class="form-floating col-md-2">
+          <input formControlName="MpCantidadRetirada" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapCantidad" placeholder="Cantidad" required>
+          <label for="floatingInput">Cantidad</label>
+        </div>
+        <!-- Unidad medida-->
+        <div class="form-floating col-md-2">
+          <select formControlName="MpUnidadMedidaRetirada" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
+            <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
+          </select>
+          <label for="floatingSelect">Und. Medida</label>
+        </div>
+        <!-- PRECIO ESTIMADO DE LA MATERIA PRIMA  -->
+        <!-- <div class="form-floating col-md-2">
+          <input formControlName="MpPrecioRetirada" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapPrecio" placeholder="Precio">
+          <label for="floatingInput">Precio</label>
+        </div> -->
+      </div>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="mb-4">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVaciosRetirada()">Agregar </button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button">Limpiar campos</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVaciosMPRetirada()">{{AccionBoton}} Materia Prima</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos MP</button>
       </div>
     </div>
-    <!--Fin botones -->
-  </div>
-</div>
-<!--Fin Fila de botones -->
+  </form>
+  <!--Fin Formulario materia prima a entregar-->
 
-<!-- Modal de crear Proveedor -->
-<div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel2">Crear Proveedor</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <!--Carga componente crear Proveedor-->
-        <app-crear-proveedor></app-crear-proveedor>
-      </div>
-    </div>
+  <!--Linea -->
+  <div class="mb-4">
+    <hr class="colorLinea">
   </div>
-</div>
-<!-- Fin Modal de crear Crear Proveedor-->
+  <!--Fin Linea -->
 
-<!-- Modal de crear Materia Prima -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel2">Crear Materia Prima</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <!--Carga componente crear Proveedor-->
-        <app-crear-materiaprima></app-crear-materiaprima>
+  <div class="mb-4">
+    <h4 class="tituloRojo">Tabla de materias primas asignadas</h4>
+  </div>
+
+  <!-- TABLA DE RETIRO -->
+  <div class="mb-2">
+    <div class="row g-1">
+      <div class="table-responsive">
+        <!-- <div id="html2Pdf"> -->
+        <table class="table table-bordered" >
+          <thead class="TitulosTabla">
+
+            <tr *ngFor="let columnas of titulosTabla let i = index">
+              <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
+              <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
+              <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
+              <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
+              <th id="editar" scope="col">Editar</th>
+              <th id="eliminar" scope="col">Eliminar</th>
+              <!-- <th id="editarPedido" scope="col">Editar</th> -->
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" > -->
+            <!-- <tr *ngFor= "let item of IngresoMateriaP " > -->
+              <tr *ngFor="let materiaPrima of ArrayMateriaPrimaRetirada let i = index">
+                <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
+                <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
+                <td id="cantidadMateriaPrima">{{materiaPrima.Cant}}</td>
+                <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
+                <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" (click)="EditarProductoTabla(materiaPrima)" title="Editar Materia Prima"></i></a></td>
+                <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" (click)="QuitarProductoTabla(i, materiaPrima)" title="Quitar Materia Prima de la tabla"></i></a></td>
+              </tr>
+          </tbody>
+        </table>
+        <!-- <div class="mb-2">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <pagination-controls (pageChange)="page = $event"></pagination-controls>
+        </div> -->
       </div>
     </div>
   </div>
+
+  <!--Inicio Fila de botones-->
+  <div class="mb-3">
+    <div class="row g-3">
+      <!--Inicio botones -->
+      <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class="btn btn-danger btn-danger-sm" type="button" (click)="asignacionMateriaPrima()">Asignar Materia Prima </button>
+          <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMP()">Limpiar Todos Los Campos</button>
+        </div>
+      </div>
+      <!--Fin botones -->
+    </div>
+  </div>
+  <!--Fin Fila de botones -->
+
 </div>
-<!-- Fin Modal de crear Crear Proveedor-->

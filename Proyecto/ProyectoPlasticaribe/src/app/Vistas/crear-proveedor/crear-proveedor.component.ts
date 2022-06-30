@@ -93,5 +93,6 @@ export class CrearProveedorComponent implements OnInit {
     let email : string = this.FormCrearProveedor.value.ProvEmail;
 
     this.pedidoMP.CreacionProveedor(id, tipoId, nombre, tipoProveedor, ciudad, telefono, email);
+    this.FormCrearProveedor.reset();
   }
 }

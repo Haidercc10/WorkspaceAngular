@@ -77,6 +77,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   proveedor = [];
   tipodocuemnto = [];
   totalPorcentajePerida : number; //Variable que ayudará a calcular el total de perdida en una OT
+  ultimoIdFactura : number = 0;
 
 
   /* CONSULTAS DE MATERIA PRIMA */
@@ -105,13 +106,14 @@ export class PedidomateriaprimaComponent implements OnInit {
 
     this.FormMateriaPrimaFactura = this.frmBuilderMateriaPrima.group({
       //MateriaPrima
+      ConsecutivoFactura : new FormControl(),
       MpFactura: new FormControl(),
       MpingresoFecha: new FormControl(),
       proveedor: new FormControl(),
       proveedorNombre: new FormControl(),
-      tipoDocumento: new FormControl(),
-      MpEstados:new FormControl(),
-      MpOperario:new FormControl(),
+      // tipoDocumento: new FormControl(),
+      // MpEstados:new FormControl(),
+      // MpOperario:new FormControl(),
       MpObservacion : new FormControl(),
     });
 
@@ -145,6 +147,7 @@ export class PedidomateriaprimaComponent implements OnInit {
 
 
   ngOnInit(): void {
+    this.obtenerUltimoIdFacturaCompra();
     this.initForms();
     this.lecturaStorage();
     this.fecha();
@@ -155,17 +158,19 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.obtenerMateriasPrimasRetiradas();
     this.obtenerProveeedor();
     this.obtenerDocumetno();
+    this.obtenerUltimpIDMP();
   }
 
   initForms() {
     this.FormMateriaPrimaFactura = this.frmBuilderMateriaPrima.group({
+      ConsecutivoFactura : ['', Validators.required],
       MpFactura: ['', Validators.required],
       MpingresoFecha: ['', Validators.required],
       proveedor: ['', Validators.required],
       proveedorNombre: ['', Validators.required],
-      tipoDocumento: ['', Validators.required],
-      MpEstados:['', Validators.required],
-      MpOperario:['', Validators.required],
+      // tipoDocumento: ['', Validators.required],
+      // MpEstados:['', Validators.required],
+      // MpOperario:['', Validators.required],
       MpObservacion : ['', Validators.required],
     });
 
@@ -208,14 +213,14 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.today = yyyy + '-' + mm + '-' + dd;
 
     this.FormMateriaPrimaFactura.setValue({
-
+      ConsecutivoFactura : this.ultimoIdFactura,
       MpFactura: '',
       MpingresoFecha: this.today,
       proveedor: '',
       proveedorNombre: '',
-      tipoDocumento: '',
-      MpEstados:'',
-      MpOperario: this.storage_Nombre,
+      // tipoDocumento: '',
+      // MpEstados:'',
+      // MpOperario: this.storage_Nombre,
       MpObservacion : '',
     });
   }
@@ -258,13 +263,32 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   // Funcion que limpia los todos los campos de la vista
   LimpiarCampos() {
-    this.FormMateriaPrimaFactura.reset();
+    this.FormMateriaPrimaFactura.setValue({
+      ConsecutivoFactura : '',
+      MpFactura: '',
+      MpingresoFecha: this.today,
+      proveedor: '',
+      proveedorNombre: '',
+      // tipoDocumento: '',
+      // MpEstados:'',
+      // MpOperario: this.storage_Nombre,
+      MpObservacion : '',
+    });
   }
 
   //Funcion que limpiará los campos de la materia pirma entrante
   limpiarCamposMP(){
-    this.FormMateriaPrima.reset();
-    this.FormMateriaPrimaFactura.reset();
+    this.FormMateriaPrimaFactura.setValue({
+      ConsecutivoFactura : '',
+      MpFactura: '',
+      MpingresoFecha: this.today,
+      proveedor: '',
+      proveedorNombre: '',
+      // tipoDocumento: '',
+      // MpEstados:'',
+      // MpOperario: this.storage_Nombre,
+      MpObservacion : '',
+    });
   }
 
   limpiarCamposMPRetirada(){
@@ -334,7 +358,7 @@ export class PedidomateriaprimaComponent implements OnInit {
       for (let index = 0; index < datos_proveedor.length; index++) {
         this.proveedor.push(datos_proveedor[index].prov_Nombre);
       }
-    }); 
+    });
   }
 
   llenarProveedorSeleccionado(){
@@ -343,16 +367,17 @@ export class PedidomateriaprimaComponent implements OnInit {
       for (let index = 0; index < datos_proveedores.length; index++) {
         if (datos_proveedores[index].prov_Nombre == proveedorSelccionado) {
           this.FormMateriaPrimaFactura.setValue({
+            ConsecutivoFactura : this.FormMateriaPrimaFactura.value.ConsecutivoFactura,
             MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
             MpingresoFecha: this.FormMateriaPrimaFactura.value.MpingresoFecha,
             proveedor : datos_proveedores[index].prov_Id,
             proveedorNombre: this.FormMateriaPrimaFactura.value.proveedorNombre,
-            tipoDocumento: this.FormMateriaPrimaFactura.value.tipoDocumento,
-            MpEstados: this.FormMateriaPrimaFactura.value.MpEstados,
-            MpOperario: this.FormMateriaPrimaFactura.value.MpOperario,
+            // tipoDocumento: this.FormMateriaPrimaFactura.value.tipoDocumento,
+            // MpEstados: this.FormMateriaPrimaFactura.value.MpEstados,
+            // MpOperario: this.FormMateriaPrimaFactura.value.MpOperario,
             MpObservacion: this.FormMateriaPrimaFactura.value.MpObservacion,
           });
-        }        
+        }
       }
     })
   }
@@ -361,16 +386,17 @@ export class PedidomateriaprimaComponent implements OnInit {
     let proveedorID : string = this.FormMateriaPrimaFactura.value.proveedor
     this.proveedorservices.srvObtenerListaPorId(proveedorID).subscribe(datos_proveedores => {
       this.FormMateriaPrimaFactura.setValue({
+        ConsecutivoFactura : this.FormMateriaPrimaFactura.value.ConsecutivoFactura,
         MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
         MpingresoFecha: this.today,
         proveedor :this.FormMateriaPrimaFactura.value.proveedor,
         proveedorNombre:datos_proveedores.prov_Nombre,
-        tipoDocumento: this.FormMateriaPrimaFactura.value.tipoDocumento,
-        MpEstados: this.FormMateriaPrimaFactura.value.MpEstados,
-        MpOperario: this.FormMateriaPrimaFactura.value.MpOperario,
+        // tipoDocumento: this.FormMateriaPrimaFactura.value.tipoDocumento,
+        // MpEstados: this.FormMateriaPrimaFactura.value.MpEstados,
+        // MpOperario: this.FormMateriaPrimaFactura.value.MpOperario,
         MpObservacion: this.FormMateriaPrimaFactura.value.MpObservacion,
-      });    
-      
+      });
+
     })
   }
 
@@ -411,28 +437,63 @@ export class PedidomateriaprimaComponent implements OnInit {
     });
   }
 
+  obtenerUltimoIdFacturaCompra(){
+    let idsFactura = [];
+    let idUltimaFactura : number;
+    this.facturaMpComService.srvObtenerLista().subscribe(datos_facturas => {
+      for (let index = 0; index < datos_facturas.length; index++) {
+        idsFactura.push(datos_facturas[index].facco_Id);
+      }
+      this.ultimoIdFactura = Math.max.apply(null, idsFactura);
+      this.ultimoIdFactura = this.ultimoIdFactura + 1;
+      this.FormMateriaPrimaFactura.setValue({
+        ConsecutivoFactura : this.ultimoIdFactura,
+        MpFactura: '',
+        MpingresoFecha: this.today,
+        proveedor: '',
+        proveedorNombre: '',
+        // tipoDocumento: '',
+        // MpEstados:'',
+        // MpOperario: this.storage_Nombre,
+        MpObservacion : '',
+      });
+    });
+  }
+
+  obtenerUltimpIDMP(){
+    let idsMP = [];
+    let idUltimaFactura : number;
+    this.materiaPrimaService.srvObtenerLista().subscribe(datos_MP => {
+      for (let index = 0; index < datos_MP.length; index++) {
+        idsMP.push(datos_MP[index].facco_Id);
+      }
+      this.ultimoIdMateriaPrima = Math.max.apply(null, idsMP);
+      this.ultimoIdMateriaPrima = this.ultimoIdFactura + 1;
+    });
+  }
   //Funacion que crea una materia prima y la guarda en la base de datos
-  CreacionMateriaPrima(){
-    let nombreMateriaPrima : string;
-    let descripcionMateriaPrima : string;
-    let stockMateriaPrima : number;
-    let undMed : string;
-    let categoriaMateriaPrima : number;
-    let precioMateriaPrima : number;
-    let bodega : number;
+  CreacionMateriaPrima(nombreMateriaPrima : string,
+    descripcionMateriaPrima : string,
+    stockMateriaPrima : number,
+    undMed : string,
+    categoriaMateriaPrima : number,
+    precioMateriaPrima : number,
+    bodega : number,
+    proveedor : number){
+
 
     const datosMP : any = {
       MatPri_Nombre : nombreMateriaPrima,
       MatPri_Descripcion : descripcionMateriaPrima,
       MatPri_Stock : stockMateriaPrima,
-      UndMed_Id : undMed,
+      UndMed_Id : 'Kg',
       CatMP_Id : categoriaMateriaPrima,
       MatPri_Precio : precioMateriaPrima,
-      TpBod_Id : bodega,
+      TpBod_Id : 4,
     }
 
     this.materiaPrimaService.srvGuardar(datosMP).subscribe(datos_mp_creada => {
-      this.creacionMpProveedor(this.ultimoIdMateriaPrima);
+      this.creacionMpProveedor(this.ultimoIdMateriaPrima, proveedor);
     });
 
   }
@@ -476,11 +537,9 @@ export class PedidomateriaprimaComponent implements OnInit {
   }
 
   //Funcion qu creará la relacion de materia prima y proveedores
-  creacionMpProveedor(idMateriaPrima : number){
-    let idProveedor : number;
-
+  creacionMpProveedor(idMateriaPrima : number, proveedor : number){
     const datosMpProveedor = {
-      Prov_Id : idProveedor,
+      Prov_Id : proveedor,
       MatPri_Id : idMateriaPrima,
     }
 
@@ -507,35 +566,26 @@ export class PedidomateriaprimaComponent implements OnInit {
   registrarFacturaMP(){
     let nombreEstado : string = this.FormMateriaPrimaFactura.value.MpEstados;
     let consecutivoFactura : string = this.FormMateriaPrimaFactura.value.MpFactura;
-    let fechaEntrada : any = this.FormMateriaPrimaFactura.value.MpingresoFecha;
-    // let fechaVencimiento : any = this.FormMateriaPrimaFactura.value.MpingresoFechaVendcimiento;
+    // let fechaEntrada : any = this.FormMateriaPrimaFactura.value.MpingresoFecha;
     let idProveedor : number = this.FormMateriaPrimaFactura.value.proveedor;
-    let valorTotalFactura : number = this.FormMateriaPrimaFactura.value.valorTotalFactura;
     let observacionFactura : string = this.FormMateriaPrimaFactura.value.MpObservacion;
     let idEstadoFactura : number;
     let idUsuario : number = this.storage_Id;
-    let tipoDocumento : number = this.FormMateriaPrimaFactura.value.tipoDocumento;
+    // let tipoDocumento : string = this.FormMateriaPrimaFactura.value.tipoDocumento;
 
-    this.estadoService.srvObtenerListaEstados().subscribe(datos_estados => {
-      for (let index = 0; index < datos_estados.length; index++) {
-        if (datos_estados[index].estado_Nombre == nombreEstado) {
-          idEstadoFactura = datos_estados[index].estado_Id;
-          const datosFactura : any = {
-            Facco_Codigo : consecutivoFactura,
-            Facco_FechaFactura : this.today,
-            Facco_FechaVencimiento : this.today,
-            Prov_Id : idProveedor,
-            Facco_ValorTotal : this.valorTotal,
-            Facco_Observacion : observacionFactura,
-            Estado_Id : idEstadoFactura,
-            Usua_Id : idUsuario,
-            TpDoc_Id : tipoDocumento,
-          }
-          this.facturaMpComService.srvGuardar(datosFactura).subscribe(datos_facturaCreada => {
-            this.obtenerUltimoIdFactura();
-          });
-        }
-      }
+    const datosFactura : any = {
+      Facco_Codigo : consecutivoFactura,
+      Facco_FechaFactura : this.today,
+      Facco_FechaVencimiento : this.today,
+      Prov_Id : idProveedor,
+      Facco_ValorTotal : this.valorTotal,
+      Facco_Observacion : observacionFactura,
+      Estado_Id : 13,
+      Usua_Id : idUsuario,
+      TpDoc_Id : 'FCO',
+    }
+    this.facturaMpComService.srvGuardar(datosFactura).subscribe(datos_facturaCreada => {
+      this.obtenerUltimoIdFactura();
     });
   }
 
@@ -547,8 +597,8 @@ export class PedidomateriaprimaComponent implements OnInit {
       for (let index = 0; index < datos_facturas.length; index++) {
         idsFactura.push(datos_facturas[index].facco_Id);
       }
-      let ultimoId : number = Math.max.apply(null, idsFactura);
-      this.creacionFacturaMateriaPrima(ultimoId);
+      this.ultimoIdFactura = Math.max.apply(null, idsFactura);
+      this.creacionFacturaMateriaPrima(this.ultimoIdFactura);
     });
   }
 
@@ -594,13 +644,14 @@ export class PedidomateriaprimaComponent implements OnInit {
     }
 
     this.FormMateriaPrimaFactura.setValue({
+      ConsecutivoFactura : this.FormMateriaPrimaFactura.value.ConsecutivoFactura,
       MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
       MpingresoFecha: this.today,
       proveedor :this.FormMateriaPrimaFactura.value.proveedor,
       proveedorNombre:this.FormMateriaPrimaFactura.value.proveedorNombre,
-      tipoDocumento: this.FormMateriaPrimaFactura.value.tipoDocumento,
-      MpEstados: this.FormMateriaPrimaFactura.value.MpEstados,
-      MpOperario: this.FormMateriaPrimaFactura.value.MpOperario,
+      // tipoDocumento: this.FormMateriaPrimaFactura.value.tipoDocumento,
+      // MpEstados: this.FormMateriaPrimaFactura.value.MpEstados,
+      // MpOperario: this.FormMateriaPrimaFactura.value.MpOperario,
       MpObservacion: this.FormMateriaPrimaFactura.value.MpObservacion,
     });
 
@@ -614,12 +665,12 @@ export class PedidomateriaprimaComponent implements OnInit {
       for (let index = 0; index < formulario.length; index++) {
         if(productoExt.Id == this.ArrayMateriaPrima[index].Id) {
           this.ArrayMateriaPrima.splice(index, 1);
+          this.AccionBoton = "Agregar";
           this.ArrayMateriaPrima.push(productoExt);
           break;
         }
       }
     }
-
     this.ArrayMateriaPrima.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
   }
 
@@ -686,7 +737,49 @@ export class PedidomateriaprimaComponent implements OnInit {
           icon: 'success',
           title: '¡Registro de factura creado con exito!'
         });
+        this.FormMateriaPrimaFactura.setValue({
+          MpFactura: '',
+          MpingresoFecha: this.today,
+          proveedor: '',
+          proveedorNombre: '',
+          // tipoDocumento: '',
+          // MpEstados:'',
+          // MpOperario: this.storage_Nombre,
+          MpObservacion : '',
+        });
+        this.FormMateriaPrima.reset();
+        this.ArrayMateriaPrima = [];
+        this.valorTotal = 0;
       });
+    });
+  }
+
+   // Función para quitar un producto de la tabla
+   QuitarProductoTabla(index : number, formulario : any) {
+    Swal.fire({
+      title: '¿Estás seguro de eliminar la Materia Prima de la Factura/Remisión?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Eliminar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.ArrayMateriaPrima.splice(index, 1);
+        Swal.fire('Materia Prima eliminada');
+      }
+    });
+  }
+
+  // Función para editar uno de los productos de la tabla
+  EditarProductoTabla(formulario : any) {
+    this.AccionBoton = "Editar";
+    this.FormMateriaPrima.patchValue({
+      MpId : formulario.Id,
+      MpNombre: formulario.Nombre,
+      MpCantidad: formulario.Cant,
+      MpPrecio: formulario.PrecioUnd,
+      MpUnidadMedida:formulario.UndCant,
     });
   }
 

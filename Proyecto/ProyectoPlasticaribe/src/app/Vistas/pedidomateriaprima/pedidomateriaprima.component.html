@@ -24,19 +24,21 @@
 </div>
 
 <div class="container">
-   <!-- Inicio Botones que llama el modal de crear proveedor y Materia Prima-->
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
-      (click)="LlamarModalCrearProveedor()" title="¡Crealo aquí!">
-      Crear Proveedor
-    </button>
-    <br>
-    <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-      (click)="LlamarModalCrearMateriaPrima()" title="¡Crealo aquí!">
-      Crear Materia Prima
-    </button>
-  </div>
-<!-- Fin Botones que llama el modal de crear cliente y producto-->
+  <ng-container *ngIf="ValidarRol == 1">
+    <!-- Inicio Botones que llama el modal de crear proveedor y Materia Prima-->
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
+        (click)="LlamarModalCrearProveedor()" title="¡Crealo aquí!">
+        Crear Proveedor
+      </button>
+      <br>
+      <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+        (click)="LlamarModalCrearMateriaPrima()" title="¡Crealo aquí!">
+        Crear Materia Prima
+      </button>
+    </div>
+  </ng-container>
+
   <!-- Inicio titulo -->
   <div class="mb-4">
     <h4 class="tituloRojo">Ingresar Factura de Materia Prima</h4>
@@ -46,6 +48,10 @@
     <!-- Inicio Fila 1 Agregar producto -->
     <div class="mb-3">
       <div class="row g-3">
+        <div class="form-floating col-md-2">
+          <input formControlName="ConsecutivoFactura" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" readonly onmousedown="return false;">
+          <label for="floatingSelect">Concecutivo Factura</label>
+        </div>
         <div class="form-floating col-md-2">
           <input formControlName="MpFactura" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
           <label for="floatingSelect">Número Factura</label>
@@ -78,25 +84,25 @@
           <label for="floatingSelect">Nombre Proveedor</label>
         </div>
         <!-- Tipo Documento -->
-        <div class="form-floating col-md-2">
+        <!-- <div class="form-floating col-md-2">
           <select formControlName="tipoDocumento" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
             <option [ngValue]="estados.tpDoc_Nombre" *ngFor="let estados of tipodocuemnto">{{estados.tpDoc_Nombre}}</option>
           </select>
           <label for="floatingSelect">Tipo de Documento</label>
-        </div>
-        
+        </div> -->
+
         <!-- Estado -->
-        <div class="form-floating col-md-3">
+        <!-- <div class="form-floating col-md-3">
           <select formControlName="MpEstados" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
             <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
           </select>
           <label for="floatingSelect">Estado Factura</label>
-        </div>
+        </div> -->
         <!-- Operario -->
-        <div class="form-floating col-md-3">
+        <!-- <div class="form-floating col-md-3">
           <input formControlName="MpOperario" type="text" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso" readonly onmousedown="return false;">
           <label for="floatingInput">Operario</label>
-        </div>
+        </div> -->
         <!-- Campo Observacion -->
         <div class="form-floating col-md">
           <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" name="MpObservacion"></textarea>
@@ -189,8 +195,8 @@
               <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
               <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd | currency : 'COP'}}</td>
               <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | currency : 'COP'}}</td>
-              <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Materia Prima"></i></a></td>
-              <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Materia Prima de la tabla"></i></a></td>
+              <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" (click)="EditarProductoTabla(materiaPrima)" title="Editar Materia Prima"></i></a></td>
+              <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" (click)="QuitarProductoTabla(i, materiaPrima)" title="Quitar Materia Prima de la tabla"></i></a></td>
             </tr>
           </tbody>
         </table>

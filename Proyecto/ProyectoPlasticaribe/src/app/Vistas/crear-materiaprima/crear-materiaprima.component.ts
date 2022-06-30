@@ -18,6 +18,7 @@ import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
 import { TipoBodegaService } from 'src/app/Servicios/tipoBodega.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
+import { PedidomateriaprimaComponent } from '../pedidomateriaprima/pedidomateriaprima.component';
 
 @Component({
   selector: 'app-crear-materiaprima',
@@ -53,7 +54,8 @@ export class CrearMateriaprimaComponent implements OnInit {
                                 private facturaMpService : FacturaMpService,
                                     private asignacionMPService : AsignacionMPService,
                                       private detallesAsignacionService : DetallesAsignacionService,
-                                        private bagProServices : BagproService) {
+                                        private bagProServices : BagproService,
+                                          private pedidoMP : PedidomateriaprimaComponent) {
 
     this.materiPrima = this.frmBuilderMateriaPrima.group({
       //MateriaPrima
@@ -74,6 +76,7 @@ export class CrearMateriaprimaComponent implements OnInit {
     this.initForms();
     this.obtenerNombreCategoriasMp();
     this.obtenerUnidadMedida();
+    this.obtenerProceedor();
   }
 
   //Inicializando formulario de Crear Proveedores en modal.
@@ -105,13 +108,17 @@ export class CrearMateriaprimaComponent implements OnInit {
    obtenerNombreCategoriasMp(){
     this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => {
       for (let index = 0; index < datos_categorias.length; index++) {
-        this.nombreCategoriasMP.push(datos_categorias[index].catMP_Nombre);
+        this.nombreCategoriasMP.push(datos_categorias[index]);
       }
     });
   }
 
+  limpiarCampos(){
+    this.materiPrima.reset();
+  }
+
   obtenerProceedor(){
-    this.procesosService.srvObtenerLista().subscribe(datos_proveedores => {
+    this.proveedorservices.srvObtenerLista().subscribe(datos_proveedores => {
       for (let index = 0; index < datos_proveedores.length; index++) {
         this.proveedores.push(datos_proveedores[index])
       }
@@ -119,7 +126,17 @@ export class CrearMateriaprimaComponent implements OnInit {
   }
 
   registrarMateriPrima(){
-    let id
+    let nombreMateriaPrima : string = this.materiPrima.value.mpNombre;
+    let descripcionMateriaPrima : string = this.materiPrima.value.mpDescripcion;
+    let stockMateriaPrima : number = 0;
+    let undMed : string = 'Kg';
+    let categoriaMateriaPrima : number = this.materiPrima.value.mpCategoria;
+    let precioMateriaPrima : number = this.materiPrima.value.mpValor;
+    let bodega : number = 4;
+    let proveedor : number = this.materiPrima.value.mpProveedor;
+
+    this.pedidoMP.CreacionMateriaPrima(nombreMateriaPrima, descripcionMateriaPrima, stockMateriaPrima, undMed, categoriaMateriaPrima, precioMateriaPrima, bodega, proveedor);
+    this.materiPrima.reset();
   }
 
 

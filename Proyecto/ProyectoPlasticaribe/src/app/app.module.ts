@@ -74,7 +74,7 @@ export const routes: Routes = [
   {path: 'crear-materiaprima', canActivate: [ValidacionLoginGuard], component: CrearMateriaprimaComponent},
   {path: 'reporte-Materia-Prima', canActivate: [ValidacionLoginGuard], component: ReporteMateriaPrimaComponent},
   {path: 'reporte-Materia-Prima-OT', canActivate: [ValidacionLoginGuard], component: ReporteMpOtComponent},
-  {path: 'asignacion-materia-prima', canActivate: [ValidacionLoginGuard], component: AsignacionMateriaPrimaComponent},
+  {path: 'asignacionMP', canActivate: [ValidacionLoginGuard], component: AsignacionMateriaPrimaComponent},
 ]
 
 @NgModule({
@@ -106,12 +106,11 @@ export const routes: Routes = [
     CrearMateriaprimaComponent,
     ReporteMateriaPrimaComponent,
     ReporteMpOtComponent,
-    AsignacionMateriaPrimaComponent
+    AsignacionMateriaPrimaComponent,
   ],
 
 
   imports: [
-
     BrowserModule,
     ReactiveFormsModule,
     AppRoutingModule,

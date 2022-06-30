@@ -7,5 +7,5 @@ export interface modelFacturaMpCompra {
   Facco_Observacion : string;
   Estado_Id : number;
   Usua_Id : number;
-  TpDoc_Id : number;
+  TpDoc_Id : string;
 }
