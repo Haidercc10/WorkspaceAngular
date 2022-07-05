@@ -130,7 +130,7 @@ a, a:hover, a:focus {
 }
 
 
-a[data-toggle="collapse"] {
+/* a[data-toggle="collapse"] {
     position: relative;
 }
 
@@ -170,7 +170,7 @@ a.download {
 a.article, a.article:hover {
     background: #6d7fcc !important;
     color: #fff !important;
-}
+} */
 
 .btn{
     align-items: center;

@@ -89,6 +89,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       MpCantidad: new FormControl(),
       MpPrecio: new FormControl(),
       MpUnidadMedida:new FormControl(),
+      fecha: new FormControl(),
+      fechaFinal : new FormControl(),
     });
   }
 
@@ -107,7 +109,16 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       MpCantidad : ['', Validators.required],
       MpPrecio: ['', Validators.required],
       MpUnidadMedida: ['', Validators.required],
+      fecha: new FormControl(),
+      fechaFinal : new FormControl(),
     });
+  }
+
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => {
+    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
+    const rep = '$1,';
+    return number.toString().replace(exp,rep);
   }
 
   LimpiarCampos() {
@@ -207,6 +218,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       mpId : "Id",
       mpNombre : "Nombre",
       mpCantidad : "Cantidad",
+      mpEntrada : "Entrada",
+      mpSalida : "Salida",
       mpUndMedCant : "Und. Cant",
       mpPrecioU : "Precio U",
       mpSubTotal : "SubTotal",
@@ -242,8 +255,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       }
     }
-
-    this.ArrayMateriaPrima.sort((a,b)=> Number(a.Id) - Number(b.Id));
+    this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
   }
 
   validarConsulta(){

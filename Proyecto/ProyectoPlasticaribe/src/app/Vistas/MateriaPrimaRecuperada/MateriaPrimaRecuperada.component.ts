@@ -1,41 +1,48 @@
-import { Component, OnInit,Inject } from '@angular/core';
-import { FormBuilder, Validators, FormGroup, FormControl} from '@angular/forms';
-import Swal from 'sweetalert2';
-import { MpremisionService  } from 'src/app/Servicios/mpremision.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import moment from 'moment';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import pdfMake from 'pdfmake/build/pdfmake';
 import { AreaService } from 'src/app/Servicios/area.service';
 import { AsignacionMPService } from 'src/app/Servicios/asignacionMP.service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
+import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
 import { FactuaMpCompradaService } from 'src/app/Servicios/facturaMpComprada.service';
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
 import { MpProveedorService } from 'src/app/Servicios/MpProveedor.service';
 import { ProcesosService } from 'src/app/Servicios/procesos.service';
 import { ProveedorService } from 'src/app/Servicios/proveedor.service';
+import { RecuperadoService } from 'src/app/Servicios/recuperado.service';
+import { RecuperadoMPService } from 'src/app/Servicios/recuperadoMP.service';
+import { RemisionService } from 'src/app/Servicios/Remision.service';
+import { RemisionesMPService } from 'src/app/Servicios/remisionesMP.service';
+import { RemisionFacturaService } from 'src/app/Servicios/remisionFactura.service';
+import { RolesService } from 'src/app/Servicios/roles.service';
 import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
 import { TipoBodegaService } from 'src/app/Servicios/tipoBodega.service';
 import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
+import { TipoRecuperadoService } from 'src/app/Servicios/tipoRecuperado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
-import { RemisionesMPService } from 'src/app/Servicios/remisionesMP.service';
-import { RemisionService } from 'src/app/Servicios/Remision.service';
-
-
+import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-mpremision',
-  templateUrl: './mpremision.component.html',
-  styleUrls: ['./mpremision.component.css']
+  selector: 'app-MateriaPrimaRecuperada',
+  templateUrl: './MateriaPrimaRecuperada.component.html',
+  styleUrls: ['./MateriaPrimaRecuperada.component.css']
 })
-export class MpremisionComponent implements OnInit {
+export class MateriaPrimaRecuperadaComponent implements OnInit {
 
-  public FormMateriaPrimaRemision !: FormGroup;
+  public FormMateriaPrimaRecuperada !: FormGroup;
   public FormMateriaPrima !: FormGroup;
-  public remisiones !: FormGroup;
+  public FormRemisiones !: FormGroup;
+
+  public consultaRemisiones !: FormGroup;
+
+
   public FormMateriaPrimaRetiro !: FormGroup;
   public FormMateriaPrimaRetirada !: FormGroup;
 
@@ -78,42 +85,39 @@ export class MpremisionComponent implements OnInit {
   proceso : string = ''; //Variable ayudará a almacenar el proceso del cuela se está consultando la ot
   proveedor = [];
   tipodocuemnto = [];
+  tipoRecuperado = [];
   totalPorcentajePerida : number; //Variable que ayudará a calcular el total de perdida en una OT
+  ultimoIdRecuperado: number = 0;
+  validarCamposFacRem : number = 3;
   ultimoIdRemision : number = 0;
+  ArrayRemisiones = [];
+  precioRemision = [];
+  titulosTablaRemisiones = [];
+  valorTotalRem = 0;
+  mpAgregada = [];
 
-
-  /* CONSULTAS DE MATERIA PRIMA */
-  MpConsultada = [];
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
                   private tipoBodegaService : TipoBodegaService,
                     private unidadMedidaService : UnidadMedidaService,
-                      private estadoService : EstadosService,
-                        private tipoEstadoService : TipoEstadosService,
-                          private usuarioService : UsuarioService,
-                            private procesosService : ProcesosService,
-                              private areasService : AreaService,
-                                private rolService : RolesService,
-                                  private frmBuilderMateriaPrima : FormBuilder,
-                                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                      private proveedorservices : ProveedorService,
-                                        private proveedorMPService : MpProveedorService,
-                                          private facturaMpComService : FactuaMpCompradaService,
-                                            private remisionService : RemisionService,
-                                              private tipoDocumentoService : TipoDocumentoService,
-                                                private remisionMPService : RemisionesMPService) {
+                      private usuarioService : UsuarioService,
+                        private procesosService : ProcesosService,
+                            private rolService : RolesService,
+                              private frmBuilderMateriaPrima : FormBuilder,
+                                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                                  private recuperadoService : RecuperadoService,
+                                    private recuperadoMPService : RecuperadoMPService,
+                                        private tipoDocumentoService : TipoDocumentoService,
+                                          private tipoRecuperadoService : TipoRecuperadoService) {
 
-    this.FormMateriaPrimaRemision = this.frmBuilderMateriaPrima.group({
+    this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
       //MateriaPrima
-      ConsecutivoRemision : new FormControl(),
-      MpRemision: new FormControl(),
+      ConsecutivoFactura : new FormControl(),
       MpingresoFecha: new FormControl(),
-      proveedor: new FormControl(),
-      proveedorNombre: new FormControl(),
-      // tipoDocumento: new FormControl(),
-      // MpEstados:new FormControl(),
-      // MpOperario:new FormControl(),
+      usuarioNombre: new FormControl(),
+      usuarioId: new FormControl(),
+      proceso: new FormControl(),
       MpObservacion : new FormControl(),
     });
 
@@ -121,41 +125,31 @@ export class MpremisionComponent implements OnInit {
       MpId : new FormControl(),
       MpNombre: new FormControl(),
       MpCantidad: new FormControl(),
-      MpPrecio: new FormControl(),
+      tipoRecuperado: new FormControl(),
       MpUnidadMedida:new FormControl(),
-    });
-
-    this.remisiones = this.frmBuilderMateriaPrima.group({
-
     });
   }
 
 
   ngOnInit(): void {
-    this.obtenerUltimoIdRemisionCompra();
     this.initForms();
     this.lecturaStorage();
     this.fecha();
     this.ColumnasTabla();
     this.obtenerUnidadMedida();
-    this.obtenerEstados();
-    this.obtenerProcesos();
     this.obtenerMateriasPrimasRetiradas();
-    this.obtenerProveeedor();
-    this.obtenerDocumetno();
-    this.obtenerUltimpIDMP();
+    this.obtenerUsuarios();
+    this.obtenerProcesos();
+    this.obtenerTipoRecuperado();
   }
 
   initForms() {
-    this.FormMateriaPrimaRemision = this.frmBuilderMateriaPrima.group({
-      ConsecutivoRemision : ['', Validators.required],
-      MpRemision: ['', Validators.required],
+    this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
+      ConsecutivoFactura : ['', Validators.required],
       MpingresoFecha: ['', Validators.required],
-      proveedor: ['', Validators.required],
-      proveedorNombre: ['', Validators.required],
-      // tipoDocumento: ['', Validators.required],
-      // MpEstados:['', Validators.required],
-      // MpOperario:['', Validators.required],
+      usuarioNombre: ['', Validators.required],
+      usuarioId: ['', Validators.required],
+      proceso: ['', Validators.required],
       MpObservacion : ['', Validators.required],
     });
 
@@ -163,7 +157,7 @@ export class MpremisionComponent implements OnInit {
       MpId : ['', Validators.required],
       MpNombre: ['', Validators.required],
       MpCantidad : ['', Validators.required],
-      MpPrecio: ['', Validators.required],
+      tipoRecuperado: ['', Validators.required],
       MpUnidadMedida: ['', Validators.required],
     });
   }
@@ -178,15 +172,12 @@ export class MpremisionComponent implements OnInit {
     if (mm < 10) mm = '0' + mm;
     this.today = yyyy + '-' + mm + '-' + dd;
 
-    this.FormMateriaPrimaRemision.setValue({
-      ConsecutivoRemision : this.ultimoIdRemision,
-      MpRemision: '',
+    this.FormMateriaPrimaRecuperada.setValue({
+      ConsecutivoFactura : this.ultimoIdRecuperado,
       MpingresoFecha: this.today,
-      proveedor: '',
-      proveedorNombre: '',
-      // tipoDocumento: '',
-      // MpEstados:'',
-      // MpOperario: this.storage_Nombre,
+      usuarioNombre: '',
+      usuarioId: '',
+      proceso : '',
       MpObservacion : '',
     });
   }
@@ -229,54 +220,26 @@ export class MpremisionComponent implements OnInit {
 
   // Funcion que limpia los todos los campos de la vista
   LimpiarCampos() {
-    this.FormMateriaPrimaRemision.setValue({
-      ConsecutivoRemision : '',
-      MpRemision: '',
+    this.FormMateriaPrimaRecuperada.setValue({
+      ConsecutivoFactura : this.ultimoIdRecuperado,
       MpingresoFecha: this.today,
-      proveedor: '',
-      proveedorNombre: '',
-      // tipoDocumento: '',
-      // MpEstados:'',
-      // MpOperario: this.storage_Nombre,
+      usuarioNombre: '',
+      usuarioId: '',
+      proceso : '',
       MpObservacion : '',
     });
   }
 
   //Funcion que limpiará los campos de la materia pirma entrante
-  limpiarCamposMPRemision(){
-    this.FormMateriaPrimaRemision.setValue({
-      ConsecutivoRemision : '',
-      MpRemision: '',
-      MpingresoFecha: this.today,
-      proveedor: '',
-      proveedorNombre: '',
-      // tipoDocumento: '',
-      // MpEstados:'',
-      // MpOperario: this.storage_Nombre,
-      MpObservacion : '',
-    });
-  }
-
-
-  //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
-  obtenerMateriasPrimas(){
-    let idProveedor : number = this.FormMateriaPrimaRemision.value.proveedor;
-    this.proveedorMPService.srvObtenerLista().subscribe(datos_mpProveedor => {
-      for (let index = 0; index < datos_mpProveedor.length; index++) {
-        if (datos_mpProveedor[index].prov_Id == idProveedor) {
-          this.materiaPrimaService.srvObtenerListaPorId(datos_mpProveedor[index].matPri_Id).subscribe(datos_materiaPrima => {
-            this.materiasPrimas.push(datos_materiaPrima);
-          });
-        }
-      }
-    });
+  limpiarCamposMP(){
+    this.FormMateriaPrima.reset();
   }
 
   //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
   obtenerMateriasPrimasRetiradas(){
     this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
       for (let index = 0; index < datos_materiaPrima.length; index++) {
-        this.materiasPrimasRetiradas.push(datos_materiaPrima[index]);
+        this.materiasPrimas.push(datos_materiaPrima[index]);
       }
     });
   }
@@ -303,77 +266,40 @@ export class MpremisionComponent implements OnInit {
   obtenerUsuarios(){
     this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
       for (let index = 0; index < datos_usuarios.length; index++) {
-        this.usuarios.push(datos_usuarios[index]);
-      }
-    });
-  }
-
-  obtenerDocumetno(){
-    this.tipoDocumentoService.srvObtenerLista().subscribe(datos_documento => {
-      for (let index = 0; index < datos_documento.length; index++) {
-        this.tipodocuemnto.push(datos_documento[index]);
-      }
-    });
-  }
-
-  obtenerProveeedor(){
-    this.proveedorservices.srvObtenerLista().subscribe(datos_proveedor => {
-      for (let index = 0; index < datos_proveedor.length; index++) {
-        this.proveedor.push(datos_proveedor[index].prov_Nombre);
-      }
-    });
-  }
-
-  llenarProveedorSeleccionadoRemision(){
-    let proveedorSelccionado : string = this.FormMateriaPrimaRemision.value.proveedorNombre;
-    this.proveedorservices.srvObtenerLista().subscribe(datos_proveedores => {
-      for (let index = 0; index < datos_proveedores.length; index++) {
-        if (datos_proveedores[index].prov_Nombre == proveedorSelccionado) {
-          this.FormMateriaPrimaRemision.setValue({
-            ConsecutivoRemision : this.FormMateriaPrimaRemision.value.ConsecutivoRemision,
-            MpRemision: this.FormMateriaPrimaRemision.value.MpRemision,
-            MpingresoFecha: this.FormMateriaPrimaRemision.value.MpingresoFecha,
-            proveedor : datos_proveedores[index].prov_Id,
-            proveedorNombre: this.FormMateriaPrimaRemision.value.proveedorNombre,
-            // tipoDocumento: this.FormMateriaPrimaRemision.value.tipoDocumento,
-            // MpEstados: this.FormMateriaPrimaRemision.value.MpEstados,
-            // MpOperario: this.FormMateriaPrimaRemision.value.MpOperario,
-            MpObservacion: this.FormMateriaPrimaRemision.value.MpObservacion,
-          });
+        if (datos_usuarios[index].rolUsu_Id == 3) {
+          this.usuarios.push(datos_usuarios[index]);
         }
       }
+    });
+  }
+
+  llenarUsuarioSeleccionado(){
+    let usuarioSelccionado : string = this.FormMateriaPrimaRecuperada.value.usuarioNombre;
+    this.usuarioService.srvObtenerListaPorId(usuarioSelccionado).subscribe(datos_usuario => {
+      this.FormMateriaPrimaRecuperada.setValue({
+        ConsecutivoFactura : this.FormMateriaPrimaRecuperada.value.ConsecutivoFactura,
+        MpingresoFecha: this.FormMateriaPrimaRecuperada.value.MpingresoFecha,
+        usuarioNombre : this.FormMateriaPrimaRecuperada.value.usuarioNombre,
+        usuarioId: datos_usuario.usua_Id,
+        proceso : this.FormMateriaPrimaRecuperada.value.proceso,
+        MpObservacion: this.FormMateriaPrimaRecuperada.value.MpObservacion,
+      });
     })
   }
 
-  llenarProvedorIdRemision(){
-    let proveedorID : string = this.FormMateriaPrimaRemision.value.proveedor
-    this.proveedorservices.srvObtenerListaPorId(proveedorID).subscribe(datos_proveedores => {
-      this.FormMateriaPrimaRemision.setValue({
-        ConsecutivoRemision : this.FormMateriaPrimaRemision.value.ConsecutivoRemision,
-        MpRemision: this.FormMateriaPrimaRemision.value.MpRemision,
+  llenarUsuarioId(){
+    let usuarioID : string = this.FormMateriaPrimaRecuperada.value.usuarioId
+    this.usuarioService.srvObtenerListaPorId(usuarioID).subscribe(datos_usuario => {
+      this.FormMateriaPrimaRecuperada.setValue({
+        ConsecutivoFactura : this.FormMateriaPrimaRecuperada.value.ConsecutivoFactura,
         MpingresoFecha: this.today,
-        proveedor :this.FormMateriaPrimaRemision.value.proveedor,
-        proveedorNombre:datos_proveedores.prov_Nombre,
-        // tipoDocumento: this.FormMateriaPrimaRemision.value.tipoDocumento,
-        // MpEstados: this.FormMateriaPrimaRemision.value.MpEstados,
-        // MpOperario: this.FormMateriaPrimaRemision.value.MpOperario,
-        MpObservacion: this.FormMateriaPrimaRemision.value.MpObservacion,
+        usuarioNombre :datos_usuario.usua_Nombre,
+        usuarioId:this.FormMateriaPrimaRecuperada.value.usuarioId,
+        proceso : this.FormMateriaPrimaRecuperada.value.proceso,
+        MpObservacion: this.FormMateriaPrimaRecuperada.value.MpObservacion,
       });
 
     })
-  }
-
-  //Funcion que buscará y almacenará todos los estados existententes para documentos
-  obtenerEstados(){
-    this.tipoEstadoService.srvObtenerListaPorId(1).subscribe(datos_tipoEstados => {
-      this.estadoService.srvObtenerListaEstados().subscribe(datos_estados => {
-        for (let index = 0; index < datos_estados.length; index++) {
-          if (datos_estados[index].tpEstado_Id == datos_tipoEstados.tpEstado_Id) {
-            this.estado.push(datos_estados[index].estado_Nombre);
-          }
-        }
-      });
-    });
   }
 
   //Funcion que se encagará de obtener los procesos de la empresa
@@ -385,182 +311,41 @@ export class MpremisionComponent implements OnInit {
     });
   }
 
-  // Funcion que se encargará de obtener todas las areas de la empresa exceptuando ()
-  obtenerAreas(){
-    this.areas = [];
-    let usuarioSeleccionado : string = this.FormMateriaPrimaRetiro.value.UsuarioRetiro;
-    this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-      for (let index = 0; index < datos_usuarios.length; index++) {
-        if (datos_usuarios[index].usua_Nombre == usuarioSeleccionado) {
-          this.areasService.srvObtenerListaPorId(datos_usuarios[index].area_Id).subscribe(datos_areas => {
-            this.areas.push(datos_areas);
-          });
-        }
+  obtenerTipoRecuperado(){
+    this.tipoRecuperadoService.srvObtenerLista().subscribe(datos_tiposRecuperados => {
+      for (let index = 0; index < datos_tiposRecuperados.length; index++) {
+        this.tipoRecuperado.push(datos_tiposRecuperados[index]);
       }
-    });
-  }
-
-  obtenerUltimoIdRemisionCompra(){
-    let idsRemision = [];
-    let idUltimaRemision : number;
-    this.remisionService.srvObtenerLista().subscribe(datos_remision => {
-      for (let index = 0; index < datos_remision.length; index++) {
-        idsRemision.push(datos_remision[index].rem_Id);
-      }
-      this.ultimoIdRemision = Math.max.apply(null, idsRemision);
-      this.ultimoIdRemision = this.ultimoIdRemision + 1;
-      this.FormMateriaPrimaRemision.setValue({
-        ConsecutivoRemision : this.ultimoIdRemision,
-        MpRemision: '',
-        MpingresoFecha: this.today,
-        proveedor: '',
-        proveedorNombre: '',
-        // tipoDocumento: '',
-        // MpEstados:'',
-        // MpOperario: this.storage_Nombre,
-        MpObservacion : '',
-      });
-    });
-  }
-
-  obtenerUltimpIDMP(){
-    let idsMP = [];
-    let idUltimaRemision : number;
-    this.materiaPrimaService.srvObtenerLista().subscribe(datos_MP => {
-      for (let index = 0; index < datos_MP.length; index++) {
-        idsMP.push(datos_MP[index].facco_Id);
-      }
-      this.ultimoIdMateriaPrima = Math.max.apply(null, idsMP);
-      this.ultimoIdMateriaPrima = this.ultimoIdRemision + 1;
-    });
-  }
-  //Funacion que crea una materia prima y la guarda en la base de datos
-  CreacionMateriaPrima(nombreMateriaPrima : string,
-    descripcionMateriaPrima : string,
-    stockMateriaPrima : number,
-    undMed : string,
-    categoriaMateriaPrima : number,
-    precioMateriaPrima : number,
-    bodega : number,
-    proveedor : number){
-
-
-    const datosMP : any = {
-      MatPri_Nombre : nombreMateriaPrima,
-      MatPri_Descripcion : descripcionMateriaPrima,
-      MatPri_Stock : stockMateriaPrima,
-      UndMed_Id : 'Kg',
-      CatMP_Id : categoriaMateriaPrima,
-      MatPri_Precio : precioMateriaPrima,
-      TpBod_Id : 4,
-    }
-
-    this.materiaPrimaService.srvGuardar(datosMP).subscribe(datos_mp_creada => {
-      this.creacionMpProveedor(this.ultimoIdMateriaPrima, proveedor);
-    });
-
-  }
-
-  //Funcion que creará un proveedor y lo guardará en la base de datos
-  CreacionProveedor( idProveedor : number,
-     TipoIdProveedor : string,
-     nombreProveedor : string,
-     tipoproveedor : number,
-     ciudadProveedor : string,
-     telefonoProveedor : string,
-     emailProveedor : string){
-
-    const datosProveedor : any = {
-      Prov_Id : idProveedor,
-      TipoIdentificacion_Id : TipoIdProveedor,
-      Prov_Nombre : nombreProveedor,
-      TpProv_Id : tipoproveedor,
-      Prov_Ciudad : ciudadProveedor,
-      Prov_Telefono : telefonoProveedor,
-      Prov_Email : emailProveedor,
-    }
-
-    this.proveedorservices.srvGuardar(datosProveedor).subscribe(datos_nuevoProveedor => {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: '¡Proveedor creado con exito!'
-      });
-    });
-  }
-
-  //Funcion qu creará la relacion de materia prima y proveedores
-  creacionMpProveedor(idMateriaPrima : number, proveedor : number){
-    const datosMpProveedor = {
-      Prov_Id : proveedor,
-      MatPri_Id : idMateriaPrima,
-    }
-
-    this.proveedorMPService.srvGuardar(datosMpProveedor).subscribe(datos_MpProveedorCreado => {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: '¡Materia Prima creada con exito!'
-      });
     });
   }
 
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante
-  registrarRemisionMP(){
-    let nombreEstado : string = this.FormMateriaPrimaRemision.value.MpEstados;
-    let consecutivoRemision : string = this.FormMateriaPrimaRemision.value.MpRemision;
-    // let fechaEntrada : any = this.FormMateriaPrimaRemision.value.MpingresoFecha;
-    let idProveedor : number = this.FormMateriaPrimaRemision.value.proveedor;
-    let observacionRemision : string = this.FormMateriaPrimaRemision.value.MpObservacion;
-    let idEstadoRemision : number;
-    let idUsuario : number = this.storage_Id;
-    // let tipoDocumento : string = this.FormMateriaPrimaRemision.value.tipoDocumento;
+  registrarRecuperado(){
+    let idUsuario: number = this.FormMateriaPrimaRecuperada.value.usuarioId;
+    let observacion : string = this.FormMateriaPrimaRecuperada.value.MpObservacion;
+    let proceso : string = this.FormMateriaPrimaRecuperada.value.proceso;
 
-    const datosRemision : any = {
-      Rem_Codigo : consecutivoRemision,
-      Rem_Fecha : this.today,
-      Rem_PrecioEstimado : this.valorTotal,
-      Prov_Id : idProveedor,
-      Estado_Id : 12,
+    const datosRecuperado : any = {
+      RecMp_FechaIngreso : this.today,
       Usua_Id : idUsuario,
-      TpDoc_Id : 'REM',
-      Rem_Observacion : observacionRemision,
+      RecMp_Observacion : observacion,
+      Proc_Id : proceso,
     }
-    this.remisionService.srvGuardar(datosRemision).subscribe(datos_remisionCreada => {
-      this.obtenerUltimoIdRemision();
+
+    this.recuperadoService.srvGuardar(datosRecuperado).subscribe(datos_RecuperadoCreada => {
+      this.obtenerUltimoIdRecuperado();
     });
   }
 
   // Funcion que se encargará de obtener el ultimo Id de las facturas
-  obtenerUltimoIdRemision(){
-    let idsRemision = [];
-    let idUltimaRemision : number;
-    this.remisionService.srvObtenerLista().subscribe(datos_remision => {
-      for (let index = 0; index < datos_remision.length; index++) {
-        idsRemision.push(datos_remision[index].rem_Id);
+  obtenerUltimoIdRecuperado(){
+    let idsRecuperado = [];
+    this.recuperadoService.srvObtenerLista().subscribe(datos_recuperados => {
+      for (let index = 0; index < datos_recuperados.length; index++) {
+        idsRecuperado.push(datos_recuperados[index].recMp_Id);
       }
-      this.ultimoIdRemision = Math.max.apply(null, idsRemision);
-      this.creacionRemisionMateriaPrima(this.ultimoIdRemision);
+      this.ultimoIdRecuperado = Math.max.apply(null, idsRecuperado);
+      this.creacionRecuperadoMateriaPrima(this.ultimoIdRecuperado);
     });
   }
 
@@ -572,13 +357,12 @@ export class MpremisionComponent implements OnInit {
       mpNombre : "Nombre",
       mpCantidad : "Cantidad",
       mpUndMedCant : "Und. Cant",
-      mpPrecioU : "Precio U",
-      mpSubTotal : "SubTotal",
+      mpTipoRecup : "Recuperado",
     }]
   }
 
   //
-  validarCamposVaciosMPRemision(){
+  validarCamposVaciosMP(){
     if (this.FormMateriaPrima.valid) this.cargarFormMpEnTablas(this.ArrayMateriaPrima)
     else Swal.fire("Hay campos de la Materi Prima vacios")
   }
@@ -587,34 +371,25 @@ export class MpremisionComponent implements OnInit {
   cargarFormMpEnTablas(formulario : any){
     let idMateriaPrima : number = this.FormMateriaPrima.value.MpId;
     this.nombreMateriaPrima = this.FormMateriaPrima.value.MpNombre;
-    let precioMateriaPrima : number = this.FormMateriaPrima.value.MpPrecio;
+    let tipoRecuperado = this.FormMateriaPrima.value.tipoRecuperado;
     let presentacion : string = this.FormMateriaPrima.value.MpUnidadMedida;
     let cantidad : number = this.FormMateriaPrima.value.MpCantidad;
-    let subtotalProd : number = precioMateriaPrima * cantidad;
-
-    this.valorTotal = this.valorTotal + subtotalProd;
-    this.formatonumeros(this.valorTotal);
 
     let productoExt : any = {
       Id : idMateriaPrima,
       Nombre : this.nombreMateriaPrima,
       Cant : cantidad,
       UndCant : presentacion,
-      PrecioUnd : precioMateriaPrima,
-      Stock : this.FormMateriaPrima.value,
-      SubTotal : subtotalProd
+      mpTipoRecup : tipoRecuperado,
     }
 
-    this.FormMateriaPrimaRemision.setValue({
-      ConsecutivoRemision : this.FormMateriaPrimaRemision.value.ConsecutivoRemision,
-      MpRemision: this.FormMateriaPrimaRemision.value.MpRemision,
+    this.FormMateriaPrimaRecuperada.setValue({
+      ConsecutivoFactura : this.FormMateriaPrimaRecuperada.value.ConsecutivoFactura,
       MpingresoFecha: this.today,
-      proveedor :this.FormMateriaPrimaRemision.value.proveedor,
-      proveedorNombre:this.FormMateriaPrimaRemision.value.proveedorNombre,
-      // tipoDocumento: this.FormMateriaPrimaRemision.value.tipoDocumento,
-      // MpEstados: this.FormMateriaPrimaRemision.value.MpEstados,
-      // MpOperario: this.FormMateriaPrimaRemision.value.MpOperario,
-      MpObservacion: this.FormMateriaPrimaRemision.value.MpObservacion,
+      usuarioNombre :this.FormMateriaPrimaRecuperada.value.usuarioNombre,
+      usuarioId:this.FormMateriaPrimaRecuperada.value.usuarioId,
+      proceso : this.FormMateriaPrimaRecuperada.value.proceso,
+      MpObservacion: this.FormMateriaPrimaRecuperada.value.MpObservacion,
     });
 
     if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length == 0) {
@@ -634,14 +409,15 @@ export class MpremisionComponent implements OnInit {
       }
     }
     this.ArrayMateriaPrima.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
+    this.FormMateriaPrima.reset();
   }
 
   //Funcion que creará el registro de la materia que viene en un pedido
-  creacionRemisionMateriaPrima(idRemision : number){
+  creacionRecuperadoMateriaPrima(idRecuperado : number){
     let idMateriaPrima : number;
     let cantidadMateriaPrima : number;
     let presentacionMateriaPrima : string;
-    let valorUnitarioMp : number;
+    let tipoRecuperado : number;
 
     if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla")
     else {
@@ -649,24 +425,27 @@ export class MpremisionComponent implements OnInit {
         idMateriaPrima = this.ArrayMateriaPrima[index].Id;
         cantidadMateriaPrima = this.ArrayMateriaPrima[index].Cant;
         presentacionMateriaPrima = this.ArrayMateriaPrima[index].UndCant;
-        valorUnitarioMp = this.ArrayMateriaPrima[index].PrecioUnd;
+        tipoRecuperado = this.ArrayMateriaPrima[index].mpTipoRecup;
 
-        const datosRemisionMp : any = {
-          Rem_Id : idRemision,
+        const datosRecuperadoMp : any = {
+          RecMp_Id : idRecuperado,
           MatPri_Id : idMateriaPrima,
-          RemiMatPri_Cantidad : cantidadMateriaPrima,
+          RecMatPri_Cantidad : cantidadMateriaPrima,
           UndMed_Id : presentacionMateriaPrima,
-          RemiMatPri_ValorUnitario : valorUnitarioMp,
+          TpRecu_Id : 1,
         }
-        this.remisionMPService.srvGuardar(datosRemisionMp).subscribe(datos_remisionMpCreada => {
+
+        this.recuperadoMPService.srvGuardar(datosRecuperadoMp).subscribe(datos_recuperadoMpCreada => {
         });
+        this.moverInventarioMpAgregada();
       }
-      this.moverInventarioMpAgregada();
     }
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima entrante
   moverInventarioMpAgregada(){
+    let idMateriaPrima : number;
+    let cantidadMateriaPrima : number;
     let stockMateriaPrimaInicial : number;
     let stockMateriaPrimaFinal : number;
 
@@ -699,30 +478,31 @@ export class MpremisionComponent implements OnInit {
           });
           Toast.fire({
             icon: 'success',
-            title: '¡Registro de factura creado con exito!'
+            title: '¡Registro De Materia Prima Recuperada Creado Con Exito!'
           });
-          this.FormMateriaPrimaRemision.setValue({
-            MpRemision: '',
-            MpingresoFecha: this.today,
-            proveedor: '',
-            proveedorNombre: '',
-            // tipoDocumento: '',
-            // MpEstados:'',
-            // MpOperario: this.storage_Nombre,
-            MpObservacion : '',
-          });
-          this.FormMateriaPrima.reset();
-          this.ArrayMateriaPrima = [];
-          this.valorTotal = 0;
+          this.limpiarTodosCampos();
         });
       });
     }
   }
 
-   // Función para quitar un producto de la tabla
-  QuitarProductoTablaRemision(index : number, formulario : any) {
+  limpiarTodosCampos(){
+    this.FormMateriaPrimaRecuperada.setValue({
+      ConsecutivoFactura : this.ultimoIdRecuperado,
+      MpingresoFecha: this.today,
+      usuarioNombre: '',
+      usuarioId: '',
+      proceso : '',
+      MpObservacion : '',
+    });
+    this.FormMateriaPrima.reset();
+    this.ArrayMateriaPrima = [];
+  }
+
+  // Función para quitar un producto de la tabla
+  QuitarProductoTabla(index : number, formulario : any) {
     Swal.fire({
-      title: '¿Estás seguro de eliminar la Materia Prima de la Remision/Remisión?',
+      title: '¿Estás seguro de eliminar la Materia Prima de la Factura/Remisión?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -737,7 +517,7 @@ export class MpremisionComponent implements OnInit {
   }
 
   // Función para editar uno de los productos de la tabla
-  EditarProductoTablaRemision(formulario : any) {
+  EditarProductoTabla(formulario : any) {
     this.AccionBoton = "Editar";
     this.FormMateriaPrima.patchValue({
       MpId : formulario.Id,
@@ -749,7 +529,7 @@ export class MpremisionComponent implements OnInit {
   }
 
   //Funcion que consultara una materia prima con base a un ID pasado en la vista
-  buscarMpIdRemision(){
+  buscarMpId(){
     let idMateriaPrima : number = this.FormMateriaPrima.value.MpId;
     this.materiaPrimaSeleccionada = [];
     this.categoriaMPBuscadaID = '';
@@ -762,14 +542,14 @@ export class MpremisionComponent implements OnInit {
           this.materiasPrimas.push(datos_materiaPrima);
           this.categoriaMPBuscadaID = datos_categoria.catMP_Nombre;
           this.tipobodegaMPBuscadaId = datos_bodega.tpBod_Nombre;
-          this.cargarInfoMPRemision();
+          this.cargarInfoMP();
         });
       });
     });
   }
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
-  buscarMpSeleccionadaRemision(){
+  buscarMpSeleccionada(){
     let nombreMateriaPrima : string = this.FormMateriaPrima.value.MpNombre;
     let idMateriaPrima : number; //En el HTML se pasará el nombre de la materia prima pero el input tendrá como valor el Id de la materia prima
     this.materiaPrimaSeleccionada = [];
@@ -782,7 +562,7 @@ export class MpremisionComponent implements OnInit {
               this.materiaPrimaSeleccionada.push(datos_materiasPrimas[index]);
               this.categoriaMPSeleccionada = datos_categoria.catMP_Nombre;
               this.tipoBodegaMPSeleccionada = datos_bodega.tpBod_Nombre;
-              this.cargarInfoMPRemision();
+              this.cargarInfoMP();
             });
           });
         }
@@ -791,25 +571,16 @@ export class MpremisionComponent implements OnInit {
   }
 
   //Funcion que llenará la infomacion de materia prima buscada o seleccionada y pasará la informacion a la vista
-  cargarInfoMPRemision(){
+  cargarInfoMP(){
     for (const Mp of this.materiaPrimaSeleccionada) {
       this.FormMateriaPrima.setValue({
         MpId : Mp.matPri_Id,
         MpNombre: Mp.matPri_Nombre,
         MpCantidad: '',
-        MpPrecio: Mp.matPri_Precio,
+        tipoRecuperado: '',
         MpUnidadMedida : Mp.undMed_Id,
       });
     }
   }
 
-  // Funcion para llamar el modal que crea clientes
-  LlamarModalCrearProveedor() {
-    this.ModalCrearProveedor = true;
-  }
-
-  // Funcion para llamar el modal que crea clientes
-  LlamarModalCrearMateriaPrima(){
-    this.ModalCrearMateriaPrima = true;
-  }
 }

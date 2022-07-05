@@ -4,4 +4,5 @@ export interface modelAsignacionMP {
   AsigMp_Observacion : string;
   Estado_Id : number;
   AsigMp_Maquina : number;
+  Usua_Id : number;
 }

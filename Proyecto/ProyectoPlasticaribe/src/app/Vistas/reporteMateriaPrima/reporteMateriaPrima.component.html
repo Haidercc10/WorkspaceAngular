@@ -36,6 +36,16 @@
           </select>
           <label for="floatingSelect">Nombre de la Materia Prima</label>
         </div>
+        <!-- Fecha inicial -->
+        <div class="form-floating col-md-2">
+          <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput"required >
+          <label for="floatingInput">Fecha Inicial</label>
+        </div>
+        <!-- Fecha final -->
+        <div class="form-floating col-md-2">
+          <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
+          <label for="floatingInput">Fecha Final</label>
+        </div>
       </div>
     </div>
     <!-- BOTONES -->
@@ -57,6 +67,8 @@
               <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
               <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
               <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
+              <th id="cantidadMateriaPrima" scope="col">{{columnas.mpEntrada}}</th>
+              <th id="cantidadMateriaPrima" scope="col">{{columnas.mpSalida}}</th>
               <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
               <ng-container *ngIf="ValidarRol == 1">
                 <th id="precioMateriaPrima" scope="col" >{{columnas.mpPrecioU}}</th>
@@ -68,11 +80,11 @@
             <tr *ngFor="let materiaPrima of ArrayMateriaPrima | paginate: {itemsPerPage: 30, currentPage: page} let i=index" >
               <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
               <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
-              <td id="cantidadMateriaPrima">{{materiaPrima.Cant}}</td>
+              <td id="cantidadMateriaPrima">{{materiaPrima.Cant | number}}</td>
               <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
               <ng-container *ngIf="ValidarRol == 1">
-                <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd}}</td>
-                <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | currency : 'COP '}}</td>
+                <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd | number}}</td>
+                <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | number}}</td>
               </ng-container>
             </tr>
           </tbody>

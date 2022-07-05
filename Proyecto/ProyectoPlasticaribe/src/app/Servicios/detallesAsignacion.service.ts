@@ -9,7 +9,7 @@ import { modelDetallesAsignacion } from '../Modelo/modelDetallesAsignacion';
 })
 export class DetallesAsignacionService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }
@@ -19,8 +19,8 @@ export class DetallesAsignacionService {
         return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetalleAsignacion_MateriaPrima')
     }
 
-    srvObtenerListaPorId(dato : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/${dato}`);
+    srvObtenerListaPorId(asignacion : any, materiaPrima : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/ ?AsigMp_Id=${asignacion}&MatPri_Id=${materiaPrima}`);
     }
 
   //Metodo agregar

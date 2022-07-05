@@ -50,38 +50,61 @@
       <div class="row g-3">
         <div class="form-floating col-md-2">
           <input formControlName="ConsecutivoFactura" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" readonly onmousedown="return false;">
-          <label for="floatingSelect">Concecutivo Factura</label>
+          <label for="floatingSelect">Concecutivo</label>
         </div>
-        <div class="form-floating col-md-2">
-          <input formControlName="MpFactura" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
-          <label for="floatingSelect">Número Factura</label>
-        </div>
-        <!-- Remision -->
-        <!-- <div class="form-floating col-md-2">
-          <input formControlName="MpRemision" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
-          <label for="floatingSelect">Número Remisión</label>
-        </div> -->
-        <!-- Fecha Ingreso -->
-        <div class="form-floating col-md-2">
-          <input formControlName="MpingresoFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso" readonly onmousedown="return false;">
-          <label for="floatingInput">Fecha Ingreso</label>
-        </div>
+
+        <ng-container *ngIf="validarCamposFacRem == 1">
+          <div class="form-floating col-md-2">
+            <input formControlName="MpFactura" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" readonly onmousedown="return false;">
+            <label for="floatingSelect">Número Factura</label>
+          </div>
+          <!-- Remision -->
+          <div class="form-floating col-md-2">
+            <input formControlName="MpRemision" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+            <label for="floatingSelect">Número Remisión</label>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="validarCamposFacRem == 2">
+          <div class="form-floating col-md-2">
+            <input formControlName="MpFactura" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid">
+            <label for="floatingSelect">Número Factura</label>
+          </div>
+          <!-- Remision -->
+          <div class="form-floating col-md-2">
+            <input formControlName="MpRemision" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" readonly onmousedown="return false;">
+            <label for="floatingSelect">Número Remisión</label>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="validarCamposFacRem == 3">
+          <div class="form-floating col-md-2">
+            <input formControlName="MpFactura" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+            <label for="floatingSelect">Número Factura</label>
+          </div>
+          <!-- Remision -->
+          <div class="form-floating col-md-2">
+            <input formControlName="MpRemision" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+            <label for="floatingSelect">Número Remisión</label>
+          </div>
+        </ng-container>
+
+
+
         <!-- Fecha Vencimiento Factura -->
         <!-- <div class="form-floating col-md -2">
           <input formControlName="MpingresoFechaVendcimiento" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso">
           <label for="floatingInput">Fecha Vencimiento</label>
         </div> -->
-        <!-- Proveedor -->
-        <div class="form-floating col-md-3">
-          <input formControlName="proveedor" (keyup.enter)="llenarProvedorId()"type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
-          <label for="floatingSelect">ID Proveedor</label>
-        </div>
         <!-- Nombre Proveedor -->
         <div class="form-floating col-md-3">
           <select formControlName="proveedorNombre" id="floatingSelect" type="text" (change)="llenarProveedorSeleccionado()" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
             <option [ngValue]="proveedores" *ngFor="let proveedores of proveedor">{{proveedores}}</option>
           </select>
           <label for="floatingSelect">Nombre Proveedor</label>
+        </div>
+        <!-- Proveedor -->
+        <div class="form-floating col-md-3">
+          <input formControlName="proveedor" (keyup.enter)="llenarProvedorId()"type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+          <label for="floatingSelect">ID Proveedor</label>
         </div>
         <!-- Tipo Documento -->
         <!-- <div class="form-floating col-md-2">
@@ -107,6 +130,11 @@
         <div class="form-floating col-md">
           <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" name="MpObservacion"></textarea>
           <label for="floatingTextarea">Observación</label>
+        </div>
+        <!-- Fecha Ingreso -->
+        <div class="form-floating col-md-2">
+          <input formControlName="MpingresoFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso" readonly onmousedown="return false;">
+          <label for="floatingInput">Fecha Ingreso</label>
         </div>
       </div>
     </div>
@@ -154,7 +182,7 @@
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVaciosMP()">{{AccionBoton}} Materia Prima</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMP()">Limpiar Campos</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMP()">Limpiar Campos Materia Prima</button>
       </div>
     </div>
   </form>
@@ -220,46 +248,49 @@
   </div>
 
   <form [formGroup]="FormRemisiones">
-    <div class="form-floating col-md-3">
-      <input formControlName="idRemision" (keyup.enter)="llenarProvedorId()"type="number" class="form-control form-control-sm" id="floatingInput">
-      <label for="floatingSelect">ID Remisión</label>
+    <div class="form-floating col-md-2">
+      <input formControlName="idRemision" (keyup.enter)="consultarIdRemisiones()" type="text"  class="form-control form-control-sm" id="floatingInput">
+      <label for="floatingInput">Número Remisión</label>
     </div>
   </form>
+
 
   <div class="mb-4">
     <h4 class="tituloRojo">Tabla Remisiones</h4>
   </div>
 
-  <!-- TABLA DE INGRESO -->
+  <!-- TABLA DE REMISIONES -->
   <div class="mb-2">
     <div class="row g-1">
       <div class="table-responsive">
         <!-- <div id="html2Pdf"> -->
         <table class="table table-bordered" >
           <thead class="TitulosTabla">
-            <tr *ngFor="let columnas of titulosTabla let i = index">
-              <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
-              <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
-              <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
-              <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
-              <th id="precioMateriaPrima" scope="col">{{columnas.mpPrecioU}}</th>
-              <th id="subTotalMateriaPrima" scope="col">{{columnas.mpSubTotal}}</th>
-              <th id="editar" scope="col">Editar</th>
-              <th id="eliminar" scope="col">Eliminar</th>
+            <tr *ngFor="let remColumnas of titulosTablaRemisiones let i = index">
+              <th id="idMateriaPrima" scope="col">{{remColumnas.remId}}</th>
+              <th id="nombreMateriaPrima" scope="col">{{remColumnas.remCodigo}}</th>
+              <th id="cantidadMateriaPrima" scope="col">{{remColumnas.remFecha}}</th>
+              <th id="UnidadMedida" scope="col">{{remColumnas.remProveedor}}</th>
+              <th id="precioMateriaPrima" scope="col">{{remColumnas.remUsuario}}</th>
+              <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remTipoDoc}}</th>
+              <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remPrecio}}</th>
+              <th id="archivo" scope="col">Archivo</th>
+
             </tr>
             </thead>
           <tbody>
             <!-- <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" > -->
             <!-- <tr *ngFor= "let item of IngresoMateriaP " > -->
-            <tr *ngFor="let materiaPrima of ArrayMateriaPrima let i = index">
-              <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
-              <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
-              <td id="cantidadMateriaPrima">{{materiaPrima.Cant}}</td>
-              <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
-              <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd | currency : 'COP'}}</td>
-              <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | currency : 'COP'}}</td>
-              <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" (click)="EditarProductoTabla(materiaPrima)" title="Editar Materia Prima"></i></a></td>
-              <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" (click)="QuitarProductoTabla(i, materiaPrima)" title="Quitar Materia Prima de la tabla"></i></a></td>
+            <tr *ngFor="let remisiones of ArrayRemisiones let i = index">
+
+              <td id="idMateriaPrima">{{remisiones.remisionId}}</td>
+              <td id="nombreMateriaPrima">{{remisiones.remisionCodigo}}</td>
+              <td id="cantidadMateriaPrima">{{remisiones.remisionFecha | date : 'yyyy-MM-dd'}}</td>
+              <td id="UnidadMedida">{{remisiones.remisionProveedor}}</td>
+              <td id="precioMateriaPrima">{{remisiones.remisionUsuario}}</td>
+              <td id="subTotalMateriaPrima">{{remisiones.remisionDocumento}}</td>
+              <td id="subTotalMateriaPrima">{{remisiones.remisionPrecio | currency}}</td>
+              <td id="archivo"><a><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver archivo" (click)="llenarDocumento(remisiones)"></i></a></td>
             </tr>
           </tbody>
         </table>
@@ -271,11 +302,16 @@
     </div>
   </div>
 
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <label for=""><b>Valor total: $</b></label>
+    <label for="">${{valorTotalRem | currency : 'COP'}}</label>
+  </div>
+
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button" (click)="registrarFacturaMP()">Agregar Factura</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button">Limpiar Campos</button>
+      <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCampos()">Agregar Factura</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosCampos()">Limpiar Todos los Campos</button>
     </div>
   </div>
 
