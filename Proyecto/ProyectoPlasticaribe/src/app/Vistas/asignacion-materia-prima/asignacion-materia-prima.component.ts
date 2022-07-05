@@ -359,6 +359,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       AsigMp_Observacion : observacion,
       Estado_Id : 13,
       AsigMp_Maquina : maquina,
+      Usua_Id : this.storage_Id,
     }
     this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
       this.obtenerUltimoIdAsignacaion();
@@ -407,9 +408,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         }
 
         this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {
-          this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
         });
       }
+      this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
     }
   }
 
@@ -470,38 +471,56 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let stockMateriaPrimaInicial : number;
     let stockMateriaPrimaFinal : number;
 
-    this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
-      stockMateriaPrimaInicial = datos_materiaPrima.matPri_Stock;
-      stockMateriaPrimaFinal = stockMateriaPrimaInicial - cantidadMateriaPrima;
-      const datosMP : any = {
-        MatPri_Id : idMateriaPrima,
-        MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
-        MatPri_Descripcion : datos_materiaPrima.matPri_Descripcion,
-        MatPri_Stock : stockMateriaPrimaFinal,
-        UndMed_Id : datos_materiaPrima.undMed_Id,
-        CatMP_Id : datos_materiaPrima.catMP_Id,
-        MatPri_Precio : datos_materiaPrima.matPri_Precio,
-        TpBod_Id : datos_materiaPrima.tpBod_Id,
-      }
-      this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).subscribe(datos_mp_creada => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 1500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'success',
-          title: '¡Registro de Asignación creado con exito!'
+    for (let index = 0; index < this.ArrayMateriaPrimaRetirada.length; index++) {
+
+
+      this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrimaRetirada[index].Id).subscribe(datos_materiaPrima => {
+        stockMateriaPrimaInicial = datos_materiaPrima.matPri_Stock;
+        stockMateriaPrimaFinal = stockMateriaPrimaInicial - this.ArrayMateriaPrimaRetirada[index].Cant;
+        const datosMP : any = {
+          MatPri_Id : this.ArrayMateriaPrimaRetirada[index].Id,
+          MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
+          MatPri_Descripcion : datos_materiaPrima.matPri_Descripcion,
+          MatPri_Stock : stockMateriaPrimaFinal,
+          UndMed_Id : datos_materiaPrima.undMed_Id,
+          CatMP_Id : datos_materiaPrima.catMP_Id,
+          MatPri_Precio : datos_materiaPrima.matPri_Precio,
+          TpBod_Id : datos_materiaPrima.tpBod_Id,
+        }
+        this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrimaRetirada[index].Id, datosMP).subscribe(datos_mp_creada => {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'center',
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer)
+              toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+          });
+          Toast.fire({
+            icon: 'success',
+            title: '¡Registro de Asignación creado con exito!'
+          });
+          this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
+            OTRetiro : '',
+            FechaRetiro : this.today,
+            Maquina : '',
+            UsuarioRetiro : '',
+            AreaRetiro : '',
+            EstadoRetiro : '',
+            ObservacionRetiro : '',
+            ProcesoRetiro : '',
+          });
+          this.ArrayMateriaPrimaRetirada= [];
+          this.FormMateriaPrimaRetirada.reset();
         });
       });
-    });
+    }
+
   }
+
 
   //Funcion que consultara una materia prima con base a un ID pasado en la vista
   buscarMpId(){

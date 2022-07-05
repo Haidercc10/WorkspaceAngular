@@ -44,6 +44,8 @@ import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-pri
 import { ConsultaFac_Rem_MPComponent } from './Vistas/consultaFac_Rem_MP/consultaFac_Rem_MP.component';
 // import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
 import { MpremisionComponent } from './Vistas/mpremision/mpremision.component';
+import { MovimientoMPComponent } from './Vistas/movimientoMP/movimientoMP.component';
+import { MateriaPrimaRecuperadaComponent } from './Vistas/MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
 
 
 
@@ -82,6 +84,8 @@ export const routes: Routes = [
   // {path: 'asignacion-materia-prima', canActivate: [ValidacionLoginGuard], component: AsignacionMateriaPrimaComponent},
   // {path: 'asignacionMP', canActivate: [ValidacionLoginGuard], component: AsignacionMateriaPrimaComponent},
   {path: 'reporte-facturas-remisiones-mp', canActivate: [ValidacionLoginGuard], component: ConsultaFac_Rem_MPComponent},
+  {path: 'movimiento-mp', canActivate: [ValidacionLoginGuard], component: MovimientoMPComponent},
+  {path: 'mp-recuperada', canActivate: [ValidacionLoginGuard], component: MateriaPrimaRecuperadaComponent},
 ]
 
 @NgModule({
@@ -116,6 +120,8 @@ export const routes: Routes = [
     AsignacionMateriaPrimaComponent,
     MpremisionComponent,
     ConsultaFac_Rem_MPComponent,
+    MovimientoMPComponent,
+    MateriaPrimaRecuperadaComponent,
   ],
 
 

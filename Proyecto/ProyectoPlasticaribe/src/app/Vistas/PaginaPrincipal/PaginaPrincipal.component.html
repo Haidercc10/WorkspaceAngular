@@ -276,16 +276,20 @@
                   Inventario de Materia Prima
                 </a>
               </div>
-              <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="/reporte-facturas-remisiones-mp" role="button" aria-expanded="false" aria-controls="">
-                  Reporte Fact. Rem. de Materia Prima
-                </a>
-              </div>
-              <!-- <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima-OT" role="button" aria-expanded="false" aria-controls="">
-                  Reporte Materia Prima por OT
-                </a>
-              </div> -->
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
+                    Movimientos MP
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/reporte-facturas-remisiones-mp" role="button" aria-expanded="false" aria-controls="">
+                    Reporte Fact. Rem. de Materia Prima
+                  </a>
+                </div>
+              </ng-container>
               <div class="mb-2">
                 <hr>
               </div>
@@ -324,17 +328,22 @@
             <div class="collapse" id="collapseExample10">
               <div class="mb-2">
                 <a class="fst-normal" data-bs-toggle="" href="/MateriaPrima" role="button" aria-expanded="false" aria-controls="">
-                  Entrada Factura de Materia prima
+                  Entradas
                 </a>
               </div>
-              <div class="mb-2">
+              <!-- <div class="mb-2">
                 <a class="fst-normal" data-bs-toggle="" href="/mpremision" role="button" aria-expanded="false" aria-controls="">
                   Entrada Remisión de Materia prima
                 </a>
-              </div>
+              </div> -->
               <div class="mb-2">
                 <a class="fst-normal" data-bs-toggle="" href="/asignacionMP" role="button" aria-expanded="false" aria-controls="">
-                  Asignación de Materia Prima
+                  Asignaciones
+                </a>
+              </div>
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="/mp-recuperada" role="button" aria-expanded="false" aria-controls="">
+                  Recuperado
                 </a>
               </div>
                 <!-- <div class="mb-2">

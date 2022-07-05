@@ -73,12 +73,12 @@
         </div> -->
         <!-- Proveedor -->
         <div class="form-floating col-md-3">
-          <input formControlName="proveedor" (keyup.enter)="llenarProvedorId()"type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+          <input formControlName="proveedor" (keyup.enter)="llenarProvedorIdRemision()"type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
           <label for="floatingSelect">ID Proveedor</label>
         </div>
         <!-- Nombre Proveedor -->
         <div class="form-floating col-md-3">
-          <select formControlName="proveedorNombre" id="floatingSelect" type="text" (change)="llenarProveedorSeleccionado()" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+          <select formControlName="proveedorNombre" id="floatingSelect" type="text" (change)="llenarProveedorSeleccionadoRemision()" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
             <option [ngValue]="proveedores" *ngFor="let proveedores of proveedor">{{proveedores}}</option>
           </select>
           <label for="floatingSelect">Nombre Proveedor</label>
@@ -120,12 +120,12 @@
     <div class="mb-3">
       <div class="row g-3">
         <div class="form-floating col-md-2">
-          <input formControlName="MpId" type="number" min="0" (keyup.enter)="buscarMpId()" class="form-control" id="floatingInput"required >
+          <input formControlName="MpId" type="number" min="0" (keyup.enter)="buscarMpIdRemision()" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Id Producto</label>
         </div>
         <!-- ID/Nombre Producto -->
         <div class="form-floating col-md-4">
-          <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
+          <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionadaRemision()" aria-label="Floating label select example" required>
             <!-- <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima.matPri_Nombre}}</option> -->
             <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimasRetiradas">{{materiaPrima.matPri_Nombre}}</option>
           </select>
@@ -153,8 +153,8 @@
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVaciosMP()">{{AccionBoton}} Materia Prima</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMP()">Limpiar Campos</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVaciosMPRemision()">{{AccionBoton}} Materia Prima</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMPRemision()">Limpiar Campos</button>
       </div>
     </div>
   </form>
@@ -195,8 +195,8 @@
               <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
               <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd | currency : 'COP'}}</td>
               <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | currency : 'COP'}}</td>
-              <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" (click)="EditarProductoTabla(materiaPrima)" title="Editar Materia Prima"></i></a></td>
-              <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" (click)="QuitarProductoTabla(i, materiaPrima)" title="Quitar Materia Prima de la tabla"></i></a></td>
+              <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" (click)="EditarProductoTablaRemision(materiaPrima)" title="Editar Materia Prima"></i></a></td>
+              <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" (click)="QuitarProductoTablaRemision(i, materiaPrima)" title="Quitar Materia Prima de la tabla"></i></a></td>
             </tr>
           </tbody>
         </table>

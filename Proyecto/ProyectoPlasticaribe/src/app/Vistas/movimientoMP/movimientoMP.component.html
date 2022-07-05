@@ -13,7 +13,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Consulta de Facturas y Remisiones de Materia Prima</h2>
+      <h2 class="tituloRojo">Movimientos de Materia Prima</h2>
     </div>
 
     <div class="mb-4">
@@ -26,29 +26,37 @@
     <div class="mb-3">
       <div class="row g-3">
         <!-- ID Documento -->
-        <div class="form-floating col-md-3">
+        <div class="form-floating col-md-2">
           <input formControlName="idDocumento" type="number" class="form-control" id="floatingInput"required >
-          <label for="floatingInput">Id Documento</label>
+          <label for="floatingInput">Orden de trabajo</label>
         </div>
-        <!-- Fecha -->
-        <div class="form-floating col-md-3">
+        <!-- Fecha inicial -->
+        <div class="form-floating col-md-2">
           <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput"required >
-          <label for="floatingInput">Fecha</label>
+          <label for="floatingInput">Fecha Inicial</label>
+        </div>
+        <!-- Fecha final -->
+        <div class="form-floating col-md-2">
+          <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
+          <label for="floatingInput">Fecha Final</label>
         </div>
         <!-- Tipo Docuemtno -->
         <div class="form-floating col-md">
           <select formControlName="TipoDocumento" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
-            <option [ngValue]="tiposDocumentos.tpDoc_Id" *ngFor="let tiposDocumentos of tipoDocumento">{{tiposDocumentos.tpDoc_Nombre}}</option>
-            <option>Remisiones sin Factura</option>
+            <ng-container *ngIf="ValidarRol == 1">
+              <option [ngValue]="tiposDocumentos.tpDoc_Id" *ngFor="let tiposDocumentos of tipoDocumento">{{tiposDocumentos.tpDoc_Nombre}}</option>
+            </ng-container>
+            <option>Asignación</option>
+            <option>Recuperado</option>
           </select>
           <label for="floatingSelect">Tipo de Documento</label>
         </div>
         <!-- Proveedores -->
         <div class="form-floating col-md">
-          <select formControlName="proveedores" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
-            <option [ngValue]="proveedores.prov_Id" *ngFor="let proveedores of proveedor">{{proveedores.prov_Nombre}}</option>
+          <select formControlName="materiaPrima" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+            <option [ngValue]="mp.matPri_Id" *ngFor="let mp of ArrayMateriaPrimaRetirada">{{mp.matPri_Nombre}}</option>
           </select>
-          <label for="floatingSelect">Proveedor</label>
+          <label for="floatingSelect">Materia prima</label>
         </div>
       </div>
     </div>
@@ -64,17 +72,15 @@
   <div class="mb-2">
     <div class="row g-1">
       <div class="table-responsive">
-        <!-- <div id="html2Pdf"> -->
         <table class="table table-bordered">
           <thead class="TitulosTabla">
             <tr *ngFor="let columnas of titulosTabla let i = index">
               <th id="CodigoFactura" scope="col">{{columnas.idFact}}</th>
               <th id="Tipo" scope="col">{{columnas.tipo}}</th>
               <th id="fecha" scope="col">{{columnas.FechaFact}}</th>
-              <th id="proveedor" scope="col">{{columnas.proveedor}}</th>
-              <ng-container *ngIf="ValidarRol == 1">
-                <th id="subTotal" scope="col" (dblclick)="organizacionPrecioDblClick()" (click)="organizacionPrecio()">{{columnas.Costo}}</th>
-              </ng-container>
+              <th id="proveedor" scope="col">{{columnas.usuario}}</th>
+              <th id="mp" scope="col">{{columnas.mp}}</th>
+              <th id="cantMp" scope="col">{{columnas.cant}}</th>
               <th id="ver" scope="col" >{{columnas.Ver}}</th>
             </tr>
             </thead>
@@ -83,10 +89,9 @@
               <td id="CodigoFactura">{{doc.codigo}}</td>
               <td id="Tipo">{{doc.tipoDoc}}</td>
               <td id="fecha">{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
-              <td id="proveedor">{{doc.proveedor}}</td>
-              <ng-container *ngIf="ValidarRol == 1">
-                <td id="subTotal">{{doc.subTotal | currency : 'COP '}}</td>
-              </ng-container>
+              <td id="proveedor">{{doc.usuario}}</td>
+              <td id="mp">{{doc.mp}}</td>
+              <td id="mp">{{doc.cant | number}}</td>
               <td id="subTotalMateriaPrima"><input class="btn btn-danger btn-danger-sm" type="button" value="Ver" (click)="llenarDocumento(doc)"></td>
             </tr>
           </tbody>
@@ -97,6 +102,13 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="mb-1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <label><b>Total Materia Prima Entregada: </b></label>
+      <label><b>{{totalMPEntregada | number}} KG</b></label>
     </div>
   </div>
 </div>
