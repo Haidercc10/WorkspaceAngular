@@ -69,7 +69,7 @@ export class MovimientoMPComponent implements OnInit {
   cantidadTotalDbl : number; //Variable que va a almacenar el total de la cantidad doblada en una OT
   proceso : string = ''; //Variable ayudará a almacenar el proceso del cuela se está consultando la ot
   totalPorcentajePerida : number; //Variable que ayudará a calcular el total de perdida en una OT
-  asignacion = 0;
+  asignacion : string;
   recuperado = 3;
   tipoDocumento = [];
   proveedor = [];
@@ -90,8 +90,8 @@ export class MovimientoMPComponent implements OnInit {
                             private proveedorService : ProveedorService,
                               private remisionService : RemisionService,
                                 private remisionMpService : RemisionesMPService,
-                                  private facturaCompraService : FactuaMpCompradaService,
-                                    private facturaCompraMPService : FacturaMpService,
+                                  private facturaCompraMPService : FactuaMpCompradaService,
+                                    private facturaCompraService : FacturaMpService,
                                       private usuarioService : UsuarioService,
                                         private remisionFacturaService : RemisionFacturaService,
                                           private asignacionService : AsignacionMPService,
@@ -212,6 +212,7 @@ export class MovimientoMPComponent implements OnInit {
 
   validarConsulta(){
     this.ArrayDocumento = [];
+    this.asignacion = '';
     this.totalMPEntregada = 0;
     let idDoc : number = this.FormDocumentos.value.idDocumento;
     let fecha : any = this.FormDocumentos.value.fecha;
@@ -231,7 +232,7 @@ export class MovimientoMPComponent implements OnInit {
             fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
             for (let i = 0; i < datos_asignacionMP.length; i++) {
               if (moment(fechaCreacionFinal).isBetween(fecha, fechaFinal) && datos_asignacionMP[i].matPri_Id == materiaPrima) {
-                this.asignacion = 1;
+                this.asignacion = 'Asignacion';
                 this.lenarTabla(datos_asignacionMP[i]);
               }
             }
@@ -248,7 +249,7 @@ export class MovimientoMPComponent implements OnInit {
             fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
             for (let i = 0; i < datos_asignacionMP.length; i++) {
               if (moment(fecha).isSame(fechaCreacionFinal) && datos_asignacionMP[i].asigMp_Id == datos_asignacion[index].asigMp_Id && datos_asignacionMP[i].matPri_Id == materiaPrima) {
-                this.asignacion = 1;
+                this.asignacion = 'Asignacion';
                 this.lenarTabla(datos_asignacionMP[i]);
               }
             }
@@ -264,7 +265,7 @@ export class MovimientoMPComponent implements OnInit {
               let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
               fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
               if (moment(fechaCreacionFinal).isBetween(fecha, fechaFinal) && datos_asignacionMP[i].matPri_Id == materiaPrima) {
-                this.asignacion = 1;
+                this.asignacion = 'Asignacion';
                 this.lenarTabla(datos_asignacionMP[i]);
               }
             }
@@ -282,8 +283,7 @@ export class MovimientoMPComponent implements OnInit {
           this.asignacionMpService.srvObtenerLista().subscribe(datos_asignacionMP => {
             for (let i = 0; i < datos_asignacionMP.length; i++) {
               if (moment(fechaCreacionFinal).isBetween(fecha, fechaFinal) && datos_asignacionMP[i].asigMp_Id == datos_asignacion[index].asigMp_Id) {
-                this.asignacion = 1;
-                console.log(datos_asignacionMP[i])
+                this.asignacion = 'Asignacion';
                 this.lenarTabla(datos_asignacionMP[i]);
               }
             }
@@ -299,7 +299,7 @@ export class MovimientoMPComponent implements OnInit {
             fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
             for (let i = 0; i < datos_asignacionMP.length; i++) {
               if (moment(fecha).isSame(fechaCreacionFinal) && datos_asignacionMP[i].asigMp_Id == datos_asignacion[index].asigMp_Id) {
-                this.asignacion = 1;
+                this.asignacion = 'Asignacion';
                 this.lenarTabla(datos_asignacionMP[i]);
               }
             }
@@ -312,7 +312,7 @@ export class MovimientoMPComponent implements OnInit {
           this.asignacionMpService.srvObtenerLista().subscribe(datos_asignacionMP => {
             for (let i = 0; i < datos_asignacionMP.length; i++) {
               if (datos_asignacionMP[i].matPri_Id == materiaPrima) {
-                this.asignacion = 1;
+                this.asignacion = 'Asignacion';
                 this.lenarTabla(datos_asignacionMP[i]);
               }
             }
@@ -327,7 +327,7 @@ export class MovimientoMPComponent implements OnInit {
             this.asignacionMpService.srvObtenerLista().subscribe(datos_asignacionMp => {
               for (let i = 0; i < datos_asignacionMp.length; i++) {
                 if (datos_asignacionMp[i].asigMp_Id == datos_asignaciones[index].asigMp_Id) {
-                  this.asignacion = 1;
+                  this.asignacion = 'Asignacion';
                   this.lenarTabla(datos_asignacionMp[i]);
                 }
               }
@@ -341,7 +341,7 @@ export class MovimientoMPComponent implements OnInit {
       //   this.remisionService.srvObtenerListaPorId(idDoc).subscribe(datos_remision => {
       //     this.lenarTabla(datos_remision);
       //     this.asignacionService.srvObtenerListaPorId(idDoc).subscribe(datos_asignacion => {
-      //       this.asignacion = 1;
+      //       this.asignacion = 'Asignacion';
       //       this.lenarTabla(datos_asignacion);
       //       this.recuperadoService.srvObtenerListaPorId(idDoc).subscribe(datos_recpuerado => {
       //         // this.recuperado = 2;
@@ -405,7 +405,7 @@ export class MovimientoMPComponent implements OnInit {
             fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
             for (let i = 0; i < datos_asignacionMP.length; i++) {
               if (moment(fecha).isSame(fechaCreacionFinal) && datos_asignacionMP[i].asigMp_Id == datos_asignacion[index].asigMp_Id) {
-                this.asignacion = 1;
+                this.asignacion = 'Asignacion';
                 this.lenarTabla(datos_asignacionMP[i]);
               }
             }
@@ -427,7 +427,7 @@ export class MovimientoMPComponent implements OnInit {
 
     } else if (TipoDocumento != null) {
       if (TipoDocumento ==  'FCO') {
-        this.facturaCompraService.srvObtenerLista().subscribe(datos_factura => {
+        this.facturaCompraMPService.srvObtenerLista().subscribe(datos_factura => {
           for (let index = 0; index < datos_factura.length; index++) {
             this.lenarTabla(datos_factura[index]);
           }
@@ -441,8 +441,14 @@ export class MovimientoMPComponent implements OnInit {
       } else if (TipoDocumento == 'Asignación') {
         this.asignacionService.srvObtenerLista().subscribe(datos_asignacion => {
           for (let index = 0; index < datos_asignacion.length; index++) {
-            this.asignacion = 1;
-            this.lenarTabla(datos_asignacion[index]);
+            this.asignacionMpService.srvObtenerLista().subscribe(datos_asignacionMp => {
+              for (let i = 0; i < datos_asignacionMp.length; i++) {
+                if (datos_asignacion[index].asigMp_Id == datos_asignacionMp[i].asigMp_Id) {
+                  this.asignacion = 'Asignacion';
+                  this.lenarTabla(datos_asignacionMp[i]);
+                }
+              }
+            });
           }
         });
       } else if (TipoDocumento == 'Recuperado') {
@@ -458,14 +464,14 @@ export class MovimientoMPComponent implements OnInit {
         for (let index = 0; index < datos_asgincaionMp.length; index++) {
           if (datos_asgincaionMp[index].matPri_Id == materiaPrima) {
             this.asignacionService.srvObtenerListaPorId(datos_asgincaionMp[index].asigMp_Id).subscribe(datos_asignacion => {
-              this.asignacion = 1;
+              this.asignacion = 'Asignacion';
               this.lenarTabla(datos_asgincaionMp[index]);
             });
           }
         }
       });
     } else {
-      this.facturaCompraService.srvObtenerLista().subscribe(datos_factura => {
+      this.facturaCompraMPService.srvObtenerLista().subscribe(datos_factura => {
         for (let index = 0; index < datos_factura.length; index++) {
           this.lenarTabla(datos_factura[index]);
         }
@@ -483,11 +489,10 @@ export class MovimientoMPComponent implements OnInit {
       });
       this.asignacionService.srvObtenerLista().subscribe(datos_asignacion => {
         for (let asg = 0; asg < datos_asignacion.length; asg++) {
-          this.asignacion = 1;
+          this.asignacion = 'Asignacion';
           this.lenarTabla(datos_asignacion[asg]);
         }
       });
-
     }
   }
 
@@ -524,9 +529,7 @@ export class MovimientoMPComponent implements OnInit {
         infoDoc.usuario = datos_usuario.usua_Nombre;
       });
 
-    } else if (this.asignacion == 1 ) {
-      // if (materiaPrima != null) {
-
+    } else if (this.asignacion == 'Asignacion') {
       this.asignacionService.srvObtenerListaPorId(formulario.asigMp_Id).subscribe(datos_asignacion => {
         const infoDoc : any = {
           id : datos_asignacion.asigMp_Id,
@@ -547,21 +550,6 @@ export class MovimientoMPComponent implements OnInit {
           infoDoc.mp = datos_mp.matPri_Nombre
         });
       });
-      // } else if () {
-      //   const infoDoc : any = {
-      //     id : formulario.asigMp_Id,
-      //     codigo : formulario.asigMP_OrdenTrabajo,
-      //     tipoDoc : 'ASIGNACION',
-      //     fecha : formulario.asigMp_FechaEntrega,
-      //     usuario : formulario.usua_Id,
-      //     mp : formulario.asigMp_Maquina,
-      //   }
-      //   this.ArrayDocumento.push(infoDoc);
-      //   this.totalMPEntregada = this.totalMPEntregada
-      //   this.usuarioService.srvObtenerListaPorId(infoDoc.usuario).subscribe(datos_usuario => {
-      //     infoDoc.usuario = datos_usuario.usua_Nombre;
-      //   });
-      // }
     } else if (formulario.proc_Id === 'RECUP') {
       const infoDoc : any = {
         id : formulario.recMp_Id,
@@ -577,6 +565,8 @@ export class MovimientoMPComponent implements OnInit {
         infoDoc.usuario = datos_usuario.usua_Nombre;
       });
     }
+
+    this.ArrayDocumento.sort((a,b) =>  (b.fecha) - (a.fecha));
   }
 
   // Funcion que llena el array con los productos que pertenecen al pedido que se consulta

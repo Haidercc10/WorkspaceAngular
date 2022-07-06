@@ -19,8 +19,8 @@ export class FactuaMpCompradaService {
         return this.http.get<any>(this.rutaPlasticaribeAPI + '/Factura_Compra')
     }
 
-    srvObtenerListaPorId(dato : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/${dato}`);
+    srvObtenerListaPorId(factura : any, mp : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/ Facco_Id=${factura}&MatPri_Id=${mp}`);
     }
 
   //Metodo agregar Facturas de Materia Prima Comprada

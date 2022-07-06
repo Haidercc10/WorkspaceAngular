@@ -84,8 +84,8 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
                             private proveedorService : ProveedorService,
                               private remisionService : RemisionService,
                                 private remisionMpService : RemisionesMPService,
-                                  private facturaCompraService : FactuaMpCompradaService,
-                                    private facturaCompraMPService : FacturaMpService,
+                                  private facturaCompraMPService : FactuaMpCompradaService,
+                                    private facturaCompraService : FacturaMpService,
                                       private usuarioService : UsuarioService,
                                         private remisionFacturaService : RemisionFacturaService) {
 

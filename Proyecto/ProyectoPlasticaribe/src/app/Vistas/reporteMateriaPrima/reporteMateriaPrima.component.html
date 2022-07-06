@@ -81,6 +81,8 @@
               <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
               <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
               <td id="cantidadMateriaPrima">{{materiaPrima.Cant | number}}</td>
+              <td id="cantidadMateriaPrima">{{materiaPrima.Entrada | number}}</td>
+              <td id="cantidadMateriaPrima">{{materiaPrima.Salida | number}}</td>
               <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
               <ng-container *ngIf="ValidarRol == 1">
                 <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd | number}}</td>
