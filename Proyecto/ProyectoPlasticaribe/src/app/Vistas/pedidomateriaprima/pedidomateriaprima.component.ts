@@ -1181,19 +1181,21 @@ export class PedidomateriaprimaComponent implements OnInit {
                               //Recorro remisiones_facturascompras para ver lo que va para la tabla.
                                 this.remisionFacturaService.srvObtenerLista().subscribe(datosRemisiones_Facturas => {
                                   for (let remFac = 0; remFac < datosRemisiones_Facturas.length; remFac++) {
+                                     //subtotal = datosRemisiones[index].rem_PrecioEstimado;
 
-                                    let remFac_remisionId : any = [datosRemisiones_Facturas[remFac]];
+                                    let remFac_remisionId : any = [datosRemisiones_Facturas[remFac].rem_Id];
+                                    let propioRemisionId : any = [datosRemisiones[index].rem_Id];
+
                                     console.log(remFac_remisionId);
+                                    console.log(propioRemisionId);
 
-                                    if(remFac_remisionId.find(datosRemisiones[index].rem_Id)){
+                                    if(remFac_remisionId.includes(propioRemisionId)){
 
-                                      subtotal = datosRemisiones[index].rem_PrecioEstimado;
-
+                                      Swal.fire('La remisión  "' + propioRemisionId + '"ya tiene una factura asociada.')
                                       console.log('Entró acá');
-                                      console.log(datosRemisiones_Facturas[remFac]);
-
-
-                                    } else {
+                                      //console.log(remFac_remisionId);
+                                      break;
+                                    } else if (!remFac_remisionId.includes(propioRemisionId)){
 
                                       let datosTablaRemisiones : any = {
                                         remisionId : datosRemisiones[index].rem_Id,
@@ -1209,9 +1211,9 @@ export class PedidomateriaprimaComponent implements OnInit {
                                         this.valorTotalRem = this.valorTotalRem + subtotal;
                                         this.llenarDocumento(datosRemisiones[index].rem_Id);
 
-                                        console.log(datosRemisiones_Facturas[remFac]);
-
-
+                                        console.log('Entra');
+                                        //console.log(datosRemisiones_Facturas[remFac]);
+                                        break;
                                     }
 
                                   }

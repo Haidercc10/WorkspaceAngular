@@ -125,7 +125,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
       MpId : new FormControl(),
       MpNombre: new FormControl(),
       MpCantidad: new FormControl(),
-      tipoRecuperado: new FormControl(),
+      //tipoRecuperado: new FormControl(),
       MpUnidadMedida:new FormControl(),
     });
   }
@@ -157,7 +157,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
       MpId : ['', Validators.required],
       MpNombre: ['', Validators.required],
       MpCantidad : ['', Validators.required],
-      tipoRecuperado: ['', Validators.required],
+      //tipoRecuperado: ['', Validators.required],
       MpUnidadMedida: ['', Validators.required],
     });
   }
@@ -299,7 +299,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         MpObservacion: this.FormMateriaPrimaRecuperada.value.MpObservacion,
       });
 
-    })
+    });
   }
 
   //Funcion que se encagará de obtener los procesos de la empresa
@@ -335,6 +335,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     this.recuperadoService.srvGuardar(datosRecuperado).subscribe(datos_RecuperadoCreada => {
       this.obtenerUltimoIdRecuperado();
     });
+
+
   }
 
   // Funcion que se encargará de obtener el ultimo Id de las facturas
@@ -357,21 +359,24 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
       mpNombre : "Nombre",
       mpCantidad : "Cantidad",
       mpUndMedCant : "Und. Cant",
-      mpTipoRecup : "Recuperado",
+      //mpTipoRecup : "Recuperado",
     }]
   }
 
   //
   validarCamposVaciosMP(){
     if (this.FormMateriaPrima.valid) this.cargarFormMpEnTablas(this.ArrayMateriaPrima)
-    else Swal.fire("Hay campos de la Materi Prima vacios")
+
+    else Swal.fire("Hay campos de la Materi Prima vacios"),
+    console.log(this.ArrayMateriaPrima),
+    console.log(this.FormMateriaPrima);
   }
 
   //Funcion que envia la informacion de los productos a la tabla.
   cargarFormMpEnTablas(formulario : any){
     let idMateriaPrima : number = this.FormMateriaPrima.value.MpId;
     this.nombreMateriaPrima = this.FormMateriaPrima.value.MpNombre;
-    let tipoRecuperado = this.FormMateriaPrima.value.tipoRecuperado;
+    //let tipoRecuperado = this.FormMateriaPrima.value.tipoRecuperado;
     let presentacion : string = this.FormMateriaPrima.value.MpUnidadMedida;
     let cantidad : number = this.FormMateriaPrima.value.MpCantidad;
 
@@ -380,7 +385,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
       Nombre : this.nombreMateriaPrima,
       Cant : cantidad,
       UndCant : presentacion,
-      mpTipoRecup : tipoRecuperado,
+      //mpTipoRecup : tipoRecuperado,
     }
 
     this.FormMateriaPrimaRecuperada.setValue({
@@ -417,7 +422,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     let idMateriaPrima : number;
     let cantidadMateriaPrima : number;
     let presentacionMateriaPrima : string;
-    let tipoRecuperado : number;
+    let tipoRecuperado : string = '1';
 
     if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla")
     else {
@@ -425,15 +430,17 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         idMateriaPrima = this.ArrayMateriaPrima[index].Id;
         cantidadMateriaPrima = this.ArrayMateriaPrima[index].Cant;
         presentacionMateriaPrima = this.ArrayMateriaPrima[index].UndCant;
-        tipoRecuperado = this.ArrayMateriaPrima[index].mpTipoRecup;
+
 
         const datosRecuperadoMp : any = {
           RecMp_Id : idRecuperado,
           MatPri_Id : idMateriaPrima,
           RecMatPri_Cantidad : cantidadMateriaPrima,
           UndMed_Id : presentacionMateriaPrima,
-          TpRecu_Id : 1,
+          TpRecu_Id : tipoRecuperado,
         }
+
+        console.log(tipoRecuperado);
 
         this.recuperadoMPService.srvGuardar(datosRecuperadoMp).subscribe(datos_recuperadoMpCreada => {
         });
@@ -577,7 +584,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         MpId : Mp.matPri_Id,
         MpNombre: Mp.matPri_Nombre,
         MpCantidad: '',
-        tipoRecuperado: '',
+        //tipoRecuperado: '',
         MpUnidadMedida : Mp.undMed_Id,
       });
     }
