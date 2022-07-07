@@ -81,8 +81,6 @@ export const routes: Routes = [
   {path: 'reporte-Materia-Prima-OT', canActivate: [ValidacionLoginGuard], component: ReporteMpOtComponent},
   {path: 'asignacionMP', canActivate: [ValidacionLoginGuard], component: AsignacionMateriaPrimaComponent},
   {path: 'mpremision', canActivate: [ValidacionLoginGuard], component: MpremisionComponent},
-  // {path: 'asignacion-materia-prima', canActivate: [ValidacionLoginGuard], component: AsignacionMateriaPrimaComponent},
-  // {path: 'asignacionMP', canActivate: [ValidacionLoginGuard], component: AsignacionMateriaPrimaComponent},
   {path: 'reporte-facturas-remisiones-mp', canActivate: [ValidacionLoginGuard], component: ConsultaFac_Rem_MPComponent},
   {path: 'movimiento-mp', canActivate: [ValidacionLoginGuard], component: MovimientoMPComponent},
   {path: 'mp-recuperada', canActivate: [ValidacionLoginGuard], component: MateriaPrimaRecuperadaComponent},

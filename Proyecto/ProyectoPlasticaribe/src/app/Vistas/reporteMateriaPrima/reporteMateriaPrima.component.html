@@ -66,9 +66,10 @@
             <tr *ngFor="let columnas of titulosTabla let i = index">
               <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
               <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
-              <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
+              <th id="cantidadMateriaPrima" scope="col">Inicial</th>
               <th id="cantidadMateriaPrima" scope="col">{{columnas.mpEntrada}}</th>
               <th id="cantidadMateriaPrima" scope="col">{{columnas.mpSalida}}</th>
+              <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
               <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
               <ng-container *ngIf="ValidarRol == 1">
                 <th id="precioMateriaPrima" scope="col" >{{columnas.mpPrecioU}}</th>
@@ -80,9 +81,10 @@
             <tr *ngFor="let materiaPrima of ArrayMateriaPrima let i=index" >
               <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
               <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
-              <td id="cantidadMateriaPrima">{{materiaPrima.Cant | number}}</td>
+              <td id="cantidadMateriaPrima">0</td>
               <td id="cantidadMateriaPrima">{{materiaPrima.Entrada | number}}</td>
               <td id="cantidadMateriaPrima">{{materiaPrima.Salida | number}}</td>
+              <td id="cantidadMateriaPrima">{{materiaPrima.Cant | number}}</td>
               <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
               <ng-container *ngIf="ValidarRol == 1">
                 <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd | number}}</td>
