@@ -9,14 +9,23 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-        <h2 class="tituloRojo">Productos</h2>
+        <!--<h2 class="tituloRojo">Productos</h2>-->
     </div>
     <div class="mb-5">
         <hr class="colorLinea">
     </div>
     <div class="mb-4">
-        <h4 class="tituloRojo">Crear/Consultar Productos</h4>
+        <!--<h4 class="tituloRojo">Crear/Consultar Productos</h4>-->
     </div>
+
+    <div class="container">
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button type="button" class="btn btn-danger btn-danger-sm" (click)="InventarioExistenciaZeus()">
+          Generar inventario
+        </button>
+      </div>
+
     <!-- FORMULARIO DE PRODUCTOS -->
     <form [formGroup]="formularioProducto" (ngSubmit)="validarCamposVacios()">
         <!-- Inicio fila 1 de campos -->
@@ -91,15 +100,16 @@
         <!-- Botones para agregar productos -->
         <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" >Agregar Producto</button>
+                <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" (click)="InventarioExistenciaZeus()">Agregar</button>
                 <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" expand="full" (click)="clear()">Limpiar campos</button>
             </div>
         </div>
+      </form>
         <div class="mb-5">
             <hr class="colorLinea">
         </div>
         <div class="mb-4">
-            <h4 class="tituloRojo">Listado de Productos</h4>
+            <!--<h4 class="tituloRojo">Listado de Productos</h4>-->
         </div>
         <!-- Tabla donde se mostrarán los producto existentes -->
         <div class="mb-4">
@@ -174,6 +184,8 @@
 
             </div>
         </div>
-    </form>
+
+
+  </div>
   </div>
 </div>

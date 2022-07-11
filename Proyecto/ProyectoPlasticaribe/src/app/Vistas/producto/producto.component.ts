@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { modelProducto } from 'src/app/Modelo/modelProducto';
+import { BagproService } from 'src/app/Servicios/Bagpro.service';
+import { InventarioZeusService } from 'src/app/Servicios/inventario-zeus.service';
+import { InventarioArticuloZeusService } from 'src/app/Servicios/inventarioArticuloZeus.service';
 import { ProductoService } from 'src/app/Servicios/producto.service';
 import { TipoProductoService } from 'src/app/Servicios/tipo-producto.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
@@ -19,9 +22,18 @@ export class ProductoComponent implements OnInit {
 
   titulosTabla = [];
   ArrayProducto = [];
+  datosTabla : any = [];
 
-  constructor(private productoServices : ProductoService, private TipoProductoService : TipoProductoService, private UnidadMedidaService : UnidadMedidaService, private frmBuilderProducto : FormBuilder) {
-    this.formularioProducto = this.frmBuilderProducto.group({
+
+  constructor(private productoServices : ProductoService,
+              private TipoProductoService : TipoProductoService,
+              private UnidadMedidaService : UnidadMedidaService,
+              private frmBuilderProducto : FormBuilder,
+              private existenciasZeus : InventarioZeusService,
+              private bagProServices : BagproService,
+              private articulosZeus : InventarioArticuloZeusService) {
+
+      this.formularioProducto = this.frmBuilderProducto.group({
       ProductoID: [, Validators.required],
       ProductoNombre: [, Validators.required],
       ProductoDescripcion: ['',],
@@ -113,6 +125,56 @@ export class ProductoComponent implements OnInit {
       pUndMed : "Und. Med",
       pPrecioTotal : "Precio Total"
     }]
+  }
+
+
+  InventarioExistenciaZeus(){
+    this.existenciasZeus.srvObtenerExistenciasZeus().subscribe(datosExistencias => {
+
+      for (let exi = 0; exi < datosExistencias.length; exi++) {
+        let CampoArticulo: any = datosExistencias[exi].articulo;
+
+        this.articulosZeus.srvObtenerListaPorId(CampoArticulo).subscribe(datosArticulos => {
+          //for (let art = 0; art < datosArticulos.length; art++) {
+            let CampoCodigo: any = datosArticulos.codigo;
+
+            this.bagProServices.srvObtenerListaClienteOTItemsXItem(CampoCodigo).subscribe(datosClientesOtItems =>{
+                for (let cl = 0; cl < datosClientesOtItems.length; cl++) {
+
+                        if(datosExistencias[exi].bodega == '003'
+                        && datosExistencias[exi].existencias >= 1.0000
+                        && datosExistencias[exi].articulo == datosArticulos.idArticulo
+                        && datosArticulos.tipo == 'PRODUCTO TERMINADO'
+                        && datosArticulos.codigo == datosClientesOtItems[cl].clienteItems.toString())
+                        {
+
+                            this.datosTabla = {
+                              //ArticuloId : datosArticulos[art].idArticulo,
+                              //ExistArticulo : datosExistencias[exi].articulo,
+                              ArticuloCodigo : datosArticulos.codigo,
+                              ArticuloNombre : datosArticulos.nombre,
+                              ArticuloPrecio : datosArticulos.precioVenta,
+                              ExistExistencia : datosExistencias[exi].existencias,
+                              //ClotiItemId : datosClientesOtItems[cl].clienteItems.toString(),
+                              ClotiCliente : datosClientesOtItems[cl].clienteNom,
+                              //ArticuloTipo : datosArticulos[art].tipo,
+                            }
+
+                            console.log(this.datosTabla);
+                        }
+
+
+
+                }
+
+            });
+          //}
+          });
+
+      }
+      });
+
+
   }
 
 

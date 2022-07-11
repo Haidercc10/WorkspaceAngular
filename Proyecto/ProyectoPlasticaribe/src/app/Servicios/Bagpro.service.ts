@@ -7,13 +7,17 @@ import { Observable } from 'rxjs';
 })
 export class BagproService {
 
-  readonly rutaPlasticaribeAPI = "https://localhost:7160/api";
+  readonly rutaPlasticaribeAPI = "http://192.168.0.137:9056/api";
 
   constructor(private http : HttpClient) { }
 
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
   srvObtenerListaClienteOTItems():Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/ClientesOtItems');
+  }
+
+  srvObtenerListaClienteOTItemsXItem(idItem : number):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/ClientesOtItems/OtItem/${idItem}`);
   }
 
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
