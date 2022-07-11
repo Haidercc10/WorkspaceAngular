@@ -510,6 +510,7 @@ export class MovimientoMPComponent implements OnInit {
         subTotal : formulario.facco_ValorTotal,
       }
       this.ArrayDocumento.push(infoDoc);
+      this.ArrayDocumento.sort((a,b) => b.fecha.localeCompare(a.fecha));
       this.usuarioService.srvObtenerListaPorId(infoDoc.usuario).subscribe(datos_usuario => {
         infoDoc.usuario = datos_usuario.usua_Nombre;
       });
@@ -525,6 +526,7 @@ export class MovimientoMPComponent implements OnInit {
         subTotal : formulario.rem_PrecioEstimado,
       }
       this.ArrayDocumento.push(infoDoc);
+      this.ArrayDocumento.sort((a,b) => b.fecha.localeCompare(a.fecha));
       this.usuarioService.srvObtenerListaPorId(infoDoc.usuario).subscribe(datos_usuario => {
         infoDoc.usuario = datos_usuario.usua_Nombre;
       });
@@ -545,6 +547,8 @@ export class MovimientoMPComponent implements OnInit {
           infoDoc.usuario = datos_usuario.usua_Nombre;
         });
         this.totalMPEntregada = this.totalMPEntregada + infoDoc.cant;
+        // this.ArrayDocumento.sort((a,b) =>  (b.fecha) - (a.fecha));
+        this.ArrayDocumento.sort((a,b) => b.fecha.localeCompare(a.fecha));
         this.formatonumeros(this.totalMPEntregada);
         this.materiaPrimaService.srvObtenerListaPorId(infoDoc.mp).subscribe(datos_mp => {
           infoDoc.mp = datos_mp.matPri_Nombre
@@ -566,7 +570,6 @@ export class MovimientoMPComponent implements OnInit {
       });
     }
 
-    this.ArrayDocumento.sort((a,b) =>  (b.fecha) - (a.fecha));
   }
 
   // Funcion que llena el array con los productos que pertenecen al pedido que se consulta
