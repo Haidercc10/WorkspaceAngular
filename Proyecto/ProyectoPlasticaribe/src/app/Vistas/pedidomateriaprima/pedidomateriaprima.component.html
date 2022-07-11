@@ -259,53 +259,61 @@
     <h4 class="tituloRojo">Tabla Remisiones</h4>
   </div>
 
-  <!-- TABLA DE REMISIONES -->
-  <div class="mb-2">
-    <div class="row g-1">
-      <div class="table-responsive">
-        <!-- <div id="html2Pdf"> -->
-        <table class="table table-bordered" >
-          <thead class="TitulosTabla">
-            <tr *ngFor="let remColumnas of titulosTablaRemisiones let i = index">
-              <th id="idMateriaPrima" scope="col">{{remColumnas.remId}}</th>
-              <th id="nombreMateriaPrima" scope="col">{{remColumnas.remCodigo}}</th>
-              <th id="cantidadMateriaPrima" scope="col">{{remColumnas.remFecha}}</th>
-              <th id="UnidadMedida" scope="col">{{remColumnas.remProveedor}}</th>
-              <th id="precioMateriaPrima" scope="col">{{remColumnas.remUsuario}}</th>
-              <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remTipoDoc}}</th>
-              <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remPrecio}}</th>
-              <th id="archivo" scope="col">Archivo</th>
+  <div class="overlay" *ngIf="!load">
+    <div class="spinner ">
+      <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+    </div>
+  </div>
 
-            </tr>
-            </thead>
-          <tbody>
-            <!-- <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" > -->
-            <!-- <tr *ngFor= "let item of IngresoMateriaP " > -->
-            <tr *ngFor="let remisiones of ArrayRemisiones let i = index">
+  <div *ngIf="load">
+    <!-- TABLA DE REMISIONES -->
+    <div class="mb-2">
+      <div class="row g-1">
+        <div class="table-responsive">
+          <!-- <div id="html2Pdf"> -->
+          <table class="table table-bordered" >
+            <thead class="TitulosTabla">
+              <tr *ngFor="let remColumnas of titulosTablaRemisiones let i = index">
+                <th id="idMateriaPrima" scope="col">{{remColumnas.remId}}</th>
+                <th id="nombreMateriaPrima" scope="col">{{remColumnas.remCodigo}}</th>
+                <th id="cantidadMateriaPrima" scope="col">{{remColumnas.remFecha}}</th>
+                <th id="UnidadMedida" scope="col">{{remColumnas.remProveedor}}</th>
+                <th id="precioMateriaPrima" scope="col">{{remColumnas.remUsuario}}</th>
+                <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remTipoDoc}}</th>
+                <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remPrecio}}</th>
+                <th id="archivo" scope="col">Archivo</th>
 
-              <td id="idMateriaPrima">{{remisiones.remisionId}}</td>
-              <td id="nombreMateriaPrima">{{remisiones.remisionCodigo}}</td>
-              <td id="cantidadMateriaPrima">{{remisiones.remisionFecha | date : 'yyyy-MM-dd'}}</td>
-              <td id="UnidadMedida">{{remisiones.remisionProveedor}}</td>
-              <td id="precioMateriaPrima">{{remisiones.remisionUsuario}}</td>
-              <td id="subTotalMateriaPrima">{{remisiones.remisionDocumento}}</td>
-              <td id="subTotalMateriaPrima">{{remisiones.remisionPrecio | currency}}</td>
-              <td id="archivo"><a><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver archivo" (click)="llenarDocumento(remisiones)"></i></a></td>
-            </tr>
-          </tbody>
-        </table>
-        <!-- <div class="mb-2">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <pagination-controls (pageChange)="page = $event"></pagination-controls>
-        </div> -->
+              </tr>
+              </thead>
+            <tbody>
+              <!-- <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" > -->
+              <!-- <tr *ngFor= "let item of IngresoMateriaP " > -->
+              <tr *ngFor="let remisiones of ArrayRemisiones let i = index">
+
+                <td id="idMateriaPrima">{{remisiones.remisionId}}</td>
+                <td id="nombreMateriaPrima">{{remisiones.remisionCodigo}}</td>
+                <td id="cantidadMateriaPrima">{{remisiones.remisionFecha | date : 'yyyy-MM-dd'}}</td>
+                <td id="UnidadMedida">{{remisiones.remisionProveedor}}</td>
+                <td id="precioMateriaPrima">{{remisiones.remisionUsuario}}</td>
+                <td id="subTotalMateriaPrima">{{remisiones.remisionDocumento}}</td>
+                <td id="subTotalMateriaPrima">{{remisiones.remisionPrecio | currency}}</td>
+                <td id="archivo"><a><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver archivo" (click)="llenarDocumento(remisiones)"></i></a></td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- <div class="mb-2">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <pagination-controls (pageChange)="page = $event"></pagination-controls>
+          </div> -->
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  <!-- <div class="d-grid gap-2 d-md-flex justify-content-md-end">
     <label for=""><b>Valor total: $</b></label>
     <label for="">${{valorTotalRem | currency : 'COP'}}</label>
-  </div>
+  </div> -->
 
   <!-- BOTONES -->
   <div class="mb-1">

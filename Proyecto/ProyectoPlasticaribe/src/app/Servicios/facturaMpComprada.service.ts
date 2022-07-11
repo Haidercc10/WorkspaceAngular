@@ -9,7 +9,7 @@ import { modelFacturaMpCompra } from '../Modelo/modelFacturaMpComprada';
 })
 export class FactuaMpCompradaService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }
@@ -19,8 +19,24 @@ export class FactuaMpCompradaService {
         return this.http.get<any>(this.rutaPlasticaribeAPI + '/Factura_Compra')
     }
 
-    srvObtenerListaPorId(factura : any, mp : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/ Facco_Id=${factura}&MatPri_Id=${mp}`);
+    srvObtenerListaPorId(dato : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/${dato}`);
+    }
+
+    srvObtenerListaPorTipo(dato : string){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/api/Factura_Compra/%20?nombre=${dato}`);
+    }
+
+    srvObtenerListaPorUsuario(dato : number){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/F/${dato}`);
+    }
+
+    srvObtenerListaPorProvId(dato : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/P/${dato}`);
+    }
+
+    srvObtenerListaPorFecha(dato : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/fecha/${dato}`);
     }
 
   //Metodo agregar Facturas de Materia Prima Comprada

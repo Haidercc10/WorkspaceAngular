@@ -23,6 +23,14 @@ export class DetallesAsignacionService {
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/ ?AsigMp_Id=${asignacion}&MatPri_Id=${materiaPrima}`);
     }
 
+    srvObtenerListaPorAsigId(asignacion : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/asignacion/${asignacion}`);
+    }
+
+    srvObtenerListaPorMatPriId(materiaPrima : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/matPri/${materiaPrima}`);
+    }
+
   //Metodo agregar
     srvAgregar(data:any) {
       return this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_MateriaPrima', data)

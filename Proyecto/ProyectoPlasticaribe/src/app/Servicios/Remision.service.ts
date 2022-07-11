@@ -10,7 +10,7 @@ import { modelRemision } from '../Modelo/modelRemision';
 export class RemisionService {
 
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }
@@ -22,6 +22,14 @@ export class RemisionService {
 
     srvObtenerListaPorId(id : any){
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/${id}`);
+    }
+
+    srvObtenerListaPorProv(id : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/P/${id}`);
+    }
+
+    srvObtenerListaPorFecha(id : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/fecha/${id}`);
     }
 
   //Metodo agregar proveedor

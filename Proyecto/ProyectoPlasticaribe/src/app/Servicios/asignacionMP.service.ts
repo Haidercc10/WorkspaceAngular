@@ -9,7 +9,7 @@ import { modelAsignacionMP } from '../Modelo/modelAsignacionMP';
 })
 export class AsignacionMPService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }
@@ -21,6 +21,18 @@ export class AsignacionMPService {
 
     srvObtenerListaPorId(dato : any){
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrima/${dato}`);
+    }
+
+    srvObtenerListaPorOt(dato : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrima/ot/${dato}`);
+    }
+
+    srvObtenerListaPorFecha(dato : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrima/fecha/${dato}`);
+    }
+
+    srvObtenerListaPorFechas(fecha1 : any, fecha2 : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrima/fechas?AsigMp_FechaEntrega1=${fecha1}&AsigMp_FechaEntrega2=${fecha2}`);
     }
 
   //Metodo agregar

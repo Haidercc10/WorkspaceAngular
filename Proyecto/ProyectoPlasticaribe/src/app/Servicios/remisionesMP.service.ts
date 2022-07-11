@@ -23,6 +23,14 @@ export class RemisionesMPService {
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_MateriaPrima/${id}`);
     }
 
+    srvObtenerListaPorRemId(id : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_MateriaPrima/remision/${id}`);
+    }
+
+    srvObtenerListaPorMpId(id : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_MateriaPrima/MP/${id}`);
+    }
+
   //Metodo agregar proveedor
     srvAgregar(data:any) {
       return this.http.post(this.rutaPlasticaribeAPI + '/Remision_MateriaPrima', data)

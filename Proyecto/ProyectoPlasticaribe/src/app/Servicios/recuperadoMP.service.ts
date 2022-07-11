@@ -9,7 +9,7 @@ import { modelRecuperadoMP } from '../Modelo/modelRecuperadoMP';
 })
 export class RecuperadoMPService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }
@@ -21,6 +21,14 @@ export class RecuperadoMPService {
 
     srvObtenerListaPorId(id : any){
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/${id}`);
+    }
+
+    srvObtenerListaPorMatPriId(id : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/materiaPrima/${id}`);
+    }
+
+    srvObtenerListaPorRecuperadoId(id : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/recuperado/${id}`);
     }
 
   //Metodo agregar proveedor

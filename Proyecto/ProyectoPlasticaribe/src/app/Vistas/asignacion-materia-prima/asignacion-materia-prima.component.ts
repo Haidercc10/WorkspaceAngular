@@ -77,6 +77,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   totalPorcentajePerida : number; //Variable que ayudará a calcular el total de perdida en una OT
   ultimoId : number = 0;
 
+  kgOT : number;
+  cantidadAsignada : number = 0;
+  cantRestante : number = 0;
+
+  public load: boolean;
 
   /* CONSULTAS DE MATERIA PRIMA */
   MpConsultada = [];
@@ -107,7 +112,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       FechaRetiro : new FormControl(),
       Maquina : new FormControl(),
       UsuarioRetiro : new FormControl(),
-      AreaRetiro : new FormControl(),
+      kgOt : new FormControl(),
       EstadoRetiro : new FormControl(),
       ObservacionRetiro : new FormControl(),
       ProcesoRetiro : new FormControl(),
@@ -121,6 +126,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       MpUnidadMedidaRetirada:new FormControl(),
       MpStockRetirada : new FormControl(),
     });
+
+    this.load = true;
   }
 
 
@@ -142,7 +149,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       FechaRetiro : ['', Validators.required],
       Maquina : ['', Validators.required],
       UsuarioRetiro : ['', Validators.required],
-      AreaRetiro : ['', Validators.required],
+      kgOt : ['', Validators.required],
       EstadoRetiro : ['', Validators.required],
       ObservacionRetiro : ['', Validators.required],
       ProcesoRetiro : ['', Validators.required],
@@ -173,7 +180,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       FechaRetiro : this.today,
       Maquina : '',
       UsuarioRetiro : '',
-      AreaRetiro : '',
+      kgOt : '',
       EstadoRetiro : '',
       ObservacionRetiro : '',
       ProcesoRetiro : '',
@@ -228,7 +235,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       FechaRetiro : this.today,
       Maquina : '',
       UsuarioRetiro : '',
-      AreaRetiro : '',
+      kgOt : '',
       EstadoRetiro : '',
       ObservacionRetiro : '',
       ProcesoRetiro : '',
@@ -345,6 +352,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   //Funcion que asignará la materia prima a una Orden de trabajo y Proceso y lo guardará en la base de datos
   asignacionMateriaPrima(){
+    this.infoOT();
     let idOrdenTrabajo : number = this.FormMateriaPrimaRetiro.value.OTRetiro;
     let fechaEntrega : any = this.FormMateriaPrimaRetiro.value.FechaRetiro;
     let observacion : string = this.FormMateriaPrimaRetiro.value.ObservacionRetiro;
@@ -352,6 +360,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let idUsuario : number;
     let idArea : number;
     let idEstado : number;
+    let cantidadadicional: number = this.kgOT * 0.1;
+    let cantidadFinal : number = cantidadadicional + this.kgOT;
+    let cantAsig : number = 0; //Variable que almacena la cantidad de materia prima que se ha asignado hasta el momento
+    let cantRestante : number = 0;
 
     const datosAsignacion : any = {
       AsigMP_OrdenTrabajo : idOrdenTrabajo,
@@ -364,6 +376,39 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
       this.obtenerUltimoIdAsignacaion();
     });
+
+    // this.asignacionMPService.srvObtenerListaPorOt(idOrdenTrabajo).subscribe(datos_asigncaion => {
+    //   for (let index = 0; index < datos_asigncaion.length; index++) {
+    //     this.detallesAsignacionService.srvObtenerLista().subscribe(datos_asignacionMP => {
+    //       for (let i = 0; i < datos_asignacionMP.length; i++) {
+    //         if (datos_asigncaion[index].asigMp_Id == datos_asignacionMP[i].asigMp_Id) {
+    //           cantAsig = cantAsig + datos_asignacionMP[i].dtAsigMp_Cantidad;
+    //           this.cantidadAsignada = this.cantidadAsignada + datos_asignacionMP[i].dtAsigMp_Cantidad;
+    //         }
+    //       }
+    //     });
+    //   }
+    // });
+
+    // setTimeout(() => {
+    //   this.load = false;
+    //   if (this.cantidadAsignada <= this.cantRestante) {
+    //     const datosAsignacion : any = {
+    //       AsigMP_OrdenTrabajo : idOrdenTrabajo,
+    //       AsigMp_FechaEntrega : fechaEntrega,
+    //       AsigMp_Observacion : observacion,
+    //       Estado_Id : 13,
+    //       AsigMp_Maquina : maquina,
+    //       Usua_Id : this.storage_Id,
+    //     }
+    //     this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
+    //       this.obtenerUltimoIdAsignacaion();
+    //     });
+    //   } else {
+    //     this.load = true;
+    //     Swal.fire(`La cantidad a asignar supera el limete de Kg permitidos para la OT ${idOrdenTrabajo}`);
+    //   }
+    // }, 1000);
   }
 
   //Funcion que va a buscar y obtener el id de la ultima asignacion
@@ -375,6 +420,49 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       }
       let ultimoId : number = Math.max.apply(null, idsAsignaciones);
       this.detallesAsignacionMP(ultimoId);
+    });
+  }
+
+  infoOT(){
+    let ot : string = this.FormMateriaPrimaRetiro.value.OTRetiro;
+    let cantidadadicional: number = this.kgOT * 0.1;
+    let cantidadFinal : number = cantidadadicional + this.kgOT;
+    let cantAsig : number = 0; //Variable que almacena la cantidad de materia prima que se ha asignado hasta el momento
+
+    this.load = false;
+    this.bagProServices.srvObtenerListaProcExtOt(ot).subscribe(datos_procesos => {
+      for (let index = 0; index < datos_procesos.length; index++) {
+        this.kgOT = datos_procesos[index].exttotalextruir;
+        this.FormMateriaPrimaRetiro.setValue({
+          OTRetiro : this.FormMateriaPrimaRetiro.value.OTRetiro,
+          FechaRetiro : this.FormMateriaPrimaRetiro.value.FechaRetiro,
+          Maquina : this.FormMateriaPrimaRetiro.value.Maquina,
+          UsuarioRetiro : this.FormMateriaPrimaRetiro.value.UsuarioRetiro,
+          kgOt : this.kgOT,
+          EstadoRetiro : this.FormMateriaPrimaRetiro.value.EstadoRetiro,
+          ObservacionRetiro : this.FormMateriaPrimaRetiro.value.ObservacionRetiro,
+          ProcesoRetiro : this.FormMateriaPrimaRetiro.value.ProcesoRetiro,
+        });
+        this.asignacionMPService.srvObtenerLista().subscribe(datos_asigncaion => {
+          for (let j = 0; j < datos_asigncaion.length; j++) {
+            if (datos_asigncaion[j].asigMP_OrdenTrabajo == ot) {
+              this.detallesAsignacionService.srvObtenerLista().subscribe(datos_asignacionMP => {
+                for (let i = 0; i < datos_asignacionMP.length; i++) {
+                  if (datos_asigncaion[j].asigMp_Id == datos_asignacionMP[i].asigMp_Id) {
+                    cantAsig = cantAsig + datos_asignacionMP[i].dtAsigMp_Cantidad;
+                  }
+                }
+              });
+              break;
+            }
+          }
+        });
+        setTimeout(() => {
+          this.cantRestante = this.kgOT - cantAsig;
+          this.load = true;
+        }, 1000);
+        break;
+      }
     });
   }
 
@@ -414,6 +502,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     }
   }
 
+  //
   validarCamposVaciosMPRetirada(){
     if (this.FormMateriaPrimaRetirada.valid) this.cargarFormMpRetiradaTablas(this.ArrayMateriaPrimaRetirada)
     else Swal.fire("Hay campos de la Materi Prima vacios")
@@ -426,44 +515,49 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let precioMateriaPrima : number = this.FormMateriaPrimaRetirada.value.MpPrecioRetirada;
     let presentacion : string = this.FormMateriaPrimaRetirada.value.MpUnidadMedidaRetirada;
     let cantidad : number = this.FormMateriaPrimaRetirada.value.MpCantidadRetirada;
+    let stock : number = this.FormMateriaPrimaRetirada.value.MpStockRetirada;
     let subtotalProd : number = precioMateriaPrima * cantidad;
 
-    let productoExt : any = {
-      Id : idMateriaPrima,
-      Nombre : this.nombreMateriaPrima,
-      Cant : cantidad,
-      UndCant : presentacion,
-      PrecioUnd : precioMateriaPrima,
-      Stock : this.FormMateriaPrimaRetirada.value.MpStockRetirada,
-      SubTotal : subtotalProd
-    }
+    this.cantidadAsignada = this.cantidadAsignada + cantidad;
 
-    if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrimaRetirada.length == 0) {
-      this.ArrayMateriaPrimaRetirada.push(productoExt);
+    if (cantidad <= stock) {
+      let productoExt : any = {
+        Id : idMateriaPrima,
+        Nombre : this.nombreMateriaPrima,
+        Cant : cantidad,
+        UndCant : presentacion,
+        PrecioUnd : precioMateriaPrima,
+        Stock : this.FormMateriaPrimaRetirada.value.MpStockRetirada,
+        SubTotal : subtotalProd
+      }
 
-    } else if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrimaRetirada.length != 0){
-      this.ArrayMateriaPrimaRetirada.push(productoExt);
-      productoExt = [];
-    } else {
-      for (let index = 0; index < formulario.length; index++) {
-        if(productoExt.Id == this.ArrayMateriaPrimaRetirada[index].Id) {
-          this.ArrayMateriaPrimaRetirada.splice(index, 1);
-          this.AccionBoton = "Agregar";
-          this.ArrayMateriaPrimaRetirada.push(productoExt);
-          break;
+      if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrimaRetirada.length == 0) {
+        this.ArrayMateriaPrimaRetirada.push(productoExt);
+
+      } else if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrimaRetirada.length != 0){
+        this.ArrayMateriaPrimaRetirada.push(productoExt);
+        productoExt = [];
+      } else {
+        for (let index = 0; index < formulario.length; index++) {
+          if(productoExt.Id == this.ArrayMateriaPrimaRetirada[index].Id) {
+            this.ArrayMateriaPrimaRetirada.splice(index, 1);
+            this.AccionBoton = "Agregar";
+            this.ArrayMateriaPrimaRetirada.push(productoExt);
+            break;
+          }
         }
       }
-    }
 
-    this.FormMateriaPrimaRetirada.setValue({
-      MpIdRetirada : '',
-      MpNombreRetirada: '',
-      MpCantidadRetirada : '',
-      MpPrecioRetirada: '',
-      MpUnidadMedidaRetirada: '',
-      MpStockRetirada: '',
-    });
-    this.ArrayMateriaPrimaRetirada.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
+      this.FormMateriaPrimaRetirada.setValue({
+        MpIdRetirada : '',
+        MpNombreRetirada: '',
+        MpCantidadRetirada : '',
+        MpPrecioRetirada: '',
+        MpUnidadMedidaRetirada: '',
+        MpStockRetirada: '',
+      });
+      this.ArrayMateriaPrimaRetirada.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
+    } else Swal.fire("La cantidad a asignar no debe superar lo que hay en stock ")
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima saliente
@@ -472,8 +566,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let stockMateriaPrimaFinal : number;
 
     for (let index = 0; index < this.ArrayMateriaPrimaRetirada.length; index++) {
-
-
       this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrimaRetirada[index].Id).subscribe(datos_materiaPrima => {
         stockMateriaPrimaInicial = datos_materiaPrima.matPri_Stock;
         stockMateriaPrimaFinal = stockMateriaPrimaInicial - this.ArrayMateriaPrimaRetirada[index].Cant;
@@ -508,13 +600,14 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             FechaRetiro : this.today,
             Maquina : '',
             UsuarioRetiro : '',
-            AreaRetiro : '',
+            kgOt : '',
             EstadoRetiro : '',
             ObservacionRetiro : '',
             ProcesoRetiro : '',
           });
           this.ArrayMateriaPrimaRetirada= [];
           this.FormMateriaPrimaRetirada.reset();
+          this.load = true;
         });
       });
     }
@@ -606,91 +699,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       MpStockRetirada: formulario,
     });
   }
-
-
-
-  //Funcion que consultará la materia prima que se ha asignado a la Orden de trabajo buscada
-  consultarMpAsignadaOT(){
-    let ordenTrabajo : number;
-    let operario : any;
-    let idOperario : any;
-    let fechaAsignacion : any;
-
-    if (operario != null) {
-      this.asignacionMPService.srvObtenerLista().subscribe(datos_asignaciones => {
-        for (let index = 0; index < datos_asignaciones.length; index++) {
-          if (datos_asignaciones[index].usua_Id == idOperario) this.llenadoMpAsignada(datos_asignaciones[index]);
-        }
-      });
-    } else if (fechaAsignacion != null) {
-      this.asignacionMPService.srvObtenerLista().subscribe(datos_asignaciones => {
-        for (let index = 0; index < datos_asignaciones.length; index++) {
-          if (moment(datos_asignaciones[index].asigMp_FechaEntrega).isBetween(fechaAsignacion, undefined)) this.llenadoMpAsignada(datos_asignaciones[index]);
-        }
-      });
-    } else if (ordenTrabajo != null) {
-      this.asignacionMPService.srvObtenerLista().subscribe(datos_asignaciones => {
-        for (let index = 0; index < datos_asignaciones.length; index++) {
-          if (datos_asignaciones[index].asigMP_OrdenTrabajo == ordenTrabajo) this.llenadoMpAsignada(datos_asignaciones[index]);
-        }
-      });
-    } else {
-      this.asignacionMPService.srvObtenerLista().subscribe(datos_asignaciones => {
-        for (let index = 0; index < datos_asignaciones.length; index++) {
-          this.llenadoMpAsignada(datos_asignaciones[index]);
-        }
-      });
-    }
-  }
-
-  //Funcion que se encargará de llenar la tabla de Asignaciones en la vista
-  llenadoMpAsignada(asignacion : any){
-
-  }
-
-  //Funcion que consultará la materia prima por los filtros que se le den
-  consultarMateriasPrimas(){
-    let idMateriaPrima : number;
-    let nombreMateriaPrima : string;
-    let consecutivoFactura : any;
-    this.MpConsultada = [];
-
-    if (consecutivoFactura != null && (idMateriaPrima != null || nombreMateriaPrima != null)) {
-      this.facturaMpComService.srvObtenerLista().subscribe(datos_facturas => {
-        for (let index = 0; index < datos_facturas.length; index++) {
-          if (datos_facturas[index].facco_Codigo == consecutivoFactura) {
-            if (idMateriaPrima != null) {
-              this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
-                this.MpConsultada.push(datos_materiaPrima);
-              });
-            } else if (nombreMateriaPrima != null) {
-              this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
-                for (let index = 0; index < datos_materiaPrima.length; index++) {
-
-                }
-              });
-            }
-
-            this.facturaMateriaPrima.push(datos_facturas[index]);
-          }
-        }
-      });
-
-    } else if (consecutivoFactura != null) {
-      this.facturaMpComService.srvObtenerLista().subscribe(datos_facturas => {
-        for (let index = 0; index < datos_facturas.length; index++) {
-          if (datos_facturas[index].facco_Codigo == consecutivoFactura) {
-            this.facturaMateriaPrima.push(datos_facturas[index]);
-          }
-        }
-      });
-    } else if (idMateriaPrima != null || nombreMateriaPrima != null) {
-
-    } else {
-
-    }
-  }
-
 
   // Funcion para llamar el modal que crea clientes
   LlamarModalCrearProveedor() {

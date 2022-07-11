@@ -22,7 +22,6 @@
     </div>
   </div>
 </div>
-
 <div class="container">
     <!--Titulo Asignación -->
   <div class="mb-3">
@@ -36,7 +35,7 @@
       <div class="row g-3">
         <!-- OT -->
         <div class="form-floating col-md-2">
-          <input formControlName="OTRetiro" class="form-control form-control-sm" id="floatingInput" type="number" min="100000" max="999999" required>
+          <input formControlName="OTRetiro" class="form-control form-control-sm" (keyup.enter)="infoOT()" id="floatingInput" type="number" min="100000" max="999999" required>
           <label for="floatingInput">OT</label>
         </div>
         <!-- Fecha entrega -->
@@ -45,7 +44,7 @@
           <label for="floatingInput">Fecha Retiro</label>
         </div>
         <!-- Usuario -->
-        <div class="form-floating col-md -2">
+        <div class="form-floating col-md">
           <input formControlName="Maquina" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" required title="Maquina">
           <label for="floatingInput">Maquina</label>
         </div>
@@ -75,6 +74,13 @@
             <option [ngValue]="proceso.proceso_Id" *ngFor="let proceso of procesos">{{proceso.proceso_Nombre}}</option>
           </select>
           <label for="floatingSelect">Proceso</label>
+        </div>
+        <div class="form-floating col-md-2">
+          <input formControlName="kgOt" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" required title="Maquina" readonly onmousedown="return false;">
+          <label for="floatingInput">KG OT</label>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <label for=""><b>Kg Restante: {{cantRestante | number}}</b></label>
+          </div>
         </div>
       </div>
     </div>
@@ -207,18 +213,27 @@
     </div>
   </div>
 
-  <!--Inicio Fila de botones-->
-  <div class="mb-3">
-    <div class="row g-3">
-      <!--Inicio botones -->
-      <div class="mb-3">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class="btn btn-danger btn-danger-sm" type="button" (click)="asignacionMateriaPrima()">Asignar Materia Prima </button>
-          <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMP()">Limpiar Todos Los Campos</button>
-        </div>
-      </div>
-      <!--Fin botones -->
+  <div class="overlay" *ngIf="!load">
+    <div class="spinner ">
+      <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
     </div>
+  </div>
+
+  <div *ngIf="load">
+    <!--Inicio Fila de botones-->
+    <div class="mb-3">
+      <div class="row g-3">
+        <!--Inicio botones -->
+        <div class="mb-3">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button class="btn btn-danger btn-danger-sm" type="button" (click)="asignacionMateriaPrima()">Asignar Materia Prima </button>
+            <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMP()">Limpiar Todos Los Campos</button>
+          </div>
+        </div>
+        <!--Fin botones -->
+      </div>
+    </div>
+
   </div>
   <!--Fin Fila de botones -->
 

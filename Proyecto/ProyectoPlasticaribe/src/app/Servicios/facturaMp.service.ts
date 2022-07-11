@@ -9,7 +9,7 @@ import { modelFacturaMp } from '../Modelo/modelFacturaMp';
 })
 export class FacturaMpService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }
@@ -19,8 +19,16 @@ export class FacturaMpService {
         return this.http.get<any>(this.rutaPlasticaribeAPI + '/FacturaCompra_MateriaPrima')
     }
 
-    srvObtenerListaPorId(dato : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/FacturaCompra_MateriaPrima/${dato}`);
+    srvObtenerListaPorId(factura : any, mp : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/FacturaCompra_MateriaPrima/ Facco_Id=${factura}&MatPri_Id=${mp}`);
+    }
+
+    srvObtenerListaPorFacId(factura : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/FacturaCompra_MateriaPrima/facturaCompra/${factura}`);
+    }
+
+    srvObtenerListaPorMpId(materiaPrima : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/FacturaCompra_MateriaPrima/MP/${materiaPrima}`);
     }
 
   //Metodo agregar Facturas de Materia Prima Comprada

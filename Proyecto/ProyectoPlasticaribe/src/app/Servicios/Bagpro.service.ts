@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { rutaBagPro, rutaBagProLocate } from 'src/polyfills';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BagproService {
 
-  readonly rutaPlasticaribeAPI = "http://192.168.0.137:9056/api";
+  readonly rutaPlasticaribeAPI = rutaBagPro;
 
   constructor(private http : HttpClient) { }
 
@@ -28,6 +29,10 @@ export class BagproService {
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
   srvObtenerListaProcExt():Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/ProcExtrusion');
+  }
+
+  srvObtenerListaProcExtOt(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/ProcExtrusion/OT/${ot}`);
   }
 
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO

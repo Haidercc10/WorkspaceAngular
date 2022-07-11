@@ -43,9 +43,7 @@
         <!-- Tipo Docuemtno -->
         <div class="form-floating col-md">
           <select formControlName="TipoDocumento" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
-            <ng-container *ngIf="ValidarRol == 1">
-              <option [ngValue]="tiposDocumentos.tpDoc_Id" *ngFor="let tiposDocumentos of tipoDocumento">{{tiposDocumentos.tpDoc_Nombre}}</option>
-            </ng-container>
+            <option [ngValue]="tiposDocumentos.tpDoc_Id" *ngFor="let tiposDocumentos of tipoDocumento">{{tiposDocumentos.tpDoc_Nombre}}</option>
             <option>Asignación</option>
             <option>Recuperado</option>
           </select>
@@ -105,11 +103,19 @@
     </div>
   </div>
 
+  <div class="overlay" *ngIf="!load">
+    <div class="spinner ">
+      <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+    </div>
+  </div>
+
+  <div *ngIf="load">
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <label><b>Total Materia Prima Entregada: </b></label>
-      <label><b>{{totalMPEntregada | number}} KG</b></label>
+      <label><b>Total Materia Prima Entregada: {{totalMPEntregada | number}} KG</b></label>
+      <label><b>--- KG Restante Por Entregar: {{cantRestante | number}}</b></label>
     </div>
+  </div>
   </div>
 </div>
 

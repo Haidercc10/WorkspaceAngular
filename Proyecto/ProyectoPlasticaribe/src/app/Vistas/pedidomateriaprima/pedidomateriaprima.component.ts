@@ -96,6 +96,10 @@ export class PedidomateriaprimaComponent implements OnInit {
   mpAgregada = [];
   /* CONSULTAS DE MATERIA PRIMA */
   MpConsultada = [];
+  remision : any = [];
+  remConFac : any = [];
+
+  public load: boolean;
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -165,6 +169,8 @@ export class PedidomateriaprimaComponent implements OnInit {
       MpUnidadMedidaRetirada:new FormControl(),
       MpStockRetirada : new FormControl(),
     });
+
+    this.load = true;
   }
 
 
@@ -749,7 +755,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   cargarRemisionEnFactura(idFactura : number){
     for (const rem of this.ArrayRemisiones) {
       const datosFacRem : any = {
-        Rem_Id : rem.rem_Id,
+        Rem_Id : rem.remisionId,
         Facco_Id : idFactura,
       }
       this.remisionFacturaService.srvGuardar(datosFacRem).subscribe(datosFacRemision => { });
@@ -1053,45 +1059,6 @@ export class PedidomateriaprimaComponent implements OnInit {
     }
   }
 
-  //Funcion que consultará la materia prima que se ha asignado a la Orden de trabajo buscada
-  consultarMpAsignadaOT(){
-    let ordenTrabajo : number;
-    let operario : any;
-    let idOperario : any;
-    let fechaAsignacion : any;
-
-    if (operario != null) {
-      this.asignacionMPService.srvObtenerLista().subscribe(datos_asignaciones => {
-        for (let index = 0; index < datos_asignaciones.length; index++) {
-          if (datos_asignaciones[index].usua_Id == idOperario) this.llenadoMpAsignada(datos_asignaciones[index]);
-        }
-      });
-    } else if (fechaAsignacion != null) {
-      this.asignacionMPService.srvObtenerLista().subscribe(datos_asignaciones => {
-        for (let index = 0; index < datos_asignaciones.length; index++) {
-          if (moment(datos_asignaciones[index].asigMp_FechaEntrega).isBetween(fechaAsignacion, undefined)) this.llenadoMpAsignada(datos_asignaciones[index]);
-        }
-      });
-    } else if (ordenTrabajo != null) {
-      this.asignacionMPService.srvObtenerLista().subscribe(datos_asignaciones => {
-        for (let index = 0; index < datos_asignaciones.length; index++) {
-          if (datos_asignaciones[index].asigMP_OrdenTrabajo == ordenTrabajo) this.llenadoMpAsignada(datos_asignaciones[index]);
-        }
-      });
-    } else {
-      this.asignacionMPService.srvObtenerLista().subscribe(datos_asignaciones => {
-        for (let index = 0; index < datos_asignaciones.length; index++) {
-          this.llenadoMpAsignada(datos_asignaciones[index]);
-        }
-      });
-    }
-  }
-
-  //Funcion que se encargará de llenar la tabla de Asignaciones en la vista
-  llenadoMpAsignada(asignacion : any){
-
-  }
-
   //Funcion que consultará la materia prima por los filtros que se le den
   consultarMateriasPrimas(){
     let idMateriaPrima : number;
@@ -1139,7 +1106,68 @@ export class PedidomateriaprimaComponent implements OnInit {
   consultarIdRemisiones(){
     let idRemision : number = this.FormRemisiones.value.idRemision;
     let subtotal : number;
-    let validarRemisionesFacturas = [];
+    this.remision = [];
+    this.remConFac = [];
+
+    this.load = false;
+
+    this.remisionService.srvObtenerLista().subscribe(datos_remision => {
+      for (let index = 0; index < datos_remision.length; index++) {
+        if (idRemision == datos_remision[index].rem_Codigo) {
+          this.remision.push(datos_remision[index].rem_Id);
+        }
+      }
+    });
+
+    // Llenado de Array con Remisiones con Facturas
+    this.remisionFacturaService.srvObtenerLista().subscribe(datos_remisionesFacturas => {
+      for (let i = 0; i < datos_remisionesFacturas.length; i++) {
+        this.remConFac.push(datos_remisionesFacturas[i].rem_Id);
+      }
+    });
+
+    // Se esperan unos segundos a que termine el llenado
+    setTimeout(() => {
+      for (let m = 0; m < this.remConFac.length; m++) {
+        for (let l = 0; l < this.remision.length; l++) {
+          if (this.remConFac.includes(this.remision[l])) {
+            if (this.remision[l] == this.remConFac[m]) {
+              this.remision = [];
+            }
+          }
+        }
+      }
+
+      if (this.remision.length == 0) {
+        Swal.fire(`La remision con el código ${idRemision} ya tiene una factura asignada`)
+      } else {
+        // Recorre el Array de Remisiones y busca cada id para mostrarlo en la tabla
+        for (let k = 0; k < this.remision.length; k++) {
+          this.remisionService.srvObtenerListaPorId(this.remision[k]).subscribe(datos_remision => {
+            this.proveedorservices.srvObtenerListaPorId(datos_remision.prov_Id).subscribe(datos_proveedor => {
+              this.usuarioService.srvObtenerListaPorId(datos_remision.usua_Id).subscribe(datos_usuario => {
+                this.tipoDocumentoService.srvObtenerListaPorId(datos_remision.tpDoc_Id).subscribe(datos_tipoDocumento => {
+                  let datosTablaRemisiones : any = {
+                  remisionId : datos_remision.rem_Id,
+                  remisionCodigo : datos_remision.rem_Codigo,
+                  remisionFecha : datos_remision.rem_Fecha,
+                  remisionProveedor : datos_proveedor.prov_Nombre,
+                  remisionUsuario :  datos_usuario.usua_Nombre,
+                  remisionDocumento : datos_tipoDocumento.tpDoc_Nombre,
+                  remisionPrecio : datos_remision.rem_PrecioEstimado
+                }
+                  this.precioRemision = datosTablaRemisiones.remisionPrecio
+                  this.ArrayRemisiones.push(datosTablaRemisiones);
+                });
+              });
+            });
+          });
+        }
+      }
+
+      this.load = true;
+    }, 2000);
+
 
     //Recorro remisiones según el código ingresado
     /*this.remisionService.srvObtenerLista().subscribe(datosRemisiones => {
@@ -1162,76 +1190,76 @@ export class PedidomateriaprimaComponent implements OnInit {
   //  if (validarRemisionesFacturas.length == 0) {
 
     //Recorro remisiones según el código ingresado
-      this.remisionService.srvObtenerLista().subscribe(datosRemisiones => {
-        for (let index = 0; index < datosRemisiones.length; index++) {
-          if(idRemision == datosRemisiones[index].rem_Codigo) {
+      // this.remisionService.srvObtenerLista().subscribe(datosRemisiones => {
+      //   for (let index = 0; index < datosRemisiones.length; index++) {
+      //     if(idRemision == datosRemisiones[index].rem_Codigo) {
 
-            //Recorro usuarios según el ID para mostrar el nombre en la tabla.
-            this.usuarioService.srvObtenerListaUsuario().subscribe(datosUsuarios => {
-              for (let usu = 0; usu < datosUsuarios.length; usu++) {
-                if(datosRemisiones[index].usua_Id === datosUsuarios[usu].usua_Id) {
-                  //Recorro proveedores según el ID para mostrar el nombre en la tabla.
-                  this.proveedorservices.srvObtenerLista().subscribe(datosProveedor => {
-                    for (let prv = 0; prv < datosProveedor.length; prv++) {
-                      if (datosRemisiones[index].prov_Id === datosProveedor[prv].prov_Id) {
-                        //Recorro tipo documento según el ID para mostrar el nombre en la tabla.
-                        this.tipoDocumentoService.srvObtenerLista().subscribe(datosDocumentos => {
-                          for (let doc = 0; doc < datosDocumentos.length; doc++) {
-                            if(datosRemisiones[index].tpDoc_Id === datosDocumentos[doc].tpDoc_Id) {
-                              //Recorro remisiones_facturascompras para ver lo que va para la tabla.
-                                this.remisionFacturaService.srvObtenerLista().subscribe(datosRemisiones_Facturas => {
-                                  for (let remFac = 0; remFac < datosRemisiones_Facturas.length; remFac++) {
-                                     //subtotal = datosRemisiones[index].rem_PrecioEstimado;
+      //       //Recorro usuarios según el ID para mostrar el nombre en la tabla.
+      //       this.usuarioService.srvObtenerListaUsuario().subscribe(datosUsuarios => {
+      //         for (let usu = 0; usu < datosUsuarios.length; usu++) {
+      //           if(datosRemisiones[index].usua_Id === datosUsuarios[usu].usua_Id) {
+      //             //Recorro proveedores según el ID para mostrar el nombre en la tabla.
+      //             this.proveedorservices.srvObtenerLista().subscribe(datosProveedor => {
+      //               for (let prv = 0; prv < datosProveedor.length; prv++) {
+      //                 if (datosRemisiones[index].prov_Id === datosProveedor[prv].prov_Id) {
+      //                   //Recorro tipo documento según el ID para mostrar el nombre en la tabla.
+      //                   this.tipoDocumentoService.srvObtenerLista().subscribe(datosDocumentos => {
+      //                     for (let doc = 0; doc < datosDocumentos.length; doc++) {
+      //                       if(datosRemisiones[index].tpDoc_Id === datosDocumentos[doc].tpDoc_Id) {
+      //                         //Recorro remisiones_facturascompras para ver lo que va para la tabla.
+      //                           this.remisionFacturaService.srvObtenerLista().subscribe(datosRemisiones_Facturas => {
+      //                             for (let remFac = 0; remFac < datosRemisiones_Facturas.length; remFac++) {
+      //                                //subtotal = datosRemisiones[index].rem_PrecioEstimado;
 
-                                    let remFac_remisionId : any = [datosRemisiones_Facturas[remFac].rem_Id];
-                                    let propioRemisionId : any = [datosRemisiones[index].rem_Id];
+      //                               let remFac_remisionId : any = [datosRemisiones_Facturas[remFac].rem_Id];
+      //                               let propioRemisionId : any = [datosRemisiones[index].rem_Id];
 
-                                    console.log(remFac_remisionId);
-                                    console.log(propioRemisionId);
+      //                               console.log(remFac_remisionId);
+      //                               console.log(propioRemisionId);
 
-                                    if(remFac_remisionId.includes(propioRemisionId)){
+      //                               if(remFac_remisionId.includes(propioRemisionId)){
 
-                                      Swal.fire('La remisión  "' + propioRemisionId + '"ya tiene una factura asociada.')
-                                      console.log('Entró acá');
-                                      //console.log(remFac_remisionId);
-                                      break;
-                                    } else if (!remFac_remisionId.includes(propioRemisionId)){
+      //                                 Swal.fire('La remisión  "' + propioRemisionId + '" ya tiene una factura asociada.')
+      //                                 console.log('Entró acá');
+      //                                 //console.log(remFac_remisionId);
+      //                                 break;
+      //                               } else if (!remFac_remisionId.includes(propioRemisionId)){
 
-                                      let datosTablaRemisiones : any = {
-                                        remisionId : datosRemisiones[index].rem_Id,
-                                        remisionCodigo : datosRemisiones[index].rem_Codigo,
-                                        remisionFecha : datosRemisiones[index].rem_Fecha,
-                                        remisionProveedor : datosProveedor[prv].prov_Nombre,
-                                        remisionUsuario :  datosUsuarios[usu].usua_Nombre,
-                                        remisionDocumento : datosDocumentos[doc].tpDoc_Nombre,
-                                        remisionPrecio : datosRemisiones[index].rem_PrecioEstimado
-                                      }
-                                        this.precioRemision = datosTablaRemisiones.remisionPrecio
-                                        this.ArrayRemisiones.push(datosTablaRemisiones);
-                                        this.valorTotalRem = this.valorTotalRem + subtotal;
-                                        this.llenarDocumento(datosRemisiones[index].rem_Id);
+      //                                 let datosTablaRemisiones : any = {
+      //                                   remisionId : datosRemisiones[index].rem_Id,
+      //                                   remisionCodigo : datosRemisiones[index].rem_Codigo,
+      //                                   remisionFecha : datosRemisiones[index].rem_Fecha,
+      //                                   remisionProveedor : datosProveedor[prv].prov_Nombre,
+      //                                   remisionUsuario :  datosUsuarios[usu].usua_Nombre,
+      //                                   remisionDocumento : datosDocumentos[doc].tpDoc_Nombre,
+      //                                   remisionPrecio : datosRemisiones[index].rem_PrecioEstimado
+      //                                 }
+      //                                   this.precioRemision = datosTablaRemisiones.remisionPrecio
+      //                                   this.ArrayRemisiones.push(datosTablaRemisiones);
+      //                                   this.valorTotalRem = this.valorTotalRem + subtotal;
+      //                                   this.llenarDocumento(datosRemisiones[index].rem_Id);
 
-                                        console.log('Entra');
-                                        //console.log(datosRemisiones_Facturas[remFac]);
-                                        break;
-                                    }
+      //                                   console.log('Entra');
+      //                                   //console.log(datosRemisiones_Facturas[remFac]);
+      //                                   break;
+      //                               }
 
-                                  }
-                                });
+      //                             }
+      //                           });
 
-                              //Array que recibe la variable para agregar en tabla remisiones.
-                            }
-                          }
-                        });
-                      }
-                    }
-                  });
-                }
-              }
-            });
-          }
-        }
-      }, error => { console.log(error); })
+      //                         //Array que recibe la variable para agregar en tabla remisiones.
+      //                       }
+      //                     }
+      //                   });
+      //                 }
+      //               }
+      //             });
+      //           }
+      //         }
+      //       });
+      //     }
+      //   }
+      // }, error => { console.log(error); })
     //}
   }
 
