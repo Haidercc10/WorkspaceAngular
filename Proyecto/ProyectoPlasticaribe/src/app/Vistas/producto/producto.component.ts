@@ -177,5 +177,20 @@ export class ProductoComponent implements OnInit {
 
   }
 
+/** Llenar el formulario
+Al final campo para cargar una imagen
+Al presionar el boton de agregar
+Se guarda la imagen en una ruta en especifico
+Luego cuando se consulte dicho registro (factura) se debe
+buscar la ruta en que se encuentra la imagen y cargarla en un enlace. */
+  guardarImagenDesdeRuta(){
+    let nombreArchivo : string;
+    let rutaImagen : string = "C:\ImagenesEjemplo";
+
+
+
+
+  }
+
 
 }

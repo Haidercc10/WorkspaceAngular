@@ -24,6 +24,11 @@
         <button type="button" class="btn btn-danger btn-danger-sm" (click)="InventarioExistenciaZeus()">
           Generar inventario
         </button>
+
+        <input type="file" accept="image/*" id="formFileSm" name="formFileSm" class="btn btn-danger btn-danger-sm">
+        <button ngModel="formFileSm" type="button" class="btn btn-danger btn-danger-sm" (click)="guardarImagenDesdeRuta()">
+          Guardar Imagen
+        </button>
       </div>
 
     <!-- FORMULARIO DE PRODUCTOS -->
