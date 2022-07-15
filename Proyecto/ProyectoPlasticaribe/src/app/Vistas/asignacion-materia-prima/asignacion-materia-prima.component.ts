@@ -35,10 +35,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   public FormMateriaPrimaRetiro !: FormGroup;
   public FormMateriaPrimaRetirada !: FormGroup;
 
-  //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
-  public ModalCrearProveedor: boolean = false;
-  public ModalCrearMateriaPrima: boolean= false;
-
   /* Vaiables*/
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -86,6 +82,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   /* CONSULTAS DE MATERIA PRIMA */
   MpConsultada = [];
 
+  acumuladoraTintas = 0;
+
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
                   private tipoBodegaService : TipoBodegaService,
@@ -98,52 +96,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                                 private rolService : RolesService,
                                   private frmBuilderMateriaPrima : FormBuilder,
                                     @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                      private proveedorservices : ProveedorService,
-                                        private proveedorMPService : MpProveedorService,
-                                          private facturaMpComService : FactuaMpCompradaService,
-                                            private facturaMpService : FacturaMpService,
-                                                private asignacionMPService : AsignacionMPService,
-                                                  private detallesAsignacionService : DetallesAsignacionService,
-                                                    private bagProServices : BagproService,
-                                                      private tipoDocumentoService : TipoDocumentoService) {
+                                      private proveedorMPService : MpProveedorService,
+                                        private asignacionMPService : AsignacionMPService,
+                                          private detallesAsignacionService : DetallesAsignacionService,
+                                            private bagProServices : BagproService,) {
 
-    this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
-      OTRetiro : new FormControl(),
-      FechaRetiro : new FormControl(),
-      Maquina : new FormControl(),
-      UsuarioRetiro : new FormControl(),
-      kgOt : new FormControl(),
-      EstadoRetiro : new FormControl(),
-      ObservacionRetiro : new FormControl(),
-    });
-
-    this.FormMateriaPrimaRetirada = this.frmBuilderMateriaPrima.group({
-      MpIdRetirada : new FormControl(),
-      MpNombreRetirada: new FormControl(),
-      MpCantidadRetirada: new FormControl(),
-      MpPrecioRetirada: new FormControl(),
-      MpUnidadMedidaRetirada:new FormControl(),
-      MpStockRetirada : new FormControl(),
-      ProcesoRetiro : new FormControl(),
-    });
-
-    this.load = true;
-  }
-
-
-  ngOnInit(): void {
-    this.initForms();
-    this.lecturaStorage();
-    this.fecha();
-    this.ColumnasTabla();
-    this.obtenerUnidadMedida();
-    this.obtenerUsuarios();
-    this.obtenerEstados();
-    this.obtenerProcesos();
-    this.obtenerMateriasPrimasRetiradas();
-  }
-
-  initForms() {
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : ['', Validators.required],
       FechaRetiro : ['', Validators.required],
@@ -163,6 +120,17 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       MpStockRetirada: ['', Validators.required],
       ProcesoRetiro : ['', Validators.required],
     });
+
+    this.load = true;
+  }
+
+  ngOnInit(): void {
+    this.lecturaStorage();
+    this.fecha();
+    this.ColumnasTabla();
+    this.obtenerUnidadMedida();
+    this.obtenerProcesos();
+    this.obtenerMateriasPrimasRetiradas();
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -242,38 +210,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.ArrayMateriaPrimaRetirada = [];
   }
 
-  limpiarCamposMPRetirada(){
-    this.FormMateriaPrimaRetirada.reset();
-  }
-
-  //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
-  obtenerMateriasPrimas(){
-    let idProveedor : number = this.FormMateriaPrimaFactura.value.proveedor;
-    this.proveedorMPService.srvObtenerLista().subscribe(datos_mpProveedor => {
-      for (let index = 0; index < datos_mpProveedor.length; index++) {
-        if (datos_mpProveedor[index].prov_Id == idProveedor) {
-          this.materiaPrimaService.srvObtenerListaPorId(datos_mpProveedor[index].matPri_Id).subscribe(datos_materiaPrima => {
-            this.materiasPrimas.push(datos_materiaPrima);
-          });
-        }
-      }
-    });
-  }
-
   //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
   obtenerMateriasPrimasRetiradas(){
     this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
       for (let index = 0; index < datos_materiaPrima.length; index++) {
         this.materiasPrimasRetiradas.push(datos_materiaPrima[index]);
-      }
-    });
-  }
-
-  //Funcion que va a buscar y almacenar todos los nombre de las categorias de materia prima
-  obtenerNombreCategoriasMp(){
-    this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => {
-      for (let index = 0; index < datos_categorias.length; index++) {
-        this.nombreCategoriasMP.push(datos_categorias[index].catMP_Nombre);
       }
     });
   }
@@ -287,50 +228,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     });
   }
 
-  //Funcion que se encargará de buscary almacenar todos los usuarios
-  obtenerUsuarios(){
-    this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-      for (let index = 0; index < datos_usuarios.length; index++) {
-        this.usuarios.push(datos_usuarios[index]);
-      }
-    });
-  }
-
-  //Funcion que buscará y almacenará todos los estados existententes para documentos
-  obtenerEstados(){
-    this.tipoEstadoService.srvObtenerListaPorId(1).subscribe(datos_tipoEstados => {
-      this.estadoService.srvObtenerListaEstados().subscribe(datos_estados => {
-        for (let index = 0; index < datos_estados.length; index++) {
-          if (datos_estados[index].tpEstado_Id == datos_tipoEstados.tpEstado_Id) {
-            if (datos_estados[index].estado_Id == 12 || datos_estados[index].estado_Id == 13) {
-              this.estado.push(datos_estados[index].estado_Nombre);
-            }
-          }
-        }
-      });
-    });
-  }
-
   //Funcion que se encagará de obtener los procesos de la empresa
   obtenerProcesos(){
     this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
       for (let index = 0; index < datos_procesos.length; index++) {
         this.procesos.push(datos_procesos[index]);
-      }
-    });
-  }
-
-  // Funcion que se encargará de obtener todas las areas de la empresa exceptuando ()
-  obtenerAreas(){
-    this.areas = [];
-    let usuarioSeleccionado : string = this.FormMateriaPrimaRetiro.value.UsuarioRetiro;
-    this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-      for (let index = 0; index < datos_usuarios.length; index++) {
-        if (datos_usuarios[index].usua_Nombre == usuarioSeleccionado) {
-          this.areasService.srvObtenerListaPorId(datos_usuarios[index].area_Id).subscribe(datos_areas => {
-            this.areas.push(datos_areas);
-          });
-        }
       }
     });
   }
@@ -472,7 +374,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let ot : string = this.FormMateriaPrimaRetiro.value.OTRetiro;
     if (this.FormMateriaPrimaRetiro.valid) this.asignacionMateriaPrima();
     else if (ot.length < 6) Swal.fire("La OT debe tener mas de 6 digitos");
-    else Swal.fire("Hay campos de la Materi Prima vacios");
+    else Swal.fire("Hay campos de la Materia Prima vacios");
   }
 
   //Funcion que almacenará de forma detalla la(s) materia prima que se están asignando a una OT y Proceso
@@ -513,7 +415,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   //
   validarCamposVaciosMPRetirada(){
     if (this.FormMateriaPrimaRetirada.valid) this.cargarFormMpRetiradaTablas(this.ArrayMateriaPrimaRetirada)
-    else Swal.fire("Hay campos de la Materi Prima vacios")
+    else Swal.fire("Hay campos de la Materia Prima vacios")
   }
 
   // // Funcion que envia la informacion de la materia prima pedida a la tabla.
@@ -528,6 +430,16 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let proceso : string = this.FormMateriaPrimaRetirada.value.ProcesoRetiro;
 
     this.cantidadAsignada = this.cantidadAsignada + cantidad;
+
+    // //Codigo que validará que solo se asignen maximo 7 tintas a una orden de trabajo
+    // this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
+    //   for (let j = 0; j < datos_materiaPrima.length; j++) {
+    //     if (datos_materiaPrima[j].catMP_Id == 7) { // El Numero 7 es el ID que le corresponde a la categoria de Tintas
+    //       this.acumuladoraTintas = this.acumuladoraTintas + 1;
+    //       if (this.acumuladoraTintas > 7) Swal.fire("Solo puede asignar maximo 7 Tintas a una OT");
+    //     }
+    //   }
+    // });
 
     this.procesosService.srvObtenerLista().subscribe(datos_proceso => {
       for (let i = 0; i < datos_proceso.length; i++) {
@@ -631,7 +543,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   }
 
-
   //Funcion que consultara una materia prima con base a un ID pasado en la vista
   buscarMpId(){
     let idMateriaPrima : number = this.FormMateriaPrimaRetirada.value.MpIdRetirada;
@@ -719,17 +630,5 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
     });
   }
-
-  // Funcion para llamar el modal que crea clientes
-  LlamarModalCrearProveedor() {
-    this.ModalCrearProveedor = true;
-  }
-
-  // Funcion para llamar el modal que crea clientes
-  LlamarModalCrearMateriaPrima(){
-    this.ModalCrearMateriaPrima = true;
-  }
-
-
 
 }

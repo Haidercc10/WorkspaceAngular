@@ -16,14 +16,13 @@
     <div class="mb-4 Titulo">
       <h2 class="tituloRojo">Asignacion de Materia Prima</h2>
     </div>
-
     <div class="mb-4">
       <hr class="colorLinea">
     </div>
   </div>
 </div>
 <div class="container">
-    <!--Titulo Asignación -->
+  <!--Titulo Asignación -->
   <div class="mb-3">
     <h4 class="tituloRojo">Asignación de Materia Prima</h4>
   </div>
@@ -43,31 +42,12 @@
           <input formControlName="FechaRetiro" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" readonly onmousedown="return false;">
           <label for="floatingInput">Fecha Retiro</label>
         </div>
-        <!-- Usuario -->
+        <!-- Maquina -->
         <div class="form-floating col-md-3">
           <input formControlName="Maquina" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" required title="Maquina">
           <label for="floatingInput">Maquina</label>
         </div>
-        <!-- <div class="form-floating col-md">
-          <select formControlName="UsuarioRetiro" id="floatingSelect" (change)="obtenerAreas()" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="usuario.usua_Nombre" *ngFor="let usuario of usuarios">{{usuario.usua_Nombre}}</option>
-          </select>
-          <label for="floatingSelect">Maquina</label>
-        </div> -->
-        <!-- Usuario -->
-        <!-- <div class="form-floating col-md">
-          <select formControlName="UsuarioRetiro" id="floatingSelect" (change)="obtenerAreas()" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="usuario.usua_Nombre" *ngFor="let usuario of usuarios">{{usuario.usua_Nombre}}</option>
-          </select>
-          <label for="floatingSelect">Usuario</label>
-        </div> -->
-        <!-- Area -->
-        <!-- <div class="form-floating col-md">
-          <select formControlName="AreaRetiro" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="area.area_Nombre" *ngFor="let area of areas">{{area.area_Nombre}}</option>
-          </select>
-          <label for="floatingSelect">Area</label>
-        </div> -->
+        <!-- Kg OT -->
         <div class="form-floating col-md-3">
           <input formControlName="kgOt" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" required title="Maquina" readonly onmousedown="return false;">
           <label for="floatingInput">KG OT</label>
@@ -77,27 +57,17 @@
         </div>
       </div>
     </div>
-    <!--Fin Fila 1-->
 
     <!--Inicio Fila 2-->
     <div class="mb-3">
       <div class="row g-3">
-        <!-- Estado -->
-        <!-- <div class="form-floating col-md-2">
-          <select formControlName="EstadoRetiro" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
-          </select>
-          <label for="floatingSelect">Estado Materia Prima</label>
-        </div> -->
         <!-- Campo Observacion -->
         <div class="form-floating col-6 col-md">
           <textarea formControlName="ObservacionRetiro"  id="floatingTextArea" type="text" class="form-control form-control-sm campoObservacion" maxlength="200" ></textarea>
           <label for="floatingTextArea">Observación</label>
         </div>
-
-        </div>
+      </div>
     </div>
-    <!--Fin Fila 2-->
   </form>
   <!--Fin Formulario de asignación -->
 
@@ -111,6 +81,7 @@
   <form [formGroup]="FormMateriaPrimaRetirada">
     <div class="mb-3">
       <div class="row g-3">
+        <!-- Id Materia Prima -->
         <div class="form-floating col-md">
           <input formControlName="MpIdRetirada" type="number" min="0" (keyup.enter)="buscarMpId()" class="form-control" id="floatingInput" name="MapId" placeholder="Id" required >
           <label for="floatingInput">Id</label>
@@ -146,11 +117,6 @@
           </select>
           <label for="floatingSelect">Proceso</label>
         </div>
-        <!-- PRECIO ESTIMADO DE LA MATERIA PRIMA  -->
-        <!-- <div class="form-floating col-md-2">
-          <input formControlName="MpPrecioRetirada" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapPrecio" placeholder="Precio">
-          <label for="floatingInput">Precio</label>
-        </div> -->
       </div>
     </div>
 
@@ -178,10 +144,8 @@
   <div class="mb-2">
     <div class="row g-1">
       <div class="table-responsive">
-        <!-- <div id="html2Pdf"> -->
         <table class="table table-bordered" >
           <thead class="TitulosTabla">
-
             <tr *ngFor="let columnas of titulosTabla let i = index">
               <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
               <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
@@ -190,27 +154,20 @@
               <th id="UnidadMedida" scope="col">{{columnas.mpProceso}}</th>
               <th id="editar" scope="col">Editar</th>
               <th id="eliminar" scope="col">Eliminar</th>
-              <!-- <th id="editarPedido" scope="col">Editar</th> -->
             </tr>
           </thead>
           <tbody>
-            <!-- <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" > -->
-            <!-- <tr *ngFor= "let item of IngresoMateriaP " > -->
-              <tr *ngFor="let materiaPrima of ArrayMateriaPrimaRetirada let i = index">
-                <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
-                <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
-                <td id="cantidadMateriaPrima">{{materiaPrima.Cant}}</td>
-                <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
-                <td id="UnidadMedida">{{materiaPrima.Proceso}}</td>
-                <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" (click)="EditarProductoTabla(materiaPrima)" title="Editar Materia Prima"></i></a></td>
-                <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" (click)="QuitarProductoTabla(i, materiaPrima)" title="Quitar Materia Prima de la tabla"></i></a></td>
-              </tr>
+            <tr *ngFor="let materiaPrima of ArrayMateriaPrimaRetirada let i = index">
+              <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
+              <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
+              <td id="cantidadMateriaPrima">{{materiaPrima.Cant}}</td>
+              <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
+              <td id="UnidadMedida">{{materiaPrima.Proceso}}</td>
+              <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" (click)="EditarProductoTabla(materiaPrima)" title="Editar Materia Prima"></i></a></td>
+              <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" (click)="QuitarProductoTabla(i, materiaPrima)" title="Quitar Materia Prima de la tabla"></i></a></td>
+            </tr>
           </tbody>
         </table>
-        <!-- <div class="mb-2">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <pagination-controls (pageChange)="page = $event"></pagination-controls>
-        </div> -->
       </div>
     </div>
   </div>
@@ -222,21 +179,15 @@
   </div>
 
   <div *ngIf="load">
-    <!--Inicio Fila de botones-->
     <div class="mb-3">
       <div class="row g-3">
-        <!--Inicio botones -->
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
             <button class="btn btn-danger btn-danger-sm" type="button" (click)="asignacionMateriaPrima()">Asignar Materia Prima </button>
             <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMP()">Limpiar Todos Los Campos</button>
           </div>
         </div>
-        <!--Fin botones -->
       </div>
     </div>
-
   </div>
-  <!--Fin Fila de botones -->
-
 </div>

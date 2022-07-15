@@ -35,7 +35,10 @@ export class LoginComponentComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void { this.cargaDatosComboBox(); }
+  ngOnInit(): void {
+    this.storage.clear();
+    this.cargaDatosComboBox();
+   }
 
 
   saveInLocal(key, val): void {
@@ -73,7 +76,7 @@ export class LoginComponentComponent implements OnInit {
         this.empresaServices.srvObtenerLista().subscribe(datos_empresa => {
           for (let index = 0; index < datos_empresa.length; index++) {
             if (datos_empresa[index].empresa_Nombre == empresa) {
-              if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena == datos_usuarios.usua_Contrasena && datos_usuarios.empresa_Id == datos_empresa[index].empresa_Id) {
+              if (this.formularioUsuario.value.Contrasena == datos_usuarios.usua_Contrasena && datos_usuarios.empresa_Id == datos_empresa[index].empresa_Id) {
                 // CREACIÓN DE COOKIES PARA MANTENER EL ROL DEL USUARIO Y MOSTRAR CIERTOS COMPONENTES
                 let idUsuario : number = datos_usuarios.usua_Id;
                 let nombre: string = datos_usuarios.usua_Nombre;

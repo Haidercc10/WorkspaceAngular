@@ -15,7 +15,6 @@
     <div class="mb-4 Titulo">
       <h2 class="tituloRojo">Reporte de Costos de Orden de Treabajo</h2>
     </div>
-
     <div class="mb-4">
       <hr class="colorLinea">
     </div>
@@ -96,7 +95,7 @@
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button class="btn btn-danger btn-danger-sm" type="button" (click)="consultaOTBagPro()">Consultar OT</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" >Limpiar Campos</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         <button class="btn btn-danger btn-danger-sm" type="button" (click)="CargarPDF()">Reporte en PDF</button>
       </div>
     </div>
@@ -159,7 +158,6 @@
     <div class="mb-2">
       <div class="row g-1">
         <div class="table-responsive">
-          <!-- <div id="html2Pdf"> -->
           <table class="table table-bordered" id="table">
             <thead class="TitulosTabla">
               <tr *ngFor="let columnas of titulosTablaprocesos let i = index">

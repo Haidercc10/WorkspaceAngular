@@ -44,9 +44,9 @@ export class ReporteCostosOTComponent implements OnInit {
   valorFinalOT : number = 0; // Variable que almacenará el valor final que tendrá la ot consultada
   diferencia : number = 0; //Variable que servirá para almacenar la diferencia de el valor final de la ot y el valor estimado o inicial
   diferenciaPorcentaje : number = 0; //Variable que servirá para almacenar la diferencia en porcentaje de el valor final de la ot y el valor estimado o inicial
-  cantidadSellandoUnidad : number = 0;
+  cantidadSellandoUnidad : number = 0; //Varibale que calculará la cantidad total de unidades selladas, esto se en caso de que la presentación del producto sea en unidad
 
-  // Variables globlales que almacenarán la informacion que se mostrará en el PDF
+  // Variables globlales que almacenarán la informacion general de la orden de trabajo que se mostrará en el PDF
   ordenTrabajo : number;
   NombreCliente : string;
   idProducto : number;
@@ -91,6 +91,38 @@ export class ReporteCostosOTComponent implements OnInit {
     this.lecturaStorage();
     this.ColumnasTabla();
     this.ColumnasTablaProcesos();
+  }
+
+  limpiarCampos(){
+    this.infoOT.reset();
+    this.cantidadTotalExt = 0;
+    this.cantidadTotalImp = 0;
+    this.cantidadTotalDbl = 0;
+    this.cantidadTotalRot = 0;
+    this.cantidadTotalEmpaque = 0;
+    this.cantidadTotalCorte = 0;
+    this.cantidadTotalLaminado = 0;
+    this.cantidadTotalSella = 0;
+    this.cantidadTotalWiketiado = 0;
+    this.ArrayProcesos = [];
+    this.valorFinalOT = 0;
+    this.ArrayMateriaPrima = [];
+    this.totalMPEntregada = 0;
+    this.ValorMPEntregada = 0;
+    this.diferencia = 0;
+    this.diferenciaPorcentaje = 0;
+    this.ordenTrabajo = 0;
+    this.NombreCliente = '';
+    this.idProducto = 0;
+    this.nombreProducto = '';
+    this.cantProdSinMargenUnd = 0;
+    this.cantProdSinMargenKg = 0;
+    this.CantidadMargen = 0;
+    this.cantProdConMargenKg = 0;
+    this.presentacionProducto = '';
+    this.valorUnitarioProdUnd = 0;
+    this.valorUnitarioProdKg = 0;
+    this.valorEstimadoOT = 0;
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -209,6 +241,7 @@ export class ReporteCostosOTComponent implements OnInit {
     this.consultaProceso(ot);
   }
 
+  // Funcion en la que se consultaran los procesos de por los que ha pasado la orden de trabajo y calculará el total de kg o unidades que se hizo en cada uno
   consultaProceso(ot : number){
     let cantExtruida : number;
     let cantImpresa : number;
@@ -272,6 +305,8 @@ export class ReporteCostosOTComponent implements OnInit {
   cantidadPorcPerdidaProcesoaProceso(ot : any){
     this.ArrayProcesos = [];
     this.valorFinalOT = 0;
+    this.diferencia = 0;
+    this.diferenciaPorcentaje = 0;
     const cant : any = {
       Ot : ot,
       Ext : Math.round(this.cantidadTotalExt),
@@ -374,11 +409,6 @@ export class ReporteCostosOTComponent implements OnInit {
               style: 'titulo',
             },
             '\n \n',
-            // {
-            //   text: `Fecha de registro: ${}`,
-            //   style: 'header',
-            //   alignment: 'right',
-            // },
             {
               text: `Solicitado Por: ${this.storage_Nombre}\n`,
               alignment: 'right',
@@ -391,13 +421,13 @@ export class ReporteCostosOTComponent implements OnInit {
             },
             {
               table: {
-                widths: ['*', '*', '*'],
+                widths: [130, 220, '*'],
                 style: 'header',
                 body: [
                   [
                     `N°: ${this.ordenTrabajo}`,
                     `Nombre Cliente: ${this.NombreCliente}`,
-                    `Valor de la OT: ${this.formatonumeros(this.diferencia)}`
+                    `Valor de la OT: ${this.formatonumeros(this.valorFinalOT)}`
                   ],
                   [
                     `Id Producto: ${this.idProducto}`,
@@ -405,13 +435,13 @@ export class ReporteCostosOTComponent implements OnInit {
                     `Presentación: ${this.presentacionProducto}`
                   ],
                   [
-                    `Cantidad Und.: ${this.formatonumeros(this.cantidadSellandoUnidad)}`,
+                    `Cantidad Und: ${this.formatonumeros(this.cantidadSellandoUnidad)}`,
                     `Cantidad Kg: ${this.formatonumeros(this.cantProdSinMargenKg)}`,
                     `Cantidad Margen: ${this.formatonumeros(this.CantidadMargen)}%`
                   ],
                   [
                     `Cantidad Kg Con Margen: ${this.formatonumeros(this.cantProdConMargenKg)}`,
-                    `Valor Unitario Und.: ${this.formatonumeros(this.valorUnitarioProdUnd)}`,
+                    `Valor Unitario Und: ${this.formatonumeros(this.valorUnitarioProdUnd)}`,
                     `Valor Unitario Kg: ${this.formatonumeros(this.valorUnitarioProdKg)}`
                   ]
                 ]
@@ -445,24 +475,28 @@ export class ReporteCostosOTComponent implements OnInit {
                 style: 'header',
                 body: [
                   [
-                    `Extrusión: ${Math.round(this.cantidadTotalExt)}`,
-                    `Impresión: ${Math.round(this.cantidadTotalImp)}`,
-                    `Rotograbado: ${Math.round(this.cantidadTotalRot)}`
+                    `Extrusión: ${this.formatonumeros(Math.round(this.cantidadTotalExt))}`,
+                    `Impresión: ${this.formatonumeros(Math.round(this.cantidadTotalImp))}`,
+                    `Rotograbado: ${this.formatonumeros(Math.round(this.cantidadTotalRot))}`
                   ],
                   [
-                    `Doblado: ${Math.round(this.cantidadTotalDbl)}`,
-                    `Laminado: ${Math.round(this.cantidadTotalLaminado)}`,
-                    `Empaque: ${Math.round(this.cantidadTotalEmpaque)}`
+                    `Doblado: ${this.formatonumeros(Math.round(this.cantidadTotalDbl))}`,
+                    `Laminado: ${this.formatonumeros(Math.round(this.cantidadTotalLaminado))}`,
+                    `Empaque: ${this.formatonumeros(Math.round(this.cantidadTotalEmpaque))}`
                   ],
                   [
-                    `Wiketiado: ${Math.round(this.cantidadTotalWiketiado)}`,
-                    `Sellado: ${Math.round(this.cantidadTotalSella)}`,
-                    `Corte: ${Math.round(this.cantidadTotalCorte)}`
+                    `Wiketiado: ${this.formatonumeros(Math.round(this.cantidadTotalWiketiado))}`,
+                    `Sellado: ${this.formatonumeros(Math.round(this.cantidadTotalSella))}`,
+                    `Corte: ${this.formatonumeros(Math.round(this.cantidadTotalCorte))}`
                   ],
                 ]
               },
 
-              layout: 'noBorders',
+              layout: {
+                fillColor: function (rowIndex, node, columnIndex) {
+                  return (rowIndex % 2 === 0) ? '#CCCCCC' : null;
+                }
+              },
               fontSize: 9,
             },
             '\n \n',
@@ -485,11 +519,7 @@ export class ReporteCostosOTComponent implements OnInit {
                   ],
                 ]
               },
-              layout: {
-                fillColor: function (rowIndex, node, columnIndex) {
-                  return (rowIndex % 2 === 0) ? '#CCCCCC' : null;
-                }
-              },
+              layout: 'noBorders',
               fontSize: 9,
             },
 

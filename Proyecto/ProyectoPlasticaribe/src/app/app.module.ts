@@ -43,7 +43,6 @@ import { ReporteMpOtComponent } from './Vistas/reporteMpOt/reporteMpOt.component
 import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
 import { ConsultaFac_Rem_MPComponent } from './Vistas/consultaFac_Rem_MP/consultaFac_Rem_MP.component';
 // import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
-import { MpremisionComponent } from './Vistas/mpremision/mpremision.component';
 import { MovimientoMPComponent } from './Vistas/movimientoMP/movimientoMP.component';
 import { MateriaPrimaRecuperadaComponent } from './Vistas/MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
 import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insumo/prueba-imagen-cat-insumo.component';
@@ -84,7 +83,6 @@ export const routes: Routes = [
   {path: 'reporte-Materia-Prima', canActivate: [ValidacionLoginGuard], component: ReporteMateriaPrimaComponent},
   {path: 'reporte-Materia-Prima-OT', canActivate: [ValidacionLoginGuard], component: ReporteMpOtComponent},
   {path: 'asignacionMP', canActivate: [ValidacionLoginGuard], component: AsignacionMateriaPrimaComponent},
-  {path: 'mpremision', canActivate: [ValidacionLoginGuard], component: MpremisionComponent},
   {path: 'reporte-facturas-remisiones-mp', canActivate: [ValidacionLoginGuard], component: ConsultaFac_Rem_MPComponent},
   {path: 'movimiento-mp', canActivate: [ValidacionLoginGuard], component: MovimientoMPComponent},
   {path: 'mp-recuperada', canActivate: [ValidacionLoginGuard], component: MateriaPrimaRecuperadaComponent},
@@ -122,7 +120,6 @@ export const routes: Routes = [
     ReporteMateriaPrimaComponent,
     ReporteMpOtComponent,
     AsignacionMateriaPrimaComponent,
-    MpremisionComponent,
     ConsultaFac_Rem_MPComponent,
     MovimientoMPComponent,
     MateriaPrimaRecuperadaComponent,
