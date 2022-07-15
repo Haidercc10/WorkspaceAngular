@@ -39,6 +39,14 @@ export class FactuaMpCompradaService {
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/fecha/${dato}`);
     }
 
+    srvObtenerListaPorFechas(fecha1 : any , fecha2 : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/fechas?Facco_FechaFactura1=${fecha1}&Facco_FechaFactura2=${fecha2}`);
+    }
+
+    srvObtenerListaPorCodigo(codigo : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/codigo/${codigo}`);
+    }
+
   //Metodo agregar Facturas de Materia Prima Comprada
     srvAgregar(data:any) {
       return this.http.post(this.rutaPlasticaribeAPI + '/Factura_Compra', data)

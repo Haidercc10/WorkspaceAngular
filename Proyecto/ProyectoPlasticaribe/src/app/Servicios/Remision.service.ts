@@ -32,6 +32,14 @@ export class RemisionService {
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/fecha/${id}`);
     }
 
+    srvObtenerListaPorFechas(fecha1 : any, fecha2 : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/fecha?Rem_Fecha1=${fecha1}&Rem_Fecha2=${fecha2}`);
+    }
+
+    srvObtenerListaPorcodigo(codigo : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/codigo/${codigo}`);
+    }
+
   //Metodo agregar proveedor
     srvAgregar(data:any) {
       return this.http.post(this.rutaPlasticaribeAPI + '/Remision', data)

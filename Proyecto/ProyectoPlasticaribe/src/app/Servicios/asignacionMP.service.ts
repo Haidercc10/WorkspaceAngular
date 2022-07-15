@@ -35,6 +35,10 @@ export class AsignacionMPService {
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrima/fechas?AsigMp_FechaEntrega1=${fecha1}&AsigMp_FechaEntrega2=${fecha2}`);
     }
 
+    srvObtenerListaPorFecha_Ot(fecha : any, ot : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrima/fecha_Ot?AsigMp_FechaEntrega=${fecha}&AsigMP_OrdenTrabajo=${ot}`);
+    }
+
   //Metodo agregar
     srvAgregar(data:any) {
       return this.http.post(this.rutaPlasticaribeAPI + '/Asignacion_MatPrima', data)

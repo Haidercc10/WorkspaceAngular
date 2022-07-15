@@ -46,8 +46,9 @@
             <option [ngValue]="tiposDocumentos.tpDoc_Id" *ngFor="let tiposDocumentos of tipoDocumento">{{tiposDocumentos.tpDoc_Nombre}}</option>
             <option>Asignación</option>
             <option>Recuperado</option>
+            <option>Devoluciones</option>
           </select>
-          <label for="floatingSelect">Tipo de Documento</label>
+          <label for="floatingSelect">Tipo de Movimiento</label>
         </div>
         <!-- Proveedores -->
         <div class="form-floating col-md">
@@ -110,12 +111,13 @@
   </div>
 
   <div *ngIf="load">
-  <div class="mb-1">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <label><b>Total Materia Prima Entregada: {{totalMPEntregada | number}} KG</b></label>
-      <label><b>--- KG Restante Por Entregar: {{cantRestante | number}}</b></label>
+    <div class="mb-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <label><b>Total Materia Prima Entregada: {{totalMPEntregada | number}} KG</b></label>
+        <label><b>Total Materia Prima Devuelta: {{cantidadKgDevuelta | number}} KG</b></label>
+        <label><b>--- KG Restante Por Entregar: {{cantRestante | number}}</b></label>
+      </div>
     </div>
-  </div>
   </div>
 </div>
 

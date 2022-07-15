@@ -27,6 +27,10 @@ export class RecuperadoService {
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/fecha/${id}`);
     }
 
+    srvObtenerListaPorFechas(fecha1 : any, fecha2 : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/fechas?RecMp_FechaIngreso1=${fecha1}&RecMp_FechaIngreso2=${fecha2}`);
+    }
+
   //Metodo agregar proveedor
     srvAgregar(data:any) {
       return this.http.post(this.rutaPlasticaribeAPI + '/Recuperado_MatPrima', data)

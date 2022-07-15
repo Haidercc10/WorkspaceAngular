@@ -46,6 +46,8 @@ import { ConsultaFac_Rem_MPComponent } from './Vistas/consultaFac_Rem_MP/consult
 import { MpremisionComponent } from './Vistas/mpremision/mpremision.component';
 import { MovimientoMPComponent } from './Vistas/movimientoMP/movimientoMP.component';
 import { MateriaPrimaRecuperadaComponent } from './Vistas/MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
+import { DevolucionesMPComponent } from './Vistas/devolucionesMP/devolucionesMP.component';
+import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 
 
 
@@ -84,6 +86,8 @@ export const routes: Routes = [
   {path: 'reporte-facturas-remisiones-mp', canActivate: [ValidacionLoginGuard], component: ConsultaFac_Rem_MPComponent},
   {path: 'movimiento-mp', canActivate: [ValidacionLoginGuard], component: MovimientoMPComponent},
   {path: 'mp-recuperada', canActivate: [ValidacionLoginGuard], component: MateriaPrimaRecuperadaComponent},
+  {path: 'mp-devoluciones', canActivate: [ValidacionLoginGuard], component: DevolucionesMPComponent},
+  {path: 'reporte-costos-ot', canActivate: [ValidacionLoginGuard], component: ReporteCostosOTComponent},
 ]
 
 @NgModule({
@@ -120,6 +124,8 @@ export const routes: Routes = [
     ConsultaFac_Rem_MPComponent,
     MovimientoMPComponent,
     MateriaPrimaRecuperadaComponent,
+    DevolucionesMPComponent,
+    ReporteCostosOTComponent,
   ],
 
 
@@ -128,13 +134,13 @@ export const routes: Routes = [
     ReactiveFormsModule,
     AppRoutingModule,
     RouterModule.forRoot(routes),
-    HttpClientModule,
     FormsModule,
     NgxPaginationModule,
     StorageServiceModule,
     BrowserAnimationsModule,
     MatNativeDateModule,
     MaterialExampleModule,
+    HttpClientModule,
   ],
 
   providers: [

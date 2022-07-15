@@ -8,7 +8,7 @@ import { rutaBagPro, rutaBagProLocate } from 'src/polyfills';
 })
 export class BagproService {
 
-  readonly rutaPlasticaribeAPI = rutaBagPro;
+  readonly rutaPlasticaribeAPI = rutaBagProLocate;
 
   constructor(private http : HttpClient) { }
 
@@ -22,8 +22,12 @@ export class BagproService {
   }
 
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
-  srvObtenerListaClienteOT():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/ClientesOt');
+  srvObtenerListaClienteOT_Item(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/ClientesOt/OT/${ot}`);
+  }
+
+  srvObtenerListaClienteOT_ItemCostos(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/ClientesOt/CostosOT/${ot}`);
   }
 
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
@@ -40,9 +44,17 @@ export class BagproService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/ProcSellado');
   }
 
+  srvObtenerListaProcSelladoOT(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/ProcSellado/OT/${ot}`);
+  }
+
   // CONSULTAS A LA TABLA PROC_DESPERDICIOS DE BAGPRO
   srvObtenerListaDespercicios():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Procdesperdicios');
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Procdesperdicio');
+  }
+
+  srvObtenerListaDespercicios_Ot(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Procdesperdicio/OT/${ot}`);
   }
 
 
