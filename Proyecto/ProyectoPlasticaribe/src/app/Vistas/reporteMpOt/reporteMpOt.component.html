@@ -13,7 +13,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Materia Prima</h2>
+      <h2 class="tituloRojo">Reporte de Orden de Treabajo</h2>
     </div>
 
     <div class="mb-4">
@@ -36,58 +36,110 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button class="btn btn-danger btn-danger-sm" type="button" (click)="consultaOTBagPro()">Consultar OT</button>
         <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="exportToExcel()">Exporta a Excel</button>
       </div>
     </div>
   </form>
 
-  <div class="mb-2">
-    <div class="row g-1">
-      <div class="table-responsive">
-        <!-- <div id="html2Pdf"> -->
-        <table class="table table-bordered">
-          <thead class="TitulosTabla">
-            <tr *ngFor="let columnas of titulosTabla let i = index">
-              <th id="ot" scope="col">{{columnas.oT}}</th>
-              <th id="cliente" scope="col">{{columnas.Cliente}}</th>
-              <th id="producto" scope="col">{{columnas.Producto}}</th>
-              <th id="Materia_Prima" scope="col">{{columnas.Materia_Prima}}</th>
-              <th id="Proceso" scope="col" >{{columnas.Proceso}}</th>
-              <th id="mpCant" scope="col" >{{columnas.mpCant}}</th>
-              <th id="valorMp" scope="col" >{{columnas.valorMp}}</th>
-              <th id="porcentajeMp" scope="col" >{{columnas.porcentajeMp}}</th>
-              <!-- <th id="subTotalMateriaPrima" scope="col" (dblclick)="organizacionPrecioDblClick()" (click)="organizacionPrecio()">{{columnas.mpSubTotal}}</th> -->
-            </tr>
-            </thead>
-          <tbody>
-            <tr *ngFor="let materiaPrima of ArrayMateriaPrima | paginate: {itemsPerPage: 30, currentPage: page} let i=index" >
-              <td id="ot">{{materiaPrima.Id}}</td>
-              <td id="cliente">{{clienteOT}}</td>
-              <td id="producto">{{materiaPrima.Cant}}</td>
-              <td id="Materia_Prima">{{materiaPrima.UndCant}}</td>
-              <td id="Proceso">{{materiaPrima.PrecioUnd}}</td>
-              <td id="mpCant">{{materiaPrima.PrecioUnd}}</td>
-              <td id="valorMp">{{materiaPrima.PrecioUnd}}</td>
-              <td id="porcentajeMp">{{materiaPrima.PrecioUnd}}</td>
-              <!-- <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | currency : 'COP '}}</td> -->
-            </tr>
-          </tbody>
-        </table>
-        <div class="mb-2">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <pagination-controls (pageChange)="page = $event"></pagination-controls>
-          </div>
+  <div class="overlay" *ngIf="!load">
+    <div class="spinner ">
+      <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+    </div>
+  </div>
+  <div *ngIf="load">
+    <div class="mb-2">
+      <div class="row g-1">
+        <div class="table-responsive">
+          <!-- <div id="html2Pdf"> -->
+          <table class="table table-bordered" id="table">
+            <thead class="TitulosTabla">
+              <tr *ngFor="let columnas of titulosTablaprocesos let i = index">
+                <th id="ot" scope="col">{{columnas.ot}}</th>
+                <th id="cliente" scope="col">{{columnas.ext}}</th>
+                <th id="producto" scope="col">{{columnas.imp}}</th>
+                <th id="Materia_Prima" scope="col">{{columnas.rot}}</th>
+                <th id="Proceso" scope="col" >{{columnas.dbld}}</th>
+                <th id="mpCant" scope="col" >{{columnas.lam}}</th>
+                <th id="valorMp" scope="col" >{{columnas.emp}}</th>
+                <th id="porcentajeMp" scope="col" >{{columnas.corte}}</th>
+                <th id="porcentajeMp" scope="col" >{{columnas.sel}}</th>
+                <th id="porcentajeMp" scope="col" >{{columnas.wik}}</th>
+                <!-- <th id="subTotalMateriaPrima" scope="col" (dblclick)="organizacionPrecioDblClick()" (click)="organizacionPrecio()">{{columnas.mpSubTotal}}</th> -->
+              </tr>
+              </thead>
+            <tbody>
+              <tr *ngFor="let materiaPrima of ArrayProcesos let i=index" >
+                <th id="ot"><button class="btn" type="button" (click)="mpAsignada(materiaPrima.ot)">{{materiaPrima.ot}}</button></th>
+                <td id="cliente">{{materiaPrima.ext | number}}</td>
+                <td id="producto">{{materiaPrima.imp | number}}</td>
+                <td id="Materia_Prima">{{materiaPrima.rot | number}}</td>
+                <td id="Proceso">{{materiaPrima.dbld | number}}</td>
+                <td id="mpCant">{{materiaPrima.lam | number}}</td>
+                <td id="valorMp">{{materiaPrima.emp | number}}</td>
+                <td id="porcentajeMp">{{materiaPrima.corte | number}}</td>
+                <td id="porcentajeMp">{{materiaPrima.sel | number}}</td>
+                <td id="porcentajeMp">{{materiaPrima.wik | number}}</td>
+                <!-- <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | currency : 'COP '}}</td> -->
+              </tr>
+            </tbody>
+          </table>
+          <!-- <div class="mb-2">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <pagination-controls (pageChange)="page = $event"></pagination-controls>
+            </div>
+          </div> -->
         </div>
+      </div>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <label for=""><b>Valor total OT: ${{precioOT | currency : 'COP '}}</b></label>
+        <label for=""><b>Cantidad KG total OT: {{totalKgPedida | number}}KG</b></label>
       </div>
     </div>
 
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <label for=""><b>Valor total OT: $</b></label>
-      <label for="">{{precioOT | currency : 'COP '}}</label>
-    </div>
+    <div class="mb-2">
+      <div class="row g-1">
+        <div class="table-responsive">
+          <!-- <div id="html2Pdf"> -->
+          <table class="table table-bordered" id="table2">
+            <thead class="TitulosTabla">
+              <tr *ngFor="let columnas of titulosTablaprocesosDiferencias let i = index">
+                <th id="ot" scope="col">{{columnas.ot}}</th>
+                <th id="cliente" scope="col">{{columnas.ext_imp}}</th>
+                <th id="producto" scope="col">{{columnas.imp_dbld}}</th>
+                <th id="Materia_Prima" scope="col">{{columnas.dbld_rot}}</th>
+                <th id="Proceso" scope="col" >{{columnas.dbld_sell}}</th>
+                <th id="mpCant" scope="col" >{{columnas.total}}</th>
+                <!--<th id="valorMp" scope="col" >{{columnas.valorMp}}</th>
+                <th id="porcentajeMp" scope="col" >{{columnas.porcentajeMp}}</th> -->
+                <!-- <th id="subTotalMateriaPrima" scope="col" (dblclick)="organizacionPrecioDblClick()" (click)="organizacionPrecio()">{{columnas.mpSubTotal}}</th> -->
+              </tr>
+              </thead>
+            <tbody>
+              <tr *ngFor="let materiaPrima of ArrayProcesosDiferencias let i=index" >
+                <th id="ot">{{materiaPrima.ot}}</th>
+                <td id="cliente">{{materiaPrima.ext_imp | number}}</td>
+                <td id="producto">{{materiaPrima.imp_dbld | number}}</td>
+                <td id="Materia_Prima">{{materiaPrima.dbld_rot | number}}</td>
+                <td id="Proceso">{{materiaPrima.dbld_sell | number}}</td>
+                <td id="mpCant">{{materiaPrima.total | number}}</td>
+                <!-- <td id="valorMp">{{materiaPrima.PrecioUnd}}</td>
+                <td id="porcentajeMp">{{materiaPrima.PrecioUnd}}</td> -->
+                <!-- <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | currency : 'COP '}}</td> -->
+              </tr>
+            </tbody>
+          </table>
+          <!-- <div class="mb-2">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <pagination-controls (pageChange)="page = $event"></pagination-controls>
+            </div>
+          </div> -->
+        </div>
+      </div>
 
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <label for=""><b>Porc(%) total: </b></label>
-      <label for="">{{porcentajeTotal}}%</label>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <label for=""><b>Porc(%) total: {{totalPerdidaPorcentaje | number}}%</b></label>
+        <label for=""><b>Perdida en KG: {{totalPerdida | number}}KG</b></label>
+      </div>
     </div>
   </div>
 </div>

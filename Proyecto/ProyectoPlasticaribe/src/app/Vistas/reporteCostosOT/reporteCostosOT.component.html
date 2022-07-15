@@ -1,0 +1,206 @@
+<div class="contain">
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
+    </div>
+    <ul class="btn-group open">
+      <p><b>User: {{storage_Nombre}}</b></p>
+      <span><b>Tipo: {{storage_Rol}} </b></span>
+      <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
+    </ul>
+  </nav>
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Reporte de Costos de Orden de Treabajo</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+<div class="container">
+  <form [formGroup]="infoOT">
+    <div class="mb-3">
+      <div class="row g-3">
+        <!-- Numero de La Orden de Trabajo -->
+        <div class="form-floating col-md-2">
+          <input formControlName="ot" type="number" min="0" (keyup.enter)="consultaOTBagPro()" class="form-control" id="floatingInput"required >
+          <label for="floatingInput">Orden de Trabajo</label>
+        </div>
+        <!-- Nombre del cliente -->
+        <div class="form-floating col-md-4">
+          <input formControlName="cliente" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Nombre Cliente</label>
+        </div>
+        <!-- Id Producto -->
+        <div class="form-floating col-md-2">
+          <input formControlName="IdProducto" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Id Producto</label>
+        </div>
+        <!-- Nombre Producto -->
+        <div class="form-floating col-md">
+          <input formControlName="NombreProducto" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Nombre Producto</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <div class="row g-3">
+        <!-- Cantidad Producto Unidad Sin Margen -->
+        <div class="form-floating col-md-2">
+          <input formControlName="cantProductoSinMargenUnd" type="number" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Cantidad Prod. Unidad</label>
+        </div>
+        <!-- Cantidad Producto Kg Sin Margen -->
+        <div class="form-floating col-md-2">
+          <input formControlName="cantProductoSinMargenKg" type="number" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Cantidad Prod. Kg</label>
+        </div>
+        <!-- Margen -->
+        <div class="form-floating col-md-2">
+          <input formControlName="margenAdicional" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Margen Adicional</label>
+        </div>
+        <!-- Cantidad Producto Con Margen-->
+        <div class="form-floating col-md-2">
+          <input formControlName="cantProductoConMargen" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Cant. Kg Prod. con Margen</label>
+        </div>
+        <!-- Presentacion Producto -->
+        <div class="form-floating col-md-2">
+          <input formControlName="PresentacionProducto" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Presentacion Producto</label>
+        </div>
+        <!-- Valor Unidad Producto -->
+        <div class="form-floating col-md-2">
+          <input formControlName="ValorUnidadProductoUnd" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Valor Unidad Producto</label>
+        </div>
+        <!-- Valor Kg Producto -->
+        <div class="form-floating col-md-2">
+          <input formControlName="ValorUnidadProductoKg" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Valor Kg Producto</label>
+        </div>
+        <!-- Valor Estimado OT -->
+        <div class="form-floating col-md-2">
+          <input formControlName="ValorEstimadoOt" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Valor OT</label>
+        </div>
+      </div>
+    </div>
+    <!-- BOTONES -->
+    <div class="mb-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="consultaOTBagPro()">Consultar OT</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" >Limpiar Campos</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="CargarPDF()">Reporte en PDF</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="overlay" *ngIf="!load">
+    <div class="spinner ">
+      <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+    </div>
+  </div>
+
+  <div *ngIf="load">
+    <div class="mb-4">
+      <hr class="Linea">
+    </div>
+
+    <div class="mb-4">
+      <h4 class="tituloRojo">Tabla de Materia Prima</h4>
+    </div>
+
+    <div class="mb-2">
+      <div class="row g-1">
+        <div class="table-responsive">
+          <table class="table table-bordered" >
+            <thead class="TitulosTabla">
+              <tr *ngFor="let columnas of titulosTabla let i = index">
+                <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
+                <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
+                <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
+                <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
+                <th id="PrecioUnidad" scope="col">{{columnas.mpPrecioU}}</th>
+                <th id="mpSubTotal" scope="col">{{columnas.mpSubTotal}}</th>
+                <th id="proceso" scope="col">{{columnas.mpProceso}}</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let materiaPrima of ArrayMateriaPrima let i = index">
+                  <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
+                  <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
+                  <td id="cantidadMateriaPrima">{{materiaPrima.Cantidad}}</td>
+                  <td id="UnidadMedida">{{materiaPrima.Presentacion}}</td>
+                  <td id="precio">${{materiaPrima.PrecioUnd}}</td>
+                  <td id="subtotal">${{materiaPrima.SubTotal}}</td>
+                  <td id="proceso">{{materiaPrima.Proceso}}</td>
+                </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <hr class="Linea">
+    </div>
+
+    <div class="mb-4">
+      <h4 class="tituloRojo">Tabla de Procesos</h4>
+    </div>
+
+    <div class="mb-2">
+      <div class="row g-1">
+        <div class="table-responsive">
+          <!-- <div id="html2Pdf"> -->
+          <table class="table table-bordered" id="table">
+            <thead class="TitulosTabla">
+              <tr *ngFor="let columnas of titulosTablaprocesos let i = index">
+                <th id="ot" scope="col">{{columnas.ot}}</th>
+                <th id="cliente" scope="col">{{columnas.ext}}</th>
+                <th id="producto" scope="col">{{columnas.imp}}</th>
+                <th id="Materia_Prima" scope="col">{{columnas.rot}}</th>
+                <th id="Proceso" scope="col" >{{columnas.dbld}}</th>
+                <th id="mpCant" scope="col" >{{columnas.lam}}</th>
+                <th id="valorMp" scope="col" >{{columnas.emp}}</th>
+                <th id="porcentajeMp" scope="col" >{{columnas.corte}}</th>
+                <th id="porcentajeMp" scope="col" >{{columnas.sel}}</th>
+                <th id="porcentajeMp" scope="col" >{{columnas.wik}}</th>
+               </tr>
+              </thead>
+            <tbody>
+              <tr *ngFor="let materiaPrima of ArrayProcesos let i=index" >
+                <th id="ot">{{materiaPrima.Ot}}</th>
+                <td id="cliente">{{materiaPrima.Ext | number}}</td>
+                <td id="producto">{{materiaPrima.Imp | number}}</td>
+                <td id="Materia_Prima">{{materiaPrima.Rot | number}}</td>
+                <td id="Proceso">{{materiaPrima.Dbld | number}}</td>
+                <td id="mpCant">{{materiaPrima.Lam | number}}</td>
+                <td id="valorMp">{{materiaPrima.Emp | number}}</td>
+                <td id="porcentajeMp">{{materiaPrima.Corte | number}}</td>
+                <td id="porcentajeMp">{{materiaPrima.Sel | number}}</td>
+                <td id="porcentajeMp">{{materiaPrima.Wik | number}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mb-1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <label><b>Total Materia Prima Entregada:</b> {{totalMPEntregada | number}} KG</label>
+      <label><b>Valor Materia Prima Entregada:</b> {{ValorMPEntregada | currency}} </label>
+      <label><b>Valor Final OT:</b> {{valorFinalOT | currency}} </label>
+      <label><b>Diferencia:</b> ${{diferencia | number}} </label>
+      <label><b>Diferencia (%):</b> {{diferenciaPorcentaje | number}}%</label>
+    </div>
+  </div>
+</div>

@@ -67,7 +67,7 @@
       <div class="row g-1">
         <div class="table-responsive">
           <!-- <div id="html2Pdf"> -->
-          <table class="table table-bordered">
+          <table class="table table-bordered" id="table">
             <thead class="TitulosTabla">
               <tr *ngFor="let columnas of titulosTabla let i = index">
                 <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
@@ -91,7 +91,7 @@
                 <td id="cantidadMateriaPrima">{{materiaPrima.Inicial | number}}</td>
                 <td id="cantidadMateriaPrima">{{materiaPrima.Entrada | number}}</td>
                 <td id="cantidadMateriaPrima">{{materiaPrima.Salida | number}}</td>
-                <td id="cantidadMateriaPrima">{{materiaPrima.Cant | number}}</td>
+                <td id="cantidadMateriaPrima" class="columnaCantidad"><b>{{materiaPrima.Cant | number}}</b></td>
                 <td id="cantidadMateriaPrima">{{materiaPrima.Diferencia | number}}</td>
                 <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
                 <ng-container *ngIf="ValidarRol == 1">
@@ -115,6 +115,11 @@
           <label for="">${{valorTotal | currency : 'COP '}}</label>
         </div>
       </ng-container>
+      <div class="mb-1">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class="btn btn-danger btn-danger-sm" type="button" (click)="exportToExcel()">Exportar a Excel</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

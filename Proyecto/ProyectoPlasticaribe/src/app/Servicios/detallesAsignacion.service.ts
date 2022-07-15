@@ -9,7 +9,7 @@ import { modelDetallesAsignacion } from '../Modelo/modelDetallesAsignacion';
 })
 export class DetallesAsignacionService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }
@@ -31,14 +31,18 @@ export class DetallesAsignacionService {
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/matPri/${materiaPrima}`);
     }
 
+    srvObtenerListaPorOT(ot : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/AsignacionesAgrupadas/${ot}`);
+    }
+
   //Metodo agregar
     srvAgregar(data:any) {
       return this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_MateriaPrima', data)
     }
 
   //Metodo actualzar
-    srvActualizar(id:number|String, data:any) {
-      return this.http.put(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/${id}`, data);
+    srvActualizar(asignacion : any, materiaPrima : any | String, data:any) {
+      return this.http.put(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/ ?AsigMp_Id=${asignacion}&MatPri_Id=${materiaPrima}`, data);
     }
 
   //Metodo eliminar

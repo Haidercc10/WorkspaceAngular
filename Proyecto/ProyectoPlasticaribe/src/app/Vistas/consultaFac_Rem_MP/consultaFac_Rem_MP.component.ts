@@ -242,13 +242,13 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
           for (let index = 0; index < datos_factura.length; index++) {
             this.lenarTabla(datos_factura[index]);
           }
-        });
+        }, error => { Swal.fire("No hay facturas registradas"); this.load = true;});
       } else if (TipoDocumento ==  'REM') {
         this.remisionService.srvObtenerLista().subscribe(datos_remision => {
           for (let index = 0; index < datos_remision.length; index++) {
             this.lenarTabla(datos_remision[index]);
           }
-        });
+        }, error => { Swal.fire("No hay remisiones registradas"); this.load = true;});
       } else if (TipoDocumento == 'Remisiones sin Factura') {
         this.load = false;
         // Llenado d Array con Remisiones
@@ -257,14 +257,14 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
             datos_remision[index].tpDoc_Id = 'Remisiones sin Factura';
             this.remision.push(datos_remision[index].rem_Id);
           }
-        });
+        }, error => { Swal.fire("No hay remisiones registradas"); this.load = true;});
 
         // Llenado de Array con Remisiones con Facturas
         this.remisionFacturaService.srvObtenerLista().subscribe(datos_remisionesFacturas => {
           for (let i = 0; i < datos_remisionesFacturas.length; i++) {
             this.remConFac.push(datos_remisionesFacturas[i].rem_Id);
           }
-        });
+        }, error => { Swal.fire("No hay remisiones registradas"); this.load = true;});
 
         // Se esperan unos segundos a que termine el llenado
         setTimeout(() => {
@@ -292,10 +292,58 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
           // Recorre el Array de Remisiones y busca cada id para mostrarlo en la tabla
           for (let k = 0; k < this.remision.length; k++) {
             this.remisionService.srvObtenerListaPorId(this.remision[k]).subscribe(datos_remision => {
-              datos_remision.tpDoc_Id = 'Remisiones sin Factura';
               this.lenarTabla(datos_remision);
             });
           }
+          this.load = true;
+        }, 2000);
+      } else if (TipoDocumento == 'Facturas sin Remisiones') {
+
+        this.load = false;
+        let facturas = [];
+        this.remConFac = [];
+
+        this.facturaCompraService.srvObtenerLista().subscribe(datos_facturas => {
+          for (let i = 0; i < datos_facturas.length; i++) {
+            facturas.push(datos_facturas[i].facco_Id);
+          }
+        });
+
+        this.remisionFacturaService.srvObtenerLista().subscribe(datos_remisionesFacturas => {
+          for (let j = 0; j < datos_remisionesFacturas.length; j++) {
+            this.remConFac.push(datos_remisionesFacturas[j].facco_Id);
+          }
+        });
+
+        setTimeout(() => {
+          // Variable para validar que un dato en los 2 Array es igual
+          let res = 0;
+          // Recorre Array con Remisiones
+          for (let l = 0; l < facturas.length; l++) {
+            res = 0
+            // Recorre Array con Remisiones con Facturas
+            for (let m = 0; m < this.remConFac.length; m++) {
+              // Pregunta si la remision tiene factura
+              if (facturas.includes(this.remConFac[m])) {
+                // Pregunta si el dato de los Arrays es igual
+                if (facturas[l] == this.remConFac[m]) {
+                  res = 1;
+                  // Quita el dato que es igual del primer Array
+                  facturas.splice(l, 1);
+                }
+              }
+            }
+            if (res == 1) continue;
+            else continue;
+          }
+
+          // Recorre el Array de Remisiones y busca cada id para mostrarlo en la tabla
+          for (let k = 0; k < facturas.length; k++) {
+            this.facturaCompraService.srvObtenerListaPorId(facturas[k]).subscribe(datos_factura => {
+              this.lenarTabla(datos_factura);
+            });
+          }
+          this.load = true;
         }, 2000);
       }
     } else if (proveedores != null) {
@@ -342,6 +390,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
         subTotal : formulario.facco_ValorTotal,
       }
       this.ArrayDocumento.push(infoDoc);
+      this.ArrayDocumento.sort((a,b) => b.fecha.localeCompare(a.fecha));
       this.proveedorService.srvObtenerListaPorId(infoDoc.proveedor).subscribe(datos_proveedor => {
         infoDoc.proveedor = datos_proveedor.prov_Nombre;
       });
@@ -357,6 +406,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
         subTotal : formulario.rem_PrecioEstimado,
       }
       this.ArrayDocumento.push(infoDoc);
+      this.ArrayDocumento.sort((a,b) => b.fecha.localeCompare(a.fecha));
       this.proveedorService.srvObtenerListaPorId(infoDoc.proveedor).subscribe(datos_proveedor => {
         infoDoc.proveedor = datos_proveedor.prov_Nombre;
       });
@@ -490,97 +540,203 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
           this.usuarioService.srvObtenerListaPorId(datos_factura.usua_Id).subscribe(datos_usuario => {
             this.proveedorService.srvObtenerListaPorId(datos_factura.prov_Id).subscribe(datos_proveedor => {
               this.remisionFacturaService.srvObtenerListaPorFactId(id).subscribe(datos_remisionFactura => {
-                for (let mp = 0; mp < this.mpAgregada.length; mp++) {
-                  let FechaEntregaDatetime = datos_factura.facco_FechaFactura;
-                  let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                  let fecharegistroFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+                if (datos_remisionFactura.length == 0) {
+                  for (let mp = 0; mp < this.mpAgregada.length; mp++) {
+                    let FechaEntregaDatetime = datos_factura.facco_FechaFactura;
+                    let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                    let fecharegistroFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
 
-                  const pdfDefinicion : any = {
-                    info: {
-                      title: `${datos_factura.facco_Codigo}`
-                    },
-                    content : [
-                      {
-                        text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
-                        alignment: 'center',
-                        style: 'titulo',
+                    const pdfDefinicion : any = {
+                      info: {
+                        title: `${datos_factura.facco_Codigo}`
                       },
-                      '\n \n',
-                      {
-                        text: `Fecha de registro: ${fecharegistroFinal}`,
-                        style: 'header',
-                        alignment: 'right',
-                      },
-                      {
-                        text: `Registrado Por: ${datos_usuario.usua_Nombre}\n`,
-                        alignment: 'right',
-                        style: 'header',
-                      },
-                      {
-                        text: `\n Información detallada del Proveedor \n \n`,
-                        alignment: 'center',
-                        style: 'header'
-                      },
-                      {
-                        style: 'tablaCliente',
-                        table: {
-                          widths: ['*', '*', '*'],
-                          style: 'header',
-                          body: [
-                            [
-                              `ID: ${datos_proveedor.prov_Id}`,
-                              `Tipo de ID: ${datos_proveedor.tipoIdentificacion_Id}`,
-                              `Tipo de Cliente: ${datos_proveedor.tpProv_Id}`
-                            ],
-                            [
-                              `Nombre: ${datos_proveedor.prov_Nombre}`,
-                              `Telefono: ${datos_proveedor.prov_Telefono}`,
-                              `Ciudad: ${datos_proveedor.prov_Ciudad}`
-                            ],
-                            [
-                              `E-mail: ${datos_proveedor.prov_Email}`,
-                              ``,
-                              ``
-                            ]
-                          ]
+                      content : [
+                        {
+                          text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
+                          alignment: 'center',
+                          style: 'titulo',
                         },
-                        layout: 'lightHorizontalLines',
-                        fontSize: 9,
-                      },
-                      {
-                        text: `\n \nObervación sobre la factura: \n ${datos_factura.facco_Observacion}\n`,
-                        style: 'header',
-                      },
-                      {
-                        text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
-                        alignment: 'center',
-                        style: 'header'
-                      },
+                        '\n \n',
+                        {
+                          text: `Fecha de registro: ${fecharegistroFinal}`,
+                          style: 'header',
+                          alignment: 'right',
+                        },
+                        {
+                          text: `Registrado Por: ${datos_usuario.usua_Nombre}\n`,
+                          alignment: 'right',
+                          style: 'header',
+                        },
+                        {
+                          text: `\n Información detallada del Proveedor \n \n`,
+                          alignment: 'center',
+                          style: 'header'
+                        },
+                        {
+                          style: 'tablaCliente',
+                          table: {
+                            widths: ['*', '*', '*'],
+                            style: 'header',
+                            body: [
+                              [
+                                `ID: ${datos_proveedor.prov_Id}`,
+                                `Tipo de ID: ${datos_proveedor.tipoIdentificacion_Id}`,
+                                `Tipo de Cliente: ${datos_proveedor.tpProv_Id}`
+                              ],
+                              [
+                                `Nombre: ${datos_proveedor.prov_Nombre}`,
+                                `Telefono: ${datos_proveedor.prov_Telefono}`,
+                                `Ciudad: ${datos_proveedor.prov_Ciudad}`
+                              ],
+                              [
+                                `E-mail: ${datos_proveedor.prov_Email}`,
+                                ``,
+                                ``
+                              ]
+                            ]
+                          },
+                          layout: 'lightHorizontalLines',
+                          fontSize: 9,
+                        },
+                        {
+                          text: `\n \nObervación sobre la factura: \n ${datos_factura.facco_Observacion}\n`,
+                          style: 'header',
+                        },
+                        {
+                          text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
+                          alignment: 'center',
+                          style: 'header'
+                        },
 
-                      this.table(this.mpAgregada, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                        this.table(this.mpAgregada, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
 
-                      {
-                        text: `\n\nValor Total Factura: $${this.formatonumeros(datos_factura.facco_ValorTotal)}`,
-                        alignment: 'right',
-                        style: 'header',
-                      },
+                        {
+                          text: `\n\nValor Total Factura: $${this.formatonumeros(datos_factura.facco_ValorTotal)}`,
+                          alignment: 'right',
+                          style: 'header',
+                        },
 
 
-                    ],
-                    styles: {
-                      header: {
-                        fontSize: 8,
-                        bold: true
-                      },
-                      titulo: {
-                        fontSize: 15,
-                        bold: true
+                      ],
+                      styles: {
+                        header: {
+                          fontSize: 8,
+                          bold: true
+                        },
+                        titulo: {
+                          fontSize: 15,
+                          bold: true
+                        }
                       }
                     }
+                    const pdf = pdfMake.createPdf(pdfDefinicion);
+                    pdf.open();
+                    break;
                   }
-                  const pdf = pdfMake.createPdf(pdfDefinicion);
-                  pdf.open();
-                  break;
+
+                } else {
+                  for (let i = 0; i < datos_remisionFactura.length; i++) {
+                    this.remisionService.srvObtenerListaPorId(datos_remisionFactura[i].rem_Id).subscribe(datos_remision => {
+                      this.remisionMpService.srvObtenerListaPorRemId(id).subscribe(datos_remisionMP => {
+                        this.usuarioService.srvObtenerListaPorId(datos_remision.usua_Id).subscribe(datos_usuario => {
+                          this.proveedorService.srvObtenerListaPorId(datos_remision.prov_Id).subscribe(datos_proveedor => {
+                            this.materiaPrimaService.srvObtenerListaPorId(datos_remisionMP.matPri_Id).subscribe(datos_materiPrima => {
+                              for (let mp = 0; mp < this.mpAgregada.length; mp++) {
+                                let FechaEntregaDatetime = datos_factura.facco_FechaFactura;
+                                let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                                let fecharegistroFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+
+                                const pdfDefinicion : any = {
+                                  info: {
+                                    title: `${datos_factura.facco_Codigo}`
+                                  },
+                                  content : [
+                                    {
+                                      text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
+                                      alignment: 'center',
+                                      style: 'titulo',
+                                    },
+                                    '\n \n',
+                                    {
+                                      text: `Fecha de registro: ${fecharegistroFinal}`,
+                                      style: 'header',
+                                      alignment: 'right',
+                                    },
+                                    {
+                                      text: `Registrado Por: ${datos_usuario.usua_Nombre}\n`,
+                                      alignment: 'right',
+                                      style: 'header',
+                                    },
+                                    {
+                                      text: `\n Información detallada del Proveedor \n \n`,
+                                      alignment: 'center',
+                                      style: 'header'
+                                    },
+                                    {
+                                      style: 'tablaCliente',
+                                      table: {
+                                        widths: ['*', '*', '*'],
+                                        style: 'header',
+                                        body: [
+                                          [
+                                            `ID: ${datos_proveedor.prov_Id}`,
+                                            `Tipo de ID: ${datos_proveedor.tipoIdentificacion_Id}`,
+                                            `Tipo de Cliente: ${datos_proveedor.tpProv_Id}`
+                                          ],
+                                          [
+                                            `Nombre: ${datos_proveedor.prov_Nombre}`,
+                                            `Telefono: ${datos_proveedor.prov_Telefono}`,
+                                            `Ciudad: ${datos_proveedor.prov_Ciudad}`
+                                          ],
+                                          [
+                                            `E-mail: ${datos_proveedor.prov_Email}`,
+                                            ``,
+                                            ``
+                                          ]
+                                        ]
+                                      },
+                                      layout: 'lightHorizontalLines',
+                                      fontSize: 9,
+                                    },
+                                    {
+                                      text: `\n \nObervación sobre la factura: \n ${datos_factura.facco_Observacion}\n`,
+                                      style: 'header',
+                                    },
+                                    {
+                                      text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
+                                      alignment: 'center',
+                                      style: 'header'
+                                    },
+
+                                    this.table(this.mpAgregada, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+
+                                    {
+                                      text: `\n\nValor Total Factura: $${this.formatonumeros(datos_factura.facco_ValorTotal)}`,
+                                      alignment: 'right',
+                                      style: 'header',
+                                    },
+                                  ],
+                                  styles: {
+                                    header: {
+                                      fontSize: 8,
+                                      bold: true
+                                    },
+                                    titulo: {
+                                      fontSize: 15,
+                                      bold: true
+                                    }
+                                  }
+                                }
+                                const pdf = pdfMake.createPdf(pdfDefinicion);
+                                pdf.open();
+                                break;
+                              }
+                            });
+                          });
+                        });
+                      });
+                    });
+                  }
                 }
               });
             });
@@ -590,102 +746,106 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     } else if (tipoDoc == 'REM') {
       this.remisionService.srvObtenerListaPorId(id).subscribe(datos_remision => {
         this.remisionMpService.srvObtenerListaPorRemId(id).subscribe(datos_remisionMP => {
-          this.usuarioService.srvObtenerListaPorId(datos_remision.usua_Id).subscribe(datos_usuario => {
-            this.proveedorService.srvObtenerListaPorId(datos_remision.prov_Id).subscribe(datos_proveedor => {
-              this.materiaPrimaService.srvObtenerListaPorId(datos_remisionMP.matPri_Id).subscribe(datos_materiPrima => {
-                for (let mp = 0; mp < this.mpAgregada.length; mp++) {
-                  let FechaEntregaDatetime = datos_remision.rem_Fecha;
-                  let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                  let fecharegistroFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+          for (let i = 0; i < datos_remisionMP.length; i++) {
+            console.log(datos_remisionMP[i].matPri_Id)
+            this.usuarioService.srvObtenerListaPorId(datos_remision.usua_Id).subscribe(datos_usuario => {
+              this.proveedorService.srvObtenerListaPorId(datos_remision.prov_Id).subscribe(datos_proveedor => {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_remisionMP[i].matPri_Id).subscribe(datos_materiPrima => {
+                  for (let mp = 0; mp < this.mpAgregada.length; mp++) {
+                    let FechaEntregaDatetime = datos_remision.rem_Fecha;
+                    let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                    let fecharegistroFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
 
-                  const pdfDefinicion : any = {
-                    info: {
-                      title: `${datos_remision.rem_Id}`
-                    },
-                    content : [
-                      {
-                        text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
-                        alignment: 'center',
-                        style: 'titulo',
+                    const pdfDefinicion : any = {
+                      info: {
+                        title: `${datos_remision.rem_Id}`
                       },
-                      '\n \n',
-                      {
-                        text: `Fecha de registro: ${fecharegistroFinal}`,
-                        style: 'header',
-                        alignment: 'right',
-                      },
-                      {
-                        text: `Registrado Por: ${datos_usuario.usua_Nombre}\n`,
-                        alignment: 'right',
-                        style: 'header',
-                      },
-                      {
-                        text: `\n Información detallada del Proveedor \n \n`,
-                        alignment: 'center',
-                        style: 'header'
-                      },
-                      {
-                        style: 'tablaCliente',
-                        table: {
-                          widths: ['*', '*', '*'],
-                          style: 'header',
-                          body: [
-                            [
-                              `ID: ${datos_proveedor.prov_Id}`,
-                              `Tipo de ID: ${datos_proveedor.tipoIdentificacion_Id}`,
-                              `Tipo de Cliente: ${datos_proveedor.tpProv_Id}`
-                            ],
-                            [
-                              `Nombre: ${datos_proveedor.prov_Nombre}`,
-                              `Telefono: ${datos_proveedor.prov_Telefono}`,
-                              `Ciudad: ${datos_proveedor.prov_Ciudad}`
-                            ],
-                            [
-                              `E-mail: ${datos_proveedor.prov_Email}`,
-                              ``,
-                              ``
-                            ]
-                          ]
+                      content : [
+                        {
+                          text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
+                          alignment: 'center',
+                          style: 'titulo',
                         },
-                        layout: 'lightHorizontalLines',
-                        fontSize: 9,
-                      },
-                      {
-                        text: `\n \nObervación sobre la remisión: \n ${datos_remision.rem_Observacion}\n`,
-                        style: 'header',
-                      },
-                      {
-                        text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
-                        alignment: 'center',
-                        style: 'header'
-                      },
+                        '\n \n',
+                        {
+                          text: `Fecha de registro: ${fecharegistroFinal}`,
+                          style: 'header',
+                          alignment: 'right',
+                        },
+                        {
+                          text: `Registrado Por: ${datos_usuario.usua_Nombre}\n`,
+                          alignment: 'right',
+                          style: 'header',
+                        },
+                        {
+                          text: `\n Información detallada del Proveedor \n \n`,
+                          alignment: 'center',
+                          style: 'header'
+                        },
+                        {
+                          style: 'tablaCliente',
+                          table: {
+                            widths: ['*', '*', '*'],
+                            style: 'header',
+                            body: [
+                              [
+                                `ID: ${datos_proveedor.prov_Id}`,
+                                `Tipo de ID: ${datos_proveedor.tipoIdentificacion_Id}`,
+                                `Tipo de Cliente: ${datos_proveedor.tpProv_Id}`
+                              ],
+                              [
+                                `Nombre: ${datos_proveedor.prov_Nombre}`,
+                                `Telefono: ${datos_proveedor.prov_Telefono}`,
+                                `Ciudad: ${datos_proveedor.prov_Ciudad}`
+                              ],
+                              [
+                                `E-mail: ${datos_proveedor.prov_Email}`,
+                                ``,
+                                ``
+                              ]
+                            ]
+                          },
+                          layout: 'lightHorizontalLines',
+                          fontSize: 9,
+                        },
+                        {
+                          text: `\n \nObervación sobre la remisión: \n ${datos_remision.rem_Observacion}\n`,
+                          style: 'header',
+                        },
+                        {
+                          text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
+                          alignment: 'center',
+                          style: 'header'
+                        },
 
-                      this.table(this.mpAgregada, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                        this.table(this.mpAgregada, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
 
-                      {
-                        text: `\n\nValor Total Remisión: $${this.formatonumeros(datos_remision.rem_PrecioEstimado)}`,
-                        alignment: 'right',
-                        style: 'header',
-                      },
-                    ],
-                    styles: {
-                      header: {
-                        fontSize: 8,
-                        bold: true
-                      },
-                      titulo: {
-                        fontSize: 15,
-                        bold: true
+                        {
+                          text: `\n\nValor Total Remisión: $${this.formatonumeros(datos_remision.rem_PrecioEstimado)}`,
+                          alignment: 'right',
+                          style: 'header',
+                        },
+                      ],
+                      styles: {
+                        header: {
+                          fontSize: 8,
+                          bold: true
+                        },
+                        titulo: {
+                          fontSize: 15,
+                          bold: true
+                        }
                       }
                     }
+                    const pdf = pdfMake.createPdf(pdfDefinicion);
+                    pdf.open();
+                    break;
                   }
-                  const pdf = pdfMake.createPdf(pdfDefinicion);
-                  pdf.open();
-                  break;
-                }
+                });
               });
             });
-          });
+            break;
+          }
         });
       });
     } else if (tipoDoc == 'Remisiones sin Factura') {
