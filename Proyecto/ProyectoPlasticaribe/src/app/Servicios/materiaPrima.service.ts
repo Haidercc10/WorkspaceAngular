@@ -24,7 +24,7 @@ export class MateriaPrimaService {
   }
 
   //Metodo agregar Productos
-  srvAgregar(data:any) {
+  srvAgregar(data : any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data)
   }
 

@@ -21,12 +21,11 @@
     <div class="container">
 
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="button" class="btn btn-danger btn-danger-sm" (click)="InventarioExistenciaZeus()">
+        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#exampleModal" (click)="llamarModalImagenCargada()"> <!--(click)="InventarioExistenciaZeus()"-->
           Generar inventario
         </button>
 
-        <input type="file" accept="image/*" id="formFileSm" name="formFileSm" class="btn btn-danger btn-danger-sm">
-        <button ngModel="formFileSm" type="button" class="btn btn-danger btn-danger-sm" (click)="guardarImagenDesdeRuta()">
+         <button type="button" class="btn btn-danger btn-danger-sm" (click)="guardarImagenARuta()">
           Guardar Imagen
         </button>
       </div>
@@ -99,6 +98,12 @@
                 <!-- Precio Producto -->
                 <div class="col-md">
                     <input formControlName="PrecioProducto"  type="text" class="form-control form-control-sm" id=""  placeholder="Precio del producto" name="precioProducto" required>
+                </div>
+                <div class="mb-3">
+                  <div class="col-md">
+                    <input formControlName="nombreImagen" type="file" (change)="cargarImagen($event)" accept="image/*" class="form-control form-control-sm" data-bs-toggle="modal" data-bs-target="#exampleModal" required>
+                      <!--<img style="height: 100%;" [src]="Url" alt="">-->
+                  </div>
                 </div>
             </div>
         </div>
@@ -174,9 +179,9 @@
                       </thead>
                       <tbody>
                         <tr>
-                          <th id="cid" class="TextosInfoTabla"></th>
+                          <th id="cid" class="TextosInfoTabla2"></th>
                           <td id="cnombre" class="TextosInfoTabla"></td>
-                          <th id="pid" class="TextosInfoTabla"></th>
+                          <td id="pid" class="TextosInfoTabla"></td>
                           <td id="pnombre" class="TextosInfoTabla"></td>
                           <td id="pprecio" class="TextosInfoTabla"></td>
                           <td id="pstock" class="TextosInfoTabla"></td>
@@ -190,6 +195,21 @@
             </div>
         </div>
 
+
+        <div  class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-xl">
+          <div class="modal-content">
+            <!--<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+             <!-- <div class="modal-header">
+                  <h5 class="modal-title" id="staticBackdropLabel2">Previsualización</h5>
+              </div>-->
+              <div *ngIf="Url" class="modal-body">
+                <!--Carga componente crear Proveedor-->
+                    <img style="width: 100%;" [src]="Url" alt="">
+              </div>
+           </div>
+          </div>
+        </div>
 
   </div>
   </div>

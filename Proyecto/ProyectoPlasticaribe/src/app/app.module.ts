@@ -46,6 +46,10 @@ import { ConsultaFac_Rem_MPComponent } from './Vistas/consultaFac_Rem_MP/consult
 import { MpremisionComponent } from './Vistas/mpremision/mpremision.component';
 import { MovimientoMPComponent } from './Vistas/movimientoMP/movimientoMP.component';
 import { MateriaPrimaRecuperadaComponent } from './Vistas/MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
+import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insumo/prueba-imagen-cat-insumo.component';
+import { MateriasPrimasComponent } from './Vistas/materias-primas/materias-primas.component';
+import { CrearCategoriasMPComponent } from './Vistas/crear-categorias-mp/crear-categorias-mp.component';
+import { CrearUnidadesMedidasComponent } from './Vistas/crear-unidades-medidas/crear-unidades-medidas.component';
 
 
 
@@ -84,6 +88,8 @@ export const routes: Routes = [
   {path: 'reporte-facturas-remisiones-mp', canActivate: [ValidacionLoginGuard], component: ConsultaFac_Rem_MPComponent},
   {path: 'movimiento-mp', canActivate: [ValidacionLoginGuard], component: MovimientoMPComponent},
   {path: 'mp-recuperada', canActivate: [ValidacionLoginGuard], component: MateriaPrimaRecuperadaComponent},
+  {path: 'prueba-cat-insumo', canActivate: [ValidacionLoginGuard], component: PruebaImagenCatInsumoComponent},
+  {path: 'materias_primas', canActivate: [ValidacionLoginGuard], component: MateriasPrimasComponent},
 ]
 
 @NgModule({
@@ -120,6 +126,11 @@ export const routes: Routes = [
     ConsultaFac_Rem_MPComponent,
     MovimientoMPComponent,
     MateriaPrimaRecuperadaComponent,
+    PruebaImagenCatInsumoComponent,
+    MateriasPrimasComponent,
+    CrearCategoriasMPComponent,
+    CrearUnidadesMedidasComponent,
+
   ],
 
 

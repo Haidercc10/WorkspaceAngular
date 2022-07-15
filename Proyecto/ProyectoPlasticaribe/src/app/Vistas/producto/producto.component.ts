@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { modelProducto } from 'src/app/Modelo/modelProducto';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { InventarioZeusService } from 'src/app/Servicios/inventario-zeus.service';
@@ -23,7 +23,8 @@ export class ProductoComponent implements OnInit {
   titulosTabla = [];
   ArrayProducto = [];
   datosTabla : any = [];
-
+  public Url : any; //variable publica que va hacia el elemento html (input) en el atributo [src]
+  public modalImagenCargada : boolean = false; //modal para cargar imagen
 
   constructor(private productoServices : ProductoService,
               private TipoProductoService : TipoProductoService,
@@ -33,7 +34,35 @@ export class ProductoComponent implements OnInit {
               private bagProServices : BagproService,
               private articulosZeus : InventarioArticuloZeusService) {
 
+
+
       this.formularioProducto = this.frmBuilderProducto.group({
+        ProductoID : new FormControl(),
+        ProductoNombre : new FormControl(),
+        ProductoDescripcion: new FormControl(),
+        ProductoTipo: new FormControl(),
+        PesoBrutoProducto: new FormControl(),
+        PesoNetoProducto: new FormControl(),
+        ProductoUndPeso: new FormControl(),
+        FuelleProducto: new FormControl(),
+        AnchoProducto: new FormControl(),
+        CalibreProducto: new FormControl(),
+        ProductoUndFAC: new FormControl(),
+        PrecioProducto: new FormControl(),
+        nombreImagen: new FormControl(),
+    });
+   }
+
+  ngOnInit(): void {
+    //this.cargarUndMedida();
+    //this.cargarTipoProducto();
+    this.ColumnasTabla();
+    //this.cargarTabla();
+
+  }
+
+  iniciarFormularios(){
+    this.formularioProducto = this.frmBuilderProducto.group({
       ProductoID: [, Validators.required],
       ProductoNombre: [, Validators.required],
       ProductoDescripcion: ['',],
@@ -46,14 +75,8 @@ export class ProductoComponent implements OnInit {
       CalibreProducto: ['',],
       ProductoUndFAC: [, Validators.required],
       PrecioProducto: [, Validators.required],
+      nombreImagen: [, Validators.required],
     });
-   }
-
-  ngOnInit(): void {
-    this.cargarUndMedida();
-    this.cargarTipoProducto();
-    this.ColumnasTabla();
-    //this.cargarTabla();
   }
 
   // FUNCION PARA CARGAR LAS UNIDADES DE MEDIDA EN UN COMBOBOX DESDE QUE INCIA LA PAGINA
@@ -162,9 +185,6 @@ export class ProductoComponent implements OnInit {
 
                             console.log(this.datosTabla);
                         }
-
-
-
                 }
 
             });
@@ -182,15 +202,42 @@ Al final campo para cargar una imagen
 Al presionar el boton de agregar
 Se guarda la imagen en una ruta en especifico
 Luego cuando se consulte dicho registro (factura) se debe
-buscar la ruta en que se encuentra la imagen y cargarla en un enlace. */
-  guardarImagenDesdeRuta(){
-    let nombreArchivo : string;
-    let rutaImagen : string = "C:\ImagenesEjemplo";
+buscar la ruta en que se encuentra la imagen y cargarla
+en un enlace. y luego mostrarla*/
+
+guardarImagenARuta(){
+  let rutaGuardarImgs : string = "C:\\ImagenesEjemplo\\";
+  let nombreArchivo : string = this.formularioProducto.get('nombreImagen')?.value;
 
 
+  let RutaFakeImg = nombreArchivo;
+  let NombreImagen = RutaFakeImg.substring(12);
 
+  console.log(NombreImagen);
+  console.log(rutaGuardarImgs + NombreImagen);
+
+}
+  //Llamar modal después de haber cargado la imagen.
+  cargarImagen(event) {
+  let nombreArchivo : string = this.formularioProducto.get('nombreImagen')?.value;
+  //const file = event.target.files[0];
+      if(event.target.files[0]) {
+        let reader = new FileReader(); //Instancia de fileReader
+        reader.readAsDataURL(event.target.files[0]);
+        reader.onload = (event) =>
+        this.Url = event.target.result;
+        console.log(event.target.files[0]);
+      }
+        if(this.Url != "Sin archivos seleccionados") {
+          console.log('Hola22');
+        } else {
+          console.log('Hola');
+        }
 
   }
 
+  llamarModalImagenCargada(){
+    this.modalImagenCargada = true;
+  }
 
 }

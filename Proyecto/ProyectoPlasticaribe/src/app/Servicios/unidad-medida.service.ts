@@ -8,6 +8,9 @@ import { modelUnidadMedida } from '../Modelo/modelUnidadMedida';
   providedIn: 'root'
 })
 export class UnidadMedidaService {
+  push(undMed_Id: any) {
+    throw new Error('Method not implemented.');
+  }
 
   readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 

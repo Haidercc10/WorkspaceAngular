@@ -357,7 +357,6 @@ export class ReporteMpOtComponent implements OnInit {
 
   //Funcion que calcula y guarda la cantidad de perdida que hubo de un proceso a otro
   cantidadPorcPerdidaProcesoaProceso(){
-    
     let diferenciaExt_Imp : number = 0;
     let difereciaExt_ImpPorcentaje : number = 0;
 
@@ -384,7 +383,7 @@ export class ReporteMpOtComponent implements OnInit {
 
     diferenciaDbld_Sell = this.cantidadTotalDbl - this.cantidadTotalSella;
     difereciaDbld_SellPorcentaje = (diferenciaDbld_Sell / this.cantidadTotalDbl) * 100;
-    
+
     totalPerdida = diferenciaExt_Imp + diferenciaImp_Dbld  + diferenciaDbld_Sell;
     totalPerdidaPorcentaje = difereciaExt_ImpPorcentaje + difereciaImp_DbldPorcentaje  + difereciaDbld_SellPorcentaje;
 
