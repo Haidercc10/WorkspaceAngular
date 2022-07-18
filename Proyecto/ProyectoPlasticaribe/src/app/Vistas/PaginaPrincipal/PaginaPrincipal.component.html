@@ -353,11 +353,18 @@
                   Recuperado
                 </a>
               </div>
-              <!-- <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="/mpremision" role="button" aria-expanded="false" aria-controls="">
-                  Entrada Remisión de Materia prima
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/materias_primas" role="button" aria-expanded="false" aria-controls="">
+                    Materias Primas
+                  </a>
+                </div>
+              </ng-container>
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="/asignacion-tintas" role="button" aria-expanded="false" aria-controls="">
+                  Asignación Tintas
                 </a>
-              </div> -->
+              </div>
               <div class="mb-2">
                 <hr>
               </div>

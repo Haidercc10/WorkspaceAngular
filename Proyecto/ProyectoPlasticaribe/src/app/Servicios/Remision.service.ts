@@ -10,7 +10,7 @@ import { modelRemision } from '../Modelo/modelRemision';
 export class RemisionService {
 
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }

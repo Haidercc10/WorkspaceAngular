@@ -81,6 +81,8 @@ a, a:hover, a:focus {
     background: #d83542;
     color: #fff;
     transition: all 0.3s;
+    overflow-y: scroll;
+
 }
 
 #sidebar.active {

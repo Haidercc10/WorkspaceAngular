@@ -232,7 +232,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   obtenerProcesos(){
     this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
       for (let index = 0; index < datos_procesos.length; index++) {
-        this.procesos.push(datos_procesos[index]);
+        if (datos_procesos[index].proceso_Id == 'TINTAS') continue;
+        else this.procesos.push(datos_procesos[index]);
       }
     });
   }
@@ -320,8 +321,28 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         idsAsignaciones.push(datos_asignaciones[index].asigMp_Id);
       }
       let ultimoId : number = Math.max.apply(null, idsAsignaciones);
-      this.detallesAsignacionMP(ultimoId);
+      this.obtenerProcesoId(ultimoId);
     });
+  }
+
+  obtenerProcesoId(asigncaion : number){
+    for (let index = 0; index < this.ArrayMateriaPrimaRetirada.length; index++) {
+      this.procesosService.srvObtenerLista().subscribe(datos_proceso => {
+        for (let i = 0; i < datos_proceso.length; i++) {
+          if (datos_proceso[i].proceso_Nombre == this.ArrayMateriaPrimaRetirada[index].Proceso) {
+            let idMateriaPrima = this.ArrayMateriaPrimaRetirada[index].Id;
+            let cantidadMateriaPrima = this.ArrayMateriaPrimaRetirada[index].Cant;
+            let presentacionMateriaPrima = this.ArrayMateriaPrimaRetirada[index].UndCant;
+            let proceso : string = datos_proceso[i].proceso_Id;
+            this.detallesAsignacionMP(asigncaion,
+                                      idMateriaPrima,
+                                      cantidadMateriaPrima,
+                                      presentacionMateriaPrima,
+                                      proceso);
+          }
+        }
+      });
+    }
   }
 
   infoOT(){
@@ -378,37 +399,22 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   //Funcion que almacenará de forma detalla la(s) materia prima que se están asignando a una OT y Proceso
-  detallesAsignacionMP(idAsignacion : number){
-    let idMateriaPrima : number;
-    let cantidadMateriaPrima : number;
-    let presentacionMateriaPrima : string;
-    let proceso : string;
+  detallesAsignacionMP(idAsignacion : number, idMp : number, cantidad : number, presentacion : string, proceso : string){
 
     if (this.ArrayMateriaPrimaRetirada.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla")
     else {
-      for (let index = 0; index < this.ArrayMateriaPrimaRetirada.length; index++) {
-        idMateriaPrima = this.ArrayMateriaPrimaRetirada[index].Id;
-        cantidadMateriaPrima = this.ArrayMateriaPrimaRetirada[index].Cant;
-        presentacionMateriaPrima = this.ArrayMateriaPrimaRetirada[index].UndCant;
-        proceso = this.ArrayMateriaPrimaRetirada[index].Proceso;
-        this.procesosService.srvObtenerLista().subscribe(datos_proceso => {
-          for (let i = 0; i < datos_proceso.length; i++) {
-            if (datos_proceso[i].proceso_Nombre == proceso) {
-              const datosDetallesAsignacion : any = {
-                AsigMp_Id : idAsignacion,
-                MatPri_Id : idMateriaPrima,
-                DtAsigMp_Cantidad : cantidadMateriaPrima,
-                UndMed_Id : presentacionMateriaPrima,
-                Proceso_Id : datos_proceso[i].proceso_Id,
-              }
-
-              this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {
-              });
-            }
-          }
-        });
+      const datosDetallesAsignacion : any = {
+        AsigMp_Id : idAsignacion,
+        MatPri_Id : idMp,
+        DtAsigMp_Cantidad : cantidad,
+        UndMed_Id : presentacion,
+        Proceso_Id : proceso,
       }
-      this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
+
+      this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {
+      });
+
+      this.moverInventarioMpPedida(idMp, cantidad);
     }
   }
 

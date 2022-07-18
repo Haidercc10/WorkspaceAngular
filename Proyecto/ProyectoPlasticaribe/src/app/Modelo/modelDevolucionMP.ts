@@ -3,4 +3,5 @@ export interface modelDevolucionMP{
   MatPri_Id : number;
   DtDevMatPri_CantidadDevuelta : number;
   UndMed_Id : string;
+  Proceso_Id : string;
 }

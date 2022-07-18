@@ -7,6 +7,7 @@ import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.
 import { DevolucionesService } from 'src/app/Servicios/devoluciones.service';
 import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service';
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
+import { ProcesosService } from 'src/app/Servicios/procesos.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { TipoBodegaService } from 'src/app/Servicios/tipoBodega.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
@@ -79,6 +80,11 @@ export class DevolucionesMPComponent implements OnInit {
   valorTotalRem = 0;
   mpAgregada = [];
 
+  procesoID : string;
+  idMateriaPrima : number;
+  cantidadMateriaPrima : number;
+  presentacionMateriaPrima : string;
+
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -90,7 +96,8 @@ export class DevolucionesMPComponent implements OnInit {
                             private devolucionService : DevolucionesService,
                               private devolucionMPService : DevolucionesMPService,
                                 private asignacionService : AsignacionMPService,
-                                  private asignacionMPService : DetallesAsignacionService,) {
+                                  private asignacionMPService : DetallesAsignacionService,
+                                    private procesosService : ProcesosService,) {
 
     this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
       //MateriaPrima
@@ -103,8 +110,8 @@ export class DevolucionesMPComponent implements OnInit {
       MpId : new FormControl(),
       MpNombre: new FormControl(),
       MpCantidad: new FormControl(),
-      //tipoRecuperado: new FormControl(),
       MpUnidadMedida:new FormControl(),
+      Proceso: new FormControl(),
     });
   }
 
@@ -116,6 +123,7 @@ export class DevolucionesMPComponent implements OnInit {
     this.ColumnasTabla();
     this.obtenerUnidadMedida();
     this.obtenerMateriasPrimasRetiradas();
+    this.obtenerProcesos();
   }
 
   initForms() {
@@ -129,8 +137,8 @@ export class DevolucionesMPComponent implements OnInit {
       MpId : ['', Validators.required],
       MpNombre: ['', Validators.required],
       MpCantidad : ['', Validators.required],
-      //tipoRecuperado: ['', Validators.required],
       MpUnidadMedida: ['', Validators.required],
+      Proceso : ['', Validators.required],
     });
   }
 
@@ -219,6 +227,16 @@ export class DevolucionesMPComponent implements OnInit {
     });
   }
 
+  //Funcion que se encagará de obtener los procesos de la empresa
+  obtenerProcesos(){
+    this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
+      for (let index = 0; index < datos_procesos.length; index++) {
+        if (datos_procesos[index].proceso_Id == 'TINTAS') continue;
+        else this.procesos.push(datos_procesos[index]);
+      }
+    });
+  }
+
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante
   registrarDevolucion(){
     let observacion : string = this.FormMateriaPrimaRecuperada.value.MpObservacion;
@@ -244,7 +262,7 @@ export class DevolucionesMPComponent implements OnInit {
         idsDevolucion.push(datos_devolucion[index].devMatPri_Id);
       }
       this.ultimoIDevolucion = Math.max.apply(null, idsDevolucion);
-      this.creacionDevolucionMateriaPrima(this.ultimoIDevolucion);
+      this.obtenerIdProceso();
     });
   }
 
@@ -256,6 +274,7 @@ export class DevolucionesMPComponent implements OnInit {
       mpNombre : "Nombre",
       mpCantidad : "Cantidad",
       mpUndMedCant : "Und. Cant",
+      mpProceso : "Proceso"
     }]
   }
 
@@ -271,13 +290,14 @@ export class DevolucionesMPComponent implements OnInit {
     this.nombreMateriaPrima = this.FormMateriaPrima.value.MpNombre;
     let presentacion : string = this.FormMateriaPrima.value.MpUnidadMedida;
     let cantidad : number = this.FormMateriaPrima.value.MpCantidad;
+    let proceso : string = this.FormMateriaPrima.value.Proceso;
 
     let productoExt : any = {
       Id : idMateriaPrima,
       Nombre : this.nombreMateriaPrima,
       Cant : cantidad,
       UndCant : presentacion,
-      //mpTipoRecup : tipoRecuperado,
+      Proceso : proceso,
     }
 
     this.FormMateriaPrimaRecuperada.setValue({
@@ -306,28 +326,52 @@ export class DevolucionesMPComponent implements OnInit {
     this.FormMateriaPrima.reset();
   }
 
+  obtenerIdProceso(){
+    let procesoNombre : string;
+    this.idMateriaPrima = 0;
+    this.cantidadMateriaPrima = 0;
+    this.presentacionMateriaPrima = '';
+    this.procesoID = '';
+    for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
+      procesoNombre = this.ArrayMateriaPrima[index].Proceso;
+
+      this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
+        for (let i = 0; i < datos_procesos.length; i++) {
+          if (datos_procesos[i].proceso_Nombre == this.ArrayMateriaPrima[index].Proceso) {
+            this.procesoID = '';
+            this.idMateriaPrima = this.ArrayMateriaPrima[index].Id;
+            this.cantidadMateriaPrima = this.ArrayMateriaPrima[index].Cant;
+            this.presentacionMateriaPrima = this.ArrayMateriaPrima[index].UndCant;
+            let procesoId = datos_procesos[i].proceso_Id;
+            this.creacionDevolucionMateriaPrima(this.ultimoIDevolucion,
+                                                this.idMateriaPrima,
+                                                this.cantidadMateriaPrima,
+                                                this.presentacionMateriaPrima,
+                                                procesoId);
+            this.procesoID = '';
+            break;
+          }
+        }
+      });
+    }
+  }
+
   //Funcion que creará el registro de la materia que viene en un pedido
-  creacionDevolucionMateriaPrima(idDevolucion : number){
-    let idMateriaPrima : number;
-    let cantidadMateriaPrima : number;
-    let presentacionMateriaPrima : string;
+  creacionDevolucionMateriaPrima(idDevolucion : number, idMp : number, cantidad : number, undMed : string, proceso : string,){
     let ot : string = this.FormMateriaPrimaRecuperada.value.ot;
 
     if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla");
     else {
-      for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
-        idMateriaPrima = this.ArrayMateriaPrima[index].Id;
-        cantidadMateriaPrima = this.ArrayMateriaPrima[index].Cant;
-        presentacionMateriaPrima = this.ArrayMateriaPrima[index].UndCant;
 
-        const datosRecuperadoMp : any = {
-          DevMatPri_Id : idDevolucion,
-          MatPri_Id : idMateriaPrima,
-          DtDevMatPri_CantidadDevuelta : cantidadMateriaPrima,
-          UndMed_Id : presentacionMateriaPrima,
-        }
+      const datosDevolucionMp : any = {
+        DevMatPri_Id : idDevolucion,
+        MatPri_Id : idMp,
+        DtDevMatPri_CantidadDevuelta : cantidad,
+        UndMed_Id : undMed,
+        Proceso_Id : proceso,
+      }
 
-        this.devolucionMPService.srvGuardar(datosRecuperadoMp).subscribe(datos_recuperadoMpCreada => {
+        this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(datos_recuperadoMpCreada => {
           /* BUSCA EN LA TABLA DE ASIGNACIONES LA OT QUE ESTÁ DEVOLVIENDO MATERIA PRIMA Y LE RESTA LA CANTIDAD QUE SE ESTÁ DEVOLVIENDO
           AL REGISTRO DE ASIGNACION, EJEMPLO: SI SE DEVUELVEN 2KG DE UNA ASIGNACION QUE TENIA 3KG, EL REGISTRO DE ESTA ASIGNACION AHORA
           SERÁ DE 1KG
@@ -349,9 +393,8 @@ export class DevolucionesMPComponent implements OnInit {
               });
             }
           });*/
-          this.moverInventarioMpAgregada();
         });
-      }
+      this.moverInventarioMpAgregada();
     }
   }
 
@@ -488,8 +531,8 @@ export class DevolucionesMPComponent implements OnInit {
         MpId : Mp.matPri_Id,
         MpNombre: Mp.matPri_Nombre,
         MpCantidad: '',
-        //tipoRecuperado: '',
         MpUnidadMedida : Mp.undMed_Id,
+        Proceso : '',
       });
     }
   }

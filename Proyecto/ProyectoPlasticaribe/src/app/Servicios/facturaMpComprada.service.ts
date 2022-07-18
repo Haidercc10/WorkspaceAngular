@@ -9,7 +9,7 @@ import { modelFacturaMpCompra } from '../Modelo/modelFacturaMpComprada';
 })
 export class FactuaMpCompradaService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
     constructor(private http : HttpClient) { }

@@ -1,20 +1,28 @@
 <!--Navegador parte superior -->
 <div class="contain">
-  <nav class="navbar navbar-expand-lg ">
+  <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-      <p class="titulo">Plasti<span>caribe S.A.S</span></p>
+      <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
     </div>
+    <ul class="btn-group open">
+      <p><b>User: {{storage_Nombre}}</b></p>
+      <span><b>Tipo: {{storage_Rol}} </b></span>
+      <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
+    </ul>
   </nav>
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Materias Primas</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+<div class="contain">
 <!-- Navegador fin de parte superior -->
 <div class="container-fluid">
-  <!-- principal -->
-  <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Materias Primas</h2>
-  </div>
-  <div class="mb-5">
-      <hr class="colorLinea">
-  </div>
-
   <div class="container">
     <!-- botón que llama el componente de crear-categoria -->
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -28,67 +36,65 @@
         Crear Unidad Medida
       </button>
     </div>
-
     <div class="mb-4">
       <h4 class="tituloRojo">Crear Materias Primas</h4>
-     </div>
-
-  <!-- FORMULARIO DE MATERIAS PRIMAS -->
-  <form [formGroup]="formularioMatPrimas" (ngSubmit)="validarCamposVacios()">
+    </div>
+    <!-- FORMULARIO DE MATERIAS PRIMAS -->
+    <form [formGroup]="formularioMatPrimas" (ngSubmit)="validarCamposVacios()">
       <!-- Inicio fila 1 de campos -->
       <div class="mb-4">
-          <div class="row g-3">
-              <!-- Nombre -->
-              <div class="form-floating col-md">
-                <input formControlName="MatPriNombre" type="text" class="form-control form-control-sm" id="floatingInput" required >
-                <label for="floatingInput">Nombre</label>
-              </div>
-              <!-- Descripción -->
-              <div class="form-floating col-md">
-                <input formControlName="MatPriDescripcion" type="text" class="form-control form-control-sm" id="floatingInput" required >
-                <label for="floatingInput">Descripción</label>
-              </div>
-              <!-- Stock -->
-              <div class="form-floating col-md-2">
-                <input formControlName="MatPriStock" type="text" class="form-control form-control-sm" id="floatingInput" required >
-                <label for="floatingInput">Stock</label>
-              </div>
-               <!--Categoria -->
-               <div class="form-floating col-md-2">
-                <select formControlName="MatPriUnidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                  <option [ngValue]="unidadMedidas" *ngFor="let unidadMedidas of unidadMedida">{{unidadMedidas}}</option>
-                </select>
-                <label for="floatingSelect">Unidad Medida</label>
-              </div>
+        <div class="row g-3">
+          <!-- Nombre -->
+          <div class="form-floating col-md">
+            <input formControlName="MatPriNombre" type="text" class="form-control form-control-sm" id="floatingInput" required >
+            <label for="floatingInput">Nombre</label>
           </div>
+          <!-- Descripción -->
+          <div class="form-floating col-md">
+            <textarea formControlName="MatPriDescripcion" type="text" class="form-control form-control-sm" id="floatingInput" required ></textarea>
+            <label for="floatingInput">Descripción</label>
+          </div>
+          <!-- Stock -->
+          <div class="form-floating col-md-2">
+            <input formControlName="MatPriStock" type="text" class="form-control form-control-sm" id="floatingInput" required >
+            <label for="floatingInput">Stock</label>
+          </div>
+            <!--Categoria -->
+            <div class="form-floating col-md-2">
+            <select formControlName="MatPriUnidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <option [ngValue]="unidadMedidas" *ngFor="let unidadMedidas of unidadMedida">{{unidadMedidas}}</option>
+            </select>
+            <label for="floatingSelect">Unidad Medida</label>
+          </div>
+        </div>
       </div>
       <!-- Fin fila 1 de campos -->
 
        <!-- Inicio fila 2 de campos -->
       <div class="mb-3">
-          <div class="row g-3">
-               <!-- Stock -->
-               <div class="form-floating col-md-2">
-                <select formControlName="MatPriCategoria" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                  <option [ngValue]="Categoria.catMP_Id" *ngFor="let Categoria of nombreCategoriasMP">{{Categoria.catMP_Nombre}}</option>
-                </select>
-                <label for="floatingSelect">Categoria</label>
-              </div>
-              <!-- Precio -->
-              <div class="form-floating col-md-2">
-                <input formControlName="MatPriPrecio" type="number" class="form-control form-control-sm" id="floatingInput" required >
-                <label for="floatingInput">Precio</label>
-              </div>
+        <div class="row g-3">
+          <!-- Stock -->
+          <div class="form-floating col-md-2">
+            <select formControlName="MatPriCategoria" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <option [ngValue]="Categoria.catMP_Id" *ngFor="let Categoria of nombreCategoriasMP">{{Categoria.catMP_Nombre}}</option>
+            </select>
+            <label for="floatingSelect">Categoria</label>
           </div>
+          <!-- Precio -->
+          <div class="form-floating col-md-2">
+            <input formControlName="MatPriPrecio" type="number" class="form-control form-control-sm" id="floatingInput" required >
+            <label for="floatingInput">Precio</label>
+          </div>
+        </div>
       </div>
       <!-- Fin fila 2 de campos -->
 
       <!-- Botones para crear materias primas -->
       <div class="mb-3">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit">Agregar</button>
-              <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()" expand="full">Limpiar campos</button>
-          </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit">{{AccionBoton}}</button>
+          <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()" expand="full">Limpiar campos</button>
+        </div>
       </div>
 
     </form>
@@ -106,12 +112,12 @@
         <div class="row g-3">
           <!-- ID -->
           <div class="form-floating col-md-2">
-            <input formControlName="consMatPri_Id" type="number" class="form-control form-control-sm" id="floatingInput" required >
+            <input formControlName="consMatPri_Id" type="number" class="form-control form-control-sm" id="floatingInput" (change)="buscarMpId()">
             <label for="floatingInput">Id.</label>
           </div>
           <!--Nombre -->
           <div class="form-floating col-md-5">
-            <select formControlName="consMatPri_Nombre" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <select formControlName="consMatPri_Nombre" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" (change)="buscarMpSeleccionada()">
               <option [ngValue]="MateriasPrimas.matPri_Id" *ngFor="let MateriasPrimas of nombreMateriasPrimas">{{MateriasPrimas.matPri_Nombre}}</option>
             </select>
             <label for="floatingSelect">Nombre</label>
@@ -119,8 +125,8 @@
           <!--Bototones-->
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit">Consultar</button>
-                <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()" expand="full">Limpiar campos</button>
+                <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" (click)="consultarTodasMateriasPrimas()">Consultar</button>
+                <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTablaConsulta()" expand="full">Limpiar campos</button>
             </div>
         </div>
       </div>
@@ -142,24 +148,23 @@
               <div class="table-responsive">
                 <table class="table table-bordered table-hover mt-2" >
                   <thead class="TitulosTabla">
-                      <tr *ngFor="let columnas of titulosTabla let i = index">
-                        <th scope="col" class="idProducto">{{columnas.mpNombre}}</th>
-                        <th id="Descripcion" scope="col">{{columnas.mpDescripcion}}</th>
-                        <th id="Stock" scope="col" class="">{{columnas.mpStock}}</th>
-                        <th id="Und" scope="col">{{columnas.mpUndMedida}}</th>
-                        <th id="Categoria" scope="col" class="">{{columnas.mpCategoria}}</th>
-                        <th id="Precio" scope="col">{{columnas.mpPrecio}}</th>
-
-                      </tr>
+                    <tr *ngFor="let columnas of titulosTabla let i = index">
+                      <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
+                      <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
+                      <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
+                      <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
+                      <th id="precioMateriaPrima" scope="col" >{{columnas.mpPrecioU}}</th>
+                      <th id="subTotalMateriaPrima" scope="col">{{columnas.mpSubTotal}}</th>
+                    </tr>
                   </thead>
                     <tbody>
-                      <tr>
-                        <th id="nombre" class="TextosInfoTabla"></th>
-                        <td id="Descripcion" class="TextosInfoTabla"></td>
-                        <td id="Stock" class="TextosInfoTabla"></td>
-                        <th id="Und" class="TextosInfoTabla"></th>
-                        <td id="Categoria" class="TextosInfoTabla"></td>
-                        <td id="Precio" class="TextosInfoTabla"></td>
+                      <tr *ngFor="let materiaPrima of ArrayMateriaPrima let i=index" >
+                        <td id="idMateriaPrima" (click)="valorArray(materiaPrima)">{{materiaPrima.Id}}</td>
+                        <td id="nombreMateriaPrima" (click)="valorArray(materiaPrima)">{{materiaPrima.Nombre}}</td>
+                        <th id="cantidadMateriaPrima" (click)="valorArray(materiaPrima)">{{materiaPrima.Cant | number}}</th>
+                        <td id="UnidadMedida" (click)="valorArray(materiaPrima)">{{materiaPrima.UndCant}}</td>
+                        <td id="precioMateriaPrima" (click)="valorArray(materiaPrima)">{{materiaPrima.PrecioUnd | number}}</td>
+                        <td id="subTotalMateriaPrima" (click)="valorArray(materiaPrima)">{{materiaPrima.SubTotal | number}}</td>
                       </tr>
                     </tbody>
                 </table>
@@ -203,7 +208,7 @@
   </div>
   <!-- Fin Modal de crear Crear Unidad Medida-->
 
-</div>
+  </div>
 </div>
 </div>
 

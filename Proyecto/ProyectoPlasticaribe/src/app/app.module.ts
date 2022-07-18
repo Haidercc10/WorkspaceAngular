@@ -49,6 +49,9 @@ import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insum
 import { MateriasPrimasComponent } from './Vistas/materias-primas/materias-primas.component';
 import { CrearCategoriasMPComponent } from './Vistas/crear-categorias-mp/crear-categorias-mp.component';
 import { CrearUnidadesMedidasComponent } from './Vistas/crear-unidades-medidas/crear-unidades-medidas.component';
+import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
+import { DevolucionesMPComponent } from './Vistas/devolucionesMP/devolucionesMP.component';
+import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion-Tintas.component';
 
 
 
@@ -88,6 +91,9 @@ export const routes: Routes = [
   {path: 'mp-recuperada', canActivate: [ValidacionLoginGuard], component: MateriaPrimaRecuperadaComponent},
   {path: 'prueba-cat-insumo', canActivate: [ValidacionLoginGuard], component: PruebaImagenCatInsumoComponent},
   {path: 'materias_primas', canActivate: [ValidacionLoginGuard], component: MateriasPrimasComponent},
+  {path: 'reporte-costos-ot', canActivate: [ValidacionLoginGuard], component: ReporteCostosOTComponent},
+  {path: 'mp-devoluciones', canActivate: [ValidacionLoginGuard], component: DevolucionesMPComponent},
+  {path: 'asignacion-tintas', canActivate: [ValidacionLoginGuard], component: AsignacionTintasComponent},
 ]
 
 @NgModule({
@@ -127,7 +133,9 @@ export const routes: Routes = [
     MateriasPrimasComponent,
     CrearCategoriasMPComponent,
     CrearUnidadesMedidasComponent,
-
+    ReporteCostosOTComponent,
+    DevolucionesMPComponent,
+    AsignacionTintasComponent
   ],
 
 

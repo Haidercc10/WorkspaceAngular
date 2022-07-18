@@ -10,7 +10,7 @@ import { modelDevolucion } from '../Modelo/modelDevolucion';
 export class DevolucionesService {
 
   //Ruta del API
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
 //Encapsular httpclient en el constructor
   constructor(private http: HttpClient) { }
