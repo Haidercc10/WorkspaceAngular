@@ -73,9 +73,9 @@
                   </thead>
                     <tbody>
                       <tr *ngFor="let infoCatInsumos of ArrayCatgInsumos;">
-                        <th id="nombre" class="TextosInfoTabla">{{infoCatInsumos.catgNombre}}</th>
-                        <td id="Descripcion" class="TextosInfoTabla">{{infoCatInsumos.catgDescripcion}}</td>
-                        <td id="Imagen" class="TextosInfoTabla">{{infoCatInsumos.catgImagen}}</td>
+                        <th id="nombre" class="pt-3-half TextosInfoTabla" contenteditable="true">{{infoCatInsumos.catgNombre}}</th>
+                        <td id="Descripcion" class="pt-3-half TextosInfoTabla" contenteditable="true">{{infoCatInsumos.catgDescripcion}}</td>
+                        <td id="Imagen" class="pt-3-half TextosInfoTabla">{{infoCatInsumos.catgImagen}}</td>
                       </tr>
                     </tbody>
                 </table>
@@ -86,7 +86,7 @@
 
       <div class="mb-3">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="boton_guardar btn btn-danger btn-danger-sm" type="button" (click)="registrarCategoriaInsumo()">Crear Categoria</button>
+            <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" (click)="registrarCategoriaInsumo()">Crear Categoria</button>
         </div>
     </div>
 

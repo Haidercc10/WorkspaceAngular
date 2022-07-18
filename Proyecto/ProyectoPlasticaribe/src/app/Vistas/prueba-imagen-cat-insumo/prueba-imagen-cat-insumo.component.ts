@@ -60,10 +60,10 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
             reader.readAsDataURL(event.target.files[0]);
             reader.onload = (event) =>
             this.Url = event.target.result;
-            //console.log(event.target.files[0]);
-
             this.NombreImagen = event.target.files[0].name;
-            console.log(this.NombreImagen)
+            //console.log(event.target.files[0]);
+            console.log(event.target.files[0]);
+            console.log(this.NombreImagen);
           }
 
     }
@@ -80,7 +80,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       //datosAtabla.catgImagen = NombreImagen;
 
       this.ArrayCatgInsumos.push(datosAtabla);
-
 
       //console.log(datosAtabla);
     }
