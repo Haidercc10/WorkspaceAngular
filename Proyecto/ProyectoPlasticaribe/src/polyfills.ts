@@ -51,7 +51,7 @@ export let rutaBagPro = "http://192.168.0.85:9095/api"; //Ruta al servidor de la
 export let rutaBagProLocate = "http://192.168.0.153:9095/api"; //Ruta al servidor de la base de datos de BagPro --- LOCAL
 export let rutaPlasticaribe = "http://192.168.0.153:9085/api";
 export let rutaPlasticaribe2 = "http://localhost:9085/api";
-export let rutaPlasticaribe3 = "https://192.168.0.193:7137/api";
+export let rutaPlasticaribe3 = "https://192.168.0.153:7137/api";
 
 /***************************************************************************************************
  * APPLICATION IMPORTS

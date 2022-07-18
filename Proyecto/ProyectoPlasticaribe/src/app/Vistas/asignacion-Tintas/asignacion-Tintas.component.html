@@ -24,6 +24,9 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="container">
+
+
+
       <!--Titulo Asignación -->
       <div class="mb-3">
         <h4 class="tituloRojo">Creación de Tintas</h4>
@@ -176,6 +179,40 @@
           </div>
         </div>
       </div>
+              <!-- Modal de crear Tinta -->
+        <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel2">Crear Categoria</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                 <!--Carga componente crear Tinta-->
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Fin Modal de crear Crear Tinta -->
+
+        <!-- Modal de crear Materia Prima -->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="staticBackdropLabel2">Crear Unidad Medida</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <app-crear-materiaprima></app-crear-materiaprima> <!--Carga componente crear Unidad Medida-->
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Fin Modal de crear Crear Unidad Medida-->
+
+
+
     </div>
   </div>
 </div>

@@ -32,6 +32,7 @@ export class AsignacionTintasComponent implements OnInit {
   AccionBoton = "Agregar"; //Varibale para saber si una materia prima está en edicion o no
   materiaPrimaSeleccionada = []; //Varibale que almacenará temporalmente la materia prima que se buscó por id o se seleccionó para poder llenar el resto de informacion de esta materia prima
 
+
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
                   private frmBuilder : FormBuilder,
