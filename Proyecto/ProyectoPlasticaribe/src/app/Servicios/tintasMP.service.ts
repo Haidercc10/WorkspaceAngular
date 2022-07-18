@@ -15,31 +15,31 @@ export class TintasMPService {
 
   //Metodo buscar lista de Productos
   srvObtenerLista():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/');
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tinta_MateriaPrima');
   }
 
   srvObtenerListaPorId(id : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `//${id}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Tinta_MateriaPrima/${id}`);
   }
 
   //Metodo agregar Productos
   srvAgregar(data : any) {
-    return this.http.post(this.rutaPlasticaribeAPI + '/', data)
+    return this.http.post(this.rutaPlasticaribeAPI + '/Tinta_MateriaPrima', data)
   }
 
   //Metodo actualzar Productos
   srvActualizar(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `//${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/Tinta_MateriaPrima/${id}`, data);
   }
 
   //Metodo eliminar Productos
   srvEliminar(id:number|String) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `//${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Tinta_MateriaPrima/${id}`);
   }
 
   //
   srvGuardar(data : modelTintasMateriasPrimas): Observable<any> {
-    return this.http.post(this.rutaPlasticaribeAPI + '/', data)
+    return this.http.post(this.rutaPlasticaribeAPI + '/Tinta_MateriaPrima', data)
   }
 
 }

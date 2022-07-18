@@ -16,6 +16,7 @@ import { MpProveedorService } from 'src/app/Servicios/MpProveedor.service';
 import { ProcesosService } from 'src/app/Servicios/procesos.service';
 import { ProveedorService } from 'src/app/Servicios/proveedor.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
+import { TintasService } from 'src/app/Servicios/tintas.service';
 import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
 import { TipoBodegaService } from 'src/app/Servicios/tipoBodega.service';
 import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
@@ -99,7 +100,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                                       private proveedorMPService : MpProveedorService,
                                         private asignacionMPService : AsignacionMPService,
                                           private detallesAsignacionService : DetallesAsignacionService,
-                                            private bagProServices : BagproService,) {
+                                            private bagProServices : BagproService,
+                                              private tintasService : TintasService,) {
 
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : ['', Validators.required],
@@ -131,6 +133,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.obtenerUnidadMedida();
     this.obtenerProcesos();
     this.obtenerMateriasPrimasRetiradas();
+    this.obtenerTintas();
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -214,7 +217,15 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   obtenerMateriasPrimasRetiradas(){
     this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
       for (let index = 0; index < datos_materiaPrima.length; index++) {
-        this.materiasPrimasRetiradas.push(datos_materiaPrima[index]);
+        this.materiasPrimasRetiradas.push(datos_materiaPrima[index].matPri_Nombre);
+      }
+    });
+  }
+
+  obtenerTintas(){
+    this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
+      for (let i = 0; i < datos_tintas.length; i++) {
+        this.materiasPrimasRetiradas.push(datos_tintas[i].tinta_Nombre);
       }
     });
   }
@@ -411,6 +422,14 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         Proceso_Id : proceso,
       }
 
+      const datosDetallesAsignacionTintas : any = {
+        // AsigMp_Id : number;
+        // Tinta_Id : number;
+        // DtAsigTinta_Cantidad : number;
+        // UndMed_Id : string;
+        // Proceso_Id : string;
+      }
+
       this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {
       });
 
@@ -563,6 +582,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.materiasPrimas.push(datos_materiaPrima);
           this.categoriaMPBuscadaID = datos_categoria.catMP_Nombre;
           this.tipobodegaMPBuscadaId = datos_bodega.tpBod_Nombre;
+          this.tintasService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_tintas => {
+
+          });
           this.cargarInfoMP();
         });
       });

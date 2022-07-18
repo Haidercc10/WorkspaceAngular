@@ -39,8 +39,8 @@
           <div class="row g-3">
             <!-- Nombre tinta -->
             <div class="form-floating col-md-5">
-              <select formControlName="Tinta" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
-                <option [ngValue]="tinta" *ngFor="let tinta of tintas">{{tinta}}</option>
+              <select formControlName="Tinta" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" (change)="buscarTintaSeleccionada()">
+                <option [ngValue]="tinta.tinta_Id" *ngFor="let tinta of tintas">{{tinta.tinta_Nombre}}</option>
               </select>
               <label for="floatingSelect">Nombre de Tinta</label>
             </div>
