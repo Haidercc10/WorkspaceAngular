@@ -65,6 +65,7 @@ export class AsignacionTintasComponent implements OnInit {
     this.fecha();
     this.obtenerMateriaPrima();
     this.obtenerUnidadesMedida();
+    this.obtenerTintas();
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -140,6 +141,21 @@ export class AsignacionTintasComponent implements OnInit {
       for (let i = 0; i < datos_tintas.length; i++) {
         this.tintas.push(datos_tintas[i]);
       }
+    });
+  }
+
+  // funcion que servirá para llenar el campo de unidad de medida de la tinta dependiendo la tinta seleccionada
+  buscarTintaSeleccionada(){
+    let tinta : any = this.FormAsignacionMP.value.Tinta;
+
+    this.tintasService.srvObtenerListaPorId(tinta).subscribe(datos_tinta => {
+      this.FormAsignacionMP .setValue({
+        Tinta : this.FormAsignacionMP.value.Tinta,
+        cantidadTinta : this.FormAsignacionMP.value.cantidadTinta,
+        undMedTinta : datos_tinta.undMed_Id,
+        Observacion : this.FormAsignacionMP.value.Observacion,
+        Fecha : this.FormAsignacionMP.value.Fecha,
+      });
     });
   }
 
@@ -275,9 +291,9 @@ export class AsignacionTintasComponent implements OnInit {
       Estado_Id : 13,
     }
 
-    this.asignacionMPxTintas.srvGuardar(datos_asignacionMP).subscribe(datos_asignacionMPxTintas => {});
-
-    this.obtenerUltimoIdAsignacion();
+    this.asignacionMPxTintas.srvGuardar(datos_asignacionMP).subscribe(datos_asignacionMPxTintas => {
+      this.obtenerUltimoIdAsignacion();
+    });
   }
 
   // Funcion que servirá para poder obtener el ultimo Id de la asignacion creada y pasarlo a la funcion de creacion de AsignacionMP para que pueda tener el ID de la asignacion
@@ -285,7 +301,7 @@ export class AsignacionTintasComponent implements OnInit {
     let idsAsignaciones = [];
     this.asignacionMPxTintas.srvObtenerLista().subscribe(datos_asignaciones => {
       for (let index = 0; index < datos_asignaciones.length; index++) {
-        idsAsignaciones.push(datos_asignaciones[index].asigMp_Id);
+        idsAsignaciones.push(datos_asignaciones[index].asigMPxTinta_Id);
       }
       let ultimoId : number = Math.max.apply(null, idsAsignaciones);
       this.mpAsignada(ultimoId);
@@ -352,19 +368,22 @@ export class AsignacionTintasComponent implements OnInit {
             icon: 'success',
             title: '¡Registro de Asignación creado con exito!'
           });
-          this.FormMateriaPrima.setValue({
-            Tinta : ['', Validators.required],
-            cantidadTinta : ['', Validators.required],
-            undMedTinta : ['', Validators.required],
-            Observacion : ['', Validators.required],
+          this.FormAsignacionMP.setValue({
+            Tinta : '',
+            cantidadTinta : '',
+            undMedTinta : '',
+            Observacion : '',
             Fecha : this.today,
           });
-          this.ArrayMateriaPrima= [];
+          this.ArrayMateriaPrima = [];
           this.FormMateriaPrima.reset();
           this.load = true;
         });
+        this.load = true;
       });
+      this.load = true;
     }
+    this.load = true;
   }
 
   //
