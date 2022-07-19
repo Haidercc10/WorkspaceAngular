@@ -1,6 +1,7 @@
 import { ThisReceiver } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { modelTintasMateriasPrimas } from 'src/app/Modelo/modelTintasMateriasPrimas';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
 import { TintasService } from 'src/app/Servicios/tintas.service';
@@ -56,6 +57,7 @@ export class ModalCrearMateriasPrimasComponent implements OnInit {
     this.obtenerNombreCategoriasMp();
     this.obtenerNombresTintas();
     this.obtenerUnidadMedida();
+    this.obtenerUltimoIDMatPrima();
   }
 
     /*Funcion que va almacenar todas las unidades de medida existentes en la empresa*/
@@ -104,7 +106,7 @@ export class ModalCrearMateriasPrimasComponent implements OnInit {
 
     /**  Agregar Materia Prima */
     this.servicioMatPrima.srvAgregar(camposMateriasPrimas).subscribe(datosMatPrima => {
-      this.crearRelacionTintas_MateriaPrima(camposMateriasPrimas.Tinta_Id, camposMateriasPrimas.Tinta_Id);
+      this.crearRelacionTintas_MateriaPrima(camposMateriasPrimas.Tinta_Id, this.ultimoIdMateriaPrima);
       const Toast = Swal.mixin({
           toast: true,
           position: 'center',
@@ -132,27 +134,13 @@ export class ModalCrearMateriasPrimasComponent implements OnInit {
 
   /** Función que creará la relación entre tintas y materias primas */
   crearRelacionTintas_MateriaPrima(Tinta : number, MatPrima : number) {
-    const datosTintasMatPrima = {
-      idTinta : Tinta,
-      idMatPrima : MatPrima,
+    const datosTintasMatPrima : modelTintasMateriasPrimas = {
+      Tinta_Id : Tinta,
+      MatPri_Id : MatPrima,
     }
 
     this.servicioTintas_MatPrima.srvAgregar(datosTintasMatPrima).subscribe(dataTintaMP => {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: '¡Materia Prima creada con exito!'
-      });
+      console.log(datosTintasMatPrima);
     });
   }
 
@@ -163,12 +151,13 @@ export class ModalCrearMateriasPrimasComponent implements OnInit {
 
     this.servicioMatPrima.srvObtenerLista().subscribe(datos_MP => {
       for (let index = 0; index < datos_MP.length; index++) {
-        identificadoresMP = datos_MP[index].matPri_Id
+        identificadoresMP.push(datos_MP[index].matPri_Id);
       }
-      //this.ultimoIdMateriaPrima = Math.max.apply(null, identificadoresMP);
-      //this.ultimoIdMateriaPrima = this.ultimoIdMateriaPrima + 1;
+      let ultimaMatPrima = Math.max.apply(null, identificadoresMP);
+      this.ultimoIdMateriaPrima = ultimaMatPrima + 1;
 
-      console.log(identificadoresMP);
+      console.log(this.ultimoIdMateriaPrima);
+      //console.log(identificadoresMP);
     });
   }
 }
