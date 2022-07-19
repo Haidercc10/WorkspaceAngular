@@ -20,21 +20,28 @@ export class EntradaBOPPService {
   srvObtenerListaPorId(id : any):Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/${id}`)
   }
+
+  srvObtenerListaPorSerial(id : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/serial/${id}`)
+  }
+
   //Metodo agregar
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/BOPP', data)
   }
+
   //Metodo actualzar
-  srvActualizar(id:number|String, data:any) {
+  srvActualizar(id:any, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/BOPP/${id}`, data);
   }
+
   //Metodo eliminar
   srvEliminar(id:number|String) {
     return this.http.delete(this.rutaPlasticaribeAPI + `/BOPP/${id}`);
   }
 
   srvGuardar(data: modelBOPP): Observable<any> {
-  return this.http.post(this.rutaPlasticaribeAPI + '/BOPP', data)
+    return this.http.post(this.rutaPlasticaribeAPI + '/BOPP', data)
   }
 
 }
