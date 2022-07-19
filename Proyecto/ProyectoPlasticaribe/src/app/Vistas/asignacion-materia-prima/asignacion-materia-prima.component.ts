@@ -8,6 +8,7 @@ import { AsignacionMPService } from 'src/app/Servicios/asignacionMP.service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
+import { DetallesAsignacionTintasService } from 'src/app/Servicios/detallesAsignacionTintas.service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
 import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
 import { FactuaMpCompradaService } from 'src/app/Servicios/facturaMpComprada.service';
@@ -85,6 +86,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   acumuladoraTintas = 0;
 
+  categoria = 0; // Variable para identificar a que categoria pertenece la materia prima que se ha introduciodo en la tabla
+
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
                   private tipoBodegaService : TipoBodegaService,
@@ -101,7 +104,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                                         private asignacionMPService : AsignacionMPService,
                                           private detallesAsignacionService : DetallesAsignacionService,
                                             private bagProServices : BagproService,
-                                              private tintasService : TintasService,) {
+                                              private tintasService : TintasService,
+                                                private detallesAsignacionTintas : DetallesAsignacionTintasService) {
 
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : ['', Validators.required],
@@ -215,6 +219,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
   obtenerMateriasPrimasRetiradas(){
+    this.categoria = 0;
     this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
       for (let index = 0; index < datos_materiaPrima.length; index++) {
         this.materiasPrimasRetiradas.push(datos_materiaPrima[index].matPri_Nombre);
@@ -223,6 +228,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   obtenerTintas(){
+    this.categoria = 0;
     this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
       for (let i = 0; i < datos_tintas.length; i++) {
         this.materiasPrimasRetiradas.push(datos_tintas[i].tinta_Nombre);
@@ -321,7 +327,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     //     this.load = true;
     //     Swal.fire(`La cantidad a asignar supera el limete de Kg permitidos para la OT ${idOrdenTrabajo}`);
     //   }
-    // }, 1000);
+    // }, 1500);
   }
 
   //Funcion que va a buscar y obtener el id de la ultima asignacion
@@ -414,26 +420,31 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
     if (this.ArrayMateriaPrimaRetirada.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla")
     else {
-      const datosDetallesAsignacion : any = {
-        AsigMp_Id : idAsignacion,
-        MatPri_Id : idMp,
-        DtAsigMp_Cantidad : cantidad,
-        UndMed_Id : presentacion,
-        Proceso_Id : proceso,
+      if (proceso == 'IMP' || proceso == 'ROT') {
+        const datosDetallesAsignacionTintas : any = {
+          AsigMp_Id : idAsignacion,
+          Tinta_Id : idMp,
+          DtAsigTinta_Cantidad : cantidad,
+          UndMed_Id : presentacion,
+          Proceso_Id : proceso,
+        }
+
+        this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(datos_asignacionTintas => {});
+        this.moverInventarioTintas(idMp, cantidad);
+
+      } else {
+        const datosDetallesAsignacion : any = {
+          AsigMp_Id : idAsignacion,
+          MatPri_Id : idMp,
+          DtAsigMp_Cantidad : cantidad,
+          UndMed_Id : presentacion,
+          Proceso_Id : proceso,
+        }
+
+        this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {
+        });
+        this.moverInventarioMpPedida(idMp, cantidad);
       }
-
-      const datosDetallesAsignacionTintas : any = {
-        // AsigMp_Id : number;
-        // Tinta_Id : number;
-        // DtAsigTinta_Cantidad : number;
-        // UndMed_Id : string;
-        // Proceso_Id : string;
-      }
-
-      this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {
-      });
-
-      this.moverInventarioMpPedida(idMp, cantidad);
     }
   }
 
@@ -456,59 +467,95 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
     this.cantidadAsignada = this.cantidadAsignada + cantidad;
 
-    // //Codigo que validará que solo se asignen maximo 7 tintas a una orden de trabajo
-    // this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
-    //   for (let j = 0; j < datos_materiaPrima.length; j++) {
-    //     if (datos_materiaPrima[j].catMP_Id == 7) { // El Numero 7 es el ID que le corresponde a la categoria de Tintas
-    //       this.acumuladoraTintas = this.acumuladoraTintas + 1;
-    //       if (this.acumuladoraTintas > 7) Swal.fire("Solo puede asignar maximo 7 Tintas a una OT");
-    //     }
-    //   }
-    // });
-
     this.procesosService.srvObtenerLista().subscribe(datos_proceso => {
       for (let i = 0; i < datos_proceso.length; i++) {
         if (datos_proceso[i].proceso_Nombre == proceso) {
-          if (cantidad <= stock) {
-            let productoExt : any = {
-              Id : idMateriaPrima,
-              Nombre : this.nombreMateriaPrima,
-              Cant : cantidad,
-              UndCant : presentacion,
-              PrecioUnd : precioMateriaPrima,
-              Stock : this.FormMateriaPrimaRetirada.value.MpStockRetirada,
-              SubTotal : subtotalProd,
-              Proceso : datos_proceso[i].proceso_Nombre,
-            }
 
-            if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrimaRetirada.length == 0) {
-              this.ArrayMateriaPrimaRetirada.push(productoExt);
+          if (this.categoria == 7) {
+            if (proceso == 'Impresion' || proceso == 'Rotograbado') {
+              if (cantidad <= stock) {
+                let productoExt : any = {
+                  Id : idMateriaPrima,
+                  Nombre : this.nombreMateriaPrima,
+                  Cant : cantidad,
+                  UndCant : presentacion,
+                  PrecioUnd : precioMateriaPrima,
+                  Stock : this.FormMateriaPrimaRetirada.value.MpStockRetirada,
+                  SubTotal : subtotalProd,
+                  Proceso : datos_proceso[i].proceso_Nombre,
+                }
 
-            } else if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrimaRetirada.length != 0){
-              this.ArrayMateriaPrimaRetirada.push(productoExt);
-              productoExt = [];
-            } else {
-              for (let index = 0; index < formulario.length; index++) {
-                if(productoExt.Id == this.ArrayMateriaPrimaRetirada[index].Id) {
-                  this.ArrayMateriaPrimaRetirada.splice(index, 1);
-                  this.AccionBoton = "Agregar";
+                if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrimaRetirada.length == 0) {
                   this.ArrayMateriaPrimaRetirada.push(productoExt);
-                  break;
+
+                } else if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrimaRetirada.length != 0){
+                  this.ArrayMateriaPrimaRetirada.push(productoExt);
+                  productoExt = [];
+                } else {
+                  for (let index = 0; index < formulario.length; index++) {
+                    if(productoExt.Id == this.ArrayMateriaPrimaRetirada[index].Id) {
+                      this.ArrayMateriaPrimaRetirada.splice(index, 1);
+                      this.AccionBoton = "Agregar";
+                      this.ArrayMateriaPrimaRetirada.push(productoExt);
+                      break;
+                    }
+                  }
+                }
+
+                this.FormMateriaPrimaRetirada.setValue({
+                  MpIdRetirada : '',
+                  MpNombreRetirada: '',
+                  MpCantidadRetirada : '',
+                  MpPrecioRetirada: '',
+                  MpUnidadMedidaRetirada: '',
+                  MpStockRetirada: '',
+                  ProcesoRetiro : '',
+                });
+                this.ArrayMateriaPrimaRetirada.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
+              } else Swal.fire("La cantidad a asignar no debe superar lo que hay en stock ");
+            } else Swal.fire("Las tintas Solo pueden ir a los procesos de Impresión y Rotograbado");
+          } else {
+            if (cantidad <= stock) {
+              let productoExt : any = {
+                Id : idMateriaPrima,
+                Nombre : this.nombreMateriaPrima,
+                Cant : cantidad,
+                UndCant : presentacion,
+                PrecioUnd : precioMateriaPrima,
+                Stock : this.FormMateriaPrimaRetirada.value.MpStockRetirada,
+                SubTotal : subtotalProd,
+                Proceso : datos_proceso[i].proceso_Nombre,
+              }
+
+              if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrimaRetirada.length == 0) {
+                this.ArrayMateriaPrimaRetirada.push(productoExt);
+
+              } else if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrimaRetirada.length != 0){
+                this.ArrayMateriaPrimaRetirada.push(productoExt);
+                productoExt = [];
+              } else {
+                for (let index = 0; index < formulario.length; index++) {
+                  if(productoExt.Id == this.ArrayMateriaPrimaRetirada[index].Id) {
+                    this.ArrayMateriaPrimaRetirada.splice(index, 1);
+                    this.AccionBoton = "Agregar";
+                    this.ArrayMateriaPrimaRetirada.push(productoExt);
+                    break;
+                  }
                 }
               }
-            }
 
-            this.FormMateriaPrimaRetirada.setValue({
-              MpIdRetirada : '',
-              MpNombreRetirada: '',
-              MpCantidadRetirada : '',
-              MpPrecioRetirada: '',
-              MpUnidadMedidaRetirada: '',
-              MpStockRetirada: '',
-              ProcesoRetiro : '',
-            });
-            this.ArrayMateriaPrimaRetirada.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
-          } else Swal.fire("La cantidad a asignar no debe superar lo que hay en stock ")
+              this.FormMateriaPrimaRetirada.setValue({
+                MpIdRetirada : '',
+                MpNombreRetirada: '',
+                MpCantidadRetirada : '',
+                MpPrecioRetirada: '',
+                MpUnidadMedidaRetirada: '',
+                MpStockRetirada: '',
+                ProcesoRetiro : '',
+              });
+              this.ArrayMateriaPrimaRetirada.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
+            } else Swal.fire("La cantidad a asignar no debe superar lo que hay en stock ");
+          }
           break;
         }
       }
@@ -520,52 +567,99 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let stockMateriaPrimaInicial : number;
     let stockMateriaPrimaFinal : number;
 
-    for (let index = 0; index < this.ArrayMateriaPrimaRetirada.length; index++) {
-      this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrimaRetirada[index].Id).subscribe(datos_materiaPrima => {
-        stockMateriaPrimaInicial = datos_materiaPrima.matPri_Stock;
-        stockMateriaPrimaFinal = stockMateriaPrimaInicial - this.ArrayMateriaPrimaRetirada[index].Cant;
-        const datosMP : any = {
-          MatPri_Id : this.ArrayMateriaPrimaRetirada[index].Id,
-          MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
-          MatPri_Descripcion : datos_materiaPrima.matPri_Descripcion,
-          MatPri_Stock : stockMateriaPrimaFinal,
-          UndMed_Id : datos_materiaPrima.undMed_Id,
-          CatMP_Id : datos_materiaPrima.catMP_Id,
-          MatPri_Precio : datos_materiaPrima.matPri_Precio,
-          TpBod_Id : datos_materiaPrima.tpBod_Id,
+    this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
+      stockMateriaPrimaInicial = datos_materiaPrima.matPri_Stock;
+      stockMateriaPrimaFinal = stockMateriaPrimaInicial - cantidadMateriaPrima;
+      const datosMP : any = {
+        MatPri_Id : idMateriaPrima,
+        MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
+        MatPri_Descripcion : datos_materiaPrima.matPri_Descripcion,
+        MatPri_Stock : stockMateriaPrimaFinal,
+        UndMed_Id : datos_materiaPrima.undMed_Id,
+        CatMP_Id : datos_materiaPrima.catMP_Id,
+        MatPri_Precio : datos_materiaPrima.matPri_Precio,
+        TpBod_Id : datos_materiaPrima.tpBod_Id,
+      }
+      this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).subscribe(datos_mp_creada => {});
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'center',
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
         }
-        this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrimaRetirada[index].Id, datosMP).subscribe(datos_mp_creada => {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 1500,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          });
-          Toast.fire({
-            icon: 'success',
-            title: '¡Registro de Asignación creado con exito!'
-          });
-          this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
-            OTRetiro : '',
-            FechaRetiro : this.today,
-            Maquina : '',
-            UsuarioRetiro : '',
-            kgOt : '',
-            EstadoRetiro : '',
-            ObservacionRetiro : '',
-          });
-          this.ArrayMateriaPrimaRetirada= [];
-          this.FormMateriaPrimaRetirada.reset();
-          this.load = true;
-        });
       });
-    }
+      Toast.fire({
+        icon: 'success',
+        title: '¡Registro de Asignación creado con exito!'
+      });
+      this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
+        OTRetiro : '',
+        FechaRetiro : this.today,
+        Maquina : '',
+        UsuarioRetiro : '',
+        kgOt : '',
+        EstadoRetiro : '',
+        ObservacionRetiro : '',
+      });
+      this.ArrayMateriaPrimaRetirada= [];
+      this.FormMateriaPrimaRetirada.reset();
+      this.load = true;
+    });
+  }
 
+  moverInventarioTintas(idMateriaPrima : number, cantidad : number){
+    let stockTintaInicial : number;
+    let stockTintaFinal : number;
+
+    this.tintasService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_tintas => {
+      stockTintaInicial = datos_tintas.tinta_Stock;
+      stockTintaFinal = stockTintaInicial - cantidad;
+
+      const datosTintas : any = {
+        Tinta_Id: idMateriaPrima,
+        Tinta_Nombre : datos_tintas.tinta_Nombre,
+        Tinta_Descripcion : datos_tintas.tinta_Descripcion,
+        Tinta_CodigoHexadecimal : datos_tintas.tinta_CodigoHexadecimal,
+        Tinta_Stock : stockTintaFinal,
+        UndMed_Id : datos_tintas.undMed_Id,
+        Tinta_Precio : datos_tintas.tinta_Precio,
+        CatMP_Id : datos_tintas.catMP_Id,
+        TpBod_Id : datos_tintas.tpBod_Id,
+      }
+
+      this.tintasService.srvActualizar(idMateriaPrima, datosTintas).subscribe(datos_tintasActualizada => {});
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'center',
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+      Toast.fire({
+        icon: 'success',
+        title: '¡Registro de Asignación creado con exito!'
+      });
+      this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
+        OTRetiro : '',
+        FechaRetiro : this.today,
+        Maquina : '',
+        UsuarioRetiro : '',
+        kgOt : '',
+        EstadoRetiro : '',
+        ObservacionRetiro : '',
+      });
+      this.ArrayMateriaPrimaRetirada= [];
+      this.FormMateriaPrimaRetirada.reset();
+      this.load = true;
+    });
   }
 
   //Funcion que consultara una materia prima con base a un ID pasado en la vista
@@ -574,6 +668,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.materiaPrimaSeleccionada = [];
     this.categoriaMPBuscadaID = '';
     this.tipobodegaMPBuscadaId = '';
+    this.categoria = 0;
 
     this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
       this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
@@ -582,12 +677,17 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.materiasPrimas.push(datos_materiaPrima);
           this.categoriaMPBuscadaID = datos_categoria.catMP_Nombre;
           this.tipobodegaMPBuscadaId = datos_bodega.tpBod_Nombre;
-          this.tintasService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_tintas => {
-
-          });
+          this.categoria = datos_materiaPrima.catMP_Id;
           this.cargarInfoMP();
         });
       });
+    });
+
+
+    this.tintasService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_tintas => {
+      this.materiaPrimaSeleccionada.push(datos_tintas);
+      this.categoria = datos_tintas.catMP_Id;
+      this.cargarInfoMP();
     });
   }
 
@@ -596,6 +696,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let nombreMateriaPrima : string = this.FormMateriaPrimaRetirada.value.MpNombreRetirada;
     let idMateriaPrima : number; //En el HTML se pasará el nombre de la materia prima pero el input tendrá como valor el Id de la materia prima
     this.materiaPrimaSeleccionada = [];
+    this.categoria = 0;
 
     this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiasPrimas => {
       for (let index = 0; index < datos_materiasPrimas.length; index++) {
@@ -605,9 +706,20 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               this.materiaPrimaSeleccionada.push(datos_materiasPrimas[index]);
               this.categoriaMPSeleccionada = datos_categoria.catMP_Nombre;
               this.tipoBodegaMPSeleccionada = datos_bodega.tpBod_Nombre;
+              this.categoria = datos_materiasPrimas[index].catMP_Id;
               this.cargarInfoMP();
             });
           });
+        }
+      }
+    });
+
+    this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
+      for (let i = 0; i < datos_tintas.length; i++) {
+        if (nombreMateriaPrima == datos_tintas[i].tinta_Nombre) {
+          this.materiaPrimaSeleccionada.push(datos_tintas[i]);
+          this.categoria = datos_tintas[i].catMP_Id;
+          this.cargarInfoMP();
         }
       }
     });
@@ -616,15 +728,27 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   //Funcion que llenará la infomacion de materia prima buscada o seleccionada y pasará la informacion a la vista
   cargarInfoMP(){
     for (const Mp of this.materiaPrimaSeleccionada) {
-      this.FormMateriaPrimaRetirada.setValue({
-        MpIdRetirada : Mp.matPri_Id,
-        MpNombreRetirada: Mp.matPri_Nombre,
-        MpCantidadRetirada : '',
-        MpPrecioRetirada: Mp.matPri_Precio,
-        MpUnidadMedidaRetirada: Mp.undMed_Id,
-        MpStockRetirada: Mp.matPri_Stock,
-        ProcesoRetiro : this.FormMateriaPrimaRetirada.value.ProcesoRetiro,
-      });
+      if (Mp.catMP_Id == 7) {
+        this.FormMateriaPrimaRetirada.setValue({
+          MpIdRetirada : Mp.tinta_Id,
+          MpNombreRetirada: Mp.tinta_Nombre,
+          MpCantidadRetirada : '',
+          MpPrecioRetirada: Mp.tinta_Precio,
+          MpUnidadMedidaRetirada: Mp.undMed_Id,
+          MpStockRetirada: Mp.tinta_Stock,
+          ProcesoRetiro : this.FormMateriaPrimaRetirada.value.ProcesoRetiro,
+        });
+      } else {
+        this.FormMateriaPrimaRetirada.setValue({
+          MpIdRetirada : Mp.matPri_Id,
+          MpNombreRetirada: Mp.matPri_Nombre,
+          MpCantidadRetirada : '',
+          MpPrecioRetirada: Mp.matPri_Precio,
+          MpUnidadMedidaRetirada: Mp.undMed_Id,
+          MpStockRetirada: Mp.matPri_Stock,
+          ProcesoRetiro : this.FormMateriaPrimaRetirada.value.ProcesoRetiro,
+        });
+      }
     }
   }
 

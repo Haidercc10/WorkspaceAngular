@@ -9,6 +9,7 @@ import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
 import { info } from 'console';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { EstadosService } from 'src/app/Servicios/estados.service';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -45,9 +46,12 @@ export class ReporteCostosOTComponent implements OnInit {
   diferencia : number = 0; //Variable que servirá para almacenar la diferencia de el valor final de la ot y el valor estimado o inicial
   diferenciaPorcentaje : number = 0; //Variable que servirá para almacenar la diferencia en porcentaje de el valor final de la ot y el valor estimado o inicial
   cantidadSellandoUnidad : number = 0; //Varibale que calculará la cantidad total de unidades selladas, esto se en caso de que la presentación del producto sea en unidad
+  cantidadWiketiadoUnidad : number = 0; //Varibale que calculará la cantidad total de unidades en wiketiado, esto se en caso de que la presentación del producto sea en unidad
+  cantidadEmpaqueUnidad : number = 0; //Varibale que calculará la cantidad total de unidades en empaque, esto se en caso de que la presentación del producto sea en unidad
+  estados = []; //Variable que va a almacenar los estados que tendrá la orden de trabajo
 
   // Variables globlales que almacenarán la informacion general de la orden de trabajo que se mostrará en el PDF
-  ordenTrabajo : number;
+  ordenTrabajo : number = 0;
   NombreCliente : string;
   idProducto : number;
   nombreProducto : string;
@@ -60,6 +64,9 @@ export class ReporteCostosOTComponent implements OnInit {
   valorUnitarioProdKg : number;
   valorEstimadoOT : number;
   fechaOT : any;
+  fechaFinalOT : any;
+  usuarioCreador : any;
+  estado : string;
 
   constructor( private frmBuilderMateriaPrima : FormBuilder,
                 private bagProServices : BagproService,
@@ -83,6 +90,9 @@ export class ReporteCostosOTComponent implements OnInit {
       ValorUnidadProductoUnd : ['', Validators.required],
       ValorUnidadProductoKg : ['', Validators.required],
       ValorEstimadoOt : ['', Validators.required],
+      fechaInicioOT : ['', Validators.required],
+      fechaFinOT : ['', Validators.required],
+      estadoOT : ['', Validators.required],
     });
 
     this.load = true;
@@ -176,6 +186,7 @@ export class ReporteCostosOTComponent implements OnInit {
     }]
   }
 
+  //Funcion para darle el nombre a cada columna de la tabla de procesos
   ColumnasTablaProcesos(){
     this.titulosTablaprocesos = [];
     this.titulosTablaprocesos = [{
@@ -192,11 +203,14 @@ export class ReporteCostosOTComponent implements OnInit {
     }]
   }
 
+  //Funcion que consultará la OT que le sea pasada y mostrará la información general de dicha Orden de Trabajo
   consultaOTBagPro(){
+    this.ArrayMateriaPrima = [];
     this.load = false;
     this.valorFinalOT = 0;
     this.diferencia = 0;
     this.diferenciaPorcentaje = 0;
+    this.estado = '';
 
     let ot : number = this.infoOT.value.ot;
     let porcentajeMargen : number = 0;
@@ -224,6 +238,10 @@ export class ReporteCostosOTComponent implements OnInit {
           let FechaCreacionNueva = FechaDatetime.indexOf("T");
           let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
           this.fechaOT = fechaCreacionFinal;
+          this.usuarioCreador = item.usrCrea;
+          if (item.estado == null || item.estado == '' || item.estado == '0') this.estado = 'NULL';
+          else if (item.estado == 4) this.estado = '4';
+          else if (item.estado == 1) this.estado = '1';
 
           this.infoOT.setValue({
             ot : ot,
@@ -238,6 +256,9 @@ export class ReporteCostosOTComponent implements OnInit {
             ValorUnidadProductoUnd : this.formatonumeros(item.datosvalorBolsa),
             ValorUnidadProductoKg : this.formatonumeros(item.datosValorKg),
             ValorEstimadoOt : this.formatonumeros(item.datosvalorOt),
+            fechaInicioOT : this.fechaOT,
+            fechaFinOT : '',
+            estadoOT : this.estado,
           });
           this.detallesAsignacionService.srvObtenerListaPorOT(ot).subscribe(datos_asignacionMP => {
             if (datos_asignacionMP.length == 0) Swal.fire(`La OT N° ${ot} no tiene asignaciones registradas`)
@@ -311,6 +332,7 @@ export class ReporteCostosOTComponent implements OnInit {
           } else if (datos_selado[i].nomStatus == "Wiketiado") {
             cantWiketiado = datos_selado[i].peso;
             this.cantidadTotalWiketiado = cantWiketiado + this.cantidadTotalWiketiado;
+            this.cantidadWiketiadoUnidad = this.cantidadWiketiadoUnidad + datos_selado[i].qty;
           }
         }
         this.cantidadPorcPerdidaProcesoaProceso(ot);
@@ -338,15 +360,103 @@ export class ReporteCostosOTComponent implements OnInit {
     }
     this.ArrayProcesos.push(cant);
     for (const item of this.ArrayProcesos) {
-      if (item.Sel == 0 && item.Corte != 0) {
-        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = item.Corte * this.valorUnitarioProdKg;
+      if (item.Sel == 0 && item.Emp != 0 && item.Wik == 0) {
+        this.bagProServices.srvObtenerListaProcExtOt_fechaFinal(ot).subscribe(datos_extrusion => {
+          let empaque : any = [];
+          empaque.push(datos_extrusion)
+          for (const item of empaque) {
+            let FechaDatetime = item.fecha;
+            let FechaCreacionNueva = FechaDatetime.indexOf("T");
+            let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
+            this.fechaFinalOT = fechaCreacionFinal;
+            this.infoOT.setValue({
+              ot : ot,
+              cliente : this.infoOT.value.cliente,
+              IdProducto : this.infoOT.value.IdProducto,
+              NombreProducto : this.infoOT.value.NombreProducto,
+              cantProductoSinMargenUnd : this.infoOT.value.cantProductoSinMargenUnd,
+              cantProductoSinMargenKg : this.infoOT.value.cantProductoSinMargenKg,
+              margenAdicional : this.infoOT.value.margenAdicional,
+              cantProductoConMargen : this.infoOT.value.cantProductoConMargen,
+              PresentacionProducto : this.infoOT.value.PresentacionProducto,
+              ValorUnidadProductoUnd : this.infoOT.value.ValorUnidadProductoUnd,
+              ValorUnidadProductoKg : this.infoOT.value.ValorUnidadProductoKg,
+              ValorEstimadoOt : this.infoOT.value.ValorEstimadoOt,
+              fechaInicioOT : this.infoOT.value.fechaInicioOT,
+              fechaFinOT : this.fechaFinalOT,
+              estadoOT : this.infoOT.value.estadoOT,
+            });
+          }
+        });
+        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = item.Emp * this.valorUnitarioProdKg;
         else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo' || this.presentacionProducto == 'Paquete') {
-          this.valorFinalOT = item.Corte * this.valorUnitarioProdUnd;
+          this.valorFinalOT = item.Emp * this.valorUnitarioProdUnd;
         }
-      } else if (item.Sel != 0 && item.Corte == 0) {
+      } else if (item.Sel != 0 && item.Emp == 0 && item.Wik == 0) {
+        this.bagProServices.srvObtenerListaProcSelladoOT_FechaFinal(ot).subscribe(datos_sellado => {
+          let sellado : any = [];
+          sellado.push(datos_sellado)
+          for (const item of sellado) {
+            let FechaDatetime = item.fechaEntrada;
+            let FechaCreacionNueva = FechaDatetime.indexOf("T");
+            let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
+            this.fechaFinalOT = fechaCreacionFinal;
+            this.infoOT.setValue({
+              ot : ot,
+              cliente : this.infoOT.value.cliente,
+              IdProducto : this.infoOT.value.IdProducto,
+              NombreProducto : this.infoOT.value.NombreProducto,
+              cantProductoSinMargenUnd : this.infoOT.value.cantProductoSinMargenUnd,
+              cantProductoSinMargenKg : this.infoOT.value.cantProductoSinMargenKg,
+              margenAdicional : this.infoOT.value.margenAdicional,
+              cantProductoConMargen : this.infoOT.value.cantProductoConMargen,
+              PresentacionProducto : this.infoOT.value.PresentacionProducto,
+              ValorUnidadProductoUnd : this.infoOT.value.ValorUnidadProductoUnd,
+              ValorUnidadProductoKg : this.infoOT.value.ValorUnidadProductoKg,
+              ValorEstimadoOt : this.infoOT.value.ValorEstimadoOt,
+              fechaInicioOT : this.infoOT.value.fechaInicioOT,
+              fechaFinOT : this.fechaFinalOT,
+              estadoOT : this.infoOT.value.estadoOT,
+            });
+            break;
+          }
+        });
         if (this.presentacionProducto == 'Kilo') this.valorFinalOT = item.Sel * this.valorUnitarioProdKg;
         else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') {
           this.valorFinalOT = this.cantidadSellandoUnidad * this.valorUnitarioProdUnd;
+        }
+      } else if (item.Sel == 0 && item.Emp == 0 && item.Wik != 0) {
+        this.bagProServices.srvObtenerListaProcSelladoOT_FechaFinal(ot).subscribe(datos_sellado => {
+          let sellado : any = [];
+          sellado.push(datos_sellado)
+          for (const item of sellado) {
+            let FechaDatetime = item.fechaEntrada;
+            let FechaCreacionNueva = FechaDatetime.indexOf("T");
+            let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
+            this.fechaFinalOT = fechaCreacionFinal;
+            this.infoOT.setValue({
+              ot : ot,
+              cliente : this.infoOT.value.cliente,
+              IdProducto : this.infoOT.value.IdProducto,
+              NombreProducto : this.infoOT.value.NombreProducto,
+              cantProductoSinMargenUnd : this.infoOT.value.cantProductoSinMargenUnd,
+              cantProductoSinMargenKg : this.infoOT.value.cantProductoSinMargenKg,
+              margenAdicional : this.infoOT.value.margenAdicional,
+              cantProductoConMargen : this.infoOT.value.cantProductoConMargen,
+              PresentacionProducto : this.infoOT.value.PresentacionProducto,
+              ValorUnidadProductoUnd : this.infoOT.value.ValorUnidadProductoUnd,
+              ValorUnidadProductoKg : this.infoOT.value.ValorUnidadProductoKg,
+              ValorEstimadoOt : this.infoOT.value.ValorEstimadoOt,
+              fechaInicioOT : this.infoOT.value.fechaInicioOT,
+              fechaFinOT : this.fechaFinalOT,
+              estadoOT : this.infoOT.value.estadoOT,
+            });
+            break;
+          }
+        });
+        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = item.Wik * this.valorUnitarioProdKg;
+        else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') {
+          this.valorFinalOT = this.cantidadWiketiadoUnidad * this.valorUnitarioProdUnd;
         }
       }
     }
@@ -355,6 +465,7 @@ export class ReporteCostosOTComponent implements OnInit {
     this.load = true;
   }
 
+  // Funcion para llenar la tabla con la materia prima que se ha pedido para la OT consultada
   llenarTablaMP(formulario : any){
     this.ArrayMateriaPrima = [];
     this.totalMPEntregada = 0;
@@ -411,6 +522,7 @@ export class ReporteCostosOTComponent implements OnInit {
     };
   }
 
+  // Funcion que cargará el PDF con la infomración de la OT
   CargarPDF(){
     if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe buscar una OT para crear el reporte")
     else {
@@ -780,6 +892,40 @@ export class ReporteCostosOTComponent implements OnInit {
         }
         break;
       }
+    }
+  }
+
+  // Funcion que cambiará el estado de una Orden de trabajo consultada
+  cambiarEstado(){
+
+    let estado : string = this.infoOT.value.estadoOT;
+
+    if (this.ordenTrabajo == 0) Swal.fire(`¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
+    else {
+      const data : any = {
+        item : this.ordenTrabajo,
+        clienteNom : this.NombreCliente,
+        clienteItemsNom : this.nombreProducto,
+        usrCrea : this.usuarioCreador,
+        estado : estado,
+      }
+      this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(datos_clientesOT => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2200,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+          }
+        });
+        Toast.fire({
+          icon: 'success',
+          title: '¡Actualizacion de OT exitosa!'
+        });
+      });
     }
   }
 

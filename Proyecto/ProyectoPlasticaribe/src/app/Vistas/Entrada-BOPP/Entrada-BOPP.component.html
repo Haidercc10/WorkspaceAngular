@@ -1,0 +1,158 @@
+ <!-- Inicio Contenedor total -->
+ <div class="contain">
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
+    </div>
+    <ul class="btn-group open">
+      <p><b>User: {{storage_Nombre}}</b></p>
+      <span><b>Tipo: {{storage_Rol}} </b></span>
+      <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
+    </ul>
+  </nav>
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Entrada de BOPP</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <div class="container">
+
+      <!--Titulo Entrada BOPP -->
+      <div class="mb-3">
+        <h4 class="tituloRojo">Entrada de BOPP</h4>
+      </div>
+
+      <!-- Información general para la asignación de materia Prima Para la creación de tintas -->
+      <form [formGroup]="FormEntradaBOPP">
+        <!-- Fila 1 -->
+        <div class="mb-3">
+          <div class="row g-3">
+            <!-- Nombre BOPP -->
+            <div class="form-floating col-md-5">
+              <input formControlName="Nombre" type="text" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" >
+              <label for="floatingInput">Nombre BOPP</label>
+            </div>
+
+            <!-- Serial BOPP -->
+            <div class="form-floating col-md-3">
+              <input formControlName="serial" type="text" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" >
+              <label for="floatingInput">Serial BOPP</label>
+            </div>
+
+            <div class="form-floating col-md-2">
+              <input formControlName="cantidad" type="text" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" >
+              <label for="floatingInput">Cantidad en micras</label>
+            </div>
+
+            <!-- <div class="form-floating col-md-2">
+              <input formControlName="cantidadKg" type="text" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" >
+              <label for="floatingInput">Cantidad en Kg</label>
+            </div> -->
+
+            <!-- Unidad medida-->
+            <!-- <div class="form-floating col-md-2">
+              <select formControlName="undMed" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
+                <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
+              </select>
+              <label for="floatingSelect">Und. Medida</label>
+            </div> -->
+
+            <!-- Fecha entrega -->
+            <div class="form-floating col-md-2">
+              <input formControlName="Fecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" readonly onmousedown="return false;">
+              <label for="floatingInput">Fecha Entrada</label>
+            </div>
+
+            <!-- Campo Observacion -->
+            <div class="form-floating col-md">
+              <textarea formControlName="Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm" maxlength="200" ></textarea>
+              <label for="floatingTextArea">Decripción</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="mb-4">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button class="btn btn-danger btn-danger-sm" type="button" (click)="cargarBOPPTabla()"> Añadir BOPP</button>
+            <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+          </div>
+        </div>
+      </form>
+
+      <!--Linea -->
+      <div class="mb-4">
+        <hr class="colorLinea">
+      </div>
+
+      <div class="mb-4">
+        <h4 class="tituloRojo">Tabla de BOPP entrate</h4>
+      </div>
+
+      <!-- Tabla de BOPP entrante -->
+      <div class="mb-2">
+        <div class="row g-1">
+          <div class="table-responsive">
+            <table class="table table-bordered" >
+              <thead class="TitulosTabla">
+                <tr>
+                  <th id="idMateriaPrima" scope="col">Serial</th>
+                  <th id="nombreMateriaPrima" scope="col">Nombre</th>
+                  <th id="nombreMateriaPrima" scope="col">Decripción</th>
+                  <th id="cantidadMateriaPrima" scope="col">Cantidad (µm)</th>
+                  <!-- <th id="cantidadMateriaPrima" scope="col">Cantidad (KG)</th> -->
+                  <th id="UnidadMedida" scope="col">Und Medida</th>
+                  <!-- <th id="editar" scope="col">Editar</th> -->
+                  <!-- <th id="eliminar" scope="col">Eliminar</th> -->
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                <tr *ngFor="let bopp of ArrayBOPP let i = index">
+                  <td id="idMateriaPrima">{{bopp.Serial}}</td>
+                  <td id="nombreMateriaPrima">{{bopp.Nombre}}</td>
+                  <td id="nombreMateriaPrima">{{bopp.Descripcion}}</td>
+                  <th id="cantidadMateriaPrima">{{bopp.Cant}} µm</th>
+                  <!-- <th id="cantidadMateriaPrima">{{bopp.Cant}} KG</th> -->
+                  <td id="UnidadMedida">{{bopp.UndCant}}</td>
+                  <!-- <td id="Editar" (click)="EditarMateriaPrimaTabla(materiaPrima)"><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Materia Prima"></i></a></td> -->
+                  <!-- <td id="Eliminar" (click)="QuitarMateriaPrimaTabla(i, materiaPrima)"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Materia Prima de la tabla"></i></a></td> -->
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gif de Carga -->
+      <div class="overlay" *ngIf="!load">
+        <div class="spinner ">
+          <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+        </div>
+      </div>
+
+      <div *ngIf="load">
+        <div class="mb-3">
+          <div class="row g-3">
+            <div class="mb-3">
+              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <button class="btn btn-danger btn-danger-sm" type="button" (click)="crearEntrada()">Crear Entrada </button>
+                <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosLosCampos()">Limpiar Todo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

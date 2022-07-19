@@ -25,7 +25,7 @@
   <form [formGroup]="FormMateriaPrima">
     <div class="mb-3">
       <div class="row g-3">
-        <div class="form-floating col-md-3">
+        <div class="form-floating col-md-2">
           <input formControlName="MpId" type="number" min="0" (change)="buscarMpId()" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Id Materia Prima</label>
         </div>
@@ -35,6 +35,13 @@
             <option [ngValue]="materiaPrima.matPri_Id" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima.matPri_Nombre}}</option>
           </select>
           <label for="floatingSelect">Nombre de la Materia Prima</label>
+        </div>
+        <!-- ID/Nombre Producto -->
+        <div class="form-floating col-md-2">
+          <select formControlName="MpCategoria" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
+            <option [ngValue]="categoria.catMP_Id" *ngFor="let categoria of categorias">{{categoria.catMP_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Categorias de Materia Prima</label>
         </div>
         <!-- Fecha inicial -->
         <div class="form-floating col-md-2">
@@ -82,6 +89,7 @@
                   <th id="precioMateriaPrima" scope="col" >{{columnas.mpPrecioU}}</th>
                   <th id="subTotalMateriaPrima" scope="col" (dblclick)="organizacionPrecioDblClick()" (click)="organizacionPrecio()">{{columnas.mpSubTotal}}</th>
                 </ng-container>
+                <th id="UnidadMedida" scope="col">{{columnas.mpCategoria}}</th>
               </tr>
               </thead>
             <tbody>
@@ -98,6 +106,7 @@
                   <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd | number}}</td>
                   <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | number}}</td>
                 </ng-container>
+                <td id="UnidadMedida">{{materiaPrima.Categoria}}</td>
               </tr>
             </tbody>
           </table>

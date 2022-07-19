@@ -22,6 +22,10 @@ export class DetallesAsignacionTintasService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_Tinta/${id}`);
   }
 
+  srvObtenerListaPor_Asignacion(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_Tinta/aisgnacion/${id}`);
+  }
+
   //Metodo agregar Productos
   srvAgregar(data : any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_Tinta', data)

@@ -13,7 +13,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Reporte de Costos de Orden de Treabajo</h2>
+      <h2 class="tituloRojo">Reporte de Costos de Orden de Trabajo</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -89,14 +89,38 @@
           <input formControlName="ValorEstimadoOt" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
           <label for="floatingInput">Valor OT</label>
         </div>
+        <!-- Fecha de Inicio -->
+        <div class="form-floating col-md-2">
+          <input formControlName="fechaInicioOT" type="date" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Fecha Inicio</label>
+        </div>
+        <!-- Fecha en que Finaliza -->
+        <div class="form-floating col-md-2">
+          <input formControlName="fechaFinOT" type="date" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
+          <label for="floatingInput">Fecha Final</label>
+        </div>
+        <!-- Estados de la OT -->
+        <div class="form-floating col-md">
+          <select formControlName="estadoOT" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example">
+            <!-- <option [ngValue]="estado" *ngFor="let estado of estados">{{estado}}</option> -->
+            <option value="NULL">Abierto</option>
+            <option value="4">Anulado</option>
+            <option value="1">Cerrado</option>
+          </select>
+          <label for="floatingSelect">Estado Orden de Trabajo</label>
+        </div>
       </div>
     </div>
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button class="btn btn-danger btn-danger-sm" type="button" (click)="consultaOTBagPro()">Consultar OT</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button class="btn btn-danger btn-danger-sm" type="button" (click)="CargarPDF()">Reporte en PDF</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="cambiarEstado()">Cambiar Estado</button>
       </div>
     </div>
   </form>
@@ -126,9 +150,9 @@
                 <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
                 <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
                 <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
+                <th id="proceso" scope="col">{{columnas.mpProceso}}</th>
                 <th id="PrecioUnidad" scope="col">{{columnas.mpPrecioU}}</th>
                 <th id="mpSubTotal" scope="col">{{columnas.mpSubTotal}}</th>
-                <th id="proceso" scope="col">{{columnas.mpProceso}}</th>
               </tr>
             </thead>
             <tbody>
@@ -137,13 +161,23 @@
                   <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
                   <td id="cantidadMateriaPrima">{{materiaPrima.Cantidad}}</td>
                   <td id="UnidadMedida">{{materiaPrima.Presentacion}}</td>
+                  <td id="proceso">{{materiaPrima.Proceso}}</td>
                   <td id="precio">${{materiaPrima.PrecioUnd}}</td>
                   <td id="subtotal">${{materiaPrima.SubTotal}}</td>
-                  <td id="proceso">{{materiaPrima.Proceso}}</td>
                 </tr>
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+    <div class="mb-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <label class="labelMateriaPrima">
+          <b>Total Materia Prima Entregada:</b> {{totalMPEntregada | number}} KG
+        </label>
+        <label class="labelMateriaPrima">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <b>Valor Materia Prima Entregada:</b> {{ValorMPEntregada | currency}}
+        </label>
       </div>
     </div>
 
@@ -167,8 +201,8 @@
                 <th id="Materia_Prima" scope="col">{{columnas.rot}}</th>
                 <th id="Proceso" scope="col" >{{columnas.dbld}}</th>
                 <th id="mpCant" scope="col" >{{columnas.lam}}</th>
-                <th id="valorMp" scope="col" >{{columnas.emp}}</th>
                 <th id="porcentajeMp" scope="col" >{{columnas.corte}}</th>
+                <th id="valorMp" scope="col" >{{columnas.emp}}</th>
                 <th id="porcentajeMp" scope="col" >{{columnas.sel}}</th>
                 <th id="porcentajeMp" scope="col" >{{columnas.wik}}</th>
                </tr>
@@ -181,8 +215,8 @@
                 <td id="Materia_Prima">{{materiaPrima.Rot | number}}</td>
                 <td id="Proceso">{{materiaPrima.Dbld | number}}</td>
                 <td id="mpCant">{{materiaPrima.Lam | number}}</td>
-                <td id="valorMp">{{materiaPrima.Emp | number}}</td>
                 <td id="porcentajeMp">{{materiaPrima.Corte | number}}</td>
+                <td id="valorMp">{{materiaPrima.Emp | number}}</td>
                 <td id="porcentajeMp">{{materiaPrima.Sel | number}}</td>
                 <td id="porcentajeMp">{{materiaPrima.Wik | number}}</td>
               </tr>
@@ -194,10 +228,8 @@
   </div>
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <label><b>Total Materia Prima Entregada:</b> {{totalMPEntregada | number}} KG</label>
-      <label><b>Valor Materia Prima Entregada:</b> {{ValorMPEntregada | currency}} </label>
-      <label><b>Valor Final OT:</b> {{valorFinalOT | currency}} </label>
-      <label><b>Diferencia:</b> ${{diferencia | number}} </label>
+      <label><b>Valor Final OT:</b> {{valorFinalOT | currency}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+      <label><b>Diferencia:</b> ${{diferencia | number}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
       <label><b>Diferencia (%):</b> {{diferenciaPorcentaje | number}}%</label>
     </div>
   </div>

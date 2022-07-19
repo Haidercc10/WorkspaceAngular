@@ -55,6 +55,7 @@ import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion
 import { CrearTintasComponent } from './Vistas/crear-tintas/crear-tintas.component';
 import { ModalCrearMateriasPrimasComponent } from './Vistas/modal-crear-materias-primas/modal-crear-materias-primas.component';
 import { AsignacionBOPPComponent } from './Vistas/asignacion-bopp/asignacion-bopp.component';
+import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
 
 
 
@@ -98,6 +99,7 @@ export const routes: Routes = [
   {path: 'mp-devoluciones', canActivate: [ValidacionLoginGuard], component: DevolucionesMPComponent},
   {path: 'asignacion-tintas', canActivate: [ValidacionLoginGuard], component: AsignacionTintasComponent},
   {path: 'asignacion-bopp', canActivate: [ValidacionLoginGuard], component: AsignacionBOPPComponent},
+  {path: 'entrada-BOPP', canActivate: [ValidacionLoginGuard], component: EntradaBOPPComponent},
 ]
 
 @NgModule({
@@ -142,7 +144,8 @@ export const routes: Routes = [
     AsignacionTintasComponent,
     CrearTintasComponent,
     ModalCrearMateriasPrimasComponent,
-    AsignacionBOPPComponent
+    AsignacionBOPPComponent,
+    EntradaBOPPComponent,
   ],
 
 

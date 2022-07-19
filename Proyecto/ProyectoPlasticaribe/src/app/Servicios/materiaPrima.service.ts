@@ -10,7 +10,7 @@ import { modelPedidomateriaprima } from '../Modelo/modelPedidomateriaprima';
 })
 export class MateriaPrimaService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
 
   constructor(private http : HttpClient) { }
 
@@ -21,6 +21,10 @@ export class MateriaPrimaService {
 
   srvObtenerListaPorId(id : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`);
+  }
+
+  srvObtenerListaPorCategoria(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/categoria/${id}`);
   }
 
   //Metodo agregar Productos

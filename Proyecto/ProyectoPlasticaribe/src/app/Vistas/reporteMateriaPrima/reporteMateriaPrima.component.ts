@@ -7,6 +7,7 @@ import { AsignacionMPService } from 'src/app/Servicios/asignacionMP.service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
+import { DetallesAsignacionTintasService } from 'src/app/Servicios/detallesAsignacionTintas.service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
 import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
 import { FactuaMpCompradaService } from 'src/app/Servicios/facturaMpComprada.service';
@@ -21,6 +22,7 @@ import { RemisionService } from 'src/app/Servicios/Remision.service';
 import { RemisionesMPService } from 'src/app/Servicios/remisionesMP.service';
 import { RemisionFacturaService } from 'src/app/Servicios/remisionFactura.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
+import { TintasService } from 'src/app/Servicios/tintas.service';
 import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
 import { TipoBodegaService } from 'src/app/Servicios/tipoBodega.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
@@ -83,6 +85,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   inventInicial : number = 0;
   sumaEntrada : number = 0;
   sumaSalida : number = 0;
+  categorias : any = []; //variable que almacenará las categorias existentes
 
   public load: boolean;
 
@@ -90,22 +93,24 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   MpConsultada = [];
 
   constructor(private materiaPrimaService : MateriaPrimaService,
-                private categoriMpService : CategoriaMateriaPrimaService,
-                  private tipoBodegaService : TipoBodegaService,
-                    private rolService : RolesService,
-                      private frmBuilderMateriaPrima : FormBuilder,
-                        @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                          private remisionService : RemisionService,
-                            private remisionMpService : RemisionesMPService,
-                              private facturaCompraService : FactuaMpCompradaService,
-                                private facturaCompraMPService : FacturaMpService,
-                                  private usuarioService : UsuarioService,
-                                    private remisionFacturaService : RemisionFacturaService,
-                                      private asignacionService : AsignacionMPService,
-                                        private asignacionMpService : DetallesAsignacionService,
-                                          private recuperadoService : RecuperadoService,
-                                            private recuperadoMPService : RecuperadoMPService,
-                                              private inventInicialDiaService : InventInicialDiaService,) {
+                private tintasService : TintasService,
+                  private categoriMpService : CategoriaMateriaPrimaService,
+                    private tipoBodegaService : TipoBodegaService,
+                      private rolService : RolesService,
+                        private frmBuilderMateriaPrima : FormBuilder,
+                          @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                            private remisionService : RemisionService,
+                              private remisionMpService : RemisionesMPService,
+                                private facturaCompraService : FactuaMpCompradaService,
+                                  private facturaCompraMPService : FacturaMpService,
+                                    private usuarioService : UsuarioService,
+                                      private remisionFacturaService : RemisionFacturaService,
+                                        private asignacionService : AsignacionMPService,
+                                          private asignacionMpService : DetallesAsignacionService,
+                                            private asignacionTintasService : DetallesAsignacionTintasService,
+                                              private recuperadoService : RecuperadoService,
+                                                private recuperadoMPService : RecuperadoMPService,
+                                                  private inventInicialDiaService : InventInicialDiaService,) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : new FormControl(),
@@ -115,6 +120,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       MpUnidadMedida:new FormControl(),
       fecha: new FormControl(),
       fechaFinal : new FormControl(),
+      MpCategoria : new FormControl(),
     });
 
     this.load = true;
@@ -139,6 +145,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.obtenerMateriasPrimasRetiradas();
     this.LimpiarCampos();
     this.fecha();
+    this.obtenerCategorias();
   }
 
   initForms() {
@@ -150,6 +157,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       MpUnidadMedida: ['', Validators.required],
       fecha: ['', Validators.required],
       fechaFinal: ['', Validators.required],
+      MpCategoria : ['', Validators.required],
     });
   }
 
@@ -206,6 +214,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     })
   }
 
+  obtenerCategorias(){
+    this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => {
+      for (let i = 0; i < datos_categorias.length; i++) {
+        this.categorias.push(datos_categorias[i]);
+      }
+    });
+  }
+
   obtenerMateriasPrimasRetiradas(){
     this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
       for (let index = 0; index < datos_materiaPrima.length; index++) {
@@ -233,7 +249,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           this.materiasPrimas.push(datos_materiaPrima);
           this.categoriaMPBuscadaID = datos_categoria.catMP_Nombre;
           this.tipobodegaMPBuscadaId = datos_bodega.tpBod_Nombre;
-          this.cargarFormMpEnTablas(this.ArrayMateriaPrima, datos_materiaPrima.matPri_Id, datos_materiaPrima.matPri_Nombre, datos_materiaPrima.matPri_Precio, this.inventInicial, sumaEntrada, sumaSalida, datos_materiaPrima.matPri_Stock, datos_materiaPrima.undMed_Id);
+          this.cargarFormMpEnTablas(this.ArrayMateriaPrima, datos_materiaPrima.matPri_Id, datos_materiaPrima.matPri_Nombre, datos_materiaPrima.matPri_Precio, this.inventInicial, sumaEntrada, sumaSalida, datos_materiaPrima.matPri_Stock, datos_materiaPrima.undMed_Id, this.categoriaMPBuscadaID);
         });
       });
     });
@@ -257,7 +273,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           this.materiasPrimas.push(datos_materiaPrima);
           this.categoriaMPBuscadaID = datos_categoria.catMP_Nombre;
           this.tipobodegaMPBuscadaId = datos_bodega.tpBod_Nombre;
-          this.cargarFormMpEnTablas(this.ArrayMateriaPrima, datos_materiaPrima.matPri_Id, datos_materiaPrima.matPri_Nombre, datos_materiaPrima.matPri_Precio, this.inventInicial, sumaEntrada, sumaSalida, datos_materiaPrima.matPri_Stock, datos_materiaPrima.undMed_Id);
+          this.cargarFormMpEnTablas(this.ArrayMateriaPrima, datos_materiaPrima.matPri_Id, datos_materiaPrima.matPri_Nombre, datos_materiaPrima.matPri_Precio, this.inventInicial, sumaEntrada, sumaSalida, datos_materiaPrima.matPri_Stock, datos_materiaPrima.undMed_Id, this.categoriaMPBuscadaID);
         });
       });
     });
@@ -277,10 +293,11 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       mpUndMedCant : "Und. Cant",
       mpPrecioU : "Precio U",
       mpSubTotal : "SubTotal",
+      mpCategoria : 'Categoria',
     }]
   }
 
-  cargarFormMpEnTablas(formulario : any, id: number, nombre : string, precio : number, inicial : number, entrada : number, salida : number, cantidad : number, undMEd : string){
+  cargarFormMpEnTablas(formulario : any, id: number, nombre : string, precio : number, inicial : number, entrada : number, salida : number, cantidad : number, undMEd : string, categoria : any){
     let subtotalProd : number = precio * cantidad;
     this.valorTotal = this.valorTotal + subtotalProd;
     if (inicial == 0) {
@@ -294,7 +311,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         Diferencia : cantidad - inicial,
         UndCant : undMEd,
         PrecioUnd : precio,
-        SubTotal : subtotalProd
+        SubTotal : subtotalProd,
+        Categoria : categoria,
       }
 
       if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length == 0) {
@@ -324,7 +342,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         Diferencia : cantidad - inicial,
         UndCant : undMEd,
         PrecioUnd : precio,
-        SubTotal : subtotalProd
+        SubTotal : subtotalProd,
+        Categoria : categoria,
       }
 
       if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length == 0) {
@@ -352,6 +371,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     let idMateriaPrima : number = this.FormMateriaPrima.value.MpId;
     let fecha : any = this.FormMateriaPrima.value.fecha;
     let fechaFinal : any = this.FormMateriaPrima.value.fechaFinal;
+    let categoria : any = this.FormMateriaPrima.value.MpCategoria
     let fechaCreacionFinal : any;
     this.ArrayMateriaPrima = [];
     this.valorTotal = 0;
@@ -434,6 +454,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorId(materiaPrima).subscribe(datos_materiaPrima => {
+            this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
               this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima.matPri_Id).subscribe(datos_inventarioInicial => {
                 this.sumaSalida = 0;
                 this.sumaEntrada = 0;
@@ -477,9 +498,11 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   this.sumaEntrada,
                   this.sumaSalida,
                   datos_materiaPrima.matPri_Stock,
-                  datos_materiaPrima.undMed_Id);
+                  datos_materiaPrima.undMed_Id,
+                  datos_categoria.catMP_Id);
 
               });
+            });
           });
           this.load = true;
         }, 2000);
@@ -551,6 +574,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
+            this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
               this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima.matPri_Id).subscribe(datos_inventarioInicial => {
                 this.sumaSalida = 0;
                 this.sumaEntrada = 0;
@@ -594,9 +618,11 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   this.sumaEntrada,
                   this.sumaSalida,
                   datos_materiaPrima.matPri_Stock,
-                  datos_materiaPrima.undMed_Id);
+                  datos_materiaPrima.undMed_Id,
+                  datos_categoria.catMP_Nombre);
 
               });
+            });
           });
           this.load = true;
         }, 2000);
@@ -674,6 +700,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorId(materiaPrima).subscribe(datos_materiaPrima => {
+            this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
               this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima.matPri_Id).subscribe(datos_inventarioInicial => {
                 this.sumaSalida = 0;
                 this.sumaEntrada = 0;
@@ -717,9 +744,11 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   this.sumaEntrada,
                   this.sumaSalida,
                   datos_materiaPrima.matPri_Stock,
-                  datos_materiaPrima.undMed_Id);
+                  datos_materiaPrima.undMed_Id,
+                  datos_categoria.catMP_Nombre);
 
               });
+            });
           });
           this.load = true;
         }, 2000);
@@ -791,6 +820,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
+            this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
               this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima.matPri_Id).subscribe(datos_inventarioInicial => {
                 this.sumaSalida = 0;
                 this.sumaEntrada = 0;
@@ -834,9 +864,11 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   this.sumaEntrada,
                   this.sumaSalida,
                   datos_materiaPrima.matPri_Stock,
-                  datos_materiaPrima.undMed_Id);
+                  datos_materiaPrima.undMed_Id,
+                  datos_categoria.catMP_Nombre);
 
               });
+            });
           });
           this.load = true;
         }, 2000);
@@ -997,50 +1029,53 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       setTimeout(() => {
         this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
           for (let index = 0; index < datos_materiaPrima.length; index++) {
-            this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima[index].matPri_Id).subscribe(datos_inventarioInicial => {
-              this.sumaSalida = 0;
-              this.sumaEntrada = 0;
-              this.inventInicial = 0;
-              this.inventInicial = datos_inventarioInicial.invInicial_Stock;
-              // Asignaciones
-              for (const item of materia_cantidad) {
-                if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
-                  this.sumaSalida = this.sumaSalida + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+            this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima[index].catMP_Id).subscribe(datos_categoria => {
+              this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima[index].matPri_Id).subscribe(datos_inventarioInicial => {
+                this.sumaSalida = 0;
+                this.sumaEntrada = 0;
+                this.inventInicial = 0;
+                this.inventInicial = datos_inventarioInicial.invInicial_Stock;
+                // Asignaciones
+                for (const item of materia_cantidad) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                    this.sumaSalida = this.sumaSalida + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+                  }
                 }
-              }
-              // Facturas
-              for (const item of materia_cantidad_factura) {
-                if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
-                  this.sumaEntrada = this.sumaEntrada + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+                // Facturas
+                for (const item of materia_cantidad_factura) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+                  }
                 }
-              }
-              // Remisiones
-              for (const item of materia_cantidad_remision) {
-                if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
-                  this.sumaEntrada = this.sumaEntrada + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                // Remisiones
+                for (const item of materia_cantidad_remision) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                  }
                 }
-              }
 
-              // Recuperado
-              for (const item of materia_cantidad_recuperado) {
-                if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
-                  this.sumaEntrada = this.sumaEntrada + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                // Recuperado
+                for (const item of materia_cantidad_recuperado) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                  }
                 }
-              }
 
-              this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
-                datos_materiaPrima[index].matPri_Id,
-                datos_materiaPrima[index].matPri_Nombre,
-                datos_materiaPrima[index].matPri_Precio,
-                this.inventInicial,
-                this.sumaEntrada,
-                this.sumaSalida,
-                datos_materiaPrima[index].matPri_Stock,
-                datos_materiaPrima[index].undMed_Id);
+                this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                  datos_materiaPrima[index].matPri_Id,
+                  datos_materiaPrima[index].matPri_Nombre,
+                  datos_materiaPrima[index].matPri_Precio,
+                  this.inventInicial,
+                  this.sumaEntrada,
+                  this.sumaSalida,
+                  datos_materiaPrima[index].matPri_Stock,
+                  datos_materiaPrima[index].undMed_Id,
+                  datos_categoria.catMP_Nombre);
+              });
             });
           }
         });
@@ -1118,54 +1153,269 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       setTimeout(() => {
         this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
           for (let index = 0; index < datos_materiaPrima.length; index++) {
-            this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima[index].matPri_Id).subscribe(datos_inventarioInicial => {
-              this.sumaSalida = 0;
-              this.sumaEntrada = 0;
-              this.inventInicial = 0;
-              this.inventInicial = datos_inventarioInicial.invInicial_Stock;
-              // Asignaciones
-              for (const item of materia_cantidad) {
-                if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
-                  this.sumaSalida = this.sumaSalida + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+            this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima[index].catMP_Id).subscribe(datos_categoria => {
+              this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima[index].matPri_Id).subscribe(datos_inventarioInicial => {
+                this.sumaSalida = 0;
+                this.sumaEntrada = 0;
+                this.inventInicial = 0;
+                this.inventInicial = datos_inventarioInicial.invInicial_Stock;
+                // Asignaciones
+                for (const item of materia_cantidad) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                    this.sumaSalida = this.sumaSalida + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+                  }
                 }
-              }
-              // Facturas
-              for (const item of materia_cantidad_factura) {
-                if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
-                  this.sumaEntrada = this.sumaEntrada + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+                // Facturas
+                for (const item of materia_cantidad_factura) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+                  }
                 }
-              }
-              // Remisiones
-              for (const item of materia_cantidad_remision) {
-                if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
-                  this.sumaEntrada = this.sumaEntrada + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                // Remisiones
+                for (const item of materia_cantidad_remision) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                  }
                 }
-              }
 
-              // Recuperado
-              for (const item of materia_cantidad_recuperado) {
-                if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
-                  this.sumaEntrada = this.sumaEntrada + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                // Recuperado
+                for (const item of materia_cantidad_recuperado) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                  }
                 }
-              }
 
-              this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
-                datos_materiaPrima[index].matPri_Id,
-                datos_materiaPrima[index].matPri_Nombre,
-                datos_materiaPrima[index].matPri_Precio,
-                this.inventInicial,
-                this.sumaEntrada,
-                this.sumaSalida,
-                datos_materiaPrima[index].matPri_Stock,
-                datos_materiaPrima[index].undMed_Id);
+                this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                  datos_materiaPrima[index].matPri_Id,
+                  datos_materiaPrima[index].matPri_Nombre,
+                  datos_materiaPrima[index].matPri_Precio,
+                  this.inventInicial,
+                  this.sumaEntrada,
+                  this.sumaSalida,
+                  datos_materiaPrima[index].matPri_Stock,
+                  datos_materiaPrima[index].undMed_Id,
+                  datos_categoria.catMP_Nombre);
+              });
             });
           }
         });
       }, 2000);
+    } else if (categoria != null)  {
+      this.load = false;
+
+      this.asignacionService.srvObtenerListaPorFecha(this.today).subscribe(datos_asignaciones => {
+        for (let i = 0; i < datos_asignaciones.length; i++) {
+          this.asignacionMpService.srvObtenerListaPorAsigId(datos_asignaciones[i].asigMp_Id).subscribe(datos_asignacionesMP => {
+            for (let j = 0; j < datos_asignacionesMP.length; j++) {
+              this.materiaPrimaService.srvObtenerListaPorId(datos_asignacionesMP[j].matPri_Id).subscribe(datos_materiaPrima => {
+                if (datos_materiaPrima.catMP_Id == categoria) {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_asignacionesMP[j].dtAsigMp_Cantidad,
+                    categoria : datos_materiaPrima.catMP_Id,
+                  }
+                  materia_cantidad.push(matCant);
+                }
+              });
+            }
+          });
+
+          // this.asignacionTintasService.srvObtenerListaPor_Asignacion(datos_asignaciones[i].asigMp_Id).subscribe(datos_asignacionTintas => {
+          //   for (let j = 0; j < datos_asignacionTintas.length; j++) {
+          //     this.tintasService.srvObtenerListaPorId(datos_asignacionTintas[j].tinta_Id).subscribe(datos_tintas => {
+          //       if (datos_tintas.catMP_Id == categoria) {
+          //         const matCant : any = {
+          //           materiaPrima : datos_tintas.tinta_Id,
+          //           cantidad : datos_asignacionTintas[j].dtAsigTinta_Cantidad,
+          //           categoria : datos_tintas.catMP_Id,
+          //         }
+          //         materia_cantidad.push(matCant);
+          //       }
+          //     });
+          //   }
+          // });
+        }
+      });
+
+      this.facturaCompraService.srvObtenerListaPorFecha(this.today).subscribe(datos_factura => {
+        for (let i = 0; i < datos_factura.length; i++) {
+          this.facturaCompraMPService.srvObtenerListaPorFacId(datos_factura[i].facco_Id).subscribe(datos_facturaMP => {
+            console.log(datos_facturaMP)
+            for (let j = 0; j < datos_facturaMP.length; j++) {
+              this.materiaPrimaService.srvObtenerListaPorId(datos_facturaMP[j].matPri_Id).subscribe(datos_materiaPrima => {
+                if (datos_materiaPrima.catMP_Id == categoria) {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_facturaMP[j].faccoMatPri_Cantidad,
+                  }
+                  materia_cantidad_factura.push(matCant);
+                }
+              });
+            }
+          });
+        }
+      });
+
+      this.remisionService.srvObtenerListaPorFecha(this.today).subscribe(datos_remisiones => {
+        for (let i = 0; i < datos_remisiones.length; i++) {
+          this.remisionMpService.srvObtenerListaPorRemId(datos_remisiones[i].rem_Id).subscribe(datos_remisionMP => {
+            for (let j = 0; j < datos_remisionMP.length; j++) {
+              this.materiaPrimaService.srvObtenerListaPorId(datos_remisionMP[j].matPri_Id).subscribe(datos_materiaPrima => {
+                if (datos_materiaPrima.catMP_Id == categoria) {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_remisionMP[j].remiMatPri_Cantidad,
+                  }
+                  materia_cantidad_remision.push(matCant);
+                }
+              });
+            }
+          });
+        }
+      });
+
+      this.recuperadoService.srvObtenerListaPorFecha(this.today).subscribe(datos_recuperado => {
+        for (let i = 0; i < datos_recuperado.length; i++) {
+          this.recuperadoMPService.srvObtenerListaPorRecuperadoId(datos_recuperado[i].recMp_Id).subscribe(datos_recuperadoMP => {
+            for (let j = 0; j < datos_recuperadoMP.length; j++) {
+              this.materiaPrimaService.srvObtenerListaPorId(datos_recuperadoMP[j].matPri_Id).subscribe(datos_materiaPrima => {
+                if (datos_materiaPrima.catMP_Id == categoria) {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_recuperadoMP[j].recMatPri_Cantidad,
+                  }
+                  materia_cantidad_recuperado.push(matCant);
+                }
+              });
+            }
+          });
+        }
+      });
+
+      setTimeout(() => {
+        this.materiaPrimaService.srvObtenerListaPorCategoria(categoria).subscribe(datos_materiaPrima => {
+          if (datos_materiaPrima.length == 0) {
+            Swal.fire(`No se encuentra ninguna materia prima con la categoria ${categoria}`);
+            this.load = true;
+          }
+          for (let index = 0; index < datos_materiaPrima.length; index++) {
+            if (datos_materiaPrima[index].catMP_Id == categoria) {
+              this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima[index].catMP_Id).subscribe(datos_categoria => {
+                this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima[index].matPri_Id).subscribe(datos_inventarioInicial => {
+                  this.sumaSalida = 0;
+                  this.sumaEntrada = 0;
+                  this.inventInicial = 0;
+                  this.inventInicial = datos_inventarioInicial.invInicial_Stock;
+                  // Asignaciones
+                  for (const item of materia_cantidad) {
+                    if (datos_materiaPrima[index].matPri_Id == item.materiaPrima && item.categoria != 7) {
+                      this.sumaSalida = this.sumaSalida + item.cantidad;
+                      // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+                    }
+                  }
+                  // Facturas
+                  for (const item of materia_cantidad_factura) {
+                    if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                      this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                      // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+                    }
+                  }
+                  // Remisiones
+                  for (const item of materia_cantidad_remision) {
+                    if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                      this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                      // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                    }
+                  }
+
+                  // Recuperado
+                  for (const item of materia_cantidad_recuperado) {
+                    if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                      this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                      // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                    }
+                  }
+
+                  this.inventInicial = 0;
+                  this.inventInicial = datos_inventarioInicial.invInicial_Stock;
+
+                  this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                    datos_materiaPrima[index].matPri_Id,
+                    datos_materiaPrima[index].matPri_Nombre,
+                    datos_materiaPrima[index].matPri_Precio,
+                    this.inventInicial,
+                    this.sumaEntrada,
+                    this.sumaSalida,
+                    datos_materiaPrima[index].matPri_Stock,
+                    datos_materiaPrima[index].undMed_Id,
+                    datos_categoria.catMP_Nombre);
+                });
+              });
+            }
+          }
+        });
+
+        // this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
+        //   for (let i = 0; i < datos_tintas.length; i++) {
+        //     if (datos_tintas[i].catMP_Id == categoria) {
+        //       this.categoriMpService.srvObtenerListaPorId(datos_tintas[i].catMP_Id).subscribe(datos_categoria => {
+        //         this.sumaSalida = 0;
+        //           this.sumaEntrada = 0;
+        //           this.inventInicial = 0;
+        //           this.inventInicial = 0;
+        //           // Asignaciones
+        //           for (const item of materia_cantidad) {
+        //             if (datos_tintas[i].tinta_Id == item.materiaPrima && item.categoria == 7) {
+        //               this.sumaSalida = this.sumaSalida + item.cantidad;
+        //               // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+        //             }
+        //           }
+        //           // Facturas
+        //           for (const item of materia_cantidad_factura) {
+        //             if (datos_tintas[i].tinta_Id == item.materiaPrima) {
+        //               this.sumaEntrada = this.sumaEntrada + item.cantidad;
+        //               // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+        //             }
+        //           }
+        //           // Remisiones
+        //           for (const item of materia_cantidad_remision) {
+        //             if (datos_tintas[i].tinta_Id == item.materiaPrima) {
+        //               this.sumaEntrada = this.sumaEntrada + item.cantidad;
+        //               // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+        //             }
+        //           }
+
+        //           // Recuperado
+        //           for (const item of materia_cantidad_recuperado) {
+        //             if (datos_tintas[i].tinta_Id == item.materiaPrima) {
+        //               this.sumaEntrada = this.sumaEntrada + item.cantidad;
+        //               // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+        //             }
+        //           }
+
+        //           this.inventInicial = 0;
+        //           this.inventInicial = 0;
+
+        //           this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+        //             datos_tintas[i].tinta_Id,
+        //             datos_tintas[i].tinta_Nombre,
+        //             datos_tintas[i].tinta_Precio,
+        //             this.inventInicial,
+        //             this.sumaEntrada,
+        //             this.sumaSalida,
+        //             datos_tintas[i].tinta_Stock,
+        //             datos_tintas[i].undMed_Id,
+        //             datos_categoria.catMP_Nombre);
+        //       });
+        //     }
+        //   }
+        // });
+      }, 2000);
+
     } else {
       this.load = false;
 
@@ -1177,11 +1427,25 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                 const matCant : any = {
                   materiaPrima : datos_materiaPrima.matPri_Id,
                   cantidad : datos_asignacionesMP[j].dtAsigMp_Cantidad,
+                  categoria : datos_materiaPrima.catMP_Id,
                 }
                 materia_cantidad.push(matCant);
               });
             }
           });
+
+          // this.asignacionTintasService.srvObtenerListaPor_Asignacion(datos_asignaciones[i].asigMp_Id).subscribe(datos_asignacionTintas => {
+          //   for (let j = 0; j < datos_asignacionTintas.length; j++) {
+          //     this.tintasService.srvObtenerListaPorId(datos_asignacionTintas[j].tinta_Id).subscribe(datos_tintas => {
+          //       const matCant : any = {
+          //         materiaPrima : datos_tintas.tinta_Id,
+          //         cantidad : datos_asignacionTintas[j].dtAsigTinta_Cantidad,
+          //         categoria : datos_tintas.catMP_Id,
+          //       }
+          //       materia_cantidad.push(matCant);
+          //     });
+          //   }
+          // });
         }
       });
 
@@ -1238,56 +1502,113 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       setTimeout(() => {
         this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
           for (let index = 0; index < datos_materiaPrima.length; index++) {
-            this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima[index].matPri_Id).subscribe(datos_inventarioInicial => {
-              this.sumaSalida = 0;
-              this.sumaEntrada = 0;
-              this.inventInicial = 0;
-              this.inventInicial = datos_inventarioInicial.invInicial_Stock;
-              // Asignaciones
-              for (const item of materia_cantidad) {
-                if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
-                  this.sumaSalida = this.sumaSalida + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+            this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima[index].catMP_Id).subscribe(datos_categoria => {
+              this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima[index].matPri_Id).subscribe(datos_inventarioInicial => {
+                this.sumaSalida = 0;
+                this.sumaEntrada = 0;
+                this.inventInicial = 0;
+                this.inventInicial = datos_inventarioInicial.invInicial_Stock;
+                // Asignaciones
+                for (const item of materia_cantidad) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima && item.categoria != 7) {
+                    this.sumaSalida = this.sumaSalida + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+                  }
                 }
-              }
-              // Facturas
-              for (const item of materia_cantidad_factura) {
-                if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
-                  this.sumaEntrada = this.sumaEntrada + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+                // Facturas
+                for (const item of materia_cantidad_factura) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+                  }
                 }
-              }
-              // Remisiones
-              for (const item of materia_cantidad_remision) {
-                if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
-                  this.sumaEntrada = this.sumaEntrada + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                // Remisiones
+                for (const item of materia_cantidad_remision) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                  }
                 }
-              }
 
-              // Recuperado
-              for (const item of materia_cantidad_recuperado) {
-                if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
-                  this.sumaEntrada = this.sumaEntrada + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                // Recuperado
+                for (const item of materia_cantidad_recuperado) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                  }
                 }
-              }
 
-              this.inventInicial = 0;
-              this.inventInicial = datos_inventarioInicial.invInicial_Stock;
+                this.inventInicial = 0;
+                this.inventInicial = datos_inventarioInicial.invInicial_Stock;
 
-              this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
-                datos_materiaPrima[index].matPri_Id,
-                datos_materiaPrima[index].matPri_Nombre,
-                datos_materiaPrima[index].matPri_Precio,
-                this.inventInicial,
-                this.sumaEntrada,
-                this.sumaSalida,
-                datos_materiaPrima[index].matPri_Stock,
-                datos_materiaPrima[index].undMed_Id);
+                this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                  datos_materiaPrima[index].matPri_Id,
+                  datos_materiaPrima[index].matPri_Nombre,
+                  datos_materiaPrima[index].matPri_Precio,
+                  this.inventInicial,
+                  this.sumaEntrada,
+                  this.sumaSalida,
+                  datos_materiaPrima[index].matPri_Stock,
+                  datos_materiaPrima[index].undMed_Id,
+                  datos_categoria.catMP_Nombre);
+              });
             });
           }
         });
+
+        // this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
+        //   for (let i = 0; i < datos_tintas.length; i++) {
+        //     this.categoriMpService.srvObtenerListaPorId(datos_tintas[i].catMP_Id).subscribe(datos_categoria => {
+        //       this.sumaSalida = 0;
+        //         this.sumaEntrada = 0;
+        //         this.inventInicial = 0;
+        //         this.inventInicial = 0;
+        //         // Asignaciones
+        //         for (const item of materia_cantidad) {
+        //           if (datos_tintas[i].tinta_Id == item.materiaPrima && item.categoria == 7) {
+        //             this.sumaSalida = this.sumaSalida + item.cantidad;
+        //             // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+        //           }
+        //         }
+        //         // Facturas
+        //         for (const item of materia_cantidad_factura) {
+        //           if (datos_tintas[i].tinta_Id == item.materiaPrima) {
+        //             this.sumaEntrada = this.sumaEntrada + item.cantidad;
+        //             // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+        //           }
+        //         }
+        //         // Remisiones
+        //         for (const item of materia_cantidad_remision) {
+        //           if (datos_tintas[i].tinta_Id == item.materiaPrima) {
+        //             this.sumaEntrada = this.sumaEntrada + item.cantidad;
+        //             // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+        //           }
+        //         }
+
+        //         // Recuperado
+        //         for (const item of materia_cantidad_recuperado) {
+        //           if (datos_tintas[i].tinta_Id == item.materiaPrima) {
+        //             this.sumaEntrada = this.sumaEntrada + item.cantidad;
+        //             // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+        //           }
+        //         }
+
+        //         this.inventInicial = 0;
+        //         this.inventInicial = 0;
+
+        //         this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+        //           datos_tintas[i].tinta_Id,
+        //           datos_tintas[i].tinta_Nombre,
+        //           datos_tintas[i].tinta_Precio,
+        //           this.inventInicial,
+        //           this.sumaEntrada,
+        //           this.sumaSalida,
+        //           datos_tintas[i].tinta_Stock,
+        //           datos_tintas[i].undMed_Id,
+        //           datos_categoria.catMP_Nombre);
+        //     });
+        //   }
+        // });
       }, 2000);
     }
   }

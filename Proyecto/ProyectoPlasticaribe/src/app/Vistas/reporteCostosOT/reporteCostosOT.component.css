@@ -103,6 +103,10 @@ a {
   font-size: 14px;
  }
 
+ .labelMateriaPrima{
+  font-size: 16px;
+ }
+
  .overlay{
   z-index: 2;
   position: fixed;

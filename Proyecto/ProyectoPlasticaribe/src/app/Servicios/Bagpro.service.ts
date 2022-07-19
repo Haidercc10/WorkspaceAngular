@@ -8,55 +8,76 @@ import { rutaBagPro, rutaBagProLocate } from 'src/polyfills';
 })
 export class BagproService {
 
-  readonly rutaPlasticaribeAPI = rutaBagPro;
+  readonly rutaBagPro = rutaBagProLocate;
 
   constructor(private http : HttpClient) { }
 
+  /* PROCSELLADO */
+
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
-  srvObtenerListaClienteOTItems():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/ClientesOtItems');
+  srvObtenerListaProcSellado():Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + '/ProcSellado');
   }
 
-  srvObtenerListaClienteOTItemsXItem(idItem : number):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/ClientesOtItems/OtItem/${idItem}`);
+  srvObtenerListaProcSelladoOT(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OT/${ot}`);
+  }
+
+  srvObtenerListaProcSelladoOT_FechaFinal(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/FechaFinOT/${ot}`);
+  }
+
+  /* PROCEXTRUSION */
+
+  // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
+  srvObtenerListaProcExt():Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + '/ProcExtrusion');
+  }
+
+  srvObtenerListaProcExtOt(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/OT/${ot}`);
+  }
+
+  srvObtenerListaProcExtOt_fechaFinal(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/FechaFinOT/${ot}`);
+  }
+
+  /* CLIENTESOT */
+
+  srvActualizar(id:number|String, data:any, estado : string) {
+    return this.http.put(this.rutaBagPro + `/ClientesOt/CambioEstadoOT/${id}?Estado=${estado}`, data);
   }
 
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
   srvObtenerListaClienteOT_Item(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/ClientesOt/OT/${ot}`);
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/OT/${ot}`);
   }
 
   srvObtenerListaClienteOT_ItemCostos(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/ClientesOt/CostosOT/${ot}`);
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/CostosOT/${ot}`);
   }
+
+  /* CLIENTESOTITEM */
 
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
-  srvObtenerListaProcExt():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/ProcExtrusion');
+  srvObtenerListaClienteOTItems():Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + '/ClientesOtItems');
   }
 
-  srvObtenerListaProcExtOt(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/ProcExtrusion/OT/${ot}`);
+  srvObtenerListaClienteOTItemsXItem(idItem : number):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/OtItem/${idItem}`);
   }
 
-  // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
-  srvObtenerListaProcSellado():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/ProcSellado');
-  }
-
-  srvObtenerListaProcSelladoOT(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/ProcSellado/OT/${ot}`);
-  }
+  /* DESPERDICIO */
 
   // CONSULTAS A LA TABLA PROC_DESPERDICIOS DE BAGPRO
   srvObtenerListaDespercicios():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Procdesperdicio');
+    return this.http.get<any>(this.rutaBagPro + '/Procdesperdicio');
   }
 
   srvObtenerListaDespercicios_Ot(ot : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Procdesperdicio/OT/${ot}`);
+    return this.http.get<any>(this.rutaBagPro + `/Procdesperdicio/OT/${ot}`);
   }
-
 
 
 
