@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribe3 } from 'src/polyfills';
+import { rutaPlasticaribe3, rutaPlasticaribeAPI } from 'src/polyfills';
 import { modelTintasMateriasPrimas } from '../Modelo/modelTintasMateriasPrimas';
 
 @Injectable({
@@ -9,7 +9,7 @@ import { modelTintasMateriasPrimas } from '../Modelo/modelTintasMateriasPrimas';
 })
 export class TintasMPService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient) { }
 
