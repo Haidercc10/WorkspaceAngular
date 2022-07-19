@@ -8,4 +8,5 @@ export interface modelBOPP{
   BOPP_Precio : number;
   TpBod_Id : number;
   BOPP_FechaIngreso : Date;
+  BOPP_Ancho : number;
 }

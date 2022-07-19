@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
+import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/detallesAsignacionBOPP.service';
 import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
@@ -28,6 +29,7 @@ export class AsignacionBOPPComponent implements OnInit {
   ArrayBOPP = []; //Varibale que almacenará los BOPP existentes
   ArrayBoppPedida = []; //variable que almacenará el BOPPP pedido por una orden de trabajo
   boppSeleccionado : any = []; //Variable que almacenará la informacion del bopp que haya sido selccionado
+  cantidadBOPP : number = 0;
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -35,7 +37,8 @@ export class AsignacionBOPPComponent implements OnInit {
                     private rolService : RolesService,
                       private boppService : EntradaBOPPService,
                         private asignacionBOPPService : AsignacionBOPPService,
-                          private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService) {
+                          private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,
+                            private bagProService : BagproService) {
 
     this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
       AsgBopp_OT : ['', Validators.required],
@@ -48,8 +51,8 @@ export class AsignacionBOPPComponent implements OnInit {
       boppId : ['', Validators.required],
       boppNombre : ['', Validators.required],
       boppSerial: ['', Validators.required],
-      boppStock: ['', Validators.required],
-      boppCantidad : ['', Validators.required],
+      // boppStock: ['', Validators.required],
+      // boppCantidad : ['', Validators.required],
     });
     this.load = true;
   }
@@ -93,11 +96,12 @@ export class AsignacionBOPPComponent implements OnInit {
     });
   }
 
-  //
+  //Funcion que buscará y mostrará los BOPP existentes
   obtenerBOPP(){
+    this.ArrayBOPP = [];
     this.boppService.srvObtenerLista().subscribe(datos_BOPP => {
       for (let i = 0; i < datos_BOPP.length; i++) {
-        this.ArrayBOPP.push(datos_BOPP[i]);
+        if (datos_BOPP[i].bopP_Cantidad != 0) this.ArrayBOPP.push(datos_BOPP[i]);
       }
     });
   }
@@ -115,6 +119,7 @@ export class AsignacionBOPPComponent implements OnInit {
     });
     this.FormularioBOPP.reset();
     this.ArrayBoppPedida = [];
+    this.cantidadBOPP = 0;
   }
 
   /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
@@ -130,6 +135,52 @@ export class AsignacionBOPPComponent implements OnInit {
     });
   }
 
+  infoOT(){
+    let ot : string = this.FormAsignacionBopp.value.AsgBopp_OT;
+    // let cantidadadicional: number = this.kgOT * 0.1;
+    // let cantidadFinal : number = cantidadadicional + this.kgOT;
+    // let cantAsig : number = 0; //Variable que almacena la cantidad de materia prima que se ha asignado hasta el momento
+
+    // this.load = false;
+    // this.bagProServices.srvObtenerListaClienteOT_Item(ot).subscribe(datos_procesos => {
+    //   if (datos_procesos.length != 0) {
+    //     for (let index = 0; index < datos_procesos.length; index++) {
+    //       this.kgOT = datos_procesos[index].datosotKg;
+    //       this.FormMateriaPrimaRetiro.setValue({
+    //         OTRetiro : this.FormMateriaPrimaRetiro.value.OTRetiro,
+    //         FechaRetiro : this.FormMateriaPrimaRetiro.value.FechaRetiro,
+    //         Maquina : this.FormMateriaPrimaRetiro.value.Maquina,
+    //         UsuarioRetiro : this.FormMateriaPrimaRetiro.value.UsuarioRetiro,
+    //         kgOt : this.kgOT,
+    //         EstadoRetiro : this.FormMateriaPrimaRetiro.value.EstadoRetiro,
+    //         ObservacionRetiro : this.FormMateriaPrimaRetiro.value.ObservacionRetiro,
+    //       });
+    //       this.asignacionMPService.srvObtenerListaPorOt(ot).subscribe(datos_asignaciones => {
+    //         if (datos_asignaciones.length != 0) {
+    //           for (let index = 0; index < datos_asignaciones.length; index++) {
+    //             if (datos_asignaciones[index].asigMP_OrdenTrabajo == ot) {
+    //               this.detallesAsignacionService.srvObtenerListaPorAsigId(datos_asignaciones[index].asigMp_Id).subscribe(datos_asignacionMp => {
+    //                 for (let i = 0; i < datos_asignacionMp.length; i++) {
+    //                   cantAsig = cantAsig + datos_asignacionMp[i].dtAsigMp_Cantidad;
+    //                 }
+    //               });
+    //             }
+    //           }
+    //         }
+    //       });
+    //       setTimeout(() => {
+    //         this.cantRestante = this.kgOT - cantAsig;
+    //         this.load = true;
+    //       }, 1000);
+    //       break;
+    //     }
+    //   } else {
+    //     Swal.fire(`La orden de trabajo N° ${ot} no se encuentra registrada en BagPro`);
+    //     this.load = true;
+    //   }
+    // });
+  }
+
   BOPPSeleccionado(){
     this.boppSeleccionado = [];
     let bopp : number = this.FormularioBOPP.value.boppNombre;
@@ -137,6 +188,7 @@ export class AsignacionBOPPComponent implements OnInit {
       for (let i = 0; i < datos_bopp.length; i++) {
         if (datos_bopp[i].bopP_Nombre == bopp) {
           this.boppSeleccionado.push(datos_bopp[i]);
+          this.cantidadBOPP = datos_bopp[i].bopP_Cantidad;
           this.cargarBOPP();
         }
       }
@@ -149,6 +201,7 @@ export class AsignacionBOPPComponent implements OnInit {
     this.boppService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
       for (let i = 0; i < datos_bopp.length; i++) {
         this.boppSeleccionado.push(datos_bopp[i]);
+        this.cantidadBOPP = datos_bopp[i].bopP_Cantidad;
         this.cargarBOPP();
       }
     });
@@ -160,8 +213,8 @@ export class AsignacionBOPPComponent implements OnInit {
         boppId : item.bopP_Id,
         boppSerial: item.bopP_Serial,
         boppNombre : item.bopP_Nombre,
-        boppStock: item.bopP_Cantidad,
-        boppCantidad : '',
+        // boppStock: item.bopP_Cantidad,
+        // boppCantidad : '',
       });
     }
   }
@@ -225,15 +278,17 @@ export class AsignacionBOPPComponent implements OnInit {
       let datos : any = {
         AsigBOPP_Id : idAsignacion,
         BOPP_Id : this.ArrayBoppPedida[i].Id,
-        DtAsigBOPP_Cantidad : this.ArrayBoppPedida[i].Cant,
+        DtAsigBOPP_Cantidad : this.cantidadBOPP,
         UndMed_Id : 'µm',
         Proceso_Id : 'EXT',
       }
 
       this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
-        this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
+        this.moverInventarioBOPP(datos.BOPP_Id, this.cantidadBOPP);
       });
     }
+
+    this.obtenerBOPP();
   }
 
   //
@@ -260,6 +315,7 @@ export class AsignacionBOPPComponent implements OnInit {
           bopP_Precio : item.bopP_Precio,
           tpBod_Id : item.tpBod_Id,
           bopP_FechaIngreso : item.bopP_FechaIngreso,
+          bopP_Ancho : item.bopP_Ancho,
         }
 
         this.boppService.srvActualizar(id, datosBOPP).subscribe(datos_boppActualizado => {

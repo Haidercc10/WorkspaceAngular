@@ -82,22 +82,22 @@
               <label for="floatingInput">Serial</label>
             </div>
             <!-- Nombre  -->
-            <div class="form-floating col-md-4">
+            <div class="form-floating col-md">
               <select formControlName="boppNombre" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" (change)="BOPPSeleccionado()">
                 <option [ngValue]="bopp.bopP_Nombre" *ngFor="let bopp of ArrayBOPP">{{bopp.bopP_Nombre}}</option>
               </select>
               <label for="floatingSelect">Nombre Bopp</label>
             </div>
               <!-- stock -->
-            <div class="form-floating col-md">
+            <!-- <div class="form-floating col-md">
               <input formControlName="boppStock" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapStock" placeholder="Stock" required  readonly onmousedown="return false;">
               <label for="floatingInput">Stock en micras (µm)</label>
-            </div>
+            </div> -->
             <!-- CANTIDAD -->
-            <div class="form-floating col-md">
+            <!-- <div class="form-floating col-md">
               <input formControlName="boppCantidad" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapCantidad" placeholder="Cantidad" required>
               <label for="floatingInput">Cantidaden micras (µm)</label>
-            </div>
+            </div> -->
             <!-- Unidad medida-->
             <!--<div class="form-floating col-md-2">
               <select formControlName="boppUndMed" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
@@ -134,10 +134,10 @@
               <thead class="TitulosTabla">
                 <tr>
                   <th id="idMateriaPrima" scope="col">ID</th>
-                  <th id="idMateriaPrima" scope="col">Serial</th>
+                  <th id="idMateriaPrima" scope="col">Pallet/Serial</th>
                   <th id="nombreMateriaPrima" scope="col">Nombre</th>
-                  <th id="cantidadMateriaPrima" scope="col">Cantidad</th>
-                  <th id="UnidadMedida" scope="col">Und Medida</th>
+                  <!-- <th id="cantidadMateriaPrima" scope="col">Cantidad</th>
+                  <th id="UnidadMedida" scope="col">Und Medida</th> -->
                   <!-- <th id="editar" scope="col">Editar</th> -->
                   <!-- <th id="eliminar" scope="col">Eliminar</th> -->
                 </tr>
@@ -148,8 +148,8 @@
                   <td id="idMateriaPrima">{{bopp.Id}}</td>
                   <td id="idMateriaPrima">{{bopp.Serial}}</td>
                   <td id="nombreMateriaPrima">{{bopp.Nombre}}</td>
-                  <th id="cantidadMateriaPrima">{{bopp.Cant}}</th>
-                  <td id="UnidadMedida">{{bopp.UndCant}}</td>
+                  <!-- <th id="cantidadMateriaPrima">{{bopp.Cant}}</th>
+                  <td id="UnidadMedida">{{bopp.UndCant}}</td> -->
                   <!-- <td id="Editar" (click)="EditarMateriaPrimaTabla(materiaPrima)"><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Materia Prima"></i></a></td> -->
                   <!-- <td id="Eliminar" (click)="QuitarMateriaPrimaTabla(i, materiaPrima)"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Materia Prima de la tabla"></i></a></td> -->
                 </tr>

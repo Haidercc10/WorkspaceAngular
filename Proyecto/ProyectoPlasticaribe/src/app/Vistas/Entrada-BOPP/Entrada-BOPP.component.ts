@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { faAnchor } from '@fortawesome/free-solid-svg-icons';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
@@ -34,7 +35,8 @@ export class EntradaBOPPComponent implements OnInit {
       Nombre : ['', Validators.required],
       serial : ['', Validators.required],
       cantidad : ['', Validators.required],
-      cantidadKg : ['', Validators.required],
+      precio : ['', Validators.required],
+      ancho : ['', Validators.required],
       undMed : ['', Validators.required],
       Fecha : ['', Validators.required],
       Observacion : ['', Validators.required],
@@ -64,7 +66,8 @@ export class EntradaBOPPComponent implements OnInit {
       Nombre : '',
       serial : '',
       cantidad : '',
-      cantidadKg : '',
+      precio : '',
+      ancho : '',
       undMed : '',
       Fecha : this.today,
       Observacion : '',
@@ -115,7 +118,8 @@ export class EntradaBOPPComponent implements OnInit {
       Nombre : '',
       serial : '',
       cantidad : '',
-      cantidadKg : '',
+      precio : '',
+      ancho : '',
       undMed : '',
       Fecha : this.today,
       Observacion : '',
@@ -128,7 +132,8 @@ export class EntradaBOPPComponent implements OnInit {
       Nombre : '',
       serial : '',
       cantidad : '',
-      cantidadKg : '',
+      precio : '',
+      ancho : '',
       undMed : '',
       Fecha : this.today,
       Observacion : '',
@@ -140,13 +145,17 @@ export class EntradaBOPPComponent implements OnInit {
     let cantidad : number = this.FormEntradaBOPP.value.cantidad;
     let nombre : string = this.FormEntradaBOPP.value.Nombre;
     let descripcion : string = this.FormEntradaBOPP.value.Observacion;
+    let precio : number = this.FormEntradaBOPP.value.precio;
+    let ancho : number = this.FormEntradaBOPP.value.ancho;
 
     let productoExt : any = {
       Serial : serial,
       Nombre : nombre,
       Descripcion : descripcion,
+      Ancho : ancho,
       Cant : cantidad,
       UndCant : 'µm',
+      Precio : precio,
     }
     this.ArrayBOPP.push(productoExt);
 
@@ -154,7 +163,8 @@ export class EntradaBOPPComponent implements OnInit {
       Nombre : '',
       serial : '',
       cantidad : '',
-      // cantidadKg : '',
+      precio : '',
+      ancho : '',
       undMed : '',
       Fecha : this.today,
       Observacion : '',
@@ -173,9 +183,10 @@ export class EntradaBOPPComponent implements OnInit {
           BOPP_Cantidad : this.ArrayBOPP[i].Cant,
           UndMed_Id : 'µm',
           CatMP_Id : 6,
-          BOPP_Precio : 0,
+          BOPP_Precio : this.ArrayBOPP[i].Precio,
           TpBod_Id : 8,
           BOPP_FechaIngreso : this.today,
+          BOPP_Ancho : this.ArrayBOPP[i].Ancho
         }
 
         this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(datos_BOPP => {
@@ -200,7 +211,8 @@ export class EntradaBOPPComponent implements OnInit {
             Nombre : '',
             serial : '',
             cantidad : '',
-            cantidadKg : '',
+            precio : '',
+            ancho : '',
             undMed : '',
             Fecha : this.today,
             Observacion : '',
