@@ -52,6 +52,9 @@ import { CrearUnidadesMedidasComponent } from './Vistas/crear-unidades-medidas/c
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { DevolucionesMPComponent } from './Vistas/devolucionesMP/devolucionesMP.component';
 import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion-Tintas.component';
+import { CrearTintasComponent } from './Vistas/crear-tintas/crear-tintas.component';
+import { ModalCrearMateriasPrimasComponent } from './Vistas/modal-crear-materias-primas/modal-crear-materias-primas.component';
+import { AsignacionBOPPComponent } from './Vistas/asignacion-bopp/asignacion-bopp.component';
 
 
 
@@ -94,6 +97,7 @@ export const routes: Routes = [
   {path: 'reporte-costos-ot', canActivate: [ValidacionLoginGuard], component: ReporteCostosOTComponent},
   {path: 'mp-devoluciones', canActivate: [ValidacionLoginGuard], component: DevolucionesMPComponent},
   {path: 'asignacion-tintas', canActivate: [ValidacionLoginGuard], component: AsignacionTintasComponent},
+  {path: 'asignacion-bopp', canActivate: [ValidacionLoginGuard], component: AsignacionBOPPComponent},
 ]
 
 @NgModule({
@@ -135,7 +139,10 @@ export const routes: Routes = [
     CrearUnidadesMedidasComponent,
     ReporteCostosOTComponent,
     DevolucionesMPComponent,
-    AsignacionTintasComponent
+    AsignacionTintasComponent,
+    CrearTintasComponent,
+    ModalCrearMateriasPrimasComponent,
+    AsignacionBOPPComponent
   ],
 
 

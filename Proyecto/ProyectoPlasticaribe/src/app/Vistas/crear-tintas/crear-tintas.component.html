@@ -1,0 +1,48 @@
+
+<form [formGroup]="formularioTintas" (ngSubmit)="agregarTintas()">
+  <!-- Inicio Fila 1 Agregar Unidad Medida -->
+  <div class="mb-3">
+    <div class="row g-3">
+         <!-- Id -->
+
+          <!-- Nombre -->
+        <div class="form-floating col-md">
+          <input formControlName="TintaNombre" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off" required>
+          <label for="floatingInput">Nombre</label>
+        </div>
+        <!-- Descripción -->
+        <div class="form-floating col-md">
+          <input formControlName="TintaDescripcion" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off" required>
+          <label for="floatingInput">Descripción</label>
+        </div>
+         <!-- Código Hexadecimal -->
+        <div class="form-floating col-md-2">
+          <input formControlName="TintaCodigoHexa" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off">
+          <label for="floatingInput" alt="Si no conoce el código Hexadecimal para este color, puede omitir este campo">Código Hexa</label>
+        </div>
+        <!-- Unidad Medida -->
+        <div class="form-floating col-md-2">
+          <select formControlName="TintaUndMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="unidadMedidas" *ngFor="let unidadMedidas of unidadMedida">{{unidadMedidas}}</option> <!--  {{unidadMedidas}} -->
+          </select>
+          <label for="floatingSelect">Und. Medida</label>
+        </div>
+        <!-- Precio -->
+        <div class="form-floating col-md-2">
+          <input formControlName="TintaPrecio" class="form-control form-control-sm" id="floatingInput" type="number" autocomplete="off" required>
+          <label for="floatingInput">Precio</label>
+        </div>
+
+    </div>
+  </div>
+  <!-- Fin Fila 1 -->
+
+  <!--Inicio Fila 2 Botones Agregar tintas y Limpiar Campos-->
+  <div class="mb-1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button class="btn btn-danger btn-danger-sm" type="submit">Agregar Tinta</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+    </div>
+  </div>
+  <!--Fin Fila 2-->
+</form>

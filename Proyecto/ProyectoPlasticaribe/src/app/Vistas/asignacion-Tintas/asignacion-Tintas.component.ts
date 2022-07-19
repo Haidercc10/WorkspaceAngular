@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { AsignacionMPService } from 'src/app/Servicios/asignacionMP.service';
 import { AsignacionMPxTintasService } from 'src/app/Servicios/asignacionMPxTintas.service';
+import { CrearMateriaprimaService } from 'src/app/Servicios/crear-materiaprima.service';
 import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/detallesAsignacionMPxTintas.service';
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
@@ -31,7 +32,8 @@ export class AsignacionTintasComponent implements OnInit {
   ArrayMateriaPrima = []; //Varibale que almacenará las materias primas que se estan asignando para crear una tinta
   AccionBoton = "Agregar"; //Varibale para saber si una materia prima está en edicion o no
   materiaPrimaSeleccionada = []; //Varibale que almacenará temporalmente la materia prima que se buscó por id o se seleccionó para poder llenar el resto de informacion de esta materia prima
-
+  public componenteCrearTintas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalCrearTintas();
+  public componenteCrearMateriasPrimas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
@@ -40,7 +42,8 @@ export class AsignacionTintasComponent implements OnInit {
                       private materiaPrimaService : MateriaPrimaService,
                         private tintasService : TintasService,
                           private asignacionMPxTintas : AsignacionMPxTintasService,
-                            private detallesAsignacionMPxTintas : DetallesAsignacionMPxTintasService) {
+                            private detallesAsignacionMPxTintas : DetallesAsignacionMPxTintasService,
+                            private crearMateriaPrima : CrearMateriaprimaService) {
 
     this.FormAsignacionMP = this.frmBuilder.group({
       Tinta : ['', Validators.required],
@@ -419,5 +422,13 @@ export class AsignacionTintasComponent implements OnInit {
       cantidadMateriaPrima : formulario,
       undMedMateriaPrima : formulario,
     });
+  }
+
+  llamarModalMateriasPrimas() {
+    this.componenteCrearMateriasPrimas = true;
+  }
+
+  llamarModalCrearTintas(){
+    this.componenteCrearTintas = true;
   }
 }

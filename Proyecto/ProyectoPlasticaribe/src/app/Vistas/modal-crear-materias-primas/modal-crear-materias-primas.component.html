@@ -1,0 +1,63 @@
+<form [formGroup]="FormCrearMateriaPrima" (ngSubmit)="obtenerUltimoIDMatPrima()">
+
+  <!-- Inicio Fila 1 Agregar Materia Prima -->
+  <div class="mb-3">
+    <div class="row g-3">
+        <!-- Nombre Materia Prima -->
+        <div class="form-floating col-md">
+          <input formControlName="mpNombre" type="text" class="form-control form-control-sm" id="floatingInput" placeholder="Nombre" required>
+          <label for="floatingInput">Nombre</label>
+        </div>
+
+      <!-- Descripción -->
+      <div class="form-floating col-md">
+        <input formControlName="mpdescripcion" class="form-control form-control-sm" id="floatingInput" placeholder="Descripción" required>
+        <label for="floatingInput">Descripción</label>
+      </div>
+       <!-- CATEGORIA  -->
+       <div class="form-floating col-md-2">
+        <select formControlName="mpCategoria" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+          <option [ngValue]="Categoria.catMP_Id" *ngFor="let Categoria of comboCategoriasMatPri">{{Categoria.catMP_Nombre}}</option>
+        </select>
+        <label for="floatingSelect">Categoria</label>
+      </div>
+    </div>
+  </div>
+  <!-- Fin Fila 1 -->
+
+  <!--Inicio Fila 2-->
+  <div class="mb-3">
+    <div class="row g-3">
+        <!-- Unidad medida-->
+        <div class="form-floating col-md-2">
+          <select formControlName="mpUnidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm"  aria-label=".form-select-sm example">
+            <option [ngValue]="unidadMedidas" *ngFor="let unidadMedidas of comboUnidadMedida">{{unidadMedidas}}</option>
+          </select>
+          <label for="floatingSelect">Und. Medida</label>
+        </div>
+      <!-- precio  -->
+      <div class="form-floating col-md-3">
+        <input formControlName="mpValor" type="number" id="floatingInput" class="form-control form-control-sm" placeholder="Precio" required>
+        <label for="floatingInput">Precio</label>
+      </div>
+       <!-- Tinta -->
+      <div class="form-floating col-md">
+        <select formControlName="mpTinta" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example"  required>
+          <option [ngValue]="tinta.tinta_Id" *ngFor="let tinta of comboTintas">{{tinta.tinta_Nombre}}</option>
+        </select>
+        <label for="floatingSelect">Tinta</label>
+      </div>
+    </div>
+  </div>
+  <!--Fin Fila 2 -->
+
+  <!--Inicio Fila 3 Botones y Limpiar Campos-->
+  <div class="mb-1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button class="btn btn-danger btn-danger-sm" type="submit">Crear</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar campos</button>
+    </div>
+  </div>
+  <!--Fin Fila 3-->
+</form>
+

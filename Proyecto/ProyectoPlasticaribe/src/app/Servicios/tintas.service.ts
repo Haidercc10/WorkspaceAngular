@@ -9,7 +9,7 @@ import { modelTintas } from '../Modelo/modelTintas';
 })
 export class TintasService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient) { }
 
