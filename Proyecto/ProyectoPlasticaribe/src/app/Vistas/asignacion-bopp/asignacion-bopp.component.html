@@ -71,27 +71,32 @@
       <form [formGroup]="FormularioBOPP">
         <div class="mb-3">
           <div class="row g-3">
+            <!--Id-->
+            <div class="form-floating col-md">
+              <input formControlName="boppId" type="number" id="floatingSelect" class="form-control form-control-sm" (keyup.enter)="BOPPBuscado()">
+              <label for="floatingInput">Id</label>
+            </div>
             <!--Serial-->
             <div class="form-floating col-md">
-              <input formControlName="boppSerial" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapCantidad" placeholder="Cantidad" required>
+              <input formControlName="boppSerial" type="number" id="floatingSelect" class="form-control form-control-sm" (keyup.enter)="BOPPBuscado()">
               <label for="floatingInput">Serial</label>
             </div>
             <!-- Nombre  -->
             <div class="form-floating col-md-4">
-              <select formControlName="boppNombre" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example">
-                <option [ngValue]="bopp" *ngFor="let bopp of ArrayBOPP">{{bopp}}</option>
+              <select formControlName="boppNombre" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" (change)="BOPPSeleccionado()">
+                <option [ngValue]="bopp.bopP_Nombre" *ngFor="let bopp of ArrayBOPP">{{bopp.bopP_Nombre}}</option>
               </select>
               <label for="floatingSelect">Nombre Bopp</label>
             </div>
               <!-- stock -->
             <div class="form-floating col-md">
               <input formControlName="boppStock" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapStock" placeholder="Stock" required  readonly onmousedown="return false;">
-              <label for="floatingInput">Stock</label>
+              <label for="floatingInput">Stock en micras (µm)</label>
             </div>
             <!-- CANTIDAD -->
             <div class="form-floating col-md">
-              <input formControlName="boppCantidadEnt" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapCantidad" placeholder="Cantidad" required>
-              <label for="floatingInput">Cantidad</label>
+              <input formControlName="boppCantidad" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapCantidad" placeholder="Cantidad" required>
+              <label for="floatingInput">Cantidaden micras (µm)</label>
             </div>
             <!-- Unidad medida-->
             <!--<div class="form-floating col-md-2">
@@ -128,6 +133,7 @@
             <table class="table table-bordered" >
               <thead class="TitulosTabla">
                 <tr>
+                  <th id="idMateriaPrima" scope="col">ID</th>
                   <th id="idMateriaPrima" scope="col">Serial</th>
                   <th id="nombreMateriaPrima" scope="col">Nombre</th>
                   <th id="cantidadMateriaPrima" scope="col">Cantidad</th>
@@ -138,7 +144,8 @@
               </thead>
               <tbody>
                 <tr>
-                <tr *ngFor="let bopp of ArrayBOPP let i = index">
+                <tr *ngFor="let bopp of ArrayBoppPedida let i = index">
+                  <td id="idMateriaPrima">{{bopp.Id}}</td>
                   <td id="idMateriaPrima">{{bopp.Serial}}</td>
                   <td id="nombreMateriaPrima">{{bopp.Nombre}}</td>
                   <th id="cantidadMateriaPrima">{{bopp.Cant}}</th>
@@ -164,7 +171,7 @@
           <div class="row g-3">
             <div class="mb-3">
               <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <button class="btn btn-danger btn-danger-sm" type="button">Crear Asignación</button>
+                <button class="btn btn-danger btn-danger-sm" type="button" (click)="asignarBOPP()">Crear Asignación</button>
                 <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosLosCampos()">Limpiar Todo</button>
               </div>
             </div>
