@@ -165,10 +165,10 @@ export class ModalCrearMateriasPrimasComponent implements OnInit {
       for (let index = 0; index < datos_MP.length; index++) {
         identificadoresMP = datos_MP[index].matPri_Id
       }
-      this.ultimoIdMateriaPrima = Math.max.apply(null, identificadoresMP);
-      this.ultimoIdMateriaPrima = this.ultimoIdMateriaPrima + 1;
+      //this.ultimoIdMateriaPrima = Math.max.apply(null, identificadoresMP);
+      //this.ultimoIdMateriaPrima = this.ultimoIdMateriaPrima + 1;
 
-      console.log(this.ultimoIdMateriaPrima);
+      console.log(identificadoresMP);
     });
   }
 }
