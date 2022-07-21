@@ -39,28 +39,28 @@
           <div class="row g-3">
             <!-- Nombre BOPP -->
             <div class="form-floating col-md-5">
-              <input formControlName="Nombre" type="text" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" >
+              <input formControlName="Nombre" type="text" class="form-control form-control-sm" id="floatingInput" required title="Nombre BOPP" >
               <label for="floatingInput">Nombre BOPP</label>
             </div>
 
             <!-- Serial BOPP -->
             <div class="form-floating col-md-3">
-              <input formControlName="serial" type="text" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" >
-              <label for="floatingInput">Serial BOPP</label>
+              <input formControlName="serial" type="text" class="form-control form-control-sm" id="floatingInput" required title="Serial BOPP" >
+              <label for="floatingInput">Pallet/Serial BOPP</label>
             </div>
 
             <div class="form-floating col-md-2">
-              <input formControlName="cantidad" type="text" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" >
+              <input formControlName="cantidad" type="text" class="form-control form-control-sm" id="floatingInput" required title="Cantidad Micras" >
               <label for="floatingInput">Cantidad en micras</label>
             </div>
 
             <div class="form-floating col-md-2">
-              <input formControlName="precio" type="text" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" >
+              <input formControlName="precio" type="text" class="form-control form-control-sm" id="floatingInput" required title="Precio Unitario" >
               <label for="floatingInput">Precio Unitario</label>
             </div>
 
             <div class="form-floating col-md-2">
-              <input formControlName="ancho" type="text" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" >
+              <input formControlName="ancho" type="number" class="form-control form-control-sm" id="floatingInput" required title="Ancho BOPP" >
               <label for="floatingInput">Ancho</label>
             </div>
 
@@ -74,13 +74,13 @@
 
             <!-- Fecha entrega -->
             <div class="form-floating col-md-2">
-              <input formControlName="Fecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" readonly onmousedown="return false;">
+              <input formControlName="Fecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha de Entrada" readonly onmousedown="return false;">
               <label for="floatingInput">Fecha Entrada</label>
             </div>
 
             <!-- Campo Observacion -->
             <div class="form-floating col-md">
-              <textarea formControlName="Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm" maxlength="200" ></textarea>
+              <textarea formControlName="Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm" maxlength="200" title="Descripción"></textarea>
               <label for="floatingTextArea">Decripción</label>
             </div>
           </div>
@@ -111,7 +111,7 @@
             <table class="table table-bordered" >
               <thead class="TitulosTabla">
                 <tr>
-                  <th id="idMateriaPrima" scope="col">Serial</th>
+                  <th id="idMateriaPrima" scope="col">Pallet/Serial</th>
                   <th id="nombreMateriaPrima" scope="col">Nombre</th>
                   <th id="nombreMateriaPrima" scope="col">Decripción</th>
                   <th id="cantidadMateriaPrima" scope="col">Cantidad (µm)</th>

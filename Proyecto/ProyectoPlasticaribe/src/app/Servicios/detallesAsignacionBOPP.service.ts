@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribe3 } from 'src/polyfills';
+import { rutaPlasticaribe3, rutaPlasticaribeAPI } from 'src/polyfills';
 import { modelDetallesAsignacionBopp } from '../Modelo/modelDetallesAsignacionBopp';
 
 @Injectable( { providedIn: 'root' } )
 
 export class DetalleAsignacion_BOPPService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient) { }
 

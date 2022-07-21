@@ -8,7 +8,7 @@ import { modelBOPP } from '../Modelo/modelBOPP';
 
 export class EntradaBOPPService {
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribe3;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   constructor(private http : HttpClient) { }
 

@@ -199,10 +199,13 @@ export class AsignacionBOPPComponent implements OnInit {
     this.boppSeleccionado = [];
     let serial : string = this.FormularioBOPP.value.boppSerial;
     this.boppService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
-      for (let i = 0; i < datos_bopp.length; i++) {
-        this.boppSeleccionado.push(datos_bopp[i]);
-        this.cantidadBOPP = datos_bopp[i].bopP_Cantidad;
-        this.cargarBOPP();
+      if (datos_bopp.length == 0) Swal.fire("El Pallet/Serial no se encuentra registrado.");
+      else {
+        for (let i = 0; i < datos_bopp.length; i++) {
+          this.boppSeleccionado.push(datos_bopp[i]);
+          this.cantidadBOPP = datos_bopp[i].bopP_Cantidad;
+          this.cargarBOPP();
+        }
       }
     });
   }
@@ -335,10 +338,10 @@ export class AsignacionBOPPComponent implements OnInit {
             title: 'Asignación de BOPP registrada con exito!'
           });
           this.limpiarTodosLosCampos();
+          this.obtenerBOPP();
 
         }, error => { console.log(error); });
       }
     });
   }
-
 }

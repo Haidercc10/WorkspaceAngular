@@ -8,6 +8,7 @@ import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
 import { DetallesAsignacionTintasService } from 'src/app/Servicios/detallesAsignacionTintas.service';
+import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
 import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
 import { FactuaMpCompradaService } from 'src/app/Servicios/facturaMpComprada.service';
@@ -110,7 +111,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                                             private asignacionTintasService : DetallesAsignacionTintasService,
                                               private recuperadoService : RecuperadoService,
                                                 private recuperadoMPService : RecuperadoMPService,
-                                                  private inventInicialDiaService : InventInicialDiaService,) {
+                                                  private inventInicialDiaService : InventInicialDiaService,
+                                                    private boppService : EntradaBOPPService,) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : new FormControl(),
@@ -1555,6 +1557,12 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             });
           }
         });
+
+        // this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+        //   for (let i = 0; i < datos_bopp.length; i++) {
+        //     this.categoria
+        //   }
+        // });
 
         // this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
         //   for (let i = 0; i < datos_tintas.length; i++) {
