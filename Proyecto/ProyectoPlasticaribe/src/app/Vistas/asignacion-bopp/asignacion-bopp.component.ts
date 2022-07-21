@@ -51,8 +51,8 @@ export class AsignacionBOPPComponent implements OnInit {
       boppId : ['', Validators.required],
       boppNombre : ['', Validators.required],
       boppSerial: ['', Validators.required],
-      // boppStock: ['', Validators.required],
-      // boppCantidad : ['', Validators.required],
+      boppStock: ['', Validators.required],
+      boppCantidad : ['', Validators.required],
     });
     this.load = true;
   }
@@ -101,7 +101,7 @@ export class AsignacionBOPPComponent implements OnInit {
     this.ArrayBOPP = [];
     this.boppService.srvObtenerLista().subscribe(datos_BOPP => {
       for (let i = 0; i < datos_BOPP.length; i++) {
-        if (datos_BOPP[i].bopP_Cantidad != 0) this.ArrayBOPP.push(datos_BOPP[i]);
+        if (datos_BOPP[i].bopP_CantidadKg != 0) this.ArrayBOPP.push(datos_BOPP[i]);
       }
     });
   }
@@ -203,7 +203,6 @@ export class AsignacionBOPPComponent implements OnInit {
       else {
         for (let i = 0; i < datos_bopp.length; i++) {
           this.boppSeleccionado.push(datos_bopp[i]);
-          this.cantidadBOPP = datos_bopp[i].bopP_Cantidad;
           this.cargarBOPP();
         }
       }
@@ -216,8 +215,8 @@ export class AsignacionBOPPComponent implements OnInit {
         boppId : item.bopP_Id,
         boppSerial: item.bopP_Serial,
         boppNombre : item.bopP_Nombre,
-        // boppStock: item.bopP_Cantidad,
-        // boppCantidad : '',
+        boppStock: item.bopP_CantidadKg,
+        boppCantidad : '',
       });
     }
   }
@@ -233,17 +232,20 @@ export class AsignacionBOPPComponent implements OnInit {
     let serial : string = this.FormularioBOPP.value.boppSerial;
     let nombre : string = this.FormularioBOPP.value.boppNombre;
     let cantidad : number = this.FormularioBOPP.value.boppCantidad;
+    let stock : number = this.FormularioBOPP.value.boppStock;
 
-    let bopp : any = {
-      Id : id,
-      Serial : serial,
-      Nombre : nombre,
-      Cant : cantidad,
-      UndCant : 'µm',
-    }
+    if (cantidad <= stock) {
+      let bopp : any = {
+        Id : id,
+        Serial : serial,
+        Nombre : nombre,
+        Cant : cantidad,
+        UndCant : 'Kg',
+      }
 
-    this.ArrayBoppPedida.push(bopp);
-    this.FormularioBOPP.reset();
+      this.ArrayBoppPedida.push(bopp);
+      this.FormularioBOPP.reset();
+    } else Swal.fire("¡No se puede asignar una cantidad mayor a la que hay en stock!");
   }
 
   //
@@ -281,13 +283,13 @@ export class AsignacionBOPPComponent implements OnInit {
       let datos : any = {
         AsigBOPP_Id : idAsignacion,
         BOPP_Id : this.ArrayBoppPedida[i].Id,
-        DtAsigBOPP_Cantidad : this.cantidadBOPP,
-        UndMed_Id : 'µm',
-        Proceso_Id : 'EXT',
+        DtAsigBOPP_Cantidad : this.ArrayBoppPedida[i].Cant,
+        UndMed_Id : 'Kg',
+        Proceso_Id : 'CORTE',
       }
 
       this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
-        this.moverInventarioBOPP(datos.BOPP_Id, this.cantidadBOPP);
+        this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
       });
     }
 
@@ -300,7 +302,7 @@ export class AsignacionBOPPComponent implements OnInit {
       let bopp : any = [];
       bopp.push(datos_bopp);
       for (const item of bopp) {
-        let stock : number = item.bopP_Cantidad;
+        let stock : number = item.bopP_CantidadKg;
         let cantidadFinal : number = stock - cantidad;
 
         let FechaDatetime = item.bopP_FechaIngreso;
@@ -312,13 +314,15 @@ export class AsignacionBOPPComponent implements OnInit {
           bopP_Nombre : item.bopP_Nombre,
           bopP_Descripcion : item.bopP_Descripcion,
           bopP_Serial : item.bopP_Serial,
-          bopP_Cantidad : cantidadFinal,
+          bopP_Cantidad :  item.bopP_Cantidad,
           undMed_Id : item.undMed_Id,
           catMP_Id : item.catMP_Id,
           bopP_Precio : item.bopP_Precio,
           tpBod_Id : item.tpBod_Id,
           bopP_FechaIngreso : item.bopP_FechaIngreso,
           bopP_Ancho : item.bopP_Ancho,
+          bopP_CantidadKg : cantidadFinal,
+          UndMed_Kg : item.undMed_Kg,
         }
 
         this.boppService.srvActualizar(id, datosBOPP).subscribe(datos_boppActualizado => {

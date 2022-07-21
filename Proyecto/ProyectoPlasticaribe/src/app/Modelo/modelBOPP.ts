@@ -9,4 +9,6 @@ export interface modelBOPP{
   TpBod_Id : number;
   BOPP_FechaIngreso : Date;
   BOPP_Ancho : number;
+  BOPP_CantidadKg : number;
+  UndMed_Kg : string;
 }

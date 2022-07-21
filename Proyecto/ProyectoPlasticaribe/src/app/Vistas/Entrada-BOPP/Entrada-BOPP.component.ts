@@ -35,6 +35,7 @@ export class EntradaBOPPComponent implements OnInit {
       Nombre : ['', Validators.required],
       serial : ['', Validators.required],
       cantidad : ['', Validators.required],
+      cantidadKG : ['', Validators.required],
       precio : ['', Validators.required],
       ancho : ['', Validators.required],
       undMed : ['', Validators.required],
@@ -66,6 +67,7 @@ export class EntradaBOPPComponent implements OnInit {
       Nombre : '',
       serial : '',
       cantidad : '',
+      cantidadKG : '',
       precio : '',
       ancho : '',
       undMed : '',
@@ -118,6 +120,7 @@ export class EntradaBOPPComponent implements OnInit {
       Nombre : '',
       serial : '',
       cantidad : '',
+      cantidadKG : '',
       precio : '',
       ancho : '',
       undMed : '',
@@ -132,6 +135,7 @@ export class EntradaBOPPComponent implements OnInit {
       Nombre : '',
       serial : '',
       cantidad : '',
+      cantidadKG : '',
       precio : '',
       ancho : '',
       undMed : '',
@@ -143,6 +147,7 @@ export class EntradaBOPPComponent implements OnInit {
   cargarBOPPTabla(){
     let serial : number = this.FormEntradaBOPP.value.serial;
     let cantidad : number = this.FormEntradaBOPP.value.cantidad;
+    let cantidadKg : number = this.FormEntradaBOPP.value.cantidadKG;
     let nombre : string = this.FormEntradaBOPP.value.Nombre;
     let descripcion : string = this.FormEntradaBOPP.value.Observacion;
     let precio : number = this.FormEntradaBOPP.value.precio;
@@ -155,6 +160,8 @@ export class EntradaBOPPComponent implements OnInit {
       Ancho : ancho,
       Cant : cantidad,
       UndCant : 'µm',
+      CantKg : cantidadKg,
+      UndCantKg : 'Kg',
       Precio : precio,
     }
     this.ArrayBOPP.push(productoExt);
@@ -163,6 +170,7 @@ export class EntradaBOPPComponent implements OnInit {
       Nombre : '',
       serial : '',
       cantidad : '',
+      cantidadKG : '',
       precio : '',
       ancho : '',
       undMed : '',
@@ -186,7 +194,9 @@ export class EntradaBOPPComponent implements OnInit {
           BOPP_Precio : this.ArrayBOPP[i].Precio,
           TpBod_Id : 8,
           BOPP_FechaIngreso : this.today,
-          BOPP_Ancho : this.ArrayBOPP[i].Ancho
+          BOPP_Ancho : this.ArrayBOPP[i].Ancho,
+          BOPP_CantidadKg : this.ArrayBOPP[i].CantKg,
+          UndMed_Kg : 'Kg',
         }
 
         this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(datos_BOPP => {
@@ -211,6 +221,7 @@ export class EntradaBOPPComponent implements OnInit {
             Nombre : '',
             serial : '',
             cantidad : '',
+            cantidadKG : '',
             precio : '',
             ancho : '',
             undMed : '',

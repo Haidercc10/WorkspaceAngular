@@ -25,6 +25,9 @@ export class AsignacionBOPPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/fecha/${id}`)
   }
 
+  srvObtenerListaPorfechas(fecha1 : any, fecha2 : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/fechas?AsigBOPP_FechaEntrega1=${fecha1}&AsigBOPP_FechaEntrega2=${fecha2}`)
+  }
   //Metodo agregar
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Asignacion_BOPP', data)

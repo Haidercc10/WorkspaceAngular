@@ -49,39 +49,40 @@
               <label for="floatingInput">Pallet/Serial BOPP</label>
             </div>
 
+            <!-- Cantidad de micras -->
             <div class="form-floating col-md-2">
               <input formControlName="cantidad" type="text" class="form-control form-control-sm" id="floatingInput" required title="Cantidad Micras" >
-              <label for="floatingInput">Cantidad en micras</label>
+              <label for="floatingInput">Cantidad en micras (µm)</label>
             </div>
 
+            <!-- Cantidad de Kilogramos -->
+            <div class="form-floating col-md-2">
+              <input formControlName="cantidadKG" type="text" class="form-control form-control-sm" id="floatingInput" required title="Cantidad Micras" >
+              <label for="floatingInput">Cantidad en Kilogramos (Kg)</label>
+            </div>
+
+            <!-- precio unitario -->
             <div class="form-floating col-md-2">
               <input formControlName="precio" type="number" class="form-control form-control-sm" id="floatingInput" required title="Precio Unitario" >
               <label for="floatingInput">Precio Unitario</label>
             </div>
 
+            <!-- Ancho -->
             <div class="form-floating col-md-2">
               <input formControlName="ancho" type="number" class="form-control form-control-sm" id="floatingInput" required title="Ancho BOPP" >
               <label for="floatingInput">Ancho</label>
-            </div>
-
-            <!-- Unidad medida-->
-            <!-- <div class="form-floating col-md-2">
-              <select formControlName="undMed" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-                <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
-              </select>
-              <label for="floatingSelect">Und. Medida</label>
-            </div> -->
-
-            <!-- Fecha entrega -->
-            <div class="form-floating col-md-2">
-              <input formControlName="Fecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha de Entrada" readonly onmousedown="return false;">
-              <label for="floatingInput">Fecha Entrada</label>
             </div>
 
             <!-- Campo Observacion -->
             <div class="form-floating col-md">
               <textarea formControlName="Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm" maxlength="200" title="Descripción"></textarea>
               <label for="floatingTextArea">Decripción</label>
+            </div>
+
+            <!-- Fecha entrega -->
+            <div class="form-floating col-md-2">
+              <input formControlName="Fecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha de Entrada" readonly onmousedown="return false;">
+              <label for="floatingInput">Fecha Entrada</label>
             </div>
           </div>
         </div>
@@ -116,8 +117,10 @@
                   <th id="nombreMateriaPrima" scope="col">Decripción</th>
                   <th id="cantidadMateriaPrima" scope="col">Cantidad (µm)</th>
                   <th id="UnidadMedida" scope="col">Und Medida</th>
+                  <th id="cantidadMateriaPrima" scope="col">Cantidad (Kg)</th>
+                  <th id="UnidadMedida" scope="col">Und Medida</th>
                   <th id="cantidadMateriaPrima" scope="col">Ancho</th>
-                  <th id="cantidadMateriaPrima" scope="col">Precio</th>
+                  <th id="cantidadMateriaPrima" scope="col">Precio Und</th>
                   <!-- <th id="editar" scope="col">Editar</th> -->
                   <!-- <th id="eliminar" scope="col">Eliminar</th> -->
                 </tr>
@@ -130,6 +133,8 @@
                   <td id="nombreMateriaPrima">{{bopp.Descripcion}}</td>
                   <th id="cantidadMateriaPrima">{{bopp.Cant}}</th>
                   <td id="UnidadMedida">{{bopp.UndCant}}</td>
+                  <th id="cantidadMateriaPrima">{{bopp.CantKg}}</th>
+                  <td id="UnidadMedida">{{bopp.UndCantKg}}</td>
                   <th id="cantidadMateriaPrima">{{bopp.Ancho}}</th>
                   <th id="cantidadMateriaPrima">{{bopp.Precio}}</th>
                   <!-- <td id="Editar" (click)="EditarMateriaPrimaTabla(materiaPrima)"><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Materia Prima"></i></a></td> -->

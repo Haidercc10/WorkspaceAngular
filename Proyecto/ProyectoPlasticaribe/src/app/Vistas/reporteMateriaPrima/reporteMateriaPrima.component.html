@@ -32,7 +32,7 @@
         <!-- ID/Nombre Producto -->
         <div class="form-floating col-md">
           <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
-            <option [ngValue]="materiaPrima.matPri_Id" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima.matPri_Nombre}}</option>
+            <option [ngValue]="materiaPrima.Id" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima.Nombre}}</option>
           </select>
           <label for="floatingSelect">Nombre de la Materia Prima</label>
         </div>

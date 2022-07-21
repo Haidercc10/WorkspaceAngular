@@ -10,6 +10,11 @@ import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
 import { info } from 'console';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { EstadosService } from 'src/app/Servicios/estados.service';
+import { TintasService } from 'src/app/Servicios/tintas.service';
+import { DetallesAsignacionTintasService } from 'src/app/Servicios/detallesAsignacionTintas.service';
+import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
+import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
+import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/detallesAsignacionBOPP.service';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -49,6 +54,9 @@ export class ReporteCostosOTComponent implements OnInit {
   cantidadWiketiadoUnidad : number = 0; //Varibale que calculará la cantidad total de unidades en wiketiado, esto se en caso de que la presentación del producto sea en unidad
   cantidadEmpaqueUnidad : number = 0; //Varibale que calculará la cantidad total de unidades en empaque, esto se en caso de que la presentación del producto sea en unidad
   estados = []; //Variable que va a almacenar los estados que tendrá la orden de trabajo
+  sumaValorExtruido : number = 0; //Variable que servirá para mostrar el valor total de la materia prima que se utulizó en extrusion
+  sumaValorImpresion : number = 0; //Variable que servirá para mostrar el valor total de materia prima utilizada en impresión
+  sumaValorRotograbado : number = 0; //Variable que servirá para mostrar el valor total de la materia prima utilizada en rotograbado
 
   // Variables globlales que almacenarán la informacion general de la orden de trabajo que se mostrará en el PDF
   ordenTrabajo : number = 0;
@@ -74,7 +82,12 @@ export class ReporteCostosOTComponent implements OnInit {
                     private rolService : RolesService,
                       private asignacionMPService : AsignacionMPService,
                         private detallesAsignacionService : DetallesAsignacionService,
-                          private materiaPrimaService : MateriaPrimaService,) {
+                          private materiaPrimaService : MateriaPrimaService,
+                            private tintasService : TintasService,
+                              private detallesAsignacionTintasService : DetallesAsignacionTintasService,
+                                private boppService : EntradaBOPPService,
+                                  private asignacionBOPPService : AsignacionBOPPService,
+                                    private detallesAsigBOPPService : DetalleAsignacion_BOPPService) {
 
 
     this.infoOT = this.frmBuilderMateriaPrima.group({
@@ -206,6 +219,8 @@ export class ReporteCostosOTComponent implements OnInit {
   //Funcion que consultará la OT que le sea pasada y mostrará la información general de dicha Orden de Trabajo
   consultaOTBagPro(){
     this.ArrayMateriaPrima = [];
+    this.totalMPEntregada = 0;
+    this.ValorMPEntregada = 0;
     this.load = false;
     this.valorFinalOT = 0;
     this.diferencia = 0;
@@ -268,6 +283,7 @@ export class ReporteCostosOTComponent implements OnInit {
               }
             }
           });
+          this
           break;
         }
       }
@@ -467,9 +483,6 @@ export class ReporteCostosOTComponent implements OnInit {
 
   // Funcion para llenar la tabla con la materia prima que se ha pedido para la OT consultada
   llenarTablaMP(formulario : any){
-    this.ArrayMateriaPrima = [];
-    this.totalMPEntregada = 0;
-    this.ValorMPEntregada = 0;
 
     this.materiaPrimaService.srvObtenerListaPorId(formulario.matPri_Id).subscribe(datos_materiaPrima => {
       const infoDoc : any = {
@@ -488,6 +501,16 @@ export class ReporteCostosOTComponent implements OnInit {
       this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
     });
     this.load = true;
+  }
+
+  // Funcion que servirá para llenar la tabla de materias primas utilizadas con el BOPP que se asignó para la OT consultada
+  llenarTablaBOPP(){
+
+  }
+
+  // Funcion que servirá para llenar la tabla de materias primas utilizadas con las tintas que se asignaron para la OT consultada
+  llenarTablaTintas(){
+
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
