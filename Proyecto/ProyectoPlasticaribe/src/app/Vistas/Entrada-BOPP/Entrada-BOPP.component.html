@@ -55,7 +55,7 @@
             </div>
 
             <div class="form-floating col-md-2">
-              <input formControlName="precio" type="text" class="form-control form-control-sm" id="floatingInput" required title="Precio Unitario" >
+              <input formControlName="precio" type="number" class="form-control form-control-sm" id="floatingInput" required title="Precio Unitario" >
               <label for="floatingInput">Precio Unitario</label>
             </div>
 
@@ -116,6 +116,7 @@
                   <th id="nombreMateriaPrima" scope="col">Decripción</th>
                   <th id="cantidadMateriaPrima" scope="col">Cantidad (µm)</th>
                   <th id="UnidadMedida" scope="col">Und Medida</th>
+                  <th id="cantidadMateriaPrima" scope="col">Ancho</th>
                   <th id="cantidadMateriaPrima" scope="col">Precio</th>
                   <!-- <th id="editar" scope="col">Editar</th> -->
                   <!-- <th id="eliminar" scope="col">Eliminar</th> -->
@@ -129,7 +130,8 @@
                   <td id="nombreMateriaPrima">{{bopp.Descripcion}}</td>
                   <th id="cantidadMateriaPrima">{{bopp.Cant}}</th>
                   <td id="UnidadMedida">{{bopp.UndCant}}</td>
-                  <th id="cantidadMateriaPrima">{{bopp.Precio}} KG</th>
+                  <th id="cantidadMateriaPrima">{{bopp.Ancho}}</th>
+                  <th id="cantidadMateriaPrima">{{bopp.Precio}}</th>
                   <!-- <td id="Editar" (click)="EditarMateriaPrimaTabla(materiaPrima)"><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Materia Prima"></i></a></td> -->
                   <!-- <td id="Eliminar" (click)="QuitarMateriaPrimaTabla(i, materiaPrima)"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Materia Prima de la tabla"></i></a></td> -->
                 </tr>

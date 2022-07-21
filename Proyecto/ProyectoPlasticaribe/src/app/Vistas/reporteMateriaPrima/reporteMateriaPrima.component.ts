@@ -3,10 +3,12 @@ import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms'
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { AreaService } from 'src/app/Servicios/area.service';
+import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
 import { AsignacionMPService } from 'src/app/Servicios/asignacionMP.service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
+import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/detallesAsignacionBOPP.service';
 import { DetallesAsignacionTintasService } from 'src/app/Servicios/detallesAsignacionTintas.service';
 import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
@@ -112,7 +114,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                                               private recuperadoService : RecuperadoService,
                                                 private recuperadoMPService : RecuperadoMPService,
                                                   private inventInicialDiaService : InventInicialDiaService,
-                                                    private boppService : EntradaBOPPService,) {
+                                                    private boppService : EntradaBOPPService,
+                                                      private asignacionBOPPService : AsignacionBOPPService,
+                                                        private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : new FormControl(),
@@ -383,6 +387,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     let materia_cantidad_factura = [];
     let materia_cantidad_remision = [];
     let materia_cantidad_recuperado = [];
+    let bopp_entrante = [];
+    let bopp_Saliente = [];
 
     if (fecha != null && fechaFinal != null && (materiaPrima != null || idMateriaPrima != null)) {
       this.load = false;
@@ -1451,10 +1457,37 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       });
 
+      this.boppService.srvObtenerListaPorFecha(this.today).subscribe(datos_bopp => {
+        for (let i = 0; i < datos_bopp.length; i++) {
+          const matCant : any = {
+            materiaPrima : datos_bopp[i].bopP_Id,
+            cantidad : datos_bopp[i].bopP_Cantidad,
+          }
+          bopp_entrante.push(matCant);
+        }
+      });
+
+      this.asignacionBOPPService.srvObtenerListaPorfecha(this.today).subscribe(datos_asignacionBopp => {
+        for (let i = 0; i < datos_asignacionBopp.length; i++) {
+          this.detallesAsignacionBOPPService.srvObtenerListaPorAsignacion(datos_asignacionBopp[i].asigBOPP_Id).subscribe(datos_detallesAsgBopp => {
+            for (let j = 0; j < datos_detallesAsgBopp.length; j++) {
+              this.boppService.srvObtenerListaPorId(datos_detallesAsgBopp[j].bopP_Id).subscribe(datos_bopp => {
+                for (let i = 0; i < datos_bopp.length; i++) {
+                  const matCant : any = {
+                    materiaPrima : datos_bopp[i].bopP_Id,
+                    cantidad : datos_bopp[i].bopP_Cantidad,
+                  }
+                  bopp_Saliente.push(matCant);
+                }
+              });
+            }
+          });
+        }
+      });
+
       this.facturaCompraService.srvObtenerListaPorFecha(this.today).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
           this.facturaCompraMPService.srvObtenerListaPorFacId(datos_factura[i].facco_Id).subscribe(datos_facturaMP => {
-            console.log(datos_facturaMP)
             for (let j = 0; j < datos_facturaMP.length; j++) {
               this.materiaPrimaService.srvObtenerListaPorId(datos_facturaMP[j].matPri_Id).subscribe(datos_materiaPrima => {
                 const matCant : any = {
@@ -1558,11 +1591,39 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
         });
 
-        // this.boppService.srvObtenerLista().subscribe(datos_bopp => {
-        //   for (let i = 0; i < datos_bopp.length; i++) {
-        //     this.categoria
-        //   }
-        // });
+        this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+          for (let i = 0; i < datos_bopp.length; i++) {
+            this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
+
+              for (const item of bopp_Saliente) {
+                if (datos_bopp[i].bopP_Id == item.materiaPrima && item.categoria != 7) {
+                  this.sumaSalida = this.sumaSalida + item.cantidad;
+                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+                }
+              }
+              // Facturas
+              for (const item of bopp_entrante) {
+                if (datos_bopp[i].bopP_Id == item.materiaPrima) {
+                  this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+                }
+              }
+
+              this.inventInicial = 0;
+
+              this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                datos_bopp[i].bopP_Serial,
+                datos_bopp[i].bopP_Nombre,
+                datos_bopp[i].bopP_Precio,
+                this.inventInicial,
+                this.sumaEntrada,
+                this.sumaSalida,
+                datos_bopp[i].bopP_Cantidad,
+                datos_bopp[i].undMed_Id,
+                datos_categoria.catMP_Nombre);
+            });
+          }
+        });
 
         // this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
         //   for (let i = 0; i < datos_tintas.length; i++) {

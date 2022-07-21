@@ -25,6 +25,10 @@ export class EntradaBOPPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/serial/${id}`)
   }
 
+  srvObtenerListaPorFecha(id : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/fecha/${id}`)
+  }
+
   //Metodo agregar
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/BOPP', data)
