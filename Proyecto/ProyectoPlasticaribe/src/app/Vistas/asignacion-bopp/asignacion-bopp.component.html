@@ -73,7 +73,7 @@
           <div class="row g-3">
             <!--Id-->
             <div class="form-floating col-md">
-              <input formControlName="boppId" type="number" id="floatingSelect" class="form-control form-control-sm" (keyup.enter)="BOPPBuscado()">
+              <input formControlName="boppId" type="number" id="floatingSelect" class="form-control form-control-sm">
               <label for="floatingInput">Id</label>
             </div>
             <!--Serial-->
@@ -83,7 +83,7 @@
             </div>
             <!-- Nombre  -->
             <div class="form-floating col-md">
-              <select formControlName="boppNombre" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" (change)="BOPPSeleccionado()">
+              <select formControlName="boppNombre" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example">
                 <option [ngValue]="bopp.bopP_Nombre" *ngFor="let bopp of ArrayBOPP">{{bopp.bopP_Nombre}}</option>
               </select>
               <label for="floatingSelect">Nombre Bopp</label>

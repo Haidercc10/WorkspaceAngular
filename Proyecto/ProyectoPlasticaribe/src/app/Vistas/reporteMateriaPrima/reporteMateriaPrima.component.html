@@ -38,7 +38,7 @@
         </div>
         <!-- ID/Nombre Producto -->
         <div class="form-floating col-md-2">
-          <select formControlName="MpCategoria" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
+          <select formControlName="MpCategoria" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
             <option [ngValue]="categoria.catMP_Id" *ngFor="let categoria of categorias">{{categoria.catMP_Nombre}}</option>
           </select>
           <label for="floatingSelect">Categorias de Materia Prima</label>

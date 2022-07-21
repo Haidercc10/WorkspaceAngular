@@ -1249,6 +1249,40 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       });
 
+      this.boppService.srvObtenerListaPorFecha(this.today).subscribe(datos_bopp => {
+        for (let i = 0; i < datos_bopp.length; i++) {
+          if (datos_bopp[i].catMP_Id == categoria) {
+            const matCant : any = {
+              materiaPrima : datos_bopp[i].bopP_Id,
+              cantidad : datos_bopp[i].bopP_Cantidad,
+            }
+            bopp_entrante.push(matCant);
+          }
+        }
+      });
+
+      this.asignacionBOPPService.srvObtenerListaPorfecha(this.today).subscribe(datos_asignacionBopp => {
+        for (let i = 0; i < datos_asignacionBopp.length; i++) {
+          this.detallesAsignacionBOPPService.srvObtenerListaPorAsignacion(datos_asignacionBopp[i].asigBOPP_Id).subscribe(datos_detallesAsgBopp => {
+            for (let j = 0; j < datos_detallesAsgBopp.length; j++) {
+              this.boppService.srvObtenerListaPorId(datos_detallesAsgBopp[j].bopP_Id).subscribe(datos_bopp => {
+                let bopp : any = [];
+                bopp.push(datos_bopp);
+                for (const item of bopp) {
+                  if (item.catMP_Id == categoria) {
+                    const matCant : any = {
+                      materiaPrima : item.bopP_Id,
+                      cantidad : datos_detallesAsgBopp[j].dtAsigBOPP_Cantidad,
+                    }
+                    bopp_Saliente.push(matCant);
+                  }
+                }
+              });
+            }
+          });
+        }
+      });
+
       this.facturaCompraService.srvObtenerListaPorFecha(this.today).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
           this.facturaCompraMPService.srvObtenerListaPorFacId(datos_factura[i].facco_Id).subscribe(datos_facturaMP => {
@@ -1306,10 +1340,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
       setTimeout(() => {
         this.materiaPrimaService.srvObtenerListaPorCategoria(categoria).subscribe(datos_materiaPrima => {
-          if (datos_materiaPrima.length == 0) {
-            Swal.fire(`No se encuentra ninguna materia prima con la categoria ${categoria}`);
-            this.load = true;
-          }
           for (let index = 0; index < datos_materiaPrima.length; index++) {
             if (datos_materiaPrima[index].catMP_Id == categoria) {
               this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima[index].catMP_Id).subscribe(datos_categoria => {
@@ -1362,6 +1392,42 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                     datos_materiaPrima[index].undMed_Id,
                     datos_categoria.catMP_Nombre);
                 });
+              });
+            }
+          }
+        });
+
+        this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+          for (let i = 0; i < datos_bopp.length; i++) {
+            if (datos_bopp[i].catMP_Id == categoria) {
+              this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
+                this.sumaSalida = 0;
+                this.sumaEntrada = 0;
+                this.inventInicial = 0;
+                for (const item of bopp_Saliente) {
+                  if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
+                    this.sumaSalida = 1;
+                  }
+                }
+
+                for (const item of bopp_entrante) {
+                  if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
+                    this.sumaEntrada = 1;
+                  }
+                }
+
+                this.inventInicial = 0;
+
+                this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                  datos_bopp[i].bopP_Serial,
+                  datos_bopp[i].bopP_Nombre,
+                  datos_bopp[i].bopP_Precio,
+                  this.inventInicial,
+                  this.sumaEntrada,
+                  this.sumaSalida,
+                  1,
+                  "Rollo(s)",
+                  datos_categoria.catMP_Nombre);
               });
             }
           }
@@ -1472,10 +1538,12 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           this.detallesAsignacionBOPPService.srvObtenerListaPorAsignacion(datos_asignacionBopp[i].asigBOPP_Id).subscribe(datos_detallesAsgBopp => {
             for (let j = 0; j < datos_detallesAsgBopp.length; j++) {
               this.boppService.srvObtenerListaPorId(datos_detallesAsgBopp[j].bopP_Id).subscribe(datos_bopp => {
-                for (let i = 0; i < datos_bopp.length; i++) {
+                let bopp : any = [];
+                bopp.push(datos_bopp);
+                for (const item of bopp) {
                   const matCant : any = {
-                    materiaPrima : datos_bopp[i].bopP_Id,
-                    cantidad : datos_bopp[i].bopP_Cantidad,
+                    materiaPrima : item.bopP_Id,
+                    cantidad : datos_detallesAsgBopp[j].dtAsigBOPP_Cantidad,
                   }
                   bopp_Saliente.push(matCant);
                 }
@@ -1594,18 +1662,18 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         this.boppService.srvObtenerLista().subscribe(datos_bopp => {
           for (let i = 0; i < datos_bopp.length; i++) {
             this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
-
+              this.sumaSalida = 0;
+              this.sumaEntrada = 0;
+              this.inventInicial = 0;
               for (const item of bopp_Saliente) {
-                if (datos_bopp[i].bopP_Id == item.materiaPrima && item.categoria != 7) {
-                  this.sumaSalida = this.sumaSalida + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+                if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == datos_bopp[i].catMP_Id) {
+                  this.sumaSalida = 1;
                 }
               }
-              // Facturas
+
               for (const item of bopp_entrante) {
-                if (datos_bopp[i].bopP_Id == item.materiaPrima) {
-                  this.sumaEntrada = this.sumaEntrada + item.cantidad;
-                  // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+                if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == datos_bopp[i].catMP_Id) {
+                  this.sumaEntrada = 1;
                 }
               }
 
@@ -1618,8 +1686,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                 this.inventInicial,
                 this.sumaEntrada,
                 this.sumaSalida,
-                datos_bopp[i].bopP_Cantidad,
-                datos_bopp[i].undMed_Id,
+                1,
+                "Rollo(s)",
                 datos_categoria.catMP_Nombre);
             });
           }

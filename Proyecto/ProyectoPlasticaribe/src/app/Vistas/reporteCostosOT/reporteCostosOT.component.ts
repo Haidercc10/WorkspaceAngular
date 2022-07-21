@@ -261,7 +261,7 @@ export class ReporteCostosOTComponent implements OnInit {
             estadoOT : this.estado,
           });
           this.detallesAsignacionService.srvObtenerListaPorOT(ot).subscribe(datos_asignacionMP => {
-            if (datos_asignacionMP.length == 0) Swal.fire(`La OT N° ${ot} no tiene asignaciones registradas`)
+            if (datos_asignacionMP.length == 0) Swal.fire(`La OT N° ${ot} no tiene asignaciones registradas`);
             else{
               for (let j = 0; j < datos_asignacionMP.length; j++) {
                 this.llenarTablaMP(datos_asignacionMP[j]);

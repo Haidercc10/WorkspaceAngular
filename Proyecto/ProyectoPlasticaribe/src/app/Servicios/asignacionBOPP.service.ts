@@ -22,7 +22,7 @@ export class AsignacionBOPPService {
   }
 
   srvObtenerListaPorfecha(id : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/fecha${id}`)
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/fecha/${id}`)
   }
 
   //Metodo agregar
