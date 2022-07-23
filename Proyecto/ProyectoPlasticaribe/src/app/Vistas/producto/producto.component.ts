@@ -5,6 +5,8 @@ import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { InventarioZeusService } from 'src/app/Servicios/inventario-zeus.service';
 import { InventarioArticuloZeusService } from 'src/app/Servicios/inventarioArticuloZeus.service';
 import { ProductoService } from 'src/app/Servicios/producto.service';
+import { SrvClienteOtItemsService } from 'src/app/Servicios/srv-cliente-ot-items.service';
+import { SrvEstadosService } from 'src/app/Servicios/srv-estados.service';
 import { TipoProductoService } from 'src/app/Servicios/tipo-producto.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 import Swal from 'sweetalert2';
@@ -25,6 +27,7 @@ export class ProductoComponent implements OnInit {
   datosTabla : any = [];
   public Url : any; //variable publica que va hacia el elemento html (input) en el atributo [src]
   public modalImagenCargada : boolean = false; //modal para cargar imagen
+  public datosCodigo : string;
 
   constructor(private productoServices : ProductoService,
               private TipoProductoService : TipoProductoService,
@@ -32,7 +35,8 @@ export class ProductoComponent implements OnInit {
               private frmBuilderProducto : FormBuilder,
               private existenciasZeus : InventarioZeusService,
               private bagProServices : BagproService,
-              private articulosZeus : InventarioArticuloZeusService) {
+              private articulosZeus : InventarioArticuloZeusService,
+              private clienteOtItems : SrvClienteOtItemsService) {
 
 
 
@@ -152,47 +156,20 @@ export class ProductoComponent implements OnInit {
 
 
   InventarioExistenciaZeus(){
-    this.existenciasZeus.srvObtenerExistenciasZeus().subscribe(datosExistencias => {
+    this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datosExistencias => {
 
       for (let exi = 0; exi < datosExistencias.length; exi++) {
-        let CampoArticulo: any = datosExistencias[exi].articulo;
+        this.datosCodigo = datosExistencias[exi].codigo;
 
-        this.articulosZeus.srvObtenerListaPorId(CampoArticulo).subscribe(datosArticulos => {
-          //for (let art = 0; art < datosArticulos.length; art++) {
-            let CampoCodigo: any = datosArticulos.codigo;
+        this.clienteOtItems.srvObtenerItemsBagproXClienteItem(this.datosCodigo).subscribe(datosCLOTI => {
+          for (let cl = 0; cl < datosCLOTI.length; cl++) {
+            console.log(datosCLOTI[cl]);
+          }
 
-            this.bagProServices.srvObtenerListaClienteOTItemsXItem(CampoCodigo).subscribe(datosClientesOtItems =>{
-                for (let cl = 0; cl < datosClientesOtItems.length; cl++) {
-
-                        if(datosExistencias[exi].bodega == '003'
-                        && datosExistencias[exi].existencias >= 1.0000
-                        && datosExistencias[exi].articulo == datosArticulos.idArticulo
-                        && datosArticulos.tipo == 'PRODUCTO TERMINADO'
-                        && datosArticulos.codigo == datosClientesOtItems[cl].clienteItems.toString())
-                        {
-
-                            this.datosTabla = {
-                              //ArticuloId : datosArticulos[art].idArticulo,
-                              //ExistArticulo : datosExistencias[exi].articulo,
-                              ArticuloCodigo : datosArticulos.codigo,
-                              ArticuloNombre : datosArticulos.nombre,
-                              ArticuloPrecio : datosArticulos.precioVenta,
-                              ExistExistencia : datosExistencias[exi].existencias,
-                              //ClotiItemId : datosClientesOtItems[cl].clienteItems.toString(),
-                              ClotiCliente : datosClientesOtItems[cl].clienteNom,
-                              //ArticuloTipo : datosArticulos[art].tipo,
-                            }
-
-                            console.log(this.datosTabla);
-                        }
-                }
-
-            });
-          //}
-          });
+        });
 
       }
-      });
+    });
 
 
   }

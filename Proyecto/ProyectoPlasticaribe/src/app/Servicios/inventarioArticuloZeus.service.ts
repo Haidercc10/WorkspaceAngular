@@ -7,7 +7,7 @@ import { Observable } from 'rxjs/internal/Observable';
 })
 export class InventarioArticuloZeusService {
 
-  readonly rutaInventarioZeusAPI = "http://192.168.0.137:9055/api";
+  readonly rutaInventarioZeusAPI = "http://192.168.0.140:9055/api";
 
   constructor(private http : HttpClient) { }
 

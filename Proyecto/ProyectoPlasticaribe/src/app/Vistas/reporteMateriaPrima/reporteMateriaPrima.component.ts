@@ -89,6 +89,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   sumaEntrada : number = 0;
   sumaSalida : number = 0;
   categorias : any = []; //variable que almacenará las categorias existentes
+  categoriaBOPP : string;
 
   public load: boolean;
 
@@ -353,13 +354,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     }]
   }
 
-  cargarFormMpEnTablas(formulario : any, id: number, nombre : string, precio : number, inicial : number, entrada : number, salida : number, cantidad : number, undMEd : string, categoria : any){
+  cargarFormMpEnTablas(formulario : any, id: number, nombre : string, precio : number, inicial : number, entrada : number, salida : number, cantidad : number, undMEd : string, categoria : any, ancho? : number ){
     let subtotalProd : number = precio * cantidad;
     this.valorTotal = this.valorTotal + subtotalProd;
     if (inicial == 0) {
       let productoExt : any = {
         Id : id,
         Nombre : nombre,
+        Ancho : ancho,
         Inicial : inicial,
         Entrada : entrada,
         Salida : salida,
@@ -391,6 +393,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       let productoExt : any = {
         Id : id,
         Nombre : nombre,
+        Ancho : ancho,
         Inicial : inicial,
         Entrada : entrada,
         Salida : salida,
@@ -3005,6 +3008,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       }, 2000);
     } else if (categoria != null)  {
       this.load = false;
+      this.categoriaBOPP = 'BOPP';
 
       this.asignacionService.srvObtenerListaPorFecha(this.today).subscribe(datos_asignaciones => {
         for (let i = 0; i < datos_asignaciones.length; i++) {
@@ -3211,14 +3215,16 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
                 this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
                   datos_bopp[i].bopP_Serial,
-                  datos_bopp[i].bopP_Nombre,
+                  datos_bopp[i].bopP_Descripcion, /** Descripcion en vez de nombre */
                   datos_bopp[i].bopP_Precio,
                   datos_bopp[i].bopP_CantidadInicialKg,
                   this.sumaEntrada,
                   this.sumaSalida,
                   datos_bopp[i].bopP_Stock,
                   "Kg",
-                  datos_categoria.catMP_Nombre);
+                  datos_categoria.catMP_Nombre,
+                  datos_bopp[i].bopP_Ancho);
+
               });
             }
           }
