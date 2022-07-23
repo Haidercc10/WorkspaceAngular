@@ -265,7 +265,7 @@
             </div>
         </li> -->
         <!-- REPORTES -->
-        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
           <li>
             <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample8" role="button" aria-expanded="false" aria-controls="collapseExample">
               Reportes
@@ -283,7 +283,7 @@
                   Inventario de Materia Prima
                 </a>
               </div>
-              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
                 <div class="mb-2">
                   <a class="fst-normal" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
                     Movimientos MP
@@ -326,8 +326,8 @@
             </div>
         </li> -->
 
+        <!-- MATERIAS PRIMAS -->
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
-          <!-- MATERIAS PRIMAS -->
           <li>
             <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample10" role="button" aria-expanded="false" aria-controls="collapseExample">
                 Materia Prima
@@ -339,11 +339,6 @@
                 </a>
               </div>
               <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="/AsignacionBOPPTemporal" role="button" aria-expanded="false" aria-controls="">
-                  Asignación de BOPP
-                </a>
-              </div>
-              <div class="mb-2">
                 <a class="fst-normal" data-bs-toggle="" href="/mp-devoluciones" role="button" aria-expanded="false" aria-controls="">
                   Devoluciones
                 </a>
@@ -351,11 +346,6 @@
               <div class="mb-2">
                 <a class="fst-normal" data-bs-toggle="" href="/MateriaPrima" role="button" aria-expanded="false" aria-controls="">
                   Entradas
-                </a>
-              </div>
-              <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="/entrada-BOPP" role="button" aria-expanded="false" aria-controls="">
-                  Entrada de BOPP
                 </a>
               </div>
               <div class="mb-2">
@@ -375,6 +365,34 @@
                   Asignación Tintas
                 </a>
               </div>
+              <div class="mb-2">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- BOPP -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample11" role="button" aria-expanded="false" aria-controls="collapseExample">
+                BOPP
+            </a>
+            <div class="collapse" id="collapseExample11">
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/AsignacionBOPPTemporal" role="button" aria-expanded="false" aria-controls="">
+                    Asignación de BOPP
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/entrada-BOPP" role="button" aria-expanded="false" aria-controls="">
+                    Entrada de BOPP
+                  </a>
+                </div>
+              </ng-container>
               <div class="mb-2">
                 <hr>
               </div>

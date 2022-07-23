@@ -127,7 +127,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     this.ArrayBOPP = [];
     this.boppService.srvObtenerLista().subscribe(datos_BOPP => {
       for (let i = 0; i < datos_BOPP.length; i++) {
-        if (datos_BOPP[i].bopP_Stock != 0) this.ArrayBOPP.push(datos_BOPP[i]);
+        if (datos_BOPP[i].bopP_Stock <= 3.5) this.ArrayBOPP.push(datos_BOPP[i]);
       }
     });
   }
@@ -232,7 +232,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       if (datos_bopp.length == 0) Swal.fire("El Pallet/Serial no se encuentra registrado.");
       else {
         for (let i = 0; i < datos_bopp.length; i++) {
-          if (datos_bopp[i].bopP_Stock != 0) {
+          if (datos_bopp[i].bopP_Stock <= 3.5) {
             this.boppSeleccionado.push(datos_bopp[i]);
             this.cargarBOPP();
           }
@@ -344,7 +344,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             let datos : any = {
               AsigBOPP_Id : idAsignacion,
               BOPP_Id : datos_bopp[i].bopP_Id,
-              DtAsigBOPP_Cantidad : datos_bopp[i].bopP_Stock / numeroOT,
+              DtAsigBOPP_Cantidad : datos_bopp[i].bopP_CantidadInicialKg / numeroOT,
               UndMed_Id : 'Kg',
               Proceso_Id : 'CORTE',
             }
@@ -428,7 +428,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             tpBod_Id : item.tpBod_Id,
             bopP_FechaIngreso : item.bopP_FechaIngreso,
             bopP_Ancho : item.bopP_Ancho,
-            bopP_Stock : 0,
+            bopP_Stock : cantidadFinal,
             UndMed_Kg : item.undMed_Kg,
             bopP_CantidadInicialKg : item.bopP_CantidadInicialKg,
           }

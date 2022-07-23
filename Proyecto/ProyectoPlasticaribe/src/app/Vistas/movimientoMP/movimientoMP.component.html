@@ -43,11 +43,16 @@
         <!-- Tipo Docuemtno -->
         <div class="form-floating col-md">
           <select formControlName="TipoDocumento" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
-            <option [ngValue]="tiposDocumentos.tpDoc_Id" *ngFor="let tiposDocumentos of tipoDocumento">{{tiposDocumentos.tpDoc_Nombre}}</option>
-            <option>Asignación</option>
-            <option>Recuperado</option>
-            <option>Devoluciones</option>
-            <option>Asignación de BOPP</option>
+            <option [ngValue]="null" disabled selected>Seleccione Movimiento</option>
+            <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+              <option [ngValue]="tiposDocumentos.tpDoc_Id" *ngFor="let tiposDocumentos of tipoDocumento">{{tiposDocumentos.tpDoc_Nombre}}</option>
+              <option>Asignación</option>
+              <option>Recuperado</option>
+              <option>Devoluciones</option>
+            </ng-container>
+            <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
+              <option>Asignación de BOPP</option>
+            </ng-container>
           </select>
           <label for="floatingSelect">Tipo de Movimiento</label>
         </div>
@@ -58,11 +63,13 @@
           </select>
           <label for="floatingSelect">Materia prima</label>
         </div>
-        <!-- Serial BOPP -->
-        <!-- <div class="form-floating col-md-2">
-          <input formControlName="idDocumento" type="number" class="form-control" id="floatingInput"required >
-          <label for="floatingInput">Serial de BOPP</label>
-        </div> -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
+          <!-- Serial BOPP -->
+          <div class="form-floating col-md-2">
+            <input formControlName="idDocumento" type="number" class="form-control" id="floatingInput"required >
+            <label for="floatingInput">Serial de BOPP</label>
+          </div>
+        </ng-container>
       </div>
     </div>
     <!-- BOTONES -->
@@ -119,9 +126,14 @@
   <div *ngIf="load">
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <label><b>Total Materia Prima Entregada: {{totalMPEntregada | number}} KG</b></label>
-        <label><b>Total Materia Prima Devuelta: {{cantidadKgDevuelta | number}} KG</b></label>
-        <label><b>--- KG Restante Por Entregar: {{cantRestante | number}}</b></label>
+        <label><b>Total Materia Prima Entregada: {{totalMPEntregada | number}} KG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <label><b>Total Materia Prima Devuelta: {{cantidadKgDevuelta | number}} KG</b></label>
+          <label><b>--- KG Restante Por Entregar: {{cantRestante | number}}</b></label>
+        </ng-container>
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
+          <label><b>Cantidad de KG Producida en total: {{kgProduciodosOT | number}}</b></label>
+        </ng-container>
       </div>
     </div>
   </div>

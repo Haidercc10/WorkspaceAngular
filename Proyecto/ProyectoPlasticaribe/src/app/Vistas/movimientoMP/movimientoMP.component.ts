@@ -5,10 +5,12 @@ import { info } from 'console';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
 import { AsignacionMPService } from 'src/app/Servicios/asignacionMP.service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
+import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/detallesAsignacionBOPP.service';
 import { DevolucionesService } from 'src/app/Servicios/devoluciones.service';
 import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service';
 import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
@@ -75,6 +77,9 @@ export class MovimientoMPComponent implements OnInit {
   cantidadTotalDbl : number; //Variable que va a almacenar el total de la cantidad doblada en una OT
   proceso : string = ''; //Variable ayudará a almacenar el proceso del cuela se está consultando la ot
   totalPorcentajePerida : number; //Variable que ayudará a calcular el total de perdida en una OT
+  cantidadTotalSella : number = 0; //Variable que va a almacenar el total de la cantidad sellada en una OT
+  cantidadTotalEmpaque : number = 0; //Variable que va a almacenar el total de la cantidad empacada en una OT
+  cantidadTotalWiketiado : number = 0; //Variable que va a almacenar el total de la cantidad cantidad Tota wiketeada en una OT
   asignacion : string;
   recuperadoTipo : string;
   recuperado = 3;
@@ -91,10 +96,12 @@ export class MovimientoMPComponent implements OnInit {
   factura : number = 1;
   remision : number = 1;
   cantidadKgDevuelta : number = 0;
-
+  asignacionBOPP : string;
+  kgProduciodosOT : number = 0;
   /* CONSULTAS DE MATERIA PRIMA */
   MpConsultada = [];
   kgOT : number;
+  acumuladorOT = [];
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -117,7 +124,9 @@ export class MovimientoMPComponent implements OnInit {
                                                   private bagProServices : BagproService,
                                                   private devolucionService : DevolucionesService,
                                                     private devolucionMPService : DevolucionesMPService,
-                                                      private boppService : EntradaBOPPService,) {
+                                                      private boppService : EntradaBOPPService,
+                                                        private asignacionBOPPService : AsignacionBOPPService,
+                                                          private detallesAsgBOPPService : DetalleAsignacion_BOPPService,) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : new FormControl(),
@@ -219,11 +228,12 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   obtenerBOPP(){
-
     let TipoDocumento : string = this.FormDocumentos.value.TipoDocumento;
 
-    if (TipoDocumento) {
-
+    if (this.ValidarRol == 1 || this.ValidarRol == 4) {
+      if (TipoDocumento == 'Asignación de BOPP') {
+        this.ArrayMateriaPrimaRetirada = [];
+      }
     }
   }
 
@@ -260,6 +270,10 @@ export class MovimientoMPComponent implements OnInit {
     this.factura = 1;
     this.remision = 1;
     this.devolucionN = 1;
+    this.kgProduciodosOT = 0;
+    this.cantidadTotalEmpaque = 0;
+    this.cantidadTotalSella = 0;
+    this.cantidadTotalWiketiado = 0;
 
     let idDoc : string = this.FormDocumentos.value.idDocumento;
     let fecha : any = this.FormDocumentos.value.fecha;
@@ -685,87 +699,107 @@ export class MovimientoMPComponent implements OnInit {
         }
       });
     } else if (fecha != null && TipoDocumento != null) {
-      if (TipoDocumento == 'Asignación') {
-        this.asignacionService.srvObtenerListaPorFecha(fecha).subscribe(datos_asignacion => {
-          if (datos_asignacion.length == 0) {
-            this.load = true;
-            Swal.fire(`No se encuentras registros de asignaciones con la fecha ${fecha}`);
-          } else {
-            for (let index = 0; index < datos_asignacion.length; index++) {
-              this.asignacionMpService.srvObtenerListaPorAsigId(datos_asignacion[index].asigMp_Id).subscribe(datos_asignacionMP => {
-                for (let i = 0; i < datos_asignacionMP.length; i++) {
-                  this.asignacion = 'Asignacion';
-                  this.lenarTabla(datos_asignacionMP[i]);
-                }
-              });
+      if (this.ValidarRol == 1 || this.ValidarRol == 3) {
+        if (TipoDocumento == 'Asignación') {
+          this.asignacionService.srvObtenerListaPorFecha(fecha).subscribe(datos_asignacion => {
+            if (datos_asignacion.length == 0) {
+              this.load = true;
+              Swal.fire(`No se encuentras registros de asignaciones con la fecha ${fecha}`);
+            } else {
+              for (let index = 0; index < datos_asignacion.length; index++) {
+                this.asignacionMpService.srvObtenerListaPorAsigId(datos_asignacion[index].asigMp_Id).subscribe(datos_asignacionMP => {
+                  for (let i = 0; i < datos_asignacionMP.length; i++) {
+                    this.asignacion = 'Asignacion';
+                    this.lenarTabla(datos_asignacionMP[i]);
+                  }
+                });
+              }
             }
-          }
-        });
-      } else if (TipoDocumento == 'Recuperado') {
-        this.recuperadoService.srvObtenerListaPorFecha(fecha).subscribe(datos_recuperado => {
-          if (datos_recuperado.length == 0) {
-            this.load = true;
-            Swal.fire(`No se encuentran registros de recuperado con la fecha ${fecha}`);
-          } else {
-            for (let index = 0; index < datos_recuperado.length; index++) {
-              this.recuperadoMPService.srvObtenerListaPorRecuperadoId(datos_recuperado[index].recMp_Id).subscribe(datos_recuperadoMP => {
-                for (let j = 0; j < datos_recuperadoMP.length; j++) {
-                  this.recuperadoTipo = 'RECUP';
-                  this.recuperado = 2;
-                  this.lenarTabla(datos_recuperado[index]);
-                }
-              });
+          });
+        } else if (TipoDocumento == 'Recuperado') {
+          this.recuperadoService.srvObtenerListaPorFecha(fecha).subscribe(datos_recuperado => {
+            if (datos_recuperado.length == 0) {
+              this.load = true;
+              Swal.fire(`No se encuentran registros de recuperado con la fecha ${fecha}`);
+            } else {
+              for (let index = 0; index < datos_recuperado.length; index++) {
+                this.recuperadoMPService.srvObtenerListaPorRecuperadoId(datos_recuperado[index].recMp_Id).subscribe(datos_recuperadoMP => {
+                  for (let j = 0; j < datos_recuperadoMP.length; j++) {
+                    this.recuperadoTipo = 'RECUP';
+                    this.recuperado = 2;
+                    this.lenarTabla(datos_recuperado[index]);
+                  }
+                });
+              }
             }
-          }
-        });
-      } else if (TipoDocumento == 'Devoluciones') {
-        this.devolucionService.srvObtenerListaPorfecha(fecha).subscribe(datos_devoluciones => {
-          if (datos_devoluciones.length == 0) {
-            this.load = true;
-            Swal.fire(`No se encuentran registros de devoluciones con la fecha ${fecha}`);
-          } else {
-            for (let i = 0; i < datos_devoluciones.length; i++) {
-              this.devolucionMPService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_devolucionesMP => {
-                for (let j = 0; j < datos_devolucionesMP.length; j++) {
-                  this.devolucion = 'DEVOLUCION';
-                  this.lenarTabla(datos_devoluciones[i]);
-                }
-              });
+          });
+        } else if (TipoDocumento == 'Devoluciones') {
+          this.devolucionService.srvObtenerListaPorfecha(fecha).subscribe(datos_devoluciones => {
+            if (datos_devoluciones.length == 0) {
+              this.load = true;
+              Swal.fire(`No se encuentran registros de devoluciones con la fecha ${fecha}`);
+            } else {
+              for (let i = 0; i < datos_devoluciones.length; i++) {
+                this.devolucionMPService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_devolucionesMP => {
+                  for (let j = 0; j < datos_devolucionesMP.length; j++) {
+                    this.devolucion = 'DEVOLUCION';
+                    this.lenarTabla(datos_devoluciones[i]);
+                  }
+                });
+              }
             }
-          }
-        });
-      } else if (TipoDocumento == 'FCO') {
-        this.facturaCompraMPService.srvObtenerListaPorFecha(fecha).subscribe(datos_factura => {
-          if (datos_factura.length == 0) {
-            this.load = true;
-            Swal.fire(`No se encuentran registros de facturas con la fecha ${fecha}`);
-          } else {
-            for (let index = 0; index < datos_factura.length; index++) {
-              this.facturaCompraService.srvObtenerListaPorFacId(datos_factura[index].facco_Id).subscribe(datos_facturaMP => {
-                for (let j = 0; j < datos_facturaMP.length; j++) {
-                  this.factura = 2;
-                  this.lenarTabla(datos_facturaMP[j]);
-                  this.factura = 1;
-                }
-              });
+          });
+        } else if (TipoDocumento == 'FCO') {
+          this.facturaCompraMPService.srvObtenerListaPorFecha(fecha).subscribe(datos_factura => {
+            if (datos_factura.length == 0) {
+              this.load = true;
+              Swal.fire(`No se encuentran registros de facturas con la fecha ${fecha}`);
+            } else {
+              for (let index = 0; index < datos_factura.length; index++) {
+                this.facturaCompraService.srvObtenerListaPorFacId(datos_factura[index].facco_Id).subscribe(datos_facturaMP => {
+                  for (let j = 0; j < datos_facturaMP.length; j++) {
+                    this.factura = 2;
+                    this.lenarTabla(datos_facturaMP[j]);
+                    this.factura = 1;
+                  }
+                });
+              }
             }
-          }
-        });
-      } else if (TipoDocumento == 'REM') {
-        this.remisionService.srvObtenerListaPorFecha(fecha).subscribe(datos_remision => {
-          if (datos_remision.length == 0) {
-            this.load = true;
-            Swal.fire(`No se encurntran regitros de remisiones con la fecha ${fecha}`)
-          } else {
-            for (let index = 0; index < datos_remision.length; index++) {
-              this.remisionMpService.srvObtenerListaPorRemId(datos_remision[index].rem_Fecha).subscribe(datos_remisionMP => {
-                for (let j = 0; j < datos_remisionMP.length; j++) {
-                  this.lenarTabla(datos_remisionMP[j]);
-                }
-              });
+          });
+        } else if (TipoDocumento == 'REM') {
+          this.remisionService.srvObtenerListaPorFecha(fecha).subscribe(datos_remision => {
+            if (datos_remision.length == 0) {
+              this.load = true;
+              Swal.fire(`No se encurntran regitros de remisiones con la fecha ${fecha}`)
+            } else {
+              for (let index = 0; index < datos_remision.length; index++) {
+                this.remisionMpService.srvObtenerListaPorRemId(datos_remision[index].rem_Fecha).subscribe(datos_remisionMP => {
+                  for (let j = 0; j < datos_remisionMP.length; j++) {
+                    this.lenarTabla(datos_remisionMP[j]);
+                  }
+                });
+              }
             }
-          }
-        });
+          });
+        }
+      } else if (this.ValidarRol == 1 || this.ValidarRol == 4) {
+        if (TipoDocumento == 'Asignación de BOPP') {
+          this.asignacionBOPPService.srvObtenerListaPorfecha(fecha).subscribe(dato_asignacionBOPP => {
+            if (dato_asignacionBOPP.length == 0) {
+              this.load = true;
+              Swal.fire(`No se encurntran regitros de asignaciones de BOPP con la fecha ${fecha}`)
+            } else {
+              for (let i = 0; i < dato_asignacionBOPP.length; i++) {
+                this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(dato_asignacionBOPP[i].asigBOPP_Id).subscribe(datos_detallesAsgBOPP => {
+                  for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
+                    this.asignacionBOPP = 'BOPP';
+                    this.lenarTabla(datos_detallesAsgBOPP[j]);
+                  }
+                });
+              }
+            }
+          });
+        }
       }
     } else if (fecha != null && materiaPrima != null) {
 
@@ -1044,43 +1078,61 @@ export class MovimientoMPComponent implements OnInit {
       });
 
     } else if (fecha != null) {
-      this.facturaCompraMPService.srvObtenerListaPorFecha(fecha).subscribe(datos_factura => {
-        for (let index = 0; index < datos_factura.length; index++) {
-          this.lenarTabla(datos_factura[index]);
-        }
-      });
+      if (this.ValidarRol == 1 || this.ValidarRol == 3) {
+        this.facturaCompraMPService.srvObtenerListaPorFecha(fecha).subscribe(datos_factura => {
+          for (let index = 0; index < datos_factura.length; index++) {
+            this.lenarTabla(datos_factura[index]);
+          }
+        });
 
-      this.remisionService.srvObtenerListaPorFecha(fecha).subscribe(datos_remision => {
-        for (let index = 0; index < datos_remision.length; index++) {
-          this.lenarTabla(datos_remision[index]);
-        }
-      });
+        this.remisionService.srvObtenerListaPorFecha(fecha).subscribe(datos_remision => {
+          for (let index = 0; index < datos_remision.length; index++) {
+            this.lenarTabla(datos_remision[index]);
+          }
+        });
 
-      this.asignacionService.srvObtenerListaPorFecha(fecha).subscribe(datos_asignacion => {
-        for (let index = 0; index < datos_asignacion.length; index++) {
-          this.asignacionMpService.srvObtenerListaPorAsigId(datos_asignacion[index].asigMp_Id).subscribe(datos_asignacionMP => {
-            for (let i = 0; i < datos_asignacionMP.length; i++) {
-              this.asignacion = 'Asignacion';
-              this.lenarTabla(datos_asignacionMP[i]);
+        this.asignacionService.srvObtenerListaPorFecha(fecha).subscribe(datos_asignacion => {
+          for (let index = 0; index < datos_asignacion.length; index++) {
+            this.asignacionMpService.srvObtenerListaPorAsigId(datos_asignacion[index].asigMp_Id).subscribe(datos_asignacionMP => {
+              for (let i = 0; i < datos_asignacionMP.length; i++) {
+                this.asignacion = 'Asignacion';
+                this.lenarTabla(datos_asignacionMP[i]);
+              }
+            });
+          }
+        });
+
+        this.recuperadoService.srvObtenerListaPorFecha(fecha).subscribe(datos_recuperado => {
+          for (let index = 0; index < datos_recuperado.length; index++) {
+            this.recuperadoTipo = 'RECUP';
+            this.recuperado = 2;
+            this.lenarTabla(datos_recuperado[index]);
+          }
+        });
+
+        this.devolucionService.srvObtenerListaPorfecha(fecha).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.devolucion = 'DEVOLUCION';
+            this.lenarTabla(datos_devoluciones[i]);
+          }
+        });
+      } else if (this.ValidarRol == 1 || this.ValidarRol == 4) {
+        this.asignacionBOPPService.srvObtenerListaPorfecha(fecha).subscribe(dato_asignacionBOPP => {
+          if (dato_asignacionBOPP.length == 0) {
+            this.load = true;
+            Swal.fire(`No se encurntran regitros de asignaciones de BOPP con la fecha ${fecha}`)
+          } else {
+            for (let i = 0; i < dato_asignacionBOPP.length; i++) {
+              this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(dato_asignacionBOPP[i].asigBOPP_Id).subscribe(datos_detallesAsgBOPP => {
+                for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
+                  this.asignacionBOPP = 'BOPP';
+                  this.lenarTabla(datos_detallesAsgBOPP[j]);
+                }
+              });
             }
-          });
-        }
-      });
-
-      this.recuperadoService.srvObtenerListaPorFecha(fecha).subscribe(datos_recuperado => {
-        for (let index = 0; index < datos_recuperado.length; index++) {
-          this.recuperadoTipo = 'RECUP';
-          this.recuperado = 2;
-          this.lenarTabla(datos_recuperado[index]);
-        }
-      });
-
-      this.devolucionService.srvObtenerListaPorfecha(fecha).subscribe(datos_devoluciones => {
-        for (let i = 0; i < datos_devoluciones.length; i++) {
-          this.devolucion = 'DEVOLUCION';
-          this.lenarTabla(datos_devoluciones[i]);
-        }
-      });
+          }
+        });
+      }
 
     } else if (TipoDocumento != null) {
       if (TipoDocumento ==  'FCO') {
@@ -1138,6 +1190,8 @@ export class MovimientoMPComponent implements OnInit {
             });
           }
         });
+      } else if (TipoDocumento == 'Asignación de BOPP') {
+
       }
     } else if (materiaPrima != null) {
       this.facturaCompraService.srvObtenerListaPorMpId(materiaPrima).subscribe(datos_faturaMP => {
@@ -1188,41 +1242,51 @@ export class MovimientoMPComponent implements OnInit {
         }
       });
     } else {
-      this.facturaCompraMPService.srvObtenerLista().subscribe(datos_factura => {
-        for (let index = 0; index < datos_factura.length; index++) {
-          this.lenarTabla(datos_factura[index]);
-        }
-      });
-      this.remisionService.srvObtenerLista().subscribe(datos_remision => {
-        for (let rem = 0; rem < datos_remision.length; rem++) {
-          this.lenarTabla(datos_remision[rem]);
-        }
-      });
-      this.recuperadoService.srvObtenerLista().subscribe(datos_recuperado => {
-        for (let index = 0; index < datos_recuperado.length; index++) {
-          this.recuperadoTipo = 'RECUP';
-          this.recuperado = 2;
-          this.lenarTabla(datos_recuperado[index]);
-          this.recuperadoTipo = '';
-          this.recuperado = 1;
-        }
-      });
-      this.asignacionService.srvObtenerLista().subscribe(datos_asignacion => {
-        for (let asg = 0; asg < datos_asignacion.length; asg++) {
-          this.asignacion = 'Asignacion';
-          this.lenarTabla(datos_asignacion[asg]);
-          this.asignacion = '';
-        }
-      });
-      this.devolucionService.srvObtenerLista().subscribe(datos_devoluciones => {
-        for (let i = 0; i < datos_devoluciones.length; i++) {
-          this.devolucion = 'DEVOLUCION'
-          this.devolucionN = 2;
-          this.lenarTabla(datos_devoluciones[i]);
-          this.devolucion = ''
-          this.devolucionN = 1;
-        }
-      });
+      if (this.ValidarRol == 1 || this.ValidarRol == 3) {
+        this.facturaCompraMPService.srvObtenerLista().subscribe(datos_factura => {
+          for (let index = 0; index < datos_factura.length; index++) {
+            this.lenarTabla(datos_factura[index]);
+          }
+        });
+        this.remisionService.srvObtenerLista().subscribe(datos_remision => {
+          for (let rem = 0; rem < datos_remision.length; rem++) {
+            this.lenarTabla(datos_remision[rem]);
+          }
+        });
+        this.recuperadoService.srvObtenerLista().subscribe(datos_recuperado => {
+          for (let index = 0; index < datos_recuperado.length; index++) {
+            this.recuperadoTipo = 'RECUP';
+            this.recuperado = 2;
+            this.lenarTabla(datos_recuperado[index]);
+            this.recuperadoTipo = '';
+            this.recuperado = 1;
+          }
+        });
+        this.asignacionService.srvObtenerLista().subscribe(datos_asignacion => {
+          for (let asg = 0; asg < datos_asignacion.length; asg++) {
+            this.asignacion = 'Asignacion';
+            this.lenarTabla(datos_asignacion[asg]);
+            this.asignacion = '';
+          }
+        });
+        this.devolucionService.srvObtenerLista().subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.devolucion = 'DEVOLUCION'
+            this.devolucionN = 2;
+            this.lenarTabla(datos_devoluciones[i]);
+            this.devolucion = ''
+            this.devolucionN = 1;
+          }
+        });
+      } else if (this.ValidarRol == 1 || this.ValidarRol == 4) {
+        this.detallesAsgBOPPService.srvObtenerLista().subscribe(datos_detallesAsgBOPP => {
+          for (let i = 0; i < datos_detallesAsgBOPP.length; i++) {
+            this.asignacionBOPP = 'BOPP';
+            this.lenarTabla(datos_detallesAsgBOPP[i]);
+          }
+        });
+
+      }
     }
   }
 
@@ -1337,6 +1401,60 @@ export class MovimientoMPComponent implements OnInit {
           infoDoc.mp = datos_mp.matPri_Nombre
         });
       });
+    } else if (this.asignacionBOPP == 'BOPP') {
+      this.asignacionBOPPService.srvObtenerListaPorId(formulario.asigBOPP_Id).subscribe(datos_asignacionBOPP => {
+        let bopp : any = [];
+        bopp.push(datos_asignacionBOPP);
+        for (const item of bopp) {
+          const infoDoc : any = {
+            id : item.asigBOPP_Id,
+            codigo : item.asigBOPP_OrdenTrabajo,
+            tipoDoc : 'BOPP',
+            fecha : item.asigBOPP_FechaEntrega,
+            usuario : item.usua_Id,
+            mp : formulario.bopP_Id,
+            cant : formulario.dtAsigBOPP_Cantidad,
+          }
+
+          this.ArrayDocumento.push(infoDoc);
+          this.usuarioService.srvObtenerListaPorId(infoDoc.usuario).subscribe(datos_usuario => {
+            infoDoc.usuario = datos_usuario.usua_Nombre;
+          });
+          this.totalMPEntregada = this.totalMPEntregada + infoDoc.cant;
+          this.ArrayDocumento.sort((a,b) => b.fecha.localeCompare(a.fecha));
+          this.formatonumeros(this.totalMPEntregada);
+          this.boppService.srvObtenerListaPorId(infoDoc.mp).subscribe(datos_bopp => {
+            let boppNombre : any = [];
+            boppNombre.push(datos_bopp);
+            for (const i of boppNombre) {
+              infoDoc.mp = i.bopP_Nombre;
+            }
+          });
+          if (!this.acumuladorOT.includes(infoDoc.codigo)) {
+            this.acumuladorOT.push(infoDoc.codigo);
+            this.bagProServices.srvObtenerListaProcExtOt(infoDoc.codigo).subscribe(datos_procesos => {
+              for (let index = 0; index < datos_procesos.length; index++) {
+                if (datos_procesos[index].nomStatus == "EMPAQUE") {
+                  this.cantidadTotalEmpaque = datos_procesos[index].extnetokg; + this.cantidadTotalEmpaque;
+                  this.kgProduciodosOT += this.cantidadTotalEmpaque;
+                }
+              }
+              //SELLADO Y WIKETIADO
+              this.bagProServices.srvObtenerListaProcSelladoOT(infoDoc.codigo).subscribe(datos_selado => {
+                for (let i = 0; i < datos_selado.length; i++) {
+                  if (datos_selado[i].nomStatus == "SELLADO") {
+                    this.cantidadTotalSella = datos_selado[i].peso; + this.cantidadTotalSella;
+                    this.kgProduciodosOT += this.cantidadTotalSella;
+                  } else if (datos_selado[i].nomStatus == "Wiketiado") {
+                    this.cantidadTotalWiketiado = datos_selado[i].peso + this.cantidadTotalWiketiado;
+                    this.kgProduciodosOT += this.cantidadTotalWiketiado;
+                  }
+                }
+              });
+            });
+          }
+        }
+      });
     }
 
     this.load = true;
@@ -1443,6 +1561,28 @@ export class MovimientoMPComponent implements OnInit {
           });
         }
       });
+    } else if (tipoDoc == 'BOPP') {
+      this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(id).subscribe(datos_detallesAsgBOPP => {
+        for (let i = 0; i < datos_detallesAsgBOPP.length; i++) {
+          this.boppService.srvObtenerListaPorId(datos_detallesAsgBOPP[i].bopP_Id).subscribe(datos_bopp => {
+            let bopp : any = [];
+            bopp.push(datos_bopp);
+            for (const item of bopp) {
+              const asignacionBOPP : any = {
+                Id : item.bopP_Id,
+                Nombre : item.bopP_Nombre,
+                Cant : this.formatonumeros(datos_detallesAsgBOPP[i].dtAsigBOPP_Cantidad),
+                UndCant : datos_detallesAsgBOPP[i].undMed_Id,
+                Stock : item.bopP_Stock,
+                UndStock : item.undMed_Id,
+                PrecioUnd : item.bopP_Precio,
+                SubTotal : '',
+              }
+              this.mpAgregada.push(asignacionBOPP);
+            }
+          })
+        }
+      });
     }
     this.llenarPDFConBD(formulario);
   }
@@ -1495,6 +1635,23 @@ export class MovimientoMPComponent implements OnInit {
         }
     };
   }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  tableAsignacionBOPP(data, columns) {
+  return {
+      table: {
+        headerRows: 1,
+        widths: ['*', '*',],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 9,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+  };
+}
 
   // Funcion para llenar el pdf con información de la base de datos dependiendo el pedido
   llenarPDFConBD(formulario : any){
@@ -1966,6 +2123,91 @@ export class MovimientoMPComponent implements OnInit {
             break;
           }
         });
+      });
+    } else if (tipoDoc == 'BOPP') {
+      this.asignacionBOPPService.srvObtenerListaPorId(id).subscribe(datos_asignacionBOPP => {
+        let boppAsg : any = [];
+        boppAsg.push(datos_asignacionBOPP);
+        for (const item of boppAsg) {
+          this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(id).subscribe(datos_detallesAsgBOPP => {
+            for (let i = 0; i < datos_detallesAsgBOPP.length; i++) {
+              this.usuarioService.srvObtenerListaPorId(item.usua_Id).subscribe(datos_usuario => {
+                for (let mp = 0; mp < this.mpAgregada.length; mp++) {
+                  let FechaEntregaDatetime = item.asigBOPP_FechaEntrega;
+                  let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+                  let fecharegistroFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+                  const pdfDefinicion : any = {
+                    info: {
+                      title: `${item.asigBOPP_Id}`
+                    },
+                    content : [
+                      {
+                        text: `Plasticaribe S.A.S ---- Asignación de BOPP`,
+                        alignment: 'center',
+                        style: 'titulo',
+                      },
+                      '\n \n',
+                      {
+                        text: `Fecha de registro: ${fecharegistroFinal}`,
+                        style: 'header',
+                        alignment: 'right',
+                      },
+                      {
+                        text: `Registrado Por: ${datos_usuario.usua_Nombre}\n`,
+                        alignment: 'right',
+                        style: 'header',
+                      },
+                      {
+                        text: `\n Información la Asignación \n \n`,
+                        alignment: 'center',
+                        style: 'header'
+                      },
+                      {
+                        style: 'tablaCliente',
+                        table: {
+                          widths: ['*', '*', '*'],
+                          style: 'header',
+                          body: [
+                            [
+                              `OT: ${item.asigBOPP_OrdenTrabajo}`,
+                            ]
+                          ]
+                        },
+                        layout: 'lightHorizontalLines',
+                        fontSize: 12,
+                      },
+                      {
+                        text: `\n \nObervación sobre la Asignación: \n ${item.asigBOPP_Observacion}\n`,
+                        style: 'header',
+                      },
+                      {
+                        text: `\n Información detallada del BOPP asignado \n `,
+                        alignment: 'center',
+                        style: 'header'
+                      },
+
+                      this.tableAsignacionBOPP(this.mpAgregada, ['Id', 'Nombre']),
+                    ],
+                    styles: {
+                      header: {
+                        fontSize: 10,
+                        bold: true
+                      },
+                      titulo: {
+                        fontSize: 15,
+                        bold: true
+                      }
+                    }
+                  }
+                  const pdf = pdfMake.createPdf(pdfDefinicion);
+                  pdf.open();
+                  break;
+                }
+
+              });
+            }
+          });
+        }
       });
     }
   }
