@@ -276,14 +276,21 @@ export class ReporteCostosOTComponent implements OnInit {
             estadoOT : this.estado,
           });
           this.detallesAsignacionService.srvObtenerListaPorOT(ot).subscribe(datos_asignacionMP => {
-            if (datos_asignacionMP.length == 0) Swal.fire(`La OT N° ${ot} no tiene asignaciones registradas`);
-            else{
+            if (datos_asignacionMP.length != 0){
               for (let j = 0; j < datos_asignacionMP.length; j++) {
                 this.llenarTablaMP(datos_asignacionMP[j]);
               }
             }
           });
-          this
+          this.asignacionBOPPService.srvObtenerListaPorOT(ot).subscribe(datos_asignacionBOPP => {
+            for (let j = 0; j < datos_asignacionBOPP.length; j++) {
+              this.detallesAsigBOPPService.srvObtenerListaPorAsignacion(datos_asignacionBOPP[j].asigBOPP_Id).subscribe(datos_detallesAsgBOPP => {
+                for (let k = 0; k < datos_detallesAsgBOPP.length; k++) {
+                  this.llenarTablaBOPP(datos_detallesAsgBOPP[k]);
+                }
+              })
+            }
+          })
           break;
         }
       }
@@ -477,7 +484,7 @@ export class ReporteCostosOTComponent implements OnInit {
       }
     }
     this.diferencia = this.valorFinalOT - this.ValorMPEntregada;
-    Math.round(this.diferenciaPorcentaje = (this.diferencia / this.valorEstimadoOT) * 100);
+    Math.round(this.diferenciaPorcentaje = (this.diferencia / this.valorFinalOT) * 100);
     this.load = true;
   }
 
@@ -504,8 +511,26 @@ export class ReporteCostosOTComponent implements OnInit {
   }
 
   // Funcion que servirá para llenar la tabla de materias primas utilizadas con el BOPP que se asignó para la OT consultada
-  llenarTablaBOPP(){
-
+  llenarTablaBOPP(formulario : any){
+    let bopp : any = [];
+    this.boppService.srvObtenerListaPorId(formulario.bopP_Id).subscribe(datos_bopp => {
+      bopp.push(datos_bopp);
+      for (const item of bopp) {
+        const infoBopp : any = {
+          Id : item.bopP_Id,
+          Nombre : item.bopP_Nombre,
+          Cantidad : formulario.dtAsigBOPP_Cantidad,
+          Presentacion : item.undMed_Kg,
+          PrecioUnd : this.formatonumeros(item.bopP_Precio),
+          SubTotal : this.formatonumeros(Math.round((item.bopP_Precio / item.bopP_CantidadInicialKg) * formulario.dtAsigBOPP_Cantidad)),
+          Proceso : formulario.proceso_Id,
+        }
+        this.totalMPEntregada = this.totalMPEntregada + infoBopp.Cantidad;
+        this.ValorMPEntregada = this.ValorMPEntregada + (Math.round((item.bopP_Precio / item.bopP_CantidadInicialKg) * formulario.dtAsigBOPP_Cantidad));
+        this.ArrayMateriaPrima.push(infoBopp);
+      }
+    });
+    this.load = true;
   }
 
   // Funcion que servirá para llenar la tabla de materias primas utilizadas con las tintas que se asignaron para la OT consultada
@@ -551,7 +576,7 @@ export class ReporteCostosOTComponent implements OnInit {
     else {
       for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
         for (const item of this.ArrayProcesos) {
-          if (item.Sel == 0 && item.Corte != 0) {
+          if (item.Sel == 0 && item.Emp != 0) {
             const pdfDefinicion : any = {
               info: {
                 title: `${this.ordenTrabajo}`
@@ -731,7 +756,7 @@ export class ReporteCostosOTComponent implements OnInit {
             pdf.open();
             break;
 
-          } else if (item.Sel != 0 && item.Corte == 0) {
+          } else if (item.Sel != 0 && item.Emp == 0) {
             const pdfDefinicion : any = {
               info: {
                 title: `${this.ordenTrabajo}`

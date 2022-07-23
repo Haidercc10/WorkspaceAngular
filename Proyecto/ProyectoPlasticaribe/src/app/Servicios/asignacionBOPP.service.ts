@@ -25,6 +25,15 @@ export class AsignacionBOPPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/fecha/${id}`)
   }
 
+  srvObtenerListaPorOT(id : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/ot/${id}`)
+  }
+
+  srvObtenerListaPorAgrupadoOT(id : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/AsignacionesXOrden/${id}`)
+  }
+
+
   srvObtenerListaPorfechas(fecha1 : any, fecha2 : any):Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/fechas?AsigBOPP_FechaEntrega1=${fecha1}&AsigBOPP_FechaEntrega2=${fecha2}`)
   }

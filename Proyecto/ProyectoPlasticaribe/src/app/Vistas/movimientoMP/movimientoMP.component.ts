@@ -11,6 +11,7 @@ import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateria
 import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
 import { DevolucionesService } from 'src/app/Servicios/devoluciones.service';
 import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service';
+import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
 import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
 import { FactuaMpCompradaService } from 'src/app/Servicios/facturaMpComprada.service';
 import { InventInicialDiaService } from 'src/app/Servicios/inventInicialDia.service';
@@ -115,7 +116,8 @@ export class MovimientoMPComponent implements OnInit {
                                                 private recuperadoMPService : RecuperadoMPService,
                                                   private bagProServices : BagproService,
                                                   private devolucionService : DevolucionesService,
-                                                    private devolucionMPService : DevolucionesMPService,) {
+                                                    private devolucionMPService : DevolucionesMPService,
+                                                      private boppService : EntradaBOPPService,) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : new FormControl(),
@@ -214,6 +216,15 @@ export class MovimientoMPComponent implements OnInit {
         this.ArrayMateriaPrimaRetirada.sort((a,b) => a.matPri_Nombre.localeCompare(b.matPri_Nombre));
       }
     });
+  }
+
+  obtenerBOPP(){
+
+    let TipoDocumento : string = this.FormDocumentos.value.TipoDocumento;
+
+    if (TipoDocumento) {
+
+    }
   }
 
   //Funcion que colocará el nombre a las columnas de la tabla en la cual se muestran los productos pedidos por los clientes

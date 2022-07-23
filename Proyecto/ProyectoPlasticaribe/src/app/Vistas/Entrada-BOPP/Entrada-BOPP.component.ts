@@ -185,18 +185,31 @@ export class EntradaBOPPComponent implements OnInit {
       for (let i = 0; i < this.ArrayBOPP.length; i++) {
 
         let datosBOPP : any = {
-          BOPP_Nombre : this.ArrayBOPP[i].Nombre,
+          // BOPP_Nombre : `${this.ArrayBOPP[i].Nombre} - ${this.ArrayBOPP[i].Serial} - ${this.ArrayBOPP[i].CantKg} - ${this.ArrayBOPP[i].Ancho}`,
+          // BOPP_Descripcion : this.ArrayBOPP[i].Descripcion,
+          // BOPP_Serial : this.ArrayBOPP[i].Serial,
+          // BOPP_Cantidad : this.ArrayBOPP[i].Cant,
+          // UndMed_Id : 'µm',
+          // CatMP_Id : 6,
+          // BOPP_Precio : this.ArrayBOPP[i].Precio,
+          // TpBod_Id : 8,
+          // BOPP_FechaIngreso : this.today,
+          // BOPP_Ancho : this.ArrayBOPP[i].Ancho,
+          // BOPP_CantidadKg : this.ArrayBOPP[i].CantKg,
+          // UndMed_Kg : 'Kg',
+          BOPP_Nombre : `${this.ArrayBOPP[i].Nombre} - ${this.ArrayBOPP[i].Serial} - ${this.ArrayBOPP[i].CantKg} - ${this.ArrayBOPP[i].Ancho}`,
           BOPP_Descripcion : this.ArrayBOPP[i].Descripcion,
           BOPP_Serial : this.ArrayBOPP[i].Serial,
-          BOPP_Cantidad : this.ArrayBOPP[i].Cant,
+          BOPP_CantidadMicras : this.ArrayBOPP[i].Cant,
           UndMed_Id : 'µm',
           CatMP_Id : 6,
           BOPP_Precio : this.ArrayBOPP[i].Precio,
           TpBod_Id : 8,
           BOPP_FechaIngreso : this.today,
           BOPP_Ancho : this.ArrayBOPP[i].Ancho,
-          BOPP_CantidadKg : this.ArrayBOPP[i].CantKg,
+          BOPP_Stock : this.ArrayBOPP[i].CantKg,
           UndMed_Kg : 'Kg',
+          BOPP_CantidadInicialKg : this.ArrayBOPP[i].CantKg,
         }
 
         this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(datos_BOPP => {

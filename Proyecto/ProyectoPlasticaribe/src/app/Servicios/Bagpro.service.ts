@@ -8,7 +8,7 @@ import { rutaBagPro, rutaBagProLocate } from 'src/polyfills';
 })
 export class BagproService {
 
-  readonly rutaBagPro = rutaBagProLocate;
+  readonly rutaBagPro = rutaBagPro;
 
   constructor(private http : HttpClient) { }
 

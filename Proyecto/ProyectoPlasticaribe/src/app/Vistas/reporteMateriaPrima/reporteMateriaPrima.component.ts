@@ -482,7 +482,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             if (datos_bopp[i].catMP_Id == categoria && datos_bopp[i].bopP_Id == materiaPrima) {
               const matCant : any = {
                 materiaPrima : datos_bopp[i].bopP_Id,
-                cantidad : datos_bopp[i].bopP_Cantidad,
+                cantidad : datos_bopp[i].bopP_CantidadKg,
               }
               bopp_entrante.push(matCant);
             }
@@ -636,28 +636,28 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   this.inventInicial = 0;
                   for (const item of bopp_Saliente) {
                     if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
-                      this.sumaSalida = 1;
+                      this.sumaSalida = this.sumaSalida + item.cantidad;
                     }
                   }
 
                   for (const item of bopp_entrante) {
                     if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
-                      this.sumaEntrada = 1;
+                      this.sumaEntrada = this.sumaEntrada + + item.cantidad;
                     }
                   }
 
                   this.inventInicial = 0;
 
-                  this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
-                    datos_bopp[i].bopP_Serial,
-                    datos_bopp[i].bopP_Nombre,
-                    datos_bopp[i].bopP_Precio,
-                    this.inventInicial,
-                    this.sumaEntrada,
-                    this.sumaSalida,
-                    1,
-                    "Rollo(s)",
-                    datos_categoria.catMP_Nombre);
+                this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                  datos_bopp[i].bopP_Serial,
+                  datos_bopp[i].bopP_Nombre,
+                  datos_bopp[i].bopP_Precio,
+                  datos_bopp[i].bopP_CantidadInicialKg,
+                  this.sumaEntrada,
+                  this.sumaSalida,
+                  datos_bopp[i].bopP_Stock,
+                  "Kg",
+                  datos_categoria.catMP_Nombre);
                 });
               }
             }
@@ -759,7 +759,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             if (datos_bopp[i].catMP_Id == categoria && datos_bopp[i].bopP_Id == idMateriaPrima) {
               const matCant : any = {
                 materiaPrima : datos_bopp[i].bopP_Id,
-                cantidad : datos_bopp[i].bopP_Cantidad,
+                cantidad : datos_bopp[i].bopP_CantidadKg,
               }
               bopp_entrante.push(matCant);
             }
@@ -913,28 +913,28 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   this.inventInicial = 0;
                   for (const item of bopp_Saliente) {
                     if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
-                      this.sumaSalida = 1;
+                      this.sumaSalida = this.sumaSalida + item.cantidad;
                     }
                   }
 
                   for (const item of bopp_entrante) {
                     if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
-                      this.sumaEntrada = 1;
+                      this.sumaEntrada = this.sumaEntrada + + item.cantidad;
                     }
                   }
 
                   this.inventInicial = 0;
 
-                  this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
-                    datos_bopp[i].bopP_Serial,
-                    datos_bopp[i].bopP_Nombre,
-                    datos_bopp[i].bopP_Precio,
-                    this.inventInicial,
-                    this.sumaEntrada,
-                    this.sumaSalida,
-                    1,
-                    "Rollo(s)",
-                    datos_categoria.catMP_Nombre);
+                this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                  datos_bopp[i].bopP_Serial,
+                  datos_bopp[i].bopP_Nombre,
+                  datos_bopp[i].bopP_Precio,
+                  datos_bopp[i].bopP_CantidadInicialKg,
+                  this.sumaEntrada,
+                  this.sumaSalida,
+                  datos_bopp[i].bopP_Stock,
+                  "Kg",
+                  datos_categoria.catMP_Nombre);
                 });
               }
             }
@@ -1287,7 +1287,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             if (datos_bopp[i].catMP_Id == categoria && datos_bopp[i].bopP_Id == materiaPrima) {
               const matCant : any = {
                 materiaPrima : datos_bopp[i].bopP_Id,
-                cantidad : datos_bopp[i].bopP_Cantidad,
+                cantidad : datos_bopp[i].bopP_CantidadKg,
               }
               bopp_entrante.push(matCant);
             }
@@ -1441,28 +1441,28 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   this.inventInicial = 0;
                   for (const item of bopp_Saliente) {
                     if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
-                      this.sumaSalida = 1;
+                      this.sumaSalida = this.sumaSalida + item.cantidad;
                     }
                   }
 
                   for (const item of bopp_entrante) {
                     if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
-                      this.sumaEntrada = 1;
+                      this.sumaEntrada = this.sumaEntrada + + item.cantidad;
                     }
                   }
 
                   this.inventInicial = 0;
 
-                  this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
-                    datos_bopp[i].bopP_Serial,
-                    datos_bopp[i].bopP_Nombre,
-                    datos_bopp[i].bopP_Precio,
-                    this.inventInicial,
-                    this.sumaEntrada,
-                    this.sumaSalida,
-                    1,
-                    "Rollo(s)",
-                    datos_categoria.catMP_Nombre);
+                this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                  datos_bopp[i].bopP_Serial,
+                  datos_bopp[i].bopP_Nombre,
+                  datos_bopp[i].bopP_Precio,
+                  datos_bopp[i].bopP_CantidadInicialKg,
+                  this.sumaEntrada,
+                  this.sumaSalida,
+                  datos_bopp[i].bopP_Stock,
+                  "Kg",
+                  datos_categoria.catMP_Nombre);
                 });
               }
             }
@@ -1564,7 +1564,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             if (datos_bopp[i].catMP_Id == categoria && datos_bopp[i].bopP_Id == idMateriaPrima) {
               const matCant : any = {
                 materiaPrima : datos_bopp[i].bopP_Id,
-                cantidad : datos_bopp[i].bopP_Cantidad,
+                cantidad : datos_bopp[i].bopP_CantidadKg,
               }
               bopp_entrante.push(matCant);
             }
@@ -1718,28 +1718,28 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   this.inventInicial = 0;
                   for (const item of bopp_Saliente) {
                     if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
-                      this.sumaSalida = 1;
+                      this.sumaSalida = this.sumaSalida + item.cantidad;
                     }
                   }
 
                   for (const item of bopp_entrante) {
                     if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
-                      this.sumaEntrada = 1;
+                      this.sumaEntrada = this.sumaEntrada + + item.cantidad;
                     }
                   }
 
                   this.inventInicial = 0;
 
-                  this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
-                    datos_bopp[i].bopP_Serial,
-                    datos_bopp[i].bopP_Nombre,
-                    datos_bopp[i].bopP_Precio,
-                    this.inventInicial,
-                    this.sumaEntrada,
-                    this.sumaSalida,
-                    1,
-                    "Rollo(s)",
-                    datos_categoria.catMP_Nombre);
+                this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                  datos_bopp[i].bopP_Serial,
+                  datos_bopp[i].bopP_Nombre,
+                  datos_bopp[i].bopP_Precio,
+                  datos_bopp[i].bopP_CantidadInicialKg,
+                  this.sumaEntrada,
+                  this.sumaSalida,
+                  datos_bopp[i].bopP_Stock,
+                  "Kg",
+                  datos_categoria.catMP_Nombre);
                 });
               }
             }
@@ -2090,7 +2090,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           if (datos_bopp[i].catMP_Id == categoria) {
             const matCant : any = {
               materiaPrima : datos_bopp[i].bopP_Id,
-              cantidad : datos_bopp[i].bopP_Cantidad,
+              cantidad : datos_bopp[i].bopP_CantidadKg,
             }
             bopp_entrante.push(matCant);
           }
@@ -2241,28 +2241,27 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                 this.sumaEntrada = 0;
                 this.inventInicial = 0;
                 for (const item of bopp_Saliente) {
-                  if (datos_bopp[i].bopP_Id == item.materiaPrima) {
-                    this.sumaSalida = this.sumaSalida - 1;
+                  if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
+                    this.sumaSalida = this.sumaSalida + item.cantidad;
                   }
                 }
 
                 for (const item of bopp_entrante) {
-                  if (datos_bopp[i].bopP_Id == item.materiaPrima) {
-                    this.sumaEntrada = this.sumaEntrada + 1;
+                  if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
+                    this.sumaEntrada = this.sumaEntrada + + item.cantidad;
                   }
                 }
 
                 this.inventInicial = 0;
-
                 this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
                   datos_bopp[i].bopP_Serial,
                   datos_bopp[i].bopP_Nombre,
                   datos_bopp[i].bopP_Precio,
-                  this.inventInicial,
+                  datos_bopp[i].bopP_CantidadInicialKg,
                   this.sumaEntrada,
                   this.sumaSalida,
-                  1,
-                  "Rollo(s)",
+                  datos_bopp[i].bopP_Stock,
+                  "Kg",
                   datos_categoria.catMP_Nombre);
               });
             }
@@ -2646,7 +2645,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           if (datos_bopp[i].catMP_Id == categoria) {
             const matCant : any = {
               materiaPrima : datos_bopp[i].bopP_Id,
-              cantidad : datos_bopp[i].bopP_Cantidad,
+              cantidad : datos_bopp[i].bopP_CantidadKg,
             }
             bopp_entrante.push(matCant);
           }
@@ -2798,27 +2797,26 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                 this.inventInicial = 0;
                 for (const item of bopp_Saliente) {
                   if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
-                    this.sumaSalida = 1;
+                    this.sumaSalida = this.sumaSalida + item.cantidad;
                   }
                 }
 
                 for (const item of bopp_entrante) {
                   if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
-                    this.sumaEntrada = 1;
+                    this.sumaEntrada = this.sumaEntrada + + item.cantidad;
                   }
                 }
 
                 this.inventInicial = 0;
-
                 this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
                   datos_bopp[i].bopP_Serial,
                   datos_bopp[i].bopP_Nombre,
                   datos_bopp[i].bopP_Precio,
-                  this.inventInicial,
+                  datos_bopp[i].bopP_CantidadInicialKg,
                   this.sumaEntrada,
                   this.sumaSalida,
-                  1,
-                  "Rollo(s)",
+                  datos_bopp[i].bopP_Stock,
+                  "Kg",
                   datos_categoria.catMP_Nombre);
               });
             }
@@ -3215,10 +3213,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   datos_bopp[i].bopP_Serial,
                   datos_bopp[i].bopP_Nombre,
                   datos_bopp[i].bopP_Precio,
-                  this.inventInicial,
+                  datos_bopp[i].bopP_CantidadInicialKg,
                   this.sumaEntrada,
                   this.sumaSalida,
-                  datos_bopp[i].bopP_CantidadKg,
+                  datos_bopp[i].bopP_Stock,
                   "Kg",
                   datos_categoria.catMP_Nombre);
               });
