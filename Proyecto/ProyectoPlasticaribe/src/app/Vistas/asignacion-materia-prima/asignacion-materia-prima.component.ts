@@ -283,51 +283,52 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let cantidadFinal : number = cantidadadicional + this.kgOT;
     let cantAsig : number = 0; //Variable que almacena la cantidad de materia prima que se ha asignado hasta el momento
     let cantRestante : number = 0;
+    this.cantidadAsignada = 0;
 
-    const datosAsignacion : any = {
-      AsigMP_OrdenTrabajo : idOrdenTrabajo,
-      AsigMp_FechaEntrega : fechaEntrega,
-      AsigMp_Observacion : observacion,
-      Estado_Id : 13,
-      AsigMp_Maquina : maquina,
-      Usua_Id : this.storage_Id,
-    }
-    this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
-      this.obtenerUltimoIdAsignacaion();
-    });
-
-    // this.asignacionMPService.srvObtenerListaPorOt(idOrdenTrabajo).subscribe(datos_asigncaion => {
-    //   for (let index = 0; index < datos_asigncaion.length; index++) {
-    //     this.detallesAsignacionService.srvObtenerLista().subscribe(datos_asignacionMP => {
-    //       for (let i = 0; i < datos_asignacionMP.length; i++) {
-    //         if (datos_asigncaion[index].asigMp_Id == datos_asignacionMP[i].asigMp_Id) {
-    //           cantAsig = cantAsig + datos_asignacionMP[i].dtAsigMp_Cantidad;
-    //           this.cantidadAsignada = this.cantidadAsignada + datos_asignacionMP[i].dtAsigMp_Cantidad;
-    //         }
-    //       }
-    //     });
-    //   }
+    // const datosAsignacion : any = {
+    //   AsigMP_OrdenTrabajo : idOrdenTrabajo,
+    //   AsigMp_FechaEntrega : fechaEntrega,
+    //   AsigMp_Observacion : observacion,
+    //   Estado_Id : 13,
+    //   AsigMp_Maquina : maquina,
+    //   Usua_Id : this.storage_Id,
+    // }
+    // this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
+    //   this.obtenerUltimoIdAsignacaion();
     // });
 
-    // setTimeout(() => {
-    //   this.load = false;
-    //   if (this.cantidadAsignada <= this.cantRestante) {
-    //     const datosAsignacion : any = {
-    //       AsigMP_OrdenTrabajo : idOrdenTrabajo,
-    //       AsigMp_FechaEntrega : fechaEntrega,
-    //       AsigMp_Observacion : observacion,
-    //       Estado_Id : 13,
-    //       AsigMp_Maquina : maquina,
-    //       Usua_Id : this.storage_Id,
-    //     }
-    //     this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
-    //       this.obtenerUltimoIdAsignacaion();
-    //     });
-    //   } else {
-    //     this.load = true;
-    //     Swal.fire(`La cantidad a asignar supera el limete de Kg permitidos para la OT ${idOrdenTrabajo}`);
-    //   }
-    // }, 1500);
+    this.asignacionMPService.srvObtenerListaPorOt(idOrdenTrabajo).subscribe(datos_asigncaion => {
+      for (let index = 0; index < datos_asigncaion.length; index++) {
+        this.detallesAsignacionService.srvObtenerLista().subscribe(datos_asignacionMP => {
+          for (let i = 0; i < datos_asignacionMP.length; i++) {
+            if (datos_asigncaion[index].asigMp_Id == datos_asignacionMP[i].asigMp_Id) {
+              cantAsig = cantAsig + datos_asignacionMP[i].dtAsigMp_Cantidad;
+              this.cantidadAsignada = this.cantidadAsignada + datos_asignacionMP[i].dtAsigMp_Cantidad;
+            }
+          }
+        });
+      }
+    });
+
+    setTimeout(() => {
+      this.load = false;
+      if (this.cantidadAsignada <= this.cantRestante) {
+        const datosAsignacion : any = {
+          AsigMP_OrdenTrabajo : idOrdenTrabajo,
+          AsigMp_FechaEntrega : fechaEntrega,
+          AsigMp_Observacion : observacion,
+          Estado_Id : 13,
+          AsigMp_Maquina : maquina,
+          Usua_Id : this.storage_Id,
+        }
+        this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
+          this.obtenerUltimoIdAsignacaion();
+        });
+      } else {
+        this.load = true;
+        Swal.fire(`La cantidad a asignar supera el limete de Kg permitidos para la OT ${idOrdenTrabajo}`);
+      }
+    }, 2000);
   }
 
   //Funcion que va a buscar y obtener el id de la ultima asignacion
@@ -366,6 +367,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let ot : string = this.FormMateriaPrimaRetiro.value.OTRetiro;
     let cantidadadicional: number = this.kgOT * 0.1;
     let cantidadFinal : number = cantidadadicional + this.kgOT;
+    this.cantRestante = 0;
     let cantAsig : number = 0; //Variable que almacena la cantidad de materia prima que se ha asignado hasta el momento
 
     this.load = false;
