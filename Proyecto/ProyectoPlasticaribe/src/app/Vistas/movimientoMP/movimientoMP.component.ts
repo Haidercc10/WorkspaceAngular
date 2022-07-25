@@ -2959,9 +2959,6 @@ export class MovimientoMPComponent implements OnInit {
     let id : any = formulario.id;
     let tipoDoc : any = formulario.tipoDoc;
     this.mpAgregada = [];
-    this.boppAsignada = [];
-    this.producidoPDF = 0;
-    this.asignadoPDF = 0;
 
     if (tipoDoc == 'FCO') {
       this.facturaCompraService.srvObtenerLista().subscribe(datos_mpFactura => {
@@ -3059,6 +3056,10 @@ export class MovimientoMPComponent implements OnInit {
         }
       });
     } else if (tipoDoc == 'BOPP') {
+      this.boppAsignada = [];
+      this.producidoPDF = 0;
+      this.asignadoPDF = 0;
+      this.acumuladorOTPDF = [];
       this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(id).subscribe(datos_detallesAsgBOPP => {
         for (let i = 0; i < datos_detallesAsgBOPP.length; i++) {
           this.boppService.srvObtenerListaPorId(datos_detallesAsgBOPP[i].bopP_Id).subscribe(datos_bopp => {
@@ -3069,12 +3070,6 @@ export class MovimientoMPComponent implements OnInit {
                 OT : datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo,
                 Serial : item.bopP_Serial,
                 Nombre : item.bopP_Nombre,
-                Cant : this.formatonumeros(datos_detallesAsgBOPP[i].dtAsigBOPP_Cantidad),
-                UndCant : datos_detallesAsgBOPP[i].undMed_Id,
-                Stock : item.bopP_Stock,
-                UndStock : item.undMed_Id,
-                PrecioUnd : item.bopP_Precio,
-                SubTotal : '',
               }
               this.mpAgregada.push(asignacionBOPP);
 
@@ -3090,24 +3085,22 @@ export class MovimientoMPComponent implements OnInit {
                 this.bagProServices.srvObtenerListaProcExtOt(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo).subscribe(datos_procesos => {
                   for (let index = 0; index < datos_procesos.length; index++) {
                     if (datos_procesos[index].nomStatus == "EMPAQUE") {
-                      this.cantidadTotalEmpaque = datos_procesos[index].extnetokg; + this.cantidadTotalEmpaque;
-                      this.producidoPDF += this.cantidadTotalEmpaque;
+                      this.producidoPDF += datos_procesos[index].extnetokg;
                     }
                   }
                   //SELLADO Y WIKETIADO
                   this.bagProServices.srvObtenerListaProcSelladoOT(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo).subscribe(datos_selado => {
-                    for (let i = 0; i < datos_selado.length; i++) {
-                      if (datos_selado[i].nomStatus == "SELLADO") {
-                        this.cantidadTotalSella = datos_selado[i].peso; + this.cantidadTotalSella;
-                        this.kgProduciodosOT += this.cantidadTotalSella;
-                      } else if (datos_selado[i].nomStatus == "Wiketiado") {
-                        this.cantidadTotalWiketiado = datos_selado[i].peso + this.cantidadTotalWiketiado;
-                        this.producidoPDF += this.cantidadTotalWiketiado;
+                    for (let j = 0; j < datos_selado.length; j++) {
+                      if (datos_selado[j].nomStatus == "SELLADO") {
+                        this.producidoPDF += datos_selado[j].peso;
+                      } else if (datos_selado[j].nomStatus == "Wiketiado") {
+                        this.producidoPDF += datos_selado[j].peso;
                       }
                     }
                   });
                 });
               }
+              break;
             }
           });
         }
@@ -3706,13 +3699,13 @@ export class MovimientoMPComponent implements OnInit {
                       this.tableAsignacionBOPP(this.mpAgregada, ['OT', 'Serial', 'Nombre']),
 
                       {
-                        text: `\n\nCantidad Total de Materia Prima Asignada: ${this.asignadoPDF}`,
+                        text: `\n\nCantidad Total de Materia Prima Asignada: ${this.formatonumeros(Math.round(this.asignadoPDF))}`,
                         alignment: 'right',
                         style: 'header',
                       },
                       '\n \n',
                       {
-                        text: `\n\nSuma de Producido por las Ordenes de Trabajo: ${this.producidoPDF}`,
+                        text: `\n\nSuma de Producido por las Ordenes de Trabajo: ${this.formatonumeros(Math.round(this.producidoPDF))}`,
                         alignment: 'right',
                         style: 'header',
                       },
@@ -3741,6 +3734,7 @@ export class MovimientoMPComponent implements OnInit {
         }
       });
     }
+
   }
 
 }

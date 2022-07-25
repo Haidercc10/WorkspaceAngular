@@ -232,7 +232,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       if (datos_bopp.length == 0) Swal.fire("El Pallet/Serial no se encuentra registrado.");
       else {
         for (let i = 0; i < datos_bopp.length; i++) {
-          if (datos_bopp[i].bopP_Stock <= 3.5) {
+          if (datos_bopp[i].bopP_Stock >= 1.5) {
             this.boppSeleccionado.push(datos_bopp[i]);
             this.cargarBOPP();
           }
@@ -338,10 +338,11 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
         this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
           for (let k = 0; k < datos_bopp.length; k++) {
             if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
+              let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
               let datos : any = {
                 AsigBOPP_Id : idAsignacion,
                 BOPP_Id : datos_bopp[k].bopP_Id,
-                DtAsigBOPP_Cantidad : datos_bopp[i].bopP_CantidadInicialKg / numeroOT,
+                DtAsigBOPP_Cantidad : cantidad,
                 UndMed_Id : 'Kg',
                 Proceso_Id : 'CORTE',
                 DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
@@ -425,7 +426,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             tpBod_Id : item.tpBod_Id,
             bopP_FechaIngreso : item.bopP_FechaIngreso,
             bopP_Ancho : item.bopP_Ancho,
-            bopP_Stock : cantidadFinal,
+            bopP_Stock : 0,
             UndMed_Kg : item.undMed_Kg,
             bopP_CantidadInicialKg : item.bopP_CantidadInicialKg,
           }
