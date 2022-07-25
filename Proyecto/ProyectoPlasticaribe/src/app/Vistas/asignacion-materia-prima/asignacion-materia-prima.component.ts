@@ -342,6 +342,23 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   obtenerProcesoId(asigncaion : number){
+    // for (const item of this.ArrayMateriaPrimaRetirada) {
+    //   this.procesosService.srvObtenerLista().subscribe(datos_proceso => {
+    //     for (let i = 0; i < datos_proceso.length; i++) {
+    //       if (datos_proceso[i].proceso_Nombre == item.Proceso) {
+    //         let idMateriaPrima = item.Id;
+    //         let cantidadMateriaPrima = item.Cant;
+    //         let presentacionMateriaPrima = item.UndCant;
+    //         let proceso : string = datos_proceso[i].proceso_Id;
+    //         this.detallesAsignacionMP(asigncaion,
+    //                                   idMateriaPrima,
+    //                                   cantidadMateriaPrima,
+    //                                   presentacionMateriaPrima,
+    //                                   proceso);
+    //       }
+    //     }
+    //   });
+    // }
     for (let index = 0; index < this.ArrayMateriaPrimaRetirada.length; index++) {
       this.procesosService.srvObtenerLista().subscribe(datos_proceso => {
         for (let i = 0; i < datos_proceso.length; i++) {
@@ -595,21 +612,24 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         icon: 'success',
         title: '¡Registro de Asignación creado con exito!'
       });
-      this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
-        OTRetiro : '',
-        FechaRetiro : this.today,
-        Maquina : '',
-        UsuarioRetiro : '',
-        kgOt : '',
-        EstadoRetiro : '',
-        ObservacionRetiro : '',
-      });
-      this.ArrayMateriaPrimaRetirada= [];
-      this.FormMateriaPrimaRetirada.reset();
-      this.cantidadAsignada = 0;
-      this.cantRestante = 0;
-      this.kgOT = 0;
-      this.load = true;
+
+      setTimeout(() => {
+        this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
+          OTRetiro : '',
+          FechaRetiro : this.today,
+          Maquina : '',
+          UsuarioRetiro : '',
+          kgOt : '',
+          EstadoRetiro : '',
+          ObservacionRetiro : '',
+        });
+        this.ArrayMateriaPrimaRetirada= [];
+        this.FormMateriaPrimaRetirada.reset();
+        this.cantidadAsignada = 0;
+        this.cantRestante = 0;
+        this.kgOT = 0;
+        this.load = true;
+      }, 2500);
     });
   }
 

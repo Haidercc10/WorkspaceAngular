@@ -2942,7 +2942,7 @@ export class MovimientoMPComponent implements OnInit {
         for (const item of bopp) {
           const infoDoc : any = {
             id : item.asigBOPP_Id,
-            codigo : item.asigBOPP_OrdenTrabajo,
+            codigo : formulario.dtAsigBOPP_OrdenTrabajo,
             tipoDoc : 'BOPP',
             fecha : item.asigBOPP_FechaEntrega,
             usuario : item.usua_Id,
@@ -3105,14 +3105,15 @@ export class MovimientoMPComponent implements OnInit {
             bopp.push(datos_bopp);
             for (const item of bopp) {
               const asignacionBOPP : any = {
-                Id : item.bopP_Id,
+                OT : datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo,
+                Serial : item.bopP_Serial,
                 Nombre : item.bopP_Nombre,
-                Cant : this.formatonumeros(datos_detallesAsgBOPP[i].dtAsigBOPP_Cantidad),
-                UndCant : datos_detallesAsgBOPP[i].undMed_Id,
-                Stock : item.bopP_Stock,
-                UndStock : item.undMed_Id,
-                PrecioUnd : item.bopP_Precio,
-                SubTotal : '',
+                // Cant : this.formatonumeros(datos_detallesAsgBOPP[i].dtAsigBOPP_Cantidad),
+                // UndCant : datos_detallesAsgBOPP[i].undMed_Id,
+                // Stock : item.bopP_Stock,
+                // UndStock : item.undMed_Id,
+                // PrecioUnd : item.bopP_Precio,
+                // SubTotal : '',
               }
               this.mpAgregada.push(asignacionBOPP);
             }
@@ -3177,7 +3178,7 @@ export class MovimientoMPComponent implements OnInit {
   return {
       table: {
         headerRows: 1,
-        widths: ['*', '*',],
+        widths: ['*', '*',, '*'],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 9,
@@ -3674,7 +3675,7 @@ export class MovimientoMPComponent implements OnInit {
                   let fecharegistroFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
                   const pdfDefinicion : any = {
                     info: {
-                      title: `${item.asigBOPP_Id}`
+                      // title: `${datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo}`
                     },
                     content : [
                       {
@@ -3698,20 +3699,20 @@ export class MovimientoMPComponent implements OnInit {
                         alignment: 'center',
                         style: 'header'
                       },
-                      {
-                        style: 'tablaCliente',
-                        table: {
-                          widths: ['*', '*', '*'],
-                          style: 'header',
-                          body: [
-                            [
-                              `OT: ${item.asigBOPP_OrdenTrabajo}`,
-                            ]
-                          ]
-                        },
-                        layout: 'lightHorizontalLines',
-                        fontSize: 12,
-                      },
+                      // {
+                      //   style: 'tablaCliente',
+                      //   table: {
+                      //     widths: ['*', '*', '*'],
+                      //     style: 'header',
+                      //     body: [
+                      //       [
+                      //         `OT: ${datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo}`,
+                      //       ]
+                      //     ]
+                      //   },
+                      //   layout: 'lightHorizontalLines',
+                      //   fontSize: 12,
+                      // },
                       {
                         text: `\n \nObervación sobre la Asignación: \n ${item.asigBOPP_Observacion}\n`,
                         style: 'header',
@@ -3722,7 +3723,7 @@ export class MovimientoMPComponent implements OnInit {
                         style: 'header'
                       },
 
-                      this.tableAsignacionBOPP(this.mpAgregada, ['Id', 'Nombre']),
+                      this.tableAsignacionBOPP(this.mpAgregada, ['OT', 'Serial', 'Nombre']),
                     ],
                     styles: {
                       header: {
