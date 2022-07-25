@@ -73,13 +73,6 @@
             <label for="floatingSelect">BOPP</label>
           </div>
         </ng-container>
-        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
-          <!-- Serial BOPP -->
-          <!-- <div class="form-floating col-md-2">
-            <input formControlName="idDocumento" type="number" class="form-control" id="floatingInput"required >
-            <label for="floatingInput">Serial de BOPP</label>
-          </div> -->
-        </ng-container>
       </div>
     </div>
     <!-- BOTONES -->
@@ -141,7 +134,7 @@
           <label><b>Cantidad de KG Producida en total: {{kgProduciodosOT | number}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
         </ng-container>
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
-          <label><b>Total Materia Prima Devuelta: {{cantidadKgDevuelta | number}} KG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
+          <!-- <label><b>Total Materia Prima Devuelta: {{cantidadKgDevuelta | number}} KG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label> -->
           <label><b>KG Restante Por Entregar: {{cantRestante | number}}</b></label>
         </ng-container>
       </div>

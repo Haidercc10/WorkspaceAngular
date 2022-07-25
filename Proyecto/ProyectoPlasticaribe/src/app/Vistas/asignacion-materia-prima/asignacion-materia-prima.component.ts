@@ -279,8 +279,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let idUsuario : number;
     let idArea : number;
     let idEstado : number;
-    let cantidadadicional: number = this.kgOT * 0.1;
-    let cantidadFinal : number = cantidadadicional + this.kgOT;
     let cantAsig : number = 0; //Variable que almacena la cantidad de materia prima que se ha asignado hasta el momento
     let cantRestante : number = 0;
     this.cantidadAsignada = 0;
@@ -297,13 +295,13 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     //   this.obtenerUltimoIdAsignacaion();
     // });
 
+    /* Consulta en la tabla de asignaciones la ot y suma la cantidad que se le ha asignado a dicha OT  */
     this.asignacionMPService.srvObtenerListaPorOt(idOrdenTrabajo).subscribe(datos_asigncaion => {
       for (let index = 0; index < datos_asigncaion.length; index++) {
         this.detallesAsignacionService.srvObtenerLista().subscribe(datos_asignacionMP => {
           for (let i = 0; i < datos_asignacionMP.length; i++) {
             if (datos_asigncaion[index].asigMp_Id == datos_asignacionMP[i].asigMp_Id) {
-              cantAsig = cantAsig + datos_asignacionMP[i].dtAsigMp_Cantidad;
-              this.cantidadAsignada = this.cantidadAsignada + datos_asignacionMP[i].dtAsigMp_Cantidad;
+              this.cantidadAsignada += datos_asignacionMP[i].dtAsigMp_Cantidad;
             }
           }
         });
@@ -326,7 +324,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         });
       } else {
         this.load = true;
-        Swal.fire(`La cantidad a asignar supera el limete de Kg permitidos para la OT ${idOrdenTrabajo}`);
+        Swal.fire(`La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}`);
       }
     }, 2000);
   }
@@ -365,9 +363,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   infoOT(){
     let ot : string = this.FormMateriaPrimaRetiro.value.OTRetiro;
-    let cantidadadicional: number = this.kgOT * 0.1;
-    let cantidadFinal : number = cantidadadicional + this.kgOT;
     this.cantRestante = 0;
+    this.kgOT = 0;
     let cantAsig : number = 0; //Variable que almacena la cantidad de materia prima que se ha asignado hasta el momento
 
     this.load = false;
@@ -609,6 +606,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       });
       this.ArrayMateriaPrimaRetirada= [];
       this.FormMateriaPrimaRetirada.reset();
+      this.cantidadAsignada = 0;
+      this.cantRestante = 0;
+      this.kgOT = 0;
       this.load = true;
     });
   }
