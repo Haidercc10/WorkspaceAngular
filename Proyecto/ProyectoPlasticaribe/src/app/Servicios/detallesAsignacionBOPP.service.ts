@@ -29,6 +29,10 @@ export class DetalleAsignacion_BOPPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/BOPP/${id}`)
   }
 
+  srvObtenerListaPorOt(id : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/OT/${id}`)
+  }
+
   //Metodo agregar
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_BOPP', data)

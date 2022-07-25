@@ -104,6 +104,11 @@ export class MovimientoMPComponent implements OnInit {
   kgOT : number;
   acumuladorOT = [];
 
+  producidoPDF = 0;
+  asignadoPDF = 0;
+  acumuladorOTPDF = [];
+  boppAsignada : any = [];
+
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
                   private tipoBodegaService : TipoBodegaService,
@@ -1954,23 +1959,11 @@ export class MovimientoMPComponent implements OnInit {
             this.recuperado = 1;
         });
 
-        this.asignacionBOPPService.srvObtenerListaPorfecha(fecha).subscribe(dato_asignacionBOPP => {
-          if (dato_asignacionBOPP.length == 0) {
-            this.load = true;
-          } else {
-            for (let i = 0; i < dato_asignacionBOPP.length; i++) {
-              if (dato_asignacionBOPP[i].asigBOPP_OrdenTrabajo == idDoc) {
-                this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(dato_asignacionBOPP[i].asigBOPP_Id).subscribe(datos_detallesAsgBOPP => {
-                  for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
-                    this.asignacionBOPP = 'BOPP';
-                    this.lenarTabla(datos_detallesAsgBOPP[j]);
-                    this.asignacionBOPP = '';
-                  }
-                });
-              } else {
-                this.load = true;
-              }
-            }
+        this.detallesAsgBOPPService.srvObtenerListaPorOt(idDoc).subscribe(datos_detallesAsgBOPP => {
+          for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
+            this.asignacionBOPP = 'BOPP';
+            this.lenarTabla(datos_detallesAsgBOPP[j]);
+            this.asignacionBOPP = '';
           }
         });
 
@@ -2032,24 +2025,11 @@ export class MovimientoMPComponent implements OnInit {
             this.recuperado = 1;
         });
       } else if (this.ValidarRol == 4) {
-        this.asignacionBOPPService.srvObtenerListaPorfecha(fecha).subscribe(dato_asignacionBOPP => {
-          if (dato_asignacionBOPP.length == 0) {
-            this.load = true;
-            Swal.fire(`No se encurntran regitros de asignaciones de BOPP para la OT ${idDoc}`);
-          } else {
-            for (let i = 0; i < dato_asignacionBOPP.length; i++) {
-              if (dato_asignacionBOPP[i].asigBOPP_OrdenTrabajo == idDoc) {
-                this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(dato_asignacionBOPP[i].asigBOPP_Id).subscribe(datos_detallesAsgBOPP => {
-                  for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
-                    this.asignacionBOPP = 'BOPP';
-                    this.lenarTabla(datos_detallesAsgBOPP[j]);
-                    this.asignacionBOPP = '';
-                  }
-                });
-              } else {
-                this.load = true;
-              }
-            }
+        this.detallesAsgBOPPService.srvObtenerListaPorOt(idDoc).subscribe(datos_detallesAsgBOPP => {
+          for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
+            this.asignacionBOPP = 'BOPP';
+            this.lenarTabla(datos_detallesAsgBOPP[j]);
+            this.asignacionBOPP = '';
           }
         });
       }
@@ -2115,14 +2095,11 @@ export class MovimientoMPComponent implements OnInit {
             }
           });
         } else if (TipoDocumento == 'Asignación de BOPP') {
-          this.asignacionBOPPService.srvObtenerListaPorOT(idDoc).subscribe(datos_asignacionBOPP => {
-            for (let i = 0; i < datos_asignacionBOPP.length; i++) {
-              this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(datos_asignacionBOPP[i].asigBOPP_Id).subscribe(datos_detallesAsgBOPP => {
-                for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
-                  this.asignacionBOPP = 'BOPP';
-                  this.lenarTabla(datos_detallesAsgBOPP[j]);
-                }
-              });
+          this.detallesAsgBOPPService.srvObtenerListaPorOt(idDoc).subscribe(datos_detallesAsgBOPP => {
+            for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
+              this.asignacionBOPP = 'BOPP';
+              this.lenarTabla(datos_detallesAsgBOPP[j]);
+              this.asignacionBOPP = '';
             }
           });
         }
@@ -2164,14 +2141,11 @@ export class MovimientoMPComponent implements OnInit {
         }
       } else if (this.ValidarRol == 4) {
         if (TipoDocumento == 'Asignación de BOPP') {
-          this.asignacionBOPPService.srvObtenerListaPorOT(idDoc).subscribe(datos_asignacionBOPP => {
-            for (let i = 0; i < datos_asignacionBOPP.length; i++) {
-              this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(datos_asignacionBOPP[i].asigBOPP_Id).subscribe(datos_detallesAsgBOPP => {
-                for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
-                  this.asignacionBOPP = 'BOPP';
-                  this.lenarTabla(datos_detallesAsgBOPP[j]);
-                }
-              });
+          this.detallesAsgBOPPService.srvObtenerListaPorOt(idDoc).subscribe(datos_detallesAsgBOPP => {
+            for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
+              this.asignacionBOPP = 'BOPP';
+              this.lenarTabla(datos_detallesAsgBOPP[j]);
+              this.asignacionBOPP = '';
             }
           });
         }
@@ -2241,19 +2215,11 @@ export class MovimientoMPComponent implements OnInit {
           this.recuperado = 1;
         });
 
-        this.asignacionBOPPService.srvObtenerListaPorOT(idDoc).subscribe(dato_asignacionBOPP => {
-          if (dato_asignacionBOPP.length == 0) {
-            this.load = true;
-          } else {
-            for (let i = 0; i < dato_asignacionBOPP.length; i++) {
-              this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(dato_asignacionBOPP[i].asigBOPP_Id).subscribe(datos_detallesAsgBOPP => {
-                for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
-                  this.asignacionBOPP = 'BOPP';
-                  this.lenarTabla(datos_detallesAsgBOPP[j]);
-                  this.asignacionBOPP = '';
-                }
-              });
-            }
+        this.detallesAsgBOPPService.srvObtenerListaPorOt(idDoc).subscribe(datos_detallesAsgBOPP => {
+          for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
+            this.asignacionBOPP = 'BOPP';
+            this.lenarTabla(datos_detallesAsgBOPP[j]);
+            this.asignacionBOPP = '';
           }
         });
 
@@ -2331,20 +2297,11 @@ export class MovimientoMPComponent implements OnInit {
           this.recuperado = 1;
         });
       } else if (this.ValidarRol == 1 || this.ValidarRol == 4) {
-        this.asignacionBOPPService.srvObtenerListaPorOT(idDoc).subscribe(dato_asignacionBOPP => {
-          if (dato_asignacionBOPP.length == 0) {
-            this.load = true;
-            Swal.fire(`No se encurntran regitros de asignaciones de BOPP para la OT ${idDoc}`);
-          } else {
-            for (let i = 0; i < dato_asignacionBOPP.length; i++) {
-              this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(dato_asignacionBOPP[i].asigBOPP_Id).subscribe(datos_detallesAsgBOPP => {
-                for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
-                  this.asignacionBOPP = 'BOPP';
-                  this.lenarTabla(datos_detallesAsgBOPP[j]);
-                  this.asignacionBOPP = '';
-                }
-              });
-            }
+        this.detallesAsgBOPPService.srvObtenerListaPorOt(idDoc).subscribe(datos_detallesAsgBOPP => {
+          for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
+            this.asignacionBOPP = 'BOPP';
+            this.lenarTabla(datos_detallesAsgBOPP[j]);
+            this.asignacionBOPP = '';
           }
         });
       }
@@ -2998,9 +2955,13 @@ export class MovimientoMPComponent implements OnInit {
 
   // Funcion que llena el array con los productos que pertenecen al pedido que se consulta
   llenarDocumento(formulario : any){
+    this.load = false;
     let id : any = formulario.id;
     let tipoDoc : any = formulario.tipoDoc;
     this.mpAgregada = [];
+    this.boppAsignada = [];
+    this.producidoPDF = 0;
+    this.asignadoPDF = 0;
 
     if (tipoDoc == 'FCO') {
       this.facturaCompraService.srvObtenerLista().subscribe(datos_mpFactura => {
@@ -3108,20 +3069,53 @@ export class MovimientoMPComponent implements OnInit {
                 OT : datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo,
                 Serial : item.bopP_Serial,
                 Nombre : item.bopP_Nombre,
-                // Cant : this.formatonumeros(datos_detallesAsgBOPP[i].dtAsigBOPP_Cantidad),
-                // UndCant : datos_detallesAsgBOPP[i].undMed_Id,
-                // Stock : item.bopP_Stock,
-                // UndStock : item.undMed_Id,
-                // PrecioUnd : item.bopP_Precio,
-                // SubTotal : '',
+                Cant : this.formatonumeros(datos_detallesAsgBOPP[i].dtAsigBOPP_Cantidad),
+                UndCant : datos_detallesAsgBOPP[i].undMed_Id,
+                Stock : item.bopP_Stock,
+                UndStock : item.undMed_Id,
+                PrecioUnd : item.bopP_Precio,
+                SubTotal : '',
               }
               this.mpAgregada.push(asignacionBOPP);
+
+              if (!this.boppAsignada.includes(item.bopP_Nombre)) {
+                this.boppAsignada.push(item.bopP_Nombre);
+                this.asignadoPDF += item.bopP_CantidadInicialKg;
+              }
+
+              // LLENARÁ UN ARRAY CON LAS OT Y BUSCARÁ LA PRODUCCION TOTAL DE LAS OT GUARDADAS
+              if (!this.acumuladorOTPDF.includes(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo)) {
+                this.acumuladorOTPDF.push(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo);
+                // EMPAQUE
+                this.bagProServices.srvObtenerListaProcExtOt(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo).subscribe(datos_procesos => {
+                  for (let index = 0; index < datos_procesos.length; index++) {
+                    if (datos_procesos[index].nomStatus == "EMPAQUE") {
+                      this.cantidadTotalEmpaque = datos_procesos[index].extnetokg; + this.cantidadTotalEmpaque;
+                      this.producidoPDF += this.cantidadTotalEmpaque;
+                    }
+                  }
+                  //SELLADO Y WIKETIADO
+                  this.bagProServices.srvObtenerListaProcSelladoOT(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo).subscribe(datos_selado => {
+                    for (let i = 0; i < datos_selado.length; i++) {
+                      if (datos_selado[i].nomStatus == "SELLADO") {
+                        this.cantidadTotalSella = datos_selado[i].peso; + this.cantidadTotalSella;
+                        this.kgProduciodosOT += this.cantidadTotalSella;
+                      } else if (datos_selado[i].nomStatus == "Wiketiado") {
+                        this.cantidadTotalWiketiado = datos_selado[i].peso + this.cantidadTotalWiketiado;
+                        this.producidoPDF += this.cantidadTotalWiketiado;
+                      }
+                    }
+                  });
+                });
+              }
             }
-          })
+          });
         }
       });
     }
-    this.llenarPDFConBD(formulario);
+    setTimeout(() => {
+      this.llenarPDFConBD(formulario);
+    }, 1800);
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -3178,7 +3172,7 @@ export class MovimientoMPComponent implements OnInit {
   return {
       table: {
         headerRows: 1,
-        widths: ['*', '*',, '*'],
+        widths: [70, 100, '*'],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 9,
@@ -3675,7 +3669,7 @@ export class MovimientoMPComponent implements OnInit {
                   let fecharegistroFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
                   const pdfDefinicion : any = {
                     info: {
-                      // title: `${datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo}`
+                      title: `Asignación BOPP N° ${item.asigBOPP_Id}`
                     },
                     content : [
                       {
@@ -3699,20 +3693,6 @@ export class MovimientoMPComponent implements OnInit {
                         alignment: 'center',
                         style: 'header'
                       },
-                      // {
-                      //   style: 'tablaCliente',
-                      //   table: {
-                      //     widths: ['*', '*', '*'],
-                      //     style: 'header',
-                      //     body: [
-                      //       [
-                      //         `OT: ${datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo}`,
-                      //       ]
-                      //     ]
-                      //   },
-                      //   layout: 'lightHorizontalLines',
-                      //   fontSize: 12,
-                      // },
                       {
                         text: `\n \nObervación sobre la Asignación: \n ${item.asigBOPP_Observacion}\n`,
                         style: 'header',
@@ -3724,6 +3704,19 @@ export class MovimientoMPComponent implements OnInit {
                       },
 
                       this.tableAsignacionBOPP(this.mpAgregada, ['OT', 'Serial', 'Nombre']),
+
+                      {
+                        text: `\n\nCantidad Total de Materia Prima Asignada: ${this.asignadoPDF}`,
+                        alignment: 'right',
+                        style: 'header',
+                      },
+                      '\n \n',
+                      {
+                        text: `\n\nSuma de Producido por las Ordenes de Trabajo: ${this.producidoPDF}`,
+                        alignment: 'right',
+                        style: 'header',
+                      },
+                      '\n \n',
                     ],
                     styles: {
                       header: {
@@ -3736,6 +3729,7 @@ export class MovimientoMPComponent implements OnInit {
                       }
                     }
                   }
+                  this.load = true;
                   const pdf = pdfMake.createPdf(pdfDefinicion);
                   pdf.open();
                   break;
@@ -3747,45 +3741,6 @@ export class MovimientoMPComponent implements OnInit {
         }
       });
     }
-  }
-
-  organizacionPrecioDblClick(){
-    this.ArrayDocumento.sort((a,b)=> Number(b.subTotal) - Number(a.subTotal));
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2500,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-      }
-    });
-    Toast.fire({
-      icon: 'warning',
-      title: 'Ordenado por "Precio Total" de mayor a menor'
-    });
-  }
-
-  //Funcion que organiza los campos de la tabla de pedidos de menor a mayor
-  organizacionPrecio(){
-    this.ArrayDocumento.sort((a,b)=> Number(a.subTotal) - Number(b.subTotal));
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2500,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-      }
-    });
-    Toast.fire({
-      icon: 'warning',
-      title: 'Ordenado por "Precio Total" de menor a mayor'
-    });
   }
 
 }

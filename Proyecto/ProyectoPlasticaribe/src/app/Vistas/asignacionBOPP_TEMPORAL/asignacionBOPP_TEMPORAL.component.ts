@@ -335,7 +335,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
     for (let i = 0; i < this.ordenesTrabajo.length; i++) {
       for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
-        this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+        this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
           for (let k = 0; k < datos_bopp.length; k++) {
             if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
               let datos : any = {
@@ -367,7 +367,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       for (const item of bopp) {
         let stock : number = item.bopP_Stock;
         let cantidadFinal : any = stock - cantidad;
-        if (cantidadFinal <= 3.5) {
+        if (cantidadFinal <= 1.5) {
 
           let datosBOPP : any = {
             bopP_Id : item.bopP_Id,
@@ -425,7 +425,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             tpBod_Id : item.tpBod_Id,
             bopP_FechaIngreso : item.bopP_FechaIngreso,
             bopP_Ancho : item.bopP_Ancho,
-            bopP_Stock : 0,
+            bopP_Stock : cantidadFinal,
             UndMed_Kg : item.undMed_Kg,
             bopP_CantidadInicialKg : item.bopP_CantidadInicialKg,
           }
