@@ -3292,7 +3292,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           if (datos_bopp[i].catMP_Id == categoria) {
             const matCant : any = {
               materiaPrima : datos_bopp[i].bopP_Id,
-              cantidad : datos_bopp[i].bopP_CantidadKg,
+              cantidad : datos_bopp[i].bopP_CantidadInicialKg,
+              ancho : datos_bopp[i].bopP_Ancho,
             }
             bopp_entrante.push(matCant);
           }
@@ -3311,6 +3312,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                     const matCant : any = {
                       materiaPrima : item.bopP_Id,
                       cantidad : datos_detallesAsgBopp[j].dtAsigBOPP_Cantidad,
+
                     }
                     bopp_Saliente.push(matCant);
                   }
@@ -3458,14 +3460,15 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                 this.inventInicial = 0;
                 this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
                   datos_bopp[i].bopP_Serial,
-                  datos_bopp[i].bopP_Nombre,
+                  datos_bopp[i].bopP_Descripcion,
                   datos_bopp[i].bopP_Precio,
                   datos_bopp[i].bopP_CantidadInicialKg,
                   this.sumaEntrada,
                   this.sumaSalida,
                   datos_bopp[i].bopP_Stock,
                   "Kg",
-                  datos_categoria.catMP_Nombre);
+                  datos_categoria.catMP_Nombre,
+                  datos_bopp[i].bopP_Ancho);
               });
             }
           }
