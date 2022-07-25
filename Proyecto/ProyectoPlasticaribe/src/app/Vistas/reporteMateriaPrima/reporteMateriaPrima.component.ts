@@ -90,6 +90,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   sumaSalida : number = 0;
   categorias : any = []; //variable que almacenará las categorias existentes
   categoriaBOPP : string;
+/** Nvo */
+  categoriaSeleccionadaCombo = [];
+/** Nvo */
+
 
   public load: boolean;
 
@@ -154,6 +158,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.fecha();
     this.obtenerCategorias();
     this.obtenerBOPP();
+    this.LimpiarCampos();
   }
 
   initForms() {
@@ -266,6 +271,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.materiaPrimaSeleccionada = [];
     this.categoriaMPBuscadaID = '';
     this.tipobodegaMPBuscadaId = '';
+    this.categoriaBOPP = '';
 
     this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
       this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
@@ -283,17 +289,82 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       let bopp : any = [];
       bopp.push(datos_bopp);
       for (const item of bopp) {
+        this.categoriaBOPP = 'BOPP';
         this.categoriMpService.srvObtenerListaPorId(item.catMP_Id).subscribe(datos_categoria => {
           this.tipoBodegaService.srvObtenerListaPorId(item.tpBod_Id).subscribe(datos_bodega => {
             this.materiaPrimaSeleccionada.push(item);
             this.materiasPrimas.push(item);
             this.categoriaMPBuscadaID = datos_categoria.catMP_Nombre;
             this.tipobodegaMPBuscadaId = datos_bodega.tpBod_Nombre;
-            this.cargarFormMpEnTablas(this.ArrayMateriaPrima, item.bopP_Id, item.bopP_Nombre, item.bopP_Precio, this.inventInicial, sumaEntrada, sumaSalida, item.bopP_Cantidad, item.undMed_Id, this.categoriaMPBuscadaID);
+            this.cargarFormMpEnTablas(this.ArrayMateriaPrima, item.bopP_Id, item.bopP_Descripcion, item.bopP_Precio, item.bopP_CantidadInicialKg, sumaEntrada, sumaSalida, item.bopP_Stock, 'Kg', this.categoriaMPBuscadaID, item.bopP_Ancho);
           });
         });
       }
     });
+  }
+  /** Cargar combo materias primas al seleccionar cual categoria menos BOPP y tintas */
+  cargarComboMatPrimaSegunCategorias(){
+    let comboCategorias = this.FormMateriaPrima.get('MpCategoria')?.value;
+    this.materiasPrimas = [];
+
+    this.categoriMpService.srvObtenerListaPorId(comboCategorias).subscribe(registrosCategorias => {
+        this.categoriaSeleccionadaCombo = registrosCategorias.catMP_Id;
+
+          this.materiaPrimaService.srvObtenerLista().subscribe(registrosMatPrima => {
+            for (let mp = 0; mp < registrosMatPrima.length; mp++) {
+              if(this.categoriaSeleccionadaCombo == registrosMatPrima[mp].catMP_Id) {
+                //let matPrimas = registrosMatPrima[mp].matPri_Id;
+                //this.materiasPrimas.push(matPrimas);
+                //console.log(matPrimas);
+                const matp : any = {
+                  Id : registrosMatPrima[mp].matPri_Id,
+                  Nombre : registrosMatPrima[mp].matPri_Nombre,
+                }
+
+                this.materiasPrimas.push(matp);
+
+
+              } else if (comboCategorias == 6) {
+                this.cargarComboBOPPSegunCategoria();
+                break;
+              } else {
+                Swal.fire('Debe seleccionar una categoria válida.')
+              }
+
+            }
+          });
+    });
+
+
+
+
+
+  }
+  /** Nvo */
+
+  /** Cargar combo materias primas al seleccionar categoria BOPP */
+  cargarComboBOPPSegunCategoria() {
+    let comboCategorias = this.FormMateriaPrima.get('MpCategoria')?.value;
+    this.materiasPrimas = [];
+
+    this.categoriMpService.srvObtenerListaPorId(comboCategorias).subscribe(registrosCategorias => {
+      this.categoriaSeleccionadaCombo = registrosCategorias.catMP_Id;
+      //console.log(this.categoriaSeleccionadaCombo);
+
+        this.boppService.srvObtenerLista().subscribe(registrosBopp => {
+
+          for (let b = 0; b < registrosBopp.length; b++) {
+            if(this.categoriaSeleccionadaCombo == registrosBopp[b].catMP_Id) {
+
+              const BOPPs : any = {
+                Id : registrosBopp[b].bopP_Id,
+                Nombre : registrosBopp[b].bopP_Nombre,
+              }
+              this.materiasPrimas.push(BOPPs);
+            }
+          }
+        });
+  });
   }
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
@@ -306,6 +377,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.materiaPrimaSeleccionada = [];
     let sumaEntrada : number = 0;
     let sumaSalida : number = 0;
+    this.categoriaBOPP = '';
 
     this.materiaPrimaService.srvObtenerListaPorId(nombreMateriaPrima).subscribe(datos_materiaPrima => {
       this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
@@ -323,13 +395,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       let bopp : any = [];
       bopp.push(datos_bopp);
       for (const item of bopp) {
+        this.categoriaBOPP = 'BOPP';
         this.categoriMpService.srvObtenerListaPorId(item.catMP_Id).subscribe(datos_categoria => {
           this.tipoBodegaService.srvObtenerListaPorId(item.tpBod_Id).subscribe(datos_bodega => {
             this.materiaPrimaSeleccionada.push(item);
             this.materiasPrimas.push(item);
             this.categoriaMPBuscadaID = datos_categoria.catMP_Nombre;
             this.tipobodegaMPBuscadaId = datos_bodega.tpBod_Nombre;
-            this.cargarFormMpEnTablas(this.ArrayMateriaPrima, item.bopP_Id, item.bopP_Nombre, item.bopP_Precio, this.inventInicial, sumaEntrada, sumaSalida, item.bopP_Cantidad, item.undMed_Id, this.categoriaMPBuscadaID);
+            this.cargarFormMpEnTablas(this.ArrayMateriaPrima, item.bopP_Id, item.bopP_Descripcion, item.bopP_Precio, item.bopP_CantidadInicialKg, sumaEntrada, sumaSalida, item.bopP_Stock, 'Kg', this.categoriaMPBuscadaID, item.bopP_Ancho);
           });
         });
       }
@@ -441,6 +514,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     let materia_cantidad_recuperado = [];
     let bopp_entrante = [];
     let bopp_Saliente = [];
+    this.categoriaBOPP = '';
+
 
     if (fecha != null && fechaFinal != null && (materiaPrima != null || idMateriaPrima != null) && categoria != null) {
       this.load = false;
@@ -3008,7 +3083,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       }, 2000);
     } else if (categoria != null)  {
       this.load = false;
-      this.categoriaBOPP = 'BOPP';
 
       this.asignacionService.srvObtenerListaPorFecha(this.today).subscribe(datos_asignaciones => {
         for (let i = 0; i < datos_asignaciones.length; i++) {
@@ -3195,6 +3269,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         this.boppService.srvObtenerLista().subscribe(datos_bopp => {
           for (let i = 0; i < datos_bopp.length; i++) {
             if (datos_bopp[i].catMP_Id == categoria) {
+              this.categoriaBOPP = 'BOPP';
               this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
                 this.sumaSalida = 0;
                 this.sumaEntrada = 0;
