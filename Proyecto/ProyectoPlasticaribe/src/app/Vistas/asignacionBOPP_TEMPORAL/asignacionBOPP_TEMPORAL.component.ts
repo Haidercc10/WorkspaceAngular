@@ -127,7 +127,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     this.ArrayBOPP = [];
     this.boppService.srvObtenerLista().subscribe(datos_BOPP => {
       for (let i = 0; i < datos_BOPP.length; i++) {
-        if (datos_BOPP[i].bopP_Stock <= 3.5) this.ArrayBOPP.push(datos_BOPP[i]);
+        if (datos_BOPP[i].bopP_Stock >= 3.5) this.ArrayBOPP.push(datos_BOPP[i]);
       }
     });
   }
@@ -273,18 +273,28 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   asignarBOPP(){
     this.load = false;
 
-    for (const item of this.ordenesTrabajo) {
-      const datos : any = {
-        AsigBOPP_OrdenTrabajo : item.ot,
-        AsigBOPP_FechaEntrega : this.today,
-        AsigBOPP_Observacion : '',
-        Usua_Id : this.storage_Id,
-        Estado_Id : 13,
-      }
-      this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => {
-        this.obtenerIdUltimaAsignacion(datos.AsigBOPP_OrdenTrabajo);
-      });
+    const datos : any = {
+      AsigBOPP_FechaEntrega : this.today,
+      AsigBOPP_Observacion : '',
+      Usua_Id : this.storage_Id,
+      Estado_Id : 13,
     }
+    this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => {
+      this.obtenerIdUltimaAsignacion();
+    });
+
+    // for (const item of this.ordenesTrabajo) {
+    //   const datos : any = {
+    //     AsigBOPP_OrdenTrabajo : item.ot,
+    //     AsigBOPP_FechaEntrega : this.today,
+    //     AsigBOPP_Observacion : '',
+    //     Usua_Id : this.storage_Id,
+    //     Estado_Id : 13,
+    //   }
+    //   this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => {
+    //     this.obtenerIdUltimaAsignacion(datos.AsigBOPP_OrdenTrabajo);
+    //   });
+    // }
     // for (const item of this.ArrayBoppPedida) {
     //   if (this.ot.includes(item.Ot)) {
     //     this.obtenerIdUltimaAsignacion(item.Ot, item.Nombre, item.Cant);
@@ -305,57 +315,47 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     // }
   }
 
-  obtenerIdUltimaAsignacion(ot : number){
+  obtenerIdUltimaAsignacion(){
     let idsAsignaciones = [];
-    // this.asignacionBOPPService.srvObtenerLista().subscribe(datos_asignaciones => {
-    //   for (let i = 0; i < datos_asignaciones.length; i++) {
-    //     idsAsignaciones.push(datos_asignaciones[i].asigBOPP_Id);
-    //   }
-    //   let ultimoId : number = Math.max.apply(null, idsAsignaciones);
-    //   this.detallesAsginacionBOPP(ultimoId);
-    // });
-
-    this.asignacionBOPPService.srvObtenerListaPorAgrupadoOT(ot).subscribe(datos_bopp => {
-      this.detallesAsginacionBOPP(datos_bopp);
+    this.asignacionBOPPService.srvObtenerLista().subscribe(datos_asignaciones => {
+      for (let i = 0; i < datos_asignaciones.length; i++) {
+        idsAsignaciones.push(datos_asignaciones[i].asigBOPP_Id);
+      }
+      let ultimoId : number = Math.max.apply(null, idsAsignaciones);
+      this.detallesAsginacionBOPP(ultimoId);
     });
+
+    // this.asignacionBOPPService.srvObtenerListaPorAgrupadoOT(ot).subscribe(datos_bopp => {
+    //   this.detallesAsginacionBOPP(datos_bopp);
+    // });
   }
 
   detallesAsginacionBOPP(idAsignacion : any){
-    // for (let j = 0; j < this.boppArray.length; j++) {
-    //   let datos : any = {
-    //     AsigBOPP_Id : idAsignacion,
-    //     BOPP_Id : this.boppArray[j].id,
-    //     DtAsigBOPP_Cantidad : this.boppArray[j].cantidad,
-    //     UndMed_Id : 'Kg',
-    //     Proceso_Id : 'CORTE',
-    //   }
-
-    //   this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
-    //     this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
-    //   });
-    // }
-
     let numeroOT : number = this.ordenesTrabajo.length;
 
-    for (const bopp of this.ArrayBoppPedida) {
-      this.boppService.srvObtenerLista().subscribe(datos_bopp => {
-        for (let i = 0; i < datos_bopp.length; i++) {
-          if (datos_bopp[i].bopP_Serial == bopp.Serial) {
-            let datos : any = {
-              AsigBOPP_Id : idAsignacion,
-              BOPP_Id : datos_bopp[i].bopP_Id,
-              DtAsigBOPP_Cantidad : datos_bopp[i].bopP_CantidadInicialKg / numeroOT,
-              UndMed_Id : 'Kg',
-              Proceso_Id : 'CORTE',
-            }
+    for (let i = 0; i < this.ordenesTrabajo.length; i++) {
+      for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
+        this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
+          for (let k = 0; k < datos_bopp.length; k++) {
+            if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
+              let datos : any = {
+                AsigBOPP_Id : idAsignacion,
+                BOPP_Id : datos_bopp[k].bopP_Id,
+                DtAsigBOPP_Cantidad : datos_bopp[i].bopP_CantidadInicialKg / numeroOT,
+                UndMed_Id : 'Kg',
+                Proceso_Id : 'CORTE',
+                DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
+              }
 
-            this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
-              this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
-            });
+              setTimeout(() => {
+                this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
+                  this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
+                });
+              }, 1500);
+            }
           }
-        }
-      });
-      this.obtenerBOPP();
+        });
+      }
     }
   }
 
@@ -367,10 +367,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       for (const item of bopp) {
         let stock : number = item.bopP_Stock;
         let cantidadFinal : any = stock - cantidad;
-        if (cantidadFinal <= 3.5) {
-          let FechaDatetime = item.bopP_FechaIngreso;
-          let FechaCreacionNueva = FechaDatetime.indexOf("T");
-          let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
+        if (cantidadFinal <= 1.5) {
 
           let datosBOPP : any = {
             bopP_Id : item.bopP_Id,
