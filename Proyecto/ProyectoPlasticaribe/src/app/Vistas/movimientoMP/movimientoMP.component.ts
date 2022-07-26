@@ -119,6 +119,10 @@ export class MovimientoMPComponent implements OnInit {
   acumuladorOTPDF = [];
   boppAsignada : any = [];
 
+  ordenesTrabajo = []; //Variable que almacenará las ordenes de trabajo que se consulten
+  cantidadKG : number = 0; //Variable almacenará la cantidad en kilogramos pedida en la OT
+  arrayOT : any = [];
+
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
                   private tipoBodegaService : TipoBodegaService,

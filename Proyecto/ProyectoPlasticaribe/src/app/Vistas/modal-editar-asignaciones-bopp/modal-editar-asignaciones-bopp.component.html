@@ -19,10 +19,10 @@
               <label for="floatingInput">Ajuste</label>
             </div> -->
             <!-- Campo Observacion -->
-            <!-- <div class="form-floating col-md">
+            <div class="form-floating col-md">
               <textarea formControlName="AsgBopp_Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm" maxlength="200" ></textarea>
               <label for="floatingTextArea">Observación</label>
-            </div> -->
+            </div>
 
             <!-- <div class="form-floating col-md-1">
               <mat-checkbox>Impresión</mat-checkbox>
@@ -145,7 +145,7 @@
                   <td id="idMateriaPrima">{{bopp.Serial}}</td>
                   <td id="nombreMateriaPrima">{{bopp.Nombre}}</td>
                   <!-- <td id="Editar" (click)="EditarMateriaPrimaTabla(materiaPrima)"><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Materia Prima"></i></a></td> -->
-                  <!-- <td id="Eliminar" (click)="QuitarMateriaPrimaTabla(i, materiaPrima)"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Materia Prima de la tabla"></i></a></td> -->
+                  <td id="Eliminar" (click)="quitarBOPP(i, bopp)"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar BOPP de la asignación"></i></a></td>
                 </tr>
               </tbody>
             </table>
