@@ -118,7 +118,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
   }
 
   //
-   public limpiarTodosLosCampos(){
+  public limpiarTodosLosCampos(){
     this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
       AsgBopp_OT : '',
       AsgBopp_Ancho : 0,

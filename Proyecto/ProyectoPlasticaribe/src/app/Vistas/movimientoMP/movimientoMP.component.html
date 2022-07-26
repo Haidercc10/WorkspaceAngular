@@ -148,11 +148,11 @@
       <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="staticBackdropLabel2">Editar asignacion Nro. {{identificadorAsignacion}} </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="limpiarCamposAlCerrarModal()"></button>
         </div>
         <div class="modal-body">
           <!--Carga componente editar asignación -->
-          <app-modal-editar-asignaciones-bopp></app-modal-editar-asignaciones-bopp>
+          <app-modal-editar-asignaciones-bopp *ngIf="modalEdicionAsignacionBOPP == true"></app-modal-editar-asignaciones-bopp>
         </div>
       </div>
     </div>

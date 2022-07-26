@@ -1,5 +1,5 @@
 import { ThisReceiver } from '@angular/compiler';
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { info } from 'console';
 import moment from 'moment';
@@ -40,6 +40,8 @@ import { ModalEditarAsignacionesBOPPComponent } from '../modal-editar-asignacion
 
 
 export class MovimientoMPComponent implements OnInit {
+
+  @ViewChild(ModalEditarAsignacionesBOPPComponent)  EditarAsignacionesBOPP : ModalEditarAsignacionesBOPPComponent
 
   public FormDocumentos !: FormGroup;
 
@@ -111,6 +113,7 @@ export class MovimientoMPComponent implements OnInit {
   public modalEdicionAsignacionBOPP : boolean = false;
 
 
+
   producidoPDF = 0;
   asignadoPDF = 0;
   acumuladorOTPDF = [];
@@ -139,8 +142,7 @@ export class MovimientoMPComponent implements OnInit {
                                                     private devolucionMPService : DevolucionesMPService,
                                                       private boppService : EntradaBOPPService,
                                                         private asignacionBOPPService : AsignacionBOPPService,
-                                                          private detallesAsgBOPPService : DetalleAsignacion_BOPPService,
-                                                           private EditarAsignacionesBOPP : ModalEditarAsignacionesBOPPComponent) {
+                                                          private detallesAsgBOPPService : DetalleAsignacion_BOPPService) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : new FormControl(),
@@ -151,7 +153,7 @@ export class MovimientoMPComponent implements OnInit {
       fechaFinal : new FormControl(),
     });
     this.load = true;
-    this.EditarAsignacionesBOPP = EditarAsignacionesBOPP
+    //this.modal = this.EditarAsignacionesBOPP;
   }
 
 
@@ -3763,10 +3765,14 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   editarAsignacion(formulario : any){
+
     if (formulario.tipoDoc == 'BOPP') {
-      this.EditarAsignacionesBOPP.limpiarTodosLosCampos();
       this.modalEdicionAsignacionBOPP = true;
       this.identificadorAsignacion = formulario.id;
     }
+  }
+
+  limpiarCamposAlCerrarModal() {
+    this.EditarAsignacionesBOPP.limpiarTodosLosCampos();
   }
 }
