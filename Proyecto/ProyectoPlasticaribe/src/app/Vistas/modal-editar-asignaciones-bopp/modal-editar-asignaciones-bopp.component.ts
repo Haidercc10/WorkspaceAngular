@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
@@ -13,6 +13,11 @@ import Swal from 'sweetalert2';
   templateUrl: './modal-editar-asignaciones-bopp.component.html',
   styleUrls: ['./modal-editar-asignaciones-bopp.component.css']
 })
+
+@Injectable({
+  providedIn: 'root'
+})
+
 export class ModalEditarAsignacionesBOPPComponent implements OnInit {
 
 
@@ -63,6 +68,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
     this.fecha();
     this.lecturaStorage();
     this.obtenerBOPP();
+    this.limpiarTodosLosCampos();
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -112,7 +118,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
   }
 
   //
-  limpiarTodosLosCampos(){
+   public limpiarTodosLosCampos(){
     this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
       AsgBopp_OT : '',
       AsgBopp_Ancho : 0,
