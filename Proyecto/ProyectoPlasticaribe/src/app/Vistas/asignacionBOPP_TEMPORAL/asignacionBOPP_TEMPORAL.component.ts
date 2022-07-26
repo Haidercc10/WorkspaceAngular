@@ -29,6 +29,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   ordenesTrabajo = []; //Variable que almacenará las ordenes de trabajo que se consulten
   cantidadKG : number = 0; //Variable almacenará la cantidad en kilogramos pedida en la OT
   ot : any = [];
+  estadoOT : any; //Varibale que almacenará el estado en que se encuentra la orden de trabajo
+  arrayOT : any = [];
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -146,48 +148,47 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   }
 
   infoOT(){
-    let ot : string = this.FormAsignacionBopp.value.AsgBopp_OT;
-    let arrayOT : any = [];
+    let ordenTrabajo : string = this.FormAsignacionBopp.value.AsgBopp_OT;
 
     if (this.ordenesTrabajo.length == 0) {
-      this.bagProService.srvObtenerListaClienteOT_Item(ot).subscribe(datos_OT => {
+      this.bagProService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
         for (const item of datos_OT) {
-          const infoOT : any = {
-            ot : item.item,
-            cliente : item.clienteNom,
-            micras : item.extCalibre,
-            ancho : item.ptAnchopt,
-            item : item.clienteItemsNom,
-            kg : item.datosotKg,
-          }
-          this.ordenesTrabajo.push(infoOT);
-          this.cantidadKG = item.datosotKg + this.cantidadKG;
+          this.arrayOT.push(ordenTrabajo);
+          if (item.estado == null || item.estado == '' || item.estado == '0') {
+            const infoOT : any = {
+              ot : item.item,
+              cliente : item.clienteNom,
+              micras : item.extCalibre,
+              ancho : item.ptAnchopt,
+              item : item.clienteItemsNom,
+              kg : item.datosotKg,
+            }
+            this.ordenesTrabajo.push(infoOT);
+            this.cantidadKG = item.datosotKg + this.cantidadKG;
+          } else if (item.estado == 4 || item.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
         }
       });
     } else {
-      for (const item of this.ordenesTrabajo) {
-        arrayOT.push(item.ot);
-        if (arrayOT.includes(ot)) {
-          Swal.fire(`La OT ${ot} ya se encuentra en la tabla`);
-          break;
-        }
-        else {
-          this.bagProService.srvObtenerListaClienteOT_Item(ot).subscribe(datos_OT => {
-            for (const item of datos_OT) {
+      if (!this.arrayOT.includes(ordenTrabajo)) {
+        this.arrayOT.push(ordenTrabajo);
+        this.bagProService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
+          for (const itemOT of datos_OT) {
+            if (itemOT.estado == null || itemOT.estado == '' || itemOT.estado == '0') {
               const infoOT : any = {
-                ot : item.item,
-                cliente : item.clienteNom,
-                micras : item.extCalibre,
-                ancho : item.ptAnchopt,
-                item : item.clienteItemsNom,
-                kg : item.datosotKg,
+                ot : itemOT.item,
+                cliente : itemOT.clienteNom,
+                micras : itemOT.extCalibre,
+                ancho : itemOT.ptAnchopt,
+                item : itemOT.clienteItemsNom,
+                kg : itemOT.datosotKg,
               }
               this.ordenesTrabajo.push(infoOT);
-              this.cantidadKG = item.datosotKg + this.cantidadKG;
-            }
-          });
-        }
-        break;
+              this.cantidadKG = itemOT.datosotKg + this.cantidadKG;
+            } else if (itemOT.estado == 4 || itemOT.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
+          }
+        });
+      } else {
+        Swal.fire(`La OT ${ordenTrabajo} ya se encuentra en la tabla`);
       }
     }
   }
@@ -205,6 +206,11 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       if (result.isConfirmed) {
         this.cantidadKG = this.cantidadKG - formulario.kg;
         this.ordenesTrabajo.splice(index, 1);
+        for (let i = 0; i < this.arrayOT.length; i++) {
+          if (this.arrayOT[i] == formulario.ot) {
+            this.arrayOT.splice(i, 1);
+          }
+        }
         Swal.fire('Orden de Trabajo eliminada');
       }
     });

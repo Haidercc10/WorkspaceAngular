@@ -2959,6 +2959,8 @@ export class MovimientoMPComponent implements OnInit {
     let id : any = formulario.id;
     let tipoDoc : any = formulario.tipoDoc;
     this.mpAgregada = [];
+    let otConsultadas = [];
+    let acumuladora : number = 0;
 
     if (tipoDoc == 'FCO') {
       this.facturaCompraService.srvObtenerLista().subscribe(datos_mpFactura => {
@@ -3062,53 +3064,67 @@ export class MovimientoMPComponent implements OnInit {
       this.acumuladorOTPDF = [];
       this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(id).subscribe(datos_detallesAsgBOPP => {
         for (let i = 0; i < datos_detallesAsgBOPP.length; i++) {
-          this.boppService.srvObtenerListaPorId(datos_detallesAsgBOPP[i].bopP_Id).subscribe(datos_bopp => {
-            let bopp : any = [];
-            bopp.push(datos_bopp);
-            for (const item of bopp) {
-              const asignacionBOPP : any = {
-                OT : datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo,
-                Serial : item.bopP_Serial,
-                Nombre : item.bopP_Nombre,
-              }
-              this.mpAgregada.push(asignacionBOPP);
+          if (!otConsultadas.includes(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo)) {
+            otConsultadas.push(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo);
+          }
+        }
+      });
 
-              if (!this.boppAsignada.includes(item.bopP_Nombre)) {
-                this.boppAsignada.push(item.bopP_Nombre);
-                this.asignadoPDF += item.bopP_CantidadInicialKg;
-              }
-
-              // LLENARÁ UN ARRAY CON LAS OT Y BUSCARÁ LA PRODUCCION TOTAL DE LAS OT GUARDADAS
-              if (!this.acumuladorOTPDF.includes(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo)) {
-                this.acumuladorOTPDF.push(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo);
-                // EMPAQUE
-                this.bagProServices.srvObtenerListaProcExtOt(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo).subscribe(datos_procesos => {
-                  for (let index = 0; index < datos_procesos.length; index++) {
-                    if (datos_procesos[index].nomStatus == "EMPAQUE") {
-                      this.producidoPDF += datos_procesos[index].extnetokg;
-                    }
+      setTimeout(() => {
+        for (const itemOT of otConsultadas) {
+          this.detallesAsgBOPPService.srvObtenerListaPorOt(itemOT).subscribe(datos_detallesAsgBOPP => {
+            for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
+              this.boppService.srvObtenerListaPorId(datos_detallesAsgBOPP[j].bopP_Id).subscribe(datos_bopp => {
+                let bopp : any = [];
+                bopp.push(datos_bopp);
+                acumuladora += 1
+                for (const item of bopp) {
+                  const asignacionBOPP : any = {
+                    ID : acumuladora,
+                    OT : itemOT,
+                    Serial : item.bopP_Serial,
+                    Nombre : item.bopP_Nombre,
                   }
-                  //SELLADO Y WIKETIADO
-                  this.bagProServices.srvObtenerListaProcSelladoOT(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo).subscribe(datos_selado => {
-                    for (let j = 0; j < datos_selado.length; j++) {
-                      if (datos_selado[j].nomStatus == "SELLADO") {
-                        this.producidoPDF += datos_selado[j].peso;
-                      } else if (datos_selado[j].nomStatus == "Wiketiado") {
-                        this.producidoPDF += datos_selado[j].peso;
+                  this.mpAgregada.push(asignacionBOPP);
+
+                  if (!this.boppAsignada.includes(item.bopP_Nombre)) {
+                    this.boppAsignada.push(item.bopP_Nombre);
+                    this.asignadoPDF += item.bopP_CantidadInicialKg;
+                  }
+
+                  // LLENARÁ UN ARRAY CON LAS OT Y BUSCARÁ LA PRODUCCION TOTAL DE LAS OT GUARDADAS
+                  if (!this.acumuladorOTPDF.includes(itemOT)) {
+                    this.acumuladorOTPDF.push(itemOT);
+                    // EMPAQUE
+                    this.bagProServices.srvObtenerListaProcExtOt(itemOT).subscribe(datos_procesos => {
+                      for (let index = 0; index < datos_procesos.length; index++) {
+                        if (datos_procesos[index].nomStatus == "EMPAQUE") {
+                          this.producidoPDF += datos_procesos[index].extnetokg;
+                        }
                       }
-                    }
-                  });
-                });
-              }
-              break;
+                      //SELLADO Y WIKETIADO
+                      this.bagProServices.srvObtenerListaProcSelladoOT(itemOT).subscribe(datos_selado => {
+                        for (let j = 0; j < datos_selado.length; j++) {
+                          if (datos_selado[j].nomStatus == "SELLADO") {
+                            this.producidoPDF += datos_selado[j].peso;
+                          } else if (datos_selado[j].nomStatus == "Wiketiado") {
+                            this.producidoPDF += datos_selado[j].peso;
+                          }
+                        }
+                      });
+                    });
+                  }
+                  break;
+                }
+              });
             }
           });
         }
-      });
+      }, 1200);
     }
     setTimeout(() => {
       this.llenarPDFConBD(formulario);
-    }, 1800);
+    }, 2500);
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -3165,7 +3181,7 @@ export class MovimientoMPComponent implements OnInit {
   return {
       table: {
         headerRows: 1,
-        widths: [70, 100, '*'],
+        widths: [30, 70, 100, '*'],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 9,
@@ -3696,7 +3712,7 @@ export class MovimientoMPComponent implements OnInit {
                         style: 'header'
                       },
 
-                      this.tableAsignacionBOPP(this.mpAgregada, ['OT', 'Serial', 'Nombre']),
+                      this.tableAsignacionBOPP(this.mpAgregada, ['ID', 'OT', 'Serial', 'Nombre']),
 
                       {
                         text: `\n\nCantidad Total de Materia Prima Asignada: ${this.formatonumeros(Math.round(this.asignadoPDF))}`,

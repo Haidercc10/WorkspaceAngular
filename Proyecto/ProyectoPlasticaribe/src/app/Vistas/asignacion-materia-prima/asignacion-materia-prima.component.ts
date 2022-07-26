@@ -78,6 +78,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   kgOT : number;
   cantidadAsignada : number = 0;
   cantRestante : number = 0;
+  estadoOT : any;
 
   public load: boolean;
 
@@ -296,37 +297,40 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     // });
 
     /* Consulta en la tabla de asignaciones la ot y suma la cantidad que se le ha asignado a dicha OT  */
-    this.asignacionMPService.srvObtenerListaPorOt(idOrdenTrabajo).subscribe(datos_asigncaion => {
-      for (let index = 0; index < datos_asigncaion.length; index++) {
-        this.detallesAsignacionService.srvObtenerLista().subscribe(datos_asignacionMP => {
-          for (let i = 0; i < datos_asignacionMP.length; i++) {
-            if (datos_asigncaion[index].asigMp_Id == datos_asignacionMP[i].asigMp_Id) {
-              this.cantidadAsignada += datos_asignacionMP[i].dtAsigMp_Cantidad;
-            }
-          }
-        });
-      }
-    });
 
-    setTimeout(() => {
-      this.load = false;
-      if (this.cantidadAsignada <= this.cantRestante) {
-        const datosAsignacion : any = {
-          AsigMP_OrdenTrabajo : idOrdenTrabajo,
-          AsigMp_FechaEntrega : fechaEntrega,
-          AsigMp_Observacion : observacion,
-          Estado_Id : 13,
-          AsigMp_Maquina : maquina,
-          Usua_Id : this.storage_Id,
+    if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
+      this.asignacionMPService.srvObtenerListaPorOt(idOrdenTrabajo).subscribe(datos_asigncaion => {
+        for (let index = 0; index < datos_asigncaion.length; index++) {
+          this.detallesAsignacionService.srvObtenerLista().subscribe(datos_asignacionMP => {
+            for (let i = 0; i < datos_asignacionMP.length; i++) {
+              if (datos_asigncaion[index].asigMp_Id == datos_asignacionMP[i].asigMp_Id) {
+                this.cantidadAsignada += datos_asignacionMP[i].dtAsigMp_Cantidad;
+              }
+            }
+          });
         }
-        this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
-          this.obtenerUltimoIdAsignacaion();
-        });
-      } else {
-        this.load = true;
-        Swal.fire(`La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}`);
-      }
-    }, 2000);
+      });
+
+      setTimeout(() => {
+        this.load = false;
+        if (this.cantidadAsignada <= this.cantRestante) {
+          const datosAsignacion : any = {
+            AsigMP_OrdenTrabajo : idOrdenTrabajo,
+            AsigMp_FechaEntrega : fechaEntrega,
+            AsigMp_Observacion : observacion,
+            Estado_Id : 13,
+            AsigMp_Maquina : maquina,
+            Usua_Id : this.storage_Id,
+          }
+          this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
+            this.obtenerUltimoIdAsignacaion();
+          });
+        } else {
+          this.load = true;
+          Swal.fire(`La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}`);
+        }
+      }, 2000);
+    } else if (this.estadoOT == 4 || this.estadoOT == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${idOrdenTrabajo} se encuentra cerrada.`);
   }
 
   //Funcion que va a buscar y obtener el id de la ultima asignacion
@@ -389,6 +393,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       if (datos_procesos.length != 0) {
         for (let index = 0; index < datos_procesos.length; index++) {
           this.kgOT = datos_procesos[index].datosotKg;
+          this.estadoOT = datos_procesos[index].estado;
           this.FormMateriaPrimaRetiro.setValue({
             OTRetiro : this.FormMateriaPrimaRetiro.value.OTRetiro,
             FechaRetiro : this.FormMateriaPrimaRetiro.value.FechaRetiro,
