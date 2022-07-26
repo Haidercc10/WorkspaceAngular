@@ -196,7 +196,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   // Función para quitar una Ot de la tabla
   QuitarOrdenTrabajo(index : number, formulario : any) {
     Swal.fire({
-      title: '¿Estás seguro de eliminar la Materia Prima de la Asignación?',
+      title: '¿Estás seguro de eliminar la OT de la Asignación?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -257,6 +257,23 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     }
   }
 
+  //
+  quitarBOPP(index : number, formulario : any){
+    Swal.fire({
+      title: '¿Estás seguro de eliminar la Materia Prima de la Asignación?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Eliminar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.ArrayBoppPedida.splice(index, 1);
+        Swal.fire('Orden de Trabajo eliminada');
+      }
+    });
+  }
+
   validarCamposBOPP(){
     if (this.FormularioBOPP.valid) this.cargarBOPPTabla();
     else Swal.fire("Debe cargar minimo un BOPP en la tabla para realizar la asignación");
@@ -278,10 +295,11 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   //
   asignarBOPP(){
     this.load = false;
+    let observacion : string = this.FormAsignacionBopp.value.AsgBopp_Observacion;
 
     const datos : any = {
       AsigBOPP_FechaEntrega : this.today,
-      AsigBOPP_Observacion : '',
+      AsigBOPP_Observacion : observacion,
       Usua_Id : this.storage_Id,
       Estado_Id : 13,
     }

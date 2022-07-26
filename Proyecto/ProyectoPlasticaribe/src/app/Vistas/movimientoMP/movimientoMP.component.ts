@@ -29,6 +29,7 @@ import { TipoBodegaService } from 'src/app/Servicios/tipoBodega.service';
 import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
+import { ModalEditarAsignacionesBOPPComponent } from '../modal-editar-asignaciones-bopp/modal-editar-asignaciones-bopp.component';
 
 @Component({
   selector: 'app-movimientoMP',
@@ -110,6 +111,10 @@ export class MovimientoMPComponent implements OnInit {
   acumuladorOTPDF = [];
   boppAsignada : any = [];
 
+  ordenesTrabajo = []; //Variable que almacenará las ordenes de trabajo que se consulten
+  cantidadKG : number = 0; //Variable almacenará la cantidad en kilogramos pedida en la OT
+  arrayOT : any = [];
+
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
                   private tipoBodegaService : TipoBodegaService,
@@ -133,7 +138,8 @@ export class MovimientoMPComponent implements OnInit {
                                                     private devolucionMPService : DevolucionesMPService,
                                                       private boppService : EntradaBOPPService,
                                                         private asignacionBOPPService : AsignacionBOPPService,
-                                                          private detallesAsgBOPPService : DetalleAsignacion_BOPPService,) {
+                                                          private detallesAsgBOPPService : DetalleAsignacion_BOPPService,
+                                                            private modalAsignacionBOPP : ModalEditarAsignacionesBOPPComponent) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : new FormControl(),
@@ -3756,7 +3762,80 @@ export class MovimientoMPComponent implements OnInit {
 
   editarAsignacion(formulario : any){
     if (formulario.tipoDoc == 'BOPP') {
-      this.identificadorAsignacion = formulario.id;
+      let datosAsgBOPP: any = [];
+      let datosDetallesAsgBOPP : any = [];
+      this.asignacionBOPPService.srvObtenerListaPorId(formulario.id).subscribe(datos_asignacionBOPP => {
+        datosAsgBOPP.push(datos_asignacionBOPP);
+        for (const item of datosAsgBOPP) {
+          this.modalAsignacionBOPP.FormAsignacionBopp.setValue({
+              AsgBopp_OT : '',
+              AsgBopp_Ancho : 0,
+              AsgBopp_Fecha : this.today,
+              AsgBopp_Observacion: item.asigBOPP_Observacion,
+              AsgBopp_Estado: '',
+          });
+        }
+        this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(formulario.id).subscribe(datos_detallesAsgBOPP => {
+          for (let i = 0; i < datos_detallesAsgBOPP.length; i++) {
+            this.boppService.srvObtenerListaPorId(datos_detallesAsgBOPP[i].bopP_Id).subscribe(datos_bopp => {
+              let datosBOPPAsg : any = [];
+              datosBOPPAsg.push(datos_bopp);
+              for (const item of datosBOPPAsg) {
+                let bopp : any = {
+                  Serial : item.bopP_Serial,
+                  Nombre : item.bopP_Nombre,
+                }
+                this.modalAsignacionBOPP.ArrayBoppPedida.push(bopp);
+              }
+            });
+            this.infoOT(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo);
+          }
+        });
+      });
+    }
+  }
+
+  infoOT(ordenTrabajo : number){
+    if (this.modalAsignacionBOPP.ordenesTrabajo.length == 0) {
+      this.bagProServices.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
+        for (const item of datos_OT) {
+          this.arrayOT.push(ordenTrabajo);
+          if (item.estado == null || item.estado == '' || item.estado == '0') {
+            const infoOT : any = {
+              ot : item.item,
+              cliente : item.clienteNom,
+              micras : item.extCalibre,
+              ancho : item.ptAnchopt,
+              item : item.clienteItemsNom,
+              kg : item.datosotKg,
+            }
+            this.modalAsignacionBOPP.ordenesTrabajo.push(infoOT);
+            this.cantidadKG = item.datosotKg + this.cantidadKG;
+          } else if (item.estado == 4 || item.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
+        }
+      });
+    } else {
+      if (!this.arrayOT.includes(ordenTrabajo)) {
+        this.arrayOT.push(ordenTrabajo);
+        this.bagProServices.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
+          for (const itemOT of datos_OT) {
+            if (itemOT.estado == null || itemOT.estado == '' || itemOT.estado == '0') {
+              const infoOT : any = {
+                ot : itemOT.item,
+                cliente : itemOT.clienteNom,
+                micras : itemOT.extCalibre,
+                ancho : itemOT.ptAnchopt,
+                item : itemOT.clienteItemsNom,
+                kg : itemOT.datosotKg,
+              }
+              this.modalAsignacionBOPP.ordenesTrabajo.push(infoOT);
+              this.cantidadKG = itemOT.datosotKg + this.cantidadKG;
+            } else if (itemOT.estado == 4 || itemOT.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
+          }
+        });
+      } else {
+        Swal.fire(`La OT ${ordenTrabajo} ya se encuentra en la tabla`);
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
@@ -12,6 +12,9 @@ import Swal from 'sweetalert2';
   selector: 'app-modal-editar-asignaciones-bopp',
   templateUrl: './modal-editar-asignaciones-bopp.component.html',
   styleUrls: ['./modal-editar-asignaciones-bopp.component.css']
+})
+@Injectable({
+  providedIn: 'root'
 })
 export class ModalEditarAsignacionesBOPPComponent implements OnInit {
 
@@ -259,6 +262,22 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
     }
   }
 
+  quitarBOPP(index : number, formulario : any){
+    Swal.fire({
+      title: '¿Estás seguro de eliminar la Materia Prima de la Asignación?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Eliminar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.ArrayBoppPedida.splice(index, 1);
+        Swal.fire('Orden de Trabajo eliminada');
+      }
+    });
+  }
+
   validarCamposBOPP(){
     if (this.FormularioBOPP.valid) this.cargarBOPPTabla();
     else Swal.fire("Debe cargar minimo un BOPP en la tabla para realizar la asignación");
@@ -280,10 +299,11 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
   //
   asignarBOPP(){
     this.load = false;
+    let observacion : string = this.FormAsignacionBopp.value.AsgBopp_Observacion;
 
     const datos : any = {
       AsigBOPP_FechaEntrega : this.today,
-      AsigBOPP_Observacion : '',
+      AsigBOPP_Observacion : observacion,
       Usua_Id : this.storage_Id,
       Estado_Id : 13,
     }
@@ -463,5 +483,50 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
         }
       }
     });
+  }
+
+
+  ActualizarAsignacion(idAsg : number){
+    this.load = false;
+    let observacion : string = this.FormAsignacionBopp.value.AsgBopp_Observacion;
+
+    const datos : any = {
+      AsigBOPP_FechaEntrega : this.today,
+      AsigBOPP_Observacion : observacion,
+      Usua_Id : this.storage_Id,
+      Estado_Id : 13,
+    }
+
+    this.asignacionBOPPService.srvActualizar(idAsg, datos).subscribe(datos_asginacionBOPP => {
+      this.actualizarDetallesAsignacion(idAsg);
+    });
+  }
+
+  actualizarDetallesAsignacion(idAsg : number){
+    for (let i = 0; i < this.ordenesTrabajo.length; i++) {
+      for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
+        this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
+          for (let k = 0; k < datos_bopp.length; k++) {
+            if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
+              let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
+              let datos : any = {
+                AsigBOPP_Id : idAsg,
+                BOPP_Id : datos_bopp[k].bopP_Id,
+                DtAsigBOPP_Cantidad : cantidad,
+                UndMed_Id : 'Kg',
+                Proceso_Id : 'CORTE',
+                DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
+              }
+
+              setTimeout(() => {
+                this.detallesAsignacionBOPPService.srvActualizar(idAsg, datos).subscribe(datos_detallesAsignacion => {
+                  this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
+                });
+              }, 1500);
+            }
+          }
+        });
+      }
+    }
   }
 }
