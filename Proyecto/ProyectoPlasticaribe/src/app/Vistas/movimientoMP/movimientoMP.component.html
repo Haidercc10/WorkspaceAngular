@@ -101,12 +101,12 @@
             </thead>
           <tbody>
             <tr *ngFor="let doc of ArrayDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index" >
-              <td id="CodigoFactura" (click)="editarAsignacion(doc)">{{doc.codigo}}</td>
-              <td id="Tipo" (click)="editarAsignacion(doc)">{{doc.tipoDoc}}</td>
-              <td id="fecha" (click)="editarAsignacion(doc)">{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
-              <td id="proveedor" (click)="editarAsignacion(doc)">{{doc.usuario}}</td>
-              <td id="mp" (click)="editarAsignacion(doc)">{{doc.mp}}</td>
-              <td id="mp" (click)="editarAsignacion(doc)">{{doc.cant | number}}</td>
+              <td id="CodigoFactura" (click)="editarAsignacion(doc)"  data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.codigo}}</td>
+              <td id="Tipo" (click)="editarAsignacion(doc)"  data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.tipoDoc}}</td>
+              <td id="fecha" (click)="editarAsignacion(doc)"  data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
+              <td id="proveedor" (click)="editarAsignacion(doc)"  data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.usuario}}</td>
+              <td id="mp" (click)="editarAsignacion(doc)"  data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.mp}}</td>
+              <td id="mp" (click)="editarAsignacion(doc)"  data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.cant | number}}</td>
               <td id="subTotalMateriaPrima"><input class="btn btn-danger btn-danger-sm" type="button" value="Ver" (click)="llenarDocumento(doc)"></td>
             </tr>
           </tbody>
@@ -140,5 +140,25 @@
       </div>
     </div>
   </div>
+
+   <!-- Modal de editar asignación -->
+   <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel2">Editar asignacion Nro. {{identificadorAsignacion}} </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!--Carga componente editar asignación -->
+          <p>Hola</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Fin Modal de editar asignación -->
+
+
 </div>
 

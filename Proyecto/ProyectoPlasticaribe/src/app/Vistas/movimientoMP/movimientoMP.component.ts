@@ -103,6 +103,7 @@ export class MovimientoMPComponent implements OnInit {
   MpConsultada = [];
   kgOT : number;
   acumuladorOT = [];
+  public identificadorAsignacion : number;
 
   producidoPDF = 0;
   asignadoPDF = 0;
@@ -3754,6 +3755,8 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   editarAsignacion(formulario : any){
-    if (formulario.tipoDoc == 'BOPP') console.log(formulario);
+    if (formulario.tipoDoc == 'BOPP') {
+      this.identificadorAsignacion = formulario.id;
+    }
   }
 }

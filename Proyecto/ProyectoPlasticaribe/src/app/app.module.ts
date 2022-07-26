@@ -57,6 +57,7 @@ import { ModalCrearMateriasPrimasComponent } from './Vistas/modal-crear-materias
 import { AsignacionBOPPComponent } from './Vistas/asignacion-bopp/asignacion-bopp.component';
 import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
 import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
+import { ModalEditarAsignacionesBOPPComponent } from './Vistas/modal-editar-asignaciones-bopp/modal-editar-asignaciones-bopp.component';
 
 
 
@@ -149,6 +150,7 @@ export const routes: Routes = [
     AsignacionBOPPComponent,
     EntradaBOPPComponent,
     AsignacionBOPP_TEMPORALComponent,
+    ModalEditarAsignacionesBOPPComponent,
   ],
 
 
