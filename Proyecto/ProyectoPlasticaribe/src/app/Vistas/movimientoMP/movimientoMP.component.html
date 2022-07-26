@@ -87,7 +87,7 @@
   <div class="mb-2">
     <div class="row g-1">
       <div class="table-responsive">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-hover mt-2">
           <thead class="TitulosTabla">
             <tr *ngFor="let columnas of titulosTabla let i = index">
               <th id="CodigoFactura" scope="col">{{columnas.idFact}}</th>
@@ -101,12 +101,12 @@
             </thead>
           <tbody>
             <tr *ngFor="let doc of ArrayDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index" >
-              <td id="CodigoFactura">{{doc.codigo}}</td>
-              <td id="Tipo">{{doc.tipoDoc}}</td>
-              <td id="fecha">{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
-              <td id="proveedor">{{doc.usuario}}</td>
-              <td id="mp">{{doc.mp}}</td>
-              <td id="mp">{{doc.cant | number}}</td>
+              <td id="CodigoFactura" (click)="editarAsignacion(doc)">{{doc.codigo}}</td>
+              <td id="Tipo" (click)="editarAsignacion(doc)">{{doc.tipoDoc}}</td>
+              <td id="fecha" (click)="editarAsignacion(doc)">{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
+              <td id="proveedor" (click)="editarAsignacion(doc)">{{doc.usuario}}</td>
+              <td id="mp" (click)="editarAsignacion(doc)">{{doc.mp}}</td>
+              <td id="mp" (click)="editarAsignacion(doc)">{{doc.cant | number}}</td>
               <td id="subTotalMateriaPrima"><input class="btn btn-danger btn-danger-sm" type="button" value="Ver" (click)="llenarDocumento(doc)"></td>
             </tr>
           </tbody>

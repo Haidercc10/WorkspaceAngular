@@ -3698,7 +3698,7 @@ export class MovimientoMPComponent implements OnInit {
                         style: 'header',
                       },
                       {
-                        text: `\n Información la Asignación \n \n`,
+                        text: `\n Información de la Asignación \n \n`,
                         alignment: 'center',
                         style: 'header'
                       },
@@ -3753,4 +3753,7 @@ export class MovimientoMPComponent implements OnInit {
 
   }
 
+  editarAsignacion(formulario : any){
+    if (formulario.tipoDoc == 'BOPP') console.log(formulario);
+  }
 }
