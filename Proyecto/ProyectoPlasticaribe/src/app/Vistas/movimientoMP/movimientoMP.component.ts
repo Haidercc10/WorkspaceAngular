@@ -122,6 +122,7 @@ export class MovimientoMPComponent implements OnInit {
   ordenesTrabajo = []; //Variable que almacenará las ordenes de trabajo que se consulten
   cantidadKG : number = 0; //Variable almacenará la cantidad en kilogramos pedida en la OT
   arrayOT : any = [];
+  otAsignadas : any = [];
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -2949,6 +2950,7 @@ export class MovimientoMPComponent implements OnInit {
           });
           this.totalMPEntregada = this.totalMPEntregada + infoDoc.cant;
           this.ArrayDocumento.sort((a,b) => b.fecha.localeCompare(a.fecha));
+          this.ArrayDocumento.sort((a,b) => Number(b.codigo) - Number(a.codigo));
           this.formatonumeros(this.totalMPEntregada);
           this.boppService.srvObtenerListaPorId(infoDoc.mp).subscribe(datos_bopp => {
             let boppNombre : any = [];
@@ -3098,6 +3100,8 @@ export class MovimientoMPComponent implements OnInit {
       this.producidoPDF = 0;
       this.asignadoPDF = 0;
       this.acumuladorOTPDF = [];
+      this.otAsignadas = [];
+
       this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(id).subscribe(datos_detallesAsgBOPP => {
         for (let i = 0; i < datos_detallesAsgBOPP.length; i++) {
           if (!otConsultadas.includes(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo)) {
@@ -3107,6 +3111,7 @@ export class MovimientoMPComponent implements OnInit {
       });
 
       setTimeout(() => {
+        let boppAsignada : any = [];
         for (const itemOT of otConsultadas) {
           this.detallesAsgBOPPService.srvObtenerListaPorOt(itemOT).subscribe(datos_detallesAsgBOPP => {
             for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
@@ -3115,13 +3120,15 @@ export class MovimientoMPComponent implements OnInit {
                 bopp.push(datos_bopp);
                 acumuladora += 1
                 for (const item of bopp) {
-                  const asignacionBOPP : any = {
-                    ID : acumuladora,
-                    OT : itemOT,
-                    Serial : item.bopP_Serial,
-                    Nombre : item.bopP_Nombre,
+                  if (!boppAsignada.includes(datos_detallesAsgBOPP[j].bopP_Id)) {
+                    boppAsignada.push(datos_detallesAsgBOPP[j].bopP_Id);
+                    const asignacionBOPP : any = {
+                      Nro : acumuladora,
+                      Serial : item.bopP_Serial,
+                      Nombre : item.bopP_Nombre,
+                    }
+                    this.mpAgregada.push(asignacionBOPP);
                   }
-                  this.mpAgregada.push(asignacionBOPP);
 
                   if (!this.boppAsignada.includes(item.bopP_Nombre)) {
                     this.boppAsignada.push(item.bopP_Nombre);
@@ -3131,6 +3138,21 @@ export class MovimientoMPComponent implements OnInit {
                   // LLENARÁ UN ARRAY CON LAS OT Y BUSCARÁ LA PRODUCCION TOTAL DE LAS OT GUARDADAS
                   if (!this.acumuladorOTPDF.includes(itemOT)) {
                     this.acumuladorOTPDF.push(itemOT);
+
+                    this.bagProServices.srvObtenerListaClienteOT_Item(itemOT).subscribe(datos_ot => {
+                      for (let k = 0; k < datos_ot.length; k++) {
+                        let datosOT : any = {
+                          Nro : datos_ot[k].item,
+                          Cliente : datos_ot[k].clienteNom,
+                          Item : datos_ot[k].clienteItemsNom,
+                          Micras : datos_ot[k].extCalibre,
+                          Ancho : datos_ot[k].ptAnchopt,
+                          Kg : datos_ot[k].datosotKg,
+                        }
+                        this.otAsignadas.push(datosOT);
+                      }
+                    });
+
                     // EMPAQUE
                     this.bagProServices.srvObtenerListaProcExtOt(itemOT).subscribe(datos_procesos => {
                       for (let index = 0; index < datos_procesos.length; index++) {
@@ -3156,7 +3178,7 @@ export class MovimientoMPComponent implements OnInit {
             }
           });
         }
-      }, 1200);
+      }, 1500);
     }
     setTimeout(() => {
       this.llenarPDFConBD(formulario);
@@ -3214,10 +3236,10 @@ export class MovimientoMPComponent implements OnInit {
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   tableAsignacionBOPP(data, columns) {
-  return {
+    return {
       table: {
         headerRows: 1,
-        widths: [30, 70, 100, '*'],
+        widths: [30, 100, '*'],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 9,
@@ -3226,8 +3248,24 @@ export class MovimientoMPComponent implements OnInit {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
-  };
-}
+    }
+  }
+
+  tableAsignacionOT(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: [40, '*', '*', 30, 30, 30],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 9,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+    }
+  }
 
   // Funcion para llenar el pdf con información de la base de datos dependiendo el pedido
   llenarPDFConBD(formulario : any){
@@ -3743,25 +3781,35 @@ export class MovimientoMPComponent implements OnInit {
                         style: 'header',
                       },
                       {
-                        text: `\n Información detallada del BOPP asignado \n `,
+                        text: `\n Información detallada de las Ordenes de trabajo \n `,
                         alignment: 'center',
                         style: 'header'
                       },
 
-                      this.tableAsignacionBOPP(this.mpAgregada, ['ID', 'OT', 'Serial', 'Nombre']),
+                      this.tableAsignacionOT(this.otAsignadas, ['Nro', 'Cliente', 'Item', 'Micras', 'Ancho', 'Kg']),
+
+                      '\n',
+                      {
+                        text: `\nProducido por las Ordenes de Trabajo: ${this.formatonumeros(Math.round(this.producidoPDF))}`,
+                        alignment: 'right',
+                        style: 'header',
+                      },
+
+                      '\n',
 
                       {
-                        text: `\n\nCantidad Total de Materia Prima Asignada: ${this.formatonumeros(Math.round(this.asignadoPDF))}`,
-                        alignment: 'right',
-                        style: 'header',
+                        text: `\n Información detallada deL BOPP \n `,
+                        alignment: 'center',
+                        style: 'header'
                       },
-                      '\n \n',
+
+                      this.tableAsignacionBOPP(this.mpAgregada, ['Nro', 'Serial', 'Nombre']),
+
                       {
-                        text: `\n\nSuma de Producido por las Ordenes de Trabajo: ${this.formatonumeros(Math.round(this.producidoPDF))}`,
+                        text: `\nCantidad Total de Materia Prima Asignada: ${this.formatonumeros(Math.round(this.asignadoPDF))}`,
                         alignment: 'right',
                         style: 'header',
                       },
-                      '\n \n',
                     ],
                     styles: {
                       header: {
@@ -3795,7 +3843,6 @@ export class MovimientoMPComponent implements OnInit {
       this.identificadorAsignacion = formulario.id;
       this.arrayOT = [];
       let boppAsignada : any = [];
-      // this.EditarAsignacionesBOPP.idAsignacion = formulario.id;
       this.asignacionBOPPService.srvObtenerListaPorId(formulario.id).subscribe(datos_asignacionBOPP => {
         this.EditarAsignacionesBOPP.cargarDatos(datos_asignacionBOPP);
       });
@@ -3813,10 +3860,12 @@ export class MovimientoMPComponent implements OnInit {
                   Nombre : item.bopP_Nombre,
                 }
                 this.EditarAsignacionesBOPP.ArrayBoppPedida.push(bopp);
+                this.EditarAsignacionesBOPP.idAsignacion = formulario.id;
+                this.EditarAsignacionesBOPP.boppRegistrados.push(item.bopP_Serial);
               }
             }
           });
-          this.infoOT(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo);
+          this.infoOT(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo, datos_detallesAsgBOPP[i].dtAsigBOPP_Id);
         }
       });
       this.modalEdicionAsignacionBOPP = true;
@@ -3827,13 +3876,14 @@ export class MovimientoMPComponent implements OnInit {
     this.EditarAsignacionesBOPP.limpiarTodosLosCampos();
   }
 
-  infoOT(ordenTrabajo : number){
+  infoOT(ordenTrabajo : number, IdDtAsg : number){
     if (!this.arrayOT.includes(ordenTrabajo)) {
       this.arrayOT.push(ordenTrabajo);
       this.bagProServices.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
         for (const itemOT of datos_OT) {
           if (itemOT.estado == null || itemOT.estado == '' || itemOT.estado == '0') {
             const infoOT : any = {
+              IdDtAsg : IdDtAsg,
               ot : itemOT.item,
               cliente : itemOT.clienteNom,
               micras : itemOT.extCalibre,
@@ -3841,7 +3891,9 @@ export class MovimientoMPComponent implements OnInit {
               item : itemOT.clienteItemsNom,
               kg : itemOT.datosotKg,
             }
+            console.log(infoOT)
             this.EditarAsignacionesBOPP.ordenesTrabajo.push(infoOT);
+            this.EditarAsignacionesBOPP.otRegistradas.push(ordenTrabajo);
             break;
           } else if (itemOT.estado == 4 || itemOT.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
         }

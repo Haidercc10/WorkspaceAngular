@@ -60,7 +60,9 @@
                   <th id="nombreMateriaPrima" scope="col">Micras</th>
                   <th id="nombreMateriaPrima" scope="col">Ancho</th>
                   <th id="UnidadMedida" scope="col">Kg</th>
-                  <th id="eliminar" scope="col">Eliminar</th>
+                  <ng-container *ngIf="ValidarRol == 1">
+                    <th id="eliminar" scope="col">Eliminar</th>
+                  </ng-container>
                 </tr>
               </thead>
               <tbody>
@@ -72,7 +74,9 @@
                   <td id="nombreMateriaPrima">{{ot.micras | number}}</td>
                   <td id="nombreMateriaPrima">{{ot.ancho | number}}</td>
                   <td id="UnidadMedida">{{ot.kg | number}}</td>
-                  <td id="Eliminar" (click)="QuitarOrdenTrabajo(i, ot)"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Materia Prima de la tabla"></i></a></td>
+                  <ng-container *ngIf="ValidarRol == 1">
+                    <td id="Eliminar" (click)="QuitarOrdenTrabajo(i, ot)"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Materia Prima de la tabla"></i></a></td>
+                  </ng-container>
                 </tr>
               </tbody>
             </table>
@@ -136,7 +140,9 @@
                   <th id="idMateriaPrima" scope="col">Pallet/Serial</th>
                   <th id="nombreMateriaPrima" scope="col">Nombre</th>
                   <!-- <th id="editar" scope="col">Editar</th> -->
-                  <!-- <th id="eliminar" scope="col">Eliminar</th> -->
+                  <ng-container *ngIf="ValidarRol == 1">
+                    <th id="eliminar" scope="col">Eliminar</th>
+                  </ng-container>
                 </tr>
               </thead>
               <tbody>
@@ -145,7 +151,9 @@
                   <td id="idMateriaPrima">{{bopp.Serial}}</td>
                   <td id="nombreMateriaPrima">{{bopp.Nombre}}</td>
                   <!-- <td id="Editar" (click)="EditarMateriaPrimaTabla(materiaPrima)"><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Materia Prima"></i></a></td> -->
-                  <td id="Eliminar" (click)="quitarBOPP(i, bopp)"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar BOPP de la asignación"></i></a></td>
+                  <ng-container *ngIf="ValidarRol == 1">
+                    <td id="Eliminar" (click)="quitarBOPP(i, bopp)"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar BOPP de la asignación"></i></a></td>
+                  </ng-container>
                 </tr>
               </tbody>
             </table>
@@ -165,7 +173,7 @@
           <div class="row g-3">
             <div class="mb-3">
               <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <button class="btn btn-danger btn-danger-sm" type="button" (click)="asignarBOPP()">Editar Asignación</button>
+                <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarDetallesAsignacion()">Editar Asignación</button>
                 <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosLosCampos()">Limpiar Todo</button>
               </div>
             </div>

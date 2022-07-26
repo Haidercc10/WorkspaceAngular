@@ -39,6 +39,8 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
   estadoOT : any; //Varibale que almacenará el estado en que se encuentra la orden de trabajo
   arrayOT : any = [];
   idAsignacion : number = 0;
+  otRegistradas : any = [];
+  boppRegistrados : any = [];
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -215,6 +217,13 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
       if (result.isConfirmed) {
         this.cantidadKG = this.cantidadKG - formulario.kg;
         this.ordenesTrabajo.splice(index, 1);
+        for (const item of this.ordenesTrabajo) {
+          if (item.IdDtAsg == formulario.IdDtAsg) {
+            this.detallesAsignacionBOPPService.srvEliminar(item.IdDtAsg).subscribe(datos_dtAsgEliminada => {
+              console.log('bien')
+            });
+          }
+        }
         for (let i = 0; i < this.arrayOT.length; i++) {
           if (this.arrayOT[i] == formulario.ot) {
             this.arrayOT.splice(i, 1);
@@ -277,6 +286,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.ArrayBoppPedida.splice(index, 1);
+        // this.detallesAsignacionBOPPService.srvEliminar()
         Swal.fire('Orden de Trabajo eliminada');
       }
     });
@@ -434,7 +444,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
             });
             Toast.fire({
               icon: 'success',
-              title: 'Asignación de BOPP registrada con exito!'
+              title: 'Asignación de BOPP editada con exito!'
             });
             this.limpiarTodosLosCampos();
             this.load = true;
@@ -490,7 +500,6 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
   }
 
   cargarDatos(item : any){
-    console.log(item)
     this.FormAsignacionBopp.setValue({
       AsgBopp_OT : '',
       AsgBopp_Ancho : 0,
@@ -498,49 +507,104 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
       AsgBopp_Observacion: item.asigBOPP_Observacion,
       AsgBopp_Estado: '',
     });
-    console.log(this.FormAsignacionBopp)
   }
 
   ActualizarAsignacion(){
     this.load = false;
     let observacion : string = this.FormAsignacionBopp.value.AsgBopp_Observacion;
 
-    const datos : any = {
-      AsigBOPP_FechaEntrega : this.today,
-      AsigBOPP_Observacion : observacion,
-      Usua_Id : this.storage_Id,
-      Estado_Id : 13,
-    }
+    this.asignacionBOPPService.srvObtenerListaPorId(this.idAsignacion).subscribe(datos_asignacion => {
+      let asignacion : any = [];
+      asignacion.push(datos_asignacion);
+      for (const item of asignacion) {
+        const datos : any = {
+          AsigBOPP_FechaEntrega : item.asigBOPP_FechaEntrega,
+          AsigBOPP_Observacion : observacion,
+          Usua_Id : item.usua_Id,
+          Estado_Id : item.estado_Id,
+        }
 
-    this.asignacionBOPPService.srvActualizar(this.idAsignacion, datos).subscribe(datos_asginacionBOPP => {
-      this.actualizarDetallesAsignacion(this.idAsignacion);
+        this.asignacionBOPPService.srvActualizar(this.idAsignacion, datos).subscribe(datos_asginacionBOPP => {
+          // this.actualizarDetallesAsignacion(this.idAsignacion);
+        });
+      }
     });
   }
 
-  actualizarDetallesAsignacion(idAsg : number){
+  actualizarDetallesAsignacion(){
     for (let i = 0; i < this.ordenesTrabajo.length; i++) {
-      for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
-        this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
-          for (let k = 0; k < datos_bopp.length; k++) {
-            if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
-              let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
-              let datos : any = {
-                AsigBOPP_Id : idAsg,
-                BOPP_Id : datos_bopp[k].bopP_Id,
-                DtAsigBOPP_Cantidad : cantidad,
-                UndMed_Id : 'Kg',
-                Proceso_Id : 'CORTE',
-                DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
-              }
+      if (!this.otRegistradas.includes(this.ordenesTrabajo[i].ot)) {
+        for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
+          this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
+            for (let k = 0; k < datos_bopp.length; k++) {
+              if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
+                let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
+                let datos : any = {
+                  AsigBOPP_Id : this.idAsignacion,
+                  BOPP_Id : datos_bopp[k].bopP_Id,
+                  DtAsigBOPP_Cantidad : cantidad,
+                  UndMed_Id : 'Kg',
+                  Proceso_Id : 'CORTE',
+                  DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
+                }
 
-              setTimeout(() => {
-                this.detallesAsignacionBOPPService.srvActualizar(idAsg, datos).subscribe(datos_detallesAsignacion => {
-                  this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
-                });
-              }, 1500);
+                setTimeout(() => {
+                  this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
+                    this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
+                  });
+                }, 1500);
+              }
             }
+          });
+        }
+      } else {
+        for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
+          if (!this.boppRegistrados.includes(this.ArrayBoppPedida[j].Serial)) {
+            this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
+              for (let k = 0; k < datos_bopp.length; k++) {
+                if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
+                  let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
+                  let datos : any = {
+                    AsigBOPP_Id : this.idAsignacion,
+                    BOPP_Id : datos_bopp[k].bopP_Id,
+                    DtAsigBOPP_Cantidad : cantidad,
+                    UndMed_Id : 'Kg',
+                    Proceso_Id : 'CORTE',
+                    DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
+                  }
+
+                  setTimeout(() => {
+                    this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
+                      this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
+                    });
+                  }, 1500);
+                }
+              }
+            });
+          } else {
+            this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
+              for (let k = 0; k < datos_bopp.length; k++) {
+                if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
+                  let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
+                  let datos : any = {
+                    AsigBOPP_Id : this.idAsignacion,
+                    BOPP_Id : datos_bopp[k].bopP_Id,
+                    DtAsigBOPP_Cantidad : cantidad,
+                    UndMed_Id : 'Kg',
+                    Proceso_Id : 'CORTE',
+                    DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
+                  }
+
+                  setTimeout(() => {
+                    this.detallesAsignacionBOPPService.srvActualizar(this.idAsignacion, datos).subscribe(datos_detallesAsignacion => {
+                      this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
+                    });
+                  }, 1500);
+                }
+              }
+            });
           }
-        });
+        }
       }
     }
   }
