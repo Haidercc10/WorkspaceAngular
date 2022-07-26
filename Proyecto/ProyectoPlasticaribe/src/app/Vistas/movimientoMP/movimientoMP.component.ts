@@ -169,6 +169,27 @@ export class MovimientoMPComponent implements OnInit {
     this.obtenerMP();
     this.obtenerBOPP();
     this.LimpiarCampos();
+    this.fecha();
+  }
+
+
+  //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
+  fecha(){
+    this.today = new Date();
+    var dd : any = this.today.getDate();
+    var mm : any = this.today.getMonth() + 1;
+    var yyyy : any = this.today.getFullYear();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    this.today = yyyy + '-' + mm + '-' + dd;
+
+    // this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
+    //   AsgBopp_OT : '',
+    //   AsgBopp_Ancho :0,
+    //   AsgBopp_Fecha : this.today,
+    //   AsgBopp_Observacion: '',
+    //   AsgBopp_Estado: '',
+    // });
   }
 
   initForms() {
@@ -3771,12 +3792,60 @@ export class MovimientoMPComponent implements OnInit {
   editarAsignacion(formulario : any){
 
     if (formulario.tipoDoc == 'BOPP') {
-      this.modalEdicionAsignacionBOPP = true;
       this.identificadorAsignacion = formulario.id;
+      this.arrayOT = [];
+      let boppAsignada : any = [];
+      // this.EditarAsignacionesBOPP.idAsignacion = formulario.id;
+      this.asignacionBOPPService.srvObtenerListaPorId(formulario.id).subscribe(datos_asignacionBOPP => {
+        this.EditarAsignacionesBOPP.cargarDatos(datos_asignacionBOPP);
+      });
+      this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(formulario.id).subscribe(datos_detallesAsgBOPP => {
+        for (let i = 0; i < datos_detallesAsgBOPP.length; i++) {
+          this.boppService.srvObtenerListaPorId(datos_detallesAsgBOPP[i].bopP_Id).subscribe(datos_bopp => {
+            let datosBOPPAsg : any = [];
+            datosBOPPAsg.push(datos_bopp);
+            for (const item of datosBOPPAsg) {
+              if (!boppAsignada.includes(item.bopP_Serial)) {
+                boppAsignada.push(item.bopP_Serial);
+
+                let bopp : any = {
+                  Serial : item.bopP_Serial,
+                  Nombre : item.bopP_Nombre,
+                }
+                this.EditarAsignacionesBOPP.ArrayBoppPedida.push(bopp);
+              }
+            }
+          });
+          this.infoOT(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo);
+        }
+      });
+      this.modalEdicionAsignacionBOPP = true;
     }
   }
 
   limpiarCamposAlCerrarModal() {
     this.EditarAsignacionesBOPP.limpiarTodosLosCampos();
+  }
+
+  infoOT(ordenTrabajo : number){
+    if (!this.arrayOT.includes(ordenTrabajo)) {
+      this.arrayOT.push(ordenTrabajo);
+      this.bagProServices.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
+        for (const itemOT of datos_OT) {
+          if (itemOT.estado == null || itemOT.estado == '' || itemOT.estado == '0') {
+            const infoOT : any = {
+              ot : itemOT.item,
+              cliente : itemOT.clienteNom,
+              micras : itemOT.extCalibre,
+              ancho : itemOT.ptAnchopt,
+              item : itemOT.clienteItemsNom,
+              kg : itemOT.datosotKg,
+            }
+            this.EditarAsignacionesBOPP.ordenesTrabajo.push(infoOT);
+            break;
+          } else if (itemOT.estado == 4 || itemOT.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
+        }
+      });
+    }
   }
 }

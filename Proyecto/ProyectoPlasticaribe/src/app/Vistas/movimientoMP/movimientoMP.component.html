@@ -101,12 +101,12 @@
             </thead>
           <tbody>
             <tr *ngFor="let doc of ArrayDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
-              <td id="CodigoFactura" (dblclick)="editarAsignacion(doc)">{{doc.codigo}}</td>
-              <td id="Tipo" (dblclick)="editarAsignacion(doc)">{{doc.tipoDoc}}</td>
-              <td id="fecha" (dblclick)="editarAsignacion(doc)">{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
-              <td id="proveedor" (dblclick)="editarAsignacion(doc)">{{doc.usuario}}</td>
-              <td id="mp" (dblclick)="editarAsignacion(doc)">{{doc.mp}}</td>
-              <td id="mp" (dblclick)="editarAsignacion(doc)">{{doc.cant | number}}</td>
+              <td id="CodigoFactura" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.codigo}}</td>
+              <td id="Tipo" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.tipoDoc}}</td>
+              <td id="fecha" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
+              <td id="proveedor" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.usuario}}</td>
+              <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.mp}}</td>
+              <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.cant | number}}</td>
               <td id="subTotalMateriaPrima"><input class="btn btn-danger btn-danger-sm" type="button" value="Ver" (click)="llenarDocumento(doc)"></td>
             </tr>
           </tbody>
@@ -158,7 +158,4 @@
     </div>
   </div>
   <!-- Fin Modal de editar asignación -->
-
-
 </div>
-

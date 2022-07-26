@@ -277,12 +277,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let fechaEntrega : any = this.FormMateriaPrimaRetiro.value.FechaRetiro;
     let observacion : string = this.FormMateriaPrimaRetiro.value.ObservacionRetiro;
     let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina;
-    let idUsuario : number;
-    let idArea : number;
-    let idEstado : number;
-    let cantAsig : number = 0; //Variable que almacena la cantidad de materia prima que se ha asignado hasta el momento
-    let cantRestante : number = 0;
-    this.cantidadAsignada = 0;
+    // this.cantidadAsignada = 0;
 
     // const datosAsignacion : any = {
     //   AsigMP_OrdenTrabajo : idOrdenTrabajo,
@@ -299,20 +294,21 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     /* Consulta en la tabla de asignaciones la ot y suma la cantidad que se le ha asignado a dicha OT  */
 
     if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
-      this.asignacionMPService.srvObtenerListaPorOt(idOrdenTrabajo).subscribe(datos_asigncaion => {
-        for (let index = 0; index < datos_asigncaion.length; index++) {
-          this.detallesAsignacionService.srvObtenerLista().subscribe(datos_asignacionMP => {
-            for (let i = 0; i < datos_asignacionMP.length; i++) {
-              if (datos_asigncaion[index].asigMp_Id == datos_asignacionMP[i].asigMp_Id) {
-                this.cantidadAsignada += datos_asignacionMP[i].dtAsigMp_Cantidad;
-              }
-            }
-          });
-        }
-      });
+      // this.asignacionMPService.srvObtenerListaPorOt(idOrdenTrabajo).subscribe(datos_asigncaion => {
+      //   for (let index = 0; index < datos_asigncaion.length; index++) {
+      //     this.detallesAsignacionService.srvObtenerLista().subscribe(datos_asignacionMP => {
+      //       for (let i = 0; i < datos_asignacionMP.length; i++) {
+      //         if (datos_asigncaion[index].asigMp_Id == datos_asignacionMP[i].asigMp_Id) {
+      //           this.cantidadAsignada += datos_asignacionMP[i].dtAsigMp_Cantidad;
+      //         }
+      //       }
+      //     });
+      //   }
+      // });
 
       setTimeout(() => {
         this.load = false;
+        console.log
         if (this.cantidadAsignada <= this.cantRestante) {
           const datosAsignacion : any = {
             AsigMP_OrdenTrabajo : idOrdenTrabajo,
@@ -806,8 +802,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       MpUnidadMedidaRetirada: formulario.UndCant,
       MpStockRetirada: formulario,
       ProcesoRetiro : formulario.Proceso
-
     });
+    this.cantidadAsignada = this.cantidadAsignada - formulario.Cant;
   }
 
 }

@@ -38,22 +38,23 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
   ot : any = [];
   estadoOT : any; //Varibale que almacenará el estado en que se encuentra la orden de trabajo
   arrayOT : any = [];
+  idAsignacion : number = 0;
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private rolService : RolesService,
-                    private boppService : EntradaBOPPService,
-                      private asignacionBOPPService : AsignacionBOPPService,
-                        private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,
-                          private bagProService : BagproService) {
+                      private boppService : EntradaBOPPService,
+                        private asignacionBOPPService : AsignacionBOPPService,
+                          private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,
+                            private bagProService : BagproService) {
 
     this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
-      AsgBopp_OT : ['', Validators.required],
-      AsgBopp_Ancho : [0, Validators.required],
-      AsgBopp_Fecha : ['', Validators.required],
-      AsgBopp_Observacion: ['', Validators.required],
-      AsgBopp_Estado: ['', Validators.required],
+      AsgBopp_OT : [Validators.required],
+      AsgBopp_Ancho : [Validators.required],
+      AsgBopp_Fecha : [Validators.required],
+      AsgBopp_Observacion: [Validators.required],
+      AsgBopp_Estado: [Validators.required],
     });
 
     this.FormularioBOPP = this.FormBuilderBOPP.group({
@@ -488,8 +489,19 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
     });
   }
 
+  cargarDatos(item : any){
+    console.log(item)
+    this.FormAsignacionBopp.setValue({
+      AsgBopp_OT : '',
+      AsgBopp_Ancho : 0,
+      AsgBopp_Fecha : '',
+      AsgBopp_Observacion: item.asigBOPP_Observacion,
+      AsgBopp_Estado: '',
+    });
+    console.log(this.FormAsignacionBopp)
+  }
 
-  ActualizarAsignacion(idAsg : number){
+  ActualizarAsignacion(){
     this.load = false;
     let observacion : string = this.FormAsignacionBopp.value.AsgBopp_Observacion;
 
@@ -500,8 +512,8 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
       Estado_Id : 13,
     }
 
-    this.asignacionBOPPService.srvActualizar(idAsg, datos).subscribe(datos_asginacionBOPP => {
-      this.actualizarDetallesAsignacion(idAsg);
+    this.asignacionBOPPService.srvActualizar(this.idAsignacion, datos).subscribe(datos_asginacionBOPP => {
+      this.actualizarDetallesAsignacion(this.idAsignacion);
     });
   }
 
