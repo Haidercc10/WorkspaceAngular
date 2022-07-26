@@ -1,5 +1,5 @@
 import { ThisReceiver } from '@angular/compiler';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { info } from 'console';
 import moment from 'moment';
@@ -36,6 +36,9 @@ import { ModalEditarAsignacionesBOPPComponent } from '../modal-editar-asignacion
   templateUrl: './movimientoMP.component.html',
   styleUrls: ['./movimientoMP.component.css']
 })
+
+
+
 export class MovimientoMPComponent implements OnInit {
 
   public FormDocumentos !: FormGroup;
@@ -105,6 +108,8 @@ export class MovimientoMPComponent implements OnInit {
   kgOT : number;
   acumuladorOT = [];
   public identificadorAsignacion : number;
+  public modalEdicionAsignacionBOPP : boolean = false;
+
 
   producidoPDF = 0;
   asignadoPDF = 0;
@@ -150,6 +155,7 @@ export class MovimientoMPComponent implements OnInit {
       fechaFinal : new FormControl(),
     });
     this.load = true;
+    // this.EditarAsignacionesBOPP = EditarAsignacionesBOPP
   }
 
 
