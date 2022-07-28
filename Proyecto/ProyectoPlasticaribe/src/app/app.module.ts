@@ -58,6 +58,7 @@ import { AsignacionBOPPComponent } from './Vistas/asignacion-bopp/asignacion-bop
 import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.component';
 import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
 import { ModalEditarAsignacionesBOPPComponent } from './Vistas/modal-editar-asignaciones-bopp/modal-editar-asignaciones-bopp.component';
+import { ModalGenerarInventarioZeusComponent } from './Vistas/modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 
 
 
@@ -151,6 +152,7 @@ export const routes: Routes = [
     EntradaBOPPComponent,
     AsignacionBOPP_TEMPORALComponent,
     ModalEditarAsignacionesBOPPComponent,
+    ModalGenerarInventarioZeusComponent,
   ],
 
 

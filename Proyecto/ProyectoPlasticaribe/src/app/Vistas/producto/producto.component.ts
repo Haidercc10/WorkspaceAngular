@@ -154,7 +154,7 @@ export class ProductoComponent implements OnInit {
     }]
   }
 
-
+  /** Generar inventario de productos con más de 1.0 de existencias en Zeus y BagPro. */
   InventarioExistenciaZeus(){
     this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datosExistencias => {
 
@@ -163,7 +163,17 @@ export class ProductoComponent implements OnInit {
 
         this.clienteOtItems.srvObtenerItemsBagproXClienteItem(this.datosCodigo).subscribe(datosCLOTI => {
           for (let cl = 0; cl < datosCLOTI.length; cl++) {
-            console.log(datosCLOTI[cl]);
+            if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
+              const datosInventario: any = {
+                codigoItem : datosCLOTI[cl].clienteItems,
+                nombreItem : datosCLOTI[cl].clienteItemsNom,
+                cantidadItem : datosExistencias[exi].existencias,
+                PrecioItem : datosExistencias[exi].precioVenta,
+                PrecioTotalItem : datosExistencias[exi].precio_Total,
+                ClienteNombre : datosCLOTI[cl].clienteNom,
+              }
+              console.log(datosInventario);
+            }
           }
 
         });
@@ -171,6 +181,10 @@ export class ProductoComponent implements OnInit {
       }
     });
 
+
+  }
+
+  cargarVistaInventarioZeus(){
 
   }
 

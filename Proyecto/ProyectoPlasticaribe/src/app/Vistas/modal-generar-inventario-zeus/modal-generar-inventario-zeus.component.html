@@ -1,0 +1,31 @@
+<div class="mb-4">
+  <div class="row g-3">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover mt-2" >
+          <thead class="TitulosTabla">
+              <tr *ngFor="let columnas of titulosTabla let i = index">
+                <th scope="col" class="idProducto">{{columnas.invItem}}</th>
+                <th id="nombre" scope="col">{{columnas.invNombre}}</th>
+                <th id="existencias" scope="col">{{columnas.invStock}}</th>
+                <th id="precio" scope="col">{{columnas.invPrecio}}</th>
+                <th id="Subtotal" scope="col">{{columnas.invSubtotal}}</th>
+                <th id="Cliente" scope="col">{{columnas.invCliente}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th id="cid" class="TextosInfoTabla2"></th>
+                <td id="cnombre" class="TextosInfoTabla"></td>
+                <td id="pid" class="TextosInfoTabla"></td>
+                <td id="pnombre" class="TextosInfoTabla"></td>
+                <td id="pprecio" class="TextosInfoTabla"></td>
+                <td id="pstock" class="TextosInfoTabla"></td>
+                <td id="pundmed" class="TextosInfoTabla"></td>
+                <td id="ppreciototal" class="TextosInfoTabla"></td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="btn-danger btn-danger-sm" type="submit">Agregar</button>
+  </div>
+</div>

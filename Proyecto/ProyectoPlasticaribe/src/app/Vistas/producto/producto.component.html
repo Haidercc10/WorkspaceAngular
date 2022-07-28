@@ -21,7 +21,7 @@
     <div class="container">
 
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#exampleModal" (click)="InventarioExistenciaZeus()"> <!--(click)="InventarioExistenciaZeus()"-->
+        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#exampleModal" (click)="cargarVistaInventarioZeus()"> <!--(click)="InventarioExistenciaZeus()"-->
           Generar inventario
         </button>
 
@@ -199,13 +199,13 @@
         <div  class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered modal-xl">
           <div class="modal-content">
-            <!--<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
-             <!-- <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <div class="modal-header">
                   <h5 class="modal-title" id="staticBackdropLabel2">Previsualización</h5>
-              </div>-->
-              <div *ngIf="Url" class="modal-body">
-                <!--Carga componente crear Proveedor-->
-                    <img style="width: 100%;" [src]="Url" alt="">
+              </div>
+              <div  class="modal-body">
+                <!--Carga componente Generar Excel -->
+                <app-modal-generar-inventario-zeus></app-modal-generar-inventario-zeus>
               </div>
            </div>
           </div>
