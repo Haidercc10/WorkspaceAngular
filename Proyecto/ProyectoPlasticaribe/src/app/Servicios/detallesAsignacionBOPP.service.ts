@@ -46,6 +46,14 @@ export class DetalleAsignacion_BOPPService {
     return this.http.delete(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/${id}`);
   }
 
+  srvEliminarPorOT(idAsg : number, ot : number){
+    return this.http.delete(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/EliminarXOT_AsignacionBOPP?AsigBOPP_Id=${idAsg}&DtAsigBOPP_OrdenTrabajo=${ot}`);
+  }
+
+  srvEliminarPorBOPP(idAsg : number, idbopp : number){
+    return this.http.delete(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/EliminarXAsignacion_BOPP?AsigBOPP_Id=${idAsg}&BOPP_Id=${idbopp}`);
+  }
+
   srvGuardar(data: modelDetallesAsignacionBopp): Observable<any> {
   return this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_BOPP', data)
   }

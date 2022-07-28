@@ -215,21 +215,18 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
       confirmButtonText: 'Eliminar'
     }).then((result) => {
       if (result.isConfirmed) {
+        for (const item of this.ordenesTrabajo) {
+          this.detallesAsignacionBOPPService.srvEliminarPorOT(item.IdDtAsg, formulario.ot).subscribe(datos_dtAsgEliminada => {
+            Swal.fire('Orden de Trabajo eliminada');
+          });
+        }
         this.cantidadKG = this.cantidadKG - formulario.kg;
         this.ordenesTrabajo.splice(index, 1);
-        for (const item of this.ordenesTrabajo) {
-          if (item.IdDtAsg == formulario.IdDtAsg) {
-            this.detallesAsignacionBOPPService.srvEliminar(item.IdDtAsg).subscribe(datos_dtAsgEliminada => {
-              console.log('bien')
-            });
-          }
-        }
         for (let i = 0; i < this.arrayOT.length; i++) {
           if (this.arrayOT[i] == formulario.ot) {
             this.arrayOT.splice(i, 1);
           }
         }
-        Swal.fire('Orden de Trabajo eliminada');
       }
     });
   }
@@ -286,8 +283,11 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.ArrayBoppPedida.splice(index, 1);
-        // this.detallesAsignacionBOPPService.srvEliminar()
-        Swal.fire('Orden de Trabajo eliminada');
+        for (const item of this.ArrayBoppPedida) {
+          this.detallesAsignacionBOPPService.srvEliminarPorBOPP(item.IdAsg, formulario.idBOPP).subscribe(datos_detallesAsgEliminada => {
+            Swal.fire('BOPP eliminado');
+          });
+        }
       }
     });
   }
@@ -302,12 +302,19 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
     let serial : string = this.FormularioBOPP.value.boppSerial;
     let nombre : string = this.FormularioBOPP.value.boppNombre;
 
-    let bopp : any = {
-      Serial : serial,
-      Nombre : nombre,
-    }
-    this.ArrayBoppPedida.push(bopp);
-    this.FormularioBOPP.reset();
+    this.boppService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
+      let boppSeleccionado : any;
+      boppSeleccionado.push(datos_bopp);
+      for (const item of boppSeleccionado) {
+        let bopp : any = {
+          idBOPP : item.bopP_Id,
+          Serial : serial,
+          Nombre : nombre,
+        }
+        this.ArrayBoppPedida.push(bopp);
+        this.FormularioBOPP.reset();
+      }
+    });
   }
 
   //

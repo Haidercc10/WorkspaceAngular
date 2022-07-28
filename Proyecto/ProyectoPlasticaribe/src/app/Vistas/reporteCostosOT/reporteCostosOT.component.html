@@ -159,7 +159,7 @@
                 <tr *ngFor="let materiaPrima of ArrayMateriaPrima let i = index">
                   <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
                   <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
-                  <td id="cantidadMateriaPrima">{{materiaPrima.Cantidad}}</td>
+                  <td id="cantidadMateriaPrima">{{materiaPrima.Cantidad | number}}</td>
                   <td id="UnidadMedida">{{materiaPrima.Presentacion}}</td>
                   <td id="proceso">{{materiaPrima.Proceso}}</td>
                   <td id="precio">${{materiaPrima.PrecioUnd}}</td>
@@ -217,8 +217,8 @@
                 <td id="mpCant">{{materiaPrima.Lam | number}}</td>
                 <td id="porcentajeMp">{{materiaPrima.Corte | number}}</td>
                 <td id="valorMp">{{materiaPrima.Emp | number}}</td>
-                <td id="porcentajeMp">{{materiaPrima.Sel | number}}</td>
-                <td id="porcentajeMp">{{materiaPrima.Wik | number}}</td>
+                <td id="porcentajeMp">{{materiaPrima.Sel}}</td>
+                <td id="porcentajeMp">{{materiaPrima.Wik}}</td>
               </tr>
             </tbody>
           </table>
