@@ -137,6 +137,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       fecha: new FormControl(),
       fechaFinal : new FormControl(),
       MpCategoria : new FormControl(),
+      MpBodega : new FormControl(),
     });
 
     this.load = true;
@@ -176,6 +177,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       fecha: ['', Validators.required],
       fechaFinal: ['', Validators.required],
       MpCategoria : ['', Validators.required],
+      MpBodega : ['', Validators.required],
     });
   }
 
@@ -424,7 +426,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   cargarFormMpEnTablas(formulario : any, id: number, nombre : string, precio : number, inicial : number, entrada : number, salida : number, cantidad : number, undMEd : string, categoria : any, ancho? : number ){
     if (this.categoriaBOPP == 'BOPP') {
-      this.valorTotal = this.valorTotal + precio;
+      this.valorTotal = this.valorTotal + precio * cantidad;
       let productoExt : any = {
         Id : id,
         Nombre : nombre,
@@ -436,7 +438,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         Diferencia : cantidad - inicial,
         UndCant : undMEd,
         PrecioUnd : precio,
-        SubTotal : precio,
+        SubTotal : precio * cantidad,
         Categoria : categoria,
       }
 
@@ -501,6 +503,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     let fecha : any = this.FormMateriaPrima.value.fecha;
     let fechaFinal : any = this.FormMateriaPrima.value.fechaFinal;
     let categoria : any = this.FormMateriaPrima.value.MpCategoria;
+    let bodega : any = this.FormMateriaPrima.value.MpBodega;
     this.ArrayMateriaPrima = [];
     this.valorTotal = 0;
     this.sumaSalida = 0;
@@ -3971,6 +3974,427 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         // });
       }, 2000);
 
+    } else if (bodega != null) {
+      this.load = false;
+      if (bodega == 1) {
+        // Mostrará todas las categorias a excepcion de las Tintas, Aditivos, Solventes y BOPP.
+        this.asignacionService.srvObtenerListaPorFecha(this.today).subscribe(datos_asignaciones => {
+          for (let i = 0; i < datos_asignaciones.length; i++) {
+            this.asignacionMpService.srvObtenerListaPorAsigId(datos_asignaciones[i].asigMp_Id).subscribe(datos_asignacionesMP => {
+              for (let j = 0; j < datos_asignacionesMP.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_asignacionesMP[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_asignacionesMP[j].dtAsigMp_Cantidad,
+                    categoria : datos_materiaPrima.catMP_Id,
+                  }
+                  materia_cantidad.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
+        this.facturaCompraService.srvObtenerListaPorFecha(this.today).subscribe(datos_factura => {
+          for (let i = 0; i < datos_factura.length; i++) {
+            this.facturaCompraMPService.srvObtenerListaPorFacId(datos_factura[i].facco_Id).subscribe(datos_facturaMP => {
+              for (let j = 0; j < datos_facturaMP.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_facturaMP[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_facturaMP[j].faccoMatPri_Cantidad,
+                  }
+                  materia_cantidad_factura.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
+        this.remisionService.srvObtenerListaPorFecha(this.today).subscribe(datos_remisiones => {
+          for (let i = 0; i < datos_remisiones.length; i++) {
+            this.remisionMpService.srvObtenerListaPorRemId(datos_remisiones[i].rem_Id).subscribe(datos_remisionMP => {
+              for (let j = 0; j < datos_remisionMP.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_remisionMP[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_remisionMP[j].remiMatPri_Cantidad,
+                  }
+                  materia_cantidad_remision.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
+        this.recuperadoService.srvObtenerListaPorFecha(this.today).subscribe(datos_recuperado => {
+          for (let i = 0; i < datos_recuperado.length; i++) {
+            this.recuperadoMPService.srvObtenerListaPorRecuperadoId(datos_recuperado[i].recMp_Id).subscribe(datos_recuperadoMP => {
+              for (let j = 0; j < datos_recuperadoMP.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_recuperadoMP[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_recuperadoMP[j].recMatPri_Cantidad,
+                  }
+                  materia_cantidad_recuperado.push(matCant);
+
+                });
+              }
+            });
+          }
+        });
+
+        this.devolucionesService.srvObtenerListaPorfecha(this.today).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+              for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                  }
+                  materia_cantidad_devoluciones.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
+        setTimeout(() => {
+          this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
+            for (let index = 0; index < datos_materiaPrima.length; index++) {
+              let categoriaMP : number = datos_materiaPrima[index].catMP_Id;
+              if (categoriaMP != 8 && categoriaMP != 7 && categoriaMP != 6 && categoriaMP != 5) {
+                this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima[index].catMP_Id).subscribe(datos_categoria => {
+                  this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima[index].matPri_Id).subscribe(datos_inventarioInicial => {
+                    this.sumaSalida = 0;
+                    this.sumaEntrada = 0;
+                    this.inventInicial = 0;
+                    this.inventInicial = datos_inventarioInicial.invInicial_Stock;
+                    // Asignaciones
+                    for (const item of materia_cantidad) {
+                      if (datos_materiaPrima[index].matPri_Id == item.materiaPrima && item.categoria != 7) {
+                        this.sumaSalida = this.sumaSalida + item.cantidad;
+                        // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+                      }
+                    }
+                    // Facturas
+                    for (const item of materia_cantidad_factura) {
+                      if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                        this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                        // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+                      }
+                    }
+                    // Remisiones
+                    for (const item of materia_cantidad_remision) {
+                      if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                        this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                        // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                      }
+                    }
+
+                    // Recuperado
+                    for (const item of materia_cantidad_recuperado) {
+                      if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                        this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                        // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                      }
+                    }
+
+                    for (const item of materia_cantidad_devoluciones) {
+                      if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                        this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                        this.sumaSalida = this.sumaSalida - item.cantidad;
+                      }
+                    }
+
+                    this.inventInicial = 0;
+                    this.inventInicial = datos_inventarioInicial.invInicial_Stock;
+
+                    this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                      datos_materiaPrima[index].matPri_Id,
+                      datos_materiaPrima[index].matPri_Nombre,
+                      datos_materiaPrima[index].matPri_Precio,
+                      this.inventInicial,
+                      this.sumaEntrada,
+                      this.sumaSalida,
+                      datos_materiaPrima[index].matPri_Stock,
+                      datos_materiaPrima[index].undMed_Id,
+                      datos_categoria.catMP_Nombre);
+                  });
+                });
+              }
+            }
+          });
+        }, 2000);
+      } else if (bodega == 2) {
+        // Mostrará Tintas, Aditivos y Solventes.
+        this.asignacionService.srvObtenerListaPorFecha(this.today).subscribe(datos_asignaciones => {
+          for (let i = 0; i < datos_asignaciones.length; i++) {
+            this.asignacionMpService.srvObtenerListaPorAsigId(datos_asignaciones[i].asigMp_Id).subscribe(datos_asignacionesMP => {
+              for (let j = 0; j < datos_asignacionesMP.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_asignacionesMP[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_asignacionesMP[j].dtAsigMp_Cantidad,
+                    categoria : datos_materiaPrima.catMP_Id,
+                  }
+                  materia_cantidad.push(matCant);
+                });
+              }
+            });
+
+            this.asignacionTintasService.srvObtenerListaPor_Asignacion(datos_asignaciones[i].asigMp_Id).subscribe(datos_asignacionTintas => {
+              for (let j = 0; j < datos_asignacionTintas.length; j++) {
+                this.tintasService.srvObtenerListaPorId(datos_asignacionTintas[j].tinta_Id).subscribe(datos_tintas => {
+                  const matCant : any = {
+                    materiaPrima : datos_tintas.tinta_Id,
+                    cantidad : datos_asignacionTintas[j].dtAsigTinta_Cantidad,
+                    categoria : datos_tintas.catMP_Id,
+                  }
+                  materia_cantidad_tintas.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
+        this.facturaCompraService.srvObtenerListaPorFecha(this.today).subscribe(datos_factura => {
+          for (let i = 0; i < datos_factura.length; i++) {
+            this.facturaCompraMPService.srvObtenerListaPorFacId(datos_factura[i].facco_Id).subscribe(datos_facturaMP => {
+              for (let j = 0; j < datos_facturaMP.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_facturaMP[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_facturaMP[j].faccoMatPri_Cantidad,
+                  }
+                  materia_cantidad_factura.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
+        this.remisionService.srvObtenerListaPorFecha(this.today).subscribe(datos_remisiones => {
+          for (let i = 0; i < datos_remisiones.length; i++) {
+            this.remisionMpService.srvObtenerListaPorRemId(datos_remisiones[i].rem_Id).subscribe(datos_remisionMP => {
+              for (let j = 0; j < datos_remisionMP.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_remisionMP[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_remisionMP[j].remiMatPri_Cantidad,
+                  }
+                  materia_cantidad_remision.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
+        this.recuperadoService.srvObtenerListaPorFecha(this.today).subscribe(datos_recuperado => {
+          for (let i = 0; i < datos_recuperado.length; i++) {
+            this.recuperadoMPService.srvObtenerListaPorRecuperadoId(datos_recuperado[i].recMp_Id).subscribe(datos_recuperadoMP => {
+              for (let j = 0; j < datos_recuperadoMP.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_recuperadoMP[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_recuperadoMP[j].recMatPri_Cantidad,
+                  }
+                  materia_cantidad_recuperado.push(matCant);
+
+                });
+              }
+            });
+          }
+        });
+
+        this.devolucionesService.srvObtenerListaPorfecha(this.today).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+              for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                  }
+                  materia_cantidad_devoluciones.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
+        setTimeout(() => {
+          this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
+            for (let index = 0; index < datos_materiaPrima.length; index++) {
+              let categoriaMP : number = datos_materiaPrima[index].catMP_Id;
+              if (categoriaMP == 8 || categoriaMP == 7 || categoriaMP == 6 || categoriaMP == 5) {
+                this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima[index].catMP_Id).subscribe(datos_categoria => {
+                  this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima[index].matPri_Id).subscribe(datos_inventarioInicial => {
+                    this.sumaSalida = 0;
+                    this.sumaEntrada = 0;
+                    this.inventInicial = 0;
+                    this.inventInicial = datos_inventarioInicial.invInicial_Stock;
+                    // Asignaciones
+                    for (const item of materia_cantidad) {
+                      if (datos_materiaPrima[index].matPri_Id == item.materiaPrima && item.categoria != 7) {
+                        this.sumaSalida = this.sumaSalida + item.cantidad;
+                        // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+                      }
+                    }
+                    // Facturas
+                    for (const item of materia_cantidad_factura) {
+                      if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                        this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                        // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} FACTURA`)
+                      }
+                    }
+                    // Remisiones
+                    for (const item of materia_cantidad_remision) {
+                      if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                        this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                        // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                      }
+                    }
+
+                    // Recuperado
+                    for (const item of materia_cantidad_recuperado) {
+                      if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                        this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                        // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                      }
+                    }
+
+                    for (const item of materia_cantidad_devoluciones) {
+                      if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                        this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                        this.sumaSalida = this.sumaSalida - item.cantidad;
+                      }
+                    }
+
+                    this.inventInicial = 0;
+                    this.inventInicial = datos_inventarioInicial.invInicial_Stock;
+
+                    this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                      datos_materiaPrima[index].matPri_Id,
+                      datos_materiaPrima[index].matPri_Nombre,
+                      datos_materiaPrima[index].matPri_Precio,
+                      this.inventInicial,
+                      this.sumaEntrada,
+                      this.sumaSalida,
+                      datos_materiaPrima[index].matPri_Stock,
+                      datos_materiaPrima[index].undMed_Id,
+                      datos_categoria.catMP_Nombre);
+                  });
+                });
+              } else this.load = true;
+            }
+          });
+
+          this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
+            for (let i = 0; i < datos_tintas.length; i++) {
+              this.categoriMpService.srvObtenerListaPorId(datos_tintas[i].catMP_Id).subscribe(datos_categoria => {
+                this.sumaSalida = 0;
+                this.sumaEntrada = 0;
+                this.inventInicial = 0;
+                this.inventInicial = 0;
+                // Asignaciones
+                for (const item of materia_cantidad_tintas) {
+                  if (datos_tintas[i].tinta_Id == item.materiaPrima && item.categoria == 7) {
+                    this.sumaSalida = this.sumaSalida + item.cantidad;
+                    // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaSalida} de salida el dia ${fecha}`)
+                  }
+                }
+
+                this.inventInicial = 0;
+                this.inventInicial = 0;
+
+                this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                  datos_tintas[i].tinta_Id,
+                  datos_tintas[i].tinta_Nombre,
+                  datos_tintas[i].tinta_Precio,
+                  this.inventInicial,
+                  this.sumaEntrada,
+                  this.sumaSalida,
+                  datos_tintas[i].tinta_Stock,
+                  datos_tintas[i].undMed_Id,
+                  datos_categoria.catMP_Nombre);
+              });
+            }
+          });
+        }, 2000);
+      } else if (bodega == 3) {
+        // Solo mostrará BOPP
+        this.boppService.srvObtenerListaPorFecha(this.today).subscribe(datos_bopp => {
+          for (let i = 0; i < datos_bopp.length; i++) {
+            const matCant : any = {
+              materiaPrima : datos_bopp[i].bopP_Id,
+              cantidad : datos_bopp[i].bopP_CantidadInicialKg,
+            }
+            bopp_entrante.push(matCant);
+          }
+        });
+
+        this.asignacionBOPPService.srvObtenerListaPorfecha(this.today).subscribe(datos_asignacionBopp => {
+          for (let i = 0; i < datos_asignacionBopp.length; i++) {
+            this.detallesAsignacionBOPPService.srvObtenerListaPorAsignacion(datos_asignacionBopp[i].asigBOPP_Id).subscribe(datos_detallesAsgBopp => {
+              for (let j = 0; j < datos_detallesAsgBopp.length; j++) {
+                this.boppService.srvObtenerListaPorId(datos_detallesAsgBopp[j].bopP_Id).subscribe(datos_bopp => {
+                  let bopp : any = [];
+                  bopp.push(datos_bopp);
+                  for (const item of bopp) {
+                    if (item.catMP_Id == categoria) {
+                      const matCant : any = {
+                        materiaPrima : item.bopP_Id,
+                        cantidad : datos_detallesAsgBopp[j].dtAsigBOPP_Cantidad,
+                      }
+                      bopp_Saliente.push(matCant);
+                    }
+                  }
+                });
+              }
+            });
+          }
+        });
+
+        setTimeout(() => {
+          this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+            for (let i = 0; i < datos_bopp.length; i++) {
+              this.categoriaBOPP = 'BOPP';
+              this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
+                this.sumaSalida = 0;
+                this.sumaEntrada = 0;
+                this.inventInicial = 0;
+                for (const item of bopp_Saliente) {
+                  if (datos_bopp[i].bopP_Id == item.materiaPrima) {
+                    this.sumaSalida = this.sumaSalida + item.cantidad;
+                  }
+                }
+
+                for (const item of bopp_entrante) {
+                  if (datos_bopp[i].bopP_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                  }
+                }
+
+                this.inventInicial = 0;
+
+                this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                  datos_bopp[i].bopP_Serial,
+                  datos_bopp[i].bopP_Descripcion, /** Descripcion en vez de nombre */
+                  datos_bopp[i].bopP_Precio,
+                  datos_bopp[i].bopP_CantidadInicialKg,
+                  this.sumaEntrada,
+                  this.sumaSalida,
+                  datos_bopp[i].bopP_Stock,
+                  "Kg",
+                  datos_categoria.catMP_Nombre,
+                  datos_bopp[i].bopP_Ancho);
+              });
+            }
+          });
+        }, 2000);
+      }
     } else {
       this.load = false;
 

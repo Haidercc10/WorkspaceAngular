@@ -8,13 +8,12 @@ import { rutaBagPro, rutaBagProLocate } from 'src/polyfills';
 })
 export class BagproService {
 
-  readonly rutaBagPro = rutaBagPro;
+  readonly rutaBagPro = rutaBagProLocate;
 
   constructor(private http : HttpClient) { }
 
   /* PROCSELLADO */
 
-  // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
   srvObtenerListaProcSellado():Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + '/ProcSellado');
   }
@@ -27,9 +26,12 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/FechaFinOT/${ot}`);
   }
 
+  srvObtenerListaProcSelladoProducido(ot : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OtConSellado/${ot}`);
+  }
+
   /* PROCEXTRUSION */
 
-  // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
   srvObtenerListaProcExt():Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + '/ProcExtrusion');
   }
@@ -40,6 +42,10 @@ export class BagproService {
 
   srvObtenerListaProcExtOt_fechaFinal(ot : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/FechaFinOT/${ot}`);
+  }
+
+  srvObtenerListaProcextrusionProducido(ot : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OtConEmpaque/${ot}`);
   }
 
   /* CLIENTESOT */

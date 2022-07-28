@@ -282,15 +282,11 @@ export class ReporteCostosOTComponent implements OnInit {
               }
             }
           });
-          this.asignacionBOPPService.srvObtenerListaPorOT(ot).subscribe(datos_asignacionBOPP => {
+          this.detallesAsigBOPPService.srvObtenerListaPorOt(ot).subscribe(datos_asignacionBOPP => {
             for (let j = 0; j < datos_asignacionBOPP.length; j++) {
-              this.detallesAsigBOPPService.srvObtenerListaPorAsignacion(datos_asignacionBOPP[j].asigBOPP_Id).subscribe(datos_detallesAsgBOPP => {
-                for (let k = 0; k < datos_detallesAsgBOPP.length; k++) {
-                  this.llenarTablaBOPP(datos_detallesAsgBOPP[k]);
-                }
-              })
+              this.llenarTablaBOPP(datos_asignacionBOPP[j]);
             }
-          })
+          });
           break;
         }
       }
@@ -319,6 +315,7 @@ export class ReporteCostosOTComponent implements OnInit {
     this.cantidadTotalLaminado = 0;
     this.cantidadTotalSella = 0;
     this.cantidadTotalWiketiado = 0;
+    this.cantidadWiketiadoUnidad = 0;
 
     this.bagProServices.srvObtenerListaProcExtOt(ot).subscribe(datos_procesos => {
       for (let index = 0; index < datos_procesos.length; index++) {
@@ -378,12 +375,19 @@ export class ReporteCostosOTComponent implements OnInit {
       Lam : Math.round(this.cantidadTotalLaminado),
       Emp : Math.round(this.cantidadTotalEmpaque),
       Corte : Math.round(this.cantidadTotalCorte),
-      Sel : Math.round(this.cantidadTotalSella),
-      Wik : Math.round(this.cantidadTotalWiketiado),
+      Sel : `${this.formatonumeros(Math.round(this.cantidadTotalSella))} KG - ${this.formatonumeros(Math.round(this.cantidadSellandoUnidad))} Und`,
+      Wik : `${this.formatonumeros(Math.round(this.cantidadTotalWiketiado))} KG - ${this.formatonumeros(Math.round(this.cantidadWiketiadoUnidad))} Und`,
     }
     this.ArrayProcesos.push(cant);
     for (const item of this.ArrayProcesos) {
-      if (item.Sel == 0 && item.Emp != 0 && item.Wik == 0) {
+      let Sellado = item.Sel;
+      let SelladoNuevo = Sellado.indexOf(" KG");
+      let SelladoFinal = Sellado.substring(0, SelladoNuevo);
+      let wiketiado = item.Wik;
+      let wiketiadoNuevo = wiketiado.indexOf(" KG");
+      let wiketiadoFinal = wiketiado.substring(0, wiketiadoNuevo);
+
+      if (SelladoFinal == 0 && item.Emp != 0 && wiketiadoFinal == 0) {
         this.bagProServices.srvObtenerListaProcExtOt_fechaFinal(ot).subscribe(datos_extrusion => {
           let empaque : any = [];
           empaque.push(datos_extrusion)
@@ -415,12 +419,12 @@ export class ReporteCostosOTComponent implements OnInit {
         else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo' || this.presentacionProducto == 'Paquete') {
           this.valorFinalOT = item.Emp * this.valorUnitarioProdUnd;
         }
-      } else if (item.Sel != 0 && item.Emp == 0 && item.Wik == 0) {
+      } else if (SelladoFinal != 0 && item.Emp == 0 && wiketiadoFinal == 0) {
         this.bagProServices.srvObtenerListaProcSelladoOT_FechaFinal(ot).subscribe(datos_sellado => {
           let sellado : any = [];
           sellado.push(datos_sellado)
-          for (const item of sellado) {
-            let FechaDatetime = item.fechaEntrada;
+          for (const itemSel of sellado) {
+            let FechaDatetime = itemSel.fechaEntrada;
             let FechaCreacionNueva = FechaDatetime.indexOf("T");
             let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
             this.fechaFinalOT = fechaCreacionFinal;
@@ -444,11 +448,11 @@ export class ReporteCostosOTComponent implements OnInit {
             break;
           }
         });
-        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = item.Sel * this.valorUnitarioProdKg;
+        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = SelladoFinal * this.valorUnitarioProdKg;
         else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') {
           this.valorFinalOT = this.cantidadSellandoUnidad * this.valorUnitarioProdUnd;
         }
-      } else if (item.Sel == 0 && item.Emp == 0 && item.Wik != 0) {
+      } else if (SelladoFinal == 0 && item.Emp == 0 && wiketiadoFinal != 0) {
         this.bagProServices.srvObtenerListaProcSelladoOT_FechaFinal(ot).subscribe(datos_sellado => {
           let sellado : any = [];
           sellado.push(datos_sellado)
@@ -477,9 +481,42 @@ export class ReporteCostosOTComponent implements OnInit {
             break;
           }
         });
-        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = item.Wik * this.valorUnitarioProdKg;
+        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = wiketiadoFinal * this.valorUnitarioProdKg;
         else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') {
           this.valorFinalOT = this.cantidadWiketiadoUnidad * this.valorUnitarioProdUnd;
+        }
+      } else if (SelladoFinal != 0 && item.Emp == 0 && wiketiadoFinal != 0) {
+        this.bagProServices.srvObtenerListaProcSelladoOT_FechaFinal(ot).subscribe(datos_sellado => {
+          let sellado : any = [];
+          sellado.push(datos_sellado)
+          for (const itemOT of sellado) {
+            let FechaDatetime = itemOT.fechaEntrada;
+            let FechaCreacionNueva = FechaDatetime.indexOf("T");
+            let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
+            this.fechaFinalOT = fechaCreacionFinal;
+            this.infoOT.setValue({
+              ot : ot,
+              cliente : this.infoOT.value.cliente,
+              IdProducto : this.infoOT.value.IdProducto,
+              NombreProducto : this.infoOT.value.NombreProducto,
+              cantProductoSinMargenUnd : this.infoOT.value.cantProductoSinMargenUnd,
+              cantProductoSinMargenKg : this.infoOT.value.cantProductoSinMargenKg,
+              margenAdicional : this.infoOT.value.margenAdicional,
+              cantProductoConMargen : this.infoOT.value.cantProductoConMargen,
+              PresentacionProducto : this.infoOT.value.PresentacionProducto,
+              ValorUnidadProductoUnd : this.infoOT.value.ValorUnidadProductoUnd,
+              ValorUnidadProductoKg : this.infoOT.value.ValorUnidadProductoKg,
+              ValorEstimadoOt : this.infoOT.value.ValorEstimadoOt,
+              fechaInicioOT : this.infoOT.value.fechaInicioOT,
+              fechaFinOT :fechaCreacionFinal,
+              estadoOT : this.infoOT.value.estadoOT,
+            });
+            break;
+          }
+        });
+        if (this.presentacionProducto == 'Kilo') this.valorFinalOT = (wiketiadoFinal * this.valorUnitarioProdKg) + (SelladoFinal * this.valorUnitarioProdKg);
+        else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') {
+          this.valorFinalOT = (this.cantidadWiketiadoUnidad * this.valorUnitarioProdUnd) + (this.cantidadSellandoUnidad * this.valorUnitarioProdUnd);
         }
       }
     }
@@ -522,11 +559,11 @@ export class ReporteCostosOTComponent implements OnInit {
           Cantidad : formulario.dtAsigBOPP_Cantidad,
           Presentacion : item.undMed_Kg,
           PrecioUnd : this.formatonumeros(item.bopP_Precio),
-          SubTotal : this.formatonumeros(Math.round((item.bopP_Precio / item.bopP_CantidadInicialKg) * formulario.dtAsigBOPP_Cantidad)),
+          SubTotal : this.formatonumeros(Math.round(item.bopP_Precio * formulario.dtAsigBOPP_Cantidad)),
           Proceso : formulario.proceso_Id,
         }
         this.totalMPEntregada = this.totalMPEntregada + infoBopp.Cantidad;
-        this.ValorMPEntregada = this.ValorMPEntregada + (Math.round((item.bopP_Precio / item.bopP_CantidadInicialKg) * formulario.dtAsigBOPP_Cantidad));
+        this.ValorMPEntregada = this.ValorMPEntregada + (Math.round(item.bopP_Precio * formulario.dtAsigBOPP_Cantidad));
         this.ArrayMateriaPrima.push(infoBopp);
       }
     });
@@ -576,7 +613,14 @@ export class ReporteCostosOTComponent implements OnInit {
     else {
       for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
         for (const item of this.ArrayProcesos) {
-          if (item.Sel == 0 && item.Emp != 0) {
+          let Sellado = item.Sel;
+          let SelladoNuevo = Sellado.indexOf(" KG");
+          let SelladoFinal = Sellado.substring(0, SelladoNuevo);
+          let wiketiado = item.Wik;
+          let wiketiadoNuevo = wiketiado.indexOf(" KG");
+          let wiketiadoFinal = wiketiado.substring(0, wiketiadoNuevo);
+
+          if (SelladoFinal != 0 && wiketiadoFinal != 0 && item.Emp == 0) {
             const pdfDefinicion : any = {
               info: {
                 title: `${this.ordenTrabajo}`
@@ -619,7 +663,7 @@ export class ReporteCostosOTComponent implements OnInit {
                         `Presentación: ${this.presentacionProducto}`
                       ],
                       [
-                        `Cantidad Und: ${this.formatonumeros(this.cantidadSellandoUnidad)}`,
+                        `Cantidad Und: ${this.formatonumeros(this.cantProdSinMargenUnd)}`,
                         `Cantidad Kg: ${this.formatonumeros(this.cantProdSinMargenKg)}`,
                         `Cantidad Margen: ${this.formatonumeros(this.CantidadMargen)}%`
                       ],
@@ -653,8 +697,187 @@ export class ReporteCostosOTComponent implements OnInit {
                       [
                         `Producido`,
                         `$${this.formatonumeros(this.valorFinalOT)}`,
-                        `${this.formatonumeros(this.cantidadSellandoUnidad)}`,
-                        `${this.formatonumeros(Math.round(this.cantidadTotalCorte))}`
+                        `${this.formatonumeros(this.cantidadSellandoUnidad + this.cantidadWiketiadoUnidad)}`,
+                        `${this.formatonumeros(Math.round(this.cantidadTotalSella + this.cantidadTotalWiketiado))}`
+                      ],
+                      [
+                        `Teorico`,
+                        `$${this.formatonumeros(this.valorEstimadoOT)}`,
+                        `${this.formatonumeros(Math.round(this.cantProdSinMargenUnd))}`,
+                        `${this.formatonumeros(this.cantProdSinMargenKg)}`
+                      ],
+                    ]
+                  },
+                  layout: 'lightHorizontalLines',
+                  fontSize: 9,
+                },
+                '\n \n',
+                {
+                  text: `\n Información detallada de Materia(s) Prima(s) Utilizada \n `,
+                  alignment: 'center',
+                  style: 'header'
+                },
+
+                this.table(this.ArrayMateriaPrima, ['Id', 'Nombre', 'Cantidad', 'Presentacion', 'PrecioUnd', 'SubTotal', 'Proceso']),
+
+                {
+                  text: `\n\nValor Total Materia Prima Utilizada: $${this.formatonumeros(this.ValorMPEntregada)}`,
+                  alignment: 'right',
+                  style: 'header',
+                },
+                '\n \n',
+                {
+                  text: `\n Información detallada de la Producción en cada proceso \n `,
+                  alignment: 'center',
+                  style: 'header'
+                },
+                {
+                  table: {
+                    widths: ['*', '*', '*'],
+                    style: 'header',
+                    body: [
+                      [
+                        `Extrusión: ${this.formatonumeros(Math.round(this.cantidadTotalExt))}`,
+                        `Impresión: ${this.formatonumeros(Math.round(this.cantidadTotalImp))}`,
+                        `Rotograbado: ${this.formatonumeros(Math.round(this.cantidadTotalRot))}`
+                      ],
+                      [
+                        `Doblado: ${this.formatonumeros(Math.round(this.cantidadTotalDbl))}`,
+                        `Laminado: ${this.formatonumeros(Math.round(this.cantidadTotalLaminado))}`,
+                        `Empaque: ${this.formatonumeros(Math.round(this.cantidadTotalEmpaque))}`
+                      ],
+                      [
+                        `Wiketiado: ${this.formatonumeros(Math.round(this.cantidadTotalWiketiado))}`,
+                        `Sellado: ${this.formatonumeros(Math.round(this.cantidadTotalSella))}`,
+                        `Corte: ${this.formatonumeros(Math.round(this.cantidadTotalCorte))}`
+                      ],
+                    ]
+                  },
+
+                  layout: {
+                    fillColor: function (rowIndex, node, columnIndex) {
+                      return (rowIndex % 2 === 0) ? '#CCCCCC' : null;
+                    }
+                  },
+                  fontSize: 9,
+                },
+                '\n \n',
+                {
+                  table: {
+                    widths: [1,'*'],
+                    style: 'header',
+                    body: [
+                      [
+                        '',
+                        `Valor Final de La OT: $${this.formatonumeros(this.valorFinalOT)}`,
+                      ],
+                      [
+                        '',
+                        `Diferencia de Costos La OT: $${this.formatonumeros(this.diferencia)}`,
+                      ],
+                      [
+                        '',
+                        `Porcentaje de Diferencia de Costos de La OT: ${this.formatonumeros(Math.round(this.diferenciaPorcentaje))}%`,
+                      ],
+                    ]
+                  },
+                  layout: 'noBorders',
+                  fontSize: 9,
+                },
+              ],
+              styles: {
+                header: {
+                  fontSize: 10,
+                  bold: true
+                },
+                titulo: {
+                  fontSize: 15,
+                  bold: true
+                }
+              }
+            }
+            const pdf = pdfMake.createPdf(pdfDefinicion);
+            pdf.open();
+            break;
+          } else if (SelladoFinal == 0 && item.Emp != 0) {
+            const pdfDefinicion : any = {
+              info: {
+                title: `${this.ordenTrabajo}`
+              },
+              content : [
+                {
+                  text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
+                  alignment: 'center',
+                  style: 'titulo',
+                },
+                '\n \n',
+                {
+                  text: `Solicitado Por: ${this.storage_Nombre}\n`,
+                  alignment: 'right',
+                  style: 'header',
+                },
+                {
+                  text: `Fecha Creación OT: ${this.fechaOT}\n`,
+                  alignment: 'right',
+                  style: 'header',
+                },
+                {
+                  text: `\n Información detallada de la Orden de Trabajo \n \n`,
+                  alignment: 'center',
+                  style: 'header'
+                },
+                {
+                  table: {
+                    widths: [130, 220, '*'],
+                    style: 'header',
+                    body: [
+                      [
+                        `N°: ${this.ordenTrabajo}`,
+                        `Nombre Cliente: ${this.NombreCliente}`,
+                        `Valor de la OT: ${this.formatonumeros(this.valorFinalOT)}`
+                      ],
+                      [
+                        `Id Producto: ${this.idProducto}`,
+                        `Nombre Producto: ${this.nombreProducto}`,
+                        `Presentación: ${this.presentacionProducto}`
+                      ],
+                      [
+                        `Cantidad Und: ${this.formatonumeros(this.cantProdSinMargenUnd)}`,
+                        `Cantidad Kg: ${this.formatonumeros(this.cantProdSinMargenKg)}`,
+                        `Cantidad Margen: ${this.formatonumeros(this.CantidadMargen)}%`
+                      ],
+                      [
+                        `Cantidad Kg Con Margen: ${this.formatonumeros(this.cantProdConMargenKg)}`,
+                        `Valor Unitario Und: ${this.formatonumeros(this.valorUnitarioProdUnd)}`,
+                        `Valor Unitario Kg: ${this.formatonumeros(this.valorUnitarioProdKg)}`
+                      ],
+                    ]
+                  },
+                  layout: 'lightHorizontalLines',
+                  fontSize: 9,
+                },
+                '\n \n',
+                {
+                  text: `\n Comparativa \n \n`,
+                  alignment: 'center',
+                  style: 'header'
+                },
+                {
+                  table: {
+                    widths: ['*', '*', '*', '*'],
+                    style: 'header',
+                    body: [
+                      [
+                        ``,
+                        `Valor OT`,
+                        `Cantidad Und`,
+                        `Cantidad Kg`
+                      ],
+                      [
+                        `Producido`,
+                        `$${this.formatonumeros(this.valorFinalOT)}`,
+                        `${this.formatonumeros(this.cantProdSinMargenUnd)}`,
+                        `${this.formatonumeros(Math.round(this.cantidadTotalEmpaque))}`
                       ],
                       [
                         `Teorico`,
@@ -756,7 +979,7 @@ export class ReporteCostosOTComponent implements OnInit {
             pdf.open();
             break;
 
-          } else if (item.Sel != 0 && item.Emp == 0) {
+          } else if (SelladoFinal != 0 && item.Emp == 0) {
             const pdfDefinicion : any = {
               info: {
                 title: `${this.ordenTrabajo}`
@@ -799,7 +1022,7 @@ export class ReporteCostosOTComponent implements OnInit {
                         `Presentación: ${this.presentacionProducto}`
                       ],
                       [
-                        `Cantidad Und: ${this.formatonumeros(this.cantidadSellandoUnidad)}`,
+                        `Cantidad Und: ${this.formatonumeros(this.cantProdSinMargenUnd)}`,
                         `Cantidad Kg: ${this.formatonumeros(this.cantProdSinMargenKg)}`,
                         `Cantidad Margen: ${this.formatonumeros(this.CantidadMargen)}%`
                       ],

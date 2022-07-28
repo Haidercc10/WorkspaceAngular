@@ -36,12 +36,21 @@
           </select>
           <label for="floatingSelect">Nombre de la Materia Prima</label>
         </div>
-        <!-- ID/Nombre Producto -->
+        <!-- Categoria Producto -->
         <div class="form-floating col-md-2">
           <select formControlName="MpCategoria" (change)="cargarComboMatPrimaSegunCategorias()" class="form-select form-select-sm" id="floatingSelect"  aria-label="Floating label select example" required>
             <option [ngValue]="categoria.catMP_Id" *ngFor="let categoria of categorias">{{categoria.catMP_Nombre}}</option>
           </select>
           <label for="floatingSelect">Categorias de Materia Prima</label>
+        </div>
+        <!-- Bodegas -->
+        <div class="form-floating col-md-2">
+          <select formControlName="MpBodega" class="form-select form-select-sm" id="floatingSelect"  aria-label="Floating label select example" required>
+            <option value="1">Bodega 1</option>
+            <option value="2">Bodega 2</option>
+            <option value="3">Bodega 3</option>
+          </select>
+          <label for="floatingSelect">Bodegas</label>
         </div>
         <!-- Fecha inicial -->
         <div class="form-floating col-md-2">

@@ -308,7 +308,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
       setTimeout(() => {
         this.load = false;
-        console.log
         if (this.cantidadAsignada <= this.cantRestante) {
           const datosAsignacion : any = {
             AsigMP_OrdenTrabajo : idOrdenTrabajo,
@@ -388,7 +387,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.bagProServices.srvObtenerListaClienteOT_Item(ot).subscribe(datos_procesos => {
       if (datos_procesos.length != 0) {
         for (let index = 0; index < datos_procesos.length; index++) {
-          this.kgOT = datos_procesos[index].datosotKg;
+          let adicional : number = datos_procesos[index].datosotKg * 0.1;
+          this.kgOT = datos_procesos[index].datosotKg + adicional;
           this.estadoOT = datos_procesos[index].estado;
           this.FormMateriaPrimaRetiro.setValue({
             OTRetiro : this.FormMateriaPrimaRetiro.value.OTRetiro,
