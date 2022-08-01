@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { modelProducto } from 'src/app/Modelo/modelProducto';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
@@ -10,6 +10,7 @@ import { SrvEstadosService } from 'src/app/Servicios/srv-estados.service';
 import { TipoProductoService } from 'src/app/Servicios/tipo-producto.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 import Swal from 'sweetalert2';
+import { ModalGenerarInventarioZeusComponent } from '../modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 
 
 @Component({
@@ -18,12 +19,15 @@ import Swal from 'sweetalert2';
   styleUrls: ['./producto.component.css']
 })
 
+
 export class ProductoComponent implements OnInit {
+
+  @ViewChild(ModalGenerarInventarioZeusComponent) productoZeus : ModalGenerarInventarioZeusComponent;
 
   public formularioProducto !: FormGroup;
 
   titulosTabla = [];
-  ArrayProducto = [];
+  ArrayProductoZeus = [];
   datosTabla : any = [];
   public Url : any; //variable publica que va hacia el elemento html (input) en el atributo [src]
   public modalImagenCargada : boolean = false; //modal para cargar imagen
@@ -154,38 +158,9 @@ export class ProductoComponent implements OnInit {
     }]
   }
 
-  /** Generar inventario de productos con más de 1.0 de existencias en Zeus y BagPro. */
-  InventarioExistenciaZeus(){
-    this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datosExistencias => {
-
-      for (let exi = 0; exi < datosExistencias.length; exi++) {
-        this.datosCodigo = datosExistencias[exi].codigo;
-
-        this.clienteOtItems.srvObtenerItemsBagproXClienteItem(this.datosCodigo).subscribe(datosCLOTI => {
-          for (let cl = 0; cl < datosCLOTI.length; cl++) {
-            if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
-              const datosInventario: any = {
-                codigoItem : datosCLOTI[cl].clienteItems,
-                nombreItem : datosCLOTI[cl].clienteItemsNom,
-                cantidadItem : datosExistencias[exi].existencias,
-                PrecioItem : datosExistencias[exi].precioVenta,
-                PrecioTotalItem : datosExistencias[exi].precio_Total,
-                ClienteNombre : datosCLOTI[cl].clienteNom,
-              }
-              console.log(datosInventario);
-            }
-          }
-
-        });
-
-      }
-    });
-
-
-  }
 
   cargarVistaInventarioZeus(){
-
+    this.productoZeus.InventarioExistenciaZeus();
   }
 
 /** Llenar el formulario

@@ -48,6 +48,17 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OtConEmpaque/${ot}`);
   }
 
+  /** Nvo */
+  srvObtenerListaFilasEmpaqueEnProcExtrusion(ot : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnEmpaque/${ot}`);
+  }
+
+    /** Nvo */
+    srvObtenerListaFilasSelladoEnProcSellado(ot : any) {
+      return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnSellado/${ot}`);
+    }
+
+
   /* CLIENTESOT */
 
   srvActualizar(id:number|String, data:any, estado : string) {

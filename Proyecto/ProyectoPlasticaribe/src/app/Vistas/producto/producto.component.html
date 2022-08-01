@@ -21,7 +21,7 @@
     <div class="container">
 
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#exampleModal" (click)="cargarVistaInventarioZeus()"> <!--(click)="InventarioExistenciaZeus()"-->
+        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="cargarVistaInventarioZeus()"> <!--(click)="InventarioExistenciaZeus()"-->
           Generar inventario
         </button>
 
@@ -110,7 +110,7 @@
         <!-- Botones para agregar productos -->
         <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" (click)="InventarioExistenciaZeus()">Agregar</button>
+                <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" (click)="cargarVistaInventarioZeus()">Agregar</button>
                 <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" expand="full" (click)="clear()">Limpiar campos</button>
             </div>
         </div>
@@ -195,19 +195,18 @@
             </div>
         </div>
 
-
-        <div  class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered modal-xl">
-          <div class="modal-content">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
               <div class="modal-header">
-                  <h5 class="modal-title" id="staticBackdropLabel2">Previsualización</h5>
+                  <h5 class="modal-title" id="staticBackdropLabel2">Inventario Zeus</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <div  class="modal-body">
-                <!--Carga componente Generar Excel -->
+              <div class="modal-body">
+                <!--Carga componente Generar Inventario Zeus -->
                 <app-modal-generar-inventario-zeus></app-modal-generar-inventario-zeus>
               </div>
-           </div>
+            </div>
           </div>
         </div>
 
