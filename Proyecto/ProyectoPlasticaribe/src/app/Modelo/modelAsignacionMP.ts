@@ -5,4 +5,5 @@ export interface modelAsignacionMP {
   Estado_Id : number;
   AsigMp_Maquina : number;
   Usua_Id : number;
+  Estado_OrdenTrabajo : number;
 }

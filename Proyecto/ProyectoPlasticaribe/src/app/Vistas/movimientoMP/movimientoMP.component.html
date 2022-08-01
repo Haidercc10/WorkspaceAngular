@@ -113,7 +113,9 @@
               <th id="proveedor" scope="col">{{columnas.usuario}}</th>
               <th id="mp" scope="col">{{columnas.mp}}</th>
               <th id="cantMp" scope="col">{{columnas.cant}}</th>
-              <th id="estado" scope="col">{{columnas.estado}}</th>
+              <ng-container *ngIf="ValidarRol == 1 && this.estadoOt != ''">
+                <th id="estado" scope="col">{{columnas.estado}}</th>
+              </ng-container>
               <th id="ver" scope="col" >{{columnas.Ver}}</th>
             </tr>
             </thead>
@@ -125,7 +127,9 @@
               <td id="proveedor" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.usuario}}</td>
               <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.mp}}</td>
               <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.cant | number}}</td>
-              <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.estado}}</td>
+              <ng-container *ngIf="ValidarRol == 1 && this.estadoOt != ''">
+                <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.estado}}</td>
+              </ng-container>
               <td id="subTotalMateriaPrima"><input class="btn btn-danger btn-danger-sm" type="button" value="Ver" (click)="llenarDocumento(doc)"></td>
             </tr>
           </tbody>
@@ -172,7 +176,7 @@
           </div>
           <div class="modal-body">
             <!--Carga componente editar asignación -->
-            <app-modal-editar-asignaciones-bopp></app-modal-editar-asignaciones-bopp>
+            <app-modal-editar-asignaciones-bopp ></app-modal-editar-asignaciones-bopp>
           </div>
         </div>
       </div>

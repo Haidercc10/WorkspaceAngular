@@ -8,7 +8,7 @@ import { rutaBagPro, rutaBagProLocate } from 'src/polyfills';
 })
 export class BagproService {
 
-  readonly rutaBagPro = rutaBagProLocate;
+  readonly rutaBagPro = rutaBagPro;
 
   constructor(private http : HttpClient) { }
 
@@ -26,7 +26,7 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/FechaFinOT/${ot}`);
   }
 
-  srvObtenerListaProcSelladoProducido(ot : any) {
+  srvObtenerListaProcSelladoProducido(ot : any){
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OtConSellado/${ot}`);
   }
 
@@ -45,7 +45,7 @@ export class BagproService {
   }
 
   srvObtenerListaProcextrusionProducido(ot : any) {
-    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OtConEmpaque/${ot}`);
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/OtConEmpaque/${ot}`);
   }
 
   /** Nvo */
@@ -61,7 +61,7 @@ export class BagproService {
 
   /* CLIENTESOT */
 
-  srvActualizar(id:number|String, data:any, estado : string) {
+  srvActualizar(id:number|String, data:any, estado : any) {
     return this.http.put(this.rutaBagPro + `/ClientesOt/CambioEstadoOT/${id}?Estado=${estado}`, data);
   }
 

@@ -5,4 +5,5 @@ export interface modelDetallesAsignacionBopp {
   UndMed_Id : string;
   Proceso_Id : string;
   DtAsigBOPP_OrdenTrabajo : number;
+  Estado_OrdenTrabajo : number;
 }

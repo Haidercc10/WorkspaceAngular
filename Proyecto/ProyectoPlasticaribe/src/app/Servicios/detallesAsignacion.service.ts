@@ -39,6 +39,11 @@ export class DetallesAsignacionService {
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/AsignacionesAgrupadasXvalores/${ot}`);
     }
 
+    srvObtenerListaPorEstadoOT(estado : any){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/estadoOT/${estado}`);
+    }
+
+
   //Metodo agregar
     srvAgregar(data:any) {
       return this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_MateriaPrima', data)

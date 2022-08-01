@@ -9,6 +9,8 @@ import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
 import { DetallesAsignacionTintasService } from 'src/app/Servicios/detallesAsignacionTintas.service';
+import { DevolucionesService } from 'src/app/Servicios/devoluciones.service';
+import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
 import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
 import { FactuaMpCompradaService } from 'src/app/Servicios/facturaMpComprada.service';
@@ -106,7 +108,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                                           private detallesAsignacionService : DetallesAsignacionService,
                                             private bagProServices : BagproService,
                                               private tintasService : TintasService,
-                                                private detallesAsignacionTintas : DetallesAsignacionTintasService) {
+                                                private detallesAsignacionTintas : DetallesAsignacionTintasService,
+                                                  private devolucionesService : DevolucionesService,
+                                                    private devolucionesMPService : DevolucionesMPService, ) {
 
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : ['', Validators.required],
@@ -316,6 +320,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             Estado_Id : 13,
             AsigMp_Maquina : maquina,
             Usua_Id : this.storage_Id,
+            Estado_OrdenTrabajo : 14,
           }
           this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
             this.obtenerUltimoIdAsignacaion();
@@ -382,6 +387,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.cantRestante = 0;
     this.kgOT = 0;
     let cantAsig : number = 0; //Variable que almacena la cantidad de materia prima que se ha asignado hasta el momento
+    let devolucionMP : number = 0; // Varibale que almacenará la cantidad de materia prima devuelta por la ot
 
     this.load = false;
     this.bagProServices.srvObtenerListaClienteOT_Item(ot).subscribe(datos_procesos => {
@@ -412,10 +418,20 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               }
             }
           });
+
+          this.devolucionesService.srvObtenerListaPorOT(ot).subscribe(datos_devoluciones => {
+            for (let i = 0; i < datos_devoluciones.length; i++) {
+              this.devolucionesMPService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_devolucionesMP => {
+                for (let j = 0; j < datos_devolucionesMP.length; j++) {
+                  devolucionMP += datos_devolucionesMP[j].dtDevMatPri_CantidadDevuelta;
+                }
+              });
+            }
+          });
           setTimeout(() => {
-            this.cantRestante = this.kgOT - cantAsig;
+            this.cantRestante = (this.kgOT - cantAsig) + devolucionMP;
             this.load = true;
-          }, 1000);
+          }, 1500);
           break;
         }
       } else {
