@@ -15,6 +15,8 @@ import { DetallesAsignacionTintasService } from 'src/app/Servicios/detallesAsign
 import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
 import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
 import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/detallesAsignacionBOPP.service';
+import { DevolucionesService } from 'src/app/Servicios/devoluciones.service';
+import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -57,6 +59,7 @@ export class ReporteCostosOTComponent implements OnInit {
   sumaValorExtruido : number = 0; //Variable que servirá para mostrar el valor total de la materia prima que se utulizó en extrusion
   sumaValorImpresion : number = 0; //Variable que servirá para mostrar el valor total de materia prima utilizada en impresión
   sumaValorRotograbado : number = 0; //Variable que servirá para mostrar el valor total de la materia prima utilizada en rotograbado
+  devolucion : number = 0; //Varibale que almacenará la cantidad de materia prima que fue devuelta en una OT
 
   // Variables globlales que almacenarán la informacion general de la orden de trabajo que se mostrará en el PDF
   ordenTrabajo : number = 0;
@@ -74,7 +77,7 @@ export class ReporteCostosOTComponent implements OnInit {
   fechaOT : any;
   fechaFinalOT : any;
   usuarioCreador : any;
-  estado : string;
+  estado : any;
 
   constructor( private frmBuilderMateriaPrima : FormBuilder,
                 private bagProServices : BagproService,
@@ -87,7 +90,9 @@ export class ReporteCostosOTComponent implements OnInit {
                               private detallesAsignacionTintasService : DetallesAsignacionTintasService,
                                 private boppService : EntradaBOPPService,
                                   private asignacionBOPPService : AsignacionBOPPService,
-                                    private detallesAsigBOPPService : DetalleAsignacion_BOPPService) {
+                                    private detallesAsigBOPPService : DetalleAsignacion_BOPPService,
+                                    private devolucionesService : DevolucionesService,
+                                      private devolucionesMPService : DevolucionesMPService,) {
 
 
     this.infoOT = this.frmBuilderMateriaPrima.group({
@@ -226,6 +231,7 @@ export class ReporteCostosOTComponent implements OnInit {
     this.diferencia = 0;
     this.diferenciaPorcentaje = 0;
     this.estado = '';
+    this.devolucion = 0;
 
     let ot : number = this.infoOT.value.ot;
     let porcentajeMargen : number = 0;
@@ -275,6 +281,17 @@ export class ReporteCostosOTComponent implements OnInit {
             fechaFinOT : '',
             estadoOT : this.estado,
           });
+
+          this.devolucionesService.srvObtenerListaPorOT(ot).subscribe(datos_devoluciones => {
+            for (let i = 0; i < datos_devoluciones.length; i++) {
+              this.devolucionesMPService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_devolucionesMP => {
+                for (let j = 0; j < datos_devolucionesMP.length; j++) {
+                  this.devolucion = datos_devolucionesMP[j].dtDevMatPri_CantidadDevuelta;
+                  this.llenarTablaMP(datos_devolucionesMP[j]);
+                }
+              });
+            }
+          });
           this.detallesAsignacionService.srvObtenerListaPorOT(ot).subscribe(datos_asignacionMP => {
             if (datos_asignacionMP.length != 0){
               for (let j = 0; j < datos_asignacionMP.length; j++) {
@@ -282,12 +299,31 @@ export class ReporteCostosOTComponent implements OnInit {
               }
             }
           });
+
+          // this.detallesAsignacionService.srvObtenerListaPorOT(ot).subscribe(datos_asignacionMP => {
+          //   if (datos_asignacionMP.length != 0){
+          //     for (let j = 0; j < datos_asignacionMP.length; j++) {
+          //       this.devolucionesService.srvObtenerListaPorOT(ot).subscribe(datos_devoluciones => {
+          //         for (let i = 0; i < datos_devoluciones.length; i++) {
+          //           this.devolucionesMPService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_devolucionesMP => {
+          //             for (let k = 0; k < datos_devolucionesMP.length; k++) {
+          //               this.devolucion = datos_devolucionesMP[k].dtDevMatPri_CantidadDevuelta;
+          //               this.llenarTablaMP(datos_asignacionMP[j], this.devolucion);
+          //               this.devolucion = 0;
+          //               break;
+          //             }
+          //           });
+          //           break
+          //         }
+          //       });
+          //     }
+          //   }
+          // });
           this.detallesAsigBOPPService.srvObtenerListaPorOt(ot).subscribe(datos_asignacionBOPP => {
             for (let j = 0; j < datos_asignacionBOPP.length; j++) {
               this.llenarTablaBOPP(datos_asignacionBOPP[j]);
             }
           });
-          break;
         }
       }
     });
@@ -525,26 +561,71 @@ export class ReporteCostosOTComponent implements OnInit {
     this.load = true;
   }
 
+  // llenarTablaMP(formulario : any, CantDevuelta : number){
+  //   if (formulario.sum == 0) this.load = true;
+  //   else {
+  //     this.materiaPrimaService.srvObtenerListaPorId(formulario.matPri_Id).subscribe(datos_materiaPrima => {
+  //       const infoDoc : any = {
+  //         Id : datos_materiaPrima.matPri_Id,
+  //         Nombre : datos_materiaPrima.matPri_Nombre,
+  //         Cantidad : (formulario.sum - CantDevuelta),
+  //         Presentacion : datos_materiaPrima.undMed_Id,
+  //         PrecioUnd : this.formatonumeros(datos_materiaPrima.matPri_Precio),
+  //         SubTotal : this.formatonumeros(Math.round((formulario.sum - CantDevuelta) * datos_materiaPrima.matPri_Precio)),
+  //         Proceso : formulario.proceso_Nombre,
+  //       }
+
+  //       this.totalMPEntregada = (this.totalMPEntregada + infoDoc.Cantidad) - CantDevuelta;
+  //       this.ValorMPEntregada = this.ValorMPEntregada + ((formulario.sum - CantDevuelta) * datos_materiaPrima.matPri_Precio);
+  //       this.ArrayMateriaPrima.push(infoDoc);
+  //       this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+  //       this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
+  //     });
+  //     this.load = true;
+  //     this.devolucion = 0;
+  //   }
+  // }
+
   // Funcion para llenar la tabla con la materia prima que se ha pedido para la OT consultada
   llenarTablaMP(formulario : any){
+    if (this.devolucion != 0) {
+      this.materiaPrimaService.srvObtenerListaPorId(formulario.matPri_Id).subscribe(datos_materiaPrima => {
+        const infoDoc : any = {
+          Id : datos_materiaPrima.matPri_Id,
+          Nombre : datos_materiaPrima.matPri_Nombre,
+          Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
+          Presentacion : datos_materiaPrima.undMed_Id,
+          PrecioUnd : this.formatonumeros(datos_materiaPrima.matPri_Precio),
+          SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio)),
+          Proceso : 'Devolución',
+        }
+        this.totalMPEntregada = this.totalMPEntregada - infoDoc.Cantidad;
+        this.ValorMPEntregada = this.ValorMPEntregada - (formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio);
+        this.ArrayMateriaPrima.push(infoDoc);
+        this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+        this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
+      });
+      this.load = true;
+    } else {
+      this.materiaPrimaService.srvObtenerListaPorId(formulario.matPri_Id).subscribe(datos_materiaPrima => {
+        const infoDoc : any = {
+          Id : datos_materiaPrima.matPri_Id,
+          Nombre : datos_materiaPrima.matPri_Nombre,
+          Cantidad : formulario.sum,
+          Presentacion : datos_materiaPrima.undMed_Id,
+          PrecioUnd : this.formatonumeros(datos_materiaPrima.matPri_Precio),
+          SubTotal : this.formatonumeros(Math.round(formulario.sum * datos_materiaPrima.matPri_Precio)),
+          Proceso : formulario.proceso_Nombre,
+        }
 
-    this.materiaPrimaService.srvObtenerListaPorId(formulario.matPri_Id).subscribe(datos_materiaPrima => {
-      const infoDoc : any = {
-        Id : datos_materiaPrima.matPri_Id,
-        Nombre : datos_materiaPrima.matPri_Nombre,
-        Cantidad : formulario.sum,
-        Presentacion : datos_materiaPrima.undMed_Id,
-        PrecioUnd : this.formatonumeros(datos_materiaPrima.matPri_Precio),
-        SubTotal : this.formatonumeros(Math.round(formulario.sum * datos_materiaPrima.matPri_Precio)),
-        Proceso : formulario.proceso_Nombre,
-      }
-
-      this.totalMPEntregada = this.totalMPEntregada + infoDoc.Cantidad;
-      this.ValorMPEntregada = this.ValorMPEntregada + (formulario.sum * datos_materiaPrima.matPri_Precio);
-      this.ArrayMateriaPrima.push(infoDoc);
-      this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-    });
-    this.load = true;
+        this.totalMPEntregada = this.totalMPEntregada + infoDoc.Cantidad;
+        this.ValorMPEntregada = this.ValorMPEntregada + (formulario.sum * datos_materiaPrima.matPri_Precio);
+        this.ArrayMateriaPrima.push(infoDoc);
+        this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+        this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
+      });
+      this.load = true;
+    }
   }
 
   // Funcion que servirá para llenar la tabla de materias primas utilizadas con el BOPP que se asignó para la OT consultada
@@ -1169,10 +1250,12 @@ export class ReporteCostosOTComponent implements OnInit {
   // Funcion que cambiará el estado de una Orden de trabajo consultada
   cambiarEstado(){
 
-    let estado : string = this.infoOT.value.estadoOT;
+    let estado : any = this.infoOT.value.estadoOT;
 
     if (this.ordenTrabajo == 0) Swal.fire(`¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
     else {
+
+
       const data : any = {
         item : this.ordenTrabajo,
         clienteNom : this.NombreCliente,
@@ -1197,6 +1280,60 @@ export class ReporteCostosOTComponent implements OnInit {
           title: '¡Actualizacion de OT exitosa!'
         });
       });
+
+
+      // if (estado == 0) {
+      //   const data : any = {
+      //     item : this.ordenTrabajo,
+      //     clienteNom : this.NombreCliente,
+      //     clienteItemsNom : this.nombreProducto,
+      //     usrCrea : this.usuarioCreador,
+      //     estado : estado,
+      //   }
+      //   this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(datos_clientesOT => {
+      //     const Toast = Swal.mixin({
+      //       toast: true,
+      //       position: 'center',
+      //       showConfirmButton: false,
+      //       timer: 2200,
+      //       timerProgressBar: true,
+      //       didOpen: (toast) => {
+      //         toast.addEventListener('mouseenter', Swal.stopTimer);
+      //         toast.addEventListener('mouseleave', Swal.resumeTimer);
+      //       }
+      //     });
+      //     Toast.fire({
+      //       icon: 'success',
+      //       title: '¡Actualizacion de OT exitosa!'
+      //     });
+      //   });
+
+      // } else {
+      //   const data : any = {
+      //     item : this.ordenTrabajo,
+      //     clienteNom : this.NombreCliente,
+      //     clienteItemsNom : this.nombreProducto,
+      //     usrCrea : this.usuarioCreador,
+      //     estado : estado,
+      //   }
+      //   this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(datos_clientesOT => {
+      //     const Toast = Swal.mixin({
+      //       toast: true,
+      //       position: 'center',
+      //       showConfirmButton: false,
+      //       timer: 2200,
+      //       timerProgressBar: true,
+      //       didOpen: (toast) => {
+      //         toast.addEventListener('mouseenter', Swal.stopTimer);
+      //         toast.addEventListener('mouseleave', Swal.resumeTimer);
+      //       }
+      //     });
+      //     Toast.fire({
+      //       icon: 'success',
+      //       title: '¡Actualizacion de OT exitosa!'
+      //     });
+      //   });
+      // }
     }
   }
 

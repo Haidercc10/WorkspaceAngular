@@ -370,6 +370,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
                 UndMed_Id : 'Kg',
                 Proceso_Id : 'CORTE',
                 DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
+                Estado_OrdenTrabajo : 14,
               }
 
               setTimeout(() => {

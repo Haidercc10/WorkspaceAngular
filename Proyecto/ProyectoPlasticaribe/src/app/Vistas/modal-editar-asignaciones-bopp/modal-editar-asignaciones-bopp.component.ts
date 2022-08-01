@@ -303,10 +303,11 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
     let nombre : string = this.FormularioBOPP.value.boppNombre;
 
     this.boppService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
-      let boppSeleccionado : any;
+      let boppSeleccionado : any = [];
       boppSeleccionado.push(datos_bopp);
       for (const item of boppSeleccionado) {
         let bopp : any = {
+          IdAsg : this.idAsignacion,
           idBOPP : item.bopP_Id,
           Serial : serial,
           Nombre : nombre,
@@ -539,6 +540,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
   }
 
   actualizarDetallesAsignacion(){
+    this.load = false;
     for (let i = 0; i < this.ordenesTrabajo.length; i++) {
       if (!this.otRegistradas.includes(this.ordenesTrabajo[i].ot)) {
         for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
@@ -553,6 +555,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
                   UndMed_Id : 'Kg',
                   Proceso_Id : 'CORTE',
                   DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
+                  Estado_OrdenTrabajo : 14,
                 }
 
                 setTimeout(() => {
@@ -578,6 +581,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
                     UndMed_Id : 'Kg',
                     Proceso_Id : 'CORTE',
                     DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
+                    Estado_OrdenTrabajo : 14,
                   }
 
                   setTimeout(() => {
@@ -600,6 +604,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
                     UndMed_Id : 'Kg',
                     Proceso_Id : 'CORTE',
                     DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
+                    Estado_OrdenTrabajo : 14,
                   }
 
                   setTimeout(() => {
