@@ -1,8 +1,12 @@
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { FiltrosProductosTerminadosZeusPipe } from 'src/app/Pipes/filtros-productos-terminados-zeus.pipe';
 import { InventarioZeusService } from 'src/app/Servicios/inventario-zeus.service';
+import { RolesService } from 'src/app/Servicios/roles.service';
 import { SrvClienteOtItemsService } from 'src/app/Servicios/srv-cliente-ot-items.service';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -10,12 +14,11 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./modal-generar-inventario-zeus.component.css']
 })
 
-@Injectable({
+/*@Injectable({
   providedIn: 'root'
-})
+})*/
 
 export class ModalGenerarInventarioZeusComponent implements OnInit {
-
 
   public titulosTabla : any = [];
   public arrayInventario = [];
@@ -23,13 +26,52 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   ArrayProductoZeus = [];
   public nombreArchivo = "Inventario de Productos Terminados.xlsx"
   public page : number;
+  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  public filtroNombre : any;
+  public NombrePT = '';
 
   constructor(private existenciasZeus : InventarioZeusService,
-    private clienteOtItems : SrvClienteOtItemsService) { }
+    private clienteOtItems : SrvClienteOtItemsService,
+    @Inject(SESSION_STORAGE) private storage: WebStorageService,
+    private rolService : RolesService) { }
 
   ngOnInit(): void {
+    this.lecturaStorage();
     this.ColumnasTabla();
+    this.InventarioExistenciaZeus();
   }
+
+  lecturaStorage(){
+    this.storage_Id = this.storage.get('Id');
+    this.storage_Nombre = this.storage.get('Nombre');
+    let rol = this.storage.get('Rol');
+    this.rolService.srvObtenerLista().subscribe(datos_roles => {
+      for (let index = 0; index < datos_roles.length; index++) {
+        if (datos_roles[index].rolUsu_Id == rol) {
+          this.ValidarRol = rol;
+          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
+        }
+      }
+    });
+  }
+
+    /* FUNCION PARA RELIZAR CONFIRMACIÓN DE SALIDA (CIERRE SESIÓN)*/
+    confimacionSalida(){
+      Swal.fire({
+        title: '¿Seguro que desea salir?',
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Salir',
+        denyButtonText: `No Salir`,
+      }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) window.location.href = "./";
+      })
+    }
+
 
   ColumnasTabla(){
     this.titulosTabla = [{
@@ -53,12 +95,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     }
   }
 
-
-  cargarTablaArticulos(){
-
-  }
-
-  /** Generar inventario de productos con más de 1.0 de existencias en Zeus y BagPro. */
+  /**Función para generar inventario de productos con más de 1.0 de existencias en Zeus y BagPro. */
   InventarioExistenciaZeus(){
     this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datosExistencias => {
 
@@ -77,7 +114,10 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                 ClienteNombre : datosCLOTI[cl].clienteNom,
               }
               //console.log(datosInventario);
+
               this.ArrayProductoZeus.push(datosInventario);
+              //this.NombrePT = datosInventario.nombreItem;
+              //this.NombrePT = '';
             }
           }
 

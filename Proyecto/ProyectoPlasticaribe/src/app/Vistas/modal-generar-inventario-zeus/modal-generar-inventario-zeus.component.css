@@ -2,8 +2,8 @@
   font-size: smaller;
 }
 
-.titulo span{
-  color: #a23;
+.titulo {
+  color: #d83542;
 }
 
 .TitulosTabla {
@@ -49,7 +49,7 @@ a {
 }
 
 .tituloRojo{
-  color: rgb(158, 1, 1);;
+  color: #d83542;
 }
 
 .colorLinea{
@@ -62,5 +62,9 @@ a {
 }
 
 .TextosInfoTabla2{
-background-color: gainsboro;
+background-color: lightblue;
+}
+
+.form-floating{
+  font-size: small;
 }

@@ -59,7 +59,8 @@ import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.compone
 import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
 import { ModalEditarAsignacionesBOPPComponent } from './Vistas/modal-editar-asignaciones-bopp/modal-editar-asignaciones-bopp.component';
 import { ModalGenerarInventarioZeusComponent } from './Vistas/modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
-
+import { FiltrosProductosTerminadosZeusPipe } from './Pipes/filtros-productos-terminados-zeus.pipe';
+import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 export const routes: Routes = [
 
@@ -103,6 +104,7 @@ export const routes: Routes = [
   {path: 'asignacion-bopp', canActivate: [ValidacionLoginGuard], component: AsignacionBOPPComponent},
   {path: 'entrada-BOPP', canActivate: [ValidacionLoginGuard], component: EntradaBOPPComponent},
   {path: 'AsignacionBOPPTemporal', canActivate: [ValidacionLoginGuard], component: AsignacionBOPP_TEMPORALComponent},
+  {path: 'inventario-productos-terminados', canActivate: [ValidacionLoginGuard], component: ModalGenerarInventarioZeusComponent},
 ]
 
 @NgModule({
@@ -153,6 +155,7 @@ export const routes: Routes = [
     ModalEditarAsignacionesBOPPComponent,
     ModalGenerarInventarioZeusComponent,
     PruebasComponent,
+    FiltrosProductosTerminadosZeusPipe,
   ],
 
 
@@ -168,6 +171,7 @@ export const routes: Routes = [
     BrowserAnimationsModule,
     MatNativeDateModule,
     MaterialExampleModule,
+    Ng2SearchPipeModule,
   ],
 
   providers: [

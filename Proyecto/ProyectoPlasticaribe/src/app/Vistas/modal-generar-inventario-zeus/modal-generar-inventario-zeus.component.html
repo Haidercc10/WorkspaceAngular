@@ -1,38 +1,76 @@
-<div class="mb-4">
-  <div class="row g-3">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover mt-2" id="tablaProductosTerminados">
-          <thead class="TitulosTabla">
-              <tr *ngFor="let columnas of titulosTabla let i = index">
-                <th scope="col" class="idProducto">{{columnas.invItem}}</th>
-                <th id="nombre" scope="col">{{columnas.invNombre}}</th>
-                <th id="existencias" scope="col">{{columnas.invStock}}</th>
-                <th id="precio" scope="col">{{columnas.invPrecio}}</th>
-                <th id="Subtotal" scope="col">{{columnas.invSubtotal}}</th>
-                <th id="Cliente" scope="col">{{columnas.invCliente}}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let prodZeus of ArrayProductoZeus | paginate: {itemsPerPage: 30, currentPage: page} let i = index">
-                <th id="id" class="TextosInfoTabla">{{prodZeus.codigoItem}}</th>
-                <td id="nombre" class="TextosInfoTabla">{{prodZeus.nombreItem}}</td>
-                <td id="existencias" class="TextosInfoTabla2">{{prodZeus.cantidadItem | number }}</td>
-                <td id="precio" class="TextosInfoTabla">{{prodZeus.PrecioItem | number }}</td>
-                <td id="subtotal" class="TextosInfoTabla">{{prodZeus.PrecioTotalItem | number }}</td>
-                <td id="cliente" class="TextosInfoTabla">{{prodZeus.ClienteNombre}}</td>
-              </tr>
-          </tbody>
-        </table>
-        <div class="mb-2">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <pagination-controls (pageChange)="page = $event"></pagination-controls>
-          </div>
-      </div>
-      </div>
-      <div class="mb-0">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class="btn btn-danger btn-danger-sm" type="submit" (click)="exportarExcel()">Exportar Excel</button>
+  <!-- Inicio  -->
+<div class="contain">
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
+    </div>
+    <ul class="btn-group open">
+      <p><b>User: {{storage_Nombre}}</b></p>
+      <span><b>Tipo: {{storage_Rol}} </b></span>
+      <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
+    </ul>
+  </nav>
+  <!-- Navegador fin de parte superior -->
+
+<div class="container-fluid">
+    <div class="mb-4 Titulo">
+        <h2 class="tituloRojo">Inventario de Productos Terminados</h2>
+    </div>
+    <div class="mb-4">
+        <hr class="colorLinea">
+    </div>
+  <div class="container">
+
+    <!-- Inicio fila 1 de campos -->
+    <div class="mb-4">
+      <div class="row g-3">
+        <!-- Nombre Producto -->
+        <div class="form-floating col-md-4">
+          <input type="text" name="NombrePT" [(ngModel)]="NombrePT" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
+          <label for="floatingInput">Nombre</label>
         </div>
       </div>
+    </div>
+    <!-- Fin fila 1 de campos -->
+
+      <div class="mb-4">
+        <div class="row g-3">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover mt-2" id="tablaProductosTerminados">
+                <thead class="TitulosTabla">
+                    <tr *ngFor="let columnas of titulosTabla let i = index">
+                      <th scope="col" class="idProducto">{{columnas.invItem}}</th>
+                      <th id="nombre" scope="col">{{columnas.invNombre}}</th>
+                      <th id="existencias" scope="col">{{columnas.invStock}}</th>
+                      <th id="precio" scope="col">{{columnas.invPrecio}}</th>
+                      <th id="Subtotal" scope="col">{{columnas.invSubtotal}}</th>
+                      <th id="Cliente" scope="col">{{columnas.invCliente}}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let prodZeus of ArrayProductoZeus | filtrosProductosTerminadosZeus: NombrePT">
+                      <th id="id" class="TextosInfoTabla">{{prodZeus.codigoItem}}</th>
+                      <td id="nombre" class="TextosInfoTabla">{{prodZeus.nombreItem}}</td>
+                      <td id="existencias" class="TextosInfoTabla2">{{prodZeus.cantidadItem | number }}</td>
+                      <td id="precio" class="TextosInfoTabla">{{prodZeus.PrecioItem | number }}</td>
+                      <td id="subtotal" class="TextosInfoTabla">{{prodZeus.PrecioTotalItem | number }}</td>
+                      <td id="cliente" class="TextosInfoTabla">{{prodZeus.ClienteNombre}}</td>
+                    </tr>
+                </tbody>
+              </table>
+            <!--  <div class="mb-2">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                  <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                </div> -->
+            </div>
+            </div>
+            <div class="mb-0">
+              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <button class="btn btn-danger btn-danger-sm" type="submit" (click)="exportarExcel()">Exportar Excel</button>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+
