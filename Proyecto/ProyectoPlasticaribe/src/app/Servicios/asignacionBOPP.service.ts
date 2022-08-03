@@ -33,6 +33,9 @@ export class AsignacionBOPPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/AsignacionesXOrden/${id}`)
   }
 
+  srvObtenerListaUltimoId():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/ultimoId`)
+  }
 
   srvObtenerListaPorfechas(fecha1 : any, fecha2 : any):Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_BOPP/fechas?AsigBOPP_FechaEntrega1=${fecha1}&AsigBOPP_FechaEntrega2=${fecha2}`)

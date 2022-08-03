@@ -117,24 +117,40 @@ export class AsignacionBOPPComponent implements OnInit {
   }
 
   infoOT(){
+    this.load = false;
     let ordenTrabajo : number = this.FormAsignacionBopp.value.AsgBopp_OT;
+    let cantidadAsignada : number = 0;
 
     if (this.ordenesTrabajo.length == 0) {
       this.bagProService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
         for (const item of datos_OT) {
           this.arrayOT.push(ordenTrabajo);
           if (item.estado == null || item.estado == '' || item.estado == '0') {
-            const infoOT : any = {
-              ot : item.item,
-              cliente : item.clienteNom,
-              micras : item.extCalibre,
-              ancho : item.ptAnchopt,
-              item : item.clienteItemsNom,
-              kg : item.datosotKg,
-            }
-            this.ordenesTrabajo.push(infoOT);
-            this.cantidadKG = item.datosotKg + this.cantidadKG;
+            this.detallesAsignacionBOPPService.srvObtenerListaPorOt(ordenTrabajo).subscribe(datos_dtAsgBOPP => {
+              if (datos_dtAsgBOPP.length == 0) cantidadAsignada = 0;
+              else {
+                for (let i = 0; i < datos_dtAsgBOPP.length; i++) {
+                  cantidadAsignada += datos_dtAsgBOPP[i].dtAsigBOPP_Cantidad;
+                }
+              }
+            });
+            setTimeout(() => {
+              if (cantidadAsignada <= (item.datosotKg)) {
+                const infoOT : any = {
+                  ot : item.item,
+                  cliente : item.clienteNom,
+                  micras : item.extCalibre,
+                  ancho : item.ptAnchopt,
+                  item : item.clienteItemsNom,
+                  kg : item.datosotKg,
+                }
+                this.ordenesTrabajo.push(infoOT);
+                this.cantidadKG = item.datosotKg + this.cantidadKG;
+                this.load = true;
+              } else Swal.fire(`¡No se le puede asignar material a la OT ${ordenTrabajo}, ya se le ha asignado la cantidad máxima!`)
+            }, 900);
           } else if (item.estado == 4 || item.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
+          this.load = true;
         }
       });
     } else {
@@ -143,21 +159,36 @@ export class AsignacionBOPPComponent implements OnInit {
         this.bagProService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
           for (const itemOT of datos_OT) {
             if (itemOT.estado == null || itemOT.estado == '' || itemOT.estado == '0') {
-              const infoOT : any = {
-                ot : itemOT.item,
-                cliente : itemOT.clienteNom,
-                micras : itemOT.extCalibre,
-                ancho : itemOT.ptAnchopt,
-                item : itemOT.clienteItemsNom,
-                kg : itemOT.datosotKg,
-              }
-              this.ordenesTrabajo.push(infoOT);
-              this.cantidadKG = itemOT.datosotKg + this.cantidadKG;
+              this.detallesAsignacionBOPPService.srvObtenerListaPorOt(ordenTrabajo).subscribe(datos_dtAsgBOPP => {
+                if (datos_dtAsgBOPP.length == 0) cantidadAsignada = 0;
+                else {
+                  for (let i = 0; i < datos_dtAsgBOPP.length; i++) {
+                    cantidadAsignada += datos_dtAsgBOPP[i].dtAsigBOPP_Cantidad;
+                  }
+                }
+              });
+              setTimeout(() => {
+                if (cantidadAsignada <= (itemOT.datosotKg)) {
+                  const infoOT : any = {
+                    ot : itemOT.item,
+                    cliente : itemOT.clienteNom,
+                    micras : itemOT.extCalibre,
+                    ancho : itemOT.ptAnchopt,
+                    item : itemOT.clienteItemsNom,
+                    kg : itemOT.datosotKg,
+                  }
+                  this.ordenesTrabajo.push(infoOT);
+                  this.cantidadKG = itemOT.datosotKg + this.cantidadKG;
+                  this.load = true;
+                } else Swal.fire(`¡No se le puede asignar material a la OT ${ordenTrabajo}, ya se le ha asignado la cantidad máxima!`)
+              }, 1200);
             } else if (itemOT.estado == 4 || itemOT.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
+            this.load = true;
           }
         });
       } else {
         Swal.fire(`La OT ${ordenTrabajo} ya se encuentra en la tabla`);
+        this.load = true;
       }
     }
 
@@ -237,6 +268,7 @@ export class AsignacionBOPPComponent implements OnInit {
     this.cantidadBOPP = 0;
     this.ancho = 0;
     this.cantidadKG = 0;
+    this.arrayOT = [];
   }
 
   /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
@@ -333,8 +365,6 @@ export class AsignacionBOPPComponent implements OnInit {
                 this.ArrayBoppPedida.push(bopp);
                 this.FormularioBOPP.reset();
               } else Swal.fire("¡No se puede asignar una cantidad mayor a la que hay en stock!");
-            } else {
-
             }
           }
         } else continue;
@@ -392,17 +422,13 @@ export class AsignacionBOPPComponent implements OnInit {
   }
 
   obtenerIdUltimaAsignacion(){
-    let idsAsignaciones = [];
-    this.asignacionBOPPService.srvObtenerLista().subscribe(datos_asignaciones => {
-      for (let i = 0; i < datos_asignaciones.length; i++) {
-        idsAsignaciones.push(datos_asignaciones[i].asigBOPP_Id);
-      }
-      let ultimoId : number = Math.max.apply(null, idsAsignaciones);
-      this.detallesAsginacionBOPP(ultimoId);
+    this.asignacionBOPPService.srvObtenerListaUltimoId().subscribe(datos_asignaciones => {
+      this.detallesAsginacionBOPP(datos_asignaciones);
     });
   }
 
-  detallesAsginacionBOPP(idAsignacion : any){
+  detallesAsginacionBOPP(asignacion : any){
+    let idAsignacion : number = asignacion.asigBOPP_Id;
     for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
       this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
         for (let k = 0; k < datos_bopp.length; k++) {
@@ -417,102 +443,84 @@ export class AsignacionBOPPComponent implements OnInit {
               Estado_OrdenTrabajo : 14,
             }
             setTimeout(() => {
-              this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
-                this.moverInventarioBOPP();
-              });
+              this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => { });
             }, 1111);
           }
         }
       });
     }
+    setTimeout(() => {
+      this.moverInventarioBOPP();
+    }, 1500);
   }
 
-  //
   moverInventarioBOPP(){
+    let boppActualizada : any = [];
+    let serialCantBOPP : any = [];
     for (let i = 0; i < this.ArrayBoppPedida.length; i++) {
-      this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[i].Serial).subscribe(datos_bopp => {
-        for (let j = 0; j < datos_bopp.length; j++) {
-          let stock : number = datos_bopp[j].bopP_Stock;
-          let restante : number = stock - this.ArrayBoppPedida[i].Cant;
-          if (restante <= 1.5) {
-            let datosBOPP : any = {
-              bopP_Id : datos_bopp[j].bopP_Id,
-              bopP_Nombre : datos_bopp[j].bopP_Nombre,
-              bopP_Descripcion : datos_bopp[j].bopP_Descripcion,
-              bopP_Serial : datos_bopp[j].bopP_Serial,
-              bopP_CantidadMicras :  datos_bopp[j].bopP_CantidadMicras,
-              undMed_Id : datos_bopp[j].undMed_Id,
-              catMP_Id : datos_bopp[j].catMP_Id,
-              bopP_Precio : datos_bopp[j].bopP_Precio,
-              tpBod_Id : datos_bopp[j].tpBod_Id,
-              bopP_FechaIngreso : datos_bopp[j].bopP_FechaIngreso,
-              bopP_Ancho : datos_bopp[j].bopP_Ancho,
-              bopP_Stock : 0,
-              UndMed_Kg : datos_bopp[j].undMed_Kg,
-              bopP_CantidadInicialKg : datos_bopp[j].bopP_CantidadInicialKg,
-            }
+      let dataBOPP : any = {
+        serial : this.ArrayBoppPedida[i].Serial,
+        Cant : this.ArrayBoppPedida[i].Cant,
+      }
 
-            this.boppService.srvActualizar(datos_bopp[j].bopP_Id, datosBOPP).subscribe(datos_boppActualizado => {
-              this.obtenerBOPP();
-              const Toast = Swal.mixin({
-                toast: true,
-                position: 'center',
-                showConfirmButton: false,
-                timer: 1500,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                  toast.addEventListener('mouseenter', Swal.stopTimer)
-                  toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-              });
-              Toast.fire({
-                icon: 'success',
-                title: 'Asignación de BOPP registrada con exito!'
-              });
-              this.limpiarTodosLosCampos();
-              this.load = true;
-            }, error => { console.log(error); });
-          } else {
-            let datosBOPP : any = {
-              bopP_Id : datos_bopp[j].bopP_Id,
-              bopP_Nombre : datos_bopp[j].bopP_Nombre,
-              bopP_Descripcion : datos_bopp[j].bopP_Descripcion,
-              bopP_Serial : datos_bopp[j].bopP_Serial,
-              bopP_CantidadMicras :  datos_bopp[j].bopP_CantidadMicras,
-              undMed_Id : datos_bopp[j].undMed_Id,
-              catMP_Id : datos_bopp[j].catMP_Id,
-              bopP_Precio : datos_bopp[j].bopP_Precio,
-              tpBod_Id : datos_bopp[j].tpBod_Id,
-              bopP_FechaIngreso : datos_bopp[j].bopP_FechaIngreso,
-              bopP_Ancho : datos_bopp[j].bopP_Ancho,
-              bopP_Stock : restante,
-              UndMed_Kg : datos_bopp[j].undMed_Kg,
-              bopP_CantidadInicialKg : datos_bopp[j].bopP_CantidadInicialKg,
-            }
-
-            this.boppService.srvActualizar(datos_bopp[j].bopP_Id, datosBOPP).subscribe(datos_boppActualizado => {
-              this.obtenerBOPP();
-              const Toast = Swal.mixin({
-                toast: true,
-                position: 'center',
-                showConfirmButton: false,
-                timer: 1500,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                  toast.addEventListener('mouseenter', Swal.stopTimer)
-                  toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-              });
-              Toast.fire({
-                icon: 'success',
-                title: 'Asignación de BOPP registrada con exito!'
-              });
-              this.limpiarTodosLosCampos();
-              this.load = true;
-            }, error => { console.log(error); });
+      if (!boppActualizada.includes(this.ArrayBoppPedida[i].Serial)) {
+        serialCantBOPP.push(dataBOPP);
+        boppActualizada.push(this.ArrayBoppPedida[i].Serial);
+      }
+      else {
+        for (let b = 0; b < serialCantBOPP.length; b++) {
+          if (serialCantBOPP[b].serial == this.ArrayBoppPedida[i].Serial) {
+            serialCantBOPP[b].Cant += this.ArrayBoppPedida[i].Cant;
           }
         }
-      });
+      }
     }
+    setTimeout(() => {
+      for (let j = 0; j < serialCantBOPP.length; j++) {
+        this.boppService.srvObtenerListaPorSerial(serialCantBOPP[j].serial).subscribe(datos_bopp => {
+          for (let k = 0; k < datos_bopp.length; k++) {
+            let stock : number = datos_bopp[k].bopP_Stock;
+            let restante : number = stock - serialCantBOPP[j].Cant;
+            const datosBOPP : any = {
+              bopP_Id : datos_bopp[k].bopP_Id,
+              bopP_Nombre : datos_bopp[k].bopP_Nombre,
+              bopP_Descripcion : datos_bopp[k].bopP_Descripcion,
+              bopP_Serial : datos_bopp[k].bopP_Serial,
+              bopP_CantidadMicras :  datos_bopp[k].bopP_CantidadMicras,
+              undMed_Id : datos_bopp[k].undMed_Id,
+              catMP_Id : datos_bopp[k].catMP_Id,
+              bopP_Precio : datos_bopp[k].bopP_Precio,
+              tpBod_Id : datos_bopp[k].tpBod_Id,
+              bopP_FechaIngreso : datos_bopp[k].bopP_FechaIngreso,
+              bopP_Ancho : datos_bopp[k].bopP_Ancho,
+              bopP_Stock : restante,
+              UndMed_Kg : datos_bopp[k].undMed_Kg,
+              bopP_CantidadInicialKg : datos_bopp[k].bopP_CantidadInicialKg,
+            }
+
+            this.boppService.srvActualizar(datos_bopp[k].bopP_Id, datosBOPP).subscribe(datos_boppActualizado => {
+              this.obtenerBOPP();
+              const Toast = Swal.mixin({
+                toast: true,
+                position: 'center',
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                  toast.addEventListener('mouseenter', Swal.stopTimer)
+                  toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+              });
+              Toast.fire({
+                icon: 'success',
+                title: 'Asignación de BOPP registrada con exito!'
+              });
+              this.limpiarTodosLosCampos();
+              this.load = true;
+             }, error => { console.log(error); });
+          }
+        });
+      }
+    }, 2000);
   }
 }

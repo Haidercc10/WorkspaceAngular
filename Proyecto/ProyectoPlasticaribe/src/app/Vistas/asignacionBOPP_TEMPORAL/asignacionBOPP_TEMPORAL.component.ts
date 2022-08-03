@@ -122,6 +122,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     this.ArrayBoppPedida = [];
     this.ordenesTrabajo = [];
     this.cantidadKG = 0;
+    this.arrayOT = [];
   }
 
   //Funcion que buscará y mostrará los BOPP existentes
@@ -154,6 +155,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       this.bagProService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
         for (const item of datos_OT) {
           this.arrayOT.push(ordenTrabajo);
+
           if (item.estado == null || item.estado == '' || item.estado == '0') {
             const infoOT : any = {
               ot : item.item,
