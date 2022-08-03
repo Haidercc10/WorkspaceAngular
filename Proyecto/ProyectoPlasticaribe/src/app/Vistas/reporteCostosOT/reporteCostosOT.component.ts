@@ -260,7 +260,7 @@ export class ReporteCostosOTComponent implements OnInit {
           let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
           this.fechaOT = fechaCreacionFinal;
           this.usuarioCreador = item.usrCrea;
-          if (item.estado == null || item.estado == '' || item.estado == '0') this.estado = 'NULL';
+          if (item.estado == null || item.estado == '' || item.estado == '0') this.estado = '0';
           else if (item.estado == 4) this.estado = '4';
           else if (item.estado == 1) this.estado = '1';
 
@@ -1280,60 +1280,6 @@ export class ReporteCostosOTComponent implements OnInit {
           title: '¡Actualizacion de OT exitosa!'
         });
       });
-
-
-      // if (estado == 0) {
-      //   const data : any = {
-      //     item : this.ordenTrabajo,
-      //     clienteNom : this.NombreCliente,
-      //     clienteItemsNom : this.nombreProducto,
-      //     usrCrea : this.usuarioCreador,
-      //     estado : estado,
-      //   }
-      //   this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(datos_clientesOT => {
-      //     const Toast = Swal.mixin({
-      //       toast: true,
-      //       position: 'center',
-      //       showConfirmButton: false,
-      //       timer: 2200,
-      //       timerProgressBar: true,
-      //       didOpen: (toast) => {
-      //         toast.addEventListener('mouseenter', Swal.stopTimer);
-      //         toast.addEventListener('mouseleave', Swal.resumeTimer);
-      //       }
-      //     });
-      //     Toast.fire({
-      //       icon: 'success',
-      //       title: '¡Actualizacion de OT exitosa!'
-      //     });
-      //   });
-
-      // } else {
-      //   const data : any = {
-      //     item : this.ordenTrabajo,
-      //     clienteNom : this.NombreCliente,
-      //     clienteItemsNom : this.nombreProducto,
-      //     usrCrea : this.usuarioCreador,
-      //     estado : estado,
-      //   }
-      //   this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(datos_clientesOT => {
-      //     const Toast = Swal.mixin({
-      //       toast: true,
-      //       position: 'center',
-      //       showConfirmButton: false,
-      //       timer: 2200,
-      //       timerProgressBar: true,
-      //       didOpen: (toast) => {
-      //         toast.addEventListener('mouseenter', Swal.stopTimer);
-      //         toast.addEventListener('mouseleave', Swal.resumeTimer);
-      //       }
-      //     });
-      //     Toast.fire({
-      //       icon: 'success',
-      //       title: '¡Actualizacion de OT exitosa!'
-      //     });
-      //   });
-      // }
     }
   }
 

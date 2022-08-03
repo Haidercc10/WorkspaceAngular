@@ -29,11 +29,11 @@ import { EstadosComponent } from './Vistas/estados/estados.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { ValidacionLoginGuard } from './Guards/validacion-login.guard';
-import { StorageServiceModule} from 'ngx-webstorage-service';
+import { StorageServiceModule } from 'ngx-webstorage-service';
 import { PaginaPrincipalComponent } from './Vistas/PaginaPrincipal/PaginaPrincipal.component'
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {MaterialExampleModule} from '../material.module';
-import {MatNativeDateModule} from '@angular/material/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialExampleModule } from '../material.module';
+import { MatNativeDateModule } from '@angular/material/core';
 import { DesperdicioComponent } from './Vistas/desperdicio/desperdicio.component';
 import { PruebasComponent } from './Vistas/pruebas/pruebas.component';
 import { CrearProveedorComponent } from './Vistas/crear-proveedor/crear-proveedor.component';
@@ -59,7 +59,6 @@ import { EntradaBOPPComponent } from './Vistas/Entrada-BOPP/Entrada-BOPP.compone
 import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPORAL/asignacionBOPP_TEMPORAL.component';
 import { ModalEditarAsignacionesBOPPComponent } from './Vistas/modal-editar-asignaciones-bopp/modal-editar-asignaciones-bopp.component';
 import { ModalGenerarInventarioZeusComponent } from './Vistas/modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
-
 
 
 export const routes: Routes = [
@@ -153,6 +152,7 @@ export const routes: Routes = [
     AsignacionBOPP_TEMPORALComponent,
     ModalEditarAsignacionesBOPPComponent,
     ModalGenerarInventarioZeusComponent,
+    PruebasComponent,
   ],
 
 

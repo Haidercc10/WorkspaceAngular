@@ -406,6 +406,53 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     });
   }
 
+  cambioBOPP(){
+    let fecha1 : any = this.FormMateriaPrima.value.fecha;
+    let fecha2 : any = this.FormMateriaPrima.value.fechaFinal;
+    this.materiasPrimas = [];
+    console.log(fecha1)
+
+    if (fecha1 != null && fecha2 != null) {
+      this.asignacionBOPPService.srvObtenerListaPorfechas(fecha1, fecha2).subscribe(datos_asignaciones => {
+        for (let i = 0; i < datos_asignaciones.length; i++) {
+          this.detallesAsignacionBOPPService.srvObtenerListaPorAsignacion(datos_asignaciones[i].asigBOPP_Id).subscribe(datos_detallesBOPP => {
+            for (let j = 0; j < datos_detallesBOPP.length; j++) {
+              this.boppService.srvObtenerListaPorId(datos_detallesBOPP[j].bopP_Id).subscribe(datos_bopp => {
+                for (let k = 0; k < datos_bopp.length; k++) {
+                  const bopp : any = {
+                    Id : datos_bopp[i].bopP_Id,
+                    Nombre : datos_bopp[i].bopP_Nombre,
+                  }
+                  this.materiasPrimas.push(bopp);
+                  this.materiasPrimas.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+                }
+              });
+            }
+          });
+        }
+      });
+    } else {
+      this.asignacionBOPPService.srvObtenerListaPorfecha(fecha1).subscribe(datos_asignaciones => {
+        for (let i = 0; i < datos_asignaciones.length; i++) {
+          this.detallesAsignacionBOPPService.srvObtenerListaPorAsignacion(datos_asignaciones[i].asigBOPP_Id).subscribe(datos_detallesBOPP => {
+            for (let j = 0; j < datos_detallesBOPP.length; j++) {
+              this.boppService.srvObtenerListaPorId(datos_detallesBOPP[j].bopP_Id).subscribe(datos_bopp => {
+                for (let k = 0; k < datos_bopp.length; k++) {
+                  const BOPPs : any = {
+                    Id : datos_bopp[k].bopP_Id,
+                    Nombre : datos_bopp[k].bopP_Nombre,
+                  }
+                  this.materiasPrimas.push(BOPPs);
+                  this.materiasPrimas.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  }
+
   //Funcion que colocará el nombre a las columnas de la tabla en la cual se muestran los productos pedidos por los clientes
   ColumnasTabla(){
     this.titulosTabla = [];

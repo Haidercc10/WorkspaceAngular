@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { InventarioArticuloZeusService } from 'src/app/Servicios/inventarioArticuloZeus.service';
+import {FormControl} from '@angular/forms';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 
 @Component({
   selector: 'app-pruebas',
@@ -8,19 +9,21 @@ import { InventarioArticuloZeusService } from 'src/app/Servicios/inventarioArtic
   styleUrls: ['./pruebas.component.css']
 })
 export class PruebasComponent implements OnInit {
-
-  public ModalCrearProveedor: boolean = false;
-  items = [];
-  articulos = [];
-
-  constructor() { }
+  myControl = new FormControl();
+  options: string[] = ['One', 'Two', 'Three'];
+  filteredOptions: Observable<string[]>;
 
   ngOnInit() {
-
+    this.filteredOptions = this.myControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value)),
+    );
   }
 
-  LlamarModalCrearProveedor() {
-    this.ModalCrearProveedor = true;
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.options.filter(option => option.toLowerCase().includes(filterValue));
   }
 
 }

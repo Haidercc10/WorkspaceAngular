@@ -14,19 +14,13 @@ import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
 })
 export class AreasComponentComponent implements OnInit {
 
-  arrayBOPP = [];
-
   //Colocar el mismo nombre del formulario de la vista.
   formularioAreas !: FormGroup;
-  myControl = new FormControl('');
-  options: string[] = ['One', 'Two', 'Three'];
-  filteredOptions: Observable<string[]>;
 
 
   //Instancia el servicio en el contructor, además Inyeccion de dependencias formBuilder.
   constructor(private servicioAreasTS : ServicioAreasService,
-                 private frmBuilderAreas : FormBuilder,
-                 private bopp : EntradaBOPPService,) {
+                 private frmBuilderAreas : FormBuilder,) {
     this.formularioAreas = this.frmBuilderAreas.group({
       areaId: ['',],
       areaNombre: [, Validators.required],
@@ -34,28 +28,7 @@ export class AreasComponentComponent implements OnInit {
     });
    }
 
-  ngOnInit() {
-    this.obtenerBOPP();
-
-    this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value || '')),
-    );
-  }
-
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-
-    return this.arrayBOPP.filter(option => option.toLowerCase().includes(filterValue));
-  }
-
-  obtenerBOPP(){
-    this.bopp.srvObtenerLista().subscribe(datos_bopp => {
-      for (let i = 0; i < datos_bopp.length; i++) {
-        this.arrayBOPP.push(datos_bopp[i].bopP_Nombre);
-      }
-    });
-  }
+  ngOnInit() { }
 
   //Metodo para limpiar campos
   limpiarCampos(){
