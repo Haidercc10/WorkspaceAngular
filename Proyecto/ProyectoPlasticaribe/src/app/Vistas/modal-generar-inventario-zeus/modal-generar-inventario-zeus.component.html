@@ -1,7 +1,7 @@
 <div class="mb-4">
   <div class="row g-3">
       <div class="table-responsive">
-        <table class="table table-bordered table-hover mt-2" >
+        <table class="table table-bordered table-hover mt-2" id="tablaProductosTerminados">
           <thead class="TitulosTabla">
               <tr *ngFor="let columnas of titulosTabla let i = index">
                 <th scope="col" class="idProducto">{{columnas.invItem}}</th>
@@ -13,19 +13,26 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th id="cid" class="TextosInfoTabla2"></th>
-                <td id="cnombre" class="TextosInfoTabla"></td>
-                <td id="pid" class="TextosInfoTabla"></td>
-                <td id="pnombre" class="TextosInfoTabla"></td>
-                <td id="pprecio" class="TextosInfoTabla"></td>
-                <td id="pstock" class="TextosInfoTabla"></td>
-                <td id="pundmed" class="TextosInfoTabla"></td>
-                <td id="ppreciototal" class="TextosInfoTabla"></td>
+              <tr *ngFor="let prodZeus of ArrayProductoZeus | paginate: {itemsPerPage: 30, currentPage: page} let i = index">
+                <th id="id" class="TextosInfoTabla">{{prodZeus.codigoItem}}</th>
+                <td id="nombre" class="TextosInfoTabla">{{prodZeus.nombreItem}}</td>
+                <td id="existencias" class="TextosInfoTabla2">{{prodZeus.cantidadItem | number }}</td>
+                <td id="precio" class="TextosInfoTabla">{{prodZeus.PrecioItem | number }}</td>
+                <td id="subtotal" class="TextosInfoTabla">{{prodZeus.PrecioTotalItem | number }}</td>
+                <td id="cliente" class="TextosInfoTabla">{{prodZeus.ClienteNombre}}</td>
               </tr>
           </tbody>
         </table>
+        <div class="mb-2">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+          </div>
       </div>
-      <button class="btn-danger btn-danger-sm" type="submit">Agregar</button>
+      </div>
+      <div class="mb-0">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class="btn btn-danger btn-danger-sm" type="submit" (click)="exportarExcel()">Exportar Excel</button>
+        </div>
+      </div>
   </div>
 </div>
