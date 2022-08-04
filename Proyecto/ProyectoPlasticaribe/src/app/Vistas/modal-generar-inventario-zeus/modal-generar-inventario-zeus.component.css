@@ -69,6 +69,13 @@ background-color: lightblue;
   font-size: small;
 }
 
+.existencias{
+  background-color:  #fff;
+  width: 100%;
+  height: 100%;
+  border : none;
+ }
+
 .overlay{
   z-index: 2;
   position: fixed;

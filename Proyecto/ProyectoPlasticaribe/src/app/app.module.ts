@@ -42,7 +42,6 @@ import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/repor
 import { ReporteMpOtComponent } from './Vistas/reporteMpOt/reporteMpOt.component';
 import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
 import { ConsultaFac_Rem_MPComponent } from './Vistas/consultaFac_Rem_MP/consultaFac_Rem_MP.component';
-// import { AsignacionMateriaPrimaComponent } from './Vistas/asignacion-materia-prima/asignacion-materia-prima.component';
 import { MovimientoMPComponent } from './Vistas/movimientoMP/movimientoMP.component';
 import { MateriaPrimaRecuperadaComponent } from './Vistas/MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
 import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insumo/prueba-imagen-cat-insumo.component';
@@ -60,9 +59,10 @@ import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPOR
 import { ModalEditarAsignacionesBOPPComponent } from './Vistas/modal-editar-asignaciones-bopp/modal-editar-asignaciones-bopp.component';
 import { ModalGenerarInventarioZeusComponent } from './Vistas/modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 import { FiltrosProductosTerminadosZeusPipe } from './Pipes/filtros-productos-terminados-zeus.pipe';
-// import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { FiltroNombreClientePTPipe } from './Pipes/filtro-nombre-cliente-pt.pipe';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import {AutocompleteLibModule} from 'angular-ng-autocomplete';
 
 export const routes: Routes = [
 
@@ -174,7 +174,9 @@ export const routes: Routes = [
     BrowserAnimationsModule,
     MatNativeDateModule,
     MaterialExampleModule,
+    NgxMatSelectSearchModule,
     // Ng2SearchPipeModule,
+    AutocompleteLibModule,
   ],
 
   providers: [

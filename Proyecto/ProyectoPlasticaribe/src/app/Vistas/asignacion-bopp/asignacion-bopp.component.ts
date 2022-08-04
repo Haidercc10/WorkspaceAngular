@@ -42,6 +42,7 @@ export class AsignacionBOPPComponent implements OnInit {
   anchoBOPP : number = 0;
   cantidadKgBOPP : number = 0;
   arrayOT : any = [];
+  keyword = 'name';
 
 
   constructor(private FormBuilderAsignacion : FormBuilder,
@@ -242,14 +243,23 @@ export class AsignacionBOPPComponent implements OnInit {
     this.ArrayBOPP = [];
     this.boppService.srvObtenerLista().subscribe(datos_BOPP => {
       for (let i = 0; i < datos_BOPP.length; i++) {
-        if (datos_BOPP[i].bopP_Stock != 0) this.ArrayBOPP.push(datos_BOPP[i]);
+        if (datos_BOPP[i].bopP_Stock != 0) {
+          const bopp : any = {
+            name : datos_BOPP[i].bopP_Nombre,
+          }
+          this.ArrayBOPP.push(bopp);
+        }
       }
     });
   }
 
   //
   limpiarCamposBOPP(){
-    this.FormularioBOPP.reset();
+    this.FormularioBOPP.setValue({
+      boppNombre : '',
+      boppSerial: '',
+      boppStock: '',
+    });
   }
 
   //
@@ -261,7 +271,11 @@ export class AsignacionBOPPComponent implements OnInit {
       AsgBopp_Observacion: '',
       AsgBopp_Estado: '',
     });
-    this.FormularioBOPP.reset();
+    this.FormularioBOPP.setValue({
+      boppNombre : '',
+      boppSerial: '',
+      boppStock: '',
+    });
     this.ArrayBoppPedida = [];
     this.ordenesTrabajo = [];
     this.micras = 0;
@@ -285,9 +299,11 @@ export class AsignacionBOPPComponent implements OnInit {
   }
 
   //
-  BOPPSeleccionado(){
+  BOPPSeleccionado(item){
+    this.FormularioBOPP.value.boppNombre = item.name;
     this.boppSeleccionado = [];
     let bopp : number = this.FormularioBOPP.value.boppNombre;
+    console.log(bopp)
     this.boppService.srvObtenerLista().subscribe(datos_bopp => {
       for (let i = 0; i < datos_bopp.length; i++) {
         if (datos_bopp[i].bopP_Nombre == bopp) {
@@ -366,7 +382,11 @@ export class AsignacionBOPPComponent implements OnInit {
                 }
 
                 this.ArrayBoppPedida.push(bopp);
-                this.FormularioBOPP.reset();
+                this.FormularioBOPP.setValue({
+                  boppNombre : '',
+                  boppSerial: '',
+                  boppStock: '',
+                });
               } else Swal.fire("¡No se puede asignar una cantidad mayor a la que hay en stock!");
             }
           }

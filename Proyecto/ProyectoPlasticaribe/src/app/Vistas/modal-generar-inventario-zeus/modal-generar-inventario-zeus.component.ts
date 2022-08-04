@@ -112,9 +112,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         const book : XLSX.WorkBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(book, worksheet, 'Sheet1');
         XLSX.writeFile(book, nombreArchivo);
-        setTimeout(() => {
-          this.load = true;
-        }, 1000);
+        this.load = true;
       }, 1200);
     }
   }

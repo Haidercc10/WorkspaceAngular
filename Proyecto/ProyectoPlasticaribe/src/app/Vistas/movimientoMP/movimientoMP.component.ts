@@ -3593,6 +3593,79 @@ export class MovimientoMPComponent implements OnInit {
         }
       });
     } else if (tipoDoc == 'BOPP') {
+      // this.boppAsignada = [];
+      // this.producidoPDF = 0;
+      // this.asignadoPDF = 0;
+      // this.acumuladorOTPDF = [];
+      // this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(id).subscribe(datos_detallesAsgBOPP => {
+      //   for (let i = 0; i < datos_detallesAsgBOPP.length; i++) {
+      //     if (!otConsultadas.includes(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo)) {
+      //       otConsultadas.push(datos_detallesAsgBOPP[i].dtAsigBOPP_OrdenTrabajo);
+      //     }
+      //   }
+      // });
+
+      // setTimeout(() => {
+      //   let boppConsultado : any = [];
+      //   for (const itemOT of otConsultadas) {
+      //     this.detallesAsgBOPPService.srvObtenerListaPorOt(itemOT).subscribe(datos_detallesAsgBOPP => {
+      //       for (let j = 0; j < datos_detallesAsgBOPP.length; j++) {
+      //         this.boppService.srvObtenerListaPorId(datos_detallesAsgBOPP[j].bopP_Id).subscribe(datos_bopp => {
+      //           let bopp : any = [];
+      //           bopp.push(datos_bopp);
+      //           acumuladora += 1
+      //           for (const item of bopp) {
+      //             if (!boppConsultado.includes(item.bopP_Serial)) {
+      //               boppConsultado.push(item.bopP_Serial);
+      //               const asignacionBOPP : any = {
+      //                 OT : otConsultadas,
+      //                 Serial : item.bopP_Serial,
+      //                 Nombre : item.bopP_Nombre,
+      //               }
+
+      //               this.mpAgregada.push(asignacionBOPP);
+      //             }
+
+      //             if (!this.boppAsignada.includes(item.bopP_Nombre)) {
+      //               this.boppAsignada.push(item.bopP_Nombre);
+      //               this.asignadoPDF += item.bopP_CantidadInicialKg;
+      //             }
+
+      //             // LLENARÁ UN ARRAY CON LAS OT Y BUSCARÁ LA PRODUCCION TOTAL DE LAS OT GUARDADAS
+      //             if (!this.acumuladorOTPDF.includes(itemOT)) {
+      //               this.acumuladorOTPDF.push(itemOT);
+
+      //               this.bagProServices.srvObtenerListaClienteOT_Item(itemOT).subscribe(datos_ot => {
+      //                 for (let k = 0; k < datos_ot.length; k++) {
+      //                   let datosOT : any = {
+      //                     Nro : datos_ot[k].item,
+      //                     Cliente : datos_ot[k].clienteNom,
+      //                     Item : datos_ot[k].clienteItemsNom,
+      //                     Micras : datos_ot[k].extCalibre,
+      //                     Ancho : datos_ot[k].ptAnchopt,
+      //                     Kg : datos_ot[k].datosotKg,
+      //                   }
+      //                   this.otAsignadas.push(datosOT);
+      //                 }
+      //               });
+      //               // EMPAQUE
+      //               this.bagProServices.srvObtenerListaProcExtOt(itemOT).subscribe(datos_procesos => {
+      //                 for (let index = 0; index < datos_procesos.length; index++) {
+      //                   if (datos_procesos[index].nomStatus == "EMPAQUE") {
+      //                     this.producidoPDF += datos_procesos[index].extnetokg;
+      //                   }
+      //                 }
+      //               });
+      //             }
+      //             this.mpAgregada.sort((a,b) => Number(a.OT) - Number(b.OT));
+      //             break;
+      //           }
+      //         });
+      //       }
+      //     });
+      //   }
+      // }, 1200);
+
       this.boppAsignada = [];
       this.producidoPDF = 0;
       this.asignadoPDF = 0;
@@ -3637,16 +3710,6 @@ export class MovimientoMPComponent implements OnInit {
                           this.producidoPDF += datos_procesos[index].extnetokg;
                         }
                       }
-                      //SELLADO Y WIKETIADO
-                      this.bagProServices.srvObtenerListaProcSelladoOT(itemOT).subscribe(datos_selado => {
-                        for (let j = 0; j < datos_selado.length; j++) {
-                          if (datos_selado[j].nomStatus == "SELLADO") {
-                            this.producidoPDF += datos_selado[j].peso;
-                          } else if (datos_selado[j].nomStatus == "Wiketiado") {
-                            this.producidoPDF += datos_selado[j].peso;
-                          }
-                        }
-                      });
                     });
                   }
                   this.mpAgregada.sort((a,b) => Number(a.OT) - Number(b.OT));
@@ -3728,6 +3791,23 @@ export class MovimientoMPComponent implements OnInit {
       }
     }
   }
+
+  // Funcion que genera la tabla donde se mostrará la información de las OT
+  // tableAsignacionOT(data, columns) {
+  //   return {
+  //     table: {
+  //       headerRows: 1,
+  //       widths: [40, '*', '*', 30, 30, 30],
+  //       body: this.buildTableBody(data, columns),
+  //     },
+  //     fontSize: 9,
+  //     layout: {
+  //       fillColor: function (rowIndex, node, columnIndex) {
+  //         return (rowIndex == 0) ? '#CCCCCC' : null;
+  //       }
+  //     }
+  //   }
+  // }
 
   // Funcion para llenar el pdf con información de la base de datos dependiendo el pedido
   llenarPDFConBD(formulario : any){
@@ -4202,6 +4282,99 @@ export class MovimientoMPComponent implements OnInit {
         });
       });
     } else if (tipoDoc == 'BOPP') {
+      // this.asignacionBOPPService.srvObtenerListaPorId(id).subscribe(datos_asignacionBOPP => {
+      //   let boppAsg : any = [];
+      //   boppAsg.push(datos_asignacionBOPP);
+      //   for (const item of boppAsg) {
+      //     this.detallesAsgBOPPService.srvObtenerListaPorAsignacion(id).subscribe(datos_detallesAsgBOPP => {
+      //       for (let i = 0; i < datos_detallesAsgBOPP.length; i++) {
+      //         this.usuarioService.srvObtenerListaPorId(item.usua_Id).subscribe(datos_usuario => {
+      //           for (let mp = 0; mp < this.mpAgregada.length; mp++) {
+      //             let FechaEntregaDatetime = item.asigBOPP_FechaEntrega;
+      //             let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+      //             let fecharegistroFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+      //             const pdfDefinicion : any = {
+      //               info: {
+      //                 title: `Asignación BOPP N° ${item.asigBOPP_Id}`
+      //               },
+      //               content : [
+      //                 {
+      //                   text: `Plasticaribe S.A.S ---- Asignación de BOPP`,
+      //                   alignment: 'center',
+      //                   style: 'titulo',
+      //                 },
+      //                 '\n \n',
+      //                 {
+      //                   text: `Fecha de registro: ${fecharegistroFinal}`,
+      //                   style: 'header',
+      //                   alignment: 'right',
+      //                 },
+      //                 {
+      //                   text: `Registrado Por: ${datos_usuario.usua_Nombre}\n`,
+      //                   alignment: 'right',
+      //                   style: 'header',
+      //                 },
+      //                 {
+      //                   text: `\n Información de la Asignación \n \n`,
+      //                   alignment: 'center',
+      //                   style: 'header'
+      //                 },
+      //                 {
+      //                   text: `\n \nObervación sobre la Asignación: \n ${item.asigBOPP_Observacion}\n`,
+      //                   style: 'header',
+      //                 },
+      //                 {
+      //                   text: `\n Información detallada de las Ordenes de trabajo \n `,
+      //                   alignment: 'center',
+      //                   style: 'header'
+      //                 },
+
+      //                 this.tableAsignacionOT(this.otAsignadas, ['Nro', 'Cliente', 'Item', 'Micras', 'Ancho', 'Kg']),
+
+      //                 {
+      //                   text: `\n Información detallada deL BOPP \n `,
+      //                   alignment: 'center',
+      //                   style: 'header'
+      //                 },
+
+      //                 this.tableAsignacionBOPP(this.mpAgregada, ['Serial', 'Nombre']),
+
+      //                 {
+      //                   text: `\nCantidad Total de Materia Prima Asignada: ${this.formatonumeros(Math.round(this.asignadoPDF))}`,
+      //                   alignment: 'right',
+      //                   style: 'header',
+      //                 },
+
+      //                 '\n',
+      //                 {
+      //                   text: `\nProducido por las Ordenes de Trabajo: ${this.formatonumeros(Math.round(this.producidoPDF))}`,
+      //                   alignment: 'right',
+      //                   style: 'header',
+      //                 },
+      //               ],
+      //               styles: {
+      //                 header: {
+      //                   fontSize: 10,
+      //                   bold: true
+      //                 },
+      //                 titulo: {
+      //                   fontSize: 15,
+      //                   bold: true
+      //                 }
+      //               }
+      //             }
+      //             this.load = true;
+      //             const pdf = pdfMake.createPdf(pdfDefinicion);
+      //             pdf.open();
+      //             break;
+      //           }
+      //         });
+      //         break;
+      //       }
+      //     });
+      //   }
+      // });
+
       this.asignacionBOPPService.srvObtenerListaPorId(id).subscribe(datos_asignacionBOPP => {
         let boppAsg : any = [];
         boppAsg.push(datos_asignacionBOPP);
