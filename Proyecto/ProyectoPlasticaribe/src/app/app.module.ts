@@ -60,7 +60,7 @@ import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPOR
 import { ModalEditarAsignacionesBOPPComponent } from './Vistas/modal-editar-asignaciones-bopp/modal-editar-asignaciones-bopp.component';
 import { ModalGenerarInventarioZeusComponent } from './Vistas/modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 import { FiltrosProductosTerminadosZeusPipe } from './Pipes/filtros-productos-terminados-zeus.pipe';
-import { Ng2SearchPipeModule } from 'ng2-search-filter';
+// import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 export const routes: Routes = [
 
@@ -171,7 +171,7 @@ export const routes: Routes = [
     BrowserAnimationsModule,
     MatNativeDateModule,
     MaterialExampleModule,
-    Ng2SearchPipeModule,
+    // Ng2SearchPipeModule,
   ],
 
   providers: [

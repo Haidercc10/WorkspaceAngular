@@ -338,7 +338,7 @@ export class AsignacionBOPPComponent implements OnInit {
     let nombre : string = this.FormularioBOPP.value.boppNombre;
     let stock : number = this.FormularioBOPP.value.boppStock;
     let ot : any = [];
-    let cantidadAsignada : number;
+    let cantidadAsignada : any;
 
     for (const item of this.ordenesTrabajo) {
       const otInfo : any = {
@@ -351,14 +351,17 @@ export class AsignacionBOPPComponent implements OnInit {
         if (itemOT.kg != 0) {
           if (itemOT.ot == item.ot) {
             if (stock != 0) {
-              cantidadAsignada = item.ancho / this.anchoBOPP * stock;
+              cantidadAsignada = `${item.ancho / this.anchoBOPP * stock}`;
+              let cantidadAsignadaNueva = cantidadAsignada.indexOf(".");
+              let cantidadAsignadaFinal = cantidadAsignada.substring(0, (cantidadAsignadaNueva + 3));
               itemOT.kg = itemOT.kg - cantidadAsignada;
               if (cantidadAsignada <= stock) {
                 let bopp : any = {
                   Ot : item.ot,
                   Serial : serial,
                   Nombre : nombre,
-                  Cant : cantidadAsignada,
+                  CantTotal : item.ancho / this.anchoBOPP * stock,
+                  Cant : cantidadAsignadaFinal,
                   UndCant : 'Kg',
                 }
 
@@ -370,39 +373,6 @@ export class AsignacionBOPPComponent implements OnInit {
         } else continue;
       }
     }
-
-    // let ot : number = this.FormularioBOPP.value.AsgBopp_OT;
-    // let serial : string = this.FormularioBOPP.value.boppSerial;
-    // let nombre : string = this.FormularioBOPP.value.boppNombre;
-    // let cantidad : number = this.FormularioBOPP.value.boppCantidad;
-    // let stock : number = this.FormularioBOPP.value.boppStock;
-    // let observacion : string = this.FormularioBOPP.value.AsgBopp_Observacion;
-
-    // if (cantidad <= stock) {
-    //   let bopp : any = {
-    //     Ot : ot,
-    //     Serial : serial,
-    //     Nombre : nombre,
-    //     Cant : cantidad,
-    //     UndCant : 'Kg',
-    //     Observacion : observacion,
-    //   }
-
-    //   this.ArrayBoppPedida.push(bopp);
-
-    //   this.boppService.srvObtenerLista().subscribe(datos_bopp => {
-    //     for (let i = 0; i < datos_bopp.length; i++) {
-    //       if (datos_bopp[i].bopP_Nombre == bopp.Nombre) {
-    //         const datos : any = {
-    //           id : datos_bopp[i].bopP_Id,
-    //           cantidad : bopp.Cant,
-    //         }
-    //         this.boppArray.push(datos);
-    //       }
-    //     }
-    //   });
-    //   this.FormularioBOPP.reset();
-    // } else Swal.fire("¡No se puede asignar una cantidad mayor a la que hay en stock!");
   }
 
   //
@@ -460,7 +430,7 @@ export class AsignacionBOPPComponent implements OnInit {
     for (let i = 0; i < this.ArrayBoppPedida.length; i++) {
       let dataBOPP : any = {
         serial : this.ArrayBoppPedida[i].Serial,
-        Cant : this.ArrayBoppPedida[i].Cant,
+        Cant : this.ArrayBoppPedida[i].CantTotal,
       }
 
       if (!boppActualizada.includes(this.ArrayBoppPedida[i].Serial)) {
@@ -470,7 +440,7 @@ export class AsignacionBOPPComponent implements OnInit {
       else {
         for (let b = 0; b < serialCantBOPP.length; b++) {
           if (serialCantBOPP[b].serial == this.ArrayBoppPedida[i].Serial) {
-            serialCantBOPP[b].Cant += this.ArrayBoppPedida[i].Cant;
+            serialCantBOPP[b].Cant += this.ArrayBoppPedida[i].CantTotal;
           }
         }
       }

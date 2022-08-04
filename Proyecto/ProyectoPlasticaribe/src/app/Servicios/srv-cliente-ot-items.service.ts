@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { rutaBagPro, rutaBagProLocate } from 'src/polyfills';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ export class SrvClienteOtItemsService {
   constructor(private http : HttpClient) { }
 
 
-  readonly rutaBagproAPI = "http://192.168.0.140:9056/api";
+  readonly rutaBagproAPI = rutaBagProLocate;
 
     srvObtenerItemsBagpro():Observable<any[]> {
       return this.http.get<any>(this.rutaBagproAPI + '/ClientesOtItems');
