@@ -24,13 +24,20 @@
     <!-- Inicio fila 1 de campos -->
     <div class="mb-4">
       <div class="row g-3">
-        <!-- Nombre Producto -->
-        <div class="form-floating col-md-4">
-          <input type="text" name="NombrePT" [(ngModel)]="NombrePT" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
-          <label for="floatingInput">Nombre</label>
+          <!-- Nombre Producto -->
+          <div class="form-floating col-md-4">
+            <input type="text" name="NombrePT" [(ngModel)]="NombrePT" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
+            <label for="floatingInput">Nombre</label>
+          </div>
+
+        <!-- Nombre Cliente -->
+        <div class="form-floating col-md-3">
+          <input type="text" name="NombreCliente" [(ngModel)]="NombreCliente" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
+          <label for="floatingInput">Cliente</label>
         </div>
-      </div>
-    </div>
+     </div>
+   </div>
+
     <!-- Fin fila 1 de campos -->
 
       <div class="mb-4">
@@ -41,17 +48,17 @@
                     <tr *ngFor="let columnas of titulosTabla let i = index">
                       <th scope="col" class="idProducto">{{columnas.invItem}}</th>
                       <th id="nombre" scope="col">{{columnas.invNombre}}</th>
-                      <th id="existencias" scope="col">{{columnas.invStock}}</th>
+                      <th id="existencias" scope="col" (dblclick)="organizarExistenciasDobleClick()" (click)="organizarExistenciasUnClick()">{{columnas.invStock}}</th>
                       <th id="precio" scope="col">{{columnas.invPrecio}}</th>
                       <th id="Subtotal" scope="col">{{columnas.invSubtotal}}</th>
                       <th id="Cliente" scope="col">{{columnas.invCliente}}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let prodZeus of ArrayProductoZeus | filtrosProductosTerminadosZeus: NombrePT">
+                    <tr *ngFor="let prodZeus of ArrayProductoZeus | filtrosProductosTerminadosZeus: NombrePT | filtroNombreClientePT: NombreCliente">
                       <th id="id" class="TextosInfoTabla">{{prodZeus.codigoItem}}</th>
                       <td id="nombre" class="TextosInfoTabla">{{prodZeus.nombreItem}}</td>
-                      <td id="existencias" class="TextosInfoTabla2">{{prodZeus.cantidadItem | number }}</td>
+                      <td id="existencias" class="TextosInfoTabla2" >{{prodZeus.cantidadItem | number }}</td>
                       <td id="precio" class="TextosInfoTabla">{{prodZeus.PrecioItem | number }}</td>
                       <td id="subtotal" class="TextosInfoTabla">{{prodZeus.PrecioTotalItem | number }}</td>
                       <td id="cliente" class="TextosInfoTabla">{{prodZeus.ClienteNombre}}</td>

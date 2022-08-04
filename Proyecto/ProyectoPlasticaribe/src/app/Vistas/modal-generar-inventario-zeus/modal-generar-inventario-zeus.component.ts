@@ -32,6 +32,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   public filtroNombre : any;
   public NombrePT = '';
+  public NombreCliente = '';
 
   constructor(private existenciasZeus : InventarioZeusService,
     private clienteOtItems : SrvClienteOtItemsService,
@@ -42,6 +43,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.lecturaStorage();
     this.ColumnasTabla();
     this.InventarioExistenciaZeus();
+
   }
 
   lecturaStorage(){
@@ -113,20 +115,54 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                 PrecioTotalItem : datosExistencias[exi].precio_Total,
                 ClienteNombre : datosCLOTI[cl].clienteNom,
               }
-              //console.log(datosInventario);
 
               this.ArrayProductoZeus.push(datosInventario);
-              //this.NombrePT = datosInventario.nombreItem;
-              //this.NombrePT = '';
+              //this.organizarExistencias();
             }
           }
-
         });
-
       }
     });
+  }
 
+  /** Organiza el inventario de PT por existencias de mayor a menor. */
+  organizarExistenciasDobleClick() {
+    this.ArrayProductoZeus.sort((a,b)=> Number(b.cantidadItem) - Number(a.cantidadItem));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Existencia" de mayor a menor.'
+    });
+  }
 
+  /** Organiza el inventario de PT por existencias de menor a mayor. */
+  organizarExistenciasUnClick() {
+    this.ArrayProductoZeus.sort((a,b)=> Number(b.cantidadItem) - Number(a.cantidadItem));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Existencia" de menor a mayor.'
+    });
   }
 
 }

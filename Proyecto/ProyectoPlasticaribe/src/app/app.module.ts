@@ -61,6 +61,7 @@ import { ModalEditarAsignacionesBOPPComponent } from './Vistas/modal-editar-asig
 import { ModalGenerarInventarioZeusComponent } from './Vistas/modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 import { FiltrosProductosTerminadosZeusPipe } from './Pipes/filtros-productos-terminados-zeus.pipe';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
+import { FiltroNombreClientePTPipe } from './Pipes/filtro-nombre-cliente-pt.pipe';
 
 export const routes: Routes = [
 
@@ -156,6 +157,7 @@ export const routes: Routes = [
     ModalGenerarInventarioZeusComponent,
     PruebasComponent,
     FiltrosProductosTerminadosZeusPipe,
+    FiltroNombreClientePTPipe,
   ],
 
 
