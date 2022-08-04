@@ -33,6 +33,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   public filtroNombre : any;
   public NombrePT = '';
   public load : boolean;
+  public NombreCliente = '';
 
   constructor(private existenciasZeus : InventarioZeusService,
                 private clienteOtItems : SrvClienteOtItemsService,
@@ -46,6 +47,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.ColumnasTabla();
     this.fecha();
     this.InventarioExistenciaZeus();
+
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -139,6 +141,46 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           }
         });
       }
+    });
+  }
+
+  /** Organiza el inventario de PT por existencias de mayor a menor. */
+  organizarExistenciasDobleClick() {
+    this.ArrayProductoZeus.sort((a,b)=> Number(b.cantidadItem) - Number(a.cantidadItem));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Existencia" de mayor a menor.'
+    });
+  }
+
+  /** Organiza el inventario de PT por existencias de menor a mayor. */
+  organizarExistenciasUnClick() {
+    this.ArrayProductoZeus.sort((a,b)=> Number(b.cantidadItem) - Number(a.cantidadItem));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Existencia" de menor a mayor.'
     });
   }
 }
