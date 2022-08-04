@@ -159,12 +159,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.initForms();
     this.lecturaStorage();
     this.ColumnasTabla();
-    this.obtenerMateriasPrimasRetiradas();
     this.LimpiarCampos();
     this.fecha();
     this.obtenerCategorias();
-    this.obtenerBOPP();
-    this.LimpiarCampos();
   }
 
   initForms() {
@@ -204,6 +201,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.ArrayMateriaPrima = [];
     this.valorTotal = 0;
     this.categoriaBOPP = '';
+    this.materiasPrimas = [];
+    this.obtenerBOPP();
+    this.obtenerMateriasPrimasRetiradas();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -406,44 +406,56 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     });
   }
 
-  cambioBOPP(){
-    let fecha1 : any = this.FormMateriaPrima.value.fecha;
-    let fecha2 : any = this.FormMateriaPrima.value.fechaFinal;
+  // Funcion que buscará el BOPP
+  buscarBOPPSegunFecha(){
+    let fecha : any = this.FormMateriaPrima.value.fecha;
+    let fechaFinal : any = this.FormMateriaPrima.value.fechaFinal;
     this.materiasPrimas = [];
-    console.log(fecha1)
+    this.obtenerMateriasPrimasRetiradas();
+    let IdBOPP : any = [];
 
-    if (fecha1 != null && fecha2 != null) {
-      this.asignacionBOPPService.srvObtenerListaPorfechas(fecha1, fecha2).subscribe(datos_asignaciones => {
+    if (fecha != null && fechaFinal != null) {
+      this.asignacionBOPPService.srvObtenerListaPorfechas(fecha, fechaFinal).subscribe(datos_asignaciones => {
         for (let i = 0; i < datos_asignaciones.length; i++) {
           this.detallesAsignacionBOPPService.srvObtenerListaPorAsignacion(datos_asignaciones[i].asigBOPP_Id).subscribe(datos_detallesBOPP => {
             for (let j = 0; j < datos_detallesBOPP.length; j++) {
               this.boppService.srvObtenerListaPorId(datos_detallesBOPP[j].bopP_Id).subscribe(datos_bopp => {
-                for (let k = 0; k < datos_bopp.length; k++) {
-                  const bopp : any = {
-                    Id : datos_bopp[i].bopP_Id,
-                    Nombre : datos_bopp[i].bopP_Nombre,
-                  }
-                  this.materiasPrimas.push(bopp);
-                  this.materiasPrimas.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+                let bopp : any = [];
+                bopp.push(datos_bopp);
+                for (const item of bopp) {
+                  if (!IdBOPP.includes(item.bopP_Id)) {
+                    IdBOPP.push(item.bopP_Id)
+                    const BOPPs : any = {
+                      Id : item.bopP_Id,
+                      Nombre : item.bopP_Nombre,
+                    }
+                    this.materiasPrimas.push(BOPPs);
+                    this.materiasPrimas.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+                  } else continue;
                 }
               });
             }
           });
         }
       });
-    } else {
-      this.asignacionBOPPService.srvObtenerListaPorfecha(fecha1).subscribe(datos_asignaciones => {
+    } else if (fecha != null){
+      this.asignacionBOPPService.srvObtenerListaPorfecha(fecha).subscribe(datos_asignaciones => {
         for (let i = 0; i < datos_asignaciones.length; i++) {
           this.detallesAsignacionBOPPService.srvObtenerListaPorAsignacion(datos_asignaciones[i].asigBOPP_Id).subscribe(datos_detallesBOPP => {
             for (let j = 0; j < datos_detallesBOPP.length; j++) {
               this.boppService.srvObtenerListaPorId(datos_detallesBOPP[j].bopP_Id).subscribe(datos_bopp => {
-                for (let k = 0; k < datos_bopp.length; k++) {
-                  const BOPPs : any = {
-                    Id : datos_bopp[k].bopP_Id,
-                    Nombre : datos_bopp[k].bopP_Nombre,
-                  }
-                  this.materiasPrimas.push(BOPPs);
-                  this.materiasPrimas.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+                let bopp : any = [];
+                bopp.push(datos_bopp);
+                for (const item of bopp) {
+                  if (!IdBOPP.includes(item.bopP_Id)) {
+                    IdBOPP.push(item.bopP_Id)
+                    const BOPPs : any = {
+                      Id : item.bopP_Id,
+                      Nombre : item.bopP_Nombre,
+                    }
+                    this.materiasPrimas.push(BOPPs);
+                    this.materiasPrimas.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+                  } else continue;
                 }
               });
             }

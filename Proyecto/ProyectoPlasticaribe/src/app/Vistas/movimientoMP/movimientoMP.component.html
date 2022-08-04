@@ -32,12 +32,12 @@
         </div>
         <!-- Fecha inicial -->
         <div class="form-floating col-md-2">
-          <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput"required >
+          <input formControlName="fecha" type="date" min="0" (change)="buscarBOPPSegunFecha()" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Fecha Inicial</label>
         </div>
         <!-- Fecha final -->
         <div class="form-floating col-md-2">
-          <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
+          <input formControlName="fechaFinal" type="date" min="0" (change)="buscarBOPPSegunFecha()" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Fecha Final</label>
         </div>
         <!-- Tipo Docuemtno -->
