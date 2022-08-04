@@ -166,7 +166,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
   /** Organiza el inventario de PT por existencias de menor a mayor. */
   organizarExistenciasUnClick() {
-    this.ArrayProductoZeus.sort((a,b)=> Number(b.cantidadItem) - Number(a.cantidadItem));
+    this.ArrayProductoZeus.sort((a,b)=> Number(a.cantidadItem) - Number(b.cantidadItem));
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',
