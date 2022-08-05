@@ -63,6 +63,7 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { FiltroNombreClientePTPipe } from './Pipes/filtro-nombre-cliente-pt.pipe';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import {AutocompleteLibModule} from 'angular-ng-autocomplete';
+import { ReporteEstadosOTComponent } from './Vistas/reporte-estados-ot/reporte-estados-ot.component';
 
 export const routes: Routes = [
 
@@ -107,6 +108,7 @@ export const routes: Routes = [
   {path: 'entrada-BOPP', canActivate: [ValidacionLoginGuard], component: EntradaBOPPComponent},
   {path: 'AsignacionBOPPTemporal', canActivate: [ValidacionLoginGuard], component: AsignacionBOPP_TEMPORALComponent},
   {path: 'inventario-productos-terminados', canActivate: [ValidacionLoginGuard], component: ModalGenerarInventarioZeusComponent},
+  {path: 'reporte-estados-ot', canActivate: [ValidacionLoginGuard], component: ReporteEstadosOTComponent},
 ]
 
 @NgModule({
@@ -159,6 +161,7 @@ export const routes: Routes = [
     PruebasComponent,
     FiltrosProductosTerminadosZeusPipe,
     FiltroNombreClientePTPipe,
+    ReporteEstadosOTComponent,
   ],
 
 
