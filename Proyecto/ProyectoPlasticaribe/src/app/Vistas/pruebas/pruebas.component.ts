@@ -13,6 +13,9 @@ export class PruebasComponent implements OnInit{
 
   public FormPrueba !: FormGroup;
   ArrayBOPP = []; //Varibale que almacenará los BOPP existentes
+  validarInput : any;
+  keyword = 'name';
+  public historyHeading: string = 'Seleccionado Recientemente';
 
   constructor(private boppService : EntradaBOPPService,
                 private formBuilder : FormBuilder,){
@@ -20,6 +23,7 @@ export class PruebasComponent implements OnInit{
       AsgBopp_OT : ['', Validators.required],
       AsgBopp : ['', Validators.required],
     });
+    this.validarInput = true;
   }
 
   ngOnInit(): void {
@@ -33,7 +37,7 @@ export class PruebasComponent implements OnInit{
       for (let i = 0; i < datos_BOPP.length; i++) {
         if (datos_BOPP[i].bopP_Stock != 0) {
           const bopp : any = {
-            id : datos_BOPP[i].bopP_Serial,
+            id : datos_BOPP[i].bopP_Id,
             name : datos_BOPP[i].bopP_Nombre,
           }
           this.ArrayBOPP.push(bopp);
@@ -42,35 +46,25 @@ export class PruebasComponent implements OnInit{
     });
   }
 
-  keyword = 'name';
-  data = [
-    {
-      id: 1,
-      name: 'Georgia'
-    },
-     {
-       id: 2,
-       name: 'Usa'
-     },
-     {
-       id: 3,
-       name: 'England'
-     }
-  ];
-
 
   selectEvent(item) {
-    this.FormPrueba.value.AsgBopp = item;
+    this.FormPrueba.value.AsgBopp = item.id;
+    if (this.FormPrueba.value.AsgBopp != '') this.validarInput = false;
+    else this.validarInput = true;
     // do something with selected item
   }
 
-  // onChangeSearch(val: string) {
-  //   // fetch remote data from here
-  //   // And reassign the 'data' which is binded to 'data' property.
-  // }
+  onChangeSearch(val: string) {
+    if (val != '') this.validarInput = false;
+    else this.validarInput = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
 
-  // onFocused(e){
-  //   // do something when input is focused
-  // }
+  onFocused(e){
+    if (!e.isTrusted) this.validarInput = false;
+    else this.validarInput = true;
+    // do something when input is focused
+  }
 
 }

@@ -21,6 +21,11 @@
                 class=""
                 [data]="ArrayBOPP"
                 (selected)='selectEvent($event)'
+                (inputChanged)='onChangeSearch($event)'
+                (inputFocused)='onFocused($event)'
+                historyIdentifier="countriesTemplateList"
+                [historyHeading]="historyHeading"
+                [historyListMaxNumber]="3"
                 [searchKeyword]="keyword"
                 [itemTemplate]="itemTemplate"
                 [notFoundTemplate]="notFoundTemplate"
@@ -35,7 +40,7 @@
               <ng-template #notFoundTemplate let-notFound>
                 <div [innerHTML]="notFound"></div>
               </ng-template>
-              <label for="floatingInput">OT</label>
+              <label for="floatingInput" *ngIf="validarInput">OT</label>
             </div>
           </div>
         </div>

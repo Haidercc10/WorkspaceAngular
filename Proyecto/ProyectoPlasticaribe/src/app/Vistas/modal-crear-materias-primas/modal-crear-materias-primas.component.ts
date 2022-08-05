@@ -155,8 +155,6 @@ export class ModalCrearMateriasPrimasComponent implements OnInit {
       }
       let ultimaMatPrima = Math.max.apply(null, identificadoresMP);
       this.ultimoIdMateriaPrima = ultimaMatPrima + 1;
-
-      console.log(this.ultimoIdMateriaPrima);
       //console.log(identificadoresMP);
     });
   }

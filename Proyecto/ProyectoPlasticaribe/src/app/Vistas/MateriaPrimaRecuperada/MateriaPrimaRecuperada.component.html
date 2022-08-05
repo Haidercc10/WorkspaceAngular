@@ -39,7 +39,7 @@
         </div> -->
 
         <!-- Nombre Proveedor -->
-        <div class="form-floating col-md-3">
+        <div class="form-floating col-md-4">
           <select formControlName="usuarioNombre" id="floatingSelect" type="text" (change)="llenarUsuarioSeleccionado()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
             <option [ngValue]="usuario.usua_Id" *ngFor="let usuario of usuarios">{{usuario.usua_Nombre}}</option>
           </select>
@@ -51,7 +51,7 @@
           <label for="floatingSelect">ID Operario</label>
         </div>
         <!-- Tipo Documento -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md-3">
           <select formControlName="proceso" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
             <option [ngValue]="proceso.proceso_Id" *ngFor="let proceso of procesos">{{proceso.proceso_Nombre}}</option>
           </select>
@@ -76,8 +76,8 @@
           <label for="floatingInput">Operario</label>
         </div> -->
         <!-- Campo Observacion -->
-        <div class="form-floating col-md-10">
-          <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" name="MpObservacion"></textarea>
+        <div class="form-floating col-md">
+          <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm" name="MpObservacion"></textarea>
           <label for="floatingTextarea">Observación</label>
         </div>
       </div>
@@ -96,12 +96,33 @@
           <label for="floatingInput">Id Materia Prima</label>
         </div>
         <!-- ID/Nombre Producto -->
-        <div class="form-floating col-md-4">
+            <div class="ng-autocomplete form-floating col-md-2 form-control form-control-sm">
+              <ng-autocomplete
+                class=""
+                [data]="materiasPrimas"
+                (selected)='buscarMpSeleccionada($event)'
+                [searchKeyword]="keyword"
+                [itemTemplate]="itemTemplate"
+                [notFoundTemplate]="notFoundTemplate"
+                id="floatingInput"
+                formControlName="MpNombre">
+              </ng-autocomplete>
+
+              <ng-template #itemTemplate let-item>
+                <a [innerHTML]="item.name"></a>
+              </ng-template>
+
+              <ng-template #notFoundTemplate let-notFound>
+                <div [innerHTML]="notFound"></div>
+              </ng-template>
+              <!-- <label for="floatingInput" *ngIf="validarInput">OT</label> -->
+            </div>
+        <!-- <div class="form-floating col-md-4">
           <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
             <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima.matPri_Nombre}}</option>
           </select>
           <label for="floatingSelect">Nombre de la Materia Prima</label>
-        </div>
+        </div> -->
         <!-- CANTIDAD DE MATERIA PRIMA  -->
         <div class="form-floating col-md-2">
           <input formControlName="MpCantidad" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" >

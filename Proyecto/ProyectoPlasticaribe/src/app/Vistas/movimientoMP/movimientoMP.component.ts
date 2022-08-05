@@ -125,6 +125,11 @@ export class MovimientoMPComponent implements OnInit {
   arrayOT : any = [];
   otAsignadas : any = [];
   estadoOt : string = ''; //Variable que almacenará el estado de la orden de trabajo (Abierta, Asignada, En proceso, Terminada o Finalizada)
+  validarInputMp : any;
+  validarInputBOPP : any;
+  keywordMp = 'matPri_Nombre';
+  keywordBOPP = 'bopP_Nombre';
+  public historyHeading: string = 'Seleccionado Recientemente';
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -161,6 +166,8 @@ export class MovimientoMPComponent implements OnInit {
       estado : new FormControl(),
     });
     this.load = true;
+    this.validarInputBOPP = true;
+    this.validarInputMp = true;
     //this.modal = this.EditarAsignacionesBOPP;
   }
 
@@ -176,6 +183,45 @@ export class MovimientoMPComponent implements OnInit {
     this.fecha();
   }
 
+  selectEventBOPP(item) {
+    this.FormDocumentos.value.bopp = item.bopP_Id;
+    if (this.FormDocumentos.value.bopp != '') this.validarInputBOPP = false;
+    else this.validarInputBOPP = true;
+    // do something with selected item
+  }
+
+  onChangeSearchBOPP(val: string) {
+    if (val != '') this.validarInputBOPP = false;
+    else this.validarInputBOPP = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocusedBOPP(e){
+    if (!e.isTrusted) this.validarInputBOPP = false;
+    else this.validarInputBOPP = true;
+    // do something when input is focused
+  }
+
+  selectEventMp(item) {
+    this.FormDocumentos.value.materiaPrima = item.matPri_Id;
+    if (this.FormDocumentos.value.materiaPrima != '') this.validarInputMp = false;
+    else this.validarInputMp = true;
+    // do something with selected item
+  }
+
+  onChangeSearchMp(val: string) {
+    if (val != '') this.validarInputMp = false;
+    else this.validarInputMp = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocusedMp(e){
+    if (!e.isTrusted) this.validarInputMp = false;
+    else this.validarInputMp = true;
+    // do something when input is focused
+  }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
   fecha(){
@@ -209,7 +255,15 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   LimpiarCampos() {
-    this.FormDocumentos.reset();
+    this.FormDocumentos.setValue({
+      idDocumento : null,
+      TipoDocumento: null,
+      materiaPrima : '',
+      bopp : '',
+      fecha: null,
+      fechaFinal: null,
+      estado : null,
+    });
     this.ArrayDocumento = [];
     this.valorTotal = 0;
     this.totalMPEntregada = 0;
@@ -379,12 +433,17 @@ export class MovimientoMPComponent implements OnInit {
     this.cantRestante = 0;
     this.estadoOt = '';
     this.estadoOtCA = '';
+    console.log(this.FormDocumentos.value)
     let idDoc : string = this.FormDocumentos.value.idDocumento;
     let fecha : any = this.FormDocumentos.value.fecha;
     let fechaFinal : any = this.FormDocumentos.value.fechaFinal;
     let TipoDocumento : string = this.FormDocumentos.value.TipoDocumento;
-    let materiaPrima : number = this.FormDocumentos.value.materiaPrima;
+    let materiaPrima : number;
+    if (this.FormDocumentos.value.materiaPrima.matPri_Id == undefined) materiaPrima = null;
+    else materiaPrima = this.FormDocumentos.value.materiaPrima.matPri_Id;
     let boppSelected : number = this.FormDocumentos.value.bopp;
+    if (this.FormDocumentos.value.bopp.bopP_Id == undefined) boppSelected = null;
+    else boppSelected = this.FormDocumentos.value.bopp.bopP_Id;
     let estado : string = this.FormDocumentos.value.estado;
 
     if (fecha != null && fechaFinal != null && (materiaPrima != null || boppSelected != null) && TipoDocumento != null) {

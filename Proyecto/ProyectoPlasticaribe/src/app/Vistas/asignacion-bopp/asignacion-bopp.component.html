@@ -3,13 +3,13 @@
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
       <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <p><b>{{today}}</b></p>
+        <p><b>User:</b> {{storage_Nombre}}</p>
+        <span><b>Tipo:</b> {{storage_Rol}}</span>
+        <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
+      </div>
     </div>
-    <ul class="btn-group open">
-      <p><b>{{today}}</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-      <p><b>User: {{storage_Nombre}}</b></p>
-      <span><b>Tipo: {{storage_Rol}} </b></span>
-      <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
-    </ul>
   </nav>
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
@@ -148,7 +148,10 @@
               <ng-autocomplete
                 class=""
                 [data]="ArrayBOPP"
+                placeholder="BOPP"
                 (selected)='BOPPSeleccionado($event)'
+                (inputChanged)='onChangeSearch($event)'
+                (inputFocused)='onFocused($event)'
                 [searchKeyword]="keyword"
                 [itemTemplate]="itemTemplate"
                 [notFoundTemplate]="notFoundTemplate"
@@ -162,7 +165,7 @@
               <ng-template #notFoundTemplate let-notFound>
                 <div [innerHTML]="notFound"></div>
               </ng-template>
-              <!-- <label for="floatingInput">OT</label> -->
+              <!-- <label for="floatingInput" *ngIf="validarInput">BOPP</label> -->
             </div>
             <!-- <div class="form-floating col-md">
               <select formControlName="boppNombre" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" (change)="BOPPSeleccionado()">

@@ -43,7 +43,8 @@ export class AsignacionBOPPComponent implements OnInit {
   cantidadKgBOPP : number = 0;
   arrayOT : any = [];
   keyword = 'name';
-
+  public historyHeading: string = 'Seleccionado Recientemente';
+  validarInput : any;
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -68,12 +69,26 @@ export class AsignacionBOPPComponent implements OnInit {
       boppStock: ['', Validators.required],
     });
     this.load = true;
+    this.validarInput = true;
   }
 
   ngOnInit(): void {
     this.fecha();
     this.lecturaStorage();
     this.obtenerBOPP();
+  }
+
+  onChangeSearch(val: string) {
+    if (val != '') this.validarInput = false;
+    else this.validarInput = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocused(e){
+    if (!e.isTrusted) this.validarInput = false;
+    else this.validarInput = true;
+    // do something when input is focused
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -245,6 +260,7 @@ export class AsignacionBOPPComponent implements OnInit {
       for (let i = 0; i < datos_BOPP.length; i++) {
         if (datos_BOPP[i].bopP_Stock != 0) {
           const bopp : any = {
+            id : datos_BOPP[i].bopP_Id,
             name : datos_BOPP[i].bopP_Nombre,
           }
           this.ArrayBOPP.push(bopp);
@@ -300,17 +316,18 @@ export class AsignacionBOPPComponent implements OnInit {
 
   //
   BOPPSeleccionado(item){
-    this.FormularioBOPP.value.boppNombre = item.name;
+    this.FormularioBOPP.value.boppNombre = item.id;
+    if (this.FormularioBOPP.value.boppNombre != '') this.validarInput = false;
+    else this.validarInput = true;
     this.boppSeleccionado = [];
     let bopp : number = this.FormularioBOPP.value.boppNombre;
-    console.log(bopp)
-    this.boppService.srvObtenerLista().subscribe(datos_bopp => {
-      for (let i = 0; i < datos_bopp.length; i++) {
-        if (datos_bopp[i].bopP_Nombre == bopp) {
-          this.boppSeleccionado.push(datos_bopp[i]);
-          this.cantidadBOPP = datos_bopp[i].bopP_Cantidad;
-          this.cargarBOPP();
-        }
+    this.boppService.srvObtenerListaPorId(bopp).subscribe(datos_bopp => {
+      let bopp2 : any = [];
+      bopp2.push(datos_bopp);
+      for (const item of bopp2) {
+        this.boppSeleccionado.push(item);
+        this.cantidadBOPP = item.bopP_Cantidad;
+        this.cargarBOPP();
       }
     });
   }
@@ -344,8 +361,8 @@ export class AsignacionBOPPComponent implements OnInit {
 
   //
   validarCamposBOPP(){
-    if (this.FormularioBOPP.valid) this.cargarBOPPTabla();
-    else Swal.fire("Debe cargar minimo un BOPP en la tabla para realizar la asignación");
+    if (this.ordenesTrabajo.length != 0) this.cargarBOPPTabla();
+    else Swal.fire("¡Debe cargar minimo unorden de trabajo en la tabla para realizar la asignación de BOPP!");
   }
 
   //

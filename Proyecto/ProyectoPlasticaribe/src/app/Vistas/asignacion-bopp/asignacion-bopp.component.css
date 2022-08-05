@@ -123,5 +123,5 @@ a {
 
 .ng-autocomplete ::ng-deep .autocomplete-container {
   box-shadow: none;
-  width: auto;
+  font-size: smaller;
 }
