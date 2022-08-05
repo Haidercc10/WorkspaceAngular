@@ -88,11 +88,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   proceso : string = ''; //Variable ayudará a almacenar el proceso del cuela se está consultando la ot
   totalPorcentajePerida : number; //Variable que ayudará a calcular el total de perdida en una OT
   name = 'Inventario_Materia_Prima.xlsx'; //Variable que le da nombre al archivo de excel que se genera
-  inventInicial : number = 0;
-  sumaEntrada : number = 0;
-  sumaSalida : number = 0;
+  inventInicial : number = 0; //Variable que almacena el inventario inicial de una materia prima
+  sumaEntrada : number = 0; //Variable que almacena el total de entrada que tuvo una materia prima
+  sumaSalida : number = 0; //Variable que almacena el total de salidas que tuvo una materia prima
   categorias : any = []; //variable que almacenará las categorias existentes
   categoriaBOPP : string;
+  validarInput : any; //Variable para validar si el input de materia prima tiene información o no
+  keyword = 'Nombre'; //Variable que le dirá al autocomplement por que caracteristica busca en el array
+  public historyHeading: string = 'Seleccionado Recientemente'; //Variable que se mostrará al momento en que salen las materias primas buscadas recientemente
 /** Nvo */
   categoriaSeleccionadaCombo = [];
 /** Nvo */
@@ -129,18 +132,19 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                                                             private detallesDevolucionesService : DevolucionesMPService,) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
-      MpId : new FormControl(),
-      MpNombre: new FormControl(),
-      MpCantidad: new FormControl(),
-      MpPrecio: new FormControl(),
-      MpUnidadMedida:new FormControl(),
-      fecha: new FormControl(),
-      fechaFinal : new FormControl(),
-      MpCategoria : new FormControl(),
-      MpBodega : new FormControl(),
+      MpId : ['', Validators.required],
+      MpNombre: ['', Validators.required],
+      MpCantidad : ['', Validators.required],
+      MpPrecio: ['', Validators.required],
+      MpUnidadMedida: ['', Validators.required],
+      fecha: ['', Validators.required],
+      fechaFinal: ['', Validators.required],
+      MpCategoria : ['', Validators.required],
+      MpBodega : ['', Validators.required],
     });
 
     this.load = true;
+    this.validarInput = true;
   }
 
 
@@ -156,7 +160,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initForms();
     this.lecturaStorage();
     this.ColumnasTabla();
     this.LimpiarCampos();
@@ -164,18 +167,17 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.obtenerCategorias();
   }
 
-  initForms() {
-    this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
-      MpId : ['', Validators.required],
-      MpNombre: ['', Validators.required],
-      MpCantidad : ['', Validators.required],
-      MpPrecio: ['', Validators.required],
-      MpUnidadMedida: ['', Validators.required],
-      fecha: ['', Validators.required],
-      fechaFinal: ['', Validators.required],
-      MpCategoria : ['', Validators.required],
-      MpBodega : ['', Validators.required],
-    });
+  onChangeSearch(val: string) {
+    if (val != '') this.validarInput = false;
+    else this.validarInput = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocused(e){
+    if (!e.isTrusted) this.validarInput = false;
+    else this.validarInput = true;
+    // do something when input is focused
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -197,7 +199,17 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   }
 
   LimpiarCampos() {
-    this.FormMateriaPrima.reset();
+    this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
+      MpId : null,
+      MpNombre: null,
+      MpCantidad : null,
+      MpPrecio: null,
+      MpUnidadMedida: null,
+      fecha: null,
+      fechaFinal: null,
+      MpCategoria : null,
+      MpBodega : null,
+    });
     this.ArrayMateriaPrima = [];
     this.valorTotal = 0;
     this.categoriaBOPP = '';
@@ -365,8 +377,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   }
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
-  buscarMpSeleccionada(){
-
+  buscarMpSeleccionada(item){
+    this.FormMateriaPrima.value.MpNombre = item.Id
+    if (this.FormMateriaPrima.value.MpNombre != '') this.validarInput = false;
+    else this.validarInput = true;
     this.ArrayMateriaPrima = [];
     this.valorTotal = 0;
     let nombreMateriaPrima : string = this.FormMateriaPrima.value.MpNombre;
@@ -558,6 +572,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   validarConsulta(){
     let materiaPrima : string = this.FormMateriaPrima.value.MpNombre;
+    if (materiaPrima == '') null;
     let idMateriaPrima : number = this.FormMateriaPrima.value.MpId;
     let fecha : any = this.FormMateriaPrima.value.fecha;
     let fechaFinal : any = this.FormMateriaPrima.value.fechaFinal;
@@ -4639,7 +4654,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
               datos_bopp[i].conteoDescripcion,
               datos_bopp[i].bopP_Descripcion, /** Descripcion en vez de nombre */
-              datos_bopp[i].sumaPrecio,
+              (datos_bopp[i].sumaPrecio / datos_bopp[i].conteoDescripcion),
               datos_bopp[i].sumaKilosIngresados,
               this.sumaEntrada,
               this.sumaSalida,

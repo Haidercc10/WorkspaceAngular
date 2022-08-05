@@ -98,6 +98,11 @@ export class PedidomateriaprimaComponent implements OnInit {
   MpConsultada = [];
   remision : any = [];
   remConFac : any = [];
+  validarInputProveedor : any;
+  validarInputMP : any;
+  keywordProveedor = 'prov_Nombre';
+  keywordMP = 'matPri_Nombre';
+  public historyHeading: string = 'Seleccionado Recientemente';
 
   public load: boolean;
 
@@ -171,6 +176,8 @@ export class PedidomateriaprimaComponent implements OnInit {
     });
 
     this.load = true;
+    this.validarInputProveedor = true;
+    this.validarInputMP = true;
   }
 
 
@@ -188,6 +195,32 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.obtenerProveeedor();
     this.obtenerDocumetno();
     this.obtenerUltimpIDMP();
+  }
+
+  onChangeSearchProveedor(val: string) {
+    if (val != '') this.validarInputProveedor = false;
+    else this.validarInputProveedor = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocusedProveedor(e){
+    if (!e.isTrusted) this.validarInputProveedor = false;
+    else this.validarInputProveedor = true;
+    // do something when input is focused
+  }
+
+  onChangeSearchMP(val: string) {
+    if (val != '') this.validarInputMP = false;
+    else this.validarInputMP = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocusedMP(e){
+    if (!e.isTrusted) this.validarInputMP = false;
+    else this.validarInputMP = true;
+    // do something when input is focused
   }
 
   initForms() {
@@ -382,12 +415,15 @@ export class PedidomateriaprimaComponent implements OnInit {
   obtenerProveeedor(){
     this.proveedorservices.srvObtenerLista().subscribe(datos_proveedor => {
       for (let index = 0; index < datos_proveedor.length; index++) {
-        this.proveedor.push(datos_proveedor[index].prov_Nombre);
+        this.proveedor.push(datos_proveedor[index]);
       }
     });
   }
 
-  llenarProveedorSeleccionado(){
+  llenarProveedorSeleccionado(item){
+    this.FormMateriaPrimaFactura.value.proveedorNombre = item.prov_Nombre;
+    if (this.FormMateriaPrimaFactura.value.proveedorNombre != '') this.validarInputProveedor = false;
+    else this.validarInputProveedor = true;
     let proveedorSelccionado : string = this.FormMateriaPrimaFactura.value.proveedorNombre;
     this.proveedorservices.srvObtenerLista().subscribe(datos_proveedores => {
       for (let index = 0; index < datos_proveedores.length; index++) {
@@ -424,8 +460,9 @@ export class PedidomateriaprimaComponent implements OnInit {
         // MpOperario: this.FormMateriaPrimaFactura.value.MpOperario,
         MpObservacion: this.FormMateriaPrimaFactura.value.MpObservacion,
       });
-
-    })
+      if (this.FormMateriaPrimaFactura.value.proveedorNombre != '') this.validarInputProveedor = false;
+      else this.validarInputProveedor = true;
+    });
   }
 
   //Funcion que buscará y almacenará todos los estados existententes para documentos
@@ -720,6 +757,7 @@ export class PedidomateriaprimaComponent implements OnInit {
       }
     }
     this.ArrayMateriaPrima.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
+    this.limpiarCamposMP();
   }
 
   //Funcion que creará el registro de la materia que viene en un pedido
@@ -969,7 +1007,8 @@ export class PedidomateriaprimaComponent implements OnInit {
   }
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
-  buscarMpSeleccionada(){
+  buscarMpSeleccionada(item){
+    this.FormMateriaPrima.value.MpNombre = item.matPri_Nombre;
     let nombreMateriaPrima : string = this.FormMateriaPrima.value.MpNombre;
     let idMateriaPrima : number; //En el HTML se pasará el nombre de la materia prima pero el input tendrá como valor el Id de la materia prima
     this.materiaPrimaSeleccionada = [];
@@ -1000,6 +1039,8 @@ export class PedidomateriaprimaComponent implements OnInit {
         MpPrecio: Mp.matPri_Precio,
         MpUnidadMedida : Mp.undMed_Id,
       });
+      if (this.FormMateriaPrima.value.MpNombre != '') this.validarInputMP = false;
+      else this.validarInputMP = true;
     }
   }
 

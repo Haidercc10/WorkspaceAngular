@@ -45,12 +45,36 @@
           <label for="floatingSelect">Tipo de Documento</label>
         </div>
         <!-- Proveedores -->
-        <div class="form-floating col-md">
+        <div class="ng-autocomplete form-floating col-md-2 form-control form-control-sm">
+          <ng-autocomplete
+            class=""
+            [data]="proveedor"
+            (selected)='selectEvent($event)'
+            historyIdentifier="countriesTemplateList"
+            [historyHeading]="historyHeading"
+            [historyListMaxNumber]="3"
+            [searchKeyword]="keyword"
+            [itemTemplate]="itemTemplate"
+            [notFoundTemplate]="notFoundTemplate"
+            id="floatingInput"
+            formControlName="proveedores">
+          </ng-autocomplete>
+
+          <ng-template #itemTemplate let-item>
+            <a [innerHTML]="item.name"></a>
+          </ng-template>
+
+          <ng-template #notFoundTemplate let-notFound>
+            <div [innerHTML]="notFound"></div>
+          </ng-template>
+          <label for="floatingInput" *ngIf="validarInput">OT</label>
+        </div>
+        <!-- <div class="form-floating col-md">
           <select formControlName="proveedores" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
             <option [ngValue]="proveedores.prov_Id" *ngFor="let proveedores of proveedor">{{proveedores.prov_Nombre}}</option>
           </select>
           <label for="floatingSelect">Proveedor</label>
-        </div>
+        </div> -->
       </div>
     </div>
     <!-- BOTONES -->

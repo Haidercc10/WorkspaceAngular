@@ -95,12 +95,38 @@
           <label for="floatingInput">Fecha Vencimiento</label>
         </div> -->
         <!-- Nombre Proveedor -->
-        <div class="form-floating col-md-3">
+        <div class="ng-autocomplete form-floating col-md-1 form-control form-control-sm">
+          <ng-autocomplete
+            class=""
+            [data]="proveedor"
+            (selected)='llenarProveedorSeleccionado($event)'
+            (inputChanged)='onChangeSearchProveedor($event)'
+            (inputFocused)='onFocusedProveedor($event)'
+            historyIdentifier="countriesTemplateList"
+            [historyHeading]="historyHeading"
+            [historyListMaxNumber]="3"
+            [searchKeyword]="keywordProveedor"
+            [itemTemplate]="itemTemplatePrv"
+            [notFoundTemplate]="notFoundTemplate"
+            id="floatingInput"
+            formControlName="proveedorNombre">
+          </ng-autocomplete>
+
+          <ng-template #itemTemplatePrv let-item>
+            <a [innerHTML]="item.prov_Nombre"></a>
+          </ng-template>
+
+          <ng-template #notFoundTemplate let-notFound>
+            <div [innerHTML]="notFound"></div>
+          </ng-template>
+          <label for="floatingInput" *ngIf="validarInputProveedor">Nombre Proveedor</label>
+        </div>
+        <!-- <div class="form-floating col-md-3">
           <select formControlName="proveedorNombre" id="floatingSelect" type="text" (change)="llenarProveedorSeleccionado()" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
             <option [ngValue]="proveedores" *ngFor="let proveedores of proveedor">{{proveedores}}</option>
           </select>
           <label for="floatingSelect">Nombre Proveedor</label>
-        </div>
+        </div> -->
         <!-- Proveedor -->
         <div class="form-floating col-md-3">
           <input formControlName="proveedor" (keyup.enter)="llenarProvedorId()"type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
@@ -128,7 +154,7 @@
         </div> -->
         <!-- Campo Observacion -->
         <div class="form-floating col-md">
-          <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" name="MpObservacion"></textarea>
+          <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm" name="MpObservacion"></textarea>
           <label for="floatingTextarea">Observación</label>
         </div>
         <!-- Fecha Ingreso -->
@@ -152,13 +178,36 @@
           <label for="floatingInput">Id Materia Prima</label>
         </div>
         <!-- ID/Nombre Producto -->
-        <div class="form-floating col-md-4">
+        <div class="ng-autocomplete form-floating col-md-1 form-control form-control-sm">
+          <ng-autocomplete
+            class=""
+            [data]="materiasPrimasRetiradas"
+            (selected)='buscarMpSeleccionada($event)'
+            (inputChanged)='onChangeSearchMP($event)'
+            (inputFocused)='onFocusedMP($event)'
+            [searchKeyword]="keywordMP"
+            [itemTemplate]="itemTemplate"
+            [notFoundTemplate]="notFoundTemplate"
+            id="floatingInput"
+            formControlName="MpNombre">
+          </ng-autocomplete>
+
+          <ng-template #itemTemplate let-item>
+            <a [innerHTML]="item.matPri_Nombre"></a>
+          </ng-template>
+
+          <ng-template #notFoundTemplate let-notFound>
+            <div [innerHTML]="notFound"></div>
+          </ng-template>
+          <label for="floatingInput" *ngIf="validarInputMP">Nombre Materia Prima</label>
+        </div>
+        <!-- <div class="form-floating col-md-4">
           <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
-            <!-- <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima.matPri_Nombre}}</option> -->
+            <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima.matPri_Nombre}}</option>
             <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimasRetiradas">{{materiaPrima.matPri_Nombre}}</option>
           </select>
           <label for="floatingSelect">Nombre de la Materia Prima</label>
-        </div>
+        </div> -->
         <!-- CANTIDAD DE MATERIA PRIMA  -->
         <div class="form-floating col-md-2">
           <input formControlName="MpCantidad" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" >

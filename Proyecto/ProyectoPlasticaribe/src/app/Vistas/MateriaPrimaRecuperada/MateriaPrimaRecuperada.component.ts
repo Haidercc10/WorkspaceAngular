@@ -95,7 +95,9 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   titulosTablaRemisiones = [];
   valorTotalRem = 0;
   mpAgregada = [];
-
+  validarInput : any;
+  keyword = 'name';
+  public historyHeading: string = 'Seleccionado Recientemente';
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -239,7 +241,11 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   obtenerMateriasPrimasRetiradas(){
     this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
       for (let index = 0; index < datos_materiaPrima.length; index++) {
-        this.materiasPrimas.push(datos_materiaPrima[index]);
+        let mp : any = {
+          id : datos_materiaPrima[index].matPri_Id,
+          name : datos_materiaPrima[index].matPri_Nombre,
+        }
+        this.materiasPrimas.push(mp);
       }
     });
   }
@@ -556,7 +562,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   }
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
-  buscarMpSeleccionada(){
+  buscarMpSeleccionada(item){
+    this.FormMateriaPrima.value.MpNombre = item.name;
     let nombreMateriaPrima : string = this.FormMateriaPrima.value.MpNombre;
     let idMateriaPrima : number; //En el HTML se pasará el nombre de la materia prima pero el input tendrá como valor el Id de la materia prima
     this.materiaPrimaSeleccionada = [];

@@ -34,6 +34,11 @@ export class AsignacionTintasComponent implements OnInit {
   materiaPrimaSeleccionada = []; //Varibale que almacenará temporalmente la materia prima que se buscó por id o se seleccionó para poder llenar el resto de informacion de esta materia prima
   public componenteCrearTintas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalCrearTintas();
   public componenteCrearMateriasPrimas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
+  validarInputTintas : any;
+  keywordTintas = 'name';
+  validarInputMp : any;
+  keywordMp = 'name';
+  public historyHeading: string = 'Seleccionado Recientemente';
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
@@ -129,27 +134,44 @@ export class AsignacionTintasComponent implements OnInit {
       Observacion : '',
       Fecha : this.today,
     });
-    this.FormMateriaPrima.reset();
+    this.FormMateriaPrima.setValue({
+      idMateriaPrima : '',
+      nombreMateriaPrima : '',
+      stockMateriaPrima : '',
+      cantidadMateriaPrima : '',
+      undMedMateriaPrima : '',
+    });
     this.ArrayMateriaPrima = [];
     this.AccionBoton = 'Agregar'
   }
 
   // Funcion que limpiará los campos del apartado de Materias Primas
   limpiarCamposMateriaPrima(){
-    this.FormMateriaPrima.reset();
+    this.FormMateriaPrima.setValue({
+      idMateriaPrima : '',
+      nombreMateriaPrima : '',
+      stockMateriaPrima : '',
+      cantidadMateriaPrima : '',
+      undMedMateriaPrima : '',
+    });
   }
 
   // Funcion que buscará las tintas que se utilizan en la empresa
   obtenerTintas(){
     this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
       for (let i = 0; i < datos_tintas.length; i++) {
-        this.tintas.push(datos_tintas[i]);
+        let tinta : any = {
+          id : datos_tintas[i].tinta_Id,
+          name : datos_tintas[i].tinta_Nombre,
+        }
+        this.tintas.push(tinta);
       }
     });
   }
 
   // funcion que servirá para llenar el campo de unidad de medida de la tinta dependiendo la tinta seleccionada
-  buscarTintaSeleccionada(){
+  buscarTintaSeleccionada(item){
+    this.FormAsignacionMP.value.Tinta = item.id;
     let tinta : any = this.FormAsignacionMP.value.Tinta;
 
     this.tintasService.srvObtenerListaPorId(tinta).subscribe(datos_tinta => {
@@ -168,7 +190,11 @@ export class AsignacionTintasComponent implements OnInit {
     this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiasPrimas => {
       for (let i = 0; i < datos_materiasPrimas.length; i++) {
         if (datos_materiasPrimas[i]) {
-          this.materiasPrimas.push(datos_materiasPrimas[i].matPri_Nombre);
+          let mp : any = {
+            id : datos_materiasPrimas[i].matPri_Id,
+            name : datos_materiasPrimas[i].matPri_Nombre,
+          }
+          this.materiasPrimas.push(mp);
         }
       }
     });
@@ -195,7 +221,8 @@ export class AsignacionTintasComponent implements OnInit {
   }
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
-  buscarMpSeleccionada(){
+  buscarMpSeleccionada(item){
+    this.FormMateriaPrima.value.nombreMateriaPrima = item.name;
     let nombreMateriaPrima : string = this.FormMateriaPrima.value.nombreMateriaPrima;
     this.materiaPrimaSeleccionada = [];
 

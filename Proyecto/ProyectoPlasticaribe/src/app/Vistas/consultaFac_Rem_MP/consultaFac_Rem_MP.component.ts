@@ -65,6 +65,9 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
   cantidadTotalDbl : number; //Variable que va a almacenar el total de la cantidad doblada en una OT
   proceso : string = ''; //Variable ayudará a almacenar el proceso del cuela se está consultando la ot
   totalPorcentajePerida : number; //Variable que ayudará a calcular el total de perdida en una OT
+  validarInput : any;
+  keyword = 'name';
+  public historyHeading: string = 'Seleccionado Recientemente';
 
   tipoDocumento = [];
   proveedor = [];
@@ -110,6 +113,11 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     this.ColumnasTabla();
     this.obtenerTipoDocumento();
     this.obtenerProveedor();
+  }
+
+  selectEvent(item) {
+    this.FormDocumentos.value.proveedores = item.id;
+    // do something with selected item
   }
 
   initForms() {
@@ -174,8 +182,12 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
   obtenerProveedor(){
     this.proveedorService.srvObtenerLista().subscribe(datos_proveedores => {
       for (let index = 0; index < datos_proveedores.length; index++) {
-        this.proveedor.push(datos_proveedores[index]);
-        this.proveedor.sort((a, b) => a.prov_Nombre.localeCompare(b.prov_Nombre));
+        let prov : any = {
+          id: datos_proveedores[index].prov_Id,
+          name: datos_proveedores[index].prov_Nombre,
+        }
+        this.proveedor.push(prov);
+        this.proveedor.sort((a, b) => a.name.localeCompare(b.name));
       }
     })
   }
@@ -200,7 +212,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     let idDoc : number = this.FormDocumentos.value.idDocumento;
     let fecha : any = this.FormDocumentos.value.fecha;
     let TipoDocumento : string = this.FormDocumentos.value.TipoDocumento;
-    let proveedores : number = this.FormDocumentos.value.proveedores;
+    let proveedores : any = this.FormDocumentos.value.proveedores.id;
     let fechaCreacionFinal : any;
     let fechaEntregaFinal : any;
     let acu : number = 0;

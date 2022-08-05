@@ -72,6 +72,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   cantidadTotalImp : number; //Variable que va a almacenar el total de la cantidad impresa en una OT
   cantidadTotalDbl : number; //Variable que va a almacenar el total de la cantidad doblada en una OT
   proceso : string = ''; //Variable ayudará a almacenar el proceso del cuela se está consultando la ot
+  validarInput : any;
+  keyword = 'name';
+  public historyHeading: string = 'Seleccionado Recientemente';
   proveedor = [];
   tipodocuemnto = [];
   totalPorcentajePerida : number; //Variable que ayudará a calcular el total de perdida en una OT
@@ -133,6 +136,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     });
 
     this.load = true;
+    this.validarInput = true;
   }
 
   ngOnInit(): void {
@@ -143,6 +147,19 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.obtenerProcesos();
     this.obtenerMateriasPrimasRetiradas();
     this.obtenerTintas();
+  }
+
+  onChangeSearch(val: string) {
+    if (val != '') this.validarInput = false;
+    else this.validarInput = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocused(e){
+    if (!e.isTrusted) this.validarInput = false;
+    else this.validarInput = true;
+    // do something when input is focused
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -204,7 +221,15 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   // Funcion que limpia los todos los campos de la vista
   LimpiarCampos() {
-    this.FormMateriaPrimaRetirada.reset();
+    this.FormMateriaPrimaRetirada.setValue({
+      MpIdRetirada : ['', Validators.required],
+      MpNombreRetirada: ['', Validators.required],
+      MpCantidadRetirada : ['', Validators.required],
+      MpPrecioRetirada: ['', Validators.required],
+      MpUnidadMedidaRetirada: ['', Validators.required],
+      MpStockRetirada: ['', Validators.required],
+      ProcesoRetiro : ['', Validators.required],
+    });
   }
 
   //Funcion que limpiará los campos de la materia pirma entrante
@@ -227,7 +252,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.categoria = 0;
     this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
       for (let index = 0; index < datos_materiaPrima.length; index++) {
-        this.materiasPrimasRetiradas.push(datos_materiaPrima[index].matPri_Nombre);
+        let mp : any = {
+          id : datos_materiaPrima[index].matPri_Id,
+          name : datos_materiaPrima[index].matPri_Nombre,
+        }
+        this.materiasPrimasRetiradas.push(mp);
       }
     });
   }
@@ -236,7 +265,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.categoria = 0;
     this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
       for (let i = 0; i < datos_tintas.length; i++) {
-        this.materiasPrimasRetiradas.push(datos_tintas[i].tinta_Nombre);
+        let tintas : any = {
+          id : datos_tintas[i].tinta_Id,
+          name : datos_tintas[i].tinta_Nombre,
+        }
+        this.materiasPrimasRetiradas.push(tintas);
       }
     });
   }
@@ -731,7 +764,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
-  buscarMpSeleccionada(){
+  buscarMpSeleccionada(item){
+    this.FormMateriaPrimaRetirada.value.MpNombreRetirada = item.name;
+    if (this.FormMateriaPrimaRetirada.value.MpNombreRetirada != '') this.validarInput = false;
+    else this.validarInput = true;
     let nombreMateriaPrima : string = this.FormMateriaPrimaRetirada.value.MpNombreRetirada;
     let idMateriaPrima : number; //En el HTML se pasará el nombre de la materia prima pero el input tendrá como valor el Id de la materia prima
     this.materiaPrimaSeleccionada = [];

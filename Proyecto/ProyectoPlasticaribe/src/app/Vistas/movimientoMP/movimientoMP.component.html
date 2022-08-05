@@ -41,7 +41,7 @@
           <label for="floatingInput">Fecha Final</label>
         </div>
         <!-- Tipo Docuemtno -->
-        <div class="form-floating col-md">
+        <div class="form-floating col-md-2">
           <select formControlName="TipoDocumento" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
             <option [ngValue]="null" disabled selected>Seleccione Movimiento</option>
             <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
@@ -58,26 +58,69 @@
         </div>
         <!-- Proveedores -->
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
-          <div class="form-floating col-md">
+          <div class="ng-autocomplete form-floating col-md form-control form-control-sm">
+            <ng-autocomplete
+              class=""
+              [data]="ArrayMateriaPrimaRetirada"
+              (selected)='selectEventMp($event)'
+              (inputChanged)='onChangeSearchMp($event)'
+              (inputFocused)='onFocusedMp($event)'
+              historyIdentifier="countriesTemplateList"
+              [historyHeading]="historyHeading"
+              [historyListMaxNumber]="3"
+              [searchKeyword]="keywordMp"
+              [itemTemplate]="itemTemplate"
+              [notFoundTemplate]="notFoundTemplate"
+              id="floatingInput"
+              formControlName="materiaPrima">
+            </ng-autocomplete>
+            <ng-template #itemTemplate let-item>
+              <a [innerHTML]="item.matPri_Nombre"></a>
+            </ng-template>
+            <ng-template #notFoundTemplate let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+            <label for="floatingInput" *ngIf="validarInputMp">Materia Prima</label>
+          </div>
+          <!-- <div class="form-floating col-md">
             <select formControlName="materiaPrima" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
               <option [ngValue]="mp.matPri_Id" *ngFor="let mp of ArrayMateriaPrimaRetirada">{{mp.matPri_Nombre}}</option>
             </select>
             <label for="floatingSelect">Materia prima</label>
-          </div>
+          </div> -->
         </ng-container>
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
-          <div class="form-floating col-md">
+          <div class="ng-autocomplete form-floating col-md-4 form-control form-control-sm">
+            <ng-autocomplete
+              class=""
+              [data]="ArrayBopp"
+              (selected)='selectEventBOPP($event)'
+              (inputChanged)='onChangeSearchBOPP($event)'
+              (inputFocused)='onFocusedBOPP($event)'
+              historyIdentifier="countriesTemplateList"
+              [historyHeading]="historyHeading"
+              [historyListMaxNumber]="3"
+              [searchKeyword]="keywordBOPP"
+              [itemTemplate]="itemTemplate"
+              [notFoundTemplate]="notFoundTemplate"
+              id="floatingInput"
+              formControlName="bopp">
+            </ng-autocomplete>
+            <ng-template #itemTemplate let-item>
+              <a [innerHTML]="item.bopP_Nombre"></a>
+            </ng-template>
+            <ng-template #notFoundTemplate let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+            <label for="floatingInput" *ngIf="validarInputBOPP">BOPP</label>
+          </div>
+          <!-- <div class="form-floating col-md-4">
             <select formControlName="bopp" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
               <option [ngValue]="mp.bopP_Id" *ngFor="let mp of ArrayBopp">{{mp.bopP_Nombre}}</option>
             </select>
             <label for="floatingSelect">BOPP</label>
-          </div>
+          </div> -->
         </ng-container>
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <div class="row g-3">
         <ng-container *ngIf="ValidarRol == 1">
           <div class="form-floating col-md-3">
             <select formControlName="estado" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
