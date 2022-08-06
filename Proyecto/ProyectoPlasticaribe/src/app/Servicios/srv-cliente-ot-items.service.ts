@@ -11,7 +11,7 @@ export class SrvClienteOtItemsService {
   constructor(private http : HttpClient) { }
 
 
-  readonly rutaBagproAPI = rutaBagProLocate;
+  readonly rutaBagproAPI = rutaBagPro;
 
     srvObtenerItemsBagpro():Observable<any[]> {
       return this.http.get<any>(this.rutaBagproAPI + '/ClientesOtItems');

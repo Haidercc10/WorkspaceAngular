@@ -11,7 +11,7 @@ export class InventarioZeusService {
   constructor(private http : HttpClient) { }
 
 //Crear ruta del api
-readonly rutaInventarioZeusAPI = "http://192.168.0.140:9055/api";
+readonly rutaInventarioZeusAPI = "http://192.168.0.85:9055/api";
 
   srvObtenerExistenciasZeus():Observable<any[]> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + '/existencias');
