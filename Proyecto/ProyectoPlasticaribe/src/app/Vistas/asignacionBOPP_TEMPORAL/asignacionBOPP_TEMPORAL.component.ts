@@ -31,6 +31,9 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   ot : any = [];
   estadoOT : any; //Varibale que almacenará el estado en que se encuentra la orden de trabajo
   arrayOT : any = [];
+  validarInput : boolean = true;
+  keyword = 'bopP_Nombre';
+  public historyHeading: string = 'Seleccionado Recientemente';
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -61,6 +64,19 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     this.fecha();
     this.lecturaStorage();
     this.obtenerBOPP();
+  }
+
+  onChangeSearch(val: string) {
+    if (val != '') this.validarInput = false;
+    else this.validarInput = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocused(e){
+    if (!e.isTrusted) this.validarInput = false;
+    else this.validarInput = true;
+    // do something when input is focused
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -219,9 +235,11 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   }
 
   //
-  BOPPSeleccionado(){
+  BOPPSeleccionado(item : any){
+    this.validarInput = false;
     this.boppSeleccionado = [];
-    let bopp : number = this.FormularioBOPP.value.boppNombre;
+    this.FormularioBOPP.value.boppNombre = item.bopP_Nombre
+    let bopp : any = this.FormularioBOPP.value.boppNombre;
     this.boppService.srvObtenerLista().subscribe(datos_bopp => {
       for (let i = 0; i < datos_bopp.length; i++) {
         if (datos_bopp[i].bopP_Nombre == bopp) {

@@ -124,12 +124,38 @@
               <label for="floatingInput">Pallet/Serial</label>
             </div>
             <!-- Nombre  -->
-            <div class="form-floating col-md">
+            <div class="ng-autocomplete form-floating col-md form-control form-control-sm">
+              <ng-autocomplete
+                class=""
+                [data]="ArrayBOPP"
+                (selected)='BOPPSeleccionado($event)'
+                (inputChanged)='onChangeSearch($event)'
+                (inputFocused)='onFocused($event)'
+                historyIdentifier="countriesTemplateList"
+                [historyHeading]="historyHeading"
+                [historyListMaxNumber]="3"
+                [searchKeyword]="keyword"
+                [itemTemplate]="itemTemplate"
+                [notFoundTemplate]="notFoundTemplate"
+                id="floatingInput"
+                formControlName="boppNombre">
+              </ng-autocomplete>
+    
+              <ng-template #itemTemplate let-item>
+                <a [innerHTML]="item.bopP_Nombre"></a>
+              </ng-template>
+    
+              <ng-template #notFoundTemplate let-notFound>
+                <div [innerHTML]="notFound"></div>
+              </ng-template>
+              <label for="floatingInput" *ngIf="validarInput">Nombre BOPP</label>
+            </div>
+            <!-- <div class="form-floating col-md">
               <select formControlName="boppNombre" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" (change)="BOPPSeleccionado()">
                 <option [ngValue]="bopp.bopP_Nombre" *ngFor="let bopp of ArrayBOPP">{{bopp.bopP_Nombre}}</option>
               </select>
               <label for="floatingSelect">Nombre Bopp</label>
-            </div>
+            </div> -->
           </div>
         </div>
 
