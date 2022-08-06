@@ -95,7 +95,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   titulosTablaRemisiones = [];
   valorTotalRem = 0;
   mpAgregada = [];
-  validarInput : any;
+  validarInput : boolean = true;
   keyword = 'name';
   public historyHeading: string = 'Seleccionado Recientemente';
 
@@ -162,6 +162,19 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
       //tipoRecuperado: ['', Validators.required],
       MpUnidadMedida: ['', Validators.required],
     });
+  }
+
+  onChangeSearch(val: string) {
+    if (val != '') this.validarInput = false;
+    else this.validarInput = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocused(e){
+    if (!e.isTrusted) this.validarInput = false;
+    else this.validarInput = true;
+    // do something when input is focused
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -563,6 +576,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
   buscarMpSeleccionada(item){
+    this.validarInput = false;
     this.FormMateriaPrima.value.MpNombre = item.name;
     let nombreMateriaPrima : string = this.FormMateriaPrima.value.MpNombre;
     let idMateriaPrima : number; //En el HTML se pasará el nombre de la materia prima pero el input tendrá como valor el Id de la materia prima

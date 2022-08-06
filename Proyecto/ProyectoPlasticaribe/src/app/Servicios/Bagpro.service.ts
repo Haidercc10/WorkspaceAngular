@@ -30,6 +30,15 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OtConSellado/${ot}`);
   }
 
+  srvObtenerListaProcSelladoProdPesoUnidades(ot : any){
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OtConSelladoPesoUnidad/${ot}`);
+  }
+
+   /** Nvo */
+   srvObtenerListaFilasSelladoEnProcSellado(ot : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnSellado/${ot}`);
+  }
+
   /* PROCEXTRUSION */
 
   srvObtenerListaProcExt():Observable<any[]> {
@@ -53,11 +62,7 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnEmpaque/${ot}`);
   }
 
-    /** Nvo */
-    srvObtenerListaFilasSelladoEnProcSellado(ot : any) {
-      return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnSellado/${ot}`);
-    }
-
+ 
 
   /* CLIENTESOT */
 
@@ -68,6 +73,14 @@ export class BagproService {
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
   srvObtenerListaClienteOT_Item(ot : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOt/OT/${ot}`);
+  }
+
+  srvObtenerListaClienteOT_Fecha(fecha : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/FechaCreacion/${fecha}`);
+  }
+
+  srvObtenerListaClienteOT_Fechas(fecha1 : any, fecha2 : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/FechasCreacion?FechaCrea1=${fecha1}&FechaCrea2=${fecha2}`);
   }
 
   srvObtenerListaClienteOT_ItemCostos(ot : any):Observable<any[]> {

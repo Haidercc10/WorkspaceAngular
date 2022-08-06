@@ -104,6 +104,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     });
 
     this.load = true;
+    this.validarInput = true;
   }
 
 
@@ -117,7 +118,21 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
 
   selectEvent(item) {
     this.FormDocumentos.value.proveedores = item.id;
+    this.validarInput = false;
     // do something with selected item
+  }
+
+  onChangeSearch(val: string) {
+    if (val != '') this.validarInput = false;
+    else this.validarInput = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocused(e){
+    if (!e.isTrusted) this.validarInput = false;
+    else this.validarInput = true;
+    // do something when input is focused
   }
 
   initForms() {

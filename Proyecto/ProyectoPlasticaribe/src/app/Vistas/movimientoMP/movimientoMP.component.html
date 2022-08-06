@@ -128,7 +128,7 @@
               <option title="Este estado indica que OT tiene asignaciones de materia prima pero no ha empezado su producción.">Asignada</option>
               <option title="Este estado indica que OT tiene asignaciones de materia prima y ha empezado su producción.">En Proceso</option>
               <option title="Este estado indica que OT ha culminado su producción">Terminada</option>
-              <option title="Este estado indica que OT ha sido cerrada">Finalizada</option>
+              <option title="Este estado indica que OT ha sido cerrada">Cerrada</option>
             </select>
             <label for="floatingSelect">Estado OT</label>
           </div>
@@ -144,42 +144,44 @@
     </div>
   </form>
 
-  <div class="mb-2">
-    <div class="row g-1">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover mt-2">
-          <thead class="TitulosTabla">
-            <tr *ngFor="let columnas of titulosTabla let i = index">
-              <th id="CodigoFactura" scope="col">{{columnas.idFact}}</th>
-              <th id="Tipo" scope="col">{{columnas.tipo}}</th>
-              <th id="fecha" scope="col">{{columnas.FechaFact}}</th>
-              <th id="proveedor" scope="col">{{columnas.usuario}}</th>
-              <th id="mp" scope="col">{{columnas.mp}}</th>
-              <th id="cantMp" scope="col">{{columnas.cant}}</th>
-              <ng-container *ngIf="ValidarRol == 1 && this.estadoOt != ''">
-                <th id="estado" scope="col">{{columnas.estado}}</th>
-              </ng-container>
-              <th id="ver" scope="col" >{{columnas.Ver}}</th>
-            </tr>
-            </thead>
-          <tbody>
-            <tr *ngFor="let doc of ArrayDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
-              <td id="CodigoFactura" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.codigo}}</td>
-              <td id="Tipo" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.tipoDoc}}</td>
-              <td id="fecha" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
-              <td id="proveedor" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.usuario}}</td>
-              <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.mp}}</td>
-              <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.cant | number}}</td>
-              <ng-container *ngIf="ValidarRol == 1 && this.estadoOt != ''">
-                <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.estado}}</td>
-              </ng-container>
-              <td id="subTotalMateriaPrima"><input class="btn btn-danger btn-danger-sm" type="button" value="Ver" (click)="llenarDocumento(doc)"></td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="mb-2">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+  <div *ngIf="load">
+    <div class="mb-2">
+      <div class="row g-1">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover mt-2">
+            <thead class="TitulosTabla">
+              <tr *ngFor="let columnas of titulosTabla let i = index">
+                <th id="CodigoFactura" scope="col">{{columnas.idFact}}</th>
+                <th id="Tipo" scope="col">{{columnas.tipo}}</th>
+                <th id="fecha" scope="col">{{columnas.FechaFact}}</th>
+                <th id="proveedor" scope="col">{{columnas.usuario}}</th>
+                <th id="mp" scope="col">{{columnas.mp}}</th>
+                <th id="cantMp" scope="col">{{columnas.cant}}</th>
+                <ng-container *ngIf="ValidarRol == 1 && this.estadoOt != ''">
+                  <th id="estado" scope="col">{{columnas.estado}}</th>
+                </ng-container>
+                <th id="ver" scope="col" >{{columnas.Ver}}</th>
+              </tr>
+              </thead>
+            <tbody>
+              <tr *ngFor="let doc of ArrayDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
+                <td id="CodigoFactura" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.codigo}}</td>
+                <td id="Tipo" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.tipoDoc}}</td>
+                <td id="fecha" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
+                <td id="proveedor" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.usuario}}</td>
+                <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.mp}}</td>
+                <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.cant | number}}</td>
+                <ng-container *ngIf="ValidarRol == 1 && this.estadoOt != ''">
+                  <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.estado}}</td>
+                </ng-container>
+                <td id="subTotalMateriaPrima"><input class="btn btn-danger btn-danger-sm" type="button" value="Ver" (click)="llenarDocumento(doc)"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mb-2">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <pagination-controls (pageChange)="page = $event"></pagination-controls>
+            </div>
           </div>
         </div>
       </div>

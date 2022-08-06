@@ -34,9 +34,9 @@ export class AsignacionTintasComponent implements OnInit {
   materiaPrimaSeleccionada = []; //Varibale que almacenará temporalmente la materia prima que se buscó por id o se seleccionó para poder llenar el resto de informacion de esta materia prima
   public componenteCrearTintas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalCrearTintas();
   public componenteCrearMateriasPrimas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
-  validarInputTintas : any;
+  validarInputTintas : boolean = true;
   keywordTintas = 'name';
-  validarInputMp : any;
+  validarInputMp : boolean = true;
   keywordMp = 'name';
   public historyHeading: string = 'Seleccionado Recientemente';
 
@@ -75,6 +75,33 @@ export class AsignacionTintasComponent implements OnInit {
     this.obtenerMateriaPrima();
     this.obtenerUnidadesMedida();
     this.obtenerTintas();
+  }
+  
+  onChangeSearchTinta(val: string) {
+    if (val != '') this.validarInputTintas = false;
+    else this.validarInputTintas = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocusedTinta(e){
+    if (!e.isTrusted) this.validarInputTintas = false;
+    else this.validarInputTintas = true;
+    // do something when input is focused
+  }
+
+    
+  onChangeSearchMp(val: string) {
+    if (val != '') this.validarInputMp = false;
+    else this.validarInputMp = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocusedMp(e){
+    if (!e.isTrusted) this.validarInputMp = false;
+    else this.validarInputMp = true;
+    // do something when input is focused
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -171,6 +198,7 @@ export class AsignacionTintasComponent implements OnInit {
 
   // funcion que servirá para llenar el campo de unidad de medida de la tinta dependiendo la tinta seleccionada
   buscarTintaSeleccionada(item){
+    this.validarInputTintas = false;
     this.FormAsignacionMP.value.Tinta = item.id;
     let tinta : any = this.FormAsignacionMP.value.Tinta;
 
@@ -222,6 +250,7 @@ export class AsignacionTintasComponent implements OnInit {
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
   buscarMpSeleccionada(item){
+    this.validarInputMp = false;
     this.FormMateriaPrima.value.nombreMateriaPrima = item.name;
     let nombreMateriaPrima : string = this.FormMateriaPrima.value.nombreMateriaPrima;
     this.materiaPrimaSeleccionada = [];

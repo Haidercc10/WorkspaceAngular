@@ -55,6 +55,8 @@
                 class=""
                 [data]="tintas"
                 (selected)='buscarTintaSeleccionada($event)'
+                (inputChanged)='onChangeSearchTinta($event)'
+                (inputFocused)='onFocusedTinta($event)'
                 [searchKeyword]="keywordTintas"
                 [itemTemplate]="itemTemplate"
                 [notFoundTemplate]="notFoundTemplate"
@@ -69,7 +71,7 @@
               <ng-template #notFoundTemplate let-notFound>
                 <div [innerHTML]="notFound"></div>
               </ng-template>
-              <!-- <label for="floatingInput" *ngIf="validarInputTintas">OT</label> -->
+              <label for="floatingInput" *ngIf="validarInputTintas">Tinta</label>
             </div>
             <!-- <div class="form-floating col-md-5">
               <select formControlName="Tinta" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
@@ -123,6 +125,8 @@
                 class=""
                 [data]="materiasPrimas"
                 (selected)='buscarMpSeleccionada($event)'
+                (inputChanged)='onChangeSearchMp($event)'
+                (inputFocused)='onFocusedMp($event)'
                 [searchKeyword]="keywordMp"
                 [itemTemplate]="itemTemplate"
                 [notFoundTemplate]="notFoundTemplate"
@@ -137,7 +141,7 @@
               <ng-template #notFoundTemplate let-notFound>
                 <div [innerHTML]="notFound"></div>
               </ng-template>
-              <!-- <label for="floatingInput" *ngIf="validarInput">OT</label> -->
+              <label for="floatingInput" *ngIf="validarInputMp">Materia Prima</label>
             </div>
             <!-- <div class="form-floating col-md-4">
               <select formControlName="nombreMateriaPrima" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" (change)="buscarMpSeleccionada()">

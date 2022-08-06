@@ -101,6 +101,8 @@
                 class=""
                 [data]="materiasPrimas"
                 (selected)='buscarMpSeleccionada($event)'
+                (inputChanged)='onChangeSearch($event)'
+                (inputFocused)='onFocused($event)'
                 [searchKeyword]="keyword"
                 [itemTemplate]="itemTemplate"
                 [notFoundTemplate]="notFoundTemplate"
@@ -115,7 +117,7 @@
               <ng-template #notFoundTemplate let-notFound>
                 <div [innerHTML]="notFound"></div>
               </ng-template>
-              <!-- <label for="floatingInput" *ngIf="validarInput">OT</label> -->
+              <label for="floatingInput" *ngIf="validarInput">Materia Prima</label>
             </div>
         <!-- <div class="form-floating col-md-4">
           <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>

@@ -133,7 +133,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : ['', Validators.required],
-      MpNombre: ['', Validators.required],
+      MpNombre: [, Validators.required],
       MpCantidad : ['', Validators.required],
       MpPrecio: ['', Validators.required],
       MpUnidadMedida: ['', Validators.required],
@@ -147,7 +147,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.validarInput = true;
   }
 
-
+  // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
     if (this.ArrayMateriaPrima.length == 0) Swal.fire("Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla");
     else {
@@ -167,6 +167,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.obtenerCategorias();
   }
 
+  // Funcion para validar si el input que contiene las materias primas a cambiado
   onChangeSearch(val: string) {
     if (val != '') this.validarInput = false;
     else this.validarInput = true;
@@ -174,9 +175,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     // And reassign the 'data' which is binded to 'data' property.
   }
 
+  // Funcion para validar si el input que contiene las materias primas está seleccionado, es decir que está esperando que se escriba sobre el
   onFocused(e){
-    if (!e.isTrusted) this.validarInput = false;
-    else this.validarInput = true;
+    if (e.isTrusted || this.FormMateriaPrima.value.MpNombre != '') this.validarInput = true;
     // do something when input is focused
   }
 
@@ -201,7 +202,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   LimpiarCampos() {
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : null,
-      MpNombre: null,
+      MpNombre: '',
       MpCantidad : null,
       MpPrecio: null,
       MpUnidadMedida: null,
@@ -214,6 +215,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.valorTotal = 0;
     this.categoriaBOPP = '';
     this.materiasPrimas = [];
+    this.validarInput = true;
     this.obtenerBOPP();
     this.obtenerMateriasPrimasRetiradas();
   }
@@ -247,6 +249,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     })
   }
 
+  // Funcion para obtener las diferentes categorias de materia prima existentes
   obtenerCategorias(){
     this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => {
       for (let i = 0; i < datos_categorias.length; i++) {
@@ -256,6 +259,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     });
   }
 
+  // Funcion para obtener el bopp existente
   obtenerBOPP(){
     this.boppService.srvObtenerLista().subscribe(datos_bopp => {
       for (let i = 0; i < datos_bopp.length; i++) {
@@ -269,6 +273,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     });
   }
 
+  // Funcion para obtener las materias primas registradas
   obtenerMateriasPrimasRetiradas(){
     this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
       for (let index = 0; index < datos_materiaPrima.length; index++) {
@@ -282,6 +287,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     });
   }
 
+  // Funcion para buscar por id una materia prima o bopp
   buscarMpId(){
 
     this.ArrayMateriaPrima = [];
@@ -321,6 +327,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       }
     });
   }
+
   /** Cargar combo materias primas al seleccionar cual categoria menos BOPP y tintas */
   cargarComboMatPrimaSegunCategorias(){
     let comboCategorias = this.FormMateriaPrima.get('MpCategoria')?.value;
@@ -497,6 +504,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     }]
   }
 
+  // Funcion que cargará las informacion de las materias primas segun los filtros que se consulten
   cargarFormMpEnTablas(formulario : any, id: number, nombre : string, precio : number, inicial : number, entrada : number, salida : number, cantidad : number, undMEd : string, categoria : any, ancho? : number ){
     if (this.categoriaBOPP == 'BOPP') {
       this.valorTotal = this.valorTotal + precio * cantidad;
@@ -570,9 +578,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     }
   }
 
+  // Funcion que realizará la busqueda de materias primas segun los filtros que se consulten y le enviará la informacion a la funcion "cargarFormMpEnTablas"
   validarConsulta(){
-    let materiaPrima : string = this.FormMateriaPrima.value.MpNombre;
-    if (materiaPrima == '') null;
+    let materiaPrima : any = this.FormMateriaPrima.value.MpNombre;
+    if (materiaPrima != null) materiaPrima.Id;
     let idMateriaPrima : number = this.FormMateriaPrima.value.MpId;
     let fecha : any = this.FormMateriaPrima.value.fecha;
     let fechaFinal : any = this.FormMateriaPrima.value.fechaFinal;
@@ -722,6 +731,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
         });
 
+        this.devolucionesService.srvObtenerListaPofechas(fecha, fechaFinal).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+              for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                  }
+                  materia_cantidad_devoluciones.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorId(materiaPrima).subscribe(datos_materiaPrima => {
             if (datos_materiaPrima.catMP_Id == categoria) {
@@ -760,6 +785,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                         if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
                           this.sumaEntrada = this.sumaEntrada + item.cantidad;
                           // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                        }
+                      }
+
+                      // Devoluciones
+                      for (const item of materia_cantidad_devoluciones) {
+                        if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                          this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                          this.sumaSalida = this.sumaSalida - item.cantidad;
                         }
                       }
 
@@ -1002,6 +1035,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
         });
 
+        this.devolucionesService.srvObtenerListaPofechas(fecha, fechaFinal).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+              for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                  }
+                  materia_cantidad_devoluciones.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
             if (datos_materiaPrima.catMP_Id == categoria) {
@@ -1040,6 +1089,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                         if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
                           this.sumaEntrada = this.sumaEntrada + item.cantidad;
                           // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                        }
+                      }
+
+                      // Devoluciones
+                      for (const item of materia_cantidad_devoluciones) {
+                        if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                          this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                          this.sumaSalida = this.sumaSalida - item.cantidad;
                         }
                       }
 
@@ -1229,6 +1286,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
         });
 
+        this.devolucionesService.srvObtenerListaPofechas(fecha, fechaFinal).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+              for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                  }
+                  materia_cantidad_devoluciones.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorId(materiaPrima).subscribe(datos_materiaPrima => {
             this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
@@ -1264,6 +1337,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   if (datos_materiaPrima.matPri_Id == item.materiaPrima) {
                     this.sumaEntrada = this.sumaEntrada + item.cantidad;
                     // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                  }
+                }
+
+                // Devoluciones
+                for (const item of materia_cantidad_devoluciones) {
+                  if (datos_materiaPrima.matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    this.sumaSalida = this.sumaSalida - item.cantidad;
                   }
                 }
 
@@ -1349,6 +1430,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
         });
 
+        this.devolucionesService.srvObtenerListaPofechas(fecha, fechaFinal).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+              for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                  }
+                  materia_cantidad_devoluciones.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
             this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
@@ -1384,6 +1481,15 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   if (datos_materiaPrima.matPri_Id == item.materiaPrima) {
                     this.sumaEntrada = this.sumaEntrada + item.cantidad;
                     // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                  }
+                }
+
+
+                // Devoluciones
+                for (const item of materia_cantidad_devoluciones) {
+                  if (datos_materiaPrima.matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    this.sumaSalida = this.sumaSalida - item.cantidad;
                   }
                 }
 
@@ -1533,6 +1639,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
         });
 
+        this.devolucionesService.srvObtenerListaPofechas(fecha, fechaFinal).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+              for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                  }
+                  materia_cantidad_devoluciones.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorId(materiaPrima).subscribe(datos_materiaPrima => {
             if (datos_materiaPrima.catMP_Id == categoria) {
@@ -1571,6 +1693,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                         if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
                           this.sumaEntrada = this.sumaEntrada + item.cantidad;
                           // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                        }
+                      }
+
+                      // Devoluciones
+                      for (const item of materia_cantidad_devoluciones) {
+                        if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                          this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                          this.sumaSalida = this.sumaSalida - item.cantidad;
                         }
                       }
 
@@ -1813,6 +1943,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
         });
 
+        this.devolucionesService.srvObtenerListaPofechas(fecha, fechaFinal).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+              for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                  }
+                  materia_cantidad_devoluciones.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
             if (datos_materiaPrima.catMP_Id == categoria) {
@@ -1851,6 +1997,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                         if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
                           this.sumaEntrada = this.sumaEntrada + item.cantidad;
                           // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                        }
+                      }
+
+                      // Devoluciones
+                      for (const item of materia_cantidad_devoluciones) {
+                        if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                          this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                          this.sumaSalida = this.sumaSalida - item.cantidad;
                         }
                       }
 
@@ -2039,6 +2193,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
         });
 
+        this.devolucionesService.srvObtenerListaPorfecha(fecha).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+              for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                  }
+                  materia_cantidad_devoluciones.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorId(materiaPrima).subscribe(datos_materiaPrima => {
             this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
@@ -2074,6 +2244,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   if (datos_materiaPrima.matPri_Id == item.materiaPrima) {
                     this.sumaEntrada = this.sumaEntrada + item.cantidad;
                     // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                  }
+                }
+
+                // Devoluciones
+                for (const item of materia_cantidad_devoluciones) {
+                  if (datos_materiaPrima.matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    this.sumaSalida = this.sumaSalida - item.cantidad;
                   }
                 }
 
@@ -2159,6 +2337,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
         });
 
+        this.devolucionesService.srvObtenerListaPofechas(fecha, fechaFinal).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+              for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                  }
+                  materia_cantidad_devoluciones.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
             this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
@@ -2194,6 +2388,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   if (datos_materiaPrima.matPri_Id == item.materiaPrima) {
                     this.sumaEntrada = this.sumaEntrada + item.cantidad;
                     // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                  }
+                }
+
+                // Devoluciones
+                for (const item of materia_cantidad_devoluciones) {
+                  if (datos_materiaPrima.matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    this.sumaSalida = this.sumaSalida - item.cantidad;
                   }
                 }
 
@@ -2341,6 +2543,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       });
 
+      this.devolucionesService.srvObtenerListaPofechas(fecha, fechaFinal).subscribe(datos_devoluciones => {
+        for (let i = 0; i < datos_devoluciones.length; i++) {
+          this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+            for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+              this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                const matCant : any = {
+                  materiaPrima : datos_materiaPrima.matPri_Id,
+                  cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                }
+                materia_cantidad_devoluciones.push(matCant);
+              });
+            }
+          });
+        }
+      });
+
       setTimeout(() => {
         this.materiaPrimaService.srvObtenerListaPorCategoria(categoria).subscribe(datos_materiaPrima => {
           for (let index = 0; index < datos_materiaPrima.length; index++) {
@@ -2378,6 +2596,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                     if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
                       this.sumaEntrada = this.sumaEntrada + item.cantidad;
                       // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                    }
+                  }
+
+                  // Devoluciones
+                  for (const item of materia_cantidad_devoluciones) {
+                    if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                      this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                      this.sumaSalida = this.sumaSalida - item.cantidad;
                     }
                   }
 
@@ -2621,6 +2847,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
         });
 
+        this.devolucionesService.srvObtenerListaPorfecha(this.today).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+              for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                  }
+                  materia_cantidad_devoluciones.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorCategoria(categoria).subscribe(datos_materiaPrima => {
             if (datos_materiaPrima.length == 0) this.load = true;
@@ -2660,6 +2902,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                         if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
                           this.sumaEntrada = this.sumaEntrada + item.cantidad;
                           // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                        }
+                      }
+
+                      // Devoluciones
+                      for (const item of materia_cantidad_devoluciones) {
+                        if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                          this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                          this.sumaSalida = this.sumaSalida - item.cantidad;
                         }
                       }
 
@@ -2902,6 +3152,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
         });
 
+        this.devolucionesService.srvObtenerListaPorfecha(this.today).subscribe(datos_devoluciones => {
+          for (let i = 0; i < datos_devoluciones.length; i++) {
+            this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+              for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+                this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                  const matCant : any = {
+                    materiaPrima : datos_materiaPrima.matPri_Id,
+                    cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                  }
+                  materia_cantidad_devoluciones.push(matCant);
+                });
+              }
+            });
+          }
+        });
+
         setTimeout(() => {
           this.materiaPrimaService.srvObtenerListaPorCategoria(categoria).subscribe(datos_materiaPrima => {
             if (datos_materiaPrima.length == 0) this.load = true;
@@ -2941,6 +3207,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                         if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
                           this.sumaEntrada = this.sumaEntrada + item.cantidad;
                           // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                        }
+                      }
+
+                      // Devoluciones
+                      for (const item of materia_cantidad_devoluciones) {
+                        if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                          this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                          this.sumaSalida = this.sumaSalida - item.cantidad;
                         }
                       }
 
@@ -3127,7 +3401,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       });
 
-      // BOPP
       this.boppService.srvObtenerListaPorFechas(fecha, fechaFinal).subscribe(datos_bopp => {
         for (let i = 0; i < datos_bopp.length; i++) {
           if (datos_bopp[i].catMP_Id == categoria) {
@@ -3156,6 +3429,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                     bopp_Saliente.push(matCant);
                   }
                 }
+              });
+            }
+          });
+        }
+      });
+
+      this.devolucionesService.srvObtenerListaPofechas(fecha, fechaFinal).subscribe(datos_devoluciones => {
+        for (let i = 0; i < datos_devoluciones.length; i++) {
+          this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+            for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+              this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                const matCant : any = {
+                  materiaPrima : datos_materiaPrima.matPri_Id,
+                  cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                }
+                materia_cantidad_devoluciones.push(matCant);
               });
             }
           });
@@ -3282,6 +3571,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
                     this.sumaEntrada = this.sumaEntrada + item.cantidad;
                     // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                  }
+                }
+
+                // Devoluciones
+                for (const item of materia_cantidad_devoluciones) {
+                  if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    this.sumaSalida = this.sumaSalida - item.cantidad;
                   }
                 }
 
@@ -3466,6 +3763,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       });
 
+      this.devolucionesService.srvObtenerListaPorfecha(fecha).subscribe(datos_devoluciones => {
+        for (let i = 0; i < datos_devoluciones.length; i++) {
+          this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+            for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+              this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                const matCant : any = {
+                  materiaPrima : datos_materiaPrima.matPri_Id,
+                  cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                }
+                materia_cantidad_devoluciones.push(matCant);
+              });
+            }
+          });
+        }
+      });
+
       setTimeout(() => {
         this.materiaPrimaService.srvObtenerListaPorCategoria(categoria).subscribe(datos_materiaPrima => {
           for (let index = 0; index < datos_materiaPrima.length; index++) {
@@ -3503,6 +3816,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                     if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
                       this.sumaEntrada = this.sumaEntrada + item.cantidad;
                       // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                    }
+                  }
+
+                  // Devoluciones
+                  for (const item of materia_cantidad_devoluciones) {
+                    if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                      this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                      this.sumaSalida = this.sumaSalida - item.cantidad;
                     }
                   }
 
@@ -3891,6 +4212,22 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       });
 
+      this.devolucionesService.srvObtenerListaPorfecha(this.today).subscribe(datos_devoluciones => {
+        for (let i = 0; i < datos_devoluciones.length; i++) {
+          this.detallesDevolucionesService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_detallesDevoluciones => {
+            for (let j = 0; j < datos_detallesDevoluciones.length; j++) {
+              this.materiaPrimaService.srvObtenerListaPorId(datos_detallesDevoluciones[j].matPri_Id).subscribe(datos_materiaPrima => {
+                const matCant : any = {
+                  materiaPrima : datos_materiaPrima.matPri_Id,
+                  cantidad : datos_detallesDevoluciones[j].dtDevMatPri_CantidadDevuelta,
+                }
+                materia_cantidad_devoluciones.push(matCant);
+              });
+            }
+          });
+        }
+      });
+
       setTimeout(() => {
         this.materiaPrimaService.srvObtenerListaPorCategoria(categoria).subscribe(datos_materiaPrima => {
           if (datos_materiaPrima.length == 0) this.load = true;
@@ -3930,6 +4267,14 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                       if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
                         this.sumaEntrada = this.sumaEntrada + item.cantidad;
                         // console.log(`La materia prima ${item.materiaPrima} tuvo ${this.sumaEntrada} de salida el dia ${fecha} REMISION`)
+                      }
+                    }
+
+                    // Devoluciones
+                    for (const item of materia_cantidad_devoluciones) {
+                      if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
+                        this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                        this.sumaSalida = this.sumaSalida - item.cantidad;
                       }
                     }
 
@@ -4606,6 +4951,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                   }
                 }
 
+                // Devoluciones
                 for (const item of materia_cantidad_devoluciones) {
                   if (datos_materiaPrima[index].matPri_Id == item.materiaPrima) {
                     this.sumaEntrada = this.sumaEntrada + item.cantidad;
@@ -4701,6 +5047,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     }
   }
 
+  // Funcion que organiza los campos de la tabla segun su precio de mayor a menor
   organizacionPrecioDblClick(){
     this.ArrayMateriaPrima.sort((a,b)=> Number(b.SubTotal) - Number(a.SubTotal));
     const Toast = Swal.mixin({
