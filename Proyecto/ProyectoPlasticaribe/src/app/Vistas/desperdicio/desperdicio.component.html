@@ -1,22 +1,14 @@
 <!--Navegador parte superior -->
+<app-menuLateral></app-menuLateral>
+
 <div class="contain">
-    <nav class="navbar navbar-expand-lg">
-      <div class="container-fluid">
-        <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
-      </div>
-      <ul class="btn-group open">
-        <p><b>User: {{storage_Nombre}}</b></p>
-        <span><b>Tipo: {{storage_Rol}} </b></span>
-        <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
-      </ul>
-    </nav>
     <!-- Navegador fin de parte superior -->
     <div class="container-fluid">
       <!-- principal -->
       <div class="mb-4 Titulo">
         <h2 class="tituloRojo">Desperdicio</h2>
       </div>
-  
+
       <div class="mb-4">
         <hr class="colorLinea">
       </div>
@@ -30,17 +22,17 @@
   <div class="mb-4">
     <h4 class="tituloRojo">Registro de Desperdicio</h4>
   </div>
-  
-  
-  
- 
-  
- 
+
+
+
+
+
+
   <form [formGroup]="FormDesperdicio">
     <!-- Inicio Fila 1 Agregar producto -->
     <div class="mb-3">
       <div class="row g-3">
-  
+
         <div class="form-floating col-md-2">
           <input formControlName="Mpid" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
           <label for="floatingSelect">Id</label>
@@ -58,7 +50,7 @@
             </select>
             <label for="floatingSelect">Nombre del Producto</label>
         </div>
-  
+
 
            <!-- Operario -->
       <div class="form-floating col-md-3">
@@ -85,8 +77,8 @@
             <input formControlName="MpingresoFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso">
             <label for="floatingInput">Fecha Ingreso</label>
           </div>
-  
-         
+
+
           <!-- Unidad medida-->
           <div class="form-floating col-md-2">
             <select formControlName="MpunidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" >
@@ -115,11 +107,11 @@
         <textarea formControlName="MpObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" maxlength="200" placeholder="Observacion" name="despObservacion"></textarea>
         <label for="floatingTextarea">Observación</label>
       </div>
-    
+
       </div>
     </div>
   </form>
-  
+
 </div>
                       <!-- BOTONES DE  CONSULTAR Y LIMPIAR CAMPOS -->
                        <div class="mb-1">
@@ -127,4 +119,4 @@
                           <input class="btn btn-danger btn-danger-sm" type="submit" value="Guardar">
                           <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="limpiarCamposConsulta()">
                         </div>
-                      </div> 
+                      </div>

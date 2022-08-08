@@ -1,16 +1,7 @@
  <!-- Inicio Contenedor total -->
-<div class="contain">
-  <nav class="navbar navbar-expand-lg">
-    <div class="container-fluid">
-      <a href="/home"><b><p>Plasti<span>caribe S.A.S</span></p></b></a>
-    </div>
-    <ul class="btn-group open">
-      <p><b>User: {{storage_Nombre}}</b></p>
-      <span><b>Tipo: {{storage_Rol}} </b></span>
-      <span> <li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li> </span>
-    </ul>
-  </nav>
-  <!-- Navegador fin de parte superior -->
+<app-menuLateral></app-menuLateral>
+
+<div class="container">
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
@@ -21,9 +12,6 @@
       <hr class="colorLinea">
     </div>
   </div>
-</div>
-
-<div class="container">
   <ng-container *ngIf="ValidarRol == 1">
     <!-- Inicio Botones que llama el modal de crear proveedor y Materia Prima-->
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">

@@ -167,49 +167,6 @@ a, a:hover, a:focus {
     background: #ff5b68;
 }
 
-
-/* a[data-toggle="collapse"] {
-    position: relative;
-}
-
-a[aria-expanded="false"]::before, a[aria-expanded="true"]::before {
-    content: '\e259';
-    display: block;
-    position: absolute;
-    right: 20px;
-    font-family: 'Glyphicons Halflings';
-    font-size: 0.6em;
-}
-a[aria-expanded="true"]::before {
-    content: '\e260';
-}
-
-ul ul a {
-    font-size: 0.9em !important;
-    padding-left: 30px !important;
-    background: #6d7fcc;
-}
-
-ul.CTAs {
-    padding: 20px;
-}
-
-ul.CTAs a {
-    text-align: center;
-    font-size: 0.9em !important;
-    display: block;
-    border-radius: 5px;
-    margin-bottom: 5px;
-}
-a.download {
-    background: #fff;
-    color: #7386D5;
-}
-a.article, a.article:hover {
-    background: #6d7fcc !important;
-    color: #fff !important;
-} */
-
 .btn{
     align-items: center;
 }
@@ -233,7 +190,6 @@ a.article, a.article:hover {
 .texto{
   width: 80%;
   padding-left: 10%;
-  margin-top: 140px;
 }
 
 .textoIntermedio .parrafo b{
@@ -259,8 +215,33 @@ a.article, a.article:hover {
     color: #000;
 }
 
-@media (max-width: 500px) {
-  .Titulo{
-    margin-top: 140px;
-   }
+.menu {
+  height: 150px;
+}
+
+.btn-close:hover{
+  background-color: #ff5b68;
+}
+mat-sidenav-content{
+  -webkit-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+ -moz-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+ box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
+}
+
+.user {
+  color: #000;
+}
+
+.botonMenu {
+  padding-top: 20px;
+}
+
+.botonMenu :hover {
+  color: #ff5b68;
+}
+
+@media (max-width: 500px){
+  .menu {
+    height: 230px;
+  }
 }

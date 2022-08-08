@@ -27,44 +27,7 @@ export class PruebasComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    this.obtenerBOPP();
-  }
 
-  //Funcion que buscará y mostrará los BOPP existentes
-  obtenerBOPP(){
-    this.ArrayBOPP = [];
-    this.boppService.srvObtenerLista().subscribe(datos_BOPP => {
-      for (let i = 0; i < datos_BOPP.length; i++) {
-        if (datos_BOPP[i].bopP_Stock != 0) {
-          const bopp : any = {
-            id : datos_BOPP[i].bopP_Id,
-            name : datos_BOPP[i].bopP_Nombre,
-          }
-          this.ArrayBOPP.push(bopp);
-        }
-      }
-    });
-  }
-
-
-  selectEvent(item) {
-    this.FormPrueba.value.AsgBopp = item.id;
-    if (this.FormPrueba.value.AsgBopp != '') this.validarInput = false;
-    else this.validarInput = true;
-    // do something with selected item
-  }
-
-  onChangeSearch(val: string) {
-    if (val != '') this.validarInput = false;
-    else this.validarInput = true;
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
-  }
-
-  onFocused(e){
-    if (!e.isTrusted) this.validarInput = false;
-    else this.validarInput = true;
-    // do something when input is focused
   }
 
 }

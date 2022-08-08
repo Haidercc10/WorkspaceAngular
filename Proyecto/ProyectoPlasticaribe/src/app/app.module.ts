@@ -64,6 +64,7 @@ import { FiltroNombreClientePTPipe } from './Pipes/filtro-nombre-cliente-pt.pipe
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import {AutocompleteLibModule} from 'angular-ng-autocomplete';
 import { ReporteEstadosOTComponent } from './Vistas/reporte-estados-ot/reporte-estados-ot.component';
+import { MenuLateralComponent } from './Vistas/menuLateral/menuLateral.component';
 
 export const routes: Routes = [
 
@@ -109,6 +110,8 @@ export const routes: Routes = [
   {path: 'AsignacionBOPPTemporal', canActivate: [ValidacionLoginGuard], component: AsignacionBOPP_TEMPORALComponent},
   {path: 'inventario-productos-terminados', canActivate: [ValidacionLoginGuard], component: ModalGenerarInventarioZeusComponent},
   {path: 'reporte-estados-ot', canActivate: [ValidacionLoginGuard], component: ReporteEstadosOTComponent},
+  {path: 'menu-lateral', canActivate: [ValidacionLoginGuard], component: MenuLateralComponent},
+
 ]
 
 @NgModule({
@@ -162,6 +165,7 @@ export const routes: Routes = [
     FiltrosProductosTerminadosZeusPipe,
     FiltroNombreClientePTPipe,
     ReporteEstadosOTComponent,
+    MenuLateralComponent,
   ],
 
 
