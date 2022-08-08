@@ -61,7 +61,7 @@ export class OpedidoproductoComponent implements OnInit {
   public ModalSedesClientes: boolean = false;
 
   // VARIABLES PARA PASAR A LOS COMBOBOX
-  cliente:ClientesService[]=[]; //Variable que almacenará el nombre de los clientes para pasarlos en la vista
+  cliente = []; //Variable que almacenará el nombre de los clientes para pasarlos en la vista
   clienteDatos = []; //Variable que almacenará la informacion completa de los clientes
   sedeCliente:SedeClienteService[]=[]; //Varieble que almacenará las direcciones de las sedes de los cliente
   ciudad :SedeClienteService[]=[]; //Variable que almacenará las ciudades de los clientes
@@ -117,6 +117,15 @@ export class OpedidoproductoComponent implements OnInit {
   pigmento : any = ''; //Variable que se usará para almacenar el pigmento del producto consultado o seleccionado
   material : any = ''; //Variable que se usará para almacenar el material del producto consultado o seleccionado
   public load : boolean = true; //Variable que va a servir para mostrar o no la imagen de carga
+
+  /** Variables para inputs de autocompletados */
+  validarInputClientes : any;
+  keywordClientes = 'cli_Nombre';
+  validarInputNombresProductos : any;
+  keywordNombresProductos = 'prod_Nombre';
+  public historyHeading: string = 'Seleccionado Recientemente';
+  public historyHeading2: string = 'Seleccionado Recientemente';
+
 
   constructor(private pedidoproductoService : OpedidoproductoService,
     private productosServices : ProductoService,
@@ -183,6 +192,9 @@ export class OpedidoproductoComponent implements OnInit {
       PedExtClienteConsulta: new FormControl(),
       PedExtIdClienteConsulta : new FormControl(),
     });
+
+    this.validarInputClientes = true;
+    this.validarInputNombresProductos = true
   }
 
   //Cargar al iniciar.
@@ -203,6 +215,46 @@ export class OpedidoproductoComponent implements OnInit {
     this.LimpiarCampos();
     this.limpiarCamposConsulta();
     this.fecha();
+  }
+
+  selectEventNombreCliente(item) {
+    this.FormPedidoExternoClientes.value.PedClienteNombre = item.cli_Id;
+    if (this.FormPedidoExternoClientes.value.PedClienteNombre != '') this.validarInputClientes = false;
+    else this.validarInputClientes = true;
+    // do something with selected item
+  }
+
+  onChangeSearchNombreCliente(val: string) {
+    if (val != '') this.validarInputClientes = false;
+    else this.validarInputClientes = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocusedNombreCliente(e){
+    if (!e.isTrusted) this.validarInputClientes = false;
+    else this.validarInputClientes = true;
+    // do something when input is focused
+  }
+
+  selectEventNombreProductos(item) {
+    this.FormPedidoExternoProductos.value.ProdNombre = item.prod_Id;
+    if (this.FormPedidoExternoProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
+    else this.validarInputNombresProductos = true;
+    // do something with selected item
+  }
+
+  onChangeSearchNombreProductos(val: string) {
+    if (val != '') this.validarInputNombresProductos = false;
+    else this.validarInputNombresProductos = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocusedNombreProductos(e){
+    if (!e.isTrusted) this.validarInputNombresProductos = false;
+    else this.validarInputNombresProductos = true;
+    // do something when input is focused
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -331,12 +383,12 @@ export class OpedidoproductoComponent implements OnInit {
           if (datos_clientes[index].estado_Id == 1) {
             if (datos_usuarios.rolUsu_Id == 2) {
               if (datos_clientes[index].usua_Id == datos_usuarios.usua_Id) {
-                this.cliente.push(datos_clientes[index].cli_Nombre);
+                this.cliente.push(datos_clientes[index]);
                 this.clienteDatos.push(datos_clientes[index]);
                 continue;
               }
             }else {
-              this.cliente.push(datos_clientes[index].cli_Nombre);
+              this.cliente.push(datos_clientes[index]);
               this.clienteDatos.push(datos_clientes[index]);
             }
             this.cliente.sort();
@@ -347,12 +399,14 @@ export class OpedidoproductoComponent implements OnInit {
   }
 
   //Funcion para llenar las ciudades del cliente en donde tiene sedes
-  ciudadClienteComboBox(){
+  ciudadClienteComboBox(itemsNombre : any){
+    this.selectEventNombreCliente(itemsNombre);
+    this.FormPedidoExternoClientes.value.PedClienteNombre = itemsNombre.cli_Nombre
     this.LimpiarCamposProductos();
     this.ciudad = [];
     this.sedeCliente=[];
     this.usuarioVende=[];
-    let clienteNombreBD: string = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    let clienteNombreBD: any = this.FormPedidoExternoClientes.value.PedClienteNombre;
     this.clientesService.srvObtenerLista().subscribe(datos_cliente=>{
       for (let index = 0; index < datos_cliente.length; index++) {
         this.ciudad = [];
@@ -389,7 +443,7 @@ export class OpedidoproductoComponent implements OnInit {
   // Funcion para llenar el comboBox de sedes y usuarios dependiendo del cliente seleccionado
   sedesClientesComboBox(){
     //LLENA LA SEDE DEL CLIENTE DEPENDIENDO DEL CLIENTE
-    let clienteNombreBD: string = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    let clienteNombreBD: string = this.FormPedidoExternoClientes.value.PedClienteNombre.cli_Nombre;
     this.clientesService.srvObtenerLista().subscribe(datos_cliente=>{
       for (let index = 0; index < datos_cliente.length; index++) {
         if (datos_cliente[index].cli_Nombre == clienteNombreBD){
@@ -482,7 +536,8 @@ export class OpedidoproductoComponent implements OnInit {
   // Funcion para cargar los productos de un solo cliente
   productoCliente(){
     this.producto = [];
-    let nombre_Cliente : string = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    let nombre_Cliente : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
+
     let id_cliente : number;
     this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
       for (let i = 0; i < datos_clientes.length; i++) {
@@ -492,8 +547,19 @@ export class OpedidoproductoComponent implements OnInit {
         for (let index = 0; index < datos_clientesProductos.length; index++) {
           if (datos_clientesProductos[index].cli_Id == id_cliente) {
             this.productosServices.srvObtenerListaPorId(datos_clientesProductos[index].prod_Id).subscribe(datos_productos => {
-              this.producto.push(datos_productos);
-              this.producto.sort((a, b) => a.prod_Nombre.localeCompare(b.prod_Nombre));
+
+              let variable = [];
+              variable.push(datos_productos);
+
+              for (const Prod of variable) {
+                let objeto : any = {
+                  prod_Nombre : Prod.prod_Nombre
+                }
+
+                this.producto.push(objeto);
+                this.producto.sort((a, b) => a.prod_Nombre.localeCompare(b.prod_Nombre));
+              }
+
             });
           }
         }
@@ -2368,7 +2434,7 @@ export class OpedidoproductoComponent implements OnInit {
                                           PedObservacion: datos_pedidos.pedExt_Observacion,
                                         });
 
-                                        this.ciudadClienteComboBox();
+                                        //this.ciudadClienteComboBox();
                                         this.sedesClientesComboBox();
                                         this.tiposProductosService.srvObtenerListaPorId(datos_productos[i].tpProd_Id).subscribe(datos_tipo_producto => {
 

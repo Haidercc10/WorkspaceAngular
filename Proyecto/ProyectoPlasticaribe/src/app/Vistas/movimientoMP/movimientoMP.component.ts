@@ -125,6 +125,7 @@ export class MovimientoMPComponent implements OnInit {
   arrayOT : any = [];
   otAsignadas : any = [];
   estadoOt : string = ''; //Variable que almacenará el estado de la orden de trabajo (Abierta, Asignada, En proceso, Terminada o Finalizada)
+
   validarInputMp : any;
   validarInputBOPP : any;
   keywordMp = 'matPri_Nombre';
