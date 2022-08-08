@@ -176,7 +176,7 @@ export class ReporteEstadosOTComponent implements OnInit {
       } else if (TipoDocumento == 'Asignación de BOPP') {
         this.bagProServices.srvObtenerListaClienteOT_Fechas(fecha, fechaFinal).subscribe(registros_OT => {
           if (registros_OT.length == 0) this.load = true;
-          for (let bpro = 0; bpro < registros_OT.length; bpro++) {  
+          for (let bpro = 0; bpro < registros_OT.length; bpro++) {
             this.detallesAsgBOPPService.srvObtenerListaPorOt(registros_OT[bpro].item).subscribe(datos_dtAsgBOPP => {
               if (datos_dtAsgBOPP.length == 0) this.load = true;
               for (let i = 0; i < datos_dtAsgBOPP.length; i++) {
@@ -198,6 +198,10 @@ export class ReporteEstadosOTComponent implements OnInit {
                 else if (estado == 16 && datos_asignacion[i].estado_OrdenTrabajo == 16) this.recorrerEncabezadoAsignacionesMatPrima(registros_OT[bpro].item, registros_OT[bpro].fechaCrea);
                 else if (estado == 17 && datos_asignacion[i].estado_OrdenTrabajo == 17) this.recorrerEncabezadoAsignacionesMatPrima(registros_OT[bpro].item, registros_OT[bpro].fechaCrea);
                 else if (estado == 18 && datos_asignacion[i].estado_OrdenTrabajo == 18) this.recorrerEncabezadoAsignacionesMatPrima(registros_OT[bpro].item, registros_OT[bpro].fechaCrea);
+                else {
+                  this.load = true;
+                  continue;
+                }
               }
             });
           }
@@ -205,7 +209,7 @@ export class ReporteEstadosOTComponent implements OnInit {
       } else if (TipoDocumento == 'Asignación de BOPP') {
         this.bagProServices.srvObtenerListaClienteOT_Fechas(fecha, fechaFinal).subscribe(registros_OT => {
           if (registros_OT.length == 0) this.load = true;
-          for (let bpro = 0; bpro < registros_OT.length; bpro++) {  
+          for (let bpro = 0; bpro < registros_OT.length; bpro++) {
             this.detallesAsgBOPPService.srvObtenerListaPorOt(registros_OT[bpro].item).subscribe(datos_dtAsgBOPP => {
               if (datos_dtAsgBOPP.length == 0) this.load = true;
               for (let i = 0; i < datos_dtAsgBOPP.length; i++) {
@@ -213,6 +217,10 @@ export class ReporteEstadosOTComponent implements OnInit {
                 else if (estado == 16 && datos_dtAsgBOPP[i].estado_OrdenTrabajo == 16) this.llenarTablaAsignacionBOPP(registros_OT[bpro].item, registros_OT[bpro].fechaCrea);
                 else if (estado == 17 && datos_dtAsgBOPP[i].estado_OrdenTrabajo == 17) this.llenarTablaAsignacionBOPP(registros_OT[bpro].item, registros_OT[bpro].fechaCrea);
                 else if (estado == 18 && datos_dtAsgBOPP[i].estado_OrdenTrabajo == 18) this.llenarTablaAsignacionBOPP(registros_OT[bpro].item, registros_OT[bpro].fechaCrea);
+                else {
+                  this.load = true;
+                  continue;
+                }
               }
             });
           }
@@ -229,7 +237,7 @@ export class ReporteEstadosOTComponent implements OnInit {
       } else if (TipoDocumento == 'Asignación de BOPP') {
         this.bagProServices.srvObtenerListaClienteOT_Fechas(fecha, fechaFinal).subscribe(datos_ot => {
           if (datos_ot.length == 0) this.load = true;
-          for (let i = 0; i < datos_ot.length; i++) {          
+          for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].item == idDoc) this.llenarTablaAsignacionBOPP(datos_ot[i].item, datos_ot[i].fechaCrea);
           }
         });
@@ -258,7 +266,7 @@ export class ReporteEstadosOTComponent implements OnInit {
       if (TipoDocumento == 'Asignación') {
         this.bagProServices.srvObtenerListaClienteOT_Fechas(fecha, fechaFinal).subscribe(datos_ot => {
           if (datos_ot.length == 0) this.load = true;
-          for (let i = 0; i < datos_ot.length; i++) {          
+          for (let i = 0; i < datos_ot.length; i++) {
             this.recorrerEncabezadoAsignacionesMatPrima(datos_ot[i].item, datos_ot[i].fechaCrea);
           }
         });
@@ -321,6 +329,10 @@ export class ReporteEstadosOTComponent implements OnInit {
               else if (estado == 16 && datos_asignacion[i].estado_OrdenTrabajo == 16) this.recorrerEncabezadoAsignacionesMatPrima(registros_OT[bpro].item, registros_OT[bpro].fechaCrea);
               else if (estado == 17 && datos_asignacion[i].estado_OrdenTrabajo == 17) this.recorrerEncabezadoAsignacionesMatPrima(registros_OT[bpro].item, registros_OT[bpro].fechaCrea);
               else if (estado == 18 && datos_asignacion[i].estado_OrdenTrabajo == 18) this.recorrerEncabezadoAsignacionesMatPrima(registros_OT[bpro].item, registros_OT[bpro].fechaCrea);
+              else {
+                this.load = true;
+                continue;
+              }
             }
           });
 
@@ -331,6 +343,10 @@ export class ReporteEstadosOTComponent implements OnInit {
               else if (estado == 16 && datos_dtAsgBOPP[i].estado_OrdenTrabajo == 16) this.llenarTablaAsignacionBOPP(registros_OT[bpro].item, registros_OT[bpro].fechaCrea);
               else if (estado == 17 && datos_dtAsgBOPP[i].estado_OrdenTrabajo == 17) this.llenarTablaAsignacionBOPP(registros_OT[bpro].item, registros_OT[bpro].fechaCrea);
               else if (estado == 18 && datos_dtAsgBOPP[i].estado_OrdenTrabajo == 18) this.llenarTablaAsignacionBOPP(registros_OT[bpro].item, registros_OT[bpro].fechaCrea);
+              else {
+                this.load = true;
+                continue;
+              }
             }
           });
         }
@@ -338,7 +354,7 @@ export class ReporteEstadosOTComponent implements OnInit {
     } else if (fecha != null && fechaFinal != null) {
       this.bagProServices.srvObtenerListaClienteOT_Fechas(fecha, fechaFinal).subscribe(datos_ot => {
         if (datos_ot.length == 0) this.load = true;
-        for (let i = 0; i < datos_ot.length; i++) {          
+        for (let i = 0; i < datos_ot.length; i++) {
           this.recorrerEncabezadoAsignacionesMatPrima(datos_ot[i].item, datos_ot[i].fechaCrea);
           this.llenarTablaAsignacionBOPP(datos_ot[i].item, datos_ot[i].fechaCrea);
         }
@@ -352,7 +368,10 @@ export class ReporteEstadosOTComponent implements OnInit {
               this.bagProServices.srvObtenerListaClienteOT_Item(datos_asignacion[i].asigMP_OrdenTrabajo).subscribe(registros_OT => {
                 for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                   if (datos_asignacion[i].estado_OrdenTrabajo == 14) this.recorrerEncabezadoAsignacionesMatPrima(datos_asignacion[i].asigMP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                  else continue;
+                  else {
+                    this.load = true;
+                    continue;
+                  }
                 }
               });
             }
@@ -364,7 +383,10 @@ export class ReporteEstadosOTComponent implements OnInit {
               this.bagProServices.srvObtenerListaClienteOT_Item(datos_asignacion[i].asigMP_OrdenTrabajo).subscribe(registros_OT => {
                 for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                   if (datos_asignacion[i].estado_OrdenTrabajo == 16) this.recorrerEncabezadoAsignacionesMatPrima(datos_asignacion[i].asigMP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                  else continue;
+                  else {
+                    this.load = true;
+                    continue;
+                  }
                   break;
                 }
               });
@@ -377,7 +399,10 @@ export class ReporteEstadosOTComponent implements OnInit {
               this.bagProServices.srvObtenerListaClienteOT_Item(datos_asignacion[i].asigMP_OrdenTrabajo).subscribe(registros_OT => {
                 for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                   if (datos_asignacion[i].estado_OrdenTrabajo == 17) this.recorrerEncabezadoAsignacionesMatPrima(datos_asignacion[i].asigMP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                  else continue;
+                  else {
+                    this.load = true;
+                    continue;
+                  }
                 }
               });
             }
@@ -389,7 +414,10 @@ export class ReporteEstadosOTComponent implements OnInit {
               this.bagProServices.srvObtenerListaClienteOT_Item(datos_asignacion[i].asigMP_OrdenTrabajo).subscribe(registros_OT => {
                 for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                   if (datos_asignacion[i].estado_OrdenTrabajo == 18) this.recorrerEncabezadoAsignacionesMatPrima(datos_asignacion[i].asigMP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                  else continue;
+                  else {
+                    this.load = true;
+                    continue;
+                  }
                 }
               });
             }
@@ -405,7 +433,10 @@ export class ReporteEstadosOTComponent implements OnInit {
                   this.bagProServices.srvObtenerListaClienteOT_Item(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo).subscribe(registros_OT => {
                     for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                       if (datos_dtAsgBOPP[j].estado_OrdenTrabajo == 14) this.llenarTablaAsignacionBOPP(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                      else continue;
+                      else {
+                        this.load = true;
+                        continue;
+                      }
                     }
                   });
                 }
@@ -421,7 +452,10 @@ export class ReporteEstadosOTComponent implements OnInit {
                   this.bagProServices.srvObtenerListaClienteOT_Item(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo).subscribe(registros_OT => {
                     for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                       if (datos_dtAsgBOPP[j].estado_OrdenTrabajo == 16) this.llenarTablaAsignacionBOPP(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                      else continue;
+                      else {
+                        this.load = true;
+                        continue;
+                      }
                       break;
                     }
                   });
@@ -438,7 +472,10 @@ export class ReporteEstadosOTComponent implements OnInit {
                   this.bagProServices.srvObtenerListaClienteOT_Item(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo).subscribe(registros_OT => {
                     for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                       if (datos_dtAsgBOPP[j].estado_OrdenTrabajo == 17) this.llenarTablaAsignacionBOPP(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                      else continue;
+                      else {
+                        this.load = true;
+                        continue;
+                      }
                     }
                   });
                 }
@@ -454,7 +491,10 @@ export class ReporteEstadosOTComponent implements OnInit {
                   this.bagProServices.srvObtenerListaClienteOT_Item(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo).subscribe(registros_OT => {
                     for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                       if (datos_dtAsgBOPP[j].estado_OrdenTrabajo == 18) this.llenarTablaAsignacionBOPP(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                      else continue;
+                      else {
+                        this.load = true;
+                        continue;
+                      }
                     }
                   });
                 }
@@ -519,7 +559,10 @@ export class ReporteEstadosOTComponent implements OnInit {
             this.bagProServices.srvObtenerListaClienteOT_Item(datos_asignacion[i].asigMP_OrdenTrabajo).subscribe(registros_OT => {
               for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                 if (datos_asignacion[i].estado_OrdenTrabajo == 14) this.recorrerEncabezadoAsignacionesMatPrima(datos_asignacion[i].asigMP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                else continue;
+                else {
+                  this.load = true;
+                  continue;
+                }
               }
             });
           }
@@ -532,7 +575,10 @@ export class ReporteEstadosOTComponent implements OnInit {
                 this.bagProServices.srvObtenerListaClienteOT_Item(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo).subscribe(registros_OT => {
                   for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                     if (datos_dtAsgBOPP[j].estado_OrdenTrabajo == 14) this.llenarTablaAsignacionBOPP(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                    else continue;
+                    else {
+                      this.load = true;
+                      continue;
+                    }
                   }
                 });
               }
@@ -546,7 +592,10 @@ export class ReporteEstadosOTComponent implements OnInit {
             this.bagProServices.srvObtenerListaClienteOT_Item(datos_asignacion[i].asigMP_OrdenTrabajo).subscribe(registros_OT => {
               for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                 if (datos_asignacion[i].estado_OrdenTrabajo == 16) this.recorrerEncabezadoAsignacionesMatPrima(datos_asignacion[i].asigMP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                else continue;
+                else {
+                  this.load = true;
+                  continue;
+                }
                 break;
               }
             });
@@ -560,7 +609,10 @@ export class ReporteEstadosOTComponent implements OnInit {
                 this.bagProServices.srvObtenerListaClienteOT_Item(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo).subscribe(registros_OT => {
                   for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                     if (datos_dtAsgBOPP[j].estado_OrdenTrabajo == 16) this.llenarTablaAsignacionBOPP(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                    else continue;
+                    else {
+                      this.load = true;
+                      continue;
+                    }
                     break;
                   }
                 });
@@ -575,7 +627,10 @@ export class ReporteEstadosOTComponent implements OnInit {
             this.bagProServices.srvObtenerListaClienteOT_Item(datos_asignacion[i].asigMP_OrdenTrabajo).subscribe(registros_OT => {
               for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                 if (datos_asignacion[i].estado_OrdenTrabajo == 17) this.recorrerEncabezadoAsignacionesMatPrima(datos_asignacion[i].asigMP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                else continue;
+                else {
+                  this.load = true;
+                  continue;
+                }
               }
             });
           }
@@ -588,7 +643,10 @@ export class ReporteEstadosOTComponent implements OnInit {
                 this.bagProServices.srvObtenerListaClienteOT_Item(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo).subscribe(registros_OT => {
                   for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                     if (datos_dtAsgBOPP[j].estado_OrdenTrabajo == 17) this.llenarTablaAsignacionBOPP(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                    else continue;
+                    else {
+                      this.load = true;
+                      continue;
+                    }
                   }
                 });
               }
@@ -602,7 +660,10 @@ export class ReporteEstadosOTComponent implements OnInit {
             this.bagProServices.srvObtenerListaClienteOT_Item(datos_asignacion[i].asigMP_OrdenTrabajo).subscribe(registros_OT => {
               for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                 if (datos_asignacion[i].estado_OrdenTrabajo == 18) this.recorrerEncabezadoAsignacionesMatPrima(datos_asignacion[i].asigMP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                else continue;
+                else {
+                  this.load = true;
+                  continue;
+                }
               }
             });
           }
@@ -615,7 +676,10 @@ export class ReporteEstadosOTComponent implements OnInit {
                 this.bagProServices.srvObtenerListaClienteOT_Item(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo).subscribe(registros_OT => {
                   for (let bpro = 0; bpro < registros_OT.length; bpro++) {
                     if (datos_dtAsgBOPP[j].estado_OrdenTrabajo == 18) this.llenarTablaAsignacionBOPP(datos_dtAsgBOPP[j].dtAsigBOPP_OrdenTrabajo, registros_OT[bpro].fechaCrea);
-                    else continue;
+                    else {
+                      this.load = true;
+                      continue;
+                    }
                   }
                 });
               }
@@ -653,6 +717,7 @@ export class ReporteEstadosOTComponent implements OnInit {
 
   recorrerEncabezadoAsignacionesMatPrima(OT : any, fecha? : any){
     if (!this.OtConsultadas.includes(OT)) {
+      this.load = true;
       this.OtConsultadas.push(OT);
       this.asignacionService.srvObtenerListaPorOt(OT).subscribe(registrosAsignacionesMP => {
         if (registrosAsignacionesMP.length == 0) this.load = true;
@@ -698,6 +763,7 @@ export class ReporteEstadosOTComponent implements OnInit {
 
   llenarTablaAsignacionBOPP(Ot : any, fecha? : any){
     if (!this.OtConsultadasBOPP.includes(Ot)) {
+      this.load = true;
       this.OtConsultadasBOPP.push(Ot);
       this.detallesAsgBOPPService.srvObtenerListaPorOt(Ot).subscribe(datos_dtAsgBOPP => {
         if (datos_dtAsgBOPP.length == 0) this.load = true;
@@ -940,15 +1006,15 @@ export class ReporteEstadosOTComponent implements OnInit {
                       text: `\n \nObervación sobre la Asignación: \n \n`,
                       style: 'header',
                     },
-    
+
                     this.tableAsignacion(this.ArrayAsgOt, ['Id', 'Nombre', 'Cant', 'UndCant']),
-                    
+
                     {
                       text: `\nCantidad Asignada: ${this.formatonumeros(Math.round(this.cantidadKgTotalEntreagada))}`,
                       alignment: 'right',
                       style: 'header',
                     },
-    
+
                     '\n',
                     {
                       text: `\nCantidad Kg Producida: ${this.formatonumeros(Math.round(this.producidoEmpKg + this.producidoSellKg))}`,
@@ -990,7 +1056,7 @@ export class ReporteEstadosOTComponent implements OnInit {
       for (let i = 0; i < datos_ot.length; i++) {
         let FechaCreacionDatetime = datos_ot[i].fechaCrea;
         let FechacreacionNueva = FechaCreacionDatetime.indexOf("T");
-        let fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechacreacionNueva);        
+        let fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechacreacionNueva);
         this.detallesAsgBOPPService.srvObtenerListaPorOt(ot).subscribe(datos_dtAsgBOPP => {
           for (let j = 0; j < datos_dtAsgBOPP.length; j++) {
             this.estadosService.srvObtenerListaPorId(datos_dtAsgBOPP[j].estado_OrdenTrabajo).subscribe(datos_estados => {
@@ -1066,15 +1132,15 @@ export class ReporteEstadosOTComponent implements OnInit {
                           text: `\n \nObervación sobre la Asignación: \n \n`,
                           style: 'header',
                         },
-    
+
                         this.tableAsignacionBOPP(this.ArrayAsgOt, ['Id', 'Serial', 'Nombre']),
-                        
+
                         {
                           text: `\nCantidad Asignada: ${this.formatonumeros(Math.round(this.cantidadKgTotalEntreagada))}`,
                           alignment: 'right',
                           style: 'header',
                         },
-    
+
                         '\n',
                         {
                           text: `\nCantidad Producida: ${this.formatonumeros(Math.round(this.producidoEmpKg))}`,
@@ -1096,7 +1162,7 @@ export class ReporteEstadosOTComponent implements OnInit {
                     const pdf = pdfMake.createPdf(pdfDefinicion);
                     pdf.open();
                   }
-                });                
+                });
               }
             });
             break;
