@@ -110,44 +110,53 @@
       <div class="mb-4">
         <h4 class="tituloRojo">Tabla Pedido</h4>
       </div>
+
+      <div class="overlay" *ngIf="!load">
+        <div class="spinner ">
+          <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+        </div>
+      </div>
+
       <!-- TABLA DE PEDIDOS -->
-      <div class="mb-2">
-          <div class="row g-1">
-            <div class="table-responsive">
-              <div id="html2Pdf">
-              <table class="table table-bordered" *ngIf="pedidosProductos">
-                <thead class="TitulosTabla">
-                  <tr>
-                    <th id="idPedido" scope="col">ID</th>
-                    <th id="fechaPedido" scope="col">Fecha Pedido</th>
-                    <th id="fechaEntrega" scope="col">Fecha Entrega</th>
-                    <th id="sede" scope="col">Cliente</th>
-                    <th id="sedecliente" scope="col">Vendedor</th>
-                    <th id="estadoPedido" scope="col">Estado</th>
-                    <th id="precioPedido" scope="col"><button class="precios" (dblclick)="organizacionPrecioDblClick()" (click)="organizacionPrecio()"><b>Precio Total</b></button></th>
-                    <th id="archivoPedido" scope="col">Archivo</th>
-                    <th id="editarPedido" scope="col">Editar</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!--Carga los productos en la tabla y pagina por 2-->
-                  <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" >
-                    <td id="idPedido">{{item.pedExt_Id}}</td>
-                    <td id="fechaPedido">{{item.pedExt_FechaCreacion | date : 'yyyy-MM-dd'}}</td>
-                    <td id="fechaEntrega">{{item.pedExt_FechaEntrega | date : 'yyyy-MM-dd'}}</td>
-                    <td id="sede">{{item.sedeCli_Id}}</td>
-                    <td id="Vendedor">{{item.usua_Id}}</td>
-                    <td id="estadoPedido">{{item.estado_Id}}</td>
-                    <td id="precioPedido">{{item.pedExt_PrecioTotal | currency:'COP '}}</td>
-                    <td id="archivoPedido"><input class="btn btn-danger btn-danger-sm" type="button" (click)="llenarProductoPedido(item)" value="Ver"></td>
-                    <td id="Editar" ><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Pedido" (click)="MostrarPedido(item)"></i></a></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div class="mb-2">
-                  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                    <pagination-controls (pageChange)="page = $event"></pagination-controls>
-                  </div>
+      <div *ngIf="load">
+        <div class="mb-2">
+            <div class="row g-1">
+              <div class="table-responsive">
+                <div id="html2Pdf">
+                <table class="table table-bordered" *ngIf="pedidosProductos">
+                  <thead class="TitulosTabla">
+                    <tr>
+                      <th id="idPedido" scope="col">ID</th>
+                      <th id="fechaPedido" scope="col">Fecha Pedido</th>
+                      <th id="fechaEntrega" scope="col">Fecha Entrega</th>
+                      <th id="sede" scope="col">Cliente</th>
+                      <th id="sedecliente" scope="col">Vendedor</th>
+                      <th id="estadoPedido" scope="col">Estado</th>
+                      <th id="precioPedido" scope="col"><button class="precios" (dblclick)="organizacionPrecioDblClick()" (click)="organizacionPrecio()"><b>Precio Total</b></button></th>
+                      <th id="archivoPedido" scope="col">Archivo</th>
+                      <th id="editarPedido" scope="col">Editar</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!--Carga los productos en la tabla y pagina por 2-->
+                    <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" >
+                      <td id="idPedido">{{item.pedExt_Id}}</td>
+                      <td id="fechaPedido">{{item.pedExt_FechaCreacion | date : 'yyyy-MM-dd'}}</td>
+                      <td id="fechaEntrega">{{item.pedExt_FechaEntrega | date : 'yyyy-MM-dd'}}</td>
+                      <td id="sede">{{item.cli_Nombre}}</td>
+                      <td id="Vendedor">{{item.usua_Nombre}}</td>
+                      <td id="estadoPedido">{{item.estado_Nombre}}</td>
+                      <td id="precioPedido">{{item.pedExt_PrecioTotal | currency:'COP '}}</td>
+                      <td id="archivoPedido"><input class="btn btn-danger btn-danger-sm" type="button" (click)="llenarProductoPedido(item)" value="Ver"></td>
+                      <td id="Editar" ><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Pedido" (click)="MostrarPedido(item)"></i></a></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="mb-2">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                      <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                    </div>
+                </div>
               </div>
             </div>
           </div>

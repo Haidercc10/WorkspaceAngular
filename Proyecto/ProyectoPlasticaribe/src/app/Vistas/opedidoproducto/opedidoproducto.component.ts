@@ -116,6 +116,7 @@ export class OpedidoproductoComponent implements OnInit {
   enPedido : string = 'no'; //Variable que se usará para saber si el cliente se encuentra en una actualizacion de pedido o no
   pigmento : any = ''; //Variable que se usará para almacenar el pigmento del producto consultado o seleccionado
   material : any = ''; //Variable que se usará para almacenar el material del producto consultado o seleccionado
+  public load : boolean = true; //Variable que va a servir para mostrar o no la imagen de carga
 
   constructor(private pedidoproductoService : OpedidoproductoService,
     private productosServices : ProductoService,
@@ -200,7 +201,7 @@ export class OpedidoproductoComponent implements OnInit {
     this.lecturaStorage();
     this.usuarioComboBox();
     this.LimpiarCampos();
-    //this.limpiarCamposConsulta();
+    this.limpiarCamposConsulta();
     this.fecha();
   }
 
@@ -747,6 +748,7 @@ export class OpedidoproductoComponent implements OnInit {
 
   // Funcion para validar los campos vacios de las consultas
   validarCamposVaciosConsulta(){
+    this.load = false;
     this.fechaCreacionCortada = [];
     this.fechaEntregaCortada = [];
     let fechaPedido : any = this.FormConsultaPedidoExterno.value.PedExtFechaConsulta;
@@ -756,86 +758,15 @@ export class OpedidoproductoComponent implements OnInit {
     let nombreVendedor : string = this.FormConsultaPedidoExterno.value.PedExtUsuarioConsulta;
     let idCliente : number = this.FormConsultaPedidoExterno.value.PedExtIdClienteConsulta;
     let nombreCliente : string = this.FormConsultaPedidoExterno.value.PedExtClienteConsulta;
-    let idUsuario : number;
-    let idEstado : number;
-    let fechaCreacionFinal : any;
-    let fechaEntregaFinal : any;
 
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, todos (no es necesario que esten llenos los campos idCliente y nombreCliente, con uno vale)
     if (fechaPedido != null && fechaEntrega != null && estadoNombre != null && nombreVendedor != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-              for (let usua = 0; usua < datos_usuarios.length; usua++) {
-                if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-                  idUsuario = datos_usuarios[usua].usua_Id;
-
-                  if (idCliente != null) {
-                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                      for (let sede = 0; sede < datos_sedes.length; sede++) {
-                        if (datos_sedes[sede].cli_Id == idCliente) {
-                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                              let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                              let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                              fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                              let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                              let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                              fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                              if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                                moment(fechaCreacionFinal).isBetween(fechaPedido, fechaEntrega) &&
-                                moment(fechaEntregaFinal).isBetween(fechaPedido, fechaEntrega) &&
-                                datos_pedidos[ped].estado_Id == idEstado &&
-                                datos_pedidos[ped].usua_Id == idUsuario) {
-                                this.llenadoPedidos(datos_pedidos[ped]);
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  } else if (nombreCliente != null) {
-                    this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-                      for (let cli = 0; cli < datos_cliente.length; cli++) {
-                        if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-                          idCliente = datos_cliente[cli].cli_Id;
-                          this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                            for (let i = 0; i < datos_sedes.length; i++) {
-                              if (datos_sedes[i].cli_Id == idCliente) {
-                                this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                                  for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                                    let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                                    let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                                    fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                                    let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                                    let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                                    fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                                    if (moment(fechaCreacionFinal).isBetween(fechaPedido, fechaEntrega) &&
-                                      moment(fechaEntregaFinal).isBetween(fechaPedido, fechaEntrega) &&
-                                      datos_pedidos[ped].estado_Id == idEstado &&
-                                      datos_pedidos[ped].usua_Id == idUsuario &&
-                                      datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                                      this.llenadoPedidos(datos_pedidos[ped]);
-                                    }
-                                  }
-                                });
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  }
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListaFechasEstadoVendedor(fechaPedido, fechaEntrega, estadoNombre, nombreVendedor).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].cli_Nombre == nombreCliente || datos_pedidos[index].cli_Id == idCliente) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -843,68 +774,11 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, todos excepto el vendedor (no es necesario que esten llenos los campos idCliente y nombreCliente, con uno vale)
     else if (fechaPedido != null && fechaEntrega != null && estadoNombre != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            if (idCliente != null) {
-              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                for (let sede = 0; sede < datos_sedes.length; sede++) {
-                  if (datos_sedes[sede].cli_Id == idCliente) {
-                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                        let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                        let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                        fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                        let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                        let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                        fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                        if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                          moment(fechaCreacionFinal).isBetween(fechaPedido, fechaEntrega) &&
-                          moment(fechaEntregaFinal).isBetween(fechaPedido, fechaEntrega) &&
-                          datos_pedidos[ped].estado_Id == idEstado) {
-                          this.llenadoPedidos(datos_pedidos[ped]);
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            } else if (nombreCliente != null) {
-              this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-                for (let cli = 0; cli < datos_cliente.length; cli++) {
-                  if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-                    idCliente = datos_cliente[cli].cli_Id;
-                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                      for (let i = 0; i < datos_sedes.length; i++) {
-                        if (datos_sedes[i].cli_Id == idCliente) {
-                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                              let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                              let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                              fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                              let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                              let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                              fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                              if (moment(fechaCreacionFinal).isBetween(fechaPedido, fechaEntrega) &&
-                                moment(fechaEntregaFinal).isBetween(fechaPedido, fechaEntrega) &&
-                                datos_pedidos[ped].estado_Id == idEstado &&
-                                datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                                this.llenadoPedidos(datos_pedidos[ped]);
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            }
+      this.pedidoproductoService.srvObtenerListaFechasEstado(fechaPedido, fechaEntrega, estadoNombre).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].cli_Nombre == nombreCliente || datos_pedidos[index].cli_Id == idCliente) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -912,104 +786,21 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, todos excepto los campos idCliente y nombreCliente
     else if (fechaPedido != null && fechaEntrega != null && estadoNombre != null && nombreVendedor != null) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-              for (let usua = 0; usua < datos_usuarios.length; usua++) {
-                if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-                  idUsuario = datos_usuarios[usua].usua_Id;
-                  this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                    for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                      let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                      let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                      fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                      let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                      let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                      fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                      if (moment(fechaCreacionFinal).isBetween(fechaPedido, fechaEntrega) &&
-                        moment(fechaEntregaFinal).isBetween(fechaPedido, fechaEntrega) &&
-                        datos_pedidos[ped].estado_Id == idEstado &&
-                        datos_pedidos[ped].usua_Id == idUsuario) {
-                        this.llenadoPedidos(datos_pedidos[ped]);
-                      }
-                    }
-                  });
-                }
-              }
-            });
-          }
+      this.pedidoproductoService.srvObtenerListaFechasEstadoVendedor(fechaPedido, fechaEntrega, estadoNombre, nombreVendedor).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          this.pedidosProductos.push(datos_pedidos[index]);
+          this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
         }
       });
     }
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, todos exceptuando la fecha de entrega (no es necesario que esten llenos los campos idCliente y nombreCliente, con uno vale)
     else if (fechaPedido != null && estadoNombre != null && nombreVendedor != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-              for (let usua = 0; usua < datos_usuarios.length; usua++) {
-                if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-                  idUsuario = datos_usuarios[usua].usua_Id;
-
-                  if (idCliente != null) {
-                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                      for (let sede = 0; sede < datos_sedes.length; sede++) {
-                        if (datos_sedes[sede].cli_Id == idCliente) {
-                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                              let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                              let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                              fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                              if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                                moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
-                                datos_pedidos[ped].estado_Id == idEstado &&
-                                datos_pedidos[ped].usua_Id == idUsuario) {
-                                this.llenadoPedidos(datos_pedidos[ped]);
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  } else if (nombreCliente != null) {
-                    this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-                      for (let cli = 0; cli < datos_cliente.length; cli++) {
-                        if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-                          idCliente = datos_cliente[cli].cli_Id;
-                          this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                            for (let i = 0; i < datos_sedes.length; i++) {
-                              if (datos_sedes[i].cli_Id == idCliente) {
-                                this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                                  for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                                    let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                                    let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                                    fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                                    if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
-                                      datos_pedidos[ped].estado_Id == idEstado &&
-                                      datos_pedidos[ped].usua_Id == idUsuario &&
-                                      datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                                      this.llenadoPedidos(datos_pedidos[ped]);
-                                    }
-                                  }
-                                });
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  }
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListaFechaCreacionEstadoVendedor(fechaPedido, estadoNombre, nombreVendedor).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].cli_Nombre == nombreCliente || datos_pedidos[index].cli_Id == idCliente) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1017,68 +808,11 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, todos exceptuando la fecha de creacion (no es necesario que esten llenos los campos idCliente y nombreCliente, con uno vale)
     else if (fechaEntrega != null && estadoNombre != null && nombreVendedor != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-              for (let usua = 0; usua < datos_usuarios.length; usua++) {
-                if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-                  idUsuario = datos_usuarios[usua].usua_Id;
-
-                  if (idCliente != null) {
-                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                      for (let sede = 0; sede < datos_sedes.length; sede++) {
-                        if (datos_sedes[sede].cli_Id == idCliente) {
-                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                              let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                              let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                              fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                              if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                                moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
-                                datos_pedidos[ped].estado_Id == idEstado &&
-                                datos_pedidos[ped].usua_Id == idUsuario) {
-                                this.llenadoPedidos(datos_pedidos[ped]);
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  } else if (nombreCliente != null) {
-                    this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-                      for (let cli = 0; cli < datos_cliente.length; cli++) {
-                        if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-                          idCliente = datos_cliente[cli].cli_Id;
-                          this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                            for (let i = 0; i < datos_sedes.length; i++) {
-                              if (datos_sedes[i].cli_Id == idCliente) {
-                                this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                                  for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                                    let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                                    let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                                    fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                                    if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
-                                      datos_pedidos[ped].estado_Id == idEstado &&
-                                      datos_pedidos[ped].usua_Id == idUsuario &&
-                                      datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                                      this.llenadoPedidos(datos_pedidos[ped]);
-                                    }
-                                  }
-                                });
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  }
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListaFechaEntregaEstadoVendedor(fechaEntrega, estadoNombre, nombreVendedor).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].cli_Nombre == nombreCliente || datos_pedidos[index].cli_Id == idCliente) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1086,27 +820,11 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fechas y estado
     else if (fechaPedido != null && fechaEntrega != null && estadoNombre != null) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-              for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                if (moment(fechaCreacionFinal).isBetween(fechaPedido, fechaEntrega) &&
-                  moment(fechaEntregaFinal).isBetween(fechaPedido, fechaEntrega) &&
-                  datos_pedidos[ped].estado_Id == idEstado) {
-                  this.llenadoPedidos(datos_pedidos[ped]);
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListaFechas(fechaPedido, fechaEntrega).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].estado_Nombre == estadoNombre) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1114,87 +832,23 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fechas y cliente (no es necesario que esten llenos los campos idCliente y nombreCliente, con uno vale)
     else if (fechaPedido != null && fechaEntrega != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      if (idCliente != null) {
-        this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-          for (let sede = 0; sede < datos_sedes.length; sede++) {
-            if (datos_sedes[sede].cli_Id == idCliente) {
-              this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                  let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                  let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                  fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                  let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                  let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                  fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                  if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                    moment(fechaCreacionFinal).isBetween(fechaPedido, fechaEntrega) &&
-                    moment(fechaEntregaFinal).isBetween(fechaPedido, fechaEntrega) ) {
-                    this.llenadoPedidos(datos_pedidos[ped]);
-                  }
-                }
-              });
-            }
+      this.pedidoproductoService.srvObtenerListaFechas(fechaPedido, fechaEntrega).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].cli_Nombre == nombreCliente || datos_pedidos[index].cli_Id == idCliente) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
-        });
-      } else if (nombreCliente != null) {
-        this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-          for (let cli = 0; cli < datos_cliente.length; cli++) {
-            if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-              idCliente = datos_cliente[cli].cli_Id;
-              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                for (let i = 0; i < datos_sedes.length; i++) {
-                  if (datos_sedes[i].cli_Id == idCliente) {
-                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                        let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                        let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                        fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                        let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                        let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                        fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                        if (moment(fechaCreacionFinal).isBetween(fechaPedido, fechaEntrega) &&
-                          moment(fechaEntregaFinal).isBetween(fechaPedido, fechaEntrega) &&
-                          datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                          this.llenadoPedidos(datos_pedidos[ped]);
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            }
-          }
-        });
-      }
+        }
+      });
     }
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fechas y vendedor
     else if (fechaPedido != null && fechaEntrega != null && nombreVendedor != null) {
       this.pedidosProductos = [];
-      this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-        for (let usua = 0; usua < datos_usuarios.length; usua++) {
-          if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-            idUsuario = datos_usuarios[usua].usua_Id;
-            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-              for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                if ( moment(fechaCreacionFinal).isBetween(fechaPedido, fechaEntrega) &&
-                  moment(fechaEntregaFinal).isBetween(fechaPedido, fechaEntrega) &&
-                  datos_pedidos[ped].usua_Id == idUsuario) {
-                  this.llenadoPedidos(datos_pedidos[ped]);
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListaFechas(fechaPedido, fechaEntrega).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].usua_Nombre == nombreVendedor) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1202,58 +856,11 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha en que se hizo el pedido, estado y cliente
     else if (fechaPedido != null && estadoNombre != null && (idCliente != null || nombreCliente != null)){
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-
-            if (idCliente != null) {
-              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                for (let sede = 0; sede < datos_sedes.length; sede++) {
-                  if (datos_sedes[sede].cli_Id == idCliente) {
-                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                        let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                        let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                        fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-                        if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                          moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
-                          datos_pedidos[ped].estado_Id == idEstado) {
-                          this.llenadoPedidos(datos_pedidos[ped]);
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            } else if (nombreCliente != null) {
-              this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-                for (let cli = 0; cli < datos_cliente.length; cli++) {
-                  if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-                    idCliente = datos_cliente[cli].cli_Id;
-                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                      for (let i = 0; i < datos_sedes.length; i++) {
-                        if (datos_sedes[i].cli_Id == idCliente) {
-                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                              let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                              let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                              fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                              if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
-                                datos_pedidos[ped].estado_Id == idEstado &&
-                                datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                                this.llenadoPedidos(datos_pedidos[ped]);
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            }
+      this.pedidoproductoService.srvObtenerListaFechaCreacionEstado(fechaPedido, estadoNombre).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].cli_Nombre == nombreCliente || datos_pedidos[index].cli_Id == idCliente) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1261,30 +868,11 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha en que se hizo el pedido, estado y vendedor
     else if (fechaPedido != null && estadoNombre != null && nombreVendedor != null) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-              for (let usua = 0; usua < datos_usuarios.length; usua++) {
-                if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-                  idUsuario = datos_usuarios[usua].usua_Id;
-
-                  this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                    for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                      let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                      let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                      fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-                      if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
-                        datos_pedidos[ped].estado_Id == idEstado &&
-                        datos_pedidos[ped].usua_Id == idUsuario) {
-                        this.llenadoPedidos(datos_pedidos[ped]);
-                      }
-                    }
-                  });
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListaFechaCreacionUsuario(fechaPedido, nombreVendedor).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].estado_Nombre == estadoNombre) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1292,59 +880,11 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha en que se hizo el pedido, vendedor y cliente
     else if (fechaPedido != null && nombreVendedor != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-        for (let usua = 0; usua < datos_usuarios.length; usua++) {
-          if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-            idUsuario = datos_usuarios[usua].usua_Id;
-
-            if (idCliente != null) {
-              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                for (let sede = 0; sede < datos_sedes.length; sede++) {
-                  if (datos_sedes[sede].cli_Id == idCliente) {
-                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                        let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                        let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                        fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                        if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                          moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
-                          datos_pedidos[ped].usua_Id == idUsuario) {
-                          this.llenadoPedidos(datos_pedidos[ped]);
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            } else if (nombreCliente != null) {
-              this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-                for (let cli = 0; cli < datos_cliente.length; cli++) {
-                  if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-                    idCliente = datos_cliente[cli].cli_Id;
-                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                      for (let i = 0; i < datos_sedes.length; i++) {
-                        if (datos_sedes[i].cli_Id == idCliente) {
-                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                              let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                              let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                              fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                              if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
-                                datos_pedidos[ped].usua_Id == idUsuario &&
-                                datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                                this.llenadoPedidos(datos_pedidos[ped]);
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            }
+      this.pedidoproductoService.srvObtenerListaFechaCreacionUsuario(fechaPedido, nombreVendedor).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].cli_Nombre == nombreCliente || datos_pedidos[index].cli_Id == idCliente) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1352,58 +892,11 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha de entrega, estado y cliente
     else if (fechaEntrega != null && estadoNombre != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            if (idCliente != null) {
-              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                for (let sede = 0; sede < datos_sedes.length; sede++) {
-                  if (datos_sedes[sede].cli_Id == idCliente) {
-                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                        let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                        let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                        fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                        if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                          moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
-                          datos_pedidos[ped].estado_Id == idEstado) {
-                          this.llenadoPedidos(datos_pedidos[ped]);
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            } else if (nombreCliente != null) {
-              this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-                for (let cli = 0; cli < datos_cliente.length; cli++) {
-                  if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-                    idCliente = datos_cliente[cli].cli_Id;
-                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                      for (let i = 0; i < datos_sedes.length; i++) {
-                        if (datos_sedes[i].cli_Id == idCliente) {
-                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                              let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                              let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                              fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                              if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
-                                datos_pedidos[ped].estado_Id == idEstado &&
-                                datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                                this.llenadoPedidos(datos_pedidos[ped]);
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            }
+      this.pedidoproductoService.srvObtenerListaFechaEntregaEstado(fechaEntrega, estadoNombre).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].cli_Nombre == nombreCliente || datos_pedidos[index].cli_Id == idCliente) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1411,31 +904,11 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha de entrega, estado y vendedor
     else if (fechaEntrega != null && estadoNombre != null && nombreVendedor != null) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-              for (let usua = 0; usua < datos_usuarios.length; usua++) {
-                if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-                  idUsuario = datos_usuarios[usua].usua_Id;
-
-                  this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                    for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                      let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                      let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                      fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                      if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
-                        datos_pedidos[ped].estado_Id == idEstado &&
-                        datos_pedidos[ped].usua_Id == idUsuario) {
-                        this.llenadoPedidos(datos_pedidos[ped]);
-                      }
-                    }
-                  });
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListaFechaEntregaUsuario(fechaEntrega, nombreVendedor).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].estado_Nombre == estadoNombre) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1443,59 +916,11 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha de entrega, vendedor y cliente
     else if (fechaEntrega != null && nombreVendedor != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-        for (let usua = 0; usua < datos_usuarios.length; usua++) {
-          if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-            idUsuario = datos_usuarios[usua].usua_Id;
-
-            if (idCliente != null) {
-              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                for (let sede = 0; sede < datos_sedes.length; sede++) {
-                  if (datos_sedes[sede].cli_Id == idCliente) {
-                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                        let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                        let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                        fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                        if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                          moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
-                          datos_pedidos[ped].usua_Id == idUsuario) {
-                          this.llenadoPedidos(datos_pedidos[ped]);
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            } else if (nombreCliente != null) {
-              this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-                for (let cli = 0; cli < datos_cliente.length; cli++) {
-                  if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-                    idCliente = datos_cliente[cli].cli_Id;
-                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                      for (let i = 0; i < datos_sedes.length; i++) {
-                        if (datos_sedes[i].cli_Id == idCliente) {
-                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                              let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                              let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                              fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                              if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
-                                datos_pedidos[ped].usua_Id == idUsuario &&
-                                datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                                this.llenadoPedidos(datos_pedidos[ped]);
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            }
+      this.pedidoproductoService.srvObtenerListaFechaEntregaUsuario(fechaEntrega, nombreVendedor).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].cli_Id == idCliente || datos_pedidos[index].cli_Nombre == nombreCliente) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1503,58 +928,11 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, estado, vendedor y cliente
     else if (estadoNombre != null && nombreVendedor != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-              for (let usua = 0; usua < datos_usuarios.length; usua++) {
-                if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-                  idUsuario = datos_usuarios[usua].usua_Id;
-
-                  if (idCliente != null) {
-                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                      for (let sede = 0; sede < datos_sedes.length; sede++) {
-                        if (datos_sedes[sede].cli_Id == idCliente) {
-                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                              if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                                datos_pedidos[ped].estado_Id == idEstado &&
-                                datos_pedidos[ped].usua_Id == idUsuario) {
-                                this.llenadoPedidos(datos_pedidos[ped]);
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  } else if (nombreCliente != null) {
-                    this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-                      for (let cli = 0; cli < datos_cliente.length; cli++) {
-                        if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-                          idCliente = datos_cliente[cli].cli_Id;
-                          this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                            for (let i = 0; i < datos_sedes.length; i++) {
-                              if (datos_sedes[i].cli_Id == idCliente) {
-                                this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                                  for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                                    if (datos_pedidos[ped].estado_Id == idEstado &&
-                                      datos_pedidos[ped].usua_Id == idUsuario &&
-                                      datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                                      this.llenadoPedidos(datos_pedidos[ped]);
-                                    }
-                                  }
-                                });
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  }
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListaEstadoUsuario(estadoNombre, nombreVendedor).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].cli_Id == idCliente || datos_pedidos[index].cli_Nombre == nombreCliente) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1562,21 +940,11 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha del pedido y estado
     else if (fechaPedido != null && estadoNombre != null) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-              for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-                if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
-                  datos_pedidos[ped].estado_Id == idEstado) {
-                  this.llenadoPedidos(datos_pedidos[ped]);
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListaFechaCreacion(fechaPedido).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].estado_Nombre == estadoNombre) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1584,73 +952,23 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha del pedido y cliente
     else if (fechaPedido != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      if (idCliente != null) {
-        this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-          for (let sede = 0; sede < datos_sedes.length; sede++) {
-            if (datos_sedes[sede].cli_Id == idCliente) {
-              this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                  let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                  let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                  fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                  if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                    moment(fechaCreacionFinal).isBetween(fechaPedido, undefined)) {
-                    this.llenadoPedidos(datos_pedidos[ped]);
-                  }
-                }
-              });
-            }
+      this.pedidoproductoService.srvObtenerListaFechaCreacion(fechaPedido).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].cli_Id == idCliente || datos_pedidos[index].cli_Nombre == nombreCliente) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
-        });
-      } else if (nombreCliente != null) {
-        this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-          for (let cli = 0; cli < datos_cliente.length; cli++) {
-            if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-              idCliente = datos_cliente[cli].cli_Id;
-              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                for (let i = 0; i < datos_sedes.length; i++) {
-                  if (datos_sedes[i].cli_Id == idCliente) {
-                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                        let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                        let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                        fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                        if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
-                          datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                          this.llenadoPedidos(datos_pedidos[ped]);
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            }
-          }
-        });
-      }
+        }
+      });
     }
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha del pedido y vendedor
     else if (fechaPedido != null && nombreVendedor != null) {
       this.pedidosProductos = [];
-      this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-        for (let usua = 0; usua < datos_usuarios.length; usua++) {
-          if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-            idUsuario = datos_usuarios[usua].usua_Id;
-
-            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-              for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                let FechaCreacionDatetime = datos_pedidos[ped].pedExt_FechaCreacion;
-                let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-                fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-                if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined) &&
-                  datos_pedidos[ped].usua_Id == idUsuario) {
-                  this.llenadoPedidos(datos_pedidos[ped]);
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListaFechaCreacion(fechaPedido).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (nombreVendedor == datos_pedidos[index].usua_Nombre) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1658,41 +976,21 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará los pedidos por las fechas filtradas
     else if (fechaPedido !== null && fechaEntrega !== null) {
       this.pedidosProductos = [];
-      this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+      this.pedidoproductoService.srvObtenerListaFechas(fechaPedido, fechaEntrega).subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
-          let FechaCreacionDatetime = datos_pedidos[index].pedExt_FechaCreacion;
-          let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-          fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-
-          let FechaEntregaDatetime = datos_pedidos[index].pedExt_FechaEntrega;
-          let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-          fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-          if (moment(fechaCreacionFinal).isBetween(fechaPedido, fechaEntrega) && moment(fechaEntregaFinal).isBetween(fechaPedido, fechaEntrega)) {
-            this.llenadoPedidos(datos_pedidos[index]);
-          }
+          this.pedidosProductos.push(datos_pedidos[index]);
+          this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
         }
       });
     }
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha de entrga y estado
     else if (fechaEntrega != null && estadoNombre != null) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-              for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
-                  datos_pedidos[ped].estado_Id == idEstado) {
-                  this.llenadoPedidos(datos_pedidos[ped]);
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListaFechaEntrega(fechaEntrega).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].estado_Nombre == estadoNombre) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1700,74 +998,23 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha de entrga y cliente
     else if (fechaEntrega != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      if (idCliente != null) {
-        this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-          for (let sede = 0; sede < datos_sedes.length; sede++) {
-            if (datos_sedes[sede].cli_Id == idCliente) {
-              this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                  let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                  let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                  fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                  if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                    moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega)) {
-                    this.llenadoPedidos(datos_pedidos[ped]);
-                  }
-                }
-              });
-            }
+      this.pedidoproductoService.srvObtenerListaFechaEntrega(fechaEntrega).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (idCliente == datos_pedidos[index].cli_Id || nombreCliente == datos_pedidos[index].cli_Nombre) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
-        });
-      } else if (nombreCliente != null) {
-        this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-          for (let cli = 0; cli < datos_cliente.length; cli++) {
-            if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-              idCliente = datos_cliente[cli].cli_Id;
-              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                for (let i = 0; i < datos_sedes.length; i++) {
-                  if (datos_sedes[i].cli_Id == idCliente) {
-                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
-
-                        let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                        let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                        fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                        if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
-                          datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                          this.llenadoPedidos(datos_pedidos[ped]);
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            }
-          }
-        });
-      }
+        }
+      });
     }
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, fecha de entrga y vendedor
     else if (fechaEntrega != null && nombreVendedor != null) {
       this.pedidosProductos = [];
-      this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-        for (let usua = 0; usua < datos_usuarios.length; usua++) {
-          if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-            idUsuario = datos_usuarios[usua].usua_Id;
-
-            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-              for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                let FechaEntregaDatetime = datos_pedidos[ped].pedExt_FechaEntrega;
-                let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
-                if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega) &&
-                  datos_pedidos[ped].usua_Id == idUsuario) {
-                  this.llenadoPedidos(datos_pedidos[ped]);
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListaFechaEntrega(fechaEntrega).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].usua_Nombre == nombreVendedor) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1775,47 +1022,12 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, estado y cliente
     else if (estadoNombre != null && (idCliente != null || nombreCliente != null)) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            if (idCliente != null) {
-              this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                for (let sede = 0; sede < datos_sedes.length; sede++) {
-                  if (datos_sedes[sede].cli_Id == idCliente) {
-                    this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                      for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                        if (datos_pedidos[ped].sedeCli_Id == datos_sedes[sede].sedeCli_Id &&
-                          datos_pedidos[ped].estado_Id == idEstado) {
-                          this.llenadoPedidos(datos_pedidos[ped]);
-                        }
-                      }
-                    });
-                  }
-                }
-              });
-            } else if (nombreCliente != null) {
-              this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-                for (let cli = 0; cli < datos_cliente.length; cli++) {
-                  if (datos_cliente[cli].cli_Nombre == nombreCliente) {
-                    idCliente = datos_cliente[cli].cli_Id;
-                    this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-                      for (let i = 0; i < datos_sedes.length; i++) {
-                        if (datos_sedes[i].cli_Id == idCliente) {
-                          this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                            for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                              if (datos_pedidos[ped].estado_Id == idEstado &&
-                                datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) {
-                                this.llenadoPedidos(datos_pedidos[ped]);
-                              }
-                            }
-                          });
-                        }
-                      }
-                    });
-                  }
-                }
-              });
+      this.pedidoproductoService.srvObtenerListanombreEstado(estadoNombre).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].estado_Nombre == estadoNombre) {
+            if (nombreCliente == datos_pedidos[index].cli_Nombre || idCliente == datos_pedidos[index].cli_Id) {
+              this.pedidosProductos.push(datos_pedidos[index]);
+              this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
             }
           }
         }
@@ -1824,26 +1036,11 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará el o los pedidos que tengan los filtros que se le están pasando, es decir, estado y vendedor
     else if (estadoNombre != null && nombreVendedor != null) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-              for (let usua = 0; usua < datos_usuarios.length; usua++) {
-                if (datos_usuarios[usua].usua_Nombre == nombreVendedor) {
-                  idUsuario = datos_usuarios[usua].usua_Id;
-
-                  this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                    for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                      if (datos_pedidos[ped].estado_Id == idEstado &&
-                        datos_pedidos[ped].usua_Id == idUsuario) {
-                        this.llenadoPedidos(datos_pedidos[ped]);
-                      }
-                    }
-                  });
-                }
-              }
-            });
+      this.pedidoproductoService.srvObtenerListanomberVendeder(nombreVendedor).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          if (datos_pedidos[index].estado_Nombre == estadoNombre) {
+            this.pedidosProductos.push(datos_pedidos[index]);
+            this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
           }
         }
       });
@@ -1851,299 +1048,89 @@ export class OpedidoproductoComponent implements OnInit {
     //Buscará los pedidos con el estado que se digitó
     else if (estadoNombre !== null) {
       this.pedidosProductos = [];
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-        for (let index = 0; index < datos_estado.length; index++) {
-          if (datos_estado[index].estado_Nombre == estadoNombre) {
-            idEstado = datos_estado[index].estado_Id;
-            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-              for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                if (datos_pedidos[ped].estado_Id == idEstado)  this.llenadoPedidos(datos_pedidos[ped]);
-              }
-            });
-          }
+      this.pedidoproductoService.srvObtenerListanombreEstado(estadoNombre).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          this.pedidosProductos.push(datos_pedidos[index]);
+          this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
         }
       });
     }
     //Buscará el pedido por el ID que se digitó
     else if (idPedido !== null) {
       this.pedidosProductos = [];
-      this.pedidoproductoService.srvObtenerListaPorId(idPedido).subscribe(datos_pedidos => {
-        this.sedesClientesService.srvObtenerListaPorId(datos_pedidos.sedeCli_Id).subscribe(datos_sedes => {
-          this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
-            this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
-
-              let FechaCreacionDatetime = datos_pedidos.pedExt_FechaCreacion
-              let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T")
-              this.fechaCreacionCortada.push(FechaCreacionDatetime.substring(0, FechaCreacionNueva));
-
-              let FechaEntregaDatetime = datos_pedidos.pedExt_FechaEntrega;
-              let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-              this.fechaEntregaCortada.push(FechaEntregaDatetime.substring(0, FechaEntregaNueva));
-
-              if (datos_usuarios.rolUsu_Id == 2) {
-                if (datos_usuarios.usua_Nombre == this.storage_Nombre) {
-                  if (datos_pedidos.usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(datos_pedidos);
-                  else {
-                    const Toast = Swal.mixin({
-                      toast: true,
-                      position: 'center',
-                      showConfirmButton: false,
-                      timer: 1000,
-                      timerProgressBar: true,
-                      didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
-                      }
-                    })
-
-                    Toast.fire({
-                      icon: 'error',
-                      title: 'Usted no tiene acceso a este pedido'
-                    });
-                  }
-                }
-              } else if (datos_usuarios.rolUsu_Id == 1) this.pedidosProductos.push(datos_pedidos);
-
-              for (const item of this.pedidosProductos) {
-                this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-                  for (let index = 0; index < datos_estado.length; index++) {
-                    if (datos_estado[index].estado_Id == item.estado_Id) item.estado_Id = datos_estado[index].estado_Nombre;
-                  }
-                });
-              }
-              for (const vendedor of this.pedidosProductos) {
-                this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuario => {
-                  for (let index = 0; index < datos_usuario.length; index++) {
-                    if (datos_usuario[index].usua_Id == vendedor.usua_Id) vendedor.usua_Id = datos_usuario[index].usua_Nombre;
-                  }
-                });
-              }
-              for (const cliente of this.pedidosProductos) {
-                this.sedesClientesService.srvObtenerListaPorId(cliente.sedeCli_Id).subscribe(datos_sede => {
-                  this.clientesService.srvObtenerListaPorId(datos_sede.cli_Id).subscribe(datos_cliente => {
-                    cliente.sedeCli_Id = datos_cliente.cli_Nombre;
-                  });
-                });
-              }
-            });
-          });
-        });
-      }, error => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 1000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer);
-            toast.addEventListener('mouseleave', Swal.resumeTimer);
-          }
-        });
-        Toast.fire({
-          icon: 'error',
-          title: 'El pedido no existe'
-        });
+      this.pedidoproductoService.srvObtenerListaIDPedido(idPedido).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          this.pedidosProductos.push(datos_pedidos[index]);
+          this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
+        }
       });
-
     }
     //Buscará los pedidos del usuario que se ha seleccionado
     else if (nombreVendedor !== null){
       this.pedidosProductos = [];
-      this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-        for (let index = 0; index < datos_usuarios.length; index++) {
-          if (datos_usuarios[index].usua_Nombre == nombreVendedor) {
-            idUsuario = datos_usuarios[index].usua_Id;
-            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-              for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                if (datos_pedidos[ped].usua_Id == idUsuario) this.llenadoPedidos(datos_pedidos[ped]);
-              }
-            });
-          }
+      this.pedidoproductoService.srvObtenerListanomberVendeder(nombreVendedor).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          this.pedidosProductos.push(datos_pedidos[index]);
+          this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
         }
       });
     }
     //Buscará los pedidos del cliente que se buscó por su Id
     else if (idCliente !== null){
       this.pedidosProductos = [];
-      this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-        for (let index = 0; index < datos_sedes.length; index++) {
-          if (datos_sedes[index].cli_Id == idCliente) {
-            this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-              for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                if (datos_pedidos[ped].sedeCli_Id == datos_sedes[index].sedeCli_Id) this.llenadoPedidos(datos_pedidos[ped]);
-              }
-            })
-          }
+      this.pedidoproductoService.srvObtenerListaIdCliente(idCliente).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          this.pedidosProductos.push(datos_pedidos[index]);
+          this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
         }
       });
     }
     //Buscará los pedidos de los clientes por el que se seleccionó
     else if (nombreCliente !== null){
       this.pedidosProductos = [];
-      this.clientesService.srvObtenerLista().subscribe(datos_cliente => {
-        for (let index = 0; index < datos_cliente.length; index++) {
-          if (datos_cliente[index].cli_Nombre == nombreCliente) {
-            idCliente = datos_cliente[index].cli_Id;
-            this.sedesClientesService.srvObtenerLista().subscribe(datos_sedes => {
-              for (let i = 0; i < datos_sedes.length; i++) {
-                if (datos_sedes[i].cli_Id == idCliente) {
-                  this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
-                    for (let ped = 0; ped < datos_pedidos.length; ped++) {
-                      if (datos_pedidos[ped].sedeCli_Id == datos_sedes[i].sedeCli_Id) this.llenadoPedidos(datos_pedidos[ped]);
-                    }
-                  })
-                }
-              }
-            });
-          }
+      this.pedidoproductoService.srvObtenerListaNombreCliente(nombreCliente).subscribe(datos_pedidos => {
+        for (let index = 0; index < datos_pedidos.length; index++) {
+          this.pedidosProductos.push(datos_pedidos[index]);
+          this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
         }
       });
     }
     //Buscará los pedidos por la fecha que se selccionó, esta fecha será la fecha de creación del pedido
     else if (fechaPedido !== null) {
       this.pedidosProductos = [];
-      this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+      this.pedidoproductoService.srvObtenerListaFechaCreacion(fechaPedido).subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
-          let FechaCreacionDatetime = datos_pedidos[index].pedExt_FechaCreacion;
-          let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-          fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-          if (moment(fechaCreacionFinal).isBetween(fechaPedido, undefined)) {
-            this.llenadoPedidos(datos_pedidos[index]);
-          }
+          this.pedidosProductos.push(datos_pedidos[index]);
+          this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
         }
       });
     }
     //Buscará los pedidos por la fecha que se selccionó, esta fecha será la fecha de entrega del pedido
     else if (fechaEntrega !== null) {
       this.pedidosProductos = [];
-      this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+      this.pedidoproductoService.srvObtenerListaFechaEntrega(fechaEntrega).subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
-          let FechaEntregaDatetime = datos_pedidos[index].pedExt_FechaEntrega;
-          let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-          fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-          if (moment(fechaEntregaFinal).isBetween(undefined, fechaEntrega)) {
-            this.llenadoPedidos(datos_pedidos[index]);
-          }
+          this.pedidosProductos.push(datos_pedidos[index]);
+          this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
         }
       });
     }
     //Bucará todos los pedidos existentes
     else {
       this.pedidosProductos = [];
-      this.pedidoproductoService.srvObtenerListaPedidosProductos().subscribe(datos_pedidos => {
+      this.pedidoproductoService.srvObtenerListaPedidoExterno().subscribe(datos_pedidos => {
         for (let index = 0; index < datos_pedidos.length; index++) {
-
-          let FechaCreacionDatetime = datos_pedidos[index].pedExt_FechaCreacion
-          let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T")
-          this.fechaCreacionCortada.push(FechaCreacionDatetime.substring(0, FechaCreacionNueva));
-
-          let FechaEntregaDatetime = datos_pedidos[index].pedExt_FechaEntrega;
-          let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-          this.fechaEntregaCortada.push(FechaEntregaDatetime.substring(0, FechaEntregaNueva));
-
-          this.sedesClientesService.srvObtenerListaPorId(datos_pedidos[index].sedeCli_Id).subscribe(datos_sedes => {
-            this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
-              this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
-                if (datos_usuarios.rolUsu_Id == 2) {
-                  if (datos_usuarios.usua_Nombre == this.storage_Nombre) {
-                    if (datos_pedidos[index].usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(datos_pedidos[index]);
-                  }
-                } else if (datos_usuarios.rolUsu_Id == 1) this.pedidosProductos.push(datos_pedidos[index]);
-
-                for (const item of this.pedidosProductos) {
-                  this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-                    for (let index = 0; index < datos_estado.length; index++) {
-                      if (datos_estado[index].estado_Id == item.estado_Id) item.estado_Id = datos_estado[index].estado_Nombre;
-                    }
-                  });
-                }
-                for (const vendedor of this.pedidosProductos) {
-                  this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuario => {
-                    for (let index = 0; index < datos_usuario.length; index++) {
-                      if (datos_usuario[index].usua_Id == vendedor.usua_Id) vendedor.usua_Id = datos_usuario[index].usua_Nombre;
-                    }
-                  });
-                }
-                for (const cliente of this.pedidosProductos) {
-                  this.sedesClientesService.srvObtenerListaPorId(cliente.sedeCli_Id).subscribe(datos_sede => {
-                    this.clientesService.srvObtenerListaPorId(datos_sede.cli_Id).subscribe(datos_cliente => {
-                      cliente.sedeCli_Id = datos_cliente.cli_Nombre;
-                    });
-                  });
-                }
-                this.pedidosProductos.sort((a,b)=> Number(a.pedExt_Id) - Number(b.pedExt_Id));
-              });
-            });
-          });
+          if (this.ValidarRol == 2) {
+            if (datos_pedidos[index].usua_Nombre == this.storage_Nombre) this.pedidosProductos.push(datos_pedidos[index]);
+          } else if (this.ValidarRol == 1) this.pedidosProductos.push(datos_pedidos[index]);
+          this.pedidosProductos.sort((a,b)=> b.pedExt_FechaCreacion.localeCompare(a.pedExt_FechaCreacion));
         }
       });
     }
-  }
 
-  // Funcion que llenará la tabla de pedidos con la informacion que viene de la funcion "validarCamposVaciosConsulta"
-  llenadoPedidos(pedido : any){
-    this.sedesClientesService.srvObtenerListaPorId(pedido.sedeCli_Id).subscribe(datos_sedes => {
-      this.clientesService.srvObtenerListaPorId(datos_sedes.cli_Id).subscribe(datos_clientes => {
-        this.usuarioService.srvObtenerListaPorId(this.storage_Id).subscribe(datos_usuarios => {
-          let FechaCreacionDatetime = pedido.pedExt_FechaCreacion
-          let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T")
-          this.fechaCreacionCortada.push(FechaCreacionDatetime.substring(0, FechaCreacionNueva));
-
-          let FechaEntregaDatetime = pedido.pedExt_FechaEntrega;
-          let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-          this.fechaEntregaCortada.push(FechaEntregaDatetime.substring(0, FechaEntregaNueva));
-
-          if (datos_usuarios.rolUsu_Id == 2) {
-            if (datos_usuarios.usua_Nombre == this.storage_Nombre) {
-              if (pedido.usua_Id == datos_usuarios.usua_Id) this.pedidosProductos.push(pedido);
-              else {
-                const Toast = Swal.mixin({
-                  toast: true,
-                  position: 'center',
-                  showConfirmButton: false,
-                  timer: 1000,
-                  timerProgressBar: true,
-                  didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                  }
-                })
-
-                Toast.fire({
-                  icon: 'error',
-                  title: 'Usted no tiene acceso a este pedido'
-                });
-              }
-            }
-          } else if (datos_usuarios.rolUsu_Id == 1) this.pedidosProductos.push(pedido);
-
-          for (const item of this.pedidosProductos) {
-            this.estadosService.srvObtenerListaEstados().subscribe(datos_estado => {
-              for (let i = 0; i < datos_estado.length; i++) {
-                if (datos_estado[i].estado_Id == item.estado_Id) item.estado_Id = datos_estado[i].estado_Nombre;
-              }
-            });
-          }
-          for (const vendedor of this.pedidosProductos) {
-            this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuario => {
-              for (let i = 0; i < datos_usuario.length; i++) {
-                if (datos_usuario[i].usua_Id == vendedor.usua_Id) vendedor.usua_Id = datos_usuario[i].usua_Nombre;
-              }
-            });
-          }
-          for (const cliente of this.pedidosProductos) {
-            this.sedesClientesService.srvObtenerListaPorId(cliente.sedeCli_Id).subscribe(datos_sede => {
-              this.clientesService.srvObtenerListaPorId(datos_sede.cli_Id).subscribe(datos_cliente => {
-                cliente.sedeCli_Id = datos_cliente.cli_Nombre;
-              });
-            });
-          }
-          this.pedidosProductos.sort((a,b)=> Number(a.pedExt_Id) - Number(b.pedExt_Id));
-          this.pedidosProductos.sort((a,b)=> Number(a.pedExt_FechaCreacion) - Number(b.pedExt_FechaCreacion));
-        });
-      });
-    });
+    setTimeout(() => {
+      this.load = true;
+    }, 1500);
   }
 
   //Funcion que organiza los campos de la tabla de pedidos de mayor a menor

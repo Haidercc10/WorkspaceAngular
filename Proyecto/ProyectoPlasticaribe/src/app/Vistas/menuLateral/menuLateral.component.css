@@ -219,6 +219,11 @@ a, a:hover, a:focus {
   height: 150px;
 }
 
+.btn-close{
+  color: #fafafa;
+  margin-top: 10px;
+}
+
 .btn-close:hover{
   background-color: #ff5b68;
 }
@@ -238,10 +243,16 @@ mat-sidenav-content{
 
 .botonMenu :hover {
   color: #ff5b68;
+  cursor: pointer;
 }
 
 @media (max-width: 500px){
   .menu {
     height: 230px;
+  }
+
+  .btn-close{
+    color: #fafafa;
+    margin-left: 200px;
   }
 }
