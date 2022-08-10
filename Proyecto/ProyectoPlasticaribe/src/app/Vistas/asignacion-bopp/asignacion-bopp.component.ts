@@ -1,9 +1,7 @@
-import { NumberFormatStyle } from '@angular/common';
-import { ThisReceiver } from '@angular/compiler';
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Console } from 'console';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { AppComponent } from 'src/app/app.component';
 import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/detallesAsignacionBOPP.service';
@@ -46,14 +44,15 @@ export class AsignacionBOPPComponent implements OnInit {
   public historyHeading: string = 'Seleccionado Recientemente';
   validarInput : any;
 
-  constructor(private FormBuilderAsignacion : FormBuilder,
-                private FormBuilderBOPP : FormBuilder,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private rolService : RolesService,
-                      private boppService : EntradaBOPPService,
-                        private asignacionBOPPService : AsignacionBOPPService,
-                          private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,
-                            private bagProService : BagproService) {
+  constructor(private appComponent : AppComponent,
+                private FormBuilderAsignacion : FormBuilder,
+                  private FormBuilderBOPP : FormBuilder,
+                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                      private rolService : RolesService,
+                        private boppService : EntradaBOPPService,
+                          private asignacionBOPPService : AsignacionBOPPService,
+                            private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,
+                              private bagProService : BagproService) {
 
     this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
       AsgBopp_OT : ['', Validators.required],
@@ -68,14 +67,17 @@ export class AsignacionBOPPComponent implements OnInit {
       boppSerial: ['', Validators.required],
       boppStock: ['', Validators.required],
     });
+
     this.load = true;
     this.validarInput = true;
   }
 
   ngOnInit(): void {
-    this.fecha();
-    this.lecturaStorage();
-    this.obtenerBOPP();
+    if (this.storage.get('Rol') === 1 || this.storage.get('Rol') === 4) {
+      this.fecha();
+      this.lecturaStorage();
+      this.obtenerBOPP();
+    } else window.location.href = "./home";
   }
 
   onChangeSearch(val: string) {

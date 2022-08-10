@@ -76,7 +76,7 @@ export class AsignacionTintasComponent implements OnInit {
     this.obtenerUnidadesMedida();
     this.obtenerTintas();
   }
-  
+
   onChangeSearchTinta(val: string) {
     if (val != '') this.validarInputTintas = false;
     else this.validarInputTintas = true;
@@ -90,7 +90,6 @@ export class AsignacionTintasComponent implements OnInit {
     // do something when input is focused
   }
 
-    
   onChangeSearchMp(val: string) {
     if (val != '') this.validarInputMp = false;
     else this.validarInputMp = true;

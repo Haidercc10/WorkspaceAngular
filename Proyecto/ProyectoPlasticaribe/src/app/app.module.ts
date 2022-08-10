@@ -59,7 +59,6 @@ import { AsignacionBOPP_TEMPORALComponent } from './Vistas/asignacionBOPP_TEMPOR
 import { ModalEditarAsignacionesBOPPComponent } from './Vistas/modal-editar-asignaciones-bopp/modal-editar-asignaciones-bopp.component';
 import { ModalGenerarInventarioZeusComponent } from './Vistas/modal-generar-inventario-zeus/modal-generar-inventario-zeus.component';
 import { FiltrosProductosTerminadosZeusPipe } from './Pipes/filtros-productos-terminados-zeus.pipe';
-import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { FiltroNombreClientePTPipe } from './Pipes/filtro-nombre-cliente-pt.pipe';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import {AutocompleteLibModule} from 'angular-ng-autocomplete';
@@ -111,7 +110,6 @@ export const routes: Routes = [
   {path: 'inventario-productos-terminados', canActivate: [ValidacionLoginGuard], component: ModalGenerarInventarioZeusComponent},
   {path: 'reporte-estados-ot', canActivate: [ValidacionLoginGuard], component: ReporteEstadosOTComponent},
   {path: 'menu-lateral', canActivate: [ValidacionLoginGuard], component: MenuLateralComponent},
-
 ]
 
 @NgModule({
@@ -182,7 +180,6 @@ export const routes: Routes = [
     MatNativeDateModule,
     MaterialExampleModule,
     NgxMatSelectSearchModule,
-    // Ng2SearchPipeModule,
     AutocompleteLibModule,
   ],
 

@@ -87,7 +87,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let prodZeus of ArrayProductoZeus | filtrosProductosTerminadosZeus: NombrePT | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
+                <tr *ngFor="let prodZeus of ArrayProductoZeus | filtrosProductosTerminadosZeus: NombrePT | filtroNombreClientePT: NombreCliente | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
                   <th id="id" class="TextosInfoTabla">{{prodZeus.codigoItem}}</th>
                   <td id="nombre" class="TextosInfoTabla">{{prodZeus.nombreItem}}</td>
                   <td id="existencias" class="TextosInfoTabla2">{{prodZeus.cantidadItem | number }}</td>

@@ -194,22 +194,24 @@ export class OpedidoproductoComponent implements OnInit {
 
   //Cargar al iniciar.
   ngOnInit(): void {
-    this.clientesComboBox();
-    this.estadoComboBox();
-    this.estadoComboBoxConsulta();
-    this.undMedidaComboBox();
-    this.obtenerEmpresa();
-    this.ObtenerUltimoPedido();
-    this.tipoProductoComboBox();
-    this.matrialProductoComboBox();
-    this.pigmentoProductocomboBox();
-    this.tipoMonedaComboBox();
-    this.ColumnasTabla();
-    this.lecturaStorage();
-    this.usuarioComboBox();
-    this.LimpiarCampos();
-    this.limpiarCamposConsulta();
-    this.fecha();
+    if (this.storage.get('Rol') == 1 || this.storage.get('Rol') == 2) {
+      this.clientesComboBox();
+      this.estadoComboBox();
+      this.estadoComboBoxConsulta();
+      this.undMedidaComboBox();
+      this.obtenerEmpresa();
+      this.ObtenerUltimoPedido();
+      this.tipoProductoComboBox();
+      this.matrialProductoComboBox();
+      this.pigmentoProductocomboBox();
+      this.tipoMonedaComboBox();
+      this.ColumnasTabla();
+      this.lecturaStorage();
+      this.usuarioComboBox();
+      this.LimpiarCampos();
+      this.limpiarCamposConsulta();
+      this.fecha();
+    } else window.location.href = "./home";
   }
 
   selectEventClienteConsulta(item) {

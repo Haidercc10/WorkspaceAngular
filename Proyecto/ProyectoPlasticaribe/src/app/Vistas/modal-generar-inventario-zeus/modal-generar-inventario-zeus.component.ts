@@ -119,6 +119,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
   /**Función para generar inventario de productos con más de 1.0 de existencias en Zeus y BagPro. */
   InventarioExistenciaZeus(){
+    this.load = false;
     this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datosExistencias => {
       for (let exi = 0; exi < datosExistencias.length; exi++) {
         this.datosCodigo = datosExistencias[exi].codigo;
@@ -140,6 +141,10 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         });
       }
     });
+
+    setTimeout(() => {
+      this.load = true;
+    }, 2000);
   }
 
   /** Organiza el inventario de PT por existencias de mayor a menor. */
