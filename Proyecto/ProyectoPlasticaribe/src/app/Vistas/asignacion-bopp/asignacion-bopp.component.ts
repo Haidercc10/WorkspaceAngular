@@ -162,6 +162,13 @@ export class AsignacionBOPPComponent implements OnInit {
                 }
                 this.ordenesTrabajo.push(infoOT);
                 this.cantidadKG = item.datosotKg + this.cantidadKG;
+                this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
+                  AsgBopp_OT : '',
+                  AsgBopp_Ancho : 0,
+                  AsgBopp_Fecha : this.today,
+                  AsgBopp_Observacion: '',
+                  AsgBopp_Estado: '',
+                });
                 this.load = true;
               } else Swal.fire(`¡No se le puede asignar material a la OT ${ordenTrabajo}, ya se le ha asignado la cantidad máxima!`)
             }, 900);
@@ -195,6 +202,13 @@ export class AsignacionBOPPComponent implements OnInit {
                   }
                   this.ordenesTrabajo.push(infoOT);
                   this.cantidadKG = itemOT.datosotKg + this.cantidadKG;
+                  this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
+                    AsgBopp_OT : '',
+                    AsgBopp_Ancho : 0,
+                    AsgBopp_Fecha : this.today,
+                    AsgBopp_Observacion: '',
+                    AsgBopp_Estado: '',
+                  });
                   this.load = true;
                 } else Swal.fire(`¡No se le puede asignar material a la OT ${ordenTrabajo}, ya se le ha asignado la cantidad máxima!`)
               }, 1200);
@@ -207,7 +221,6 @@ export class AsignacionBOPPComponent implements OnInit {
         this.load = true;
       }
     }
-
   }
 
   quitarBOPP(index : number, formulario : any){

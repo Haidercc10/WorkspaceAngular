@@ -49,14 +49,30 @@
       <label for="floatingSelect">Tipo Cliente</label>
     </div>
 
-      <!-- ID/Nombre Usuario -->
-    <div class="form-floating col-md-4">
-      <select formControlName="UsuIdNombre" type="text" id="usuarioIdNombre" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-        <!-- <option [ngValue]="null" disabled selected>Usuario Vendedor</option> -->
-        <option [ngValue]="usuarios" *ngFor="let usuarios of usuario">{{usuarios}}</option>
-      </select>
-      <label for="floatingSelect">Usuario Vendedor</label>
-    </div>
+    <!-- ID/Nombre Usuario -->
+    <ng-container>
+      <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm vendedorAutoComplete">
+        <ng-autocomplete
+          class=""
+          [data]="usuario"
+          (selected)='selectEventVendedor($event)'
+          (inputChanged)='onChangeSearchVendedor($event)'
+          (inputFocused)='onFocusedVendedor($event)'
+          [searchKeyword]="keywordVendedor"
+          [itemTemplate]="itemTemplateVendedorConsulta"
+          [notFoundTemplate]="notFoundTemplate"
+          id="floatingInput"
+          formControlName="UsuIdNombre">
+        </ng-autocomplete>
+        <ng-template #itemTemplateVendedorConsulta let-item>
+          <a [innerHTML]="item.usua_Nombre"></a>
+        </ng-template>
+        <ng-template #notFoundTemplate let-notFound>
+          <div [innerHTML]="notFound"></div>
+        </ng-template>
+        <label for="floatingInput" *ngIf="validarInputVendedor">Nombre Vendedor</label>
+      </div>
+    </ng-container>
   </div>
 
   <div class="mb-3">
@@ -66,15 +82,14 @@
     </div>
   </div>
 </form>
-  <div class="mb-4">
-    <hr>
-  </div>
+<div class="mb-4">
+  <hr>
+</div>
 
-  <div class="mb-4">
-    <h5 class="tituloRojo">Crear sedes a clientes</h5>
-  </div>
-  <!--Inicio formulario crear sede cliente -->
-
+<div class="mb-4">
+  <h5 class="tituloRojo">Crear sedes a clientes</h5>
+</div>
+<!--Inicio formulario crear sede cliente -->
 
 <form [formGroup]="FormCrearSedeClientes" (ngSubmit)="validarCamposVaciosSedes()">
   <!-- Inicio Fila 1 Crear sede cliente -->

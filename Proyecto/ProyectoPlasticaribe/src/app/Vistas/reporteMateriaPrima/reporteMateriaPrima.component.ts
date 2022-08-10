@@ -4779,37 +4779,39 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         setTimeout(() => {
           this.boppService.srvObtenerLista().subscribe(datos_bopp => {
             for (let i = 0; i < datos_bopp.length; i++) {
-              this.categoriaBOPP = 'BOPP';
-              this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
-                this.sumaSalida = 0;
-                this.sumaEntrada = 0;
-                this.inventInicial = 0;
-                for (const item of bopp_Saliente) {
-                  if (datos_bopp[i].bopP_Id == item.materiaPrima) {
-                    this.sumaSalida = this.sumaSalida + item.cantidad;
+              if (datos_bopp[i].bopP_Stock > 0) {
+                this.categoriaBOPP = 'BOPP';
+                this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
+                  this.sumaSalida = 0;
+                  this.sumaEntrada = 0;
+                  this.inventInicial = 0;
+                  for (const item of bopp_Saliente) {
+                    if (datos_bopp[i].bopP_Id == item.materiaPrima) {
+                      this.sumaSalida = this.sumaSalida + item.cantidad;
+                    }
                   }
-                }
 
-                for (const item of bopp_entrante) {
-                  if (datos_bopp[i].bopP_Id == item.materiaPrima) {
-                    this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                  for (const item of bopp_entrante) {
+                    if (datos_bopp[i].bopP_Id == item.materiaPrima) {
+                      this.sumaEntrada = this.sumaEntrada + item.cantidad;
+                    }
                   }
-                }
 
-                this.inventInicial = 0;
+                  this.inventInicial = 0;
 
-                this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
-                  datos_bopp[i].bopP_Serial,
-                  datos_bopp[i].bopP_Descripcion, /** Descripcion en vez de nombre */
-                  datos_bopp[i].bopP_Precio,
-                  datos_bopp[i].bopP_CantidadInicialKg,
-                  this.sumaEntrada,
-                  this.sumaSalida,
-                  datos_bopp[i].bopP_Stock,
-                  "Kg",
-                  datos_categoria.catMP_Nombre,
-                  datos_bopp[i].bopP_Ancho);
-              });
+                  this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                    datos_bopp[i].bopP_Serial,
+                    datos_bopp[i].bopP_Descripcion, /** Descripcion en vez de nombre */
+                    datos_bopp[i].bopP_Precio,
+                    datos_bopp[i].bopP_CantidadInicialKg,
+                    this.sumaEntrada,
+                    this.sumaSalida,
+                    datos_bopp[i].bopP_Stock,
+                    "Kg",
+                    datos_categoria.catMP_Nombre,
+                    datos_bopp[i].bopP_Ancho);
+                });
+              } else continue;
             }
           });
         }, 2000);
@@ -4979,35 +4981,37 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
         this.boppService.srvObtenerListaAgrupada().subscribe(datos_bopp => {
           for (let i = 0; i < datos_bopp.length; i++) {
-            this.categoriaBOPP = 'BOPP';
-            this.sumaSalida = 0;
-            this.sumaEntrada = 0;
-            this.inventInicial = 0;
-            for (const item of bopp_Saliente) {
-              if (datos_bopp[i].bopP_Id == item.materiaPrima) {
-                this.sumaSalida = this.sumaSalida + item.cantidad;
+            if (datos_bopp[i].sumaKilosActual > 0) {
+              this.categoriaBOPP = 'BOPP';
+              this.sumaSalida = 0;
+              this.sumaEntrada = 0;
+              this.inventInicial = 0;
+              for (const item of bopp_Saliente) {
+                if (datos_bopp[i].bopP_Id == item.materiaPrima) {
+                  this.sumaSalida = this.sumaSalida + item.cantidad;
+                }
               }
-            }
 
-            for (const item of bopp_entrante) {
-              if (datos_bopp[i].bopP_Id == item.materiaPrima) {
-                this.sumaEntrada = this.sumaEntrada + + item.cantidad;
+              for (const item of bopp_entrante) {
+                if (datos_bopp[i].bopP_Id == item.materiaPrima) {
+                  this.sumaEntrada = this.sumaEntrada + + item.cantidad;
+                }
               }
-            }
 
-            this.inventInicial = 0;
+              this.inventInicial = 0;
 
-            this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
-              datos_bopp[i].conteoDescripcion,
-              datos_bopp[i].bopP_Descripcion, /** Descripcion en vez de nombre */
-              (datos_bopp[i].sumaPrecio / datos_bopp[i].conteoDescripcion),
-              datos_bopp[i].sumaKilosIngresados,
-              this.sumaEntrada,
-              this.sumaSalida,
-              datos_bopp[i].sumaKilosActual,
-              "Kg",
-              'BOPP',
-              datos_bopp[i].bopP_Ancho);
+              this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                datos_bopp[i].conteoDescripcion,
+                datos_bopp[i].bopP_Descripcion, /** Descripcion en vez de nombre */
+                (datos_bopp[i].sumaPrecio / datos_bopp[i].conteoDescripcion),
+                datos_bopp[i].sumaKilosIngresados,
+                this.sumaEntrada,
+                this.sumaSalida,
+                datos_bopp[i].sumaKilosActual,
+                "Kg",
+                'BOPP',
+                datos_bopp[i].bopP_Ancho);
+            } else continue;
           }
         });
 

@@ -22,6 +22,14 @@ export class ClientesService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Clientes/${id}`);
   }
 
+  srvObtenerListaPorEstado(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Clientes/estadoId/${id}`);
+  }
+
+  srvObtenerListaPorNombreCliente(nombre : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Clientes/nombreCliente/${nombre}`);
+  }
+
   //Metodo agregar Productos
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Clientes', data)

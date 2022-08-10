@@ -22,6 +22,11 @@ export class MaterialProductoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Material_MatPrima/${id}`);
   }
 
+  srvObtenerListaPorNombreMaterial(nombre : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Material_MatPrima/nombreMaterial/${nombre}`);
+  }
+
+
   //Metodo agregar Materiales
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Material_MatPrima', data)

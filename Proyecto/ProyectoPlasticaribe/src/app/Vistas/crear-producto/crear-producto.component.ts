@@ -1,7 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ProductoService } from 'src/app/Servicios/producto.service';
-import { SrvModalCrearProductosService } from 'src/app/Servicios/srv-modal-crear-productos.service';
 import { TipoMonedaService } from 'src/app/Servicios/tipo-moneda.service';
 import { TipoProductoService } from 'src/app/Servicios/tipo-producto.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
@@ -14,6 +13,10 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { MaterialProductoService } from 'src/app/Servicios/materialProducto.service';
 import { PigmentoProductoService } from 'src/app/Servicios/pigmentoProducto.service';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-crear-producto',
@@ -37,6 +40,8 @@ export class CrearProductoComponent implements OnInit {
   storage_Id : number;
   storage_Nombre : any;
   storage_Rol : any;
+  validarInputClientes : any = true;
+  keywordClientes = 'cli_Nombre';
 
   constructor(private frmBuilderCrearProducto : FormBuilder,
                 private unidadMedidaService : UnidadMedidaService,
@@ -52,35 +57,54 @@ export class CrearProductoComponent implements OnInit {
                                   private materialService : MaterialProductoService,
                                     private pigmentoServices : PigmentoProductoService) {
 
-    this.FormCrearProducto = this.frmBuilderCrearProducto.group({
-
-      //Instanciar campos que vienen del formulario
-      ProduId: new FormControl(),
-      ProduNombre: new FormControl(),
-      ProduAncho: new FormControl(),
-      ProduFuelle: new FormControl(),
-      ProduCalibre: new FormControl(),
-      ProduLargo : new FormControl(),
-      ProduUnidadMedidaACF: new FormControl(),
-      ProduTipo: new FormControl(),
-      ProduMaterial: new FormControl(),
-      ProduPigmento: new FormControl(),
-      ProdDescripcion: new FormControl(),
-      ClienteNombre: new FormControl(),
+  this.FormCrearProducto = this.frmBuilderCrearProducto.group({
+    //Datos para la tabla de productos. (Iguala el valor del campo en la vista)
+      ProduId:['', Validators.required],
+      ProduNombre: ['', Validators.required],
+      ProduAncho: ['', Validators.required],
+      ProduFuelle: ['', Validators.required],
+      ProduCalibre: ['', Validators.required],
+      ProduLargo : ['', Validators.required],
+      ProduUnidadMedidaACF: ['', Validators.required],
+      ProduTipo: ['', Validators.required],
+      ProduMaterial: ['', Validators.required],
+      ProduPigmento: ['', Validators.required],
+      ProdDescripcion: ['',],
+      ClienteNombre: [null, Validators.required],
     });
 
     this.FormCrearPresentacionProducto = this.frmBuilderCrearProducto.group({
-      ProdId: new FormControl(),
-      ProduCantidad: new FormControl(),
-      ProduUnidadMedidaCant: new FormControl(),
-      ProduPrecioUnd: new FormControl(),
-      ProduTipoMoneda: new FormControl(),
+    //Datos para la tabla de productos. (Iguala el valor del campo en la vista)
+      ProdId:['', Validators.required],
+      ProduCantidad: [0, Validators.required],
+      ProduUnidadMedidaCant: ['', Validators.required],
+      ProduPrecioUnd: ['', Validators.required],
+      ProduTipoMoneda: ['', Validators.required],
     });
+  }
 
+  onChangeSearchNombreCliente(val: string) {
+    if (val != '') this.validarInputClientes = false;
+    else this.validarInputClientes = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocusedNombreCliente(e){
+    if (!e.isTrusted) this.validarInputClientes = false;
+    else this.validarInputClientes = true;
+    if (this.FormCrearProducto.value.ClienteNombre != null) this.validarInputClientes = false;
+    else this.validarInputClientes = true;
+    // do something when input is focused
+  }
+
+  selectEventNombreCliente(item) {
+    if (this.FormCrearProducto.value.ClienteNombre != null) this.validarInputClientes = false;
+    else this.validarInputClientes = true;
+    // do something with selected item
   }
 
   ngOnInit(): void {
-    this.initFormsCrearProducto
     this.undMedidaComboBox();
     this.tipoProductoComboBox();
     this.matrialProductoComboBox();
@@ -90,43 +114,13 @@ export class CrearProductoComponent implements OnInit {
     this.clientesComboBox();
   }
 
-  initFormsCrearProducto() {
-    //Campos que vienen del formulario
-    this.FormCrearProducto = this.frmBuilderCrearProducto.group({
-      //Datos para la tabla de productos. (Iguala el valor del campo en la vista)
-       ProduId:['', Validators.required],
-       ProduNombre: ['', Validators.required],
-       ProduAncho: ['', Validators.required],
-       ProduFuelle: ['', Validators.required],
-       ProduCalibre: ['', Validators.required],
-       ProduLargo : ['', Validators.required],
-       ProduUnidadMedidaACF: ['', Validators.required],
-       ProduTipo: ['', Validators.required],
-       ProduMaterial: ['', Validators.required],
-       ProduPigmento: ['', Validators.required],
-       ProdDescripcion: ['',],
-       ClienteNombre: ['', Validators.required],
-     });
-
-     this.FormCrearPresentacionProducto = this.frmBuilderCrearProducto.group({
-      //Datos para la tabla de productos. (Iguala el valor del campo en la vista)
-       ProdId:['', Validators.required],
-       ProduCantidad: ['', Validators.required],
-       ProduUnidadMedidaCant: ['', Validators.required],
-       ProduPrecioUnd: ['', Validators.required],
-       ProduTipoMoneda: ['', Validators.required],
-     });
-  }
-
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
     let rol = this.storage.get('Rol');
     this.rolService.srvObtenerLista().subscribe(datos_roles => {
       for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }
+        if (datos_roles[index].rolUsu_Id == rol) this.storage_Rol = datos_roles[index].rolUsu_Nombre;
       }
     });
   }
@@ -151,20 +145,17 @@ export class CrearProductoComponent implements OnInit {
 
   clientesComboBox() {
     this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
-      this.clientesService.srvObtenerLista().subscribe(datos_clientes => {
+      this.clientesService.srvObtenerListaPorEstado(1).subscribe(datos_clientes => {
         for (let index = 0; index < datos_clientes.length; index++) {
-          if (datos_clientes[index].estado_Id == 1) {
-            if (datos_usuarios.rolUsu_Id == 2) {
-              if (datos_clientes[index].usua_Id == datos_usuarios.usua_Id) {
-                this.cliente.push(datos_clientes[index].cli_Nombre);
-                this.clienteDatos.push(datos_clientes[index]);
-                continue;
-              }
-            }else {
-              this.cliente.push(datos_clientes[index].cli_Nombre);
-              this.clienteDatos.push(datos_clientes[index]);
-            }
+          if (datos_usuarios.rolUsu_Id == 2) {
+            this.cliente.push(datos_clientes[index]);
+            this.clienteDatos.push(datos_clientes[index]);
+            continue;
+          }else {
+            this.cliente.push(datos_clientes[index]);
+            this.clienteDatos.push(datos_clientes[index]);
           }
+          this.cliente.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
         }
       });
     });
@@ -229,7 +220,7 @@ export class CrearProductoComponent implements OnInit {
     let precioFinal : string = this.FormCrearProducto.value.ProduPrecioUnd;
     let moneda : any = this.FormCrearProducto.value.ProduTipoMoneda;
     let descripcion : any = this.FormCrearProducto.value.ProdDescripcion;
-    let cliente : any = this.FormCrearProducto.value.ClienteNombre;
+    let cliente : any = this.FormCrearProducto.value.ClienteNombre.cli_Nombre;
 
     this.pedidosProducto.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, largo, undMed, tpProducto, material, pigmento, cantidad, undMed2, precio, moneda, descripcion);
     this.pedidosProducto.registrarProducto(id, nombre, ancho, fuelle, calibre, largo, undMed, tpProducto, material, pigmento, descripcion, cliente);
@@ -246,6 +237,5 @@ export class CrearProductoComponent implements OnInit {
     this.pedidosProducto.registrarExistenciaProducto(id, cantidad, undMed2, precio, precioFinal, moneda);
     this.LimpiarCamposPresentacion();
   }
-
 
 }

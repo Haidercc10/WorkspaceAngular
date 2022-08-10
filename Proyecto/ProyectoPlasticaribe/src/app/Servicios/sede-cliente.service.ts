@@ -15,13 +15,23 @@ export class SedeClienteService {
 
   //Metodo buscar lista de Productos
   srvObtenerLista():Observable<any[]> {
-
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/SedesClientes')
-
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/SedesClientes');
   }
 
   srvObtenerListaPorId(id : number){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/${id}`);
+  }
+
+  srvObtenerListaPorCliente(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/cliente/${id}`);
+  }
+
+  srvObtenerListaPorNombreCliente(nombre : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/clienteNombre/${nombre}`);
+  }
+
+  srvObtenerListaPorClienteSede(cliente : any, ciudad : any, direccion : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/clienteSede/${cliente}/${ciudad}/${direccion}`);
   }
 
   //Metodo agregar Productos

@@ -24,6 +24,10 @@ export class EstadosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estadoes/${id}`)
   }
 
+  srvObtenerListaPorNombreEstado(nombre : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estadoes/nombreEstado/${nombre}`)
+  }
+
 //Metodo agregar Usuario
   srvAgregarEstado(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Estadoes', data)

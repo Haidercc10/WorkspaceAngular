@@ -23,6 +23,10 @@ export class PigmentoProductoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Pigmentoes/${id}`);
   }
 
+  srvObtenerListaPorNombrePigmento(nombre : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Pigmentoes/nombrePigmento/${nombre}`);
+  }
+
   //Metodo agregar Pigmentos
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Pigmentoes', data)

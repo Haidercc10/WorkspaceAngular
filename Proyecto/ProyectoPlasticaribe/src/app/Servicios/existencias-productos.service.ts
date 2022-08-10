@@ -22,6 +22,14 @@ export class ExistenciasProductosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/${id}`)
   }
 
+  srvObtenerListaPorIdProducto(id : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProducto/${id}`)
+  }
+
+  srvObtenerListaPorIdProductoPresentacion(id : any, presentacion : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProductoPresentacion/${id}/${presentacion}`)
+  }
+
   //Metodo agregar
   srvAgregar(datos_Productos:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Existencia_Productos', datos_Productos)
@@ -30,6 +38,11 @@ export class ExistenciasProductosService {
   //Metodo actualzar
   srvActualizar(id:number|String, datos_Productos:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/${id}`, datos_Productos);
+  }
+
+  //Metodo actualzar segun el producto y su presentacion
+  srvActualizarProductoPresentacion(prod : any, presentacion : any, datos_Productos:any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/ActualizacionProducto/${prod}/${presentacion}`, datos_Productos);
   }
 
   //Metodo eliminar

@@ -24,6 +24,14 @@ export class OpedidoproductoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/${dato}`);
   }
 
+  srvObtenerListaPorIdPedidoLlenarPDF(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/idPedidoLlenarPDF/${dato}`);
+  }
+
+  srvObtenerUltimoPedido(){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/UltimoPedido/`);
+  }
+
   srvObtenerListaPedidoExterno(){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/PedidoExterno`);
   }

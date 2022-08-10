@@ -22,6 +22,16 @@ export class PedidoProductosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoProducto/ ?Prod_Id=${id_producto}&PedExt_Id=${id_pedido}`);
   }
 
+  // Precio de Ultima Venta
+  srvObtenerListaPorIdProducto(id_producto:any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoProducto/IdProducto/${id_producto}`);
+  }
+
+  // Precio de Ultima Venta
+  srvObtenerListaPorIdProductoPedido(id_producto:any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoProducto/IdProductoPedido/${id_producto}`);
+  }
+
   //Metodo agregar Pedidos
   srvAgregar(datos_Pedidos:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/PedidoProducto', datos_Pedidos)

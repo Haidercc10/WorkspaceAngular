@@ -181,7 +181,13 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
               item : item.clienteItemsNom,
               kg : item.datosotKg,
             }
-            this.ordenesTrabajo.push(infoOT);
+            this.ordenesTrabajo.push(infoOT);this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
+              AsgBopp_OT : '',
+              AsgBopp_Ancho : this.FormAsignacionBopp.value.AsgBopp_Ancho,
+              AsgBopp_Fecha : this.today,
+              AsgBopp_Observacion: this.FormAsignacionBopp.value.AsgBopp_Observacion,
+              AsgBopp_Estado: this.FormAsignacionBopp.value.AsgBopp_Estado,
+            });
             this.cantidadKG = item.datosotKg + this.cantidadKG;
           } else if (item.estado == 4 || item.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
         }
@@ -202,6 +208,13 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
               }
               this.ordenesTrabajo.push(infoOT);
               this.cantidadKG = itemOT.datosotKg + this.cantidadKG;
+              this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
+                AsgBopp_OT : '',
+                AsgBopp_Ancho : this.FormAsignacionBopp.value.AsgBopp_Ancho,
+                AsgBopp_Fecha : this.today,
+                AsgBopp_Observacion: this.FormAsignacionBopp.value.AsgBopp_Observacion,
+                AsgBopp_Estado: this.FormAsignacionBopp.value.AsgBopp_Estado,
+              });
             } else if (itemOT.estado == 4 || itemOT.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
           }
         });

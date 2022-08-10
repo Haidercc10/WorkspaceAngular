@@ -22,6 +22,11 @@ export class TipoClienteService {
   srvObtenerListaPorId(id : number){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/TiposClientes/${id}`);
   }
+
+  srvObtenerListaPorNombreTipoCliente(nombre : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/TiposClientes/nombreTipoCliente/${nombre}`);
+  }
+
 //Metodo agregar Usuario
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/TiposClientes', data)

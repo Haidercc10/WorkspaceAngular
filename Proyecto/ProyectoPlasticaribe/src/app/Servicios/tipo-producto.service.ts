@@ -21,6 +21,11 @@ export class TipoProductoService {
   srvObtenerListaPorId(id : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_Producto/${id}`);
   }
+
+  srvObtenerListaPorNombreTipoProducto(nombre : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_Producto/nombreTipoProducto/${nombre}`);
+  }
+
   //Metodo agregar Productos
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Tipo_Producto', data)
