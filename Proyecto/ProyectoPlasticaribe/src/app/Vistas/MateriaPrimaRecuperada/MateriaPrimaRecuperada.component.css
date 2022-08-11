@@ -46,7 +46,6 @@ a {
 }
 
 .Titulo{
- margin-top: 140px;
  text-align: center;
 }
 
@@ -104,9 +103,3 @@ a {
  label{
   font-size: 14px;
  }
-
- @media (max-width: 500px) {
-  .Titulo{
-    margin-top: 140px;
-   }
-}

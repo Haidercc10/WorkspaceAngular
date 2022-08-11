@@ -64,6 +64,8 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import {AutocompleteLibModule} from 'angular-ng-autocomplete';
 import { ReporteEstadosOTComponent } from './Vistas/reporte-estados-ot/reporte-estados-ot.component';
 import { MenuLateralComponent } from './Vistas/menuLateral/menuLateral.component';
+import { PedidoExternoComponent } from './Vistas/Pedido-Externo/Pedido-Externo.component';
+
 
 export const routes: Routes = [
 
@@ -79,6 +81,7 @@ export const routes: Routes = [
   {path: 'cajacompensacion', canActivate: [ValidacionLoginGuard], component: CajacompensacionComponent},
   {path: 'opedido', canActivate: [ValidacionLoginGuard], component: OpedidoComponent},
   {path: 'opedidoproducto', canActivate: [ValidacionLoginGuard], component: OpedidoproductoComponent},
+  {path: 'pedido-externo', canActivate: [ValidacionLoginGuard], component: PedidoExternoComponent},
   {path: 'ocompra', canActivate: [ValidacionLoginGuard], component: OcompraComponent},
   {path: 'usuario', canActivate: [ValidacionLoginGuard], component:UsuarioComponent},
   {path: 'pedidomateriaprima', canActivate: [ValidacionLoginGuard], component:PedidomateriaprimaComponent},
@@ -126,6 +129,7 @@ export const routes: Routes = [
     CajacompensacionComponent,
     OpedidoComponent,
     OpedidoproductoComponent,
+    PedidoExternoComponent,
     OcompraComponent,
     UsuarioComponent,
     PedidomateriaprimaComponent,

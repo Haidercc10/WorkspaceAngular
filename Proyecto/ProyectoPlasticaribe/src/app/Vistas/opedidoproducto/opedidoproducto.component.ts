@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl} from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpedidoproductoService } from 'src/app/Servicios/opedidoproducto.service';
@@ -28,6 +28,10 @@ import { PigmentoProductoService } from 'src/app/Servicios/pigmentoProducto.serv
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
+@Injectable({
+  providedIn: 'root'
+})
+
 @Component({
   selector: 'app.opedidoproducto.component',
   templateUrl: './opedidoproducto.component.html',
@@ -50,6 +54,8 @@ export class OpedidoproductoComponent implements OnInit {
   public ModalCrearProductos: boolean = false;
   public ModalCrearCliente: boolean = false;
   public ModalSedesClientes: boolean = false;
+
+  temporal : boolean = false; //Variable momentanea que va a hacer que no se muestre una parte del codigo del HTML en la vista, esto mientras se soluciona el hecho de que se termine esta vista
 
   // VARIABLES PARA PASAR A LOS COMBOBOX
   cliente = []; //Variable que almacenará el nombre de los clientes para pasarlos en la vista
@@ -135,11 +141,11 @@ export class OpedidoproductoComponent implements OnInit {
                           private SrvEmpresa : EmpresaService,
                             private PedidoProductosService : PedidoProductosService,
                               private tipoClientService : TipoClienteService,
-                                  private rolService : RolesService,
-                                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                      private ClientesProductosService : ClientesProductosService,
-                                        private materialService : MaterialProductoService,
-                                          private pigmentoServices : PigmentoProductoService,) {
+                                private rolService : RolesService,
+                                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                                    private ClientesProductosService : ClientesProductosService,
+                                      private materialService : MaterialProductoService,
+                                        private pigmentoServices : PigmentoProductoService,) {
 
 
     //Campos que vienen del formulario

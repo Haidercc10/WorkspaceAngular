@@ -217,6 +217,7 @@ a, a:hover, a:focus {
 
 .menu {
   height: 150px;
+  position: sticky;
 }
 
 .btn-close{

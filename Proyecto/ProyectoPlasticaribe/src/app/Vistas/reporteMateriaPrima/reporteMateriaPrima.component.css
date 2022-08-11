@@ -46,7 +46,6 @@ a {
 }
 
 .Titulo{
- margin-top: 140px;
  text-align: center;
 }
 
@@ -125,10 +124,4 @@ a {
 
 .columnaCantidad {
   background-color: #90c0f1;
-}
-
-@media (max-width: 500px) {
-  .Titulo{
-    margin-top: 140px;
-   }
 }

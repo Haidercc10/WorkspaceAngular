@@ -44,7 +44,6 @@ a {
 }
 
 .Titulo{
- margin-top: 140px;
  text-align: center;
 }
 
@@ -124,10 +123,4 @@ a {
 .id {
   border: none;
   width: 100%;
-}
-
-@media (max-width: 500px) {
-  .Titulo{
-    margin-top: 140px;
-   }
 }

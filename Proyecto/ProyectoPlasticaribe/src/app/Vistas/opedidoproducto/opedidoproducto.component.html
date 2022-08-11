@@ -14,18 +14,20 @@
   <!-- Fin Debajo del Navegador -->
     <div class="container">
       <!-- Inicio Botones que llama el modal de crear Cliente y producto-->
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
-        (click)= "LlamarModalCrearCliente()" title="Si no encuentras el cliente consultado, ¡Crealo aquí!">
-          Crear clientes
-        </button>
+      <ng-container *ngIf="temporal">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
+          (click)= "LlamarModalCrearCliente()" title="Si no encuentras el cliente consultado, ¡Crealo aquí!">
+            Crear clientes
+          </button>
 
 
-        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-        (click)="LlamarModalCrearProducto()" title="Si no encuentras el producto solicitado, ¡Crealo aquí!">
-          Crear productos
-        </button>
-      </div>
+          <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+          (click)="LlamarModalCrearProducto()" title="Si no encuentras el producto solicitado, ¡Crealo aquí!">
+            Crear productos
+          </button>
+        </div>
+      </ng-container>
       <!-- Fin Botones que llama el modal de crear cliente y producto-->
       <!-- Inicio titulo -->
       <div class="mb-4">
@@ -191,182 +193,149 @@
         <hr class="Linea">
       </div>
 
-      <!-- Inicio titulo -->
-      <div class="mb-4">
-        <h4 class="tituloRojo">Crear Pedido</h4>
-      </div>
-      <!-- Fin titulo -->
-      <!--Inicio Crear Pedidos-->
-      <form [formGroup]="FormPedidoExternoClientes">
-        <!-- Inicio fila 1 de campos -->
-        <div class="mb-3">
-          <div class="row g-3">
-            <!-- Cliente -->
-            <ng-container>
-              <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm autoCompleteCLientes">
-                <ng-autocomplete
-                  class=""
-                  [data]="cliente"
-                  (selected)='ciudadClienteComboBox($event)'
-                  (selected)='productoCliente()'
-                  (inputChanged)='onChangeSearchNombreCliente($event)'
-                  (inputFocused)='onFocusedNombreCliente($event)'
-                  [searchKeyword]="keywordClientes"
-                  [itemTemplate]="itemTemplate"
-                  [notFoundTemplate]="notFoundTemplate"
-                  id="floatingInput"
-                  formControlName="PedClienteNombre">
-                </ng-autocomplete>
-                <ng-template #itemTemplate let-item>
-                  <a [innerHTML]="item.cli_Nombre"></a>
-                </ng-template>
-                <ng-template #notFoundTemplate let-notFound>
-                  <div [innerHTML]="notFound"></div>
-                </ng-template>
-                <label for="floatingInput" *ngIf="validarInputClientes">Cliente</label>
-              </div>
-            </ng-container>
-
-            <!-- Ciudad -->
-            <div class="form-floating col-md-2">
-              <select formControlName="ciudad_sede" type="text" id="floatingSelect" name="ciudad_sede"class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="ciudades" *ngFor="let ciudades of ciudad">{{ciudades}}</option>
-              </select>
-              <label for="floatingSelect">Ciudad(es)</label>
-            </div>
-
-            <!-- Sede Cliente -->
-            <div class="form-floating col-md-2">
-              <select formControlName="PedSedeCli_Id" type="text" id="floatingSelect" name="PSedeCli_Id" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="sedesclientes" *ngFor="let sedesclientes of sedeCliente">{{sedesclientes}}</option>
-              </select>
-              <label for="floatingSelect">Dirección Sede</label>
-            </div>
-
-            <!-- Usuario -->
-            <div class="form-floating col-md">
-              <select formControlName="PedUsuarioNombre" type="text" id="floatingSelect" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="vendedor" *ngFor="let vendedor of usuarioVende">{{vendedor}}</option>
-              </select>
-              <label for="floatingSelect">Vendedor</label>
-            </div>
-          </div>
-        </div>
-        <!-- Fin fila 1 de campos -->
-        <!-- Inicio Observacion -->
-        <div class="mb-5">
-          <div class="row g-3">
-            <!-- Fecha pedido -->
-            <div class="form-floating col-md-2">
-              <input formControlName="PedFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido" readonly onmousedown="return false;">
-              <label for="floatingInput">Fecha Pedido</label>
-            </div>
-
-            <!-- Fecha entrega -->
-            <div class="form-floating col-md-2">
-              <input formControlName="PedFechaEnt" type="date" class="form-control form-control-sm" id="floatingInput" title="Fecha Entrega">
-              <label for="floatingInput">Fecha Entrega</label>
-            </div>
-
-            <!-- Estado -->
-            <div class="form-floating col-md-2">
-              <select formControlName="PedEstadoId" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" required>
-                <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
-              </select>
-              <label for="floatingSelect">Estado</label>
-            </div>
-
-            <!-- Campo Observacion -->
-            <div class="form-floating col-md">
-              <textarea formControlName="PedObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
-              <label for="floatingTextarea">Observación</label>
-            </div>
-          </div>
-        </div>
-        <!-- Fin Observacion -->
-        <!--Fin Crear Pedidos-->
-        <!-- Linea -->
+      <ng-container *ngIf="temporal">
+        <!-- Inicio titulo -->
         <div class="mb-4">
-          <hr class="Linea">
+          <h4 class="tituloRojo">Crear Pedido</h4>
         </div>
-        <!-- Fin Linea -->
-        <!--Inicio tabla productos agregados-->
-      </form>
-        <!-- Inicio Titulo Agregar Productos al pedido -->
-      <div class="mb-4">
-        <h4 class="tituloRojo">Agregar Productos</h4>
-      </div>
-        <!-- Fin Titulo Agregar Productos al pedido -->
+        <!-- Fin titulo -->
+        <!--Inicio Crear Pedidos-->
+        <form [formGroup]="FormPedidoExternoClientes">
+          <!-- Inicio fila 1 de campos -->
+          <div class="mb-3">
+            <div class="row g-3">
+              <!-- Cliente -->
+              <ng-container>
+                <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm autoCompleteCLientes">
+                  <ng-autocomplete
+                    class=""
+                    [data]="cliente"
+                    (selected)='ciudadClienteComboBox($event)'
+                    (selected)='productoCliente()'
+                    (inputChanged)='onChangeSearchNombreCliente($event)'
+                    (inputFocused)='onFocusedNombreCliente($event)'
+                    [searchKeyword]="keywordClientes"
+                    [itemTemplate]="itemTemplate"
+                    [notFoundTemplate]="notFoundTemplate"
+                    id="floatingInput"
+                    formControlName="PedClienteNombre">
+                  </ng-autocomplete>
+                  <ng-template #itemTemplate let-item>
+                    <a [innerHTML]="item.cli_Nombre"></a>
+                  </ng-template>
+                  <ng-template #notFoundTemplate let-notFound>
+                    <div [innerHTML]="notFound"></div>
+                  </ng-template>
+                  <label for="floatingInput" *ngIf="validarInputClientes">Cliente</label>
+                </div>
+              </ng-container>
 
-      <form [formGroup]="FormPedidoExternoProductos">
-        <!-- Inicio Fila 1 Agregar producto -->
-        <div class="mb-3">
-          <div class="row g-3">
-            <!-- ID Producto -->
-            <div class="form-floating col-md-2">
-              <input formControlName="ProdId" type="search" min="0" (search)="buscarProducto()" class="form-control" id="floatingInput" name="PrdId" required >
-              <label for="floatingInput">Id Producto</label>
-            </div>
-
-            <!-- ID/Nombre Producto -->
-            <ng-container>
-              <div class="ng-autocomplete form-floating col-md-2 form-control form-control-sm autoCompleteProductos">
-                <ng-autocomplete
-                  class=""
-                  [data]="producto"
-                  (selected)='llenadoProducto($event)'
-                  (inputChanged)='onChangeSearchNombreProductos($event)'
-                  (inputFocused)='onFocusedNombreProductos($event)'
-                  [searchKeyword]="keywordNombresProductos"
-                  [itemTemplate]="itemTemplate1"
-                  [notFoundTemplate]="notFoundTemplate"
-                  id="floatingInput"
-                  formControlName="ProdNombre">
-                </ng-autocomplete>
-                <ng-template #itemTemplate1 let-item>
-                  <a [innerHTML]="item.prod_Nombre"></a>
-                </ng-template>
-                <ng-template #notFoundTemplate let-notFound>
-                  <div [innerHTML]="notFound"></div>
-                </ng-template>
-                <label for="floatingInput" *ngIf="validarInputNombresProductos">Producto</label>
-              </div>
-            </ng-container>
-
-            <ng-container *ngIf="ValidarRol == 2; else fila1">
-               <!-- Ancho Producto -->
-              <div class="form-floating col-md-1">
-                <input formControlName="ProdAncho" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" readonly onmousedown="return false;">
-                <label for="floatingInput">Ancho</label>
-              </div>
-
-              <!-- Fuelle Producto -->
-              <div class="form-floating col-md-1">
-                <input formControlName="ProdFuelle" type="number" class="form-control form-control-sm" id="floatingSelect" title="Fuelle" min="0" readonly onmousedown="return false;">
-                <label for="floatingInput">Fuelle</label>
-              </div>
-
-                <!-- Calibre Producto -->
-              <div class="form-floating col-md-1">
-                <input formControlName="ProdCalibre" type="number" class="form-control form-control-sm" id="floatingSelect" name="PrdCalibre" title="Calibre" min="0" readonly onmousedown="return false;">
-                <label for="floatingInput">Calibre</label>
-              </div>
-
-              <!-- Largo -->
-              <div class="form-floating col-md-1">
-                <input formControlName="ProdLargo" type="number" class="form-control form-control-sm" id="floatingSelect" title="Largo" min="0" readonly onmousedown="return false;">
-                <label for="floatingInput">Largo</label>
-              </div>
-
-              <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
-              <div class="form-floating col-md-1">
-                <select formControlName="ProdUnidadMedidaACF" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" readonly onmousedown="return false;">
-                  <option [ngValue]="unidadMedida" *ngFor="let unidadMedida of undMed">{{unidadMedida}}</option>
+              <!-- Ciudad -->
+              <div class="form-floating col-md-2">
+                <select formControlName="ciudad_sede" type="text" id="floatingSelect" name="ciudad_sede"class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                  <option [ngValue]="ciudades" *ngFor="let ciudades of ciudad">{{ciudades}}</option>
                 </select>
-                <label for="floatingSelect">Und. Medida</label>
+                <label for="floatingSelect">Ciudad(es)</label>
               </div>
-            </ng-container>
-            <ng-template #fila1>
+
+              <!-- Sede Cliente -->
+              <div class="form-floating col-md-2">
+                <select formControlName="PedSedeCli_Id" type="text" id="floatingSelect" name="PSedeCli_Id" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                  <option [ngValue]="sedesclientes" *ngFor="let sedesclientes of sedeCliente">{{sedesclientes}}</option>
+                </select>
+                <label for="floatingSelect">Dirección Sede</label>
+              </div>
+
+              <!-- Usuario -->
+              <div class="form-floating col-md">
+                <select formControlName="PedUsuarioNombre" type="text" id="floatingSelect" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                  <option [ngValue]="vendedor" *ngFor="let vendedor of usuarioVende">{{vendedor}}</option>
+                </select>
+                <label for="floatingSelect">Vendedor</label>
+              </div>
+            </div>
+          </div>
+          <!-- Fin fila 1 de campos -->
+          <!-- Inicio Observacion -->
+          <div class="mb-5">
+            <div class="row g-3">
+              <!-- Fecha pedido -->
+              <div class="form-floating col-md-2">
+                <input formControlName="PedFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido" readonly onmousedown="return false;">
+                <label for="floatingInput">Fecha Pedido</label>
+              </div>
+
+              <!-- Fecha entrega -->
+              <div class="form-floating col-md-2">
+                <input formControlName="PedFechaEnt" type="date" class="form-control form-control-sm" id="floatingInput" title="Fecha Entrega">
+                <label for="floatingInput">Fecha Entrega</label>
+              </div>
+
+              <!-- Estado -->
+              <div class="form-floating col-md-2">
+                <select formControlName="PedEstadoId" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" required>
+                  <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
+                </select>
+                <label for="floatingSelect">Estado</label>
+              </div>
+
+              <!-- Campo Observacion -->
+              <div class="form-floating col-md">
+                <textarea formControlName="PedObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
+                <label for="floatingTextarea">Observación</label>
+              </div>
+            </div>
+          </div>
+          <!-- Fin Observacion -->
+          <!--Fin Crear Pedidos-->
+          <!-- Linea -->
+          <div class="mb-4">
+            <hr class="Linea">
+          </div>
+          <!-- Fin Linea -->
+          <!--Inicio tabla productos agregados-->
+        </form>
+          <!-- Inicio Titulo Agregar Productos al pedido -->
+        <div class="mb-4">
+          <h4 class="tituloRojo">Agregar Productos</h4>
+        </div>
+          <!-- Fin Titulo Agregar Productos al pedido -->
+
+        <form [formGroup]="FormPedidoExternoProductos">
+          <!-- Inicio Fila 1 Agregar producto -->
+          <div class="mb-3">
+            <div class="row g-3">
+              <!-- ID Producto -->
+              <div class="form-floating col-md-2">
+                <input formControlName="ProdId" type="search" min="0" (search)="buscarProducto()" class="form-control" id="floatingInput" name="PrdId" required >
+                <label for="floatingInput">Id Producto</label>
+              </div>
+
+              <!-- ID/Nombre Producto -->
+              <ng-container>
+                <div class="ng-autocomplete form-floating col-md-2 form-control form-control-sm autoCompleteProductos">
+                  <ng-autocomplete
+                    class=""
+                    [data]="producto"
+                    (selected)='llenadoProducto($event)'
+                    (inputChanged)='onChangeSearchNombreProductos($event)'
+                    (inputFocused)='onFocusedNombreProductos($event)'
+                    [searchKeyword]="keywordNombresProductos"
+                    [itemTemplate]="itemTemplate1"
+                    [notFoundTemplate]="notFoundTemplate"
+                    id="floatingInput"
+                    formControlName="ProdNombre">
+                  </ng-autocomplete>
+                  <ng-template #itemTemplate1 let-item>
+                    <a [innerHTML]="item.prod_Nombre"></a>
+                  </ng-template>
+                  <ng-template #notFoundTemplate let-notFound>
+                    <div [innerHTML]="notFound"></div>
+                  </ng-template>
+                  <label for="floatingInput" *ngIf="validarInputNombresProductos">Producto</label>
+                </div>
+              </ng-container>
+
               <div class="form-floating col-md-1">
                 <input formControlName="ProdAncho" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0">
                 <label for="floatingInput">Ancho</label>
@@ -397,61 +366,12 @@
                 </select>
                 <label for="floatingSelect">Und. Medida</label>
               </div>
-
-            </ng-template>
+            </div>
           </div>
-        </div>
-        <!-- Fin Fila 1 Agregar Producto -->
-        <!-- Inicio Fila 2 Agregar Producto -->
-        <div class="mb-3">
-          <div class="row g-3">
-            <ng-container *ngIf="ValidarRol == 2; else fila2">
-              <!-- Tipo Producto -->
-              <div class="form-floating col-md-2">
-                <select formControlName="ProdTipo" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" readonly onmousedown="return false;">
-                  <option [ngValue]="tipoproductos" *ngFor="let tipoproductos of tipoProducto">{{tipoproductos}}</option>
-                </select>
-                <label for="floatingSelect">Tipo de Producto</label>
-              </div>
-
-              <!-- Matrial -->
-              <div class="form-floating col-md-2">
-                <select formControlName="ProdMaterial" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" readonly onmousedown="return false;">
-                  <option [ngValue]="material" *ngFor="let material of materialProducto">{{material}}</option>
-                </select>
-                <label for="floatingSelect">Material del Producto</label>
-              </div>
-
-              <!-- Pigmento -->
-              <div class="form-floating col-md-2">
-                <select formControlName="ProdPigmento" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" readonly onmousedown="return false;">
-                  <option [ngValue]="pigmantos" *ngFor="let pigmantos of pigmentoProducto">{{pigmantos}}</option>
-                </select>
-                <label for="floatingSelect">Pigmento del Producto</label>
-              </div>
-
-              <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
-              <div class="form-floating col-md-2">
-                <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm" id="floatingInput" required>
-                <label for="floatingSelect">Cantidad Pedida</label>
-              </div>
-
-              <!-- UM Cantidad Producto -->
-              <div class="form-floating col-md-2">
-                <select formControlName="ProdUnidadMedidaCant" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdUnidadMedidaCant" required >
-                  <option [ngValue]="null" disabled selected>Seleccione Presentación</option>
-                  <option [ngValue]="presentaciones" *ngFor="let presentaciones of presentacion">{{presentaciones}}</option>
-                </select>
-                <label for="floatingSelect">Presentación</label>
-              </div>
-
-              <!-- Precio Producto -->
-              <div class="form-floating col-md">
-                <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdPrecioUnd">
-                <label for="floatingInput">Precio unitario</label>
-              </div>
-            </ng-container>
-            <ng-template #fila2>
+          <!-- Fin Fila 1 Agregar Producto -->
+          <!-- Inicio Fila 2 Agregar Producto -->
+          <div class="mb-3">
+            <div class="row g-3">
               <!-- Tipo Producto -->
               <div class="form-floating col-md-2">
                 <select formControlName="ProdTipo" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example">
@@ -496,43 +416,12 @@
                 <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdPrecioUnd">
                 <label for="floatingInput">Precio unitario</label>
               </div>
-            </ng-template>
-          </div>
-        </div>
-        <!-- Fin Fila 2 Agregar Producto -->
-        <!--Fila 3 Inicio-->
-         <!-- Inicio Descripción producto -->
-        <div class="mb-4">
-          <ng-container *ngIf="ValidarRol == 2; else fila3">
-            <div class="row g-3">
-              <!-- Ultima venta -->
-              <div class="form-floating col-md">
-                <input formControlName="ProdUltFacturacion" type="number" class="form-control form-control-sm" id="floatingInput" name="ProdUltFacturacion" readonly onmousedown="return false;">
-                <label for="floatingInput">Ultimo Precio Facturado</label>
-              </div>
-
-              <!-- Tipo Moneda -->
-              <div class="form-floating col-md-2">
-                <select formControlName="ProdTipoMoneda" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdTipoMoneda" readonly onmousedown="return false;">
-                  <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas}}</option>
-                </select>
-                <label for="floatingSelect">Tipo de Moneda</label>
-              </div>
-
-              <!-- Stock Producto -->
-              <div class="form-floating col-md-2">
-                <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdStock" readonly onmousedown="return false;">
-                <label for="floatingSelect">En Stock</label>
-              </div>
-
-              <!-- Campo Descripción producto -->
-              <div class="form-floating  col-md">
-                <textarea formControlName="ProdDescripcion" id="floatingTextarea" type="text" class="form-control form-control-sm" readonly onmousedown="return false;"></textarea>
-                <label for="floatingTextarea">Descripción del Producto</label>
-              </div>
             </div>
-          </ng-container>
-          <ng-template #fila3>
+          </div>
+          <!-- Fin Fila 2 Agregar Producto -->
+          <!--Fila 3 Inicio-->
+           <!-- Inicio Descripción producto -->
+          <div class="mb-4">
             <div class="row g-3">
               <!-- Ultima venta -->
               <div class="form-floating col-md-2">
@@ -561,131 +450,131 @@
                 <label for="floatingTextarea">Descripción del Producto</label>
               </div>
             </div>
-          </ng-template>
-        </div>
-        <!-- Fin Descripción producto -->
-        <!--Fila 3 Fin -->
-        <!-- Inicio botones -->
-        <div class="mb-3">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVacios()"> {{AccionBoton}} Producto </button>
-              <ng-container *ngIf="ValidarRol == 1">
-                <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarProducto()">Actualizar Producto</button>
-              </ng-container>
-              <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
           </div>
-        </div>
-        <!-- Fin botones -->
-        <!--Fin agregar productos -->
-        <div class="mb-4">
-          <hr class="Linea">
-        </div>
-        <!--Inicio tabla productos -->
-        <!-- Inicio titulo tabla producto -->
-        <div class="mb-4">
-          <h4 class="tituloRojo">Tabla de Productos</h4>
-        </div>
-        <!-- Fin titulo producto -->
-        <!-- Inicio tabla producto -->
-        <div class="mb-3">
-          <div class="row g-3">
-            <div class="table-responsive">
-              <table class="table table-bordered table-hover mt-2" >
-                <thead class="TitulosTabla">
-                  <tr *ngFor="let columnas of titulosTabla let i = index">
-                    <th scope="col" class="idProducto">{{columnas.pID}}</th>
-                    <th id="nombre" scope="col">{{columnas.pNombre}}</th>
-                    <th id="ancho" scope="col" class="">{{columnas.pAncho}}</th>
-                    <th id="fuelle" scope="col">{{columnas.pFuelle}}</th>
-                    <th id="calibre" scope="col">{{columnas.pCalibre}}</th>
-                    <th id="largo" scope="col">{{columnas.pLargo}}</th>
-                    <th id="undMedidaPeso" scope="col">{{columnas.pUndMedACF}}</th>
-                    <th id="tipoProducto" scope="col">{{columnas.pTipoProd}}</th>
-                    <th id="material" scope="col">{{columnas.pMaterial}}</th>
-                    <th id="pigmento" scope="col">{{columnas.pPigmento}}</th>
-                    <th id="cantidad" scope="col">{{columnas.pCantidad}}</th>
-                    <th id="undMedidaCantidad" scope="col">{{columnas.pUndMedCant}}</th>
-                    <th id="precioUnitario" scope="col">{{columnas.pPrecioU}}</th>
-                    <!-- <th id="tipoMoneda" scope="col">{{columnas.pMoneda}}</th> -->
-                    <th id="Subtotal" scope="col">{{columnas.pSubtotal}}</th>
-                    <th id="acciones" scope="col"></th>
-                    <th id="acciones" scope="col"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let listaProductos of ArrayProducto; let j = index">
-                    <th id="id" class="TextosInfoTabla">{{listaProductos.Id}}</th>
-                    <td id="nombreCampo" class="TextosInfoTabla">{{listaProductos.Nombre}}</td>
-                    <td id="ancho" class="TextosInfoTabla">{{listaProductos.Ancho}}</td>
-                    <td id="fuelle" class="TextosInfoTabla">{{listaProductos.Fuelle}}</td>
-                    <td id="calibre" class="TextosInfoTabla">{{listaProductos.Cal}}</td>
-                    <td id="largo" class="TextosInfoTabla">{{listaProductos.Largo}}</td>
-                    <td id="undMedidaPeso" class="TextosInfoTabla">{{listaProductos.Und}}</td>
-                    <td id="tipoProducto" class="TextosInfoTabla">{{listaProductos.Tipo}}</td>
-                    <td id="material" class="TextosInfoTabla">{{listaProductos.Material}}</td>
-                    <td id="pigmento" class="TextosInfoTabla">{{listaProductos.Pigmento}}</td>
-                    <td id="cantidadDisponible" class="TextosInfoTabla">{{listaProductos.Cant}}</td>
-                    <td id="undMedidaCantidad" class="TextosInfoTabla">{{listaProductos.UndCant}}</td>
-                    <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.PrecioUnd | currency }}</td>
-                    <!-- <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.TpMoneda}}</td> -->
-                    <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.SubTotal | currency }}</td>
-                    <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true" title="Editar Producto"></i></a></td>
-                    <td id="Eliminar" ><a><i class="fa fa-trash" (click)="QuitarProductoTabla(j, listaProductos)" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <!-- Fin tabla producto -->
-        <!--Inicio valor total-->
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <label for=""><b>Valor total: $</b></label>
-          <label for="">${{valorTotal | currency : 'COP'}}</label>
-        </div>
-        <!--Fin valor total-->
-        <!-- Inicio Botones -->
-        <div class="bajarPagina">
+          <!-- Fin Descripción producto -->
+          <!--Fila 3 Fin -->
+          <!-- Inicio botones -->
+          <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="CrearPedidoExterno()">Crear Pedido</button>
-              <button class="btn btn-danger btn-danger-sm" type="button" (click)="editarPedido()">Actualizar Pedido</button>
+                <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVacios()"> {{AccionBoton}} Producto </button>
+                <ng-container *ngIf="ValidarRol == 1">
+                  <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarProducto()">Actualizar Producto</button>
+                </ng-container>
+                <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
             </div>
-        </div>
-      </form>
-      <!-- Fin Botones -->
-      <!-- Modal de crear producto -->
-      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="staticBackdropLabel">Crear productos</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <!-- Fin botones -->
+          <!--Fin agregar productos -->
+          <div class="mb-4">
+            <hr class="Linea">
+          </div>
+          <!--Inicio tabla productos -->
+          <!-- Inicio titulo tabla producto -->
+          <div class="mb-4">
+            <h4 class="tituloRojo">Tabla de Productos</h4>
+          </div>
+          <!-- Fin titulo producto -->
+          <!-- Inicio tabla producto -->
+          <div class="mb-3">
+            <div class="row g-3">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover mt-2" >
+                  <thead class="TitulosTabla">
+                    <tr *ngFor="let columnas of titulosTabla let i = index">
+                      <th scope="col" class="idProducto">{{columnas.pID}}</th>
+                      <th id="nombre" scope="col">{{columnas.pNombre}}</th>
+                      <th id="ancho" scope="col" class="">{{columnas.pAncho}}</th>
+                      <th id="fuelle" scope="col">{{columnas.pFuelle}}</th>
+                      <th id="calibre" scope="col">{{columnas.pCalibre}}</th>
+                      <th id="largo" scope="col">{{columnas.pLargo}}</th>
+                      <th id="undMedidaPeso" scope="col">{{columnas.pUndMedACF}}</th>
+                      <th id="tipoProducto" scope="col">{{columnas.pTipoProd}}</th>
+                      <th id="material" scope="col">{{columnas.pMaterial}}</th>
+                      <th id="pigmento" scope="col">{{columnas.pPigmento}}</th>
+                      <th id="cantidad" scope="col">{{columnas.pCantidad}}</th>
+                      <th id="undMedidaCantidad" scope="col">{{columnas.pUndMedCant}}</th>
+                      <th id="precioUnitario" scope="col">{{columnas.pPrecioU}}</th>
+                      <!-- <th id="tipoMoneda" scope="col">{{columnas.pMoneda}}</th> -->
+                      <th id="Subtotal" scope="col">{{columnas.pSubtotal}}</th>
+                      <th id="acciones" scope="col"></th>
+                      <th id="acciones" scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let listaProductos of ArrayProducto; let j = index">
+                      <th id="id" class="TextosInfoTabla">{{listaProductos.Id}}</th>
+                      <td id="nombreCampo" class="TextosInfoTabla">{{listaProductos.Nombre}}</td>
+                      <td id="ancho" class="TextosInfoTabla">{{listaProductos.Ancho}}</td>
+                      <td id="fuelle" class="TextosInfoTabla">{{listaProductos.Fuelle}}</td>
+                      <td id="calibre" class="TextosInfoTabla">{{listaProductos.Cal}}</td>
+                      <td id="largo" class="TextosInfoTabla">{{listaProductos.Largo}}</td>
+                      <td id="undMedidaPeso" class="TextosInfoTabla">{{listaProductos.Und}}</td>
+                      <td id="tipoProducto" class="TextosInfoTabla">{{listaProductos.Tipo}}</td>
+                      <td id="material" class="TextosInfoTabla">{{listaProductos.Material}}</td>
+                      <td id="pigmento" class="TextosInfoTabla">{{listaProductos.Pigmento}}</td>
+                      <td id="cantidadDisponible" class="TextosInfoTabla">{{listaProductos.Cant}}</td>
+                      <td id="undMedidaCantidad" class="TextosInfoTabla">{{listaProductos.UndCant}}</td>
+                      <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.PrecioUnd | currency }}</td>
+                      <!-- <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.TpMoneda}}</td> -->
+                      <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.SubTotal | currency }}</td>
+                      <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true" title="Editar Producto"></i></a></td>
+                      <td id="Eliminar" ><a><i class="fa fa-trash" (click)="QuitarProductoTabla(j, listaProductos)" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div class="modal-body">
-              <!--Carga componente crear producto-->
-              <app-crear-producto></app-crear-producto>
+          </div>
+          <!-- Fin tabla producto -->
+          <!--Inicio valor total-->
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <label for=""><b>Valor total: $</b></label>
+            <label for="">${{valorTotal | currency : 'COP'}}</label>
+          </div>
+          <!--Fin valor total-->
+          <!-- Inicio Botones -->
+          <div class="bajarPagina">
+              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="CrearPedidoExterno()">Crear Pedido</button>
+                <button class="btn btn-danger btn-danger-sm" type="button" (click)="editarPedido()">Actualizar Pedido</button>
+              </div>
+          </div>
+        </form>
+        <!-- Fin Botones -->
+        <!-- Modal de crear producto -->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Crear productos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <!--Carga componente crear producto-->
+                <app-crear-producto></app-crear-producto>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <!-- Fin Modal de crear producto -->
+        <!-- Fin Modal de crear producto -->
 
-      <!-- Modal de crear cliente -->
-      <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="staticBackdropLabel2">Crear clientes</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <!--Carga componente crear cliente-->
-              <app-crear-clientes></app-crear-clientes>
+        <!-- Modal de crear cliente -->
+        <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel2">Crear clientes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <!--Carga componente crear cliente-->
+                <app-crear-clientes></app-crear-clientes>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <!-- Fin Modal de crear cliente -->
+        <!-- Fin Modal de crear cliente -->
+      </ng-container>
     </div>
   </div>
 </div>
