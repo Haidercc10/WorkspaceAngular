@@ -23,8 +23,8 @@ export class PedidoProductosService {
   }
 
   // Precio de Ultima Venta
-  srvObtenerListaPorIdProducto(id_producto:any):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoProducto/IdProducto/${id_producto}`);
+  srvObtenerListaPorIdProducto(id_producto:any, presentacion : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoProducto/IdProducto/${id_producto}/${presentacion}`);
   }
 
   // Precio de Ultima Venta

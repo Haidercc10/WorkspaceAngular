@@ -617,38 +617,43 @@ export class OpedidoproductoComponent implements OnInit {
   //Funcion encargada de buscar un producto por el id del producto
   buscarProducto(){
     this.producto = [];
+    this.presentacion = [];
     let idProducto : number = this.FormPedidoExternoProductos.value.ProdId;
-    this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_productoPedido => {
-      let datos : any = [];
-      datos.push(datos_productoPedido);
-      for (const item of datos) {
-        this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
-      }
-    });
+
     this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
       for (let i = 0; i < datos_producto.length; i++) {
-        this.presentacion.push(datos_producto[i].undMed_Id);
-        this.FormPedidoExternoProductos.setValue({
-          ProdId: datos_producto[i].prod_Id,
-          ProdNombre: datos_producto[i].prod_Nombre,
-          ProdAncho: datos_producto[i].prod_Ancho,
-          ProdFuelle: datos_producto[i].prod_Fuelle,
-          ProdCalibre: datos_producto[i].prod_Calibre,
-          ProdLargo: datos_producto[i].prod_Largo,
-          ProdUnidadMedidaACF: datos_producto[i].undMedACF,
-          ProdTipo: datos_producto[i].tpProd_Nombre,
-          ProdMaterial: datos_producto[i].material_Nombre,
-          ProdPigmento: datos_producto[i].pigmt_Nombre,
-          ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
-          ProdUnidadMedidaCant: datos_producto[i].undMed_Id,
-          ProdPrecioUnd: datos_producto[i].exProd_PrecioVenta,
-          ProdUltFacturacion: this.ultimoPrecio,
-          ProdTipoMoneda: datos_producto[i].tpMoneda_Id,
-          ProdStock: datos_producto[i].exProd_Cantidad,
-          ProdDescripcion: datos_producto[i].prod_Descripcion,
+        this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto, datos_producto[i].undMed_Id).subscribe(datos_productoPedido => {
+          let datos : any = [];
+          datos.push(datos_productoPedido);
+          for (const item of datos) {
+            this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
+          }
         });
-        if (this.FormPedidoExternoProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
-        else this.validarInputNombresProductos = true;
+
+        setTimeout(() => {
+          this.presentacion.push(datos_producto[i].undMed_Id);
+          this.FormPedidoExternoProductos.setValue({
+            ProdId: datos_producto[i].prod_Id,
+            ProdNombre: datos_producto[i].prod_Nombre,
+            ProdAncho: datos_producto[i].prod_Ancho,
+            ProdFuelle: datos_producto[i].prod_Fuelle,
+            ProdCalibre: datos_producto[i].prod_Calibre,
+            ProdLargo: datos_producto[i].prod_Largo,
+            ProdUnidadMedidaACF: datos_producto[i].undMedACF,
+            ProdTipo: datos_producto[i].tpProd_Nombre,
+            ProdMaterial: datos_producto[i].material_Nombre,
+            ProdPigmento: datos_producto[i].pigmt_Nombre,
+            ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
+            ProdUnidadMedidaCant: datos_producto[i].undMed_Id,
+            ProdPrecioUnd: datos_producto[i].exProd_PrecioVenta,
+            ProdUltFacturacion: this.ultimoPrecio,
+            ProdTipoMoneda: datos_producto[i].tpMoneda_Id,
+            ProdStock: datos_producto[i].exProd_Cantidad,
+            ProdDescripcion: datos_producto[i].prod_Descripcion,
+          });
+          if (this.FormPedidoExternoProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
+          else this.validarInputNombresProductos = true;
+        }, 100);
       }
     });
   }
@@ -656,18 +661,20 @@ export class OpedidoproductoComponent implements OnInit {
   // Funcion para llenar los datos de los productos en cada uno de los campos
   llenadoProducto(item : any){
     this.productoInfo = [];
+    this.presentacion = [];
     this.FormPedidoExternoProductos.value.ProdNombre = item.prod_Id;
 
     let idProducto : any = this.FormPedidoExternoProductos.value.ProdNombre = item.prod_Id;
-    this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_productoPedido => {
-      let datos : any = [];
-      datos.push(datos_productoPedido);
-      for (const item of datos) {
-        this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
-      }
-    });
     this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
       for (let i = 0; i < datos_producto.length; i++) {
+      this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto, datos_producto[i].undMed_Id).subscribe(datos_productoPedido => {
+        let datos : any = [];
+        datos.push(datos_productoPedido);
+        for (const item of datos) {
+          this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
+        }
+      });
+
         this.presentacion.push(datos_producto[i].undMed_Id);
         this.FormPedidoExternoProductos.setValue({
           ProdId: datos_producto[i].prod_Id,
@@ -1252,53 +1259,49 @@ export class OpedidoproductoComponent implements OnInit {
 
     this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_existencias => {
       for (let index = 0; index < datos_existencias.length; index++) {
-        if (datos_existencias[index].undMed_Id == presentacion) {
-          if (precioProducto >= datos_existencias[index].exProd_PrecioVenta) {
-            let productoExt : any = {
-              Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
-              Nombre : nombreProducto,
-              Ancho : this.FormPedidoExternoProductos.get('ProdAncho').value,
-              Fuelle : this.FormPedidoExternoProductos.get('ProdFuelle').value,
-              Cal : this.FormPedidoExternoProductos.get('ProdCalibre').value,
-              Und : this.FormPedidoExternoProductos.get('ProdUnidadMedidaACF').value,
-              Tipo : this.FormPedidoExternoProductos.get('ProdTipo').value,
-              Material : this.FormPedidoExternoProductos.value.ProdMaterial,
-              Pigmento: this.FormPedidoExternoProductos.value.ProdPigmento,
-              Cant : this.FormPedidoExternoProductos.get('ProdCantidad').value,
-              Largo : this.FormPedidoExternoProductos.get('ProdLargo').value,
-              UndCant : this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
-              PrecioUnd : precioProducto,
-              TpMoneda : this.FormPedidoExternoProductos.get('ProdTipoMoneda').value,
-              Stock : this.FormPedidoExternoProductos.get('ProdStock').value,
-              Produ_Descripcion : this.FormPedidoExternoProductos.get('ProdDescripcion').value,
-              SubTotal : this.FormPedidoExternoProductos.get('ProdCantidad').value * this.FormPedidoExternoProductos.get('ProdPrecioUnd')?.value
-            }
+        if (precioProducto >= datos_existencias[index].exProd_PrecioVenta) {
+          let productoExt : any = {
+            Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
+            Nombre : nombreProducto,
+            Ancho : this.FormPedidoExternoProductos.get('ProdAncho').value,
+            Fuelle : this.FormPedidoExternoProductos.get('ProdFuelle').value,
+            Cal : this.FormPedidoExternoProductos.get('ProdCalibre').value,
+            Und : this.FormPedidoExternoProductos.get('ProdUnidadMedidaACF').value,
+            Tipo : this.FormPedidoExternoProductos.get('ProdTipo').value,
+            Material : this.FormPedidoExternoProductos.value.ProdMaterial,
+            Pigmento: this.FormPedidoExternoProductos.value.ProdPigmento,
+            Cant : this.FormPedidoExternoProductos.get('ProdCantidad').value,
+            Largo : this.FormPedidoExternoProductos.get('ProdLargo').value,
+            UndCant : this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
+            PrecioUnd : precioProducto,
+            TpMoneda : this.FormPedidoExternoProductos.get('ProdTipoMoneda').value,
+            Stock : this.FormPedidoExternoProductos.get('ProdStock').value,
+            Produ_Descripcion : this.FormPedidoExternoProductos.get('ProdDescripcion').value,
+            SubTotal : this.FormPedidoExternoProductos.get('ProdCantidad').value * this.FormPedidoExternoProductos.get('ProdPrecioUnd')?.value
+          }
 
-            let campoId = this.FormPedidoExternoProductos.get('ProdId')?.value;
-            if (this.AccionBoton == "Agregar" && this.ArrayProducto.length == 0) {
-              this.ArrayProducto.push(productoExt);
-              this.LimpiarCamposProductos();
+          let campoId = this.FormPedidoExternoProductos.get('ProdId')?.value;
+          if (this.AccionBoton == "Agregar" && this.ArrayProducto.length == 0) {
+            this.ArrayProducto.push(productoExt);
+            this.LimpiarCamposProductos();
 
-            } else if (this.AccionBoton == "Agregar" && this.ArrayProducto.length != 0){
-              this.ArrayProducto.push(productoExt);
-              this.LimpiarCamposProductos();
-              productoExt = [];
-            } else {
-              for (let index = 0; index < formulario.length; index++) {
-                if(productoExt.Id == this.ArrayProducto[index].Id) {
-                  this.ArrayProducto.splice(index, 1);
-                  this.ArrayProducto.push(productoExt);
-                  this.AccionBoton = "Agregar";
-                  this.LimpiarCamposProductos();
-                  break;
-                }
+          } else if (this.AccionBoton == "Agregar" && this.ArrayProducto.length != 0){
+            this.ArrayProducto.push(productoExt);
+            this.LimpiarCamposProductos();
+            productoExt = [];
+          } else {
+            for (let index = 0; index < formulario.length; index++) {
+              if(productoExt.Id == this.ArrayProducto[index].Id) {
+                this.ArrayProducto.splice(index, 1);
+                this.ArrayProducto.push(productoExt);
+                this.AccionBoton = "Agregar";
+                this.LimpiarCamposProductos();
+                break;
               }
             }
-          } else Swal.fire(`El precio digitado no puede ser menor al que tiene el producto estipulado $${datos_existencias[index].exProd_PrecioVenta}`);
-        } else {
-          Swal.fire(`La presentacion seleccionada no esta registrada para este producto`);
+          }
+        } else Swal.fire(`El precio digitado no puede ser menor al que tiene el producto estipulado $${datos_existencias[index].exProd_PrecioVenta}`);
         }
-      }
       // for (let index = 0; index < this.ArrayProducto.length; index++) {
       //   this.valorTotal = this.ArrayProducto.reduce((accion) => accion + (cantidad * precioProducto), 0);
       // }
@@ -1794,7 +1797,7 @@ export class OpedidoproductoComponent implements OnInit {
     this.producto = [];
     this.presentacion = [];
 
-    this.PedidoProductosService.srvObtenerListaPorIdProducto(formulario.Id).subscribe(datos_productoPedido => {
+    this.PedidoProductosService.srvObtenerListaPorIdProducto(formulario.Id, formulario.ProdUnidadMedidaCant).subscribe(datos_productoPedido => {
       let datos : any = [];
       datos.push(datos_productoPedido);
       for (const item of datos) {

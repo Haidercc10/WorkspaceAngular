@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { rutaZeus } from 'src/polyfills';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class InventarioZeusService {
   constructor(private http : HttpClient) { }
 
 //Crear ruta del api
-readonly rutaInventarioZeusAPI = "http://192.168.0.85:9055/api";
+readonly rutaInventarioZeusAPI = rutaZeus;
 
   srvObtenerExistenciasZeus():Observable<any[]> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + '/existencias');

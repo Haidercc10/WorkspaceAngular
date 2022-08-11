@@ -3,20 +3,15 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { FiltrosProductosTerminadosZeusPipe } from 'src/app/Pipes/filtros-productos-terminados-zeus.pipe';
 import { InventarioZeusService } from 'src/app/Servicios/inventario-zeus.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
-import { SrvClienteOtItemsService } from 'src/app/Servicios/srv-cliente-ot-items.service';
+import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
   templateUrl: './modal-generar-inventario-zeus.component.html',
   styleUrls: ['./modal-generar-inventario-zeus.component.css']
 })
-
-/*@Injectable({
-  providedIn: 'root'
-})*/
 
 export class ModalGenerarInventarioZeusComponent implements OnInit {
 
@@ -36,7 +31,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   public NombreCliente = '';
 
   constructor(private existenciasZeus : InventarioZeusService,
-                private clienteOtItems : SrvClienteOtItemsService,
+                private clienteOtItems : BagproService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private rolService : RolesService) {
     this.load = true;
@@ -65,14 +60,16 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
     let rol = this.storage.get('Rol');
-    this.rolService.srvObtenerLista().subscribe(datos_roles => {
-      for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
-          this.ValidarRol = rol;
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
+    setTimeout(() => {
+      this.rolService.srvObtenerLista().subscribe(datos_roles => {
+        for (let index = 0; index < datos_roles.length; index++) {
+          if (datos_roles[index].rolUsu_Id == rol) {
+            this.ValidarRol = rol;
+            this.storage_Rol = datos_roles[index].rolUsu_Nombre;
+          }
         }
-      }
-    });
+      });
+    }, 100);
   }
 
   /* FUNCION PARA RELIZAR CONFIRMACIÓN DE SALIDA (CIERRE SESIÓN)*/
@@ -95,6 +92,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
       invItem : "Item",
       invNombre : "Nombre",
       invStock : "Existencias",
+      presentacion : 'Presentación',
       invPrecio : "Precio",
       invSubtotal : "Subtotal",
       invCliente : "Cliente",
@@ -123,28 +121,28 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datosExistencias => {
       for (let exi = 0; exi < datosExistencias.length; exi++) {
         this.datosCodigo = datosExistencias[exi].codigo;
-
         this.clienteOtItems.srvObtenerItemsBagproXClienteItem(this.datosCodigo).subscribe(datosCLOTI => {
           for (let cl = 0; cl < datosCLOTI.length; cl++) {
             if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
               const datosInventario: any = {
                 codigoItem : datosCLOTI[cl].clienteItems,
                 nombreItem : datosCLOTI[cl].clienteItemsNom,
-                cantidadItem : Math.round(datosExistencias[exi].existencias),
+                cantidadItem : datosExistencias[exi].existencias,
+                presentacion : datosExistencias[exi].presentacion,
                 PrecioItem : datosExistencias[exi].precioVenta,
                 PrecioTotalItem : datosExistencias[exi].precio_Total,
                 ClienteNombre : datosCLOTI[cl].clienteNom,
               }
               this.ArrayProductoZeus.push(datosInventario);
+              this.ArrayProductoZeus.sort((a,b) => Number(a.codigoItem) - Number(b.codigoItem));
             }
           }
         });
       }
     });
-
     setTimeout(() => {
       this.load = true;
-    }, 2000);
+    }, 3500);
   }
 
   /** Organiza el inventario de PT por existencias de mayor a menor. */

@@ -3,88 +3,71 @@
   <!-- Inicio Fila 1 Crear producto -->
   <div class="mb-4">
     <div class="row g-3">
-
       <!-- ID Producto -->
       <div class="form-floating col-md-2">
         <input formControlName="ProduId" type="search" min="0" class="form-control" id="floatingInput" required >
         <label for="floatingInput">Id Producto</label>
       </div>
-
       <!-- ID/Nombre Producto -->
       <div class="form-floating col-md">
         <input formControlName="ProduNombre" type="text" class="form-control form-control-sm" id="floatingInput" required>
         <label for="floatingInput">Nombre Producto</label>
       </div>
-
       <!-- Ancho Producto -->
       <div class="form-floating col-md-2">
         <input formControlName="ProduAncho" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
         <label for="floatingInput">Ancho Producto</label>
       </div>
-
       <!-- Fuelle Producto -->
       <div class="form-floating col-md-2">
         <input formControlName="ProduFuelle" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
         <label for="floatingInput">Fuelle Producto</label>
       </div>
-
       <!-- Calibre Producto -->
       <div class="form-floating col-md-2">
         <input formControlName="ProduCalibre" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
         <label for="floatingInput">Calibre Producto</label>
       </div>
-
       <!-- Largo Producto -->
       <div class="form-floating col-md-2">
         <input formControlName="ProduLargo" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
         <label for="floatingInput">Largo Producto</label>
       </div>
-
     </div>
   </div>
-
   <!-- Fin Fila 1 Crear Producto -->
 
   <!-- Inicio Fila 2 Crear Producto -->
   <div class="mb-4">
     <div class="row g-3">
-
       <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
       <div class="form-floating col-md-2">
         <select formControlName="ProduUnidadMedidaACF" type="text" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-          <!-- <option [ngValue]="null" disabled selected>Und. Medida</option> -->
           <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
         </select>
         <label for="floatingSelect">Und. Medida</label>
       </div>
-
       <!-- Tipo Producto -->
       <div class="form-floating col-md-2">
         <select formControlName="ProduTipo" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-          <!-- <option [ngValue]="null" disabled selected>Tipo Producto</option> -->
           <option [ngValue]="tipo_Producto" *ngFor="let tipo_Producto of tipoProducto">{{tipo_Producto}}</option>
         </select>
         <label for="floatingSelect">Tipo Producto</label>
       </div>
-
       <!-- Material -->
       <div class="form-floating col-md-2">
         <select formControlName="ProduMaterial" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-          <!-- <option [ngValue]="null" disabled selected>Tipo Producto</option> -->
           <option [ngValue]="material" *ngFor="let material of materialProducto">{{material}}</option>
         </select>
         <label for="floatingSelect">Material del Producto</label>
       </div>
-
       <!-- Pigmento -->
       <div class="form-floating col-md-2">
         <select formControlName="ProduPigmento" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-          <!-- <option [ngValue]="null" disabled selected>Tipo Producto</option> -->
           <option [ngValue]="pigmento" *ngFor="let pigmento of pigmentoProducto">{{pigmento}}</option>
         </select>
         <label for="floatingSelect">Pigmento del Producto</label>
       </div>
-
       <!-- Campo Descripción producto -->
       <div class="form-floating  col-md-4">
         <textarea formControlName="ProdDescripcion" id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion"></textarea>
@@ -96,14 +79,7 @@
   <!-- Inicio fila 3 -->
   <div class="mb-4">
     <div class="row g-3">
-      <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
-      <!-- <div class="form-floating col-md-4">
-        <select formControlName="ClienteNombre" type="text" id="floatingSelect" name="ClienteId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-          <option [ngValue]="clientes.cli_Nombre" *ngFor="let clientes of cliente">{{clientes.cli_Nombre}}</option>
-        </select>
-        <label for="floatingSelect">Seleccione Cliente</label>
-      </div> -->
-
+      <!-- Cliente -->
       <ng-container>
         <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm autoCompleteCLientes">
           <ng-autocomplete
@@ -132,8 +108,8 @@
 
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVacios()">Crear Producto</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
+      <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVacios()">Crear Producto</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
     </div>
   </div>
 </form>
@@ -179,7 +155,6 @@
       <!-- Tipo Moneda -->
       <div class="form-floating col-md-3">
         <select formControlName="ProduTipoMoneda" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdTipoMoneda">
-          <!-- <option [ngValue]="null" disabled selected>Seleccione Tipo Moneda</option> -->
           <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas}}</option>
         </select>
         <label for="floatingSelect">Tipo de Moneda</label>
@@ -190,8 +165,8 @@
   <!-- Inicio botones -->
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="submit">Crear Presentación de Producto</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCamposPresentacion()">Limpiar campos</button>
+      <button class="btn btn-danger btn-danger-sm" type="submit">Crear Presentación de Producto</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCamposPresentacion()">Limpiar campos</button>
     </div>
   </div>
   <!-- Fin botones -->

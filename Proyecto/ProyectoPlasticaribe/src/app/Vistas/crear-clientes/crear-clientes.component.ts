@@ -27,7 +27,7 @@ export class ClientesComponent implements OnInit {
   usuario = [];
   tipo_cliente : number;
   keywordVendedor = 'usua_Nombre';
-  validarInputVendedor : any;
+  validarInputVendedor : any = true;
 
   constructor(private formBuilderCrearClientes : FormBuilder,
                 private tiposClientesService : TipoClienteService,
@@ -58,7 +58,7 @@ export class ClientesComponent implements OnInit {
 
   selectEventVendedor(item) {
     this.FormCrearClientes.value.UsuIdNombre = item.usua_Nombre;
-    if (this.FormCrearClientes.value.UsuIdNombre != '') this.validarInputVendedor = false;
+    if (this.FormCrearClientes.value.UsuIdNombre != '' || this.FormCrearClientes.value.UsuIdNombre != null) this.validarInputVendedor = false;
     else this.validarInputVendedor = true;
     // do something with selected item
   }
@@ -73,7 +73,7 @@ export class ClientesComponent implements OnInit {
   onFocusedVendedor(e){
     if (!e.isTrusted) this.validarInputVendedor = false;
     else this.validarInputVendedor = true;
-    if (this.FormCrearClientes.value.UsuIdNombre != null) this.validarInputVendedor = false;
+    if (this.FormCrearClientes.value.UsuIdNombre != null || this.FormCrearClientes.value.UsuIdNombre != '') this.validarInputVendedor = false;
     else this.validarInputVendedor = true;
     // do something when input is focused
   }

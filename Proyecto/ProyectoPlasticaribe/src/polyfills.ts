@@ -50,8 +50,13 @@ import 'zone.js';  // Included with Angular CLI.
 export let rutaPlasticaribeAPI = "http://192.168.0.85:9085/api"; //Ruta al servidor de la base de datos nueva
 // export let rutaPlasticaribeAPI = "https://192.168.0.153:7137/api"; //Ruta local
 
-export let rutaBagPro = "http://192.168.0.85:9095/api"; //Ruta al servidor de la base de datos de BagPro --- SERVIDOR
+export let rutaBagPro = "http://192.168.0.153:9095/api"; //Ruta al servidor de la base de datos de BagPro --- SERVIDOR
 export let rutaBagProLocate = "http://192.168.0.140:9056/api"; //Ruta al servidor de la base de datos de BagPro --- LOCAL
+
+export let rutaZeus = "http://192.168.0.85:9055/api"; //Ruta al servidor de la base de datos de Zeus --- SERVIDOR
+// export let rutaZeus = "https://localhost:7283/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
+
+
 export let rutaPlasticaribe = "http://192.168.0.153:9085/api";
 export let rutaPlasticaribe2 = "http://localhost:9085/api";
 export let rutaPlasticaribe3 = "https://192.168.0.153:7137/api";

@@ -62,7 +62,7 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnEmpaque/${ot}`);
   }
 
- 
+
 
   /* CLIENTESOT */
 
@@ -94,8 +94,8 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + '/ClientesOtItems');
   }
 
-  srvObtenerListaClienteOTItemsXItem(idItem : number):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/OtItem/${idItem}`);
+  srvObtenerItemsBagproXClienteItem(codigo : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/OtItem/${codigo}`);
   }
 
   /* DESPERDICIO */

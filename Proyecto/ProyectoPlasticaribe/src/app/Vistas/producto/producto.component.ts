@@ -5,7 +5,6 @@ import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { InventarioZeusService } from 'src/app/Servicios/inventario-zeus.service';
 import { InventarioArticuloZeusService } from 'src/app/Servicios/inventarioArticuloZeus.service';
 import { ProductoService } from 'src/app/Servicios/producto.service';
-import { SrvClienteOtItemsService } from 'src/app/Servicios/srv-cliente-ot-items.service';
 import { SrvEstadosService } from 'src/app/Servicios/srv-estados.service';
 import { TipoProductoService } from 'src/app/Servicios/tipo-producto.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
@@ -38,9 +37,8 @@ export class ProductoComponent implements OnInit {
               private UnidadMedidaService : UnidadMedidaService,
               private frmBuilderProducto : FormBuilder,
               private existenciasZeus : InventarioZeusService,
-              private bagProServices : BagproService,
               private articulosZeus : InventarioArticuloZeusService,
-              private clienteOtItems : SrvClienteOtItemsService) {
+              private clienteOtItems : BagproService) {
 
 
 
