@@ -45,6 +45,12 @@ export class ExistenciasProductosService {
     return this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/ActualizacionProducto/${prod}/${presentacion}`, datos_Productos);
   }
 
+  //Metodo actualzar segun el producto y su presentacion
+  srvActualizarExistencia(id : any, datos_Productos:any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/ActualizacionExistencia/${id}`, datos_Productos);
+  }
+
+
   //Metodo eliminar
   srvEliminar(id:number|String) {
     return this.http.delete(this.rutaPlasticaribeAPI + `/Existencia_Productos/${id}`);

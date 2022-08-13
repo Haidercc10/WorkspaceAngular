@@ -124,3 +124,7 @@ a {
   border: none;
   width: 100%;
 }
+
+.ng-autocomplete ::ng-deep .autocomplete-container {
+  box-shadow: none;
+}

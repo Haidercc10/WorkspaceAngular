@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { PruebaArchivosService } from 'src/app/Servicios/pruebaArchivos.service';
 import { SrvInsumosService } from 'src/app/Servicios/srv-insumos.service';
 import Swal from 'sweetalert2';
 
@@ -16,13 +17,14 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
   public Url : any;
   public ArrayCatgInsumos = [];
   public NombreImagen : any;
+  arcvhivo : any;
+  selectedFile: File = null;
 
   constructor(private srvInsumos : SrvInsumosService,
-    private frmBuilder : FormBuilder) {
+    private frmBuilder : FormBuilder,
+    private pruebaArchivos : PruebaArchivosService) {
 
       this.formularioCatInsumo = this.frmBuilder.group({
-        catNombre : new FormControl(),
-        catDescripcion : new FormControl(),
         catImagen : new FormControl(),
       });
   }
@@ -33,9 +35,7 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   initForms(){
     this.formularioCatInsumo = this.frmBuilder.group({
-      catNombre : [, Validators.required],
-      catNDescripcion : [, Validators.required],
-      catImagen : [, Validators.required],
+      catImagen : null,
     });
   }
 
@@ -51,21 +51,76 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     }];
   }
 
+  onSelectFile(fileInput: any) {
+    this.selectedFile = <File>fileInput.target.files[0];
+  }
+
+
+  cargarArchivos(){
+    const formData = new FormData();
+    formData.append('archivo', this.selectedFile);
+    console.log(formData)
+    this.pruebaArchivos.srvGuardar(formData).subscribe(datos_archivo => {
+      console.log(formData)
+    })
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //Llamar modal después de haber cargado la imagen.
     cargarImagen(event) {
+      this.ArrayCatgInsumos = [];
+      console.log(event.target.files)
       let nombreArchivo : string = this.formularioCatInsumo.get('catImagen')?.value;
       //const file = event.target.files[0];
           if(event.target.files[0]) {
+            this.arcvhivo = event.target.files[0];
             let reader = new FileReader(); //Instancia de fileReader
             reader.readAsDataURL(event.target.files[0]);
             reader.onload = (event) =>
             this.Url = event.target.result;
             this.NombreImagen = event.target.files[0].name;
+            this.ArrayCatgInsumos.push(event.target.files);
             //console.log(event.target.files[0]);
-            console.log(event.target.files[0]);
-            console.log(this.NombreImagen);
-          }
+            // console.log(event.target.files[0]);
+            // console.log(this.NombreImagen);
+            // console.log(event.target.files[0])
+            const formData = new FormData();
+            formData.append('file', this.arcvhivo);
+            this.pruebaArchivos.srvGuardar(formData).subscribe(datos_archisvo => {
+              console.log(this.ArrayCatgInsumos)
+            })
 
+          }
+    }
+
+
+    enviarArchivo(){
+      console.log(this.ArrayCatgInsumos)
+      let formData : FormData;
+      this.pruebaArchivos.srvGuardar(formData).subscribe(datos_archisvo => {
+        console.log(this.ArrayCatgInsumos)
+      })
     }
 
     cargarDatosEnTabla(){
@@ -79,7 +134,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       //let NombreImagen = rutaFakeImagen.substring(12);
       //datosAtabla.catgImagen = NombreImagen;
 
-      this.ArrayCatgInsumos.push(datosAtabla);
 
       //console.log(datosAtabla);
     }

@@ -119,3 +119,7 @@ a {
   left: 50%;
   transform: translate(-50%, -50%)
 }
+
+.ng-autocomplete ::ng-deep .autocomplete-container {
+  box-shadow: none;
+}

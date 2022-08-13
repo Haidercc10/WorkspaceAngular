@@ -21,23 +21,13 @@
   <div class="container">
 
   <!-- FORMULARIO DE PRODUCTOS -->
-  <form [formGroup]="formularioCatInsumo" (ngSubmit)="cargarDatosEnTabla()">
+  <form [formGroup]="formularioCatInsumo" (ngSubmit)="cargarArchivos()">
       <!-- Inicio fila 1 de campos -->
       <div class="mb-4">
           <div class="row g-3">
-              <!-- Nombre -->
-              <div class="form-floating col-md-3">
-                <input formControlName="catNombre" type="text" class="form-control" id="floatingInput"required >
-                <label for="floatingInput">Nombre</label>
-              </div>
-              <!-- Descripción -->
-              <div class="form-floating col-md-3">
-                <input formControlName="catDescripcion" type="text" class="form-control" id="floatingInput"required >
-                <label for="floatingInput">Descripción</label>
-              </div>
               <!-- Imagen -->
               <div class="col-md">
-                <input formControlName="catImagen" type="file" (change)="cargarImagen($event)" accept="image/*" class="form-control form-control-sm" data-bs-toggle="modal" data-bs-target="#exampleModal" required>
+                <input formControlName="catImagen" type="file" (change)="onSelectFile($event)" accept="image/*" class="form-control form-control-sm" data-bs-toggle="modal" data-bs-target="#exampleModal" required>
                   <!--<img style="height: 100%;" [src]="Url" alt="">--> <!---->
               </div>
           </div>
@@ -50,7 +40,7 @@
               <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" expand="full" (click)="clear()">Limpiar campos</button>
           </div>
       </div>
-    </form>
+  </form>
 
       <div class="mb-5">
           <hr class="colorLinea">
@@ -72,11 +62,11 @@
                       </tr>
                   </thead>
                     <tbody>
-                      <tr *ngFor="let infoCatInsumos of ArrayCatgInsumos;">
+                      <!-- <tr *ngFor="let infoCatInsumos of ArrayCatgInsumos;">
                         <th id="nombre" class="pt-3-half TextosInfoTabla" contenteditable="true">{{infoCatInsumos.catgNombre}}</th>
                         <td id="Descripcion" class="pt-3-half TextosInfoTabla" contenteditable="true">{{infoCatInsumos.catgDescripcion}}</td>
                         <td id="Imagen" class="pt-3-half TextosInfoTabla">{{infoCatInsumos.catgImagen}}</td>
-                      </tr>
+                      </tr> -->
                     </tbody>
                 </table>
               </div>
@@ -86,7 +76,7 @@
 
       <div class="mb-3">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" (click)="registrarCategoriaInsumo()">Crear Categoria</button>
+            <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" (click)="enviarArchivo()">Crear Categoria</button>
         </div>
     </div>
 

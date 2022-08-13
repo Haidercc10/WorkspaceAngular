@@ -36,7 +36,7 @@
 
       <!-- Inicio titulo -->
       <div class="mb-4">
-        <h4 class="tituloRojo">Crear Pedido</h4>
+        <h4 class="tituloRojo">Crear Pedido N° {{contadorPedidosExternos}}</h4>
       </div>
       <!-- Fin titulo -->
       <!--Inicio Crear Pedidos-->
@@ -263,7 +263,7 @@
               <ng-container *ngIf="ValidarRol == 1">
                 <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarProducto()">Actualizar Producto</button>
               </ng-container>
-              <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
+              <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCamposProductos()">Limpiar campos</button>
           </div>
         </div>
         <!-- Fin botones -->
@@ -300,7 +300,7 @@
                     <td id="nombreCampo" class="TextosInfoTabla">{{listaProductos.Nombre}}</td>
                     <td id="cantidadDisponible" class="TextosInfoTabla">{{listaProductos.Cant}}</td>
                     <td id="undMedidaCantidad" class="TextosInfoTabla">{{listaProductos.UndCant}}</td>
-                    <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.PrecioUnd | number }}</td>
+                    <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.PrecioUnd}}</td>
                     <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.SubTotal}}</td>
                     <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true" title="Editar Producto"></i></a></td>
                     <td id="Eliminar" ><a><i class="fa fa-trash" (click)="QuitarProductoTabla(j, listaProductos)" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
@@ -354,7 +354,8 @@
         <!-- Inicio Botones -->
         <div class="bajarPagina">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="CrearPedidoExterno()">Crear Pedido</button>
+              <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="confirmarPedido()">Crear Pedido</button>
+              <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosCampos()">Limpiar Todo</button>
             </div>
         </div>
       </form>

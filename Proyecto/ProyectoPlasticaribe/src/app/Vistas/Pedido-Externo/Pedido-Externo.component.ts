@@ -22,6 +22,7 @@ import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.se
 import { modelCliente } from 'src/app/Modelo/modelCliente';
 import { MaterialProductoService } from 'src/app/Servicios/materialProducto.service';
 import { PigmentoProductoService } from 'src/app/Servicios/pigmentoProducto.service';
+import { InventarioZeusService } from 'src/app/Servicios/inventario-zeus.service';
 
 @Injectable({
   providedIn: 'root'
@@ -142,7 +143,8 @@ export class PedidoExternoComponent implements OnInit {
                                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                                     private ClientesProductosService : ClientesProductosService,
                                       private materialService : MaterialProductoService,
-                                        private pigmentoServices : PigmentoProductoService,) {
+                                        private pigmentoServices : PigmentoProductoService,
+                                        private zeus : InventarioZeusService) {
 
 
     //Campos que vienen del formulario
@@ -190,15 +192,13 @@ export class PedidoExternoComponent implements OnInit {
   //Cargar al iniciar.
   ngOnInit(): void {
     if (this.storage.get('Rol') == 1 || this.storage.get('Rol') == 2) {
+      this.consultarExistenciasProductos();
       this.clientesComboBox();
-      this.estadoComboBox();
-      this.undMedidaComboBox();
       this.obtenerEmpresa();
       this.ObtenerUltimoPedido();
       this.ColumnasTabla();
       this.lecturaStorage();
-      this.usuarioComboBox();
-      this.LimpiarCampos();
+      this.limpiarTodosCampos();
       this.fecha();
     } else window.location.href = "./home";
   }
@@ -311,32 +311,6 @@ export class PedidoExternoComponent implements OnInit {
     else Swal.fire("Hay campos vacios en el formulario de producto");
   }
 
-  // Funcion que limpia los todos los campos de la vista
-  LimpiarCampos() {
-    this.FormPedidoExternoProductos = this.frmBuilderPedExterno.group({
-      //Productos
-      ProdId: '',
-      ProdNombre: '',
-      ProdAncho: '',
-      ProdFuelle: '',
-      ProdCalibre: '',
-      ProdLargo: '',
-      ProdUnidadMedidaACF: '',
-      ProdTipo: '',
-      ProdMaterial: '',
-      ProdPigmento: '',
-      ProdCantidad: '',
-      ProdUnidadMedidaCant: '',
-      ProdPrecioUnd: '',
-      ProdUltFacturacion : '',
-      ProdTipoMoneda: '',
-      ProdStock: '',
-      ProdDescripcion: '',
-    });
-    this.ArrayProducto = [];
-    this.valorTotal = 0;
-  }
-
   // Funcion para limpiar los campos de el apartado de productos
   LimpiarCamposProductos(){
     this.FormPedidoExternoProductos = this.frmBuilderPedExterno.group({
@@ -363,6 +337,7 @@ export class PedidoExternoComponent implements OnInit {
 
   //Funcion que limpiará TODOS los campos de la vista de pedidos
   limpiarTodosCampos(){
+    this.ObtenerUltimoPedido();
     this.ArrayProducto = [];
     this.valorTotal = 0;
     this.descuento = 0;
@@ -393,18 +368,20 @@ export class PedidoExternoComponent implements OnInit {
       ProdStock: '',
       ProdDescripcion: '',
     });
-    this.FormPedidoExternoClientes.setValue({
-      PedSedeCli_Id: '',
-      ciudad_sede: '',
-      PedClienteNombre: '',
-      PedUsuarioNombre: '',
+    this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
+      PedClienteNombre: ['', Validators.required],
+      PedSedeCli_Id: ['', Validators.required],
+      ciudad_sede: ['', Validators.required],
+      PedUsuarioNombre: ['', Validators.required],
       PedFecha: this.today,
-      PedFechaEnt: '',
-      PedEstadoId: '',
-      PedObservacion: '',
+      PedFechaEnt: ['', Validators.required],
+      PedEstadoId: ['', Validators.required],
+      PedObservacion: ['', Validators.required],
       PedDescuento : 0,
       PedIva : 0,
     });
+    this.load = true;
+    this.presentacion = [];
   }
 
   /* EMPIEZA A HACE LAS RESPECTIVAS VALIDACIONES PARA MOSTRAR DATOS EN LOS COMBOBOX DESDE QUE ARRANCA LA PAGINA */
@@ -486,46 +463,6 @@ export class PedidoExternoComponent implements OnInit {
     });
   }
 
-  usuarioComboBox(){
-    this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
-      if (datos_usuarios.rolUsu_Id == 2) {
-        this.usuarios.push(datos_usuarios);
-        this.usuarios.sort((a,b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
-      }else {
-        this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
-          for (let index = 0; index < datos_usuarios.length; index++) {
-            if (datos_usuarios[index].rolUsu_Id == 2) {
-              this.usuarios.push(datos_usuarios[index]);
-              this.usuarios.sort((a,b) => a.usua_Nombre.localeCompare(b.usua_Nombre));
-            }
-          }
-        });
-      }
-    });
-  }
-
-  // Funcion para llenar el comboBox de estados
-  estadoComboBox(){
-    // FORMA DE HACER QUE SOLO SE RETORNEN LOS ESTADOS CON EL TIPO DE ESTADO "1", QUE ES EL EXCLUSIOVO PARA DOCUMENTOS
-    this.tipoEstadoService.srvObtenerListaPorId(1).subscribe(datos_tiposEstados => {
-      this.estadosService.srvObtenerListaEstados().subscribe(datos_estados=>{
-        for (let index = 0; index < datos_estados.length; index++) {
-          if (datos_tiposEstados.tpEstado_Id == datos_estados[index].tpEstado_Id) {
-            if (this.ValidarRol == 2){
-              if (datos_estados[index].estado_Id == 11) {
-                this.estado.push(datos_estados[index].estado_Nombre);
-                break;
-              }
-            } else if (this.ValidarRol == 1){
-              this.estado.push(datos_estados[index].estado_Nombre);
-            }
-          }
-        }
-        this.estado.sort();
-      }, error =>{ console.log("error"); });
-    });
-  }
-
   // Funcion para cargar los productos de un solo cliente
   productoCliente(){
     this.producto = [];
@@ -546,95 +483,183 @@ export class PedidoExternoComponent implements OnInit {
     let idProducto : number = this.FormPedidoExternoProductos.value.ProdId;
 
     this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
-      for (let i = 0; i < datos_producto.length; i++) {
-        this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto, datos_producto[i].undMed_Id).subscribe(datos_productoPedido => {
-          let datos : any = [];
-          datos.push(datos_productoPedido);
-          for (const item of datos) {
-            this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
+      if (datos_producto.length != 0) {
+        for (let i = 0; i < datos_producto.length; i++) {
+          this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto, datos_producto[i].undMed_Id).subscribe(datos_productoPedido => {
+            let datos : any = [];
+            datos.push(datos_productoPedido);
+            for (const item of datos) {
+              this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
+            }
+          });
+
+          setTimeout(() => {
+            this.presentacion.push(datos_producto[i].undMed_Id);
+            this.FormPedidoExternoProductos.setValue({
+              ProdId: datos_producto[i].prod_Id,
+              ProdNombre: datos_producto[i].prod_Nombre,
+              ProdAncho: datos_producto[i].prod_Ancho,
+              ProdFuelle: datos_producto[i].prod_Fuelle,
+              ProdCalibre: datos_producto[i].prod_Calibre,
+              ProdLargo: datos_producto[i].prod_Largo,
+              ProdUnidadMedidaACF: datos_producto[i].undMedACF,
+              ProdTipo: datos_producto[i].tpProd_Nombre,
+              ProdMaterial: datos_producto[i].material_Nombre,
+              ProdPigmento: datos_producto[i].pigmt_Nombre,
+              ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
+              ProdUnidadMedidaCant: datos_producto[i].undMed_Id,
+              ProdPrecioUnd: datos_producto[i].exProd_PrecioVenta,
+              ProdUltFacturacion: this.ultimoPrecio,
+              ProdTipoMoneda: datos_producto[i].tpMoneda_Id,
+              ProdStock: datos_producto[i].exProd_Cantidad,
+              ProdDescripcion: datos_producto[i].prod_Descripcion,
+            });
+          }, 100);
+          if (this.FormPedidoExternoProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
+          else this.validarInputNombresProductos = true;
+        }
+      } else if (datos_producto.length == 0) {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: 'El producto no tiene existencias'
+        });
+        this.unidadMedidaService.srvObtenerLista().subscribe(datos_undMed => {
+          for (let index = 0; index < datos_undMed.length; index++) {
+            this.presentacion.push(datos_undMed[index].undMed_Id);
           }
         });
 
-        setTimeout(() => {
-          this.presentacion.push(datos_producto[i].undMed_Id);
-          this.FormPedidoExternoProductos.setValue({
-            ProdId: datos_producto[i].prod_Id,
-            ProdNombre: datos_producto[i].prod_Nombre,
-            ProdAncho: datos_producto[i].prod_Ancho,
-            ProdFuelle: datos_producto[i].prod_Fuelle,
-            ProdCalibre: datos_producto[i].prod_Calibre,
-            ProdLargo: datos_producto[i].prod_Largo,
-            ProdUnidadMedidaACF: datos_producto[i].undMedACF,
-            ProdTipo: datos_producto[i].tpProd_Nombre,
-            ProdMaterial: datos_producto[i].material_Nombre,
-            ProdPigmento: datos_producto[i].pigmt_Nombre,
-            ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
-            ProdUnidadMedidaCant: datos_producto[i].undMed_Id,
-            ProdPrecioUnd: datos_producto[i].exProd_PrecioVenta,
-            ProdUltFacturacion: this.ultimoPrecio,
-            ProdTipoMoneda: datos_producto[i].tpMoneda_Id,
-            ProdStock: datos_producto[i].exProd_Cantidad,
-            ProdDescripcion: datos_producto[i].prod_Descripcion,
-          });
-          if (this.FormPedidoExternoProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
-          else this.validarInputNombresProductos = true;
-        }, 100);
+        this.productosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
+          for (let i = 0; i < datos_producto.length; i++) {
+            this.FormPedidoExternoProductos.setValue({
+              ProdId: datos_producto[i].prod_Id,
+              ProdNombre: datos_producto[i].prod_Nombre,
+              ProdAncho: datos_producto[i].prod_Ancho,
+              ProdFuelle: datos_producto[i].prod_Fuelle,
+              ProdCalibre: datos_producto[i].prod_Calibre,
+              ProdLargo: datos_producto[i].prod_Largo,
+              ProdUnidadMedidaACF: datos_producto[i].undMedACF,
+              ProdTipo: datos_producto[i].tpProd_Nombre,
+              ProdMaterial: datos_producto[i].material_Nombre,
+              ProdPigmento: datos_producto[i].pigmt_Nombre,
+              ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
+              ProdUnidadMedidaCant: '',
+              ProdPrecioUnd: 0,
+              ProdUltFacturacion: this.ultimoPrecio,
+              ProdTipoMoneda: '',
+              ProdStock: 0,
+              ProdDescripcion: datos_producto[i].prod_Descripcion,
+            });
+            if (this.FormPedidoExternoProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
+            else this.validarInputNombresProductos = true;
+          }
+        });
       }
     });
   }
 
   // Funcion para llenar los datos de los productos en cada uno de los campos
   llenadoProducto(item : any){
-    this.productoInfo = [];
     this.presentacion = [];
     this.FormPedidoExternoProductos.value.ProdNombre = item.prod_Id;
 
     let idProducto : any = this.FormPedidoExternoProductos.value.ProdNombre = item.prod_Id;
     this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
-      for (let i = 0; i < datos_producto.length; i++) {
-        this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto, datos_producto[i].undMed_Id).subscribe(datos_productoPedido => {
-          let datos : any = [];
-          datos.push(datos_productoPedido);
-          for (const item of datos) {
-            this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
+      if (datos_producto.length != 0) {
+        for (let i = 0; i < datos_producto.length; i++) {
+          this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto, datos_producto[i].undMed_Id).subscribe(datos_productoPedido => {
+            let datos : any = [];
+            datos.push(datos_productoPedido);
+            for (const item of datos) {
+              this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
+            }
+          });
+
+          setTimeout(() => {
+            this.presentacion.push(datos_producto[i].undMed_Id);
+            this.FormPedidoExternoProductos.setValue({
+              ProdId: datos_producto[i].prod_Id,
+              ProdNombre: datos_producto[i].prod_Nombre,
+              ProdAncho: datos_producto[i].prod_Ancho,
+              ProdFuelle: datos_producto[i].prod_Fuelle,
+              ProdCalibre: datos_producto[i].prod_Calibre,
+              ProdLargo: datos_producto[i].prod_Largo,
+              ProdUnidadMedidaACF: datos_producto[i].undMedACF,
+              ProdTipo: datos_producto[i].tpProd_Nombre,
+              ProdMaterial: datos_producto[i].material_Nombre,
+              ProdPigmento: datos_producto[i].pigmt_Nombre,
+              ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
+              ProdUnidadMedidaCant: datos_producto[i].undMed_Id,
+              ProdPrecioUnd: datos_producto[i].exProd_PrecioVenta,
+              ProdUltFacturacion: this.ultimoPrecio,
+              ProdTipoMoneda: datos_producto[i].tpMoneda_Id,
+              ProdStock: datos_producto[i].exProd_Cantidad,
+              ProdDescripcion: datos_producto[i].prod_Descripcion,
+            });
+          }, 100);
+          if (this.FormPedidoExternoProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
+          else this.validarInputNombresProductos = true;
+        }
+      } else if (datos_producto.length == 0) {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: 'El producto no tiene existencias'
+        });
+        this.unidadMedidaService.srvObtenerLista().subscribe(datos_undMed => {
+          for (let index = 0; index < datos_undMed.length; index++) {
+            this.presentacion.push(datos_undMed[index].undMed_Id);
           }
         });
 
-        setTimeout(() => {
-          this.presentacion.push(datos_producto[i].undMed_Id);
-          this.FormPedidoExternoProductos.setValue({
-            ProdId: datos_producto[i].prod_Id,
-            ProdNombre: datos_producto[i].prod_Nombre,
-            ProdAncho: datos_producto[i].prod_Ancho,
-            ProdFuelle: datos_producto[i].prod_Fuelle,
-            ProdCalibre: datos_producto[i].prod_Calibre,
-            ProdLargo: datos_producto[i].prod_Largo,
-            ProdUnidadMedidaACF: datos_producto[i].undMedACF,
-            ProdTipo: datos_producto[i].tpProd_Nombre,
-            ProdMaterial: datos_producto[i].material_Nombre,
-            ProdPigmento: datos_producto[i].pigmt_Nombre,
-            ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
-            ProdUnidadMedidaCant: datos_producto[i].undMed_Id,
-            ProdPrecioUnd: datos_producto[i].exProd_PrecioVenta,
-            ProdUltFacturacion: this.ultimoPrecio,
-            ProdTipoMoneda: datos_producto[i].tpMoneda_Id,
-            ProdStock: datos_producto[i].exProd_Cantidad,
-            ProdDescripcion: datos_producto[i].prod_Descripcion,
-          });
-        }, 100);
-        if (this.FormPedidoExternoProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
-        else this.validarInputNombresProductos = true;
+        this.productosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
+          for (let i = 0; i < datos_producto.length; i++) {
+            this.FormPedidoExternoProductos.setValue({
+              ProdId: datos_producto[i].prod_Id,
+              ProdNombre: datos_producto[i].prod_Nombre,
+              ProdAncho: datos_producto[i].prod_Ancho,
+              ProdFuelle: datos_producto[i].prod_Fuelle,
+              ProdCalibre: datos_producto[i].prod_Calibre,
+              ProdLargo: datos_producto[i].prod_Largo,
+              ProdUnidadMedidaACF: datos_producto[i].undMedACF,
+              ProdTipo: datos_producto[i].tpProd_Nombre,
+              ProdMaterial: datos_producto[i].material_Nombre,
+              ProdPigmento: datos_producto[i].pigmt_Nombre,
+              ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
+              ProdUnidadMedidaCant: '',
+              ProdPrecioUnd: 0,
+              ProdUltFacturacion: this.ultimoPrecio,
+              ProdTipoMoneda: '',
+              ProdStock: 0,
+              ProdDescripcion: datos_producto[i].prod_Descripcion,
+            });
+            if (this.FormPedidoExternoProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
+            else this.validarInputNombresProductos = true;
+          }
+        });
       }
     });
-  }
-
-  // Funcion para llenar los combobox de unidad de medida con las unidades de medidas
-  undMedidaComboBox() {
-    this.unidadMedidaService.srvObtenerLista().subscribe(datos_undMed => {
-      for (let index = 0; index < datos_undMed.length; index++) {
-        this.undMed.push(datos_undMed[index].undMed_Id);
-      }
-    }, error => { Swal.fire('Ocurrió un error, intentelo de nuevo'); });
   }
 
   //Se obtiene el ultimo codigo del pedido y se incrementa en 1. (Contador)
@@ -689,8 +714,8 @@ export class PedidoExternoComponent implements OnInit {
     this.valorfinal = this.valorTotal - this.valorMenosDescuento + this.valorMenosIva;
 
     this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_existencias => {
-      for (let index = 0; index < datos_existencias.length; index++) {
-        if (precioProducto >= datos_existencias[index].exProd_PrecioVenta) {
+      if (datos_existencias.length == 0) {
+        if (precioProducto >= 1) {
           let productoExt : any = {
             Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
             Nombre : nombreProducto,
@@ -730,14 +755,105 @@ export class PedidoExternoComponent implements OnInit {
               }
             }
           }
-        } else Swal.fire(`El precio digitado no puede ser menor al que tiene el producto estipulado $${datos_existencias[index].exProd_PrecioVenta}`);
+        } else Swal.fire(`El precio digitado no puede ser menor a 0`);
+      } else if (datos_existencias.length != 0) {
+        for (let index = 0; index < datos_existencias.length; index++) {
+          if (precioProducto >= datos_existencias[index].exProd_PrecioVenta) {
+            let productoExt : any = {
+              Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
+              Nombre : nombreProducto,
+              Ancho : this.FormPedidoExternoProductos.get('ProdAncho').value,
+              Fuelle : this.FormPedidoExternoProductos.get('ProdFuelle').value,
+              Cal : this.FormPedidoExternoProductos.get('ProdCalibre').value,
+              Und : this.FormPedidoExternoProductos.get('ProdUnidadMedidaACF').value,
+              Tipo : this.FormPedidoExternoProductos.get('ProdTipo').value,
+              Material : this.FormPedidoExternoProductos.value.ProdMaterial,
+              Pigmento: this.FormPedidoExternoProductos.value.ProdPigmento,
+              Cant : this.formatonumeros(this.FormPedidoExternoProductos.get('ProdCantidad').value),
+              Largo : this.FormPedidoExternoProductos.get('ProdLargo').value,
+              UndCant : this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
+              PrecioUnd : this.formatonumeros(precioProducto),
+              TpMoneda : this.FormPedidoExternoProductos.get('ProdTipoMoneda').value,
+              Stock : this.formatonumeros(this.FormPedidoExternoProductos.get('ProdStock').value),
+              Produ_Descripcion : this.FormPedidoExternoProductos.get('ProdDescripcion').value,
+              SubTotal : this.formatonumeros((this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad).toFixed(2)),
+            }
+
+            if (this.AccionBoton == "Agregar" && this.ArrayProducto.length == 0) {
+              this.ArrayProducto.push(productoExt);
+              this.LimpiarCamposProductos();
+
+            } else if (this.AccionBoton == "Agregar" && this.ArrayProducto.length != 0){
+              this.ArrayProducto.push(productoExt);
+              this.LimpiarCamposProductos();
+              productoExt = [];
+            } else {
+              for (let index = 0; index < formulario.length; index++) {
+                if(productoExt.Id == this.ArrayProducto[index].Id) {
+                  this.ArrayProducto.splice(index, 1);
+                  this.ArrayProducto.push(productoExt);
+                  this.AccionBoton = "Agregar";
+                  this.LimpiarCamposProductos();
+                  break;
+                }
+              }
+            }
+          } else Swal.fire(`El precio digitado no puede ser menor al que tiene el producto estipulado $${datos_existencias[index].exProd_PrecioVenta}`);
         }
+      }
       this.ArrayProducto.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
+    });
+  }
+
+  // Funcion que mostrará un modal con la informacion del pedido
+  confirmarPedido(){
+    this.consultarExistenciasProductos();
+    let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
+    let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
+    let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
+
+    Swal.fire({
+      icon: 'warning',
+      title: 'Confirmación de Pedido',
+      width: 800,
+      heightAuto : true,
+      html:
+      `<b>Cliente:</b> ${clienteNombre.cli_Nombre} <br> ` +
+      `<b>Ciudad:</b> ${ciudad} <br>` +
+      `<b>Direccion:</b> ${direccionSede} <br>` +
+      `<b>Iva:</b> ${this.iva}% <b>Descuento:</b> ${this.descuento}% <br>` +
+      `<b>Valor del Pedido</b> ${this.valorfinal}<br>`,
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Crear Pedido',
+      denyButtonText: `Seguir Editando`,
+      cancelButtonText : `Cancelar Pedido`,
+    }).then((result) => {
+      if (result.isConfirmed) this.CrearPedidoExterno();
+      else if (result.isDenied) {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'info',
+          title: 'Puede seguir editando el pedido'
+        });
+      }
+      else if (result.isDismissed) this.limpiarTodosCampos();
     });
   }
 
   // Funcion para crear los pedidos de productos y añadirlos a la base de datos
   CrearPedidoExterno() {
+    this.load = false;
     let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
     let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
@@ -745,7 +861,6 @@ export class PedidoExternoComponent implements OnInit {
     let cantidadProducto : any;
     let unidadMedida : any;
     let precioUnidad : number;
-    let campoEstado = this.FormPedidoExternoClientes.get('PedEstadoId')?.value;
 
     this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre.cli_Nombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
       for (let i = 0; i < datos_sedeCliente.length; i++) {
@@ -767,7 +882,6 @@ export class PedidoExternoComponent implements OnInit {
         if(!this.ArrayProducto.length) Swal.fire('Debe cargar al menos un producto en la tabla.');
         else{
           this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data=> {
-
             this.pedidoproductoService.srvObtenerUltimoPedido().subscribe(dataPedExternos =>{
               let datos : any = [];
               datos.push(dataPedExternos);
@@ -785,26 +899,23 @@ export class PedidoExternoComponent implements OnInit {
                     UndMed_Id : unidadMedida,
                     PedExtProd_PrecioUnitario : precioUnidad
                   }
-
                   this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(registro_pedido_productos => {}, error => { console.log(error); });
                 }
                 const Toast = Swal.mixin({
                   toast: true,
                   position: 'top-end',
                   showConfirmButton: false,
-                  timer: 3000,
+                  timer: 4500,
                   timerProgressBar: true,
                   didOpen: (toast) => {
                     toast.addEventListener('mouseenter', Swal.stopTimer)
                     toast.addEventListener('mouseleave', Swal.resumeTimer)
                   }
-                })
-
+                });
                 Toast.fire({
                   icon: 'success',
                   title: 'Pedido creado satisfactoriamente'
                 });
-
                 this.crearpdf();
                 setTimeout(() => {
                   this.limpiarTodosCampos();
@@ -1064,7 +1175,7 @@ export class PedidoExternoComponent implements OnInit {
                               '',
                               {
                                 border: [true, false, true, true],
-                                text: `IVA`
+                                text: `IVA (%)`
                               },
                               {
                                 border: [false, false, true, true],
@@ -1075,7 +1186,7 @@ export class PedidoExternoComponent implements OnInit {
                               '',
                               {
                                 border: [true, false, true, true],
-                                text: `SUBTOTAL MENOS IVA`
+                                text: `SUBTOTAL MAS IVA`
                               },
                               {
                                 border: [false, false, true, true],
@@ -1185,10 +1296,9 @@ export class PedidoExternoComponent implements OnInit {
   EditarProductoTabla(formulario : any) {
     this.Ide = formulario.Id;
     this.AccionBoton = "Editar";
-    this.producto = [];
     this.presentacion = [];
 
-    this.PedidoProductosService.srvObtenerListaPorIdProducto(formulario.Id, formulario.ProdUnidadMedidaCant).subscribe(datos_productoPedido => {
+    this.PedidoProductosService.srvObtenerListaPorIdProducto(formulario.Id, formulario.UndCant).subscribe(datos_productoPedido => {
       let datos : any = [];
       datos.push(datos_productoPedido);
       for (const item of datos) {
@@ -1219,6 +1329,29 @@ export class PedidoExternoComponent implements OnInit {
           }
         });
       }
+    }, error => {
+      this.presentacion.push(formulario.UndCant);
+        this.FormPedidoExternoProductos.patchValue({
+          ProdId : formulario.Id,
+          ProdNombre: formulario.Nombre,
+          ProdAncho : formulario.Ancho,
+          ProdFuelle : formulario.Fuelle,
+          ProdCalibre : formulario.Cal,
+          ProdLargo : formulario.Largo,
+          ProdUnidadMedidaACF : formulario.Und,
+          ProdTipo : formulario.Tipo,
+          ProdCantidad : formulario.Cant,
+          ProdUnidadMedidaCant : formulario.UndCant,
+          ProdPrecioUnd : formulario.PrecioUnd,
+          ProdTipoMoneda : formulario.TpMoneda,
+          ProdStock : formulario.Stock,
+          ProdDescripcion : formulario.Produ_Descripcion,
+          ProdMaterial: formulario.Material,
+          ProdPigmento: formulario.Pigmento,
+          ProdUltFacturacion : 0,
+        });
+        if (this.FormPedidoExternoProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
+        else this.validarInputNombresProductos = true;
     });
   }
 
@@ -1515,6 +1648,47 @@ export class PedidoExternoComponent implements OnInit {
         });
       }
     });
+  }
+
+  //Funcion que consultará las existencias de los productos para luego enviarle la información a otra funcion que se encargará de actualizar dichas existencias
+  consultarExistenciasProductos(){
+    let presentacion : any;
+    this.zeus.srvObtenerExistenciasArticulosZeus().subscribe(datos_inventarioZeus => {
+      for (let i = 0; i < datos_inventarioZeus.length; i++) {
+        if (datos_inventarioZeus[i].presentacion == 'KLS' || datos_inventarioZeus[i].presentacion == 'KLG') presentacion = 'Kg';
+        else if (datos_inventarioZeus[i].presentacion == 'UND' || datos_inventarioZeus[i].presentacion == 'UNID') presentacion = 'Und';
+        else if (datos_inventarioZeus[i].presentacion == 'PAQ' || datos_inventarioZeus[i].presentacion == 'PAQT') presentacion = 'Paquete';
+        this.existenciasProductosServices.srvObtenerListaPorIdProductoPresentacion(datos_inventarioZeus[i].codigo, presentacion).subscribe(datos_productos => {
+          for (let j = 0; j < datos_productos.length; j++) {
+            setTimeout(() => {
+              this.actualizarExistenciasProductos(datos_inventarioZeus[i].codigo,
+                                                  datos_productos[j].exProd_Id,
+                                                  datos_inventarioZeus[i].existencias,
+                                                  presentacion,
+                                                  datos_productos[j].tpBod_Id,
+                                                  datos_inventarioZeus[i].precio_Total,
+                                                  datos_productos[j].tpMoneda_Id,
+                                                  datos_inventarioZeus[i].precioVenta);
+            }, 100);
+          }
+        });
+      }
+    });
+  }
+
+  // Función que se encargará de actualizar las existencias de los productos
+  actualizarExistenciasProductos(id : number, exId : number, cantidad : number, presentacion : string, bodega : number, total : number, moneda : string, precio : number){
+    const datosExistencias = {
+      Prod_Id: id,
+      exProd_Id: exId,
+      ExProd_Cantidad: cantidad,
+      UndMed_Id: presentacion,
+      TpBod_Id: bodega,
+      ExProd_PrecioExistencia: total,
+      TpMoneda_Id: moneda,
+      exProd_PrecioVenta : precio,
+    }
+    this.existenciasProductosServices.srvActualizarExistencia(exId, datosExistencias).subscribe(actualizacionExistencias => { });
   }
 
 }

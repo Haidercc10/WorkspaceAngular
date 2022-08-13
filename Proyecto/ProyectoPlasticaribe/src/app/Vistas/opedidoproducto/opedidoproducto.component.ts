@@ -40,8 +40,6 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export class OpedidoproductoComponent implements OnInit {
 
-  serializedDate = new FormControl(new Date().toISOString());
-
   public FormPedidoExternoClientes !: FormGroup; //Formulario de pedidos cliente
   public FormPedidoExternoProductos!: FormGroup; //Formuladio de pedidos productos
   public FormConsultaPedidoExterno !: FormGroup; //Formulario de pedidos consultados
@@ -1639,8 +1637,8 @@ export class OpedidoproductoComponent implements OnInit {
             },
             content : [
               {
-                text: `Plasticaribe S.A.S ---- Orden de Pedidos de Productos`,
-                alignment: 'center',
+                text: `Orden de Pedidos de Productos N° ${datos_pedido[i].pedExt_Id}`,
+                alignment: 'right',
                 style: 'titulo',
               },
               '\n \n',
@@ -1709,15 +1707,84 @@ export class OpedidoproductoComponent implements OnInit {
               this.table(this.productosPedidos, ['Id', 'Nombre', 'Ancho', 'Fuelle', 'Cal', 'Largo', 'Und', 'Tipo', 'Material', 'Pigmento', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
 
               {
-                text: `\n\nValor Total Pedido: $${this.formatonumeros(datos_pedido[i].pedExt_PrecioTotal)}`,
-                alignment: 'right',
-                style: 'header',
+                style: 'tablaTotales',
+                table: {
+                  widths: [335, 135, 55],
+                  style: 'header',
+                  body: [
+                    [
+                      '',
+                      {
+                        border: [true, false, true, true],
+                        text: `SUBTOTAL`
+                      },
+                      {
+                        border: [false, false, true, true],
+                        text: `${this.formatonumeros(datos_pedido[i].pedExt_PrecioTotal)}`
+                      },
+                    ],
+                    [
+                      '',
+                      {
+                        border: [true, false, true, true],
+                        text: `DESCUENTO (%)`
+                      },
+                      {
+                        border: [false, false, true, true],
+                        text: `${datos_pedido[i].pedExt_Descuento}`
+                      },
+                    ],
+                    [
+                      '',
+                      {
+                        border: [true, false, true, true],
+                        text: `SUBTOTAL MENOS DESCUENTO`
+                      },
+                      {
+                        border: [false, false, true, true],
+                        text: `${this.formatonumeros((datos_pedido[i].pedExt_PrecioTotal - ((datos_pedido[i].pedExt_PrecioTotal * datos_pedido[i].pedExt_Descuento) / 100)).toFixed(2))}`
+                      },
+                    ],
+                    [
+                      '',
+                      {
+                        border: [true, false, true, true],
+                        text: `IVA (%)`
+                      },
+                      {
+                        border: [false, false, true, true],
+                        text: `${this.formatonumeros(datos_pedido[i].pedExt_Iva)}`
+                      },
+                    ],
+                    [
+                      '',
+                      {
+                        border: [true, false, true, true],
+                        text: `SUBTOTAL MAS IVA`
+                      },
+                      {
+                        border: [false, false, true, true],
+                        text: `${this.formatonumeros((datos_pedido[i].pedExt_PrecioTotal + ((datos_pedido[i].pedExt_PrecioTotal* datos_pedido[i].pedExt_Iva) / 100)).toFixed(2))}`
+                      },
+                    ],
+                    [
+                      '',
+                      {
+                        border: [true, false, true, true],
+                        text: `TOTAL`
+                      },
+                      {
+                        border: [false, false, true, true],
+                        text: `${this.formatonumeros(datos_pedido[i].pedExt_PrecioTotalFinal)}`
+                      },
+                    ]
+                  ]
+                },
+                layout: {
+                  defaultBorder: false,
+                },
+                fontSize: 7,
               },
-              {
-                text: `Tipo de moneda: ${item.Moneda}`,
-                alignment: 'right',
-                style: 'header',
-              }
             ],
             styles: {
               header: {
@@ -1764,7 +1831,7 @@ export class OpedidoproductoComponent implements OnInit {
               PrecioUnd : this.formatonumeros(datos_pedido[i].pedExtProd_PrecioUnitario),
               Moneda : datos_producto[j].tpMoneda_Id,
               Stock : datos_producto[j].exProd_Cantidad,
-              SubTotal : this.formatonumeros(datos_pedido[i].pedExtProd_Cantidad * datos_pedido[i].pedExtProd_PrecioUnitario),
+              SubTotal : this.formatonumeros((datos_pedido[i].pedExtProd_Cantidad * datos_pedido[i].pedExtProd_PrecioUnitario).toFixed(2)),
             }
             this.productosPedidos.push(producto);
           }

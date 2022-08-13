@@ -42,7 +42,6 @@ a {
 }
 
 .Titulo{
- margin-top: 140px;
  text-align: center;
 }
 
@@ -133,10 +132,4 @@ a {
 
 .vendedorAutoComplete{
   width: 318px;
-}
-
- @media (max-width: 500px) {
-  .Titulo{
-    margin-top: 200px;
-   }
 }
