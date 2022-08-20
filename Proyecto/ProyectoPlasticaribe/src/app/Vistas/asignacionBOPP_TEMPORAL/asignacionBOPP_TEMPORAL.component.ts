@@ -373,18 +373,21 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   }
 
   obtenerIdUltimaAsignacion(){
-    let idsAsignaciones = [];
-    this.asignacionBOPPService.srvObtenerLista().subscribe(datos_asignaciones => {
-      for (let i = 0; i < datos_asignaciones.length; i++) {
-        idsAsignaciones.push(datos_asignaciones[i].asigBOPP_Id);
-      }
-      let ultimoId : number = Math.max.apply(null, idsAsignaciones);
-      this.detallesAsginacionBOPP(ultimoId);
-    });
+    // let idsAsignaciones = [];
+    // this.asignacionBOPPService.srvObtenerLista().subscribe(datos_asignaciones => {
+    //   for (let i = 0; i < datos_asignaciones.length; i++) {
+    //     idsAsignaciones.push(datos_asignaciones[i].asigBOPP_Id);
+    //   }
+    //   let ultimoId : number = Math.max.apply(null, idsAsignaciones);
+    //   this.detallesAsginacionBOPP(ultimoId);
+    // });
 
     // this.asignacionBOPPService.srvObtenerListaPorAgrupadoOT(ot).subscribe(datos_bopp => {
     //   this.detallesAsginacionBOPP(datos_bopp);
     // });
+    this.asignacionBOPPService.srvObtenerListaUltimoId().subscribe(datos_asignaciones => {
+      this.detallesAsginacionBOPP(datos_asignaciones);
+    });
   }
 
   detallesAsginacionBOPP(idAsignacion : any){
@@ -397,7 +400,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
               let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
               let datos : any = {
-                AsigBOPP_Id : idAsignacion,
+                AsigBOPP_Id : idAsignacion.asigBOPP_Id,
                 BOPP_Id : datos_bopp[k].bopP_Id,
                 DtAsigBOPP_Cantidad : cantidad,
                 UndMed_Id : 'Kg',
