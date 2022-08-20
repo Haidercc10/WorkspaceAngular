@@ -14,14 +14,15 @@
       <ul>
         <p>Plasticaribe S.A.S</p>
 
+        <!-- INICIO -->
         <li>
           <a class="fw-normal" href="home" role="button">
             Inicio
           </a>
         </li>
 
+        <!-- PEDIDOS -->
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2">
-          <!-- PEDIDOS -->
           <li>
             <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
               Pedidos
@@ -44,26 +45,13 @@
           </li>
         </ng-container>
 
-        <!-- ORDEN DE TRABAJO -->
-
-        <!-- PROCESOS -->
-
-        <!-- DESPERDICIOS -->
-
-        <!-- FACTURA DE VENTAS -->
-
-        <!-- USUARIOS -->
-
-        <!-- CLIENTES -->
-
         <!-- REPORTES -->
-
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
           <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample8" role="button" aria-expanded="false" aria-controls="collapseExample">
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample">
               Reportes
             </a>
-            <div class="collapse" id="collapseExample8">
+            <div class="collapse" id="collapseExample2">
               <ng-container *ngIf="ValidarRol == 1">
                 <div class="mb-2">
                   <a class="fst-normal" data-bs-toggle="" href="/reporte-facturas-remisiones-mp" role="button" aria-expanded="false" aria-controls="">
@@ -111,15 +99,13 @@
           </li>
         </ng-container>
 
-        <!-- PRODUCTOS -->
-
         <!-- MATERIAS PRIMAS -->
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
           <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample10" role="button" aria-expanded="false" aria-controls="collapseExample">
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample">
                 Materia Prima
             </a>
-            <div class="collapse" id="collapseExample10">
+            <div class="collapse" id="collapseExample3">
               <div class="mb-2">
                 <a class="fst-normal" data-bs-toggle="" href="/asignacionMP" role="button" aria-expanded="false" aria-controls="">
                   Asignaciones
@@ -162,10 +148,10 @@
         <!-- BOPP -->
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
           <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample11" role="button" aria-expanded="false" aria-controls="collapseExample">
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample4" role="button" aria-expanded="false" aria-controls="collapseExample">
                 BOPP
             </a>
-            <div class="collapse" id="collapseExample11">
+            <div class="collapse" id="collapseExample4">
               <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
                 <div class="mb-2">
                   <a class="fst-normal" data-bs-toggle="" href="/AsignacionBOPPTemporal" role="button" aria-expanded="false" aria-controls="">
@@ -186,6 +172,35 @@
             </div>
           </li>
         </ng-container>
+
+        <!-- GESTOR DE ARCHIVOS -->
+        <li>
+          <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample5" role="button" aria-expanded="false" aria-controls="collapseExample">
+            Gestor de Archivos
+          </a>
+          <div class="collapse" id="collapseExample5">
+            <div class="mb-2">
+              <a class="fst-normal" data-bs-toggle="" href="/Archivos" role="button" aria-expanded="false" aria-controls="">
+                Archivos
+              </a>
+            </div>
+          </div>
+        </li>
+
+        <!-- PRODUCTOS -->
+
+        <!-- ORDEN DE TRABAJO -->
+
+        <!-- PROCESOS -->
+
+        <!-- DESPERDICIOS -->
+
+        <!-- FACTURA DE VENTAS -->
+
+        <!-- USUARIOS -->
+
+        <!-- CLIENTES -->
+
         <!-- ACTIVOS -->
 
         <!-- PROVEEDORES -->
@@ -203,7 +218,7 @@
   <mat-sidenav-content>
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
-        <p><button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" mat-button (click)="sidenav.toggle()"><b><span class="user">Plasti<span>caribe S.A.S</span></span></b></button></p>
+        <p><button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" mat-button (click)="sidenav.toggle()"><svg xmlns="http://www.w3.org/2000/svg" style="width: 20px;" viewBox="0 0 512 512"><path d="M88 48C101.3 48 112 58.75 112 72V120C112 133.3 101.3 144 88 144H40C26.75 144 16 133.3 16 120V72C16 58.75 26.75 48 40 48H88zM480 64C497.7 64 512 78.33 512 96C512 113.7 497.7 128 480 128H192C174.3 128 160 113.7 160 96C160 78.33 174.3 64 192 64H480zM480 224C497.7 224 512 238.3 512 256C512 273.7 497.7 288 480 288H192C174.3 288 160 273.7 160 256C160 238.3 174.3 224 192 224H480zM480 384C497.7 384 512 398.3 512 416C512 433.7 497.7 448 480 448H192C174.3 448 160 433.7 160 416C160 398.3 174.3 384 192 384H480zM16 232C16 218.7 26.75 208 40 208H88C101.3 208 112 218.7 112 232V280C112 293.3 101.3 304 88 304H40C26.75 304 16 293.3 16 280V232zM88 368C101.3 368 112 378.7 112 392V440C112 453.3 101.3 464 88 464H40C26.75 464 16 453.3 16 440V392C16 378.7 26.75 368 40 368H88z"/></svg>&nbsp;&nbsp;&nbsp;<b><span class="user">Plasti<span>caribe S.A.S</span></span></b></button></p>
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <span class="user"><b>User:</b> {{storage_Nombre}}</span>
           <span class="tipoUser"><b>Tipo:</b> {{storage_Rol}} </span>

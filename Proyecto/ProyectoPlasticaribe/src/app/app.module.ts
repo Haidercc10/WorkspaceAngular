@@ -65,6 +65,8 @@ import {AutocompleteLibModule} from 'angular-ng-autocomplete';
 import { ReporteEstadosOTComponent } from './Vistas/reporte-estados-ot/reporte-estados-ot.component';
 import { MenuLateralComponent } from './Vistas/menuLateral/menuLateral.component';
 import { PedidoExternoComponent } from './Vistas/Pedido-Externo/Pedido-Externo.component';
+import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
+import { CrearCategoriasComponent } from './Vistas/CrearCategorias/CrearCategorias.component';
 
 
 export const routes: Routes = [
@@ -89,7 +91,7 @@ export const routes: Routes = [
   {path: 'crear-clientes', canActivate: [ValidacionLoginGuard], component:ClientesComponent},
   {path: 'producto', canActivate: [ValidacionLoginGuard], component:ProductoComponent},
   {path: 'estados', canActivate: [ValidacionLoginGuard], component: EstadosComponent},
-  {path: 'home', canActivate: [ValidacionLoginGuard], component: PaginaPrincipalComponent},
+  {path: 'home', component: PaginaPrincipalComponent},
   {path: 'desperdicio', canActivate: [ValidacionLoginGuard], component: DesperdicioComponent},
   {path: 'MateriaPrima', canActivate: [ValidacionLoginGuard], component: PedidomateriaprimaComponent},
   {path: 'prueba', component: PruebasComponent},
@@ -102,7 +104,7 @@ export const routes: Routes = [
   {path: 'reporte-facturas-remisiones-mp', canActivate: [ValidacionLoginGuard], component: ConsultaFac_Rem_MPComponent},
   {path: 'movimiento-mp', canActivate: [ValidacionLoginGuard], component: MovimientoMPComponent},
   {path: 'mp-recuperada', canActivate: [ValidacionLoginGuard], component: MateriaPrimaRecuperadaComponent},
-  {path: 'prueba-cat-insumo', canActivate: [ValidacionLoginGuard], component: PruebaImagenCatInsumoComponent},
+  {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
   {path: 'materias_primas', canActivate: [ValidacionLoginGuard], component: MateriasPrimasComponent},
   {path: 'reporte-costos-ot', canActivate: [ValidacionLoginGuard], component: ReporteCostosOTComponent},
   {path: 'mp-devoluciones', canActivate: [ValidacionLoginGuard], component: DevolucionesMPComponent},
@@ -113,6 +115,8 @@ export const routes: Routes = [
   {path: 'inventario-productos-terminados', canActivate: [ValidacionLoginGuard], component: ModalGenerarInventarioZeusComponent},
   {path: 'reporte-estados-ot', canActivate: [ValidacionLoginGuard], component: ReporteEstadosOTComponent},
   {path: 'menu-lateral', canActivate: [ValidacionLoginGuard], component: MenuLateralComponent},
+  {path: 'Archivos', component: ArchivosComponent},
+  {path: 'Categorias', component: CrearCategoriasComponent},
 ]
 
 @NgModule({
@@ -168,6 +172,8 @@ export const routes: Routes = [
     FiltroNombreClientePTPipe,
     ReporteEstadosOTComponent,
     MenuLateralComponent,
+    ArchivosComponent,
+    CrearCategoriasComponent,
   ],
 
 

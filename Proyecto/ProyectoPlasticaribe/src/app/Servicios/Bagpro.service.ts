@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaBagPro, rutaBagProLocate } from 'src/polyfills';
+import { rutaBagPro } from 'src/polyfills';
 
 @Injectable({
   providedIn: 'root'

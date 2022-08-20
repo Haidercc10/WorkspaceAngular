@@ -37,6 +37,7 @@
       <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit">Agregar</button>
+              <button type="button" (click)="download()">Descargar</button>
               <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" expand="full" (click)="clear()">Limpiar campos</button>
           </div>
       </div>
@@ -74,11 +75,11 @@
           </div>
       </div>
 
-      <div class="mb-3">
+      <!-- <div class="mb-3">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
             <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" (click)="enviarArchivo()">Crear Categoria</button>
         </div>
-    </div>
+    </div> -->
 
       <div  class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">

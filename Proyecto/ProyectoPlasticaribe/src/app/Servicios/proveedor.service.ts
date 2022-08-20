@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribe, rutaPlasticaribe3, rutaPlasticaribeAPI } from 'src/polyfills';
+import { rutaPlasticaribeAPI } from 'src/polyfills';
 import { modelProveedor } from '../Modelo/modelProveedor';
 
 @Injectable({

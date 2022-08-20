@@ -1,0 +1,30 @@
+<form [formGroup]="formCrearCategorias" (ngSubmit)="crearCategoriaArchivos()">
+
+  <!-- Inicio Fila 1 Agregar Categoria -->
+  <div class="mb-3">
+    <div class="row g-3">
+      <!-- Nombre -->
+      <div class="form-floating col-md">
+        <input formControlName="catNombre" type="text" class="form-control form-control-sm" id="floatingInput" required>
+        <label for="floatingInput">Nombre</label>
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-floating col-md">
+        <input formControlName="catDescripcion" class="form-control form-control-sm" id="floatingInput" required>
+        <label for="floatingInput">Descripción</label>
+      </div>
+    </div>
+  </div>
+  <!-- Fin Fila 1 -->
+
+  <!--Inicio Fila 2 Botones y Limpiar Campos-->
+  <div class="mb-1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button class="btn btn-danger btn-danger-sm" type="submit">Crear Categoria</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+    </div>
+  </div>
+  <!--Fin Fila 2-->
+</form>
+

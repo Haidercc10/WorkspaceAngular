@@ -207,7 +207,7 @@ export class EntradaBOPPComponent implements OnInit {
           tpBod_Id : 8,
           bopP_FechaIngreso : this.today,
           bopP_Ancho : this.ArrayBOPP[i].Ancho,
-          bopP_Stock : this.ArrayBOPP[i].CantKg,
+          BOPP_Stock : this.ArrayBOPP[i].CantKg,
           undMed_Kg : 'Kg',
           bopP_CantidadInicialKg : this.ArrayBOPP[i].CantKg,
         }
