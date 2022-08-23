@@ -13,6 +13,7 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { MaterialProductoService } from 'src/app/Servicios/materialProducto.service';
 import { PigmentoProductoService } from 'src/app/Servicios/pigmentoProducto.service';
+import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 
 @Injectable({
   providedIn: 'root'
@@ -48,7 +49,7 @@ export class CrearProductoComponent implements OnInit {
                   private tipoProductoService : TipoProductoService,
                     private tipoMonedaService : TipoMonedaService,
                       private productoService : ProductoService,
-                        private pedidosProducto : OpedidoproductoComponent,
+                        private pedidosProducto : PedidoExternoComponent,
                          private existenciasService : ExistenciasProductosService,
                           private clientesService : ClientesService,
                             private usuarioService : UsuarioService,
