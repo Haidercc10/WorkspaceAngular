@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+
+
 
 @Component({
   selector: 'app-ordenes-trabajo',
@@ -7,6 +11,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./ordenes-trabajo.component.css']
 })
 export class OrdenesTrabajoComponent implements OnInit {
+
 
   public FormOrdenTrabajo !: FormGroup; //Formulario de pedidos cliente
   public FormOrdenTrabajoExtrusion !: FormGroup; //Formulario de pedidos cliente
@@ -47,7 +52,41 @@ export class OrdenesTrabajoComponent implements OnInit {
 
    }
 
+  public titulosTabla = []; //Variable que llenará los titulos de la tabla
+
+
+
+
+
+
   ngOnInit(): void {
+    this.ColumnasTabla();
   }
+
+  // Función que llenará los titulos de la tabla
+  ColumnasTabla(){
+    this.titulosTabla = [];
+    this.titulosTabla = [{
+      pID : "Id",
+      pNombre : "Nombre",
+      pAncho :   "Ancho",
+      pFuelle : "Fuelle",
+      pCalibre : "Cal",
+      pUndMedACF : "Und.",
+      pTipoProd : "TipoProd",
+      pMaterial : 'Material',
+      pPigmento : 'Pigmento',
+      pCantidad : "Cantidad",
+      pLargo : "Largo",
+      pUndMedCant : "Und. Cant",
+      pPrecioU : "Precio U",
+      pMoneda : "Moneda",
+      pStock : "Stock",
+      pDescripcion : "Descripción",
+      pSubtotal : "Subtotal",
+    }]
+  }
+
+
 
 }
