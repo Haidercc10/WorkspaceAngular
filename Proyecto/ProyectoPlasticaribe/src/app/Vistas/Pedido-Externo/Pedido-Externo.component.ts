@@ -145,7 +145,7 @@ export class PedidoExternoComponent implements OnInit {
                                     private ClientesProductosService : ClientesProductosService,
                                       private materialService : MaterialProductoService,
                                         private pigmentoServices : PigmentoProductoService,
-                                        private zeus : InventarioZeusService) {
+                                          private zeus : InventarioZeusService) {
 
 
     //Campos que vienen del formulario

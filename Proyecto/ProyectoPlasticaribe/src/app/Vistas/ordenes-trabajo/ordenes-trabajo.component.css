@@ -128,3 +128,8 @@ a {
 .ng-autocomplete ::ng-deep .autocomplete-container {
   box-shadow: none;
 }
+
+.mat-tab-group {
+  margin-bottom: 48px;
+  border-bottom: #d83542;
+}

@@ -12,9 +12,7 @@
   </div>
 </div>
 <div class="contain">
-
-<!--Inicio info OT-->
-<div class="contain">
+  <!--Inicio info OT-->
   <div class="container-fluid">
     <div class="container">
 
@@ -26,80 +24,115 @@
         <h4 class="tituloRojo">Consultar/Crear OT</h4>
       </div>
 
-      <!--Primera fila de inputs-->
-      <div class="mb-3">
-        <div class="row g-3">
-          <!-- OT -->
+      <!-- Forma de informacion general de la OT como cliente, vendedor, producto, etc.. -->
+      <form [formGroup]="FormOrdenTrabajo">
+        <!--Primera fila de inputs-->
+        <div class="mb-3">
+          <div class="row g-3">
+            <!-- OT -->
+            <div class="form-floating col-md-2">
+              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" required >
+              <label for="floatingInput">Nro. OT</label>
+            </div>
 
-           <div class="form-floating col-md-2">
-            <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" required >
-            <label for="floatingInput">Nro. OT</label>
-          </div>
-          <!-- Nro. Pedido -->
-          <div class="form-floating col-md-2">
-            <input formControlName="Pedido_Id" type="number" class="form-control form-control-sm" id="floatingInput" required >
-            <label for="floatingInput">Nro. Pedido</label>
-          </div>
+            <!-- Nro. Pedido -->
+            <div class="form-floating col-md-2">
+              <input formControlName="Pedido_Id" type="number" class="form-control form-control-sm" id="floatingInput" required >
+              <label for="floatingInput">Nro. Pedido</label>
+            </div>
 
-           <!--Vendedor-->
-           <div class="form-floating col-md-4">
-            <select formControlName="Nombre_Vendedor" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example">
-              <option>1</option>
-            </select>
-            <label for="floatingSelect">Vendedor</label>
-          </div>
+            <!--Vendedor-->
+            <div class="form-floating col-md-4">
+              <select formControlName="Nombre_Vendedor" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                <option>1</option>
+              </select>
+              <label for="floatingSelect">Vendedor</label>
+            </div>
+
             <!-- Fecha creacion -->
             <div class="form-floating col-md-2">
               <input formControlName="OT_FechaCreacion" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha de Entrada" readonly onmousedown="return false;">
               <label for="floatingInput">Fecha Creación</label>
             </div>
 
-             <!-- Fecha Estimada Entrega -->
-             <div class="form-floating col-md-2">
-              <input formControlName="OT_FechaCreacion" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha de Entrada">
+            <!-- Fecha Estimada Entrega -->
+            <div class="form-floating col-md-2">
+              <input formControlName="OT_FechaEntrega" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha de Entrada">
               <label for="floatingInput">Fecha Entrega</label>
             </div>
+          </div>
+        </div>
 
+        <div class="mb-3">
+          <div class="row g-3">
+            <!-- ID Sede Cliente -->
+            <div class="form-floating col-md-2">
+              <input formControlName="Id_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <label for="floatingInput">ID Cliente</label>
+            </div>
+
+            <!-- Cliente -->
+            <div class="form-floating col-md-3">
+              <input formControlName="Nombre_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <label for="floatingInput">Nombre Cliente</label>
+            </div>
+
+            <!-- Ciudad Cliente -->
+            <div class="form-floating col-md-2">
+              <input formControlName="Ciudad_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <label for="floatingInput">Ciudad Cliente</label>
+            </div>
+
+            <!-- Sede -->
+            <div class="form-floating col-md-3">
+              <input formControlName="Direccion_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <label for="floatingInput">Direccion Sede</label>
+            </div>
+
+            <!--Estado-->
+            <div class="form-floating col-md-2">
+              <select formControlName="OT_Estado" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                <option>1</option>
+              </select>
+              <label for="floatingSelect">Estado OT</label>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- TABS de Procesos -->
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#Extrsuión" type="button" role="tab">Extrsuión</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#Impresión" type="button" role="tab">Impresión</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#Laminado" type="button" role="tab">Laminado</button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="myTabContent">
+        <!-- Extrusion -->
+        <div class="tab-pane fade show active" id="Extrsuión" role="tabpanel" aria-labelledby="Extrsuión-tab">
+          <form [formGroup]="FormOrdenTrabajoExtrusion">
+            1
+          </form>
+        </div>
+        <!-- Impresion -->
+        <div class="tab-pane fade" id="Impresión" role="tabpanel" aria-labelledby="Impresión-tab">
+          <form [formGroup]="FormOrdenTrabajoImpresion">
+            2
+          </form>
+        </div>
+        <!-- Laminado -->
+        <div class="tab-pane fade" id="Laminado" role="tabpanel" aria-labelledby="Laminado-tab">
+          <form [formGroup]="FormOrdenTrabajoLaminado">
+            3
+          </form>
         </div>
       </div>
-
-      <div class="mb-3">
-        <div class="row g-3">
-
-           <!-- ID Sede Cliente -->
-           <div class="form-floating col-md-2">
-            <input formControlName="Nombre_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
-            <label for="floatingInput">ID Cliente</label>
-          </div>
-          <!-- Cliente -->
-          <div class="form-floating col-md-3">
-            <input formControlName="Nombre_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
-            <label for="floatingInput">Nombre Cliente</label>
-          </div>
-          <!-- Ciudad Cliente -->
-          <div class="form-floating col-md-2">
-            <input formControlName="Ciudad_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
-            <label for="floatingInput">Ciudad Cliente</label>
-          </div>
-
-          <!-- Sede -->
-          <div class="form-floating col-md-3">
-            <input formControlName="Ciudad_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
-            <label for="floatingInput">Direccion Sede</label>
-          </div>
-
-          <!--Estado-->
-          <div class="form-floating col-md-2">
-            <select formControlName="OT_Estado" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example">
-              <option>1</option>
-            </select>
-            <label for="floatingSelect">Estado OT</label>
-          </div>
-
-
-        </div>
-      </div>
-
     </div>
   </div>
 </div>
