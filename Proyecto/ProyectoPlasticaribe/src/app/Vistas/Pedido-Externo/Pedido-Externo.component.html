@@ -111,15 +111,21 @@
               <label for="floatingTextarea">Observación</label>
             </div>
 
-            <div class="form-floating col-md">
-              <input formControlName="PedIva" type="number" (change)="ivaDescuento()" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido">
-              <label for="floatingInput">(%) Iva</label>
-            </div>
-
             <!-- Campo Observacion -->
             <div class="form-floating col-md">
               <input formControlName="PedDescuento" type="number" (change)="ivaDescuento()" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido">
               <label for="floatingInput">(%) Descuento</label>
+            </div>
+
+            <!-- Iva -->
+            <div class="form-floating col-md">
+              <mat-checkbox
+                formControlName="PedIva"
+                style="margin-top: 15px; margin-left: 30px; height: 12px;"
+                (click)="checkboxIva()"
+                [(ngModel)]="checked">
+                (%) Iva
+              </mat-checkbox>
             </div>
           </div>
         </div>
@@ -298,9 +304,9 @@
                   <tr *ngFor="let listaProductos of ArrayProducto; let j = index">
                     <th id="id" class="TextosInfoTabla">{{listaProductos.Id}}</th>
                     <td id="nombreCampo" class="TextosInfoTabla">{{listaProductos.Nombre}}</td>
-                    <td id="cantidadDisponible" class="TextosInfoTabla">{{listaProductos.Cant}}</td>
+                    <td id="cantidadDisponible" class="TextosInfoTabla">{{listaProductos.Cant | number}}</td>
                     <td id="undMedidaCantidad" class="TextosInfoTabla">{{listaProductos.UndCant}}</td>
-                    <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.PrecioUnd}}</td>
+                    <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.PrecioUnd | number}}</td>
                     <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.SubTotal}}</td>
                     <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true" title="Editar Producto"></i></a></td>
                     <td id="Eliminar" ><a><i class="fa fa-trash" (click)="QuitarProductoTabla(j, listaProductos)" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
@@ -339,7 +345,7 @@
           </div>
           <div class="mb-3">
             <div class="row g-3">
-              <label for=""><b>Subtotal menos Iva</b></label>
+              <label for=""><b>Subtotal Iva</b></label>
               <label for="">${{valorMenosIva | number}}</label>
             </div>
           </div>
