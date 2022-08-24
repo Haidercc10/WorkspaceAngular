@@ -1,0 +1,105 @@
+<app-menuLateral></app-menuLateral>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Ordenes de Trabajo</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+<div class="contain">
+
+<!--Inicio info OT-->
+<div class="contain">
+  <div class="container-fluid">
+    <div class="container">
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <h4 class="tituloRojo">OT N° 111111</h4>
+      </div>
+
+      <div class="mb-4">
+        <h4 class="tituloRojo">Consultar/Crear OT</h4>
+      </div>
+
+      <!--Primera fila de inputs-->
+      <div class="mb-3">
+        <div class="row g-3">
+          <!-- OT -->
+
+           <div class="form-floating col-md-2">
+            <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" required >
+            <label for="floatingInput">Nro. OT</label>
+          </div>
+          <!-- Nro. Pedido -->
+          <div class="form-floating col-md-2">
+            <input formControlName="Pedido_Id" type="number" class="form-control form-control-sm" id="floatingInput" required >
+            <label for="floatingInput">Nro. Pedido</label>
+          </div>
+
+           <!--Vendedor-->
+           <div class="form-floating col-md-4">
+            <select formControlName="Nombre_Vendedor" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example">
+              <option>1</option>
+            </select>
+            <label for="floatingSelect">Vendedor</label>
+          </div>
+            <!-- Fecha creacion -->
+            <div class="form-floating col-md-2">
+              <input formControlName="OT_FechaCreacion" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha de Entrada" readonly onmousedown="return false;">
+              <label for="floatingInput">Fecha Creación</label>
+            </div>
+
+             <!-- Fecha Estimada Entrega -->
+             <div class="form-floating col-md-2">
+              <input formControlName="OT_FechaCreacion" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha de Entrada">
+              <label for="floatingInput">Fecha Entrega</label>
+            </div>
+
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="row g-3">
+
+           <!-- ID Sede Cliente -->
+           <div class="form-floating col-md-2">
+            <input formControlName="Nombre_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+            <label for="floatingInput">ID Cliente</label>
+          </div>
+          <!-- Cliente -->
+          <div class="form-floating col-md-3">
+            <input formControlName="Nombre_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+            <label for="floatingInput">Nombre Cliente</label>
+          </div>
+          <!-- Ciudad Cliente -->
+          <div class="form-floating col-md-2">
+            <input formControlName="Ciudad_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+            <label for="floatingInput">Ciudad Cliente</label>
+          </div>
+
+          <!-- Sede -->
+          <div class="form-floating col-md-3">
+            <input formControlName="Ciudad_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+            <label for="floatingInput">Direccion Sede</label>
+          </div>
+
+          <!--Estado-->
+          <div class="form-floating col-md-2">
+            <select formControlName="OT_Estado" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example">
+              <option>1</option>
+            </select>
+            <label for="floatingSelect">Estado OT</label>
+          </div>
+
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -67,6 +67,7 @@ import { MenuLateralComponent } from './Vistas/menuLateral/menuLateral.component
 import { PedidoExternoComponent } from './Vistas/Pedido-Externo/Pedido-Externo.component';
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
 import { CrearCategoriasComponent } from './Vistas/CrearCategorias/CrearCategorias.component';
+import { OrdenesTrabajoComponent } from './Vistas/ordenes-trabajo/ordenes-trabajo.component';
 
 
 export const routes: Routes = [
@@ -117,6 +118,7 @@ export const routes: Routes = [
   {path: 'menu-lateral', canActivate: [ValidacionLoginGuard], component: MenuLateralComponent},
   {path: 'Archivos', component: ArchivosComponent},
   {path: 'Categorias', component: CrearCategoriasComponent},
+  {path: 'ordenes-trabajo', canActivate: [ValidacionLoginGuard], component: OrdenesTrabajoComponent},
 ]
 
 @NgModule({
@@ -174,6 +176,7 @@ export const routes: Routes = [
     MenuLateralComponent,
     ArchivosComponent,
     CrearCategoriasComponent,
+    OrdenesTrabajoComponent,
   ],
 
 
