@@ -112,6 +112,7 @@ export class PedidoExternoComponent implements OnInit {
   pigmento : any = ''; //Variable que se usará para almacenar el pigmento del producto consultado o seleccionado
   material : any = ''; //Variable que se usará para almacenar el material del producto consultado o seleccionado
   public load : boolean = true; //Variable que va a servir para mostrar o no la imagen de carga
+  checked = false;
 
   /** Variables para inputs de autocompletados */
   validarInputClientes : any;
@@ -286,13 +287,24 @@ export class PedidoExternoComponent implements OnInit {
     });
   }
 
+  checkboxIva(){
+    if (!this.checked) {
+      this.iva = 19;
+      this.ivaDescuento();
+    } else {
+      this.iva = 0;
+      this.valorMenosIva = 0;
+      this.valorfinal -= this.valorfinal;
+      this.ivaDescuento();
+    }
+  }
+
   //Funcion que validar si cambia uno de los input se muestre la misma informacion en la parde abajo de la tabla
   ivaDescuento(){
     this.descuento = this.FormPedidoExternoClientes.value.PedDescuento;
-    this.iva = this.FormPedidoExternoClientes.value.PedIva;
     this.valorMenosDescuento += (this.valorTotal * this.descuento) / 100;
     this.valorMenosIva += (this.valorTotal * this.iva) / 100;
-    this.valorfinal += this.valorTotal - this.valorMenosDescuento + this.valorMenosIva;
+    this.valorfinal = (this.valorTotal - this.valorMenosDescuento) + this.valorMenosIva;
   }
 
   //Cargar modal de crear producto
@@ -711,7 +723,7 @@ export class PedidoExternoComponent implements OnInit {
 
     this.valorMenosDescuento = (this.valorTotal * this.descuento) / 100;
     this.valorMenosIva = (this.valorTotal * this.iva) / 100;
-    this.valorfinal = this.valorTotal - this.valorMenosDescuento + this.valorMenosIva;
+    this.valorfinal = (this.valorTotal - this.valorMenosDescuento) + this.valorMenosIva;
 
     this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_existencias => {
       if (datos_existencias.length == 0) {
@@ -769,10 +781,10 @@ export class PedidoExternoComponent implements OnInit {
               Tipo : this.FormPedidoExternoProductos.get('ProdTipo').value,
               Material : this.FormPedidoExternoProductos.value.ProdMaterial,
               Pigmento: this.FormPedidoExternoProductos.value.ProdPigmento,
-              Cant : this.formatonumeros(this.FormPedidoExternoProductos.get('ProdCantidad').value),
+              Cant : this.FormPedidoExternoProductos.get('ProdCantidad').value,
               Largo : this.FormPedidoExternoProductos.get('ProdLargo').value,
               UndCant : this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
-              PrecioUnd : this.formatonumeros(precioProducto),
+              PrecioUnd : precioProducto,
               TpMoneda : this.FormPedidoExternoProductos.get('ProdTipoMoneda').value,
               Stock : this.formatonumeros(this.FormPedidoExternoProductos.get('ProdStock').value),
               Produ_Descripcion : this.FormPedidoExternoProductos.get('ProdDescripcion').value,
@@ -875,7 +887,7 @@ export class PedidoExternoComponent implements OnInit {
           PedExt_PrecioTotal: this.valorTotal,
           PedExt_Archivo: 0,
           PedExt_Descuento: this.FormPedidoExternoClientes.value.PedDescuento,
-          PedExt_Iva: this.FormPedidoExternoClientes.value.PedIva,
+          PedExt_Iva: this.iva,
           PedExt_PrecioTotalFinal : this.valorfinal,
         }
 

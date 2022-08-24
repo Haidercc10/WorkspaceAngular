@@ -53,7 +53,7 @@ export class OpedidoproductoComponent implements OnInit {
   public ModalCrearCliente: boolean = false;
   public ModalSedesClientes: boolean = false;
 
-  temporal : boolean = false; //Variable momentanea que va a hacer que no se muestre una parte del codigo del HTML en la vista, esto mientras se soluciona el hecho de que se termine esta vista
+  temporal : boolean = true; //Variable momentanea que va a hacer que no se muestre una parte del codigo del HTML en la vista, esto mientras se soluciona el hecho de que se termine esta vista
 
   // VARIABLES PARA PASAR A LOS COMBOBOX
   cliente = []; //Variable que almacenará el nombre de los clientes para pasarlos en la vista
@@ -1870,7 +1870,7 @@ export class OpedidoproductoComponent implements OnInit {
     this.producto = [];
     this.presentacion = [];
 
-    this.PedidoProductosService.srvObtenerListaPorIdProducto(formulario.Id, formulario.ProdUnidadMedidaCant).subscribe(datos_productoPedido => {
+    this.PedidoProductosService.srvObtenerListaPorIdProducto(formulario.Id, formulario.UndCant).subscribe(datos_productoPedido => {
       let datos : any = [];
       datos.push(datos_productoPedido);
       for (const item of datos) {
@@ -1890,7 +1890,7 @@ export class OpedidoproductoComponent implements OnInit {
               ProdUnidadMedidaCant : formulario.UndCant,
               ProdPrecioUnd : formulario.PrecioUnd,
               ProdTipoMoneda : formulario.TpMoneda,
-              ProdStock : formulario.Stock,
+              ProdStock : datos_producto[i].exProd_Cantidad,
               ProdDescripcion : formulario.Produ_Descripcion,
               ProdMaterial: formulario.Material,
               ProdPigmento: formulario.Pigmento,
