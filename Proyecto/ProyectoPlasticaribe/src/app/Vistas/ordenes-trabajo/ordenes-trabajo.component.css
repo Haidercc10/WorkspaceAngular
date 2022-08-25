@@ -133,3 +133,13 @@ a {
   margin-bottom: 48px;
   border-bottom: #d83542;
 }
+
+.nav-link {
+  color: #999ba1;
+}
+
+.nav-item {
+  color: #d83542;
+}
+
+

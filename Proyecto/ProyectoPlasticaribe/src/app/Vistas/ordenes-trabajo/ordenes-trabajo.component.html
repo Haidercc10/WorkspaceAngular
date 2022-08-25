@@ -11,9 +11,10 @@
     </div>
   </div>
 </div>
+
 <div class="contain">
   <!--Inicio info OT-->
-  <div class="container-fluid">
+  <div class="container-fluid bajarPagina">
     <div class="container">
 
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -94,21 +95,19 @@
                 <div class="row g-3">
                   <!-- Campo Observacion -->
                   <div class="form-floating col-md-7">
-                    <textarea formControlName="Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm" title="Descripción"></textarea>
+                    <textarea formControlName="OT_Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm" title="Descripción"></textarea>
                     <label for="floatingTextArea">Observación</label>
                   </div>
                 </div>
               </div>
         </form>
 
-
-
-
-
+        <!--Linea-->
       <div class="mb-4">
         <hr class="colorLinea">
       </div>
 
+       <!--Titulo tabla-->
       <div class="mb-3">
         <h4 class="tituloRojo">Tabla de Productos Pedidos</h4>
       </div>
@@ -164,10 +163,20 @@
           </div>
         </div>
 
+         <!--Linea-->
+        <div class="mb-4">
+          <hr class="colorLinea">
+        </div>
+
+      <!--Titulo procesos-->
+      <div class="mb-3">
+        <h4 class="tituloRojo">Procesos de Producción</h4>
+      </div>
+
           <!-- TABS de Procesos -->
-      <ul class="nav nav-tabs">
+      <ul class="nav nav-tabs mb-5 justify-content-md-center" >
         <li class="nav-item">
-          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#Extrsuión" type="button" role="tab">Extrsuión</button>
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#Extrusión" type="button" role="tab">Extrusión</button>
         </li>
         <li class="nav-item">
           <button class="nav-link" data-bs-toggle="tab" data-bs-target="#Impresión" type="button" role="tab">Impresión</button>
@@ -177,23 +186,314 @@
         </li>
       </ul>
 
-      <div class="tab-content" id="myTabContent">
+      <div class="tab-content " id="myTabContent" >
         <!-- Extrusion -->
-        <div class="tab-pane fade show active" id="Extrsuión" role="tabpanel" aria-labelledby="Extrsuión-tab">
+        <div class="tab-pane fade show active " id="Extrusión" role="tabpanel" aria-labelledby="Extrusión-tab">
+
           <form [formGroup]="FormOrdenTrabajoExtrusion">
-            1
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!-- Cantidad a extruir -->
+                <div class="form-floating col-md-2">
+                  <input formControlName="cantidad_Extrusion" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
+                  <label for="floatingInput">Cantidad</label>
+                </div>
+
+                <!-- Material -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Material_Extrusion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="MaterialPrd.Material_Id" *ngFor="let MaterialPrd of arrayMateriales">{{MaterialPrd.material_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Material</label>
+                </div>
+
+                <!-- Formato -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Formato_Extrusion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Formato</label>
+                </div>
+
+                 <!-- Pigmento -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Pigmento_Extrusion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="Pigmentos.pigmt_Id" *ngFor="let Pigmentos of arrayPigmentos">{{Pigmentos.pigmt_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Pigmento</label>
+                </div>
+
+              </div>
+            </div>
+
+            <!--Fila 2 -->
+            <div class="mb-3">
+              <div class="row g-3 justify-content-md-center" >
+
+                <!--Ancho 1 -->
+                <div class="form-floating col-md-1">
+                  <input formControlName="Ancho_Extrusion1" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
+                  <label for="floatingInput">Ancho 1</label>
+                </div>
+
+                <!--Ancho 2-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="Ancho_Extrusion2" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
+                  <label for="floatingInput">Ancho 2</label>
+                </div>
+
+                <!--Ancho 3-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="Ancho_Extrusion3" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
+                  <label for="floatingInput">Ancho 3</label>
+                </div>
+
+                 <!-- Formato -->
+                 <div class="form-floating col-md-1">
+                  <input formControlName="Calibre_Extrusion" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
+                  <label for="floatingInput">Calibre</label>
+                </div>
+
+                <!-- Unidad Medida -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="UnidadMedida_Extrusion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="UndMedida.undMed_Id" *ngFor="let UndMedida of arrayUnidadesMedidas">{{UndMedida.undMed_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Und. Medida</label>
+                </div>
+
+                 <!-- Formato -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Tratado_Extrusion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Tratado</label>
+                </div>
+
+              </div>
+            </div>
+
           </form>
         </div>
+
         <!-- Impresion -->
         <div class="tab-pane fade" id="Impresión" role="tabpanel" aria-labelledby="Impresión-tab">
           <form [formGroup]="FormOrdenTrabajoImpresion">
-            2
+
+            <!--Fila 1-->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+                <!-- Cantidad a extruir -->
+                <div class="form-floating col-md-2">
+                  <input formControlName="cantidad_Impresion" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a imprimir">
+                  <label for="floatingInput">Cantidad</label>
+                </div>
+
+                <!-- Material -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Tipo_Impresion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Tipo Impresión</label>
+                </div>
+
+                <!-- Formato -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Rodillo_Impresion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Rodillo</label>
+                </div>
+
+                 <!-- Formato -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Pista_Impresion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Pista</label>
+                </div>
+
+              </div>
+            </div>
+
+            <!--Fila 2-->
+            <div class="mb-3" style="text-align: center;">
+                <h6 class="tituloRojo">Tintas</h6>
+            </div>
+
+             <!--Fila 3-->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!-- Tinta 1 -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Tinta_Impresion1" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Tinta 1 (Opcional)</label>
+                </div>
+
+                <!-- Tinta 2 -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Tinta_Impresion2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Tinta 2 (Opcional)</label>
+                </div>
+
+                <!-- Tinta 3 -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Tinta_Impresion3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Tinta 3 (Opcional)</label>
+                </div>
+
+                 <!-- Tinta 4 -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Tinta_Impresion4" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Tinta 4</label>
+                </div>
+
+              </div>
+            </div>
+
+             <!--Fila 4 -->
+             <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+                <!-- Cantidad a extruir -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Tinta_Impresion5" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Tinta 5</label>
+                </div>
+
+                <!-- Material -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Tinta_Impresion6" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Tinta 6</label>
+                </div>
+
+                <!-- Formato -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Tinta_Impresion7" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Tinta 7</label>
+                </div>
+
+                 <!-- Formato -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Tinta_Impresion8" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Tinta 8</label>
+                </div>
+
+              </div>
+            </div>
+
           </form>
         </div>
+
         <!-- Laminado -->
         <div class="tab-pane fade" id="Laminado" role="tabpanel" aria-labelledby="Laminado-tab">
           <form [formGroup]="FormOrdenTrabajoLaminado">
-            3
+                <!--Fila 1-->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!-- Cantidad a laminar -->
+                <div class="form-floating col-md-2">
+                  <input formControlName="cantidad_Laminado" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a Laminar">
+                  <label for="floatingInput">Cantidad</label>
+                </div>
+              </div>
+            </div>
+
+            <!--Fila 2-->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!--Capa 1-->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Capa_Laminado1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Capa 1</label>
+                </div>
+
+                <!--Calibre 1-->
+                <div class="form-floating col-md-2">
+                  <input formControlName="Calibre_Laminado1" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                  <label for="floatingInput">Calibre 1 </label>
+                </div>
+                <!--Cantidad x capa 1-->
+                <div class="form-floating col-md-2">
+                  <input formControlName="cantidad_Laminado1" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                  <label for="floatingInput">Cantidad 1</label>
+                </div>
+              </div>
+            </div>
+
+            <!--Fila 3-->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!--Capa 2-->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Capa_Laminado2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Capa 2</label>
+                </div>
+
+                <!--Calibre 2-->
+                <div class="form-floating col-md-2">
+                  <input formControlName="Calibre_Laminado2" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">Calibre 2 </label>
+                </div>
+
+                <!--Cantidad x capa 2-->
+                <div class="form-floating col-md-2">
+                  <input formControlName="cantidad_Laminado2" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">Cantidad 2</label>
+                </div>
+              </div>
+            </div>
+
+             <!--Fila 4-->
+             <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!--Capa 3-->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Capa_Laminado3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Capa 3</label>
+                </div>
+
+                <!--Calibre 3-->
+                <div class="form-floating col-md-2">
+                  <input formControlName="Calibre_Laminado3" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                  <label for="floatingInput">Calibre 3</label>
+                </div>
+
+                <!--Cantidad x capa 3-->
+                <div class="form-floating col-md-2">
+                  <input formControlName="cantidad_Laminado3" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                  <label for="floatingInput">Cantidad 3</label>
+                </div>
+              </div>
+            </div>
+
           </form>
         </div>
       </div>

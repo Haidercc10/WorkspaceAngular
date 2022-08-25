@@ -19,7 +19,7 @@
       </div>
       <div class="mb-3">
         <select  formControlName="Empresa" name="miselect" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option [ngValue]="null" disabled selected>Seleccione la Empresa</option>
+          <!--<option [ngValue]="null" disabled selected>Seleccione la Empresa</option>-->
           <option [ngValue]="empresa" *ngFor="let empresa of empresas">{{empresa}}</option>
         </select>
       </div>
