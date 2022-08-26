@@ -142,4 +142,36 @@ a {
   color: #d83542;
 }
 
+.nav-tabs{
+  border-color: #d83542;
+}
 
+.nav-tabs .nav-item .nav-link {
+  background-color: #fff;
+  color: #ca727a;
+  border-bottom: transparent;
+}
+
+.nav-tabs .nav-item .nav-link :hover{
+  border-color: #d83542;
+}
+
+.nav-tabs .nav-item .nav-link.active {
+  color: #d83542;
+  border-color: #d83542;
+  border-bottom: transparent;
+}
+
+.tab-content {
+  border: 1px solid #dee2e6;
+  border-color: #d83542;
+  border-top: transparent;
+  border-bottom: transparent;
+  padding: 15px;
+}
+
+.tab-content .tab-pane {
+  background-color: #FFF;
+  height: 200px;
+  height: auto;
+}

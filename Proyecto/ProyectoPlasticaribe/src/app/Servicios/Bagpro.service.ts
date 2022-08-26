@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { rutaBagPro } from 'src/polyfills';
+import internal from 'stream';
 
 @Injectable({
   providedIn: 'root'
@@ -75,6 +76,11 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOt/OT/${ot}`);
   }
 
+   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
+   srvObtenerListaClienteOT_Cliente_Item_Presentacion(clienteNom : string, producto : number, presentacion : string):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/OT_Cliente_Item_Presentacion/${clienteNom}/${producto}/${presentacion}`);
+  }
+
   srvObtenerListaClienteOT_Fecha(fecha : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOt/FechaCreacion/${fecha}`);
   }
@@ -85,6 +91,10 @@ export class BagproService {
 
   srvObtenerListaClienteOT_ItemCostos(ot : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOt/CostosOT/${ot}`);
+  }
+
+  srvObtenerListaClienteOT_UltimaOT():Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/UltimaOT/`);
   }
 
   /* CLIENTESOTITEM */

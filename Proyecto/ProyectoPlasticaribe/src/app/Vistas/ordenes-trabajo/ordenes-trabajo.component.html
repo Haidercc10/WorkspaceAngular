@@ -18,91 +18,138 @@
     <div class="container">
 
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <h4 class="tituloRojo" title="Consecutivo sobre el cual se crea una nueva OT">OT N° 111111</h4>
+        <h4 class="tituloRojo" title="Consecutivo sobre el cual se crea una nueva OT">OT N° {{ultimaOrdenTrabajo}}</h4>
       </div>
 
       <div class="mb-4">
         <h4 class="tituloRojo">Consultar/Crear OT</h4>
       </div>
+
       <form [formGroup]="FormOrdenTrabajo">
-            <!--Primera fila de inputs-->
-            <div class="mb-3">
-              <div class="row g-3">
-                  <!-- OT -->
-                  <div class="form-floating col-md-2">
-                    <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" required >
-                    <label for="floatingInput">Nro. OT</label>
-                  </div>
-                  <!-- Nro. Pedido -->
-                  <div class="form-floating col-md-2">
-                    <input formControlName="Pedido_Id" type="number" class="form-control form-control-sm" id="floatingInput" required >
-                    <label for="floatingInput">Nro. Pedido</label>
-                  </div>
+        <!--Primera fila de inputs-->
+        <div class="mb-3">
+          <div class="row g-3">
+            <!-- OT -->
+            <div class="form-floating col-md-2">
+              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" required >
+              <label for="floatingInput">Nro. OT</label>
+            </div>
 
-                  <!--Vendedor-->
-                  <div class="form-floating col-md-4">
-                    <input formControlName="Nombre_Vendedor" type="text" class="form-control form-control-sm" id="floatingInput" required >
-                    <label for="floatingInput">Vendedor</label>
-                  </div>
+            <!-- Nro. Pedido -->
+            <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm" style="width: 530px;">
+              <ng-autocomplete
+                class=""
+                [data]="pedidoSinOT"
+                (selected)='consultarPedido()'
+                (keyup.enter)="consultarPedido()"
+                (inputChanged)='onChangeSearchPedido($event)'
+                (inputFocused)='onFocusedNombrePedido($event)'
+                [searchKeyword]="keywordPedidos"
+                [itemTemplate]="itemTemplate"
+                [notFoundTemplate]="notFoundTemplate"
+                id="floatingInput"
+                formControlName="Pedido_Id">
+              </ng-autocomplete>
+              <ng-template #itemTemplate let-item>
+                <a [innerHTML]="item"></a>
+              </ng-template>
+              <ng-template #notFoundTemplate let-notFound>
+                <div [innerHTML]="notFound"></div>
+              </ng-template>
+              <label for="floatingInput" *ngIf="validarInputPedidos">Pedidos</label>
+            </div>
 
-                    <!-- Fecha creacion -->
-                    <div class="form-floating col-md-2">
-                      <input formControlName="OT_FechaCreacion" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha creación" readonly onmousedown="return false;">
-                      <label for="floatingInput">Fecha Creación</label>
-                    </div>
-                    <!-- Fecha Estimada Entrega -->
-                    <div class="form-floating col-md-2">
-                      <input formControlName="OT_FechaEntrega" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha estimada de entrega">
-                      <label for="floatingInput">Fecha Entrega</label>
-                    </div>
-                </div>
-              </div>
+            <!--Vendedor-->
+            <div class="form-floating col-md-5">
+              <input formControlName="Nombre_Vendedor" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <label for="floatingInput">Vendedor</label>
+            </div>
+          </div>
+        </div>
 
-              <!--Fila 2-->
-              <div class="mb-3">
-                <div class="row g-3">
-                  <!-- ID Sede Cliente -->
-                  <div class="form-floating col-md-2">
-                    <input formControlName="ID_Cliente" type="number" class="form-control form-control-sm" id="floatingInput" required >
-                    <label for="floatingInput">ID Cliente</label>
-                  </div>
-                  <!-- Cliente -->
-                  <div class="form-floating col-md-3">
-                    <input formControlName="Nombre_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
-                    <label for="floatingInput">Nombre Cliente</label>
-                  </div>
-                  <!-- Ciudad Cliente -->
-                  <div class="form-floating col-md-2">
-                    <input formControlName="Ciudad_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
-                    <label for="floatingInput">Ciudad Cliente</label>
-                  </div>
-                  <!-- Sede -->
-                  <div class="form-floating col-md-3">
-                    <input formControlName="Direccion_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
-                    <label for="floatingInput">Direccion Sede</label>
-                  </div>
-                  <!--Estado-->
-                  <!-- Sede -->
-                  <div class="form-floating col-md-2">
-                    <input formControlName="OT_Estado" type="text" class="form-control form-control-sm" id="floatingInput" required >
-                    <label for="floatingInput">Estado OT</label>
-                  </div>
-                </div>
-              </div>
+        <!--Fila 2-->
+        <div class="mb-3">
+          <div class="row g-3">
+            <!-- Fecha creacion -->
+            <div class="form-floating col-md-2">
+              <input formControlName="OT_FechaCreacion" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha creación" readonly onmousedown="return false;">
+              <label for="floatingInput">Fecha Creación</label>
+            </div>
 
-              <!--Fila 3-->
-              <div class="mb-4">
-                <div class="row g-3">
-                  <!-- Campo Observacion -->
-                  <div class="form-floating col-md-7">
-                    <textarea formControlName="OT_Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm" title="Descripción"></textarea>
-                    <label for="floatingTextArea">Observación</label>
-                  </div>
-                </div>
-              </div>
-        </form>
+            <!-- Fecha Estimada Entrega -->
+            <div class="form-floating col-md-2">
+              <input formControlName="OT_FechaEntrega" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha estimada de entrega">
+              <label for="floatingInput">Fecha Entrega</label>
+            </div>
 
-        <!--Linea-->
+            <!-- ID Sede Cliente -->
+            <div class="form-floating col-md-2">
+              <input formControlName="ID_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <label for="floatingInput">ID Cliente</label>
+            </div>
+
+            <!-- Cliente -->
+            <div class="form-floating col-md-4">
+              <input formControlName="Nombre_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <label for="floatingInput">Nombre Cliente</label>
+            </div>
+
+            <!-- Ciudad Cliente -->
+            <div class="form-floating col-md-2">
+              <input formControlName="Ciudad_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <label for="floatingInput">Ciudad Cliente</label>
+            </div>
+          </div>
+        </div>
+
+        <!--Fila 3-->
+        <div class="mb-4">
+          <div class="row g-3">
+            <!-- Sede -->
+            <div class="form-floating col-md-3">
+              <input formControlName="Direccion_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <label for="floatingInput">Direccion Sede</label>
+            </div>
+
+            <!-- Estado -->
+            <div class="form-floating col-md-2">
+              <select formControlName="OT_Estado" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required readonly onmousedown="return false;">
+                <option [ngValue]="estados" *ngFor="let estados of estados">{{estados}}</option>
+              </select>
+              <label for="floatingSelect">Estado de la OT</label>
+            </div>
+
+            <!-- Campo Observacion -->
+            <div class="form-floating col-md-7">
+              <textarea formControlName="OT_Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm" title="Descripción"></textarea>
+              <label for="floatingTextArea">Observación</label>
+            </div>
+
+            <!-- Cyrel -->
+            <div class="form-floating col-md-1">
+              <mat-checkbox
+                formControlName="OT_Cyrel"
+                id="cyrel"
+                style="margin-top: 15px; margin-left: 30px; height: 12px;"
+                [(ngModel)]="checkedCyrel">
+                Cyrel
+              </mat-checkbox>
+            </div>
+
+            <!-- Corte -->
+            <div class="form-floating col-md-1">
+              <mat-checkbox
+                formControlName="OT_Corte"
+                id="corte"
+                style="margin-top: 15px; margin-left: 30px; height: 12px;"
+                [(ngModel)]="checkedCorte">
+                Corte
+              </mat-checkbox>
+            </div>
+          </div>
+        </div>
+      </form>
+
       <div class="mb-4">
         <hr class="colorLinea">
       </div>
@@ -112,56 +159,56 @@
         <h4 class="tituloRojo">Tabla de Productos Pedidos</h4>
       </div>
 
-        <!-- Inicio tabla producto -->
-        <div class="mb-3">
-          <div class="row g-3">
-            <div class="table-responsive">
-              <table class="table table-bordered table-hover mt-2" title="Al seleccionar un registro, se cargará la información de la última OT que incluía dicho producto en las secciones de producción">
-                <thead class="TitulosTabla">
-                  <tr *ngFor="let columnas of titulosTabla let i = index">
-                    <th scope="col" class="idProducto">{{columnas.pID}}</th>
-                    <th id="nombre" scope="col">{{columnas.pNombre}}</th>
-                    <th id="ancho" scope="col" class="">{{columnas.pAncho}}</th>
-                    <th id="fuelle" scope="col">{{columnas.pFuelle}}</th>
-                    <th id="calibre" scope="col">{{columnas.pCalibre}}</th>
-                    <th id="largo" scope="col">{{columnas.pLargo}}</th>
-                    <th id="undMedidaPeso" scope="col">{{columnas.pUndMedACF}}</th>
-                    <th id="tipoProducto" scope="col">{{columnas.pTipoProd}}</th>
-                    <th id="material" scope="col">{{columnas.pMaterial}}</th>
-                    <th id="pigmento" scope="col">{{columnas.pPigmento}}</th>
-                    <th id="cantidad" scope="col">{{columnas.pCantidad}}</th>
-                    <th id="undMedidaCantidad" scope="col">{{columnas.pUndMedCant}}</th>
-                    <th id="precioUnitario" scope="col">{{columnas.pPrecioU}}</th>
-                    <!-- <th id="tipoMoneda" scope="col">{{columnas.pMoneda}}</th> -->
-                    <th id="Subtotal" scope="col">{{columnas.pSubtotal}}</th>
-                    <th id="acciones" scope="col"></th>
-                    <th id="acciones" scope="col"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th id="id" class="TextosInfoTabla"></th>
-                    <td id="nombre" class="TextosInfoTabla"></td>
-                    <td id="ancho" class="TextosInfoTabla"></td>
-                    <td id="fuelle" class="TextosInfoTabla"></td>
-                    <td id="calibre" class="TextosInfoTabla"></td>
-                    <td id="largo" class="TextosInfoTabla"></td>
-                    <td id="undMedidaPeso" class="TextosInfoTabla"></td>
-                    <td id="tipoProducto" class="TextosInfoTabla"></td>
-                    <td id="material" class="TextosInfoTabla"></td>
-                    <td id="pigmento" class="TextosInfoTabla"></td>
-                    <td id="cantidadDisponible" class="TextosInfoTabla"></td>
-                    <td id="undMedidaCantidad" class="TextosInfoTabla"></td>
-                    <td id="precioUnitario" class="TextosInfoTabla"></td>
-                    <td id="Subtotal" class="TextosInfoTabla"></td>
-                    <td id="Editar" ><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Producto"></i></a></td>
-                    <td id="Eliminar" ><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+      <!-- Inicio tabla producto -->
+      <div class="mb-3">
+        <div class="row g-3">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover mt-2" title="Al seleccionar un registro, se cargará la información de la última OT que incluía dicho producto en las secciones de producción">
+              <thead class="TitulosTabla">
+                <tr *ngFor="let columnas of titulosTabla let i = index">
+                  <th scope="col" class="idProducto">{{columnas.pID}}</th>
+                  <th id="nombre" scope="col">{{columnas.pNombre}}</th>
+                  <th id="ancho" scope="col" class="">{{columnas.pAncho}}</th>
+                  <th id="fuelle" scope="col">{{columnas.pFuelle}}</th>
+                  <th id="calibre" scope="col">{{columnas.pCalibre}}</th>
+                  <th id="largo" scope="col">{{columnas.pLargo}}</th>
+                  <th id="undMedidaPeso" scope="col">{{columnas.pUndMedACF}}</th>
+                  <th id="tipoProducto" scope="col">{{columnas.pTipoProd}}</th>
+                  <th id="material" scope="col">{{columnas.pMaterial}}</th>
+                  <th id="pigmento" scope="col">{{columnas.pPigmento}}</th>
+                  <th id="cantidad" scope="col">{{columnas.pCantidad}}</th>
+                  <th id="undMedidaCantidad" scope="col">{{columnas.pUndMedCant}}</th>
+                  <th id="precioUnitario" scope="col">{{columnas.pPrecioU}}</th>
+                  <th id="Subtotal" scope="col">{{columnas.pSubtotal}}</th>
+                  <th id="acciones" scope="col"></th>
+                  <th id="acciones" scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let listaProductos of ArrayProducto; let j = index">
+                  <th id="id" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Id}}</th>
+                  <td id="nombreCampo" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Nombre}}</td>
+                  <td id="ancho" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Ancho}}</td>
+                  <td id="fuelle" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Fuelle}}</td>
+                  <td id="calibre" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Cal}}</td>
+                  <td id="largo" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Largo}}</td>
+                  <td id="undMedidaPeso" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Und}}</td>
+                  <td id="tipoProducto" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Tipo}}</td>
+                  <td id="material" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Material}}</td>
+                  <td id="pigmento" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Pigmento}}</td>
+                  <td id="cantidadDisponible" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Cant}}</td>
+                  <td id="undMedidaCantidad" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.UndCant}}</td>
+                  <td id="precioUnitario" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.PrecioUnd | currency }}</td>
+                  <!-- <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.TpMoneda}}</td> -->
+                  <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.SubTotal | currency }}</td>
+                  <td id="Editar" ><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Producto"></i></a></td>
+                  <td id="Eliminar" ><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
+      </div>
 
          <!--Linea-->
         <div class="mb-4">
@@ -173,7 +220,7 @@
         <h4 class="tituloRojo">Procesos de Producción</h4>
       </div>
 
-          <!-- TABS de Procesos -->
+        <!-- TABS de Procesos -->
       <ul class="nav nav-tabs mb-5 justify-content-md-center" >
         <li class="nav-item">
           <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#Extrusión" type="button" role="tab">Extrusión</button>
@@ -186,7 +233,9 @@
         </li>
       </ul>
 
-      <div class="tab-content " id="myTabContent" >
+
+      <!-- TABS de Informacion de los Procesos -->
+      <div class="tab-content" id="myTabContent">
         <!-- Extrusion -->
         <div class="tab-pane fade show active " id="Extrusión" role="tabpanel" aria-labelledby="Extrusión-tab">
 
@@ -203,7 +252,7 @@
                 <!-- Material -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Material_Extrusion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="MaterialPrd.Material_Id" *ngFor="let MaterialPrd of arrayMateriales">{{MaterialPrd.material_Nombre}}</option>
+                    <option [ngValue]="MaterialPrd" *ngFor="let MaterialPrd of arrayMateriales">{{MaterialPrd}}</option>
                   </select>
                   <label for="floatingSelect">Material</label>
                 </div>
@@ -211,7 +260,7 @@
                 <!-- Formato -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Formato_Extrusion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option>1</option>
+                    <option [ngValue]="formato" *ngFor="let formato of formatos">{{formato}}</option>
                   </select>
                   <label for="floatingSelect">Formato</label>
                 </div>
@@ -219,7 +268,7 @@
                  <!-- Pigmento -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Pigmento_Extrusion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="Pigmentos.pigmt_Id" *ngFor="let Pigmentos of arrayPigmentos">{{Pigmentos.pigmt_Nombre}}</option>
+                    <option [ngValue]="Pigmentos" *ngFor="let Pigmentos of arrayPigmentos">{{Pigmentos}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento</label>
                 </div>
@@ -258,7 +307,7 @@
                 <!-- Unidad Medida -->
                 <div class="form-floating col-md-2">
                   <select formControlName="UnidadMedida_Extrusion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="UndMedida.undMed_Id" *ngFor="let UndMedida of arrayUnidadesMedidas">{{UndMedida.undMed_Nombre}}</option>
+                    <option [ngValue]="UndMedida" *ngFor="let UndMedida of arrayUnidadesMedidas">{{UndMedida}}</option>
                   </select>
                   <label for="floatingSelect">Und. Medida</label>
                 </div>
@@ -266,7 +315,7 @@
                  <!-- Formato -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Tratado_Extrusion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option>1</option>
+                    <option [ngValue]="tratados" *ngFor="let tratados of tratado">{{tratados}}</option>
                   </select>
                   <label for="floatingSelect">Tratado</label>
                 </div>
@@ -293,25 +342,34 @@
                 <!-- Material -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Tipo_Impresion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option>1</option>
+                    <option value="1" disabled selected></option>
+                    <option [ngValue]="tipoImpresion" *ngFor="let tipoImpresion of tiposImpresion">{{tipoImpresion}}</option>
                   </select>
                   <label for="floatingSelect">Tipo Impresión</label>
                 </div>
 
                 <!-- Formato -->
                 <div class="form-floating col-md-2">
-                  <select formControlName="Rodillo_Impresion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option>1</option>
+                  <!-- <select formControlName="Rodillo_Impresion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option [ngValue]="rodillo" *ngFor="let rodillo of rodillos">{{rodillo}}</option>
                   </select>
-                  <label for="floatingSelect">Rodillo</label>
+                  <label for="floatingSelect">Rodillo</label> -->
+
+                  <input formControlName="Rodillo_Impresion" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a imprimir">
+                  <label for="floatingInput">Rodillo</label>
                 </div>
 
                  <!-- Formato -->
                 <div class="form-floating col-md-2">
-                  <select formControlName="Pista_Impresion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option>1</option>
+                  <!-- <select formControlName="Pista_Impresion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option [ngValue]="pista" *ngFor="let pista of pistas">{{pista}}</option>
                   </select>
-                  <label for="floatingSelect">Pista</label>
+                  <label for="floatingSelect">Pista</label> -->
+
+                  <input formControlName="Pista_Impresion" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a imprimir">
+                  <label for="floatingInput">Pista</label>
                 </div>
 
               </div>
@@ -329,7 +387,7 @@
                 <!-- Tinta 1 -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Tinta_Impresion1" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
                   </select>
                   <label for="floatingSelect">Tinta 1 (Opcional)</label>
                 </div>
@@ -337,7 +395,7 @@
                 <!-- Tinta 2 -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Tinta_Impresion2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
                   </select>
                   <label for="floatingSelect">Tinta 2 (Opcional)</label>
                 </div>
@@ -345,7 +403,7 @@
                 <!-- Tinta 3 -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Tinta_Impresion3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
                   </select>
                   <label for="floatingSelect">Tinta 3 (Opcional)</label>
                 </div>
@@ -353,7 +411,7 @@
                  <!-- Tinta 4 -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Tinta_Impresion4" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
                   </select>
                   <label for="floatingSelect">Tinta 4</label>
                 </div>
@@ -367,7 +425,7 @@
                 <!-- Cantidad a extruir -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Tinta_Impresion5" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
                   </select>
                   <label for="floatingSelect">Tinta 5</label>
                 </div>
@@ -375,7 +433,7 @@
                 <!-- Material -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Tinta_Impresion6" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
                   </select>
                   <label for="floatingSelect">Tinta 6</label>
                 </div>
@@ -383,7 +441,7 @@
                 <!-- Formato -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Tinta_Impresion7" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
                   </select>
                   <label for="floatingSelect">Tinta 7</label>
                 </div>
@@ -391,7 +449,7 @@
                  <!-- Formato -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Tinta_Impresion8" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas.tinta_Id" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
+                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
                   </select>
                   <label for="floatingSelect">Tinta 8</label>
                 </div>
@@ -424,7 +482,8 @@
                 <!--Capa 1-->
                 <div class="form-floating col-md-2">
                   <select formControlName="Capa_Laminado1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option>1</option>
+                    <option value="1" disabled selected></option>
+                    <option [ngValue]="lamCapas" *ngFor="let lamCapas of laminado_capas">{{lamCapas}}</option>
                   </select>
                   <label for="floatingSelect">Capa 1</label>
                 </div>
@@ -449,7 +508,8 @@
                 <!--Capa 2-->
                 <div class="form-floating col-md-2">
                   <select formControlName="Capa_Laminado2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option>1</option>
+                    <option value="1" disabled selected></option>
+                    <option [ngValue]="lamCapas" *ngFor="let lamCapas of laminado_capas">{{lamCapas}}</option>
                   </select>
                   <label for="floatingSelect">Capa 2</label>
                 </div>
@@ -475,7 +535,8 @@
                 <!--Capa 3-->
                 <div class="form-floating col-md-2">
                   <select formControlName="Capa_Laminado3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option>1</option>
+                    <option value="1" disabled selected></option>
+                    <option [ngValue]="lamCapas" *ngFor="let lamCapas of laminado_capas">{{lamCapas}}</option>
                   </select>
                   <label for="floatingSelect">Capa 3</label>
                 </div>
