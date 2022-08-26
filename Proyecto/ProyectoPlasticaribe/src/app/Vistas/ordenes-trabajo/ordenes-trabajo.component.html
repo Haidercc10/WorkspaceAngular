@@ -1,4 +1,7 @@
-<app-menuLateral></app-menuLateral>
+<ng-container *ngIf="!vistaPedidos">
+  <app-menuLateral></app-menuLateral>
+</ng-container>
+
 
 <div class="contain">
   <!-- Navegador fin de parte superior -->
@@ -31,17 +34,16 @@
           <div class="row g-3">
             <!-- OT -->
             <div class="form-floating col-md-2">
-              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" required >
+              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarOT()" required >
               <label for="floatingInput">Nro. OT</label>
             </div>
 
             <!-- Nro. Pedido -->
-            <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm" style="width: 530px;">
+            <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm" style="width: 50%;">
               <ng-autocomplete
                 class=""
-                [data]="pedidoSinOT"
-                (selected)='consultarPedido()'
-                (keyup.enter)="consultarPedido()"
+                [data]="pedidosSinOT"
+                (selected)='consultarPedido($event)'
                 (inputChanged)='onChangeSearchPedido($event)'
                 (inputFocused)='onFocusedNombrePedido($event)'
                 [searchKeyword]="keywordPedidos"
@@ -51,7 +53,7 @@
                 formControlName="Pedido_Id">
               </ng-autocomplete>
               <ng-template #itemTemplate let-item>
-                <a [innerHTML]="item"></a>
+                <a [innerHTML]="item.nombre"></a>
               </ng-template>
               <ng-template #notFoundTemplate let-notFound>
                 <div [innerHTML]="notFound"></div>
@@ -60,7 +62,7 @@
             </div>
 
             <!--Vendedor-->
-            <div class="form-floating col-md-5">
+            <div class="form-floating col-md-4">
               <input formControlName="Nombre_Vendedor" type="text" class="form-control form-control-sm" id="floatingInput" required >
               <label for="floatingInput">Vendedor</label>
             </div>
@@ -125,6 +127,15 @@
               <label for="floatingTextArea">Observación</label>
             </div>
 
+            <!-- Margen -->
+            <div class="form-floating col-md-2">
+              <input formControlName="Margen" type="number" class="form-control form-control-sm" min="0" max="100" id="floatingInput" required>
+              <label for="floatingInput">Margen (%)</label>
+              <div>
+                <label><b>Cant total: </b>{{cantidadMasMargen | number}}</label>
+              </div>
+            </div>
+
             <!-- Cyrel -->
             <div class="form-floating col-md-1">
               <mat-checkbox
@@ -170,18 +181,20 @@
                   <th id="nombre" scope="col">{{columnas.pNombre}}</th>
                   <th id="ancho" scope="col" class="">{{columnas.pAncho}}</th>
                   <th id="fuelle" scope="col">{{columnas.pFuelle}}</th>
-                  <th id="calibre" scope="col">{{columnas.pCalibre}}</th>
+                  <!-- <th id="calibre" scope="col">{{columnas.pCalibre}}</th> -->
                   <th id="largo" scope="col">{{columnas.pLargo}}</th>
                   <th id="undMedidaPeso" scope="col">{{columnas.pUndMedACF}}</th>
+                  <th id="largo" scope="col">{{columnas.pPesoMillar}}</th>
                   <th id="tipoProducto" scope="col">{{columnas.pTipoProd}}</th>
-                  <th id="material" scope="col">{{columnas.pMaterial}}</th>
-                  <th id="pigmento" scope="col">{{columnas.pPigmento}}</th>
+                  <!-- <th id="material" scope="col">{{columnas.pMaterial}}</th>
+                  <th id="pigmento" scope="col">{{columnas.pPigmento}}</th> -->
+                  <th id="cantidad" scope="col">{{columnas.pCantPaquete}}</th>
+                  <th id="cantidad" scope="col">{{columnas.pCantBulto}}</th>
                   <th id="cantidad" scope="col">{{columnas.pCantidad}}</th>
                   <th id="undMedidaCantidad" scope="col">{{columnas.pUndMedCant}}</th>
+                  <th id="undMedidaCantidad" scope="col">{{columnas.pTipoSellado}}</th>
                   <th id="precioUnitario" scope="col">{{columnas.pPrecioU}}</th>
                   <th id="Subtotal" scope="col">{{columnas.pSubtotal}}</th>
-                  <th id="acciones" scope="col"></th>
-                  <th id="acciones" scope="col"></th>
                 </tr>
               </thead>
               <tbody>
@@ -190,19 +203,20 @@
                   <td id="nombreCampo" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Nombre}}</td>
                   <td id="ancho" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Ancho}}</td>
                   <td id="fuelle" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Fuelle}}</td>
-                  <td id="calibre" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Cal}}</td>
+                  <!-- <td id="calibre" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Cal}}</td> -->
                   <td id="largo" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Largo}}</td>
                   <td id="undMedidaPeso" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Und}}</td>
+                  <td id="largo" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.PesoMillar}}</td>
                   <td id="tipoProducto" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Tipo}}</td>
-                  <td id="material" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Material}}</td>
-                  <td id="pigmento" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Pigmento}}</td>
+                  <!-- <td id="material" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Material}}</td>
+                  <td id="pigmento" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Pigmento}}</td> -->
+                  <td id="cantidadDisponible" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.CantPaquete}}</td>
+                  <td id="cantidadDisponible" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.CantBulto}}</td>
                   <td id="cantidadDisponible" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Cant}}</td>
                   <td id="undMedidaCantidad" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.UndCant}}</td>
+                  <td id="undMedidaCantidad" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.TipoSellado}}</td>
                   <td id="precioUnitario" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.PrecioUnd | currency }}</td>
-                  <!-- <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.TpMoneda}}</td> -->
                   <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.SubTotal | currency }}</td>
-                  <td id="Editar" ><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Producto"></i></a></td>
-                  <td id="Eliminar" ><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
                 </tr>
               </tbody>
             </table>
@@ -210,10 +224,10 @@
         </div>
       </div>
 
-         <!--Linea-->
-        <div class="mb-4">
-          <hr class="colorLinea">
-        </div>
+        <!--Linea-->
+      <div class="mb-4">
+        <hr class="colorLinea">
+      </div>
 
       <!--Titulo procesos-->
       <div class="mb-3">
@@ -232,7 +246,6 @@
           <button class="nav-link" data-bs-toggle="tab" data-bs-target="#Laminado" type="button" role="tab">Laminado</button>
         </li>
       </ul>
-
 
       <!-- TABS de Informacion de los Procesos -->
       <div class="tab-content" id="myTabContent">

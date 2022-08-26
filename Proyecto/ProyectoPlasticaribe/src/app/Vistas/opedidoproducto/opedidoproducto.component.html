@@ -169,13 +169,13 @@
                   <tbody>
                     <!--Carga los productos en la tabla y pagina por 2-->
                     <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" >
-                      <td id="idPedido" data-bs-toggle="modal" data-bs-target="#staticBackdrop3">{{item.pedExt_Id}}</td>
-                      <td id="fechaPedido" data-bs-toggle="modal" data-bs-target="#staticBackdrop3">{{item.pedExt_FechaCreacion | date : 'yyyy-MM-dd'}}</td>
-                      <td id="fechaEntrega" data-bs-toggle="modal" data-bs-target="#staticBackdrop3">{{item.pedExt_FechaEntrega | date : 'yyyy-MM-dd'}}</td>
-                      <td id="sede" data-bs-toggle="modal" data-bs-target="#staticBackdrop3">{{item.cli_Nombre}}</td>
-                      <td id="Vendedor" data-bs-toggle="modal" data-bs-target="#staticBackdrop3">{{item.usua_Nombre}}</td>
-                      <td id="estadoPedido" data-bs-toggle="modal" data-bs-target="#staticBackdrop3">{{item.estado_Nombre}}</td>
-                      <td id="precioPedido" data-bs-toggle="modal" data-bs-target="#staticBackdrop3">{{item.pedExt_PrecioTotal | currency:'COP '}}</td>
+                      <td id="idPedido" (click)="CrearOT(item)" data-bs-toggle="modal" data-bs-target="#staticBackdrop3">{{item.pedExt_Id}}</td>
+                      <td id="fechaPedido" (click)="CrearOT(item)" data-bs-toggle="modal" data-bs-target="#staticBackdrop3">{{item.pedExt_FechaCreacion | date : 'yyyy-MM-dd'}}</td>
+                      <td id="fechaEntrega" (click)="CrearOT(item)" data-bs-toggle="modal" data-bs-target="#staticBackdrop3">{{item.pedExt_FechaEntrega | date : 'yyyy-MM-dd'}}</td>
+                      <td id="sede" data-bs-toggle="modal" (click)="CrearOT(item)" data-bs-target="#staticBackdrop3">{{item.cli_Nombre}}</td>
+                      <td id="Vendedor" data-bs-toggle="modal" (click)="CrearOT(item)" data-bs-target="#staticBackdrop3">{{item.usua_Nombre}}</td>
+                      <td id="estadoPedido" data-bs-toggle="modal" (click)="CrearOT(item)" data-bs-target="#staticBackdrop3">{{item.estado_Nombre}}</td>
+                      <td id="precioPedido" data-bs-toggle="modal" (click)="CrearOT(item)" data-bs-target="#staticBackdrop3">{{item.pedExt_PrecioTotal | currency:'COP '}}</td>
                       <td id="archivoPedido"><input class="btn btn-danger btn-danger-sm" type="button" (click)="llenarProductoPedido(item)" value="Ver"></td>
                       <td id="Editar" ><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Pedido" (click)="MostrarPedido(item)"></i></a></td>
                     </tr>
@@ -575,13 +575,13 @@
         </div>
         <!-- Fin Modal de crear cliente -->
 
-        <ng-container *ngIf="(ValidarRol == 1)">
+        <ng-container *ngIf="(ValidarRol == 1 && modalOrdenTrabajo)">
           <div class="modal fade" id="staticBackdrop3" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
             aria-labelledby="staticBackdropLabel2" aria-hidden="true">
             <div class="modal-dialog modal-fullscreen">
               <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="limpiarCamposAlCerrarModal()"></button>
                 </div>
                 <div class="modal-body">
                   <app-ordenes-trabajo></app-ordenes-trabajo>

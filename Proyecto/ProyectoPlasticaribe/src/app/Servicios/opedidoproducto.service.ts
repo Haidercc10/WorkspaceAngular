@@ -104,7 +104,9 @@ export class OpedidoproductoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/fechasEstado/${fecha}/${fechaEntrega}/${estado}`);
   }
 
-
+  srvObtenerListaPedidosSinOT(){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/PedidosSinOT`);
+  }
 
 
 //Metodo agregar Pedidos de Productos

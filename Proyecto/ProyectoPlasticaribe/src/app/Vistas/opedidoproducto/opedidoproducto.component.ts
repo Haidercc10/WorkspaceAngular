@@ -1,4 +1,4 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl} from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpedidoproductoService } from 'src/app/Servicios/opedidoproducto.service';
@@ -24,6 +24,8 @@ import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.se
 import { modelCliente } from 'src/app/Modelo/modelCliente';
 import { MaterialProductoService } from 'src/app/Servicios/materialProducto.service';
 import { PigmentoProductoService } from 'src/app/Servicios/pigmentoProducto.service';
+import { OrdenesTrabajoComponent } from '../ordenes-trabajo/ordenes-trabajo.component';
+import { Orden_TrabajoService } from 'src/app/Servicios/Orden_Trabajo.service';
 //import * as XLSX from 'xlsx';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -40,6 +42,8 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export class OpedidoproductoComponent implements OnInit {
 
+  @ViewChild(OrdenesTrabajoComponent) CrearOrdenTrabajo : OrdenesTrabajoComponent;
+
   public FormPedidoExternoClientes !: FormGroup; //Formulario de pedidos cliente
   public FormPedidoExternoProductos!: FormGroup; //Formuladio de pedidos productos
   public FormConsultaPedidoExterno !: FormGroup; //Formulario de pedidos consultados
@@ -54,6 +58,7 @@ export class OpedidoproductoComponent implements OnInit {
   public ModalSedesClientes: boolean = false;
 
   temporal : boolean = true; //Variable momentanea que va a hacer que no se muestre una parte del codigo del HTML en la vista, esto mientras se soluciona el hecho de que se termine esta vista
+  modalOrdenTrabajo : boolean = false; //Variable para validar si se abre el modal o no
 
   // VARIABLES PARA PASAR A LOS COMBOBOX
   cliente = []; //Variable que almacenará el nombre de los clientes para pasarlos en la vista
@@ -143,7 +148,8 @@ export class OpedidoproductoComponent implements OnInit {
                                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                                     private ClientesProductosService : ClientesProductosService,
                                       private materialService : MaterialProductoService,
-                                        private pigmentoServices : PigmentoProductoService,) {
+                                        private pigmentoServices : PigmentoProductoService,
+                                          private ordenTrabajoService : Orden_TrabajoService,) {
 
 
     //Campos que vienen del formulario
@@ -2600,4 +2606,54 @@ export class OpedidoproductoComponent implements OnInit {
     });
   }
 
+  //
+  CrearOT(item : any){
+    this.ordenTrabajoService.srvObtenerListaNumeroPedido(item.pedExt_Id).subscribe(datos_ot => {
+      if (datos_ot.length == 0) {
+        this.modalOrdenTrabajo = true;
+        this.CrearOrdenTrabajo.vistaPedidos = true;
+        let FechaEntregaDatetime = item.pedExt_FechaEntrega;
+        let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+        let fechaEntrega = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+        let itemOt : any = {
+          id : item.pedExt_Id,
+          nombre : `${item.pedExt_Id} - ${item.cli_Nombre} - ${fechaEntrega}`,
+          fecha : fechaEntrega,
+        }
+        this.CrearOrdenTrabajo.consultarPedido(itemOt);
+      } else if (datos_ot.length >= 1){
+        let productosOT : any = [];
+
+        for (let i = 0; i < datos_ot.length; i++) {
+          productosOT.push(datos_ot[i].prod_Id);
+        }
+
+        this.PedidoProductosService.srvObtenerListaPorIdProductoPedido(item.pedExt_Id).subscribe(datos_productosPedidos => {
+          let productos : any = [];
+          for (let j = 0; j < datos_productosPedidos.length; j++) {
+            if (!productosOT.includes(datos_productosPedidos[j].prod_Id)) {
+              productos.push(datos_productosPedidos[j].prod_Id)
+              this.modalOrdenTrabajo = true;
+              this.CrearOrdenTrabajo.vistaPedidos = true;
+              let FechaEntregaDatetime = item.pedExt_FechaEntrega;
+              let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+              let fechaEntrega = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+              let itemOt : any = {
+                id : item.pedExt_Id,
+                nombre : `${item.pedExt_Id} - ${item.cli_Nombre} - ${fechaEntrega}`,
+                fecha : fechaEntrega,
+              }
+              this.CrearOrdenTrabajo.consultarPedido(itemOt);
+            } else continue;
+          }
+          if (productos.length == 0) Swal.fire(`El pedido ${item.pedExt_Id} ya tiene ordenes de trabajo`);
+        });
+      } else Swal.fire(`El pedido ${item.pedExt_Id} ya tiene ordenes de trabajo`);
+    });
+  }
+
+  limpiarCamposAlCerrarModal() {
+    this.modalOrdenTrabajo = false;
+  }
 }
+;
