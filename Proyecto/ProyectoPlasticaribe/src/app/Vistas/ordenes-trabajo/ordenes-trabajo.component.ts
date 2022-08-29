@@ -646,19 +646,37 @@ export class OrdenesTrabajoComponent implements OnInit {
         impresion = itemOt.impFlexoNom.trim();
         if (impresion != 'FLEXOGRAFIA' && impresion != 'ROTOGRABADO') impresion = 1;
 
+        let tinta1 : string = itemOt.impTinta1Nom.trim();
+        let tinta2 : string = itemOt.impTinta2Nom.trim();
+        let tinta3 : string = itemOt.impTinta3Nom.trim();
+        let tinta4 : string = itemOt.impTinta4Nom.trim();
+        let tinta5 : string = itemOt.impTinta5Nom.trim();
+        let tinta6 : string = itemOt.impTinta6Nom.trim();
+        let tinta7 : string = itemOt.impTinta7Nom.trim();
+        let tinta8 : string = itemOt.impTinta8Nom.trim();
+
+        if (tinta1 == '') tinta1 = 'NO APLICA';
+        if (tinta2 == '') tinta2 = 'NO APLICA';
+        if (tinta3 == '') tinta3 = 'NO APLICA';
+        if (tinta4 == '') tinta4 = 'NO APLICA';
+        if (tinta5 == '') tinta5 = 'NO APLICA';
+        if (tinta6 == '') tinta6 = 'NO APLICA';
+        if (tinta7 == '') tinta7 = 'NO APLICA';
+        if (tinta8 == '') tinta8 = 'NO APLICA';
+
         this.FormOrdenTrabajoImpresion.setValue({
           cantidad_Impresion : '',
           Tipo_Impresion : itemOt.impFlexoNom.trim(),
           Rodillo_Impresion : itemOt.impRodillo,
           Pista_Impresion : itemOt.impPista,
-          Tinta_Impresion1 : '',
-          Tinta_Impresion2 : '',
-          Tinta_Impresion3 : '',
-          Tinta_Impresion4 : '',
-          Tinta_Impresion5 : '',
-          Tinta_Impresion6 : '',
-          Tinta_Impresion7 : '',
-          Tinta_Impresion8 : '',
+          Tinta_Impresion1 : tinta1,
+          Tinta_Impresion2 : tinta2,
+          Tinta_Impresion3 : tinta3,
+          Tinta_Impresion4 : tinta4,
+          Tinta_Impresion5 : tinta5,
+          Tinta_Impresion6 : tinta6,
+          Tinta_Impresion7 : tinta7,
+          Tinta_Impresion8 : tinta8,
         });
 
         laminadoCapa1 = itemOt.lamCapa1Nom.trim();
