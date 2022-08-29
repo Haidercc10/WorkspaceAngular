@@ -138,13 +138,15 @@
 
             <!-- Cyrel -->
             <div class="form-floating col-md-1">
-              <mat-checkbox
+              <input
                 formControlName="OT_Cyrel"
                 id="cyrel"
-                style="margin-top: 15px; margin-left: 30px; height: 12px;"
-                [(ngModel)]="checkedCyrel">
-                Cyrel
-              </mat-checkbox>
+                class="form-check-input"
+                type="checkbox"
+                [(ngModel)]="checkedCyrel"
+                value="Cyrel"
+                style="margin-top: 15px; margin-left: 30px; height: 15px;">
+
             </div>
 
             <!-- Corte -->
@@ -244,6 +246,9 @@
         </li>
         <li class="nav-item">
           <button class="nav-link" data-bs-toggle="tab" data-bs-target="#Laminado" type="button" role="tab">Laminado</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#Mezclas" type="button" role="tab">Mezclas</button>
         </li>
       </ul>
 
@@ -570,6 +575,417 @@
 
           </form>
         </div>
+
+        <!-- Mezclas -->
+        <div class="tab-pane fade" id="Mezclas" role="tabpanel" aria-labelledby="Mezclas-tab">
+
+          <form [formGroup]="FormOrdenTrabajoLaminado">
+
+            <!--Fila 1-->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!-- Material -->
+              <!--  <div class="form-floating col-md-2">
+                  <select formControlName="Material_Extrusion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                     <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Material</label>
+                </div>
+
+                  !-- Pigmento --
+                  <div class="form-floating col-md-2">
+                    <select formControlName="Pigmento_Extrusion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                     <option>1</option>
+                    </select>
+                    <label for="floatingSelect">Pigmento</label>
+                  </div> -->
+
+                   <!--Modo Mezcla -->
+                   <div class="form-floating col-md-5">
+                    <select formControlName="Pigmento_Extrusion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                     <!-- <option [ngValue]="Pigmentos" *ngFor="let Pigmentos of arrayPigmentos">{{Pigmentos}}</option> -->
+                     <option>1</option>
+                    </select>
+                    <label for="floatingSelect">Modo Mezcla</label>
+                  </div>
+              </div>
+            </div>
+
+            <!--Fila 2 y 3-->
+            <div class="mb-4">
+              <div style="text-align: center;">
+
+                <div class="mb-3">
+                  <h6 class="tituloRojo">N° de capas</h6>
+                </div>
+
+                <div class="form-check form-check-inline" >
+                  <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                  <label class="form-check-label" for="inlineCheckbox1">1</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+                  <label class="form-check-label" for="inlineCheckbox2">2</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
+                  <label class="form-check-label" for="inlineCheckbox3">3</label>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3"  style="text-align: center;">
+              <h6 class="tituloRojo">Porcentajes de mezcla de capas</h6>
+           </div>
+
+            <!--Fila 4-->
+            <div class="mb-4" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!--Capa 1 unica-->
+                <div class="form-floating col-md-2">
+                  <input formControlName="Calibre_Laminado1" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                  <label for="floatingInput">% Capa 1</label>
+                </div>
+
+                <!--Capa 2 interna-->
+               <div class="form-floating col-md-2">
+                  <input formControlName="cantidad_Laminado1" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                  <label for="floatingInput">% Capa 2</label>
+                </div>
+
+                <!--Capa 3 Externa-->
+                <div class="form-floating col-md-2">
+                  <input formControlName="cantidad_Laminado1" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                  <label for="floatingInput">% Capa 3</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3"  style="text-align: center;">
+              <h6 class="tituloRojo">Porcentajes de mezcla de materiales</h6>
+           </div>
+
+
+            <!--Fila 5-->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!--Material 1 Capa 1 -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="materialP1_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Material 1</label>
+                </div>
+
+                <!--% Material 1 Capa 1-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMaterialP1_Capa1" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+                 <!--Material 1 Capa 2-->
+                 <div class="form-floating col-md-2">
+                  <select formControlName="materialP1_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Material 1</label>
+                </div>
+
+                <!--% Material 1 Capa 2-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMaterialP1_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+                 <!--Material 1 Capa 3-->
+                 <div class="form-floating col-md-2">
+                  <select formControlName="materialP1_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Material 1</label>
+                </div>
+
+                <!--% Material 1 Capa 3-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMaterialP1_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+              </div>
+            </div>
+
+            <!--Fila 6-->
+            <div class="mb-3" >
+                <div class="row g-3 justify-content-md-center">
+
+                  <!--Material 2 Capa 1-->
+                  <div class="form-floating col-md-2">
+                    <select formControlName="materialP2_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                      <option value="1" disabled selected></option>
+                      <option>1</option>
+                    </select>
+                    <label for="floatingSelect">Material 2</label>
+                  </div>
+
+                  <!--% Material 2 Capa 1  -->
+                  <div class="form-floating col-md-1">
+                    <input formControlName="PorcentajeMaterialP2_Capa1" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                    <label for="floatingInput">%</label>
+                  </div>
+
+                   <!--Material 2 Capa 2-->
+                   <div class="form-floating col-md-2">
+                    <select formControlName="materialP2_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                      <option value="1" disabled selected></option>
+                      <option>1</option>
+                    </select>
+                    <label for="floatingSelect">Material 2</label>
+                  </div>
+
+                  <!--% Material 2 Capa 2-->
+                  <div class="form-floating col-md-1">
+                    <input formControlName="PorcentajeMaterialP2_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                    <label for="floatingInput">%</label>
+                  </div>
+
+                   <!--Material 2 Capa 3-->
+                   <div class="form-floating col-md-2">
+                    <select formControlName="materialP2_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                      <option value="1" disabled selected></option>
+                      <option>1</option>
+                    </select>
+                    <label for="floatingSelect">Material 2</label>
+                  </div>
+
+                  <!--% Material 2 Capa 3-->
+                  <div class="form-floating col-md-1">
+                    <input formControlName="PorcentajeMaterialP2_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                    <label for="floatingInput">%</label>
+                  </div>
+
+                </div>
+            </div>
+
+            <!--Fila 7-->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!--Material 3 Capa 1 -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="materialP3_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Material 3</label>
+                </div>
+
+                <!--% Material 3 Capa 1-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMaterialP3_Capa1" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+                 <!--Material 3 Capa 2-->
+                 <div class="form-floating col-md-2">
+                  <select formControlName="materialP3_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Material 3</label>
+                </div>
+
+                <!--% Material 3 Capa 2-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMaterialP3_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+                 <!--Material 3 Capa 3-->
+                 <div class="form-floating col-md-2">
+                  <select formControlName="materialP3_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Material 3</label>
+                </div>
+
+                <!--% Material 3 Capa 1-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMaterialP3_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+              </div>
+          </div>
+
+            <!--Fila 8-->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!-- Material 4 Capa 1-->
+                <div class="form-floating col-md-2">
+                  <select formControlName="materialP4_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Material 4</label>
+                </div>
+
+                <!--% Material 4 Capa 1-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMaterialP4_Capa1" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+                 <!--Material 4 Capa 2-->
+                 <div class="form-floating col-md-2">
+                  <select formControlName="materialP4_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Material 4</label>
+                </div>
+
+                <!--% Material 4 Capa 2-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMaterialP4_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+                 <!--Material 4 Capa 3-->
+                 <div class="form-floating col-md-2">
+                  <select formControlName="materialP_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Material 4</label>
+                </div>
+
+                <!--% Material 4 Capa 3-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMaterialP_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+              </div>
+          </div>
+
+            <!--Fila 9-->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!--Pigmento 1 Capa 1-->
+                <div class="form-floating col-md-2">
+                  <select formControlName="MezclaPigmentoP1_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Pigmento 1</label>
+                </div>
+
+                <!--% Pigmento 1 Capa 1-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMezclaPigmentoP1_Capa1" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+                 <!-- Pigmento 1 Capa 2-->
+                 <div class="form-floating col-md-2">
+                  <select formControlName="MezclaPigmentoP1_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Pigmento 1</label>
+                </div>
+
+                <!--% Pigmento 1 Capa 2-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMezclaPigmentoP1_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+                 <!-- Pigmento 1 Capa 3 -->
+                 <div class="form-floating col-md-2">
+                  <select formControlName="MezclaPigmento1_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Pigmento 1</label>
+                </div>
+
+                <!--% Pigmento 1 Capa 3-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMezclaPigmentoP1_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+              </div>
+            </div>
+
+            <!--Fila 10-->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+
+                <!--Pigmento 2 Capa 1-->
+                <div class="form-floating col-md-2">
+                  <select formControlName="MezclaPigmentoP2_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Pigmento 2</label>
+                </div>
+
+                <!--% Pigmento 2 Capa 1-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMezclaPigmentoP2_Capa1" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+                 <!--Pigmento 2 Capa 2-->
+                 <div class="form-floating col-md-2">
+                  <select formControlName="MezclaPigmentoP2_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Pigmento 2</label>
+                </div>
+
+                <!--% Pigmento 2 Capa 2-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMezclaPigmentoP2_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+                 <!--Pigmento 2 Capa 3-->
+                 <div class="form-floating col-md-2">
+                  <select formControlName="MezclaPigmento2_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option value="1" disabled selected></option>
+                    <option>1</option>
+                  </select>
+                  <label for="floatingSelect">Pigmento 2</label>
+                </div>
+
+                <!--% Pigmento 2 Capa 3 -->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMezclaPigmentoP2_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+              </div>
+            </div>
+
+
+          </form>
+        </div>
+
+
       </div>
 
     </div>
