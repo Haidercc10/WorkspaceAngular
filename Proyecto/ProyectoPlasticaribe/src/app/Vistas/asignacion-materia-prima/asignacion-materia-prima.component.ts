@@ -315,7 +315,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let observacion : string = this.FormMateriaPrimaRetiro.value.ObservacionRetiro;
     let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina;
     // this.cantidadAsignada = 0;
-
     // const datosAsignacion : any = {
     //   AsigMP_OrdenTrabajo : idOrdenTrabajo,
     //   AsigMp_FechaEntrega : fechaEntrega,
@@ -327,7 +326,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     // this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
     //   this.obtenerUltimoIdAsignacaion();
     // });
-
     /* Consulta en la tabla de asignaciones la ot y suma la cantidad que se le ha asignado a dicha OT  */
 
     if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
@@ -622,6 +620,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               this.ArrayMateriaPrimaRetirada.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
             } else Swal.fire("La cantidad a asignar no debe superar lo que hay en stock ");
           }
+
+          for (let i = 0; i < this.materiasPrimasRetiradas.length; i++) {
+            if (this.materiasPrimasRetiradas[i].id == idMateriaPrima) this.materiasPrimasRetiradas.splice(i, 1);
+            else continue;
+          }
           break;
         }
       }
@@ -839,6 +842,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.ArrayMateriaPrimaRetirada.splice(index, 1);
+        this.cantidadAsignada = this.cantidadAsignada - formulario.Cant;
         Swal.fire('Materia Prima eliminada');
       }
     });
@@ -852,10 +856,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       MpNombreRetirada: formulario.Nombre,
       MpCantidadRetirada : formulario.Cant,
       MpUnidadMedidaRetirada: formulario.UndCant,
-      MpStockRetirada: formulario,
+      MpStockRetirada: formulario.Stock,
       ProcesoRetiro : formulario.Proceso
     });
     this.cantidadAsignada = this.cantidadAsignada - formulario.Cant;
+    this.buscarMpId();
   }
 
 }

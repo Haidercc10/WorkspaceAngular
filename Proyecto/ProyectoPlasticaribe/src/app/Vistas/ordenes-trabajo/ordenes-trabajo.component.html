@@ -2,6 +2,11 @@
   <app-menuLateral></app-menuLateral>
 </ng-container>
 
+<div class="overlay" *ngIf="!cargando">
+  <div class="spinner ">
+    <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+  </div>
+</div>
 
 <div class="contain">
   <!-- Navegador fin de parte superior -->
@@ -132,21 +137,22 @@
               <input formControlName="Margen" type="number" class="form-control form-control-sm" min="0" max="100" id="floatingInput" required>
               <label for="floatingInput">Margen (%)</label>
               <div>
-                <label><b>Cant total: </b>{{cantidadMasMargen | number}}</label>
+                <label><b>Cant Kg total: </b>{{cantidadKgMasMargen | number}}</label>
+              </div>
+              <div>
+                <label><b>Cant Und total: </b>{{cantidadUndMasMargen | number}}</label>
               </div>
             </div>
 
             <!-- Cyrel -->
             <div class="form-floating col-md-1">
-              <input
+              <mat-checkbox
                 formControlName="OT_Cyrel"
-                id="cyrel"
-                class="form-check-input"
-                type="checkbox"
-                [(ngModel)]="checkedCyrel"
-                value="Cyrel"
-                style="margin-top: 15px; margin-left: 30px; height: 15px;">
-
+                id="corte"
+                style="margin-top: 15px; margin-left: 30px; height: 12px;"
+                [(ngModel)]="checkedCyrel">
+                Corte
+              </mat-checkbox>
             </div>
 
             <!-- Corte -->
@@ -237,7 +243,7 @@
       </div>
 
         <!-- TABS de Procesos -->
-      <ul class="nav nav-tabs mb-5 justify-content-md-center" >
+      <ul class="nav nav-tabs justify-content-md-center" >
         <li class="nav-item">
           <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#Extrusión" type="button" role="tab">Extrusión</button>
         </li>
@@ -360,13 +366,12 @@
                 <!-- Material -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Tipo_Impresion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
                     <option [ngValue]="tipoImpresion" *ngFor="let tipoImpresion of tiposImpresion">{{tipoImpresion}}</option>
                   </select>
                   <label for="floatingSelect">Tipo Impresión</label>
                 </div>
 
-                <!-- Formato -->
+                <!-- Rodillo -->
                 <div class="form-floating col-md-2">
                   <!-- <select formControlName="Rodillo_Impresion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                     <option value="1" disabled selected></option>
@@ -378,7 +383,7 @@
                   <label for="floatingInput">Rodillo</label>
                 </div>
 
-                 <!-- Formato -->
+                 <!-- Psita -->
                 <div class="form-floating col-md-2">
                   <!-- <select formControlName="Pista_Impresion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                     <option value="1" disabled selected></option>
@@ -500,7 +505,6 @@
                 <!--Capa 1-->
                 <div class="form-floating col-md-2">
                   <select formControlName="Capa_Laminado1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
                     <option [ngValue]="lamCapas" *ngFor="let lamCapas of laminado_capas">{{lamCapas}}</option>
                   </select>
                   <label for="floatingSelect">Capa 1</label>
@@ -526,7 +530,6 @@
                 <!--Capa 2-->
                 <div class="form-floating col-md-2">
                   <select formControlName="Capa_Laminado2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
                     <option [ngValue]="lamCapas" *ngFor="let lamCapas of laminado_capas">{{lamCapas}}</option>
                   </select>
                   <label for="floatingSelect">Capa 2</label>
@@ -553,7 +556,6 @@
                 <!--Capa 3-->
                 <div class="form-floating col-md-2">
                   <select formControlName="Capa_Laminado3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
                     <option [ngValue]="lamCapas" *ngFor="let lamCapas of laminado_capas">{{lamCapas}}</option>
                   </select>
                   <label for="floatingSelect">Capa 3</label>
@@ -578,15 +580,13 @@
 
         <!-- Mezclas -->
         <div class="tab-pane fade" id="Mezclas" role="tabpanel" aria-labelledby="Mezclas-tab">
-
-          <form [formGroup]="FormOrdenTrabajoLaminado">
+          <form [formGroup]="FormOrdenTrabajoMezclas">
 
             <!--Fila 1-->
             <div class="mb-3" >
               <div class="row g-3 justify-content-md-center">
-
                 <!-- Material -->
-              <!--  <div class="form-floating col-md-2">
+                <!--  <div class="form-floating col-md-2">
                   <select formControlName="Material_Extrusion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                      <option>1</option>
                   </select>
@@ -601,18 +601,38 @@
                     <label for="floatingSelect">Pigmento</label>
                   </div> -->
 
-                   <!--Modo Mezcla -->
-                   <div class="form-floating col-md-5">
-                    <select formControlName="Pigmento_Extrusion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                     <!-- <option [ngValue]="Pigmentos" *ngFor="let Pigmentos of arrayPigmentos">{{Pigmentos}}</option> -->
-                     <option>1</option>
-                    </select>
-                    <label for="floatingSelect">Modo Mezcla</label>
-                  </div>
+                <!--Modo Mezcla -->
+                <!-- <div class="form-floating col-md-5">
+                  <select formControlName="Nombre_Mezclas" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="mezcla" *ngFor="let mezcla of mezclas">{{mezcla}}</option>
+                  </select>
+                  <label for="floatingSelect">Modo Mezcla</label>
+                </div> -->
+                <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm" style="width: 50%;">
+                  <ng-autocomplete
+                    class=""
+                    [data]="mezclas"
+                    (selected)='cargarCombinacionMezclas($event)'
+                    (inputChanged)='onChangeSearchMezcla($event)'
+                    (inputFocused)='onFocusedNombreMezcla($event)'
+                    [searchKeyword]="keywordMezclas"
+                    [itemTemplate]="itemTemplate2"
+                    [notFoundTemplate]="notFoundTemplate"
+                    id="floatingInput"
+                    formControlName="Nombre_Mezclas">
+                  </ng-autocomplete>
+                  <ng-template #itemTemplate2 let-item>
+                    <a [innerHTML]="item.mezcla_Nombre"></a>
+                  </ng-template>
+                  <ng-template #notFoundTemplate let-notFound>
+                    <div [innerHTML]="notFound"></div>
+                  </ng-template>
+                  <label for="floatingInput" *ngIf="validarInputMezclas">Mezclas</label>
+                </div>
               </div>
             </div>
 
-            <!--Fila 2 y 3-->
+            <!--Fila 2 y 3 Checkbox-->
             <div class="mb-4">
               <div style="text-align: center;">
 
@@ -620,25 +640,26 @@
                   <h6 class="tituloRojo">N° de capas</h6>
                 </div>
 
-                <div class="form-check form-check-inline" >
-                  <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" formControlName="Chechbox_Capa1" type="checkbox" id="capa1" [(ngModel)]="checkedCapa1" value="option1">
                   <label class="form-check-label" for="inlineCheckbox1">1</label>
                 </div>
+
                 <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+                  <input class="form-check-input" formControlName="Chechbox_Capa2" type="checkbox" id="capa2" [(ngModel)]="checkedCapa2" value="option2">
                   <label class="form-check-label" for="inlineCheckbox2">2</label>
                 </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-                  <label class="form-check-label" for="inlineCheckbox3">3</label>
 
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" formControlName="Chechbox_Capa3" type="checkbox" id="capa3" [(ngModel)]="checkedCapa3" value="option3">
+                  <label class="form-check-label" for="inlineCheckbox3">3</label>
                 </div>
               </div>
             </div>
 
             <div class="mb-3"  style="text-align: center;">
               <h6 class="tituloRojo">Porcentajes de mezcla de capas</h6>
-           </div>
+            </div>
 
             <!--Fila 4-->
             <div class="mb-4" >
@@ -646,19 +667,19 @@
 
                 <!--Capa 1 unica-->
                 <div class="form-floating col-md-2">
-                  <input formControlName="Calibre_Laminado1" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                  <input formControlName="Proc_Capa1" type="number" class="form-control form-control-sm" id="floatingInput" required >
                   <label for="floatingInput">% Capa 1</label>
                 </div>
 
                 <!--Capa 2 interna-->
                <div class="form-floating col-md-2">
-                  <input formControlName="cantidad_Laminado1" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                  <input formControlName="Proc_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required >
                   <label for="floatingInput">% Capa 2</label>
                 </div>
 
                 <!--Capa 3 Externa-->
                 <div class="form-floating col-md-2">
-                  <input formControlName="cantidad_Laminado1" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                  <input formControlName="Proc_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required >
                   <label for="floatingInput">% Capa 3</label>
                 </div>
               </div>
@@ -666,8 +687,7 @@
 
             <div class="mb-3"  style="text-align: center;">
               <h6 class="tituloRojo">Porcentajes de mezcla de materiales</h6>
-           </div>
-
+            </div>
 
             <!--Fila 5-->
             <div class="mb-3" >
@@ -676,8 +696,7 @@
                 <!--Material 1 Capa 1 -->
                 <div class="form-floating col-md-2">
                   <select formControlName="materialP1_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
                   </select>
                   <label for="floatingSelect">Material 1</label>
                 </div>
@@ -691,8 +710,7 @@
                  <!--Material 1 Capa 2-->
                  <div class="form-floating col-md-2">
                   <select formControlName="materialP1_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
                   </select>
                   <label for="floatingSelect">Material 1</label>
                 </div>
@@ -706,8 +724,7 @@
                  <!--Material 1 Capa 3-->
                  <div class="form-floating col-md-2">
                   <select formControlName="materialP1_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
                   </select>
                   <label for="floatingSelect">Material 1</label>
                 </div>
@@ -723,54 +740,50 @@
 
             <!--Fila 6-->
             <div class="mb-3" >
-                <div class="row g-3 justify-content-md-center">
+              <div class="row g-3 justify-content-md-center">
 
-                  <!--Material 2 Capa 1-->
-                  <div class="form-floating col-md-2">
-                    <select formControlName="materialP2_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                      <option value="1" disabled selected></option>
-                      <option>1</option>
-                    </select>
-                    <label for="floatingSelect">Material 2</label>
-                  </div>
-
-                  <!--% Material 2 Capa 1  -->
-                  <div class="form-floating col-md-1">
-                    <input formControlName="PorcentajeMaterialP2_Capa1" type="number" class="form-control form-control-sm" id="floatingInput" required>
-                    <label for="floatingInput">%</label>
-                  </div>
-
-                   <!--Material 2 Capa 2-->
-                   <div class="form-floating col-md-2">
-                    <select formControlName="materialP2_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                      <option value="1" disabled selected></option>
-                      <option>1</option>
-                    </select>
-                    <label for="floatingSelect">Material 2</label>
-                  </div>
-
-                  <!--% Material 2 Capa 2-->
-                  <div class="form-floating col-md-1">
-                    <input formControlName="PorcentajeMaterialP2_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required>
-                    <label for="floatingInput">%</label>
-                  </div>
-
-                   <!--Material 2 Capa 3-->
-                   <div class="form-floating col-md-2">
-                    <select formControlName="materialP2_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                      <option value="1" disabled selected></option>
-                      <option>1</option>
-                    </select>
-                    <label for="floatingSelect">Material 2</label>
-                  </div>
-
-                  <!--% Material 2 Capa 3-->
-                  <div class="form-floating col-md-1">
-                    <input formControlName="PorcentajeMaterialP2_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required>
-                    <label for="floatingInput">%</label>
-                  </div>
-
+                <!--Material 2 Capa 1-->
+                <div class="form-floating col-md-2">
+                  <select formControlName="materialP2_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                  </select>
+                  <label for="floatingSelect">Material 2</label>
                 </div>
+
+                <!--% Material 2 Capa 1  -->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMaterialP2_Capa1" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+                  <!--Material 2 Capa 2-->
+                <div class="form-floating col-md-2">
+                  <select formControlName="materialP2_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                  </select>
+                  <label for="floatingSelect">Material 2</label>
+                </div>
+
+                <!--% Material 2 Capa 2-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMaterialP2_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+
+                  <!--Material 2 Capa 3-->
+                <div class="form-floating col-md-2">
+                  <select formControlName="materialP2_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                  </select>
+                  <label for="floatingSelect">Material 2</label>
+                </div>
+
+                <!--% Material 2 Capa 3-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PorcentajeMaterialP2_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">%</label>
+                </div>
+              </div>
             </div>
 
             <!--Fila 7-->
@@ -780,8 +793,7 @@
                 <!--Material 3 Capa 1 -->
                 <div class="form-floating col-md-2">
                   <select formControlName="materialP3_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
                   </select>
                   <label for="floatingSelect">Material 3</label>
                 </div>
@@ -795,8 +807,7 @@
                  <!--Material 3 Capa 2-->
                  <div class="form-floating col-md-2">
                   <select formControlName="materialP3_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
                   </select>
                   <label for="floatingSelect">Material 3</label>
                 </div>
@@ -810,8 +821,7 @@
                  <!--Material 3 Capa 3-->
                  <div class="form-floating col-md-2">
                   <select formControlName="materialP3_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
                   </select>
                   <label for="floatingSelect">Material 3</label>
                 </div>
@@ -821,9 +831,8 @@
                   <input formControlName="PorcentajeMaterialP3_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required>
                   <label for="floatingInput">%</label>
                 </div>
-
               </div>
-          </div>
+            </div>
 
             <!--Fila 8-->
             <div class="mb-3" >
@@ -832,8 +841,7 @@
                 <!-- Material 4 Capa 1-->
                 <div class="form-floating col-md-2">
                   <select formControlName="materialP4_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
                   </select>
                   <label for="floatingSelect">Material 4</label>
                 </div>
@@ -847,8 +855,7 @@
                  <!--Material 4 Capa 2-->
                  <div class="form-floating col-md-2">
                   <select formControlName="materialP4_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
                   </select>
                   <label for="floatingSelect">Material 4</label>
                 </div>
@@ -862,8 +869,7 @@
                  <!--Material 4 Capa 3-->
                  <div class="form-floating col-md-2">
                   <select formControlName="materialP_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
                   </select>
                   <label for="floatingSelect">Material 4</label>
                 </div>
@@ -875,7 +881,7 @@
                 </div>
 
               </div>
-          </div>
+            </div>
 
             <!--Fila 9-->
             <div class="mb-3" >
@@ -884,8 +890,7 @@
                 <!--Pigmento 1 Capa 1-->
                 <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmentoP1_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 1</label>
                 </div>
@@ -899,8 +904,7 @@
                  <!-- Pigmento 1 Capa 2-->
                  <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmentoP1_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 1</label>
                 </div>
@@ -914,8 +918,7 @@
                  <!-- Pigmento 1 Capa 3 -->
                  <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmento1_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 1</label>
                 </div>
@@ -936,8 +939,7 @@
                 <!--Pigmento 2 Capa 1-->
                 <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmentoP2_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 2</label>
                 </div>
@@ -951,8 +953,7 @@
                  <!--Pigmento 2 Capa 2-->
                  <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmentoP2_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 2</label>
                 </div>
@@ -966,8 +967,7 @@
                  <!--Pigmento 2 Capa 3-->
                  <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmento2_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option>1</option>
+                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 2</label>
                 </div>
@@ -977,17 +977,19 @@
                   <input formControlName="PorcentajeMezclaPigmentoP2_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required>
                   <label for="floatingInput">%</label>
                 </div>
-
               </div>
             </div>
-
-
           </form>
         </div>
-
-
       </div>
 
+      <!-- Inicio Botones -->
+      <div class="bajarPagina">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="guardarOT()">Crear Orden de Trabajo</button>
+          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

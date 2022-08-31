@@ -22,6 +22,10 @@ export class FormatosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Formatos/${dato}`);
   }
 
+  srvObtenerListaPorExtrusionNombres(formato : string, material : string, pigmento : string, tratado : string){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Formatos/consultaExtrusion/${formato}/${material}/${pigmento}/${tratado}`);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Formatos/${id}`, data);
   }

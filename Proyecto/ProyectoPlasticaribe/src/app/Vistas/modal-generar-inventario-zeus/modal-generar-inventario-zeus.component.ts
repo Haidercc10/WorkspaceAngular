@@ -72,6 +72,13 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     }, 100);
   }
 
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => {
+    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
+    const rep = '$1,';
+    return number.toString().replace(exp,rep);
+  }
+
   /* FUNCION PARA RELIZAR CONFIRMACIÓN DE SALIDA (CIERRE SESIÓN)*/
   confimacionSalida(){
     Swal.fire({
@@ -106,7 +113,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
       setTimeout(() => {
         let nombreArchivo : string = `Inventario de Productos Terminados ${this.today}.xlsx`
         let element = document.getElementById('tablaProductosTerminados');
-        const worksheet : XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
+        let worksheet : XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
         const book : XLSX.WorkBook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(book, worksheet, 'Sheet1');
         XLSX.writeFile(book, nombreArchivo);
@@ -124,17 +131,40 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         this.clienteOtItems.srvObtenerItemsBagproXClienteItem(this.datosCodigo).subscribe(datosCLOTI => {
           for (let cl = 0; cl < datosCLOTI.length; cl++) {
             if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
-              const datosInventario: any = {
-                codigoItem : datosCLOTI[cl].clienteItems,
-                nombreItem : datosCLOTI[cl].clienteItemsNom,
-                cantidadItem : datosExistencias[exi].existencias,
-                presentacion : datosExistencias[exi].presentacion,
-                PrecioItem : datosExistencias[exi].precioVenta,
-                PrecioTotalItem : datosExistencias[exi].precio_Total,
-                ClienteNombre : datosCLOTI[cl].clienteNom,
+
+              let cantidad : string = `${datosExistencias[exi].existencias}`;
+              let cantidad1 : number = cantidad.indexOf(".");
+              let cantidadFinal = cantidad.substring(0, (cantidad1 + 9));
+
+              let Cantidad2 : string = cantidadFinal;
+              let cantidad2_1 : number = Cantidad2.indexOf(".");
+              let cantidadFinal2 = Cantidad2.substring(0, (cantidad2_1 + 3));
+
+              if (cantidad2_1 != -1) {
+                const datosInventario: any = {
+                  codigoItem : datosCLOTI[cl].clienteItems,
+                  nombreItem : datosCLOTI[cl].clienteItemsNom,
+                  cantidadItem : this.formatonumeros(cantidadFinal2),
+                  presentacion : datosExistencias[exi].presentacion,
+                  PrecioItem : this.formatonumeros(datosExistencias[exi].precioVenta),
+                  PrecioTotalItem : this.formatonumeros(datosExistencias[exi].precio_Total),
+                  ClienteNombre : datosCLOTI[cl].clienteNom,
+                }
+                this.ArrayProductoZeus.push(datosInventario);
+                this.ArrayProductoZeus.sort((a,b) => Number(a.codigoItem) - Number(b.codigoItem));
+              } else if (cantidad2_1 == -1) {
+                const datosInventario: any = {
+                  codigoItem : datosCLOTI[cl].clienteItems,
+                  nombreItem : datosCLOTI[cl].clienteItemsNom,
+                  cantidadItem : this.formatonumeros(Cantidad2),
+                  presentacion : datosExistencias[exi].presentacion,
+                  PrecioItem : this.formatonumeros(datosExistencias[exi].precioVenta),
+                  PrecioTotalItem : this.formatonumeros(datosExistencias[exi].precio_Total),
+                  ClienteNombre : datosCLOTI[cl].clienteNom,
+                }
+                this.ArrayProductoZeus.push(datosInventario);
+                this.ArrayProductoZeus.sort((a,b) => Number(a.codigoItem) - Number(b.codigoItem));
               }
-              this.ArrayProductoZeus.push(datosInventario);
-              this.ArrayProductoZeus.sort((a,b) => Number(a.codigoItem) - Number(b.codigoItem));
             }
           }
         });

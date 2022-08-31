@@ -456,12 +456,13 @@ export class MovimientoMPComponent implements OnInit {
                 Swal.fire(`No se encuentras registros de asignaciones entre las fechas ${fecha}, ${fechaFinal} y la materia prima ${fechaFinal}`);
               } else {
                 for (let index = 0; index < datos_asignacion.length; index++) {
-                  this.asignacionMpService.srvObtenerLista().subscribe(datos_asignacionMP => {
+                  this.asignacionMpService.srvObtenerListaPorAsigId(datos_asignacion[index].asigMp_Id).subscribe(datos_asignacionMP => {
                     for (let i = 0; i < datos_asignacionMP.length; i++) {
                       if (datos_asignacionMP[i].matPri_Id == materiaPrima) {
                         this.asignacion = 'Asignacion';
                         this.lenarTabla(datos_asignacionMP[i]);
-                      }
+                        break;
+                      } else continue;
                     }
                   });
                 }
@@ -567,12 +568,13 @@ export class MovimientoMPComponent implements OnInit {
                 Swal.fire(`No se encuentras registros de asignaciones entre las fechas ${fecha}, ${fechaFinal} y la materia prima ${fechaFinal}`);
               } else {
                 for (let index = 0; index < datos_asignacion.length; index++) {
-                  this.asignacionMpService.srvObtenerLista().subscribe(datos_asignacionMP => {
+                  this.asignacionMpService.srvObtenerListaPorAsigId(datos_asignacion[index].asigMp_Id).subscribe(datos_asignacionMP => {
                     for (let i = 0; i < datos_asignacionMP.length; i++) {
                       if (datos_asignacionMP[i].matPri_Id == materiaPrima) {
                         this.asignacion = 'Asignacion';
                         this.lenarTabla(datos_asignacionMP[i]);
-                      }
+                        break;
+                      } else continue;
                     }
                   });
                 }

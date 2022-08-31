@@ -22,6 +22,10 @@ export class Laminado_CapaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Laminado_Capa/${dato}`);
   }
 
+  srvObtenerListaPorConsultaLaminado(c1 : string, c2 : string, c3 : string){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Laminado_Capa/consultaLaminado/${c1}/${c2}/${c3}`);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Laminado_Capa/${id}`, data);
   }

@@ -1,5 +1,4 @@
 export interface modelOrden_Trabajo {
-  Ot_Id : number;
   SedeCli_Id : number;
   Prod_Id : number;
   Ot_CantidadKilos : number;
@@ -14,4 +13,6 @@ export interface modelOrden_Trabajo {
   Ot_Observacion : number;
   Ot_Cyrel : number;
   Ot_Corte : number;
+  Mezcla_Id : number;
+  UndMed_Id : string;
 }
