@@ -1300,7 +1300,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             }
           });
 
-          // setTimeout(() => {
+          setTimeout(() => {
             const Toast = Swal.mixin({
               toast: true,
               position: 'top-end',
@@ -1318,7 +1318,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             });
             this.pdfOrdenTrabajo(datos_ot.ot_Id);
             this.limpiarCampos();
-          // }, 2500);
+          }, 2100);
         });
       }
     });
@@ -1326,6 +1326,1359 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que creará el PDF de la Orden de trabajo
   pdfOrdenTrabajo(ot : number){
+    this.ordenTrabajoService.srvObtenerListaPdfOTInsertada(ot).subscribe(datos_ot => {
+      for (let i = 0; i < datos_ot.length; i++) {
+        let FechaDatetime = datos_ot[i].ot_FechaCreacion;
+        let FechaCreacionNueva = FechaDatetime.indexOf("T");
+        let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
+
+        let FechaEntregaDatetime = datos_ot[i].pedExt_FechaEntrega;
+        let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
+        let fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
+        const pdfDefinicion : any = {
+          info: {
+            title: `${ot}`
+          },
+          pageSize: {
+            width: 630,
+            height: 760
+          },
+          content : [
+            {
+              text: `OT ${ot}`,
+              alignment: 'right',
+              style: 'ot',
+            },
+            {
+              text: `Plasticaribe S.A.S 800188732-2\n\nORDEN DE TRABAJO. ${fechaCreacionFinal}`,
+              alignment: 'center',
+              style: 'titulo',
+            },
+            '\n',
+            {
+              style: 'tablaEmpresa',
+              table: {
+                widths: [90, '*', 90, '*'],
+                style: 'header',
+                body: [
+                  [
+                    {
+                      border: [true, true, false, false],
+                      text: `Id Cliente`,
+                      style: 'titulo',
+                    },
+                    {
+                      border: [false, true, false, false],
+                      text: `${datos_ot[i].cli_Id}`
+                    },
+                    {
+                      border: [true, true, false, false],
+                      text: `Id Producto`,
+                      style: 'titulo',
+                    },
+                    {
+                      border: [false, true, true, false],
+                      text: `${datos_ot[i].prod_Id}`
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, false, false, true],
+                      text: `Cliente`,
+                      style: 'titulo',
+                    },
+                    {
+                      border: [false, false, true, true],
+                      text: `${datos_ot[i].cli_Nombre}`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `Producto`,
+                      style: 'titulo',
+                    },
+                    {
+                      border: [false, false, true, true],
+                      text: `${datos_ot[i].prod_Nombre}`
+                    },
+                  ],
+                ]
+              },
+              layout: {
+                defaultBorder: false,
+              },
+              fontSize: 9,
+            },
+            '\n',
+            {
+              table : {
+                widths : ['*', '*', '*', '*', '*'],
+                style : '',
+                body : [
+                  [
+                    {
+                      border: [false, false, false, false],
+                      fillColor: '#aaaaaa',
+                      text: `Material`,
+                      style: 'titulo',
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      fillColor: '#aaaaaa',
+                      text: `Cant. Bolsas`,
+                      style: 'titulo',
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      fillColor: '#aaaaaa',
+                      text: `Cant. Kilos (Kg)`,
+                      style: 'titulo',
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      fillColor: '#aaaaaa',
+                      text: `Presentación`,
+                      style: 'titulo',
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      fillColor: '#aaaaaa',
+                      text: `Despachar`,
+                      style: 'titulo',
+                      alignment: 'center',
+                    },
+                  ],
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `${datos_ot[i].material_Nombre}`,
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `${this.formatonumeros(datos_ot[i].ot_CantidadUnidades_Margen)}`,
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `${this.formatonumeros(datos_ot[i].ot_CantidadKilos_Margen)}`,
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `${datos_ot[i].presentacion_Nombre}`,
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `${fechaEntregaFinal}`,
+                      alignment: 'center',
+                    },
+                  ]
+                ]
+              },
+              layout: {
+                defaultBorder: false,
+              },
+              fontSize: 9,
+            },
+            '\n \n',
+            {
+              table : {
+                widths : ['*'],
+                style : '',
+                body : [
+                  [
+                    {
+                      border: [false, false, false, false],
+                      fillColor: '#aaaaaa',
+                      text: `Materia Prima`,
+                      alignment: 'center',
+                      style: 'titulo',
+                    }
+                  ]
+                ]
+              },
+              layout: {
+                defaultBorder: false,
+              },
+              fontSize: 9,
+            },
+          // Mezclas
+            '\n',
+            {
+              table : {
+                widths : ['*', '*', '*'],
+                style : '',
+                body : [
+                  [
+                    {
+                      border: [false, false, false, true],
+                      text: `Material`,
+                      alignment: 'center',
+                      style: 'titulo',
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `Cod Producto`,
+                      alignment: 'center',
+                      style: 'titulo',
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `Kilos (Kg)`,
+                      alignment: 'center',
+                      style: 'titulo',
+                    }
+                  ],
+                  [
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              border : [],
+                              text : `CAPA UNICA:`,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeCapa1}`,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                          ]
+                        ]
+                      }
+                    },
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].m1C1_nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].m2C1_nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].m3C1_nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].m4C1_nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].p1C1_Nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].p2C1_Nombre}`,
+                              alignment: 'justify',
+                            },
+                          ]
+                        ]
+                      }
+                    },
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa1}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa1}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa1}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa1}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa1}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa1}%`,
+                              alignment: 'center',
+                            },
+                          ]
+                        ]
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              border : [],
+                              text : `CAPA INTERNA:`,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeCapa2}`,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                          ]
+                        ]
+                      }
+                    },
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].m1C2_nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].m2C2_nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].m3C2_nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].m4C2_nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].p1C2_Nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].p2C2_Nombre}`,
+                              alignment: 'justify',
+                            },
+                          ]
+                        ]
+                      }
+                    },
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa2}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa2}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa2}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa2}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa2}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa2}%`,
+                              alignment: 'center',
+                            },
+                          ]
+                        ]
+                      }
+                    }
+                  ],
+                  [
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              border : [],
+                              text : `CAPA EXTERNA:`,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeCapa3}`,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                          ]
+                        ]
+                      }
+                    },
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].m1C3_nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].m2C3_nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].m3C3_nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].m4C3_nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].p1C3_Nombre}`,
+                              alignment: 'justify',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].p2C3_Nombre}`,
+                              alignment: 'justify',
+                            },
+                          ]
+                        ]
+                      }
+                    },
+                    {
+                      border : [false, false, false, true],
+                      table : {
+                        widths : ['*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeMaterial1_Capa3}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeMaterial2_Capa3}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeMaterial3_Capa3}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajeMaterial4_Capa3}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajePigmto1_Capa3}%`,
+                              alignment: 'center',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].mezcla_PorcentajePigmto2_Capa3}%`,
+                              alignment: 'center',
+                            },
+                          ]
+                        ]
+                      }
+                    }
+                  ],
+
+                ]
+              },
+              layout: {
+                defaultBorder: false,
+              },
+              fontSize: 9,
+            },
+            {
+              text: `OT ${ot}`,
+              alignment: 'right',
+              style: 'ot',
+              pageBreak: 'before',
+            },
+            {
+              text: `Plasticaribe S.A.S 800188732-2\nORDEN DE TRABAJO. ${fechaCreacionFinal}`,
+              alignment: 'center',
+              style: 'titulo',
+            },
+            '\n',
+            {
+              style: 'tablaEmpresa',
+              table: {
+                widths: [90, '*', 90, '*'],
+                style: 'header',
+                body: [
+                  [
+                    {
+                      border: [true, true, false, false],
+                      text: `Id Cliente`,
+                      style: 'titulo',
+                    },
+                    {
+                      border: [false, true, false, false],
+                      text: `${datos_ot[i].cli_Id}`
+                    },
+                    {
+                      border: [true, true, false, false],
+                      text: `Id Producto`,
+                      style: 'titulo',
+                    },
+                    {
+                      border: [false, true, true, false],
+                      text: `${datos_ot[i].prod_Id}`
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, false, false, true],
+                      text: `Cliente`,
+                      style: 'titulo',
+                    },
+                    {
+                      border: [false, false, true, true],
+                      text: `${datos_ot[i].cli_Nombre}`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `Producto`,
+                      style: 'titulo',
+                    },
+                    {
+                      border: [false, false, true, true],
+                      text: `${datos_ot[i].prod_Nombre}`
+                    },
+                  ],
+                ]
+              },
+              layout: {
+                defaultBorder: false,
+              },
+              fontSize: 9,
+            },
+            '\n',
+            {
+              table : {
+                widths : ['*', '*', '*', '*', '*'],
+                style : '',
+                body : [
+                  [
+                    {
+                      border: [false, false, false, false],
+                      fillColor: '#aaaaaa',
+                      text: `Material`,
+                      style: 'titulo',
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      fillColor: '#aaaaaa',
+                      text: `Cant. Bolsas`,
+                      style: 'titulo',
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      fillColor: '#aaaaaa',
+                      text: `Cant. Kilos (Kg)`,
+                      style: 'titulo',
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      fillColor: '#aaaaaa',
+                      text: `Presentación`,
+                      style: 'titulo',
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      fillColor: '#aaaaaa',
+                      text: `Despachar`,
+                      style: 'titulo',
+                      alignment: 'center',
+                    },
+                  ],
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `${datos_ot[i].material_Nombre}`,
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `${this.formatonumeros(datos_ot[i].ot_CantidadUnidades_Margen)}`,
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `${this.formatonumeros(datos_ot[i].ot_CantidadKilos_Margen)}`,
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `${datos_ot[i].presentacion_Nombre}`,
+                      alignment: 'center',
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `${fechaEntregaFinal}`,
+                      alignment: 'center',
+                    },
+                  ]
+                ]
+              },
+              layout: {
+                defaultBorder: false,
+              },
+              fontSize: 9,
+            },
+            '\n',
+            {
+              table : {
+                widths : ['*', 20, '*'],
+                style : '',
+                body : [
+                  [
+                    // Extrusion
+                    {
+                      table : {
+                        widths : ['*', '*', '*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              colSpan : 3,
+                              text : `EXTRUSIÓN`,
+                              alignment: 'center',
+                              fillColor: '#aaaaaa',
+                              style: 'titulo',
+                            },
+                            { },
+                            { }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Pigmento: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].pigmt_Nombre}`,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Formato: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].formato_Nombre}`,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Calibre: `,
+                            },
+                            {
+                              border : [],
+                              text : `${this.formatonumeros(datos_ot[i].extrusion_Calibre)}`,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Unidad Medida: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].undMed_Id}`,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `ANCHO`,
+                            },
+                            {
+                              border : [],
+                              text : `${this.formatonumeros(datos_ot[i].extrusion_Ancho1)}       +       ${this.formatonumeros(datos_ot[i].extrusion_Ancho2)}       +       `,
+                            },
+                            {
+                              border : [],
+                              text : `       ${this.formatonumeros(datos_ot[i].extrusion_Ancho3)}`,
+                            }
+                          ],
+                          // [
+                          //   {
+                          //     border : [],
+                          //     text : `${this.formatonumeros(datos_ot[i].extrusion_Ancho1)}`,
+                          //     alignment: 'right',
+                          //   },
+                          //   {
+                          //     border : [],
+                          //     text : `+           ${this.formatonumeros(datos_ot[i].extrusion_Ancho2)}           +`,
+                          //     alignment: 'center',
+                          //   },
+                          //   {
+                          //     border : [],
+                          //     text : `${this.formatonumeros(datos_ot[i].extrusion_Ancho3)}`,
+                          //     alignment: 'left',
+                          //   }
+                          // ],
+                          [
+                            {
+                              border : [],
+                              text : `Peso MT (Min/Max): `,
+                            },
+                            {
+                              border : [false, false, false, false],
+                              text : ``,
+                            },
+                            {
+                              border : [false, false, false, false],
+                              text : ``,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Tratado Caras: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].tratado_Nombre}`,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            }
+                          ],
+                        ]
+                      }
+                    },
+                    { },
+                    // Laminado
+                    {
+                      table : {
+                        widths : ['*', '*', '*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              colSpan : 3,
+                              text : `LAMINADO`,
+                              alignment: 'center',
+                              fillColor: '#aaaaaa',
+                              style: 'titulo',
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `CAPA`,
+                              bold : true,
+                            },
+                            {
+                              border : [],
+                              text : `CALIBRE`,
+                              bold : true,
+                            },
+                            {
+                              border : [],
+                              text : `CANTIDAD`,
+                              bold : true,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].lamCapa1_Nombre}`,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].lamCapa_Calibre1}`,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].lamCapa_Cantidad1}`,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].lamCapa2_Nombre}`,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].lamCapa_Calibre2}`,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].lamCapa_Cantidad2}`,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `${datos_ot[i].lamCapa3_Nombre}`,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].lamCapa_Calibre3}`,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].lamCapa_Cantidad3}`,
+                            }
+                          ]
+                        ]
+                      }
+                    }
+                  ],
+                  [
+                    { },
+                    { },
+                    { }
+                  ],
+                  [
+                    { },
+                    { },
+                    { }
+                  ],
+                  [
+                    // Impresion
+                    {
+                      table : {
+                        widths : ['*', '*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              colSpan : 2,
+                              text : `IMPRESIÓN`,
+                              alignment: 'center',
+                              fillColor: '#aaaaaa',
+                              style: 'titulo',
+                            },
+                            { },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Tipo Impresión: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].tpImpresion_Nombre}`,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Rodillo N°: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].rodillo_Id}`,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `N° de Pista: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].pista_Id}`,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Tinta 1: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].tinta1_Nombre}`,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Tinta 2: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].tinta2_Nombre}`,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Tinta 3: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].tinta3_Nombre}`,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Tinta 4: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].tinta4_Nombre}`,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Tinta 5: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].tinta5_Nombre}`,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Tinta 6: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].tinta6_Nombre}`,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Tinta 7: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].tinta7_Nombre}`,
+                            }
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Tinta 8: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].tinta8_Nombre}`,
+                            }
+                          ],
+                        ]
+                      }
+                    },
+                    { },
+                    // Producto Terimnado
+                    {
+                      table : {
+                        widths : ['*', '*', '*'],
+                        style : '',
+                        body : [
+                          [
+                            {
+                              colSpan : 3,
+                              text : `PRODUCTO TERMINADO`,
+                              alignment: 'center',
+                              fillColor: '#aaaaaa',
+                              style: 'titulo',
+                            },
+                            { },
+                            { },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Formato Bolsa: `,
+                              alignment: 'center',
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].tpProd_Nombre}`,
+                              alignment: 'center',
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Ancho`,
+                              alignment: 'right',
+                              bold : true,
+                            },
+                            {
+                              border : [],
+                              text : `Largo`,
+                              alignment: 'center',
+                              bold : true,
+                            },
+                            {
+                              border : [],
+                              text : `Fuelle`,
+                              alignment: 'left',
+                              bold : true,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              colspan : 3,
+                              text : `${this.formatonumeros(datos_ot[i].prod_Ancho)}`,
+                              alignment: 'right',
+                            },
+                            {
+                              border : [],
+                              colspan : 3,
+                              text : `x          ${this.formatonumeros(datos_ot[i].prod_Largo)}          x`,
+                              alignment: 'center',
+                            },
+                            {
+                              border : [],
+                              colspan : 3,
+                              text : `${this.formatonumeros(datos_ot[i].prod_Fuelle)}               ${datos_ot[i].undMedACF}`,
+                              alignment: 'left',
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Sellado: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].tpSellados_Nombre}`,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Margen: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].ot_MargenAdicional}`,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Peso Millar: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].prod_Peso_Millar}`,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Cant. x Paquete: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].prod_CantBolsasPaquete}`,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                          ],
+                          [
+                            {
+                              border : [],
+                              text : `Cant. x Bulto: `,
+                            },
+                            {
+                              border : [],
+                              text : `${datos_ot[i].prod_CantBolsasBulto}`,
+                            },
+                            {
+                              border : [],
+                              text : ``,
+                            },
+                          ]
+                        ]
+                      }
+                    },
+                  ]
+                ]
+              },
+              layout: {
+                defaultBorder: false,
+              },
+              fontSize: 9,
+            },
+            '\n\n\n',
+            {
+              table : {
+                widths : ['*'],
+                style : '',
+                body : [
+                  [
+                    {
+                      border : [true, true, true, false],
+                      text : `Observacion: `
+                    }
+                  ],
+                  [
+                    {
+                      border : [true, false, true, true],
+                      text : `${datos_ot[i].ot_Observacion}`
+                    }
+                  ]
+                ]
+              },
+              layout: {
+                defaultBorder: false,
+              },
+              fontSize: 10.5,
+            }
+          ],
+          styles: {
+            header: {
+              fontSize: 7,
+              bold: true
+            },
+            titulo: {
+              fontSize: 11,
+              bold: true
+            },
+            ot: {
+              fontSize: 13,
+              bold: true
+            }
+          }
+        }
+        const pdf = pdfMake.createPdf(pdfDefinicion);
+        pdf.open();
+      }
+    });
+  }
+
+  // Funcion que consultará una orden de trabajo
+  consultarOTCreada(){
+    let ot : number = this.FormOrdenTrabajo.value.OT_Id;
     this.ordenTrabajoService.srvObtenerListaPdfOTInsertada(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
         let FechaDatetime = datos_ot[i].ot_FechaCreacion;
