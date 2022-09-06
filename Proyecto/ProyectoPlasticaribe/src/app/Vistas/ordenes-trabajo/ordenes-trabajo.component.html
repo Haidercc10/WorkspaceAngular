@@ -144,14 +144,25 @@
               </div>
             </div>
 
+            <!-- <div class="form-floating col-md-1">
+              <mat-checkbox
+                formControlName="OT_Cyrel"
+                style="margin-top: 15px; margin-left: 30px; height: 12px;"
+                id="extrusion"
+                (change)="CheckExtrusion($event)"
+                [(ngModel)]="checkedExtrusion">
+                Extrusion
+              </mat-checkbox>
+            </div> -->
+
             <!-- Cyrel -->
             <div class="form-floating col-md-1">
               <mat-checkbox
                 formControlName="OT_Cyrel"
-                id="corte"
+                id="cyrel"
                 style="margin-top: 15px; margin-left: 30px; height: 12px;"
                 [(ngModel)]="checkedCyrel">
-                Corte
+                Cyrel
               </mat-checkbox>
             </div>
 
@@ -261,8 +272,7 @@
       <!-- TABS de Informacion de los Procesos -->
       <div class="tab-content" id="myTabContent">
         <!-- Extrusion -->
-        <div class="tab-pane fade show active " id="Extrusión" role="tabpanel" aria-labelledby="Extrusión-tab">
-
+        <div class="tab-pane fade show active" id="Extrusión" role="tabpanel" aria-labelledby="Extrusión-tab">
           <form [formGroup]="FormOrdenTrabajoExtrusion">
             <div class="mb-3" >
               <div class="row g-3 justify-content-md-center">
@@ -296,7 +306,6 @@
                   </select>
                   <label for="floatingSelect">Pigmento</label>
                 </div>
-
               </div>
             </div>
 
@@ -343,10 +352,8 @@
                   </select>
                   <label for="floatingSelect">Tratado</label>
                 </div>
-
               </div>
             </div>
-
           </form>
         </div>
 

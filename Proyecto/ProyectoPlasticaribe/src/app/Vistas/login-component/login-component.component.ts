@@ -17,7 +17,7 @@ export class LoginComponentComponent implements OnInit {
   public formularioUsuario !: FormGroup;
   public data:any=[];
 
-  /* SE INSTANCIA LA VARIABLE "empresas" QUE VA A SER DE TIPO "EmpresaService" Y TAMBIEN SERÁ UN ARRAY.
+  /* SE INSTANCIA LA VARIABLE "empresas" QUE VA A SER DE TIPO "EmpresaService" Y TAMBIEN SERÁ UN ARRAY
   AQUÍ SE GUARDARÁN LOS NOMBRES DE LAS EMPRESAS QUE HAY EN LA BASE DE DATOS */
   empresas:EmpresaService[]=[];
   empresa=[];
@@ -108,6 +108,22 @@ export class LoginComponentComponent implements OnInit {
       }, error =>{ Swal.fire('El número de identificación no se encuentra registrado'); });
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  consulta_insercionAsistencia(){
+    if (!true){
+      Swal.fire({
+        icon: 'error',
+        title: 'Asistencia Registrada!',
+        text: 'La asistencia de la persona X el día Y ha sido registrado con éxito!'
+      })
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'No se ha podido registrar su asistencia!'
+      })
     }
   }
 }

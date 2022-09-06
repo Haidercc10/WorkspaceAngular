@@ -1,0 +1,215 @@
+  <!-- Navegador parte superior -->
+  <app-menuLateral></app-menuLateral>
+
+  <div class="contain">
+    <!--  fin Navegador de parte superior -->
+
+    <div class="container-fluid">
+      <div class="mb-4 Titulo">
+        <h2 class="tituloRojo">Reporte de Procesos OT</h2>
+      </div>
+      <div class="mb-4">
+        <hr class="colorLinea">
+      </div>
+
+      <div class="container">
+        <div class="mb-4">
+          <h4 class="tituloRojo">Búsqueda por filtros</h4>
+        </div>
+        <!-- Inicio formulario Estado OT -->
+        <form [formGroup]="formularioOT">
+          <!-- Inicio fila 1 de campos -->
+          <div class="mb-4">
+            <div class="row g-3">
+            <!--OT-->
+              <div class="form-floating col-md-2">
+                <input formControlName="idDocumento" type="number" class="form-control" id="floatingInput" title="N° de la Orden de Trabajo" required >
+                <label for="floatingInput">Orden de trabajo</label>
+              </div>
+              <!-- Fecha inicial -->
+              <div class="form-floating col-md-2">
+                <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput" title="Fecha de creación de la Orden de trabajo" required >
+                <label for="floatingInput">Fecha Inicial</label>
+              </div>
+              <!-- Fecha final -->
+              <div class="form-floating col-md-2">
+                <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
+                <label for="floatingInput">Fecha Final</label>
+              </div>
+
+            </div>
+          </div>
+          <!-- Fin fila 1 de campos -->
+
+          <!-- Botones para consultar OT -->
+          <div class="mb-3">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button class="btn btn-danger btn-danger-sm" type="submit">Consultar</button>
+              <button class="btn btn-secondary btn-secondary-sm" type="button">Limpiar campos</button>
+            </div>
+          </div>
+        </form>
+        <!--Fin Formulario -->
+
+        <div class="mb-4">
+          <hr class="colorLinea">
+        </div>
+
+        <div class="mb-4">
+          <h4 class="tituloRojo">Listado de Ordenes de Trabajo</h4>
+        </div>
+
+        <div class="overlay" *ngIf="!load">
+          <div class="spinner ">
+            <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+          </div>
+        </div>
+
+        <!-- Tabla donde se mostrarán las OT Consultadas -->
+        <div *ngIf="load">
+          <div class="mb-4">
+            <div class="row g-3">
+              <!--Inicio Tabla OT-->
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover mt-2" >
+                  <thead class="TitulosTabla">
+                    <tr>
+                      <th id="" scope="col">OT</th>
+                      <th id="" scope="col">Extrusión</th>
+                      <th id="" scope="col">Impresión</th>
+                      <th id="" scope="col">Rotograbado</th>
+                      <th id="" scope="col">Doblado</th>
+                      <th id="" scope="col">Laminado</th>
+                      <th id="" scope="col">Corte</th>
+                      <th id="" scope="col">Empaque</th>
+                      <th id="" scope="col">Sellado</th>
+                      <th id="" scope="col">Wiketiado</th>
+                      <th id="" scope="col">Cantidad Producir</th>
+                    </tr>
+                  </thead>
+                    <tbody>
+                      <tr *ngFor="let tabla of ArrayDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
+                        <!-- Orden de Trabajo -->
+                        <td id="ot" scope="col">{{tabla.ot}}</td>
+
+                        <!-- Extrusion -->
+                        <ng-container *ngIf="tabla.ext >= tabla.cant">
+                          <td id="ext" scope="col" style="background-color: rgb(137, 238, 137);">{{tabla.ext}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.ext < tabla.cant">
+                          <td id="ext" scope="col" style="background-color: rgb(255, 177, 94);">{{tabla.ext}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.ext == 0 && tabla.ext < tabla.cant">
+                          <td id="ext" scope="col" style="background-color: rgb(250, 80, 80);">{{tabla.ext}}</td>
+                        </ng-container>
+
+                        <!-- Impresion -->
+                        <ng-container *ngIf="tabla.imp >= tabla.cant">
+                          <td id="imp" scope="col" style="background-color: rgb(137, 238, 137);">{{tabla.imp}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.imp < tabla.cant">
+                          <td id="imp" scope="col" style="background-color: rgb(255, 177, 94);">{{tabla.imp}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.imp == 0 && tabla.imp < tabla.cant">
+                          <td id="imp" scope="col" style="background-color: rgb(250, 80, 80);">{{tabla.imp}}</td>
+                        </ng-container>
+
+                        <!-- Rotograbado -->
+                        <ng-container *ngIf="tabla.rot >= tabla.cant">
+                          <td id="rot" scope="col" style="background-color: rgb(137, 238, 137);">{{tabla.rot}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.rot < tabla.cant">
+                          <td id="rot" scope="col" style="background-color: rgb(255, 177, 94);">{{tabla.rot}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.rot == 0 && tabla.rot < tabla.cant">
+                          <td id="rot" scope="col" style="background-color: rgb(250, 80, 80);">{{tabla.rot}}</td>
+                        </ng-container>
+
+                        <!-- Doblado -->
+                        <ng-container *ngIf="tabla.dbl >= tabla.cant">
+                          <td id="dbl" scope="col" style="background-color: rgb(137, 238, 137);">{{tabla.dbl}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.dbl < tabla.cant">
+                          <td id="dbl" scope="col" style="background-color: rgb(255, 177, 94);">{{tabla.dbl}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.dbl == 0 && tabla.dbl < tabla.cant">
+                          <td id="dbl" scope="col" style="background-color: rgb(250, 80, 80);">{{tabla.dbl}}</td>
+                        </ng-container>
+
+                        <!-- laminado -->
+                        <ng-container *ngIf="tabla.lam >= tabla.cant">
+                          <td id="lam" scope="col" style="background-color: rgb(137, 238, 137);">{{tabla.lam}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.lam < tabla.cant">
+                          <td id="lam" scope="col" style="background-color: rgb(255, 177, 94);">{{tabla.lam}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.lam == 0 && tabla.lam < tabla.cant">
+                          <td id="lam" scope="col" style="background-color: rgb(250, 80, 80);">{{tabla.lam}}</td>
+                        </ng-container>
+
+                        <!-- Corte -->
+                        <ng-container *ngIf="tabla.cor >= tabla.cant">
+                          <td id="cor" scope="col" style="background-color: rgb(137, 238, 137);">{{tabla.cor}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.cor < tabla.cant">
+                          <td id="cor" scope="col" style="background-color: rgb(255, 177, 94);">{{tabla.cor}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.cor == 0 && tabla.cor < tabla.cant">
+                          <td id="cor" scope="col" style="background-color: rgb(250, 80, 80);">{{tabla.cor}}</td>
+                        </ng-container>
+
+                        <!-- Empaque -->
+                        <ng-container *ngIf="tabla.emp >= tabla.cant">
+                          <td id="emp" scope="col" style="background-color: rgb(137, 238, 137);">{{tabla.emp}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.emp < tabla.cant">
+                          <td id="emp" scope="col" style="background-color: rgb(255, 177, 94);">{{tabla.emp}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.emp == 0 && tabla.emp < tabla.cant">
+                          <td id="emp" scope="col" style="background-color: rgb(250, 80, 80);">{{tabla.emp}}</td>
+                        </ng-container>
+
+                        <!-- Sellado -->
+                        <ng-container *ngIf="tabla.sel >= tabla.cant">
+                          <td id="sel" scope="col" style="background-color: rgb(137, 238, 137);">{{tabla.sel}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.sel < tabla.cant">
+                          <td id="sel" scope="col" style="background-color: rgb(255, 177, 94);">{{tabla.sel}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.sel == 0 && tabla.sel < tabla.cant">
+                          <td id="sel" scope="col" style="background-color: rgb(250, 80, 80);">{{tabla.sel}}</td>
+                        </ng-container>
+
+                        <!-- Wiketiado -->
+                        <ng-container *ngIf="tabla.wik >= tabla.cant">
+                          <td id="wik" scope="col" style="background-color: rgb(137, 238, 137);">{{tabla.wik}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.wik < tabla.cant">
+                          <td id="wik" scope="col" style="background-color: rgb(255, 177, 94);">{{tabla.wik}}</td>
+                        </ng-container>
+                        <ng-container *ngIf="tabla.wik == 0 && tabla.wik < tabla.cant">
+                          <td id="wik" scope="col" style="background-color: rgb(250, 80, 80);">{{tabla.wik}}</td>
+                        </ng-container>
+
+                        <!-- Cantidad Total a Producir -->
+                        <td id="cant" scope="col">{{tabla.cant}}</td>
+                      </tr>
+                    </tbody>
+                </table>
+                <div class="mb-2">
+                  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                  </div>
+                </div>
+                <!--Fin Tabla OT's-->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+

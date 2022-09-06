@@ -68,6 +68,7 @@ import { PedidoExternoComponent } from './Vistas/Pedido-Externo/Pedido-Externo.c
 import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
 import { CrearCategoriasComponent } from './Vistas/CrearCategorias/CrearCategorias.component';
 import { OrdenesTrabajoComponent } from './Vistas/ordenes-trabajo/ordenes-trabajo.component';
+import { Reporte_Procesos_OTComponent } from './Vistas/Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 
 
 export const routes: Routes = [
@@ -119,6 +120,7 @@ export const routes: Routes = [
   {path: 'Archivos', component: ArchivosComponent},
   {path: 'Categorias', component: CrearCategoriasComponent},
   {path: 'ordenes-trabajo', canActivate: [ValidacionLoginGuard], component: OrdenesTrabajoComponent},
+  {path: 'reportes-procesos-ot', canActivate: [ValidacionLoginGuard], component: Reporte_Procesos_OTComponent},
 ]
 
 @NgModule({
@@ -177,6 +179,7 @@ export const routes: Routes = [
     ArchivosComponent,
     CrearCategoriasComponent,
     OrdenesTrabajoComponent,
+    Reporte_Procesos_OTComponent,
   ],
 
 

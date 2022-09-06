@@ -28,8 +28,12 @@ export class PedidoProductosService {
   }
 
   // Precio de Ultima Venta
-  srvObtenerListaPorIdProductoPedido(id_producto:any):Observable<any[]> {
+  srvObtenerListaPorIdProductoPedido(id_producto : any):Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoProducto/IdProductoPedido/${id_producto}`);
+  }
+
+  srvObtenerListaPorIdProducto_Pedido(id_producto : any, pedidoId : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoProducto/IdProducto_Pedido/${id_producto}/${pedidoId}`);
   }
 
   //Metodo agregar Pedidos
