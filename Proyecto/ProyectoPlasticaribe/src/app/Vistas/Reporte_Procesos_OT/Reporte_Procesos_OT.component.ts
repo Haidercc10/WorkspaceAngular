@@ -263,7 +263,25 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
     } else if (fechaincial != null && fallas != null) {
-
+      this.estadosProcesos_OTService.srvObtenerListaPorOtFechaFalla(fechaincial, fallas).subscribe(datos_ot => {
+        for (let i = 0; i < datos_ot.length; i++) {
+          this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+                          datos_ot[i].estProcOT_ExtrusionKg,
+                          datos_ot[i].estProcOT_ImpresionKg,
+                          datos_ot[i].estProcOT_RotograbadoKg,
+                          datos_ot[i].estProcOT_DobladoKg,
+                          datos_ot[i].estProcOT_LaminadoKg,
+                          datos_ot[i].estProcOT_CorteKg,
+                          datos_ot[i].estProcOT_EmpaqueKg,
+                          datos_ot[i].estProcOT_SelladoKg,
+                          datos_ot[i].estProcOT_WiketiadoKg,
+                          datos_ot[i].estProcOT_CantidadPedida,
+                          datos_ot[i].falla_Id,
+                          datos_ot[i].estProcOT_Observacion,
+                          datos_ot[i].estado_Id,
+                          datos_ot[i].estProcOT_FechaCreacion,);
+        }
+      });
     } else if (numOT != null) {
       this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
         for (let i = 0; i < datos_ot.length; i++) {
@@ -325,7 +343,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
     } else {
-      this.estadosProcesos_OTService.srvObtenerListaPorFechas(this.month, this.today).subscribe(datos_ot => {
+      this.estadosProcesos_OTService.srvObtenerListaPorFecha(this.today).subscribe(datos_ot => {
         for (let i = 0; i < datos_ot.length; i++) {
           this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                           datos_ot[i].estProcOT_ExtrusionKg,
