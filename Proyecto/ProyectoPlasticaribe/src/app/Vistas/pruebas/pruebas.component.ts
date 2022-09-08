@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {Observable} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
-import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 
 @Component({
   selector: 'app-pruebas',
@@ -10,39 +8,86 @@ import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
   styleUrls: ['./pruebas.component.css']
 })
 export class PruebasComponent implements OnInit{
+  datePipe: any;
 
-  control = new FormControl('');
-  streets: string[] = ['Champs-Élysées', 'Lombard Street', 'Abbey Road', 'Fifth Avenue'];
-  filteredStreets: Observable<string[]>;
-  public FormPrueba !: FormGroup;
-  ArrayBOPP = []; //Varibale que almacenará los BOPP existentes
-  validarInput : any;
-  keyword = 'name';
-  public historyHeading: string = 'Seleccionado Recientemente';
-
-  constructor(private boppService : EntradaBOPPService,
-                private formBuilder : FormBuilder,){
-    this.FormPrueba = this.formBuilder.group({
-      AsgBopp_OT : ['', Validators.required],
-      AsgBopp : ['', Validators.required],
-    });
-    this.validarInput = true;
-  }
+  constructor(){ }
 
   ngOnInit() {
-    this.filteredStreets = this.control.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value || '')),
+    const title = 'Car Sell Report';
+    const header = ["Year", "Month", "Make", "Model", "Quantity", "Pct"]
+    const data = [
+      { "Year" : 2007, "Month" : 1, "Make" : "Volkswagen ", "Model" : "Volkswagen Passat", "Quantity" : 1267, "Pct" : 10},
+      { "Year" : 2007, "Month" : 1, "Make" : "Volkswagen ", "Model" : "Volkswagen Passat", "Quantity" : 1267, "Pct" : 11},
+      { "Year" : 2007, "Month" : 1, "Make" : "Volkswagen ", "Model" : "Volkswagen Passat", "Quantity" : 1267, "Pct" : 12},
+      // [2007, 1, "Toyota ", "Toyota Rav4", 819, 6.5],
+      // [2007, 1, "Toyota ", "Toyota Avensis", 1, 6.2],
+      // [2007, 1, "Volkswagen ", "Volkswagen Golf", 720, 5.7],
+      // [2007, 1, "Toyota ", "Toyota Corolla", 400, 5.4],
+    ];
+    console.log(data)
+    let data3 : any =[];
+    for (const item of data) {
+      const data2  : any =
+        [item.Year, item.Month, item.Make, item.Model, item.Quantity, item.Pct]
+
+      data3.push(data2);
+      console.log(data3)
+    }
+    let workbook = new Workbook();
+    let worksheet = workbook.addWorksheet('Car Data');
+
+    // Add new row
+    let titleRow = worksheet.addRow([title]);
+
+    // Set font, size and style in title row.
+    titleRow.font = { name: 'Comic Sans MS', family: 4, size: 16, underline: 'double', bold: true };
+
+    // Blank Row
+    worksheet.addRow([]);
+
+    //Add row with current date
+
+    //Add Header Row
+    let headerRow = worksheet.addRow(header);
+
+    // Cell Style : Fill and Border
+    headerRow.eachCell((cell, number) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'ff0000' }
+      }
+      cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    });
+
+    worksheet.mergeCells('A1:D2');
+
+    // Add Data and Conditional Formatting
+
+    let data3_1 = data3[2]
+    console.log(data3_1[5])
+    data3.forEach(d => {
+        let row = worksheet.addRow(d);
+        let qty = row.getCell(5);
+        console.log(qty)
+        let color = 'FF99FF99';
+        if (+qty.value > data3_1[5]) {
+          color = 'FF9999'
+        }
+        qty.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: color }
+        }
+      }
     );
+
+    // workbook.xlsx.writeBuffer().then((data) => {
+    //   let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    //   fs.saveAs(blob, 'CarData.xlsx');
+    // });
   }
 
-  private _filter(value: string): string[] {
-    const filterValue = this._normalizeValue(value);
-    return this.streets.filter(street => this._normalizeValue(street).includes(filterValue));
-  }
 
-  private _normalizeValue(value: string): string {
-    return value.toLowerCase().replace(/\s/g, '');
-  }
 
 }

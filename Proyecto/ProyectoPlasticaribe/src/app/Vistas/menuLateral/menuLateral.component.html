@@ -7,8 +7,8 @@
         </div>
       </div>
       <div class="sidebar-header">
-          <h4 class="nombreUsuario">{{storage_Nombre}}</h4>
-          <h6 class="tipoUsuario">{{storage_Rol}}</h6>
+        <h4 class="nombreUsuario">{{storage_Nombre}}</h4>
+        <h6 class="tipoUsuario">{{storage_Rol}}</h6>
       </div>
 
       <ul>
@@ -21,137 +21,13 @@
           </a>
         </li>
 
-        <!-- PEDIDOS -->
-        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2">
-          <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-              Pedidos
-            </a>
-            <div class="collapse" id="collapseExample">
-              <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="pedido-externo" role="button" aria-expanded="false">
-                  Pedidos Externos
-                </a>
-              </div>
-              <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="opedidoproducto" role="button" aria-expanded="false">
-                  Ver Pedidos
-                </a>
-              </div>
-              <div class="mb-2">
-                <hr>
-              </div>
-            </div>
-          </li>
-        </ng-container>
-
-        <!-- REPORTES -->
-        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
-          <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample">
-              Reportes
-            </a>
-            <div class="collapse" id="collapseExample2">
-              <ng-container *ngIf="ValidarRol == 1">
-                <div class="mb-2">
-                  <a class="fst-normal" data-bs-toggle="" href="/reporte-facturas-remisiones-mp" role="button" aria-expanded="false" aria-controls="">
-                    Entradas de Materia Prima
-                  </a>
-                </div>
-              </ng-container>
-              <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
-                  Inventario de Materia Prima
-                </a>
-              </div>
-              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
-                <div class="mb-2">
-                  <a class="fst-normal" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
-                    Movimientos MP
-                  </a>
-                </div>
-              </ng-container>
-              <ng-container *ngIf="ValidarRol == 1">
-                <div class="mb-2">
-                  <a class="fst-normal" data-bs-toggle="" href="/inventario-productos-terminados" role="button" aria-expanded="false" aria-controls="">
-                    Producto Terminado
-                  </a>
-                </div>
-              </ng-container>
-              <ng-container *ngIf="ValidarRol == 1">
-                <div class="mb-2">
-                  <a class="fst-normal" data-bs-toggle="" href="/reporte-costos-ot" role="button" aria-expanded="false" aria-controls="">
-                    Reportes de Costos
-                  </a>
-                </div>
-              </ng-container>
-              <ng-container *ngIf="ValidarRol == 1">
-                <div class="mb-2">
-                  <a class="fst-normal" data-bs-toggle="" href="/reporte-estados-ot" role="button" aria-expanded="false" aria-controls="">
-                    Reportes Estados OT
-                  </a>
-                </div>
-              </ng-container>
-              <div class="mb-2">
-                <hr>
-              </div>
-            </div>
-          </li>
-        </ng-container>
-
-        <!-- MATERIAS PRIMAS -->
-        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
-          <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample">
-                Materia Prima
-            </a>
-            <div class="collapse" id="collapseExample3">
-              <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="/asignacionMP" role="button" aria-expanded="false" aria-controls="">
-                  Asignaciones
-                </a>
-              </div>
-              <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="/mp-devoluciones" role="button" aria-expanded="false" aria-controls="">
-                  Devoluciones
-                </a>
-              </div>
-              <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="/MateriaPrima" role="button" aria-expanded="false" aria-controls="">
-                  Entradas
-                </a>
-              </div>
-              <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="/mp-recuperada" role="button" aria-expanded="false" aria-controls="">
-                  Recuperado
-                </a>
-              </div>
-              <ng-container *ngIf="ValidarRol == 1">
-                <div class="mb-2">
-                  <a class="fst-normal" data-bs-toggle="" href="/materias_primas" role="button" aria-expanded="false" aria-controls="">
-                    Materias Primas
-                  </a>
-                </div>
-              </ng-container>
-              <div class="mb-2">
-                <a class="fst-normal" data-bs-toggle="" href="/asignacion-tintas" role="button" aria-expanded="false" aria-controls="">
-                  Asignación Tintas
-                </a>
-              </div>
-              <div class="mb-2">
-                <hr>
-              </div>
-            </div>
-          </li>
-        </ng-container>
-
         <!-- BOPP -->
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
           <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample4" role="button" aria-expanded="false" aria-controls="collapseExample">
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample">
                 BOPP
             </a>
-            <div class="collapse" id="collapseExample4">
+            <div class="collapse" id="collapseExample1">
               <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
                 <div class="mb-2">
                   <a class="fst-normal" data-bs-toggle="" href="/AsignacionBOPPTemporal" role="button" aria-expanded="false" aria-controls="">
@@ -175,10 +51,10 @@
 
         <!-- GESTOR DE ARCHIVOS -->
         <li>
-          <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample5" role="button" aria-expanded="false" aria-controls="collapseExample">
+          <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample">
             Gestor de Archivos
           </a>
-          <div class="collapse" id="collapseExample5">
+          <div class="collapse" id="collapseExample2">
             <div class="mb-2">
               <a class="fst-normal" data-bs-toggle="" href="/Archivos" role="button" aria-expanded="false" aria-controls="">
                 Archivos
@@ -187,9 +63,171 @@
           </div>
         </li>
 
-        <!-- PRODUCTOS -->
+        <!-- MATERIAS PRIMAS -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Materia Prima
+            </a>
+            <div class="collapse" id="collapseExample3">
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="/asignacionMP" role="button" aria-expanded="false" aria-controls="">
+                  Asignaciones MP
+                </a>
+              </div>
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="/asignacion-tintas" role="button" aria-expanded="false" aria-controls="">
+                  Asignación Tintas
+                </a>
+              </div>
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="/mp-devoluciones" role="button" aria-expanded="false" aria-controls="">
+                  Devoluciones
+                </a>
+              </div>
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="/MateriaPrima" role="button" aria-expanded="false" aria-controls="">
+                  Entradas
+                </a>
+              </div>
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/materias_primas" role="button" aria-expanded="false" aria-controls="">
+                    Materias Primas
+                  </a>
+                </div>
+              </ng-container>
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="/mp-recuperada" role="button" aria-expanded="false" aria-controls="">
+                  Recuperado
+                </a>
+              </div>
+              <div class="mb-2">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
 
         <!-- ORDEN DE TRABAJO -->
+        <ng-container *ngIf="ValidarRol == 1">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample4" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Orden de Trabajo
+            </a>
+            <div class="collapse" id="collapseExample4">
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/ordenes-trabajo" role="button" aria-expanded="false" aria-controls="">
+                    Crear OT
+                  </a>
+                </div>
+              </ng-container>
+              <div class="mb-2">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- PRODUCTOS -->
+        <ng-container *ngIf="ValidarRol == 1">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample5" role="button" aria-expanded="false" aria-controls="collapseExample">
+              Productos
+            </a>
+            <div class="collapse" id="collapseExample5">
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/inventario-productos-terminados" role="button" aria-expanded="false" aria-controls="">
+                    Producto Terminado
+                  </a>
+                </div>
+              </ng-container>
+              <div class="mb-2">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- PEDIDOS -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample6" role="button" aria-expanded="false" aria-controls="collapseExample">
+              Pedidos
+            </a>
+            <div class="collapse" id="collapseExample6">
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="pedido-externo" role="button" aria-expanded="false">
+                  Pedidos Externos
+                </a>
+              </div>
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="opedidoproducto" role="button" aria-expanded="false">
+                  Ver Pedidos
+                </a>
+              </div>
+              <div class="mb-2">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- REPORTES -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7" role="button" aria-expanded="false" aria-controls="collapseExample">
+              Reportes
+            </a>
+            <div class="collapse" id="collapseExample7">
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/reporte-facturas-remisiones-mp" role="button" aria-expanded="false" aria-controls="">
+                    Entradas de Materia Prima
+                  </a>
+                </div>
+              </ng-container>
+              <div class="mb-2">
+                <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
+                  Inventario de Materia Prima
+                </a>
+              </div>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
+                    Movimientos MP
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/reporte-costos-ot" role="button" aria-expanded="false" aria-controls="">
+                    Reportes de Costos
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/reporte-estados-ot" role="button" aria-expanded="false" aria-controls="">
+                    Reportes Estados OT
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2">
+                  <a class="fst-normal" data-bs-toggle="" href="/reportes-procesos-ot" role="button" aria-expanded="false" aria-controls="">
+                    Reporte Procesos OT
+                  </a>
+                </div>
+              </ng-container>
+              <div class="mb-2">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
 
         <!-- PROCESOS -->
 
@@ -210,8 +248,7 @@
         <!-- NOTIFICACIONES -->
 
       </ul>
-
-      <button class="btn btn-danger btn-danger-sm boton" type="button"><li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li></button>
+      <button class="btn btn-danger btn-danger-sm boton" id="boton_CerrarSesion" type="button"><li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li></button>
     </nav>
   </mat-sidenav>
 

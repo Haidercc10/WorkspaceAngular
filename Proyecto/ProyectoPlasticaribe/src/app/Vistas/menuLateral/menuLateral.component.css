@@ -247,6 +247,10 @@ mat-sidenav-content{
   cursor: pointer;
 }
 
+#boton_CerrarSesion{
+  margin-bottom: 40px;
+}
+
 @media (max-width: 500px){
   .menu {
     height: 230px;

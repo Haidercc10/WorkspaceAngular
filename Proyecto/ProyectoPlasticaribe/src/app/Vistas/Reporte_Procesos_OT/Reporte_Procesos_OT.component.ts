@@ -7,6 +7,8 @@ import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas.service'
 import { RolesService } from 'src/app/Servicios/roles.service';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 
 @Component({
   selector: 'app-Reporte_Procesos_OT',
@@ -91,14 +93,185 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     if (this.ArrayDocumento.length == 0) Swal.fire("¡Para poder crear el archivo de Excel primero debe cargar minimo un OT en la tabla!");
     else {
       this.load = false;
+      const title = `Reporte de OT por Procesos - ${this.today}`;
+      const header = ["OT", "Extrusión", "Impresión", "Rotograbado", "Laminado", "Doblado", "Corte", "Empaque", "Sellado", "Wiketiado", "Cant. Producir", "Fallas", "Observación", "Estado", "Fecha Creación"]
+      let datos : any =[];
+      for (const item of this.ArrayDocumento) {
+        const datos1  : any = [item.ot, item.ext, item.imp, item.rot, item.lam, item.dbl, item.cor, item.emp, item.sel, item.wik, item.cant, item.falla, item.obs, item.est, item.fecha];
+        datos.push(datos1);
+      }
+      let workbook = new Workbook();
+      let worksheet = workbook.addWorksheet(`Reporte de OT por Procesos - ${this.today}`);
+      let titleRow = worksheet.addRow([title]);
+      titleRow.font = { name: 'Comic Sans MS', family: 4, size: 16, underline: 'double', bold: true };
+      worksheet.addRow([]);
+      let headerRow = worksheet.addRow(header);
+      headerRow.eachCell((cell, number) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'eeeeee' }
+        }
+        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      });
+      worksheet.mergeCells('A1:O2');
+      datos.forEach(d => {
+        let row = worksheet.addRow(d);
+        // Extrusion
+        let qtyExt = row.getCell(2);
+        row.getCell(2).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        let colorExt;
+        if (+qtyExt.value >= d[10]) {
+          colorExt = 'C7FD7A';
+        } else if (+qtyExt.value < d[10] && +qtyExt.value > 0) {
+          colorExt = 'FDCD7A'
+        } else if (+qtyExt.value == 0) {
+          colorExt = 'FF837B'
+        }
+        qtyExt.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: colorExt }
+        }
+        // Impresion
+        let qtyImp = row.getCell(3);
+        row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        let colorImp;
+        if (+qtyImp.value >= d[10]) {
+          colorImp = 'C7FD7A';
+        } else if (+qtyImp.value < d[10] && +qtyImp.value > 0) {
+          colorImp = 'FDCD7A'
+        } else if (+qtyImp.value == 0) {
+          colorImp = 'FF837B'
+        }
+        qtyImp.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: colorImp }
+        }
+        //Rotograbado
+        let qtyRot = row.getCell(4);
+        row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        let colorRot;
+        if (+qtyRot.value >= d[10]) {
+          colorRot = 'C7FD7A';
+        } else if (+qtyRot.value < d[10] && +qtyRot.value > 0) {
+          colorRot = 'FDCD7A'
+        } else if (+qtyRot.value == 0) {
+          colorRot = 'FF837B'
+        }
+        qtyRot.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: colorRot }
+        }
+        //Laminado
+        let qtyLam = row.getCell(5);
+        row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        let colorLam;
+        if (+qtyLam.value >= d[10]) {
+          colorLam = 'C7FD7A';
+        } else if (+qtyLam.value < d[10] && +qtyLam.value > 0) {
+          colorLam = 'FDCD7A'
+        } else if (+qtyLam.value == 0) {
+          colorLam = 'FF837B'
+        }
+        qtyLam.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: colorLam }
+        }
+        // Doblado
+        let qtyDbl = row.getCell(6);
+        row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        let colorDbl;
+        if (+qtyDbl.value >= d[10]) {
+          colorDbl = 'C7FD7A';
+        } else if (+qtyDbl.value < d[10] && +qtyDbl.value > 0) {
+          colorDbl = 'FDCD7A'
+        } else if (+qtyDbl.value == 0) {
+          colorDbl = 'FF837B'
+        }
+        qtyDbl.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: colorDbl }
+        }
+        // Corte
+        let qtyCor = row.getCell(7);
+        row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        let colorCor;
+        if (+qtyCor.value >= d[10]) {
+          colorCor = 'C7FD7A';
+        } else if (+qtyCor.value < d[10] && +qtyCor.value > 0) {
+          colorCor = 'FDCD7A'
+        } else if (+qtyCor.value == 0) {
+          colorCor = 'FF837B'
+        }
+        qtyCor.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: colorCor }
+        }
+        // Empaque
+        let qtyEmp = row.getCell(8);
+        row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        let colorEmp;
+        if (+qtyEmp.value >= d[10]) {
+          colorEmp = 'C7FD7A';
+        } else if (+qtyEmp.value < d[10] && +qtyEmp.value > 0) {
+          colorEmp = 'FDCD7A'
+        } else if (+qtyEmp.value == 0) {
+          colorEmp = 'FF837B'
+        }
+        qtyEmp.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: colorEmp }
+        }
+        // Sellado
+        let qtySel = row.getCell(9);
+        row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        let colorSel;
+        if (+qtySel.value >= d[10]) {
+          colorSel = 'C7FD7A';
+        } else if (+qtySel.value < d[10] && +qtySel.value > 0) {
+          colorSel = 'FDCD7A'
+        } else if (+qtySel.value == 0) {
+          colorSel = 'FF837B'
+        }
+        qtySel.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: colorSel }
+        }
+        // Wiketiado
+        let qtyWik = row.getCell(10);
+        row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+        let colorWik;
+        if (+qtyWik.value >= d[10]) {
+          colorWik = 'C7FD7A';
+        } else if (+qtyWik.value < d[10] && +qtyWik.value > 0) {
+          colorWik = 'FDCD7A'
+        } else if (+qtyWik.value == 0) {
+          colorWik = 'FF837B'
+        }
+        qtyWik.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: colorWik }
+        }
+
+
+        row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+      });
       setTimeout(() => {
-        let element = document.getElementById('table2');
-        const worksheet : XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
-        const book : XLSX.WorkBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(book, worksheet, 'Sheet1');
-        XLSX.writeFile(book, `Reporte de OT por Procesos - ${this.today}.xlsx`);
+        workbook.xlsx.writeBuffer().then((data) => {
+          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          fs.saveAs(blob, `Reporte de OT por Procesos - ${this.today}.xlsx`);
+        });
         this.load = true;
-      }, 1500);
+      }, 2000);
     }
   }
 
@@ -365,7 +538,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     }
     setTimeout(() => {
       this.load = true;
-    }, 2000);
+    }, 4000);
   }
 
   //Funcion encargada de llenar un array con la informacion de las ordenes de trabajo y el producido de cada area
@@ -400,7 +573,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.ArrayDocumento.push(info);
     this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
     this.ArrayDocumento.sort((a,b) => Number(a.ot)- Number(b.ot));
-    this.load = true;
   }
 
   // Funcion que va a asignar un valor una variable, el valor será la orden de trabajo sobre la que se le dió click
