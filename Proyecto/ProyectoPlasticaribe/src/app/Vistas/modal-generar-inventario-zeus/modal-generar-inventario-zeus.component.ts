@@ -149,6 +149,13 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             fgColor: { argb: color }
           }
         });
+        worksheet.getColumn(1).width = 10;
+        worksheet.getColumn(2).width = 60;
+        worksheet.getColumn(3).width = 60;
+        worksheet.getColumn(4).width = 20;
+        worksheet.getColumn(5).width = 20;
+        worksheet.getColumn(6).width = 10;
+        worksheet.getColumn(7).width = 20;
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -159,22 +166,6 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
       }, 3500);
     }
   }
-
-  // exportarExcel(){
-  //   this.load = false;
-  //   if (this.ArrayProductoZeus.length == 0) Swal.fire("Para generar el archivo de Excel, debe haber productos en la tabla");
-  //   else {
-  //     setTimeout(() => {
-  //       let nombreArchivo : string = `Inventario de Productos Terminados ${this.today}.xlsx`
-  //       let element = document.getElementById('tablaProductosTerminados');
-  //       let worksheet : XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
-  //       const book : XLSX.WorkBook = XLSX.utils.book_new();
-  //       XLSX.utils.book_append_sheet(book, worksheet, 'Sheet1');
-  //       XLSX.writeFile(book, nombreArchivo);
-  //       this.load = true;
-  //     }, 1200);
-  //   }
-  // }
 
   /**Función para generar inventario de productos con más de 1.0 de existencias en Zeus y BagPro. */
   InventarioExistenciaZeus(){

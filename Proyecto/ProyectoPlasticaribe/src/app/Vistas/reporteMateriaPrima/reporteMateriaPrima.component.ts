@@ -35,6 +35,8 @@ import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
 import { threadId } from 'worker_threads';
 import * as XLSX from 'xlsx';
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -149,13 +151,71 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
-    if (this.ArrayMateriaPrima.length == 0) Swal.fire("Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla");
+    if (this.ArrayMateriaPrima.length == 0) Swal.fire("¡Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla!");
     else {
-      let element = document.getElementById('table');
-      const worksheet : XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
-      const book : XLSX.WorkBook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(book, worksheet, 'Sheet1');
-      XLSX.writeFile(book, this.name);
+      this.load = false;
+      setTimeout(() => {
+        const title = `Inventario Materia_Prima - ${this.today}`;
+        const header = ["Id", "Nombre", "Ancho", "Inventario Inicial", "Entrada", "Salida", "Cantidad Actual", "Diferencia", "Und. Cant", "Precio U", "SubTotal", "Categoria"]
+        let datos : any =[];
+        for (const item of this.ArrayMateriaPrima) {
+          const datos1  : any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria];
+          datos.push(datos1);
+        }
+        let workbook = new Workbook();
+        let worksheet = workbook.addWorksheet(`Inventario Materia_Prima - ${this.today}`);
+        let titleRow = worksheet.addRow([title]);
+        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+        worksheet.addRow([]);
+        let headerRow = worksheet.addRow(header);
+        headerRow.eachCell((cell, number) => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'eeeeee' }
+          }
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+        });
+        worksheet.mergeCells('A1:L2');
+        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+        datos.forEach(d => {
+          let row = worksheet.addRow(d);
+          row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          row.getCell(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          let qty= row.getCell(7);
+          let color = 'ADD8E6';
+          qty.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: color }
+          }
+        });
+        worksheet.getColumn(1).width = 10;
+        worksheet.getColumn(2).width = 60;
+        worksheet.getColumn(3).width = 12;
+        worksheet.getColumn(4).width = 22;
+        worksheet.getColumn(5).width = 12;
+        worksheet.getColumn(6).width = 12;
+        worksheet.getColumn(7).width = 22;
+        worksheet.getColumn(8).width = 12;
+        worksheet.getColumn(9).width = 12;
+        worksheet.getColumn(10).width = 12;
+        worksheet.getColumn(11).width = 20;
+        worksheet.getColumn(12).width = 20;
+        setTimeout(() => {
+          workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            fs.saveAs(blob, `Inventario Materia_Prima - ${this.today}.xlsx`);
+          });
+          this.load = true;
+        }, 1000);
+      }, 3500);
     }
   }
 

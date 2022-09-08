@@ -267,6 +267,22 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
           row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
+
+        worksheet.getColumn(1).width = 10;
+        worksheet.getColumn(2).width = 12;
+        worksheet.getColumn(3).width = 12;
+        worksheet.getColumn(4).width = 12;
+        worksheet.getColumn(5).width = 12;
+        worksheet.getColumn(6).width = 12;
+        worksheet.getColumn(7).width = 12;
+        worksheet.getColumn(8).width = 12;
+        worksheet.getColumn(9).width = 12;
+        worksheet.getColumn(10).width = 12;
+        worksheet.getColumn(11).width = 15;
+        worksheet.getColumn(12).width = 20;
+        worksheet.getColumn(13).width = 20;
+        worksheet.getColumn(14).width = 15;
+        worksheet.getColumn(15).width = 15;
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -561,7 +577,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       falla : falla,
       obs : observacion,
       est : estado,
-      fecha : fecha,
+      fecha : fecha.replace("T00:00:00", ""),
     }
     this.ArrayDocumento.push(info);
     this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
