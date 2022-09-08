@@ -6,6 +6,8 @@ import { RolesService } from 'src/app/Servicios/roles.service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -106,21 +108,73 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     }];
   }
 
-  exportarExcel(){
-    this.load = false;
+  exportarExcel() : void {
     if (this.ArrayProductoZeus.length == 0) Swal.fire("Para generar el archivo de Excel, debe haber productos en la tabla");
     else {
+      this.load = false;
       setTimeout(() => {
-        let nombreArchivo : string = `Inventario de Productos Terminados ${this.today}.xlsx`
-        let element = document.getElementById('tablaProductosTerminados');
-        let worksheet : XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
-        const book : XLSX.WorkBook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(book, worksheet, 'Sheet1');
-        XLSX.writeFile(book, nombreArchivo);
-        this.load = true;
-      }, 1200);
+        const title = `Inventario de Productos Terminados ${this.today}`;
+        const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal"]
+        let datos : any =[];
+        for (const item of this.ArrayProductoZeus) {
+          const datos1  : any = [item.codigoItem, item.ClienteNombre, item.nombreItem, item.PrecioItem, item.cantidadItem, item.presentacion, item.PrecioTotalItem];
+          datos.push(datos1);
+        }
+        let workbook = new Workbook();
+        let worksheet = workbook.addWorksheet(`Inventario de Productos Terminados ${this.today}`);
+        let titleRow = worksheet.addRow([title]);
+        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+        worksheet.addRow([]);
+        let headerRow = worksheet.addRow(header);
+        headerRow.eachCell((cell, number) => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'eeeeee' }
+          }
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+        });
+        worksheet.mergeCells('A1:G2');
+        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+        datos.forEach(d => {
+          let row = worksheet.addRow(d);
+          row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          let qty= row.getCell(5);
+          let color = 'ADD8E6';
+          qty.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: color }
+          }
+        });
+        setTimeout(() => {
+          workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            fs.saveAs(blob, `Inventario de Productos Terminados ${this.today}.xlsx`);
+          });
+          this.load = true;
+        }, 1000);
+      }, 3500);
     }
   }
+
+  // exportarExcel(){
+  //   this.load = false;
+  //   if (this.ArrayProductoZeus.length == 0) Swal.fire("Para generar el archivo de Excel, debe haber productos en la tabla");
+  //   else {
+  //     setTimeout(() => {
+  //       let nombreArchivo : string = `Inventario de Productos Terminados ${this.today}.xlsx`
+  //       let element = document.getElementById('tablaProductosTerminados');
+  //       let worksheet : XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
+  //       const book : XLSX.WorkBook = XLSX.utils.book_new();
+  //       XLSX.utils.book_append_sheet(book, worksheet, 'Sheet1');
+  //       XLSX.writeFile(book, nombreArchivo);
+  //       this.load = true;
+  //     }, 1200);
+  //   }
+  // }
 
   /**Función para generar inventario de productos con más de 1.0 de existencias en Zeus y BagPro. */
   InventarioExistenciaZeus(){
@@ -131,40 +185,17 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         this.clienteOtItems.srvObtenerItemsBagproXClienteItem(this.datosCodigo).subscribe(datosCLOTI => {
           for (let cl = 0; cl < datosCLOTI.length; cl++) {
             if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
-
-              let cantidad : string = `${datosExistencias[exi].existencias}`;
-              let cantidad1 : number = cantidad.indexOf(".");
-              let cantidadFinal = cantidad.substring(0, (cantidad1 + 9));
-
-              let Cantidad2 : string = cantidadFinal;
-              let cantidad2_1 : number = Cantidad2.indexOf(".");
-              let cantidadFinal2 = Cantidad2.substring(0, (cantidad2_1 + 3));
-
-              if (cantidad2_1 != -1) {
-                const datosInventario: any = {
-                  codigoItem : datosCLOTI[cl].clienteItems,
-                  nombreItem : datosCLOTI[cl].clienteItemsNom,
-                  cantidadItem : this.formatonumeros(cantidadFinal2),
-                  presentacion : datosExistencias[exi].presentacion,
-                  PrecioItem : this.formatonumeros(datosExistencias[exi].precioVenta),
-                  PrecioTotalItem : this.formatonumeros(datosExistencias[exi].precio_Total),
-                  ClienteNombre : datosCLOTI[cl].clienteNom,
-                }
-                this.ArrayProductoZeus.push(datosInventario);
-                this.ArrayProductoZeus.sort((a,b) => Number(a.codigoItem) - Number(b.codigoItem));
-              } else if (cantidad2_1 == -1) {
-                const datosInventario: any = {
-                  codigoItem : datosCLOTI[cl].clienteItems,
-                  nombreItem : datosCLOTI[cl].clienteItemsNom,
-                  cantidadItem : this.formatonumeros(Cantidad2),
-                  presentacion : datosExistencias[exi].presentacion,
-                  PrecioItem : this.formatonumeros(datosExistencias[exi].precioVenta),
-                  PrecioTotalItem : this.formatonumeros(datosExistencias[exi].precio_Total),
-                  ClienteNombre : datosCLOTI[cl].clienteNom,
-                }
-                this.ArrayProductoZeus.push(datosInventario);
-                this.ArrayProductoZeus.sort((a,b) => Number(a.codigoItem) - Number(b.codigoItem));
+              const datosInventario: any = {
+                codigoItem : datosCLOTI[cl].clienteItems,
+                nombreItem : datosCLOTI[cl].clienteItemsNom,
+                cantidadItem : datosExistencias[exi].existencias,
+                presentacion : datosExistencias[exi].presentacion,
+                PrecioItem : datosExistencias[exi].precioVenta,
+                PrecioTotalItem : datosExistencias[exi].precio_Total,
+                ClienteNombre : datosCLOTI[cl].clienteNom,
               }
+              this.ArrayProductoZeus.push(datosInventario);
+              this.ArrayProductoZeus.sort((a,b) => Number(a.codigoItem) - Number(b.codigoItem));
             }
           }
         });

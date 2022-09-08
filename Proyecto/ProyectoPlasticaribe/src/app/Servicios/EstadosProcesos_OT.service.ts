@@ -15,7 +15,7 @@ export class EstadosProcesos_OTService {
   constructor(private http: HttpClient) { }
 
   srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Estados_ProcesosOT');
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Estados_ProcesosOT/consultaGeneral');
   }
 
   srvObtenerListaPorId(dato : any){
