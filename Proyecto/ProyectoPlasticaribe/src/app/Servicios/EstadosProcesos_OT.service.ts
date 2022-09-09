@@ -62,6 +62,26 @@ export class EstadosProcesos_OTService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorOtFechsFalla/${fecha}/${falla}`);
   }
 
+  srvObtenerListaPorOtEstado(estado : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultarPorEstados/${estado}`);
+  }
+
+  srvObtenerListaPorOtEstadoFalla(estado : any, falla : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorEstadosFallas/${estado}/${falla}`);
+  }
+
+  srvObtenerListaPorFechaEstadoFalla(fecha : any, estado : any, falla : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorFechaEstadoFalla/${fecha}/${estado}/${falla}`);
+  }
+
+  srvObtenerListaPorFechasEstado(fecha1 : any, fecha2 : any, estado : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorFechasEstado/${fecha1}/${fecha2}/${estado}`);
+  }
+
+  srvObtenerListaPorFechasEstadoFalla(fecha1 : any, fecha2 : any, estado : any, falla : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorFechasEstadoFallas/${fecha1}/${fecha2}/${estado}/${falla}`);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/${id}`, data);
   }

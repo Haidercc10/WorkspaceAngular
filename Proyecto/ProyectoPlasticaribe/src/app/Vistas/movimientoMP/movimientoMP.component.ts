@@ -1,8 +1,5 @@
-import { ThisReceiver } from '@angular/compiler';
-import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
-import { info } from 'console';
-import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
@@ -36,8 +33,6 @@ import { ModalEditarAsignacionesBOPPComponent } from '../modal-editar-asignacion
   templateUrl: './movimientoMP.component.html',
   styleUrls: ['./movimientoMP.component.css']
 })
-
-
 
 export class MovimientoMPComponent implements OnInit {
 
@@ -2045,11 +2040,11 @@ export class MovimientoMPComponent implements OnInit {
       this.load = false;
       if (this.ValidarRol == 1) {
         this.bagProServices.srvObtenerListaProcExtOt(idDoc).subscribe(datos_procesos => {
-          if (datos_procesos != []) {
+          if (datos_procesos.length != 0) {
             for (let index = 0; index < datos_procesos.length; index++) {
               this.kgOT = datos_procesos[index].exttotalextruir;
               this.asignacionService.srvObtenerListaPorFecha_Ot(fecha, idDoc).subscribe(datos_asignaciones => {
-                if (datos_asignaciones != []) {
+                if (datos_asignaciones.length != 0) {
                   for (let index = 0; index < datos_asignaciones.length; index++) {
                     this.asignacionMpService.srvObtenerListaPorAsigId(datos_asignaciones[index].asigMp_Id).subscribe(datos_asignacionMp => {
                       for (let i = 0; i < datos_asignacionMp.length; i++) {
@@ -2111,11 +2106,11 @@ export class MovimientoMPComponent implements OnInit {
 
       } else  if (this.ValidarRol == 3) {
         this.bagProServices.srvObtenerListaProcExtOt(idDoc).subscribe(datos_procesos => {
-          if (datos_procesos != []) {
+          if (datos_procesos.length != 0) {
             for (let index = 0; index < datos_procesos.length; index++) {
               this.kgOT = datos_procesos[index].exttotalextruir;
               this.asignacionService.srvObtenerListaPorFecha_Ot(fecha, idDoc).subscribe(datos_asignaciones => {
-                if (datos_asignaciones != []) {
+                if (datos_asignaciones.length != 0) {
                   for (let index = 0; index < datos_asignaciones.length; index++) {
                     this.asignacionMpService.srvObtenerListaPorAsigId(datos_asignaciones[index].asigMp_Id).subscribe(datos_asignacionMp => {
                       for (let i = 0; i < datos_asignacionMp.length; i++) {

@@ -7,4 +7,5 @@ export interface modelTintas{
   Tinta_Precio : number;
   CatMP_Id : number;
   TpBod_Id : number;
+  Tinta_InvInicial : number;
 }

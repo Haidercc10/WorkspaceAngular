@@ -69,6 +69,7 @@ import { ArchivosComponent } from './Vistas/Archivos/Archivos.component';
 import { CrearCategoriasComponent } from './Vistas/CrearCategorias/CrearCategorias.component';
 import { OrdenesTrabajoComponent } from './Vistas/ordenes-trabajo/ordenes-trabajo.component';
 import { Reporte_Procesos_OTComponent } from './Vistas/Reporte_Procesos_OT/Reporte_Procesos_OT.component';
+import { Entrada_TintasComponent } from './Vistas/Entrada_Tintas/Entrada_Tintas.component';
 
 
 export const routes: Routes = [
@@ -121,6 +122,7 @@ export const routes: Routes = [
   {path: 'Categorias', component: CrearCategoriasComponent},
   {path: 'ordenes-trabajo', canActivate: [ValidacionLoginGuard], component: OrdenesTrabajoComponent},
   {path: 'reportes-procesos-ot', canActivate: [ValidacionLoginGuard], component: Reporte_Procesos_OTComponent},
+  {path: 'Entrada-Tintas', canActivate : [ValidacionLoginGuard], component : Entrada_TintasComponent},
 ]
 
 @NgModule({
@@ -180,6 +182,7 @@ export const routes: Routes = [
     CrearCategoriasComponent,
     OrdenesTrabajoComponent,
     Reporte_Procesos_OTComponent,
+    Entrada_TintasComponent,
   ],
 
 

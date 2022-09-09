@@ -105,7 +105,7 @@ a {
  }
 
  .overlay{
-  z-index: 5;
+  z-index: 2;
   position: fixed;
   top: 0;
   left: 0;
@@ -120,8 +120,4 @@ a {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%)
-}
-
-.ng-autocomplete ::ng-deep .autocomplete-container {
-  box-shadow: none;
 }

@@ -37,6 +37,14 @@
                 <label for="floatingInput">Fecha Final</label>
               </div>
 
+              <!-- Estados -->
+              <div class="form-floating col-md-2">
+                <select formControlName="estado" class="form-select form-select-sm" id="floatingSelect" title="Estado de la Orden de Trabajo" required>
+                  <option [ngValue]="estado.estado_Id" *ngFor="let estado of estados">{{estado.estado_Nombre}}</option>
+                </select>
+                <label for="floatingSelect">Estado OT</label>
+              </div>
+
               <!-- Fallas -->
               <div class="form-floating col-md-2">
                 <select formControlName="fallasOT" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example">

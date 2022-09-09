@@ -1,5 +1,5 @@
   <!-- Inicio  -->
-  <app-menuLateral></app-menuLateral>
+<app-menuLateral></app-menuLateral>
 
 <div class="contain">
   <!-- Navegador fin de parte superior -->
@@ -27,8 +27,24 @@
           <input type="text" name="NombreCliente" [(ngModel)]="NombreCliente" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
           <label for="floatingInput">Cliente</label>
         </div>
+
+        <form [formGroup]="FormExistencias" id="FormExistencias">
+          <!-- Cantidad Minima -->
+          <div class="form-floating col-md-4">
+            <input type="number" formControlName="cantMinima" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="actualizarCantMinima()">
+            <label for="floatingInput">Cantidad Minima Item</label>
+          </div>
+          <label *ngIf="numeroIdProd != 0">Item: <b>{{numeroIdProd}}</b></label>
+
+          <div class="mb-3">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarCantMinima()">Actualizar</button>
+              <!-- <button class="btn btn-secondary btn-secondary-sm" type="button">Limpiar campos</button> -->
+            </div>
+          </div>
+        </form>
      </div>
-   </div>
+    </div>
 
     <!-- Fin fila 1 de campos -->
 
@@ -52,17 +68,26 @@
                   <th id="existencias" scope="col"><button class="existencias" (dblclick)="organizarExistenciasDobleClick()" (click)="organizarExistenciasUnClick()"><b>{{columnas.invStock}}</b></button></th>
                   <th id="presentacion" scope="col">{{columnas.presentacion}}</th>
                   <th id="Subtotal" scope="col">{{columnas.invSubtotal}}</th>
+                  <th id="Subtotal" scope="col">Cant. Minima</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let prodZeus of ArrayProductoZeus | filtrosProductosTerminadosZeus: NombrePT | filtroNombreClientePT: NombreCliente | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
-                  <th id="id" class="TextosInfoTabla">{{prodZeus.codigoItem}}</th>
-                  <td id="cliente" class="TextosInfoTabla">{{prodZeus.ClienteNombre}}</td>
-                  <td id="nombre" class="TextosInfoTabla">{{prodZeus.nombreItem}}</td>
-                  <td id="precio" class="TextosInfoTabla">{{prodZeus.PrecioItem | number}}</td>
-                  <td id="existencias" class="TextosInfoTabla2">{{prodZeus.cantidadItem | number}}</td>
-                  <td id="presentacion" scope="TextosInfoTabla">{{prodZeus.presentacion}}</td>
-                  <td id="subtotal" class="TextosInfoTabla">{{prodZeus.PrecioTotalItem | number}}</td>
+                  <th id="id" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.codigoItem}}</th>
+                  <td id="cliente" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.ClienteNombre}}</td>
+                  <td id="nombre" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.nombreItem}}</td>
+                  <td id="precio" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.PrecioItem | number : '1.2-2'}}</td>
+
+                  <ng-container *ngIf="prodZeus.cantidadItem <= prodZeus.cantMinima">
+                    <th id="existencias" style="background-color: rgb(255, 146, 146);" (click)="seleccionarProducto(prodZeus)">{{prodZeus.cantidadItem | number : '1.2-2'}}</th>
+                  </ng-container>
+                  <ng-container *ngIf="prodZeus.cantidadItem > prodZeus.cantMinima">
+                    <td id="existencias" class="TextosInfoTabla2" (click)="seleccionarProducto(prodZeus)">{{prodZeus.cantidadItem | number : '1.2-2'}}</td>
+                  </ng-container>
+
+                  <td id="presentacion" scope="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.presentacion}}</td>
+                  <td id="subtotal" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.PrecioTotalItem | number : '1.2-2'}}</td>
+                  <td id="subtotal" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.cantMinima | number : '1.2-2'}}</td>
                 </tr>
               </tbody>
             </table>

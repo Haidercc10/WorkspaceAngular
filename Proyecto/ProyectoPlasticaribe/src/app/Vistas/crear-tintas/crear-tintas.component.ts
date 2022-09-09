@@ -75,6 +75,7 @@ export class CrearTintasComponent implements OnInit {
       Tinta_Stock: cantidadTinta,
       CatMP_Id: categoriaId,
       TpBod_Id: bodegaId,
+      Tinta_InvInicial : cantidadTinta,
     }
 
     if(datosTintas.Tinta_CodigoHexadecimal == null) {

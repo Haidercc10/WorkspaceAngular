@@ -50,6 +50,9 @@ export class ExistenciasProductosService {
     return this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/ActualizacionExistencia/${id}`, datos_Productos);
   }
 
+  srvActualizarExistenciaCantidadMinima(id : any, datos_Productos:any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/Existencia_Productos/ActualizacionCantMinima/${id}`, datos_Productos);
+  }
 
   //Metodo eliminar
   srvEliminar(id:number|String) {

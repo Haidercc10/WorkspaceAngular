@@ -1,0 +1,179 @@
+<!-- Navegador de parte superior -->
+<app-menuLateral></app-menuLateral>
+
+<div class="contain">
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Entrada de Tintas</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <div class="container">
+      <!-- Botones para abrir modales -->
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" title="¡Crealo aquí!">
+          Crear Tinta
+        </button>
+      </div>
+
+      <!--Titulo Entrada de Tintas -->
+      <div class="mb-3">
+        <h4 class="tituloRojo">Entrada de Tintas</h4>
+      </div>
+
+      <!-- Formulario con informacion de las Tintas -->
+      <form [formGroup]="FormEntradaTintas">
+        <!-- Fila 1 -->
+        <div class="mb-3">
+          <div class="row g-3">
+
+            <!-- Id Tinta -->
+            <div class="form-floating col-md-2">
+              <input formControlName="IdTinta" type="number" class="form-control form-control-sm" id="floatingInput" title="Id Tinta" (keyup.enter)="buscarTintaId()">
+              <label for="floatingInput">Id Tinta</label>
+            </div>
+
+            <!-- Nombre tinta -->
+            <div class="ng-autocomplete form-floating col-md-2 form-control form-control-sm" style="width: 30%;">
+              <ng-autocomplete
+                class=""
+                [data]="tintas"
+                (selected)='buscarTintaSeleccionada($event)'
+                (inputChanged)='onChangeSearchTinta($event)'
+                (inputFocused)='onFocusedTinta($event)'
+                [searchKeyword]="keywordTintas"
+                [itemTemplate]="itemTemplate"
+                [notFoundTemplate]="notFoundTemplate"
+                id="floatingInput"
+                formControlName="Tinta">
+              </ng-autocomplete>
+
+              <ng-template #itemTemplate let-item>
+                <a [innerHTML]="item.name"></a>
+              </ng-template>
+
+              <ng-template #notFoundTemplate let-notFound>
+                <div [innerHTML]="notFound"></div>
+              </ng-template>
+              <label for="floatingInput" *ngIf="validarInputTintas">Tinta</label>
+            </div>
+
+            <!-- Cantidad Tinta -->
+            <div class="form-floating col-md-2">
+              <input formControlName="cantidadTinta" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" required title="Cantidad (Kg) Tinta">
+              <label for="floatingInput">Cantidad (Kg) Tinta</label>
+            </div>
+
+            <!-- Unidad medida-->
+            <div class="form-floating col-md">
+              <select formControlName="undMedTinta" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                <option value="Kg">Kg</option>
+              </select>
+              <label for="floatingSelect">Und. Medida</label>
+            </div>
+
+            <!-- Campo Observacion -->
+            <div class="form-floating col-md-5">
+              <textarea formControlName="Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm" maxlength="200" ></textarea>
+              <label for="floatingTextArea">Observación</label>
+            </div>
+
+            <!-- Fecha entrada -->
+            <div class="form-floating col-md-2">
+              <input formControlName="Fecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Entrada" readonly onmousedown="return false;">
+              <label for="floatingInput">Fecha Entrada</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="mb-4">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button class="btn btn-danger btn-danger-sm" type="button" (click)="cargarTablaTintas()">{{AccionBoton}} Tinta</button>
+            <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+          </div>
+        </div>
+      </form>
+
+      <!--Linea -->
+      <div class="mb-4">
+        <hr class="colorLinea">
+      </div>
+
+      <div class="mb-4">
+        <h4 class="tituloRojo">Tabla de Tintas</h4>
+      </div>
+
+      <!-- TABLA DE Materias Primas Asignadas -->
+      <div class="mb-2">
+        <div class="row g-1">
+          <div class="table-responsive">
+            <table class="table table-bordered" >
+              <thead class="TitulosTabla">
+                <tr>
+                  <th id="idMateriaPrima" scope="col">ID</th>
+                  <th id="nombreMateriaPrima" scope="col">Nombre</th>
+                  <th id="cantidadMateriaPrima" scope="col">Cantidad (Kg)</th>
+                  <th id="UnidadMedida" scope="col">Und Medida</th>
+                  <th id="editar" scope="col">Editar</th>
+                  <th id="eliminar" scope="col">Eliminar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                <tr *ngFor="let tinta of ArrayTintas let i = index">
+                  <td id="idMateriaPrima">{{tinta.IdTinta}}</td>
+                  <td id="nombreMateriaPrima">{{tinta.NombreTinta}}</td>
+                  <th id="cantidadMateriaPrima">{{tinta.CantTinta | number : '1.2-2'}}</th>
+                  <td id="UnidadMedida">{{tinta.UndMed}}</td>
+                  <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Tinta" (click)="EditarProductoTabla(tinta)"></i></a></td>
+                  <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Tinta de la tabla"(click)="QuitarProductoTabla(i, tinta)"></i></a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="overlay" *ngIf="!load">
+        <div class="spinner ">
+          <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="row g-3">
+          <div class="mb-3">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button class="btn btn-danger btn-danger-sm" type="button" (click)="moverInventario()">Crear Entrada</button>
+              <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()">Limpiar Todos Los Campos</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de crear Tinta -->
+      <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel2">Crear Tinta</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <app-crear-tintas></app-crear-tintas>  <!--Carga componente crear Tinta-->
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

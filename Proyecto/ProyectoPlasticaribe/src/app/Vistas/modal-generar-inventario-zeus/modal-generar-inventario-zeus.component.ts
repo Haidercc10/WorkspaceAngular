@@ -8,6 +8,8 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
+import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -17,6 +19,7 @@ import * as fs from 'file-saver';
 
 export class ModalGenerarInventarioZeusComponent implements OnInit {
 
+  public FormExistencias !: FormGroup;
   public titulosTabla : any = [];
   public arrayInventario = [];
   public datosCodigo : string;
@@ -31,11 +34,18 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   public NombrePT = '';
   public load : boolean;
   public NombreCliente = '';
+  numeroIdProd : number = 0;
 
   constructor(private existenciasZeus : InventarioZeusService,
                 private clienteOtItems : BagproService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private rolService : RolesService) {
+                    private rolService : RolesService,
+                      private existencias_ProductosService : ExistenciasProductosService,
+                        private frmBuilder : FormBuilder,) {
+
+    this.FormExistencias = this.frmBuilder.group({
+      cantMinima : [0],
+    })
     this.load = true;
   }
 
@@ -81,21 +91,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     return number.toString().replace(exp,rep);
   }
 
-  /* FUNCION PARA RELIZAR CONFIRMACIÓN DE SALIDA (CIERRE SESIÓN)*/
-  confimacionSalida(){
-    Swal.fire({
-      title: '¿Seguro que desea salir?',
-      showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: 'Salir',
-      denyButtonText: `No Salir`,
-    }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
-      if (result.isConfirmed) window.location.href = "./";
-    })
-  }
-
-
+  //
   ColumnasTabla(){
     this.titulosTabla = [{
       invItem : "Item",
@@ -108,16 +104,17 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     }];
   }
 
+  //
   exportarExcel() : void {
     if (this.ArrayProductoZeus.length == 0) Swal.fire("Para generar el archivo de Excel, debe haber productos en la tabla");
     else {
       this.load = false;
       setTimeout(() => {
         const title = `Inventario de Productos Terminados ${this.today}`;
-        const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal"]
+        const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal", "Cantidad Minima"]
         let datos : any =[];
         for (const item of this.ArrayProductoZeus) {
-          const datos1  : any = [item.codigoItem, item.ClienteNombre, item.nombreItem, item.PrecioItem, item.cantidadItem, item.presentacion, item.PrecioTotalItem];
+          const datos1  : any = [item.codigoItem, item.ClienteNombre, item.nombreItem, item.PrecioItem, item.cantidadItem, item.presentacion, item.PrecioTotalItem, item.cantMinima];
           datos.push(datos1);
         }
         let workbook = new Workbook();
@@ -134,20 +131,24 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:G2');
+        worksheet.mergeCells('A1:H2');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
         datos.forEach(d => {
           let row = worksheet.addRow(d);
-          row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-          let qty= row.getCell(5);
+          let qty = row.getCell(5);
           let color = 'ADD8E6';
+          if (+qty.value < d[7]) {
+            color = 'FF837B';
+          }
           qty.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: color }
           }
+          row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
         worksheet.getColumn(1).width = 10;
         worksheet.getColumn(2).width = 60;
@@ -156,6 +157,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         worksheet.getColumn(5).width = 20;
         worksheet.getColumn(6).width = 10;
         worksheet.getColumn(7).width = 20;
+        worksheet.getColumn(8).width = 20;
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -170,23 +172,31 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   /**Función para generar inventario de productos con más de 1.0 de existencias en Zeus y BagPro. */
   InventarioExistenciaZeus(){
     this.load = false;
+    this.ArrayProductoZeus = [];
+    this.numeroIdProd = 0;
     this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datosExistencias => {
       for (let exi = 0; exi < datosExistencias.length; exi++) {
         this.datosCodigo = datosExistencias[exi].codigo;
         this.clienteOtItems.srvObtenerItemsBagproXClienteItem(this.datosCodigo).subscribe(datosCLOTI => {
           for (let cl = 0; cl < datosCLOTI.length; cl++) {
             if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
-              const datosInventario: any = {
-                codigoItem : datosCLOTI[cl].clienteItems,
-                nombreItem : datosCLOTI[cl].clienteItemsNom,
-                cantidadItem : datosExistencias[exi].existencias,
-                presentacion : datosExistencias[exi].presentacion,
-                PrecioItem : datosExistencias[exi].precioVenta,
-                PrecioTotalItem : datosExistencias[exi].precio_Total,
-                ClienteNombre : datosCLOTI[cl].clienteNom,
-              }
-              this.ArrayProductoZeus.push(datosInventario);
-              this.ArrayProductoZeus.sort((a,b) => Number(a.codigoItem) - Number(b.codigoItem));
+              this.existencias_ProductosService.srvObtenerListaPorIdProducto(datosCLOTI[cl].clienteItems).subscribe(datos_existenciasProd => {
+                for (let i = 0; i < datos_existenciasProd.length; i++) {
+                  const datosInventario: any = {
+                    codigoItem : datosCLOTI[cl].clienteItems,
+                    nombreItem : datosCLOTI[cl].clienteItemsNom,
+                    cantidadItem : datosExistencias[exi].existencias,
+                    presentacion : datosExistencias[exi].presentacion,
+                    PrecioItem : datosExistencias[exi].precioVenta,
+                    PrecioTotalItem : datosExistencias[exi].precio_Total,
+                    ClienteNombre : datosCLOTI[cl].clienteNom,
+                    cantMinima : datos_existenciasProd[i].exProd_CantMinima,
+                  }
+                  this.ArrayProductoZeus.push(datosInventario);
+                  this.ArrayProductoZeus.sort((a,b) => Number(a.codigoItem) - Number(b.codigoItem));
+                  break;
+                }
+              });
             }
           }
         });
@@ -195,6 +205,43 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     setTimeout(() => {
       this.load = true;
     }, 3500);
+  }
+
+  //
+  seleccionarProducto(item){
+    this.numeroIdProd = item.codigoItem;
+    // const a : any = document.createElement("a");
+    // document.body.appendChild(a);
+    // a.href = "#FormExistencias";
+    // a.click();
+    // document.body.removeChild(a);
+  }
+
+  //
+  actualizarCantMinima(){
+    let cantidad : number = this.FormExistencias.value.cantMinima;
+    this.existencias_ProductosService.srvObtenerListaPorIdProducto(this.numeroIdProd).subscribe(datos_existencias => {
+      for (let i = 0; i < datos_existencias.length; i++) {
+        const datosExistencias = {
+          Prod_Id: this.numeroIdProd,
+          exProd_Id: datos_existencias[i].exProd_Id,
+          ExProd_Cantidad: datos_existencias[i].exProd_Cantidad,
+          UndMed_Id: datos_existencias[i].undMed_Id,
+          TpBod_Id: datos_existencias[i].tpBod_Id,
+          ExProd_Precio: datos_existencias[i].exProd_Precio,
+          ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
+          ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
+          ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
+          TpMoneda_Id: datos_existencias[i].tpMoneda_Id,
+          exProd_PrecioVenta : datos_existencias[i].exProd_PrecioVenta,
+          ExProd_CantMinima : cantidad,
+        }
+
+        this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
+          this.InventarioExistenciaZeus();
+        });
+      }
+    });
   }
 
   /** Organiza el inventario de PT por existencias de mayor a menor. */
