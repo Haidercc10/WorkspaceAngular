@@ -35,6 +35,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   public load : boolean;
   public NombreCliente = '';
   numeroIdProd : number = 0;
+  totalProductos : number = 0;
 
   constructor(private existenciasZeus : InventarioZeusService,
                 private clienteOtItems : BagproService,
@@ -193,7 +194,9 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                     cantMinima : datos_existenciasProd[i].exProd_CantMinima,
                   }
                   this.ArrayProductoZeus.push(datosInventario);
-                  this.ArrayProductoZeus.sort((a,b) => Number(a.codigoItem) - Number(b.codigoItem));
+                  this.ArrayProductoZeus.sort((a,b) => a.nombreItem.localeCompare(b.nombreItem));
+                  this.ArrayProductoZeus.sort((a,b) => Number(b.cantidadItem <= b.cantMinima) - Number(a.cantidadItem <= a.cantMinima));
+                  this.totalProductos += datosExistencias[exi].precio_Total;
                   break;
                 }
               });
@@ -241,6 +244,106 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           this.InventarioExistenciaZeus();
         });
       }
+    });
+  }
+
+  //
+  organizarCliente_A_Z(){
+    this.ArrayProductoZeus.sort((a,b) => a.ClienteNombre.localeCompare(b.ClienteNombre));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Cliente" de la A a la Z.'
+    });
+  }
+
+  //
+  organizarCliente_Z_A(){
+    this.ArrayProductoZeus.sort((a,b) => b.ClienteNombre.localeCompare(a.ClienteNombre));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Cliente" de la Z a la A.'
+    });
+  }
+
+   //
+  organizarProducto_A_Z(){
+    this.ArrayProductoZeus.sort((a,b) => a.nombreItem.localeCompare(b.nombreItem));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Producto" de la A a la Z.'
+    });
+  }
+
+  //
+  organizarProducto_Z_A(){
+    this.ArrayProductoZeus.sort((a,b) => b.nombreItem.localeCompare(a.nombreItem));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Producto" de la Z a la A.'
+    });
+  }
+
+  //
+  organizarCantMinima(){
+    this.ArrayProductoZeus.sort((a,b) => Number(b.cantidadItem <= b.cantMinima) - Number(a.cantidadItem <= a.cantMinima));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Cantidad Minima".'
     });
   }
 

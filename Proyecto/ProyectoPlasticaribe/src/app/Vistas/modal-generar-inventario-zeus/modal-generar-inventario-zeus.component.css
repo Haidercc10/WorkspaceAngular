@@ -93,3 +93,11 @@ background-color: lightblue;
   transform: translate(-50%, -50%)
 }
 
+#Cliente, #cantMinima, #nombre{
+  cursor: pointer;
+}
+
+#Cliente:hover, #cantMinima:hover, #nombre:hover, #existencias:hover{
+  background-color: #ddd;
+}
+
