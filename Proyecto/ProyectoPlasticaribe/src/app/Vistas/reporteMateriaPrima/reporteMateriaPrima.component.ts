@@ -1447,6 +1447,47 @@ export class ReporteMateriaPrimaComponent implements OnInit {
               }
             });
           }
+
+          if (this.ValidarRol == 1 || this.ValidarRol == 4){
+            this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+              for (let i = 0; i < datos_bopp.length; i++) {
+                if (datos_bopp[i].catMP_Id == categoria && datos_bopp[i].bopP_Id == materiaPrima) {
+                  this.categoriaBOPP = 'BOPP';
+                  this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
+                    this.sumaSalida = 0;
+                    this.sumaEntrada = 0;
+                    this.inventInicial = 0;
+                    for (const item of bopp_Saliente) {
+                      if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
+                        this.sumaSalida = this.sumaSalida + item.cantidad;
+                      }
+                    }
+
+                    for (const item of bopp_entrante) {
+                      if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
+                        this.sumaEntrada = this.sumaEntrada + + item.cantidad;
+                      }
+                    }
+
+                    this.inventInicial = 0;
+
+                    this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                      datos_bopp[i].bopP_Serial,
+                      datos_bopp[i].bopP_Descripcion, /** Descripcion en vez de nombre */
+                      datos_bopp[i].bopP_Precio,
+                      datos_bopp[i].bopP_CantidadInicialKg,
+                      this.sumaEntrada,
+                      this.sumaSalida,
+                      datos_bopp[i].bopP_Stock,
+                      "Kg",
+                      datos_categoria.catMP_Nombre,
+                      datos_bopp[i].bopP_Ancho);
+                  });
+                }
+              }
+            });
+          }
+
           this.load = true;
         }, 2000);
       } else if (idMateriaPrima != null) {
@@ -1663,6 +1704,47 @@ export class ReporteMateriaPrimaComponent implements OnInit {
               }
             });
           }
+
+          if (this.ValidarRol == 1 || this.ValidarRol == 4){
+            this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+              for (let i = 0; i < datos_bopp.length; i++) {
+                if (datos_bopp[i].catMP_Id == categoria && datos_bopp[i].bopP_Id == idMateriaPrima) {
+                  this.categoriaBOPP = 'BOPP';
+                  this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
+                    this.sumaSalida = 0;
+                    this.sumaEntrada = 0;
+                    this.inventInicial = 0;
+                    for (const item of bopp_Saliente) {
+                      if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
+                        this.sumaSalida = this.sumaSalida + item.cantidad;
+                      }
+                    }
+
+                    for (const item of bopp_entrante) {
+                      if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
+                        this.sumaEntrada = this.sumaEntrada + + item.cantidad;
+                      }
+                    }
+
+                    this.inventInicial = 0;
+
+                    this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                      datos_bopp[i].bopP_Serial,
+                      datos_bopp[i].bopP_Descripcion, /** Descripcion en vez de nombre */
+                      datos_bopp[i].bopP_Precio,
+                      datos_bopp[i].bopP_CantidadInicialKg,
+                      this.sumaEntrada,
+                      this.sumaSalida,
+                      datos_bopp[i].bopP_Stock,
+                      "Kg",
+                      datos_categoria.catMP_Nombre,
+                      datos_bopp[i].bopP_Ancho);
+                  });
+                }
+              }
+            });
+          }
+
           this.load = true;
         }, 2000);
       }
@@ -2451,6 +2533,47 @@ export class ReporteMateriaPrimaComponent implements OnInit {
               }
             });
           }
+
+          if (this.ValidarRol == 1 || this.ValidarRol == 4){
+            this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+              for (let i = 0; i < datos_bopp.length; i++) {
+                if (datos_bopp[i].catMP_Id == categoria && datos_bopp[i].bopP_Id == materiaPrima) {
+                  this.categoriaBOPP = 'BOPP';
+                  this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
+                    this.sumaSalida = 0;
+                    this.sumaEntrada = 0;
+                    this.inventInicial = 0;
+                    for (const item of bopp_Saliente) {
+                      if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
+                        this.sumaSalida = this.sumaSalida + item.cantidad;
+                      }
+                    }
+
+                    for (const item of bopp_entrante) {
+                      if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
+                        this.sumaEntrada = this.sumaEntrada + + item.cantidad;
+                      }
+                    }
+
+                    this.inventInicial = 0;
+
+                    this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                      datos_bopp[i].bopP_Serial,
+                      datos_bopp[i].bopP_Descripcion, /** Descripcion en vez de nombre */
+                      datos_bopp[i].bopP_Precio,
+                      datos_bopp[i].bopP_CantidadInicialKg,
+                      this.sumaEntrada,
+                      this.sumaSalida,
+                      datos_bopp[i].bopP_Stock,
+                      "Kg",
+                      datos_categoria.catMP_Nombre,
+                      datos_bopp[i].bopP_Ancho);
+                  });
+                }
+              }
+            });
+          }
+
           this.load = true;
         }, 2000);
       } else if (idMateriaPrima != null) {
@@ -3534,7 +3657,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             });
           }
 
-
           if (this.ValidarRol == 1 || this.ValidarRol == 4){
             this.boppService.srvObtenerLista().subscribe(datos_bopp => {
               for (let i = 0; i < datos_bopp.length; i++) {
@@ -4348,6 +4470,44 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                       datos_categoria.catMP_Nombre);
                 });
               }
+            }
+          });
+        }
+
+        if (this.ValidarRol == 1 || this.ValidarRol == 4){
+          this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+            for (let i = 0; i < datos_bopp.length; i++) {
+              this.categoriaBOPP = 'BOPP';
+              this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
+                this.sumaSalida = 0;
+                this.sumaEntrada = 0;
+                this.inventInicial = 0;
+                for (const item of bopp_Saliente) {
+                  if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
+                    this.sumaSalida = this.sumaSalida + item.cantidad;
+                  }
+                }
+
+                for (const item of bopp_entrante) {
+                  if (datos_bopp[i].bopP_Id == item.materiaPrima && datos_categoria.catMP_Id == categoria) {
+                    this.sumaEntrada = this.sumaEntrada + + item.cantidad;
+                  }
+                }
+
+                this.inventInicial = 0;
+
+                this.cargarFormMpEnTablas(this.ArrayMateriaPrima,
+                  datos_bopp[i].bopP_Serial,
+                  datos_bopp[i].bopP_Descripcion, /** Descripcion en vez de nombre */
+                  datos_bopp[i].bopP_Precio,
+                  datos_bopp[i].bopP_CantidadInicialKg,
+                  this.sumaEntrada,
+                  this.sumaSalida,
+                  datos_bopp[i].bopP_Stock,
+                  "Kg",
+                  datos_categoria.catMP_Nombre,
+                  datos_bopp[i].bopP_Ancho);
+              });
             }
           });
         }

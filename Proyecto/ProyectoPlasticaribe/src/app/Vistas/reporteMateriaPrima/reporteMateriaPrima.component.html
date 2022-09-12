@@ -45,13 +45,7 @@
           </ng-template>
           <label for="floatingInput" *ngIf="validarInput">Materia Prima</label>
         </div>
-        <!-- <div class="form-floating col-md">
-          <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
-            <option [ngValue]="materiaPrima.Id" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima.Nombre}}</option>
-          </select>
-          <label for="floatingSelect">Nombre de la Materia Prima</label>
-        </div> -->
-        <!-- Categoria Producto -->
+        <!-- Categoria -->
         <div class="form-floating col-md-2">
           <select formControlName="MpCategoria" (change)="cargarComboMatPrimaSegunCategorias()" class="form-select form-select-sm" id="floatingSelect"  aria-label="Floating label select example" required>
             <option [ngValue]="categoria.catMP_Id" *ngFor="let categoria of categorias">{{categoria.catMP_Nombre}}</option>
@@ -85,7 +79,13 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarConsulta()">Consultar Materia Prima</button>
         <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="exportToExcel()">Exportar a Excel</button>
       </div>
+      <ng-container *ngIf="ValidarRol == 1">
+        <div style="text-align: right;">
+          <label for=""><b>Valor total: ${{valorTotal | currency : 'COP '}}</b></label>
+        </div>
+      </ng-container>
     </div>
   </form>
 
@@ -98,7 +98,6 @@
     <div class="mb-2">
       <div class="row g-1">
         <div class="table-responsive">
-          <!-- <div id="html2Pdf"> -->
           <table class="table table-bordered" id="table">
             <thead class="TitulosTabla">
               <tr *ngFor="let columnas of titulosTabla let i = index">
@@ -141,23 +140,6 @@
               </tr>
             </tbody>
           </table>
-          <!-- <div class="mb-2">
-            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <pagination-controls (pageChange)="page = $event"></pagination-controls>
-            </div>
-          </div> -->
-        </div>
-      </div>
-
-      <ng-container *ngIf="ValidarRol == 1">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <label for=""><b>Valor total: $</b></label>
-          <label for="">${{valorTotal | currency : 'COP '}}</label>
-        </div>
-      </ng-container>
-      <div class="mb-1">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class="btn btn-danger btn-danger-sm" type="button" (click)="exportToExcel()">Exportar a Excel</button>
         </div>
       </div>
     </div>
