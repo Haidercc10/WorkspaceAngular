@@ -1,6 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { Detalles_EntradaTintasService } from 'src/app/Servicios/Detalles_EntradaTintas.service';
+import { Entrada_TintaService } from 'src/app/Servicios/Entrada_Tinta.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { TintasService } from 'src/app/Servicios/tintas.service';
 import Swal from 'sweetalert2';
@@ -30,7 +32,9 @@ export class Entrada_TintasComponent implements OnInit {
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
                   private frmBuilder : FormBuilder,
-                        private tintasService : TintasService) {
+                        private tintasService : TintasService,
+                          private entradasTintasService : Entrada_TintaService,
+                            private detallesEntTintasService : Detalles_EntradaTintasService,) {
 
     this.FormEntradaTintas = this.frmBuilder.group({
       IdTinta : [''],
@@ -177,7 +181,6 @@ export class Entrada_TintasComponent implements OnInit {
     let idTinta : number = this.FormEntradaTintas.value.IdTinta;
     let Tinta : any = this.FormEntradaTintas.value.Tinta;
     let cantTinta : number = this.FormEntradaTintas.value.cantidadTinta;
-    let observacion : string = this.FormEntradaTintas.value.Observacion;
 
     let info : any = {
       IdTinta : idTinta,
@@ -201,7 +204,14 @@ export class Entrada_TintasComponent implements OnInit {
       }
     }
     this.ArrayvalidarTintas.push(idTinta);
-    this.limpiarCampos();
+    this.FormEntradaTintas = this.frmBuilder.group({
+      IdTinta : '',
+      Tinta : '',
+      cantidadTinta : '',
+      undMedTinta : 'Kg',
+      Observacion : this.FormEntradaTintas.value.Observacion,
+      Fecha : this.today,
+    });
   }
 
   // Función para quitar una de las tintas de la tabla
@@ -235,9 +245,41 @@ export class Entrada_TintasComponent implements OnInit {
     this.buscarTintaId();
   }
 
+  // Funcion para crear la entrada de las tintas
+  crearEntradaTintas(){
+    this.load = false;
+    let fecha : any = this.today;
+    let usuario : number = this.storage_Id;
+    let observacion : string = this.FormEntradaTintas.value.Observacion;
+
+    let info : any = {
+      entTinta_FechaEntrada : fecha,
+      Usua_Id : usuario,
+      entTinta_Observacion : observacion
+    }
+    this.entradasTintasService.srvGuardar(info).subscribe(datos_entrada => {
+      setTimeout(() => {
+        this.entradasTintasService.srvObtenerUltimoId().subscribe(datos_ultEntrada => { this.crearDetallesEntradaTintas(datos_ultEntrada); });
+      }, 500);
+    });
+  }
+
+  // Funcion que creará los detalles de la entrada de tintas, es decir, cada una de las tintas con sus correspondientes cantidades
+  crearDetallesEntradaTintas(ultimaEntrada : any){
+    for (let i = 0; i < this.ArrayTintas.length; i++) {
+      let tintas : any = {
+        EntTinta_Id : ultimaEntrada.entTinta_Id,
+        Tinta_Id : this.ArrayTintas[i].IdTinta,
+        dtEntTinta_Cantidad : this.ArrayTintas[i].CantTinta,
+        UndMed_Id : this.ArrayTintas[i].UndMed,
+      }
+      this.detallesEntTintasService.srvGuardar(tintas).subscribe(datos_tintas => { })
+    }
+    setTimeout(() => { this.moverInventario(); }, 100);
+  }
+
   // Funcion para mover el inventario de las tintas
   moverInventario(){
-    this.load = false;
     for (let i = 0; i < this.ArrayTintas.length; i++) {
       this.tintasService.srvObtenerListaPorId(this.ArrayTintas[i].IdTinta).subscribe(datos_tintas => {
         let info : any = {
@@ -271,8 +313,6 @@ export class Entrada_TintasComponent implements OnInit {
         });
       });
     }
-    setTimeout(() => {
-      this.limpiarTodo();
-    }, 2000);
+    setTimeout(() => { this.limpiarTodo(); }, 2000);
   }
 }

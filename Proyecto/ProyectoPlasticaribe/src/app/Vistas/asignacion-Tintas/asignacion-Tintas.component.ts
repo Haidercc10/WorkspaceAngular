@@ -365,6 +365,11 @@ export class AsignacionTintasComponent implements OnInit {
       let ultimoId : number = Math.max.apply(null, idsAsignaciones);
       this.mpAsignada(ultimoId);
     });
+
+    // this.asignacionMPxTintas.srvObtenerUltimaAsignacion().subscribe(datos_asignaciones => {
+    //   // this.mpAsignada(datos_asignaciones.asigMp_Id);
+    //   console.log(datos_asignaciones)
+    // });
   }
 
   // Funcion que creará el resgitro donde queda detallado que materia prima se pidio, cuanto y a qye asignacion pertenece

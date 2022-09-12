@@ -360,12 +360,10 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
 
   // Funcion que se encargará de obtener el ultimo Id de las facturas
   obtenerUltimoIdRecuperado(){
-    let idsRecuperado = [];
-    this.recuperadoService.srvObtenerLista().subscribe(datos_recuperados => {
+    this.recuperadoService.srvObtenerUltimaAsignacion().subscribe(datos_recuperados => {
       for (let index = 0; index < datos_recuperados.length; index++) {
-        idsRecuperado.push(datos_recuperados[index].recMp_Id);
+        this.ultimoIdRecuperado = (datos_recuperados[index].recMp_Id);
       }
-      this.ultimoIdRecuperado = Math.max.apply(null, idsRecuperado);
       this.creacionRecuperadoMateriaPrima(this.ultimoIdRecuperado);
     });
   }

@@ -23,6 +23,10 @@ export class AsignacionMPService {
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrima/${dato}`);
     }
 
+    srvObtenerUltimaAsignacion(){
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrima/ultimoId`);
+    }
+
     srvObtenerListaPorOt(dato : any){
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrima/ot/${dato}`);
     }

@@ -20,6 +20,10 @@ export class DevolucionesService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Devolucion_MatPrima')
   }
 
+  srvObtenerUltimaAsignacion(){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Devolucion_MatPrima/ultimoId`);
+  }
+
   srvObtenerListaPorId(id : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Devolucion_MatPrima/${id}`);
   }

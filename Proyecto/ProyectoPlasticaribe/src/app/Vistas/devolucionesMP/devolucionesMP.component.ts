@@ -128,7 +128,7 @@ export class DevolucionesMPComponent implements OnInit {
     this.obtenerMateriasPrimasRetiradas();
     this.obtenerProcesos();
   }
-  
+
   onChangeSearch(val: string) {
     if (val != '') this.validarInput = false;
     else this.validarInput = true;
@@ -276,12 +276,8 @@ export class DevolucionesMPComponent implements OnInit {
 
   // Funcion que se encargará de obtener el ultimo Id de las facturas
   obtenerUltimoIdDevolcuion(){
-    let idsDevolucion = [];
-    this.devolucionService.srvObtenerLista().subscribe(datos_devolucion => {
-      for (let index = 0; index < datos_devolucion.length; index++) {
-        idsDevolucion.push(datos_devolucion[index].devMatPri_Id);
-      }
-      this.ultimoIDevolucion = Math.max.apply(null, idsDevolucion);
+    this.devolucionService.srvObtenerUltimaAsignacion().subscribe(datos_devolucion => {
+      this.ultimoIDevolucion = datos_devolucion.devMatPri_Id;
       this.obtenerIdProceso();
     });
   }

@@ -18,6 +18,10 @@ export class AsignacionMPxTintasService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Asignacion_MatPrimaXTinta');
   }
 
+  srvObtenerUltimaAsignacion(){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrimaXTinta/ultimoId`);
+  }
+
   srvObtenerListaPorId(id : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrimaXTinta/${id}`);
   }

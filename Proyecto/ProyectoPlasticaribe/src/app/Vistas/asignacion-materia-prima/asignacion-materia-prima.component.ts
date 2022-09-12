@@ -314,33 +314,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let fechaEntrega : any = this.FormMateriaPrimaRetiro.value.FechaRetiro;
     let observacion : string = this.FormMateriaPrimaRetiro.value.ObservacionRetiro;
     let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina;
-    // this.cantidadAsignada = 0;
-    // const datosAsignacion : any = {
-    //   AsigMP_OrdenTrabajo : idOrdenTrabajo,
-    //   AsigMp_FechaEntrega : fechaEntrega,
-    //   AsigMp_Observacion : observacion,
-    //   Estado_Id : 13,
-    //   AsigMp_Maquina : maquina,
-    //   Usua_Id : this.storage_Id,
-    // }
-    // this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => {
-    //   this.obtenerUltimoIdAsignacaion();
-    // });
-    /* Consulta en la tabla de asignaciones la ot y suma la cantidad que se le ha asignado a dicha OT  */
-
     if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
-      // this.asignacionMPService.srvObtenerListaPorOt(idOrdenTrabajo).subscribe(datos_asigncaion => {
-      //   for (let index = 0; index < datos_asigncaion.length; index++) {
-      //     this.detallesAsignacionService.srvObtenerLista().subscribe(datos_asignacionMP => {
-      //       for (let i = 0; i < datos_asignacionMP.length; i++) {
-      //         if (datos_asigncaion[index].asigMp_Id == datos_asignacionMP[i].asigMp_Id) {
-      //           this.cantidadAsignada += datos_asignacionMP[i].dtAsigMp_Cantidad;
-      //         }
-      //       }
-      //     });
-      //   }
-      // });
-
       setTimeout(() => {
         this.load = false;
         if (this.cantidadAsignada <= this.cantRestante) {
@@ -366,34 +340,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   //Funcion que va a buscar y obtener el id de la ultima asignacion
   obtenerUltimoIdAsignacaion(){
-    let idsAsignaciones = [];
-    this.asignacionMPService.srvObtenerLista().subscribe(datos_asignaciones => {
-      for (let index = 0; index < datos_asignaciones.length; index++) {
-        idsAsignaciones.push(datos_asignaciones[index].asigMp_Id);
-      }
-      let ultimoId : number = Math.max.apply(null, idsAsignaciones);
-      this.obtenerProcesoId(ultimoId);
+    this.asignacionMPService.srvObtenerUltimaAsignacion().subscribe(datos_asignaciones => {
+      this.obtenerProcesoId(datos_asignaciones.asigMp_Id);
     });
   }
 
   obtenerProcesoId(asigncaion : number){
-    // for (const item of this.ArrayMateriaPrimaRetirada) {
-    //   this.procesosService.srvObtenerLista().subscribe(datos_proceso => {
-    //     for (let i = 0; i < datos_proceso.length; i++) {
-    //       if (datos_proceso[i].proceso_Nombre == item.Proceso) {
-    //         let idMateriaPrima = item.Id;
-    //         let cantidadMateriaPrima = item.Cant;
-    //         let presentacionMateriaPrima = item.UndCant;
-    //         let proceso : string = datos_proceso[i].proceso_Id;
-    //         this.detallesAsignacionMP(asigncaion,
-    //                                   idMateriaPrima,
-    //                                   cantidadMateriaPrima,
-    //                                   presentacionMateriaPrima,
-    //                                   proceso);
-    //       }
-    //     }
-    //   });
-    // }
     for (let index = 0; index < this.ArrayMateriaPrimaRetirada.length; index++) {
       this.procesosService.srvObtenerLista().subscribe(datos_proceso => {
         for (let i = 0; i < datos_proceso.length; i++) {

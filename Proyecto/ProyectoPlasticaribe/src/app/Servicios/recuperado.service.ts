@@ -12,43 +12,47 @@ export class RecuperadoService {
   readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
-    constructor(private http : HttpClient) { }
+  constructor(private http : HttpClient) { }
 
   //Metodo buscar lista de proveedor
-    srvObtenerLista():Observable<any[]> {
-        return this.http.get<any>(this.rutaPlasticaribeAPI + '/Recuperado_MatPrima')
-    }
+  srvObtenerLista():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Recuperado_MatPrima')
+  }
 
-    srvObtenerListaPorId(id : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/${id}`);
-    }
+  srvObtenerUltimaAsignacion():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Recuperado_MatPrima/ultimoId')
+  }
 
-    srvObtenerListaPorFecha(id : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/fecha/${id}`);
-    }
+  srvObtenerListaPorId(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/${id}`);
+  }
 
-    srvObtenerListaPorFechas(fecha1 : any, fecha2 : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/fechas?RecMp_FechaIngreso1=${fecha1}&RecMp_FechaIngreso2=${fecha2}`);
-    }
+  srvObtenerListaPorFecha(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/fecha/${id}`);
+  }
 
-  //Metodo agregar proveedor
-    srvAgregar(data:any) {
-      return this.http.post(this.rutaPlasticaribeAPI + '/Recuperado_MatPrima', data)
-    }
+  srvObtenerListaPorFechas(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/fechas?RecMp_FechaIngreso1=${fecha1}&RecMp_FechaIngreso2=${fecha2}`);
+  }
 
-  //Metodo actualzar proveedor
-    srvActualizar(id:number|String, data:any) {
-      return this.http.put(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/${id}`, data);
-    }
+//Metodo agregar proveedor
+  srvAgregar(data:any) {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Recuperado_MatPrima', data)
+  }
 
-  //Metodo eliminar proveedor
-    srvEliminar(id:number|String) {
-      return this.http.delete(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/${id}`);
-    }
+//Metodo actualzar proveedor
+  srvActualizar(id:number|String, data:any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/${id}`, data);
+  }
 
-    //Metodo Guardar proveedor con un modelo
-    srvGuardar(data : modelRecuperado): Observable<any> {
-     return this.http.post(this.rutaPlasticaribeAPI + '/Recuperado_MatPrima', data);
-   }
+//Metodo eliminar proveedor
+  srvEliminar(id:number|String) {
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Recuperado_MatPrima/${id}`);
+  }
+
+  //Metodo Guardar proveedor con un modelo
+  srvGuardar(data : modelRecuperado): Observable<any> {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Recuperado_MatPrima', data);
+  }
 
 }
