@@ -18,14 +18,6 @@ export class MenuLateralComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  subir : boolean = true;
-  subir1 : boolean = true;
-  subir2 : boolean = true;
-  subir3 : boolean = true;
-  subir4 : boolean = true;
-  subir5 : boolean = true;
-  subir6 : boolean = true;
-  subir7 : boolean = true;
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService) { }
@@ -60,42 +52,6 @@ export class MenuLateralComponent implements OnInit {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) window.location.href = "./";
     })
-  }
-
-  // Funcion que hacer que aparezca un icono u otro
-  clickIcon1(){
-    if (this.subir1) this.subir1 = false;
-    else this.subir1 = true;
-  }
-
-  clickIcon2(){
-    if (this.subir2) this.subir2 = false;
-    else this.subir2 = true;
-  }
-
-  clickIcon3(){
-    if (this.subir3) this.subir3 = false;
-    else this.subir3 = true;
-  }
-
-  clickIcon4(){
-    if (this.subir4) this.subir4 = false;
-    else this.subir4 = true;
-  }
-
-  clickIcon5(){
-    if (this.subir5) this.subir5 = false;
-    else this.subir5 = true;
-  }
-
-  clickIcon6(){
-    if (this.subir6) this.subir6 = false;
-    else this.subir6 = true;
-  }
-
-  clickIcon7(){
-    if (this.subir7) this.subir7 = false;
-    else this.subir7 = true;
   }
 
 }
