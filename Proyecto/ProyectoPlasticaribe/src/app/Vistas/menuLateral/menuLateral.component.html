@@ -7,7 +7,10 @@
         </div>
       </div>
       <div class="sidebar-header">
-        <h4 class="nombreUsuario">{{storage_Nombre}}</h4>
+        <h4 class="nombreUsuario">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" style="width: 30px;"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg>
+          {{storage_Nombre}}
+        </h4>
         <h6 class="tipoUsuario">{{storage_Rol}}</h6>
       </div>
 
@@ -17,32 +20,42 @@
         <!-- INICIO -->
         <li>
           <a class="fw-normal" href="home" role="button">
-            Inicio
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" style="width: 15px; margin-right: 3%;"><path d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"/></svg>
+            <b>Inicio</b>
           </a>
         </li>
 
         <!-- BOPP -->
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
           <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample">
-                BOPP
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" (click)="clickIcon1()" aria-controls="collapseExample">
+              <ng-container *ngIf="subir1; then thenTemplate1; else elseTemplate1"></ng-container>
+              <ng-template #thenTemplate1>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-bottom: 10px;  margin-right: 3%;"><path d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z"/></svg>
+              </ng-template>
+              <ng-template #elseTemplate1>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-top: 10px;  margin-right: 3%;"><path d="M279 224H41c-21.4 0-32.1-25.9-17-41L143 64c9.4-9.4 24.6-9.4 33.9 0l119 119c15.2 15.1 4.5 41-16.9 41z"/></svg>
+              </ng-template>
+              <b>BOPP</b>
             </a>
             <div class="collapse" id="collapseExample1">
               <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
-                <div class="mb-2">
+                 <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/AsignacionBOPPTemporal" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                     Asignación de BOPP
                   </a>
                 </div>
               </ng-container>
               <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
-                <div class="mb-2">
+                 <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/entrada-BOPP" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                     Entrada de BOPP
                   </a>
                 </div>
               </ng-container>
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <hr>
               </div>
             </div>
@@ -51,12 +64,20 @@
 
         <!-- GESTOR DE ARCHIVOS -->
         <li>
-          <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample">
-            Gestor de Archivos
+          <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" (click)="clickIcon2()" aria-controls="collapseExample">
+            <ng-container *ngIf="subir2; then thenTemplate; else elseTemplate"></ng-container>
+              <ng-template #thenTemplate>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-bottom: 10px; margin-right: 3%;"><path d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z"/></svg>
+              </ng-template>
+              <ng-template #elseTemplate>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-top: 10px; margin-right: 3%;"><path d="M279 224H41c-21.4 0-32.1-25.9-17-41L143 64c9.4-9.4 24.6-9.4 33.9 0l119 119c15.2 15.1 4.5 41-16.9 41z"/></svg>
+              </ng-template>
+              <b>Gestor de Archivos</b>
           </a>
           <div class="collapse" id="collapseExample2">
-            <div class="mb-2">
+             <div class="mb-2 sangria">
               <a class="fst-normal" data-bs-toggle="" href="/Archivos" role="button" aria-expanded="false" aria-controls="">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                 Archivos
               </a>
             </div>
@@ -66,43 +87,56 @@
         <!-- MATERIAS PRIMAS -->
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
           <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample">
-                Materia Prima
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample3" role="button" (click)="clickIcon3()"  aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir3; then thenTemplate; else elseTemplate"></ng-container>
+              <ng-template #thenTemplate>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-bottom: 10px; margin-right: 3%;"><path d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z"/></svg>
+              </ng-template>
+              <ng-template #elseTemplate>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-top: 10px; margin-right: 3%;"><path d="M279 224H41c-21.4 0-32.1-25.9-17-41L143 64c9.4-9.4 24.6-9.4 33.9 0l119 119c15.2 15.1 4.5 41-16.9 41z"/></svg>
+              </ng-template>
+              <b>Materia Prima</b>
             </a>
             <div class="collapse" id="collapseExample3">
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <a class="fst-normal" data-bs-toggle="" href="/asignacionMP" role="button" aria-expanded="false" aria-controls="">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                   Asignaciones MP
                 </a>
               </div>
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <a class="fst-normal" data-bs-toggle="" href="/asignacion-tintas" role="button" aria-expanded="false" aria-controls="">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                   Asignación Tintas
                 </a>
               </div>
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <a class="fst-normal" data-bs-toggle="" href="/mp-devoluciones" role="button" aria-expanded="false" aria-controls="">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                   Devoluciones
                 </a>
               </div>
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <a class="fst-normal" data-bs-toggle="" href="/MateriaPrima" role="button" aria-expanded="false" aria-controls="">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                   Entradas
                 </a>
               </div>
               <ng-container *ngIf="ValidarRol == 1">
-                <div class="mb-2">
+                 <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/materias_primas" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                     Materias Primas
                   </a>
                 </div>
               </ng-container>
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <a class="fst-normal" data-bs-toggle="" href="/mp-recuperada" role="button" aria-expanded="false" aria-controls="">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                   Recuperado
                 </a>
               </div>
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <hr>
               </div>
             </div>
@@ -112,18 +146,26 @@
         <!-- ORDEN DE TRABAJO -->
         <ng-container *ngIf="ValidarRol == 1">
           <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample4" role="button" aria-expanded="false" aria-controls="collapseExample">
-                Orden de Trabajo
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample4" role="button" (click)="clickIcon4()" aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir4; then thenTemplate; else elseTemplate"></ng-container>
+              <ng-template #thenTemplate>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-bottom: 10px; margin-right: 3%;"><path d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z"/></svg>
+              </ng-template>
+              <ng-template #elseTemplate>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-top: 10px; margin-right: 3%;"><path d="M279 224H41c-21.4 0-32.1-25.9-17-41L143 64c9.4-9.4 24.6-9.4 33.9 0l119 119c15.2 15.1 4.5 41-16.9 41z"/></svg>
+              </ng-template>
+              <b>Orden de Trabajo</b>
             </a>
             <div class="collapse" id="collapseExample4">
               <ng-container *ngIf="ValidarRol == 1">
-                <div class="mb-2">
+                 <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/ordenes-trabajo" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                     Crear OT
                   </a>
                 </div>
               </ng-container>
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <hr>
               </div>
             </div>
@@ -133,21 +175,30 @@
         <!-- PEDIDOS -->
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2">
           <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample5" role="button" aria-expanded="false" aria-controls="collapseExample">
-              Pedidos
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample5" role="button" (click)="clickIcon5()" aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir5; then thenTemplate; else elseTemplate"></ng-container>
+              <ng-template #thenTemplate>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-bottom: 10px; margin-right: 3%;"><path d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z"/></svg>
+              </ng-template>
+              <ng-template #elseTemplate>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-top: 10px; margin-right: 3%;"><path d="M279 224H41c-21.4 0-32.1-25.9-17-41L143 64c9.4-9.4 24.6-9.4 33.9 0l119 119c15.2 15.1 4.5 41-16.9 41z"/></svg>
+              </ng-template>
+              <b>Pedidos</b>
             </a>
             <div class="collapse" id="collapseExample5">
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <a class="fst-normal" data-bs-toggle="" href="pedido-externo" role="button" aria-expanded="false">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                   Pedidos Externos
                 </a>
               </div>
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <a class="fst-normal" data-bs-toggle="" href="opedidoproducto" role="button" aria-expanded="false">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                   Ver Pedidos
                 </a>
               </div>
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <hr>
               </div>
             </div>
@@ -157,18 +208,26 @@
         <!-- PRODUCTOS -->
         <ng-container *ngIf="ValidarRol == 1">
           <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample6" role="button" aria-expanded="false" aria-controls="collapseExample">
-              Productos
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample6" role="button" (click)="clickIcon6()" aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir6; then thenTemplate; else elseTemplate"></ng-container>
+              <ng-template #thenTemplate>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-bottom: 10px; margin-right: 3%;"><path d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z"/></svg>
+              </ng-template>
+              <ng-template #elseTemplate>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-top: 10px; margin-right: 3%;"><path d="M279 224H41c-21.4 0-32.1-25.9-17-41L143 64c9.4-9.4 24.6-9.4 33.9 0l119 119c15.2 15.1 4.5 41-16.9 41z"/></svg>
+              </ng-template>
+              <b>Productos</b>
             </a>
             <div class="collapse" id="collapseExample6">
               <ng-container *ngIf="ValidarRol == 1">
-                <div class="mb-2">
+                 <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/inventario-productos-terminados" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                     Producto Terminado
                   </a>
                 </div>
               </ng-container>
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <hr>
               </div>
             </div>
@@ -178,51 +237,64 @@
         <!-- REPORTES -->
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
           <li>
-            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7" role="button" aria-expanded="false" aria-controls="collapseExample">
-              Reportes
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7" role="button" (click)="clickIcon7()" aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir7; then thenTemplate7; else elseTemplate7"></ng-container>
+              <ng-template #thenTemplate7>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-bottom: 10px; margin-right: 3%;"><path d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z"/></svg>
+              </ng-template>
+              <ng-template #elseTemplate7>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-top: 10px; margin-right: 3%;"><path d="M279 224H41c-21.4 0-32.1-25.9-17-41L143 64c9.4-9.4 24.6-9.4 33.9 0l119 119c15.2 15.1 4.5 41-16.9 41z"/></svg>
+              </ng-template>
+              <b>Reportes</b>
             </a>
             <div class="collapse" id="collapseExample7">
               <ng-container *ngIf="ValidarRol == 1">
-                <div class="mb-2">
+                 <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/reporte-facturas-remisiones-mp" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                     Entradas de Materia Prima
                   </a>
                 </div>
               </ng-container>
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                   Inventario de Materia Prima
                 </a>
               </div>
               <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
-                <div class="mb-2">
+                 <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                     Movimientos MP
                   </a>
                 </div>
               </ng-container>
               <ng-container *ngIf="ValidarRol == 1">
-                <div class="mb-2">
+                 <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/reporte-costos-ot" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                     Reportes de Costos
                   </a>
                 </div>
               </ng-container>
               <ng-container *ngIf="ValidarRol == 1">
-                <div class="mb-2">
+                 <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/reporte-estados-ot" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                     Reportes Estados OT
                   </a>
                 </div>
               </ng-container>
               <ng-container *ngIf="ValidarRol == 1">
-                <div class="mb-2">
+                 <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/reportes-procesos-ot" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                     Reporte Procesos OT
                   </a>
                 </div>
               </ng-container>
-              <div class="mb-2">
+               <div class="mb-2 sangria">
                 <hr>
               </div>
             </div>
@@ -248,7 +320,7 @@
         <!-- NOTIFICACIONES -->
 
       </ul>
-      <button class="btn btn-danger btn-danger-sm boton" id="boton_CerrarSesion" type="button"><li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br>Cerrar Seccion</li></button>
+      <button class="btn btn-danger btn-danger-sm boton" id="boton_CerrarSesion" type="button"><li class="fa fa-sign-out" aria-hidden="true" (click)="confimacionSalida()"><br><b>Cerrar Seccion</b></li></button>
     </nav>
   </mat-sidenav>
 
