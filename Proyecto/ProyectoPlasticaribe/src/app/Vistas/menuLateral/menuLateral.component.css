@@ -118,7 +118,6 @@ a, a:hover, a:focus {
     color: #fff;
     transition: all 0.3s;
     overflow-y: scroll;
-
 }
 
 #sidebar.active {
@@ -223,6 +222,7 @@ a, a:hover, a:focus {
 .btn-close{
   color: #fafafa;
   margin-top: 10px;
+  position: fixed;
 }
 
 .btn-close:hover{
@@ -254,6 +254,14 @@ mat-sidenav-content{
 .sangria{
   margin-left: 8%;
   font-size: 14px;
+  transition: all 5s ease;
+}
+
+
+.subSangria{
+  margin-left: 11%;
+  font-size: 14px;
+  transition: all 5s ease;
 }
 
 @media (max-width: 500px){

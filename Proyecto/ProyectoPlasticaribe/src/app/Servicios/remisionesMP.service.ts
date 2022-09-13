@@ -35,6 +35,22 @@ export class RemisionesMPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_MateriaPrima/MPFechaActual/${id}?Rem_Fecha=${fecha}`);
   }
 
+  srvObtenerListaMov0(fecha : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_MateriaPrima/consultaMovimiento0/${fecha}`);
+  }
+
+  srvObtenerListaMov1(materiaPrima : any, fecha : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_MateriaPrima/consultaMovimiento1/${materiaPrima}/${fecha}`);
+  }
+
+  srvObtenerListaMov2(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_MateriaPrima/consultaMovimientos2/${id}`);
+  }
+
+  srvObtenerListaMov3(fechaIncial : any, fechaFinal : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_MateriaPrima/consultaMovimientos3/${fechaIncial}/${fechaFinal}`);
+  }
+
 //Metodo agregar proveedor
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Remision_MateriaPrima', data)

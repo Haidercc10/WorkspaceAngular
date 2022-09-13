@@ -1,0 +1,170 @@
+<app-menuLateral></app-menuLateral>
+
+<div class="contain">
+  <div class="container-fluid">
+    <!-- Titulo principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Movimientos de Materia Prima</h2>
+    </div>
+
+    <!-- Linea principal -->
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Formulario con filtros de busqueda -->
+  <form [formGroup]="FormDocumentos">
+    <!-- Fila 1 -->
+    <div class="mb-3">
+      <div class="row g-3">
+        <!-- ID Documento -->
+        <div class="form-floating col-md-2">
+          <input formControlName="idDocumento" type="text" class="form-control" id="floatingInput"required >
+          <label for="floatingInput">Orden de trabajo</label>
+        </div>
+
+        <!-- Fecha inicial -->
+        <div class="form-floating col-md-2">
+          <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput"required >
+          <label for="floatingInput">Fecha Inicial</label>
+        </div>
+
+        <!-- Fecha final -->
+        <div class="form-floating col-md-2">
+          <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
+          <label for="floatingInput">Fecha Final</label>
+        </div>
+
+        <!-- Tipo Docuemtno -->
+        <div class="form-floating col-md-2">
+          <select formControlName="TipoDocumento" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+            <option [ngValue]="null" disabled selected>Seleccione Movimiento</option>
+            <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+              <option [ngValue]="tiposDocumentos.tpDoc_Id" *ngFor="let tiposDocumentos of tipoDocumento">{{tiposDocumentos.tpDoc_Nombre}}</option>
+            </ng-container>
+          </select>
+          <label for="floatingSelect">Tipo de Movimiento</label>
+        </div>
+
+        <!-- Materia Prima -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <div class="ng-autocomplete form-floating col-md form-control form-control-sm" style="width: 500%;">
+            <ng-autocomplete
+              class=""
+              [data]="ArrayMateriaPrima"
+              (selected)='selectEventMp($event)'
+              (inputChanged)='onChangeSearchMp($event)'
+              (inputFocused)='onFocusedMp($event)'
+              [searchKeyword]="keywordMp"
+              [itemTemplate]="itemTemplate"
+              [notFoundTemplate]="notFoundTemplate"
+              id="floatingInput"
+              formControlName="materiaPrima">
+            </ng-autocomplete>
+            <ng-template #itemTemplate let-item>
+              <a [innerHTML]="item.matPri_Nombre"></a>
+            </ng-template>
+            <ng-template #notFoundTemplate let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+            <label for="floatingInput" *ngIf="validarInputMp">Materia Prima</label>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Fila 2 -->
+    <div class="mb-3">
+      <div class="row g-3">
+        <!-- Estados -->
+        <ng-container *ngIf="ValidarRol == 1">
+          <div class="form-floating col-md-3">
+            <select formControlName="estado" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+              <option [ngValue]="estados.estado_Id" *ngFor="let estados of ArrayEstados">{{estados.estado_Nombre}}</option>
+            </select>
+            <label for="floatingSelect">Estado OT</label>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="mb-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="consultar()">Consultar Documento</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Tabla -->
+  <div *ngIf="load">
+    <div class="mb-2">
+      <div class="row g-1">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover mt-2">
+            <thead class="TitulosTabla">
+              <tr *ngFor="let columnas of titulosTabla let i = index">
+                <th id="CodigoFactura" scope="col">{{columnas.idFact}}</th>
+                <th id="Tipo" scope="col">{{columnas.tipo}}</th>
+                <th id="fecha" scope="col">{{columnas.FechaFact}}</th>
+                <th id="proveedor" scope="col">{{columnas.usuario}}</th>
+                <th id="mp" scope="col">{{columnas.mp}}</th>
+                <th id="cantMp" scope="col">{{columnas.cant}}</th>
+                <ng-container *ngIf="ValidarRol == 1">
+                  <th id="estado" scope="col">{{columnas.estado}}</th>
+                </ng-container>
+                <th id="ver" scope="col" >{{columnas.Ver}}</th>
+              </tr>
+              </thead>
+            <tbody>
+              <tr *ngFor="let doc of ArrayInfoConsulta | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
+                <td id="CodigoFactura" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.ot}}</td>
+                <td id="Tipo" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.tipo}}</td>
+                <td id="fecha" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
+                <td id="proveedor" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.usuario}}</td>
+                <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.matPrima}}</td>
+                <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.cant | number}}</td>
+                <ng-container *ngIf="ValidarRol == 1">
+                  <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.estado}}</td>
+                </ng-container>
+                <td id="subTotalMateriaPrima"><input class="btn btn-danger btn-danger-sm" type="button" value="Ver"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mb-2">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <pagination-controls (pageChange)="page = $event"></pagination-controls>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Imagen de Carga -->
+  <div class="overlay" *ngIf="!load">
+    <div class="spinner ">
+      <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+    </div>
+  </div>
+
+  <!-- Labels con información -->
+  <div *ngIf="load">
+    <div class="mb-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <label><b>Total Materia Prima Entregada: {{totalMPEntregada | number}} KG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
+          <label><b>Cantidad de KG Producida en total: {{kgProduciodosOT | number}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
+        </ng-container>
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <!-- <label><b>Total Materia Prima Devuelta: {{cantidadKgDevuelta | number}} KG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label> -->
+          <label><b>KG Restante Por Entregar: {{cantRestante | number}}</b></label>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

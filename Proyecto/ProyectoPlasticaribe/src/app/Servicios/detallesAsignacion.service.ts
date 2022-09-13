@@ -47,6 +47,33 @@ export class DetallesAsignacionService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/estadoOT/${estado}`);
   }
 
+  srvObtenerConsultaMov0(fechaIncial : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos0/${fechaIncial}`);
+  }
+
+  srvObtenerConsultaMov1(estado){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos1/${estado}`);
+  }
+
+  srvObtenerConsultaMov2(materiaPrima, fechaIncial : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos2/${materiaPrima}/${fechaIncial}`);
+  }
+
+  srvObtenerConsultaMov3(ot : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos3/${ot}`);
+  }
+
+  srvObtenerConsultaMov4(fechaIncial : any, fechaFinal : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos4/${fechaIncial}/${fechaFinal}`);
+  }
+
+  srvObtenerConsultaMov10(ot : number, fechaIncial : any, fechaFinal : any, materiaPrima, estado){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos1/${ot}/${fechaIncial}/${fechaFinal}/${materiaPrima}/${estado}`);
+  }
+
+  srvObtenerConsultaMov20(ot : number, fechaIncial : any, fechaFinal : any, materiaPrima){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos2/${ot}/${fechaIncial}/${fechaFinal}/${materiaPrima}`);
+  }
 
 //Metodo agregar
   srvAgregar(data:any) {

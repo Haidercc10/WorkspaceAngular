@@ -35,6 +35,22 @@ export class RecuperadoMPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/recuperado/${id}`);
   }
 
+  srvObtenerConsultaMov0(fechaIncial : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/consultaMovimientos0/${fechaIncial}`);
+  }
+
+  srvObtenerConsultaMov1(materiaPrima : any, fecha : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/consultaMovimiento1/${materiaPrima}/${fecha}`);
+  }
+
+  srvObtenerConsultaMov2(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/consultaMovimientos2/${id}`);
+  }
+
+  srvObtenerConsultaMov3(fechaIncial : any, fechaFinal : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/consultaMovimientos3/${fechaIncial}/${fechaFinal}`);
+  }
+
 //Metodo agregar proveedor
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/DetalleRecuperado_MateriaPrima', data)

@@ -306,6 +306,7 @@ export class MovimientoMPComponent implements OnInit {
   obtenerTipoDocumento(){
     this.tipoDocuemntoService.srvObtenerLista().subscribe(datos_tiposDocumentos => {
       for (let index = 0; index < datos_tiposDocumentos.length; index++) {
+        if (datos_tiposDocumentos[index].tpDoc_Id != 'RECP' && datos_tiposDocumentos[index].tpDoc_Id != 'DEVMP' && datos_tiposDocumentos[index].tpDoc_Id != 'ASGIBOPP' && datos_tiposDocumentos[index].tpDoc_Id != 'ASIGMP')
         this.tipoDocumento.push(datos_tiposDocumentos[index])
       }
     });

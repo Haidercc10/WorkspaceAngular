@@ -52,8 +52,8 @@ section .title::after{
 /* NAVBAR */
 .contenedorNavbar {
 	width: 100%;
-    padding: 15px 0;
-    background: #fff;
+  padding: 15px 0;
+  background: #fff;
 	color: #a23;
 	position: fixed;
 	z-index: 9999;
