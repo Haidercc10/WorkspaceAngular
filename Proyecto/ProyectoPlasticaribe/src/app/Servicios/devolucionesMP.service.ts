@@ -52,6 +52,18 @@ export class DevolucionesMPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleDevolucion_MateriaPrima/consultaMovimientos3/${fechaIncial}/${fechaFinal}`);
   }
 
+  srvObtenerConsultaMov4(fechaIncial : any, materiaPrima : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleDevolucion_MateriaPrima/consultaMovimientos4/${fechaIncial}/${materiaPrima}`);
+  }
+
+  srvObtenerConsultaMov5(ot : number, fechaIncial : any, fechaFinal : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleDevolucion_MateriaPrima/consultaMovimientos5/${ot}/${fechaIncial}/${fechaFinal}`);
+  }
+
+  srvObtenerConsultaMov6(fechaIncial : any, fechaFinal : any, materiaPrima){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleDevolucion_MateriaPrima/consultaMovimientos6/${fechaIncial}/${fechaFinal}/${materiaPrima}`);
+  }
+
   srvObtenerConsultaMov10(ot : number, fechaIncial : any, fechaFinal : any, materiaPrima){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleDevolucion_MateriaPrima/consultaMovimientos1/${ot}/${fechaIncial}/${fechaFinal}/${materiaPrima}`);
   }

@@ -50,29 +50,27 @@
         </div>
 
         <!-- Materia Prima -->
-        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
-          <div class="ng-autocomplete form-floating col-md form-control form-control-sm" style="width: 500%;">
-            <ng-autocomplete
-              class=""
-              [data]="ArrayMateriaPrima"
-              (selected)='selectEventMp($event)'
-              (inputChanged)='onChangeSearchMp($event)'
-              (inputFocused)='onFocusedMp($event)'
-              [searchKeyword]="keywordMp"
-              [itemTemplate]="itemTemplate"
-              [notFoundTemplate]="notFoundTemplate"
-              id="floatingInput"
-              formControlName="materiaPrima">
-            </ng-autocomplete>
-            <ng-template #itemTemplate let-item>
-              <a [innerHTML]="item.matPri_Nombre"></a>
-            </ng-template>
-            <ng-template #notFoundTemplate let-notFound>
-              <div [innerHTML]="notFound"></div>
-            </ng-template>
-            <label for="floatingInput" *ngIf="validarInputMp">Materia Prima</label>
-          </div>
-        </ng-container>
+        <div class="ng-autocomplete form-floating col-md form-control form-control-sm" style="width: 500%;">
+          <ng-autocomplete
+            class=""
+            [data]="ArrayMateriaPrima"
+            (selected)='selectEventMp($event)'
+            (inputChanged)='onChangeSearchMp($event)'
+            (inputFocused)='onFocusedMp($event)'
+            [searchKeyword]="keywordMp"
+            [itemTemplate]="itemTemplate"
+            [notFoundTemplate]="notFoundTemplate"
+            id="floatingInput"
+            formControlName="materiaPrima">
+          </ng-autocomplete>
+          <ng-template #itemTemplate let-item>
+            <a [innerHTML]="item.matPri_Nombre"></a>
+          </ng-template>
+          <ng-template #notFoundTemplate let-notFound>
+            <div [innerHTML]="notFound"></div>
+          </ng-template>
+          <label for="floatingInput" *ngIf="validarInputMp">Materia Prima</label>
+        </div>
       </div>
     </div>
 
@@ -157,13 +155,10 @@
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <label><b>Total Materia Prima Entregada: {{totalMPEntregada | number}} KG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
-        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
+        <ng-container *ngIf="ValidarRol == 1">
           <label><b>Cantidad de KG Producida en total: {{kgProduciodosOT | number}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
         </ng-container>
-        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
-          <!-- <label><b>Total Materia Prima Devuelta: {{cantidadKgDevuelta | number}} KG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label> -->
-          <label><b>KG Restante Por Entregar: {{cantRestante | number}}</b></label>
-        </ng-container>
+        <label><b>KG Restante Por Entregar: {{cantRestante | number}}</b></label>
       </div>
     </div>
   </div>
