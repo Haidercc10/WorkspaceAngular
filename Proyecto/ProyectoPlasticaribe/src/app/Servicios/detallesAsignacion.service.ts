@@ -88,11 +88,7 @@ export class DetallesAsignacionService {
   }
 
   srvObtenerConsultaMov10(ot : number, fechaIncial : any, fechaFinal : any, materiaPrima, estado){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos1/${ot}/${fechaIncial}/${fechaFinal}/${materiaPrima}/${estado}`);
-  }
-
-  srvObtenerConsultaMov20(ot : number, fechaIncial : any, fechaFinal : any, materiaPrima){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos2/${ot}/${fechaIncial}/${fechaFinal}/${materiaPrima}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos10/${ot}/${fechaIncial}/${fechaFinal}/${materiaPrima}/${estado}`);
   }
 
 //Metodo agregar

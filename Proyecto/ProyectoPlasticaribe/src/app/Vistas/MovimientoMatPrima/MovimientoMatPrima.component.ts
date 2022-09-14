@@ -221,6 +221,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
   consultar(){
     this.load = false;
     this.kgOT = 0;
+    this.totalMPEntregada = 0;
     this.ArrayInfoConsulta = [];
     this.kgProduciodosOT = 0;
     this.cantRestante = 0;
@@ -241,7 +242,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
           for (let i = 0; i < datos_asignacion.length; i++) {
             this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
               for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+                break;
               }
             });
             setTimeout(() => {
@@ -266,7 +268,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
           for (let i = 0; i < datos_asignacion.length; i++) {
             this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
               for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+                break;
               }
             });
             setTimeout(() => {
@@ -284,7 +287,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+              break;
             }
           });
           setTimeout(() => {
@@ -300,12 +304,13 @@ export class MovimientoMatPrimaComponent implements OnInit {
           for (let i = 0; i < datos_asignacion.length; i++) {
             this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
               for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+                break;
               }
             });
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].matPri_Id == materiaPrima && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+              if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
             }, 1500);
           }
         });
@@ -317,7 +322,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
           for (let i = 0; i < datos_asignacion.length; i++) {
             this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
               for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+                break;
               }
             });
             setTimeout(() => {
@@ -389,7 +395,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
           for (let i = 0; i < datos_asignacion.length; i++) {
             this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
               for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+                break;
               }
             });
             setTimeout(() => {
@@ -406,7 +413,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
           for (let i = 0; i < datos_asignacion.length; i++) {
             this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
               for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+                break;
               }
             });
             setTimeout(() => {
@@ -423,7 +431,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
           for (let i = 0; i < datos_asignacion.length; i++) {
             this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
               for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+                break;
               }
             });
             setTimeout(() => {
@@ -464,7 +473,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+              break;
             }
           });
           setTimeout(() => {
@@ -480,7 +490,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+              break;
             }
           });
           setTimeout(() => {
@@ -521,7 +532,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
           for (let i = 0; i < datos_asignacion.length; i++) {
             this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
               for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+                break;
               }
             });
             setTimeout(() => {
@@ -672,7 +684,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+              break;
             }
           });
           setTimeout(() => {
@@ -688,7 +701,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+              break;
             }
           });
           setTimeout(() => {
@@ -704,7 +718,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+              break;
             }
           });
           setTimeout(() => {
@@ -745,7 +760,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+              break;
             }
           });
           setTimeout(() => {
@@ -787,7 +803,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
           for (let i = 0; i < datos_asignacion.length; i++) {
             this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
               for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+                break;
               }
             });
             setTimeout(() => {
@@ -804,7 +821,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
           for (let i = 0; i < datos_asignacion.length; i++) {
             this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
               for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+                break;
               }
             });
             setTimeout(() => {
@@ -845,7 +863,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
           for (let i = 0; i < datos_asignacion.length; i++) {
             this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
               for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+                break;
               }
             });
             setTimeout(() => {
@@ -1014,7 +1033,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+              break;
             }
           });
           setTimeout(() => {
@@ -1030,7 +1050,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+              break;
             }
           });
           setTimeout(() => {
@@ -1071,7 +1092,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+              break;
             }
           });
           setTimeout(() => {
@@ -1112,7 +1134,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
           for (let i = 0; i < datos_asignacion.length; i++) {
             this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
               for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+                break;
               }
             });
             setTimeout(() => {
@@ -1153,13 +1176,14 @@ export class MovimientoMatPrimaComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           this.dtAsgMP.srvObtenerListaPorAsigId(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j].dtAsigMp_Cantidad;
+              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
+              break;
             }
           });
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
             this.llenarTabla(datos_asignacion[i], 'ASIGMP');
-          }, 1500);
+          }, 2000);
         }
       });
       // Devolución de materia prima
