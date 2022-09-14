@@ -63,6 +63,10 @@ export class RemisionesMPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_MateriaPrima/consultaMovimientos6/${fechaIncial}/${fechaFinal}/${materiaPrima}`);
   }
 
+  srvObtenerpdfMovimientos(codigo : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_MateriaPrima/pdfMovimientos/${codigo}`);
+  }
+
 //Metodo agregar proveedor
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Remision_MateriaPrima', data)

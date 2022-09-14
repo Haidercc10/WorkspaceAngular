@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import pdfMake from 'pdfmake/build/pdfmake';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
 import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service';
@@ -44,6 +45,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
   cantidadTotalKgOT = 0; //Variable que almacenará la cantidad de kilos que pidió una orden de trabajo
   ArrayEstados : any = []; //Variable en la que se almacenaran los estados que puede tener una orden de trabajo
   kgOT : number = 0; //Variable que va a almacenar la cantidad total de kilos que se estipularon para una orden de trabajo
+  ArrayMpPDF : any = [] //Variable que almacenará las materias primas del pdf que se esé consultando
 
   constructor(private rolService : RolesService,
                 private frmBuilderMateriaPrima : FormBuilder,
@@ -255,7 +257,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
       }
     } else if (tipoDoc != null && fechaIncial != null && fechaFinal != null && materiaPrima != null && estado != null) {
       if (tipoDoc == 'ASIGMP') {
-        this.dtAsgMP.srvObtenerConsultaMov5(fechaIncial, materiaPrima).subscribe(datos_asignacion => {
+        this.dtAsgMP.srvObtenerConsultaMov4(fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
             if (datos_asignacion[i].estado_OrdenTrabajo == estado && datos_asignacion[i].matPri_Id == materiaPrima) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
           }
@@ -1355,7 +1357,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
     if (tipoDoc == 'ASIGMP') {
       let info : any = {
         ot : datos.asigMP_OrdenTrabajo,
-        tipo : 'Asignación Materia Prima',
+        tipoId : 'ASIGMP',
+        tipo : 'Asignación de Materia Prima',
         fecha : datos.asigMp_FechaEntrega,
         usuario : datos.usua_Nombre,
         matPrima : datos.matPri_Nombre,
@@ -1363,10 +1366,10 @@ export class MovimientoMatPrimaComponent implements OnInit {
         estado : datos.estado_Nombre,
       }
       this.ArrayInfoConsulta.push(info);
-
     } else if (tipoDoc == 'DEVMP') {
       let info : any = {
         ot : datos.devMatPri_OrdenTrabajo,
+        tipoId : 'DEVMP',
         tipo : 'Devolución de Materia Prima',
         fecha : datos.devMatPri_Fecha,
         usuario : datos.usua_Nombre,
@@ -1378,6 +1381,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
     } else if (tipoDoc == 'FCO') {
       let info : any = {
         ot : datos.facco_Codigo,
+        tipoId : 'FCO',
         tipo : 'Factura de compra de MP',
         fecha : datos.facco_FechaFactura,
         usuario : datos.usua_Nombre,
@@ -1389,6 +1393,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
     } else if (tipoDoc == 'REM') {
       let info : any = {
         ot : datos.rem_Codigo,
+        tipoId : 'REM',
         tipo : 'Remisión de MP',
         fecha : datos.rem_Fecha,
         usuario : datos.usua_Nombre,
@@ -1400,6 +1405,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
     } else if (tipoDoc == 'RECP') {
       let info : any = {
         ot : datos.recMp_Id,
+        tipoId : 'RECP',
         tipo : 'Recuperado',
         fecha : datos.recMp_FechaIngreso,
         usuario : datos.usua_Nombre,
@@ -1411,5 +1417,540 @@ export class MovimientoMatPrimaComponent implements OnInit {
     }
     this.ArrayInfoConsulta.sort((a,b) => Number(a.ot) - Number(b.ot));
     this.ArrayInfoConsulta.sort((a,b) => b.fecha.localeCompare(a.fecha));
+  }
+
+  // Funcion que almacenará en una variable todas las materia primas del movimiento al que se le hizo la consulta
+  articulosPdf(data : any){
+    this.ArrayMpPDF = [];
+    this.load = false;
+    if (data.tipoId == 'ASIGMP') {
+      this.dtAsgMP.srvObtenerListaPorOT(data.ot).subscribe(datos_asignacion => {
+        for (let i = 0; i < datos_asignacion.length; i++) {
+          let items : any = {
+            Id : datos_asignacion[i].matPri_Id,
+            Nombre : datos_asignacion[i].matPri_Nombre,
+            Cant : this.formatonumeros(datos_asignacion[i].sum),
+            UndCant : datos_asignacion[i].undMed_Id,
+          }
+          this.ArrayMpPDF.push(items);
+        }
+        setTimeout(() => { this.verPDF(data); }, 2000);
+      });
+    } else if (data.tipoId == 'DEVMP') {
+      this.dtDevMP.srvObtenerpdfMovimientos(data.ot).subscribe(datos_devolucion => {
+        for (let i = 0; i < datos_devolucion.length; i++) {
+          let items : any = {
+            Id : datos_devolucion[i].matPri_Id,
+            Nombre : datos_devolucion[i].matPri_Nombre,
+            Cant : this.formatonumeros(datos_devolucion[i].dtDevMatPri_CantidadDevuelta),
+            UndCant : datos_devolucion[i].undMed_Id,
+          }
+          this.ArrayMpPDF.push(items);
+        }
+        setTimeout(() => { this.verPDF(data); }, 2000);
+      });
+    } else if (data.tipoId == 'FCO') {
+      this.dtFacturaMP.srvObtenerpdfMovimientos(data.ot).subscribe(datos_factura => {
+        for (let i = 0; i < datos_factura.length; i++) {
+          let items : any = {
+            Id : datos_factura[i].matPri_Id,
+            Nombre : datos_factura[i].matPri_Nombre,
+            Cant : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad),
+            UndCant : datos_factura[i].undMed_Id,
+            PrecioUnd : this.formatonumeros(datos_factura[i].faccoMatPri_ValorUnitario),
+            SubTotal : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad * datos_factura[i].faccoMatPri_ValorUnitario),
+          }
+          this.ArrayMpPDF.push(items);
+        }
+        setTimeout(() => { this.verPDF(data); }, 2000);
+      });
+    } else if (data.tipoId == 'REM') {
+      this.dtRemision.srvObtenerpdfMovimientos(data.ot).subscribe(datos_remision => {
+        for (let i = 0; i < datos_remision.length; i++) {
+          let items : any = {
+            Id : datos_remision[i].matPri_Id,
+            Nombre : datos_remision[i].matPri_Nombre,
+            Cant : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad),
+            UndCant : datos_remision[i].undMed_Id,
+            PrecioUnd : this.formatonumeros(datos_remision[i].remiMatPri_ValorUnitario),
+            SubTotal : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad * datos_remision[i].remiMatPri_ValorUnitario),
+          }
+          this.ArrayMpPDF.push(items);
+        }
+        setTimeout(() => { this.verPDF(data); }, 2000);
+      });
+    } else if (data.tipoId == 'RECP') {
+      this.dtRecuperado.srvObtenerpdfMovimientos(data.ot).subscribe(datos_recuperado => {
+        for (let i = 0; i < datos_recuperado.length; i++) {
+          let items : any = {
+            Id : datos_recuperado[i].matPri_Id,
+            Nombre : datos_recuperado[i].matPri_Nombre,
+            Cant : this.formatonumeros(datos_recuperado[i].recMatPri_Cantidad),
+            UndCant : datos_recuperado[i].undMed_Id,
+          }
+          this.ArrayMpPDF.push(items);
+        }
+        setTimeout(() => { this.verPDF(data); }, 2000);
+      });
+    }
+  }
+
+  // Funcion que permitirá ver la informacion del documento en un formato PDF
+  verPDF(data : any){
+    if (data.tipoId == 'ASIGMP') {
+      this.dtAsgMP.srvObtenerpdfMovimientos(data.ot).subscribe(datos_asignacion => {
+        for (let i = 0; i < datos_asignacion.length; i++) {
+          for (let j = 0; j < this.ArrayMpPDF.length; j++) {
+            const pdfDefinicion : any = {
+              info: {
+                title: `${datos_asignacion[i].asigMp_Id}`
+              },
+              content : [
+                {
+                  text: `Plasticaribe S.A.S ---- Asignación de Materia Prima`,
+                  alignment: 'center',
+                  style: 'titulo',
+                },
+                '\n \n',
+                {
+                  text: `Fecha de registro: ${datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00', '')}`,
+                  style: 'header',
+                  alignment: 'right',
+                },
+                {
+                  text: `Registrado Por: ${datos_asignacion[i].usua_Nombre}\n`,
+                  alignment: 'right',
+                  style: 'header',
+                },
+                {
+                  text: `\n Información la Asignación \n \n`,
+                  alignment: 'center',
+                  style: 'header'
+                },
+                {
+                  style: 'tablaCliente',
+                  table: {
+                    widths: ['*', '*', '*'],
+                    style: 'header',
+                    body: [
+                      [
+                        `OT: ${datos_asignacion[i].asigMP_OrdenTrabajo}`,
+                        `Maquina: ${datos_asignacion[i].asigMp_Maquina}`,
+                        `Proceso : ${datos_asignacion[i].proceso_Nombre}`
+                      ]
+                    ]
+                  },
+                  layout: 'lightHorizontalLines',
+                  fontSize: 12,
+                },
+                {
+                  text: `\n \nObervación sobre la remisión: \n ${datos_asignacion[i].asigMp_Observacion}\n`,
+                  style: 'header',
+                },
+                {
+                  text: `\n Información detallada de Materia(s) Prima(s) asignada(s) \n `,
+                  alignment: 'center',
+                  style: 'header'
+                },
+
+                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant']),
+              ],
+              styles: {
+                header: {
+                  fontSize: 10,
+                  bold: true
+                },
+                titulo: {
+                  fontSize: 15,
+                  bold: true
+                }
+              }
+            }
+            const pdf = pdfMake.createPdf(pdfDefinicion);
+            pdf.open();
+            break;
+          }
+          break;
+        }
+      });
+    } else if (data.tipoId == 'DEVMP') {
+      this.dtDevMP.srvObtenerpdfMovimientos(data.ot).subscribe(datos_devolucion => {
+        for (let i = 0; i < datos_devolucion.length; i++) {
+          for (let j = 0; j < this.ArrayMpPDF.length; j++) {
+            const pdfDefinicion : any = {
+              info: {
+                title: `${datos_devolucion[i].devMatPri_OrdenTrabajo}`
+              },
+              content : [
+                {
+                  text: `Plasticaribe S.A.S ---- Devolución de Materia Prima`,
+                  alignment: 'center',
+                  style: 'titulo',
+                },
+                '\n \n',
+                {
+                  text: `Fecha de registro: ${datos_devolucion[i].devMatPri_Fecha.replace('T00:00:00', '')}`,
+                  style: 'header',
+                  alignment: 'right',
+                },
+                {
+                  text: `Registrado Por: ${datos_devolucion[i].usua_Nombre}\n`,
+                  alignment: 'right',
+                  style: 'header',
+                },
+                {
+                  text: `\n Información la Asignación \n \n`,
+                  alignment: 'center',
+                  style: 'header'
+                },
+                {
+                  style: 'tablaCliente',
+                  table: {
+                    widths: ['*', '*', '*'],
+                    style: 'header',
+                    body: [
+                      [
+                        `Orden de Trabajo: ${datos_devolucion[i].devMatPri_OrdenTrabajo}`,
+                        ``,
+                        ``
+                      ]
+                    ]
+                  },
+                  layout: 'lightHorizontalLines',
+                  fontSize: 9,
+                },
+                {
+                  text: `\n \nObervación sobre la remisión: \n ${datos_devolucion[i].devMatPri_Motivo}\n`,
+                  style: 'header',
+                },
+                {
+                  text: `\n Información detallada de Materia(s) Prima(s) asignada(s) \n `,
+                  alignment: 'center',
+                  style: 'header'
+                },
+
+                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant']),
+              ],
+              styles: {
+                header: {
+                  fontSize: 8,
+                  bold: true
+                },
+                titulo: {
+                  fontSize: 15,
+                  bold: true
+                }
+              }
+            }
+            const pdf = pdfMake.createPdf(pdfDefinicion);
+            pdf.open();
+            break;
+          }
+        }
+      });
+    } else if (data.tipoId == 'FCO') {
+      this.dtFacturaMP.srvObtenerpdfMovimientos(data.ot).subscribe(datos_factura => {
+        for (let i = 0; i < datos_factura.length; i++) {
+          for (let mp = 0; mp < this.ArrayMpPDF.length; mp++) {
+            const pdfDefinicion : any = {
+              info: {
+                title: `${data.ot}`
+              },
+              content : [
+                {
+                  text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
+                  alignment: 'center',
+                  style: 'titulo',
+                },
+                '\n \n',
+                {
+                  text: `Fecha de registro: ${datos_factura[i].facco_FechaFactura.replace('T00:00:00', '')}`,
+                  style: 'header',
+                  alignment: 'right',
+                },
+                {
+                  text: `Registrado Por: ${datos_factura[i].usua_Nombre}\n`,
+                  alignment: 'right',
+                  style: 'header',
+                },
+                {
+                  text: `\n Información detallada del Proveedor \n \n`,
+                  alignment: 'center',
+                  style: 'header'
+                },
+                {
+                  style: 'tablaCliente',
+                  table: {
+                    widths: ['*', '*', '*'],
+                    style: 'header',
+                    body: [
+                      [
+                        `ID: ${datos_factura[i].prov_Id}`,
+                        `Tipo de ID: ${datos_factura[i].tipoIdentificacion_Id}`,
+                        `Tipo de Proveedor: ${datos_factura[i].tpProv_Nombre}`
+                      ],
+                      [
+                        `Nombre: ${datos_factura[i].prov_Nombre}`,
+                        `Telefono: ${datos_factura[i].prov_Telefono}`,
+                        `Ciudad: ${datos_factura[i].prov_Ciudad}`
+                      ],
+                      [
+                        `E-mail: ${datos_factura[i].prov_Email}`,
+                        ``,
+                        ``
+                      ]
+                    ]
+                  },
+                  layout: 'lightHorizontalLines',
+                  fontSize: 9,
+                },
+                {
+                  text: `\n \nObervación sobre la factura: \n ${datos_factura[i].facco_Observacion}\n`,
+                  style: 'header',
+                },
+                {
+                  text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
+                  alignment: 'center',
+                  style: 'header'
+                },
+
+                this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+
+                {
+                  text: `\n\nValor Total Factura: $${this.formatonumeros(datos_factura[i].facco_ValorTotal)}`,
+                  alignment: 'right',
+                  style: 'header',
+                }
+              ],
+              styles: {
+                header: {
+                  fontSize: 8,
+                  bold: true
+                },
+                titulo: {
+                  fontSize: 15,
+                  bold: true
+                }
+              }
+            }
+            const pdf = pdfMake.createPdf(pdfDefinicion);
+            pdf.open();
+            break;
+          }
+          break;
+        }
+      });
+    } else if (data.tipoId == 'REM') {
+      this.dtRemision.srvObtenerpdfMovimientos(data.ot).subscribe(datos_remision => {
+        for (let i = 0; i < datos_remision.length; i++) {
+          for (let j = 0; j < this.ArrayMpPDF.length; j++) {
+            const pdfDefinicion : any = {
+              info: {
+                title: `${data.ot}`
+              },
+              content : [
+                {
+                  text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
+                  alignment: 'center',
+                  style: 'titulo',
+                },
+                '\n \n',
+                {
+                  text: `Fecha de registro: ${datos_remision[i].rem_Fecha.replace('T00:00:00', '')}`,
+                  style: 'header',
+                  alignment: 'right',
+                },
+                {
+                  text: `Registrado Por: ${datos_remision[i].usua_Nombre}\n`,
+                  alignment: 'right',
+                  style: 'header',
+                },
+                {
+                  text: `\n Información detallada del Proveedor \n \n`,
+                  alignment: 'center',
+                  style: 'header'
+                },
+                {
+                  style: 'tablaCliente',
+                  table: {
+                    widths: ['*', '*', '*'],
+                    style: 'header',
+                    body: [
+                      [
+                        `ID: ${datos_remision[i].prov_Id}`,
+                        `Tipo de ID: ${datos_remision[i].tipoIdentificacion_Id}`,
+                        `Tipo de Proveedor: ${datos_remision[i].tpProv_Nombre}`
+                      ],
+                      [
+                        `Nombre: ${datos_remision[i].prov_Nombre}`,
+                        `Telefono: ${datos_remision[i].prov_Telefono}`,
+                        `Ciudad: ${datos_remision[i].prov_Ciudad}`
+                      ],
+                      [
+                        `E-mail: ${datos_remision[i].prov_Email}`,
+                        ``,
+                        ``
+                      ]
+                    ]
+                  },
+                  layout: 'lightHorizontalLines',
+                  fontSize: 9,
+                },
+                {
+                  text: `\n \nObervación sobre la remisión: \n ${datos_remision[i].rem_Observacion}\n`,
+                  style: 'header',
+                },
+                {
+                  text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
+                  alignment: 'center',
+                  style: 'header'
+                },
+
+                this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+              ],
+              styles: {
+                header: {
+                  fontSize: 8,
+                  bold: true
+                },
+                titulo: {
+                  fontSize: 15,
+                  bold: true
+                }
+              }
+            }
+            const pdf = pdfMake.createPdf(pdfDefinicion);
+            pdf.open();
+            break;
+          }
+          break;
+        }
+      });
+    } else if (data.tipoId == 'RECP') {
+      this.dtRecuperado.srvObtenerpdfMovimientos(data.ot).subscribe(datos_recuperado => {
+        for (let i = 0; i < datos_recuperado.length; i++) {
+          for (let j = 0; j < this.ArrayMpPDF.length; j++) {
+            const pdfDefinicion : any = {
+              info: {
+                title: `${datos_recuperado[i].recMp_Id}`
+              },
+              content : [
+                {
+                  text: `Plasticaribe S.A.S ---- Recuperado de Materia Prima`,
+                  alignment: 'center',
+                  style: 'titulo',
+                },
+                '\n \n',
+                {
+                  text: `Fecha de registro: ${datos_recuperado[i]}`,
+                  style: 'header',
+                  alignment: 'right',
+                },
+                {
+                  text: `Registrado Por: ${datos_recuperado[i].usua_Nombre}\n`,
+                  alignment: 'right',
+                  style: 'header',
+                },
+                {
+                  text: `\n Información la Asignación \n \n`,
+                  alignment: 'center',
+                  style: 'header'
+                },
+                {
+                  style: 'tablaCliente',
+                  table: {
+                    widths: ['*', '*', '*'],
+                    style: 'header',
+                    body: [
+                      [
+                        `Proceso: ${datos_recuperado[i].proceso_Nombre}`,
+                        ``,
+                        ``
+                      ]
+                    ]
+                  },
+                  layout: 'lightHorizontalLines',
+                  fontSize: 9,
+                },
+                {
+                  text: `\n \nObervación sobre la remisión: \n ${datos_recuperado[i].recMp_Observacion}\n`,
+                  style: 'header',
+                },
+                {
+                  text: `\n Información detallada de Materia(s) Prima(s) asignada(s) \n `,
+                  alignment: 'center',
+                  style: 'header'
+                },
+
+                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant']),
+              ],
+              styles: {
+                header: {
+                  fontSize: 8,
+                  bold: true
+                },
+                titulo: {
+                  fontSize: 15,
+                  bold: true
+                }
+              }
+            }
+            const pdf = pdfMake.createPdf(pdfDefinicion);
+            pdf.open();
+            break;
+          }
+          break;
+        }
+      });
+    }
+    setTimeout(() => { this.load = true; }, 1000);
+  }
+
+  // funcion que se encagará de llenar la tabla de los productos en el pdf
+  buildTableBody(data, columns) {
+    var body = [];
+    body.push(columns);
+    data.forEach(function(row) {
+      var dataRow = [];
+      columns.forEach(function(column) {
+          dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: [30, '*', 70, 50, 50, 80],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 9,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+    };
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  tableAsignacion(data, columns) {
+  return {
+      table: {
+        headerRows: 1,
+        widths: [70, '*', 100, 50],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 9,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+  };
   }
 }

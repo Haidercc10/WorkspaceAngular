@@ -68,6 +68,10 @@ export class DevolucionesMPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleDevolucion_MateriaPrima/consultaMovimientos1/${ot}/${fechaIncial}/${fechaFinal}/${materiaPrima}`);
   }
 
+  srvObtenerpdfMovimientos(ot : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleDevolucion_MateriaPrima/pdfMovimientos/${ot}`);
+  }
+
   //Metodo agregar
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/DetalleDevolucion_MateriaPrima', data)

@@ -91,6 +91,10 @@ export class DetallesAsignacionService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos10/${ot}/${fechaIncial}/${fechaFinal}/${materiaPrima}/${estado}`);
   }
 
+  srvObtenerpdfMovimientos(ot : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/pdfMovimientos/${ot}`);
+  }
+
 //Metodo agregar
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_MateriaPrima', data)

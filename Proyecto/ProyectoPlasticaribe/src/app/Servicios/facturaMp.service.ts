@@ -63,6 +63,10 @@ export class FacturaMpService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/FacturaCompra_MateriaPrima/consultaMovimientos6/${fechaIncial}/${fechaFinal}/${materiaPrima}`);
   }
 
+  srvObtenerpdfMovimientos(codigo : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/FacturaCompra_MateriaPrima/pdfMovimientos/${codigo}`);
+  }
+
 //Metodo agregar Facturas de Materia Prima Comprada
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/FacturaCompra_MateriaPrima', data)
