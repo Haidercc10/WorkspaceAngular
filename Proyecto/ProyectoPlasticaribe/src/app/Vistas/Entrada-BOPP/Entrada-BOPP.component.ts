@@ -210,6 +210,7 @@ export class EntradaBOPPComponent implements OnInit {
           BOPP_Stock : this.ArrayBOPP[i].CantKg,
           undMed_Kg : 'Kg',
           bopP_CantidadInicialKg : this.ArrayBOPP[i].CantKg,
+          Usua_Id : this.storage_Id,
         }
 
         this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(datos_BOPP => {

@@ -12,4 +12,5 @@ export interface modelBOPP{
   BOPP_Stock : number;
   UndMed_Kg : string;
   BOPP_CantidadInicialKg : number;
+  Usua_Id : number;
 }

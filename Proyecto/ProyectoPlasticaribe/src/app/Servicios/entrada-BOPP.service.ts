@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribe3, rutaPlasticaribeAPI } from 'src/polyfills';
+import { rutaPlasticaribeAPI } from 'src/polyfills';
 import { modelBOPP } from '../Modelo/modelBOPP';
 
 @Injectable( { providedIn: 'root' } )
@@ -36,6 +36,39 @@ export class EntradaBOPPService {
   srvObtenerListaAgrupada():Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/BoppAgrupado`)
   }
+
+  srvObtenerConsultaMov0(fechaIncial : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos0/${fechaIncial}`);
+  }
+
+  srvObtenerConsultaMov1(id, fechaIncial : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos1/${id}/${fechaIncial}`);
+  }
+
+  srvObtenerConsultaMov2(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos2/${id}`);
+  }
+
+  srvObtenerConsultaMov3(fechaIncial : any, fechaFinal : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos3/${fechaIncial}/${fechaFinal}`);
+  }
+
+  srvObtenerConsultaMov4(ot : number, fechaIncial : any, fechaFinal : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos4/${ot}/${fechaIncial}/${fechaFinal}`);
+  }
+
+  srvObtenerConsultaMov5(fechaIncial : any, fechaFinal : any, id){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos5/${fechaIncial}/${fechaFinal}/${id}`);
+  }
+
+  srvObtenerpdfMovimientos(ot : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/pdfMovimientos/${ot}`);
+  }
+
+  srvObtenerConsultaMov6(id : any, fechaIncial : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos6/${id}/${fechaIncial}`);
+  }
+
 
   //Metodo agregar
   srvAgregar(data:any) {

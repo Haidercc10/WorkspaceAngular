@@ -41,6 +41,55 @@ export class DetalleAsignacion_BOPPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/estadoOT/${id}`)
   }
 
+  srvObtenerConsultaMov0(fechaIncial : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/consultaMovimientos0/${fechaIncial}`);
+  }
+
+  srvObtenerConsultaMov1(estado){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/consultaMovimientos1/${estado}`);
+  }
+
+  srvObtenerConsultaMov2(materiaPrima, fechaIncial : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/consultaMovimientos2/${materiaPrima}/${fechaIncial}`);
+  }
+
+  srvObtenerConsultaMov3(ot : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/consultaMovimientos3/${ot}`);
+  }
+
+  srvObtenerConsultaMov4(fechaIncial : any, fechaFinal : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/consultaMovimientos4/${fechaIncial}/${fechaFinal}`);
+  }
+
+  srvObtenerConsultaMov5(fechaIncial : any, materiaPrima : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/consultaMovimientos5/${fechaIncial}/${materiaPrima}`);
+  }
+
+  srvObtenerConsultaMov6(ot : number, fechaIncial : any, fechaFinal : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/consultaMovimientos6/${ot}/${fechaIncial}/${fechaFinal}`);
+  }
+
+  srvObtenerConsultaMov7(fechaIncial : any, fechaFinal : any, estado){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/consultaMovimientos7/${fechaIncial}/${fechaFinal}/${estado}`);
+  }
+
+  srvObtenerConsultaMov8(fechaIncial : any, fechaFinal : any, materiaPrima){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/consultaMovimientos8/${fechaIncial}/${fechaFinal}/${materiaPrima}`);
+  }
+
+  srvObtenerConsultaMov9(fechaIncial : any, fechaFinal : any, materiaPrima : any, estado : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/consultaMovimientos9/${fechaIncial}/${fechaFinal}/${materiaPrima}/${estado}`);
+  }
+
+  srvObtenerConsultaMov10(ot : number, fechaIncial : any, fechaFinal : any, materiaPrima, estado){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/consultaMovimientos10/${ot}/${fechaIncial}/${fechaFinal}/${materiaPrima}/${estado}`);
+  }
+
+  srvObtenerpdfMovimientos(ot : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_BOPP/pdfMovimientos/${ot}`);
+  }
+
+
   //Metodo agregar
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_BOPP', data)

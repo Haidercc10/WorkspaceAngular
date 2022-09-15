@@ -71,6 +71,7 @@ import { OrdenesTrabajoComponent } from './Vistas/ordenes-trabajo/ordenes-trabaj
 import { Reporte_Procesos_OTComponent } from './Vistas/Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { Entrada_TintasComponent } from './Vistas/Entrada_Tintas/Entrada_Tintas.component';
 import { MovimientoMatPrimaComponent } from './Vistas/MovimientoMatPrima/MovimientoMatPrima.component';
+import { MovimientosBOPPComponent } from './Vistas/MovimientosBOPP/MovimientosBOPP.component';
 
 
 export const routes: Routes = [
@@ -125,6 +126,7 @@ export const routes: Routes = [
   {path: 'reportes-procesos-ot', canActivate: [ValidacionLoginGuard], component: Reporte_Procesos_OTComponent},
   {path: 'Entrada-Tintas', canActivate : [ValidacionLoginGuard], component : Entrada_TintasComponent},
   {path: 'movimientos-matprima', canActivate : [ValidacionLoginGuard], component : MovimientoMatPrimaComponent}, // MOVIMIENTOS DE MATERIA PRIMA
+  {path: 'movimientos-bopp', canActivate : [ValidacionLoginGuard], component : MovimientosBOPPComponent}, // MOVIMIENTOS DE BOPP
 ]
 
 @NgModule({
@@ -186,6 +188,7 @@ export const routes: Routes = [
     Reporte_Procesos_OTComponent,
     Entrada_TintasComponent,
     MovimientoMatPrimaComponent,
+    MovimientosBOPPComponent,
   ],
 
 

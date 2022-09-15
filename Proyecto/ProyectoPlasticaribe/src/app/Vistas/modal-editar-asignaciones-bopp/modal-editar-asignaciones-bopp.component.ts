@@ -145,19 +145,6 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
     });
   }
 
-  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
-  confimacionSalida(){
-    Swal.fire({
-      title: '¿Seguro que desea salir?',
-      showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: 'Salir',
-      denyButtonText: `No Salir`,
-    }).then((result) => {
-      if (result.isConfirmed) window.location.href = "./";
-    });
-  }
-
   infoOT(){
     let ordenTrabajo : string = this.FormAsignacionBopp.value.AsgBopp_OT;
 
@@ -517,28 +504,6 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
     });
   }
 
-  ActualizarAsignacion(){
-    this.load = false;
-    let observacion : string = this.FormAsignacionBopp.value.AsgBopp_Observacion;
-
-    this.asignacionBOPPService.srvObtenerListaPorId(this.idAsignacion).subscribe(datos_asignacion => {
-      let asignacion : any = [];
-      asignacion.push(datos_asignacion);
-      for (const item of asignacion) {
-        const datos : any = {
-          AsigBOPP_FechaEntrega : item.asigBOPP_FechaEntrega,
-          AsigBOPP_Observacion : observacion,
-          Usua_Id : item.usua_Id,
-          Estado_Id : item.estado_Id,
-        }
-
-        this.asignacionBOPPService.srvActualizar(this.idAsignacion, datos).subscribe(datos_asginacionBOPP => {
-          // this.actualizarDetallesAsignacion(this.idAsignacion);
-        });
-      }
-    });
-  }
-
   actualizarDetallesAsignacion(){
     this.load = false;
     for (let i = 0; i < this.ordenesTrabajo.length; i++) {
@@ -559,7 +524,9 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
                 }
 
                 setTimeout(() => {
+                  console.log(datos)
                   this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
+                    console.log(2)
                     this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
                   });
                 }, 1500);
@@ -618,6 +585,8 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
           }
         }
       }
+      continue;
     }
+    setTimeout(() => { this.load = true; }, 3000);
   }
 }
