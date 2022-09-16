@@ -10,6 +10,7 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import moment from 'moment';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -26,6 +27,8 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   ArrayProductoZeus = [];
   public page : number;
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  fechaBusqueda : any = new Date(); // Variable que va a ayudar al momento de saber hasta que fecha se va a buscar
+  mostrarColumna : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -46,7 +49,9 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
     this.FormExistencias = this.frmBuilder.group({
       cantMinima : [0],
-    })
+      cantidad : [0],
+      filtroFechas : [''],
+    });
     this.load = true;
   }
 
@@ -55,7 +60,6 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.ColumnasTabla();
     this.fecha();
     this.InventarioExistenciaZeus();
-
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -69,6 +73,17 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.today = yyyy + '-' + mm + '-' + dd;
   }
 
+  // Funcion que calculará cual es la fecha segun los parametros especificados
+  fechaBuscada(){
+    let cantidad : number = this.FormExistencias.value.cantidad;
+    let filtroFechas : any = this.FormExistencias.value.filtroFechas;
+
+    if (filtroFechas == 1) this.fechaBusqueda = moment().subtract(cantidad, 'week').format('YYYY-MM-DD');
+    else if (filtroFechas == 2) this.fechaBusqueda = moment().subtract(cantidad, 'month').format('YYYY-MM-DD');
+    else if (filtroFechas == 3) this.fechaBusqueda = moment().subtract(cantidad, 'years').format('YYYY-MM-DD');
+  }
+
+  //
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
@@ -103,6 +118,34 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
       invSubtotal : "Subtotal",
       invCliente : "Cliente",
     }];
+  }
+
+  // Funcion que buscará la ultima fecha en que se editó cada producto
+  buscarPrecios(){
+    this.load = false;
+    this.fechaBuscada();
+    for (let i = 0; i < this.ArrayProductoZeus.length; i++) {
+      this.ArrayProductoZeus[i].fechaModificacion = '';
+      this.clienteOtItems.srvObtenerListaConsultarItem(this.fechaBusqueda, this.today, this.ArrayProductoZeus[i].codigoItem, this.ArrayProductoZeus[i].PrecioItem).subscribe(datos_item => {
+        if (datos_item.length != 0){
+          for (let j = 0; j < datos_item.length; j++) {
+            this.mostrarColumna = true;
+            this.ArrayProductoZeus[i].fechaModificacion = datos_item[j].fechaCrea.replace('T00:00:00', '');
+          }
+        }
+      });
+    }
+    setTimeout(() => { this.ordenarItems(); }, 7000);
+  }
+
+  //Funcion que ordenará por fecha de la antugua a la mas reciente, y enviará los espacios en blanco al final
+  ordenarItems(){
+    this.ArrayProductoZeus.sort((a,b) => b.fechaModificacion.localeCompare(a.fechaModificacion));
+    this.ArrayProductoZeus.sort((a,b) => {
+      if (a.fechaModificacion == '' && b.fechaModificacion != '') return 1;
+      else return -1;
+    });
+    setTimeout(() => { this.load = true; }, 1200);
   }
 
   //
@@ -192,6 +235,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                     PrecioTotalItem : datosExistencias[exi].precio_Total,
                     ClienteNombre : datosCLOTI[cl].clienteNom,
                     cantMinima : datos_existenciasProd[i].exProd_CantMinima,
+                    fechaModificacion : '',
                   }
                   this.ArrayProductoZeus.push(datosInventario);
                   this.ArrayProductoZeus.sort((a,b) => a.nombreItem.localeCompare(b.nombreItem));

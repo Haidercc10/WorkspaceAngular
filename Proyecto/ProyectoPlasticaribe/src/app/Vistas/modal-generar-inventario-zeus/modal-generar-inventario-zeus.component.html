@@ -30,17 +30,35 @@
         </div>
 
         <form [formGroup]="FormExistencias" id="FormExistencias">
-          <!-- Cantidad Minima -->
-          <div class="form-floating col-md-3">
-            <input type="number" formControlName="cantMinima" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="actualizarCantMinima()">
-            <label for="floatingInput">Cantidad Minima Item</label>
-          </div>
-          <label *ngIf="numeroIdProd != 0">Item: <b>{{numeroIdProd}}</b></label>
+          <div class="mb-3">
+            <div class="row g-3">
+              <!-- Cantidad Minima -->
+              <label *ngIf="numeroIdProd != 0">Item: <b>{{numeroIdProd}}</b></label>
+              <div class="form-floating col-md-3">
+                <input type="number" formControlName="cantMinima" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="actualizarCantMinima()">
+                <label for="floatingInput">Cantidad Minima Item</label>
+              </div>
 
+              <div class="form-floating col-md-1">
+                <input type="number" formControlName="cantidad" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="actualizarCantMinima()">
+                <label for="floatingInput">Cantidad</label>
+              </div>
+
+              <div class="form-floating col-md-2 justify-content-end">
+                <select formControlName="filtroFechas" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                  <option value="1">Semana(s)</option>
+                  <option value="2">Mes(es)</option>
+                  <option value="3">Año(s)</option>
+                </select>
+                <label for="floatingInput">Filtro</label>
+              </div>
+            </div>
+          </div>
           <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarCantMinima()">Actualizar</button>
-              <button class="btn btn-danger btn-danger-sm" type="submit" (click)="exportarExcel()">Exportar Excel</button>
+              <button class="btn btn-danger btn-danger-sm" type="button" (click)="exportarExcel()">Exportar Excel</button>
+              <button class="btn btn-danger btn-danger-sm" type="button" (click)="buscarPrecios()">Ult. Actualización</button>
               <!-- <button class="btn btn-secondary btn-secondary-sm" type="button">Limpiar campos</button> -->
             </div>
 
@@ -74,6 +92,10 @@
                   <th id="presentacion" scope="col">{{columnas.presentacion}}</th>
                   <th id="Subtotal" scope="col">{{columnas.invSubtotal}}</th>
                   <th id="cantMinima" scope="col" (click)="organizarCantMinima()">Cant. Minima</th>
+                  <ng-container *ngIf="mostrarColumna">
+                    <th id="ultimaModificacion" scope="col" >Ult. Modificación</th>
+                  </ng-container>
+
                 </tr>
               </thead>
               <tbody>
@@ -93,6 +115,10 @@
                   <td id="presentacion" scope="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.presentacion}}</td>
                   <td id="subtotal" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.PrecioTotalItem | number : '1.2-2'}}</td>
                   <td id="CantMinima" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.cantMinima | number : '1.2-2'}}</td>
+
+                  <ng-container *ngIf="prodZeus.fechaModificacion != ''">
+                    <td id="CantMinima" style="background-color: rgb(255, 146, 146);" class="TextosInfoTabla">{{prodZeus.fechaModificacion}}</td>
+                  </ng-container>
                 </tr>
               </tbody>
             </table>

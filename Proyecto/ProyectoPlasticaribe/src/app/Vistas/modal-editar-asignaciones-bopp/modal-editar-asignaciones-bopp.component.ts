@@ -1,3 +1,4 @@
+import { DataSource } from '@angular/cdk/collections';
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
@@ -31,7 +32,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
   ArrayBOPP = []; //Varibale que almacenará los BOPP existentes
-  ArrayBoppPedida = []; //variable que almacenará el BOPPP pedido por una orden de trabajo
+  ArrayBoppPedida : any [] = []; //variable que almacenará el BOPPP pedido por una orden de trabajo
   boppSeleccionado : any = []; //Variable que almacenará la informacion del bopp que haya sido selccionado
   ordenesTrabajo = []; //Variable que almacenará las ordenes de trabajo que se consulten
   cantidadKG : number = 0; //Variable almacenará la cantidad en kilogramos pedida en la OT
@@ -206,12 +207,20 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
           this.detallesAsignacionBOPPService.srvEliminarPorOT(item.IdDtAsg, formulario.ot).subscribe(datos_dtAsgEliminada => {
             Swal.fire('Orden de Trabajo eliminada');
           });
+          break;
         }
         this.cantidadKG = this.cantidadKG - formulario.kg;
         this.ordenesTrabajo.splice(index, 1);
         for (let i = 0; i < this.arrayOT.length; i++) {
           if (this.arrayOT[i] == formulario.ot) {
             this.arrayOT.splice(i, 1);
+            break;
+          }
+        }
+        for (let i = 0; i < this.otRegistradas.length; i++) {
+          if (this.otRegistradas[i] == formulario.ot) {
+            this.otRegistradas.splice(i, 1);
+            break;
           }
         }
       }
@@ -274,6 +283,9 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
           this.detallesAsignacionBOPPService.srvEliminarPorBOPP(item.IdAsg, formulario.idBOPP).subscribe(datos_detallesAsgEliminada => {
             Swal.fire('BOPP eliminado');
           });
+        }
+        for (let i = 0; i < this.boppRegistrados.length; i++) {
+          this.boppRegistrados.splice(i, 1);
         }
       }
     });
@@ -422,6 +434,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
             bopP_Stock : 0,
             UndMed_Kg : item.undMed_Kg,
             bopP_CantidadInicialKg : item.bopP_CantidadInicialKg,
+            usua_Id : item.usua_Id,
           }
 
           this.boppService.srvActualizar(id, datosBOPP).subscribe(datos_boppActualizado => {
@@ -504,6 +517,28 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
     });
   }
 
+  ActualizarAsignacion(){
+    this.load = false;
+    let observacion : string = this.FormAsignacionBopp.value.AsgBopp_Observacion;
+
+    this.asignacionBOPPService.srvObtenerListaPorId(this.idAsignacion).subscribe(datos_asignacion => {
+      let asignacion : any = [];
+      asignacion.push(datos_asignacion);
+      for (const item of asignacion) {
+        const datos : any = {
+          AsigBOPP_FechaEntrega : item.asigBOPP_FechaEntrega,
+          AsigBOPP_Observacion : observacion,
+          Usua_Id : item.usua_Id,
+          Estado_Id : item.estado_Id,
+        }
+
+        this.asignacionBOPPService.srvActualizar(this.idAsignacion, datos).subscribe(datos_asginacionBOPP => {
+          // this.actualizarDetallesAsignacion(this.idAsignacion);
+        });
+      }
+    });
+  }
+
   actualizarDetallesAsignacion(){
     this.load = false;
     for (let i = 0; i < this.ordenesTrabajo.length; i++) {
@@ -511,7 +546,31 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
         for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
           this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
             for (let k = 0; k < datos_bopp.length; k++) {
-              if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
+              let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
+              let datos : any = {
+                AsigBOPP_Id : this.idAsignacion,
+                BOPP_Id : datos_bopp[k].bopP_Id,
+                DtAsigBOPP_Cantidad : cantidad,
+                UndMed_Id : 'Kg',
+                Proceso_Id : 'CORTE',
+                DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
+                Estado_OrdenTrabajo : 14,
+              }
+              setTimeout(() => {
+                this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
+                  this.load = true;
+                  this.moverInventarioBOPP(datos_bopp[k].bopP_Id, cantidad);
+                });
+              }, 1500);
+              }
+          });
+        }
+        continue;
+      } else {
+        for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
+          if (!this.boppRegistrados.includes(this.ArrayBoppPedida[j].Serial)) {
+            this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
+              for (let k = 0; k < datos_bopp.length; k++) {
                 let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
                 let datos : any = {
                   AsigBOPP_Id : this.idAsignacion,
@@ -522,71 +581,37 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
                   DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
                   Estado_OrdenTrabajo : 14,
                 }
-
                 setTimeout(() => {
-                  console.log(datos)
                   this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
-                    console.log(2)
-                    this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
+                    this.moverInventarioBOPP(datos_bopp[k].bopP_Id, cantidad);
                   });
                 }, 1500);
               }
-            }
-          });
-        }
-      } else {
-        for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
-          if (!this.boppRegistrados.includes(this.ArrayBoppPedida[j].Serial)) {
-            this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
-              for (let k = 0; k < datos_bopp.length; k++) {
-                if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
-                  let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
-                  let datos : any = {
-                    AsigBOPP_Id : this.idAsignacion,
-                    BOPP_Id : datos_bopp[k].bopP_Id,
-                    DtAsigBOPP_Cantidad : cantidad,
-                    UndMed_Id : 'Kg',
-                    Proceso_Id : 'CORTE',
-                    DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
-                    Estado_OrdenTrabajo : 14,
-                  }
-
-                  setTimeout(() => {
-                    this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
-                      this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
-                    });
-                  }, 1500);
-                }
-              }
             });
-          } else {
-            this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
-              for (let k = 0; k < datos_bopp.length; k++) {
-                if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
-                  let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
-                  let datos : any = {
-                    AsigBOPP_Id : this.idAsignacion,
-                    BOPP_Id : datos_bopp[k].bopP_Id,
-                    DtAsigBOPP_Cantidad : cantidad,
-                    UndMed_Id : 'Kg',
-                    Proceso_Id : 'CORTE',
-                    DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
-                    Estado_OrdenTrabajo : 14,
-                  }
-
-                  setTimeout(() => {
-                    this.detallesAsignacionBOPPService.srvActualizar(this.idAsignacion, datos).subscribe(datos_detallesAsignacion => {
-                      this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
-                    });
-                  }, 1500);
-                }
-              }
-            });
-          }
+          } else this.load = true;
+          //  else {
+          //   this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
+          //     for (let k = 0; k < datos_bopp.length; k++) {
+          //       let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
+          //       let datos : any = {
+          //         AsigBOPP_Id : this.idAsignacion,
+          //         BOPP_Id : datos_bopp[k].bopP_Id,
+          //         DtAsigBOPP_Cantidad : cantidad,
+          //         UndMed_Id : 'Kg',
+          //         Proceso_Id : 'CORTE',
+          //         DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
+          //         Estado_OrdenTrabajo : 14,
+          //       }
+          //       setTimeout(() => {
+          //         this.detallesAsignacionBOPPService.srvActualizar(this.idAsignacion, datos).subscribe(datos_detallesAsignacion => {
+          //           this.moverInventarioBOPP(datos_bopp[k].bopP_Id, cantidad);
+          //         });
+          //       }, 1500);
+          //     }
+          //   });
+          // }
         }
       }
-      continue;
     }
-    setTimeout(() => { this.load = true; }, 3000);
   }
 }

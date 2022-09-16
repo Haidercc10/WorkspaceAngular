@@ -91,20 +91,6 @@ export class EntradaBOPPComponent implements OnInit {
     });
   }
 
-  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
-  confimacionSalida(){
-    Swal.fire({
-      title: '¿Seguro que desea salir?',
-      showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: 'Salir',
-      denyButtonText: `No Salir`,
-    }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
-      if (result.isConfirmed) window.location.href = "./";
-    })
-  }
-
   //Funcion para  obtener las unidades de medidas
   obtenerUnidadesMedida() {
     this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => {

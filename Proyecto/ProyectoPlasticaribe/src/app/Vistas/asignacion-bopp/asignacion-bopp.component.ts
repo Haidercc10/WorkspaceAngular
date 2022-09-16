@@ -456,13 +456,13 @@ export class AsignacionBOPPComponent implements OnInit {
         for (let k = 0; k < datos_bopp.length; k++) {
           if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
             let datos : any = {
-              AsigBOPP_Id : idAsignacion,
-              BOPP_Id : datos_bopp[k].bopP_Id,
-              DtAsigBOPP_Cantidad : this.ArrayBoppPedida[j].Cant,
-              UndMed_Id : 'Kg',
-              Proceso_Id : 'CORTE',
-              DtAsigBOPP_OrdenTrabajo : this.ArrayBoppPedida[j].Ot,
-              Estado_OrdenTrabajo : 14,
+              asigBOPP_Id : idAsignacion,
+              bopP_Id : datos_bopp[k].bopP_Id,
+              dtAsigBOPP_Cantidad : this.ArrayBoppPedida[j].Cant,
+              undMed_Id : 'Kg',
+              proceso_Id : 'CORTE',
+              dtAsigBOPP_OrdenTrabajo : this.ArrayBoppPedida[j].Ot,
+              estado_OrdenTrabajo : 14,
             }
             setTimeout(() => {
               this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => { });
@@ -518,6 +518,7 @@ export class AsignacionBOPPComponent implements OnInit {
               bopP_Stock : restante,
               UndMed_Kg : datos_bopp[k].undMed_Kg,
               bopP_CantidadInicialKg : datos_bopp[k].bopP_CantidadInicialKg,
+              Usua_Id : datos_bopp[k].usua_Id,
             }
 
             this.boppService.srvActualizar(datos_bopp[k].bopP_Id, datosBOPP).subscribe(datos_boppActualizado => {

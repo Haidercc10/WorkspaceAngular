@@ -446,6 +446,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             bopP_Stock : 0,
             UndMed_Kg : item.undMed_Kg,
             bopP_CantidadInicialKg : item.bopP_CantidadInicialKg,
+            usua_Id : item.usua_Id,
           }
 
           this.boppService.srvActualizar(id, datosBOPP).subscribe(datos_boppActualizado => {

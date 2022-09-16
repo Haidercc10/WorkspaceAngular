@@ -97,6 +97,10 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOt/UltimaOT/`);
   }
 
+  srvObtenerListaConsultarItem(fecha1 : any, fecha2 : any, item : any, precio : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/consultarItem/${fecha1}/${fecha2}/${item}/${precio}`);
+  }
+
   /* CLIENTESOTITEM */
 
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO

@@ -826,12 +826,8 @@ export class MovimientosBOPPComponent implements OnInit {
         for (const item of boppAsg) {
           this.dtAsgBOPPService.srvObtenerListaPorAsignacion(data.id).subscribe(datos_detallesAsgBOPP => {
             for (let i = 0; i < datos_detallesAsgBOPP.length; i++) {
-              console.log(1)
               this.usuarioService.srvObtenerListaPorId(item.usua_Id).subscribe(datos_usuario => {
                 for (let mp = 0; mp < this.ArrayMpPDF.length; mp++) {
-                  let FechaEntregaDatetime = item.asigBOPP_FechaEntrega;
-                  let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                  let fecharegistroFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
                   const pdfDefinicion : any = {
                     info: {
                       title: `Asignación BOPP N° ${item.asigBOPP_Id}`
@@ -844,7 +840,7 @@ export class MovimientosBOPPComponent implements OnInit {
                       },
                       '\n \n',
                       {
-                        text: `Fecha de registro: ${fecharegistroFinal}`,
+                        text: `Fecha de registro: ${item.asigBOPP_FechaEntrega.replace('T00:00:00', '')}`,
                         style: 'header',
                         alignment: 'right',
                       },
