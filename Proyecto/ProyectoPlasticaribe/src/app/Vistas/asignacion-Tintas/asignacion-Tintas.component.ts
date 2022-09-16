@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { modelAsignacionMPxTintas } from 'src/app/Modelo/modelAsignacionMPxTintas';
 import { AsignacionMPService } from 'src/app/Servicios/asignacionMP.service';
 import { AsignacionMPxTintasService } from 'src/app/Servicios/asignacionMPxTintas.service';
 import { CrearMateriaprimaService } from 'src/app/Servicios/crear-materiaprima.service';
@@ -340,14 +341,15 @@ export class AsignacionTintasComponent implements OnInit {
     let usuario : number = this.storage_Id;
     let fecha : Date = this.today;
 
-    let datos_asignacionMP : any = {
-      Tinta_Id : tinta,
-      AsigMPxTinta_Cantidad : cantidad,
-      UndMed_Id : presentacion,
-      AsigMPxTinta_FechaEntrega : fecha,
-      AsigMPxTinta_Observacion : Observacion,
-      Usua_Id : usuario,
-      Estado_Id : 13,
+    let datos_asignacionMP : modelAsignacionMPxTintas = {
+      AsigMPxTinta_Id: 0,
+      Tinta_Id: tinta.id,
+      AsigMPxTinta_Cantidad: cantidad,
+      UndMed_Id: presentacion,
+      AsigMPxTinta_FechaEntrega: fecha,
+      AsigMPxTinta_Observacion: Observacion,
+      Usua_Id: usuario,
+      Estado_Id: 13
     }
 
     this.asignacionMPxTintas.srvGuardar(datos_asignacionMP).subscribe(datos_asignacionMPxTintas => {
@@ -364,6 +366,7 @@ export class AsignacionTintasComponent implements OnInit {
       }
       let ultimoId : number = Math.max.apply(null, idsAsignaciones);
       this.mpAsignada(ultimoId);
+      console.log(ultimoId);
     });
 
     // this.asignacionMPxTintas.srvObtenerUltimaAsignacion().subscribe(datos_asignaciones => {
