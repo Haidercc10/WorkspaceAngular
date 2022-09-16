@@ -39,7 +39,7 @@ export class MovimientosTintasComponent implements OnInit {
   titulosTabla = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
   ArrayInfoConsulta : any [] = []; //Variable que tendrá la informacion de los resultados de la consulta realizada
   valorTotal : number = 0; //Variable que guardará el valor total de la factura de entrada de materia prima
-  totalMPEntregada = 0; //Vairble que almacenará la cantidad de materia prima entregada para una orden de trabajo
+  totalMPEntregada : any; //Vairble que almacenará la cantidad de materia prima entregada para una orden de trabajo
   cantRestante : number = 0; //Variable que tendrá la cantidad de kilos de materia prima que hacen falta por entregar pára una orden de trabajo
   kgProduciodosOT : number = 0; //Variable que almacenará la cantidad de kilos producidos por una orden de trabajo
   estadoOt : string = ''; //Variable que almacenará el estado de la orden de trabajo (Abierta, Asignada, En proceso, Terminada o Finalizada)
@@ -50,7 +50,6 @@ export class MovimientosTintasComponent implements OnInit {
   ArrayEstados : any = []; //Variable en la que se almacenaran los estados que puede tener una orden de trabajo
   kgOT : number = 0; //Variable que va a almacenar la cantidad total de kilos que se estipularon para una orden de trabajo
   ArrayMpPDF : any = [] //Variable que almacenará las materias primas del pdf que se esé consultando
-
 
   constructor(private rolService : RolesService,
                 private frmBuilderMateriaPrima : FormBuilder,
@@ -87,6 +86,7 @@ export class MovimientosTintasComponent implements OnInit {
     this.obtenerTipoDocumento();
     this.obtenerEstados();
     this.obtenerTintas();
+
   }
 
   //
@@ -220,6 +220,7 @@ export class MovimientosTintasComponent implements OnInit {
 
   // Funcion que consultará en bagpro la ot para validar la cantidad de kg que se pidió por cada ot
   consultaOTBagPro(ot : any){
+    this.sumarCantidadesMatPrima_Tintas(ot)
     this.bagProServices.srvObtenerListaClienteOT_Item(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
         this.kgOT = datos_ot[i].datosotKg;
@@ -237,6 +238,16 @@ export class MovimientosTintasComponent implements OnInit {
         this.kgProduciodosOT += datos_OT[index].peso;
       }
     });
+  }
+
+
+  /** */
+  sumarCantidadesMatPrima_Tintas(OT : number){
+    this.dtAsgTinta.srvObtenerSumaCantidadesTintas_MatPrimas(OT).subscribe(registrosTintas_MatPrima => {
+      this.totalMPEntregada = registrosTintas_MatPrima;
+
+    })
+
   }
 
   // Funcion que va a consultar por cada combinacion de filtro que se le indiquen
@@ -262,14 +273,9 @@ export class MovimientosTintasComponent implements OnInit {
     if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null && estado != null) {
       if (tipoDoc == 'ASIGMP') {
         this.consultaOTBagPro(ot);
+
         this.dtAsgTinta.srvObtenerConsultaMov10(ot, fechaIncial, fechaFinal, tintaConsulta, estado).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-              for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-                break;
-              }
-            });
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
               this.llenarTabla(datos_asignacion[i], tipoDoc);
@@ -291,12 +297,6 @@ export class MovimientosTintasComponent implements OnInit {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-              for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-                break;
-              }
-            });
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
               if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00','') == fechaIncial
@@ -310,12 +310,6 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-            for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-              break;
-            }
-          });
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
             if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -327,12 +321,6 @@ export class MovimientosTintasComponent implements OnInit {
         this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-              for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-                break;
-              }
-            });
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
               if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -345,12 +333,6 @@ export class MovimientosTintasComponent implements OnInit {
         this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-              for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-                break;
-              }
-            });
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
               if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -418,12 +400,7 @@ export class MovimientosTintasComponent implements OnInit {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-              for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-                break;
-              }
-            });
+
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
               if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -436,12 +413,6 @@ export class MovimientosTintasComponent implements OnInit {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-              for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
-                break;
-              }
-            });
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
               if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00', '') == fechaIncial && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -454,12 +425,6 @@ export class MovimientosTintasComponent implements OnInit {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-              for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
-                break;
-              }
-            });
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
               if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00', '') == fechaIncial && datos_asignacion[i].matPri_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -496,12 +461,6 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-            for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
-              break;
-            }
-          });
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
             if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -555,12 +514,6 @@ export class MovimientosTintasComponent implements OnInit {
         this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-              for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-                break;
-              }
-            });
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
               this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -707,12 +660,6 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-            for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-              break;
-            }
-          });
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
             if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -741,12 +688,6 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-            for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-              break;
-            }
-          });
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
             if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00','') == fechaIncial && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -783,12 +724,6 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-            for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-              break;
-            }
-          });
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
             this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -826,12 +761,6 @@ export class MovimientosTintasComponent implements OnInit {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-              for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
-                break;
-              }
-            });
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
               if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -844,12 +773,6 @@ export class MovimientosTintasComponent implements OnInit {
         this.dtAsgTinta.srvObtenerConsultaMov2(tintaConsulta, this.today).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-              for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
-                break;
-              }
-            });
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
               if (datos_asignacion[i].asigMP_OrdenTrabajo == ot) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -886,12 +809,6 @@ export class MovimientosTintasComponent implements OnInit {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-              for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-                break;
-              }
-            });
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
               if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -1057,12 +974,6 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-            for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-              break;
-            }
-          });
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
             if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -1074,12 +985,6 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-            for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-              break;
-            }
-          });
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
             if (datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -1116,12 +1021,6 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-            for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j+i].dtAsigMp_Cantidad;
-              break;
-            }
-          });
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
             if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00','') == fechaIncial) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
@@ -1158,12 +1057,6 @@ export class MovimientosTintasComponent implements OnInit {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
-              for (let j = 0; j < datos_asig.length; j++) {
-                this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-                break;
-              }
-            });
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
               this.llenarTabla(datos_asignacion[i], 'ASIGMP');
