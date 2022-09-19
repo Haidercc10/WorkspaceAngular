@@ -349,7 +349,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     }
   }
 
-  // Funcion para buscar por id una materia prima o bopp
+  // Funcion para buscar por id una materia prima o bopp o tinta
   buscarMpId(){
 
     this.ArrayMateriaPrima = [];
@@ -388,7 +388,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         });
       }
     });
+
+
   }
+
 
   /** Cargar combo materias primas al seleccionar cual categoria menos BOPP y tintas */
   cargarComboMatPrimaSegunCategorias(){
@@ -5103,6 +5106,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           });
         }, 2000);
       }
+
+    } else if(idMateriaPrima != null) {
+      this.buscarMpId();
+
     } else {
       this.load = false;
 
@@ -5358,6 +5365,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       }, 2000);
     }
+
   }
 
   // Funcion que organiza los campos de la tabla segun su precio de mayor a menor
