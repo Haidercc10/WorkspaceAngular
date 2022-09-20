@@ -1,11 +1,10 @@
-import { ThisReceiver } from '@angular/compiler';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Console } from 'console';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/clientes.service';
 import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.service';
+import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
 import { ProductoService } from 'src/app/Servicios/producto.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
@@ -49,9 +48,10 @@ export class AsignarProductosFacturasComponent implements OnInit {
                     private bagProService : BagproService,
                       private ExistenciasProdService : ExistenciasProductosService,
                         private servicioProducto : ProductoService,
-                        private servicioClientes: ClientesService,
-                        private servicioClientesProductos : ClientesProductosService,
-                        private servicioUsuarios : UsuarioService ) {
+                          private servicioClientes: ClientesService,
+                            private servicioClientesProductos : ClientesProductosService,
+                              private servicioUsuarios : UsuarioService,
+                                private dtEntradaRollo : DetallesEntradaRollosService,) {
 
     this.FormConsultarProductos = this.frmBuilderPedExterno.group({
       Factura : ['', Validators.required],
@@ -66,17 +66,16 @@ export class AsignarProductosFacturasComponent implements OnInit {
   ngOnInit() {
     this.fecha();
     this.lecturaStorage();
-    //this.llenadoProducto();
     this.llenadoClientes();
     this.ObtenerUsuariosConductores()
-    }
+  }
 
-    selectEventProducto(item) {
-      this.FormConsultarProductos.value.ProdNombre = item.prod_Id;
-      if (this.FormConsultarProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
-      else this.validarInputNombresProductos = true;
-      // do something with selected item
-    }
+  selectEventProducto(item) {
+    this.FormConsultarProductos.value.ProdNombre = item.prod_Id;
+    if (this.FormConsultarProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
+    else this.validarInputNombresProductos = true;
+    // do something with selected item
+  }
 
   onChangeSearchNombreProductos(val: string) {
     if (val != '') this.validarInputNombresProductos = false;
@@ -111,7 +110,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
     else this.validarInputClientes = true;
     // do something when input is focused
   }
-
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => {
@@ -154,56 +152,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.validarRollo = [];
   }
 
-  //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
-  consultarOTbagPro(){
-    this.rollos = [];
-    this.rollosInsertar = [];
-    this.validarRollo = [];
-    this.cargando = false;
-    let ot : number = this.FormConsultarProductos.value.OT_Id;
-
-    this.bagProService.srvObtenerListaProcExtOt(ot).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        if (datos_ot[i].nomStatus == 'EMPAQUE'){
-          this.idProducto = datos_ot[i].clienteItem;
-          let info : any = {
-            Id : datos_ot[i].item,
-            Producto : datos_ot[i].clienteItemNombre,
-            Cantidad : datos_ot[i].extnetokg,
-            Presentacion : 'Kg',
-          }
-          this.rollos.push(info);
-          this.FormConsultarProductos.setValue({
-            OT_Id: ot,
-            Cliente : datos_ot[i].clienteNombre,
-            Producto : datos_ot[i].clienteItemNombre,
-          });
-        }
-      }
-    });
-    this.bagProService.srvObtenerListaProcSelladoOT(ot).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        this.idProducto = datos_ot[i].referencia;
-        if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
-        if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
-        if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-        let info : any = {
-          Id : datos_ot[i].item,
-          Producto : datos_ot[i].nomReferencia,
-          Cantidad : datos_ot[i].qty,
-          Presentacion : datos_ot[i].unidad,
-        }
-        this.rollos.push(info);
-        this.FormConsultarProductos.setValue({
-          OT_Id: ot,
-          Cliente : datos_ot[i].cliente,
-          Producto : datos_ot[i].nomReferencia,
-        });
-      }
-    });
-    setTimeout(() => { this.cargando = true; }, 2000);
-  }
-
   //Funcion que va a agregar Productos en la tabla
   cargarProducto(item : any){
     if (this.rollosInsertar.length == 0) {
@@ -236,56 +184,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
     }
   }
 
-  // Funcion par ingresar los rollos
-  ingresarRollos(){
-    if (this.rollosInsertar.length == 0) Swal.fire("¡Debe tener minimo un rollo seleccionado!");
-    else {
-      for (let i = 0; i < this.rollosInsertar.length; i++) {
-        let info : any = {
-
-        }
-      }
-    }
-  }
-
-  InventarioProductos(){
-    for (let i = 0; i < this.rollosInsertar.length; i++) {
-      this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.idProducto, this.presentacionProducto).subscribe(datos_existencias => {
-        for (let j = 0; j < datos_existencias.length; j++) {
-          let info : any = {
-            Prod_Id: this.idProducto,
-            exProd_Id : datos_existencias[j].exProd_Id,
-            ExProd_Cantidad: (datos_existencias[j].ExProd_Cantidad + this.rollosInsertar[i].Cantidad),
-            UndMed_Id: this.presentacionProducto,
-            TpBod_Id: datos_existencias[j].TpBod_Id,
-            ExProd_Precio: datos_existencias[j].ExProd_Precio,
-            ExProd_PrecioExistencia: datos_existencias[j].ExProd_PrecioExistencia,
-            ExProd_PrecioSinInflacion: datos_existencias[j].ExProd_PrecioSinInflacion,
-            TpMoneda_Id: datos_existencias[j].TpMoneda_Id,
-            ExProd_PrecioVenta: datos_existencias[j].ExProd_PrecioVenta,
-          }
-          this.ExistenciasProdService.srvActualizarExistencia(datos_existencias[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
-            const Toast = Swal.mixin({
-              toast: true,
-              position: 'center',
-              showConfirmButton: false,
-              timer: 1500,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-              }
-            });
-            Toast.fire({
-              icon: 'success',
-              title: '¡Entrada de Rollos registrada con exito!'
-            });
-          });
-        }
-      });
-    }
-  }
-
+  //Funcion que llanará el array de clientes
   llenadoClientes(){
     this.servicioClientes.srvObtenerLista().subscribe(registrosClientes => {
       for (let index = 0; index < registrosClientes.length; index++) {
@@ -297,6 +196,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
     });
   }
 
+  //Funcion que va mostrar todos los productos a los que está relacionado el cliente selccionado
   obtenerProductosXClientes(){
     this.arrayProducto = [];
     let Client : any = this.FormConsultarProductos.value.Cliente;
@@ -304,63 +204,53 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.servicioClientesProductos.srvObtenerListaPorNombreCliente(Client).subscribe(registrosCliProd => {
       for (let index = 0; index < registrosCliProd.length; index++) {
         this.servicioProducto.srvObtenerPresentacionProducto(registrosCliProd[index].prod_Id).subscribe(registrosPresentProd => {
-            this.arrayProducto.push(registrosPresentProd);
-            console.log(registrosPresentProd);
-            //console.log(this.arrayProducto);
+          for (let j = 0; j < registrosPresentProd.length; j++) {
+            this.arrayProducto.push(registrosPresentProd[j]);
+          }
         });
       }
     });
   }
 
+  //Funcion que a mostrar los usuarios de tipo conductor
   ObtenerUsuariosConductores() {
     this.servicioUsuarios.srvObtenerListaUsuario().subscribe(registrosUsuarios => {
       for (let index = 0; index < registrosUsuarios.length; index++) {
         this.servicioUsuarios.srvObtenerListaPorIdConductor(registrosUsuarios[index].usua_Id).subscribe(registrosConductores => {
           for (let ind = 0; ind < registrosConductores.length; ind++) {
-            this.arrayConductor.push(registrosConductores[ind].usua_Id);
+            this.arrayConductor.push(registrosConductores[ind]);
           }
-
-        });
-      }
-    });
-
-  }
-
-  /*obtenerCambioCliente() {
-    this.arrayProducto = [];
-    let Id_Cliente : any = this.FormConsultarProductos.value.PedClienteNombre;
-    this.servicioClientesProductos.srvObtenerListaPorNombreCliente(Id_Cliente).subscribe(datos_clientesProductos => {
-      for (let index = 0; index < datos_clientesProductos.length; index++) {
-        this.productosServices.srvObtenerListaPorId(datos_clientesProductos[index].prod_Id).subscribe(datos_productos => {
-          this.producto.push(datos_productos);
         });
       }
     });
   }
 
-    llenadoProducto2(item : any){
-
+  // Funcion que va a cargra los rollos disponibles de un producto
+  mostrarRollos(item){
     this.FormConsultarProductos.value.ProdNombre = item.prod_Id;
-    let nombreProducto = this.FormConsultarProductos.value.Producto = item.prod_Id;
-
-    this.servicioProducto.srvObtenerPresentacionProducto(nombreProducto).subscribe(registrosProductos => {
-      for (let prd = 0; prd < registrosProductos.length; prd++) {
-        console.log(registrosProductos[prd].prod_Nombre);
+    if (this.FormConsultarProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
+    else this.validarInputNombresProductos = true;
+    let producto : any = this.FormConsultarProductos.value.ProdNombre;
+    this.dtEntradaRollo.srvConsultarProducto(producto).subscribe(datos_rollos => {
+      for (let i = 0; i < datos_rollos.length; i++) {
+        let info : any = {
+          Id : datos_rollos[i].rollo_Id,
+          Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
+          Presentacion : datos_rollos[i].undMed_Id,
+        }
+        this.rollos.push(info);
       }
     });
   }
 
-  /** Llenado del Select input de Productos
-  llenadoProducto(item : any){
-    this.servicioProducto.srvObtenerLista().subscribe(registrosProductos => {
-      for (let index = 0; index < registrosProductos.length; index++) {
-        let ProductosID : any = registrosProductos[index];
-         this.arrayProducto.push(ProductosID);
-         //console.log(this.arrayProducto);
-      }
-    });
-  }*/
+  // Funcion para cargar en la base de datos la informacion de una factura a la que se le asignarán rollos
+  crearAsignacion(){
 
+  }
 
+  // Funcion para subir los detalles de la asignacion, es decir, cada rollo que se asignó a la factura
+  crearDetallesAsignacion(){
+
+  }
 
 }

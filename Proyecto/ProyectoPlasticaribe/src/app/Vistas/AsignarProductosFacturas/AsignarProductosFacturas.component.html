@@ -30,37 +30,11 @@
         <!-- Primera Fila -->
         <div class="mb-3">
           <div class="row g-3">
-
-             <!-- Factura -->
-             <div class="form-floating col-md-2">
+            <!-- Factura -->
+            <div class="form-floating col-md-2">
               <input formControlName="Factura" type="text" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Factura</label>
             </div>
-
-             <!-- Producto -->
-            <ng-container>
-              <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteProductos">
-                <ng-autocomplete
-                  class=""
-                  [data]="arrayProducto"
-                  (selected)='selectEventProducto($event)'
-                  (inputChanged)='onChangeSearchNombreProductos($event)'
-                  (inputFocused)='onFocusedNombreProductos($event)'
-                  [searchKeyword]="keywordNombresProductos"
-                  [itemTemplate]="itemTemplate1"
-                  [notFoundTemplate]="notFoundTemplate"
-                  id="floatingInput"
-                  formControlName="ProdNombre">
-                </ng-autocomplete>
-                <ng-template #itemTemplate1 let-item>
-                  <a [innerHTML]="item.prod_Nombre"></a>
-                </ng-template>
-                <ng-template #notFoundTemplate let-notFound>
-                  <div [innerHTML]="notFound"></div>
-                </ng-template>
-                <label for="floatingInput" *ngIf="validarInputNombresProductos">Producto</label>
-              </div>
-            </ng-container>
 
              <!-- Cliente -->
              <ng-container>
@@ -88,17 +62,40 @@
               </div>
             </ng-container>
 
+             <!-- Producto -->
+            <ng-container>
+              <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteProductos" style="margin-left: 1%; margin-right: 1%;">
+                <ng-autocomplete
+                  class=""
+                  [data]="arrayProducto"
+                  (selected)='mostrarRollos($event)'
+                  (inputChanged)='onChangeSearchNombreProductos($event)'
+                  (inputFocused)='onFocusedNombreProductos($event)'
+                  [searchKeyword]="keywordNombresProductos"
+                  [itemTemplate]="itemTemplate1"
+                  [notFoundTemplate]="notFoundTemplate"
+                  id="floatingInput"
+                  formControlName="ProdNombre">
+                </ng-autocomplete>
+                <ng-template #itemTemplate1 let-item>
+                  <a [innerHTML]="item.prod_Nombre"></a>
+                </ng-template>
+                <ng-template #notFoundTemplate let-notFound>
+                  <div [innerHTML]="notFound"></div>
+                </ng-template>
+                <label for="floatingInput" *ngIf="validarInputNombresProductos">Producto</label>
+              </div>
+            </ng-container>
           </div>
         </div>
 
         <!--Fila 2-->
         <div class="mb-4">
           <div class="row g-3">
-
            <!-- Conductor -->
             <div class="form-floating col-md-3">
               <select formControlName="Conductor" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-                <option [ngValue]="conductor" *ngFor="let conductor of arrayConductor">{{conductor.usua_Nombre}}</option>
+                <option [ngValue]="conductor.usua_Id" *ngFor="let conductor of arrayConductor">{{conductor.usua_Nombre}}</option>
               </select>
               <label for="floatingSelect">Conductor</label>
             </div>
@@ -114,15 +111,14 @@
               <textarea formControlName="Observacion"  id="floatingTextarea" type="text" class="form-control form-control-sm" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
               <label for="floatingTextarea">Observación</label>
             </div>
-
           </div>
         </div>
-
       </form>
 
       <div class="mb-4">
         <hr class="Linea">
       </div>
+
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4">
         <h4 class="tituloRojo">Tabla de Rollos</h4>
@@ -195,7 +191,7 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="ingresarRollos()">Ingresar Rollos</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button">Ingresar Rollos</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>

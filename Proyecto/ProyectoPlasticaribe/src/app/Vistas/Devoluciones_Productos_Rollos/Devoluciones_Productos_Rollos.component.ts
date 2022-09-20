@@ -95,7 +95,6 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
     this.cargando = true;
   }
 
-
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
   consultarFactura(){
     this.rollos = [];
