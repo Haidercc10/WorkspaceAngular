@@ -4045,63 +4045,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                     datos_categoria.catMP_Nombre,
                     datos_bopp[i].bopP_Ancho);
                 });
-<<<<<<< Updated upstream
-              } else continue;
-            }
-          });
-        }, 2000);
-      }
-
-    } else if(idMateriaPrima != null) {
-      this.buscarMpId();
-
-    } else {
-      this.load = false;
-
-      this.asignacionService.srvObtenerListaPorFecha(this.today).subscribe(datos_asignaciones => {
-        for (let i = 0; i < datos_asignaciones.length; i++) {
-          this.asignacionMpService.srvObtenerListaPorAsigId(datos_asignaciones[i].asigMp_Id).subscribe(datos_asignacionesMP => {
-            for (let j = 0; j < datos_asignacionesMP.length; j++) {
-              this.materiaPrimaService.srvObtenerListaPorId(datos_asignacionesMP[j].matPri_Id).subscribe(datos_materiaPrima => {
-                const matCant : any = {
-                  materiaPrima : datos_materiaPrima.matPri_Id,
-                  cantidad : datos_asignacionesMP[j].dtAsigMp_Cantidad,
-                  categoria : datos_materiaPrima.catMP_Id,
-                }
-                materia_cantidad.push(matCant);
-              });
-            }
-          });
-
-          this.asignacionTintasService.srvObtenerListaPor_Asignacion(datos_asignaciones[i].asigMp_Id).subscribe(datos_asignacionTintas => {
-            for (let j = 0; j < datos_asignacionTintas.length; j++) {
-              this.tintasService.srvObtenerListaPorId(datos_asignacionTintas[j].tinta_Id).subscribe(datos_tintas => {
-                const matCant : any = {
-                  materiaPrima : datos_tintas.tinta_Id,
-                  cantidad : datos_asignacionTintas[j].dtAsigTinta_Cantidad,
-                  categoria : datos_tintas.catMP_Id,
-                }
-                materia_cantidad_tintas.push(matCant);
-              });
-            }
-          });
-        }
-      });
-
-      this.facturaCompraService.srvObtenerListaPorFecha(this.today).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.facturaCompraMPService.srvObtenerListaPorFacId(datos_factura[i].facco_Id).subscribe(datos_facturaMP => {
-            for (let j = 0; j < datos_facturaMP.length; j++) {
-              this.materiaPrimaService.srvObtenerListaPorId(datos_facturaMP[j].matPri_Id).subscribe(datos_materiaPrima => {
-                const matCant : any = {
-                  materiaPrima : datos_materiaPrima.matPri_Id,
-                  cantidad : datos_facturaMP[j].faccoMatPri_Cantidad,
-                }
-                materia_cantidad_factura.push(matCant);
-              });
-=======
               }
->>>>>>> Stashed changes
             }
           });
         }
