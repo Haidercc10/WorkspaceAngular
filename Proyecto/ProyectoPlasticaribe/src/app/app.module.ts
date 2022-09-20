@@ -74,6 +74,8 @@ import { MovimientoMatPrimaComponent } from './Vistas/MovimientoMatPrima/Movimie
 import { MovimientosBOPPComponent } from './Vistas/MovimientosBOPP/MovimientosBOPP.component';
 import { MovimientosTintasComponent } from './Vistas/movimientos-tintas/movimientos-tintas.component';
 import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresar_Productos.component';
+import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura/RollosAsignadasFactura.component';
+import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
 
 
 export const routes: Routes = [
@@ -130,7 +132,9 @@ export const routes: Routes = [
   {path: 'movimientos-matprima', canActivate : [ValidacionLoginGuard], component : MovimientoMatPrimaComponent}, // MOVIMIENTOS DE MATERIA PRIMA
   {path: 'movimientos-bopp', canActivate : [ValidacionLoginGuard], component : MovimientosBOPPComponent}, // MOVIMIENTOS DE BOPP
   {path: 'movimientos-tintas', canActivate : [ValidacionLoginGuard], component : MovimientosTintasComponent}, // MOVIMIENTOS DE TINTAS
-  {path: 'ingresar-productos', canActivate : [ValidacionLoginGuard], component : Ingresar_ProductosComponent}, // Ingresar Productos
+  {path: 'ingresar-productos', canActivate : [ValidacionLoginGuard], component : Ingresar_ProductosComponent}, // Ingresar Rollos
+  {path: 'factura-rollos-productos', canActivate : [ValidacionLoginGuard], component : RollosAsignadasFacturaComponent}, //Consultar Factura
+  {path: 'devolucion-rollos-productos', canActivate : [ValidacionLoginGuard], component : Devoluciones_Productos_RollosComponent}, // Ingresar Devolucion Factura
 ]
 
 @NgModule({
@@ -195,6 +199,8 @@ export const routes: Routes = [
     MovimientosBOPPComponent,
     MovimientosTintasComponent,
     Ingresar_ProductosComponent,
+    RollosAsignadasFacturaComponent,
+    Devoluciones_Productos_RollosComponent,
   ],
 
 

@@ -16,23 +16,27 @@ export class DevolucionesProductosService {
   constructor(private http: HttpClient) { }
 
   srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/');
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Devolucion_ProductoFacturado');
+  }
+
+  srvObteneUltimoId() {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Devolucion_ProductoFacturado/UltimoId');
   }
 
   srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `//${dato}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Devolucion_ProductoFacturado/${dato}`);
   }
 
   srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `//${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/Devolucion_ProductoFacturado/${id}`, data);
   }
 
   srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `//${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Devolucion_ProductoFacturado/${id}`);
   }
 
   srvGuardar(data : modelDevolucionProductos): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/', data);
+   return this.http.post(this.rutaPlasticaribeAPI + '/Devolucion_ProductoFacturado', data);
   }
 
 }

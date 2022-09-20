@@ -15,23 +15,23 @@ export class AsignacionProductosFacturaService {
   constructor(private http: HttpClient) { }
 
   srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/');
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/AsignacionProducto_FacturaVenta');
   }
 
   srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `//${dato}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/${dato}`);
   }
 
   srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `//${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/${id}`, data);
   }
 
   srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `//${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/${id}`);
   }
 
   srvGuardar(data : modelAsigProductosFacturas): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/', data);
+   return this.http.post(this.rutaPlasticaribeAPI + '/AsignacionProducto_FacturaVenta', data);
   }
 
 }

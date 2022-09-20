@@ -10,7 +10,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Ingresar Rollos</h2>
+      <h2 class="tituloRojo">Devolución de Productos/Rollos</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -19,33 +19,37 @@
 </div>
 
 <div class="contain">
-  <!--Inicio info OT-->
   <div class="container-fluid bajarPagina">
     <div class="container">
       <div class="mb-4">
-        <h4 class="tituloRojo">Consultar OT</h4>
+        <h4 class="tituloRojo">Consultar Factura</h4>
       </div>
-      <!-- Formulario para consultar una orden de trabajo -->
-      <form [formGroup]="FormConsultarRollos">
+      <!-- Formulario para consultar Factura -->
+      <form [formGroup]="FormConsultarFactura">
         <!-- Primera Fila -->
         <div class="mb-3">
           <div class="row g-3">
             <!-- OT -->
-            <div class="form-floating col-md-2">
-              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarOTbagPro()">
-              <label for="floatingInput">Nro. OT</label>
+            <div class="form-floating col-md-3">
+              <input formControlName="Fact_Id" type="text" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarFactura()">
+              <label for="floatingInput">Cod. Factura</label>
             </div>
 
             <!-- Cliente -->
-            <div class="form-floating col-md-5">
+            <div class="form-floating col-md">
               <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Cliente</label>
             </div>
+          </div>
+        </div>
 
-            <!-- Producto -->
-            <div class="form-floating col-md-5">
-              <input formControlName="Producto" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Producto</label>
+        <!-- Fila 2 -->
+        <div class="mb-3">
+          <div class="row g-3">
+            <!-- Observacion -->
+            <div class="form-floating col-md">
+              <input formControlName="Observacion" type="text" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarFactura()">
+              <label for="floatingInput">Observación</label>
             </div>
           </div>
         </div>
@@ -92,7 +96,7 @@
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Tabla de Rollos por Ingresar</h4>
+        <h4 class="tituloRojo">Tabla de Rollos por Devolver</h4>
       </div>
 
       <!--Inicio tabla Rollos a Insertar -->
@@ -124,7 +128,7 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="IngresarInfoRollos()">Ingresar Rollos</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="creardevolucion()">Crear Devolución</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>

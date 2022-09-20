@@ -16,23 +16,27 @@ export class DetallesAsignacionProductosFacturaService {
   constructor(private http: HttpClient) { }
 
   srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/');
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetallesAsignacionProducto_FacturaVenta');
   }
 
   srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `//${dato}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/${dato}`);
+  }
+
+  srvObtenerListaPorCodigoFactura(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/CodigoFactura/${dato}`);
   }
 
   srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `//${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/${id}`, data);
   }
 
   srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `//${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/${id}`);
   }
 
   srvGuardar(data : modelAsigProductosFacturas): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/', data);
+   return this.http.post(this.rutaPlasticaribeAPI + '/DetallesAsignacionProducto_FacturaVenta', data);
   }
 
 }

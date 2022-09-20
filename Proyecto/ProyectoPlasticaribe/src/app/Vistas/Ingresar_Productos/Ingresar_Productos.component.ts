@@ -108,42 +108,48 @@ export class Ingresar_ProductosComponent implements OnInit {
 
     this.bagProService.srvObtenerListaProcExtOt(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
-        if (datos_ot[i].nomStatus == 'EMPAQUE'){
-          this.idProducto = datos_ot[i].clienteItem;
-          let info : any = {
-            Id : datos_ot[i].item,
-            Producto : datos_ot[i].clienteItemNombre,
-            Cantidad : datos_ot[i].extnetokg,
-            Presentacion : 'Kg',
+        this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+          if (datos_ot[i].nomStatus == 'EMPAQUE' && datos_rollos.length == 0){
+            this.idProducto = datos_ot[i].clienteItem;
+            let info : any = {
+              Id : datos_ot[i].item,
+              Producto : datos_ot[i].clienteItemNombre,
+              Cantidad : datos_ot[i].extnetokg,
+              Presentacion : 'Kg',
+            }
+            this.rollos.push(info);
+            this.FormConsultarRollos.setValue({
+              OT_Id: ot,
+              Cliente : datos_ot[i].clienteNombre,
+              Producto : datos_ot[i].clienteItemNombre,
+              Observacion : '',
+            });
           }
-          this.rollos.push(info);
-          this.FormConsultarRollos.setValue({
-            OT_Id: ot,
-            Cliente : datos_ot[i].clienteNombre,
-            Producto : datos_ot[i].clienteItemNombre,
-            Observacion : '',
-          });
-        }
+        });
       }
     });
     this.bagProService.srvObtenerListaProcSelladoOT(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
-        this.idProducto = datos_ot[i].referencia;
-        if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
-        if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
-        if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-        let info : any = {
-          Id : datos_ot[i].item,
-          Producto : datos_ot[i].nomReferencia,
-          Cantidad : datos_ot[i].qty,
-          Presentacion : datos_ot[i].unidad,
-        }
-        this.rollos.push(info);
-        this.FormConsultarRollos.setValue({
-          OT_Id: ot,
-          Cliente : datos_ot[i].cliente,
-          Producto : datos_ot[i].nomReferencia,
-          Observacion : '',
+        this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+          if (datos_rollos.length == 0) {
+            this.idProducto = datos_ot[i].referencia;
+            if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
+            if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
+            if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
+            let info : any = {
+              Id : datos_ot[i].item,
+              Producto : datos_ot[i].nomReferencia,
+              Cantidad : datos_ot[i].qty,
+              Presentacion : datos_ot[i].unidad,
+            }
+            this.rollos.push(info);
+            this.FormConsultarRollos.setValue({
+              OT_Id: ot,
+              Cliente : datos_ot[i].cliente,
+              Producto : datos_ot[i].nomReferencia,
+              Observacion : '',
+            });
+          }
         });
       }
     });
@@ -182,6 +188,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     }
   }
 
+  //Funcion para meter el encabezado de la entrada
   IngresarInfoRollos(){
     if (this.rollosInsertar.length == 0) Swal.fire("¡Debe tener minimo un rollo seleccionado!");
     else {
@@ -217,6 +224,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     setTimeout(() => { this.InventarioProductos(); }, 2000);
   }
 
+  // Funcion para mover el inventario de los productos
   InventarioProductos(){
     let sumaCant : number = 0;
     for (let i = 0; i < this.rollosInsertar.length; i++) {
@@ -242,7 +250,7 @@ export class Ingresar_ProductosComponent implements OnInit {
               toast: true,
               position: 'center',
               showConfirmButton: false,
-              timer: 1500,
+              timer: 2500,
               timerProgressBar: true,
               didOpen: (toast) => {
                 toast.addEventListener('mouseenter', Swal.stopTimer)
