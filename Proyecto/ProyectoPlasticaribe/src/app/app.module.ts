@@ -76,6 +76,7 @@ import { MovimientosTintasComponent } from './Vistas/movimientos-tintas/movimien
 import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresar_Productos.component';
 import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura/RollosAsignadasFactura.component';
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
+import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
 
 
 export const routes: Routes = [
@@ -135,6 +136,8 @@ export const routes: Routes = [
   {path: 'ingresar-productos', canActivate : [ValidacionLoginGuard], component : Ingresar_ProductosComponent}, // Ingresar Rollos
   {path: 'factura-rollos-productos', canActivate : [ValidacionLoginGuard], component : RollosAsignadasFacturaComponent}, //Consultar Factura
   {path: 'devolucion-rollos-productos', canActivate : [ValidacionLoginGuard], component : Devoluciones_Productos_RollosComponent}, // Ingresar Devolucion Factura
+  {path: 'ingresar-productos', canActivate : [ValidacionLoginGuard], component : Ingresar_ProductosComponent}, // Ingresar Productos
+  {path: 'asignacion-productos-facturas', canActivate : [ValidacionLoginGuard], component : AsignarProductosFacturasComponent}, // Ingresar Productos
 ]
 
 @NgModule({
@@ -201,6 +204,7 @@ export const routes: Routes = [
     Ingresar_ProductosComponent,
     RollosAsignadasFacturaComponent,
     Devoluciones_Productos_RollosComponent,
+    AsignarProductosFacturasComponent,
   ],
 
 

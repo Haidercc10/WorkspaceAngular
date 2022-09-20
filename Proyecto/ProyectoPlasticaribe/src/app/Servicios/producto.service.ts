@@ -46,5 +46,10 @@ export class ProductoService {
     return this.http.post(this.rutaPlasticaribeAPI + '/Producto', data)
   }
 
+  /** Obtener Info Producto de existencias */
+  srvObtenerPresentacionProducto(id : number|String):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/ConsultaProductoExistencia/${id}`)
+  }
+
 
 }
