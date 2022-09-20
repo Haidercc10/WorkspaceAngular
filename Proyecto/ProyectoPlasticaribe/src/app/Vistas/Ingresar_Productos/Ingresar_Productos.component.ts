@@ -2,6 +2,8 @@ import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
+import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
+import { EntradaRollosService } from 'src/app/Servicios/EntradaRollos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import Swal from 'sweetalert2';
@@ -30,19 +32,22 @@ export class Ingresar_ProductosComponent implements OnInit {
   rollos : any [] = []; //Variable que almacenará los difrentes rollos que se hicieron en la orden de trabajo
   rollosInsertar : any [] = []; //Variable que va a amacenar los diferentes rollos que se van a insertar
   validarRollo : any [] = []; //Variable para validará que el rollo no esté en la tabla
-  idProducto : number = 0; //Variable que va a almacenar el id del producto que fue hecho en la ot consultada
+  idProducto : any = 0; //Variable que va a almacenar el id del producto que fue hecho en la ot consultada
   presentacionProducto : string = ''; //Variable que almacenará la presentacion del producto de la orden de trabajo consultada
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private bagProService : BagproService,
-                      private ExistenciasProdService : ExistenciasProductosService,) {
+                      private ExistenciasProdService : ExistenciasProductosService,
+                        private entradaRolloService : EntradaRollosService,
+                          private dtEntradaRollosService : DetallesEntradaRollosService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [''],
       Cliente : [''],
       Producto : [''],
+      Observacion : [''],
     });
   }
 
@@ -90,6 +95,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     this.rollos = [];
     this.rollosInsertar = [];
     this.validarRollo = [];
+    this.cargando = true;
   }
 
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
@@ -115,6 +121,7 @@ export class Ingresar_ProductosComponent implements OnInit {
             OT_Id: ot,
             Cliente : datos_ot[i].clienteNombre,
             Producto : datos_ot[i].clienteItemNombre,
+            Observacion : '',
           });
         }
       }
@@ -136,6 +143,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           OT_Id: ot,
           Cliente : datos_ot[i].cliente,
           Producto : datos_ot[i].nomReferencia,
+          Observacion : '',
         });
       }
     });
@@ -174,33 +182,60 @@ export class Ingresar_ProductosComponent implements OnInit {
     }
   }
 
-  // Funcion par ingresar los rollos
-  ingresarRollos(){
+  IngresarInfoRollos(){
     if (this.rollosInsertar.length == 0) Swal.fire("¡Debe tener minimo un rollo seleccionado!");
     else {
-      for (let i = 0; i < this.rollosInsertar.length; i++) {
-        let info : any = {
-
-        }
+      this.cargando = false;
+      let info : any = {
+        EntRolloProd_OT : this.FormConsultarRollos.value.OT_Id,
+        Prod_Id : this.idProducto.trim(),
+        UndMed_Id : this.presentacionProducto,
+        EntRolloProd_Fecha : this.today,
+        EntRolloProd_Observacion : this.FormConsultarRollos.value.Observacion,
+        Usua_Id : this.storage_Id,
       }
+      this.entradaRolloService.srvGuardar(info).subscribe(datos_entradaRollo => {
+        this.entradaRolloService.srvObtenerUltimoId().subscribe(datos_ultEntrada => {
+          this.ingresarRollos(datos_entradaRollo.entRolloProd_Id);
+        });
+      });
     }
   }
 
-  InventarioProductos(){
+  // Funcion par ingresar los rollos
+  ingresarRollos(idEntrada : number){
     for (let i = 0; i < this.rollosInsertar.length; i++) {
+      let info : any = {
+        EntRolloProd_Id : idEntrada,
+        Rollo_Id : this.rollosInsertar[i].Id,
+        DtEntRolloProd_Cantidad : this.rollosInsertar[i].Cantidad,
+        UndMed_Id : this.presentacionProducto,
+        Estado_Id : 19,
+      }
+      this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => {  });
+    }
+    setTimeout(() => { this.InventarioProductos(); }, 2000);
+  }
+
+  InventarioProductos(){
+    let sumaCant : number = 0;
+    for (let i = 0; i < this.rollosInsertar.length; i++) {
+      sumaCant +=  this.rollosInsertar[i].Cantidad;
+    }
+    setTimeout(() => {
       this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.idProducto, this.presentacionProducto).subscribe(datos_existencias => {
         for (let j = 0; j < datos_existencias.length; j++) {
           let info : any = {
-            Prod_Id: this.idProducto,
+            Prod_Id: datos_existencias[j].prod_Id,
             exProd_Id : datos_existencias[j].exProd_Id,
-            ExProd_Cantidad: (datos_existencias[j].ExProd_Cantidad + this.rollosInsertar[i].Cantidad),
+            ExProd_Cantidad: (datos_existencias[j].exProd_Cantidad + sumaCant),
             UndMed_Id: this.presentacionProducto,
-            TpBod_Id: datos_existencias[j].TpBod_Id,
-            ExProd_Precio: datos_existencias[j].ExProd_Precio,
-            ExProd_PrecioExistencia: datos_existencias[j].ExProd_PrecioExistencia,
-            ExProd_PrecioSinInflacion: datos_existencias[j].ExProd_PrecioSinInflacion,
-            TpMoneda_Id: datos_existencias[j].TpMoneda_Id,
-            ExProd_PrecioVenta: datos_existencias[j].ExProd_PrecioVenta,
+            TpBod_Id: datos_existencias[j].tpBod_Id,
+            ExProd_Precio: datos_existencias[j].exProd_Precio,
+            ExProd_PrecioExistencia: (datos_existencias[j].exProd_Cantidad + sumaCant) * datos_existencias[j].exProd_PrecioVenta,
+            ExProd_PrecioSinInflacion: datos_existencias[j].exProd_PrecioSinInflacion,
+            TpMoneda_Id: datos_existencias[j].tpMoneda_Id,
+            ExProd_PrecioVenta: datos_existencias[j].exProd_PrecioVenta,
           }
           this.ExistenciasProdService.srvActualizarExistencia(datos_existencias[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
             const Toast = Swal.mixin({
@@ -218,10 +253,11 @@ export class Ingresar_ProductosComponent implements OnInit {
               icon: 'success',
               title: '¡Entrada de Rollos registrada con exito!'
             });
+            this.limpiarCampos();
           });
         }
       });
-    }
+    }, 2000);
   }
 
 }
