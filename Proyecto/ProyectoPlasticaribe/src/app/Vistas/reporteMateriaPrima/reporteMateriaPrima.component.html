@@ -104,9 +104,7 @@
               <tr *ngFor="let columnas of titulosTabla let i = index">
                 <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
                 <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
-                <ng-container *ngIf="categoriaBOPP == 'BOPP'">
-                  <th id="ancho" >Ancho</th>
-                </ng-container>
+                <th id="ancho" >Ancho</th>
                 <th id="cantidadMateriaPrima" scope="col">{{columnas.mpInicial}}</th>
                 <th id="cantidadMateriaPrima" scope="col">{{columnas.mpEntrada}}</th>
                 <th id="cantidadMateriaPrima" scope="col">{{columnas.mpSalida}}</th>
@@ -124,9 +122,7 @@
               <tr *ngFor="let materiaPrima of ArrayMateriaPrima let i=index" >
                 <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
                 <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
-                <ng-container *ngIf="categoriaBOPP == 'BOPP'">
-                  <td id="ancho">{{materiaPrima.Ancho}}</td>
-                </ng-container>
+                <td id="ancho">{{materiaPrima.Ancho}}</td>
                 <td id="cantidadMateriaPrima">{{materiaPrima.Inicial | number}}</td>
                 <td id="cantidadMateriaPrima">{{materiaPrima.Entrada | number}}</td>
                 <td id="cantidadMateriaPrima">{{materiaPrima.Salida | number}}</td>

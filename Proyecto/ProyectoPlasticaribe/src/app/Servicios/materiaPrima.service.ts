@@ -27,6 +27,18 @@ export class MateriaPrimaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/categoria/${id}`);
   }
 
+  srvObtenerListaNumero1(fecha1 : any, fecha2 : any, id : any, categoria : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/ConsultaInventario1/${fecha1}/${fecha2}/${id}/${categoria}`);
+  }
+
+  srvObtenerListaNumero2(fecha1 : any, id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/ConsultaInventario2/${fecha1}/${id}`);
+  }
+
+  srvObtenerListaNumero3(fecha1 : any, id : any, categoria : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/ConsultaInventario3/${fecha1}/${id}/${categoria}`);
+  }
+
   //Metodo agregar Productos
   srvAgregar(data : any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data)

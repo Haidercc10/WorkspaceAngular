@@ -205,14 +205,14 @@ export class MovimientosBOPPComponent implements OnInit {
     });
   }
 
-  // Funcion que buscará el BOPP
+  // Funcion que buscará el BOPP segun la fecha que se le pase
   buscarBOPPSegunFecha(){
     let fecha : any = this.FormDocumentos.value.fecha;
     let fechaFinal : any = this.FormDocumentos.value.fechaFinal;
-    this.ArrayBopp = [];
     let IdBOPP : any = [];
 
     if (fecha != null && fechaFinal != null) {
+      this.ArrayBopp = [];
       this.asignacionBOPPService.srvObtenerListaPorfechas(fecha, fechaFinal).subscribe(datos_asignaciones => {
         for (let i = 0; i < datos_asignaciones.length; i++) {
           this.dtAsgBOPPService.srvObtenerListaPorAsignacion(datos_asignaciones[i].asigBOPP_Id).subscribe(datos_detallesBOPP => {
@@ -233,7 +233,29 @@ export class MovimientosBOPPComponent implements OnInit {
         }
       });
     } else if (fecha != null){
+      this.ArrayBopp = [];
       this.asignacionBOPPService.srvObtenerListaPorfecha(fecha).subscribe(datos_asignaciones => {
+        for (let i = 0; i < datos_asignaciones.length; i++) {
+          this.dtAsgBOPPService.srvObtenerListaPorAsignacion(datos_asignaciones[i].asigBOPP_Id).subscribe(datos_detallesBOPP => {
+            for (let j = 0; j < datos_detallesBOPP.length; j++) {
+              this.boppService.srvObtenerListaPorId(datos_detallesBOPP[j].bopP_Id).subscribe(datos_bopp => {
+                let bopp : any = [];
+                bopp.push(datos_bopp);
+                for (const item of bopp) {
+                  if (!IdBOPP.includes(item.bopP_Id)) {
+                    IdBOPP.push(item.bopP_Id)
+                    this.ArrayBopp.push(item);
+                    this.ArrayBopp.sort((a,b) => a.bopP_Nombre.localeCompare(b.bopP_Nombre));
+                  } else continue;
+                }
+              });
+            }
+          });
+        }
+      });
+    } else if (fechaFinal != null) {
+      this.ArrayBopp = [];
+      this.asignacionBOPPService.srvObtenerListaPorfecha(fechaFinal).subscribe(datos_asignaciones => {
         for (let i = 0; i < datos_asignaciones.length; i++) {
           this.dtAsgBOPPService.srvObtenerListaPorAsignacion(datos_asignaciones[i].asigBOPP_Id).subscribe(datos_detallesBOPP => {
             for (let j = 0; j < datos_detallesBOPP.length; j++) {

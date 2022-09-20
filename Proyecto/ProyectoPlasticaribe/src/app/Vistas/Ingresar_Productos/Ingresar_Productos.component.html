@@ -1,0 +1,135 @@
+<app-menuLateral></app-menuLateral>
+
+<div class="overlay" *ngIf="!cargando">
+  <div class="spinner ">
+    <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+  </div>
+</div>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Ingresar Rollos</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="contain">
+  <!--Inicio info OT-->
+  <div class="container-fluid bajarPagina">
+    <div class="container">
+      <div class="mb-4">
+        <h4 class="tituloRojo">Consultar OT</h4>
+      </div>
+      <!-- Formulario para consultar una orden de trabajo -->
+      <form [formGroup]="FormConsultarRollos">
+        <!-- Primera Fila -->
+        <div class="mb-3">
+          <div class="row g-3">
+            <!-- OT -->
+            <div class="form-floating col-md-2">
+              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarOTbagPro()">
+              <label for="floatingInput">Nro. OT</label>
+            </div>
+
+            <!-- Cliente -->
+            <div class="form-floating col-md-5">
+              <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Cliente</label>
+            </div>
+
+            <!-- Producto -->
+            <div class="form-floating col-md-5">
+              <input formControlName="Producto" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Producto</label>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="mb-4">
+        <hr class="Linea">
+      </div>
+      <!-- Inicio titulo tabla producto -->
+      <div class="mb-4">
+        <h4 class="tituloRojo">Tabla de Rollos</h4>
+      </div>
+
+      <!--Inicio tabla Rollos creados en OT -->
+      <div class="mb-3" *ngIf="cargando">
+        <div class="row g-3">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover mt-2" >
+              <thead class="TitulosTabla">
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Producto</th>
+                  <th scope="col">Cantidad</th>
+                  <th scope="col">Presentacion</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of rollos; let i=index">
+                  <th>{{item.Id}}</th>
+                  <td>{{item.Producto}}</td>
+                  <td>{{item.Cantidad | number}}</td>
+                  <td>{{item.Presentacion}}</td>
+                  <td><input class="form-check-input" style="margin-left: 40%; " type="checkbox" (change)="cargarProducto(item)"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4" *ngIf="cargando">
+        <hr class="Linea">
+      </div>
+      <!-- Inicio titulo tabla producto -->
+      <div class="mb-4" *ngIf="cargando">
+        <h4 class="tituloRojo">Tabla de Rollos por Ingresar</h4>
+      </div>
+
+      <!--Inicio tabla Rollos a Insertar -->
+      <div class="mb-3" *ngIf="cargando">
+        <div class="row g-3">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover mt-2" >
+              <thead class="TitulosTabla">
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Producto</th>
+                  <th scope="col">Cantidad</th>
+                  <th scope="col">Presentación</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of rollosInsertar; let i=index">
+                  <th>{{item.Id}}</th>
+                  <td>{{item.Producto}}</td>
+                  <td>{{item.Cantidad | number}}</td>
+                  <td>{{item.Presentacion}}</td>
+                  <td><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Rollo de la tabla"></i></a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="bajarPagina" *ngIf="cargando">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="ingresarRollos()">Ingresar Rollos</button>
+          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

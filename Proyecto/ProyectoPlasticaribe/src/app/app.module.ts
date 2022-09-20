@@ -73,6 +73,7 @@ import { Entrada_TintasComponent } from './Vistas/Entrada_Tintas/Entrada_Tintas.
 import { MovimientoMatPrimaComponent } from './Vistas/MovimientoMatPrima/MovimientoMatPrima.component';
 import { MovimientosBOPPComponent } from './Vistas/MovimientosBOPP/MovimientosBOPP.component';
 import { MovimientosTintasComponent } from './Vistas/movimientos-tintas/movimientos-tintas.component';
+import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresar_Productos.component';
 
 
 export const routes: Routes = [
@@ -129,6 +130,7 @@ export const routes: Routes = [
   {path: 'movimientos-matprima', canActivate : [ValidacionLoginGuard], component : MovimientoMatPrimaComponent}, // MOVIMIENTOS DE MATERIA PRIMA
   {path: 'movimientos-bopp', canActivate : [ValidacionLoginGuard], component : MovimientosBOPPComponent}, // MOVIMIENTOS DE BOPP
   {path: 'movimientos-tintas', canActivate : [ValidacionLoginGuard], component : MovimientosTintasComponent}, // MOVIMIENTOS DE TINTAS
+  {path: 'ingresar-productos', canActivate : [ValidacionLoginGuard], component : Ingresar_ProductosComponent}, // Ingresar Productos
 ]
 
 @NgModule({
@@ -192,6 +194,7 @@ export const routes: Routes = [
     MovimientoMatPrimaComponent,
     MovimientosBOPPComponent,
     MovimientosTintasComponent,
+    Ingresar_ProductosComponent,
   ],
 
 

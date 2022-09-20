@@ -39,6 +39,10 @@ export class DetallesAsignacionService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/AsignacionesAgrupadas/${ot}`);
   }
 
+  srvObtenerListaPorAsignacionesOT(ot : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/AsignacionesTotales/${ot}`);
+  }
+
   srvObtenerListaPorOT2(ot : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/AsignacionesAgrupadasXvalores/${ot}`);
   }

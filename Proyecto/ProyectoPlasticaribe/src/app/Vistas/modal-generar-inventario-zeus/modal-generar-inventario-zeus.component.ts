@@ -155,10 +155,10 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
       this.load = false;
       setTimeout(() => {
         const title = `Inventario de Productos Terminados ${this.today}`;
-        const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal", "Cantidad Minima"]
+        const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal", "Cantidad Minima", "Ult. Modificación"]
         let datos : any =[];
         for (const item of this.ArrayProductoZeus) {
-          const datos1  : any = [item.codigoItem, item.ClienteNombre, item.nombreItem, item.PrecioItem, item.cantidadItem, item.presentacion, item.PrecioTotalItem, item.cantMinima];
+          const datos1  : any = [item.codigoItem, item.ClienteNombre, item.nombreItem, item.PrecioItem, item.cantidadItem, item.presentacion, item.PrecioTotalItem, item.cantMinima, item.fechaModificacion];
           datos.push(datos1);
         }
         let workbook = new Workbook();
@@ -180,10 +180,9 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         datos.forEach(d => {
           let row = worksheet.addRow(d);
           let qty = row.getCell(5);
+          let qty9 = row.getCell(9);
           let color = 'ADD8E6';
-          if (+qty.value < d[7]) {
-            color = 'FF837B';
-          }
+          if (+qty.value < d[7]) color = 'FF837B';
           qty.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -202,6 +201,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         worksheet.getColumn(6).width = 10;
         worksheet.getColumn(7).width = 20;
         worksheet.getColumn(8).width = 20;
+        worksheet.getColumn(9).width = 20;
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
