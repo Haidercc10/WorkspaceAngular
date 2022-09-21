@@ -204,7 +204,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
         let Clientes : any = registrosClientes[index];
          this.arrayClientes.push(Clientes);
          //console.log(this.arrayClientes);
-
       }
     });
   }

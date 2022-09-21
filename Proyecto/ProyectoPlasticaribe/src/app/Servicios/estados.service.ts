@@ -45,6 +45,10 @@ export class EstadosService {
    return this.http.post(this.rutaPlasticaribeAPI + '/Estadoes', data);
   }
 
+  srvObtenerEstadosRollos():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estadoes/cargarEstadosRollos`);
+  }
+
 }
 
 

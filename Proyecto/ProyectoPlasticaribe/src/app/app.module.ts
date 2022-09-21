@@ -77,6 +77,7 @@ import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresa
 import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura/RollosAsignadasFactura.component';
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
+import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
 
 
 export const routes: Routes = [
@@ -137,6 +138,7 @@ export const routes: Routes = [
   {path: 'factura-rollos-productos', canActivate : [ValidacionLoginGuard], component : RollosAsignadasFacturaComponent}, //Consultar Factura
   {path: 'devolucion-rollos-productos', canActivate : [ValidacionLoginGuard], component : Devoluciones_Productos_RollosComponent}, // Ingresar Devolucion Factura
   {path: 'asignacion-productos-facturas', canActivate : [ValidacionLoginGuard], component : AsignarProductosFacturasComponent}, // Ingresar Productos
+  {path: 'reporte-despacho', canActivate : [ValidacionLoginGuard], component : ReporteDespachoComponent}, // Ingresar Productos
 ]
 
 @NgModule({
@@ -204,6 +206,7 @@ export const routes: Routes = [
     RollosAsignadasFacturaComponent,
     Devoluciones_Productos_RollosComponent,
     AsignarProductosFacturasComponent,
+    ReporteDespachoComponent
   ],
 
 

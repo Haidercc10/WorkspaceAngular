@@ -1,0 +1,196 @@
+<app-menuLateral></app-menuLateral>
+
+<div class="overlay" *ngIf="!cargando">
+  <div class="spinner ">
+    <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+  </div>
+</div>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Reporte de Despacho</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="contain">
+  <!--Inicio info OT-->
+  <div class="container-fluid bajarPagina">
+    <div class="container">
+      <div class="mb-4">
+        <h4 class="tituloRojo">Filtros de búsqueda</h4>
+      </div>
+
+      <!-- Formulario para consultar filtros -->
+      <form [formGroup]="FormConsultarFiltros">
+
+        <!-- Primera Fila -->
+        <div class="mb-3">
+          <div class="row g-3">
+
+             <!-- Factura -->
+             <div class="form-floating col-md-2">
+              <input formControlName="Documento" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Documento</label>
+            </div>
+
+             <!-- Producto -->
+            <ng-container>
+              <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteProductos">
+                <ng-autocomplete
+                  class=""
+                  [data]="arrayProducto"
+                  (selected)='selectEventProducto($event)'
+                  (inputChanged)='onChangeSearchProductos($event)'
+                  (inputFocused)='onFocusedProductos($event)'
+                  [searchKeyword]="keywordProductos"
+                  [itemTemplate]="itemTemplate1"
+                  [notFoundTemplate]="notFoundTemplate"
+                  id="floatingInput"
+                  formControlName="ProdNombre">
+                </ng-autocomplete>
+                <ng-template #itemTemplate1 let-item>
+                  <a [innerHTML]="item.prod_Nombre"></a>
+                </ng-template>
+                <ng-template #notFoundTemplate let-notFound>
+                  <div [innerHTML]="notFound"></div>
+                </ng-template>
+                <label for="floatingInput" *ngIf="validarInputNombresProductos">Producto</label>
+              </div>
+            </ng-container>
+
+             <!-- Rollo -->
+             <ng-container>
+              <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteRollo">
+                <ng-autocomplete
+                  class=""
+                  [data]="arrayRollo"
+                  (selected)='selectEventRollo($event)'
+                  (inputChanged)='onChangeSearchRollo($event)'
+                  (inputFocused)='onFocusedRollo($event)'
+                  [searchKeyword]="keywordRollo2"
+                  [itemTemplate]="itemTemplateCL"
+                  [notFoundTemplate]="notFoundTemplate"
+                  id="floatingInput"
+                  formControlName="Rollo">
+                </ng-autocomplete>
+                <ng-template #itemTemplateCL let-item>
+                  <a [innerHTML]="item.rollo_Id"></a>
+                </ng-template>
+                <ng-template #notFoundTemplate let-notFound>
+                  <div [innerHTML]="notFound"></div>
+                </ng-template>
+                <label for="floatingInput" *ngIf="validarInputRollo">Rollo</label>
+              </div>
+            </ng-container>
+
+            <!-- Tipo Documento -->
+            <div class="form-floating col-md-3">
+              <select formControlName="tipoDoc" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
+                <option [ngValue]="tipoDocu.tpDoc_Id" *ngFor="let tipoDocu of arrayTipoDoc">{{tipoDocu.tpDoc_Nombre}}</option>-->
+              </select>
+              <label for="floatingSelect">Tipo Doc.</label>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Fila 2 -->
+        <div class="mb-3">
+          <div class="row g-3">
+
+            <!-- Fecha Factura -->
+            <div class="form-floating col-md-2">
+              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha inicial</label>
+            </div>
+
+            <!-- Fecha ingreso rollo -->
+            <div class="form-floating col-md-2">
+              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha Final</label>
+            </div>
+
+             <!-- Estado rollo -->
+             <div class="form-floating col-md-2">
+              <select formControlName="estadoRollo" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
+                <option [ngValue]="estRollo.estado_Id" *ngFor="let estRollo of arrayEstadoRollo">{{estRollo.estado_Nombre}}</option>-->
+              </select>
+              <label for="floatingSelect">Estado rollo</label>
+            </div>
+
+          </div>
+        </div>
+      </form>
+
+        <!-- Botones -->
+        <div class="mb-3" *ngIf="cargando">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button class=" btn btn-danger btn-danger-sm" type="button">Consultar</button>
+            <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+          </div>
+        </div>
+
+      <div class="mb-4">
+        <hr class="Linea">
+      </div>
+      <!-- titulo tabla producto -->
+      <div class="mb-4">
+        <h4 class="tituloRojo">Registros consultados</h4>
+      </div>
+
+      <!-- Inicio tabla de registros consultados -->
+      <div class="mb-3" *ngIf="cargando">
+        <div class="row g-3">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover mt-2" >
+              <thead class="TitulosTabla">
+                <tr>
+                  <th scope="col">Factura</th>
+                  <th scope="col">Producto</th>
+                  <th scope="col">Rollo</th>
+                  <th scope="col">Cantidad</th>
+                  <th scope="col">Fecha Factura</th>
+                  <th scope="col">Fecha Envío</th>
+                  <th scope="col">Fecha Ingreso Rollo</th>
+                  <th scope="col">Estado Rollo</th>
+                  <th scope="col">Ver</th>
+                </tr>
+              </thead>
+              <tbody>
+               <!--<tr *ngFor="let item of rollos; let i=index">-->
+                  <tr>
+                  <th></th>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td><a><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver PDF"></i></a></td>
+                 <!-- <td><input class="form-check-input" style="margin-left: 40%; " type="checkbox"></td> -->
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Botones -->
+      <div class="bajarPagina" *ngIf="cargando">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class=" btn btn-danger btn-danger-sm" type="button">Exportar Excel</button>
+          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
