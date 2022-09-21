@@ -150,7 +150,14 @@
                   <td>{{item.Producto}}</td>
                   <td>{{item.Cantidad | number}}</td>
                   <td>{{item.Presentacion}}</td>
-                  <td><input class="form-check-input" id="checkbox" style="margin-left: 40%; " type="checkbox" (change)="cargarProducto(item)"></td>
+
+                  <ng-container *ngIf="item.checkbox">
+                    <td><input class="form-check-input" id="checkbox" style="margin-left: 40%; " type="checkbox" (change)="cargarProducto(item)"></td>
+                  </ng-container>
+
+                  <ng-container *ngIf="!item.checkbox">
+                    <td><input class="form-check-input" id="checkbox" style="margin-left: 40%; " type="checkbox" (change)="cargarProducto(item)" checked></td>
+                  </ng-container>
                 </tr>
               </tbody>
             </table>

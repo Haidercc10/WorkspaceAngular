@@ -110,6 +110,8 @@ export class Ingresar_ProductosComponent implements OnInit {
       for (let i = 0; i < datos_ot.length; i++) {
         this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
           if (datos_ot[i].nomStatus == 'EMPAQUE' && datos_rollos.length == 0){
+            this.idProducto = datos_ot[i].referencia;
+            this.presentacionProducto = 'Kg';
             this.idProducto = datos_ot[i].clienteItem;
             let info : any = {
               Id : datos_ot[i].item,

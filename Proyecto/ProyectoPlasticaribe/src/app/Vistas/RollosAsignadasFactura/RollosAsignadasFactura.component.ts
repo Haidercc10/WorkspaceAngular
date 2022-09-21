@@ -86,7 +86,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   consultarFactura(){
     this.rollos = [];
     let factura : string = this.FormConsultarFactura.value.Fact_Id;
-    this.dtAsgProdFactura.srvObtenerListaPorCodigoFactura(factura).subscribe(datos_factura => {
+    this.dtAsgProdFactura.srvObtenerListaPorCodigoFactura(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         let info : any = {
           Id : datos_factura[i].rollo_Id,

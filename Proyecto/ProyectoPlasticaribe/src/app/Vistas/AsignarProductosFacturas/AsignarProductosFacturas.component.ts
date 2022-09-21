@@ -37,6 +37,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
   idProducto : number = 0; //Variable que va a almacenar el id del producto que fue hecho en la ot consultada
   presentacionProducto : string = ''; //Variable que almacenará la presentacion del producto de la orden de trabajo consultada
   rollosAsignados : any [] = []; //Variable que va a almacenar los rollos que fueron asignados a la factura creada
+  check : boolean; //Variable que nos a ayudar para saber si un rollo ya fue seleccionado
+
 
   keywordNombresProductos = 'prod_Nombre'; /** Variable de palabra clave para Input Producto. */
   validarInputNombresProductos : any = true; /** Variable para validar input producto */
@@ -244,16 +246,20 @@ export class AsignarProductosFacturasComponent implements OnInit {
     else this.validarInputNombresProductos = true;
     let producto : any = this.FormConsultarProductos.value.ProdNombre;
     this.dtEntradaRollo.srvConsultarProducto(producto).subscribe(datos_rollos => {
+      let rollosExistentes : any [] = [];
       for (let i = 0; i < datos_rollos.length; i++) {
         if (datos_rollos[i].estado_Id == 19) {
+          this.check = true;
           let info : any = {
             Id : datos_rollos[i].rollo_Id,
             IdProducto : datos_rollos[i].prod_Id,
             Producto : datos_rollos[i].prod_Nombre,
             Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
             Presentacion : datos_rollos[i].undMed_Id,
+            checkbox : this.check,
           }
           this.rollos.push(info);
+          rollosExistentes.push(datos_rollos[i].rollo_Id);
         }
       }
     });
@@ -424,31 +430,13 @@ export class AsignarProductosFacturasComponent implements OnInit {
                       },
                       {
                         border: [false, false, false, false],
-                        text: `Cod. de Factura`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `${factura.toUpperCase()}`
-                      },
-                    ],
-                    [
-                      {
-                        border: [false, false, false, false],
                         text: `Ciudad`
                       },
                       {
                         border: [false, false, false, true],
                         text: `${datos_factura[i].empresa_Ciudad}`
                       },
-                      {
-                        border: [false, false, false, false],
-                        text: ``
-                      },
-                      {
-                        border: [false, false, false, false],
-                        text: ``
-                      },
-                    ]
+                    ],
                   ]
                 },
                 layout: {
