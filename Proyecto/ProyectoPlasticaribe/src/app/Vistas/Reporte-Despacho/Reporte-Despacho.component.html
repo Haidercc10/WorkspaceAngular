@@ -113,8 +113,6 @@
                 <label for="floatingInput" *ngIf="validarInputCliente">Cliente</label>
               </div>
             </ng-container>
-
-
           </div>
         </div>
 
@@ -157,7 +155,7 @@
       <!-- Botones -->
       <div class="mb-3" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button">Consultar</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarFiltros()">Consultar</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
           <button class=" btn btn-danger btn-danger-sm" type="button">Exportar Excel</button>
         </div>
@@ -178,33 +176,38 @@
             <table class="table table-bordered table-hover mt-2" >
               <thead class="TitulosTabla">
                 <tr>
-                  <th scope="col">Factura</th>
-                  <th scope="col">Producto</th>
+                  <th scope="col">Codigo</th>
+                  <th scope="col">Id Producto</th>
+                  <th scope="col">Nombre Producto</th>
                   <th scope="col">Rollo</th>
                   <th scope="col">Cantidad</th>
-                  <th scope="col">Fecha Factura</th>
-                  <th scope="col">Fecha Envío</th>
-                  <th scope="col">Fecha Ingreso Rollo</th>
+                  <th scope="col">Presentacion</th>
+                  <th scope="col">Fecha</th>
                   <th scope="col">Estado Rollo</th>
+                  <th scope="col">Tipo Doc.</th>
                   <th scope="col">Ver</th>
                 </tr>
               </thead>
               <tbody>
-               <!--<tr *ngFor="let item of rollos; let i=index">-->
-                <tr>
-                  <th></th>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td><a><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver PDF"></i></a></td>
-                  <!-- <td><input class="form-check-input" style="margin-left: 40%; " type="checkbox"></td> -->
+               <tr *ngFor="let item of infoDoc | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
+                  <th>{{item.Codigo}}</th>
+                  <td>{{item.IdProducto}}</td>
+                  <td>{{item.Producto}}</td>
+                  <td>{{item.Rollo}}</td>
+                  <td>{{item.Cantidad | number}}</td>
+                  <td>{{item.Presentacion}}</td>
+                  <td>{{item.Fecha}}</td>
+                  <td>{{item.EstadoRollo}}</td>
+                  <td>{{item.TipoDoc}}</td>
+                  <td><a><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver PDF" (click)="buscarRolloPDF(item.Codigo)"></i></a></td>
                 </tr>
               </tbody>
             </table>
+            <div class="mb-2">
+              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <pagination-controls (pageChange)="page = $event"></pagination-controls>
+              </div>
+            </div>
           </div>
         </div>
       </div>

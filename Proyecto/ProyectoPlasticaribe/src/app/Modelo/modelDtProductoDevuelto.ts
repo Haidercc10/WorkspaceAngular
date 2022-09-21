@@ -3,4 +3,5 @@ export interface modelDtProductoDevuelto {
   Prod_Id : number;
   DtDevProdFact_Cantidad : number;
   UndMed_Id : string;
+  Rollo_Id : number;
 }

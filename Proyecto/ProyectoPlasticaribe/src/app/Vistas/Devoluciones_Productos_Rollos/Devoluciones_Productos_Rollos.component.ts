@@ -206,6 +206,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
         Prod_Id : this.rollosInsertar[i].IdProducto,
         DtDevProdFact_Cantidad : this.rollosInsertar[i].Cantidad,
         UndMed_Id : this.rollosInsertar[i].Presentacion,
+        Rollo_Id : this.rollosInsertar[i].Id,
       }
       this.dtDevolucionService.srvGuardar(info).subscribe(datos_devolcuion => {  });
     }
