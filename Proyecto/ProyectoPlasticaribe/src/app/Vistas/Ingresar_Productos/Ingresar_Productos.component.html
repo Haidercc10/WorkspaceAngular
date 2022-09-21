@@ -66,7 +66,8 @@
             <table class="table table-bordered table-hover mt-2" >
               <thead class="TitulosTabla">
                 <tr>
-                  <th scope="col">ID</th>
+                  <th scope="col">ID Rollo</th>
+                  <th scope="col">ID Producto</th>
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentacion</th>
@@ -76,10 +77,11 @@
               <tbody>
                 <tr *ngFor="let item of rollos; let i=index">
                   <th>{{item.Id}}</th>
+                  <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
                   <td>{{item.Cantidad | number}}</td>
                   <td>{{item.Presentacion}}</td>
-                  <td><input class="form-check-input" style="margin-left: 40%; " type="checkbox" (change)="cargarProducto(item)"></td>
+                  <td><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td>
                 </tr>
               </tbody>
             </table>
@@ -102,18 +104,22 @@
             <table class="table table-bordered table-hover mt-2" >
               <thead class="TitulosTabla">
                 <tr>
-                  <th scope="col">ID</th>
+                  <th scope="col">ID Rollo</th>
+                  <th scope="col">ID Producto</th>
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentación</th>
+                  <th scope="col"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let item of rollosInsertar; let i=index">
                   <th>{{item.Id}}</th>
+                  <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
                   <td>{{item.Cantidad | number}}</td>
                   <td>{{item.Presentacion}}</td>
+                  <td><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarRollo(item)"></i></a></td>
                 </tr>
               </tbody>
             </table>

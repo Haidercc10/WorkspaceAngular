@@ -33,8 +33,8 @@
         <div class="mb-3">
           <div class="row g-3">
 
-             <!-- Factura -->
-             <div class="form-floating col-md-2">
+            <!-- Factura -->
+            <div class="form-floating col-md-2">
               <input formControlName="Documento" type="text" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Documento</label>
             </div>
@@ -116,8 +116,8 @@
               <label for="floatingInput">Fecha Final</label>
             </div>
 
-             <!-- Estado rollo -->
-             <div class="form-floating col-md-2">
+            <!-- Estado rollo -->
+            <div class="form-floating col-md-2">
               <select formControlName="estadoRollo" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
                 <option [ngValue]="estRollo.estado_Id" *ngFor="let estRollo of arrayEstadoRollo">{{estRollo.estado_Nombre}}</option>-->
               </select>
@@ -128,13 +128,14 @@
         </div>
       </form>
 
-        <!-- Botones -->
-        <div class="mb-3" *ngIf="cargando">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class=" btn btn-danger btn-danger-sm" type="button">Consultar</button>
-            <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
-          </div>
+      <!-- Botones -->
+      <div class="mb-3" *ngIf="cargando">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class=" btn btn-danger btn-danger-sm" type="button">Consultar</button>
+          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button">Exportar Excel</button>
         </div>
+      </div>
 
       <div class="mb-4">
         <hr class="Linea">
@@ -164,7 +165,7 @@
               </thead>
               <tbody>
                <!--<tr *ngFor="let item of rollos; let i=index">-->
-                  <tr>
+                <tr>
                   <th></th>
                   <td></td>
                   <td></td>
@@ -174,7 +175,7 @@
                   <td></td>
                   <td></td>
                   <td><a><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver PDF"></i></a></td>
-                 <!-- <td><input class="form-check-input" style="margin-left: 40%; " type="checkbox"></td> -->
+                  <!-- <td><input class="form-check-input" style="margin-left: 40%; " type="checkbox"></td> -->
                 </tr>
               </tbody>
             </table>
@@ -182,14 +183,6 @@
         </div>
       </div>
 
-
-      <!-- Botones -->
-      <div class="bajarPagina" *ngIf="cargando">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button">Exportar Excel</button>
-          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
-        </div>
-      </div>
     </div>
   </div>
 </div>

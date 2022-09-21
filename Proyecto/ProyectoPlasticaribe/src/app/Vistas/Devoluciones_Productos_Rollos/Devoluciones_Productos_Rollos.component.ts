@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
+import { timeStamp } from 'console';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesAsignacionProductosFactura.service';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionesProductos.service';
@@ -153,6 +154,27 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
           if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
         }
       }
+    }
+    for (let i = 0; i < this.rollos.length; i++) {
+      if (item.Id == this.rollos[i].Id) this.rollos.splice(i,1);
+    }
+  }
+
+  // Funcion que se va a encargar de quitar rollos de la tabla inferior
+  quitarRollo(item : any){
+    let info : any = {
+      Id : item.Id,
+      IdProducto : item.IdProducto,
+      Producto : item.Producto,
+      Cantidad : item.Cantidad,
+      Presentacion : item.Presentacion,
+    }
+    this.rollos.push(info);
+    for (let i = 0; i < this.rollosInsertar.length; i++) {
+      if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
+    }
+    for (let i = 0; i < this.validarRollo.length; i++) {
+      if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
     }
   }
 

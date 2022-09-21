@@ -195,6 +195,28 @@ export class AsignarProductosFacturasComponent implements OnInit {
         }
       }
     }
+    for (let i = 0; i < this.rollos.length; i++) {
+      if (this.rollos[i].Id == item.Id) this.rollos.splice(i,1);
+    }
+  }
+
+  // Funcion que se va a encargar de quitar rollos de la tabla inferior
+  quitarRollo(item : any){
+    let info : any = {
+      Id : item.Id,
+      IdProducto : item.IdProducto,
+      Producto : item.Producto,
+      Cantidad : item.Cantidad,
+      Presentacion : item.Presentacion,
+      checkbox : true,
+    }
+    this.rollos.push(info);
+    for (let i = 0; i < this.rollosInsertar.length; i++) {
+      if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
+    }
+    for (let i = 0; i < this.validarRollo.length; i++) {
+      if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
+    }
   }
 
   //Funcion que llanará el array de clientes
@@ -484,7 +506,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
                 style: 'header'
               },
 
-              this.table(this.rollosAsignados, ['Id', 'Producto', 'Cantidad', 'Presentacion']),
+              this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
                 text: `\n \nObervación sobre el pedido: \n ${datos_factura[i].asigProdFV_Observacion}\n`,
                 style: 'header',
@@ -517,8 +539,9 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.dtAsgProdFactura.srvObtenerListaParaPDF(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         let info : any = {
-          Id : datos_factura[i].rollo_Id,
-          Producto : datos_factura[i].prod_Nombre,
+          Rollo : datos_factura[i].rollo_Id,
+          Producto : datos_factura[i].prod_Id,
+          Nombre : datos_factura[i].prod_Nombre,
           Cantidad : this.formatonumeros(datos_factura[i].dtAsigProdFV_Cantidad),
           Presentacion : datos_factura[i].undMed_Id,
         }
@@ -548,7 +571,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
     return {
         table: {
           headerRows: 1,
-          widths: [60, 310, 70, 70],
+          widths: [60, 60, 250, 70, 70],
           body: this.buildTableBody(data, columns),
         },
         fontSize: 9,

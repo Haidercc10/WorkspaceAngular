@@ -115,6 +115,7 @@ export class Ingresar_ProductosComponent implements OnInit {
             this.idProducto = datos_ot[i].clienteItem;
             let info : any = {
               Id : datos_ot[i].item,
+              IdProducto : datos_ot[i].referencia,
               Producto : datos_ot[i].clienteItemNombre,
               Cantidad : datos_ot[i].extnetokg,
               Presentacion : 'Kg',
@@ -140,6 +141,7 @@ export class Ingresar_ProductosComponent implements OnInit {
             if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
             let info : any = {
               Id : datos_ot[i].item,
+              IdProducto : datos_ot[i].referencia,
               Producto : datos_ot[i].nomReferencia,
               Cantidad : datos_ot[i].qty,
               Presentacion : datos_ot[i].unidad,
@@ -163,6 +165,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     if (this.rollosInsertar.length == 0) {
       let info : any = {
         Id : item.Id,
+        IdProducto : item.IdProducto,
         Producto : item.Producto,
         Cantidad : item.Cantidad,
         Presentacion : item.Presentacion,
@@ -173,6 +176,7 @@ export class Ingresar_ProductosComponent implements OnInit {
       if (!this.validarRollo.includes(item.Id)) {
         let info : any = {
           Id : item.Id,
+          IdProducto : item.IdProducto,
           Producto : item.Producto,
           Cantidad : item.Cantidad,
           Presentacion : item.Presentacion,
@@ -187,6 +191,28 @@ export class Ingresar_ProductosComponent implements OnInit {
           if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
         }
       }
+    }
+    for (let i = 0; i < this.rollos.length; i++) {
+      if (this.rollos[i].Id == item.Id) this.rollos.splice(i,1);
+    }
+  }
+
+  // Funcion que se va a encargar de quitar rollos de la tabla inferior
+  quitarRollo(item : any){
+    let info : any = {
+      Id : item.Id,
+      IdProducto : item.IdProducto,
+      Producto : item.Producto,
+      Cantidad : item.Cantidad,
+      Presentacion : item.Presentacion,
+      checkbox : true,
+    }
+    this.rollos.push(info);
+    for (let i = 0; i < this.rollosInsertar.length; i++) {
+      if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
+    }
+    for (let i = 0; i < this.validarRollo.length; i++) {
+      if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
     }
   }
 

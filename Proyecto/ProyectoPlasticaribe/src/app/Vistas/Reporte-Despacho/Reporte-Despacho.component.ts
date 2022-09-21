@@ -29,19 +29,19 @@ export class ReporteDespachoComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   checked : boolean = false; //Variable para saber si el checkbox está seleccionado o no
   keywordProductos = 'prod_Nombre' /** Palabra clave de input productos*/
-  validarInputNombresProductos : any;
+  validarInputNombresProductos : any = true;
   keywordRollo : any = 'rollo_Id' /** Palabra clave de input rollos*/
-  validarInputRollo : any;
-  keywordRollo2 = '';
+  validarInputRollo : any = true;
+  keywordRollo2 = 'rollo_Id';
 
   constructor(private servicioProducto : ProductoService,
-    private frmBuilder : FormBuilder,
-    private rolService : RolesService,
-    @Inject(SESSION_STORAGE) private storage: WebStorageService,
-    private servicioEstados : EstadosService,
-    private servicioTipoDoc : TipoDocumentoService,
-    private ServicioEntradaRollos :  EntradaRollosService,
-    private servicioDtlEntradaRollos: DetallesEntradaRollosService) {
+                private frmBuilder : FormBuilder,
+                  private rolService : RolesService,
+                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                      private servicioEstados : EstadosService,
+                        private servicioTipoDoc : TipoDocumentoService,
+                          private ServicioEntradaRollos :  EntradaRollosService,
+                            private servicioDtlEntradaRollos: DetallesEntradaRollosService) {
 
       this.FormConsultarFiltros = this.frmBuilder.group({
         Documento : ['', Validators.required],
@@ -57,7 +57,6 @@ export class ReporteDespachoComponent implements OnInit {
 
 
   ngOnInit() {
-
     this.lecturaStorage();
     this.fecha();
     this.llenadoProducto();
@@ -179,8 +178,10 @@ export class ReporteDespachoComponent implements OnInit {
   llenadoRollosIngresados() {
     this.servicioDtlEntradaRollos.srvObtenerLista().subscribe(registrosRollos => {
       for (let index = 0; index < registrosRollos.length; index++) {
-        //console.log(registrosRollos[index])
-        this.arrayRollo.push(registrosRollos[index]);
+        let info : any = {
+          rollo_Id : `${registrosRollos[index].rollo_Id}`
+        }
+        this.arrayRollo.push(info);
       }
     });
   }
@@ -194,6 +195,42 @@ export class ReporteDespachoComponent implements OnInit {
     let fechaFin : any = this.FormConsultarFiltros.value.tipoDoc;
     let estadoRollo : any = this.FormConsultarFiltros.value.tipoDoc;
 
+    // if (documento != null && fechaIni != null && fechaFin != null && producto != null && rollo != null && tipoDocu != null && estadoRollo != null){
 
+    // } else if (documento != null && estadoRollo != null) {
+
+    // } else if (documento != null && tipoDocu != null) {
+
+    // } else if (documento != null && rollo != null) {
+
+    // } else if (documento != null && producto != null) {
+
+    // } else if (fechaIni != null && estadoRollo != null) {
+
+    // } else if (fechaIni != null && tipoDocu != null) {
+
+    // } else if (fechaIni != null && rollo != null) {
+
+    // } else if (fechaIni != null && producto != null) {
+
+    // } else if (fechaIni != null && documento != null) {
+
+    // } else if (fechaIni != null && fechaFin != null) {
+
+    // } else if (estadoRollo != null) {
+
+    // } else if (fechaIni != null) {
+
+    // } else if (tipoDocu != null) {
+
+    // } else if (rollo != null) {
+
+    // } else if (producto != null) {
+
+    // } else if (documento != null) {
+
+    // } else {
+
+    // }
   }
 }
