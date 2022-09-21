@@ -127,9 +127,15 @@ a {
 
 .autoCompleteProductos{
   margin-right: 0.8%;
+  width: 98%;
 }
 
 .autoCompleteRollo {
-  width: 100%;
+  margin-right: 0.8%;
+  width: 98%;
+}
 
+.autoCompleteCliente {
+
+  width: 98%;
 }

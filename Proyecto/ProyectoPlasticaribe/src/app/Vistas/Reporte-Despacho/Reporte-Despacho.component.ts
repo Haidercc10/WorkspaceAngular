@@ -21,6 +21,7 @@ export class ReporteDespachoComponent implements OnInit {
   public arrayRollo = [];
   public arrayEstadoRollo = [];
   public arrayTipoDoc = [];
+  public arrayClientes = [];
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -33,6 +34,10 @@ export class ReporteDespachoComponent implements OnInit {
   keywordRollo : any = 'rollo_Id' /** Palabra clave de input rollos*/
   validarInputRollo : any = true;
   keywordRollo2 = 'rollo_Id';
+
+  keywordCliente = 'cli_Nombre';
+  validarInputCliente : any;
+
 
   constructor(private servicioProducto : ProductoService,
                 private frmBuilder : FormBuilder,
@@ -47,6 +52,7 @@ export class ReporteDespachoComponent implements OnInit {
         Documento : ['', Validators.required],
         ProdNombre : ['', Validators.required],
         Rollo : ['', Validators.required ],
+        Cliente : ['', Validators.required ],
         tipoDoc : ['', Validators.required ],
         fechaDoc: ['', Validators.required],
         fechaFinalDoc: ['', Validators.required],
@@ -64,7 +70,7 @@ export class ReporteDespachoComponent implements OnInit {
     this.llenadoTipoDocumento();
     this.cambioKeyword();
     this.llenadoRollosIngresados();
-
+    this.cambioKeyword();
   }
 
   cambioKeyword() {
@@ -117,6 +123,26 @@ export class ReporteDespachoComponent implements OnInit {
     // do something with selected item
   }
 
+  onChangeSearchCliente(val) {
+    if (val != '') this.validarInputCliente = false;
+    else this.validarInputCliente = true;
+    // fetch remote data from here
+    // And reassign the 'data' which is binded to 'data' property.
+  }
+
+  onFocusedCliente(e) {
+    if (!e.isTrusted) this.validarInputCliente = false;
+    else this.validarInputCliente = true;
+    // do something when input is focused
+  }
+
+  selectEventCliente(item) {
+    this.FormConsultarFiltros.value.Cliente = item.cli_Id;
+    if (this.FormConsultarFiltros.value.Cliente != '') this.validarInputCliente = false;
+    else this.validarInputCliente = true;
+    // do something with selected item
+  }
+
   onChangeSearchRollo(val) {
     if (val != '') this.validarInputRollo = false;
     else this.validarInputRollo = true;
@@ -130,7 +156,7 @@ export class ReporteDespachoComponent implements OnInit {
   }
 
   selectEventRollo(item) {
-    this.FormConsultarFiltros.value.Rollo = item.asigProdFV_Id;
+    this.FormConsultarFiltros.value.Rollo = item.entRolloProd_Id;
     if (this.FormConsultarFiltros.value.Rollo != '') this.validarInputRollo = false;
     else this.validarInputRollo = true;
 

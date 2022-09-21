@@ -36,7 +36,7 @@
             <!-- Factura -->
             <div class="form-floating col-md-2">
               <input formControlName="Documento" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Documento</label>
+              <label for="floatingInput">Cod. Documento</label>
             </div>
 
              <!-- Producto -->
@@ -89,13 +89,31 @@
               </div>
             </ng-container>
 
-            <!-- Tipo Documento -->
-            <div class="form-floating col-md-3">
-              <select formControlName="tipoDoc" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-                <option [ngValue]="tipoDocu.tpDoc_Id" *ngFor="let tipoDocu of arrayTipoDoc">{{tipoDocu.tpDoc_Nombre}}</option>-->
-              </select>
-              <label for="floatingSelect">Tipo Doc.</label>
-            </div>
+            <!-- Cliente -->
+            <ng-container>
+              <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteCliente">
+                <ng-autocomplete
+                  class=""
+                  [data]="arrayClientes"
+                  (selected)='selectEventCliente($event)'
+                  (inputChanged)='onChangeSearchCliente($event)'
+                  (inputFocused)='onFocusedCliente($event)'
+                  [searchKeyword]="keywordCliente"
+                  [itemTemplate]="itemTemplateCL"
+                  [notFoundTemplate]="notFoundTemplate"
+                  id="floatingInput"
+                  formControlName="Cliente">
+                </ng-autocomplete>
+                <ng-template #itemTemplateCL let-item>
+                  <a [innerHTML]="item.cli_Nombre"></a>
+                </ng-template>
+                <ng-template #notFoundTemplate let-notFound>
+                  <div [innerHTML]="notFound"></div>
+                </ng-template>
+                <label for="floatingInput" *ngIf="validarInputCliente">Cliente</label>
+              </div>
+            </ng-container>
+
 
           </div>
         </div>
@@ -103,6 +121,14 @@
         <!-- Fila 2 -->
         <div class="mb-3">
           <div class="row g-3">
+
+             <!-- Tipo Documento -->
+             <div class="form-floating col-md-3">
+              <select formControlName="tipoDoc" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
+                <option [ngValue]="tipoDocu.tpDoc_Id" *ngFor="let tipoDocu of arrayTipoDoc">{{tipoDocu.tpDoc_Nombre}}</option>-->
+              </select>
+              <label for="floatingSelect">Tipo Doc.</label>
+            </div>
 
             <!-- Fecha Factura -->
             <div class="form-floating col-md-2">

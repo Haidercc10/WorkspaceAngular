@@ -43,4 +43,8 @@ export class DetallesAsignacionProductosFacturaService {
    return this.http.post(this.rutaPlasticaribeAPI + '/DetallesAsignacionProducto_FacturaVenta', data);
   }
 
+  srvObtenerDocumentosXFechas(fechaInicio : any, fechaFinal : any) : Observable<any> {
+    return this.http.get(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/FiltroFechas/${fechaInicio}/${fechaFinal}`);
+  }
+
 }
