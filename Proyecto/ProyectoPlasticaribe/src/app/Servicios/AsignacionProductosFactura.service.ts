@@ -18,6 +18,10 @@ export class AsignacionProductosFacturaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/AsignacionProducto_FacturaVenta');
   }
 
+  srvObtenerUltimoId() {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/AsignacionProducto_FacturaVenta/UltimoId');
+  }
+
   srvObtenerListaPorId(dato : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/${dato}`);
   }

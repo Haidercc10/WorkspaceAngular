@@ -99,7 +99,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
   consultarFactura(){
     this.rollos = [];
     let factura : string = this.FormConsultarFactura.value.Fact_Id;
-    this.dtAsgProdFactura.srvObtenerListaPorCodigoFactura(factura).subscribe(datos_factura => {
+    this.dtAsgProdFactura.srvObtenerListaPorCodigoFactura(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         if (datos_factura[i].estado_Id == 21) {
           let info : any = {
@@ -113,7 +113,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
           this.idCliente = datos_factura[i].cli_Id;
           this.idFactura = datos_factura[i].facturaVta_Id;
           this.FormConsultarFactura.setValue({
-            Fact_Id: factura,
+            Fact_Id: factura.toUpperCase(),
             Cliente : datos_factura[i].cli_Nombre,
             Observacion : this.FormConsultarFactura.value.Observacion,
           });
@@ -193,7 +193,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
   // Funcion para mover el inventario de los rollos y cambiar su estado
   actualizarRollos(){
     if (this.rollosInsertar.length != 0) {
-      for (let i = 0; i < this.rollos.length; i++) {
+      for (let i = 0; i < this.rollosInsertar.length; i++) {
         this.rollosService.srvObtenerVerificarRollo(this.rollosInsertar[i].Id).subscribe(datos_rollos => {
           for (let j = 0; j < datos_rollos.length; j++) {
             let info : any = {

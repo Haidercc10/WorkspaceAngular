@@ -36,6 +36,12 @@
               <label for="floatingInput">Factura</label>
             </div>
 
+            <!-- Nota Credito -->
+            <div class="form-floating col-md-2">
+              <input formControlName="NotaCredito" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Nota Credito</label>
+            </div>
+
              <!-- Cliente -->
              <ng-container>
               <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteClientes">
@@ -144,7 +150,7 @@
                   <td>{{item.Producto}}</td>
                   <td>{{item.Cantidad | number}}</td>
                   <td>{{item.Presentacion}}</td>
-                  <td><input class="form-check-input" style="margin-left: 40%; " type="checkbox" (change)="cargarProducto(item)"></td>
+                  <td><input class="form-check-input" id="checkbox" style="margin-left: 40%; " type="checkbox" (change)="cargarProducto(item)"></td>
                 </tr>
               </tbody>
             </table>
@@ -191,7 +197,7 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button">Ingresar Rollos</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="crearAsignacion()">Facturar Rollos</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>
