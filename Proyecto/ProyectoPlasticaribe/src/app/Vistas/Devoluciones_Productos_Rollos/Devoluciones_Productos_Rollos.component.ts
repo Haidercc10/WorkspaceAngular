@@ -189,6 +189,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
         DevProdFact_Fecha : this.today,
         DevProdFact_Observacion : this.FormConsultarFactura.value.Observacion,
         TipoDevProdFact_Id : 1,
+        Usua_Id : this.storage_Id,
       }
       this.devolcuionesService.srvGuardar(info).subscribe(datos_devolucion => {
         this.devolcuionesService.srvObteneUltimoId().subscribe(datos_devolucion => {

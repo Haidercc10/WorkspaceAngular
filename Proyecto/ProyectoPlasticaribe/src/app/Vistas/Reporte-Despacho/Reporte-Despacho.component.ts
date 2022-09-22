@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesAsignacionProductosFactura.service';
+import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionesProductos.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 import { EntradaRollosService } from 'src/app/Servicios/EntradaRollos.service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
@@ -42,7 +43,6 @@ export class ReporteDespachoComponent implements OnInit {
   keywordCliente = 'cli_Nombre';
   validarInputCliente : any;
 
-
   constructor(private servicioProducto : ProductoService,
                 private frmBuilder : FormBuilder,
                   private rolService : RolesService,
@@ -51,7 +51,9 @@ export class ReporteDespachoComponent implements OnInit {
                         private servicioTipoDoc : TipoDocumentoService,
                           private ServicioEntradaRollos :  EntradaRollosService,
                             private servicioDtlEntradaRollos: DetallesEntradaRollosService,
-                              private dtAsigFactService : DetallesAsignacionProductosFacturaService,) {
+                              private dtAsigFactService : DetallesAsignacionProductosFacturaService,
+                                private dtDevolucion : DetallesDevolucionesProductosService,
+                                  private dtEntradaService : DetallesEntradaRollosService,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -185,6 +187,7 @@ export class ReporteDespachoComponent implements OnInit {
   //
   limpiarCampos(){
     this.FormConsultarFiltros.reset();
+    this.infoDoc = [];
   }
 
   /** Cargar Productos en Select Input */
@@ -232,66 +235,77 @@ export class ReporteDespachoComponent implements OnInit {
     });
   }
 
+  // Funcion que va a consultar por los filtros que se busquen
   consultarFiltros(){
+    this.cargando = false;
     let documento : any = this.FormConsultarFiltros.value.Documento;
-    let producto : any = this.FormConsultarFiltros.value.ProdNombre;
-    let rollo : any = this.FormConsultarFiltros.value.Rollo;
-    let tipoDocu : any = this.FormConsultarFiltros.value.tipoDoc;
-    let fechaIni : any = this.FormConsultarFiltros.value.tipoDoc;
-    let fechaFin : any = this.FormConsultarFiltros.value.tipoDoc;
-    let estadoRollo : any = this.FormConsultarFiltros.value.tipoDoc;
+    let fechaIni : any = this.FormConsultarFiltros.value.fechaDoc;
+    let fechaFin : any = this.FormConsultarFiltros.value.fechaFinalDoc;
 
     if (fechaIni != null && fechaFin != null) {
-
+      this.dtAsigFactService.srvConsultarPorFiltroFechas(fechaIni, fechaFin).subscribe(datos_factura => {
+        for (let i = 0; i < datos_factura.length; i++) {
+          this.llenarTabla(datos_factura[i]);
+        }
+      });
     } else if (documento != null) {
 
+    } else if (fechaIni != null) {
+      this.dtAsigFactService.srvConsultarPorFiltroFechas(fechaIni, fechaIni).subscribe(datos_factura => {
+        for (let i = 0; i < datos_factura.length; i++) {
+          this.llenarTabla(datos_factura[i]);
+        }
+      });
     } else {
       this.dtAsigFactService.srvConsultarPorFiltroFechas(this.today, this.today).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i], 'ASIGPRODFV');
+          this.llenarTabla(datos_factura[i]);
         }
       });
     }
+    setTimeout(() => { this.cargando = true; }, 2500);
   }
 
   // Funcion que se encagará de llenar la tabla con la informacion consultada
-  llenarTabla(datos : any, tipoDoc : string){
-    if (tipoDoc == 'ASIGPRODFV') {
+  llenarTabla(datos : any){
+    if (datos.tipo == 'ASIGPRODFV') {
       let info : any = {
-        Codigo : datos.facturaVta_Id,
+        Codigo : datos.documento,
         IdProducto : datos.prod_Id,
         Producto : datos.prod_Nombre,
-        Rollo : datos.rollo_Id,
-        Cantidad : datos.dtAsigProdFV_Cantidad,
-        Presentacion : datos.undMed_Id,
-        Fecha : datos.asigProdFV_Fecha.replace('T00:00:00', ''),
-        EstadoRollo : datos.estado_Nombre,
+        Rollo : datos.rollo,
+        Cantidad : datos.cantidad,
+        Presentacion : datos.presentacion,
+        Fecha : datos.fecha.replace('T00:00:00', ''),
+        EstadoRollo : datos.estado_Rollo,
         IdTipoDoc : 'ASIGPRODFV',
         TipoDoc : 'Factura'
       }
       this.infoDoc.push(info);
-    } else if (tipoDoc == 'DEVPRODFAC') {
+    } else if (datos.tipo == 'DEVPRODFAC') {
       let info : any = {
-        Codigo : datos,
-        IdProducto : datos,
-        Producto : datos,
-        Rollo : datos,
-        Cantidad : datos,
-        Fecha : datos,
-        EstadoRollo : datos,
+        Codigo : datos.documento,
+        IdProducto : datos.prod_Id,
+        Producto : datos.prod_Nombre,
+        Rollo : datos.rollo,
+        Cantidad : datos.cantidad,
+        Presentacion : datos.presentacion,
+        Fecha : datos.fecha.replace('T00:00:00', ''),
+        EstadoRollo : datos.estado_Rollo,
         IdTipoDoc : 'DEVPRODFAC',
         TipoDoc : 'Devolución Productos'
       }
       this.infoDoc.push(info);
-    } else if (tipoDoc == 'ENTROLLO') {
+    } else if (datos.tipo == 'ENTROLLO') {
       let info : any = {
-        Codigo : datos,
-        IdProducto : datos,
-        Producto : datos,
-        Rollo : datos,
-        Cantidad : datos,
-        Fecha : datos,
-        EstadoRollo : datos,
+        Codigo : datos.documento,
+        IdProducto : datos.prod_Id,
+        Producto : datos.prod_Nombre,
+        Rollo : datos.rollo,
+        Cantidad : datos.cantidad,
+        Presentacion : datos.presentacion,
+        Fecha : datos.fecha.replace('T00:00:00', ''),
+        EstadoRollo : datos.estado_Rollo,
         IdTipoDoc : 'ENTROLLO',
         TipoDoc : 'Entrada Rollo'
       }
@@ -299,10 +313,18 @@ export class ReporteDespachoComponent implements OnInit {
     }
     this.infoDoc.sort((a,b) => a.Codigo.localeCompare(b.Codigo));
     this.infoDoc.sort((a,b) => b.Fecha.localeCompare(a.Fecha));
+    this.cargando = true;
+  }
+
+  // Funcion que valiará que tipo de documento es el que se quiere ver y redirecciona a otra funcion que empezará con el proceso de crear un PDF
+  tipoDocumento(item : any){
+    if (item.IdTipoDoc == 'ASIGPRODFV') this.buscarRolloPDFFActura(item.Codigo);
+    else if (item.IdTipoDoc == 'DEVPRODFAC') this.buscarRolloPDFDevolucion(item.Codigo);
+    else if (item.IdTipoDoc == 'ENTROLLO') this.buscarRolloPDFEntrada(item.Codigo);
   }
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
-  crearPDF(factura){
+  crearPDFFactura(factura){
     this.dtAsigFactService.srvObtenerListaParaPDF(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         for (let j = 0; j < this.rollosAsignados.length; j++) {
@@ -413,7 +435,7 @@ export class ReporteDespachoComponent implements OnInit {
 
               this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
-                text: `\n \nObervación sobre el pedido: \n ${datos_factura[i].asigProdFV_Observacion}\n`,
+                text: `\n \nObervación: \n ${datos_factura[i].asigProdFV_Observacion}\n`,
                 style: 'header',
               }
             ],
@@ -430,7 +452,7 @@ export class ReporteDespachoComponent implements OnInit {
           }
           const pdf = pdfMake.createPdf(pdfDefinicion);
           pdf.open();
-          this.limpiarCampos();
+          this.cargando = true;
           break;
         }
         break;
@@ -439,7 +461,9 @@ export class ReporteDespachoComponent implements OnInit {
   }
 
   // Funcion que traerá los rollos que fueron asignados a la factura creada
-  buscarRolloPDF(factura){
+  buscarRolloPDFFActura(factura){
+    this.rollosAsignados = [];
+    this.cargando = false;
     this.dtAsigFactService.srvObtenerListaParaPDF(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         let info : any = {
@@ -452,7 +476,284 @@ export class ReporteDespachoComponent implements OnInit {
         this.rollosAsignados.push(info);
       }
     });
-    setTimeout(() => { this.crearPDF(factura); }, 2500);
+    setTimeout(() => { this.crearPDFFactura(factura); }, 2500);
+  }
+
+  // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
+  crearPDFDevolucion(factura){
+    this.dtDevolucion.srvObtenerCrearPDF(factura.toUpperCase()).subscribe(datos_factura => {
+      for (let i = 0; i < datos_factura.length; i++) {
+        for (let j = 0; j < this.rollosAsignados.length; j++) {
+          const pdfDefinicion : any = {
+            info: {
+              title: `${factura.toUpperCase()}`
+            },
+            pageSize: {
+              width: 630,
+              height: 760
+            },
+            content : [
+              {
+                text: `Rollos devueltos de la factura ${factura.toUpperCase()}`,
+                alignment: 'right',
+                style: 'titulo',
+              },
+              '\n \n',
+              {
+                style: 'tablaEmpresa',
+                table: {
+                  widths: [90, '*', 90, '*'],
+                  style: 'header',
+                  body: [
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Nombre Empresa`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `Plasticaribe S.A.S`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: `Fecha`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].devProdFact_Fecha.replace('T00:00:00', '')}`
+                      },
+                    ],
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Dirección`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].empresa_Direccion}`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: `Ciudad`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].empresa_Ciudad}`
+                      },
+                    ],
+                  ]
+                },
+                layout: {
+                  defaultBorder: false,
+                },
+                fontSize: 9,
+              },
+              '\n \n',
+              {
+                text: `Facturado Por: ${datos_factura[i].nombreCreador}\n`,
+                alignment: 'left',
+                style: 'header',
+              },
+              '\n \n',
+              {
+                text: `\n Información detallada de la Factura \n \n`,
+                alignment: 'center',
+                style: 'header'
+              },
+              {
+                style: 'tablaCliente',
+                table: {
+                  widths: ['*', '*'],
+                  style: 'header',
+                  body: [
+                    [
+                      `Código: ${factura.toUpperCase()}`,
+                      `Nota Credito: ${datos_factura[i].notaCredito_Id}`
+                    ],
+                    [
+                      `Id Cliente: ${datos_factura[i].cli_Id}`,
+                      `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
+                    ]
+                  ]
+                },
+                layout: 'lightHorizontalLines',
+                fontSize: 9,
+              },
+              '\n \n',
+              {
+                text: `\n\n Información detallada de los rollos ingresados \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+
+              this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
+              {
+                text: `\n \nObervación: \n ${datos_factura[i].devProdFact_Observacion}\n`,
+                style: 'header',
+              }
+            ],
+            styles: {
+              header: {
+                fontSize: 10,
+                bold: true
+              },
+              titulo: {
+                fontSize: 20,
+                bold: true
+              }
+            }
+          }
+          const pdf = pdfMake.createPdf(pdfDefinicion);
+          pdf.open();
+          this.cargando = true;
+          break;
+        }
+        break;
+      }
+    });
+  }
+
+  // Funcion que traerá los rollos que fueron asignados a la factura creada
+  buscarRolloPDFDevolucion(factura){
+    this.rollosAsignados = [];
+    this.cargando = false;
+    this.dtDevolucion.srvObtenerCrearPDF(factura.toUpperCase()).subscribe(datos_factura => {
+      for (let i = 0; i < datos_factura.length; i++) {
+        let info : any = {
+          Rollo : datos_factura[i].rollo_Id,
+          Producto : datos_factura[i].prod_Id,
+          Nombre : datos_factura[i].prod_Nombre,
+          Cantidad : this.formatonumeros(datos_factura[i].dtDevProdFact_Cantidad),
+          Presentacion : datos_factura[i].undMed_Id,
+        }
+        this.rollosAsignados.push(info);
+      }
+    });
+    setTimeout(() => { this.crearPDFDevolucion(factura); }, 2500);
+  }
+
+  // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
+  crearPDFEntrada(ot){
+    this.dtEntradaService.srvObtenerCrearPDF(ot).subscribe(datos_factura => {
+      for (let i = 0; i < datos_factura.length; i++) {
+        for (let j = 0; j < this.rollosAsignados.length; j++) {
+          const pdfDefinicion : any = {
+            info: {
+              title: `${ot}`
+            },
+            pageSize: {
+              width: 630,
+              height: 760
+            },
+            content : [
+              {
+                text: `Rollos Ingresados de la OT ${ot}`,
+                alignment: 'right',
+                style: 'titulo',
+              },
+              '\n \n',
+              {
+                style: 'tablaEmpresa',
+                table: {
+                  widths: [90, '*', 90, '*'],
+                  style: 'header',
+                  body: [
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Nombre Empresa`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `Plasticaribe S.A.S`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: `Fecha`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].entRolloProd_Fecha.replace('T00:00:00', '')}`
+                      },
+                    ],
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Dirección`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].empresa_Direccion}`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: `Ciudad`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].empresa_Ciudad}`
+                      },
+                    ],
+                  ]
+                },
+                layout: {
+                  defaultBorder: false,
+                },
+                fontSize: 9,
+              },
+              '\n \n',
+              {
+                text: `Ingresados Por: ${datos_factura[i].nombreCreador}\n`,
+                alignment: 'left',
+                style: 'header',
+              },
+              '\n \n',
+              {
+                text: `\n\n Información detallada de los rollos ingresados \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+
+              this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
+            ],
+            styles: {
+              header: {
+                fontSize: 10,
+                bold: true
+              },
+              titulo: {
+                fontSize: 20,
+                bold: true
+              }
+            }
+          }
+          const pdf = pdfMake.createPdf(pdfDefinicion);
+          pdf.open();
+          this.cargando = true;
+          break;
+        }
+        break;
+      }
+    });
+  }
+
+  // Funcion que traerá los rollos que fueron asignados a la factura creada
+  buscarRolloPDFEntrada(ot){
+    this.rollosAsignados = [];
+    this.cargando = false;
+    this.dtEntradaService.srvObtenerCrearPDF(ot).subscribe(datos_factura => {
+      for (let i = 0; i < datos_factura.length; i++) {
+        let info : any = {
+          Rollo : datos_factura[i].rollo_Id,
+          Producto : datos_factura[i].prod_Id,
+          Nombre : datos_factura[i].prod_Nombre,
+          Cantidad : this.formatonumeros(datos_factura[i].dtEntRolloProd_Cantidad),
+          Presentacion : datos_factura[i].undMed_Id,
+        }
+        this.rollosAsignados.push(info);
+      }
+    });
+    setTimeout(() => { this.crearPDFEntrada(ot); }, 2500);
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
