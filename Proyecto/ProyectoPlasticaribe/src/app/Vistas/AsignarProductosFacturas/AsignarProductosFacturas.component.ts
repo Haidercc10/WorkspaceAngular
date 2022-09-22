@@ -38,7 +38,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   presentacionProducto : string = ''; //Variable que almacenará la presentacion del producto de la orden de trabajo consultada
   rollosAsignados : any [] = []; //Variable que va a almacenar los rollos que fueron asignados a la factura creada
   check : boolean; //Variable que nos a ayudar para saber si un rollo ya fue seleccionado
-
+  Total : number = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
 
   keywordNombresProductos = 'prod_Nombre'; /** Variable de palabra clave para Input Producto. */
   validarInputNombresProductos : any = true; /** Variable para validar input producto */
@@ -173,6 +173,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       }
       this.rollosInsertar.push(info);
       this.validarRollo.push(item.Id);
+      this.Total += item.Cantidad;
     } else {
       if (!this.validarRollo.includes(item.Id)) {
         let info : any = {
@@ -184,6 +185,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         }
         this.rollosInsertar.push(info);
         this.validarRollo.push(item.Id);
+        this.Total += item.Cantidad;
       } else if (this.validarRollo.includes(item.Id)) {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
           if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
@@ -191,6 +193,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         for (let i = 0; i < this.validarRollo.length; i++) {
           if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
         }
+        this.Total -= item.Cantidad;
       }
     }
     for (let i = 0; i < this.rollos.length; i++) {
@@ -209,6 +212,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       checkbox : true,
     }
     this.rollos.push(info);
+    this.Total -= item.Cantidad;
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
     }
@@ -487,10 +491,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
                     [
                       `Id Cliente: ${datos_factura[i].cli_Id}`,
                       `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
-                    ],
-                    [
-                      `Conductor: ${datos_factura[i].nombreConductor}`,
-                      `Placa Camión: ${datos_factura[i].asigProdFV_PlacaCamion}`
                     ]
                   ]
                 },

@@ -25,6 +25,7 @@ export class ReporteDespachoComponent implements OnInit {
   public arrayEstadoRollo = [];
   public arrayTipoDoc = [];
   public arrayClientes = [];
+  rolloFiltrados : any [] = [];
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -63,13 +64,13 @@ export class ReporteDespachoComponent implements OnInit {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
-      ProdNombre : [null, Validators.required],
-      Rollo : [null, Validators.required ],
-      Cliente : [null, Validators.required ],
-      tipoDoc : [null, Validators.required ],
+      ProdNombre : ['', Validators.required],
+      Rollo : ['', Validators.required ],
+      Cliente : ['', Validators.required ],
+      tipoDoc : ['', Validators.required ],
       fechaDoc: [null, Validators.required],
       fechaFinalDoc: [null, Validators.required],
-      estadoRollo: [null, Validators.required],
+      estadoRollo: ['', Validators.required],
     });
   }
 
@@ -192,7 +193,16 @@ export class ReporteDespachoComponent implements OnInit {
 
   //
   limpiarCampos(){
-    this.FormConsultarFiltros.reset();
+    this.FormConsultarFiltros = this.frmBuilder.group({
+      Documento : [null, Validators.required],
+      ProdNombre : ['', Validators.required],
+      Rollo : ['', Validators.required ],
+      Cliente : ['', Validators.required ],
+      tipoDoc : ['', Validators.required ],
+      fechaDoc: [null, Validators.required],
+      fechaFinalDoc: [null, Validators.required],
+      estadoRollo: ['', Validators.required],
+    });
     this.infoDoc = [];
   }
 
@@ -248,10 +258,12 @@ export class ReporteDespachoComponent implements OnInit {
     let documento : any = this.FormConsultarFiltros.value.Documento;
     let fechaIni : any = this.FormConsultarFiltros.value.fechaDoc;
     let fechaFin : any = this.FormConsultarFiltros.value.fechaFinalDoc;
+    if (documento == '') documento = null;
+    if (fechaIni == '') documento = null;
+    if (fechaFin == '') documento = null;
 
-    if (documento != null && fechaIni != null && fechaFin != null) {
 
-    } else if (fechaIni != null && fechaFin != null) {
+    if (fechaIni != null && fechaFin != null) {
       this.dtAsigFactService.srvConsultarPorFiltroFechas(fechaIni, fechaFin).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
           this.llenarTabla(datos_factura[i]);
@@ -284,6 +296,8 @@ export class ReporteDespachoComponent implements OnInit {
     if (datos.tipo == 'ASIGPRODFV') {
       let info : any = {
         Codigo : datos.documento,
+        IdCliente : datos.cli_Id,
+        Cliente : datos.cli_Nombre,
         IdProducto : datos.prod_Id,
         Producto : datos.prod_Nombre,
         Rollo : datos.rollo,
@@ -298,6 +312,8 @@ export class ReporteDespachoComponent implements OnInit {
     } else if (datos.tipo == 'DEVPRODFAC') {
       let info : any = {
         Codigo : datos.documento,
+        IdCliente : datos.cli_Id,
+        Cliente : datos.cli_Nombre,
         IdProducto : datos.prod_Id,
         Producto : datos.prod_Nombre,
         Rollo : datos.rollo,
@@ -306,13 +322,15 @@ export class ReporteDespachoComponent implements OnInit {
         Fecha : datos.fecha.replace('T00:00:00', ''),
         EstadoRollo : datos.estado_Rollo,
         IdTipoDoc : 'DEVPRODFAC',
-        TipoDoc : 'Devolución Productos'
+        TipoDoc : 'Devolución'
       }
       this.infoDoc.push(info);
     } else if (datos.tipo == 'ENTROLLO') {
       let info : any = {
         Codigo : datos.documento,
         IdProducto : datos.prod_Id,
+        Cliente : datos.prod_Nombre,
+        IdCliente : datos.prod_Id,
         Producto : datos.prod_Nombre,
         Rollo : datos.rollo,
         Cantidad : datos.cantidad,
@@ -320,7 +338,7 @@ export class ReporteDespachoComponent implements OnInit {
         Fecha : datos.fecha.replace('T00:00:00', ''),
         EstadoRollo : datos.estado_Rollo,
         IdTipoDoc : 'ENTROLLO',
-        TipoDoc : 'Entrada Rollo'
+        TipoDoc : 'Entrada'
       }
       this.infoDoc.push(info);
     }
@@ -581,7 +599,7 @@ export class ReporteDespachoComponent implements OnInit {
                   body: [
                     [
                       `Código: ${factura.toUpperCase()}`,
-                      `Nota Credito: ${datos_factura[i].notaCredito_Id}`
+                      ``
                     ],
                     [
                       `Id Cliente: ${datos_factura[i].cli_Id}`,

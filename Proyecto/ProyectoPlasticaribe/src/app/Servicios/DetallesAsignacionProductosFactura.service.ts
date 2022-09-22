@@ -35,7 +35,7 @@ export class DetallesAsignacionProductosFacturaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/FiltroFechas/${fecha1}/${fecha2}`);
   }
 
-  srvConsultarPorFiltroFactura(factura : any, ot : any = 0){
+  srvConsultarPorFiltroFactura(factura : any, ot : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/FiltroFactura/${factura}/${ot}`);
   }
 

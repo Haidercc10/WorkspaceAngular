@@ -52,17 +52,16 @@
             </div>
 
             <!-- Cliente -->
-            <div class="form-floating col-md-3">
+            <div class="form-floating col-md">
               <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Cliente</label>
             </div>
 
-            <!-- Producto -->
-            <div class="form-floating col-md-3">
-              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput">
+             <!-- Producto Input-->
+             <div class="form-floating col-md">
+              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput" name="Producto" [(ngModel)]="Producto">
               <label for="floatingInput">Producto</label>
             </div>
-
 
             <!-- Cliente
             <ng-container>
@@ -154,14 +153,8 @@
 
             <!-- Producto -->
             <div class="form-floating col-md-2">
-              <input formControlName="Rollo" type="text" class="form-control form-control-sm" id="floatingInput">
+              <input formControlName="Rollo" type="text" class="form-control form-control-sm" id="floatingInput" [(ngModel)]="Rollo">
               <label for="floatingInput">Rollo</label>
-            </div>
-
-             <!-- Producto Input-->
-             <div class="form-floating col-md-4">
-              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput" name="Producto" [(ngModel)]="Producto">
-              <label for="floatingInput">Producto</label>
             </div>
 
              <!-- Tipo Documento -->
@@ -209,20 +202,22 @@
               <thead class="TitulosTabla">
                 <tr>
                   <th scope="col">Codigo</th>
+                  <th scope="col">Cliente</th>
                   <th scope="col">Id Producto</th>
                   <th scope="col">Nombre Producto</th>
                   <th scope="col">Rollo</th>
                   <th scope="col">Cantidad</th>
-                  <th scope="col">Presentacion</th>
+                  <th scope="col">Medida</th>
                   <th scope="col">Fecha</th>
                   <th scope="col">Estado Rollo</th>
                   <th scope="col">Tipo Doc.</th>
                   <th scope="col">Ver</th>
                 </tr>
               </thead>
-              <tbody>
-               <tr *ngFor="let item of infoDoc  | filtroXFacturas : Codigo | filtroXRollo_RptDespacho : Rollo | filtroXProducto_RptDespacho : Producto | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
+              <tbody style="font-size: 14px;">
+               <tr *ngFor="let item of infoDoc | filtroXFacturas : Codigo | filtroXRollo_RptDespacho : Rollo | filtroXProducto_RptDespacho : Producto | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
                   <th>{{item.Codigo}}</th>
+                  <td>{{item.Cliente}}</td>
                   <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
                   <td>{{item.Rollo}}</td>
