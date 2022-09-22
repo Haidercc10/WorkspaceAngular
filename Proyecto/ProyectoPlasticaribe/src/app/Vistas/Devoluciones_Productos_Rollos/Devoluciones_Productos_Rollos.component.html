@@ -29,10 +29,16 @@
         <!-- Primera Fila -->
         <div class="mb-3">
           <div class="row g-3">
-            <!-- OT -->
-            <div class="form-floating col-md-3">
+            <!-- Facturas -->
+            <div class="form-floating col-md-2">
               <input formControlName="Fact_Id" type="text" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarFactura()">
               <label for="floatingInput">Cod. Factura</label>
+            </div>
+
+            <!-- Rollos -->
+            <div class="form-floating col-md-2">
+              <input formControlName="Rollo_Id" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarRollo()">
+              <label for="floatingInput">Cod. Rollo</label>
             </div>
 
             <!-- Cliente -->
@@ -70,7 +76,10 @@
             <table class="table table-bordered table-hover mt-2" >
               <thead class="TitulosTabla">
                 <tr>
+                  <th scope="col">Factura</th>
                   <th scope="col">Rollo</th>
+                  <th scope="col">ID Cliente</th>
+                  <th scope="col">Cliente</th>
                   <th scope="col">ID Producto</th>
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
@@ -80,7 +89,10 @@
               </thead>
               <tbody>
                 <tr *ngFor="let item of rollos; let i=index">
+                  <th>{{item.Factura}}</th>
                   <th>{{item.Id}}</th>
+                  <td>{{item.IdCliente}}</td>
+                  <td>{{item.Cliente}}</td>
                   <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
                   <td>{{item.Cantidad | number}}</td>

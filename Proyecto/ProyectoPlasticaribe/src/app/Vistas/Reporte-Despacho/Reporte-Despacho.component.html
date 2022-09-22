@@ -51,19 +51,45 @@
               <label for="floatingInput">Fecha Final</label>
             </div>
 
-             <!-- Cliente Input-->
-             <div class="form-floating col-md">
-              <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput" name="Cliente" [(ngModel)]="Cliente">
+            <!-- Cliente -->
+            <div class="form-floating col-md-3">
+              <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Cliente</label>
             </div>
 
-            <!-- Rollo Input-->
-            <div class="form-floating col-md-2">
-              <input formControlName="Rollo" type="text" class="form-control form-control-sm" id="floatingInput" name="Rollo" [(ngModel)]="Rollo">
-              <label for="floatingInput">Rollo</label>
+            <!-- Producto -->
+            <div class="form-floating col-md-3">
+              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Producto</label>
             </div>
 
-             <!-- Producto
+
+            <!-- Cliente
+            <ng-container>
+              <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteCliente">
+                <ng-autocomplete
+                  class=""
+                  [data]="arrayClientes"
+                  (selected)='selectEventCliente($event)'
+                  (inputChanged)='onChangeSearchCliente($event)'
+                  (inputFocused)='onFocusedCliente($event)'
+                  [searchKeyword]="keywordCliente"
+                  [itemTemplate]="itemTemplateCL"
+                  [notFoundTemplate]="notFoundTemplate"
+                  id="floatingInput"
+                  formControlName="Cliente">
+                </ng-autocomplete>
+                <ng-template #itemTemplateCL let-item>
+                  <a [innerHTML]="item.cli_Nombre"></a>
+                </ng-template>
+                <ng-template #notFoundTemplate let-notFound>
+                  <div [innerHTML]="notFound"></div>
+                </ng-template>
+                <label for="floatingInput" *ngIf="validarInputCliente">Cliente</label>
+              </div>
+            </ng-container>
+
+             Producto
             <ng-container>
               <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteProductos">
                 <ng-autocomplete
@@ -91,9 +117,16 @@
               </div>
             </ng-container> -->
 
+          </div>
+        </div>
+
+        <!-- Fila 2 -->
+        <div class="mb-3">
+          <div class="row g-3">
+
              <!-- Rollo
              <ng-container>
-              <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteRollo">
+              <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm autoCompleteRollo">
                 <ng-autocomplete
                   class=""
                   [data]="arrayRollo"
@@ -117,38 +150,13 @@
                 </ng-template>
                 <label for="floatingInput" *ngIf="validarInputRollo">Rollo</label>
               </div>
-            </ng-container>-->
+            </ng-container> -->
 
-            <!-- Cliente
-            <ng-container>
-              <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteCliente">
-                <ng-autocomplete
-                  class=""
-                  [data]="arrayClientes"
-                  (selected)='selectEventCliente($event)'
-                  (inputChanged)='onChangeSearchCliente($event)'
-                  (inputFocused)='onFocusedCliente($event)'
-                  [searchKeyword]="keywordCliente"
-                  [itemTemplate]="itemTemplateCL"
-                  [notFoundTemplate]="notFoundTemplate"
-                  id="floatingInput"
-                  formControlName="Cliente">
-                </ng-autocomplete>
-                <ng-template #itemTemplateCL let-item>
-                  <a [innerHTML]="item.cli_Nombre"></a>
-                </ng-template>
-                <ng-template #notFoundTemplate let-notFound>
-                  <div [innerHTML]="notFound"></div>
-                </ng-template>
-                <label for="floatingInput" *ngIf="validarInputCliente">Cliente</label>
-              </div>
-            </ng-container>-->
-          </div>
-        </div>
-
-        <!-- Fila 2 -->
-        <div class="mb-3">
-          <div class="row g-3">
+            <!-- Producto -->
+            <div class="form-floating col-md-2">
+              <input formControlName="Rollo" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Rollo</label>
+            </div>
 
              <!-- Producto Input-->
              <div class="form-floating col-md-4">

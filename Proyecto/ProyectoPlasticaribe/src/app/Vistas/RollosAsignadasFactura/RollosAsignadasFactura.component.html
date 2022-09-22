@@ -40,6 +40,20 @@
               <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Cliente</label>
             </div>
+
+           <!-- Conductor -->
+            <div class="form-floating col-md-3">
+              <select formControlName="Conductor" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
+                <option [ngValue]="conductor.usua_Id" *ngFor="let conductor of arrayConductor">{{conductor.usua_Nombre}}</option>
+              </select>
+              <label for="floatingSelect">Conductor</label>
+            </div>
+
+            <!--Placa camión-->
+            <div class="form-floating col-md-2">
+              <input formControlName="PlacaCamion" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Placa Camión</label>
+            </div>
           </div>
         </div>
       </form>
@@ -81,7 +95,7 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="cambiarEstado()">Confirmar Rollos</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="actualizarFactura()">Confirmar Rollos</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>

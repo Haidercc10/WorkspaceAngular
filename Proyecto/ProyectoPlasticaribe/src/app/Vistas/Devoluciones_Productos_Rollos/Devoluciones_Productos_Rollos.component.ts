@@ -44,6 +44,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
 
     this.FormConsultarFactura = this.frmBuilderPedExterno.group({
       Fact_Id: [''],
+      Rollo_Id : [''],
       Cliente : [''],
       Observacion : [''],
     });
@@ -104,7 +105,10 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
       for (let i = 0; i < datos_factura.length; i++) {
         if (datos_factura[i].estado_Id == 21) {
           let info : any = {
+            Factura : factura.toUpperCase(),
             Id : datos_factura[i].rollo_Id,
+            IdCliente : datos_factura[i].cli_Id,
+            Cliente : datos_factura[i].cli_Nombre,
             IdProducto : datos_factura[i].prod_Id,
             Producto : datos_factura[i].prod_Nombre,
             Cantidad : datos_factura[i].dtAsigProdFV_Cantidad,
@@ -115,7 +119,39 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
           this.idFactura = datos_factura[i].facturaVta_Id;
           this.FormConsultarFactura.setValue({
             Fact_Id: factura.toUpperCase(),
+            Rollo_Id : this.FormConsultarFactura.value.Rollo_Id,
             Cliente : datos_factura[i].cli_Nombre,
+            Observacion : this.FormConsultarFactura.value.Observacion,
+          });
+        }
+      }
+    });
+  }
+
+  // Funcion que traerá la informacion del rollo que se esta consultando
+  consultarRollo(){
+    this.rollos = [];
+    let rollo : number = this.FormConsultarFactura.value.Rollo_Id;
+    this.dtDevolucionService.srvObtenerListaPorRollo(rollo).subscribe(datos_rollos => {
+      for (let i = 0; i < datos_rollos.length; i++) {
+        if (datos_rollos[i].estado_Id == 21) {
+          let info : any = {
+            Factura : datos_rollos[i].facturaVta_Id,
+            Id : datos_rollos[i].rollo_Id,
+            IdCliente : datos_rollos[i].cli_Id,
+            Cliente : datos_rollos[i].cli_Nombre,
+            IdProducto : datos_rollos[i].prod_Id,
+            Producto : datos_rollos[i].prod_Nombre,
+            Cantidad : datos_rollos[i].dtAsigProdFV_Cantidad,
+            Presentacion : datos_rollos[i].undMed_Id,
+          }
+          this.rollos.push(info);
+          this.idCliente = datos_rollos[i].cli_Id;
+          this.idFactura = datos_rollos[i].facturaVta_Id;
+          this.FormConsultarFactura.setValue({
+            Fact_Id: this.FormConsultarFactura.value.Fact_Id,
+            Rollo_Id : rollo,
+            Cliente : datos_rollos[i].cli_Nombre,
             Observacion : this.FormConsultarFactura.value.Observacion,
           });
         }

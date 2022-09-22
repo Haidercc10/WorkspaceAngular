@@ -6,6 +6,7 @@ import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/Det
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 import { EntradaRollosService } from 'src/app/Servicios/EntradaRollos.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
+import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -24,22 +25,28 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   rollos : any [] = []; //Variable que almacenará los difrentes rollos que se hicieron en la orden de trabajo
+  arrayConductor =[];  /** Array que guardará los conductores en el select input */
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private dtAsgProdFactura : DetallesAsignacionProductosFacturaService,
-                      private rollosService : DetallesEntradaRollosService,) {
+                      private rollosService : DetallesEntradaRollosService,
+                        private servicioUsuarios : UsuarioService,
+                          private facturaService : AsignacionProductosFacturaService,) {
 
     this.FormConsultarFactura = this.frmBuilderPedExterno.group({
       Fact_Id: [''],
       Cliente : [''],
+      Conductor : [''],
+      PlacaCamion : [''],
     });
   }
 
   ngOnInit() {
     this.fecha();
     this.lecturaStorage();
+    this.ObtenerUsuariosConductores();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -82,6 +89,19 @@ export class RollosAsignadasFacturaComponent implements OnInit {
     this.cargando = true;
   }
 
+  //Funcion que a mostrar los usuarios de tipo conductor
+  ObtenerUsuariosConductores() {
+    this.servicioUsuarios.srvObtenerListaUsuario().subscribe(registrosUsuarios => {
+      for (let index = 0; index < registrosUsuarios.length; index++) {
+        this.servicioUsuarios.srvObtenerListaPorIdConductor(registrosUsuarios[index].usua_Id).subscribe(registrosConductores => {
+          for (let ind = 0; ind < registrosConductores.length; ind++) {
+            this.arrayConductor.push(registrosConductores[ind]);
+          }
+        });
+      }
+    });
+  }
+
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
   consultarFactura(){
     this.rollos = [];
@@ -96,9 +116,34 @@ export class RollosAsignadasFacturaComponent implements OnInit {
         }
         this.rollos.push(info);
         this.FormConsultarFactura.setValue({
-          Fact_Id: factura,
+          Fact_Id: factura.toUpperCase(),
           Cliente : datos_factura[i].cli_Nombre,
+          Conductor : this.FormConsultarFactura.value.Conductor,
+          PlacaCamion : this.FormConsultarFactura.value.PlacaCamion,
         });
+      }
+    });
+  }
+
+  // Funcion que agregará el condutor y la placa del camion en que irá el pedido
+  actualizarFactura(){
+    let factura : string = this.FormConsultarFactura.value.Fact_Id;
+    let conductor : number = this.FormConsultarFactura.value.Conductor;
+    let placa : string = this.FormConsultarFactura.value.PlacaCamion;
+    this.facturaService.srvObtenerListaPorFactura(factura).subscribe(datos_factura => {
+      for (let i = 0; i < datos_factura.length; i++) {
+        let info : any = {
+          FacturaVta_Id : datos_factura[i].facturaVta_Id,
+          NotaCredito_Id : datos_factura[i].notaCredito_Id,
+          Usua_Id : datos_factura[i].usua_Id,
+          AsigProdFV_Fecha : datos_factura[i].asigProdFV_Fecha,
+          AsigProdFV_Observacion : datos_factura[i].asigProdFV_Observacion,
+          Cli_Id : datos_factura[i].cli_Id,
+          Usua_Conductor : conductor,
+          AsigProdFV_PlacaCamion : placa.toUpperCase(),
+          AsigProdFV_FechaEnvio : this.today,
+        }
+        this.facturaService.srvActualizarFactura(factura, info).subscribe(datos_facturaActualizada => { this.cambiarEstado(); });
       }
     });
   }
@@ -133,6 +178,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                 icon: 'success',
                 title: '¡Factura confirmada, el Rollo pasa a ser enviado!'
               });
+              this.limpiarCampos();
             });
           }
         });

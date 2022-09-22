@@ -244,18 +244,25 @@ export class ReporteDespachoComponent implements OnInit {
   // Funcion que va a consultar por los filtros que se busquen
   consultarFiltros(){
     this.cargando = false;
+    this.infoDoc = [];
     let documento : any = this.FormConsultarFiltros.value.Documento;
     let fechaIni : any = this.FormConsultarFiltros.value.fechaDoc;
     let fechaFin : any = this.FormConsultarFiltros.value.fechaFinalDoc;
 
-    if (fechaIni != null && fechaFin != null) {
+    if (documento != null && fechaIni != null && fechaFin != null) {
+
+    } else if (fechaIni != null && fechaFin != null) {
       this.dtAsigFactService.srvConsultarPorFiltroFechas(fechaIni, fechaFin).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
           this.llenarTabla(datos_factura[i]);
         }
       });
     } else if (documento != null) {
-
+      this.dtAsigFactService.srvConsultarPorFiltroFactura(documento, documento).subscribe(datos_factura => {
+        for (let i = 0; i < datos_factura.length; i++) {
+          this.llenarTabla(datos_factura[i]);
+        }
+      });
     } else if (fechaIni != null) {
       this.dtAsigFactService.srvConsultarPorFiltroFechas(fechaIni, fechaIni).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {

@@ -26,8 +26,16 @@ export class AsignacionProductosFacturaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/${dato}`);
   }
 
+  srvObtenerListaPorFactura(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/CodigoFactura/${dato}`);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/${id}`, data);
+  }
+
+  srvActualizarFactura(id:number|string, data:any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/AsignacionProducto_FacturaVenta/ActualizacionFactura/${id}`, data);
   }
 
   srvEliminar(id:number|string) {

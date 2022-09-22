@@ -409,17 +409,67 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
                 Estado_OrdenTrabajo : 14,
               }
 
-              setTimeout(() => {
-                this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
-                  this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
-                });
-              }, 1500);
+              this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
+                // this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
+              });
             }
           }
         });
       }
     }
+
+    setTimeout(() => { this.moverBopp(); }, 5000);
   }
+
+  //
+  moverBopp(){
+    for (let i = 0; i < this.ArrayBoppPedida.length; i++) {
+      this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[i].Serial).subscribe(datos_bopp => {
+        for (let j = 0; j < datos_bopp.length; j++) {
+          let datosBOPP : any = {
+            bopP_Id : datos_bopp[j].bopP_Id,
+            bopP_Nombre : datos_bopp[j].bopP_Nombre,
+            bopP_Descripcion : datos_bopp[j].bopP_Descripcion,
+            bopP_Serial : datos_bopp[j].bopP_Serial,
+            bopP_CantidadMicras :  datos_bopp[j].bopP_CantidadMicras,
+            undMed_Id : datos_bopp[j].undMed_Id,
+            catMP_Id : datos_bopp[j].catMP_Id,
+            bopP_Precio : datos_bopp[j].bopP_Precio,
+            tpBod_Id : datos_bopp[j].tpBod_Id,
+            bopP_FechaIngreso : datos_bopp[j].bopP_FechaIngreso,
+            bopP_Ancho : datos_bopp[j].bopP_Ancho,
+            bopP_Stock : 0,
+            UndMed_Kg : datos_bopp[j].undMed_Kg,
+            bopP_CantidadInicialKg : datos_bopp[j].bopP_CantidadInicialKg,
+            usua_Id : datos_bopp[j].usua_Id,
+          }
+
+          this.boppService.srvActualizar(datos_bopp[j].bopP_Id, datosBOPP).subscribe(datos_boppActualizado => {
+            this.obtenerBOPP();
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'center',
+              showConfirmButton: false,
+              timer: 1500,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+              }
+            });
+            Toast.fire({
+              icon: 'success',
+              title: 'Asignación de BOPP registrada con exito!'
+            });
+            this.limpiarTodosLosCampos();
+            this.load = true;
+
+          }, error => { console.log(error); });
+        }
+      });
+    }
+  }
+
 
   //
   moverInventarioBOPP(id : number, cantidad : number){
@@ -472,10 +522,6 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
           }, error => { console.log(error); });
 
         } else {
-          let FechaDatetime = item.bopP_FechaIngreso;
-          let FechaCreacionNueva = FechaDatetime.indexOf("T");
-          let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
-
           let datosBOPP : any = {
             bopP_Id : item.bopP_Id,
             bopP_Nombre : item.bopP_Nombre,

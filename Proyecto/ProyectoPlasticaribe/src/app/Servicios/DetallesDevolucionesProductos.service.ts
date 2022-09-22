@@ -22,6 +22,10 @@ export class DetallesDevolucionesProductosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleDevolucion_ProductoFacturado/${dato}`);
   }
 
+  srvObtenerListaPorRollo(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleDevolucion_ProductoFacturado/consultarRollo/${dato}`);
+  }
+
   srvObtenerCrearPDF(dato : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleDevolucion_ProductoFacturado/CrearPdf/${dato}`);
   }

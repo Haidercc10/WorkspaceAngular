@@ -67,8 +67,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
       NotaCredito : [''],
       ProdNombre: ['', Validators.required ],
       Cliente: ['', Validators.required],
-      Conductor: ['', Validators.required],
-      PlacaCamion: ['', Validators.required],
       Observacion : [''],
     });
   }
@@ -293,8 +291,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
       let factura : string = this.FormConsultarProductos.value.Factura;
       let notaCredito : string = this.FormConsultarProductos.value.NotaCredito;
       let cliente : any = this.FormConsultarProductos.value.Cliente.cli_Id;
-      let condutor : any = this.FormConsultarProductos.value.Conductor;
-      let placaCamion : string = this.FormConsultarProductos.value.PlacaCamion;
       let observacion : string = this.FormConsultarProductos.value.Observacion;
 
       let info : any = {
@@ -304,8 +300,9 @@ export class AsignarProductosFacturasComponent implements OnInit {
         AsigProdFV_Fecha : this.today,
         AsigProdFV_Observacion : observacion,
         Cli_Id : cliente,
-        Usua_Conductor : condutor,
-        AsigProdFV_PlacaCamion : placaCamion.toUpperCase(),
+        Usua_Conductor : 88,
+        AsigProdFV_PlacaCamion : 'ABC123',
+        AsigProdFV_FechaEnvio : this.today,
       }
       this.asgProdFactura.srvGuardar(info).subscribe(datos_asignacion => {
         this.asgProdFactura.srvObtenerUltimoId().subscribe(datos_ultimaAsg => { this.crearDetallesAsignacion(datos_ultimaAsg.asigProdFV_Id) });

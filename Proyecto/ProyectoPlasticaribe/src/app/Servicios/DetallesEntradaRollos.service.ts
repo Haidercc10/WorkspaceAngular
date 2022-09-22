@@ -30,6 +30,10 @@ export class DetallesEntradaRollosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/consultarProducto/${dato}`);
   }
 
+  srvConsultaRollo(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/consultarRollo/${dato}`);
+  }
+
   srvObtenerCrearPDF(dato : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/CrearPdf/${dato}`);
   }
