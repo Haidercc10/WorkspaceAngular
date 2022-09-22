@@ -39,7 +39,31 @@
               <label for="floatingInput">Cod. Documento</label>
             </div>
 
-             <!-- Producto -->
+             <!-- Fecha Factura -->
+             <div class="form-floating col-md-2">
+              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha inicial</label>
+            </div>
+
+            <!-- Fecha ingreso rollo -->
+            <div class="form-floating col-md-2">
+              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha Final</label>
+            </div>
+
+             <!-- Cliente Input-->
+             <div class="form-floating col-md">
+              <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput" name="Cliente" [(ngModel)]="Cliente">
+              <label for="floatingInput">Cliente</label>
+            </div>
+
+            <!-- Rollo Input-->
+            <div class="form-floating col-md-2">
+              <input formControlName="Rollo" type="text" class="form-control form-control-sm" id="floatingInput" name="Rollo" [(ngModel)]="Rollo">
+              <label for="floatingInput">Rollo</label>
+            </div>
+
+             <!-- Producto
             <ng-container>
               <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteProductos">
                 <ng-autocomplete
@@ -52,7 +76,9 @@
                   [itemTemplate]="itemTemplate1"
                   [notFoundTemplate]="notFoundTemplate"
                   id="floatingInput"
-                  formControlName="ProdNombre">
+                  formControlName="ProdNombre"
+                  name="Producto"
+                  [(ngModel)]="Producto">
                 </ng-autocomplete>
                 <ng-template #itemTemplate1 let-item>
                   <a [innerHTML]="item.prod_Nombre"></a>
@@ -61,10 +87,11 @@
                   <div [innerHTML]="notFound"></div>
                 </ng-template>
                 <label for="floatingInput" *ngIf="validarInputNombresProductos">Producto</label>
-              </div>
-            </ng-container>
 
-             <!-- Rollo -->
+              </div>
+            </ng-container> -->
+
+             <!-- Rollo
              <ng-container>
               <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteRollo">
                 <ng-autocomplete
@@ -77,7 +104,10 @@
                   [itemTemplate]="itemTemplateCL"
                   [notFoundTemplate]="notFoundTemplate"
                   id="floatingInput"
-                  formControlName="Rollo">
+                  formControlName="Rollo"
+                  name="Rollo"
+                  [(ngModel)]="Rollo"
+                  >
                 </ng-autocomplete>
                 <ng-template #itemTemplateCL let-item>
                   <a [innerHTML]="item.rollo_Id"></a>
@@ -87,9 +117,9 @@
                 </ng-template>
                 <label for="floatingInput" *ngIf="validarInputRollo">Rollo</label>
               </div>
-            </ng-container>
+            </ng-container>-->
 
-            <!-- Cliente -->
+            <!-- Cliente
             <ng-container>
               <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteCliente">
                 <ng-autocomplete
@@ -112,7 +142,7 @@
                 </ng-template>
                 <label for="floatingInput" *ngIf="validarInputCliente">Cliente</label>
               </div>
-            </ng-container>
+            </ng-container>-->
           </div>
         </div>
 
@@ -120,24 +150,18 @@
         <div class="mb-3">
           <div class="row g-3">
 
+             <!-- Producto Input-->
+             <div class="form-floating col-md-4">
+              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput" name="Producto" [(ngModel)]="Producto">
+              <label for="floatingInput">Producto</label>
+            </div>
+
              <!-- Tipo Documento -->
-             <div class="form-floating col-md-3">
+             <div class="form-floating col-md-2">
               <select formControlName="tipoDoc" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
                 <option [ngValue]="tipoDocu.tpDoc_Id" *ngFor="let tipoDocu of arrayTipoDoc">{{tipoDocu.tpDoc_Nombre}}</option>-->
               </select>
               <label for="floatingSelect">Tipo Doc.</label>
-            </div>
-
-            <!-- Fecha Factura -->
-            <div class="form-floating col-md-2">
-              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput"required >
-              <label for="floatingInput">Fecha inicial</label>
-            </div>
-
-            <!-- Fecha ingreso rollo -->
-            <div class="form-floating col-md-2">
-              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput"required >
-              <label for="floatingInput">Fecha Final</label>
             </div>
 
             <!-- Estado rollo -->
@@ -189,7 +213,7 @@
                 </tr>
               </thead>
               <tbody>
-               <tr *ngFor="let item of infoDoc  | filtroXFacturas : Codigo | filtroXRollo_RptDespacho : Codigo | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
+               <tr *ngFor="let item of infoDoc  | filtroXFacturas : Codigo | filtroXRollo_RptDespacho : Rollo | filtroXProducto_RptDespacho : Producto | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
                   <th>{{item.Codigo}}</th>
                   <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>

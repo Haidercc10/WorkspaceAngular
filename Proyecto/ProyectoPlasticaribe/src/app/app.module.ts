@@ -80,6 +80,7 @@ import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFact
 import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
 import { FiltroXFacturasPipe } from './Pipes/filtroXFacturas.pipe';
 import { FiltroXRollo_RptDespachoPipe } from './Pipes/filtroXRollo_RptDespacho.pipe';
+import { FiltroXProducto_RptDespachoPipe } from './Pipes/filtroXProducto_RptDespacho.pipe';
 
 
 export const routes: Routes = [
@@ -210,7 +211,8 @@ export const routes: Routes = [
     AsignarProductosFacturasComponent,
     ReporteDespachoComponent,
     FiltroXFacturasPipe,
-    FiltroXRollo_RptDespachoPipe
+    FiltroXRollo_RptDespachoPipe,
+    FiltroXProducto_RptDespachoPipe
   ],
 
 
