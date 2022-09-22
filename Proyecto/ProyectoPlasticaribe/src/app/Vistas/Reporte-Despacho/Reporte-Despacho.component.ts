@@ -42,6 +42,9 @@ export class ReporteDespachoComponent implements OnInit {
 
   keywordCliente = 'cli_Nombre';
   validarInputCliente : any;
+  public Codigo = ''; /** Varable para pipe de documento */
+  public Rollo = ''; /** Varable para pipe de Rollo */
+
 
   constructor(private servicioProducto : ProductoService,
                 private frmBuilder : FormBuilder,

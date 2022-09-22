@@ -78,6 +78,8 @@ import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
 import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
+import { FiltroXFacturasPipe } from './Pipes/filtroXFacturas.pipe';
+import { FiltroXRollo_RptDespachoPipe } from './Pipes/filtroXRollo_RptDespacho.pipe';
 
 
 export const routes: Routes = [
@@ -206,7 +208,9 @@ export const routes: Routes = [
     RollosAsignadasFacturaComponent,
     Devoluciones_Productos_RollosComponent,
     AsignarProductosFacturasComponent,
-    ReporteDespachoComponent
+    ReporteDespachoComponent,
+    FiltroXFacturasPipe,
+    FiltroXRollo_RptDespachoPipe
   ],
 
 

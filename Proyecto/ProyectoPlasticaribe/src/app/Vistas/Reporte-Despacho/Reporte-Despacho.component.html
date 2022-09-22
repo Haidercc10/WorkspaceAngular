@@ -35,7 +35,7 @@
 
             <!-- Factura -->
             <div class="form-floating col-md-2">
-              <input formControlName="Documento" type="text" class="form-control form-control-sm" id="floatingInput">
+              <input formControlName="Documento" type="text" class="form-control form-control-sm" id="floatingInput" name="Codigo" [(ngModel)]="Codigo">
               <label for="floatingInput">Cod. Documento</label>
             </div>
 
@@ -189,7 +189,7 @@
                 </tr>
               </thead>
               <tbody>
-               <tr *ngFor="let item of infoDoc | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
+               <tr *ngFor="let item of infoDoc  | filtroXFacturas : Codigo | filtroXRollo_RptDespacho : Codigo | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
                   <th>{{item.Codigo}}</th>
                   <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
