@@ -1,5 +1,5 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
@@ -9,16 +9,11 @@ import { RolesService } from 'src/app/Servicios/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-Ingresar_Productos',
-  templateUrl: './Ingresar_Productos.component.html',
-  styleUrls: ['./Ingresar_Productos.component.css']
+  selector: 'app-PreIngresoRollosExtrusion',
+  templateUrl: './PreIngresoRollosExtrusion.component.html',
+  styleUrls: ['./PreIngresoRollosExtrusion.component.css']
 })
-
-@Injectable({
-  providedIn: 'root'
-})
-
-export class Ingresar_ProductosComponent implements OnInit {
+export class PreIngresoRollosExtrusionComponent implements OnInit {
 
   public FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
 

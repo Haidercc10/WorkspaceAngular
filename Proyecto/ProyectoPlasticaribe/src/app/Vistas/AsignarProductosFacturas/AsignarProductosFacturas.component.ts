@@ -283,6 +283,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
           }
           this.rollos.push(info);
           rollosExistentes.push(datos_rollos[i].rollo_Id);
+          this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) )
         }
       }
     });

@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/AsignacionProductosFactura.service';
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesAsignacionProductosFactura.service';
@@ -26,6 +26,9 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   rollos : any [] = []; //Variable que almacenará los difrentes rollos que se hicieron en la orden de trabajo
   arrayConductor =[];  /** Array que guardará los conductores en el select input */
+  rollosInsertar : any [] = []; //Variable que va a amacenar los diferentes rollos que se van a insertar
+  validarRollo : any [] = []; //Variable para validará que el rollo no esté en la tabla
+  check : boolean = false; //Variable que nos a ayudar para saber si un rollo ya fue seleccionado
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
@@ -36,10 +39,10 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                           private facturaService : AsignacionProductosFacturaService,) {
 
     this.FormConsultarFactura = this.frmBuilderPedExterno.group({
-      Fact_Id: [''],
-      Cliente : [''],
-      Conductor : [''],
-      PlacaCamion : [''],
+      Fact_Id: ['', Validators.required],
+      Cliente : ['', Validators.required],
+      Conductor : ['', Validators.required],
+      PlacaCamion : ['', Validators.required],
     });
   }
 
@@ -86,6 +89,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   limpiarCampos(){
     this.FormConsultarFactura.reset();
     this.rollos = [];
+    this.rollosInsertar = [];
     this.cargando = true;
   }
 
@@ -108,49 +112,149 @@ export class RollosAsignadasFacturaComponent implements OnInit {
     let factura : string = this.FormConsultarFactura.value.Fact_Id;
     this.dtAsgProdFactura.srvObtenerListaPorCodigoFactura(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
-        let info : any = {
-          Id : datos_factura[i].rollo_Id,
-          Producto : datos_factura[i].prod_Nombre,
-          Cantidad : datos_factura[i].dtAsigProdFV_Cantidad,
-          Presentacion : datos_factura[i].undMed_Id,
+        if (datos_factura[i].estado_Id == 20) {
+          let info : any = {
+            Id : datos_factura[i].rollo_Id,
+            Producto : datos_factura[i].prod_Nombre,
+            Cantidad : datos_factura[i].dtAsigProdFV_Cantidad,
+            Presentacion : datos_factura[i].undMed_Id,
+          }
+          this.rollos.push(info);
+          this.FormConsultarFactura.setValue({
+            Fact_Id: factura.toUpperCase(),
+            Cliente : datos_factura[i].cli_Nombre,
+            Conductor : this.FormConsultarFactura.value.Conductor,
+            PlacaCamion : this.FormConsultarFactura.value.PlacaCamion,
+          });
         }
-        this.rollos.push(info);
-        this.FormConsultarFactura.setValue({
-          Fact_Id: factura.toUpperCase(),
-          Cliente : datos_factura[i].cli_Nombre,
-          Conductor : this.FormConsultarFactura.value.Conductor,
-          PlacaCamion : this.FormConsultarFactura.value.PlacaCamion,
-        });
       }
     });
+  }
+
+  //Funcion que va a agregar Productos en la tabla
+  cargarProducto(item : any){
+    if (this.rollosInsertar.length == 0) {
+      let info : any = {
+        Id : item.Id,
+        IdProducto : item.IdProducto,
+        Producto : item.Producto,
+        Cantidad : item.Cantidad,
+        Presentacion : item.Presentacion,
+      }
+      this.rollosInsertar.push(info);
+      this.validarRollo.push(item.Id);
+    } else {
+      if (!this.validarRollo.includes(item.Id)) {
+        let info : any = {
+          Id : item.Id,
+          IdProducto : item.IdProducto,
+          Producto : item.Producto,
+          Cantidad : item.Cantidad,
+          Presentacion : item.Presentacion,
+        }
+        this.rollosInsertar.push(info);
+        this.validarRollo.push(item.Id);
+      } else if (this.validarRollo.includes(item.Id)) {
+        for (let i = 0; i < this.rollosInsertar.length; i++) {
+          if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
+        }
+        for (let i = 0; i < this.validarRollo.length; i++) {
+          if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
+        }
+      }
+    }
+    for (let i = 0; i < this.rollos.length; i++) {
+      if (this.rollos[i].Id == item.Id) this.rollos.splice(i,1);
+    }
+  }
+
+  // Funcion que se va a encargar de quitar rollos de la tabla inferior
+  quitarRollo(item : any){
+    let info : any = {
+      Id : item.Id,
+      IdProducto : item.IdProducto,
+      Producto : item.Producto,
+      Cantidad : item.Cantidad,
+      Presentacion : item.Presentacion,
+      checkbox : true,
+    }
+    this.rollos.push(info);
+    for (let i = 0; i < this.rollosInsertar.length; i++) {
+      if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
+    }
+    for (let i = 0; i < this.validarRollo.length; i++) {
+      if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
+    }
   }
 
   // Funcion que agregará el condutor y la placa del camion en que irá el pedido
   actualizarFactura(){
-    this.cargando = false;
-    let factura : string = this.FormConsultarFactura.value.Fact_Id;
-    let conductor : number = this.FormConsultarFactura.value.Conductor;
-    let placa : string = this.FormConsultarFactura.value.PlacaCamion;
-    this.facturaService.srvObtenerListaPorFactura(factura).subscribe(datos_factura => {
-      for (let i = 0; i < datos_factura.length; i++) {
-        let info : any = {
-          FacturaVta_Id : datos_factura[i].facturaVta_Id,
-          NotaCredito_Id : datos_factura[i].notaCredito_Id,
-          Usua_Id : datos_factura[i].usua_Id,
-          AsigProdFV_Fecha : datos_factura[i].asigProdFV_Fecha,
-          AsigProdFV_Observacion : datos_factura[i].asigProdFV_Observacion,
-          Cli_Id : datos_factura[i].cli_Id,
-          Usua_Conductor : conductor,
-          AsigProdFV_PlacaCamion : placa.toUpperCase(),
-          AsigProdFV_FechaEnvio : this.today,
+    if (this.FormConsultarFactura.valid) {
+      this.cargando = false;
+      let factura : string = this.FormConsultarFactura.value.Fact_Id;
+      let conductor : number = this.FormConsultarFactura.value.Conductor;
+      let placa : string = this.FormConsultarFactura.value.PlacaCamion;
+      this.facturaService.srvObtenerListaPorFactura(factura).subscribe(datos_factura => {
+        for (let i = 0; i < datos_factura.length; i++) {
+          let info : any = {
+            FacturaVta_Id : datos_factura[i].facturaVta_Id,
+            NotaCredito_Id : datos_factura[i].notaCredito_Id,
+            Usua_Id : datos_factura[i].usua_Id,
+            AsigProdFV_Fecha : datos_factura[i].asigProdFV_Fecha,
+            AsigProdFV_Observacion : datos_factura[i].asigProdFV_Observacion,
+            Cli_Id : datos_factura[i].cli_Id,
+            Usua_Conductor : conductor,
+            AsigProdFV_PlacaCamion : placa.toUpperCase(),
+            AsigProdFV_FechaEnvio : this.today,
+          }
+          this.facturaService.srvActualizarFactura(factura, info).subscribe(datos_facturaActualizada => { this.cambiarEstado(); });
         }
-        this.facturaService.srvActualizarFactura(factura, info).subscribe(datos_facturaActualizada => { this.cambiarEstado(); });
-      }
-    });
+      });
+    } else Swal.fire("¡Hay campos vacios!");
   }
 
   // Funcion que cambiará el estado de los rollos a enviados
   cambiarEstado(){
+    if (this.rollosInsertar.length != 0) {
+      for (let i = 0; i < this.rollosInsertar.length; i++) {
+        this.rollosService.srvObtenerVerificarRollo(this.rollosInsertar[i].Id).subscribe(datos_rollos => {
+          for (let j = 0; j < datos_rollos.length; j++) {
+            let info : any = {
+              DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
+              EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
+              Rollo_Id : datos_rollos[j].rollo_Id,
+              DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
+              UndMed_Id : datos_rollos[j].undMed_Id,
+              Estado_Id : 21,
+            }
+            this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
+
+              // const Toast = Swal.mixin({
+              //   toast: true,
+              //   position: 'center',
+              //   showConfirmButton: false,
+              //   timer: 2500,
+              //   timerProgressBar: true,
+              //   didOpen: (toast) => {
+              //     toast.addEventListener('mouseenter', Swal.stopTimer)
+              //     toast.addEventListener('mouseleave', Swal.resumeTimer)
+              //   }
+              // });
+              // Toast.fire({
+              //   icon: 'success',
+              //   title: '¡Factura confirmada, el/los Rollo pasa a ser enviado!'
+              // });
+              // this.limpiarCampos();
+            });
+          }
+        });
+      }
+      setTimeout(() => { this.cambiarEstadoRollosNoVerificados(); }, 200);
+    } else Swal.fire("¡Debe cargar minimo un rollo en la tabla!");
+  }
+
+  // Funcion que cambiará el estado de los rollos a enviados
+  cambiarEstadoRollosNoVerificados(){
     if (this.rollos.length != 0) {
       for (let i = 0; i < this.rollos.length; i++) {
         this.rollosService.srvObtenerVerificarRollo(this.rollos[i].Id).subscribe(datos_rollos => {
@@ -161,7 +265,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
               Rollo_Id : datos_rollos[j].rollo_Id,
               DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
               UndMed_Id : datos_rollos[j].undMed_Id,
-              Estado_Id : 21,
+              Estado_Id : 19,
             }
             this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
               const Toast = Swal.mixin({
@@ -177,7 +281,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
               });
               Toast.fire({
                 icon: 'success',
-                title: '¡Factura confirmada, el Rollo pasa a ser enviado!'
+                title: '¡Factura confirmada, el/los Rollo pasa a ser enviado!'
               });
               this.limpiarCampos();
             });

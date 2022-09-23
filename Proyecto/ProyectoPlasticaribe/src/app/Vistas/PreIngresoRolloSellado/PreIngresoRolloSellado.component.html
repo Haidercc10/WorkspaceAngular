@@ -10,7 +10,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Revisar Factura</h2>
+      <h2 class="tituloRojo">Ingresar Rollos</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -19,48 +19,57 @@
 </div>
 
 <div class="contain">
+  <!--Inicio info OT-->
   <div class="container-fluid bajarPagina">
     <div class="container">
       <div class="mb-4">
-        <h4 class="tituloRojo">Consultar Factura</h4>
+        <h4 class="tituloRojo">Consultar OT</h4>
       </div>
-      <!-- Formulario para consultar Factura -->
-      <form [formGroup]="FormConsultarFactura">
+      <!-- Formulario para consultar una orden de trabajo -->
+      <form [formGroup]="FormConsultarRollos">
         <!-- Primera Fila -->
         <div class="mb-3">
           <div class="row g-3">
             <!-- OT -->
             <div class="form-floating col-md-2">
-              <input formControlName="Fact_Id" type="text" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarFactura()">
-              <label for="floatingInput">Cod. Factura</label>
+              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Nro. OT</label>
             </div>
 
-            <!-- Cliente -->
-            <div class="form-floating col-md-5">
-              <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Cliente</label>
+             <!-- Fecha Factura -->
+             <div class="form-floating col-md-2">
+              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha inicial</label>
             </div>
 
-           <!-- Conductor -->
-            <div class="form-floating col-md-3">
-              <select formControlName="Conductor" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-                <option [ngValue]="conductor.usua_Id" *ngFor="let conductor of arrayConductor">{{conductor.usua_Nombre}}</option>
-              </select>
-              <label for="floatingSelect">Conductor</label>
-            </div>
-
-            <!--Placa camión-->
+            <!-- Fecha ingreso rollo -->
             <div class="form-floating col-md-2">
-              <input formControlName="PlacaCamion" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Placa Camión</label>
+              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha Final</label>
+            </div>
+
+            <div class="form-floating col-md-2">
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Rollos</button>
+            </div>
+
+            <div class="form-floating col-md-2">
+              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila 2 -->
+        <div class="mb-3">
+          <div class="row g-3">
+            <!-- Observacion -->
+            <div class="form-floating col-md">
+              <input formControlName="Observacion" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Observación</label>
             </div>
           </div>
         </div>
       </form>
 
-      <div class="mb-4">
-        <hr class="Linea">
-      </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4">
         <h4 class="tituloRojo">Tabla de Rollos</h4>
@@ -73,20 +82,26 @@
             <table class="table table-bordered table-hover mt-2" >
               <thead class="TitulosTabla">
                 <tr>
-                  <th scope="col">ID</th>
+                  <th scope="col">OT</th>
+                  <th scope="col">ID Rollo</th>
+                  <th scope="col">ID Producto</th>
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentacion</th>
-                  <th scope="col"></th>
+                  <th scope="col">Proceso</th>
+                  <th scope="col"><input  *ngIf="cantidadOT == 1" class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let item of rollos; let i=index">
+                  <th (dblclick)="selccionarTodoOT(item.Ot)" style="cursor: pointer;">{{item.Ot}}</th>
                   <th>{{item.Id}}</th>
+                  <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
                   <td>{{item.Cantidad | number}}</td>
                   <td>{{item.Presentacion}}</td>
-                  <td><input class="form-check-input cursor" id="checkbox" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td>
+                  <td>{{item.Estatus}}</td>
+                  <td><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td>
                 </tr>
               </tbody>
             </table>
@@ -94,8 +109,12 @@
         </div>
       </div>
 
-      <div class="mb-4">
-        <h4 class="tituloRojo">Tabla de Rollos Verificados</h4>
+      <div class="mb-4" *ngIf="cargando">
+        <hr class="Linea">
+      </div>
+      <!-- Inicio titulo tabla producto -->
+      <div class="mb-4" *ngIf="cargando">
+        <h4 class="tituloRojo">Tabla de Rollos por Ingresar</h4>
       </div>
 
       <!--Inicio tabla Rollos a Insertar -->
@@ -105,16 +124,20 @@
             <table class="table table-bordered table-hover mt-2" >
               <thead class="TitulosTabla">
                 <tr>
+                  <th scope="col">OT</th>
                   <th scope="col">ID Rollo</th>
+                  <th scope="col">ID Producto</th>
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentación</th>
-                  <th scope="col"></th>
+                  <th scope="col"><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let item of rollosInsertar; let i=index">
+                  <th>{{item.Ot}}</th>
                   <th>{{item.Id}}</th>
+                  <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
                   <td>{{item.Cantidad | number}}</td>
                   <td>{{item.Presentacion}}</td>
@@ -129,7 +152,7 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="actualizarFactura()">Confirmar Rollos</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="IngresarInfoRollos()">Ingresar Rollos</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>

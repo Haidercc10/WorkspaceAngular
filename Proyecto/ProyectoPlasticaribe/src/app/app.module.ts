@@ -84,6 +84,8 @@ import { FiltroXProducto_RptDespachoPipe } from './Pipes/filtroXProducto_RptDesp
 import { FiltroXTipoDocumentoPipe } from './Pipes/filtroXTipoDocumento.pipe';
 import { FiltroXEstadoDespachoPipe } from './Pipes/filtroXEstadoDespacho.pipe';
 import { FiltroXClienteDespachoPipe } from './Pipes/filtroXClienteDespacho.pipe';
+import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExtrusion/PreIngresoRollosExtrusion.component';
+import { PreIngresoRolloSelladoComponent } from './Vistas/PreIngresoRolloSellado/PreIngresoRolloSellado.component';
 
 
 export const routes: Routes = [
@@ -140,6 +142,8 @@ export const routes: Routes = [
   {path: 'movimientos-matprima', canActivate : [ValidacionLoginGuard], component : MovimientoMatPrimaComponent}, // MOVIMIENTOS DE MATERIA PRIMA
   {path: 'movimientos-bopp', canActivate : [ValidacionLoginGuard], component : MovimientosBOPPComponent}, // MOVIMIENTOS DE BOPP
   {path: 'movimientos-tintas', canActivate : [ValidacionLoginGuard], component : MovimientosTintasComponent}, // MOVIMIENTOS DE TINTAS
+  {path: 'preingreso-extrusion', canActivate : [ValidacionLoginGuard], component : PreIngresoRollosExtrusionComponent}, // Pre Ingreso rollos extrusion
+  {path: 'preingreso-sellado', canActivate : [ValidacionLoginGuard], component : PreIngresoRolloSelladoComponent}, // Pre Ingreso rollos sellado
   {path: 'ingresar-productos', canActivate : [ValidacionLoginGuard], component : Ingresar_ProductosComponent}, // Ingresar Rollos
   {path: 'factura-rollos-productos', canActivate : [ValidacionLoginGuard], component : RollosAsignadasFacturaComponent}, //Consultar Factura
   {path: 'devolucion-rollos-productos', canActivate : [ValidacionLoginGuard], component : Devoluciones_Productos_RollosComponent}, // Ingresar Devolucion Factura
@@ -219,6 +223,8 @@ export const routes: Routes = [
     FiltroXTipoDocumentoPipe,
     FiltroXEstadoDespachoPipe,
     FiltroXClienteDespachoPipe,
+    PreIngresoRollosExtrusionComponent,
+    PreIngresoRolloSelladoComponent,
   ],
 
 

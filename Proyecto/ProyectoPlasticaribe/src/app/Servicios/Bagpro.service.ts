@@ -23,6 +23,18 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OT/${ot}`);
   }
 
+  srvObtenerListaProcSelladoRollosOT(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/RollosOT/${ot}`);
+  }
+
+  srvObtenerListaProcSelladoFechas(fecha1 : any, fecha2 : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/Fechas/${fecha1}/${fecha2}`);
+  }
+
+  srvObtenerListaProcSelladoFechasOT(fecha1 : any, fecha2 : any, ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/FechasOT/${fecha1}/${fecha2}/${ot}`);
+  }
+
   srvObtenerListaProcSelladoOT_FechaFinal(ot : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/FechaFinOT/${ot}`);
   }

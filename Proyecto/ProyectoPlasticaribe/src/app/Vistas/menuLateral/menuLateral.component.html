@@ -108,6 +108,33 @@
                   </a>
                 </div>
               </ng-container>
+
+              <a class="fw-normal sangria" data-bs-toggle="collapse" href="#collapseExample8_1" role="button" (click)="clickIcon8_1()" aria-expanded="false" aria-controls="collapseExample">
+                <ng-container *ngIf="subir8_1; then thenTemplate8_1; else elseTemplate8_1"></ng-container>
+                <ng-template #thenTemplate8_1>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-bottom: 10px; margin-right: 3%;"><path d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z"/></svg>
+                </ng-template>
+                <ng-template #elseTemplate8_1>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-top: 10px; margin-right: 3%;"><path d="M279 224H41c-21.4 0-32.1-25.9-17-41L143 64c9.4-9.4 24.6-9.4 33.9 0l119 119c15.2 15.1 4.5 41-16.9 41z"/></svg>
+                </ng-template>
+                Pre Ingreso
+              </a>
+              <div class="collapse" id="collapseExample8_1">
+                <div class="mb-2 subSangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/preingreso-extrusion" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
+                    Extrusion
+                  </a>
+                </div>
+              </div>
+              <div class="collapse" id="collapseExample8_1">
+                <div class="mb-2 subSangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/preingreso-sellado" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
+                    Sellado
+                  </a>
+                </div>
+              </div>
                <div class="mb-2 sangria">
                 <hr>
               </div>
