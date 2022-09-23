@@ -50,6 +50,10 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/OT/${ot}`);
   }
 
+  srvObtenerListaPorRollo(rollo : any, produ : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/MostrarRollos/${rollo}/${produ}`);
+  }
+
   srvObtenerListaProcExtOt_fechaFinal(ot : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/FechaFinOT/${ot}`);
   }

@@ -1,13 +1,12 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'FiltroXCliente_RptDespacho'
+  name: 'filtroXClienteDespacho'
 })
-export class FiltroXCliente_RptDespachoPipe implements PipeTransform {
+export class FiltroXClienteDespachoPipe implements PipeTransform {
 
   transform(value: any, arg: any): any {
-    /** Si la cantidad de letras insertadas en el campo es menor que 3 muestra toda la tabla. */
-    if(arg == '' || arg.length < 3) return value;
+    if(arg == '' || arg.length < 1) return value;
 
     const resultadoBusqFacturas = []; /** Array que mostrará el resultado de lo consultado. */
 
@@ -15,7 +14,7 @@ export class FiltroXCliente_RptDespachoPipe implements PipeTransform {
     for(const item of value) {
 
       /** Si la columna nombre de la tabla está en lo digitado del campo, muestra las filas asociadas.  */
-      if(item.Codigo.toUpperCase().indexOf(arg.toUpperCase()) > -1) {
+      if(item.Cliente.toUpperCase().indexOf(arg.toUpperCase()) > -1) {
         resultadoBusqFacturas.push(item);
       }
     }

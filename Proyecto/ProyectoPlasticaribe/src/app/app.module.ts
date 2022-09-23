@@ -81,6 +81,9 @@ import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Desp
 import { FiltroXFacturasPipe } from './Pipes/filtroXFacturas.pipe';
 import { FiltroXRollo_RptDespachoPipe } from './Pipes/filtroXRollo_RptDespacho.pipe';
 import { FiltroXProducto_RptDespachoPipe } from './Pipes/filtroXProducto_RptDespacho.pipe';
+import { FiltroXTipoDocumentoPipe } from './Pipes/filtroXTipoDocumento.pipe';
+import { FiltroXEstadoDespachoPipe } from './Pipes/filtroXEstadoDespacho.pipe';
+import { FiltroXClienteDespachoPipe } from './Pipes/filtroXClienteDespacho.pipe';
 
 
 export const routes: Routes = [
@@ -212,7 +215,10 @@ export const routes: Routes = [
     ReporteDespachoComponent,
     FiltroXFacturasPipe,
     FiltroXRollo_RptDespachoPipe,
-    FiltroXProducto_RptDespachoPipe
+    FiltroXProducto_RptDespachoPipe,
+    FiltroXTipoDocumentoPipe,
+    FiltroXEstadoDespachoPipe,
+    FiltroXClienteDespachoPipe,
   ],
 
 

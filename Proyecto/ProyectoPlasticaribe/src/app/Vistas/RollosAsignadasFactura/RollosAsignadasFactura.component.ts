@@ -127,6 +127,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
 
   // Funcion que agregará el condutor y la placa del camion en que irá el pedido
   actualizarFactura(){
+    this.cargando = false;
     let factura : string = this.FormConsultarFactura.value.Fact_Id;
     let conductor : number = this.FormConsultarFactura.value.Conductor;
     let placa : string = this.FormConsultarFactura.value.PlacaCamion;

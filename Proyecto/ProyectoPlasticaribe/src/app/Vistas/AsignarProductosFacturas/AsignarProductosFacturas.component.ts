@@ -340,7 +340,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
             Rollo_Id : datos_rollos[j].rollo_Id,
             DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
             UndMed_Id : datos_rollos[j].undMed_Id,
-            Estado_Id : 21,
+            Estado_Id : 20,
           }
           this.dtEntradaRollo.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
         }
@@ -385,7 +385,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
               });
               Toast.fire({
                 icon: 'success',
-                title: `¡La asignación de los rollos a la factura ${this.FormConsultarProductos.value.Factura} fue registrada con exito!`
+                title: `¡La asignación de los rollos a la factura ${this.FormConsultarProductos.value.Factura.toUpperCase()} fue registrada con exito!`
               });
             });
           }
@@ -504,6 +504,11 @@ export class AsignarProductosFacturasComponent implements OnInit {
               },
 
               this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
+              {
+                text: `\nCant. Total: ${this.Total}\n`,
+                alignment: 'right',
+                style: 'header',
+              },
               {
                 text: `\n \nObervación sobre el pedido: \n ${datos_factura[i].asigProdFV_Observacion}\n`,
                 style: 'header',

@@ -62,7 +62,7 @@
           </li>
         </ng-container>
 
-        <!-- Facturas y Despacho -->
+        <!-- Despacho -->
         <ng-container *ngIf="ValidarRol == 1">
           <li>
             <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample8" role="button" aria-expanded="false" (click)="clickIcon8()" aria-controls="collapseExample">
@@ -73,7 +73,7 @@
               <ng-template #elseTemplate8>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-top: 10px;  margin-right: 3%;"><path d="M279 224H41c-21.4 0-32.1-25.9-17-41L143 64c9.4-9.4 24.6-9.4 33.9 0l119 119c15.2 15.1 4.5 41-16.9 41z"/></svg>
               </ng-template>
-              <b>Facturas / Despacho</b>
+              <b>Despacho</b>
             </a>
             <div class="collapse" id="collapseExample8">
               <ng-container *ngIf="ValidarRol == 1">
@@ -309,7 +309,7 @@
                   </a>
                 </div>
               </ng-container>
-               <div class="mb-2 sangria">
+              <div class="mb-2 sangria">
                 <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                   Inventario de Materia Prima
@@ -362,6 +362,14 @@
                   <a class="fst-normal" data-bs-toggle="" href="/reporte-costos-ot" role="button" aria-expanded="false" aria-controls="">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
                     Reportes de Costos
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/reporte-despacho" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
+                    Reportes Despacho
                   </a>
                 </div>
               </ng-container>

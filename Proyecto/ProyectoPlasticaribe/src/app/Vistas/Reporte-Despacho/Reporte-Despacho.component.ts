@@ -3,6 +3,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesAsignacionProductosFactura.service';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionesProductos.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
@@ -47,7 +48,8 @@ export class ReporteDespachoComponent implements OnInit {
   public Rollo = ''; /** Variable para pipe de Rollo */
   public Producto = ''; /** Variable para pipe de Producto */
   public Cliente = ''; /** Variable para pipe de Producto */
-
+  public TipoDocumento = '';
+  public Estado = '';
 
 
   constructor(private servicioProducto : ProductoService,
@@ -60,7 +62,8 @@ export class ReporteDespachoComponent implements OnInit {
                             private servicioDtlEntradaRollos: DetallesEntradaRollosService,
                               private dtAsigFactService : DetallesAsignacionProductosFacturaService,
                                 private dtDevolucion : DetallesDevolucionesProductosService,
-                                  private dtEntradaService : DetallesEntradaRollosService,) {
+                                  private dtEntradaService : DetallesEntradaRollosService,
+                                    private bagProServise : BagproService,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -326,21 +329,25 @@ export class ReporteDespachoComponent implements OnInit {
       }
       this.infoDoc.push(info);
     } else if (datos.tipo == 'ENTROLLO') {
-      let info : any = {
-        Codigo : datos.documento,
-        IdProducto : datos.prod_Id,
-        Cliente : datos.prod_Nombre,
-        IdCliente : datos.prod_Id,
-        Producto : datos.prod_Nombre,
-        Rollo : datos.rollo,
-        Cantidad : datos.cantidad,
-        Presentacion : datos.presentacion,
-        Fecha : datos.fecha.replace('T00:00:00', ''),
-        EstadoRollo : datos.estado_Rollo,
-        IdTipoDoc : 'ENTROLLO',
-        TipoDoc : 'Entrada'
-      }
-      this.infoDoc.push(info);
+      this.bagProServise.srvObtenerListaPorRollo(datos.rollo,datos.prod_Id).subscribe(datos_rollos => {
+        for (let i = 0; i < datos_rollos.length; i++) {
+          let info : any = {
+            Codigo : datos.documento,
+            IdCliente : datos.cli_Id,
+            Cliente : datos_rollos[i].nombreCliente,
+            IdProducto : datos.prod_Id,
+            Producto : datos.prod_Nombre,
+            Rollo : datos.rollo,
+            Cantidad : datos.cantidad,
+            Presentacion : datos.presentacion,
+            Fecha : datos.fecha.replace('T00:00:00', ''),
+            EstadoRollo : datos.estado_Rollo,
+            IdTipoDoc : 'ENTROLLO',
+            TipoDoc : 'Entrada'
+          }
+          this.infoDoc.push(info);
+        }
+      });
     }
     this.infoDoc.sort((a,b) => a.Codigo.localeCompare(b.Codigo));
     this.infoDoc.sort((a,b) => b.Fecha.localeCompare(a.Fecha));
@@ -818,4 +825,5 @@ export class ReporteDespachoComponent implements OnInit {
         }
     };
   }
+
 }

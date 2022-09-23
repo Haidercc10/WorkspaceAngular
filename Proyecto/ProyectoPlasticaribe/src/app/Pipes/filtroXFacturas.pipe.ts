@@ -7,7 +7,7 @@ export class FiltroXFacturasPipe implements PipeTransform {
 
   transform(value: any, arg: any): any {
     /** Si la cantidad de letras insertadas en el campo es menor que 3 muestra toda la tabla. */
-    if(arg == '' || arg.length < 3) return value;
+    if(arg == '' || arg.length < 1) return value;
     /** Array que mostrará el resultado de lo consultado. */
     const resultadoBusqFacturas = [];
 

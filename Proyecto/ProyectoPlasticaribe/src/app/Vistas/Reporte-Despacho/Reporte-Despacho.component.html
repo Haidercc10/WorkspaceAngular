@@ -53,7 +53,7 @@
 
             <!-- Cliente -->
             <div class="form-floating col-md">
-              <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput">
+              <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput" [(ngModel)]="Cliente">
               <label for="floatingInput">Cliente</label>
             </div>
 
@@ -159,16 +159,18 @@
 
              <!-- Tipo Documento -->
              <div class="form-floating col-md-2">
-              <select formControlName="tipoDoc" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-                <option [ngValue]="tipoDocu.tpDoc_Id" *ngFor="let tipoDocu of arrayTipoDoc">{{tipoDocu.tpDoc_Nombre}}</option>-->
+              <select formControlName="tipoDoc" id="floatingSelect" type="text" [(ngModel)]="TipoDocumento" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
+                <option></option>
+                <option [ngValue]="tipoDocu.tpDoc_Nombre" *ngFor="let tipoDocu of arrayTipoDoc">{{tipoDocu.tpDoc_Nombre}}</option>
               </select>
               <label for="floatingSelect">Tipo Doc.</label>
             </div>
 
             <!-- Estado rollo -->
             <div class="form-floating col-md-2">
-              <select formControlName="estadoRollo" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-                <option [ngValue]="estRollo.estado_Id" *ngFor="let estRollo of arrayEstadoRollo">{{estRollo.estado_Nombre}}</option>-->
+              <select formControlName="estadoRollo" id="floatingSelect" type="text" [(ngModel)]="Estado" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
+                <option></option>
+                <option [ngValue]="estRollo.estado_Nombre" *ngFor="let estRollo of arrayEstadoRollo">{{estRollo.estado_Nombre}}</option>-->
               </select>
               <label for="floatingSelect">Estado rollo</label>
             </div>
@@ -182,7 +184,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
           <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarFiltros()">Consultar</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
-          <button class=" btn btn-danger btn-danger-sm" type="button">Exportar Excel</button>
+          <!-- <button class=" btn btn-danger btn-danger-sm" type="button">Exportar Excel</button> -->
         </div>
       </div>
 
@@ -215,7 +217,7 @@
                 </tr>
               </thead>
               <tbody style="font-size: 14px;">
-               <tr *ngFor="let item of infoDoc | filtroXFacturas : Codigo | filtroXRollo_RptDespacho : Rollo | filtroXProducto_RptDespacho : Producto | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
+               <tr *ngFor="let item of infoDoc | filtroXFacturas : Codigo | filtroXRollo_RptDespacho : Rollo | filtroXProducto_RptDespacho : Producto | filtroXTipoDocumento : TipoDocumento | filtroXEstadoDespacho : Estado | filtroXClienteDespacho : Cliente | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
                   <th>{{item.Codigo}}</th>
                   <td>{{item.Cliente}}</td>
                   <td>{{item.IdProducto}}</td>
