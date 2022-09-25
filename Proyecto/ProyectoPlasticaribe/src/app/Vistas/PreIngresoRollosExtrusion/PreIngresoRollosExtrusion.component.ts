@@ -115,6 +115,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     this.rollosInsertar = [];
     this.validarRollo = [];
     this.cargando = true;
+    this.Total = 0;
   }
 
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
@@ -780,7 +781,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     return {
         table: {
           headerRows: 1,
-          widths: [30, 30, 40, 100, 40, 150, 40, 50],
+          widths: [30, 30, 50, 100, 37, 150, 37, 48],
           body: this.buildTableBody(data, columns),
         },
         fontSize: 8,

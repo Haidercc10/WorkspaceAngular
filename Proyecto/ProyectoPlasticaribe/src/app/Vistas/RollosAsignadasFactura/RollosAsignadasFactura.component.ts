@@ -94,6 +94,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
     this.rollos = [];
     this.rollosInsertar = [];
     this.cargando = true;
+    this.Total = 0;
   }
 
   //Funcion que a mostrar los usuarios de tipo conductor

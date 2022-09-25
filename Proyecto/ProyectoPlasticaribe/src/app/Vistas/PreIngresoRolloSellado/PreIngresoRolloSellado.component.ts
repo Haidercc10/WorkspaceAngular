@@ -115,6 +115,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
     this.rollosInsertar = [];
     this.validarRollo = [];
     this.cargando = true;
+    this.Total = 0;
   }
 
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
@@ -929,7 +930,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
       for (let i = 0; i < datos_factura.length; i++) {
         for (let j = 0; j < this.rollosAsignados.length; j++) {
           let CantTotal : string = `${this.Total}`;
-          let cantidadAsignadaNueva = CantTotal.indexOf(".");
+          let cantidadAsignadaNueva = CantTotal.indexOf(",");
           let cantidadAsignadaFinal = CantTotal.substring(0, (cantidadAsignadaNueva + 3));
           const pdfDefinicion : any = {
             info: {
@@ -1028,7 +1029,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
 
               this.table(this.rollosAsignados, ['OT', 'Rollo', 'IdCliente', 'Cliente', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
-                text: `\nCant. Total: ${cantidadAsignadaFinal}\n`,
+                text: `\nCant. Total: ${this.Total}\n`,
                 alignment: 'right',
                 style: 'header',
               },
@@ -1095,7 +1096,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
     return {
         table: {
           headerRows: 1,
-          widths: [30, 30, 40, 100, 40, 150, 40, 50],
+          widths: [30, 30, 50, 100, 37, 150, 37, 48],
           body: this.buildTableBody(data, columns),
         },
         fontSize: 8,
