@@ -86,6 +86,8 @@ import { FiltroXEstadoDespachoPipe } from './Pipes/filtroXEstadoDespacho.pipe';
 import { FiltroXClienteDespachoPipe } from './Pipes/filtroXClienteDespacho.pipe';
 import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExtrusion/PreIngresoRollosExtrusion.component';
 import { PreIngresoRolloSelladoComponent } from './Vistas/PreIngresoRolloSellado/PreIngresoRolloSellado.component';
+import { InventarioProductosPBDDComponent } from './Vistas/Inventario-Productos-PBDD/Inventario-Productos-PBDD.component';
+import { BuscarInventarioXProductoPipe } from './Pipes/BuscarInventarioXProducto.pipe';
 
 
 export const routes: Routes = [
@@ -149,6 +151,7 @@ export const routes: Routes = [
   {path: 'devolucion-rollos-productos', canActivate : [ValidacionLoginGuard], component : Devoluciones_Productos_RollosComponent}, // Ingresar Devolucion Factura
   {path: 'asignacion-productos-facturas', canActivate : [ValidacionLoginGuard], component : AsignarProductosFacturasComponent}, // Ingresar Productos
   {path: 'reporte-despacho', canActivate : [ValidacionLoginGuard], component : ReporteDespachoComponent}, // Ingresar Productos
+  {path: 'inventario-productos', canActivate : [ValidacionLoginGuard], component : InventarioProductosPBDDComponent}, // Ingresar Productos
 ]
 
 @NgModule({
@@ -225,6 +228,8 @@ export const routes: Routes = [
     FiltroXClienteDespachoPipe,
     PreIngresoRollosExtrusionComponent,
     PreIngresoRolloSelladoComponent,
+    InventarioProductosPBDDComponent,
+    BuscarInventarioXProductoPipe
   ],
 
 

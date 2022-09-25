@@ -63,4 +63,8 @@ export class ExistenciasProductosService {
   srvGuardar(data : modelExistenciaProductos): Observable<any> {
     return this.http.post(this.rutaPlasticaribeAPI + '/Existencia_Productos', data)
   }
+
+  srvObtenerInventarioExistencias(): Observable<any> {
+    return this.http.get(this.rutaPlasticaribeAPI + '/Existencia_Productos/InventarioProductos');
+  }
 }
