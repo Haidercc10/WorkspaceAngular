@@ -48,6 +48,16 @@
               <label for="floatingInput">Fecha Final</label>
             </div>
 
+            <!-- Tipo de Proceso -->
+            <div class="form-floating col-md-2">
+              <select formControlName="Proceso" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+                <option value="0"></option>
+                <option value="1" *ngIf="ValidarRol == 9 || ValidarRol == 1">Empaque</option>
+                <option value="2" *ngIf="ValidarRol == 8 || ValidarRol == 1">Sellado</option>
+              </select>
+              <label for="floatingSelect">Proceso</label>
+            </div>
+
             <div class="form-floating col-md-2">
               <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Rollos</button>
             </div>

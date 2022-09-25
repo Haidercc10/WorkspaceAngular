@@ -15,27 +15,27 @@ export class PreEntregaRollosService {
   constructor(private http: HttpClient) { }
 
   srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/');
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/PreEntrega_RolloDespacho');
   }
 
   srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `//${dato}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PreEntrega_RolloDespacho/${dato}`);
   }
 
   srvObtenerUltimoId(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `//UltumoID`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PreEntrega_RolloDespacho/UltimoID`);
   }
 
   srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `//${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/PreEntrega_RolloDespacho/${id}`, data);
   }
 
   srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `//${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/PreEntrega_RolloDespacho/${id}`);
   }
 
   srvGuardar(data : modelPreentregaRollos): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/', data);
+   return this.http.post(this.rutaPlasticaribeAPI + '/PreEntrega_RolloDespacho', data);
   }
 
 }

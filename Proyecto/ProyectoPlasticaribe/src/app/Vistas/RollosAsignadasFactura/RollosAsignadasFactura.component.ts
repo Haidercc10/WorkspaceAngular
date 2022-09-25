@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import pdfMake from 'pdfmake/build/pdfmake';
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/AsignacionProductosFactura.service';
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesAsignacionProductosFactura.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
@@ -29,6 +30,8 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   rollosInsertar : any [] = []; //Variable que va a amacenar los diferentes rollos que se van a insertar
   validarRollo : any [] = []; //Variable para validará que el rollo no esté en la tabla
   check : boolean = false; //Variable que nos a ayudar para saber si un rollo ya fue seleccionado
+  rollosAsignados : any [] = []; //Variable que va a almacenar los rollos que fueron asignados a la factura creada
+  Total : any = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
@@ -224,49 +227,13 @@ export class RollosAsignadasFacturaComponent implements OnInit {
               EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
               Rollo_Id : datos_rollos[j].rollo_Id,
               DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
-              UndMed_Id : datos_rollos[j].undMed_Id,
+              undMed_Rollo : datos_rollos[j].undMed_Rollo,
               Estado_Id : 21,
+              dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
+              Prod_Id : datos_rollos[j].prod_Id,
+              UndMed_Prod : datos_rollos[j].undMed_Prod
             }
-            this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
-
-              // const Toast = Swal.mixin({
-              //   toast: true,
-              //   position: 'center',
-              //   showConfirmButton: false,
-              //   timer: 2500,
-              //   timerProgressBar: true,
-              //   didOpen: (toast) => {
-              //     toast.addEventListener('mouseenter', Swal.stopTimer)
-              //     toast.addEventListener('mouseleave', Swal.resumeTimer)
-              //   }
-              // });
-              // Toast.fire({
-              //   icon: 'success',
-              //   title: '¡Factura confirmada, el/los Rollo pasa a ser enviado!'
-              // });
-              // this.limpiarCampos();
-            });
-          }
-        });
-      }
-      setTimeout(() => { this.cambiarEstadoRollosNoVerificados(); }, 200);
-    } else Swal.fire("¡Debe cargar minimo un rollo en la tabla!");
-  }
-
-  // Funcion que cambiará el estado de los rollos a enviados
-  cambiarEstadoRollosNoVerificados(){
-    if (this.rollos.length != 0) {
-      for (let i = 0; i < this.rollos.length; i++) {
-        this.rollosService.srvObtenerVerificarRollo(this.rollos[i].Id).subscribe(datos_rollos => {
-          for (let j = 0; j < datos_rollos.length; j++) {
-            let info : any = {
-              DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
-              EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
-              Rollo_Id : datos_rollos[j].rollo_Id,
-              DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
-              UndMed_Id : datos_rollos[j].undMed_Id,
-              Estado_Id : 19,
-            }
+            this.Total += datos_rollos[j].dtEntRolloProd_Cantidad;
             this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
               const Toast = Swal.mixin({
                 toast: true,
@@ -281,14 +248,253 @@ export class RollosAsignadasFacturaComponent implements OnInit {
               });
               Toast.fire({
                 icon: 'success',
-                title: '¡Factura confirmada, el/los Rollo pasa a ser enviado!'
+                title: '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!'
               });
-              this.limpiarCampos();
             });
           }
         });
       }
+      setTimeout(() => {
+        this.cambiarEstadoRollosNoVerificados();
+        this.buscarRolloPDF();
+      }, 200);
     } else Swal.fire("¡Debe cargar minimo un rollo en la tabla!");
+    setTimeout(() => { this.limpiarCampos(); }, 3000);
+  }
+
+  // Funcion que cambiará el estado de los rollos a enviados
+  cambiarEstadoRollosNoVerificados(){
+    for (let i = 0; i < this.rollos.length; i++) {
+      this.rollosService.srvObtenerVerificarRollo(this.rollos[i].Id).subscribe(datos_rollos => {
+        for (let j = 0; j < datos_rollos.length; j++) {
+          let info : any = {
+              DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
+              EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
+              Rollo_Id : datos_rollos[j].rollo_Id,
+              DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
+              undMed_Rollo : datos_rollos[j].undMed_Rollo,
+              Estado_Id : 19,
+              dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
+              Prod_Id : datos_rollos[j].prod_Id,
+              UndMed_Prod : datos_rollos[j].undMed_Prod
+          }
+          this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'center',
+              showConfirmButton: false,
+              timer: 2500,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+              }
+            });
+            Toast.fire({
+              icon: 'success',
+              title: '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!'
+            });
+          });
+        }
+      });
+    }
+  }
+
+  // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
+  crearPDF(){
+    let factura : string = this.FormConsultarFactura.value.Fact_Id;
+
+    this.dtAsgProdFactura.srvObtenerListaParaPDF(factura.toUpperCase()).subscribe(datos_factura => {
+      for (let i = 0; i < datos_factura.length; i++) {
+        for (let j = 0; j < this.rollosAsignados.length; j++) {
+          let CantTotal : string = `${this.Total}`;
+          let cantidadAsignadaNueva = CantTotal.indexOf(".");
+          let cantidadAsignadaFinal = CantTotal.substring(0, (cantidadAsignadaNueva + 3));
+          const pdfDefinicion : any = {
+            info: {
+              title: `${factura.toUpperCase()}`
+            },
+            pageSize: {
+              width: 630,
+              height: 760
+            },
+            content : [
+              {
+                text: `Rollos de la Factura ${factura.toUpperCase()}`,
+                alignment: 'right',
+                style: 'titulo',
+              },
+              '\n \n',
+              {
+                style: 'tablaEmpresa',
+                table: {
+                  widths: [90, '*', 90, '*'],
+                  style: 'header',
+                  body: [
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Nombre Empresa`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `Plasticaribe S.A.S`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: `Fecha`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].asigProdFV_Fecha.replace('T00:00:00', '')}`
+                      },
+                    ],
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Dirección`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].empresa_Direccion}`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: `Ciudad`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].empresa_Ciudad}`
+                      },
+                    ],
+                  ]
+                },
+                layout: {
+                  defaultBorder: false,
+                },
+                fontSize: 9,
+              },
+              '\n \n',
+              {
+                text: `Facturado Por: ${datos_factura[i].nombreCreador}\n`,
+                alignment: 'left',
+                style: 'header',
+              },
+              '\n \n',
+              {
+                text: `\n Información detallada de la Factura \n \n`,
+                alignment: 'center',
+                style: 'header'
+              },
+              {
+                style: 'tablaCliente',
+                table: {
+                  widths: ['*', '*'],
+                  style: 'header',
+                  body: [
+                    [
+                      `Código: ${factura.toUpperCase()}`,
+                      `Nota Credito: ${datos_factura[i].notaCredito_Id}`
+                    ],
+                    [
+                      `Id Cliente: ${datos_factura[i].cli_Id}`,
+                      `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
+                    ],
+                    [
+                      `Conductor: ${datos_factura[i].nombreConductor}`,
+                      `Placa Camión: ${datos_factura[i].asigProdFV_PlacaCamion}`
+                    ]
+                  ]
+                },
+                layout: 'lightHorizontalLines',
+                fontSize: 9,
+              },
+              {
+                text: `\n\n Información detallada de producto(s) pedido(s) \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+
+              this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
+              {
+                text: `\nCant. Total: ${cantidadAsignadaFinal}\n`,
+                alignment: 'right',
+                style: 'header',
+              },
+              {
+                text: `\n \nObervación sobre el pedido: \n ${datos_factura[i].asigProdFV_Observacion}\n`,
+                style: 'header',
+              }
+            ],
+            styles: {
+              header: {
+                fontSize: 10,
+                bold: true
+              },
+              titulo: {
+                fontSize: 20,
+                bold: true
+              }
+            }
+          }
+          const pdf = pdfMake.createPdf(pdfDefinicion);
+          pdf.open();
+          this.limpiarCampos();
+          break;
+        }
+        break;
+      }
+    });
+  }
+
+  // Funcion que traerá los rollos que fueron asignados a la factura creada
+  buscarRolloPDF(){
+    let factura : string = this.FormConsultarFactura.value.Fact_Id;
+    this.dtAsgProdFactura.srvObtenerListaParaPDF(factura.toUpperCase()).subscribe(datos_factura => {
+      for (let i = 0; i < datos_factura.length; i++) {
+        let info : any = {
+          Rollo : datos_factura[i].rollo_Id,
+          Producto : datos_factura[i].prod_Id,
+          Nombre : datos_factura[i].prod_Nombre,
+          Cantidad : this.formatonumeros(datos_factura[i].dtAsigProdFV_Cantidad),
+          Presentacion : datos_factura[i].undMed_Id,
+        }
+        this.rollosAsignados.push(info);
+      }
+    });
+    setTimeout(() => { this.crearPDF(); }, 2500);
+  }
+
+  // funcion que se encagará de llenar la tabla de los productos en el pdf
+  buildTableBody(data, columns) {
+    var body = [];
+    body.push(columns);
+    data.forEach(function(row) {
+        var dataRow = [];
+        columns.forEach(function(column) {
+            dataRow.push(row[column].toString());
+        });
+        body.push(dataRow);
+    });
+
+    return body;
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table(data, columns) {
+    return {
+        table: {
+          headerRows: 1,
+          widths: [60, 60, 250, 70, 70],
+          body: this.buildTableBody(data, columns),
+        },
+        fontSize: 9,
+        layout: {
+          fillColor: function (rowIndex, node, columnIndex) {
+            return (rowIndex == 0) ? '#CCCCCC' : null;
+          }
+        }
+    };
   }
 
 }

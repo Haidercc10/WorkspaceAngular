@@ -79,6 +79,17 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnEmpaque/${ot}`);
   }
 
+  srvObtenerListaProcExtrusionRollosOT(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/RollosOT/${ot}`);
+  }
+
+  srvObtenerListaProcExtrusionFechas(fecha1 : any, fecha2 : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/FechasRollos/${fecha1}/${fecha2}`);
+  }
+
+  srvObtenerListaProcExtrusionFechasOT(fecha1 : any, fecha2 : any, ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/FechasOTRollos/${fecha1}/${fecha2}/${ot}`);
+  }
 
 
   /* CLIENTESOT */

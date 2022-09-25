@@ -233,11 +233,11 @@ export class ReporteDespachoComponent implements OnInit {
     this.servicioTipoDoc.srvObtenerLista().subscribe(registrosTipoDoc => {
       for(let rtd = 0; rtd < registrosTipoDoc.length; rtd++) {
         if(registrosTipoDoc[rtd].tpDoc_Id == 'ASIGPRODFV'
-        || registrosTipoDoc[rtd].tpDoc_Id == 'DEVPRODFAC'
-        || registrosTipoDoc[rtd].tpDoc_Id == 'ENTROLLO') {
-
-          this.arrayTipoDoc.push(registrosTipoDoc[rtd])
-        }
+        && (this.ValidarRol == 1 || this.ValidarRol == 6)) this.arrayTipoDoc.push(registrosTipoDoc[rtd]);
+        else if (registrosTipoDoc[rtd].tpDoc_Id == 'DEVPRODFAC'
+        && (this.ValidarRol == 1 || this.ValidarRol == 10 || this.ValidarRol == 7 || this.ValidarRol == 8 || this.ValidarRol == 9)) this.arrayTipoDoc.push(registrosTipoDoc[rtd]);
+        else if (registrosTipoDoc[rtd].tpDoc_Id == 'ENTROLLO'
+        && (this.ValidarRol == 1 || this.ValidarRol == 10 || this.ValidarRol == 7 || this.ValidarRol == 8 || this.ValidarRol == 9)) this.arrayTipoDoc.push(registrosTipoDoc[rtd]);
       }
     });
   }
@@ -296,7 +296,7 @@ export class ReporteDespachoComponent implements OnInit {
 
   // Funcion que se encagará de llenar la tabla con la informacion consultada
   llenarTabla(datos : any){
-    if (datos.tipo == 'ASIGPRODFV') {
+    if (datos.tipo == 'ASIGPRODFV' && (this.ValidarRol == 1 || this.ValidarRol == 6)) {
       let info : any = {
         Codigo : datos.documento,
         IdCliente : datos.cli_Id,
@@ -312,7 +312,7 @@ export class ReporteDespachoComponent implements OnInit {
         TipoDoc : 'Factura'
       }
       this.infoDoc.push(info);
-    } else if (datos.tipo == 'DEVPRODFAC') {
+    } else if (datos.tipo == 'DEVPRODFAC' && (this.ValidarRol == 1 || this.ValidarRol == 10 || this.ValidarRol == 7 || this.ValidarRol == 8 || this.ValidarRol == 9)) {
       let info : any = {
         Codigo : datos.documento,
         IdCliente : datos.cli_Id,
@@ -328,7 +328,7 @@ export class ReporteDespachoComponent implements OnInit {
         TipoDoc : 'Devolución'
       }
       this.infoDoc.push(info);
-    } else if (datos.tipo == 'ENTROLLO') {
+    } else if (datos.tipo == 'ENTROLLO' && (this.ValidarRol == 1 || this.ValidarRol == 10 || this.ValidarRol == 7 || this.ValidarRol == 8 || this.ValidarRol == 9)) {
       this.bagProServise.srvObtenerListaPorRollo(datos.rollo,datos.prod_Id).subscribe(datos_rollos => {
         for (let i = 0; i < datos_rollos.length; i++) {
           let info : any = {

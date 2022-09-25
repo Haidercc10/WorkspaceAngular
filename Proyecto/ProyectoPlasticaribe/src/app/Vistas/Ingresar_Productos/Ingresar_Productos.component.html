@@ -32,20 +32,38 @@
           <div class="row g-3">
             <!-- OT -->
             <div class="form-floating col-md-2">
-              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarOTbagPro()">
+              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Nro. OT</label>
             </div>
 
-            <!-- Cliente -->
-            <div class="form-floating col-md-5">
-              <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Cliente</label>
+             <!-- Fecha -->
+             <div class="form-floating col-md-2">
+              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha inicial</label>
             </div>
 
-            <!-- Producto -->
-            <div class="form-floating col-md-5">
-              <input formControlName="Producto" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Producto</label>
+            <!-- Fecha -->
+            <div class="form-floating col-md-2">
+              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha Final</label>
+            </div>
+
+            <!-- Tipo de Proceso -->
+            <div class="form-floating col-md-2">
+              <select formControlName="Proceso" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+                <option value="1">Empaque</option>
+                <option value="2">Extrusión</option>
+                <option value="3">Sellado</option>
+              </select>
+              <label for="floatingSelect">Proceso</label>
+            </div>
+
+            <div class="form-floating col-md-2">
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Rollos</button>
+            </div>
+
+            <div class="form-floating col-md-2">
+              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
             </div>
           </div>
         </div>
@@ -66,6 +84,7 @@
             <table class="table table-bordered table-hover mt-2" >
               <thead class="TitulosTabla">
                 <tr>
+                  <th scope="col">OT</th>
                   <th scope="col">ID Rollo</th>
                   <th scope="col">ID Producto</th>
                   <th scope="col">Producto</th>
@@ -77,13 +96,29 @@
               </thead>
               <tbody>
                 <tr *ngFor="let item of rollos; let i=index">
-                  <th>{{item.Id}}</th>
-                  <td>{{item.IdProducto}}</td>
-                  <td>{{item.Producto}}</td>
-                  <td>{{item.Cantidad | number}}</td>
-                  <td>{{item.Presentacion}}</td>
-                  <td>{{item.Estatus}}</td>
-                  <td><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td>
+                  <ng-container *ngIf="item.exits; then thenTemplate; else elseTemplate"></ng-container>
+
+                  <ng-template #thenTemplate>
+                    <th style="background-color: rgb(255, 146, 146);">{{item.Ot}}</th>
+                    <th style="background-color: rgb(255, 146, 146);">{{item.Id}}</th>
+                    <td style="background-color: rgb(255, 146, 146);">{{item.IdProducto}}</td>
+                    <td style="background-color: rgb(255, 146, 146);">{{item.Producto}}</td>
+                    <td style="background-color: rgb(255, 146, 146);">{{item.Cantidad | number}}</td>
+                    <td style="background-color: rgb(255, 146, 146);">{{item.Presentacion}}</td>
+                    <td style="background-color: rgb(255, 146, 146);">{{item.Estatus}}</td>
+                    <!-- <td><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td> -->
+                  </ng-template>
+
+                  <ng-template #elseTemplate>
+                    <th>{{item.Ot}}</th>
+                    <th>{{item.Id}}</th>
+                    <td>{{item.IdProducto}}</td>
+                    <td>{{item.Producto}}</td>
+                    <td>{{item.Cantidad | number}}</td>
+                    <td>{{item.Presentacion}}</td>
+                    <td>{{item.Estatus}}</td>
+                    <td><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td>
+                  </ng-template>
                 </tr>
               </tbody>
             </table>

@@ -261,59 +261,72 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
               EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
               Rollo_Id : datos_rollos[j].rollo_Id,
               DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
-              UndMed_Id : datos_rollos[j].undMed_Id,
+              undMed_Rollo : datos_rollos[j].undMed_Rollo,
               Estado_Id : 19,
+              dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
+              Prod_Id : datos_rollos[j].prod_Id,
+              UndMed_Prod : datos_rollos[j].undMed_Prod
             }
             this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
           }
         });
       }
-      setTimeout(() => { this.actualizarProductos(); }, 2000);
+      setTimeout(() => { this.moverInventarioProductos(); }, 2000);
     } else Swal.fire("¡Debe cargar minimo un rollo en la tabla!");
   }
 
   // Funcion para actualizar la cantidad de existencias de cada producto
-  actualizarProductos(){
-    let sumaCant : number = 0;
-    for (let i = 0; i < this.rollosInsertar.length; i++) {
-      sumaCant +=  this.rollosInsertar[i].Cantidad;
-    }
+  // Funcion que va a mover el inventario de los productos
+  moverInventarioProductos(){
+    let rollo = [];
     setTimeout(() => {
       for (let k = 0; k < this.rollosInsertar.length; k++) {
-        this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.rollosInsertar[k].IdProducto, this.rollosInsertar[k].Presentacion).subscribe(datos_existencias => {
-          for (let j = 0; j < datos_existencias.length; j++) {
-            let info : any = {
-              Prod_Id: datos_existencias[j].prod_Id,
-              exProd_Id : datos_existencias[j].exProd_Id,
-              ExProd_Cantidad: (datos_existencias[j].exProd_Cantidad + sumaCant),
-              UndMed_Id: this.presentacionProducto,
-              TpBod_Id: datos_existencias[j].tpBod_Id,
-              ExProd_Precio: datos_existencias[j].exProd_Precio,
-              ExProd_PrecioExistencia: (datos_existencias[j].exProd_Cantidad + sumaCant) * datos_existencias[j].exProd_PrecioVenta,
-              ExProd_PrecioSinInflacion: datos_existencias[j].exProd_PrecioSinInflacion,
-              TpMoneda_Id: datos_existencias[j].tpMoneda_Id,
-              ExProd_PrecioVenta: datos_existencias[j].exProd_PrecioVenta,
-            }
-            this.ExistenciasProdService.srvActualizarExistencia(datos_existencias[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
-              const Toast = Swal.mixin({
-                toast: true,
-                position: 'center',
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                  toast.addEventListener('mouseenter', Swal.stopTimer)
-                  toast.addEventListener('mouseleave', Swal.resumeTimer)
+        if (!rollo.includes(this.rollosInsertar[k].IdProducto)) {
+          this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.rollosInsertar[k].IdProducto, this.rollosInsertar[k].Presentacion).subscribe(datos_existencias => {
+            for (let j = 0; j < datos_existencias.length; j++) {
+              let sumaCantidad = 0;
+              for (let i = 0; i < this.rollosInsertar.length; i++) {
+                if (this.rollosInsertar[i].IdProducto == this.rollosInsertar[k].IdProducto
+                  && this.rollosInsertar[i].Presentacion == this.rollosInsertar[k].Presentacion) {
+                    sumaCantidad += this.rollosInsertar[i].Cantidad;
                 }
-              });
-              Toast.fire({
-                icon: 'success',
-                title: '¡Devolución de Rollos registrada con exito!'
-              });
-              this.limpiarCampos();
-            });
-          }
-        });
+              }
+              rollo.push(this.rollosInsertar[k].IdProducto);
+              setTimeout(() => {
+                let info : any = {
+                  Prod_Id: datos_existencias[j].prod_Id,
+                  exProd_Id : datos_existencias[j].exProd_Id,
+                  ExProd_Cantidad: (datos_existencias[j].exProd_Cantidad - sumaCantidad),
+                  UndMed_Id: datos_existencias[j].undMed_Id,
+                  TpBod_Id: datos_existencias[j].tpBod_Id,
+                  ExProd_Precio: datos_existencias[j].exProd_Precio,
+                  ExProd_PrecioExistencia: (datos_existencias[j].exProd_Cantidad - sumaCantidad) * datos_existencias[j].exProd_PrecioVenta,
+                  ExProd_PrecioSinInflacion: datos_existencias[j].exProd_PrecioSinInflacion,
+                  TpMoneda_Id: datos_existencias[j].tpMoneda_Id,
+                  ExProd_PrecioVenta: datos_existencias[j].exProd_PrecioVenta,
+                }
+                this.ExistenciasProdService.srvActualizar(datos_existencias[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
+                  const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'center',
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                      toast.addEventListener('mouseenter', Swal.stopTimer)
+                      toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                  });
+                  Toast.fire({
+                    icon: 'success',
+                    title: '¡Devolución de Rollos registrada con exito!'
+                  });
+                  this.limpiarCampos();
+                });
+              }, 2000);
+            }
+          });
+        }
       }
     }, 2000);
   }

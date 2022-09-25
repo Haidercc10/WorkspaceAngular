@@ -32,28 +32,44 @@
           <div class="row g-3">
             <!-- OT -->
             <div class="form-floating col-md-2">
-              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarOTbagPro()">
+              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Nro. OT</label>
             </div>
 
-            <!-- Cliente -->
-            <div class="form-floating col-md-5">
-              <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Cliente</label>
+             <!-- Fecha Factura -->
+             <div class="form-floating col-md-2">
+              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha inicial</label>
             </div>
 
-            <!-- Producto -->
-            <div class="form-floating col-md-5">
-              <input formControlName="Producto" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Producto</label>
+            <!-- Fecha ingreso rollo -->
+            <div class="form-floating col-md-2">
+              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha Final</label>
+            </div>
+
+            <div class="form-floating col-md-2">
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Rollos</button>
+            </div>
+
+            <div class="form-floating col-md-2">
+              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila 2 -->
+        <div class="mb-3">
+          <div class="row g-3">
+            <!-- Observacion -->
+            <div class="form-floating col-md">
+              <input formControlName="Observacion" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Observación</label>
             </div>
           </div>
         </div>
       </form>
 
-      <div class="mb-4">
-        <hr class="Linea">
-      </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4">
         <h4 class="tituloRojo">Tabla de Rollos</h4>
@@ -66,17 +82,19 @@
             <table class="table table-bordered table-hover mt-2" >
               <thead class="TitulosTabla">
                 <tr>
+                  <th scope="col">OT</th>
                   <th scope="col">ID Rollo</th>
                   <th scope="col">ID Producto</th>
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentacion</th>
                   <th scope="col">Proceso</th>
-                  <th scope="col"></th>
+                  <th scope="col"><input  *ngIf="cantidadOT == 1" class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let item of rollos; let i=index">
+                  <th (dblclick)="selccionarTodoOT(item.Ot)" style="cursor: pointer;">{{item.Ot}}</th>
                   <th>{{item.Id}}</th>
                   <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
@@ -106,16 +124,18 @@
             <table class="table table-bordered table-hover mt-2" >
               <thead class="TitulosTabla">
                 <tr>
+                  <th scope="col">OT</th>
                   <th scope="col">ID Rollo</th>
                   <th scope="col">ID Producto</th>
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentación</th>
-                  <th scope="col"></th>
+                  <th scope="col"><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let item of rollosInsertar; let i=index">
+                  <th>{{item.Ot}}</th>
                   <th>{{item.Id}}</th>
                   <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>

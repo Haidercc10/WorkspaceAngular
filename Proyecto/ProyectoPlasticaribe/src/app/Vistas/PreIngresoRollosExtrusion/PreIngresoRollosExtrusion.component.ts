@@ -1,10 +1,14 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import pdfMake from 'pdfmake/build/pdfmake';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
+import { DtPreEntregaRollosService } from 'src/app/Servicios/DtPreEntregaRollos.service';
 import { EntradaRollosService } from 'src/app/Servicios/EntradaRollos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
+import { PreEntregaRollosService } from 'src/app/Servicios/PreEntregaRollos.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import Swal from 'sweetalert2';
 
@@ -29,6 +33,9 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
   validarRollo : any [] = []; //Variable para validará que el rollo no esté en la tabla
   idProducto : any = 0; //Variable que va a almacenar el id del producto que fue hecho en la ot consultada
   presentacionProducto : string = ''; //Variable que almacenará la presentacion del producto de la orden de trabajo consultada
+  cantidadOT : number = 0; //
+  rollosAsignados : any = [];
+  Total : number = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
@@ -36,12 +43,15 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
                     private bagProService : BagproService,
                       private ExistenciasProdService : ExistenciasProductosService,
                         private entradaRolloService : EntradaRollosService,
-                          private dtEntradaRollosService : DetallesEntradaRollosService,) {
+                          private dtEntradaRollosService : DetallesEntradaRollosService,
+                            private dtPreEntRollosService : DtPreEntregaRollosService,
+                              private preEntRollosService : PreEntregaRollosService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
-      OT_Id: [''],
-      Cliente : [''],
-      Producto : [''],
+      OT_Id: [null],
+      fechaDoc : [null],
+      fechaFinalDoc: [null],
+      Proceso : [null, Validators.required],
       Observacion : [''],
     });
   }
@@ -82,11 +92,25 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
     this.today = yyyy + '-' + mm + '-' + dd;
+
+    this.FormConsultarRollos.setValue({
+      OT_Id: this.FormConsultarRollos.value.OT_Id,
+      fechaDoc : this.today,
+      fechaFinalDoc: this.today,
+      Observacion : this.FormConsultarRollos.value.Observacion,
+      Proceso : this.FormConsultarRollos.value.Proceso,
+    });
   }
 
   // Funcion para limpiar los campos de la vista
   limpiarCampos(){
-    this.FormConsultarRollos.reset();
+    this.FormConsultarRollos.setValue({
+      OT_Id: this.FormConsultarRollos.value.OT_Id,
+      fechaDoc : this.today,
+      fechaFinalDoc: this.today,
+      Observacion : this.FormConsultarRollos.value.Observacion,
+      Proceso : this.FormConsultarRollos.value.Proceso,
+    });
     this.rollos = [];
     this.rollosInsertar = [];
     this.validarRollo = [];
@@ -95,90 +119,331 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
 
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
   consultarOTbagPro(){
-    this.rollos = [];
-    this.rollosInsertar = [];
-    this.validarRollo = [];
-    this.cargando = false;
+    let ProcConsulta : any = this.FormConsultarRollos.value.Proceso;
     let ot : number = this.FormConsultarRollos.value.OT_Id;
+    let fechaInicial : any = this.FormConsultarRollos.value.fechaDoc;
+    let fechaFinal : any = this.FormConsultarRollos.value.fechaFinalDoc;
+    if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
+      this.rollos = [];
+      this.rollosInsertar = [];
+      this.validarRollo = [];
+      let RollosConsultados : any [] = [];
+      let otTemporral : number = 0;
+      this.cargando = false;
+      this.cantidadOT = 0;
+      let proceso : string = '';
 
-    this.bagProService.srvObtenerListaProcExtOt(ot).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-          if (datos_rollos.length == 0){
-            this.idProducto = datos_ot[i].referencia;
-            this.presentacionProducto = 'Kg';
-            this.idProducto = datos_ot[i].clienteItem;
-            let info : any = {
-              Id : datos_ot[i].item,
-              IdProducto : datos_ot[i].clienteItem,
-              Producto : datos_ot[i].clienteItemNombre,
-              Cantidad : datos_ot[i].extnetokg,
-              Presentacion : 'Kg',
-              Estatus : datos_ot[i].nomStatus,
-            }
-            this.rollos.push(info);
-            this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id));
-            this.FormConsultarRollos.setValue({
-              OT_Id: ot,
-              Cliente : datos_ot[i].clienteNombre,
-              Producto : datos_ot[i].clienteItemNombre,
-              Observacion : '',
+      if (ot != null && fechaInicial != null && fechaFinal != null) {
+        this.bagProService.srvObtenerListaProcExtrusionFechasOT(fechaInicial, fechaFinal, ot).subscribe(datos_ot => {
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+              if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
+                if (!RollosConsultados.includes(datos_ot[i].item)){
+                  if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                  if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                  if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                  if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                  if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                  if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                  if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                  if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                  if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                  let info : any = {
+                    Ot : datos_ot[i].ot,
+                    Id : datos_ot[i].item,
+                    IdCliente : datos_ot[i].identNro,
+                    Cliente : datos_ot[i].nombreComercial,
+                    IdProducto : datos_ot[i].clienteItem,
+                    Producto : datos_ot[i].clienteItemNombre,
+                    Cantidad : datos_ot[i].extnetokg,
+                    Presentacion : datos_ot[i].unidad,
+                    Estatus : datos_ot[i].nomStatus,
+                    Proceso : proceso,
+                  }
+                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                  otTemporral = datos_ot[i].ot;
+                  this.rollos.push(info);
+                  RollosConsultados.push(datos_ot[i].item);
+                  this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                  this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                  this.FormConsultarRollos.setValue({
+                    OT_Id: ot,
+                    fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                    fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                    Observacion : this.FormConsultarRollos.value.Observacion,
+                    Proceso : this.FormConsultarRollos.value.Proceso,
+                  });
+                }
+              }
+            });
+          }
+        });
+      } else if (fechaInicial != null &&  fechaFinal != null) {
+        this.bagProService.srvObtenerListaProcExtrusionFechas(fechaInicial, fechaFinal).subscribe(datos_ot => {
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+              if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
+                if (!RollosConsultados.includes(datos_ot[i].item)){
+                  if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                  if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                  if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                  if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                  if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                  if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                  if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                  if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                  if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                  let info : any = {
+                    Ot : datos_ot[i].ot,
+                    Id : datos_ot[i].item,
+                    IdCliente : datos_ot[i].identNro,
+                    Cliente : datos_ot[i].nombreComercial,
+                    IdProducto : datos_ot[i].clienteItem,
+                    Producto : datos_ot[i].clienteItemNombre,
+                    Cantidad : datos_ot[i].extnetokg,
+                    Presentacion : datos_ot[i].unidad,
+                    Estatus : datos_ot[i].nomStatus,
+                    Proceso : proceso,
+                  }
+                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                  otTemporral = datos_ot[i].ot;
+                  this.rollos.push(info);
+                  RollosConsultados.push(datos_ot[i].item);
+                  this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                  this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                  this.FormConsultarRollos.setValue({
+                    OT_Id: ot,
+                    fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                    fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                    Observacion : this.FormConsultarRollos.value.Observacion,
+                    Proceso : this.FormConsultarRollos.value.Proceso,
+                  });
+                }
+              }
+            });
+          }
+        });
+      } else if (ot != null && fechaInicial != null) {
+        this.bagProService.srvObtenerListaProcExtrusionFechasOT(fechaInicial, fechaInicial, ot).subscribe(datos_ot => {
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+              if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
+                if (!RollosConsultados.includes(datos_ot[i].item)){
+                  if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                  if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                  if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                  if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                  if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                  if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                  if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                  if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                  if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                  let info : any = {
+                    Ot : datos_ot[i].ot,
+                    Id : datos_ot[i].item,
+                    IdCliente : datos_ot[i].identNro,
+                    Cliente : datos_ot[i].nombreComercial,
+                    IdProducto : datos_ot[i].clienteItem,
+                    Producto : datos_ot[i].clienteItemNombre,
+                    Cantidad : datos_ot[i].extnetokg,
+                    Presentacion : datos_ot[i].unidad,
+                    Estatus : datos_ot[i].nomStatus,
+                    Proceso : proceso,
+                  }
+                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                  otTemporral = datos_ot[i].ot;
+                  this.rollos.push(info);
+                  RollosConsultados.push(datos_ot[i].item);
+                  this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                  this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                  this.FormConsultarRollos.setValue({
+                    OT_Id: ot,
+                    fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                    fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                    Observacion : this.FormConsultarRollos.value.Observacion,
+                    Proceso : this.FormConsultarRollos.value.Proceso,
+                  });
+                }
+              }
+            });
+          }
+        });
+      } else if (fechaInicial != null) {
+        this.bagProService.srvObtenerListaProcExtrusionFechas(fechaInicial, fechaInicial).subscribe(datos_ot => {
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+              if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
+                if (!RollosConsultados.includes(datos_ot[i].item)){
+                  if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                  if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                  if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                  if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                  if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                  if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                  if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                  if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                  if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                  let info : any = {
+                    Ot : datos_ot[i].ot,
+                    Id : datos_ot[i].item,
+                    IdCliente : datos_ot[i].identNro,
+                    Cliente : datos_ot[i].nombreComercial,
+                    IdProducto : datos_ot[i].clienteItem,
+                    Producto : datos_ot[i].clienteItemNombre,
+                    Cantidad : datos_ot[i].extnetokg,
+                    Presentacion : datos_ot[i].unidad,
+                    Estatus : datos_ot[i].nomStatus,
+                    Proceso : proceso,
+                  }
+                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                  otTemporral = datos_ot[i].ot;
+                  this.rollos.push(info);
+                  RollosConsultados.push(datos_ot[i].item);
+                  this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                  this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                  this.FormConsultarRollos.setValue({
+                    OT_Id: ot,
+                    fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                    fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                    Observacion : this.FormConsultarRollos.value.Observacion,
+                    Proceso : this.FormConsultarRollos.value.Proceso,
+                  });
+                }
+              }
+            });
+          }
+        });
+      } else if (ot != null) {
+        this.bagProService.srvObtenerListaProcExtrusionRollosOT(ot).subscribe(datos_ot => {
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+              if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
+                if (!RollosConsultados.includes(datos_ot[i].item)){
+                  if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                  if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                  if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                  if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                  if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                  if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                  if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                  if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                  if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                  let info : any = {
+                    Ot : datos_ot[i].ot,
+                    Id : datos_ot[i].item,
+                    IdCliente : datos_ot[i].identNro,
+                    Cliente : datos_ot[i].nombreComercial,
+                    IdProducto : datos_ot[i].clienteItem,
+                    Producto : datos_ot[i].clienteItemNombre,
+                    Cantidad : datos_ot[i].extnetokg,
+                    Presentacion : datos_ot[i].unidad,
+                    Estatus : datos_ot[i].nomStatus,
+                    Proceso : proceso,
+                  }
+                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                  otTemporral = datos_ot[i].ot;
+                  this.rollos.push(info);
+                  RollosConsultados.push(datos_ot[i].item);
+                  this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                  this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                  this.FormConsultarRollos.setValue({
+                    OT_Id: ot,
+                    fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                    fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                    Observacion : this.FormConsultarRollos.value.Observacion,
+                    Proceso : this.FormConsultarRollos.value.Proceso,
+                  });
+                }
+              }
+            });
+          }
+        });
+      } else {
+        this.bagProService.srvObtenerListaProcExtrusionFechas(this.today, this.today).subscribe(datos_ot => {
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+              if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
+                if (!RollosConsultados.includes(datos_ot[i].item)){
+                  if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                  if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                  if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                  if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                  if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                  if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                  if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                  if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                  if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                  let info : any = {
+                    Ot : datos_ot[i].ot,
+                    Id : datos_ot[i].item,
+                    IdCliente : datos_ot[i].identNro,
+                    Cliente : datos_ot[i].nombreComercial,
+                    IdProducto : datos_ot[i].clienteItem,
+                    Producto : datos_ot[i].clienteItemNombre,
+                    Cantidad : datos_ot[i].extnetokg,
+                    Presentacion : datos_ot[i].unidad,
+                    Estatus : datos_ot[i].nomStatus,
+                    Proceso : proceso,
+                  }
+                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                  otTemporral = datos_ot[i].ot;
+                  this.rollos.push(info);
+                  RollosConsultados.push(datos_ot[i].item);
+                  this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                  this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                  this.FormConsultarRollos.setValue({
+                    OT_Id: ot,
+                    fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                    fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                    Observacion : this.FormConsultarRollos.value.Observacion,
+                    Proceso : this.FormConsultarRollos.value.Proceso,
+                  });
+                }
+              }
             });
           }
         });
       }
-    });
-    this.bagProService.srvObtenerListaProcSelladoOT(ot).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-          if (datos_rollos.length == 0) {
-            this.idProducto = datos_ot[i].referencia;
-            if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
-            if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
-            if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-            let info : any = {
-              Id : datos_ot[i].item,
-              IdProducto : datos_ot[i].referencia,
-              Producto : datos_ot[i].nomReferencia,
-              Cantidad : datos_ot[i].qty,
-              Presentacion : datos_ot[i].unidad,
-              Estatus : datos_ot[i].nomStatus,
-            }
-            this.rollos.push(info);
-            this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id));
-            this.FormConsultarRollos.setValue({
-              OT_Id: ot,
-              Cliente : datos_ot[i].cliente,
-              Producto : datos_ot[i].nomReferencia,
-              Observacion : '',
-            });
-          }
-        });
-      }
-    });
-    setTimeout(() => { this.cargando = true; }, 2000);
+      setTimeout(() => { this.cargando = true; }, 5000);
+    } else Swal.fire("¡La fecha seleccionada no es valida!");
   }
 
   //Funcion que va a agregar Productos en la tabla
   cargarProducto(item : any){
     if (this.rollosInsertar.length == 0) {
       let info : any = {
+        Ot : item.Ot,
         Id : item.Id,
+        IdCliente : item.IdCliente,
+        Cliente : item.Cliente,
         IdProducto : item.IdProducto,
         Producto : item.Producto,
         Cantidad : item.Cantidad,
         Presentacion : item.Presentacion,
+        Estatus : item.Estatus,
+        Proceso : item.Proceso,
       }
       this.rollosInsertar.push(info);
       this.validarRollo.push(item.Id);
     } else {
       if (!this.validarRollo.includes(item.Id)) {
         let info : any = {
+          Ot : item.Ot,
           Id : item.Id,
+          IdCliente : item.IdCliente,
+          Cliente : item.Cliente,
           IdProducto : item.IdProducto,
           Producto : item.Producto,
           Cantidad : item.Cantidad,
           Presentacion : item.Presentacion,
+          Estatus : item.Estatus,
+          Proceso : item.Proceso,
         }
         this.rollosInsertar.push(info);
         this.validarRollo.push(item.Id);
@@ -196,15 +461,88 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     }
   }
 
+  // Funcion que va a seleccionar todo lo que hay en la tabla
+  selccionarTodo(){
+    for (const item of this.rollos) {
+      let info : any = {
+        Ot : item.Ot,
+        Id : item.Id,
+        IdCliente : item.IdCliente,
+        Cliente : item.Cliente,
+        IdProducto : item.IdProducto,
+        Producto : item.Producto,
+        Cantidad : item.Cantidad,
+        Presentacion : item.Presentacion,
+        Estatus : item.Estatus,
+        Proceso : item.Proceso,
+      }
+      this.rollosInsertar.push(info);
+      this.validarRollo.push(item.Id);
+    }
+    setTimeout(() => { this.rollos = []; }, 2000);
+  }
+
+  // Funcion que va a seleccionar todo lo de la OT sobre la que se dió click que hay en la tabla
+  selccionarTodoOT(ot){
+    for (let i = 0; i < this.rollos.length; i++) {
+      if (this.rollos[i].Ot == ot) {
+        let info : any = {
+          Ot : this.rollos[i].Ot,
+          Id : this.rollos[i].Id,
+          IdCliente : this.rollos[i].IdCliente,
+          Cliente : this.rollos[i].Cliente,
+          IdProducto : this.rollos[i].IdProducto,
+          Producto : this.rollos[i].Producto,
+          Cantidad : this.rollos[i].Cantidad,
+          Presentacion : this.rollos[i].Presentacion,
+          Estatus : this.rollos[i].Estatus,
+          Proceso : this.rollos[i].Proceso,
+        }
+        this.rollosInsertar.push(info);
+        this.validarRollo.push(this.rollos[i].Id);
+      }
+    }
+    for (let i = 0; i < this.rollos.length; i++) {
+      if (this.rollos[i].Ot == ot) this.rollos.splice(i,1);
+    }
+  }
+
+  // Funcion que va a quitar todo lo que hay en la tabla
+  quitarTodo(){
+    for (const item of this.rollosInsertar) {
+      let info : any = {
+        Ot : item.Ot,
+        Id : item.Id,
+        IdCliente : item.IdCliente,
+        Cliente : item.Cliente,
+        IdProducto : item.IdProducto,
+        Producto : item.Producto,
+        Cantidad : item.Cantidad,
+        Presentacion : item.Presentacion,
+        Estatus : item.Estatus,
+        Proceso : item.Proceso,
+      }
+      this.rollos.push(info);
+    }
+    setTimeout(() => {
+      this.rollosInsertar = [];
+      this.validarRollo = [];
+    }, 2000);
+  }
+
   // Funcion que se va a encargar de quitar rollos de la tabla inferior
   quitarRollo(item : any){
     let info : any = {
+      Ot : item.Ot,
       Id : item.Id,
+      IdCliente : item.IdCliente,
+      Cliente : item.Cliente,
       IdProducto : item.IdProducto,
       Producto : item.Producto,
       Cantidad : item.Cantidad,
       Presentacion : item.Presentacion,
-      checkbox : true,
+      Estatus : item.Estatus,
+      Proceso : item.Proceso,
     }
     this.rollos.push(info);
     for (let i = 0; i < this.rollosInsertar.length; i++) {
@@ -221,16 +559,13 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     else {
       this.cargando = false;
       let info : any = {
-        EntRolloProd_OT : this.FormConsultarRollos.value.OT_Id,
-        Prod_Id : this.idProducto.trim(),
-        UndMed_Id : this.presentacionProducto,
-        EntRolloProd_Fecha : this.today,
-        EntRolloProd_Observacion : this.FormConsultarRollos.value.Observacion,
+        PreEntRollo_Fecha : this.today,
+        PreEntRollo_Observacion : this.FormConsultarRollos.value.Observacion,
         Usua_Id : this.storage_Id,
       }
-      this.entradaRolloService.srvGuardar(info).subscribe(datos_entradaRollo => {
-        this.entradaRolloService.srvObtenerUltimoId().subscribe(datos_ultEntrada => {
-          this.ingresarRollos(datos_entradaRollo.entRolloProd_Id);
+      this.preEntRollosService.srvGuardar(info).subscribe(datos_entradaRollo => {
+        this.preEntRollosService.srvObtenerUltimoId().subscribe(datos_ultEntrada => {
+          this.ingresarRollos(datos_entradaRollo.preEntRollo_Id);
         });
       });
     }
@@ -240,59 +575,221 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
   ingresarRollos(idEntrada : number){
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       let info : any = {
-        EntRolloProd_Id : idEntrada,
         Rollo_Id : this.rollosInsertar[i].Id,
-        DtEntRolloProd_Cantidad : this.rollosInsertar[i].Cantidad,
-        UndMed_Id : this.presentacionProducto,
-        Estado_Id : 19,
+        DtlPreEntRollo_Cantidad : this.rollosInsertar[i].Cantidad,
+        UndMed_Rollo : this.rollosInsertar[i].Presentacion,
+        Proceso_Id : this.rollosInsertar[i].Proceso,
+        Cli_Id : parseInt(this.rollosInsertar[i].IdCliente),
+        DtlPreEntRollo_OT : parseInt(this.rollosInsertar[i].Ot.trim()),
+        Prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
+        UndMed_Producto : this.rollosInsertar[i].Presentacion,
+        preEntRollo_Id : idEntrada,
       }
-      this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => {  });
-    }
-    setTimeout(() => { this.InventarioProductos(); }, 2000);
-  }
-
-  // Funcion para mover el inventario de los productos
-  InventarioProductos(){
-    let sumaCant : number = 0;
-    for (let i = 0; i < this.rollosInsertar.length; i++) {
-      sumaCant +=  this.rollosInsertar[i].Cantidad;
+      console.log(info)
+      this.dtPreEntRollosService.srvGuardar(info).subscribe(datos_entrada => {  });
     }
     setTimeout(() => {
-      this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.idProducto, this.presentacionProducto).subscribe(datos_existencias => {
-        for (let j = 0; j < datos_existencias.length; j++) {
-          let info : any = {
-            Prod_Id: datos_existencias[j].prod_Id,
-            exProd_Id : datos_existencias[j].exProd_Id,
-            ExProd_Cantidad: (datos_existencias[j].exProd_Cantidad + sumaCant),
-            UndMed_Id: this.presentacionProducto,
-            TpBod_Id: datos_existencias[j].tpBod_Id,
-            ExProd_Precio: datos_existencias[j].exProd_Precio,
-            ExProd_PrecioExistencia: (datos_existencias[j].exProd_Cantidad + sumaCant) * datos_existencias[j].exProd_PrecioVenta,
-            ExProd_PrecioSinInflacion: datos_existencias[j].exProd_PrecioSinInflacion,
-            TpMoneda_Id: datos_existencias[j].tpMoneda_Id,
-            ExProd_PrecioVenta: datos_existencias[j].exProd_PrecioVenta,
-          }
-          this.ExistenciasProdService.srvActualizarExistencia(datos_existencias[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
-            const Toast = Swal.mixin({
-              toast: true,
-              position: 'center',
-              showConfirmButton: false,
-              timer: 2500,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-              }
-            });
-            Toast.fire({
-              icon: 'success',
-              title: '¡Entrada de Rollos registrada con exito!'
-            });
-            this.limpiarCampos();
-          });
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'center',
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
         }
       });
+      Toast.fire({
+        icon: 'success',
+        title: '¡Pre Entrada de Rollos registrada con exito!'
+      });
+      this.buscarRolloPDF(idEntrada);
     }, 2000);
+  }
+
+  // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
+  crearPDF(id : number){
+    this.dtPreEntRollosService.srvCrearPDFUltimoId(id).subscribe(datos_factura => {
+      for (let i = 0; i < datos_factura.length; i++) {
+        for (let j = 0; j < this.rollosAsignados.length; j++) {
+          let CantTotal : string = `${this.Total}`;
+          let cantidadAsignadaNueva = CantTotal.indexOf(".");
+          let cantidadAsignadaFinal = CantTotal.substring(0, (cantidadAsignadaNueva + 3));
+          const pdfDefinicion : any = {
+            info: {
+              title: `${datos_factura[i].preEntRollo_Id}`
+            },
+            pageSize: {
+              width: 630,
+              height: 760
+            },
+            content : [
+              {
+                text: `Pre Cargue de Rollos`,
+                alignment: 'right',
+                style: 'titulo',
+              },
+              '\n \n',
+              {
+                style: 'tablaEmpresa',
+                table: {
+                  widths: [90, '*', 90, '*'],
+                  style: 'header',
+                  body: [
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Nombre Empresa`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `Plasticaribe S.A.S`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: `Fecha`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].preEntRollo_Fecha.replace('T00:00:00', '')}`
+                      },
+                    ],
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Dirección`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].empresa_Direccion}`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: `Ciudad`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].empresa_Ciudad}`
+                      },
+                    ],
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Proceso`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_factura[i].proceso_Nombre}`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: ``
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: ``
+                      },
+                    ],
+                  ]
+                },
+                layout: {
+                  defaultBorder: false,
+                },
+                fontSize: 9,
+              },
+              '\n \n',
+              {
+                text: `Pre Cargado Por: ${datos_factura[i].usua_Nombre}\n`,
+                alignment: 'left',
+                style: 'header',
+              },
+              '\n \n',
+              {
+                text: `\n\n Información detallada de los Rollos \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+
+              this.table(this.rollosAsignados, ['OT', 'Rollo', 'IdCliente', 'Cliente', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
+              {
+                text: `\nCant. Total: ${cantidadAsignadaFinal}\n`,
+                alignment: 'right',
+                style: 'header',
+              },
+            ],
+            styles: {
+              header: {
+                fontSize: 10,
+                bold: true
+              },
+              titulo: {
+                fontSize: 20,
+                bold: true
+              }
+            }
+          }
+          const pdf = pdfMake.createPdf(pdfDefinicion);
+          pdf.open();
+          this.limpiarCampos();
+          break;
+        }
+        break;
+      }
+    });
+  }
+
+  // Funcion que traerá los rollos que fueron asignados a la factura creada
+  buscarRolloPDF(id : number){
+    this.dtPreEntRollosService.srvCrearPDFUltimoId(id).subscribe(datos_factura => {
+      for (let i = 0; i < datos_factura.length; i++) {
+        let info : any = {
+          OT : datos_factura[i].dtlPreEntRollo_OT,
+          Rollo : datos_factura[i].rollo_Id,
+          IdCliente : datos_factura[i].cli_Id,
+          Cliente : datos_factura[i].cli_Nombre,
+          Producto : datos_factura[i].prod_Id,
+          Nombre : datos_factura[i].prod_Nombre,
+          Cantidad : this.formatonumeros(datos_factura[i].dtlPreEntRollo_Cantidad),
+          Presentacion : datos_factura[i].undMed_Rollo,
+        }
+        this.Total += datos_factura[i].dtlPreEntRollo_Cantidad;
+        this.rollosAsignados.push(info);
+      }
+    });
+    setTimeout(() => { this.crearPDF(id); }, 2500);
+  }
+
+  // funcion que se encagará de llenar la tabla de los productos en el pdf
+  buildTableBody(data, columns) {
+    var body = [];
+    body.push(columns);
+    data.forEach(function(row) {
+        var dataRow = [];
+        columns.forEach(function(column) {
+            dataRow.push(row[column].toString());
+        });
+        body.push(dataRow);
+    });
+
+    return body;
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table(data, columns) {
+    return {
+        table: {
+          headerRows: 1,
+          widths: [30, 30, 40, 100, 40, 150, 40, 50],
+          body: this.buildTableBody(data, columns),
+        },
+        fontSize: 8,
+        layout: {
+          fillColor: function (rowIndex, node, columnIndex) {
+            return (rowIndex == 0) ? '#CCCCCC' : null;
+          }
+        }
+    };
   }
 
 }
