@@ -714,7 +714,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
 
               this.table(this.rollosAsignados, ['OT', 'Rollo', 'IdCliente', 'Cliente', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
-                text: `\nCant. Total: ${cantidadAsignadaFinal}\n`,
+                text: `\nCant. Total: ${this.formatonumeros(this.Total)}\n`,
                 alignment: 'right',
                 style: 'header',
               },

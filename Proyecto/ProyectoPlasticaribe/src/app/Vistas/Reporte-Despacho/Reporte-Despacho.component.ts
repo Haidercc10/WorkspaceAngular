@@ -448,14 +448,14 @@ export class ReporteDespachoComponent implements OnInit {
                   widths: ['*', '*'],
                   style: 'header',
                   body: [
-                    [
-                      `Código: ${factura.toUpperCase()}`,
-                      `Nota Credito: ${datos_factura[i].notaCredito_Id}`
-                    ],
-                    [
-                      `Id Cliente: ${datos_factura[i].cli_Id}`,
-                      `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
-                    ],
+                    // [
+                    //   `Código: ${factura.toUpperCase()}`,
+                    //   `Nota Credito: ${datos_factura[i].notaCredito_Id}`
+                    // ],
+                    // [
+                    //   `Id Cliente: ${datos_factura[i].cli_Id}`,
+                    //   `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
+                    // ],
                     [
                       `Conductor: ${datos_factura[i].nombreConductor}`,
                       `Placa Camión: ${datos_factura[i].asigProdFV_PlacaCamion}`
@@ -608,10 +608,10 @@ export class ReporteDespachoComponent implements OnInit {
                       `Código: ${factura.toUpperCase()}`,
                       ``
                     ],
-                    [
-                      `Id Cliente: ${datos_factura[i].cli_Id}`,
-                      `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
-                    ]
+                    // [
+                    //   `Id Cliente: ${datos_factura[i].cli_Id}`,
+                    //   `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
+                    // ]
                   ]
                 },
                 layout: 'lightHorizontalLines',

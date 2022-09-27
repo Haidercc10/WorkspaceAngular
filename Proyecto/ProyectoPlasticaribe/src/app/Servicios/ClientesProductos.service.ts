@@ -21,6 +21,10 @@ export class ClientesProductosService {
   srvObtenerListaPorId(cli_id : any, prod_id : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Cliente_Producto/ ?cli_Id=${cli_id}&prod_Id=${prod_id}`);
   }
+  
+  srvObtenerListaPorNombreCli(cli : any, prod_id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Cliente_Producto/NombreCliente/${cli}/${prod_id}`);
+  }
 
   srvObtenerListaPorNombreCliente(id : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Cliente_Producto/IdCliente/${id}`);

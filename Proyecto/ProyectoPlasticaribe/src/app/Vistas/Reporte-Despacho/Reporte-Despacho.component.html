@@ -52,10 +52,10 @@
             </div>
 
             <!-- Cliente -->
-            <div class="form-floating col-md">
+            <!-- <div class="form-floating col-md">
               <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput" [(ngModel)]="Cliente">
               <label for="floatingInput">Cliente</label>
-            </div>
+            </div> -->
 
              <!-- Producto Input-->
              <div class="form-floating col-md">
@@ -204,7 +204,7 @@
               <thead class="TitulosTabla">
                 <tr>
                   <th scope="col">Codigo</th>
-                  <th scope="col">Cliente</th>
+                  <!-- <th scope="col">Cliente</th> -->
                   <th scope="col">Id Producto</th>
                   <th scope="col">Nombre Producto</th>
                   <th scope="col">Rollo</th>
@@ -219,7 +219,7 @@
               <tbody style="font-size: 14px;">
                <tr *ngFor="let item of infoDoc | filtroXFacturas : Codigo | filtroXRollo_RptDespacho : Rollo | filtroXProducto_RptDespacho : Producto | filtroXTipoDocumento : TipoDocumento | filtroXEstadoDespacho : Estado | filtroXClienteDespacho : Cliente | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
                   <th>{{item.Codigo}}</th>
-                  <td>{{item.Cliente}}</td>
+                  <!-- <td>{{item.Cliente}}</td> -->
                   <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
                   <td>{{item.Rollo}}</td>

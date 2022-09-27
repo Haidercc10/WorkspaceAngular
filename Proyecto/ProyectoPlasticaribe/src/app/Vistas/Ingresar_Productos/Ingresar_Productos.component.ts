@@ -4,6 +4,7 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
+import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 import { EntradaRollosService } from 'src/app/Servicios/EntradaRollos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
@@ -46,10 +47,12 @@ export class Ingresar_ProductosComponent implements OnInit {
                     private bagProService : BagproService,
                       private ExistenciasProdService : ExistenciasProductosService,
                         private entradaRolloService : EntradaRollosService,
-                          private dtEntradaRollosService : DetallesEntradaRollosService,) {
+                          private dtEntradaRollosService : DetallesEntradaRollosService,
+                            private cliProdService : ClientesProductosService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
+      IdRollo : [null],
       fechaDoc : [null],
       fechaFinalDoc: [null],
       Proceso : [null, Validators.required],
@@ -95,28 +98,30 @@ export class Ingresar_ProductosComponent implements OnInit {
     this.today = yyyy + '-' + mm + '-' + dd;
 
     this.FormConsultarRollos.setValue({
-      OT_Id: this.FormConsultarRollos.value.OT_Id,
-      fechaDoc : this.today,
-      fechaFinalDoc: this.today,
-      Observacion : this.FormConsultarRollos.value.Observacion,
-      Proceso : this.FormConsultarRollos.value.Proceso,
+      OT_Id: null,
+      IdRollo : null,
+      fechaDoc : null,
+      fechaFinalDoc: null,
+      Observacion : null,
+      Proceso : null,
     });
   }
 
   // Funcion para limpiar los campos de la vista
   limpiarCampos(){
     this.FormConsultarRollos.setValue({
-      OT_Id: this.FormConsultarRollos.value.OT_Id,
-      fechaDoc : this.today,
-      fechaFinalDoc: this.today,
-      Observacion : this.FormConsultarRollos.value.Observacion,
-      Proceso : this.FormConsultarRollos.value.Proceso,
+      OT_Id: null,
+      IdRollo: null,
+      fechaDoc : null,
+      fechaFinalDoc: null,
+      Observacion : null,
+      Proceso : null,
     });
     this.rollos = [];
-    this.rollosInsertar = [];
     this.validarRollo = [];
     this.rollosAsignados = [];
     this.cargando = true;
+    this.Total = 0;
   }
 
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
@@ -125,8 +130,9 @@ export class Ingresar_ProductosComponent implements OnInit {
     let ot : number = this.FormConsultarRollos.value.OT_Id;
     let fechaInicial : any = this.FormConsultarRollos.value.fechaDoc;
     let fechaFinal : any = this.FormConsultarRollos.value.fechaFinalDoc;
+    let rollo : number = this.FormConsultarRollos.value.IdRollo;
     if (ProcConsulta != null) {
-      if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
+      // if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
         this.rollos = [];
         this.rollosInsertar = [];
         this.validarRollo = [];
@@ -175,7 +181,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -215,7 +222,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -264,7 +272,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -304,7 +313,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -356,7 +366,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -400,7 +411,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -450,7 +462,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -490,7 +503,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -538,7 +552,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -578,7 +593,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -629,7 +645,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -679,7 +696,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -719,7 +737,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -767,7 +786,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -807,7 +827,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -859,7 +880,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -903,7 +925,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -953,7 +976,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -993,7 +1017,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1041,7 +1066,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1081,7 +1107,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1132,7 +1159,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1182,7 +1210,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1222,7 +1251,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1270,7 +1300,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1310,7 +1341,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1322,10 +1354,10 @@ export class Ingresar_ProductosComponent implements OnInit {
               }
             });
           } else if (ProcConsulta == "3") {
-            this.bagProService.srvObtenerListaProcSelladoOT(ot).subscribe(datos_ot => {
+            this.bagProService.srvObtenerListaProcSelladoRollosOT(ot).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
                 this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-                  if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
+                  if (datos_rollos.length == 0) {
                     if (!RollosConsultados.includes(datos_ot[i].item)){
                       this.idProducto = datos_ot[i].referencia;
                       if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
@@ -1343,14 +1375,111 @@ export class Ingresar_ProductosComponent implements OnInit {
                       let info : any = {
                         Ot : datos_ot[i].ot,
                         Id : datos_ot[i].item,
-                        IdCliente : datos_ot[i],
-                        Cliente : datos_ot[i],
+                        IdCliente : datos_ot[i].identNro,
+                        Cliente : datos_ot[i].nombreComercial,
                         IdProducto : datos_ot[i].referencia,
                         Producto : datos_ot[i].nomReferencia,
                         Cantidad : datos_ot[i].qty,
                         Presentacion : this.presentacionProducto,
                         Estatus : datos_ot[i].nomStatus,
                         Proceso : proceso,
+                        exits : false,
+                      }
+                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                      otTemporral = datos_ot[i].ot;
+                      this.rollos.push(info);
+                      RollosConsultados.push(datos_ot[i].item);
+                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                      this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
+                      this.FormConsultarRollos.setValue({
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
+                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                        Observacion : this.FormConsultarRollos.value.Observacion,
+                        Proceso : this.FormConsultarRollos.value.Proceso,
+                      });
+                    }
+                  } else {
+                    if (!RollosConsultados.includes(datos_ot[i].item)){
+                      this.idProducto = datos_ot[i].referencia;
+                      if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
+                      if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
+                      if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
+                      if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                      if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                      if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                      if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                      if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                      if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                      if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                      if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                      let info : any = {
+                        Ot : datos_ot[i].ot,
+                        Id : datos_ot[i].item,
+                        IdCliente : datos_ot[i].identNro,
+                        Cliente : datos_ot[i].nombreComercial,
+                        IdProducto : datos_ot[i].referencia,
+                        Producto : datos_ot[i].nomReferencia,
+                        Cantidad : datos_ot[i].qty,
+                        Presentacion : this.presentacionProducto,
+                        Estatus : datos_ot[i].nomStatus,
+                        Proceso : proceso,
+                        exits : true,
+                      }
+                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                      otTemporral = datos_ot[i].ot;
+                      this.rollos.push(info);
+                      RollosConsultados.push(datos_ot[i].item);
+                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                      this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
+                      this.FormConsultarRollos.setValue({
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
+                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                        Observacion : this.FormConsultarRollos.value.Observacion,
+                        Proceso : this.FormConsultarRollos.value.Proceso,
+                      });
+                    }
+                  }
+                });
+              }
+            });
+          }
+        } else if (rollo != null) {
+          if (ProcConsulta == "1"){
+            this.bagProService.srvObtenerListaProcExtrusionRollos(rollo).subscribe(datos_ot => {
+              for (let i = 0; i < datos_ot.length; i++) {
+                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                  if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
+                    if (!RollosConsultados.includes(datos_ot[i].item)){
+                      if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                      if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                      if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                      if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                      if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                      if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                      if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                      if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                      let info : any = {
+                        Ot : datos_ot[i].ot,
+                        Id : datos_ot[i].item,
+                        IdCliente : datos_ot[i].identNro,
+                        Cliente : datos_ot[i].nombreComercial,
+                        IdProducto : datos_ot[i].clienteItem,
+                        Producto : datos_ot[i].clienteItemNombre,
+                        Cantidad : datos_ot[i].extnetokg,
+                        Presentacion : datos_ot[i].unidad,
+                        Estatus : datos_ot[i].nomStatus,
+                        Proceso : proceso,
+                        exits : false,
                       }
                       if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
                       otTemporral = datos_ot[i].ot;
@@ -1362,6 +1491,48 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
                         OT_Id: ot,
+                        IdRollo : rollo,
+                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                        Observacion : this.FormConsultarRollos.value.Observacion,
+                        Proceso : this.FormConsultarRollos.value.Proceso,
+                      });
+                    }
+                  } else if (datos_rollos.length != 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
+                    if (!RollosConsultados.includes(datos_ot[i].item)){
+                      if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                      if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                      if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                      if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                      if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                      if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                      if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                      if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                      let info : any = {
+                        Ot : datos_ot[i].ot,
+                        Id : datos_ot[i].item,
+                        IdCliente : datos_ot[i].identNro,
+                        Cliente : datos_ot[i].nombreComercial,
+                        IdProducto : datos_ot[i].clienteItem,
+                        Producto : datos_ot[i].clienteItemNombre,
+                        Cantidad : datos_ot[i].extnetokg,
+                        Presentacion : datos_ot[i].unidad,
+                        Estatus : datos_ot[i].nomStatus,
+                        Proceso : proceso,
+                        exits : true,
+                      }
+                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                      otTemporral = datos_ot[i].ot;
+                      this.rollos.push(info);
+                      RollosConsultados.push(datos_ot[i].item);
+                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                      this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
+                      this.FormConsultarRollos.setValue({
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1370,6 +1541,197 @@ export class Ingresar_ProductosComponent implements OnInit {
                     }
                   }
                 });
+                break;
+              }
+            });
+          } else if (ProcConsulta == "2") {
+            this.bagProService.srvObtenerListaProcExtrusionRollos(rollo).subscribe(datos_ot => {
+              for (let i = 0; i < datos_ot.length; i++) {
+                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                  if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
+                    if (!RollosConsultados.includes(datos_ot[i].item)){
+                      if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                      if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                      if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                      if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                      if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                      if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                      if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                      if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                      let info : any = {
+                        Ot : datos_ot[i].ot,
+                        Id : datos_ot[i].item,
+                        IdCliente : datos_ot[i].identNro,
+                        Cliente : datos_ot[i].nombreComercial,
+                        IdProducto : datos_ot[i].clienteItem,
+                        Producto : datos_ot[i].clienteItemNombre,
+                        Cantidad : datos_ot[i].extnetokg,
+                        Presentacion : datos_ot[i].unidad,
+                        Estatus : datos_ot[i].nomStatus,
+                        Proceso : proceso,
+                        exits : false,
+                      }
+                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                      otTemporral = datos_ot[i].ot;
+                      this.rollos.push(info);
+                      RollosConsultados.push(datos_ot[i].item);
+                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                      this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
+                      this.FormConsultarRollos.setValue({
+                        OT_Id: ot,
+                        IdRollo : rollo,
+                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                        Observacion : this.FormConsultarRollos.value.Observacion,
+                        Proceso : this.FormConsultarRollos.value.Proceso,
+                      });
+                    }
+                  } else if (datos_rollos.length != 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
+                    if (!RollosConsultados.includes(datos_ot[i].item)){
+                      if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                      if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                      if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                      if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                      if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                      if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                      if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                      if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                      let info : any = {
+                        Ot : datos_ot[i].ot,
+                        Id : datos_ot[i].item,
+                        IdCliente : datos_ot[i].identNro,
+                        Cliente : datos_ot[i].nombreComercial,
+                        IdProducto : datos_ot[i].clienteItem,
+                        Producto : datos_ot[i].clienteItemNombre,
+                        Cantidad : datos_ot[i].extnetokg,
+                        Presentacion : datos_ot[i].unidad,
+                        Estatus : datos_ot[i].nomStatus,
+                        Proceso : proceso,
+                        exits : true,
+                      }
+                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                      otTemporral = datos_ot[i].ot;
+                      this.rollos.push(info);
+                      RollosConsultados.push(datos_ot[i].item);
+                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                      this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
+                      this.FormConsultarRollos.setValue({
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
+                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                        Observacion : this.FormConsultarRollos.value.Observacion,
+                        Proceso : this.FormConsultarRollos.value.Proceso,
+                      });
+                    }
+                  }
+                });
+                break;
+              }
+            });
+          } else if (ProcConsulta == "3") {
+            this.bagProService.srvObtenerListaProcSelladoRollo(rollo).subscribe(datos_ot => {
+              for (let i = 0; i < datos_ot.length; i++) {
+                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                  if (datos_rollos.length == 0) {
+                    if (!RollosConsultados.includes(datos_ot[i].item)){
+                      this.idProducto = datos_ot[i].referencia;
+                      if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
+                      if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
+                      if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
+                      if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                      if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                      if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                      if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                      if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                      if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                      if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                      if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                      let info : any = {
+                        Ot : datos_ot[i].ot,
+                        Id : datos_ot[i].item,
+                        IdCliente : datos_ot[i].identNro,
+                        Cliente : datos_ot[i].nombreComercial,
+                        IdProducto : datos_ot[i].referencia,
+                        Producto : datos_ot[i].nomReferencia,
+                        Cantidad : datos_ot[i].qty,
+                        Presentacion : this.presentacionProducto,
+                        Estatus : datos_ot[i].nomStatus,
+                        Proceso : proceso,
+                        exits : false,
+                      }
+                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                      otTemporral = datos_ot[i].ot;
+                      this.rollos.push(info);
+                      RollosConsultados.push(datos_ot[i].item);
+                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                      this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
+                      this.FormConsultarRollos.setValue({
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
+                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                        Observacion : this.FormConsultarRollos.value.Observacion,
+                        Proceso : this.FormConsultarRollos.value.Proceso,
+                      });
+                    }
+                  } else {
+                    if (!RollosConsultados.includes(datos_ot[i].item)){
+                      this.idProducto = datos_ot[i].referencia;
+                      if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
+                      if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
+                      if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
+                      if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                      if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                      if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                      if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                      if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                      if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                      if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                      if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                      let info : any = {
+                        Ot : datos_ot[i].ot,
+                        Id : datos_ot[i].item,
+                        IdCliente : datos_ot[i].identNro,
+                        Cliente : datos_ot[i].nombreComercial,
+                        IdProducto : datos_ot[i].referencia,
+                        Producto : datos_ot[i].nomReferencia,
+                        Cantidad : datos_ot[i].qty,
+                        Presentacion : this.presentacionProducto,
+                        Estatus : datos_ot[i].nomStatus,
+                        Proceso : proceso,
+                        exits : true,
+                      }
+                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                      otTemporral = datos_ot[i].ot;
+                      this.rollos.push(info);
+                      RollosConsultados.push(datos_ot[i].item);
+                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                      this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
+                      this.FormConsultarRollos.setValue({
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
+                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                        Observacion : this.FormConsultarRollos.value.Observacion,
+                        Proceso : this.FormConsultarRollos.value.Proceso,
+                      });
+                    }
+                  }
+                });
+                break;
               }
             });
           }
@@ -1411,7 +1773,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1451,7 +1814,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1499,7 +1863,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1539,7 +1904,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1591,7 +1957,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1635,7 +2002,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
+                        IdRollo : this.FormConsultarRollos.value.IdRollo,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
@@ -1649,7 +2017,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           }
         }
         setTimeout(() => { this.cargando = true; }, 5000);
-      } else Swal.fire("¡La fecha seleccionada no es valida!");
+      // } else Swal.fire("¡La fecha seleccionada no es valida!");
     } else Swal.fire("¡Seleccione un proceso!");
   }
 
@@ -1703,42 +2071,50 @@ export class Ingresar_ProductosComponent implements OnInit {
   // Funcion que va a seleccionar todo lo que hay en la tabla
   selccionarTodo(){
     for (const item of this.rollos) {
-      let info : any = {
-        Ot : item.Ot,
-        Id : item.Id,
-        IdCliente : item.IdCliente,
-        Cliente : item.Cliente,
-        IdProducto : item.IdProducto,
-        Producto : item.Producto,
-        Cantidad : item.Cantidad,
-        Presentacion : item.Presentacion,
-        Estatus : item.Estatus,
-        Proceso : item.Proceso,
+      if (!item.exits) {
+        let info : any = {
+          Ot : item.Ot,
+          Id : item.Id,
+          IdCliente : item.IdCliente,
+          Cliente : item.Cliente,
+          IdProducto : item.IdProducto,
+          Producto : item.Producto,
+          Cantidad : item.Cantidad,
+          Presentacion : item.Presentacion,
+          Estatus : item.Estatus,
+          Proceso : item.Proceso,
+        }
+        this.rollosInsertar.push(info);
+        this.validarRollo.push(item.Id);
       }
-      this.rollosInsertar.push(info);
-      this.validarRollo.push(item.Id);
     }
-    setTimeout(() => { this.rollos = []; }, 2000);
+    setTimeout(() => {
+      let nuevo : any = this.rollos.filter((item) => item.exits === true);
+      this.rollos = [];
+      this.rollos = nuevo;
+    }, 500);
   }
 
   // Funcion que va a seleccionar todo lo de la OT sobre la que se dió click que hay en la tabla
   selccionarTodoOT(ot){
     for (let i = 0; i < this.rollos.length; i++) {
       if (this.rollos[i].Ot == ot) {
-        let info : any = {
-          Ot : this.rollos[i].Ot,
-          Id : this.rollos[i].Id,
-          IdCliente : this.rollos[i].IdCliente,
-          Cliente : this.rollos[i].Cliente,
-          IdProducto : this.rollos[i].IdProducto,
-          Producto : this.rollos[i].Producto,
-          Cantidad : this.rollos[i].Cantidad,
-          Presentacion : this.rollos[i].Presentacion,
-          Estatus : this.rollos[i].Estatus,
-          Proceso : this.rollos[i].Proceso,
+        if (!this.rollos[i].exits) {
+          let info : any = {
+            Ot : this.rollos[i].Ot,
+            Id : this.rollos[i].Id,
+            IdCliente : this.rollos[i].IdCliente,
+            Cliente : this.rollos[i].Cliente,
+            IdProducto : this.rollos[i].IdProducto,
+            Producto : this.rollos[i].Producto,
+            Cantidad : this.rollos[i].Cantidad,
+            Presentacion : this.rollos[i].Presentacion,
+            Estatus : this.rollos[i].Estatus,
+            Proceso : this.rollos[i].Proceso,
+          }
+          this.rollosInsertar.push(info);
+          this.validarRollo.push(this.rollos[i].Id);
         }
-        this.rollosInsertar.push(info);
-        this.validarRollo.push(this.rollos[i].Id);
       }
     }
     for (let i = 0; i < this.rollos.length; i++) {
@@ -1813,7 +2189,6 @@ export class Ingresar_ProductosComponent implements OnInit {
   // Funcion par ingresar los rollos
   ingresarRollos(idEntrada : number){
     for (let i = 0; i < this.rollosInsertar.length; i++) {
-      console.log(this.rollosInsertar[i])
       let info : any = {
         EntRolloProd_Id : idEntrada,
         Rollo_Id : this.rollosInsertar[i].Id,
@@ -1824,7 +2199,17 @@ export class Ingresar_ProductosComponent implements OnInit {
         Prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
         UndMed_Prod : this.rollosInsertar[i].Presentacion,
       }
-      this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => {  });
+      this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => {
+        this.cliProdService.srvObtenerListaPorNombreCli(this.rollosInsertar[i].Cliente, parseInt(this.rollosInsertar[i].IdProducto.trim())).subscribe(datos_cliPro => {
+          if (datos_cliPro.length == 0) {
+            let cliPro : any = {
+              cli_Id : parseInt(this.rollosInsertar[i].IdCliente.trim()),
+              prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
+            }
+            this.cliProdService.srvGuardar(cliPro).subscribe(datos_cliProSave => {})
+          }
+        });
+      });
     }
     setTimeout(() => {
       this.InventarioProductos();
@@ -1878,7 +2263,7 @@ export class Ingresar_ProductosComponent implements OnInit {
                     title: '¡Entrada de Rollos registrada con exito!'
                   });
                 });
-              }, 2000);
+              }, 4000);
             }
           });
         }
@@ -1960,7 +2345,7 @@ export class Ingresar_ProductosComponent implements OnInit {
               },
               '\n \n',
               {
-                text: `Ingresado Por: ${datos_factura[i].creador}\n`,
+                text: `Ingresado Por: ${datos_factura[i].nombreCreador}\n`,
                 alignment: 'left',
                 style: 'header',
               },
@@ -1972,7 +2357,7 @@ export class Ingresar_ProductosComponent implements OnInit {
 
               this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
-                text: `\nCant. Total: ${cantidadAsignadaFinal}\n`,
+                text: `\nCant. Total: ${this.formatonumeros(this.Total)}\n`,
                 alignment: 'right',
                 style: 'header',
               },
@@ -1990,6 +2375,8 @@ export class Ingresar_ProductosComponent implements OnInit {
           }
           const pdf = pdfMake.createPdf(pdfDefinicion);
           pdf.open();
+          this.rollosAsignados = [];
+          this.rollosInsertar = [];
           this.limpiarCampos();
           break;
         }

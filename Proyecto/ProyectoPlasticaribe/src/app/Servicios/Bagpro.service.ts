@@ -22,6 +22,10 @@ export class BagproService {
   srvObtenerListaProcSelladoOT(ot : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OT/${ot}`);
   }
+  
+  srvObtenerListaProcSelladoRollo(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/Rollos/${ot}`);
+  }
 
   srvObtenerListaProcSelladoRollosOT(ot : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/RollosOT/${ot}`);
@@ -82,6 +86,10 @@ export class BagproService {
   srvObtenerListaProcExtrusionRollosOT(ot : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/RollosOT/${ot}`);
   }
+
+  srvObtenerListaProcExtrusionRollos(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/Rollos/${ot}`);
+  }  
 
   srvObtenerListaProcExtrusionFechas(fecha1 : any, fecha2 : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/FechasRollos/${fecha1}/${fecha2}`);

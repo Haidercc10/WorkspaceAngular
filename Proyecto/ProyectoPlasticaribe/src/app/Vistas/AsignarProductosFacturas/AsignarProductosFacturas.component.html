@@ -42,8 +42,19 @@
               <label for="floatingInput">Nota Credito</label>
             </div>
 
+            <!-- Id Producto -->
+            <div class="form-floating col-md-2">
+              <input formControlName="IdProducto" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="buscarItem()">
+              <label for="floatingInput">N° Item</label>
+            </div>
+
+            <div class="form-floating col-md">
+              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="buscarItem()">
+              <label for="floatingInput">Item Nombre</label>
+            </div>
+
              <!-- Cliente -->
-             <ng-container>
+            <!-- <ng-container>
               <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteClientes">
                 <ng-autocomplete
                   class=""
@@ -66,10 +77,10 @@
                 </ng-template>
                 <label for="floatingInput" *ngIf="validarInputClientes">Cliente</label>
               </div>
-            </ng-container>
+            </ng-container> -->
 
              <!-- Producto -->
-            <ng-container>
+            <!-- <ng-container>
               <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteProductos" style="margin-left: 1%; margin-right: 1%;">
                 <ng-autocomplete
                   class=""
@@ -91,7 +102,7 @@
                 </ng-template>
                 <label for="floatingInput" *ngIf="validarInputNombresProductos">Producto</label>
               </div>
-            </ng-container>
+            </ng-container> -->
           </div>
         </div>
 
@@ -142,7 +153,10 @@
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentacion</th>
-                  <th scope="col"></th>
+
+                  <ng-container>
+                    <th scope="col"><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>
+                  </ng-container>
                 </tr>
               </thead>
               <tbody>
@@ -187,7 +201,9 @@
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentación</th>
-                  <th scope="col"></th>
+                  <ng-container>
+                    <th scope="col"><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
+                  </ng-container>
                 </tr>
               </thead>
               <tbody>
@@ -204,8 +220,44 @@
           </div>
         </div>
       </div>
+
+      <div class="mb-4" *ngIf="cargando">
+        <hr class="Linea">
+      </div>
+      <!-- Inicio titulo tabla producto -->
+      <div class="mb-4" *ngIf="cargando">
+        <h4 class="tituloRojo">Consolidado de Productos</h4>
+      </div>
+
+      <!--Inicio tabla Rollos a Insertar -->
+      <div class="mb-3" *ngIf="cargando">
+        <div class="row g-3">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover mt-2" >
+              <thead class="TitulosTabla">
+                <tr>
+                  <th scope="col">ID Producto</th>
+                  <th scope="col">Producto</th>
+                  <th scope="col">Cantidad</th>
+                  <th scope="col">N° Rollos</th>
+                  <th scope="col">Presentación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of grupoProductos; let i=index">
+                  <th>{{item.Id}}</th>
+                  <td>{{item.Nombre}}</td>
+                  <td>{{item.Cantidad | number}}</td>
+                  <td>{{item.Rollos | number}}</td>
+                  <td>{{item.Presentacion}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <label for=""><b>Total Kg: {{Total | number}}</b></label>
+        <label for=""><b>Total: {{Total | number}}</b></label>
       </div>
 
       <!-- Botones -->

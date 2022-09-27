@@ -37,8 +37,12 @@ export class AsignarProductosFacturasComponent implements OnInit {
   idProducto : number = 0; //Variable que va a almacenar el id del producto que fue hecho en la ot consultada
   presentacionProducto : string = ''; //Variable que almacenará la presentacion del producto de la orden de trabajo consultada
   rollosAsignados : any [] = []; //Variable que va a almacenar los rollos que fueron asignados a la factura creada
+  Productos = [];
   check : boolean; //Variable que nos a ayudar para saber si un rollo ya fue seleccionado
   Total : number = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
+  cantidadOT : number = 0; //
+  grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
+
 
   keywordNombresProductos = 'prod_Nombre'; /** Variable de palabra clave para Input Producto. */
   validarInputNombresProductos : any = true; /** Variable para validar input producto */
@@ -60,13 +64,15 @@ export class AsignarProductosFacturasComponent implements OnInit {
                               private servicioUsuarios : UsuarioService,
                                 private dtEntradaRollo : DetallesEntradaRollosService,
                                   private asgProdFactura : AsignacionProductosFacturaService,
-                                    private dtAsgProdFactura : DetallesAsignacionProductosFacturaService,) {
+                                    private dtAsgProdFactura : DetallesAsignacionProductosFacturaService,
+                                      private productosService : ProductoService,) {
 
     this.FormConsultarProductos = this.frmBuilderPedExterno.group({
       Factura : ['', Validators.required],
       NotaCredito : [''],
-      ProdNombre: ['', Validators.required ],
-      Cliente: ['', Validators.required],
+      IdProducto : [''],
+      ProdNombre: ['', Validators.required],
+      Cliente: [''],
       Observacion : [''],
     });
   }
@@ -74,7 +80,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   ngOnInit() {
     this.fecha();
     this.lecturaStorage();
-    this.llenadoClientes();
+    // this.llenadoClientes();
     this.ObtenerUsuariosConductores()
   }
 
@@ -200,6 +206,30 @@ export class AsignarProductosFacturasComponent implements OnInit {
     for (let i = 0; i < this.rollos.length; i++) {
       if (this.rollos[i].Id == item.Id) this.rollos.splice(i,1);
     }
+    setTimeout(() => { this.GrupoProductos(); }, 500);
+  }
+
+  // Funcion que va a seleccionar todo lo que hay en la tabla
+  selccionarTodo(){
+    for (const item of this.rollos) {
+      let info : any = {
+        Ot : item.Ot,
+        Id : item.Id,
+        IdCliente : item.IdCliente,
+        Cliente : item.Cliente,
+        IdProducto : item.IdProducto,
+        Producto : item.Producto,
+        Cantidad : item.Cantidad,
+        Presentacion : item.Presentacion,
+        Estatus : item.Estatus,
+        Proceso : item.Proceso,
+      }
+      this.Total += item.Cantidad;
+      this.rollosInsertar.push(info);
+      this.validarRollo.push(item.Id);
+    }
+    setTimeout(() => { this.rollos = []; }, 100);
+    setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
   // Funcion que se va a encargar de quitar rollos de la tabla inferior
@@ -220,6 +250,33 @@ export class AsignarProductosFacturasComponent implements OnInit {
     for (let i = 0; i < this.validarRollo.length; i++) {
       if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
     }
+    setTimeout(() => { this.GrupoProductos(); }, 500);
+  }
+
+  // Funcion que va a quitar todo lo que hay en la tabla
+  quitarTodo(){
+    for (const item of this.rollosInsertar) {
+      let info : any = {
+        Ot : item.Ot,
+        Id : item.Id,
+        IdCliente : item.IdCliente,
+        Cliente : item.Cliente,
+        IdProducto : item.IdProducto,
+        Producto : item.Producto,
+        Cantidad : item.Cantidad,
+        Presentacion : item.Presentacion,
+        Estatus : item.Estatus,
+        Proceso : item.Proceso,
+        checkbox : true,
+      }
+      this.rollos.push(info);
+      this.Total = 0;
+    }
+    setTimeout(() => {
+      this.rollosInsertar = [];
+      this.validarRollo = [];
+    }, 100);
+    setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
   //Funcion que llanará el array de clientes
@@ -290,6 +347,68 @@ export class AsignarProductosFacturasComponent implements OnInit {
     });
   }
 
+  // Funcion que permitirá buscar los rollos por el id del producto
+  buscarItem(){
+    this.rollos = [];
+    let id : number = this.FormConsultarProductos.value.IdProducto;
+    this.dtEntradaRollo.srvConsultarProducto(id).subscribe(datos_rollos => {
+      let rollosExistentes : any [] = [];
+      for (let i = 0; i < datos_rollos.length; i++) {
+        if (datos_rollos[i].estado_Id == 19) {
+          this.check = true;
+          let info : any = {
+            Id : datos_rollos[i].rollo_Id,
+            IdProducto : datos_rollos[i].prod_Id,
+            Producto : datos_rollos[i].prod_Nombre,
+            Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
+            Presentacion : datos_rollos[i].undMed_Rollo,
+            checkbox : this.check,
+          }
+          this.rollos.push(info);
+          rollosExistentes.push(datos_rollos[i].rollo_Id);
+          this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+
+          this.FormConsultarProductos.setValue({
+            Factura : this.FormConsultarProductos.value.Factura,
+            NotaCredito : this.FormConsultarProductos.value.NotaCredito,
+            IdProducto : this.FormConsultarProductos.value.IdProducto,
+            ProdNombre: datos_rollos[i].prod_Nombre,
+            Cliente: this.FormConsultarProductos.value.Cliente,
+            Observacion : this.FormConsultarProductos.value.Observacion,
+          });
+          this.validarInputNombresProductos = false;
+        }
+      }
+    });
+  }
+
+  // Funcion que permitirá ver el total de lo escogido para cada producto
+  GrupoProductos(){
+    let producto : any = [];
+    this.grupoProductos = [];
+    for (let i = 0; i < this.rollosInsertar.length; i++) {
+      if (!producto.includes(this.rollosInsertar[i].IdProducto)) {
+        let cantidad : number = 0;
+        let cantRollo : number = 0;
+        for (let j = 0; j < this.rollosInsertar.length; j++) {
+          if (this.rollosInsertar[i].IdProducto == this.rollosInsertar[j].IdProducto) {
+            cantidad += this.rollosInsertar[j].Cantidad;
+            cantRollo += 1;
+          }
+        }
+        producto.push(this.rollosInsertar[i].IdProducto);
+        let info : any = {
+          Id : this.rollosInsertar[i].IdProducto,
+          Nombre : this.rollosInsertar[i].Producto,
+          Cantidad : cantidad,
+          Rollos: cantRollo,
+          Presentacion : this.rollosInsertar[i].Presentacion,
+        }
+        this.grupoProductos.push(info);
+      }
+    }
+  }
+
   // Funcion para cargar en la base de datos la informacion de una factura a la que se le asignarán rollos
   crearAsignacion(){
     if (this.rollosInsertar.length != 0 && this.FormConsultarProductos.valid) {
@@ -305,9 +424,9 @@ export class AsignarProductosFacturasComponent implements OnInit {
         Usua_Id : this.storage_Id,
         AsigProdFV_Fecha : this.today,
         AsigProdFV_Observacion : observacion,
-        Cli_Id : cliente,
+        Cli_Id : 1,
         Usua_Conductor : 88,
-        AsigProdFV_PlacaCamion : 'ABC123',
+        AsigProdFV_PlacaCamion : '',
         AsigProdFV_FechaEnvio : this.today,
       }
       this.asgProdFactura.srvGuardar(info).subscribe(datos_asignacion => {
@@ -489,47 +608,53 @@ export class AsignarProductosFacturasComponent implements OnInit {
                 alignment: 'left',
                 style: 'header',
               },
-              '\n \n',
+              // '\n \n',
+              // {
+              //   text: `\n Información detallada de la Factura \n \n`,
+              //   alignment: 'center',
+              //   style: 'header'
+              // },
+              // {
+              //   style: 'tablaCliente',
+              //   table: {
+              //     widths: ['*', '*'],
+              //     style: 'header',
+              //     body: [
+              //       [
+              //         `Código: ${factura.toUpperCase()}`,
+              //         `Nota Credito: ${datos_factura[i].notaCredito_Id}`
+              //       ],
+              //       [
+              //         `Id Cliente: ${datos_factura[i].cli_Id}`,
+              //         `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
+              //       ]
+              //     ]
+              //   },
+              //   layout: 'lightHorizontalLines',
+              //   fontSize: 9,
+              // },
               {
-                text: `\n Información detallada de la Factura \n \n`,
-                alignment: 'center',
-                style: 'header'
-              },
-              {
-                style: 'tablaCliente',
-                table: {
-                  widths: ['*', '*'],
-                  style: 'header',
-                  body: [
-                    [
-                      `Código: ${factura.toUpperCase()}`,
-                      `Nota Credito: ${datos_factura[i].notaCredito_Id}`
-                    ],
-                    [
-                      `Id Cliente: ${datos_factura[i].cli_Id}`,
-                      `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
-                    ]
-                  ]
-                },
-                layout: 'lightHorizontalLines',
-                fontSize: 9,
-              },
-              {
-                text: `\n\n Información detallada de producto(s) pedido(s) \n `,
+                text: `\n\n Información detallada de producto(s)\n `,
                 alignment: 'center',
                 style: 'header'
               },
 
               this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
-                text: `\nCant. Total: ${cantidadAsignadaFinal}\n`,
+                text: `\n\n Consolidado de producto(s) \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+              this.table2(this.grupoProductos, ['Id', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion']),
+              {
+                text: `\nCant. Total: ${this.formatonumeros(this.Total)}\n\n`,
                 alignment: 'right',
                 style: 'header',
               },
               {
                 text: `\n \nObervación sobre el pedido: \n ${datos_factura[i].asigProdFV_Observacion}\n`,
                 style: 'header',
-              }
+              },
             ],
             styles: {
               header: {
@@ -567,6 +692,18 @@ export class AsignarProductosFacturasComponent implements OnInit {
         this.rollosAsignados.push(info);
       }
     });
+
+    this.dtAsgProdFactura.srvObtenerListaParaPDF2(factura.toUpperCase()).subscribe(datos_factura => {
+      for (let i = 0; i < datos_factura.length; i++) {
+        let info : any = {
+          Producto : datos_factura[i].prod_Id,
+          Nombre : datos_factura[i].prod_Nombre,
+          Cantidad : this.formatonumeros(datos_factura[i].suma),
+          Presentacion : datos_factura[i].undMed_Id,
+        }
+        this.Productos.push(info);
+      }
+    });
     setTimeout(() => { this.crearPDF(); }, 2500);
   }
 
@@ -593,7 +730,24 @@ export class AsignarProductosFacturasComponent implements OnInit {
           widths: [60, 60, 250, 70, 70],
           body: this.buildTableBody(data, columns),
         },
-        fontSize: 9,
+        fontSize: 7,
+        layout: {
+          fillColor: function (rowIndex, node, columnIndex) {
+            return (rowIndex == 0) ? '#CCCCCC' : null;
+          }
+        }
+    };
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table2(data, columns) {
+    return {
+        table: {
+          headerRows: 1,
+          widths: [60, 260, 70, 40, 80],
+          body: this.buildTableBody(data, columns),
+        },
+        fontSize: 7,
         layout: {
           fillColor: function (rowIndex, node, columnIndex) {
             return (rowIndex == 0) ? '#CCCCCC' : null;

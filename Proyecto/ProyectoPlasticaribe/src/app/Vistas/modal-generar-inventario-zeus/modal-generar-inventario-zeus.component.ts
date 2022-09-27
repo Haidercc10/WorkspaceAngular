@@ -131,16 +131,17 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           for (let j = 0; j < datos_item.length; j++) {
             this.mostrarColumna = true;
             this.ArrayProductoZeus[i].fechaModificacion = datos_item[j].fechaCrea.replace('T00:00:00', '');
+            break;
           }
         }
       });
     }
-    setTimeout(() => { this.ordenarItems(); }, 7000);
+    setTimeout(() => { this.ordenarItems(); }, 9000);
   }
 
   //Funcion que ordenará por fecha de la antugua a la mas reciente, y enviará los espacios en blanco al final
   ordenarItems(){
-    this.ArrayProductoZeus.sort((a,b) => b.fechaModificacion.localeCompare(a.fechaModificacion));
+    this.ArrayProductoZeus.sort((a,b) => a.fechaModificacion.localeCompare(b.fechaModificacion));
     this.ArrayProductoZeus.sort((a,b) => {
       if (a.fechaModificacion == '' && b.fechaModificacion != '') return 1;
       else return -1;

@@ -171,6 +171,28 @@ export class RollosAsignadasFacturaComponent implements OnInit {
       if (this.rollos[i].Id == item.Id) this.rollos.splice(i,1);
     }
   }
+    
+  // Funcion que va a seleccionar todo lo que hay en la tabla
+  selccionarTodo(){
+    for (const item of this.rollos) {
+      let info : any = {
+        Ot : item.Ot,
+        Id : item.Id,
+        IdCliente : item.IdCliente,
+        Cliente : item.Cliente,
+        IdProducto : item.IdProducto,
+        Producto : item.Producto,
+        Cantidad : item.Cantidad,
+        Presentacion : item.Presentacion,
+        Estatus : item.Estatus,
+        Proceso : item.Proceso,
+      }
+      this.Total += item.Cantidad;
+      this.rollosInsertar.push(info);
+      this.validarRollo.push(item.Id);
+    }
+    setTimeout(() => { this.rollos = []; }, 100);
+  }
 
   // Funcion que se va a encargar de quitar rollos de la tabla inferior
   quitarRollo(item : any){
@@ -189,6 +211,31 @@ export class RollosAsignadasFacturaComponent implements OnInit {
     for (let i = 0; i < this.validarRollo.length; i++) {
       if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
     }
+  }
+
+  // Funcion que va a quitar todo lo que hay en la tabla
+  quitarTodo(){
+    for (const item of this.rollosInsertar) {
+      let info : any = {
+        Ot : item.Ot,
+        Id : item.Id,
+        IdCliente : item.IdCliente,
+        Cliente : item.Cliente,
+        IdProducto : item.IdProducto,
+        Producto : item.Producto,
+        Cantidad : item.Cantidad,
+        Presentacion : item.Presentacion,
+        Estatus : item.Estatus,
+        Proceso : item.Proceso,
+        checkbox : true,
+      }
+      this.rollos.push(info);
+      this.Total = 0;
+    }
+    setTimeout(() => {
+      this.rollosInsertar = [];
+      this.validarRollo = [];
+    }, 100);
   }
 
   // Funcion que agregará el condutor y la placa del camion en que irá el pedido
@@ -393,14 +440,14 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                   widths: ['*', '*'],
                   style: 'header',
                   body: [
-                    [
-                      `Código: ${factura.toUpperCase()}`,
-                      `Nota Credito: ${datos_factura[i].notaCredito_Id}`
-                    ],
-                    [
-                      `Id Cliente: ${datos_factura[i].cli_Id}`,
-                      `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
-                    ],
+                    // [
+                    //   `Código: ${factura.toUpperCase()}`,
+                    //   `Nota Credito: ${datos_factura[i].notaCredito_Id}`
+                    // ],
+                    // [
+                    //   `Id Cliente: ${datos_factura[i].cli_Id}`,
+                    //   `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
+                    // ],
                     [
                       `Conductor: ${datos_factura[i].nombreConductor}`,
                       `Placa Camión: ${datos_factura[i].asigProdFV_PlacaCamion}`
@@ -418,7 +465,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
 
               this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
-                text: `\nCant. Total: ${cantidadAsignadaFinal}\n`,
+                text: `\nCant. Total: ${this.formatonumeros(this.Total)}\n`,
                 alignment: 'right',
                 style: 'header',
               },

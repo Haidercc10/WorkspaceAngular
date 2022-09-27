@@ -36,6 +36,12 @@
               <label for="floatingInput">Nro. OT</label>
             </div>
 
+            <!-- Id Rolo -->            
+            <div class="form-floating col-md">
+              <input formControlName="IdRollo" type="number" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">N° Rollo</label>
+            </div>
+
              <!-- Fecha -->
              <div class="form-floating col-md-2">
               <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput"required >
@@ -49,7 +55,7 @@
             </div>
 
             <!-- Tipo de Proceso -->
-            <div class="form-floating col-md-2">
+            <div class="form-floating col-md">
               <select formControlName="Proceso" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
                 <option value="1">Empaque</option>
                 <option value="2">Extrusión</option>
@@ -58,11 +64,11 @@
               <label for="floatingSelect">Proceso</label>
             </div>
 
-            <div class="form-floating col-md-2">
+            <div class="form-floating col-md">
               <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Rollos</button>
             </div>
 
-            <div class="form-floating col-md-2">
+            <div class="form-floating col-md">
               <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
             </div>
           </div>
@@ -91,7 +97,11 @@
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentacion</th>
                   <th scope="col">Proceso</th>
-                  <th scope="col"></th>
+
+                  <ng-container *ngIf="cantidadOT == 1">
+                    <th scope="col"><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>                   
+                  </ng-container>
+                  
                 </tr>
               </thead>
               <tbody>
@@ -146,7 +156,11 @@
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentación</th>
-                  <th scope="col"></th>
+                  
+                  <ng-container>
+                    <th scope="col"><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
+                  </ng-container>
+                  
                 </tr>
               </thead>
               <tbody>

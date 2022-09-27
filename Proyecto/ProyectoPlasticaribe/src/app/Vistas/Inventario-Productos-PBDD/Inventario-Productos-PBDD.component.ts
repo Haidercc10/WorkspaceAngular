@@ -215,60 +215,27 @@ export class InventarioProductosPBDDComponent implements OnInit {
     this.ArrayProductosBDNueva = [];
     this.numeroIdProd = 0;
 
-            this.existencias_ProductosService.srvObtenerInventarioExistencias().subscribe(registrosIPT => {
-              for (let index = 0; index < registrosIPT.length; index++) {
-
-                  if(registrosIPT[index].exProd_Cantidad >= 1.00) {
-                        const dataInventario : any = {
-                          Item : registrosIPT[index].prod_Id,
-                          NombreItem : registrosIPT[index].prod_Nombre,
-                          PrecioItem : registrosIPT[index].exProd_PrecioVenta,
-                          Stock : registrosIPT[index].exProd_Cantidad,
-                          Presentacion : registrosIPT[index].undMed_Id,
-                          Subtotal : registrosIPT[index].exProd_Cantidad * registrosIPT[index].exProd_PrecioVenta,
-                          CantMinima : registrosIPT[index].exProd_CantMinima,
-                        }
-
-                        this.ArrayProductosBDNueva.push(dataInventario)
-                        this.ArrayProductosBDNueva.sort((a,b) => a.NombreItem.localeCompare(b.NombreItem));
-                        this.ArrayProductosBDNueva.sort((a,b) => Number(b.Stock <= b.CantMinima) - Number(a.Stock <= a.CantMinima));
-                        this.totalProductos += registrosIPT[index].exProd_Cantidad * registrosIPT[index].exProd_PrecioVenta;
-                  }
-
-              }
-            });
-
-    /*this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datosExistencias => {
-      for (let exi = 0; exi < datosExistencias.length; exi++) {
-        this.datosCodigo = datosExistencias[exi].codigo;
-        this.clienteOtItems.srvObtenerItemsBagproXClienteItem(this.datosCodigo).subscribe(datosCLOTI => {
-          for (let cl = 0; cl < datosCLOTI.length; cl++) {
-            if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
-              this.existencias_ProductosService.srvObtenerListaPorIdProducto(datosCLOTI[cl].clienteItems).subscribe(datos_existenciasProd => {
-                for (let i = 0; i < datos_existenciasProd.length; i++) {
-                  const datosInventario: any = {
-                    codigoItem : datosCLOTI[cl].clienteItems,
-                    nombreItem : datosCLOTI[cl].clienteItemsNom,
-                    cantidadItem : datosExistencias[exi].existencias,
-                    presentacion : datosExistencias[exi].presentacion,
-                    PrecioItem : datosExistencias[exi].precioVenta,
-                    PrecioTotalItem : datosExistencias[exi].precio_Total,
-                    ClienteNombre : datosCLOTI[cl].clienteNom,
-                    cantMinima : datos_existenciasProd[i].exProd_CantMinima,
-                    fechaModificacion : '',
-                  }
-                  this.ArrayProductosBDNueva.push(datosInventario);
-                  this.ArrayProductosBDNueva.sort((a,b) => a.nombreItem.localeCompare(b.nombreItem));
-                  this.ArrayProductosBDNueva.sort((a,b) => Number(b.cantidadItem <= b.cantMinima) - Number(a.cantidadItem <= a.cantMinima));
-                  this.totalProductos += datosExistencias[exi].precio_Total;
-                  break;
-                }
-              });
-            }
+    this.existencias_ProductosService.srvObtenerInventarioExistencias().subscribe(registrosIPT => {
+      for (let index = 0; index < registrosIPT.length; index++) {
+        if(registrosIPT[index].exProd_Cantidad >= 1.00) {
+          const dataInventario : any = {
+            Item : registrosIPT[index].prod_Id,
+            NombreItem : registrosIPT[index].prod_Nombre,
+            PrecioItem : registrosIPT[index].exProd_PrecioVenta,
+            Stock : registrosIPT[index].exProd_Cantidad,
+            Presentacion : registrosIPT[index].undMed_Id,
+            Subtotal : registrosIPT[index].exProd_Cantidad * registrosIPT[index].exProd_PrecioVenta,
+            CantMinima : registrosIPT[index].exProd_CantMinima,
+            fechaModificacion : '',
           }
-        });
+
+          this.ArrayProductosBDNueva.push(dataInventario)
+          this.ArrayProductosBDNueva.sort((a,b) => a.NombreItem.localeCompare(b.NombreItem));
+          this.ArrayProductosBDNueva.sort((a,b) => Number(b.Stock <= b.CantMinima) - Number(a.Stock <= a.CantMinima));
+          this.totalProductos += registrosIPT[index].exProd_Cantidad * registrosIPT[index].exProd_PrecioVenta;
+        }
       }
-    });*/
+    });
     setTimeout(() => {
       this.load = true;
     }, 5000);
@@ -312,46 +279,6 @@ export class InventarioProductosPBDDComponent implements OnInit {
       }
     });
   }
-
-  //
- /* organizarCliente_A_Z(){
-    this.ArrayProductosBDNueva.sort((a,b) => a.ClienteNombre.localeCompare(b.ClienteNombre));
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2500,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-      }
-    });
-    Toast.fire({
-      icon: 'warning',
-      title: 'Ordenado por "Cliente" de la A a la Z.'
-    });
-  } */
-
-  //
- /* organizarCliente_Z_A(){
-    this.ArrayProductosBDNueva.sort((a,b) => b.ClienteNombre.localeCompare(a.ClienteNombre));
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2500,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-      }
-    });
-    Toast.fire({
-      icon: 'warning',
-      title: 'Ordenado por "Cliente" de la Z a la A.'
-    });
-  }*/
 
    //
   organizarProducto_A_Z(){

@@ -77,7 +77,9 @@
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentacion</th>
-                  <th scope="col"></th>
+                  <ng-container>
+                    <th scope="col"><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>                   
+                  </ng-container>
                 </tr>
               </thead>
               <tbody>
@@ -109,7 +111,9 @@
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentación</th>
-                  <th scope="col"></th>
+                  <ng-container>
+                    <th scope="col"><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
+                  </ng-container>
                 </tr>
               </thead>
               <tbody>

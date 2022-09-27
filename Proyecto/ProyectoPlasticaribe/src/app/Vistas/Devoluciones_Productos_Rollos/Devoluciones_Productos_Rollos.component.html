@@ -42,10 +42,10 @@
             </div>
 
             <!-- Cliente -->
-            <div class="form-floating col-md">
+            <!-- <div class="form-floating col-md">
               <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Cliente</label>
-            </div>
+            </div> -->
           </div>
         </div>
 
@@ -78,8 +78,8 @@
                 <tr>
                   <th scope="col">Factura</th>
                   <th scope="col">Rollo</th>
-                  <th scope="col">ID Cliente</th>
-                  <th scope="col">Cliente</th>
+                  <!-- <th scope="col">ID Cliente</th>
+                  <th scope="col">Cliente</th> -->
                   <th scope="col">ID Producto</th>
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
@@ -91,8 +91,8 @@
                 <tr *ngFor="let item of rollos; let i=index">
                   <th>{{item.Factura}}</th>
                   <th>{{item.Id}}</th>
-                  <td>{{item.IdCliente}}</td>
-                  <td>{{item.Cliente}}</td>
+                  <!-- <td>{{item.IdCliente}}</td>
+                  <td>{{item.Cliente}}</td> -->
                   <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
                   <td>{{item.Cantidad | number}}</td>

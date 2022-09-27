@@ -30,6 +30,10 @@ export class DetallesAsignacionProductosFacturaService {
   srvObtenerListaParaPDF(dato : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/CrearPdf/${dato}`);
   }
+  
+  srvObtenerListaParaPDF2(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/CrearPdf2/${dato}`);
+  }
 
   srvConsultarPorFiltroFechas(fecha1 : any, fecha2 : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsignacionProducto_FacturaVenta/FiltroFechas/${fecha1}/${fecha2}`);

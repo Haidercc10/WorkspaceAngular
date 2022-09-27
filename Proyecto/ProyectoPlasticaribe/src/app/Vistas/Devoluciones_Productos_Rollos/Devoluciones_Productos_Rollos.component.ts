@@ -221,7 +221,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
       this.cargando = false;
       let info : any = {
         FacturaVta_Id : this.FormConsultarFactura.value.Fact_Id,
-        Cli_Id : this.idCliente,
+        Cli_Id : 1,
         DevProdFact_Fecha : this.today,
         DevProdFact_Observacion : this.FormConsultarFactura.value.Observacion,
         TipoDevProdFact_Id : 1,
