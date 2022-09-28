@@ -171,7 +171,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
       if (this.rollos[i].Id == item.Id) this.rollos.splice(i,1);
     }
   }
-    
+
   // Funcion que va a seleccionar todo lo que hay en la tabla
   selccionarTodo(){
     for (const item of this.rollos) {
@@ -258,7 +258,24 @@ export class RollosAsignadasFacturaComponent implements OnInit {
             AsigProdFV_PlacaCamion : placa.toUpperCase(),
             AsigProdFV_FechaEnvio : this.today,
           }
-          this.facturaService.srvActualizarFactura(factura, info).subscribe(datos_facturaActualizada => { this.cambiarEstado(); });
+          this.facturaService.srvActualizarFactura(factura, info).subscribe(datos_facturaActualizada => { this.cambiarEstado(); }, error => {
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'center',
+              showConfirmButton: false,
+              timer: 2500,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+              }
+            });
+            Toast.fire({
+              icon: 'error',
+              title: '¡Error al despachar los rollos!'
+            });
+            this.cargando = true;
+          });
         }
       });
     } else Swal.fire("¡Hay campos vacios!");
@@ -298,6 +315,23 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                 icon: 'success',
                 title: '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!'
               });
+            }, error => {
+              const Toast = Swal.mixin({
+                toast: true,
+                position: 'center',
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                  toast.addEventListener('mouseenter', Swal.stopTimer)
+                  toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+              });
+              Toast.fire({
+                icon: 'error',
+                title: '¡Error al despachar los rollos!'
+              });
+              this.cargando = true;
             });
           }
         });

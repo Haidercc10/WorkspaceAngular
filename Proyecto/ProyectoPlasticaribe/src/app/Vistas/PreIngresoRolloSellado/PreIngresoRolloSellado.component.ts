@@ -57,8 +57,9 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.fecha();
     this.lecturaStorage();
+    this.fecha();
+    this.limpiarCampos();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -93,24 +94,62 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
     if (mm < 10) mm = '0' + mm;
     this.today = yyyy + '-' + mm + '-' + dd;
 
-    this.FormConsultarRollos.setValue({
-      OT_Id: this.FormConsultarRollos.value.OT_Id,
-      fechaDoc : this.today,
-      fechaFinalDoc: this.today,
-      Observacion : this.FormConsultarRollos.value.Observacion,
-      Proceso : this.FormConsultarRollos.value.Proceso,
-    });
+    setTimeout(() => {
+      if (this.ValidarRol == 8){
+        this.FormConsultarRollos.setValue({
+          OT_Id: this.FormConsultarRollos.value.OT_Id,
+          fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+          fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+          Observacion : this.FormConsultarRollos.value.Observacion,
+          Proceso : '2',
+        });
+      } else if (this.ValidarRol == 9){
+        this.FormConsultarRollos.setValue({
+          OT_Id: this.FormConsultarRollos.value.OT_Id,
+          fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+          fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+          Observacion : this.FormConsultarRollos.value.Observacion,
+          Proceso : '1',
+        });
+      } else {
+        this.FormConsultarRollos.setValue({
+          OT_Id: this.FormConsultarRollos.value.OT_Id,
+          fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+          fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+          Observacion : this.FormConsultarRollos.value.Observacion,
+          Proceso : '1',
+        });
+      }
+    }, 1500);
   }
 
   // Funcion para limpiar los campos de la vista
   limpiarCampos(){
-    this.FormConsultarRollos.setValue({
-      OT_Id: this.FormConsultarRollos.value.OT_Id,
-      fechaDoc : this.today,
-      fechaFinalDoc: this.today,
-      Observacion : this.FormConsultarRollos.value.Observacion,
-      Proceso : this.FormConsultarRollos.value.Proceso,
-    });
+    if (this.ValidarRol == 8){
+      this.FormConsultarRollos.setValue({
+        OT_Id: this.FormConsultarRollos.value.OT_Id,
+        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+        Observacion : this.FormConsultarRollos.value.Observacion,
+        Proceso : '2',
+      });
+    } else if (this.ValidarRol == 9){
+      this.FormConsultarRollos.setValue({
+        OT_Id: this.FormConsultarRollos.value.OT_Id,
+        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+        Observacion : this.FormConsultarRollos.value.Observacion,
+        Proceso : '1',
+      });
+    } else {
+      this.FormConsultarRollos.setValue({
+        OT_Id: this.FormConsultarRollos.value.OT_Id,
+        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+        Observacion : this.FormConsultarRollos.value.Observacion,
+        Proceso : '1',
+      });
+    }
     this.rollos = [];
     this.rollosInsertar = [];
     this.validarRollo = [];
@@ -125,7 +164,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
     let fechaInicial : any = this.FormConsultarRollos.value.fechaDoc;
     let fechaFinal : any = this.FormConsultarRollos.value.fechaFinalDoc;
     if (ProcConsulta != null) {
-      if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
+      // if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
         this.rollos = [];
         this.rollosInsertar = [];
         this.validarRollo = [];
@@ -139,7 +178,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           if (ProcConsulta == "1"){
             this.bagProService.srvObtenerListaProcExtrusionFechasOT(fechaInicial, fechaFinal, ot).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
                   if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
                     if (!RollosConsultados.includes(datos_ot[i].item)){
                       if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
@@ -185,7 +224,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           } else if (ProcConsulta == "2") {
             this.bagProService.srvObtenerListaProcSelladoFechasOT(fechaInicial, fechaFinal, ot).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
                   if (datos_rollos.length == 0) {
                       if (!RollosConsultados.includes(datos_ot[i].item)){
                         this.idProducto = datos_ot[i].referencia;
@@ -237,7 +276,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           if (ProcConsulta == "1"){
             this.bagProService.srvObtenerListaProcExtrusionFechas(fechaInicial, fechaFinal).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
                   if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
                     if (!RollosConsultados.includes(datos_ot[i].item)){
                       if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
@@ -283,7 +322,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           } else if (ProcConsulta == "2") {
             this.bagProService.srvObtenerListaProcSelladoFechas(fechaInicial, fechaFinal).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
                   if (datos_rollos.length == 0) {
                     if (!RollosConsultados.includes(datos_ot[i].item)){
                       this.idProducto = datos_ot[i].referencia;
@@ -335,7 +374,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           if (ProcConsulta == "1"){
             this.bagProService.srvObtenerListaProcExtrusionFechasOT(fechaInicial, fechaInicial, ot).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
                   if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
                     if (!RollosConsultados.includes(datos_ot[i].item)){
                       if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
@@ -381,7 +420,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           } else if (ProcConsulta == "2") {
             this.bagProService.srvObtenerListaProcSelladoFechasOT(fechaInicial, fechaInicial, ot).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
                   if (datos_rollos.length == 0) {
 
                       if (!RollosConsultados.includes(datos_ot[i].item)){
@@ -434,7 +473,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           if (ProcConsulta == "1"){
             this.bagProService.srvObtenerListaProcExtrusionFechas(fechaInicial, fechaInicial).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
                   if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
                     if (!RollosConsultados.includes(datos_ot[i].item)){
                       if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
@@ -480,7 +519,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           } else if (ProcConsulta == "2") {
             this.bagProService.srvObtenerListaProcSelladoFechas(fechaInicial, fechaInicial).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
                   if (datos_rollos.length == 0) {
                     if (!RollosConsultados.includes(datos_ot[i].item)){
                       this.idProducto = datos_ot[i].referencia;
@@ -532,7 +571,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           if (ProcConsulta == "1"){
             this.bagProService.srvObtenerListaProcExtrusionRollosOT(ot).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
                   if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
                     if (!RollosConsultados.includes(datos_ot[i].item)){
                       if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
@@ -576,10 +615,10 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
               }
             });
           } else if (ProcConsulta == "2") {
-            this.bagProService.srvObtenerListaProcSelladoOT(ot).subscribe(datos_ot => {
+            this.bagProService.srvObtenerListaProcSelladoRollosOT(ot).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-                  if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
+                this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                  if (datos_rollos.length == 0) {
                     if (!RollosConsultados.includes(datos_ot[i].item)){
                       this.idProducto = datos_ot[i].referencia;
                       if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
@@ -597,14 +636,15 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       let info : any = {
                         Ot : datos_ot[i].ot,
                         Id : datos_ot[i].item,
-                        IdCliente : datos_ot[i],
-                        Cliente : datos_ot[i],
+                        IdCliente : datos_ot[i].identNro,
+                        Cliente : datos_ot[i].nombreComercial,
                         IdProducto : datos_ot[i].referencia,
                         Producto : datos_ot[i].nomReferencia,
                         Cantidad : datos_ot[i].qty,
                         Presentacion : this.presentacionProducto,
                         Estatus : datos_ot[i].nomStatus,
                         Proceso : proceso,
+                        exits : false,
                       }
                       if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
                       otTemporral = datos_ot[i].ot;
@@ -613,12 +653,13 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                       this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                      this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
                       this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
+                        OT_Id: this.FormConsultarRollos.value.OT_Id,
                         fechaDoc : this.FormConsultarRollos.value.fechaDoc,
                         fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
                         Observacion : this.FormConsultarRollos.value.Observacion,
-                        Proceso : this.FormConsultarRollos.value.Proceso,
+                        Proceso : '1',
                       });
                     }
                   }
@@ -630,7 +671,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           if (ProcConsulta == "1"){
             this.bagProService.srvObtenerListaProcExtrusionFechas(this.today, this.today).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
                   if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
                     if (!RollosConsultados.includes(datos_ot[i].item)){
                       if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
@@ -676,7 +717,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           } else if (ProcConsulta == "2") {
             this.bagProService.srvObtenerListaProcSelladoFechas(this.today, this.today).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+                this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
                   if (datos_rollos.length == 0) {
                     if (!RollosConsultados.includes(datos_ot[i].item)){
                       this.idProducto = datos_ot[i].referencia;
@@ -726,7 +767,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           }
         }
         setTimeout(() => { this.cargando = true; }, 5000);
-      } else Swal.fire("¡La fecha seleccionada no es valida!");
+      // } else Swal.fire("¡La fecha seleccionada no es valida!");
     } else Swal.fire("¡Seleccione un proceso!");
   }
 
@@ -883,6 +924,23 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         this.preEntRollosService.srvObtenerUltimoId().subscribe(datos_ultEntrada => {
           this.ingresarRollos(datos_entradaRollo.preEntRollo_Id);
         });
+      }, error => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'error',
+          title: '¡Error al ingresar los rollos!'
+        });
+        this.cargando = true;
       });
     }
   }
@@ -895,14 +953,31 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         DtlPreEntRollo_Cantidad : this.rollosInsertar[i].Cantidad,
         UndMed_Rollo : this.rollosInsertar[i].Presentacion,
         Proceso_Id : this.rollosInsertar[i].Proceso,
-        Cli_Id : parseInt(this.rollosInsertar[i].IdCliente),
+        Cli_Id : 1,
         DtlPreEntRollo_OT : parseInt(this.rollosInsertar[i].Ot.trim()),
         Prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
         UndMed_Producto : this.rollosInsertar[i].Presentacion,
         preEntRollo_Id : idEntrada,
       }
       console.log(info)
-      this.dtPreEntRollosService.srvGuardar(info).subscribe(datos_entrada => {  });
+      this.dtPreEntRollosService.srvGuardar(info).subscribe(datos_entrada => {  }, error => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'error',
+          title: '¡Error al ingresar los rollos!'
+        });
+        this.cargando = true;
+      });
     }
     setTimeout(() => {
       const Toast = Swal.mixin({
@@ -1027,7 +1102,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                 style: 'header'
               },
 
-              this.table(this.rollosAsignados, ['OT', 'Rollo', 'IdCliente', 'Cliente', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
+              this.table(this.rollosAsignados, ['OT', 'Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
                 text: `\nCant. Total: ${this.formatonumeros(this.Total)}\n`,
                 alignment: 'right',
@@ -1096,7 +1171,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
     return {
         table: {
           headerRows: 1,
-          widths: [30, 30, 50, 100, 37, 150, 37, 48],
+          widths: [50, 80, 60, 200, 50, 50],
           body: this.buildTableBody(data, columns),
         },
         fontSize: 8,

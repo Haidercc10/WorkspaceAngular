@@ -2182,6 +2182,23 @@ export class Ingresar_ProductosComponent implements OnInit {
         this.entradaRolloService.srvObtenerUltimoId().subscribe(datos_ultEntrada => {
           this.ingresarRollos(datos_entradaRollo.entRolloProd_Id);
         });
+      }, error => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'error',
+          title: '¡Error al ingresar los rollos!'
+        });
+        this.cargando = true;
       });
     }
   }
@@ -2209,6 +2226,23 @@ export class Ingresar_ProductosComponent implements OnInit {
             this.cliProdService.srvGuardar(cliPro).subscribe(datos_cliProSave => {})
           }
         });
+      }, error => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'error',
+          title: '¡Error al ingresar los rollos!'
+        });
+        this.cargando = true;
       });
     }
     setTimeout(() => {

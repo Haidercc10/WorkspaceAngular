@@ -10,7 +10,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Ingresar Rollos</h2>
+      <h2 class="tituloRojo">Ingresar Producción</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -51,7 +51,7 @@
             <!-- Tipo de Proceso -->
             <div class="form-floating col-md-2">
               <select formControlName="Proceso" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
-                <option value="0"></option>
+                <!-- <option value="0"></option> -->
                 <option value="1" *ngIf="ValidarRol == 9 || ValidarRol == 1">Empaque</option>
                 <option value="2" *ngIf="ValidarRol == 8 || ValidarRol == 1">Sellado</option>
               </select>
@@ -59,7 +59,7 @@
             </div>
 
             <div class="form-floating col-md-2">
-              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Rollos</button>
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Producción</button>
             </div>
 
             <div class="form-floating col-md-2">
@@ -162,7 +162,7 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="IngresarInfoRollos()">Ingresar Rollos</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="IngresarInfoRollos()">Ingresar Producción</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>

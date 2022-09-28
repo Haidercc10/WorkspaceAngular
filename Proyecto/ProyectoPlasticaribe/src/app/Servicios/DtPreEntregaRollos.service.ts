@@ -23,6 +23,10 @@ export class DtPreEntregaRollosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/CrearPDFUltimoID/${id}`);
   }
 
+  srvObtenerVerificarRollo(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/VerificarRollo/${dato}`);
+  }
+
   srvObtenerListaPorId(dato : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/${dato}`);
   }

@@ -431,6 +431,23 @@ export class AsignarProductosFacturasComponent implements OnInit {
       }
       this.asgProdFactura.srvGuardar(info).subscribe(datos_asignacion => {
         this.asgProdFactura.srvObtenerUltimoId().subscribe(datos_ultimaAsg => { this.crearDetallesAsignacion(datos_ultimaAsg.asigProdFV_Id) });
+      }, error => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'error',
+          title: '¡Error al asignar los rollos!'
+        });
+        this.cargando = true;
       });
     } else Swal.fire("¡Hay campos vacios!");
   }
@@ -445,7 +462,24 @@ export class AsignarProductosFacturasComponent implements OnInit {
         UndMed_Id : this.rollosInsertar[i].Presentacion,
         Rollo_Id : this.rollosInsertar[i].Id,
       }
-      this.dtAsgProdFactura.srvGuardar(info).subscribe(datos_dtAsignacion => { });
+      this.dtAsgProdFactura.srvGuardar(info).subscribe(datos_dtAsignacion => { }, error => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'error',
+          title: '¡Error al asignar los rollos!'
+        });
+        this.cargando = true;
+      });
     }
     setTimeout(() => { this.cambiarEstado(); }, 2000);
   }
