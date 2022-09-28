@@ -89,6 +89,7 @@
                   <th id="nombre" scope="col" (dblclick)="organizarProducto_A_Z()" (click)="organizarProducto_Z_A()">{{columnas.invNombre}}</th>
                   <th id="precio" scope="col">{{columnas.invPrecio}}</th>
                   <th id="existencias" scope="col"><button class="existencias" (dblclick)="organizarExistenciasDobleClick()" (click)="organizarExistenciasUnClick()"><b>{{columnas.invStock}}</b></button></th>
+                  <th id="stock_real" scope="col"><button class="existencias" (dblclick)="organizarExistenciasDobleClick()" (click)="organizarExistenciasUnClick()">Stock Real</button></th>
                   <th id="presentacion" scope="col">{{columnas.presentacion}}</th>
                   <th id="Subtotal" scope="col">{{columnas.invSubtotal}}</th>
                   <th id="cantMinima" scope="col" (click)="organizarCantMinima()">Cant. Minima</th>
@@ -111,6 +112,16 @@
                   <ng-container *ngIf="prodZeus.cantidadItem > prodZeus.cantMinima">
                     <td id="existencias" class="TextosInfoTabla2" (click)="seleccionarProducto(prodZeus)">{{prodZeus.cantidadItem | number : '1.2-2'}}</td>
                   </ng-container>
+
+
+                  <ng-container *ngIf="prodZeus.cantidadItem <= prodZeus.stock_real">
+                  <td id="stock" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.stock_real | number : '1.2-2'}}</td>
+                  </ng-container>
+
+                  <ng-container *ngIf="prodZeus.cantidadItem > prodZeus.stock_real">
+                    <td id="stock" class="TextosInfoTabla" style="background-color: rgb(255, 146, 146);" (click)="seleccionarProducto(prodZeus)">{{prodZeus.stock_real | number : '1.2-2'}}</td>
+                    </ng-container>
+
 
                   <td id="presentacion" scope="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.presentacion}}</td>
                   <td id="subtotal" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.PrecioTotalItem | number : '1.2-2'}}</td>

@@ -227,10 +227,12 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
               this.existencias_ProductosService.srvObtenerListaPorIdProducto(datosCLOTI[cl].clienteItems).subscribe(datos_existenciasProd => {
                 for (let i = 0; i < datos_existenciasProd.length; i++) {
+
                   const datosInventario: any = {
                     codigoItem : datosCLOTI[cl].clienteItems,
                     nombreItem : datosCLOTI[cl].clienteItemsNom,
                     cantidadItem : datosExistencias[exi].existencias,
+                    stock_real : datos_existenciasProd[i].exProd_Cantidad,
                     presentacion : datosExistencias[exi].presentacion,
                     PrecioItem : datosExistencias[exi].precioVenta,
                     PrecioTotalItem : datosExistencias[exi].precio_Total,

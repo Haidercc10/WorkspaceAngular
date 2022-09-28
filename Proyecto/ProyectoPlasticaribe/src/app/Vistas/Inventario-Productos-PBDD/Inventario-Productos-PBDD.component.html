@@ -22,11 +22,8 @@
           <label for="floatingInput">Cliente</label>
         </div>
         -->
+               <!--Filtros de búsqueda -->
 
-        <div class="form-floating col-md-4">
-          <input type="text" name="NombrePT" [(ngModel)]="NombrePT" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
-          <label for="floatingInput">Nombre Producto</label>
-        </div>
 
       </div>
     </div>
@@ -36,11 +33,27 @@
           <div class="mb-3">
             <div class="row g-3">
 
+
+              <div class="">
+                <h5 class="tituloRojo">Filtro de búsqueda</h5>
+              </div>
+
+              <div class="form-floating col-md-4">
+                <input type="text" name="NombrePT" formControlName="filtroProducto" [(ngModel)]="NombrePT" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
+                <label for="floatingInput">Nombre Producto</label>
+              </div>
+
+
+              <div class="">
+                <h5 class="tituloRojo">Actualizar Cant. Minima</h5>
+              </div>
+
               <label *ngIf="numeroIdProd != 0">Item seleccionado: <b>{{numeroIdProd}}</b></label>
               <div class="form-floating col-md-3">
                 <input type="number" formControlName="cantMinima" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="actualizarCantMinima()">
                 <label for="floatingInput">Cantidad Minima Item</label>
               </div>
+
 
               <div class="form-floating col-md-1">
                 <input type="number" formControlName="cantidad" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="actualizarCantMinima()">

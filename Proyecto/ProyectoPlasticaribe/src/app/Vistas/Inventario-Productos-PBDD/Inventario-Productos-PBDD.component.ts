@@ -48,6 +48,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       cantMinima : [0],
       cantidad : [0],
       filtroFechas : [''],
+      filtroProducto : ['']
     });
     this.load = true;
   }
