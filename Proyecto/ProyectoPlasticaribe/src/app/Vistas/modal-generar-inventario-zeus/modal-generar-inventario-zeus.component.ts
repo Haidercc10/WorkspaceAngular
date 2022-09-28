@@ -156,10 +156,10 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
       this.load = false;
       setTimeout(() => {
         const title = `Inventario de Productos Terminados ${this.today}`;
-        const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal", "Cantidad Minima", "Ult. Modificación"]
+        const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Stock Real", "Presentación", "Subtotal", "Cantidad Minima", "Ult. Modificación"]
         let datos : any =[];
         for (const item of this.ArrayProductoZeus) {
-          const datos1  : any = [item.codigoItem, item.ClienteNombre, item.nombreItem, item.PrecioItem, item.cantidadItem, item.presentacion, item.PrecioTotalItem, item.cantMinima, item.fechaModificacion];
+          const datos1  : any = [item.codigoItem, item.ClienteNombre, item.nombreItem, item.PrecioItem, item.cantidadItem, item.stock_real, item.presentacion, item.PrecioTotalItem, item.cantMinima, item.fechaModificacion];
           datos.push(datos1);
         }
         let workbook = new Workbook();
@@ -176,14 +176,14 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:H2');
+        worksheet.mergeCells('A1:J2');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
         datos.forEach(d => {
           let row = worksheet.addRow(d);
           let qty = row.getCell(5);
           let qty9 = row.getCell(9);
           let color = 'ADD8E6';
-          if (+qty.value < d[7]) color = 'FF837B';
+          if (+qty.value < +qty9) color = 'FF837B';
           qty.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -191,18 +191,20 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           }
           row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
           row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
         worksheet.getColumn(1).width = 10;
         worksheet.getColumn(2).width = 60;
         worksheet.getColumn(3).width = 60;
         worksheet.getColumn(4).width = 20;
         worksheet.getColumn(5).width = 20;
-        worksheet.getColumn(6).width = 10;
-        worksheet.getColumn(7).width = 20;
+        worksheet.getColumn(6).width = 20;
+        worksheet.getColumn(7).width = 10;
         worksheet.getColumn(8).width = 20;
         worksheet.getColumn(9).width = 20;
+        worksheet.getColumn(10).width = 20;
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
