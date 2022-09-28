@@ -42,7 +42,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   Total : number = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
   cantidadOT : number = 0; //
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
-
+  cantTotalProducto : number = 0; //Variable que servirá para mostrar la cantidad total de existencias de un producto consultado
 
   keywordNombresProductos = 'prod_Nombre'; /** Variable de palabra clave para Input Producto. */
   validarInputNombresProductos : any = true; /** Variable para validar input producto */
@@ -72,16 +72,17 @@ export class AsignarProductosFacturasComponent implements OnInit {
       NotaCredito : [''],
       IdProducto : [''],
       ProdNombre: ['', Validators.required],
-      Cliente: [''],
+      Cliente: [null],
       Observacion : [''],
     });
   }
 
   ngOnInit() {
+    this.limpiarCampos();
     this.fecha();
     this.lecturaStorage();
-    // this.llenadoClientes();
-    this.ObtenerUsuariosConductores()
+    this.ObtenerUsuariosConductores();
+    this.llenadoClientes();
   }
 
   selectEventProducto(item) {
@@ -160,11 +161,23 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   // Funcion para limpiar los campos de la vista
   limpiarCampos(){
-    this.FormConsultarProductos.reset();
+    this.FormConsultarProductos.setValue({
+      Factura : '',
+      NotaCredito : '',
+      IdProducto : '',
+      ProdNombre: '',
+      Cliente: '',
+      Observacion : '',
+    });
     this.rollos = [];
     this.rollosInsertar = [];
+    this.rollosAsignados = [];
     this.validarRollo = [];
+    this.grupoProductos = [];
+    this.cantTotalProducto = 0;
+    this.presentacionProducto = '';
     this.cargando = true;
+    this.validarInputClientes = true;
     this.Total = 0;
   }
 
@@ -285,7 +298,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
       for (let index = 0; index < registrosClientes.length; index++) {
         let Clientes : any = registrosClientes[index];
          this.arrayClientes.push(Clientes);
-         //console.log(this.arrayClientes);
       }
     });
   }
@@ -350,6 +362,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
   // Funcion que permitirá buscar los rollos por el id del producto
   buscarItem(){
     this.rollos = [];
+    this.cantTotalProducto = 0;
+    this.presentacionProducto = '';
     let id : number = this.FormConsultarProductos.value.IdProducto;
     this.dtEntradaRollo.srvConsultarProducto(id).subscribe(datos_rollos => {
       let rollosExistentes : any [] = [];
@@ -367,7 +381,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
           this.rollos.push(info);
           rollosExistentes.push(datos_rollos[i].rollo_Id);
           this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-
+          this.cantTotalProducto += datos_rollos[i].dtEntRolloProd_Cantidad;
+          this.presentacionProducto = datos_rollos[i].undMed_Rollo;
           this.FormConsultarProductos.setValue({
             Factura : this.FormConsultarProductos.value.Factura,
             NotaCredito : this.FormConsultarProductos.value.NotaCredito,
@@ -400,8 +415,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
         let info : any = {
           Id : this.rollosInsertar[i].IdProducto,
           Nombre : this.rollosInsertar[i].Producto,
-          Cantidad : cantidad,
-          Rollos: cantRollo,
+          Cantidad : this.formatonumeros(cantidad.toFixed(2)),
+          Rollos: this.formatonumeros(cantRollo.toFixed(2)),
           Presentacion : this.rollosInsertar[i].Presentacion,
         }
         this.grupoProductos.push(info);
@@ -413,18 +428,21 @@ export class AsignarProductosFacturasComponent implements OnInit {
   crearAsignacion(){
     if (this.rollosInsertar.length != 0 && this.FormConsultarProductos.valid) {
       this.cargando = false;
+      console.log(this.FormConsultarProductos.value)
       let factura : string = this.FormConsultarProductos.value.Factura;
       let notaCredito : string = this.FormConsultarProductos.value.NotaCredito;
       let cliente : any = this.FormConsultarProductos.value.Cliente.cli_Id;
       let observacion : string = this.FormConsultarProductos.value.Observacion;
-
+      let facturaMayuscula = `${factura}`;
+      if (notaCredito == '' || notaCredito == null) notaCredito = '';
+      else if (notaCredito != '' || notaCredito != null) notaCredito.toUpperCase();
       let info : any = {
-        FacturaVta_Id : factura.toUpperCase(),
-        NotaCredito_Id : notaCredito.toUpperCase(),
+        FacturaVta_Id : facturaMayuscula.toUpperCase(),
+        NotaCredito_Id : notaCredito,
         Usua_Id : this.storage_Id,
         AsigProdFV_Fecha : this.today,
         AsigProdFV_Observacion : observacion,
-        Cli_Id : 1,
+        Cli_Id : cliente,
         Usua_Conductor : 88,
         AsigProdFV_PlacaCamion : '',
         AsigProdFV_FechaEnvio : this.today,
@@ -569,9 +587,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.dtAsgProdFactura.srvObtenerListaParaPDF(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         for (let j = 0; j < this.rollosAsignados.length; j++) {
-          let CantTotal : string = `${this.Total}`;
-          let cantidadAsignadaNueva = CantTotal.indexOf(".");
-          let cantidadAsignadaFinal = CantTotal.substring(0, (cantidadAsignadaNueva + 3));
           const pdfDefinicion : any = {
             info: {
               title: `${factura.toUpperCase()}`
@@ -642,31 +657,37 @@ export class AsignarProductosFacturasComponent implements OnInit {
                 alignment: 'left',
                 style: 'header',
               },
-              // '\n \n',
-              // {
-              //   text: `\n Información detallada de la Factura \n \n`,
-              //   alignment: 'center',
-              //   style: 'header'
-              // },
-              // {
-              //   style: 'tablaCliente',
-              //   table: {
-              //     widths: ['*', '*'],
-              //     style: 'header',
-              //     body: [
-              //       [
-              //         `Código: ${factura.toUpperCase()}`,
-              //         `Nota Credito: ${datos_factura[i].notaCredito_Id}`
-              //       ],
-              //       [
-              //         `Id Cliente: ${datos_factura[i].cli_Id}`,
-              //         `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
-              //       ]
-              //     ]
-              //   },
-              //   layout: 'lightHorizontalLines',
-              //   fontSize: 9,
-              // },
+              '\n \n',
+              {
+                text: `\n Información detallada de la Factura \n \n`,
+                alignment: 'center',
+                style: 'header'
+              },
+              {
+                style: 'tablaCliente',
+                table: {
+                  widths: ['*', '*'],
+                  style: 'header',
+                  body: [
+                    [
+                      `Código: ${factura.toUpperCase()}`,
+                      `Nota Credito: ${datos_factura[i].notaCredito_Id}`
+                    ],
+                    [
+                      `Id Cliente: ${datos_factura[i].cli_Id}`,
+                      `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
+                    ]
+                  ]
+                },
+                layout: 'lightHorizontalLines',
+                fontSize: 9,
+              },
+              {
+                text: `\n\n Consolidado de producto(s) \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+              this.table2(this.grupoProductos, ['Id', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion']),
               {
                 text: `\n\n Información detallada de producto(s)\n `,
                 alignment: 'center',
@@ -675,13 +696,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
               this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
-                text: `\n\n Consolidado de producto(s) \n `,
-                alignment: 'center',
-                style: 'header'
-              },
-              this.table2(this.grupoProductos, ['Id', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion']),
-              {
-                text: `\nCant. Total: ${this.formatonumeros(this.Total)}\n\n`,
+                text: `\nCant. Total: ${this.formatonumeros(this.Total.toFixed(2))}\n\n`,
                 alignment: 'right',
                 style: 'header',
               },
@@ -709,6 +724,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         break;
       }
     });
+    setTimeout(() => { this.cargando = true; }, 500);
   }
 
   // Funcion que traerá los rollos que fueron asignados a la factura creada

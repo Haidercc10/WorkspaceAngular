@@ -36,6 +36,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
   cantidadOT : number = 0; //
   rollosAsignados : any = [];
   Total : number = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
+  grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
@@ -95,8 +96,8 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
 
     this.FormConsultarRollos.setValue({
       OT_Id: this.FormConsultarRollos.value.OT_Id,
-      fechaDoc : this.today,
-      fechaFinalDoc: this.today,
+      fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+      fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
       Observacion : this.FormConsultarRollos.value.Observacion,
       Proceso : this.FormConsultarRollos.value.Proceso,
     });
@@ -105,17 +106,19 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
   // Funcion para limpiar los campos de la vista
   limpiarCampos(){
     this.FormConsultarRollos.setValue({
-      OT_Id: this.FormConsultarRollos.value.OT_Id,
+      OT_Id: null,
       fechaDoc : this.today,
       fechaFinalDoc: this.today,
-      Observacion : this.FormConsultarRollos.value.Observacion,
-      Proceso : this.FormConsultarRollos.value.Proceso,
+      Observacion : '',
+      Proceso : null,
     });
     this.rollos = [];
     this.rollosInsertar = [];
     this.validarRollo = [];
+    this.grupoProductos = [];
     this.cargando = true;
     this.Total = 0;
+    // window.location.href = "./preingreso-extrusion";
   }
 
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
@@ -460,6 +463,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     for (let i = 0; i < this.rollos.length; i++) {
       if (this.rollos[i].Id == item.Id) this.rollos.splice(i,1);
     }
+    setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
   // Funcion que va a seleccionar todo lo que hay en la tabla
@@ -481,6 +485,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
       this.validarRollo.push(item.Id);
     }
     setTimeout(() => { this.rollos = []; }, 2000);
+    setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
   // Funcion que va a seleccionar todo lo de la OT sobre la que se dió click que hay en la tabla
@@ -506,6 +511,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     for (let i = 0; i < this.rollos.length; i++) {
       if (this.rollos[i].Ot == ot) this.rollos.splice(i,1);
     }
+    setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
   // Funcion que va a quitar todo lo que hay en la tabla
@@ -529,6 +535,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
       this.rollosInsertar = [];
       this.validarRollo = [];
     }, 2000);
+    setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
   // Funcion que se va a encargar de quitar rollos de la tabla inferior
@@ -551,6 +558,34 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     }
     for (let i = 0; i < this.validarRollo.length; i++) {
       if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
+    }
+    setTimeout(() => { this.GrupoProductos(); }, 500);
+  }
+
+  // Funcion que permitirá ver el total de lo escogido para cada producto
+  GrupoProductos(){
+    let producto : any = [];
+    this.grupoProductos = [];
+    for (let i = 0; i < this.rollosInsertar.length; i++) {
+      if (!producto.includes(this.rollosInsertar[i].IdProducto)) {
+        let cantidad : number = 0;
+        let cantRollo : number = 0;
+        for (let j = 0; j < this.rollosInsertar.length; j++) {
+          if (this.rollosInsertar[i].IdProducto == this.rollosInsertar[j].IdProducto) {
+            cantidad += this.rollosInsertar[j].Cantidad;
+            cantRollo += 1;
+          }
+        }
+        producto.push(this.rollosInsertar[i].IdProducto);
+        let info : any = {
+          Id : this.rollosInsertar[i].IdProducto,
+          Nombre : this.rollosInsertar[i].Producto,
+          Cantidad : this.formatonumeros(cantidad.toFixed(2)),
+          Rollos: this.formatonumeros(cantRollo.toFixed(2)),
+          Presentacion : this.rollosInsertar[i].Presentacion,
+        }
+        this.grupoProductos.push(info);
+      }
     }
   }
 
@@ -741,6 +776,12 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
               },
               '\n \n',
               {
+                text: `Consolidado de producto(s) \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+              this.table2(this.grupoProductos, ['Id', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion']),
+              {
                 text: `\n\n Información detallada de los Rollos \n `,
                 alignment: 'center',
                 style: 'header'
@@ -815,10 +856,27 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     return {
         table: {
           headerRows: 1,
-          widths: [30, 80, 57, 180, 37, 48],
+          widths: [50, 80, 60, 210, 50, 50],
           body: this.buildTableBody(data, columns),
         },
-        fontSize: 8,
+        fontSize: 7,
+        layout: {
+          fillColor: function (rowIndex, node, columnIndex) {
+            return (rowIndex == 0) ? '#CCCCCC' : null;
+          }
+        }
+    };
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table2(data, columns) {
+    return {
+        table: {
+          headerRows: 1,
+          widths: [60, 260, 70, 40, 80],
+          body: this.buildTableBody(data, columns),
+        },
+        fontSize: 7,
         layout: {
           fillColor: function (rowIndex, node, columnIndex) {
             return (rowIndex == 0) ? '#CCCCCC' : null;

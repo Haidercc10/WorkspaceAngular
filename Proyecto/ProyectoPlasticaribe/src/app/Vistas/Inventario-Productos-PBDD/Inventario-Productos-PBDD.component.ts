@@ -143,7 +143,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       if (a.fechaModificacion == '' && b.fechaModificacion != '') return 1;
       else return -1;
     });
-    setTimeout(() => { this.load = true; }, 1200);
+    this.load = true;
   }
 
   //
@@ -215,6 +215,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     this.load = false;
     this.ArrayProductosBDNueva = [];
     this.numeroIdProd = 0;
+    this.totalProductos = 0;
 
     this.existencias_ProductosService.srvObtenerInventarioExistencias().subscribe(registrosIPT => {
       for (let index = 0; index < registrosIPT.length; index++) {
@@ -255,30 +256,32 @@ export class InventarioProductosPBDDComponent implements OnInit {
   //
   actualizarCantMinima(){
     let cantidad : number = this.FormExistencias.value.cantMinima;
+    if (this.numeroIdProd == 0) Swal.fire("¡Debe seleccionar un producto!");
+    else {
+      this.existencias_ProductosService.srvObtenerListaPorIdProducto(this.numeroIdProd).subscribe(datos_existencias => {
+        for (let i = 0; i < datos_existencias.length; i++) {
+          const datosExistencias = {
+            Prod_Id: this.numeroIdProd,
+            exProd_Id: datos_existencias[i].exProd_Id,
+            ExProd_Cantidad: datos_existencias[i].exProd_Cantidad,
+            UndMed_Id: datos_existencias[i].undMed_Id,
+            TpBod_Id: datos_existencias[i].tpBod_Id,
+            ExProd_Precio: datos_existencias[i].exProd_Precio,
+            ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
+            ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
+            ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
+            TpMoneda_Id: datos_existencias[i].tpMoneda_Id,
+            exProd_PrecioVenta : datos_existencias[i].exProd_PrecioVenta,
+            ExProd_CantMinima : cantidad,
+          }
 
-    this.existencias_ProductosService.srvObtenerListaPorIdProducto(this.numeroIdProd).subscribe(datos_existencias => {
-      for (let i = 0; i < datos_existencias.length; i++) {
-        const datosExistencias = {
-          Prod_Id: this.numeroIdProd,
-          exProd_Id: datos_existencias[i].exProd_Id,
-          ExProd_Cantidad: datos_existencias[i].exProd_Cantidad,
-          UndMed_Id: datos_existencias[i].undMed_Id,
-          TpBod_Id: datos_existencias[i].tpBod_Id,
-          ExProd_Precio: datos_existencias[i].exProd_Precio,
-          ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
-          ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
-          ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
-          TpMoneda_Id: datos_existencias[i].tpMoneda_Id,
-          exProd_PrecioVenta : datos_existencias[i].exProd_PrecioVenta,
-          ExProd_CantMinima : cantidad,
+          this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
+            this.InventarioExistenciaBDNueva();
+            this.numeroIdProd = 0;
+          });
         }
-
-        this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
-          this.InventarioExistenciaBDNueva();
-
-        });
-      }
-    });
+      });
+    }
   }
 
    //

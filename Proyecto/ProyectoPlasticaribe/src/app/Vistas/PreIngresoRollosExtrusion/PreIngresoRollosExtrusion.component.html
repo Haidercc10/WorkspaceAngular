@@ -149,6 +149,42 @@
         </div>
       </div>
 
+      <div class="mb-4" *ngIf="cargando">
+        <hr class="Linea">
+      </div>
+      <!-- Inicio titulo tabla producto -->
+      <div class="mb-4" *ngIf="cargando">
+        <h4 class="tituloRojo">Consolidado Productos</h4>
+      </div>
+
+      <!--Inicio tabla Rollos a Insertar -->
+      <div class="mb-3" *ngIf="cargando">
+        <div class="row g-3">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover mt-2" >
+              <thead class="TitulosTabla">
+                <tr>
+                  <th scope="col">ID Producto</th>
+                  <th scope="col">Producto</th>
+                  <th scope="col">Cantidad</th>
+                  <th scope="col">N° Rollos</th>
+                  <th scope="col">Presentación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of grupoProductos; let i=index">
+                  <th>{{item.Id}}</th>
+                  <td>{{item.Nombre}}</td>
+                  <td>{{item.Cantidad}}</td>
+                  <td>{{item.Rollos}}</td>
+                  <td>{{item.Presentacion}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">

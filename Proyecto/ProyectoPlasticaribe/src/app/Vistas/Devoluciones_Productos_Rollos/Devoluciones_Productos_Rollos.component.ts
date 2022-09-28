@@ -90,11 +90,17 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
 
   // Funcion para limpiar los campos de la vista
   limpiarCampos(){
-    this.FormConsultarFactura.reset();
+    this.FormConsultarFactura.setValue({
+      Fact_Id: '',
+      Rollo_Id : '',
+      Cliente : '',
+      Observacion : '',
+    });
     this.rollos = [];
     this.rollosInsertar = [];
     this.validarRollo = [];
     this.cargando = true;
+    // window.location.href = "./devolucion-rollos-productos";
   }
 
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
