@@ -124,7 +124,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     let ot : number = this.FormConsultarRollos.value.OT_Id;
     let fechaInicial : any = this.FormConsultarRollos.value.fechaDoc;
     let fechaFinal : any = this.FormConsultarRollos.value.fechaFinalDoc;
-    if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
+    // if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
       this.rollos = [];
       this.rollosInsertar = [];
       this.validarRollo = [];
@@ -137,7 +137,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
       if (ot != null && fechaInicial != null && fechaFinal != null) {
         this.bagProService.srvObtenerListaProcExtrusionFechasOT(fechaInicial, fechaFinal, ot).subscribe(datos_ot => {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+            this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
               if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
                 if (!RollosConsultados.includes(datos_ot[i].item)){
                   if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
@@ -183,7 +183,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
       } else if (fechaInicial != null &&  fechaFinal != null) {
         this.bagProService.srvObtenerListaProcExtrusionFechas(fechaInicial, fechaFinal).subscribe(datos_ot => {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+            this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
               if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
                 if (!RollosConsultados.includes(datos_ot[i].item)){
                   if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
@@ -229,7 +229,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
       } else if (ot != null && fechaInicial != null) {
         this.bagProService.srvObtenerListaProcExtrusionFechasOT(fechaInicial, fechaInicial, ot).subscribe(datos_ot => {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+            this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
               if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
                 if (!RollosConsultados.includes(datos_ot[i].item)){
                   if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
@@ -275,7 +275,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
       } else if (fechaInicial != null) {
         this.bagProService.srvObtenerListaProcExtrusionFechas(fechaInicial, fechaInicial).subscribe(datos_ot => {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+            this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
               if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
                 if (!RollosConsultados.includes(datos_ot[i].item)){
                   if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
@@ -321,7 +321,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
       } else if (ot != null) {
         this.bagProService.srvObtenerListaProcExtrusionRollosOT(ot).subscribe(datos_ot => {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+            this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
               if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
                 if (!RollosConsultados.includes(datos_ot[i].item)){
                   if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
@@ -367,7 +367,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
       } else {
         this.bagProService.srvObtenerListaProcExtrusionFechas(this.today, this.today).subscribe(datos_ot => {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
+            this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
               if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
                 if (!RollosConsultados.includes(datos_ot[i].item)){
                   if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
@@ -412,7 +412,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         });
       }
       setTimeout(() => { this.cargando = true; }, 5000);
-    } else Swal.fire("¡La fecha seleccionada no es valida!");
+    // } else Swal.fire("¡La fecha seleccionada no es valida!");
   }
 
   //Funcion que va a agregar Productos en la tabla
@@ -568,6 +568,23 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         this.preEntRollosService.srvObtenerUltimoId().subscribe(datos_ultEntrada => {
           this.ingresarRollos(datos_entradaRollo.preEntRollo_Id);
         });
+      }, error => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'error',
+          title: '¡Error al ingresar los rollos!'
+        });
+        this.cargando = true;
       });
     }
   }
@@ -580,14 +597,31 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         DtlPreEntRollo_Cantidad : this.rollosInsertar[i].Cantidad,
         UndMed_Rollo : this.rollosInsertar[i].Presentacion,
         Proceso_Id : this.rollosInsertar[i].Proceso,
-        Cli_Id : parseInt(this.rollosInsertar[i].IdCliente),
+        Cli_Id : 1,
         DtlPreEntRollo_OT : parseInt(this.rollosInsertar[i].Ot.trim()),
         Prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
         UndMed_Producto : this.rollosInsertar[i].Presentacion,
         preEntRollo_Id : idEntrada,
       }
       console.log(info)
-      this.dtPreEntRollosService.srvGuardar(info).subscribe(datos_entrada => {  });
+      this.dtPreEntRollosService.srvGuardar(info).subscribe(datos_entrada => {  }, error => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'error',
+          title: '¡Error al ingresar los rollos!'
+        });
+        this.cargando = true;
+      });
     }
     setTimeout(() => {
       const Toast = Swal.mixin({
@@ -712,7 +746,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
                 style: 'header'
               },
 
-              this.table(this.rollosAsignados, ['OT', 'Rollo', 'IdCliente', 'Cliente', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
+              this.table(this.rollosAsignados, ['OT', 'Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
                 text: `\nCant. Total: ${this.formatonumeros(this.Total)}\n`,
                 alignment: 'right',
@@ -781,7 +815,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     return {
         table: {
           headerRows: 1,
-          widths: [30, 30, 50, 100, 37, 150, 37, 48],
+          widths: [30, 80, 57, 180, 37, 48],
           body: this.buildTableBody(data, columns),
         },
         fontSize: 8,

@@ -231,6 +231,23 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
         this.devolcuionesService.srvObteneUltimoId().subscribe(datos_devolucion => {
           this.crearDtDevolucion(datos_devolucion.devProdFact_Id);
         });
+      }, error => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'error',
+          title: '¡Error al crear la devolución de los rollos!'
+        });
+        this.cargando = true;
       });
     }
   }
@@ -245,7 +262,24 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
         UndMed_Id : this.rollosInsertar[i].Presentacion,
         Rollo_Id : this.rollosInsertar[i].Id,
       }
-      this.dtDevolucionService.srvGuardar(info).subscribe(datos_devolcuion => {  });
+      this.dtDevolucionService.srvGuardar(info).subscribe(datos_devolcuion => {  }, error => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'error',
+          title: '¡Error al crear la devolución de los rollos!'
+        });
+        this.cargando = true;
+      });
     }
     setTimeout(() => { this.actualizarRollos(); }, 2000);
   }
