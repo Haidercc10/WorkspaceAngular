@@ -152,7 +152,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       if (a.fechaModificacion == '' && b.fechaModificacion != '') return 1;
       else return -1;
     });
-    setTimeout(() => { this.load = true; }, 1200);
+    this.load = true;
   }
 
   //
@@ -224,6 +224,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     this.load = false;
     this.ArrayProductosBDNueva = [];
     this.numeroIdProd = 0;
+    this.totalProductos = 0;
 
     this.existencias_ProductosService.srvObtenerInventarioExistencias().subscribe(registrosIPT => {
       for (let index = 0; index < registrosIPT.length; index++) {
@@ -266,6 +267,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
     let cantidad : number = this.FormExistencias.value.cantMinima;
     let cantidad2 : number = this.FormCantUtilizada.value.CantUtilizada;
 
+    if (this.numeroIdProd == 0) Swal.fire("¡Debe seleccionar un producto!");
+    else {
     this.existencias_ProductosService.srvObtenerListaPorIdProducto(this.numeroIdProd).subscribe(datos_existencias => {
       for (let i = 0; i < datos_existencias.length; i++) {
         const datosExistencias = {
@@ -285,11 +288,12 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
         this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
           this.InventarioExistenciaBDNueva();
-
+          this.numeroIdProd = 0;
         });
         this.FormCantUtilizada.reset();
       }
     });
+    }
   }
 
    //

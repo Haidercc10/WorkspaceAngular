@@ -1,6 +1,5 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
@@ -40,6 +39,7 @@ export class Ingresar_ProductosComponent implements OnInit {
   cantidadOT : number = 0; //
   rollosAsignados : any = [];
   Total : number = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
+  grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
@@ -114,14 +114,28 @@ export class Ingresar_ProductosComponent implements OnInit {
       IdRollo: null,
       fechaDoc : null,
       fechaFinalDoc: null,
-      Observacion : null,
+      Observacion : '',
       Proceso : null,
     });
     this.rollos = [];
+    this.rollosInsertar = [];
     this.validarRollo = [];
-    this.rollosAsignados = [];
+    this.grupoProductos = [];
     this.cargando = true;
     this.Total = 0;
+    // window.location.href = "./ingresar-productos";
+  }
+
+  // funcion que va a limpiar los campos del formulario
+  limpiarForm(){
+    this.FormConsultarRollos.setValue({
+      OT_Id: null,
+      IdRollo: null,
+      fechaDoc : null,
+      fechaFinalDoc: null,
+      Observacion : '',
+      Proceso : null,
+    });
   }
 
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
@@ -134,8 +148,6 @@ export class Ingresar_ProductosComponent implements OnInit {
     if (ProcConsulta != null) {
       // if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
         this.rollos = [];
-        this.rollosInsertar = [];
-        this.validarRollo = [];
         let RollosConsultados : any [] = [];
         let otTemporral : number = 0;
         this.cargando = false;
@@ -2016,7 +2028,7 @@ export class Ingresar_ProductosComponent implements OnInit {
             });
           }
         }
-        setTimeout(() => { this.cargando = true; }, 5000);
+        setTimeout(() => { this.cargando = true; }, 1200);
       // } else Swal.fire("¡La fecha seleccionada no es valida!");
     } else Swal.fire("¡Seleccione un proceso!");
   }
@@ -2066,6 +2078,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     for (let i = 0; i < this.rollos.length; i++) {
       if (this.rollos[i].Id == item.Id) this.rollos.splice(i,1);
     }
+    setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
   // Funcion que va a seleccionar todo lo que hay en la tabla
@@ -2093,6 +2106,7 @@ export class Ingresar_ProductosComponent implements OnInit {
       this.rollos = [];
       this.rollos = nuevo;
     }, 500);
+    setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
   // Funcion que va a seleccionar todo lo de la OT sobre la que se dió click que hay en la tabla
@@ -2120,6 +2134,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     for (let i = 0; i < this.rollos.length; i++) {
       if (this.rollos[i].Ot == ot) this.rollos.splice(i,1);
     }
+    setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
   // Funcion que va a quitar todo lo que hay en la tabla
@@ -2142,7 +2157,8 @@ export class Ingresar_ProductosComponent implements OnInit {
     setTimeout(() => {
       this.rollosInsertar = [];
       this.validarRollo = [];
-    }, 2000);
+    }, 500);
+    setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
   // Funcion que se va a encargar de quitar rollos de la tabla inferior
@@ -2165,6 +2181,35 @@ export class Ingresar_ProductosComponent implements OnInit {
     }
     for (let i = 0; i < this.validarRollo.length; i++) {
       if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
+    }
+    setTimeout(() => { this.GrupoProductos(); }, 500);
+  }
+
+  // Funcion que permitirá ver el total de lo escogido para cada producto
+  GrupoProductos(){
+    let producto : any = [];
+    this.grupoProductos = [];
+    for (let i = 0; i < this.rollosInsertar.length; i++) {
+      if (!producto.includes(this.rollosInsertar[i].IdProducto)) {
+        let cantidad : number = 0;
+        let cantRollo : number = 0;
+        for (let j = 0; j < this.rollosInsertar.length; j++) {
+          if (this.rollosInsertar[i].IdProducto == this.rollosInsertar[j].IdProducto) {
+            cantidad += this.rollosInsertar[j].Cantidad;
+            cantRollo += 1;
+          }
+        }
+        producto.push(this.rollosInsertar[i].IdProducto);
+        let info : any = {
+          Id : this.rollosInsertar[i].IdProducto,
+          Nombre : this.rollosInsertar[i].Producto,
+          Cantidad : this.formatonumeros(cantidad.toFixed(2)),
+          Cantidad2 : cantidad.toFixed(2),
+          Rollos: this.formatonumeros(cantRollo.toFixed(2)),
+          Presentacion : this.rollosInsertar[i].Presentacion,
+        }
+        this.grupoProductos.push(info);
+      }
     }
   }
 
@@ -2248,61 +2293,46 @@ export class Ingresar_ProductosComponent implements OnInit {
     setTimeout(() => {
       this.InventarioProductos();
       this.buscarRolloPDF(idEntrada);
-    }, 2000);
+    }, 1500);
   }
 
   // Funcion para mover el inventario de los productos
   InventarioProductos(){
-    let rollo = [];
-    setTimeout(() => {
-      for (let k = 0; k < this.rollosInsertar.length; k++) {
-        if (!rollo.includes(this.rollosInsertar[k].IdProducto)) {
-          this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.rollosInsertar[k].IdProducto, this.rollosInsertar[k].Presentacion).subscribe(datos_existencias => {
-            for (let j = 0; j < datos_existencias.length; j++) {
-              let sumaCantidad = 0;
-              for (let i = 0; i < this.rollosInsertar.length; i++) {
-                if (this.rollosInsertar[i].IdProducto == this.rollosInsertar[k].IdProducto
-                  && this.rollosInsertar[i].Presentacion == this.rollosInsertar[k].Presentacion) {
-                    sumaCantidad += this.rollosInsertar[i].Cantidad;
-                }
+    for (let i = 0; i < this.grupoProductos.length; i++) {
+      this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.grupoProductos[i].Id, this.grupoProductos[i].Presentacion).subscribe(datos_productos => {
+        for (let j = 0; j < datos_productos.length; j++) {
+          let info : any = {
+            Prod_Id: datos_productos[j].prod_Id,
+            exProd_Id : datos_productos[j].exProd_Id,
+            ExProd_Cantidad: (datos_productos[j].exProd_Cantidad + parseInt(this.grupoProductos[i].Cantidad2)),
+            UndMed_Id: datos_productos[j].undMed_Id,
+            TpBod_Id: datos_productos[j].tpBod_Id,
+            ExProd_Precio: datos_productos[j].exProd_Precio,
+            ExProd_PrecioExistencia: (datos_productos[j].exProd_Cantidad + parseInt(this.grupoProductos[i].Cantidad2)) * datos_productos[j].exProd_PrecioVenta,
+            ExProd_PrecioSinInflacion: datos_productos[j].exProd_PrecioSinInflacion,
+            TpMoneda_Id: datos_productos[j].tpMoneda_Id,
+            ExProd_PrecioVenta: datos_productos[j].exProd_PrecioVenta,
+          }
+          this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'center',
+              showConfirmButton: false,
+              timer: 2500,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
               }
-              rollo.push(this.rollosInsertar[k].IdProducto);
-              setTimeout(() => {
-                let info : any = {
-                  Prod_Id: datos_existencias[j].prod_Id,
-                  exProd_Id : datos_existencias[j].exProd_Id,
-                  ExProd_Cantidad: (datos_existencias[j].exProd_Cantidad + sumaCantidad),
-                  UndMed_Id: datos_existencias[j].undMed_Id,
-                  TpBod_Id: datos_existencias[j].tpBod_Id,
-                  ExProd_Precio: datos_existencias[j].exProd_Precio,
-                  ExProd_PrecioExistencia: (datos_existencias[j].exProd_Cantidad + sumaCantidad) * datos_existencias[j].exProd_PrecioVenta,
-                  ExProd_PrecioSinInflacion: datos_existencias[j].exProd_PrecioSinInflacion,
-                  TpMoneda_Id: datos_existencias[j].tpMoneda_Id,
-                  ExProd_PrecioVenta: datos_existencias[j].exProd_PrecioVenta,
-                }
-                this.ExistenciasProdService.srvActualizar(datos_existencias[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
-                  const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'center',
-                    showConfirmButton: false,
-                    timer: 2500,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                      toast.addEventListener('mouseenter', Swal.stopTimer)
-                      toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
-                  });
-                  Toast.fire({
-                    icon: 'success',
-                    title: '¡Entrada de Rollos registrada con exito!'
-                  });
-                });
-              }, 4000);
-            }
+            });
+            Toast.fire({
+              icon: 'success',
+              title: '¡Entrada de Rollos registrada con exito!'
+            });
           });
         }
-      }
-    }, 2000);
+      });
+    }
   }
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
@@ -2384,6 +2414,12 @@ export class Ingresar_ProductosComponent implements OnInit {
                 style: 'header',
               },
               {
+                text: `\n\n Consolidado de producto(s) \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+              this.table2(this.grupoProductos, ['Id', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion']),
+              {
                 text: `\n\n Información detallada de los Rollos \n `,
                 alignment: 'center',
                 style: 'header'
@@ -2391,7 +2427,7 @@ export class Ingresar_ProductosComponent implements OnInit {
 
               this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
-                text: `\nCant. Total: ${this.formatonumeros(this.Total)}\n`,
+                text: `\nCant. Total: ${this.formatonumeros(this.Total.toFixed(2))}\n`,
                 alignment: 'right',
                 style: 'header',
               },
@@ -2435,7 +2471,7 @@ export class Ingresar_ProductosComponent implements OnInit {
         this.rollosAsignados.push(info);
       }
     });
-    setTimeout(() => { this.crearPDF(id); }, 2500);
+    setTimeout(() => { this.crearPDF(id); }, 1200);
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -2458,10 +2494,27 @@ export class Ingresar_ProductosComponent implements OnInit {
     return {
         table: {
           headerRows: 1,
-          widths: [40, 50, '*', 50, 60],
+          widths: [40, 50, 310, 50, 60],
           body: this.buildTableBody(data, columns),
         },
-        fontSize: 9,
+        fontSize: 7,
+        layout: {
+          fillColor: function (rowIndex, node, columnIndex) {
+            return (rowIndex == 0) ? '#CCCCCC' : null;
+          }
+        }
+    };
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table2(data, columns) {
+    return {
+        table: {
+          headerRows: 1,
+          widths: [60, 260, 70, 40, 80],
+          body: this.buildTableBody(data, columns),
+        },
+        fontSize: 7,
         layout: {
           fillColor: function (rowIndex, node, columnIndex) {
             return (rowIndex == 0) ? '#CCCCCC' : null;

@@ -33,6 +33,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  TotalStockReal : number = 0; //Variable que servirá para calcular el valor total de las existentacias reales
   public filtroNombre : any;
   public NombrePT = '';
   public load : boolean;
@@ -230,6 +231,9 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.load = false;
     this.ArrayProductoZeus = [];
     this.numeroIdProd = 0;
+    this.TotalStockReal = 0;
+    this.totalProductos = 0;
+
     this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datosExistencias => {
       for (let exi = 0; exi < datosExistencias.length; exi++) {
         this.datosCodigo = datosExistencias[exi].codigo;
@@ -255,6 +259,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                   this.ArrayProductoZeus.sort((a,b) => a.nombreItem.localeCompare(b.nombreItem));
                   this.ArrayProductoZeus.sort((a,b) => Number(b.cantidadItem <= b.cantMinima) - Number(a.cantidadItem <= a.cantMinima));
                   this.totalProductos += datosExistencias[exi].precio_Total;
+                  this.TotalStockReal += (datos_existenciasProd[i].exProd_Cantidad * datosExistencias[exi].precioVenta);
                   break;
                 }
               });
@@ -281,28 +286,32 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   //
   actualizarCantMinima(){
     let cantidad : number = this.FormExistencias.value.cantMinima;
-    this.existencias_ProductosService.srvObtenerListaPorIdProducto(this.numeroIdProd).subscribe(datos_existencias => {
-      for (let i = 0; i < datos_existencias.length; i++) {
-        const datosExistencias = {
-          Prod_Id: this.numeroIdProd,
-          exProd_Id: datos_existencias[i].exProd_Id,
-          ExProd_Cantidad: datos_existencias[i].exProd_Cantidad,
-          UndMed_Id: datos_existencias[i].undMed_Id,
-          TpBod_Id: datos_existencias[i].tpBod_Id,
-          ExProd_Precio: datos_existencias[i].exProd_Precio,
-          ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
-          ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
-          ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
-          TpMoneda_Id: datos_existencias[i].tpMoneda_Id,
-          exProd_PrecioVenta : datos_existencias[i].exProd_PrecioVenta,
-          ExProd_CantMinima : cantidad,
-        }
+    if (this.numeroIdProd == 0) Swal.fire("¡Debe seleccionar un producto!");
+    else {
+      this.existencias_ProductosService.srvObtenerListaPorIdProducto(this.numeroIdProd).subscribe(datos_existencias => {
+        for (let i = 0; i < datos_existencias.length; i++) {
+          const datosExistencias = {
+            Prod_Id: this.numeroIdProd,
+            exProd_Id: datos_existencias[i].exProd_Id,
+            ExProd_Cantidad: datos_existencias[i].exProd_Cantidad,
+            UndMed_Id: datos_existencias[i].undMed_Id,
+            TpBod_Id: datos_existencias[i].tpBod_Id,
+            ExProd_Precio: datos_existencias[i].exProd_Precio,
+            ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
+            ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
+            ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
+            TpMoneda_Id: datos_existencias[i].tpMoneda_Id,
+            exProd_PrecioVenta : datos_existencias[i].exProd_PrecioVenta,
+            ExProd_CantMinima : cantidad,
+          }
 
-        this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
-          this.InventarioExistenciaZeus();
-        });
-      }
-    });
+          this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
+            this.InventarioExistenciaZeus();
+            this.numeroIdProd = 0;
+          });
+        }
+      });
+    }
   }
 
   //
@@ -428,6 +437,46 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   /** Organiza el inventario de PT por existencias de menor a mayor. */
   organizarExistenciasUnClick() {
     this.ArrayProductoZeus.sort((a,b)=> Number(a.cantidadItem) - Number(b.cantidadItem));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Existencia" de menor a mayor.'
+    });
+  }
+
+  /** Organiza el inventario de PT por existencias de mayor a menor. */
+  organizarExistenciasRealDobleClick() {
+    this.ArrayProductoZeus.sort((a,b)=> Number(b.stock_real) - Number(a.stock_real));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'warning',
+      title: 'Ordenado por "Existencia" de mayor a menor.'
+    });
+  }
+
+  /** Organiza el inventario de PT por existencias de menor a mayor. */
+  organizarExistenciasRealUnClick() {
+    this.ArrayProductoZeus.sort((a,b)=> Number(a.stock_real) - Number(b.stock_real));
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',

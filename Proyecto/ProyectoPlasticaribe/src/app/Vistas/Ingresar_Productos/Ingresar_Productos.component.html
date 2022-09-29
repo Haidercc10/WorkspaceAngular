@@ -36,7 +36,7 @@
               <label for="floatingInput">Nro. OT</label>
             </div>
 
-            <!-- Id Rolo -->            
+            <!-- Id Rolo -->
             <div class="form-floating col-md">
               <input formControlName="IdRollo" type="number" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">N° Rollo</label>
@@ -69,7 +69,7 @@
             </div>
 
             <div class="form-floating col-md">
-              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarForm()">Limpiar Campos</button>
             </div>
           </div>
         </div>
@@ -99,9 +99,9 @@
                   <th scope="col">Proceso</th>
 
                   <ng-container *ngIf="cantidadOT == 1">
-                    <th scope="col"><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>                   
+                    <th scope="col"><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>
                   </ng-container>
-                  
+
                 </tr>
               </thead>
               <tbody>
@@ -156,11 +156,11 @@
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentación</th>
-                  
+
                   <ng-container>
                     <th scope="col"><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
                   </ng-container>
-                  
+
                 </tr>
               </thead>
               <tbody>
@@ -171,6 +171,42 @@
                   <td>{{item.Cantidad | number}}</td>
                   <td>{{item.Presentacion}}</td>
                   <td><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarRollo(item)"></i></a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4" *ngIf="cargando">
+        <hr class="Linea">
+      </div>
+      <!-- Inicio titulo tabla producto -->
+      <div class="mb-4" *ngIf="cargando">
+        <h4 class="tituloRojo">Consolidado Productos</h4>
+      </div>
+
+      <!--Inicio tabla Rollos a Insertar -->
+      <div class="mb-3" *ngIf="cargando">
+        <div class="row g-3">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover mt-2" >
+              <thead class="TitulosTabla">
+                <tr>
+                  <th scope="col">ID Producto</th>
+                  <th scope="col">Producto</th>
+                  <th scope="col">Cantidad</th>
+                  <th scope="col">N° Rollos</th>
+                  <th scope="col">Presentación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of grupoProductos; let i=index">
+                  <th>{{item.Id}}</th>
+                  <td>{{item.Nombre}}</td>
+                  <td>{{item.Cantidad}}</td>
+                  <td>{{item.Rollos}}</td>
+                  <td>{{item.Presentacion}}</td>
                 </tr>
               </tbody>
             </table>

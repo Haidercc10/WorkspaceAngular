@@ -6,7 +6,7 @@
   </div>
 </div>
 
-<div class="contain">
+<div class="contain" id="form">
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
@@ -36,31 +36,30 @@
               <label for="floatingInput">Factura</label>
             </div>
 
-            <!-- Nota Credito -->
-            <div class="form-floating col-md-2">
-              <input formControlName="NotaCredito" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Nota Credito</label>
-            </div>
-
             <!-- Id Producto -->
             <div class="form-floating col-md-2">
               <input formControlName="IdProducto" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="buscarItem()">
               <label for="floatingInput">N° Item</label>
             </div>
 
+            <!-- Id Producto -->
+            <div class="form-floating col-md-2">
+              <input formControlName="CantidadProducto" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="mostrarRollosPorCantidad()">
+              <label for="floatingInput">Cantidad Item</label>
+            </div>
+
             <div class="form-floating col-md">
-              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="buscarItem()">
+              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Item Nombre</label>
             </div>
 
              <!-- Cliente -->
-            <!-- <ng-container>
+            <ng-container>
               <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteClientes">
                 <ng-autocomplete
                   class=""
                   [data]="arrayClientes"
                   (selected)='selectEventCliente($event)'
-                  (selected)='obtenerProductosXClientes()'
                   (inputChanged)='onChangeSearchClientes($event)'
                   (inputFocused)='onFocusedNombreClientes($event)'
                   [searchKeyword]="keywordClientes"
@@ -77,7 +76,7 @@
                 </ng-template>
                 <label for="floatingInput" *ngIf="validarInputClientes">Cliente</label>
               </div>
-            </ng-container> -->
+            </ng-container>
 
              <!-- Producto -->
             <!-- <ng-container>
@@ -122,6 +121,12 @@
               <input formControlName="PlacaCamion" type="text" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Placa Camión</label>
             </div> -->
+
+            <!-- Nota Credito -->
+            <div class="form-floating col-md-2">
+              <input formControlName="NotaCredito" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Nota Credito</label>
+            </div>
 
             <!-- Observacion -->
             <div class="form-floating col-md">
@@ -180,13 +185,16 @@
           </div>
         </div>
       </div>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <label for=""><b>Total {{presentacionProducto}}: {{cantTotalProducto | number : '1.2-2'}}</b></label>
+      </div>
 
       <div class="mb-4" *ngIf="cargando">
         <hr class="Linea">
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Tabla de Rollos por Ingresar</h4>
+        <h4 class="tituloRojo">Tabla de Rollos por Asignar</h4>
       </div>
 
       <!--Inicio tabla Rollos a Insertar -->
@@ -247,8 +255,8 @@
                 <tr *ngFor="let item of grupoProductos; let i=index">
                   <th>{{item.Id}}</th>
                   <td>{{item.Nombre}}</td>
-                  <td>{{item.Cantidad | number}}</td>
-                  <td>{{item.Rollos | number}}</td>
+                  <td>{{item.Cantidad}}</td>
+                  <td>{{item.Rollos}}</td>
                   <td>{{item.Presentacion}}</td>
                 </tr>
               </tbody>
@@ -256,8 +264,9 @@
           </div>
         </div>
       </div>
+
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <label for=""><b>Total: {{Total | number}}</b></label>
+        <label for=""><b>Total: {{Total | number : '1.2-2'}}</b></label>
       </div>
 
       <!-- Botones -->
