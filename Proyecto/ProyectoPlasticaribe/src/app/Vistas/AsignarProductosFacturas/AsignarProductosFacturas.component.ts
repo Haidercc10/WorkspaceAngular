@@ -194,6 +194,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
       this.rollosInsertar.push(info);
       this.validarRollo.push(item.Id);
       this.Total += item.Cantidad;
+      this.cantTotalProducto -= item.Cantidad;
+      this.presentacionProducto = item.Presentacion;
     } else {
       if (!this.validarRollo.includes(item.Id)) {
         let info : any = {
@@ -206,6 +208,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
         this.rollosInsertar.push(info);
         this.validarRollo.push(item.Id);
         this.Total += item.Cantidad;
+        this.cantTotalProducto -= item.Cantidad;
+        this.presentacionProducto = item.Presentacion;
       } else if (this.validarRollo.includes(item.Id)) {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
           if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
@@ -214,6 +218,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
           if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
         }
         this.Total -= item.Cantidad;
+        this.cantTotalProducto -= item.Cantidad;
+        this.presentacionProducto = item.Presentacion;
       }
     }
     for (let i = 0; i < this.rollos.length; i++) {
@@ -224,6 +230,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   // Funcion que va a seleccionar todo lo que hay en la tabla
   selccionarTodo(){
+    this.cantTotalProducto = 0;
+    this.presentacionProducto = '';
     for (const item of this.rollos) {
       let info : any = {
         Ot : item.Ot,
@@ -257,6 +265,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
     }
     this.rollos.push(info);
     this.Total -= item.Cantidad;
+    this.cantTotalProducto += item.Cantidad;
+    this.presentacionProducto = item.Presentacion;
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
     }
@@ -282,6 +292,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
         Proceso : item.Proceso,
         checkbox : true,
       }
+      this.cantTotalProducto += item.Cantidad;
+      this.presentacionProducto = item.Presentacion;
       this.rollos.push(info);
       this.Total = 0;
     }
@@ -416,6 +428,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
           Id : this.rollosInsertar[i].IdProducto,
           Nombre : this.rollosInsertar[i].Producto,
           Cantidad : this.formatonumeros(cantidad.toFixed(2)),
+          Cantidad2 : cantidad.toFixed(2),
           Rollos: this.formatonumeros(cantRollo.toFixed(2)),
           Presentacion : this.rollosInsertar[i].Presentacion,
         }
@@ -499,7 +512,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         this.cargando = true;
       });
     }
-    setTimeout(() => { this.cambiarEstado(); }, 2000);
+    setTimeout(() => { this.cambiarEstado(); }, 1000);
   }
 
   // Funcion que va a cambiar el estado de los rollos que estan siendo asignados a una factura
@@ -522,62 +535,47 @@ export class AsignarProductosFacturasComponent implements OnInit {
         }
       });
     }
-    setTimeout(() => { this.moverInventarioProductos(); }, 2000);
+    setTimeout(() => { this.moverInventarioProductos(); }, 1000);
   }
 
   // Funcion que va a mover el inventario de los productos
   moverInventarioProductos(){
-    let rollo = [];
-    setTimeout(() => {
-      for (let k = 0; k < this.rollosInsertar.length; k++) {
-        if (!rollo.includes(this.rollosInsertar[k].IdProducto)) {
-          this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.rollosInsertar[k].IdProducto, this.rollosInsertar[k].Presentacion).subscribe(datos_existencias => {
-            for (let j = 0; j < datos_existencias.length; j++) {
-              let sumaCantidad = 0;
-              for (let i = 0; i < this.rollosInsertar.length; i++) {
-                if (this.rollosInsertar[i].IdProducto == this.rollosInsertar[k].IdProducto
-                  && this.rollosInsertar[i].Presentacion == this.rollosInsertar[k].Presentacion) {
-                    sumaCantidad += this.rollosInsertar[i].Cantidad;
-                }
+    for (let i = 0; i < this.grupoProductos.length; i++) {
+      this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.grupoProductos[i].Id, this.grupoProductos[i].Presentacion).subscribe(datos_productos => {
+        for (let j = 0; j < datos_productos.length; j++) {
+          let info : any = {
+            Prod_Id: datos_productos[j].prod_Id,
+            exProd_Id : datos_productos[j].exProd_Id,
+            ExProd_Cantidad: (datos_productos[j].exProd_Cantidad - parseInt(this.grupoProductos[i].Cantidad2)),
+            UndMed_Id: datos_productos[j].undMed_Id,
+            TpBod_Id: datos_productos[j].tpBod_Id,
+            ExProd_Precio: datos_productos[j].exProd_Precio,
+            ExProd_PrecioExistencia: (datos_productos[j].exProd_Cantidad - parseInt(this.grupoProductos[i].Cantidad2)) * datos_productos[j].exProd_PrecioVenta,
+            ExProd_PrecioSinInflacion: datos_productos[j].exProd_PrecioSinInflacion,
+            TpMoneda_Id: datos_productos[j].tpMoneda_Id,
+            ExProd_PrecioVenta: datos_productos[j].exProd_PrecioVenta,
+          }
+          this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'center',
+              showConfirmButton: false,
+              timer: 3500,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
               }
-              rollo.push(this.rollosInsertar[k].IdProducto);
-              setTimeout(() => {
-                let info : any = {
-                  Prod_Id: datos_existencias[j].prod_Id,
-                  exProd_Id : datos_existencias[j].exProd_Id,
-                  ExProd_Cantidad: (datos_existencias[j].exProd_Cantidad - sumaCantidad),
-                  UndMed_Id: datos_existencias[j].undMed_Id,
-                  TpBod_Id: datos_existencias[j].tpBod_Id,
-                  ExProd_Precio: datos_existencias[j].exProd_Precio,
-                  ExProd_PrecioExistencia: (datos_existencias[j].exProd_Cantidad - sumaCantidad) * datos_existencias[j].exProd_PrecioVenta,
-                  ExProd_PrecioSinInflacion: datos_existencias[j].exProd_PrecioSinInflacion,
-                  TpMoneda_Id: datos_existencias[j].tpMoneda_Id,
-                  ExProd_PrecioVenta: datos_existencias[j].exProd_PrecioVenta,
-                }
-                this.ExistenciasProdService.srvActualizar(datos_existencias[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
-                  const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'center',
-                    showConfirmButton: false,
-                    timer: 2500,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                      toast.addEventListener('mouseenter', Swal.stopTimer)
-                      toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
-                  });
-                  Toast.fire({
-                    icon: 'success',
-                    title: `¡La asignación de los rollos a la factura ${this.FormConsultarProductos.value.Factura.toUpperCase()} fue registrada con exito!`
-                  });
-                });
-              }, 2000);
-            }
+            });
+            Toast.fire({
+              icon: 'success',
+              title: `¡La asignación de los rollos a la factura ${this.FormConsultarProductos.value.Factura.toUpperCase()} fue registrada con exito!`
+            });
           });
         }
-      }
-      this.buscarRolloPDF();
-    }, 2000);
+      });
+    }
+    this.buscarRolloPDF();
   }
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
@@ -701,7 +699,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
                 style: 'header',
               },
               {
-                text: `\n \nObervación sobre el pedido: \n ${datos_factura[i].asigProdFV_Observacion}\n`,
+                text: `\n \nObservación: \n ${datos_factura[i].asigProdFV_Observacion}\n`,
                 style: 'header',
               },
             ],
@@ -754,7 +752,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         this.Productos.push(info);
       }
     });
-    setTimeout(() => { this.crearPDF(); }, 2500);
+    setTimeout(() => { this.crearPDF(); }, 500);
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf

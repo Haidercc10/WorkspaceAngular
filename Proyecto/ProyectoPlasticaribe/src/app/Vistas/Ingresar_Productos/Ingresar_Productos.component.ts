@@ -1,6 +1,5 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
@@ -2029,7 +2028,7 @@ export class Ingresar_ProductosComponent implements OnInit {
             });
           }
         }
-        setTimeout(() => { this.cargando = true; }, 5000);
+        setTimeout(() => { this.cargando = true; }, 1200);
       // } else Swal.fire("¡La fecha seleccionada no es valida!");
     } else Swal.fire("¡Seleccione un proceso!");
   }
@@ -2205,6 +2204,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           Id : this.rollosInsertar[i].IdProducto,
           Nombre : this.rollosInsertar[i].Producto,
           Cantidad : this.formatonumeros(cantidad.toFixed(2)),
+          Cantidad2 : cantidad.toFixed(2),
           Rollos: this.formatonumeros(cantRollo.toFixed(2)),
           Presentacion : this.rollosInsertar[i].Presentacion,
         }
@@ -2293,61 +2293,46 @@ export class Ingresar_ProductosComponent implements OnInit {
     setTimeout(() => {
       this.InventarioProductos();
       this.buscarRolloPDF(idEntrada);
-    }, 2000);
+    }, 1500);
   }
 
   // Funcion para mover el inventario de los productos
   InventarioProductos(){
-    let rollo = [];
-    setTimeout(() => {
-      for (let k = 0; k < this.rollosInsertar.length; k++) {
-        if (!rollo.includes(this.rollosInsertar[k].IdProducto)) {
-          this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.rollosInsertar[k].IdProducto, this.rollosInsertar[k].Presentacion).subscribe(datos_existencias => {
-            for (let j = 0; j < datos_existencias.length; j++) {
-              let sumaCantidad = 0;
-              for (let i = 0; i < this.rollosInsertar.length; i++) {
-                if (this.rollosInsertar[i].IdProducto == this.rollosInsertar[k].IdProducto
-                  && this.rollosInsertar[i].Presentacion == this.rollosInsertar[k].Presentacion) {
-                    sumaCantidad += this.rollosInsertar[i].Cantidad;
-                }
+    for (let i = 0; i < this.grupoProductos.length; i++) {
+      this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.grupoProductos[i].Id, this.grupoProductos[i].Presentacion).subscribe(datos_productos => {
+        for (let j = 0; j < datos_productos.length; j++) {
+          let info : any = {
+            Prod_Id: datos_productos[j].prod_Id,
+            exProd_Id : datos_productos[j].exProd_Id,
+            ExProd_Cantidad: (datos_productos[j].exProd_Cantidad + parseInt(this.grupoProductos[i].Cantidad2)),
+            UndMed_Id: datos_productos[j].undMed_Id,
+            TpBod_Id: datos_productos[j].tpBod_Id,
+            ExProd_Precio: datos_productos[j].exProd_Precio,
+            ExProd_PrecioExistencia: (datos_productos[j].exProd_Cantidad + parseInt(this.grupoProductos[i].Cantidad2)) * datos_productos[j].exProd_PrecioVenta,
+            ExProd_PrecioSinInflacion: datos_productos[j].exProd_PrecioSinInflacion,
+            TpMoneda_Id: datos_productos[j].tpMoneda_Id,
+            ExProd_PrecioVenta: datos_productos[j].exProd_PrecioVenta,
+          }
+          this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'center',
+              showConfirmButton: false,
+              timer: 2500,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
               }
-              rollo.push(this.rollosInsertar[k].IdProducto);
-              setTimeout(() => {
-                let info : any = {
-                  Prod_Id: datos_existencias[j].prod_Id,
-                  exProd_Id : datos_existencias[j].exProd_Id,
-                  ExProd_Cantidad: (datos_existencias[j].exProd_Cantidad + sumaCantidad),
-                  UndMed_Id: datos_existencias[j].undMed_Id,
-                  TpBod_Id: datos_existencias[j].tpBod_Id,
-                  ExProd_Precio: datos_existencias[j].exProd_Precio,
-                  ExProd_PrecioExistencia: (datos_existencias[j].exProd_Cantidad + sumaCantidad) * datos_existencias[j].exProd_PrecioVenta,
-                  ExProd_PrecioSinInflacion: datos_existencias[j].exProd_PrecioSinInflacion,
-                  TpMoneda_Id: datos_existencias[j].tpMoneda_Id,
-                  ExProd_PrecioVenta: datos_existencias[j].exProd_PrecioVenta,
-                }
-                this.ExistenciasProdService.srvActualizar(datos_existencias[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
-                  const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'center',
-                    showConfirmButton: false,
-                    timer: 2500,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                      toast.addEventListener('mouseenter', Swal.stopTimer)
-                      toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
-                  });
-                  Toast.fire({
-                    icon: 'success',
-                    title: '¡Entrada de Rollos registrada con exito!'
-                  });
-                });
-              }, 4000);
-            }
+            });
+            Toast.fire({
+              icon: 'success',
+              title: '¡Entrada de Rollos registrada con exito!'
+            });
           });
         }
-      }
-    }, 2000);
+      });
+    }
   }
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
@@ -2486,7 +2471,7 @@ export class Ingresar_ProductosComponent implements OnInit {
         this.rollosAsignados.push(info);
       }
     });
-    setTimeout(() => { this.crearPDF(id); }, 2500);
+    setTimeout(() => { this.crearPDF(id); }, 1200);
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf

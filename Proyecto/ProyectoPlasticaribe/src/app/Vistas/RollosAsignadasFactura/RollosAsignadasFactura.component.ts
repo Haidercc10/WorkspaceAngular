@@ -611,7 +611,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
         this.Total += datos_factura[i].suma;
       }
     });
-    setTimeout(() => { this.crearPDF(); }, 2500);
+    setTimeout(() => { this.crearPDF(); }, 1200);
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf

@@ -638,7 +638,6 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         UndMed_Producto : this.rollosInsertar[i].Presentacion,
         preEntRollo_Id : idEntrada,
       }
-      console.log(info)
       this.dtPreEntRollosService.srvGuardar(info).subscribe(datos_entrada => {  }, error => {
         const Toast = Swal.mixin({
           toast: true,
@@ -675,7 +674,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         title: '¡Pre Entrada de Rollos registrada con exito!'
       });
       this.buscarRolloPDF(idEntrada);
-    }, 2000);
+    }, 1200);
   }
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
@@ -833,7 +832,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         this.rollosAsignados.push(info);
       }
     });
-    setTimeout(() => { this.crearPDF(id); }, 2500);
+    setTimeout(() => { this.crearPDF(id); }, 1200);
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf

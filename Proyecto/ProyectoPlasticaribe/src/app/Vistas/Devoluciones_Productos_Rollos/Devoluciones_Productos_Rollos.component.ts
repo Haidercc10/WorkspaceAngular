@@ -1,6 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { timeStamp } from 'console';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesAsignacionProductosFactura.service';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionesProductos.service';
@@ -32,6 +31,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
   idFactura : number; //variable que va a almacenar el id de la factura que se está consultando
   idProducto : any = 0; //Variable que va a almacenar el id del producto que fue hecho en la ot consultada
   presentacionProducto : string = ''; //Variable que almacenará la presentacion del producto de la orden de trabajo consultada
+  grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
@@ -200,6 +200,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
     for (let i = 0; i < this.rollos.length; i++) {
       if (item.Id == this.rollos[i].Id) this.rollos.splice(i,1);
     }
+    setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
   // Funcion que se va a encargar de quitar rollos de la tabla inferior
@@ -217,6 +218,35 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
     }
     for (let i = 0; i < this.validarRollo.length; i++) {
       if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
+    }
+    setTimeout(() => { this.GrupoProductos(); }, 500);
+  }
+
+  // Funcion que permitirá ver el total de lo escogido para cada producto
+  GrupoProductos(){
+    let producto : any = [];
+    this.grupoProductos = [];
+    for (let i = 0; i < this.rollosInsertar.length; i++) {
+      if (!producto.includes(this.rollosInsertar[i].IdProducto)) {
+        let cantidad : number = 0;
+        let cantRollo : number = 0;
+        for (let j = 0; j < this.rollosInsertar.length; j++) {
+          if (this.rollosInsertar[i].IdProducto == this.rollosInsertar[j].IdProducto) {
+            cantidad += this.rollosInsertar[j].Cantidad;
+            cantRollo += 1;
+          }
+        }
+        producto.push(this.rollosInsertar[i].IdProducto);
+        let info : any = {
+          Id : this.rollosInsertar[i].IdProducto,
+          Nombre : this.rollosInsertar[i].Producto,
+          Cantidad : this.formatonumeros(cantidad.toFixed(2)),
+          Cantidad2 : cantidad.toFixed(2),
+          Rollos: this.formatonumeros(cantRollo.toFixed(2)),
+          Presentacion : this.rollosInsertar[i].Presentacion,
+        }
+        this.grupoProductos.push(info);
+      }
     }
   }
 
@@ -315,60 +345,43 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
     } else Swal.fire("¡Debe cargar minimo un rollo en la tabla!");
   }
 
-  // Funcion para actualizar la cantidad de existencias de cada producto
   // Funcion que va a mover el inventario de los productos
   moverInventarioProductos(){
-    let rollo = [];
-    setTimeout(() => {
-      for (let k = 0; k < this.rollosInsertar.length; k++) {
-        if (!rollo.includes(this.rollosInsertar[k].IdProducto)) {
-          this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.rollosInsertar[k].IdProducto, this.rollosInsertar[k].Presentacion).subscribe(datos_existencias => {
-            for (let j = 0; j < datos_existencias.length; j++) {
-              let sumaCantidad = 0;
-              for (let i = 0; i < this.rollosInsertar.length; i++) {
-                if (this.rollosInsertar[i].IdProducto == this.rollosInsertar[k].IdProducto
-                  && this.rollosInsertar[i].Presentacion == this.rollosInsertar[k].Presentacion) {
-                    sumaCantidad += this.rollosInsertar[i].Cantidad;
-                }
+    for (let i = 0; i < this.grupoProductos.length; i++) {
+      this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.grupoProductos[i].Id, this.grupoProductos[i].Presentacion).subscribe(datos_productos => {
+        for (let j = 0; j < datos_productos.length; j++) {
+          let info : any = {
+            Prod_Id: datos_productos[j].prod_Id,
+            exProd_Id : datos_productos[j].exProd_Id,
+            ExProd_Cantidad: (datos_productos[j].exProd_Cantidad + parseInt(this.grupoProductos[i].Cantidad2)),
+            UndMed_Id: datos_productos[j].undMed_Id,
+            TpBod_Id: datos_productos[j].tpBod_Id,
+            ExProd_Precio: datos_productos[j].exProd_Precio,
+            ExProd_PrecioExistencia: (datos_productos[j].exProd_Cantidad + parseInt(this.grupoProductos[i].Cantidad2)) * datos_productos[j].exProd_PrecioVenta,
+            ExProd_PrecioSinInflacion: datos_productos[j].exProd_PrecioSinInflacion,
+            TpMoneda_Id: datos_productos[j].tpMoneda_Id,
+            ExProd_PrecioVenta: datos_productos[j].exProd_PrecioVenta,
+          }
+          this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'center',
+              showConfirmButton: false,
+              timer: 2500,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
               }
-              rollo.push(this.rollosInsertar[k].IdProducto);
-              setTimeout(() => {
-                let info : any = {
-                  Prod_Id: datos_existencias[j].prod_Id,
-                  exProd_Id : datos_existencias[j].exProd_Id,
-                  ExProd_Cantidad: (datos_existencias[j].exProd_Cantidad - sumaCantidad),
-                  UndMed_Id: datos_existencias[j].undMed_Id,
-                  TpBod_Id: datos_existencias[j].tpBod_Id,
-                  ExProd_Precio: datos_existencias[j].exProd_Precio,
-                  ExProd_PrecioExistencia: (datos_existencias[j].exProd_Cantidad - sumaCantidad) * datos_existencias[j].exProd_PrecioVenta,
-                  ExProd_PrecioSinInflacion: datos_existencias[j].exProd_PrecioSinInflacion,
-                  TpMoneda_Id: datos_existencias[j].tpMoneda_Id,
-                  ExProd_PrecioVenta: datos_existencias[j].exProd_PrecioVenta,
-                }
-                this.ExistenciasProdService.srvActualizar(datos_existencias[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
-                  const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'center',
-                    showConfirmButton: false,
-                    timer: 2500,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                      toast.addEventListener('mouseenter', Swal.stopTimer)
-                      toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
-                  });
-                  Toast.fire({
-                    icon: 'success',
-                    title: '¡Devolución de Rollos registrada con exito!'
-                  });
-                  this.limpiarCampos();
-                });
-              }, 2000);
-            }
+            });
+            Toast.fire({
+              icon: 'success',
+              title: 'Devolución de Rollos registrada con exito!'
+            });
           });
         }
-      }
-    }, 2000);
+      });
+    }
   }
 
 }
