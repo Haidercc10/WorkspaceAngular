@@ -36,20 +36,20 @@
               <label for="floatingInput">Factura</label>
             </div>
 
-            <!-- Nota Credito -->
-            <div class="form-floating col-md-2">
-              <input formControlName="NotaCredito" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Nota Credito</label>
-            </div>
-
             <!-- Id Producto -->
             <div class="form-floating col-md-2">
               <input formControlName="IdProducto" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="buscarItem()">
               <label for="floatingInput">N° Item</label>
             </div>
 
+            <!-- Id Producto -->
+            <div class="form-floating col-md-2">
+              <input formControlName="CantidadProducto" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="mostrarRollosPorCantidad()">
+              <label for="floatingInput">Cantidad Item</label>
+            </div>
+
             <div class="form-floating col-md">
-              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="buscarItem()">
+              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Item Nombre</label>
             </div>
 
@@ -122,6 +122,12 @@
               <label for="floatingInput">Placa Camión</label>
             </div> -->
 
+            <!-- Nota Credito -->
+            <div class="form-floating col-md-2">
+              <input formControlName="NotaCredito" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Nota Credito</label>
+            </div>
+
             <!-- Observacion -->
             <div class="form-floating col-md">
               <textarea formControlName="Observacion"  id="floatingTextarea" type="text" class="form-control form-control-sm" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
@@ -188,7 +194,7 @@
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Tabla de Rollos por Ingresar</h4>
+        <h4 class="tituloRojo">Tabla de Rollos por Asignar</h4>
       </div>
 
       <!--Inicio tabla Rollos a Insertar -->
@@ -258,6 +264,7 @@
           </div>
         </div>
       </div>
+
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <label for=""><b>Total: {{Total | number : '1.2-2'}}</b></label>
       </div>

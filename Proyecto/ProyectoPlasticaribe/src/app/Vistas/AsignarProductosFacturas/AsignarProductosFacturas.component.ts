@@ -1,4 +1,3 @@
-import { ThisReceiver } from '@angular/compiler';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
@@ -18,7 +17,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-AsignarProductosFacturas',
   templateUrl: './AsignarProductosFacturas.component.html',
-  styleUrls: ['./AsignarProductosFacturas.component.css']
+  styleUrls: ['./AsignarProductosFacturas.component.css'],
 })
 export class AsignarProductosFacturasComponent implements OnInit {
 
@@ -71,8 +70,9 @@ export class AsignarProductosFacturasComponent implements OnInit {
       Factura : ['', Validators.required],
       NotaCredito : [''],
       IdProducto : [''],
-      ProdNombre: ['', Validators.required],
-      Cliente: [null],
+      CantidadProducto : [''],
+      ProdNombre: [''],
+      Cliente: [null, Validators.required],
       Observacion : [''],
     });
   }
@@ -165,6 +165,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       Factura : '',
       NotaCredito : '',
       IdProducto : '',
+      CantidadProducto : '',
       ProdNombre: '',
       Cliente: '',
       Observacion : '',
@@ -343,6 +344,66 @@ export class AsignarProductosFacturasComponent implements OnInit {
     });
   }
 
+  // Funcion que va a mostrar por la cantidad deseada
+  mostrarRollosPorCantidad(){
+    this.rollos = [];
+    this.cantTotalProducto = 0;
+    this.presentacionProducto = '';
+    let id : number = this.FormConsultarProductos.value.IdProducto;
+    this.dtEntradaRollo.srvConsultarProducto(id).subscribe(datos_rollos => {
+      let rollosExistentes : any [] = [];
+      for (let i = 0; i < datos_rollos.length; i++) {
+        if (datos_rollos[i].estado_Id == 19) {
+          this.check = true;
+          let info : any = {
+            Id : datos_rollos[i].rollo_Id,
+            IdProducto : datos_rollos[i].prod_Id,
+            Producto : datos_rollos[i].prod_Nombre,
+            Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
+            Presentacion : datos_rollos[i].undMed_Rollo,
+            checkbox : this.check,
+            suma : false,
+          }
+          this.rollos.push(info);
+          rollosExistentes.push(datos_rollos[i].rollo_Id);
+          this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+          this.cantTotalProducto += datos_rollos[i].dtEntRolloProd_Cantidad;
+          this.presentacionProducto = datos_rollos[i].undMed_Rollo;
+          this.FormConsultarProductos.setValue({
+            Factura : this.FormConsultarProductos.value.Factura,
+            NotaCredito : this.FormConsultarProductos.value.NotaCredito,
+            IdProducto : this.FormConsultarProductos.value.IdProducto,
+            CantidadProducto : this.FormConsultarProductos.value.CantidadProducto,
+            ProdNombre: datos_rollos[i].prod_Nombre,
+            Cliente: this.FormConsultarProductos.value.Cliente,
+            Observacion : this.FormConsultarProductos.value.Observacion,
+          });
+          this.validarInputNombresProductos = false;
+        }
+      }
+    });
+    setTimeout(() => {
+      let cantidadPedida : number = this.FormConsultarProductos.value.CantidadProducto;
+      let sumaCantidad : number = 0;
+      this.cantTotalProducto = 0;
+      for (let i = 0; i < this.rollos.length; i++) {
+        if (sumaCantidad == cantidadPedida) break;
+        else if (sumaCantidad >= cantidadPedida) break;
+        else if (sumaCantidad < cantidadPedida) {
+          sumaCantidad += this.rollos[i].Cantidad;
+          this.rollos[i].suma = true;
+          this.cantTotalProducto += this.rollos[i].Cantidad;
+          this.presentacionProducto = this.rollos[i].Presentacion;
+        }
+      }
+      setTimeout(() => {
+        let nuevo : any = this.rollos.filter((item) => item.suma === true);
+        this.rollos = [];
+        this.rollos = nuevo;
+      }, 10);
+    }, 50);
+  }
+
   // Funcion que va a cargra los rollos disponibles de un producto
   mostrarRollos(item){
     this.rollos = [];
@@ -389,6 +450,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
             Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
             Presentacion : datos_rollos[i].undMed_Rollo,
             checkbox : this.check,
+            suma : false,
           }
           this.rollos.push(info);
           rollosExistentes.push(datos_rollos[i].rollo_Id);
@@ -399,6 +461,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
             Factura : this.FormConsultarProductos.value.Factura,
             NotaCredito : this.FormConsultarProductos.value.NotaCredito,
             IdProducto : this.FormConsultarProductos.value.IdProducto,
+            CantidadProducto : this.FormConsultarProductos.value.CantidadProducto,
             ProdNombre: datos_rollos[i].prod_Nombre,
             Cliente: this.FormConsultarProductos.value.Cliente,
             Observacion : this.FormConsultarProductos.value.Observacion,
