@@ -131,3 +131,22 @@ a {
 .autoCompleteConductor {
   width: 50%;
 }
+
+.tabla1{
+  display: flex;
+}
+
+.tablaInicial{
+  margin-top: -5%;
+}
+
+.totalProd{
+  margin-top: -5%;
+  margin-bottom: -2%;
+}
+
+.scroll {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+ }

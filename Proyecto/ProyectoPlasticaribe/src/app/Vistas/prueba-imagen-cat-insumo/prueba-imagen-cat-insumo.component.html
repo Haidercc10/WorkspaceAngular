@@ -1,102 +1,21 @@
-<!--Navegador parte superior -->
-<div class="contain">
-  <nav class="navbar navbar-expand-lg ">
-    <div class="container-fluid">
-      <p class="titulo">Plasti<span>caribe S.A.S</span></p>
+<input type="number" [(ngModel)]="cantPage">
+
+<div class="table-responsive">
+  <table class="table table-bordered table-hover mt-2">
+    <thead class="TitulosTabla">
+      <tr>
+        <th id="CodigoFactura" scope="col"> cant</th>
+      </tr>
+      </thead>
+    <tbody>
+      <tr *ngFor="let doc of ArrayDocumento | paginate: {itemsPerPage: cantPage, currentPage: page} let i=index">
+        <td id="CodigoFactura" >{{doc}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="mb-2">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <pagination-controls (pageChange)="page = $event"></pagination-controls>
     </div>
-  </nav>
-<!-- Navegador fin de parte superior -->
-<div class="container-fluid">
-  <!-- principal -->
-  <div class="mb-4 Titulo">
-      <!--<h2 class="tituloRojo">Productos</h2>-->
   </div>
-  <div class="mb-5">
-      <hr class="colorLinea">
-  </div>
-  <div class="mb-4">
-      <!--<h4 class="tituloRojo">Crear/Consultar Productos</h4>-->
-  </div>
-
-  <div class="container">
-
-  <!-- FORMULARIO DE PRODUCTOS -->
-  <form [formGroup]="formularioCatInsumo" (ngSubmit)="cargarArchivos()">
-      <!-- Inicio fila 1 de campos -->
-      <div class="mb-4">
-          <div class="row g-3">
-              <!-- Imagen -->
-              <div class="col-md">
-                <input formControlName="catImagen" type="file" (change)="onSelectFile($event)" accept="image/*" class="form-control form-control-sm" data-bs-toggle="modal" data-bs-target="#exampleModal" required>
-                  <!--<img style="height: 100%;" [src]="Url" alt="">--> <!---->
-              </div>
-          </div>
-      </div>
-
-      <!-- Botones para agregar productos -->
-      <div class="mb-3">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit">Agregar</button>
-              <button type="button" (click)="download()">Descargar</button>
-              <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" expand="full" (click)="clear()">Limpiar campos</button>
-          </div>
-      </div>
-  </form>
-
-      <div class="mb-5">
-          <hr class="colorLinea">
-      </div>
-      <div class="mb-4">
-          <!--<h4 class="tituloRojo">Listado de Productos</h4>-->
-      </div>
-      <!-- Tabla donde se mostrarán los producto existentes -->
-      <div class="mb-4">
-          <div class="row g-3">
-
-              <div class="table-responsive">
-                <table class="table table-bordered table-hover mt-2" >
-                  <thead class="TitulosTabla">
-                      <tr *ngFor="let columnas of titulosTabla let i = index">
-                        <th scope="col" class="idProducto">{{columnas.cNombre}}</th>
-                        <th id="nombre" scope="col">{{columnas.cDescripcion}}</th>
-                        <th id="Descripcion" scope="col" class="">{{columnas.cImagen}}</th>
-                      </tr>
-                  </thead>
-                    <tbody>
-                      <!-- <tr *ngFor="let infoCatInsumos of ArrayCatgInsumos;">
-                        <th id="nombre" class="pt-3-half TextosInfoTabla" contenteditable="true">{{infoCatInsumos.catgNombre}}</th>
-                        <td id="Descripcion" class="pt-3-half TextosInfoTabla" contenteditable="true">{{infoCatInsumos.catgDescripcion}}</td>
-                        <td id="Imagen" class="pt-3-half TextosInfoTabla">{{infoCatInsumos.catgImagen}}</td>
-                      </tr> -->
-                    </tbody>
-                </table>
-              </div>
-
-          </div>
-      </div>
-
-      <!-- <div class="mb-3">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit" (click)="enviarArchivo()">Crear Categoria</button>
-        </div>
-    </div> -->
-
-      <div  class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content">
-          <!--<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
-           <!-- <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel2">Previsualización</h5>
-            </div>-->
-            <div *ngIf="Url" class="modal-body">
-              <!--Carga componente crear Proveedor-->
-                  <img style="width: 100%;" [src]="Url" alt="">
-            </div>
-         </div>
-        </div>
-      </div>
-
 </div>
-</div>
-</div>
-

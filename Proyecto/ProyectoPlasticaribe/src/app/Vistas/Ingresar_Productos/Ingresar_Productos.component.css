@@ -123,3 +123,18 @@ a {
 .ng-autocomplete ::ng-deep .autocomplete-container {
   box-shadow: none;
 }
+
+.btn-consultar, .btn-limpiarForm {
+  padding-top: 1%;
+}
+
+@media (max-width: 991px) {
+  .btn-consultar, .btn-limpiarForm {
+    width: 100%;
+    align-items: center;
+  }
+
+  .btn{
+    width: 100%;
+  }
+}

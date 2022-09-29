@@ -50,7 +50,9 @@ export class AsignarProductosFacturasComponent implements OnInit {
   validarInputClientes : any = true; /** Variable para validar input producto */
   arrayClientes=[]; /** Array que guardará los clientes en el select input */
   arrayConductor =[];  /** Array que guardará los conductores en el select input */
-
+  public page : number;
+  cantPage : number;
+  windowScrolled : any;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
@@ -124,6 +126,12 @@ export class AsignarProductosFacturasComponent implements OnInit {
     if (!e.isTrusted) this.validarInputClientes = false;
     else this.validarInputClientes = true;
     // do something when input is focused
+  }
+
+  //Funcion que hará que la pagina baje
+  scrollToTop(){
+    let screen = window.screen.height;
+    window.scrollBy(0, screen);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -402,6 +410,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         this.rollos = nuevo;
       }, 10);
     }, 50);
+    setTimeout(() => { this.cantPage = this.rollos.length; }, 200);
   }
 
   // Funcion que va a cargra los rollos disponibles de un producto
@@ -430,6 +439,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         }
       }
     });
+    setTimeout(() => { this.cantPage = this.rollos.length; }, 200);
   }
 
   // Funcion que permitirá buscar los rollos por el id del producto
@@ -470,6 +480,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         }
       }
     });
+    setTimeout(() => { this.cantPage = this.rollos.length; }, 200);
   }
 
   // Funcion que permitirá ver el total de lo escogido para cada producto
