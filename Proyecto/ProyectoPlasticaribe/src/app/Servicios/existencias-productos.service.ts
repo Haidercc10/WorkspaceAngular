@@ -26,6 +26,10 @@ export class ExistenciasProductosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProducto/${id}`)
   }
 
+  srvObtenerListaPorIdProducto2(id : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProductoPBDDXCodigoArticuloZeus/${id}`)
+  }
+
   srvObtenerListaPorIdProductoPresentacion(id : any, presentacion : any):Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProductoPresentacion/${id}/${presentacion}`)
   }

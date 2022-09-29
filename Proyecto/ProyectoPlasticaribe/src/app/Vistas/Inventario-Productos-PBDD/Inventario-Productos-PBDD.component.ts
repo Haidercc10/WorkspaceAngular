@@ -36,13 +36,16 @@ export class InventarioProductosPBDDComponent implements OnInit {
   public NombreCliente = '';
   numeroIdProd : number = 0;
   totalProductos : number = 0;
+  PrecioPT : number = 0;
+  public FormCantUtilizada !: FormGroup;
 
   constructor(private existenciasZeus : InventarioZeusService,
                 private clienteOtItems : BagproService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private rolService : RolesService,
                       private existencias_ProductosService : ExistenciasProductosService,
-                        private frmBuilder : FormBuilder,) {
+                        private frmBuilder : FormBuilder,
+                         private frmBuilder2 : FormBuilder ) {
 
     this.FormExistencias = this.frmBuilder.group({
       cantMinima : [0],
@@ -50,6 +53,12 @@ export class InventarioProductosPBDDComponent implements OnInit {
       filtroFechas : [''],
       filtroProducto : ['']
     });
+
+    this.FormCantUtilizada = this.frmBuilder2.group({
+
+      CantUtilizada : [ ]
+    });
+
     this.load = true;
   }
 
@@ -218,7 +227,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
     this.existencias_ProductosService.srvObtenerInventarioExistencias().subscribe(registrosIPT => {
       for (let index = 0; index < registrosIPT.length; index++) {
-        if(registrosIPT[index].exProd_Cantidad >= 1.00) {
+
           const dataInventario : any = {
             Item : registrosIPT[index].prod_Id,
             NombreItem : registrosIPT[index].prod_Nombre,
@@ -235,7 +244,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
           this.ArrayProductosBDNueva.sort((a,b) => Number(b.Stock <= b.CantMinima) - Number(a.Stock <= a.CantMinima));
           this.totalProductos += registrosIPT[index].exProd_Cantidad * registrosIPT[index].exProd_PrecioVenta;
         }
-      }
+
     });
     setTimeout(() => {
       this.load = true;
@@ -255,6 +264,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   //
   actualizarCantMinima(){
     let cantidad : number = this.FormExistencias.value.cantMinima;
+    let cantidad2 : number = this.FormCantUtilizada.value.CantUtilizada;
 
     this.existencias_ProductosService.srvObtenerListaPorIdProducto(this.numeroIdProd).subscribe(datos_existencias => {
       for (let i = 0; i < datos_existencias.length; i++) {
@@ -270,13 +280,14 @@ export class InventarioProductosPBDDComponent implements OnInit {
           ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
           TpMoneda_Id: datos_existencias[i].tpMoneda_Id,
           exProd_PrecioVenta : datos_existencias[i].exProd_PrecioVenta,
-          ExProd_CantMinima : cantidad,
+          ExProd_CantMinima : cantidad2,
         }
 
         this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
           this.InventarioExistenciaBDNueva();
 
         });
+        this.FormCantUtilizada.reset();
       }
     });
   }

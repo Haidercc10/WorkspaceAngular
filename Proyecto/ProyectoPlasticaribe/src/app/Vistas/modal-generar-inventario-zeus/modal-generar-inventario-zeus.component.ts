@@ -182,12 +182,21 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           let row = worksheet.addRow(d);
           let qty = row.getCell(5);
           let qty9 = row.getCell(9);
+          let stock = row.getCell(6);
           let color = 'ADD8E6';
+          let color2 = 'FFFFFF'
           if (+qty.value < +qty9) color = 'FF837B';
           qty.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: color }
+          }
+
+          if (+stock.value < +qty) color2 = 'FF837B';
+          stock.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: color2 }
           }
           row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
           row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
@@ -227,7 +236,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         this.clienteOtItems.srvObtenerItemsBagproXClienteItem(this.datosCodigo).subscribe(datosCLOTI => {
           for (let cl = 0; cl < datosCLOTI.length; cl++) {
             if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
-              this.existencias_ProductosService.srvObtenerListaPorIdProducto(datosCLOTI[cl].clienteItems).subscribe(datos_existenciasProd => {
+              this.existencias_ProductosService.srvObtenerListaPorIdProducto2(datosCLOTI[cl].clienteItems).subscribe(datos_existenciasProd => {
                 for (let i = 0; i < datos_existenciasProd.length; i++) {
 
                   const datosInventario: any = {

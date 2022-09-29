@@ -31,22 +31,22 @@
         <!--Fila 2 de campos -->
         <form [formGroup]="FormExistencias" id="FormExistencias">
           <div class="mb-3">
-            <div class="row g-3">
+            <div class="row g-3" style="margin-right: auto; margin-left: auto;">
 
-
+              <!--
               <div class="">
                 <h5 class="tituloRojo">Filtro de búsqueda</h5>
-              </div>
+              </div> -->
 
               <div class="form-floating col-md-4">
                 <input type="text" name="NombrePT" formControlName="filtroProducto" [(ngModel)]="NombrePT" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
                 <label for="floatingInput">Nombre Producto</label>
               </div>
 
-
+              <!--
               <div class="">
                 <h5 class="tituloRojo">Actualizar Cant. Minima</h5>
-              </div>
+              </div> -->
 
               <label *ngIf="numeroIdProd != 0">Item seleccionado: <b>{{numeroIdProd}}</b></label>
               <div class="form-floating col-md-3">
@@ -113,7 +113,7 @@
                   <ng-container *ngIf="mostrarColumna">
                     <th id="ultimaModificacion" scope="col" >Ult. Modificación</th>
                   </ng-container>
-
+                  <th id="Subtotal" scope="col">Cant. Utilizada</th>
                 </tr>
               </thead>
               <tbody>
@@ -138,6 +138,8 @@
                   <ng-container *ngIf="prodBDNueva.fechaModificacion != ''">
                     <td id="CantMinima" style="background-color: rgb(255, 146, 146);" class="TextosInfoTabla">{{prodBDNueva.fechaModificacion}}</td>
                   </ng-container>
+                  <td (click)="seleccionarProducto(prodBDNueva)"> <form [formGroup]="FormCantUtilizada"> <input type="number" formControlName="CantUtilizada" style="border: none;" (keyup.enter)="actualizarCantMinima()"></form></td>
+
                 </tr>
               </tbody>
             </table>
