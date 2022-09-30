@@ -55,7 +55,6 @@ export class InventarioProductosPBDDComponent implements OnInit {
     });
 
     this.FormCantUtilizada = this.frmBuilder2.group({
-
       CantUtilizada : [ ]
     });
 
@@ -67,6 +66,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
     this.ColumnasTabla();
     this.fecha();
     this.InventarioExistenciaBDNueva();
+
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido

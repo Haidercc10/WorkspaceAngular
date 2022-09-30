@@ -12,31 +12,33 @@
     </div>
     <div class="container">
       <!-- Inicio fila 1 de campos -->
-      <!--Fila 2 de campos -->
-      <form [formGroup]="FormExistencias" id="FormExistencias">
-        <div class="mb-3">
-          <div class="row g-3" style="margin-right: auto; margin-left: auto;">
 
-            <!--
-            <div class="">
-              <h5 class="tituloRojo">Filtro de búsqueda</h5>
-            </div> -->
+        <form [formGroup]="FormExistencias" id="FormExistencias">
+          <div class="mb-3">
+            <div class="row g-3" style="margin-right: auto; margin-left: auto;">
 
-            <div class="form-floating col-md-4">
-              <input type="text" name="NombrePT" formControlName="filtroProducto" [(ngModel)]="NombrePT" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
-              <label for="floatingInput">Nombre Producto</label>
-            </div>
+              <!--
+              <div class="">
+                <h5 class="tituloRojo">Filtro de búsqueda</h5>
+              </div> -->
 
-            <!--
-            <div class="">
-              <h5 class="tituloRojo">Actualizar Cant. Minima</h5>
-            </div> -->
+              <div class="form-floating col-md-4">
+                <input type="text" name="NombrePT" formControlName="filtroProducto" [(ngModel)]="NombrePT" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
+                <label for="floatingInput">Nombre Producto</label>
+              </div>
 
-            <label *ngIf="numeroIdProd != 0">Item seleccionado: <b>{{numeroIdProd}}</b></label>
-            <div class="form-floating col-md-3">
-              <input type="number" formControlName="cantMinima" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="actualizarCantMinima()">
-              <label for="floatingInput">Cantidad Minima Item</label>
-            </div>
+              <!--
+              <div class="">
+                <h5 class="tituloRojo">Actualizar Cant. Minima</h5>
+              </div> -->
+              <!--
+              <label *ngIf="numeroIdProd != 0">Item seleccionado: <b>{{numeroIdProd}}</b></label>
+              <div class="form-floating col-md-3">
+                <input type="number" formControlName="cantMinima" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="actualizarCantMinima()">
+                <label for="floatingInput">Cantidad Minima Item</label>
+              </div>
+              -->
+
 
 
             <div class="form-floating col-md-1">
@@ -53,14 +55,13 @@
               <label for="floatingInput">Filtro</label>
             </div>
 
-
-            <div class="mb-3">
-              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarCantMinima()">Actualizar</button>
-                <button class="btn btn-danger btn-danger-sm" type="button" (click)="exportarExcel()">Exportar Excel</button>
-                <button class="btn btn-danger btn-danger-sm" type="button" (click)="buscarPrecios()">Ult. Actualización</button>
+              <div class="mb-3">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                 <!-- <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarCantMinima()">Actualizar</button> -->
+                  <button class="btn btn-danger btn-danger-sm" type="button" (click)="exportarExcel()">Exportar Excel</button>
+                  <button class="btn btn-danger btn-danger-sm" type="button" (click)="buscarPrecios()">Ult. Actualización</button>
+                </div>
               </div>
-            </div>
 
             <div style="text-align: right;">
               <label><b>Total ${{totalProductos | number : '1.2-2'}}</b></label>
@@ -76,55 +77,55 @@
         </div>
       </div>
 
-      <div *ngIf="load">
-        <div class="mb-4">
-          <div class="row g-3">
-            <div class="table-responsive">
-              <table class="table table-bordered table-hover mt-2">
-                <thead class="TitulosTabla">
-                  <tr *ngFor="let columnas of titulosTabla let i = index">
-                    <th scope="col" class="idProducto">{{columnas.invItem}}</th>
-                    <!--<th id="Cliente" scope="col" (dblclick)="organizarCliente_A_Z()" (click)="organizarCliente_Z_A()">{{columnas.invCliente}}</th>-->
-                    <th id="nombre" scope="col" (dblclick)="organizarProducto_A_Z()" (click)="organizarProducto_Z_A()">{{columnas.invNombre}}</th>
-                    <th id="precio" scope="col">{{columnas.invPrecio}}</th>
-                    <th id="existencias" scope="col"><button class="existencias" (dblclick)="organizarExistenciasDobleClick()" (click)="organizarExistenciasUnClick()"><b>{{columnas.invStock}}</b></button></th>
-                    <th id="presentacion" scope="col">{{columnas.presentacion}}</th>
-                    <th id="Subtotal" scope="col">{{columnas.invSubtotal}}</th>
-                    <th id="cantMinima" (click)="organizarCantMinima()" scope="col" >Cant. Minima</th><!--  -->
-                    <ng-container *ngIf="mostrarColumna">
-                      <th id="ultimaModificacion" scope="col" >Ult. Modificación</th>
-                    </ng-container>
-                    <th id="Subtotal" scope="col">Cant. Utilizada</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let prodBDNueva of ArrayProductosBDNueva | BuscarInventarioXProducto: NombrePT let i=index">
-                    <th id="id" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.Item}}</th>
-                    <!--<td id="cliente" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.ClienteNombre}}</td>-->
-                    <td id="Nombre" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.NombreItem}}</td>
-                    <td id="precio" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.PrecioItem | number : '1.2-2'}}</td>
+    <div *ngIf="load">
+      <div class="mb-4">
+        <div class="row g-3">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover mt-2">
+              <thead class="TitulosTabla">
+                <tr *ngFor="let columnas of titulosTabla let i = index">
+                  <th scope="col" class="idProducto">{{columnas.invItem}}</th>
+                  <!--<th id="Cliente" scope="col" (dblclick)="organizarCliente_A_Z()" (click)="organizarCliente_Z_A()">{{columnas.invCliente}}</th>-->
+                  <th id="nombre" scope="col" (dblclick)="organizarProducto_A_Z()" (click)="organizarProducto_Z_A()">{{columnas.invNombre}}</th>
+                  <th id="precio" scope="col">{{columnas.invPrecio}}</th>
+                  <th id="existencias" scope="col"><button class="existencias" (dblclick)="organizarExistenciasDobleClick()" (click)="organizarExistenciasUnClick()"><b>{{columnas.invStock}}</b></button></th>
+                  <th id="presentacion" scope="col">{{columnas.presentacion}}</th>
+                  <th id="Subtotal" scope="col">{{columnas.invSubtotal}}</th>
+                  <th id="cantMinima" (click)="organizarCantMinima()" scope="col" >Cant. Minima</th><!--  -->
+                  <ng-container *ngIf="mostrarColumna">
+                    <th id="ultimaModificacion" scope="col" >Ult. Modificación</th>
+                  </ng-container>
+                  <th id="Subtotal" scope="col">Actualizar Cant. Minima</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let prodBDNueva of ArrayProductosBDNueva | BuscarInventarioXProducto: NombrePT let i=index">
+                  <th id="id" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.Item}}</th>
+                  <!--<td id="cliente" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.ClienteNombre}}</td>-->
+                  <td id="Nombre" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.NombreItem}}</td>
+                  <td id="precio" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.PrecioItem | number : '1.2-2'}}</td>
 
-                    <ng-container *ngIf="prodBDNueva.Stock <= prodBDNueva.CantMinima">
-                    <th id="existencias" style="background-color: rgb(255, 146, 146);" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.Stock | number : '1.2-2'}}</th>
-                    </ng-container>
+                  <ng-container *ngIf="prodBDNueva.Stock <= prodBDNueva.CantMinima">
+                   <th id="existencias" style="background-color: rgb(255, 146, 146);" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.Stock | number : '1.2-2'}}</th>
+                  </ng-container>
 
-                    <ng-container *ngIf="prodBDNueva.Stock > prodBDNueva.CantMinima">
-                      <td id="existencias" class="TextosInfoTabla2" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.Stock | number : '1.2-2'}}</td>
-                    </ng-container>
+                  <ng-container *ngIf="prodBDNueva.Stock > prodBDNueva.CantMinima">
+                    <td id="existencias" class="TextosInfoTabla2" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.Stock | number : '1.2-2'}}</td>
+                  </ng-container>
 
-                    <td id="presentacion" scope="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.Presentacion}}</td>
-                    <td id="subtotal" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.Subtotal | number : '1.2-2'}}</td>
-                    <td id="CantMinima" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.CantMinima | number : '1.2-2'}}</td>
+                  <td id="presentacion" scope="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.Presentacion}}</td>
+                  <td id="subtotal" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.Subtotal | number : '1.2-2'}}</td>
+                  <td id="CantMinima" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.CantMinima | number : '1.2-2'}}</td>
 
-                    <ng-container *ngIf="prodBDNueva.fechaModificacion != ''">
-                      <td id="CantMinima" style="background-color: rgb(255, 146, 146);" class="TextosInfoTabla">{{prodBDNueva.fechaModificacion}}</td>
-                    </ng-container>
-                    <td (click)="seleccionarProducto(prodBDNueva)"> <form [formGroup]="FormCantUtilizada"> <input type="number" formControlName="CantUtilizada" style="border: none;" (keyup.enter)="actualizarCantMinima()"></form></td>
+                  <ng-container *ngIf="prodBDNueva.fechaModificacion != ''">
+                    <td id="CantMinima" style="background-color: rgb(255, 146, 146);" class="TextosInfoTabla">{{prodBDNueva.fechaModificacion}}</td>
+                  </ng-container>
+                  <td (click)="seleccionarProducto(prodBDNueva)"> <form [formGroup]="FormCantUtilizada"> <input type="number" class="form-control form-control-sm" formControlName="CantUtilizada" style="border: none;" (keyup.enter)="actualizarCantMinima()"></form></td>
 
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                </tr>
+              </tbody>
+            </table>
+
           </div>
         </div>
       </div>
