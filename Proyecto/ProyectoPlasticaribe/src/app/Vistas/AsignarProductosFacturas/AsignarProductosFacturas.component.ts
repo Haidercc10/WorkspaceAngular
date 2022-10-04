@@ -685,8 +685,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
               Prod_CantPaquetesRestantes : datos_rollos[j].Prod_CantPaquetesRestante,
               Prod_CantBolsasPaquete : datos_rollos[j].Prod_CantBolsasPaquete,
               Prod_CantBolsasBulto : datos_rollos[j].Prod_CantBolsasBulto,
-              Prod_CantBolsasRestates : datos_rollos[j].Prod_CantBolsasRestates,
-              Prod_CantBolsasFacturadas : datos_rollos[j].Prod_CantBolsasFacturadas,
+              Prod_CantBolsasRestates : (datos_rollos[j].prod_CantBolsasRestates - this.rollosInsertar[i].CantUndRestantes),
+              Prod_CantBolsasFacturadas : (this.rollosInsertar[i].CantUndRestantes + datos_rollos[j].prod_CantBolsasFacturadas),
             }
             this.dtEntradaRollo.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
           }

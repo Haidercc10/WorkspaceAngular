@@ -2322,7 +2322,7 @@ export class Ingresar_ProductosComponent implements OnInit {
               Prod_CantPaquetesRestantes : this.rollosInsertar[i].Cantidad,
               Prod_CantBolsasPaquete : item.prod_CantBolsasPaquete,
               Prod_CantBolsasBulto : item.prod_CantBolsasBulto,
-              Prod_CantBolsasRestates : 0,
+              Prod_CantBolsasRestates : this.rollosInsertar[i].Cantidad,
               Prod_CantBolsasFacturadas : 0,
             }
             this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => {
