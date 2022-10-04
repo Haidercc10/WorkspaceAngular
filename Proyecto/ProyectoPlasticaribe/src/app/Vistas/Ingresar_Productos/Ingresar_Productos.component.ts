@@ -2282,15 +2282,6 @@ export class Ingresar_ProductosComponent implements OnInit {
               Prod_CantBolsasFacturadas : 0,
             }
             this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => {
-              this.cliProdService.srvObtenerListaPorNombreCli(this.rollosInsertar[i].Cliente, parseInt(this.rollosInsertar[i].IdProducto.trim())).subscribe(datos_cliPro => {
-                if (datos_cliPro.length == 0) {
-                  let cliPro : any = {
-                    cli_Id : parseInt(this.rollosInsertar[i].IdCliente.trim()),
-                    prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
-                  }
-                  this.cliProdService.srvGuardar(cliPro).subscribe(datos_cliProSave => {})
-                }
-              });
             }, error => {
               const Toast = Swal.mixin({
                 toast: true,
@@ -2326,15 +2317,6 @@ export class Ingresar_ProductosComponent implements OnInit {
               Prod_CantBolsasFacturadas : 0,
             }
             this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => {
-              this.cliProdService.srvObtenerListaPorNombreCli(this.rollosInsertar[i].Cliente, parseInt(this.rollosInsertar[i].IdProducto.trim())).subscribe(datos_cliPro => {
-                if (datos_cliPro.length == 0) {
-                  let cliPro : any = {
-                    cli_Id : parseInt(this.rollosInsertar[i].IdCliente.trim()),
-                    prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
-                  }
-                  this.cliProdService.srvGuardar(cliPro).subscribe(datos_cliProSave => {})
-                }
-              });
             }, error => {
               const Toast = Swal.mixin({
                 toast: true,
@@ -2357,36 +2339,17 @@ export class Ingresar_ProductosComponent implements OnInit {
         }
       });
     }
-    if (this.rollosInsertar.length > 100) {
-      setTimeout(() => {
-        this.InventarioProductos();
-        this.buscarRolloPDF(idEntrada);
-      }, 7000);
-    } else if (this.rollosInsertar.length > 70) {
-      setTimeout(() => {
-        this.InventarioProductos();
-        this.buscarRolloPDF(idEntrada);
-      }, 6000);
-    } else if (this.rollosInsertar.length > 50) {
-      setTimeout(() => {
-        this.InventarioProductos();
-        this.buscarRolloPDF(idEntrada);
-      }, 5000);
-    } else if (this.rollosInsertar.length > 20) {
-      setTimeout(() => {
-        this.InventarioProductos();
-        this.buscarRolloPDF(idEntrada);
-      }, 4000);
-    } else {
-      setTimeout(() => {
-        this.InventarioProductos();
-        this.buscarRolloPDF(idEntrada);
-      }, 3000);
-    }
+    if (this.rollosInsertar.length > 500) setTimeout(() => { this.InventarioProductos(idEntrada); }, 60000);
+    else if (this.rollosInsertar.length > 400) setTimeout(() => { this.InventarioProductos(idEntrada); }, 30000);
+    else if (this.rollosInsertar.length > 300) setTimeout(() => { this.InventarioProductos(idEntrada); }, 20000);
+    else if (this.rollosInsertar.length > 200) setTimeout(() => { this.InventarioProductos(idEntrada); }, 15000);
+    else if (this.rollosInsertar.length > 100) setTimeout(() => { this.InventarioProductos(idEntrada); }, 10000);
+    else if (this.rollosInsertar.length > 50) setTimeout(() => { this.InventarioProductos(idEntrada); }, 5000);
+    else setTimeout(() => { this.InventarioProductos(idEntrada); }, 3000);
   }
 
   // Funcion para mover el inventario de los productos
-  InventarioProductos(){
+  InventarioProductos(idEntrada : any){
     for (let i = 0; i < this.grupoProductos.length; i++) {
       this.ExistenciasProdService.srvObtenerListaPorIdProductoPresentacion(this.grupoProductos[i].Id, this.grupoProductos[i].Presentacion).subscribe(datos_productos => {
         for (let j = 0; j < datos_productos.length; j++) {
@@ -2422,6 +2385,8 @@ export class Ingresar_ProductosComponent implements OnInit {
         }
       });
     }
+    if (this.grupoProductos.length > 10) setTimeout(() => { this.buscarRolloPDF(idEntrada); }, 3000);
+    else setTimeout(() => { this.buscarRolloPDF(idEntrada); }, 1000);
   }
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
@@ -2534,9 +2499,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           }
           const pdf = pdfMake.createPdf(pdfDefinicion);
           pdf.open();
-          this.rollosAsignados = [];
-          this.rollosInsertar = [];
-          this.limpiarCampos();
+          setTimeout(() => { (this.limpiarCampos()); }, 4000);
           break;
         }
         break;

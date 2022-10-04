@@ -667,7 +667,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         this.cargando = true;
       });
     }
-    if (this.rollosInsertar.length > 20) {
+    if (this.rollosInsertar.length > 500) {
       setTimeout(() => {
         const Toast = Swal.mixin({
           toast: true,
@@ -685,7 +685,102 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
           title: '¡Pre Entrada de Rollos registrada con exito!'
         });
         this.buscarRolloPDF(idEntrada);
-      }, 7000);
+      }, 60000);
+    }  else if (this.rollosInsertar.length > 400) {
+      setTimeout(() => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'success',
+          title: '¡Pre Entrada de Rollos registrada con exito!'
+        });
+        this.buscarRolloPDF(idEntrada);
+      }, 30000);
+    } else if (this.rollosInsertar.length > 300) {
+      setTimeout(() => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'success',
+          title: '¡Pre Entrada de Rollos registrada con exito!'
+        });
+        this.buscarRolloPDF(idEntrada);
+      }, 20000);
+    } else if (this.rollosInsertar.length > 200) {
+      setTimeout(() => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'success',
+          title: '¡Pre Entrada de Rollos registrada con exito!'
+        });
+        this.buscarRolloPDF(idEntrada);
+      }, 15000);
+    } else if (this.rollosInsertar.length > 100) {
+      setTimeout(() => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'success',
+          title: '¡Pre Entrada de Rollos registrada con exito!'
+        });
+        this.buscarRolloPDF(idEntrada);
+      }, 10000);
+    } else if (this.rollosInsertar.length > 50) {
+      setTimeout(() => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'success',
+          title: '¡Pre Entrada de Rollos registrada con exito!'
+        });
+        this.buscarRolloPDF(idEntrada);
+      }, 5000);
     } else {
       setTimeout(() => {
         const Toast = Swal.mixin({
@@ -704,7 +799,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
           title: '¡Pre Entrada de Rollos registrada con exito!'
         });
         this.buscarRolloPDF(idEntrada);
-      }, 2500);
+      }, 3000);
     }
   }
 

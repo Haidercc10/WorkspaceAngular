@@ -13,6 +13,7 @@ import { ProductoService } from 'src/app/Servicios/producto.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
+import moment from 'moment';
 
 @Component({
   selector: 'app-AsignarProductosFacturas',
@@ -577,6 +578,9 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   // Funcion para subir los detalles de la asignacion, es decir, cada rollo que se asignó a la factura
   crearDetallesAsignacion(asignacion : number){
+    // let inicio : any = moment().format('h:mm:ss:ms');
+    // let fin : any;
+    // let diferenciaFecha : any;
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       let info : any = {
         AsigProdFV_Id : asignacion,
@@ -586,7 +590,13 @@ export class AsignarProductosFacturasComponent implements OnInit {
         Rollo_Id : this.rollosInsertar[i].Id,
         Prod_CantidadUnidades : this.rollosInsertar[i].CantUndRestantes,
       }
-      this.dtAsgProdFactura.srvGuardar(info).subscribe(datos_dtAsignacion => { }, error => {
+      this.dtAsgProdFactura.srvGuardar(info).subscribe(datos_dtAsignacion => {
+        // fin = moment().format('h:mm:ss:ms');
+        // console.log(inicio)
+        // console.log(fin)
+        // diferenciaFecha = inicio.diff(fin, 'millisecond');
+        // console.log(diferenciaFecha)
+      }, error => {
         const Toast = Swal.mixin({
           toast: true,
           position: 'center',
@@ -605,27 +615,15 @@ export class AsignarProductosFacturasComponent implements OnInit {
         this.cargando = true;
       });
     }
-    if (this.rollosInsertar.length > 100) {
-      setTimeout(() => {
-        this.cambiarEstado();;
-      }, 7000);
-    } else if (this.rollosInsertar.length > 80) {
-      setTimeout(() => {
-        this.cambiarEstado();;
-      }, 6000);
-    } else if (this.rollosInsertar.length > 50) {
-      setTimeout(() => {
-        this.cambiarEstado();;
-      }, 5000);
-    } else if (this.rollosInsertar.length > 20) {
-      setTimeout(() => {
-        this.cambiarEstado();;
-      }, 4000);
-    } else {
-      setTimeout(() => {
-        this.cambiarEstado();;
-      }, 3000);
-    }
+    // setTimeout(() => { this.cambiarEstado(); }, (diferenciaFecha * this.rollosInsertar.length));
+    setTimeout(() => { this.cambiarEstado(); }, 5000);
+  //  if (this.rollosInsertar.length > 500) setTimeout(() => { this.cambiarEstado(); }, 60000);
+  //  else if (this.rollosInsertar.length > 400) setTimeout(() => { this.cambiarEstado(); }, 30000);
+  //  else if (this.rollosInsertar.length > 300) setTimeout(() => { this.cambiarEstado(); }, 20000);
+  //  else if (this.rollosInsertar.length > 200) setTimeout(() => { this.cambiarEstado(); }, 15000);
+  //  else if (this.rollosInsertar.length > 100) setTimeout(() => { this.cambiarEstado(); }, 10000);
+  //  else if (this.rollosInsertar.length > 50) setTimeout(() => { this.cambiarEstado(); }, 5000);
+  //  else setTimeout(() => { this.cambiarEstado(); }, 3000);
   }
 
   // Funcion que va a cambiar el estado de los rollos que estan siendo asignados a una factura
@@ -693,7 +691,14 @@ export class AsignarProductosFacturasComponent implements OnInit {
         }
       });
     }
-    setTimeout(() => { this.moverInventarioProductos(); }, 5500);
+    if (this.rollosInsertar.length > 500) setTimeout(() => { this.moverInventarioProductos(); }, 60000);
+    else if (this.rollosInsertar.length > 400) setTimeout(() => { this.moverInventarioProductos(); }, 30000);
+    else if (this.rollosInsertar.length > 300) setTimeout(() => { this.moverInventarioProductos(); }, 20000);
+    else if (this.rollosInsertar.length > 200) setTimeout(() => { this.moverInventarioProductos(); }, 15000);
+    else if (this.rollosInsertar.length > 100) setTimeout(() => { this.moverInventarioProductos(); }, 10000);
+    else if (this.rollosInsertar.length > 50) setTimeout(() => { this.moverInventarioProductos(); }, 5000);
+    else setTimeout(() => { this.cambiarEstado(); }, 3000);
+    // setTimeout(() => { this.moverInventarioProductos(); }, 4000);
   }
 
   // Funcion que va a mover el inventario de los productos
@@ -874,7 +879,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
           }
           const pdf = pdfMake.createPdf(pdfDefinicion);
           pdf.open();
-          this.limpiarCampos();
+          setTimeout(() => { (this.limpiarCampos()); }, 4000);
           break;
         }
         break;
