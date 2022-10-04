@@ -7,4 +7,9 @@ export interface modelDtEntradaRollos {
   EntRolloProd_OT : number;
   Prod_Id : number;
   UndMed_Prod : string;
+  Prod_CantPaquetesRestantes : number;
+  Prod_CantBolsasPaquete : number;
+  Prod_CantBolsasBulto : number;
+  Prod_CantBolsasRestates : number;
+  Prod_CantBolsasFacturadas : number;
 }

@@ -294,8 +294,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   obtenerCategorias(){
     this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => {
       for (let i = 0; i < datos_categorias.length; i++) {
-        if (this.ValidarRol == 3 && datos_categorias[i].catMP_Id == 6) continue;
-        else this.categorias.push(datos_categorias[i]);
+        this.categorias.push(datos_categorias[i]);
       }
     });
   }
@@ -318,7 +317,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion para obtener el bopp existente
   obtenerBOPP(){
-    if (this.ValidarRol == 1 || this.ValidarRol == 4) {
+    if (this.ValidarRol == 1 || this.ValidarRol == 3) {
       this.boppService.srvObtenerLista().subscribe(datos_bopp => {
         for (let i = 0; i < datos_bopp.length; i++) {
           const bopp : any = {
@@ -1425,7 +1424,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             });
           }
 
-          if (this.ValidarRol == 1 || this.ValidarRol == 4){
+          if (this.ValidarRol == 1 || this.ValidarRol == 3){
             this.boppService.srvObtenerLista().subscribe(datos_bopp => {
               for (let i = 0; i < datos_bopp.length; i++) {
                 if (datos_bopp[i].catMP_Id == categoria && datos_bopp[i].bopP_Id == materiaPrima) {
@@ -1715,7 +1714,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             });
           }
 
-          if (this.ValidarRol == 1 || this.ValidarRol == 4) {
+          if (this.ValidarRol == 1 || this.ValidarRol == 3) {
             this.boppService.srvObtenerLista().subscribe(datos_bopp => {
               for (let i = 0; i < datos_bopp.length; i++) {
                 if (datos_bopp[i].catMP_Id == categoria && datos_bopp[i].bopP_Id == idMateriaPrima) {
@@ -2073,7 +2072,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         });
 
         setTimeout(() => {
-          if (this.ValidarRol == 1 || this.ValidarRol == 4){
+          if (this.ValidarRol == 1 || this.ValidarRol == 3){
             this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
               this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
                 this.inventInicialDiaService.srvObtenerListaPorId(datos_materiaPrima.matPri_Id).subscribe(datos_inventarioInicial => {
@@ -2442,7 +2441,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
         }
 
-        if (this.ValidarRol == 1 || this.ValidarRol == 4){
+        if (this.ValidarRol == 1 || this.ValidarRol == 3){
           this.boppService.srvObtenerLista().subscribe(datos_bopp => {
             for (let i = 0; i < datos_bopp.length; i++) {
               if (datos_bopp[i].catMP_Id == categoria) {
@@ -2750,7 +2749,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             });
           }
 
-          if (this.ValidarRol == 1 || this.ValidarRol == 4){
+          if (this.ValidarRol == 1 || this.ValidarRol == 3){
             this.boppService.srvObtenerLista().subscribe(datos_bopp => {
               for (let i = 0; i < datos_bopp.length; i++) {
                 if (datos_bopp[i].catMP_Id == categoria && datos_bopp[i].bopP_Id == materiaPrima) {
@@ -3057,7 +3056,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
 
 
-          if (this.ValidarRol == 1 || this.ValidarRol == 4){
+          if (this.ValidarRol == 1 || this.ValidarRol == 3){
             this.boppService.srvObtenerLista().subscribe(datos_bopp => {
               for (let i = 0; i < datos_bopp.length; i++) {
                 if (datos_bopp[i].catMP_Id == categoria && datos_bopp[i].bopP_Serial == idMateriaPrima) {
@@ -3178,7 +3177,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       });
 
-      if (this.ValidarRol == 1 || this.ValidarRol == 4){
+      if (this.ValidarRol == 1 || this.ValidarRol == 3){
         this.boppService.srvObtenerListaPorFechas(fecha, fechaFinal).subscribe(datos_bopp => {
           for (let i = 0; i < datos_bopp.length; i++) {
             if (datos_bopp[i].catMP_Id == categoria) {
@@ -3333,7 +3332,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
 
         // BOPP
-        if (this.ValidarRol == 1 || this.ValidarRol == 4){
+        if (this.ValidarRol == 1 || this.ValidarRol == 3){
           this.boppService.srvObtenerLista().subscribe(datos_bopp => {
             for (let i = 0; i < datos_bopp.length; i++) {
               this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
@@ -3638,7 +3637,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           });
         }
 
-        if (this.ValidarRol == 1 || this.ValidarRol == 4){
+        if (this.ValidarRol == 1 || this.ValidarRol == 3){
           this.boppService.srvObtenerLista().subscribe(datos_bopp => {
             for (let i = 0; i < datos_bopp.length; i++) {
               if (datos_bopp[i].catMP_Id == categoria) {
@@ -4010,7 +4009,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           });
         }
 
-        if (this.ValidarRol == 1 || this.ValidarRol == 4){
+        if (this.ValidarRol == 1 || this.ValidarRol == 3){
           this.boppService.srvObtenerLista().subscribe(datos_bopp => {
             for (let i = 0; i < datos_bopp.length; i++) {
               if (datos_bopp[i].catMP_Id == categoria) {

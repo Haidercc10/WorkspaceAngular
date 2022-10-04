@@ -102,6 +102,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
     this.rollosInsertar = [];
     this.rollosAsignados = [];
     this.Productos = [];
+    this.grupoProductos = [];
     this.cargando = true;
     this.Total = 0;
     // window.location.href = "./factura-rollos-productos";
@@ -386,12 +387,33 @@ export class RollosAsignadasFacturaComponent implements OnInit {
           }
         });
       }
-      setTimeout(() => {
-        this.cambiarEstadoRollosNoVerificados();
-        this.buscarRolloPDF();
-      }, 200);
+      if (this.rollosInsertar.length > 100) {
+        setTimeout(() => {
+          this.cambiarEstadoRollosNoVerificados();
+          this.buscarRolloPDF();
+        }, 7000);
+      } else if (this.rollosInsertar.length > 70) {
+        setTimeout(() => {
+          this.cambiarEstadoRollosNoVerificados();
+          this.buscarRolloPDF();
+        }, 6000);
+      } else if (this.rollosInsertar.length > 50) {
+        setTimeout(() => {
+          this.cambiarEstadoRollosNoVerificados();
+          this.buscarRolloPDF();
+        }, 5000);
+      } else if (this.rollosInsertar.length > 20) {
+        setTimeout(() => {
+          this.cambiarEstadoRollosNoVerificados();
+          this.buscarRolloPDF();
+        }, 4000);
+      } else {
+        setTimeout(() => {
+          this.cambiarEstadoRollosNoVerificados();
+          this.buscarRolloPDF();
+        }, 3000);
+      }
     } else Swal.fire("¡Debe cargar minimo un rollo en la tabla!");
-    setTimeout(() => { this.limpiarCampos(); }, 3000);
   }
 
   // Funcion que cambiará el estado de los rollos a enviados
@@ -585,6 +607,8 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   // Funcion que traerá los rollos que fueron asignados a la factura creada
   buscarRolloPDF(){
     this.Total = 0;
+    this.Productos = [];
+    this.rollosAsignados = [];
     let factura : string = this.FormConsultarFactura.value.Fact_Id;
     this.dtAsgProdFactura.srvObtenerListaParaPDF(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {

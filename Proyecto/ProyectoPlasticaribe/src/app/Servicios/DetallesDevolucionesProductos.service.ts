@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI } from 'src/polyfills';
+import { AppComponent} from 'src/app/app.component';
+import { rutaPlasticaribeAPI, rutaPlasticaribeAPIPrueba } from 'src/polyfills';
 import { modelDtProductoDevuelto } from '../Modelo/modelDtProductoDevuelto';
 
 @Injectable({
@@ -9,10 +11,15 @@ import { modelDtProductoDevuelto } from '../Modelo/modelDtProductoDevuelto';
 })
 export class DetallesDevolucionesProductosService {
 
-  readonly rutaPlasticaribeAPI =  rutaPlasticaribeAPI; /*"https://localhost:7137/api"*/;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
-  constructor(private http: HttpClient) { }
+  constructor(private http : HttpClient,
+    @Inject(SESSION_STORAGE) private storage: WebStorageService) {
+
+    // if (this.storage.get('BD') == 1) this.rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = rutaPlasticaribeAPIPrueba;
+  }
 
   srvObtenerLista() {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetalleDevolucion_ProductoFacturado');

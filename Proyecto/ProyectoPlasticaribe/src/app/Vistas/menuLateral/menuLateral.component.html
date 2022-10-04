@@ -26,7 +26,7 @@
         </li>
 
         <!-- BOPP -->
-        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
           <li>
             <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" (click)="clickIcon1()" aria-controls="collapseExample">
               <ng-container *ngIf="subir1; then thenTemplate1; else elseTemplate1"></ng-container>
@@ -39,7 +39,7 @@
               <b>BOPP</b>
             </a>
             <div class="collapse" id="collapseExample1">
-              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
                  <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/AsignacionBOPPTemporal" role="button" aria-expanded="false" aria-controls="">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
@@ -47,7 +47,7 @@
                   </a>
                 </div>
               </ng-container>
-              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
+              <ng-container *ngIf="ValidarRol == 1">
                  <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/entrada-BOPP" role="button" aria-expanded="false" aria-controls="">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
@@ -377,7 +377,7 @@
                     </ng-template>
                     Movimientos
                   </a>
-                  <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 4">
+                  <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
                     <div class="mb-2 subSangria">
                       <a class="fst-normal" data-bs-toggle="" href="/movimientos-bopp" role="button" aria-expanded="false" aria-controls="">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>

@@ -9,6 +9,7 @@ import { DtPreEntregaRollosService } from 'src/app/Servicios/DtPreEntregaRollos.
 import { EntradaRollosService } from 'src/app/Servicios/EntradaRollos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
 import { PreEntregaRollosService } from 'src/app/Servicios/PreEntregaRollos.service';
+import { ProductoService } from 'src/app/Servicios/producto.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import Swal from 'sweetalert2';
 
@@ -46,7 +47,8 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
                         private entradaRolloService : EntradaRollosService,
                           private dtEntradaRollosService : DetallesEntradaRollosService,
                             private dtPreEntRollosService : DtPreEntregaRollosService,
-                              private preEntRollosService : PreEntregaRollosService,) {
+                              private preEntRollosService : PreEntregaRollosService,
+                                private productosService : ProductoService) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -107,8 +109,8 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
   limpiarCampos(){
     this.FormConsultarRollos.setValue({
       OT_Id: null,
-      fechaDoc : this.today,
-      fechaFinalDoc: this.today,
+      fechaDoc : null,
+      fechaFinalDoc: null,
       Observacion : '',
       Proceso : null,
     });
@@ -326,43 +328,51 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
           for (let i = 0; i < datos_ot.length; i++) {
             this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
               if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EXTRUSION') {
-                if (!RollosConsultados.includes(datos_ot[i].item)){
-                  if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-                  if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
-                  if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
-                  if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
-                  if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
-                  if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
-                  if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-                  if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-                  if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
-                  let info : any = {
-                    Ot : datos_ot[i].ot,
-                    Id : datos_ot[i].item,
-                    IdCliente : datos_ot[i].identNro,
-                    Cliente : datos_ot[i].nombreComercial,
-                    IdProducto : datos_ot[i].clienteItem,
-                    Producto : datos_ot[i].clienteItemNombre,
-                    Cantidad : datos_ot[i].extnetokg,
-                    Presentacion : datos_ot[i].unidad,
-                    Estatus : datos_ot[i].nomStatus,
-                    Proceso : proceso,
+                this.productosService.srvObtenerListaPorId(parseInt(datos_ot[i].clienteItem.trim())).subscribe(datos_Producto => {
+                  let productos : any = [];
+                  productos.push(datos_Producto);
+                  for (const item of productos) {
+                    if (!RollosConsultados.includes(datos_ot[i].item)){
+                      if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                      if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
+                      if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
+                      if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
+                      if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
+                      if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
+                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
+                      if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
+                      if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
+                      let info : any = {
+                        Ot : datos_ot[i].ot,
+                        Id : datos_ot[i].item,
+                        IdCliente : datos_ot[i].identNro,
+                        Cliente : datos_ot[i].nombreComercial,
+                        IdProducto : datos_ot[i].clienteItem,
+                        Producto : datos_ot[i].clienteItemNombre,
+                        Cantidad : datos_ot[i].extnetokg,
+                        CantUnidadesPq : item.prod_CantBolsasPaquete,
+                        CantUnidadesBt : item.prod_CantBolsasBulto,
+                        Presentacion : datos_ot[i].unidad,
+                        Estatus : datos_ot[i].nomStatus,
+                        Proceso : proceso,
+                      }
+                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                      otTemporral = datos_ot[i].ot;
+                      this.rollos.push(info);
+                      RollosConsultados.push(datos_ot[i].item);
+                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+                      this.FormConsultarRollos.setValue({
+                        OT_Id: ot,
+                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+                        Observacion : this.FormConsultarRollos.value.Observacion,
+                        Proceso : this.FormConsultarRollos.value.Proceso,
+                      });
+                    }
                   }
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                  this.FormConsultarRollos.setValue({
-                    OT_Id: ot,
-                    fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                    fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                    Observacion : this.FormConsultarRollos.value.Observacion,
-                    Proceso : this.FormConsultarRollos.value.Proceso,
-                  });
-                }
+                });
               }
             });
           }
@@ -484,7 +494,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
       this.rollosInsertar.push(info);
       this.validarRollo.push(item.Id);
     }
-    setTimeout(() => { this.rollos = []; }, 2000);
+    setTimeout(() => { this.rollos = []; }, 500);
     setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
@@ -657,24 +667,45 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         this.cargando = true;
       });
     }
-    setTimeout(() => {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: '¡Pre Entrada de Rollos registrada con exito!'
-      });
-      this.buscarRolloPDF(idEntrada);
-    }, 1200);
+    if (this.rollosInsertar.length > 20) {
+      setTimeout(() => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'success',
+          title: '¡Pre Entrada de Rollos registrada con exito!'
+        });
+        this.buscarRolloPDF(idEntrada);
+      }, 7000);
+    } else {
+      setTimeout(() => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'success',
+          title: '¡Pre Entrada de Rollos registrada con exito!'
+        });
+        this.buscarRolloPDF(idEntrada);
+      }, 2500);
+    }
   }
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
@@ -788,7 +819,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
 
               this.table(this.rollosAsignados, ['OT', 'Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
-                text: `\nCant. Total: ${this.formatonumeros(this.Total)}\n`,
+                text: `\nCant. Total: ${this.formatonumeros(this.Total.toFixed(2))}\n`,
                 alignment: 'right',
                 style: 'header',
               },
@@ -830,6 +861,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         }
         this.Total += datos_factura[i].dtlPreEntRollo_Cantidad;
         this.rollosAsignados.push(info);
+        this.rollosAsignados.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
     });
     setTimeout(() => { this.crearPDF(id); }, 1200);

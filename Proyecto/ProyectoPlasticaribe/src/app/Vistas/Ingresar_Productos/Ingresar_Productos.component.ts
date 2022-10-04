@@ -1,5 +1,6 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { table } from 'console';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
@@ -7,6 +8,7 @@ import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.se
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 import { EntradaRollosService } from 'src/app/Servicios/EntradaRollos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
+import { ProductoService } from 'src/app/Servicios/producto.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import Swal from 'sweetalert2';
 
@@ -48,7 +50,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                       private ExistenciasProdService : ExistenciasProductosService,
                         private entradaRolloService : EntradaRollosService,
                           private dtEntradaRollosService : DetallesEntradaRollosService,
-                            private cliProdService : ClientesProductosService,) {
+                            private cliProdService : ClientesProductosService,
+                              private productosService : ProductoService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -2050,6 +2053,7 @@ export class Ingresar_ProductosComponent implements OnInit {
       }
       this.rollosInsertar.push(info);
       this.validarRollo.push(item.Id);
+      this.Total += item.Cantidad;
     } else {
       if (!this.validarRollo.includes(item.Id)) {
         let info : any = {
@@ -2066,6 +2070,7 @@ export class Ingresar_ProductosComponent implements OnInit {
         }
         this.rollosInsertar.push(info);
         this.validarRollo.push(item.Id);
+        this.Total += item.Cantidad;
       } else if (this.validarRollo.includes(item.Id)) {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
           if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
@@ -2083,6 +2088,7 @@ export class Ingresar_ProductosComponent implements OnInit {
 
   // Funcion que va a seleccionar todo lo que hay en la tabla
   selccionarTodo(){
+    this.Total = 0;
     for (const item of this.rollos) {
       if (!item.exits) {
         let info : any = {
@@ -2099,6 +2105,7 @@ export class Ingresar_ProductosComponent implements OnInit {
         }
         this.rollosInsertar.push(info);
         this.validarRollo.push(item.Id);
+        this.Total += item.Cantidad;
       }
     }
     setTimeout(() => {
@@ -2128,6 +2135,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           }
           this.rollosInsertar.push(info);
           this.validarRollo.push(this.rollos[i].Id);
+          this.Total += this.rollos[i].Cantidad;
         }
       }
     }
@@ -2153,6 +2161,7 @@ export class Ingresar_ProductosComponent implements OnInit {
         Proceso : item.Proceso,
       }
       this.rollos.push(info);
+      this.Total -= item.Cantidad;
     }
     setTimeout(() => {
       this.rollosInsertar = [];
@@ -2176,6 +2185,7 @@ export class Ingresar_ProductosComponent implements OnInit {
       Proceso : item.Proceso,
     }
     this.rollos.push(info);
+    this.Total -= item.Cantidad;
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
     }
@@ -2251,49 +2261,128 @@ export class Ingresar_ProductosComponent implements OnInit {
   // Funcion par ingresar los rollos
   ingresarRollos(idEntrada : number){
     for (let i = 0; i < this.rollosInsertar.length; i++) {
-      let info : any = {
-        EntRolloProd_Id : idEntrada,
-        Rollo_Id : this.rollosInsertar[i].Id,
-        DtEntRolloProd_Cantidad : this.rollosInsertar[i].Cantidad,
-        UndMed_Rollo : this.rollosInsertar[i].Presentacion,
-        Estado_Id : 19,
-        DtEntRolloProd_OT : parseInt(this.rollosInsertar[i].Ot),
-        Prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
-        UndMed_Prod : this.rollosInsertar[i].Presentacion,
-      }
-      this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => {
-        this.cliProdService.srvObtenerListaPorNombreCli(this.rollosInsertar[i].Cliente, parseInt(this.rollosInsertar[i].IdProducto.trim())).subscribe(datos_cliPro => {
-          if (datos_cliPro.length == 0) {
-            let cliPro : any = {
-              cli_Id : parseInt(this.rollosInsertar[i].IdCliente.trim()),
-              prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
+      this.productosService.srvObtenerListaPorId(parseInt(this.rollosInsertar[i].IdProducto.trim())).subscribe(datos_producto => {
+        let productos : any = [];
+        productos.push(datos_producto);
+        for (const item of productos) {
+          if(this.rollosInsertar[i].Presentacion == 'Paquete') {
+            let info : any = {
+              EntRolloProd_Id : idEntrada,
+              Rollo_Id : this.rollosInsertar[i].Id,
+              DtEntRolloProd_Cantidad : this.rollosInsertar[i].Cantidad,
+              UndMed_Rollo : this.rollosInsertar[i].Presentacion,
+              Estado_Id : 19,
+              DtEntRolloProd_OT : parseInt(this.rollosInsertar[i].Ot),
+              Prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
+              UndMed_Prod : this.rollosInsertar[i].Presentacion,
+              Prod_CantPaquetesRestantes : this.rollosInsertar[i].Cantidad,
+              Prod_CantBolsasPaquete : item.prod_CantBolsasPaquete,
+              Prod_CantBolsasBulto : item.prod_CantBolsasBulto,
+              Prod_CantBolsasRestates : (this.rollosInsertar[i].Cantidad * item.prod_CantBolsasPaquete),
+              Prod_CantBolsasFacturadas : 0,
             }
-            this.cliProdService.srvGuardar(cliPro).subscribe(datos_cliProSave => {})
+            this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => {
+              this.cliProdService.srvObtenerListaPorNombreCli(this.rollosInsertar[i].Cliente, parseInt(this.rollosInsertar[i].IdProducto.trim())).subscribe(datos_cliPro => {
+                if (datos_cliPro.length == 0) {
+                  let cliPro : any = {
+                    cli_Id : parseInt(this.rollosInsertar[i].IdCliente.trim()),
+                    prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
+                  }
+                  this.cliProdService.srvGuardar(cliPro).subscribe(datos_cliProSave => {})
+                }
+              });
+            }, error => {
+              const Toast = Swal.mixin({
+                toast: true,
+                position: 'center',
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                  toast.addEventListener('mouseenter', Swal.stopTimer)
+                  toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+              });
+              Toast.fire({
+                icon: 'error',
+                title: '¡Error al ingresar los rollos!'
+              });
+              this.cargando = true;
+            });
+          } else {
+            let info : any = {
+              EntRolloProd_Id : idEntrada,
+              Rollo_Id : this.rollosInsertar[i].Id,
+              DtEntRolloProd_Cantidad : this.rollosInsertar[i].Cantidad,
+              UndMed_Rollo : this.rollosInsertar[i].Presentacion,
+              Estado_Id : 19,
+              DtEntRolloProd_OT : parseInt(this.rollosInsertar[i].Ot),
+              Prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
+              UndMed_Prod : this.rollosInsertar[i].Presentacion,
+              Prod_CantPaquetesRestantes : this.rollosInsertar[i].Cantidad,
+              Prod_CantBolsasPaquete : item.prod_CantBolsasPaquete,
+              Prod_CantBolsasBulto : item.prod_CantBolsasBulto,
+              Prod_CantBolsasRestates : 0,
+              Prod_CantBolsasFacturadas : 0,
+            }
+            this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => {
+              this.cliProdService.srvObtenerListaPorNombreCli(this.rollosInsertar[i].Cliente, parseInt(this.rollosInsertar[i].IdProducto.trim())).subscribe(datos_cliPro => {
+                if (datos_cliPro.length == 0) {
+                  let cliPro : any = {
+                    cli_Id : parseInt(this.rollosInsertar[i].IdCliente.trim()),
+                    prod_Id : parseInt(this.rollosInsertar[i].IdProducto.trim()),
+                  }
+                  this.cliProdService.srvGuardar(cliPro).subscribe(datos_cliProSave => {})
+                }
+              });
+            }, error => {
+              const Toast = Swal.mixin({
+                toast: true,
+                position: 'center',
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                  toast.addEventListener('mouseenter', Swal.stopTimer)
+                  toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+              });
+              Toast.fire({
+                icon: 'error',
+                title: '¡Error al ingresar los rollos!'
+              });
+              this.cargando = true;
+            });
           }
-        });
-      }, error => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'error',
-          title: '¡Error al ingresar los rollos!'
-        });
-        this.cargando = true;
+        }
       });
     }
-    setTimeout(() => {
-      this.InventarioProductos();
-      this.buscarRolloPDF(idEntrada);
-    }, 1500);
+    if (this.rollosInsertar.length > 100) {
+      setTimeout(() => {
+        this.InventarioProductos();
+        this.buscarRolloPDF(idEntrada);
+      }, 7000);
+    } else if (this.rollosInsertar.length > 70) {
+      setTimeout(() => {
+        this.InventarioProductos();
+        this.buscarRolloPDF(idEntrada);
+      }, 6000);
+    } else if (this.rollosInsertar.length > 50) {
+      setTimeout(() => {
+        this.InventarioProductos();
+        this.buscarRolloPDF(idEntrada);
+      }, 5000);
+    } else if (this.rollosInsertar.length > 20) {
+      setTimeout(() => {
+        this.InventarioProductos();
+        this.buscarRolloPDF(idEntrada);
+      }, 4000);
+    } else {
+      setTimeout(() => {
+        this.InventarioProductos();
+        this.buscarRolloPDF(idEntrada);
+      }, 3000);
+    }
   }
 
   // Funcion para mover el inventario de los productos
@@ -2467,8 +2556,8 @@ export class Ingresar_ProductosComponent implements OnInit {
           Cantidad : this.formatonumeros(datos_factura[i].dtEntRolloProd_Cantidad),
           Presentacion : datos_factura[i].undMed_Rollo,
         }
-        this.Total += datos_factura[i].dtEntRolloProd_Cantidad;
         this.rollosAsignados.push(info);
+        this.rollosAsignados.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
     });
     setTimeout(() => { this.crearPDF(id); }, 1200);

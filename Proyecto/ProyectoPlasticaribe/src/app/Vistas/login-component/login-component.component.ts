@@ -1,10 +1,12 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import { EmpresaService } from 'src/app/Servicios/empresa.service';
 import Swal from 'sweetalert2';
 import { CookieService } from 'ngx-cookie-service';
 import {SESSION_STORAGE, WebStorageService} from 'ngx-webstorage-service';
+import {rutaPlasticaribeAPI} from 'src/polyfills'
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -40,7 +42,6 @@ export class LoginComponentComponent implements OnInit {
     this.cargaDatosComboBox();
    }
 
-
   saveInLocal(key, val): void {
     this.storage.set(key, val);
     this.data[key]= this.storage.get(key);
@@ -72,6 +73,8 @@ export class LoginComponentComponent implements OnInit {
     // FUNCION QUE CONSULTA LOS DATOS EN LA BASE DE DATOS
     try {
       let empresa : string = this.formularioUsuario.value.Empresa;
+      this.saveInLocal('BD', 1);
+
       this.usuarioServices.srvObtenerListaPorId(this.formularioUsuario.value.Identificacion).subscribe(datos_usuarios=>{
         this.empresaServices.srvObtenerLista().subscribe(datos_empresa => {
           for (let index = 0; index < datos_empresa.length; index++) {

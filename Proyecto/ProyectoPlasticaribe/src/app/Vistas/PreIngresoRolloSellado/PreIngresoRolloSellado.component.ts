@@ -840,7 +840,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
       this.rollosInsertar.push(info);
       this.validarRollo.push(item.Id);
     }
-    setTimeout(() => { this.rollos = []; }, 2000);
+    setTimeout(() => { this.rollos = []; }, 500);
     setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
@@ -1011,24 +1011,45 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         this.cargando = true;
       });
     }
-    setTimeout(() => {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: '¡Pre Entrada de Rollos registrada con exito!'
-      });
-      this.buscarRolloPDF(idEntrada);
-    }, 1200);
+    if (this.rollosInsertar.length > 20) {
+      setTimeout(() => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'success',
+          title: '¡Pre Entrada de Rollos registrada con exito!'
+        });
+        this.buscarRolloPDF(idEntrada);
+      }, 7000);
+    } else {
+      setTimeout(() => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'success',
+          title: '¡Pre Entrada de Rollos registrada con exito!'
+        });
+        this.buscarRolloPDF(idEntrada);
+      }, 2500);
+    }
   }
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
@@ -1142,7 +1163,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
 
               this.table(this.rollosAsignados, ['OT', 'Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
-                text: `\nCant. Total: ${this.formatonumeros(this.Total)}\n`,
+                text: `\nCant. Total: ${this.formatonumeros(this.Total.toFixed(2))}\n`,
                 alignment: 'right',
                 style: 'header',
               },
@@ -1184,6 +1205,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         }
         this.Total += datos_factura[i].dtlPreEntRollo_Cantidad;
         this.rollosAsignados.push(info);
+        this.rollosAsignados.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
     });
     setTimeout(() => { this.crearPDF(id); }, 1200);

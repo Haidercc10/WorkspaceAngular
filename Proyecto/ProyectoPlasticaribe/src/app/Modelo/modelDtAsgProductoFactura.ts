@@ -4,4 +4,5 @@ export interface modelDtAsgProductoFactura {
   DtAsigProdFV_Cantidad : number;
   UndMed_Id : string;
   Rollo_Id : number;
+  Prod_CantidadUnidades : number;
 }

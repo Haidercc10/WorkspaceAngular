@@ -18,9 +18,10 @@
   </div>
 </div>
 
-<button class="scroll btn btn-ligth btn-ligth-sm" (click)="scrollToTop()">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 30px; padding-bottom: 50%">
-    <path d="M182.6 470.6c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-9.2-9.2-11.9-22.9-6.9-34.9s16.6-19.8 29.6-19.8H288c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-128 128z"/>
+<!-- Boton que llevrá hacia abajo+ -->
+<button class="scroll btn btn-ligth btn-ligth-sm" (click)="scrollToTop()" title="Bajar">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="width: 30px; padding-bottom: 10%">
+    <path d="M246.6 470.6c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L224 402.7 361.4 265.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3l-160 160zm160-352l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L224 210.7 361.4 73.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3z"/>
   </svg>
 </button>
 
@@ -170,6 +171,7 @@
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentacion</th>
+                  <th scope="col"> Und x Paquete</th>
 
                   <ng-container>
                     <th scope="col"><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>
@@ -181,16 +183,10 @@
                   <th>{{item.Id}}</th>
                   <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
-                  <td>{{item.Cantidad | number}}</td>
+                  <td>{{item.CantPaqRestantes | number}}</td>
                   <td>{{item.Presentacion}}</td>
-
-                  <ng-container *ngIf="item.checkbox">
-                    <td><input class="form-check-input cursor" id="checkbox" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td>
-                  </ng-container>
-
-                  <ng-container *ngIf="!item.checkbox">
-                    <td><input class="form-check-input" id="checkbox" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)" checked></td>
-                  </ng-container>
+                  <td>{{item.CantUndRestantes}}</td>
+                  <td><input class="form-check-input cursor" id="checkbox" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td>
                 </tr>
               </tbody>
             </table>
@@ -225,6 +221,8 @@
                   <th scope="col">ID Producto</th>
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
+                  <th scope="col">Und x Paquete</th>
+                  <th scope="col">Editar Cantidad</th>
                   <th scope="col">Presentación</th>
                   <ng-container>
                     <th scope="col"><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
@@ -236,7 +234,13 @@
                   <th>{{item.Id}}</th>
                   <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
-                  <td>{{item.Cantidad | number}}</td>
+                  <td>{{item.CantPaqRestantes | number}}</td>
+                  <td>{{item.CantUndRestantes | number}} Und</td>
+                  <td>
+                    <form [formGroup]="FormEditCant">
+                      <input formControlName="Cantidad" (keyup.Enter)="cambiarCantidadUnidades(item)" type="number" class="form-control form-control-sm" style="border: none; width: 100%;">
+                    </form>
+                  </td>
                   <td>{{item.Presentacion}}</td>
                   <td><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarRollo(item)"></i></a></td>
                 </tr>
@@ -266,6 +270,7 @@
                   <th scope="col">Cantidad</th>
                   <th scope="col">N° Rollos</th>
                   <th scope="col">Presentación</th>
+                  <th scope="col">Cantidad Unidades</th>
                 </tr>
               </thead>
               <tbody>
@@ -275,6 +280,7 @@
                   <td>{{item.Cantidad}}</td>
                   <td>{{item.Rollos}}</td>
                   <td>{{item.Presentacion}}</td>
+                  <td>{{item.Cant_Unidades}} Und</td>
                 </tr>
               </tbody>
             </table>
@@ -289,7 +295,7 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="crearAsignacion()">Facturar Rollos</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="crearAsignacion()" id="bajar">Facturar Rollos</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>

@@ -1,8 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribeAPI } from 'src/polyfills';
+import { AppComponent} from 'src/app/app.component';
 import { modelFacturaMp } from '../Modelo/modelFacturaMp';
+import { rutaPlasticaribeAPI, rutaPlasticaribeAPIPrueba } from 'src/polyfills';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +14,12 @@ export class SrvRemisionesFacturasComprasService {
   readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
-    constructor(private http : HttpClient) { }
+  constructor(private http : HttpClient,
+    @Inject(SESSION_STORAGE) private storage: WebStorageService) {
+
+    // if (this.storage.get('BD') == 1) this.rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = rutaPlasticaribeAPIPrueba;
+  }
 
   //Metodo buscar lista de facturas y remisiones en remisiones_facturascompras.
     srvObtenerLista():Observable<any[]> {

@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Observable } from 'rxjs';
-import { rutaPlasticaribe3, rutaPlasticaribeAPI } from 'src/polyfills';
+import { AppComponent} from 'src/app/app.component';
+import { rutaPlasticaribeAPI, rutaPlasticaribeAPIPrueba } from 'src/polyfills';
 import { modelDetallesAsignacionBopp } from '../Modelo/modelDetallesAsignacionBopp';
 
 @Injectable( { providedIn: 'root' } )
@@ -10,7 +12,14 @@ export class DetalleAsignacion_BOPPService {
 
   readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
-  constructor(private http : HttpClient) { }
+  //Encapsular httpclient en el constructor
+  constructor(private http : HttpClient,
+    @Inject(SESSION_STORAGE) private storage: WebStorageService) {
+
+    // if (this.storage.get('BD') == 1) this.rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = rutaPlasticaribeAPIPrueba;
+  }
+
 
   //Metodo buscar lista
   srvObtenerLista():Observable<any[]> {

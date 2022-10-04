@@ -1,11 +1,14 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { RolesService } from './Servicios/roles.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
+})
+
+@Injectable({
+  providedIn: 'root'
 })
 
 export class AppComponent implements OnInit{
@@ -15,10 +18,12 @@ export class AppComponent implements OnInit{
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  storage_Bd : number; //Variable que va a almacenar el identificador de la base de datos que se está utilizando
   rutaCarpetaArchivos : string = 'C:\\Calidad\\'; //Variable que va a almacenar la ruta principal en la que se almacenarán los archivos de la aplicacion
+  rutaPlasticaribeAPI : string = "http://192.168.0.85:9085/api"; //Ruta al servidor de la base de datos nueva
+  public data:any=[];
 
-  constructor (@Inject(SESSION_STORAGE) private storage: WebStorageService,
-                private rolService : RolesService,) { }
+  constructor (@Inject(SESSION_STORAGE) private storage: WebStorageService) { }
 
   ngOnInit(): void {
     this.inactividad();
@@ -30,14 +35,8 @@ export class AppComponent implements OnInit{
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
     let rol = this.storage.get('Rol');
-    this.rolService.srvObtenerLista().subscribe(datos_roles => {
-      for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
-          this.ValidarRol = rol;
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }
-      }
-    });
+    this.storage_Bd = this.storage.get('BD');
+    this.saveInLocal('Ruta', rol);
   }
 
   //Funcio para verificar la inactividad de un usuario, cuando pasa mas de 30 minutos sin actividad se cierra la sesion
@@ -67,5 +66,10 @@ export class AppComponent implements OnInit{
       // 1 minuto son 60000 millisegundos
       // 30 minutos son 1800000 milisegundos
     }
+  }
+
+  saveInLocal(key, val): void {
+    this.storage.set(key, val);
+    this.data[key]= this.storage.get(key);
   }
 }

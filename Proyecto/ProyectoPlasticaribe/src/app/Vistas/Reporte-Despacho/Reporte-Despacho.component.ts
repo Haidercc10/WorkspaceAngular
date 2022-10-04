@@ -786,7 +786,7 @@ export class ReporteDespachoComponent implements OnInit {
           Producto : datos_factura[i].prod_Id,
           Nombre : datos_factura[i].prod_Nombre,
           Cantidad : this.formatonumeros(datos_factura[i].dtEntRolloProd_Cantidad),
-          Presentacion : datos_factura[i].undMed_Id,
+          Presentacion : datos_factura[i].undMed_Rollo,
         }
         this.rollosAsignados.push(info);
       }
