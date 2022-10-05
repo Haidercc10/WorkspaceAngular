@@ -228,6 +228,23 @@ export class EntradaBOPPComponent implements OnInit {
             Fecha : this.today,
             Observacion : '',
           });
+        }, error => {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'center',
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer)
+              toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+          });
+          Toast.fire({
+            icon: 'error',
+            title: '¡Error al ingresar el BOPP!'
+          });
+          this.load = true;
         });
       }
     }

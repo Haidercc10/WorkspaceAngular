@@ -1,8 +1,14 @@
 <app-menuLateral></app-menuLateral>
 
-<div class="overlay" *ngIf="!cargando">
+<!-- <div class="overlay" *ngIf="!cargando">
   <div class="spinner ">
     <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+  </div>
+</div> -->
+
+<div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
   </div>
 </div>
 
@@ -79,8 +85,26 @@
         <hr class="Linea">
       </div>
       <!-- Inicio titulo tabla producto -->
-      <div class="mb-4">
-        <h4 class="tituloRojo">Tabla de Rollos</h4>
+      <div class="mb-4 tabla1">
+        <h4 class="tituloRojo" style="width: 58%;">Tabla de Rollos</h4>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-right: 5%;">
+          <div class="form-floating col-md">
+            <input type="number" class="form-control form-control-sm" id="floatingInput"[(ngModel)]="rollosIngresados" readonly>
+            <label for="floatingInput">Rollos ingresados</label>
+          </div>
+        </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-right: 5%;">
+          <div class="form-floating col-md">
+            <input type="number" class="form-control form-control-sm" id="floatingInput"[(ngModel)]="rollosSinIngresar" readonly>
+            <label for="floatingInput">Rollos No ingresados</label>
+          </div>
+        </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <div class="form-floating col-md">
+            <input type="number" class="form-control form-control-sm" id="floatingInput"[(ngModel)]="cantPage">
+            <label for="floatingInput">N° Filas</label>
+          </div>
+        </div>
       </div>
 
       <!--Inicio tabla Rollos creados en OT -->
@@ -94,6 +118,7 @@
                   <th scope="col">ID Rollo</th>
                   <th scope="col">ID Producto</th>
                   <th scope="col">Producto</th>
+                  <th scope="col">Fecha Ingreso</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentacion</th>
                   <th scope="col">Proceso</th>
@@ -105,7 +130,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let item of rollos; let i=index">
+                <tr *ngFor="let item of rollos | paginate: {itemsPerPage: cantPage, currentPage: page} let i=index">
                   <ng-container *ngIf="item.exits; then thenTemplate; else elseTemplate"></ng-container>
 
                   <ng-template #thenTemplate>
@@ -113,6 +138,7 @@
                     <th style="background-color: rgb(255, 146, 146);">{{item.Id}}</th>
                     <td style="background-color: rgb(255, 146, 146);">{{item.IdProducto}}</td>
                     <td style="background-color: rgb(255, 146, 146);">{{item.Producto}}</td>
+                    <td style="background-color: rgb(255, 146, 146);">{{item.Fecha}}</td>
                     <td style="background-color: rgb(255, 146, 146);">{{item.Cantidad | number}}</td>
                     <td style="background-color: rgb(255, 146, 146);">{{item.Presentacion}}</td>
                     <td style="background-color: rgb(255, 146, 146);">{{item.Estatus}}</td>
@@ -124,6 +150,7 @@
                     <th>{{item.Id}}</th>
                     <td>{{item.IdProducto}}</td>
                     <td>{{item.Producto}}</td>
+                    <td>{{item.Fecha}}</td>
                     <td>{{item.Cantidad | number}}</td>
                     <td>{{item.Presentacion}}</td>
                     <td>{{item.Estatus}}</td>
@@ -132,6 +159,11 @@
                 </tr>
               </tbody>
             </table>
+            <div class="mb-2">
+              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <pagination-controls (pageChange)="page = $event"></pagination-controls>
+              </div>
+            </div>
           </div>
         </div>
       </div>

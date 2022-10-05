@@ -1,5 +1,12 @@
 
+<div class="d-flex justify-content-center overlay" *ngIf="!load">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
  <!-- Inicio Contenedor total -->
+
 <div class="contain">
   <div class="container-fluid">
     <div class="container">
@@ -162,11 +169,11 @@
       </div>
 
       <!-- Gif de Carga -->
-      <div class="overlay" *ngIf="!load">
+      <!-- <div class="overlay" *ngIf="!load">
         <div class="spinner ">
           <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
         </div>
-      </div>
+      </div> -->
 
       <div *ngIf="load">
         <div class="mb-3">

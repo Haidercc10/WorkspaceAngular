@@ -1,10 +1,10 @@
 <app-menuLateral></app-menuLateral>
 
-<div class="overlay" *ngIf="!cargando">
+<!-- <div class="overlay" *ngIf="!cargando">
   <div class="spinner ">
     <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
   </div>
-</div>
+</div> -->
 
 <div class="contain" id="form">
   <!-- Navegador fin de parte superior -->
@@ -185,7 +185,7 @@
                   <td>{{item.Producto}}</td>
                   <td>{{item.CantPaqRestantes | number}}</td>
                   <td>{{item.Presentacion}}</td>
-                  <td>{{item.CantUndRestantes}}</td>
+                  <td>{{item.CantUndRestantes | number}}</td>
                   <td><input class="form-check-input cursor" id="checkbox" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td>
                 </tr>
               </tbody>
@@ -199,7 +199,7 @@
         </div>
       </div>
       <div class="d-grid gap-2 d-md-flex justify-content-md-end totalProd">
-        <label for=""><b>Total {{presentacionProducto}}: {{cantTotalProducto | number : '1.2-2'}}</b></label>
+        <label for=""><b>Total {{presentacionProducto}}(s): {{cantTotalProducto | number : '1.2-2'}}</b></label>
       </div>
 
       <div class="mb-4" *ngIf="cargando">
@@ -222,7 +222,8 @@
                   <th scope="col">Producto</th>
                   <th scope="col">Cantidad</th>
                   <th scope="col">Total Unidades</th>
-                  <th scope="col">Editar Cantidad</th>
+                  <th scope="col">Editar Paquetes</th>
+                  <th scope="col">Editar Unidades</th>
                   <th scope="col">Presentación</th>
                   <ng-container>
                     <th scope="col"><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
@@ -236,12 +237,17 @@
                   <td>{{item.Producto}}</td>
                   <td>{{item.CantPaqRestantes | number}}</td>
                   <td>{{item.CantUndRestantes | number}} Und</td>
-                  <td>
-                    <form [formGroup]="FormEditCant">
+                  <td style="width: 10%;">
+                    <form [formGroup]="FormEditPaquetes">
+                      <input *ngIf="item.Presentacion == 'Paquete'" formControlName="Cantidad" (keyup.Enter)="cambiarCantidadPaquetes(item)" type="number" class="form-control form-control-sm" style="border: none; width: 100%;">
+                    </form>
+                  </td>
+                  <td style="width: 10%;">
+                    <form [formGroup]="FormEditUnd">
                       <input formControlName="Cantidad" (keyup.Enter)="cambiarCantidadUnidades(item)" type="number" class="form-control form-control-sm" style="border: none; width: 100%;">
                     </form>
                   </td>
-                  <td>{{item.Presentacion}}</td>
+                  <th>{{item.Presentacion | uppercase}}</th>
                   <td><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarRollo(item)"></i></a></td>
                 </tr>
               </tbody>
@@ -299,6 +305,13 @@
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>
+
+      <div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+        <div class="spinner-border text-danger" role="status" style="margin: auto;">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

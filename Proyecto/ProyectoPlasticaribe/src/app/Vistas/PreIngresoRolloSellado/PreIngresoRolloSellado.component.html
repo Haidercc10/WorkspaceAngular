@@ -1,8 +1,14 @@
 <app-menuLateral></app-menuLateral>
 
-<div class="overlay" *ngIf="!cargando">
+<!-- <div class="overlay" *ngIf="!cargando">
   <div class="spinner ">
     <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+  </div>
+</div> -->
+
+<div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
   </div>
 </div>
 

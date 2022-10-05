@@ -23,7 +23,8 @@ import moment from 'moment';
 export class AsignarProductosFacturasComponent implements OnInit {
 
   public FormConsultarProductos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
-  public FormEditCant !: FormGroup;
+  public FormEditUnd !: FormGroup;
+  public FormEditPaquetes !: FormGroup;
 
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
@@ -80,7 +81,11 @@ export class AsignarProductosFacturasComponent implements OnInit {
       Observacion : [''],
     });
 
-    this.FormEditCant = this.frmBuilderPedExterno.group({
+    this.FormEditUnd = this.frmBuilderPedExterno.group({
+      Cantidad : [''],
+    });
+
+    this.FormEditPaquetes = this.frmBuilderPedExterno.group({
       Cantidad : [''],
     });
   }
@@ -386,33 +391,65 @@ export class AsignarProductosFacturasComponent implements OnInit {
       let rollosExistentes : any [] = [];
       for (let i = 0; i < datos_rollos.length; i++) {
         if (datos_rollos[i].estado_Id == 19) {
-          this.check = true;
-          let info : any = {
-            Id : datos_rollos[i].rollo_Id,
-            IdProducto : datos_rollos[i].prod_Id,
-            Producto : datos_rollos[i].prod_Nombre,
-            Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
-            Presentacion : datos_rollos[i].undMed_Rollo,
-            CantUndPaquetes : datos_rollos[i].prod_CantBolsasPaquete,
-            CantUndRestantes : datos_rollos[i].prod_CantBolsasRestates,
-            CantPaqRestantes : datos_rollos[i].prod_CantPaquetesRestantes,
-            suma : false,
+          if (datos_rollos[i].undMed_Rollo == 'Paquete') {
+            let info : any = {
+              Id : datos_rollos[i].rollo_Id,
+              IdProducto : datos_rollos[i].prod_Id,
+              Producto : datos_rollos[i].prod_Nombre,
+              Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
+              Presentacion : datos_rollos[i].undMed_Rollo,
+              CantUndPaquetes : datos_rollos[i].prod_CantBolsasPaquete,
+              CantUndRestantes : datos_rollos[i].prod_CantBolsasRestates,
+              CantPaqRestantes : datos_rollos[i].prod_CantPaquetesRestantes,
+              CantUndRestantesEnviar : datos_rollos[i].prod_CantBolsasRestates,
+              CantPaqRestantesEnviar : datos_rollos[i].prod_CantPaquetesRestantes,
+              suma : false,
+            }
+            this.rollos.push(info);
+            rollosExistentes.push(datos_rollos[i].rollo_Id);
+            this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+            this.cantTotalProducto += datos_rollos[i].dtEntRolloProd_Cantidad;
+            this.presentacionProducto = datos_rollos[i].undMed_Rollo;
+            this.FormConsultarProductos.setValue({
+              Factura : this.FormConsultarProductos.value.Factura,
+              NotaCredito : this.FormConsultarProductos.value.NotaCredito,
+              IdProducto : this.FormConsultarProductos.value.IdProducto,
+              CantidadProducto : this.FormConsultarProductos.value.CantidadProducto,
+              ProdNombre: datos_rollos[i].prod_Nombre,
+              Cliente: this.FormConsultarProductos.value.Cliente,
+              Observacion : this.FormConsultarProductos.value.Observacion,
+            });
+            this.validarInputNombresProductos = false;
+          } else {
+            let info : any = {
+              Id : datos_rollos[i].rollo_Id,
+              IdProducto : datos_rollos[i].prod_Id,
+              Producto : datos_rollos[i].prod_Nombre,
+              Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
+              Presentacion : datos_rollos[i].undMed_Rollo,
+              CantUndPaquetes : datos_rollos[i].prod_CantBolsasPaquete,
+              CantUndRestantes : datos_rollos[i].prod_CantBolsasRestates,
+              CantPaqRestantes : datos_rollos[i].prod_CantBolsasRestates,
+              CantUndRestantesEnviar : datos_rollos[i].prod_CantBolsasRestates,
+              CantPaqRestantesEnviar : datos_rollos[i].prod_CantPaquetesRestantes,
+              suma : false,
+            }
+            this.rollos.push(info);
+            rollosExistentes.push(datos_rollos[i].rollo_Id);
+            this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+            this.cantTotalProducto += datos_rollos[i].dtEntRolloProd_Cantidad;
+            this.presentacionProducto = datos_rollos[i].undMed_Rollo;
+            this.FormConsultarProductos.setValue({
+              Factura : this.FormConsultarProductos.value.Factura,
+              NotaCredito : this.FormConsultarProductos.value.NotaCredito,
+              IdProducto : this.FormConsultarProductos.value.IdProducto,
+              CantidadProducto : this.FormConsultarProductos.value.CantidadProducto,
+              ProdNombre: datos_rollos[i].prod_Nombre,
+              Cliente: this.FormConsultarProductos.value.Cliente,
+              Observacion : this.FormConsultarProductos.value.Observacion,
+            });
+            this.validarInputNombresProductos = false;
           }
-          this.rollos.push(info);
-          rollosExistentes.push(datos_rollos[i].rollo_Id);
-          this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-          this.cantTotalProducto += datos_rollos[i].dtEntRolloProd_Cantidad;
-          this.presentacionProducto = datos_rollos[i].undMed_Rollo;
-          this.FormConsultarProductos.setValue({
-            Factura : this.FormConsultarProductos.value.Factura,
-            NotaCredito : this.FormConsultarProductos.value.NotaCredito,
-            IdProducto : this.FormConsultarProductos.value.IdProducto,
-            CantidadProducto : this.FormConsultarProductos.value.CantidadProducto,
-            ProdNombre: datos_rollos[i].prod_Nombre,
-            Cliente: this.FormConsultarProductos.value.Cliente,
-            Observacion : this.FormConsultarProductos.value.Observacion,
-          });
-          this.validarInputNombresProductos = false;
         }
       }
     });
@@ -448,35 +485,65 @@ export class AsignarProductosFacturasComponent implements OnInit {
       let rollosExistentes : any [] = [];
       for (let i = 0; i < datos_rollos.length; i++) {
         if (datos_rollos[i].estado_Id == 19) {
-          this.check = true;
-          let info : any = {
-            Id : datos_rollos[i].rollo_Id,
-            IdProducto : datos_rollos[i].prod_Id,
-            Producto : datos_rollos[i].prod_Nombre,
-            Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
-            Presentacion : datos_rollos[i].undMed_Rollo,
-            CantUndPaquetes : datos_rollos[i].prod_CantBolsasPaquete,
-            CantUndRestantes : datos_rollos[i].prod_CantBolsasRestates,
-            CantPaqRestantes : datos_rollos[i].prod_CantPaquetesRestantes,
-            CantUndRestantesEnviar : datos_rollos[i].prod_CantBolsasRestates,
-            CantPaqRestantesEnviar : datos_rollos[i].prod_CantPaquetesRestantes,
-            suma : false,
+          if (datos_rollos[i].undMed_Rollo == 'Paquete') {
+            let info : any = {
+              Id : datos_rollos[i].rollo_Id,
+              IdProducto : datos_rollos[i].prod_Id,
+              Producto : datos_rollos[i].prod_Nombre,
+              Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
+              Presentacion : datos_rollos[i].undMed_Rollo,
+              CantUndPaquetes : datos_rollos[i].prod_CantBolsasPaquete,
+              CantUndRestantes : datos_rollos[i].prod_CantBolsasRestates,
+              CantPaqRestantes : datos_rollos[i].prod_CantPaquetesRestantes,
+              CantUndRestantesEnviar : datos_rollos[i].prod_CantBolsasRestates,
+              CantPaqRestantesEnviar : datos_rollos[i].prod_CantPaquetesRestantes,
+              suma : false,
+            }
+            this.rollos.push(info);
+            rollosExistentes.push(datos_rollos[i].rollo_Id);
+            this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+            this.cantTotalProducto += datos_rollos[i].dtEntRolloProd_Cantidad;
+            this.presentacionProducto = datos_rollos[i].undMed_Rollo;
+            this.FormConsultarProductos.setValue({
+              Factura : this.FormConsultarProductos.value.Factura,
+              NotaCredito : this.FormConsultarProductos.value.NotaCredito,
+              IdProducto : this.FormConsultarProductos.value.IdProducto,
+              CantidadProducto : this.FormConsultarProductos.value.CantidadProducto,
+              ProdNombre: datos_rollos[i].prod_Nombre,
+              Cliente: this.FormConsultarProductos.value.Cliente,
+              Observacion : this.FormConsultarProductos.value.Observacion,
+            });
+            this.validarInputNombresProductos = false;
+          } else {
+            let info : any = {
+              Id : datos_rollos[i].rollo_Id,
+              IdProducto : datos_rollos[i].prod_Id,
+              Producto : datos_rollos[i].prod_Nombre,
+              Cantidad : datos_rollos[i].dtEntRolloProd_Cantidad,
+              Presentacion : datos_rollos[i].undMed_Rollo,
+              CantUndPaquetes : datos_rollos[i].prod_CantBolsasPaquete,
+              CantUndRestantes : datos_rollos[i].prod_CantBolsasRestates,
+              CantPaqRestantes : datos_rollos[i].prod_CantBolsasRestates,
+              CantUndRestantesEnviar : datos_rollos[i].prod_CantBolsasRestates,
+              CantPaqRestantesEnviar : datos_rollos[i].prod_CantPaquetesRestantes,
+              suma : false,
+            }
+            this.rollos.push(info);
+            rollosExistentes.push(datos_rollos[i].rollo_Id);
+            this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+            this.cantTotalProducto += datos_rollos[i].dtEntRolloProd_Cantidad;
+            this.presentacionProducto = datos_rollos[i].undMed_Rollo;
+            this.FormConsultarProductos.setValue({
+              Factura : this.FormConsultarProductos.value.Factura,
+              NotaCredito : this.FormConsultarProductos.value.NotaCredito,
+              IdProducto : this.FormConsultarProductos.value.IdProducto,
+              CantidadProducto : this.FormConsultarProductos.value.CantidadProducto,
+              ProdNombre: datos_rollos[i].prod_Nombre,
+              Cliente: this.FormConsultarProductos.value.Cliente,
+              Observacion : this.FormConsultarProductos.value.Observacion,
+            });
+            this.validarInputNombresProductos = false;
           }
-          this.rollos.push(info);
-          rollosExistentes.push(datos_rollos[i].rollo_Id);
-          this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-          this.cantTotalProducto += datos_rollos[i].dtEntRolloProd_Cantidad;
-          this.presentacionProducto = datos_rollos[i].undMed_Rollo;
-          this.FormConsultarProductos.setValue({
-            Factura : this.FormConsultarProductos.value.Factura,
-            NotaCredito : this.FormConsultarProductos.value.NotaCredito,
-            IdProducto : this.FormConsultarProductos.value.IdProducto,
-            CantidadProducto : this.FormConsultarProductos.value.CantidadProducto,
-            ProdNombre: datos_rollos[i].prod_Nombre,
-            Cliente: this.FormConsultarProductos.value.Cliente,
-            Observacion : this.FormConsultarProductos.value.Observacion,
-          });
-          this.validarInputNombresProductos = false;
         }
       }
     });
@@ -515,16 +582,35 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   // Funcion que a cambiar el valor de la cantidad de unidades asignadas para un paquete
   cambiarCantidadUnidades(item : any){
-    let cantidad : number = this.FormEditCant.value.Cantidad;
+    let cantidad : number = this.FormEditUnd.value.Cantidad;
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       if (this.rollosInsertar[i].Id == item.Id) {
-        if (cantidad < this.rollosInsertar[i].CantUndRestantes && cantidad > 0 && cantidad != null && cantidad != undefined) {
+        if (cantidad <= this.rollosInsertar[i].CantUndRestantesEnviar && cantidad > 0 && cantidad != null && cantidad != undefined) {
           this.rollosInsertar[i].CantUndRestantes = cantidad;
-          this.rollosInsertar[i].CantPaqRestantes = (this.rollosInsertar[i].CantUndRestantes / this.rollosInsertar[i].CantUndPaquetes)
+          this.rollosInsertar[i].CantPaqRestantes = (this.rollosInsertar[i].CantUndRestantes / this.rollosInsertar[i].CantUndPaquetes);
           this.GrupoProductos();
         } else {
           Swal.fire("¡La cantidad ingresada no es valida!");
-          this.rollosInsertar[i].CantUndRestantes = this.rollosInsertar[i].CantUndRestantes;
+          this.rollosInsertar[i].CantUndRestantes = this.rollosInsertar[i].CantUndRestantesEnviar;
+          this.rollosInsertar[i].CantPaqRestantes = this.rollosInsertar[i].CantPaqRestantesEnviar;
+        }
+      }
+    }
+  }
+
+  // Funcion que a cambiar el valor de la cantidad de unidades asignadas para un paquete
+  cambiarCantidadPaquetes(item : any){
+    let cantidad : number = this.FormEditPaquetes.value.Cantidad;
+    for (let i = 0; i < this.rollosInsertar.length; i++) {
+      if (this.rollosInsertar[i].Id == item.Id) {
+        if (cantidad <= this.rollosInsertar[i].CantPaqRestantesEnviar && cantidad > 0 && cantidad != null && cantidad != undefined) {
+          this.rollosInsertar[i].CantPaqRestantes = cantidad;
+          this.rollosInsertar[i].CantUndRestantes = (this.rollosInsertar[i].CantPaqRestantes * this.rollosInsertar[i].CantUndPaquetes)
+          this.GrupoProductos();
+        } else {
+          Swal.fire("¡La cantidad ingresada no es valida!");
+          this.rollosInsertar[i].CantUndRestantes = this.rollosInsertar[i].CantUndRestantesEnviar;
+          this.rollosInsertar[i].CantPaqRestantes = this.rollosInsertar[i].CantPaqRestantesEnviar;
         }
       }
     }
@@ -691,14 +777,14 @@ export class AsignarProductosFacturasComponent implements OnInit {
         }
       });
     }
-    if (this.rollosInsertar.length > 500) setTimeout(() => { this.moverInventarioProductos(); }, 60000);
-    else if (this.rollosInsertar.length > 400) setTimeout(() => { this.moverInventarioProductos(); }, 30000);
-    else if (this.rollosInsertar.length > 300) setTimeout(() => { this.moverInventarioProductos(); }, 20000);
-    else if (this.rollosInsertar.length > 200) setTimeout(() => { this.moverInventarioProductos(); }, 15000);
-    else if (this.rollosInsertar.length > 100) setTimeout(() => { this.moverInventarioProductos(); }, 10000);
-    else if (this.rollosInsertar.length > 50) setTimeout(() => { this.moverInventarioProductos(); }, 5000);
-    else setTimeout(() => { this.cambiarEstado(); }, 3000);
-    // setTimeout(() => { this.moverInventarioProductos(); }, 4000);
+    // if (this.rollosInsertar.length > 500) setTimeout(() => { this.moverInventarioProductos(); }, 40000);
+    // else if (this.rollosInsertar.length > 400) setTimeout(() => { this.moverInventarioProductos(); }, 20000);
+    // else if (this.rollosInsertar.length > 300) setTimeout(() => { this.moverInventarioProductos(); }, 15000);
+    // else if (this.rollosInsertar.length > 200) setTimeout(() => { this.moverInventarioProductos(); }, 10000);
+    // else if (this.rollosInsertar.length > 100) setTimeout(() => { this.moverInventarioProductos(); }, 5000);
+    // else if (this.rollosInsertar.length > 50) setTimeout(() => { this.moverInventarioProductos(); }, 4000);
+    // else setTimeout(() => { this.moverInventarioProductos(); }, 3000);
+    setTimeout(() => { this.moverInventarioProductos(); }, 4000);
   }
 
   // Funcion que va a mover el inventario de los productos

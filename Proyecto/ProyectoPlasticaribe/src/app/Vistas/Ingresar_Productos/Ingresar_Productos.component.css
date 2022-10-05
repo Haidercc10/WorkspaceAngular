@@ -138,3 +138,7 @@ a {
     width: 100%;
   }
 }
+
+.tabla1{
+  display: flex;
+}
