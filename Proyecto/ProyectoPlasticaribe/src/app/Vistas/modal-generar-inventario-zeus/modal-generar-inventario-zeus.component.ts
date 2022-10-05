@@ -40,19 +40,29 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   public NombreCliente = '';
   numeroIdProd : number = 0;
   totalProductos : number = 0;
+  public FormEditarCantMinima !: FormGroup;
+  public cantMinimal : number;
 
   constructor(private existenciasZeus : InventarioZeusService,
                 private clienteOtItems : BagproService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private rolService : RolesService,
                       private existencias_ProductosService : ExistenciasProductosService,
-                        private frmBuilder : FormBuilder,) {
+                        private frmBuilder : FormBuilder,
+                        private frmBuilder2 : FormBuilder,) {
 
     this.FormExistencias = this.frmBuilder.group({
-      cantMinima : [0],
+     // cantMinima : [0],
       cantidad : [0],
       filtroFechas : [''],
     });
+
+    this.FormEditarCantMinima = this.frmBuilder.group({
+      //CantMinimaEditada : [],
+      cantMinima : [],
+    });
+
+
     this.load = true;
   }
 
@@ -61,6 +71,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.ColumnasTabla();
     this.fecha();
     this.InventarioExistenciaZeus();
+    //this.FormEditarCantMinima.disable();
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -257,7 +268,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                   }
                   this.ArrayProductoZeus.push(datosInventario);
                   this.ArrayProductoZeus.sort((a,b) => a.nombreItem.localeCompare(b.nombreItem));
-                  this.ArrayProductoZeus.sort((a,b) => Number(b.cantidadItem <= b.cantMinima) - Number(a.cantidadItem <= a.cantMinima));
+                  this.ArrayProductoZeus.sort((a,b) => Number(b.cantidadItem < b.cantMinima) - Number(a.cantidadItem < a.cantMinima));
                   this.totalProductos += datosExistencias[exi].precio_Total;
                   this.TotalStockReal += (datos_existenciasProd[i].exProd_Cantidad * datosExistencias[exi].precioVenta);
                   break;
@@ -270,12 +281,13 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     });
     setTimeout(() => {
       this.load = true;
-    }, 3500);
+    }, 5500);
   }
 
   //
   seleccionarProducto(item){
     this.numeroIdProd = item.codigoItem;
+    //this.FormEditarCantMinima.enable();
     // const a : any = document.createElement("a");
     // document.body.appendChild(a);
     // a.href = "#FormExistencias";
@@ -285,10 +297,10 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
   //
   actualizarCantMinima(){
-    let cantidad : number = this.FormExistencias.value.cantMinima;
+    let cantidad : number = this.FormEditarCantMinima.value.cantMinima;
     if (this.numeroIdProd == 0) Swal.fire("¡Debe seleccionar un producto!");
     else {
-      this.existencias_ProductosService.srvObtenerListaPorIdProducto(this.numeroIdProd).subscribe(datos_existencias => {
+      this.existencias_ProductosService.srvObtenerListaPorIdProducto2(this.numeroIdProd).subscribe(datos_existencias => {
         for (let i = 0; i < datos_existencias.length; i++) {
           const datosExistencias = {
             Prod_Id: this.numeroIdProd,
@@ -307,8 +319,12 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
           this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
             this.InventarioExistenciaZeus();
+            //cantidad = datos_existencias[i].exProd_CantidadMinima
             this.numeroIdProd = 0;
           });
+          //this.FormEditarCantMinima.reset();
+          //this.FormEditarCantMinima.disable();
+
         }
       });
     }

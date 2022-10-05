@@ -861,25 +861,29 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           EstProcOT_FechaCreacion : datos_ot[i].estProcOT_FechaCreacion,
           EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
         }
-
-        this.estadosProcesos_OTService.srvActualizarPorOT(this.otSeleccionada, info).subscribe(datos_ot => {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 1500,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
+        /**/
+        if(falla == null){
+          Swal.fire("Debe seleccionar un tipo de falla.")
+        } else {
+          this.estadosProcesos_OTService.srvActualizarPorOT(this.otSeleccionada, info).subscribe(datos_ot => {
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'center',
+              showConfirmButton: false,
+              timer: 1500,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+              }
+            });
+            Toast.fire({
+              icon: 'success',
+              title: `Falla agregada a la OT ${this.otSeleccionada} con exito!`
+            });
+            this.limpiarCampos();
           });
-          Toast.fire({
-            icon: 'success',
-            title: `Falla agregada a la OT ${this.otSeleccionada} con exito!`
-          });
-          this.limpiarCampos();
-        });
+        }
       }
     });
   }

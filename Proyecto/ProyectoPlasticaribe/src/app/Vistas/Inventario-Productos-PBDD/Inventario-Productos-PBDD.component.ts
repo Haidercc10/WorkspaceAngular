@@ -242,7 +242,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
           this.ArrayProductosBDNueva.push(dataInventario)
           this.ArrayProductosBDNueva.sort((a,b) => a.NombreItem.localeCompare(b.NombreItem));
-          this.ArrayProductosBDNueva.sort((a,b) => Number(b.Stock <= b.CantMinima) - Number(a.Stock <= a.CantMinima));
+          this.ArrayProductosBDNueva.sort((a,b) => Number(b.Stock < b.CantMinima) - Number(a.Stock < a.CantMinima));
           this.totalProductos += registrosIPT[index].exProd_Cantidad * registrosIPT[index].exProd_PrecioVenta;
         }
 
