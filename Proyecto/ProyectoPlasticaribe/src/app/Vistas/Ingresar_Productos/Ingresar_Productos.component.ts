@@ -3807,11 +3807,11 @@ export class Ingresar_ProductosComponent implements OnInit {
           let info : any = {
             Prod_Id: datos_productos[j].prod_Id,
             exProd_Id : datos_productos[j].exProd_Id,
-            ExProd_Cantidad: (datos_productos[j].exProd_Cantidad + parseInt(this.grupoProductos[i].Cantidad2)),
+            ExProd_Cantidad: (datos_productos[j].exProd_Cantidad + parseFloat(this.grupoProductos[i].Cantidad2)),
             UndMed_Id: datos_productos[j].undMed_Id,
             TpBod_Id: datos_productos[j].tpBod_Id,
             ExProd_Precio: datos_productos[j].exProd_Precio,
-            ExProd_PrecioExistencia: (datos_productos[j].exProd_Cantidad + parseInt(this.grupoProductos[i].Cantidad2)) * datos_productos[j].exProd_PrecioVenta,
+            ExProd_PrecioExistencia: (datos_productos[j].exProd_Cantidad + parseFloat(this.grupoProductos[i].Cantidad2)) * datos_productos[j].exProd_PrecioVenta,
             ExProd_PrecioSinInflacion: datos_productos[j].exProd_PrecioSinInflacion,
             TpMoneda_Id: datos_productos[j].tpMoneda_Id,
             ExProd_PrecioVenta: datos_productos[j].exProd_PrecioVenta,

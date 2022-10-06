@@ -1,21 +1,43 @@
-<input type="number" [(ngModel)]="cantPage">
 
-<div class="table-responsive">
-  <table class="table table-bordered table-hover mt-2">
-    <thead class="TitulosTabla">
-      <tr>
-        <th id="CodigoFactura" scope="col"> cant</th>
-      </tr>
-      </thead>
-    <tbody>
-      <tr *ngFor="let doc of ArrayDocumento | paginate: {itemsPerPage: cantPage, currentPage: page} let i=index">
-        <td id="CodigoFactura" >{{doc}}</td>
-      </tr>
-    </tbody>
-  </table>
-  <div class="mb-2">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <pagination-controls (pageChange)="page = $event"></pagination-controls>
-    </div>
+
+<ng-container>
+  <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteClientes">
+    <ng-autocomplete
+      class=""
+      [data]="arrayClientes"
+      [searchKeyword]="keywordClientes"
+      [itemTemplate]="itemTemplateCL"
+      [notFoundTemplate]="notFoundTemplate"
+      id="floatingInput">
+    </ng-autocomplete>
+    <ng-template #itemTemplateCL let-item>
+      <a [innerHTML]="item.cli_Nombre"></a>
+    </ng-template>
+    <ng-template #notFoundTemplate let-notFound>
+      <div [innerHTML]="notFound"></div>
+    </ng-template>
   </div>
+</ng-container>
+
+<form>
+  <mat-form-field class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteClientes" style="margin-left: 50%;">
+    <input type="text"
+           placeholder="Pick one"
+           matInput
+           [formControl]="myControl"
+           [matAutocomplete]="auto">
+    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+      <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+        {{option}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</form>
+
+
+<div class="wrap">
+  <input list="colores" name="colores" type="text" placeholder="Elige un color">
+  <datalist id="colores">
+    <option value={{item.cli_Id}} *ngFor="let item of arrayClientes">{{item.cli_Nombre}}</option>
+  </datalist>
 </div>

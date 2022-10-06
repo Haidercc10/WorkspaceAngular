@@ -61,7 +61,14 @@
             </div>
 
              <!-- Cliente -->
-            <ng-container>
+             <div class="form-floating col-md">
+              <input formControlName="Cliente" class="form-control" list="clientes" id="floatingInput" (change)='selectEventCliente()'>
+              <datalist id="clientes">
+                <option value={{item.cli_Id}} *ngFor="let item of arrayClientes">{{item.cli_Nombre}}</option>
+              </datalist>
+              <label for="floatingInput" *ngIf="validarInputClientes">Cliente</label>
+             </div>
+            <!-- <ng-container>
               <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteClientes">
                 <ng-autocomplete
                   class=""
@@ -83,7 +90,7 @@
                 </ng-template>
                 <label for="floatingInput" *ngIf="validarInputClientes">Cliente</label>
               </div>
-            </ng-container>
+            </ng-container> -->
 
              <!-- Producto -->
             <!-- <ng-container>

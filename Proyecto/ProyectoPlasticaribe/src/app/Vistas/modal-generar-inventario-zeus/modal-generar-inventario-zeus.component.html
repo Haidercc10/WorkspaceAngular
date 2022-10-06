@@ -114,7 +114,7 @@
                   <td id="Nombre" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.nombreItem}}</td>
                   <td id="precio" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.PrecioItem | number : '1.2-2'}}</td>
 
-                  <ng-container *ngIf="prodZeus.cantidadItem < prodZeus.cantMinima">
+                  <ng-container *ngIf="prodZeus.cantidadItem <= prodZeus.cantMinima">
                     <th id="existencias" style="background-color: rgb(255, 146, 146);" (click)="seleccionarProducto(prodZeus)">{{prodZeus.cantidadItem | number : '1.2-2'}}</th>
                   </ng-container>
                   <ng-container *ngIf="prodZeus.cantidadItem > prodZeus.cantMinima">
@@ -122,13 +122,13 @@
                   </ng-container>
 
 
-                  <ng-container *ngIf="prodZeus.cantidadItem < prodZeus.stock_real">
+                  <ng-container *ngIf="prodZeus.cantidadItem <= prodZeus.stock_real">
                   <td id="stock" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.stock_real | number : '1.2-2'}}</td>
                   </ng-container>
 
                   <ng-container *ngIf="prodZeus.cantidadItem > prodZeus.stock_real">
                     <td id="stock" class="TextosInfoTabla" style="background-color: rgb(255, 146, 146);" (click)="seleccionarProducto(prodZeus)">{{prodZeus.stock_real | number : '1.2-2'}}</td>
-                    </ng-container>
+                  </ng-container>
 
 
                   <td id="presentacion" scope="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.presentacion}}</td>
@@ -144,8 +144,6 @@
                   <ng-container *ngIf="prodZeus.fechaModificacion != ''">
                     <td id="CantMinima" style="background-color: rgb(255, 146, 146);" class="TextosInfoTabla">{{prodZeus.fechaModificacion}}</td>
                   </ng-container>
-
-
                 </tr>
               </tbody>
             </table>

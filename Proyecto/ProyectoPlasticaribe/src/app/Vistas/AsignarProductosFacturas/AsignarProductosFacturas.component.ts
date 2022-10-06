@@ -45,6 +45,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   cantidadOT : number = 0; //
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
   cantTotalProducto : number = 0; //Variable que servirá para mostrar la cantidad total de existencias de un producto consultado
+  idCliente : number = 0; //variable que va a almacenar el id del cliente seleccionado
 
   keywordNombresProductos = 'prod_Nombre'; /** Variable de palabra clave para Input Producto. */
   validarInputNombresProductos : any = true; /** Variable para validar input producto */
@@ -118,10 +119,19 @@ export class AsignarProductosFacturasComponent implements OnInit {
     // do something when input is focused
   }
 
-  selectEventCliente(item) {
-    this.FormConsultarProductos.value.Cliente = item.cli_Id;
-    if (this.FormConsultarProductos.value.Cliente != '') this.validarInputClientes = false;
-    else this.validarInputClientes = true;
+  selectEventCliente() {
+    this.idCliente = this.FormConsultarProductos.value.Cliente;
+    this.servicioClientes.srvObtenerListaPorId(this.FormConsultarProductos.value.Cliente).subscribe(datos_cliente => {
+      this.FormConsultarProductos = this.frmBuilderPedExterno.group({
+        Factura : this.FormConsultarProductos.value.Factura,
+        NotaCredito : this.FormConsultarProductos.value.NotaCredito,
+        IdProducto : this.FormConsultarProductos.value.IdProducto,
+        CantidadProducto : this.FormConsultarProductos.value.CantidadProducto,
+        ProdNombre: this.FormConsultarProductos.value.ProdNombre,
+        Cliente: datos_cliente.cli_Nombre,
+        Observacion : this.FormConsultarProductos.value.Observacion,
+      });
+    });
     // do something with selected item
   }
 
@@ -347,7 +357,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.servicioClientes.srvObtenerLista().subscribe(registrosClientes => {
       for (let index = 0; index < registrosClientes.length; index++) {
         let Clientes : any = registrosClientes[index];
-         this.arrayClientes.push(Clientes);
+        this.arrayClientes.push(Clientes);
+        this.arrayClientes.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
       }
     });
   }
@@ -623,7 +634,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       console.log(this.FormConsultarProductos.value)
       let factura : string = this.FormConsultarProductos.value.Factura;
       let notaCredito : string = this.FormConsultarProductos.value.NotaCredito;
-      let cliente : any = this.FormConsultarProductos.value.Cliente.cli_Id;
+      let cliente : any = this.FormConsultarProductos.value.Cliente;
       let observacion : string = this.FormConsultarProductos.value.Observacion;
       let facturaMayuscula = `${factura}`;
       if (notaCredito == '' || notaCredito == null) notaCredito = '';
@@ -634,7 +645,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         Usua_Id : this.storage_Id,
         AsigProdFV_Fecha : this.today,
         AsigProdFV_Observacion : observacion,
-        Cli_Id : cliente,
+        Cli_Id : this.idCliente,
         Usua_Conductor : 88,
         AsigProdFV_PlacaCamion : '',
         AsigProdFV_FechaEnvio : this.today,
