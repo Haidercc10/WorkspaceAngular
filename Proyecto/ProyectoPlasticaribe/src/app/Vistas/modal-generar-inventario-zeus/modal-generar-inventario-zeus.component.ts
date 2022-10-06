@@ -257,10 +257,10 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                   const datosInventario: any = {
                     codigoItem : datosCLOTI[cl].clienteItems,
                     nombreItem : datosCLOTI[cl].clienteItemsNom,
+                    PrecioItem : datosExistencias[exi].precioVenta,
                     cantidadItem : datosExistencias[exi].existencias,
                     stock_real : datos_existenciasProd[i].exProd_Cantidad,
                     presentacion : datosExistencias[exi].presentacion,
-                    PrecioItem : datosExistencias[exi].precioVenta,
                     PrecioTotalItem : datosExistencias[exi].precio_Total,
                     ClienteNombre : datosCLOTI[cl].clienteNom,
                     cantMinima : datos_existenciasProd[i].exProd_CantMinima,
@@ -281,7 +281,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     });
     setTimeout(() => {
       this.load = true;
-    }, 5500);
+    }, 6500);
   }
 
   //
@@ -322,7 +322,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             //cantidad = datos_existencias[i].exProd_CantidadMinima
             this.numeroIdProd = 0;
           });
-          //this.FormEditarCantMinima.reset();
+          this.FormEditarCantMinima.reset();
           //this.FormEditarCantMinima.disable();
 
         }

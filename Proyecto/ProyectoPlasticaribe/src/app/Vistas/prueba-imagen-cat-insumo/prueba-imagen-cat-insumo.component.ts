@@ -22,9 +22,15 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   }
 
+  control = new FormControl('');
+  streets: string[] = ['Champs-Élysées', 'Lombard Street', 'Abbey Road'];
+
+  filteredStreets: Observable<string[]>;
+
   ngOnInit(): void {
     this.llenadoClientes()
-    this.filteredOptions = this.myControl.valueChanges.pipe(
+
+    this.filteredStreets = this.control.valueChanges.pipe(
       startWith(''),
       map(value => this._filter(value || '')),
     );
@@ -34,6 +40,11 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     const filterValue = value.toLowerCase();
 
     return this.arrayClientes.filter(option => option.toLowerCase().includes(filterValue));
+
+  }
+
+  private _normalizeValue(value: string): string {
+    return value.toLowerCase().replace(/\s/g, '');
   }
 
   //Funcion que llanará el array de clientes

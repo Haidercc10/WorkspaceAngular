@@ -100,7 +100,7 @@
                   <th id="presentacion" scope="col">{{columnas.presentacion}}</th>
                   <th id="Subtotal" scope="col">{{columnas.invSubtotal}}</th>
                   <th id="cantMinima" scope="col" (click)="organizarCantMinima()">Cant. Minima</th>
-                  <th id="cantMinima" scope="col" (click)="organizarCantMinima()">Actualizar Cant. Minima</th>
+                  <th id="cantMinima" scope="col">Actualizar Cant. Minima</th>
                   <ng-container *ngIf="mostrarColumna">
                     <th id="ultimaModificacion" scope="col" >Ult. Modificación</th>
                   </ng-container>
@@ -125,7 +125,6 @@
                   <ng-container *ngIf="prodZeus.cantidadItem <= prodZeus.stock_real">
                   <td id="stock" class="TextosInfoTabla" (click)="seleccionarProducto(prodZeus)">{{prodZeus.stock_real | number : '1.2-2'}}</td>
                   </ng-container>
-
                   <ng-container *ngIf="prodZeus.cantidadItem > prodZeus.stock_real">
                     <td id="stock" class="TextosInfoTabla" style="background-color: rgb(255, 146, 146);" (click)="seleccionarProducto(prodZeus)">{{prodZeus.stock_real | number : '1.2-2'}}</td>
                   </ng-container>

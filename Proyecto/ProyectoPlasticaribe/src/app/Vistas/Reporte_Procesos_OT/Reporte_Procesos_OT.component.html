@@ -123,7 +123,7 @@
                     <tbody>
                       <tr *ngFor="let tabla of ArrayDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
                         <!-- Orden de Trabajo -->
-                        <td id="ot" scope="col">{{tabla.ot}}</td>
+                        <td (click)="seleccionarFilaTabla(tabla)" id="ot" scope="col">{{tabla.ot}}</td>
 
                         <!-- Extrusion -->
                         <ng-container *ngIf="tabla.ext >= tabla.cant">

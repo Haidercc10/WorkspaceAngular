@@ -1,3 +1,4 @@
+<!-- <input type="number" [(ngModel)]="cantPage">
 
 
 <ng-container>
@@ -41,3 +42,27 @@
     <option value={{item.cli_Id}} *ngFor="let item of arrayClientes">{{item.cli_Nombre}}</option>
   </datalist>
 </div>
+</div> -->
+
+
+<form class="example-form">
+  <input type="text"
+         placeholder="Search for a street"
+         [formControl]="control"
+         [matAutocomplete]="auto">
+  <mat-autocomplete #auto="matAutocomplete">
+    <mat-option *ngFor="let street of filteredStreets | async" [value]="street">
+      {{street}}
+    </mat-option>
+  </mat-autocomplete>
+</form>
+
+<br>
+
+<select class="selectpicker" data-live-search="true">
+  <option data-tokens="ketchup mustard">Hot Dog, Fries and a Soda</option>
+  <option data-tokens="mustard">Burger, Shake and a Smile</option>
+  <option data-tokens="frosting">Sugar, Spice and all things nice</option>
+</select>
+
+

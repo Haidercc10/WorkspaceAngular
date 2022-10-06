@@ -47,8 +47,9 @@
  */
 import 'zone.js';  // Included with Angular CLI.
 
-export let rutaPlasticaribeAPI = "http://192.168.0.85:9085/api"; //Ruta al servidor de la base de datos nueva
+//export let rutaPlasticaribeAPI = "http://192.168.0.85:9085/api"; //Ruta al servidor de la base de datos nueva
 export let rutaPlasticaribeAPIPrueba = "http://192.168.0.85:9085/api"; //Ruta al servidor de la base de datos nueva
+export let rutaPlasticaribeAPI = /*"http://192.168.0.139:9093/api"*/ "http://192.168.0.139:9093/api";  //"http://192.168.0.85:9085/api"; //Ruta al servidor de la base de datos nueva
 // export let rutaPlasticaribeAPI = "http://192.168.0.153:9085/api"; //Ruta al servidor de la base de datos nueva
 // export let rutaPlasticaribeAPI = "https://192.168.0.153:7014/api"; //Ruta local del api de prueba
 
