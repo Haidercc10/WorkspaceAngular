@@ -95,12 +95,12 @@
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentacion</th>
                   <th scope="col">Proceso</th>
-                  <th scope="col"><input  *ngIf="cantidadOT == 1" class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>
+                  <th scope="col"><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let item of rollos; let i=index">
-                  <th style="cursor: pointer;">{{item.Ot}}</th>
+                  <th>{{item.Ot}}</th>
                   <th>{{item.Id}}</th>
                   <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>

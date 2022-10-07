@@ -91,7 +91,7 @@ export class DetallesAsignacionService {
   }
 
   srvObtenerConsultaMov8(fechaIncial : any, fechaFinal : any, materiaPrima){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos7/${fechaIncial}/${fechaFinal}/${materiaPrima}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/consultaMovimientos8/${fechaIncial}/${fechaFinal}/${materiaPrima}`);
   }
 
   srvObtenerConsultaMov9(fechaIncial : any, fechaFinal : any, materiaPrima : any, estado : any){

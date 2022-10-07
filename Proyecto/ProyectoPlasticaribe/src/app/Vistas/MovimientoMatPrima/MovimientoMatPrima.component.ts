@@ -225,8 +225,6 @@ export class MovimientoMatPrimaComponent implements OnInit {
     });
   }
 
-
-
   // Funcion que va a consultar por cada la combinacion de filtro que se le idequen
   consultar(){
     this.load = false;
