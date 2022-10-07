@@ -18,6 +18,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   public load: boolean;
   public FormAsignacionBopp !: FormGroup;
   public FormularioBOPP !: FormGroup;
+  public FormularioEdicion !: FormGroup;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -34,6 +35,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   validarInput : boolean = true;
   keyword = 'bopP_Nombre';
   public historyHeading: string = 'Seleccionado Recientemente';
+  cantidadRollo : number;
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -55,7 +57,13 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     this.FormularioBOPP = this.FormBuilderBOPP.group({
       boppNombre : ['', Validators.required],
       boppSerial: ['', Validators.required],
+      boppCantidad : ['', Validators.required],
     });
+
+    this.FormularioEdicion = this.FormBuilderBOPP.group({
+      boppCantidad : ['', Validators.required],
+    });
+
     this.load = true;
   }
 
@@ -164,6 +172,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     });
   }
 
+  //
   infoOT(){
     let ordenTrabajo : string = this.FormAsignacionBopp.value.AsgBopp_OT;
 
@@ -283,9 +292,11 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   //
   cargarBOPP(){
     for (const item of this.boppSeleccionado) {
+      console.log(item)
       this.FormularioBOPP.setValue({
         boppSerial: item.bopP_Serial,
         boppNombre : item.bopP_Nombre,
+        boppCantidad : item.bopP_Stock,
       });
     }
   }
@@ -307,19 +318,23 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     });
   }
 
+  //
   validarCamposBOPP(){
     if (this.FormularioBOPP.valid) this.cargarBOPPTabla();
     else Swal.fire("Debe cargar minimo un BOPP en la tabla para realizar la asignación");
   }
 
-
+  //
   cargarBOPPTabla(){
     let serial : string = this.FormularioBOPP.value.boppSerial;
     let nombre : string = this.FormularioBOPP.value.boppNombre;
+    let cantidad : number = this.FormularioBOPP.value.boppCantidad;
 
     let bopp : any = {
       Serial : serial,
       Nombre : nombre,
+      Cantidad : cantidad,
+      Cantidad2 : cantidad,
     }
     this.ArrayBoppPedida.push(bopp);
     this.FormularioBOPP.reset();
@@ -373,18 +388,6 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   }
 
   obtenerIdUltimaAsignacion(){
-    // let idsAsignaciones = [];
-    // this.asignacionBOPPService.srvObtenerLista().subscribe(datos_asignaciones => {
-    //   for (let i = 0; i < datos_asignaciones.length; i++) {
-    //     idsAsignaciones.push(datos_asignaciones[i].asigBOPP_Id);
-    //   }
-    //   let ultimoId : number = Math.max.apply(null, idsAsignaciones);
-    //   this.detallesAsginacionBOPP(ultimoId);
-    // });
-
-    // this.asignacionBOPPService.srvObtenerListaPorAgrupadoOT(ot).subscribe(datos_bopp => {
-    //   this.detallesAsginacionBOPP(datos_bopp);
-    // });
     this.asignacionBOPPService.srvObtenerListaUltimoId().subscribe(datos_asignaciones => {
       this.detallesAsginacionBOPP(datos_asignaciones);
     });
@@ -398,7 +401,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
         this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
           for (let k = 0; k < datos_bopp.length; k++) {
             if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
-              let cantidad = datos_bopp[k].bopP_CantidadInicialKg / this.ordenesTrabajo.length;
+              let cantidad = this.ArrayBoppPedida[j].Cantidad2 / this.ordenesTrabajo.length;
               let datos : any = {
                 AsigBOPP_Id : idAsignacion.asigBOPP_Id,
                 BOPP_Id : datos_bopp[k].bopP_Id,
@@ -438,7 +441,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             tpBod_Id : datos_bopp[j].tpBod_Id,
             bopP_FechaIngreso : datos_bopp[j].bopP_FechaIngreso,
             bopP_Ancho : datos_bopp[j].bopP_Ancho,
-            bopP_Stock : 0,
+            bopP_Stock : datos_bopp[j].bopP_Stock - this.ArrayBoppPedida[i].Cantidad2,
             UndMed_Kg : datos_bopp[j].undMed_Kg,
             bopP_CantidadInicialKg : datos_bopp[j].bopP_CantidadInicialKg,
             usua_Id : datos_bopp[j].usua_Id,
@@ -470,6 +473,17 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     }
   }
 
+  //
+  cambiarCantidad(item : any){
+    let cantidad = this.FormularioEdicion.value.boppCantidad;
+    for (let i = 0; i < this.ArrayBoppPedida.length; i++) {
+      if (item.Serial == this.ArrayBoppPedida[i].Serial && cantidad > 0 && cantidad <= item.Cantidad && cantidad != undefined && cantidad != null){
+        this.ArrayBoppPedida[i].Cantidad2 = cantidad;
+      } else {
+        Swal.fire(`La cantidad a asignar debe ser mayor que 0 y menor o igual que ${item.Cantidad}`);
+      }
+    }
+  }
 
   //
   moverInventarioBOPP(id : number, cantidad : number){

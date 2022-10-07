@@ -601,7 +601,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       if (this.rollosInsertar[i].Id == item.Id) {
         if (cantidad <= this.rollosInsertar[i].CantUndRestantesEnviar && cantidad > 0 && cantidad != null && cantidad != undefined) {
           this.rollosInsertar[i].CantUndRestantes = cantidad;
-          this.rollosInsertar[i].CantPaqRestantes = (this.rollosInsertar[i].CantUndRestantes / this.rollosInsertar[i].CantUndPaquetes);
+          this.rollosInsertar[i].CantPaqRestantes = cantidad;
           this.GrupoProductos();
         } else {
           Swal.fire("¡La cantidad ingresada no es valida!");
