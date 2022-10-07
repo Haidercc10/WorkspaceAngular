@@ -37,6 +37,8 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
   rollosAsignados : any = [];
   Total : number = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
+  cantPage : number = 25;
+  public page : number;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
@@ -1168,9 +1170,10 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
             }
           }
         }, 2000);
-        if (this.rollos.length > 2000) setTimeout(() => { this.cargando = true; }, 15000);
-        else if (this.rollos.length > 1000) setTimeout(() => { this.cargando = true; }, 10000);
-        else setTimeout(() => { this.cargando = true; }, 5000);
+        setTimeout(() => {
+          if (this.rollos.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+          this.cargando = true;
+        }, 10000);
       } else Swal.fire("¡La fecha seleccionada no es valida!");
     } else Swal.fire("¡Seleccione un proceso!");
   }

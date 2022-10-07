@@ -132,6 +132,10 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
         }
       }
     });
+    setTimeout(() => {
+      if (this.rollos.length <= 0) Swal.fire(`La factura ${factura} ya devolvió todos los rollos`);
+      this.cargando = true;
+    }, 10000);
   }
 
   // Funcion que traerá la informacion del rollo que se esta consultando
