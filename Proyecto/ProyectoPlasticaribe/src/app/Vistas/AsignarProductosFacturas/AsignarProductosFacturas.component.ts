@@ -558,6 +558,9 @@ export class AsignarProductosFacturasComponent implements OnInit {
         }
       }
     });
+    setTimeout(() => {
+      if (this.rollos.length <= 0) Swal.fire(`El producto ${id} no tiene rollos disponibles`);
+    }, 1700);
   }
 
   // Funcion que permitirá ver el total de lo escogido para cada producto
@@ -581,7 +584,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
           Id : this.rollosInsertar[i].IdProducto,
           Nombre : this.rollosInsertar[i].Producto,
           Cantidad : this.formatonumeros(cantidad.toFixed(2)),
-          Cantidad2 : cantidad.toFixed(2),
+          Cantidad2 : cantidad,
           Rollos: this.formatonumeros(cantRollo.toFixed(2)),
           Presentacion : this.rollosInsertar[i].Presentacion,
           Cant_Unidades : this.formatonumeros(cantUnidades.toFixed(2)),
@@ -598,7 +601,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       if (this.rollosInsertar[i].Id == item.Id) {
         if (cantidad <= this.rollosInsertar[i].CantUndRestantesEnviar && cantidad > 0 && cantidad != null && cantidad != undefined) {
           this.rollosInsertar[i].CantUndRestantes = cantidad;
-          this.rollosInsertar[i].CantPaqRestantes = (this.rollosInsertar[i].CantUndRestantes / this.rollosInsertar[i].CantUndPaquetes);
+          this.rollosInsertar[i].CantPaqRestantes = cantidad;
           this.GrupoProductos();
         } else {
           Swal.fire("¡La cantidad ingresada no es valida!");
@@ -675,9 +678,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   // Funcion para subir los detalles de la asignacion, es decir, cada rollo que se asignó a la factura
   crearDetallesAsignacion(asignacion : number){
-    // let inicio : any = moment().format('h:mm:ss:ms');
-    // let fin : any;
-    // let diferenciaFecha : any;
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       let info : any = {
         AsigProdFV_Id : asignacion,
@@ -688,11 +688,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
         Prod_CantidadUnidades : this.rollosInsertar[i].CantUndRestantes,
       }
       this.dtAsgProdFactura.srvGuardar(info).subscribe(datos_dtAsignacion => {
-        // fin = moment().format('h:mm:ss:ms');
-        // console.log(inicio)
-        // console.log(fin)
-        // diferenciaFecha = inicio.diff(fin, 'millisecond');
-        // console.log(diferenciaFecha)
       }, error => {
         const Toast = Swal.mixin({
           toast: true,
@@ -777,9 +772,9 @@ export class AsignarProductosFacturasComponent implements OnInit {
               dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
               Prod_Id : datos_rollos[j].prod_Id,
               UndMed_Prod : datos_rollos[j].undMed_Prod,
-              Prod_CantPaquetesRestantes : datos_rollos[j].Prod_CantPaquetesRestante,
-              Prod_CantBolsasPaquete : datos_rollos[j].Prod_CantBolsasPaquete,
-              Prod_CantBolsasBulto : datos_rollos[j].Prod_CantBolsasBulto,
+              Prod_CantPaquetesRestantes : datos_rollos[j].prod_CantPaquetesRestantes,
+              Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
+              Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
               Prod_CantBolsasRestates : (datos_rollos[j].prod_CantBolsasRestates - this.rollosInsertar[i].CantUndRestantes),
               Prod_CantBolsasFacturadas : (this.rollosInsertar[i].CantUndRestantes + datos_rollos[j].prod_CantBolsasFacturadas),
             }

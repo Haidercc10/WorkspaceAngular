@@ -183,7 +183,8 @@
                 <tr>
                   <th id="idMateriaPrima" scope="col">Pallet/Serial</th>
                   <th id="nombreMateriaPrima" scope="col">Nombre</th>
-                  <!-- <th id="editar" scope="col">Editar</th> -->
+                  <th>Cantidad</th>
+                  <th id="editar" scope="col">Editar Cant.</th>
                   <th id="eliminar" scope="col">Eliminar</th>
                 </tr>
               </thead>
@@ -192,7 +193,12 @@
                 <tr *ngFor="let bopp of ArrayBoppPedida let i = index">
                   <td id="idMateriaPrima">{{bopp.Serial}}</td>
                   <td id="nombreMateriaPrima">{{bopp.Nombre}}</td>
-                  <!-- <td id="Editar" (click)="EditarMateriaPrimaTabla(materiaPrima)"><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Materia Prima"></i></a></td> -->
+                  <th>{{bopp.Cantidad2}}</th>
+                  <td id="Editar" style="width: 20%;">
+                    <form [formGroup]="FormularioEdicion">
+                      <input formControlName="boppCantidad" (keyup.Enter)="cambiarCantidad(bopp)" type="number" class="form-control" style="border: none;">
+                    </form>
+                  </td>
                   <td id="Eliminar" (click)="quitarBOPP(i, bopp)"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar BOPP de la asignación"></i></a></td>
                 </tr>
               </tbody>

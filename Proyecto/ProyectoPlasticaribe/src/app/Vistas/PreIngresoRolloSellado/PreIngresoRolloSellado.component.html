@@ -87,8 +87,14 @@
       </form>
 
       <!-- Inicio titulo tabla producto -->
-      <div class="mb-4">
-        <h4 class="tituloRojo">Tabla de Rollos</h4>
+      <div class="mb-4 tabla1">
+        <h4 class="tituloRojo" style="width: 90%;">Tabla de Rollos</h4>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <div class="form-floating col-md">
+            <input type="number" class="form-control form-control-sm" id="floatingInput"[(ngModel)]="cantPage">
+            <label for="floatingInput">N° Filas</label>
+          </div>
+        </div>
       </div>
 
       <!--Inicio tabla Rollos creados en OT -->
@@ -105,12 +111,12 @@
                   <th scope="col">Cantidad</th>
                   <th scope="col">Presentacion</th>
                   <th scope="col">Proceso</th>
-                  <th scope="col"><input  *ngIf="cantidadOT == 1" class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>
+                  <th scope="col"><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let item of rollos; let i=index">
-                  <th (dblclick)="selccionarTodoOT(item.Ot)" style="cursor: pointer;">{{item.Ot}}</th>
+                <tr *ngFor="let item of rollos | paginate: {itemsPerPage: cantPage, currentPage: page} let i=index">
+                  <th>{{item.Ot}}</th>
                   <th>{{item.Id}}</th>
                   <td>{{item.IdProducto}}</td>
                   <td>{{item.Producto}}</td>
@@ -121,6 +127,11 @@
                 </tr>
               </tbody>
             </table>
+            <div class="mb-2">
+              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <pagination-controls (pageChange)="page = $event"></pagination-controls>
+              </div>
+            </div>
           </div>
         </div>
       </div>

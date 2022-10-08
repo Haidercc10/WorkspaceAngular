@@ -4012,7 +4012,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         if (this.ValidarRol == 1 || this.ValidarRol == 3){
           this.boppService.srvObtenerLista().subscribe(datos_bopp => {
             for (let i = 0; i < datos_bopp.length; i++) {
-              if (datos_bopp[i].catMP_Id == categoria) {
+              if (datos_bopp[i].catMP_Id == categoria && datos_bopp[i].bopP_Stock > 0) {
                 this.categoriaBOPP = 'BOPP';
                 this.categoriMpService.srvObtenerListaPorId(datos_bopp[i].catMP_Id).subscribe(datos_categoria => {
                   this.sumaSalida = 0;

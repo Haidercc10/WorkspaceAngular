@@ -128,7 +128,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
     this.dtAsgProdFactura.srvObtenerListaPorCodigoFactura(factura.toUpperCase()).subscribe(datos_factura => {
       if (datos_factura.length == 0) Swal.fire(`¡La factura ${factura} no existe!`);
       for (let i = 0; i < datos_factura.length; i++) {
-        if (datos_factura[i].estado_Id == 20) {
+        if (datos_factura[i].estado_Id == 20 || datos_factura[i].estado_Id == 19) {
           let info : any = {
             Id : datos_factura[i].rollo_Id,
             IdProducto : datos_factura[i].prod_Id,
@@ -347,7 +347,12 @@ export class RollosAsignadasFacturaComponent implements OnInit {
               Estado_Id : 21,
               dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
               Prod_Id : datos_rollos[j].prod_Id,
-              UndMed_Prod : datos_rollos[j].undMed_Prod
+              UndMed_Prod : datos_rollos[j].undMed_Prod,
+              Prod_CantPaquetesRestantes : datos_rollos[j].prod_CantPaquetesRestantes,
+              Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
+              Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
+              Prod_CantBolsasRestates : datos_rollos[j].prod_CantBolsasRestates,
+              Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
             }
             this.Total += datos_rollos[j].dtEntRolloProd_Cantidad;
             this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
@@ -430,7 +435,12 @@ export class RollosAsignadasFacturaComponent implements OnInit {
               Estado_Id : 19,
               dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
               Prod_Id : datos_rollos[j].prod_Id,
-              UndMed_Prod : datos_rollos[j].undMed_Prod
+              UndMed_Prod : datos_rollos[j].undMed_Prod,
+              Prod_CantPaquetesRestantes : datos_rollos[j].prod_CantPaquetesRestantes,
+              Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
+              Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
+              Prod_CantBolsasRestates : datos_rollos[j].prod_CantBolsasRestates,
+              Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
           }
           this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
             const Toast = Swal.mixin({

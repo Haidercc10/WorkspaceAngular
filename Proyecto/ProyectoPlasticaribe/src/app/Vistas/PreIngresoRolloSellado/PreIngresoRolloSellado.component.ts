@@ -37,6 +37,8 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
   rollosAsignados : any = [];
   Total : number = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
+  cantPage : number = 25;
+  public page : number;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
@@ -209,6 +211,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       otTemporral = datos_ot[i].ot;
                       this.rollos.push(info);
                       RollosConsultados.push(datos_ot[i].item);
+                      rollos.push(datos_ot[i].item);
                       this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                       this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
@@ -264,7 +267,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
             } else if (ProcConsulta == "2") {
               this.bagProService.srvObtenerListaProcSelladoFechasOT(fechaInicial, fechaFinal, ot).subscribe(datos_ot => {
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (!rollos.includes(datos_ot[i].item)) {
+                  if (!rollos.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
                     this.idProducto = datos_ot[i].referencia;
                     if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
                     if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
@@ -283,6 +286,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       Proceso : proceso,
                     }
                     this.rollos.push(info);
+                    rollos.push(datos_ot[i].item)
                     RollosConsultados.push(datos_ot[i].item);
                     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
@@ -372,6 +376,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       otTemporral = datos_ot[i].ot;
                       this.rollos.push(info);
                       RollosConsultados.push(datos_ot[i].item);
+                      rollos.push(datos_ot[i].item);
                       this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                       this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
@@ -389,7 +394,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
             } else if (ProcConsulta == "2") {
               this.bagProService.srvObtenerListaProcSelladoFechas(fechaInicial, fechaFinal).subscribe(datos_ot => {
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (!rollos.includes(datos_ot[i].item)) {
+                  if (!rollos.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
                     this.idProducto = datos_ot[i].referencia;
                     if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
                     if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
@@ -408,6 +413,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       Proceso : proceso,
                     }
                     this.rollos.push(info);
+                    rollos.push(datos_ot[i].item)
                     RollosConsultados.push(datos_ot[i].item);
                     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
@@ -497,6 +503,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       otTemporral = datos_ot[i].ot;
                       this.rollos.push(info);
                       RollosConsultados.push(datos_ot[i].item);
+                      rollos.push(datos_ot[i].item);
                       this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                       this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
@@ -561,7 +568,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
             } else if (ProcConsulta == "2") {
               this.bagProService.srvObtenerListaProcSelladoFechasOT(fechaInicial, fechaInicial, ot).subscribe(datos_ot => {
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (!rollos.includes(datos_ot[i].item)) {
+                  if (!rollos.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
                     this.idProducto = datos_ot[i].referencia;
                     if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
                     if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
@@ -580,6 +587,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       Proceso : proceso,
                     }
                     this.rollos.push(info);
+                    rollos.push(datos_ot[i].item)
                     RollosConsultados.push(datos_ot[i].item);
                     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
@@ -662,6 +670,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       otTemporral = datos_ot[i].ot;
                       this.rollos.push(info);
                       RollosConsultados.push(datos_ot[i].item);
+                      rollos.push(datos_ot[i].item);
                       this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                       this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
@@ -725,7 +734,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
             } else if (ProcConsulta == "2") {
               this.bagProService.srvObtenerListaProcSelladoFechas(fechaInicial, fechaInicial).subscribe(datos_ot => {
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (!rollos.includes(datos_ot[i].item)) {
+                  if (!rollos.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
                     this.idProducto = datos_ot[i].referencia;
                     if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
                     if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
@@ -744,6 +753,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       Proceso : proceso,
                     }
                     this.rollos.push(info);
+                    rollos.push(datos_ot[i].item)
                     RollosConsultados.push(datos_ot[i].item);
                     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
@@ -833,6 +843,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       otTemporral = datos_ot[i].ot;
                       this.rollos.push(info);
                       RollosConsultados.push(datos_ot[i].item);
+                      rollos.push(datos_ot[i].item);
                       this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                       this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
@@ -896,7 +907,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
             } else if (ProcConsulta == "2") {
               this.bagProService.srvObtenerListaProcSelladoRollosOT(ot).subscribe(datos_ot => {
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (!rollos.includes(datos_ot[i].item)) {
+                  if (!rollos.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
                     this.idProducto = datos_ot[i].referencia;
                     if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
                     if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
@@ -915,6 +926,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       Proceso : proceso,
                     }
                     this.rollos.push(info);
+                    rollos.push(datos_ot[i].item)
                     RollosConsultados.push(datos_ot[i].item);
                     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
@@ -1006,6 +1018,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       otTemporral = datos_ot[i].ot;
                       this.rollos.push(info);
                       RollosConsultados.push(datos_ot[i].item);
+                      rollos.push(datos_ot[i].item);
                       this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                       this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
@@ -1069,7 +1082,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
             } else if (ProcConsulta == "2") {
               this.bagProService.srvObtenerListaProcSelladoFechas(this.today, this.today).subscribe(datos_ot => {
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (!rollos.includes(datos_ot[i].item)) {
+                  if (!rollos.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
                     this.idProducto = datos_ot[i].referencia;
                     if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
                     if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
@@ -1088,6 +1101,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       Proceso : proceso,
                     }
                     this.rollos.push(info);
+                    rollos.push(datos_ot[i].item)
                     RollosConsultados.push(datos_ot[i].item);
                     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
@@ -1155,9 +1169,11 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
               // });
             }
           }
-        }, 4000);        if (this.rollos.length > 2000) setTimeout(() => { this.cargando = true; }, 10000);
-        else if (this.rollos.length > 1000) setTimeout(() => { this.cargando = true; }, 7000);
-        else setTimeout(() => { this.cargando = true; }, 5000);
+        }, 2000);
+        setTimeout(() => {
+          if (this.rollos.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+          this.cargando = true;
+        }, 10000);
       } else Swal.fire("¡La fecha seleccionada no es valida!");
     } else Swal.fire("¡Seleccione un proceso!");
   }
@@ -1399,7 +1415,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         this.cargando = true;
       });
     }
-    if (this.rollosInsertar.length > 500) {
+    if (this.rollosInsertar.length > 1000) {
       setTimeout(() => {
         const Toast = Swal.mixin({
           toast: true,
@@ -1418,7 +1434,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         });
         this.buscarRolloPDF(idEntrada);
       }, 60000);
-    }  else if (this.rollosInsertar.length > 400) {
+    }  else if (this.rollosInsertar.length > 600) {
       setTimeout(() => {
         const Toast = Swal.mixin({
           toast: true,
@@ -1437,7 +1453,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         });
         this.buscarRolloPDF(idEntrada);
       }, 30000);
-    } else if (this.rollosInsertar.length > 300) {
+    } else if (this.rollosInsertar.length > 500) {
       setTimeout(() => {
         const Toast = Swal.mixin({
           toast: true,
@@ -1456,7 +1472,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         });
         this.buscarRolloPDF(idEntrada);
       }, 20000);
-    } else if (this.rollosInsertar.length > 200) {
+    } else if (this.rollosInsertar.length > 400) {
       setTimeout(() => {
         const Toast = Swal.mixin({
           toast: true,
@@ -1475,7 +1491,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         });
         this.buscarRolloPDF(idEntrada);
       }, 15000);
-    } else if (this.rollosInsertar.length > 100) {
+    } else if (this.rollosInsertar.length > 250) {
       setTimeout(() => {
         const Toast = Swal.mixin({
           toast: true,
@@ -1494,7 +1510,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         });
         this.buscarRolloPDF(idEntrada);
       }, 10000);
-    } else if (this.rollosInsertar.length > 50) {
+    } else if (this.rollosInsertar.length > 100) {
       setTimeout(() => {
         const Toast = Swal.mixin({
           toast: true,
@@ -1512,7 +1528,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           title: '¡Pre Entrada de Rollos registrada con exito!'
         });
         this.buscarRolloPDF(idEntrada);
-      }, 5000);
+      }, 6000);
     } else {
       setTimeout(() => {
         const Toast = Swal.mixin({
