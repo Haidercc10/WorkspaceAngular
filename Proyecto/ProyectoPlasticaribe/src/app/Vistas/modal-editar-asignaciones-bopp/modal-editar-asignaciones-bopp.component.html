@@ -110,11 +110,28 @@
               <label for="floatingInput">Pallet/Serial</label>
             </div>
             <!-- Nombre  -->
-            <div class="form-floating col-md">
-              <select formControlName="boppNombre" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" (change)="BOPPSeleccionado()">
-                <option [ngValue]="bopp.bopP_Nombre" *ngFor="let bopp of ArrayBOPP">{{bopp.bopP_Nombre}}</option>
-              </select>
-              <label for="floatingSelect">Nombre Bopp</label>
+            <div class="ng-autocomplete form-floating col-md form-control form-control-sm">
+              <ng-autocomplete
+                class=""
+                [data]="ArrayBOPP"
+                (selected)='BOPPSeleccionado($event)'
+                (inputChanged)='onChangeSearch($event)'
+                (inputFocused)='onFocused($event)'
+                [searchKeyword]="keyword"
+                [itemTemplate]="itemTemplate"
+                [notFoundTemplate]="notFoundTemplate"
+                id="floatingInput"
+                formControlName="boppNombre">
+              </ng-autocomplete>
+
+              <ng-template #itemTemplate let-item>
+                <a [innerHTML]="item.bopP_Nombre"></a>
+              </ng-template>
+
+              <ng-template #notFoundTemplate let-notFound>
+                <div [innerHTML]="notFound"></div>
+              </ng-template>
+              <label for="floatingInput" *ngIf="validarInput">Nombre BOPP</label>
             </div>
           </div>
         </div>
@@ -146,7 +163,8 @@
                 <tr>
                   <th id="idMateriaPrima" scope="col">Pallet/Serial</th>
                   <th id="nombreMateriaPrima" scope="col">Nombre</th>
-                  <!-- <th id="editar" scope="col">Editar</th> -->
+                  <th>Cantidad</th>
+                  <th id="editar" scope="col">Editar Cant.</th>
                   <ng-container *ngIf="ValidarRol == 1">
                     <th id="eliminar" scope="col">Eliminar</th>
                   </ng-container>
@@ -157,7 +175,12 @@
                 <tr *ngFor="let bopp of ArrayBoppPedida let i = index">
                   <td id="idMateriaPrima">{{bopp.Serial}}</td>
                   <td id="nombreMateriaPrima">{{bopp.Nombre}}</td>
-                  <!-- <td id="Editar" (click)="EditarMateriaPrimaTabla(materiaPrima)"><a><i class="fa fa-pencil" aria-hidden="true" title="Editar Materia Prima"></i></a></td> -->
+                  <th>{{bopp.Cantidad2}}</th>
+                  <td id="Editar" style="width: 20%;">
+                    <form [formGroup]="FormularioEdicion">
+                      <input formControlName="boppCantidad" (keyup.Enter)="cambiarCantidad(bopp)" type="number" class="form-control" style="border: none;">
+                    </form>
+                  </td>
                   <ng-container *ngIf="ValidarRol == 1">
                     <td id="Eliminar" (click)="quitarBOPP(i, bopp)"><a><i class="fa fa-trash" aria-hidden="true" title="Quitar BOPP de la asignación"></i></a></td>
                   </ng-container>
