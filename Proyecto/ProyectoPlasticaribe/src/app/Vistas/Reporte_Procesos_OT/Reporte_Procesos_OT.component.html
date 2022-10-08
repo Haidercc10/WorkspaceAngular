@@ -30,7 +30,7 @@
             <!--OT-->
               <div class="form-floating col-md-2">
                 <input formControlName="idDocumento" type="number" class="form-control" id="floatingInput" title="N° de la Orden de Trabajo" required >
-                <label for="floatingInput">Orden de trabajo</label>
+                <label for="floatingInput">OT</label>
               </div>
               <!-- Fecha inicial -->
               <div class="form-floating col-md-2">
@@ -73,7 +73,7 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <button class="btn btn-danger btn-danger-sm" type="button" (click)="consultarOT()">Consultar</button>
               <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar campos</button>
-              <button class="btn btn-danger btn-danger-sm" type="button" (click)="anadirFalla()">Agregar Falla</button>
+              <button class="btn btn-danger btn-danger-sm" type="button" (click)="anadirFalla()" title="Para agregar una falla debe seleccionar una OT.">Agregar Falla</button>
               <button class="btn btn-danger btn-danger-sm" type="button" (click)="exportToExcel()">Exportar A Excel</button>
             </div>
           </div>
@@ -192,10 +192,10 @@
                         </ng-container>
 
                         <!-- Empaque -->
-                        <ng-container *ngIf="tabla.emp >= tabla.cant">
+                        <ng-container *ngIf="tabla.emp >= (tabla.cant + (tabla.cant * -0.10))">
                           <td id="emp" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.emp | number}}</td>
                         </ng-container>
-                        <ng-container *ngIf="tabla.emp < tabla.cant && tabla.emp > 0">
+                        <ng-container *ngIf="tabla.emp < (tabla.cant + (tabla.cant * -0.10)) && tabla.emp > 0">
                           <td id="emp" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)">{{tabla.emp | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.emp == 0 && tabla.emp < tabla.cant">
@@ -203,10 +203,10 @@
                         </ng-container>
 
                         <!-- Sellado -->
-                        <ng-container *ngIf="tabla.sel >= tabla.cant">
+                        <ng-container *ngIf="tabla.sel >= (tabla.cant + (tabla.cant * -0.10))">
                           <td id="sel" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.sel | number}}</td>
                         </ng-container>
-                        <ng-container *ngIf="tabla.sel < tabla.cant && tabla.sel > 0">
+                        <ng-container *ngIf="tabla.sel < (tabla.cant + (tabla.cant * -0.10)) && tabla.sel > 0">
                           <td id="sel" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)">{{tabla.sel | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.sel == 0 && tabla.sel < tabla.cant">
@@ -214,10 +214,10 @@
                         </ng-container>
 
                         <!-- Wiketiado -->
-                        <ng-container *ngIf="tabla.wik >= tabla.cant">
+                        <ng-container *ngIf="tabla.wik >= (tabla.cant + (tabla.cant * -0.10))">
                           <td id="wik" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.wik | number}}</td>
                         </ng-container>
-                        <ng-container *ngIf="tabla.wik < tabla.cant && tabla.wik > 0">
+                        <ng-container *ngIf="tabla.wik < (tabla.cant + (tabla.cant * -0.10)) && tabla.wik > 0">
                           <td id="wik" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)">{{tabla.wik | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.wik == 0 && tabla.wik < tabla.cant">
