@@ -64,9 +64,6 @@ export let rutaZeus = "http://192.168.0.85:9055/api"; //Ruta al servidor de la b
 // export let rutaZeus = "https://localhost:7283/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
 
 
-// export let rutaPlasticaribeAPI = "http://192.168.0.153:9085/api";
-export let rutaPlasticaribe2 = "http://localhost:9085/api";
-export let rutaPlasticaribe3 = "https://192.168.0.153:7137/api";
 
 /***************************************************************************************************
  * APPLICATION IMPORTS

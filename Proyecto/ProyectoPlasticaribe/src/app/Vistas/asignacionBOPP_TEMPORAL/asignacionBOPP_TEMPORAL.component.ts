@@ -467,7 +467,23 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             this.limpiarTodosLosCampos();
             this.load = true;
 
-          }, error => { console.log(error); });
+          }, error => {
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'center',
+              showConfirmButton: false,
+              timer: 1500,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+              }
+            });
+            Toast.fire({
+              icon: 'error',
+              title: 'Error al actualizar la existencia del BOPP!'
+            });
+          });
         }
       });
     }
