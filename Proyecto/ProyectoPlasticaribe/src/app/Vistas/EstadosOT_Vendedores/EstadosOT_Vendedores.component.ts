@@ -1,22 +1,22 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { Workbook } from 'exceljs';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesos_OT.service';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import Swal from 'sweetalert2';
-import * as XLSX from 'xlsx';
-import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
+import { EstadosProcesosOTxVendedoresService } from 'src/app/Servicios/EstadosProcesosOTxVendedores.service';
 
 @Component({
-  selector: 'app-Reporte_Procesos_OT',
-  templateUrl: './Reporte_Procesos_OT.component.html',
-  styleUrls: ['./Reporte_Procesos_OT.component.css']
+  selector: 'app-EstadosOT_Vendedores',
+  templateUrl: './EstadosOT_Vendedores.component.html',
+  styleUrls: ['./EstadosOT_Vendedores.component.css']
 })
-export class Reporte_Procesos_OTComponent implements OnInit {
+export class EstadosOT_VendedoresComponent implements OnInit {
 
   public formularioOT !: FormGroup;
   public page : number; //Variable que tendrá el paginado de la tabla en la que se muestran los pedidos consultados
@@ -37,6 +37,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   private rolService : RolesService,
                     private fallasTecnicasService : FallasTecnicasService,
                       private estadosProcesos_OTService : EstadosProcesos_OTService,
+                       private srvEstadosOTVendedores : EstadosProcesosOTxVendedoresService,
                         private estadosService : EstadosService,
                         private servicioBagPro : BagproService) {
 
@@ -82,6 +83,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
     let rol = this.storage.get('Rol');
+    console.log(this.storage_Id);
+    console.log(this.storage_Nombre);
     this.rolService.srvObtenerLista().subscribe(datos_roles => {
       for (let index = 0; index < datos_roles.length; index++) {
         if (datos_roles[index].rolUsu_Id == rol) {
@@ -432,7 +435,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             }
           });
         } else if (numOT != null && fechaincial != null && fechaFinal != null && estado != null) {
-          this.estadosProcesos_OTService.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal).subscribe(datos_ot => {
+
+          this.srvEstadosOTVendedores.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal, this.storage_Id).subscribe(datos_ot => {
             if(datos_ot.length == 0){
               setTimeout(() => {
                 Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);
@@ -486,7 +490,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             }
           });
         } else if (numOT != null && fechaincial != null && fechaFinal != null) {
-          this.estadosProcesos_OTService.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal).subscribe(datos_ot => {
+          this.srvEstadosOTVendedores.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal, this.storage_Id).subscribe(datos_ot => {
             if(datos_ot.length == 0){
               setTimeout(() => {
                 Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);
@@ -540,7 +544,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             }
           });
         } else if (fechaincial != null && fechaFinal != null && estado != null) {
-          this.estadosProcesos_OTService.srvObtenerListaPorFechasEstado(fechaincial, fechaFinal, estado).subscribe(datos_ot => {
+          this.srvEstadosOTVendedores.srvObtenerListaPorFechasEstado(fechaincial, fechaFinal, estado, this.storage_Id).subscribe(datos_ot => {
             if(datos_ot.length == 0){
               setTimeout(() => {
                 Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);
@@ -592,7 +596,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             }
           });
         } else if (numOT != null && fechaincial != null && estado != null) {
-          this.estadosProcesos_OTService.srvObtenerListaPorOtFecha(numOT, fechaincial).subscribe(datos_ot => {
+          this.srvEstadosOTVendedores.srvObtenerListaPorOtFecha(numOT, fechaincial, this.storage_Id).subscribe(datos_ot => {
             if(datos_ot.length == 0){
               setTimeout(() => {
                 Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);
@@ -630,7 +634,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               Swal.fire('La fecha final debe ser mayor que la fecha inicial');
             }, 4800);
           }else{
-            this.estadosProcesos_OTService.srvObtenerListaPorFechas(fechaincial, fechaFinal).subscribe(datos_ot => {
+            this.srvEstadosOTVendedores.srvObtenerListaPorFechas(fechaincial, fechaFinal, this.storage_Id).subscribe(datos_ot => {
               if(datos_ot.length == 0) {
                 setTimeout(() => {
                   Swal.fire('No existen OTs creadas en las fechas consultadas.')
@@ -658,7 +662,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           });
           }
         } else if (numOT != null && fechaincial != null) {
-          this.estadosProcesos_OTService.srvObtenerListaPorOtFecha(numOT, fechaincial).subscribe(datos_ot => {
+          this.srvEstadosOTVendedores.srvObtenerListaPorOtFecha(numOT, fechaincial, this.storage_Id).subscribe(datos_ot => {
             if(datos_ot.length == 0){
               setTimeout(() => {
                 Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);
@@ -736,7 +740,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             });
           }
         } else if (estado != null && numOT != null) {
-          this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
+          this.srvEstadosOTVendedores.srvObtenerListaPorOT(numOT, this.storage_Id).subscribe(datos_ot => {
             if(datos_ot.length == 0){
               setTimeout(() => {
                 Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);
@@ -790,7 +794,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             }
           });
         } else if (fechaincial != null && estado != null) {
-          this.estadosProcesos_OTService.srvObtenerListaPorFecha(fechaincial).subscribe(datos_ot => {
+          this.srvEstadosOTVendedores.srvObtenerListaPorFecha(fechaincial, this.storage_Id).subscribe(datos_ot => {
             if(datos_ot.length == 0){
               setTimeout(() => {
                 Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);
@@ -818,7 +822,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             }
           });
         } else if (numOT != null) {
-          this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
+          this.srvEstadosOTVendedores.srvObtenerListaPorOT(numOT, this.storage_Id).subscribe(datos_ot => {
             if(datos_ot.length == 0) {
               setTimeout(() => {
                   Swal.fire('No se encontró la OT consultada.');
@@ -850,7 +854,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               Swal.fire(`Solo se muestran OT's desde el inicio de las asignaciones de Materia Prima (2022-05-01)`);
             }, 4800);
           } else {
-            this.estadosProcesos_OTService.srvObtenerListaPorFecha(fechaincial).subscribe(datos_ot => {
+            this.srvEstadosOTVendedores.srvObtenerListaPorFecha(fechaincial, this.storage_Id).subscribe(datos_ot => {
               if(datos_ot.length == 0) {
                 setTimeout(() => {
                   Swal.fire(`No se encontraron OTs creadas el día ${fechaincial}`);
@@ -904,7 +908,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             }
           });
         } else if (estado != null) {
-          this.estadosProcesos_OTService.srvObtenerListaPorOtEstado(estado).subscribe(datos_ot => {
+          this.srvEstadosOTVendedores.srvObtenerListaPorOtEstado(estado, this.storage_Id).subscribe(datos_ot => {
             if(datos_ot.length == 0) {
               setTimeout(() => {
                 Swal.fire(`No se encontraron OT's con el Estado consultado.`);
@@ -930,7 +934,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             }
           });
         } else {
-          this.estadosProcesos_OTService.srvObtenerListaPorFecha(this.today).subscribe(datos_ot => {
+          this.srvEstadosOTVendedores.srvObtenerListaPorFecha(this.today, this.storage_Id).subscribe(datos_ot => {
             if(datos_ot.length == 0) {
               setTimeout(() => {
                 Swal.fire(`No se encontraron OT's creadas del día de hoy.`);
@@ -1045,4 +1049,5 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       }
     });
   }
+
 }

@@ -22,7 +22,7 @@ export class BagproService {
   srvObtenerListaProcSelladoOT(ot : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/OT/${ot}`);
   }
-  
+
   srvObtenerListaProcSelladoRollo(ot : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/Rollos/${ot}`);
   }
@@ -89,7 +89,7 @@ export class BagproService {
 
   srvObtenerListaProcExtrusionRollos(ot : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/Rollos/${ot}`);
-  }  
+  }
 
   srvObtenerListaProcExtrusionFechas(fecha1 : any, fecha2 : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/FechasRollos/${fecha1}/${fecha2}`);
@@ -145,6 +145,10 @@ export class BagproService {
 
   srvObtenerItemsBagproXClienteItem(codigo : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/OtItem/${codigo}`);
+  }
+
+  srvObtenerOTsPorVendedor(vendedor : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/BuscarOTxVendedores/${vendedor}`);
   }
 
   /* DESPERDICIO */

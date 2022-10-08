@@ -88,6 +88,7 @@ import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExt
 import { PreIngresoRolloSelladoComponent } from './Vistas/PreIngresoRolloSellado/PreIngresoRolloSellado.component';
 import { InventarioProductosPBDDComponent } from './Vistas/Inventario-Productos-PBDD/Inventario-Productos-PBDD.component';
 import { BuscarInventarioXProductoPipe } from './Pipes/BuscarInventarioXProducto.pipe';
+import { EstadosOT_VendedoresComponent } from './Vistas/EstadosOT_Vendedores/EstadosOT_Vendedores.component';
 
 
 export const routes: Routes = [
@@ -152,6 +153,7 @@ export const routes: Routes = [
   {path: 'asignacion-productos-facturas', canActivate : [ValidacionLoginGuard], component : AsignarProductosFacturasComponent}, // Ingresar Productos
   {path: 'reporte-despacho', canActivate : [ValidacionLoginGuard], component : ReporteDespachoComponent}, // Ingresar Productos
   {path: 'inventario-productos', canActivate : [ValidacionLoginGuard], component : InventarioProductosPBDDComponent}, // Ingresar Productos
+  {path: 'estados-ot-vendedores', canActivate : [ValidacionLoginGuard], component : EstadosOT_VendedoresComponent}, // Estados OT Vendedores
 ]
 
 @NgModule({
@@ -229,7 +231,8 @@ export const routes: Routes = [
     PreIngresoRollosExtrusionComponent,
     PreIngresoRolloSelladoComponent,
     InventarioProductosPBDDComponent,
-    BuscarInventarioXProductoPipe
+    BuscarInventarioXProductoPipe,
+    EstadosOT_VendedoresComponent,
   ],
 
 
