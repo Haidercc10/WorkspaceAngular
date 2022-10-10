@@ -51,14 +51,26 @@
                <label for="floatingSelect">Estado OT</label>
              </div>
 
-
-             <!-- Fallas -->
-            <!-- <div class="form-floating col-md-2">
-               <select formControlName="fallasOT" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example">
-                 <option [ngValue]="falla.falla_Id" *ngFor="let falla of fallas">{{falla.falla_Nombre}}</option>
-               </select>
-               <label for="floatingSelect">Fallas OT</label>
-             </div>-->
+             <!-- Vendedores -->
+             <div class="ng-autocomplete form-floating col-md form-control form-control-sm" >
+              <ng-autocomplete
+                class=""
+                [data]="vendedores"
+                [searchKeyword]="keyword"
+                [itemTemplate]="itemTemplate"
+                [notFoundTemplate]="notFoundTemplate"
+                id="floatingInput"
+                placeholder="Nombre Vendedor"
+                formControlName="Vendedor">
+              </ng-autocomplete>
+              <ng-template #itemTemplate let-item>
+                <a [innerHTML]="item.usua_Nombre"></a>
+              </ng-template>
+              <ng-template #notFoundTemplate let-notFound>
+                <div [innerHTML]="notFound"></div>
+              </ng-template>
+              <!-- <label for="floatingInput" >Nombre Vendedor</label> -->
+            </div>
 
              <!-- Observación -->
             <!-- <div class="form-floating col-6 col-md">
@@ -111,7 +123,6 @@
                     <th id="" scope="col">Sellado</th>
                     <th id="" scope="col">Wiket.</th>
                     <th id="" scope="col">Cantidad Producir</th>
-                    <th id="" scope="col">Fallas</th>
                     <th id="" scope="col">Estados</th>
                     <th id="" scope="col">Fecha Creación</th>
                   </tr>
@@ -119,113 +130,110 @@
                   <tbody class="TextosInfoTabla">
                     <tr *ngFor="let tabla of ArrayDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
                       <!-- Orden de Trabajo -->
-                      <td (click)="seleccionarFilaTabla(tabla)" id="ot" scope="col">{{tabla.ot}}</td>
-                      <td (click)="seleccionarFilaTabla(tabla)" id="cliente" scope="col">{{tabla.cliente}}</td>
-                      <td (click)="seleccionarFilaTabla(tabla)" id="producto" scope="col">{{tabla.producto}}</td>
+                      <td null id="ot" scope="col">{{tabla.ot}}</td>
+                      <td null id="cliente" scope="col">{{tabla.cli}}</td>
+                      <td null id="producto" scope="col">{{tabla.prod}}</td>
                       <!-- Extrusion -->
                       <ng-container *ngIf="tabla.ext >= tabla.cant">
-                        <td id="ext" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.ext | number}}</td>
+                        <td id="ext" scope="col" style="background-color: rgb(185, 255, 185);">{{tabla.ext | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.ext < tabla.cant && tabla.ext > 0">
-                        <td id="ext" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)">{{tabla.ext | number}}</td>
+                        <td id="ext" scope="col" style="background-color: rgb(255, 201, 143);">{{tabla.ext | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.ext == 0 && tabla.ext < tabla.cant">
-                        <td id="ext" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)">{{tabla.ext | number}}</td>
+                        <td id="ext" scope="col" style="background-color: rgb(255, 146, 146);">{{tabla.ext | number}}</td>
                       </ng-container>
 
                       <!-- Impresion -->
                       <ng-container *ngIf="tabla.imp >= tabla.cant">
-                        <td id="imp" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.imp | number}}</td>
+                        <td id="imp" scope="col" style="background-color: rgb(185, 255, 185);">{{tabla.imp | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.imp < tabla.cant && tabla.imp > 0">
-                        <td id="imp" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)">{{tabla.imp | number}}</td>
+                        <td id="imp" scope="col" style="background-color: rgb(255, 201, 143);">{{tabla.imp | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.imp == 0 && tabla.imp < tabla.cant">
-                        <td id="imp" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)">{{tabla.imp | number}}</td>
+                        <td id="imp" scope="col" style="background-color: rgb(255, 146, 146);">{{tabla.imp | number}}</td>
                       </ng-container>
 
                       <!-- Rotograbado -->
                       <ng-container *ngIf="tabla.rot >= tabla.cant">
-                        <td id="rot" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.rot | number}}</td>
+                        <td id="rot" scope="col" style="background-color: rgb(185, 255, 185);">{{tabla.rot | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.rot < tabla.cant && tabla.rot > 0">
-                        <td id="rot" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)">{{tabla.rot | number}}</td>
+                        <td id="rot" scope="col" style="background-color: rgb(255, 201, 143);">{{tabla.rot | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.rot == 0 && tabla.rot < tabla.cant">
-                        <td id="rot" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)">{{tabla.rot | number}}</td>
+                        <td id="rot" scope="col" style="background-color: rgb(255, 146, 146);">{{tabla.rot | number}}</td>
                       </ng-container>
 
                       <!-- Doblado -->
                       <ng-container *ngIf="tabla.dbl >= tabla.cant">
-                        <td id="dbl" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.dbl | number}}</td>
+                        <td id="dbl" scope="col" style="background-color: rgb(185, 255, 185);">{{tabla.dbl | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.dbl < tabla.cant && tabla.dbl > 0">
-                        <td id="dbl" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)">{{tabla.dbl | number}}</td>
+                        <td id="dbl" scope="col" style="background-color: rgb(255, 201, 143);">{{tabla.dbl | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.dbl == 0 && tabla.dbl < tabla.cant">
-                        <td id="dbl" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)">{{tabla.dbl | number}}</td>
+                        <td id="dbl" scope="col" style="background-color: rgb(255, 146, 146);">{{tabla.dbl | number}}</td>
                       </ng-container>
 
                       <!-- laminado -->
                       <ng-container *ngIf="tabla.lam >= tabla.cant">
-                        <td id="lam" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.lam | number}}</td>
+                        <td id="lam" scope="col" style="background-color: rgb(185, 255, 185);">{{tabla.lam | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.lam < tabla.cant && tabla.lam > 0">
-                        <td id="lam" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)">{{tabla.lam | number}}</td>
+                        <td id="lam" scope="col" style="background-color: rgb(255, 201, 143);">{{tabla.lam | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.lam == 0 && tabla.lam < tabla.cant">
-                        <td id="lam" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)">{{tabla.lam | number}}</td>
+                        <td id="lam" scope="col" style="background-color: rgb(255, 146, 146);">{{tabla.lam | number}}</td>
                       </ng-container>
 
                       <!-- Corte -->
                       <ng-container *ngIf="tabla.cor >= tabla.cant">
-                        <td id="cor" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.cor | number}}</td>
+                        <td id="cor" scope="col" style="background-color: rgb(185, 255, 185);">{{tabla.cor | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.cor < tabla.cant && tabla.cor > 0">
-                        <td id="cor" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)">{{tabla.cor | number}}</td>
+                        <td id="cor" scope="col" style="background-color: rgb(255, 201, 143);">{{tabla.cor | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.cor == 0 && tabla.cor < tabla.cant">
-                        <td id="cor" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)">{{tabla.cor | number}}</td>
+                        <td id="cor" scope="col" style="background-color: rgb(255, 146, 146);">{{tabla.cor | number}}</td>
                       </ng-container>
 
                       <!-- Empaque -->
                       <ng-container *ngIf="tabla.emp >= (tabla.cant + (tabla.cant * -0.10))">
-                        <td id="emp" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.emp | number}}</td>
+                        <td id="emp" scope="col" style="background-color: rgb(185, 255, 185);">{{tabla.emp | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.emp < (tabla.cant + (tabla.cant * -0.10)) && tabla.emp > 0">
-                        <td id="emp" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)">{{tabla.emp | number}}</td>
+                        <td id="emp" scope="col" style="background-color: rgb(255, 201, 143);">{{tabla.emp | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.emp == 0 && tabla.emp < tabla.cant">
-                        <td id="emp" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)">{{tabla.emp | number}}</td>
+                        <td id="emp" scope="col" style="background-color: rgb(255, 146, 146);">{{tabla.emp | number}}</td>
                       </ng-container>
 
                       <!-- Sellado -->
                       <ng-container *ngIf="tabla.sel >= (tabla.cant + (tabla.cant * -0.10))">
-                        <td id="sel" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.sel | number}}</td>
+                        <td id="sel" scope="col" style="background-color: rgb(185, 255, 185);">{{tabla.sel | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.sel < (tabla.cant + (tabla.cant * -0.10)) && tabla.sel > 0">
-                        <td id="sel" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)">{{tabla.sel | number}}</td>
+                        <td id="sel" scope="col" style="background-color: rgb(255, 201, 143);">{{tabla.sel | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.sel == 0 && tabla.sel < tabla.cant">
-                        <td id="sel" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)">{{tabla.sel}}</td>
+                        <td id="sel" scope="col" style="background-color: rgb(255, 146, 146);">{{tabla.sel}}</td>
                       </ng-container>
 
                       <!-- Wiketiado -->
                       <ng-container *ngIf="tabla.wik >= (tabla.cant + (tabla.cant * -0.10))">
-                        <td id="wik" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.wik | number}}</td>
+                        <td id="wik" scope="col" style="background-color: rgb(185, 255, 185);">{{tabla.wik | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.wik < (tabla.cant + (tabla.cant * -0.10)) && tabla.wik > 0">
-                        <td id="wik" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)">{{tabla.wik | number}}</td>
+                        <td id="wik" scope="col" style="background-color: rgb(255, 201, 143);">{{tabla.wik | number}}</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.wik == 0 && tabla.wik < tabla.cant">
-                        <td id="wik" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)">{{tabla.wik | number}}</td>
+                        <td id="wik" scope="col" style="background-color: rgb(255, 146, 146);">{{tabla.wik | number}}</td>
                       </ng-container>
 
                       <!-- Cantidad Total a Producir -->
                       <td id="cant" scope="col">{{tabla.cant | number}}</td>
-
-                      <!-- Fallas -->
-                      <td id="falla" scope="col" title="{{tabla.obs}}">{{tabla.falla}}</td>
 
                       <!-- Estado OT -->
                       <td id="est" scope="col">{{tabla.est}}</td>

@@ -4,7 +4,7 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Observable } from 'rxjs';
 import { AppComponent} from 'src/app/app.component';
 import { modelMezclas } from '../Modelo/modelMezclas';
-import { rutaPlasticaribeAPI, rutaPlasticaribeAPIPrueba } from 'src/polyfills';
+import { rutaPlasticaribeAPI,  } from 'src/polyfills';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class MezclasService {
     @Inject(SESSION_STORAGE) private storage: WebStorageService) {
 
     // if (this.storage.get('BD') == 1) this.rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = rutaPlasticaribeAPIPrueba;
+    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = ;
   }
 
 

@@ -38,4 +38,11 @@ export class EstadosProcesosOTxVendedoresService {
   srvObtenerListaPorFechasEstado(fecha1 : any, fecha2 : any, estado : any, vendedor : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorFechasEstadoVendedor/${fecha1}/${fecha2}/${estado}/${vendedor}`);
   }
+
+  // Funcion que va a enviar los parametros de la consulta
+  consultarPorFechasVendedor(fecha1 : any, fecha2 : any, vendedor : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorFechasVendedor/${fecha1}/${fecha2}/${vendedor}`);
+  }
+
+
 }

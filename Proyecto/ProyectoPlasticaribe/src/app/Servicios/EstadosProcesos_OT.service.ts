@@ -4,7 +4,7 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Observable } from 'rxjs';
 import { AppComponent} from 'src/app/app.component';
 import { modelEstadosProcesos_OT } from '../Modelo/modelEstadosPreceos_OT';
-import { rutaPlasticaribeAPI, rutaPlasticaribeAPIPrueba } from 'src/polyfills';
+import { rutaPlasticaribeAPI,  } from 'src/polyfills';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class EstadosProcesos_OTService {
     @Inject(SESSION_STORAGE) private storage: WebStorageService) {
 
     // if (this.storage.get('BD') == 1) this.rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = rutaPlasticaribeAPIPrueba;
+    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = ;
   }
 
   srvObtenerLista() {
@@ -87,6 +87,11 @@ export class EstadosProcesos_OTService {
 
   srvObtenerListaPorFechasEstadoFalla(fecha1 : any, fecha2 : any, estado : any, falla : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorFechasEstadoFallas/${fecha1}/${fecha2}/${estado}/${falla}`);
+  }
+
+  // Funcion que enviará los parametros de la consulta
+  consultarPorFechasVendedor(fecha1 : any, fecha2 : any, vendedor : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorFechasVendedor/${fecha1}/${fecha2}/${vendedor}`);
   }
 
   srvActualizar(id:number|string, data:any) {

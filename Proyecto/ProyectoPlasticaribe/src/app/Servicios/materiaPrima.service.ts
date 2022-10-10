@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { AppComponent} from 'src/app/app.component';
 import { modelMateriaPrima } from '../Modelo/modelMateriaPrima';
 import { modelPedidomateriaprima } from '../Modelo/modelPedidomateriaprima';
-import { rutaPlasticaribeAPI, rutaPlasticaribeAPIPrueba } from 'src/polyfills';
+import { rutaPlasticaribeAPI,  } from 'src/polyfills';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +19,7 @@ export class MateriaPrimaService {
     @Inject(SESSION_STORAGE) private storage: WebStorageService) {
 
     // if (this.storage.get('BD') == 1) this.rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = rutaPlasticaribeAPIPrueba;
+    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = ;
   }
 
 

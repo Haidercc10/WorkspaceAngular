@@ -394,11 +394,13 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   // Funcion que va a mostrar por la cantidad deseada
   mostrarRollosPorCantidad(){
+    this.cargando = false;
     this.rollos = [];
     this.cantTotalProducto = 0;
     this.presentacionProducto = '';
     let id : number = this.FormConsultarProductos.value.IdProducto;
     this.dtEntradaRollo.srvConsultarProducto(id).subscribe(datos_rollos => {
+      console.log(9)
       let rollosExistentes : any [] = [];
       for (let i = 0; i < datos_rollos.length; i++) {
         if (datos_rollos[i].estado_Id == 19) {
@@ -416,6 +418,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
               CantPaqRestantesEnviar : datos_rollos[i].prod_CantPaquetesRestantes,
               suma : false,
             }
+
             this.rollos.push(info);
             rollosExistentes.push(datos_rollos[i].rollo_Id);
             this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
@@ -469,12 +472,13 @@ export class AsignarProductosFacturasComponent implements OnInit {
       let sumaCantidad : number = 0;
       this.cantTotalProducto = 0;
       for (let i = 0; i < this.rollos.length; i++) {
+
         if (sumaCantidad == cantidadPedida) break;
         else if (sumaCantidad >= cantidadPedida) break;
         else if (sumaCantidad < cantidadPedida) {
-          sumaCantidad += this.rollos[i].Cantidad;
+          sumaCantidad += this.rollos[i].CantPaqRestantes;
           this.rollos[i].suma = true;
-          this.cantTotalProducto += this.rollos[i].Cantidad;
+          this.cantTotalProducto += this.rollos[i].CantPaqRestantes;
           this.presentacionProducto = this.rollos[i].Presentacion;
         }
       }
@@ -482,8 +486,9 @@ export class AsignarProductosFacturasComponent implements OnInit {
         let nuevo : any = this.rollos.filter((item) => item.suma === true);
         this.rollos = [];
         this.rollos = nuevo;
-      }, 10);
-    }, 50);
+        this.cargando = true;
+      }, 1000);
+    }, 1050);
   }
 
   // Funcion que permitirá buscar los rollos por el id del producto

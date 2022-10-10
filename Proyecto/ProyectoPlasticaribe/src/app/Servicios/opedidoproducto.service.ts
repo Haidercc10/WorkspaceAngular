@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { AppComponent} from 'src/app/app.component';
 // import { AppComponent} from 'src/app/app.component';
 import { modelOpedidoproducto } from '../Modelo/modelOpedidoproducto';
-import { rutaPlasticaribeAPI, rutaPlasticaribeAPIPrueba } from 'src/polyfills';
+import { rutaPlasticaribeAPI,  } from 'src/polyfills';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +19,7 @@ export class OpedidoproductoService {
     @Inject(SESSION_STORAGE) private storage: WebStorageService) {
 
     // if (this.storage.get('BD') == 1) this.rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = rutaPlasticaribeAPIPrueba;
+    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = ;
   }
 
 //Metodo buscar lista de Pedidos de Productos

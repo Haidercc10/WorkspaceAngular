@@ -97,7 +97,7 @@ a, a:hover, a:focus {
 }
 
 .boton{
-  margin-left: 60px;
+  margin-left: 80px;
 }
 
 .boton:hover {
@@ -108,7 +108,7 @@ a, a:hover, a:focus {
     SIDEBAR STYLE
 ----------------------------------------------------- */
 #sidebar {
-    width: 300px;
+    width: 330px;
     position: fixed;
     top: 0;
     left: 0;
