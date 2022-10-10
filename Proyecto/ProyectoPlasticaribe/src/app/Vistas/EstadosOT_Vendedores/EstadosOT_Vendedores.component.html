@@ -99,26 +99,29 @@
                 <thead class="TitulosTabla">
                   <tr>
                     <th id="" scope="col">OT</th>
-                    <th id="" scope="col">Extrusión</th>
-                    <th id="" scope="col">Impresión</th>
-                    <th id="" scope="col">Rotograbado</th>
-                    <th id="" scope="col">Doblado</th>
-                    <th id="" scope="col">Laminado</th>
+                    <th id="" scope="col">Cliente</th>
+                    <th id="" scope="col">Producto</th>
+                    <th id="" scope="col">Extrus.</th>
+                    <th id="" scope="col">Impres.</th>
+                    <th id="" scope="col">Rotog.</th>
+                    <th id="" scope="col">Dobl.</th>
+                    <th id="" scope="col">Lamin.</th>
                     <th id="" scope="col">Corte</th>
-                    <th id="" scope="col">Empaque</th>
+                    <th id="" scope="col">Empaq.</th>
                     <th id="" scope="col">Sellado</th>
-                    <th id="" scope="col">Wiketiado</th>
+                    <th id="" scope="col">Wiket.</th>
                     <th id="" scope="col">Cantidad Producir</th>
                     <th id="" scope="col">Fallas</th>
                     <th id="" scope="col">Estados</th>
                     <th id="" scope="col">Fecha Creación</th>
                   </tr>
                 </thead>
-                  <tbody>
+                  <tbody class="TextosInfoTabla">
                     <tr *ngFor="let tabla of ArrayDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
                       <!-- Orden de Trabajo -->
                       <td (click)="seleccionarFilaTabla(tabla)" id="ot" scope="col">{{tabla.ot}}</td>
-
+                      <td (click)="seleccionarFilaTabla(tabla)" id="cliente" scope="col">{{tabla.cliente}}</td>
+                      <td (click)="seleccionarFilaTabla(tabla)" id="producto" scope="col">{{tabla.producto}}</td>
                       <!-- Extrusion -->
                       <ng-container *ngIf="tabla.ext >= tabla.cant">
                         <td id="ext" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)">{{tabla.ext | number}}</td>

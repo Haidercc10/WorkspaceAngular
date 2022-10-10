@@ -359,7 +359,7 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             if(datos_ot.length == 0){setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
             } else {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
+                this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                   if (datos_ot[i].estado_Id == estado){
                     this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                                     datos_ot[i].estProcOT_ExtrusionKg,
@@ -388,14 +388,10 @@ export class EstadosOT_VendedoresComponent implements OnInit {
 
         } else if (numOT != null && fechaincial != null && fechaFinal != null) {
           this.srvEstadosOTVendedores.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal, this.storage_Id).subscribe(datos_ot => {
-            if(datos_ot.length == 0){
-              setTimeout(() => {
-                Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);
-              }, 4800);
+            if(datos_ot.length == 0){setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
             } else {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
-                  if (datos_ot[i].estado_Id == estado){
+                this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                     this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                       datos_ot[i].estProcOT_ExtrusionKg,
                       datos_ot[i].estProcOT_ImpresionKg,
@@ -413,18 +409,17 @@ export class EstadosOT_VendedoresComponent implements OnInit {
                       datos_ot[i].estProcOT_FechaCreacion,
                       datos_bagpro[i].clienteNom,
                       datos_bagpro[i].clienteItemsNom,);
-                  }
                 });
               }
             }
           });
-        } else if (numOT != null && fallas != null && estado != null) {
+
           this.estadosProcesos_OTService.srvObtenerListaPorOtFallas(numOT, fallas).subscribe(datos_ot => {
             if(datos_ot.length == 0){setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
             } else {
               for (let i = 0; i < datos_ot.length; i++) {
                 if (estado == datos_ot[i].estado_Id) {
-                  this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
+                  this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                     if (datos_ot[i].estado_Id == estado){
                       this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                         datos_ot[i].estProcOT_ExtrusionKg,
@@ -454,7 +449,7 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             if(datos_ot.length == 0){setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
             } else {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
+                this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                   if (datos_ot[i].estado_Id == estado){
                     this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                       datos_ot[i].estProcOT_ExtrusionKg,
@@ -484,7 +479,7 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             if(datos_ot.length == 0){ setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
             } else {
                 for (let i = 0; i < datos_ot.length; i++) {
-                  this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
+                  this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                     if (datos_ot[i].estado_Id == estado){
                       this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                         datos_ot[i].estProcOT_ExtrusionKg,
@@ -511,15 +506,13 @@ export class EstadosOT_VendedoresComponent implements OnInit {
 
         } else if (fechaincial != null && fechaFinal != null) {
           if(fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') {setTimeout(() => {Swal.fire('Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)');}, 4800);
-          }else if(fechaFinal < fechaincial) {
-            setTimeout(() => {Swal.fire('La fecha final debe ser mayor que la fecha inicial');}, 4800);
+          }else if(fechaFinal < fechaincial) {setTimeout(() => {Swal.fire('La fecha final debe ser mayor que la fecha inicial');}, 4800);
           }else{
             this.srvEstadosOTVendedores.srvObtenerListaPorFechas(fechaincial, fechaFinal, this.storage_Id).subscribe(datos_ot => {
               if(datos_ot.length == 0) {setTimeout(() => {Swal.fire('No existen OTs creadas en las fechas consultadas.')}, 4800);
               } else {
                 for (let i = 0; i < datos_ot.length; i++) {
-                  this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
-                    if (datos_ot[i].estado_Id == estado){
+                  this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                       this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                         datos_ot[i].estProcOT_ExtrusionKg,
                         datos_ot[i].estProcOT_ImpresionKg,
@@ -537,8 +530,8 @@ export class EstadosOT_VendedoresComponent implements OnInit {
                         datos_ot[i].estProcOT_FechaCreacion,
                         datos_bagpro[i].clienteNom,
                         datos_bagpro[i].clienteItemsNom,);
-                    }
                   });
+
                 }
               }
           });
@@ -548,8 +541,7 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             if(datos_ot.length == 0){setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
             } else {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
-                  if (datos_ot[i].estado_Id == estado){
+                this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                     this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                       datos_ot[i].estProcOT_ExtrusionKg,
                       datos_ot[i].estProcOT_ImpresionKg,
@@ -567,7 +559,6 @@ export class EstadosOT_VendedoresComponent implements OnInit {
                       datos_ot[i].estProcOT_FechaCreacion,
                       datos_bagpro[i].clienteNom,
                       datos_bagpro[i].clienteItemsNom,);
-                  }
                 });
               }
             }
@@ -578,7 +569,7 @@ export class EstadosOT_VendedoresComponent implements OnInit {
           } else {
             this.estadosProcesos_OTService.srvObtenerListaPorOtFechaFalla(fechaincial, fallas).subscribe(datos_ot => {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
+                this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                   if (datos_ot[i].estado_Id == estado){
                     this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                       datos_ot[i].estProcOT_ExtrusionKg,
@@ -607,7 +598,7 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             if(datos_ot.length == 0){setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
             }else{
               for (let i = 0; i < datos_ot.length; i++) {
-                this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
+                this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                   if (datos_ot[i].estado_Id == estado){
                     this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                       datos_ot[i].estProcOT_ExtrusionKg,
@@ -633,13 +624,10 @@ export class EstadosOT_VendedoresComponent implements OnInit {
           });
 
           this.estadosProcesos_OTService.srvObtenerListaPorOtEstadoFalla(estado, fallas).subscribe(datos_ot => {
-            if(datos_ot.length == 0){
-              setTimeout(() => {
-                Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);
-              }, 4800);
+            if(datos_ot.length == 0){setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
             }else{
               for (let i = 0; i < datos_ot.length; i++) {
-                this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
+                this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                   if (datos_ot[i].estado_Id == estado){
                     this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                       datos_ot[i].estProcOT_ExtrusionKg,
@@ -665,13 +653,10 @@ export class EstadosOT_VendedoresComponent implements OnInit {
           });
         } else if (fechaincial != null && estado != null) {
           this.srvEstadosOTVendedores.srvObtenerListaPorFecha(fechaincial, this.storage_Id).subscribe(datos_ot => {
-            if(datos_ot.length == 0){
-              setTimeout(() => {
-                Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);
-              }, 4800);
+            if(datos_ot.length == 0){setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
             }else{
               for (let i = 0; i < datos_ot.length; i++) {
-                this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
+                this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                   if (datos_ot[i].estado_Id == estado){
                     this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                       datos_ot[i].estProcOT_ExtrusionKg,
@@ -697,14 +682,10 @@ export class EstadosOT_VendedoresComponent implements OnInit {
           });
         } else if (numOT != null) {
           this.srvEstadosOTVendedores.srvObtenerListaPorOT(numOT, this.storage_Id).subscribe(datos_ot => {
-            if(datos_ot.length == 0) {
-              setTimeout(() => {
-                  Swal.fire('No se encontró la OT consultada.');
-              }, 4800);
+            if(datos_ot.length == 0) {setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 4800);
             } else {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
-                  if (datos_ot[i].estado_Id == estado){
+                this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                     this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                       datos_ot[i].estProcOT_ExtrusionKg,
                       datos_ot[i].estProcOT_ImpresionKg,
@@ -722,27 +703,20 @@ export class EstadosOT_VendedoresComponent implements OnInit {
                       datos_ot[i].estProcOT_FechaCreacion,
                       datos_bagpro[i].clienteNom,
                       datos_bagpro[i].clienteItemsNom,);
-                  }
+
                 });
             }
           }
 
           });
         } else if (fechaincial != null) {
-          if(fechaincial < '2022-05-01') {
-            setTimeout(() => {
-              Swal.fire(`Solo se muestran OT's desde el inicio de las asignaciones de Materia Prima (2022-05-01)`);
-            }, 4800);
+          if(fechaincial < '2022-05-01') {setTimeout(() => {Swal.fire(`Solo se muestran OT's desde el inicio de las asignaciones de Materia Prima (2022-05-01)`);}, 4800);
           } else {
             this.srvEstadosOTVendedores.srvObtenerListaPorFecha(fechaincial, this.storage_Id).subscribe(datos_ot => {
-              if(datos_ot.length == 0) {
-                setTimeout(() => {
-                  Swal.fire(`No se encontraron OTs creadas el día ${fechaincial}`);
-                }, 4800);
+              if(datos_ot.length == 0) {setTimeout(() => {Swal.fire(`No se encontraron OTs creadas el día ${fechaincial}`);}, 4800);
               } else {
                 for (let i = 0; i < datos_ot.length; i++) {
-                  this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
-                    if (datos_ot[i].estado_Id == estado){
+                  this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                       this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                         datos_ot[i].estProcOT_ExtrusionKg,
                         datos_ot[i].estProcOT_ImpresionKg,
@@ -760,22 +734,18 @@ export class EstadosOT_VendedoresComponent implements OnInit {
                         datos_ot[i].estProcOT_FechaCreacion,
                         datos_bagpro[i].clienteNom,
                         datos_bagpro[i].clienteItemsNom,);
-                    }
                   });
                 }
               };
             });
-            }
+          }
 
 
           this.estadosProcesos_OTService.srvObtenerListaPorFallas(fallas).subscribe(datos_ot => {
-            if(datos_ot.length == 0) {
-              setTimeout(() => {
-                Swal.fire('No se encontraron OTs con la falla consultada.');
-              }, 4800);
+            if(datos_ot.length == 0) {setTimeout(() => {Swal.fire('No se encontraron OTs con la falla consultada.');}, 4800);
             } else {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
+                this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                   if (datos_ot[i].estado_Id == estado){
                     this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                       datos_ot[i].estProcOT_ExtrusionKg,
@@ -801,13 +771,10 @@ export class EstadosOT_VendedoresComponent implements OnInit {
           });
         } else if (estado != null) {
           this.srvEstadosOTVendedores.srvObtenerListaPorOtEstado(estado, this.storage_Id).subscribe(datos_ot => {
-            if(datos_ot.length == 0) {
-              setTimeout(() => {
-                Swal.fire(`No se encontraron OT's con el Estado consultado.`);
-              }, 4800);
+            if(datos_ot.length == 0) {setTimeout(() => {Swal.fire(`No se encontraron OT's con el Estado consultado.`);}, 4800);
             }else{
               for (let i = 0; i < datos_ot.length; i++) {
-                this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
+                this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                   if (datos_ot[i].estado_Id == estado){
                     this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                       datos_ot[i].estProcOT_ExtrusionKg,
@@ -833,14 +800,10 @@ export class EstadosOT_VendedoresComponent implements OnInit {
           });
         } else {
           this.srvEstadosOTVendedores.srvObtenerListaPorFecha(this.today, this.storage_Id).subscribe(datos_ot => {
-            if(datos_ot.length == 0) {
-              setTimeout(() => {
-                Swal.fire(`No se encontraron OT's creadas del día de hoy.`);
-              }, 4800);
+            if(datos_ot.length == 0) {setTimeout(() => {Swal.fire(`No se encontraron OT's creadas del día de hoy.`);}, 4800);
             } else {
               for (let i = 0; i < datos_ot.length; i++) {
-                this.servicioBagPro.srvObtenerOTsPorVendedor(this.storage_Id).subscribe(datos_bagpro => {
-                  if (datos_ot[i].estado_Id == estado){
+                this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                     this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                       datos_ot[i].estProcOT_ExtrusionKg,
                       datos_ot[i].estProcOT_ImpresionKg,
@@ -858,15 +821,12 @@ export class EstadosOT_VendedoresComponent implements OnInit {
                       datos_ot[i].estProcOT_FechaCreacion,
                       datos_bagpro[i].clienteNom,
                       datos_bagpro[i].clienteItemsNom,);
-                  }
                 });
               }
             }
           });
         }
-        setTimeout(() => {
-          this.load = true;
-        }, 5000);
+        setTimeout(() => {this.load = true;}, 5000);
   }
 
   //Funcion encargada de llenar un array con la informacion de las ordenes de trabajo y el producido de cada area
@@ -887,10 +847,13 @@ export class EstadosOT_VendedoresComponent implements OnInit {
       obs : observacion,
       est : estado,
       fecha : fecha.replace("T00:00:00", ""),
+      cliente : cli,
+      producto : prod,
     }
       this.ArrayDocumento.push(info);
       this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
       this.ArrayDocumento.sort((a,b) => Number(a.ot)- Number(b.ot));
+      console.log(this.ArrayDocumento);
   }
 
   // Funcion que va a asignar un valor una variable, el valor será la orden de trabajo sobre la que se le dió click

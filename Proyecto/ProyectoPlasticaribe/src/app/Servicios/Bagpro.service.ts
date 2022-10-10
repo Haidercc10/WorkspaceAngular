@@ -147,8 +147,8 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/OtItem/${codigo}`);
   }
 
-  srvObtenerOTsPorVendedor(vendedor : any):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOtItems/BuscarOTxVendedores/${vendedor}`);
+  srvObtenerOTsPorVendedor(/*vendedor : any,*/ OT: any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/BuscarOTxVendedores/${OT}`);
   }
 
   /* DESPERDICIO */

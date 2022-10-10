@@ -20,7 +20,7 @@ export class EstadosProcesosOTxVendedoresService {
   }
 
   srvObtenerListaPorFechas(fecha1 : any, fecha2 : any, vendedor : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorFechas?EstProcOT_FechaCreacion1=${fecha1}&EstProcOT_FechaCreacion2=${fecha2}/${vendedor}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorFechasVendedor/${vendedor}?EstProcOT_FechaCreacion1=${fecha1}&EstProcOT_FechaCreacion2=${fecha2}`);
   }
 
   srvObtenerListaPorOtFecha(ot : any, fecha : any, vendedor : any){
@@ -28,7 +28,7 @@ export class EstadosProcesosOTxVendedoresService {
   }
 
   srvObtenerListaPorOtFechas(ot : any, fecha : any, fecha2, vendedor : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorOtFechasVendedor/${ot}?EstProcOT_FechaCreacion1=${fecha}&EstProcOT_FechaCreacion2=${fecha2}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorOtFechasVendedor/${ot}?EstProcOT_FechaCreacion1=${fecha}&EstProcOT_FechaCreacion2=${fecha2}/${vendedor}`);
   }
 
   srvObtenerListaPorOtEstado(estado : any, vendedor : any){
