@@ -89,6 +89,8 @@ import { PreIngresoRolloSelladoComponent } from './Vistas/PreIngresoRolloSellado
 import { InventarioProductosPBDDComponent } from './Vistas/Inventario-Productos-PBDD/Inventario-Productos-PBDD.component';
 import { BuscarInventarioXProductoPipe } from './Pipes/BuscarInventarioXProducto.pipe';
 import { EstadosOT_VendedoresComponent } from './Vistas/EstadosOT_Vendedores/EstadosOT_Vendedores.component';
+import { FiltroXClientes_OTVendedoresPipe } from './Pipes/FiltroXClientes_OTVendedores.pipe';
+import { FiltroXProducto_OTVendedoresPipe } from './Pipes/FiltroXProducto_OTVendedores.pipe';
 
 
 export const routes: Routes = [
@@ -233,6 +235,8 @@ export const routes: Routes = [
     InventarioProductosPBDDComponent,
     BuscarInventarioXProductoPipe,
     EstadosOT_VendedoresComponent,
+    FiltroXClientes_OTVendedoresPipe,
+    FiltroXProducto_OTVendedoresPipe,
   ],
 
 

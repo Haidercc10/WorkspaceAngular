@@ -27,7 +27,7 @@ export class EstadosProcesosOTxVendedoresService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorOtFechaVendedor/${ot}/${fecha}/${vendedor}`);
   }
 
-  srvObtenerListaPorOtFechas(ot : any, fecha : any, fecha2, vendedor : any){
+  srvObtenerListaPorOtFechas(ot : any, fecha : any, fecha2: any, vendedor : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorOtFechasVendedor/${ot}?EstProcOT_FechaCreacion1=${fecha}&EstProcOT_FechaCreacion2=${fecha2}/${vendedor}`);
   }
 
@@ -45,4 +45,7 @@ export class EstadosProcesosOTxVendedoresService {
   }
 
 
+  srvObtenerListaPorOTFechasEstado(OT: any, fecha1 : any, fecha2 : any, estado : any, vendedor : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorOTFechasEstadoVendedor/${OT}/${fecha1}/${fecha2}/${estado}/${vendedor}`);
+  }
 }

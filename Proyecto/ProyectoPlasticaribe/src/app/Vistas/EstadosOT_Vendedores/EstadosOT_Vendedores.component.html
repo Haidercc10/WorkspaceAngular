@@ -79,8 +79,22 @@
              </div>-->
            </div>
          </div>
-         <!-- Fin fila 1 de campos -->
-
+      </form>
+         <!-- Fila 2 de campos -->
+        <div class="mb-4">
+          <div class="row g-3">
+          <!--Clientes-->
+            <div class="form-floating col-md-3">
+              <input type="text" [(ngModel)]="PipeCliente" name="PipeCliente" class="form-control" id="floatingInput" title="N° de la Orden de Trabajo" required >
+              <label for="floatingInput">Cliente</label>
+            </div>
+             <!--Productos-->
+             <div class="form-floating col-md-3">
+              <input type="text" [(ngModel)]="PipeProducto" name="PipeProducto" class="form-control" id="floatingInput" title="N° de la Orden de Trabajo" required >
+              <label for="floatingInput">Producto</label>
+            </div>
+          </div>
+        </div>
          <!-- Botones para consultar OT -->
          <div class="mb-3">
            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
@@ -90,7 +104,7 @@
              <button class="btn btn-danger btn-danger-sm" type="button" (click)="exportToExcel()">Exportar A Excel</button>
            </div>
          </div>
-       </form>
+
        <!--Fin Formulario -->
 
        <div class="mb-4">
@@ -128,7 +142,7 @@
                   </tr>
                 </thead>
                   <tbody class="TextosInfoTabla">
-                    <tr *ngFor="let tabla of ArrayDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
+                    <tr *ngFor="let tabla of ArrayDocumento | FiltroXClientes_OTVendedores: PipeCliente | FiltroXProducto_OTVendedores: PipeProducto |  paginate: {itemsPerPage: 30, currentPage: page}  let i=index">
                       <!-- Orden de Trabajo -->
                       <td null id="ot" scope="col">{{tabla.ot}}</td>
                       <td null id="cliente" scope="col">{{tabla.cli}}</td>
