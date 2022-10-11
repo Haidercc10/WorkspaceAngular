@@ -52,7 +52,7 @@
              </div>
 
              <!-- Vendedores -->
-             <div class="ng-autocomplete form-floating col-md form-control form-control-sm" >
+             <div class="ng-autocomplete form-floating col-md form-control form-control-sm" *ngIf="ValidarRol == 1">
               <ng-autocomplete
                 class=""
                 [data]="vendedores"

@@ -14,7 +14,7 @@ export class FiltroXProducto_OTVendedoresPipe implements PipeTransform {
     for(const tabla of value) {
 
       /** Si la columna nombre de la tabla está en lo digitado del campo, muestra las filas asociadas.  */
-      if(tabla.producto.toUpperCase().indexOf(arg.toUpperCase()) > -1) {
+      if(tabla.prod.toUpperCase().indexOf(arg.toUpperCase()) > -1) {
         resultadoBusqFacturas.push(tabla);
       }
     }
