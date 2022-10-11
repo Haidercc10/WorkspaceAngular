@@ -398,6 +398,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
     }
   }
 
+  //
   cargarDatos(item : any){
     this.FormAsignacionBopp.setValue({
       AsgBopp_OT : '',
@@ -408,6 +409,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
     });
   }
 
+  //
   actualizarDetallesAsignacion(){
     this.load = false;
     for (let i = 0; i < this.ordenesTrabajo.length; i++) {

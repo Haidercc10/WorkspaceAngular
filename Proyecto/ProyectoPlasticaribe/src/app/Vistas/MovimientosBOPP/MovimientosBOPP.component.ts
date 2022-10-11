@@ -988,6 +988,8 @@ export class MovimientosBOPPComponent implements OnInit {
                   idBOPP : item.bopP_Id,
                   Serial : item.bopP_Serial,
                   Nombre : item.bopP_Nombre,
+                  Cantidad : item.bopP_CantidadInicialKg,
+                  Cantidad2 : item.bopP_CantidadInicialKg,
                 }
                 this.EditarAsignacionesBOPP.ArrayBoppPedida.push(bopp);
                 this.EditarAsignacionesBOPP.idAsignacion = formulario.id;

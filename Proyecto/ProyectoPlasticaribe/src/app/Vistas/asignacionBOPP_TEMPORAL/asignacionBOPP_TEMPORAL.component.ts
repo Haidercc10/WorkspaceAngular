@@ -344,63 +344,33 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   asignarBOPP(){
     this.load = false;
     let observacion : string = this.FormAsignacionBopp.value.AsgBopp_Observacion;
-
     const datos : any = {
       AsigBOPP_FechaEntrega : this.today,
       AsigBOPP_Observacion : observacion,
       Usua_Id : this.storage_Id,
       Estado_Id : 13,
     }
-    this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => {
-      this.obtenerIdUltimaAsignacion();
-    });
-
-    // for (const item of this.ordenesTrabajo) {
-    //   const datos : any = {
-    //     AsigBOPP_OrdenTrabajo : item.ot,
-    //     AsigBOPP_FechaEntrega : this.today,
-    //     AsigBOPP_Observacion : '',
-    //     Usua_Id : this.storage_Id,
-    //     Estado_Id : 13,
-    //   }
-    //   this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => {
-    //     this.obtenerIdUltimaAsignacion(datos.AsigBOPP_OrdenTrabajo);
-    //   });
-    // }
-    // for (const item of this.ArrayBoppPedida) {
-    //   if (this.ot.includes(item.Ot)) {
-    //     this.obtenerIdUltimaAsignacion(item.Ot, item.Nombre, item.Cant);
-    //     continue;
-    //   } else {
-    //     this.ot.push(item.Ot);
-    //     const datos : any = {
-    //       AsigBOPP_OrdenTrabajo : item.Ot,
-    //       AsigBOPP_FechaEntrega : this.today,
-    //       AsigBOPP_Observacion : item.Observacion,
-    //       Usua_Id : this.storage_Id,
-    //       Estado_Id : 13,
-    //     }
-    //     this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => {
-    //       this.obtenerIdUltimaAsignacion(item.Ot, item.Nombre, item.Cant);
-    //     });
-    //   }
-    // }
+    this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => { this.obtenerIdUltimaAsignacion(); });
   }
 
+  //
   obtenerIdUltimaAsignacion(){
     this.asignacionBOPPService.srvObtenerListaUltimoId().subscribe(datos_asignaciones => {
       this.detallesAsginacionBOPP(datos_asignaciones);
     });
   }
 
+  //
   detallesAsginacionBOPP(idAsignacion : any){
-    let numeroOT : number = this.ordenesTrabajo.length;
-
+    let documento : string;
     for (let i = 0; i < this.ordenesTrabajo.length; i++) {
       for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
         this.boppService.srvObtenerListaPorSerial(this.ArrayBoppPedida[j].Serial).subscribe(datos_bopp => {
           for (let k = 0; k < datos_bopp.length; k++) {
             if (datos_bopp[k].bopP_Serial == this.ArrayBoppPedida[j].Serial) {
+              if (datos_bopp[k].catMP_Id == 6) documento = 'ASIGBOPP';
+              else if (datos_bopp[k].catMP_Id == 14) documento = 'ASIGBOPA';
+              else if (datos_bopp[k].catMP_Id == 15) documento = 'ASIGPOLY';
               let cantidad = this.ArrayBoppPedida[j].Cantidad2 / this.ordenesTrabajo.length;
               let datos : any = {
                 AsigBOPP_Id : idAsignacion.asigBOPP_Id,
@@ -410,17 +380,14 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
                 Proceso_Id : 'CORTE',
                 DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
                 Estado_OrdenTrabajo : 14,
+                TpDoc_Id : documento,
               }
-
-              this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
-                // this.moverInventarioBOPP(datos.BOPP_Id, datos.DtAsigBOPP_Cantidad);
-              });
+              this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => { });
             }
           }
         });
       }
     }
-
     setTimeout(() => { this.moverBopp(); }, 5000);
   }
 
@@ -495,9 +462,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     for (let i = 0; i < this.ArrayBoppPedida.length; i++) {
       if (item.Serial == this.ArrayBoppPedida[i].Serial && cantidad > 0 && cantidad <= item.Cantidad && cantidad != undefined && cantidad != null){
         this.ArrayBoppPedida[i].Cantidad2 = cantidad;
-      } else {
-        Swal.fire(`La cantidad a asignar debe ser mayor que 0 y menor o igual que ${item.Cantidad}`);
-      }
+      } else Swal.fire(`La cantidad a asignar debe ser mayor que 0 y menor o igual que ${item.Cantidad}`);
     }
   }
 
@@ -510,7 +475,6 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
         let stock : number = item.bopP_Stock;
         let cantidadFinal : any = stock - cantidad;
         if (cantidadFinal <= 1.5) {
-
           let datosBOPP : any = {
             bopP_Id : item.bopP_Id,
             bopP_Nombre : item.bopP_Nombre,
@@ -549,8 +513,24 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             this.limpiarTodosLosCampos();
             this.load = true;
 
-          }, error => { console.log(error); });
-
+          }, error => {
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'center',
+              showConfirmButton: false,
+              timer: 1500,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+              }
+            });
+            Toast.fire({
+              icon: 'error',
+              title: '¡Error al asignar la materia prima!'
+            });
+            this.load = true;
+          });
         } else {
           let datosBOPP : any = {
             bopP_Id : item.bopP_Id,

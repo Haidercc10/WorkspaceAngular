@@ -6,4 +6,5 @@ export interface modelDetallesAsignacionBopp {
   Proceso_Id : string;
   DtAsigBOPP_OrdenTrabajo : number;
   Estado_OrdenTrabajo : number;
+  TpDoc_Id : string;
 }

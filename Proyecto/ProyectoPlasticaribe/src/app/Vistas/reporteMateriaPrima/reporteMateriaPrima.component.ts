@@ -18,7 +18,6 @@ import { RecuperadoService } from 'src/app/Servicios/recuperado.service';
 import { RecuperadoMPService } from 'src/app/Servicios/recuperadoMP.service';
 import { RemisionService } from 'src/app/Servicios/Remision.service';
 import { RemisionesMPService } from 'src/app/Servicios/remisionesMP.service';
-import { RemisionFacturaService } from 'src/app/Servicios/remisionFactura.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { TintasService } from 'src/app/Servicios/tintas.service';
 import { TipoBodegaService } from 'src/app/Servicios/tipoBodega.service';
@@ -39,10 +38,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   public FormMateriaPrima !: FormGroup;
   public FormMateriaPrimaRetiro !: FormGroup;
   public FormMateriaPrimaRetirada !: FormGroup;
-
-  //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
-  public ModalCrearProveedor: boolean = false;
-  public ModalCrearMateriaPrima: boolean= false;
 
   /* Vaiables*/
   public page : number; //Variable que tendrá el paginado de la tabla en la que se muestran los pedidos consultados
@@ -89,13 +84,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   keyword = 'Nombre'; //Variable que le dirá al autocomplement por que caracteristica busca en el array
   public historyHeading: string = 'Seleccionado Recientemente'; //Variable que se mostrará al momento en que salen las materias primas buscadas recientemente
   bodegas : any = []; //variable que almacenará las bodegas
-/** Nvo */
   categoriaSeleccionadaCombo = [];
-/** Nvo */
-
   public load: boolean;
-
-  /* CONSULTAS DE MATERIA PRIMA */
   MpConsultada = [];
 
   constructor(private materiaPrimaService : MateriaPrimaService,
@@ -310,6 +300,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => {
       for (let i = 0; i < datos_categorias.length; i++) {
         this.categorias.push(datos_categorias[i]);
+        this.categorias.sort((a,b) => a.catMP_Nombre.localeCompare(b.catMP_Nombre));
       }
     });
   }

@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { faAnchor } from '@fortawesome/free-solid-svg-icons';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
 import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
@@ -23,13 +23,14 @@ export class EntradaBOPPComponent implements OnInit {
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
   unidadMedida = []; //Variable que almacenará las unidades de medida
   ArrayBOPP = []; //Varibale que almacenará los BOPP que estarán entrando
-
+  categorias : any = []; //Variable que almacenará las categorias que se podrán seleccionar para la materia prima a ingresar
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
                   private frmBuilder : FormBuilder,
                     private unidadMedidaService : UnidadMedidaService,
-                      private entradaBOPPService : EntradaBOPPService,) {
+                      private entradaBOPPService : EntradaBOPPService,
+                        private categoriaService : CategoriaMateriaPrimaService,) {
 
     this.FormEntradaBOPP = this.frmBuilder.group({
       Nombre : ['', Validators.required],
@@ -41,6 +42,7 @@ export class EntradaBOPPComponent implements OnInit {
       undMed : ['', Validators.required],
       Fecha : ['', Validators.required],
       Observacion : ['', Validators.required],
+      Categoria : ['', Validators.required],
     });
 
     this.load = true;
@@ -51,6 +53,7 @@ export class EntradaBOPPComponent implements OnInit {
     this.lecturaStorage();
     this.fecha();
     this.obtenerUnidadesMedida();
+    this.obtenerCategorias();
   }
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
@@ -73,6 +76,7 @@ export class EntradaBOPPComponent implements OnInit {
       undMed : '',
       Fecha : this.today,
       Observacion : '',
+      Categoria : '',
     });
   }
 
@@ -100,6 +104,16 @@ export class EntradaBOPPComponent implements OnInit {
     });
   }
 
+  // Funcion que servirá para cargar las categorias
+  obtenerCategorias(){
+    this.categorias = [],
+    this.categoriaService.srvObtenerLista().subscribe(datos_categorias => {
+      for (let i = 0; i < datos_categorias.length; i++) {
+        if (datos_categorias[i].catMP_Id == 6 || datos_categorias[i].catMP_Id == 14 || datos_categorias[i].catMP_Id == 15) this.categorias.push(datos_categorias[i]);
+      }
+    });
+  }
+
   // Funcion limpiará todos los campos de vista
   limpiarTodosLosCampos(){
     this.FormEntradaBOPP = this.frmBuilder.group({
@@ -112,10 +126,12 @@ export class EntradaBOPPComponent implements OnInit {
       undMed : '',
       Fecha : this.today,
       Observacion : '',
+      Categoria : '',
     });
     this.ArrayBOPP = [];
   }
 
+  //
   limpiarCampos(){
     this.FormEntradaBOPP = this.frmBuilder.group({
       Nombre : '',
@@ -127,70 +143,76 @@ export class EntradaBOPPComponent implements OnInit {
       undMed : '',
       Fecha : this.today,
       Observacion : '',
+      Categoria : '',
     });
   }
 
+  //
   cargarBOPPTabla(){
-    let serial : number = this.FormEntradaBOPP.value.serial;
-    let cantidad : number = this.FormEntradaBOPP.value.cantidad;
-    let cantidadKg : number = this.FormEntradaBOPP.value.cantidadKG;
-    let nombre : string = this.FormEntradaBOPP.value.Nombre;
-    let descripcion : string = this.FormEntradaBOPP.value.Observacion;
-    let precio : number = this.FormEntradaBOPP.value.precio;
-    let ancho : number = this.FormEntradaBOPP.value.ancho;
+    if (this.FormEntradaBOPP.valid) {
+      this.load = false;
+      let serial : number = this.FormEntradaBOPP.value.serial;
+      let cantidad : number = this.FormEntradaBOPP.value.cantidad;
+      let cantidadKg : number = this.FormEntradaBOPP.value.cantidadKG;
+      let nombre : string = this.FormEntradaBOPP.value.Nombre;
+      let descripcion : string = this.FormEntradaBOPP.value.Observacion;
+      let precio : number = this.FormEntradaBOPP.value.precio;
+      let ancho : number = this.FormEntradaBOPP.value.ancho;
+      let categoria : number = this.FormEntradaBOPP.value.Categoria;
 
-    let productoExt : any = {
-      Serial : serial,
-      Nombre : nombre,
-      Descripcion : descripcion,
-      Ancho : ancho,
-      Cant : cantidad,
-      UndCant : 'µm',
-      CantKg : cantidadKg,
-      UndCantKg : 'Kg',
-      Precio : precio,
-    }
-    this.ArrayBOPP.push(productoExt);
+      this.categoriaService.srvObtenerListaPorId(categoria).subscribe(datos_categorias => {
+        let productoExt : any = {
+          Serial : serial,
+          Nombre : nombre,
+          Descripcion : descripcion,
+          Ancho : ancho,
+          Cant : cantidad,
+          UndCant : 'µm',
+          CantKg : cantidadKg,
+          UndCantKg : 'Kg',
+          Precio : precio,
+          Cat_Id : categoria,
+          Cat : datos_categorias.catMP_Nombre,
+        }
+        this.ArrayBOPP.push(productoExt);
 
-    this.FormEntradaBOPP = this.frmBuilder.group({
-      Nombre : '',
-      serial : '',
-      cantidad : '',
-      cantidadKG : '',
-      precio : '',
-      ancho : '',
-      undMed : '',
-      Fecha : this.today,
-      Observacion : '',
-    });
+        this.FormEntradaBOPP = this.frmBuilder.group({
+          Nombre : '',
+          serial : '',
+          cantidad : '',
+          cantidadKG : '',
+          precio : '',
+          ancho : '',
+          undMed : '',
+          Fecha : this.today,
+          Observacion : '',
+          Categoria : '',
+        });
+        this.load = true;
+      });
+    } else Swal.fire("¡Hay campos vacios!");
   }
 
+  //
   crearEntrada(){
     if (this.ArrayBOPP.length == 0) Swal.fire("Debe cargar minimo un BOPP en la tabla");
     else {
+      this.load = false
       for (let i = 0; i < this.ArrayBOPP.length; i++) {
+        let bodega : number;
+        if (this.ArrayBOPP[i].Cat_Id == 6) bodega = 8;
+        else if (this.ArrayBOPP[i].Cat_Id == 14) bodega = 11;
+        if (this.ArrayBOPP[i].Cat_Id == 15) bodega = 12;
 
         let datosBOPP : any = {
-          // BOPP_Nombre : `${this.ArrayBOPP[i].Nombre} - ${this.ArrayBOPP[i].Serial} - ${this.ArrayBOPP[i].CantKg} - ${this.ArrayBOPP[i].Ancho}`,
-          // BOPP_Descripcion : this.ArrayBOPP[i].Descripcion,
-          // BOPP_Serial : this.ArrayBOPP[i].Serial,
-          // BOPP_Cantidad : this.ArrayBOPP[i].Cant,
-          // UndMed_Id : 'µm',
-          // CatMP_Id : 6,
-          // BOPP_Precio : this.ArrayBOPP[i].Precio,
-          // TpBod_Id : 8,
-          // BOPP_FechaIngreso : this.today,
-          // BOPP_Ancho : this.ArrayBOPP[i].Ancho,
-          // BOPP_CantidadKg : this.ArrayBOPP[i].CantKg,
-          // UndMed_Kg : 'Kg',
           bopP_Nombre : `${this.ArrayBOPP[i].Nombre} - ${this.ArrayBOPP[i].Serial} - ${this.ArrayBOPP[i].CantKg} - ${this.ArrayBOPP[i].Ancho}`,
           bopP_Descripcion : this.ArrayBOPP[i].Descripcion,
           bopP_Serial : this.ArrayBOPP[i].Serial,
           bopP_CantidadMicras : this.ArrayBOPP[i].Cant,
           undMed_Id : 'µm',
-          catMP_Id : 6,
+          catMP_Id : this.ArrayBOPP[i].Cat_Id,
           bopP_Precio : this.ArrayBOPP[i].Precio,
-          tpBod_Id : 8,
+          tpBod_Id : bodega,
           bopP_FechaIngreso : this.today,
           bopP_Ancho : this.ArrayBOPP[i].Ancho,
           BOPP_Stock : this.ArrayBOPP[i].CantKg,
@@ -215,19 +237,9 @@ export class EntradaBOPPComponent implements OnInit {
             icon: 'success',
             title: '¡Entrada de BOPP registrada con exito!'
           });
+          this.load = true;
 
-          this.ArrayBOPP = [];
-          this.FormEntradaBOPP = this.frmBuilder.group({
-            Nombre : '',
-            serial : '',
-            cantidad : '',
-            cantidadKG : '',
-            precio : '',
-            ancho : '',
-            undMed : '',
-            Fecha : this.today,
-            Observacion : '',
-          });
+          this.limpiarTodosLosCampos();
         }, error => {
           const Toast = Swal.mixin({
             toast: true,
