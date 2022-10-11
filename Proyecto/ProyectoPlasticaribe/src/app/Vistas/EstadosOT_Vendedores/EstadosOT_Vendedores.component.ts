@@ -445,10 +445,7 @@ export class EstadosOT_VendedoresComponent implements OnInit {
       });
     } else if (numOT != null && fechaincial != null && fechaFinal != null && vendedor != null) {
       this.srvEstadosOTVendedores.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal, this.storage_Id).subscribe(datos_ot => {
-        if(datos_ot.length == 0){
-          setTimeout(() => {
-            Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);
-          }, 4800);
+        if(datos_ot.length == 0){setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
         } else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
@@ -635,8 +632,8 @@ export class EstadosOT_VendedoresComponent implements OnInit {
 
     } else if (fechaincial != null && fechaFinal != null && vendedor != null) {
       if(fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') {setTimeout(() => {Swal.fire('Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)');}, 4800);
-      }else if(fechaFinal < fechaincial) {setTimeout(() => {Swal.fire('La fecha final debe ser mayor que la fecha inicial');}, 4800);
-      }else{
+      } else if(fechaFinal < fechaincial) {setTimeout(() => {Swal.fire('La fecha final debe ser mayor que la fecha inicial');}, 4800);
+      } else{
         this.srvEstadosOTVendedores.srvObtenerListaPorFechas(fechaincial, fechaFinal, this.storage_Id).subscribe(datos_ot => {
           if(datos_ot.length == 0) {setTimeout(() => {Swal.fire('No existen OTs creadas en las fechas consultadas.')}, 4800);
           } else {
@@ -728,10 +725,7 @@ export class EstadosOT_VendedoresComponent implements OnInit {
       });
     } else if (fechaincial != null && estado != null && vendedor != null) {
       this.srvEstadosOTVendedores.srvObtenerListaPorFecha(fechaincial, this.storage_Id).subscribe(datos_ot => {
-        if(datos_ot.length == 0){
-          setTimeout(() => {
-            Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);
-          }, 4800);
+        if(datos_ot.length == 0){setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
         }else{
           for (let i = 0; i < datos_ot.length; i++) {
             this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
