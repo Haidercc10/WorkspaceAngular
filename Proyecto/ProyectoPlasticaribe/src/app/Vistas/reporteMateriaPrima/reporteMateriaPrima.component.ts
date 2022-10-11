@@ -88,6 +88,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   validarInput : any; //Variable para validar si el input de materia prima tiene información o no
   keyword = 'Nombre'; //Variable que le dirá al autocomplement por que caracteristica busca en el array
   public historyHeading: string = 'Seleccionado Recientemente'; //Variable que se mostrará al momento en que salen las materias primas buscadas recientemente
+  bodegas : any = []; //variable que almacenará las bodegas
 /** Nvo */
   categoriaSeleccionadaCombo = [];
 /** Nvo */
@@ -218,6 +219,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       this.obtenerBOPP();
       this.obtenerTintas();
       this.obtenerMateriasPrimasRetiradas();
+      this.obtenerBodegas();
     }, 500);
   }
 
@@ -273,6 +275,19 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.obtenerBOPP();
     this.obtenerMateriasPrimasRetiradas();
     this.obtenerTintas();
+  }
+
+  //  Funcion que tomará y almacenará las bdoegas
+  obtenerBodegas(){
+    this.bodegas = [];
+    this.tipoBodegaService.srvObtenerLista().subscribe(datos_bodegas => {
+      for (let i = 0; i < datos_bodegas.length; i++) {
+        if (datos_bodegas[i].tpBod_Id == 5 || datos_bodegas[i].tpBod_Id == 8 || datos_bodegas[i].tpBod_Id == 9 || datos_bodegas[i].tpBod_Id == 10){
+          this.bodegas.push(datos_bodegas[i]);
+          this.bodegas.sort((a,b) => a.tpBod_Nombre.localeCompare(b.tpBod_Nombre));
+        }
+      }
+    });
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -4052,7 +4067,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       }, 2000);
     } else if (bodega != null) {
       this.load = false;
-      if (bodega == 1) {
+      if (bodega == 10) {
         this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrimas => {
           for (let i = 0; i < datos_materiaPrimas.length; i++) {
             if (datos_materiaPrimas[i].catMP_Id != 8 && datos_materiaPrimas[i].catMP_Id != 7 && datos_materiaPrimas[i].catMP_Id != 6 && datos_materiaPrimas[i].catMP_Id != 5)
@@ -4074,11 +4089,11 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             });
           }
         });
-      } else if (bodega == 2) {
+      } else if (bodega == 5) {
         // Mostrará Tintas, Aditivos y Solventes.
         this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrimas => {
           for (let i = 0; i < datos_materiaPrimas.length; i++) {
-            if (datos_materiaPrimas[i].catMP_Id == 8 && datos_materiaPrimas[i].catMP_Id == 5)
+            if (datos_materiaPrimas[i].catMP_Id == 5)
             this.materiaPrimaService.srvObtenerListaNumero2(this.today, datos_materiaPrimas[i].matPri_Id).subscribe(datos_materiaPrima => {
               for (let j = 0; j < datos_materiaPrima.length; j++) {
                 this.cargarTabla(datos_materiaPrima[j].id,
@@ -4117,7 +4132,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
             });
           }
         });
-      } else if (bodega == 3) {
+      } else if (bodega == 8) {
         // Solo mostrará BOPP
         this.boppService.srvObtenerLista().subscribe(datos_bopp => {
           for (let i = 0; i < datos_bopp.length; i++) {
@@ -4139,6 +4154,29 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                 }
               });
             }
+          }
+        });
+      } else if (bodega == 9){
+        // Mostrará Tintas, Aditivos y Solventes.
+        this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrimas => {
+          for (let i = 0; i < datos_materiaPrimas.length; i++) {
+            if (datos_materiaPrimas[i].catMP_Id == 8)
+            this.materiaPrimaService.srvObtenerListaNumero2(this.today, datos_materiaPrimas[i].matPri_Id).subscribe(datos_materiaPrima => {
+              for (let j = 0; j < datos_materiaPrima.length; j++) {
+                this.cargarTabla(datos_materiaPrima[j].id,
+                  datos_materiaPrima[j].nombre,
+                  datos_materiaPrima[j].ancho,
+                  datos_materiaPrima[j].inicial,
+                  datos_materiaPrima[j].entrada,
+                  datos_materiaPrima[j].salida,
+                  datos_materiaPrima[j].stock,
+                  datos_materiaPrima[j].diferencia,
+                  datos_materiaPrima[j].presentacion,
+                  datos_materiaPrima[j].precio,
+                  datos_materiaPrima[j].subTotal,
+                  datos_materiaPrima[j].categoria);
+              }
+            });
           }
         });
       }
@@ -4209,6 +4247,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       });
     }
 
+    setTimeout(() => { this.load = true; }, 3200);
   }
 
   // Funcion que organiza los campos de la tabla segun su precio de mayor a menor

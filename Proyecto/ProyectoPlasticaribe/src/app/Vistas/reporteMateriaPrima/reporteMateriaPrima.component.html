@@ -68,9 +68,11 @@
         <div class="form-floating col-md-2">
           <select formControlName="MpBodega" class="form-select form-select-sm" id="floatingSelect"  aria-label="Floating label select example" required>
             <option [ngValue]="null" disabled selected>Seleccione Bodega</option>
+            <option [ngValue]="item.tpBod_Id" *ngFor="let item of bodegas">{{item.tpBod_Nombre}}</option>
+            <!-- <option value="3" *ngIf="ValidarRol == 1 || ValidarRol == 3">Bodega BOPP</option>
+            <option value="4" *ngIf="ValidarRol == 1 || ValidarRol == 3">Bodega Chips y Solventes</option>
             <option value="1" *ngIf="ValidarRol == 1 || ValidarRol == 3">Bodega Polipropileno</option>
-            <option value="2" *ngIf="ValidarRol == 1 || ValidarRol == 3">Bodega Tintas</option>
-            <option value="3" *ngIf="ValidarRol == 1 || ValidarRol == 3">Bodega BOPP</option>
+            <option value="2" *ngIf="ValidarRol == 1 || ValidarRol == 3">Bodega Tintas</option> -->
           </select>
           <label for="floatingSelect">Bodegas</label>
         </div>
