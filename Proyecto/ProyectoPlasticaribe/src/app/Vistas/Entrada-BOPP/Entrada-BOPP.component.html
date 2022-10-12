@@ -12,7 +12,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Entrada de BOPP</h2>
+      <h2 class="tituloRojo">Entrada de BOPP / BOPA / POLIESTER</h2>
     </div>
 
     <div class="mb-4">
@@ -27,7 +27,7 @@
 
       <!--Titulo Entrada BOPP -->
       <div class="mb-3">
-        <h4 class="tituloRojo">Entrada de BOPP</h4>
+        <h4 class="tituloRojo">Entrada de Material</h4>
       </div>
 
       <!-- Información general para la asignación de materia Prima Para la creación de tintas -->
@@ -38,13 +38,13 @@
             <!-- Nombre BOPP -->
             <div class="form-floating col-md-5">
               <input formControlName="Nombre" type="text" class="form-control form-control-sm" id="floatingInput" required title="Nombre BOPP" >
-              <label for="floatingInput">Nombre BOPP</label>
+              <label for="floatingInput">Nombre Material</label>
             </div>
 
             <!-- Serial BOPP -->
             <div class="form-floating col-md-3">
               <input formControlName="serial" type="number" class="form-control form-control-sm" id="floatingInput" required title="Serial BOPP" >
-              <label for="floatingInput">Pallet/Serial BOPP</label>
+              <label for="floatingInput">Pallet/Serial Material</label>
             </div>
 
             <!-- Cantidad de micras -->
@@ -97,7 +97,7 @@
         <!-- BOTONES -->
         <div class="mb-4">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="btn btn-danger btn-danger-sm" type="button" (click)="cargarBOPPTabla()"> Añadir BOPP</button>
+            <button class="btn btn-danger btn-danger-sm" type="button" (click)="cargarBOPPTabla()"> Añadir Material</button>
             <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
           </div>
         </div>
@@ -109,7 +109,7 @@
       </div>
 
       <div class="mb-4">
-        <h4 class="tituloRojo">Tabla de BOPP Entrante</h4>
+        <h4 class="tituloRojo">Tabla de material Entrante</h4>
       </div>
 
       <!-- Tabla de BOPP entrante -->

@@ -10,6 +10,7 @@ import * as XLSX from 'xlsx';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
+import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 
 @Component({
   selector: 'app-Reporte_Procesos_OT',
@@ -38,7 +39,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                     private fallasTecnicasService : FallasTecnicasService,
                       private estadosProcesos_OTService : EstadosProcesos_OTService,
                         private estadosService : EstadosService,
-                        private servicioBagPro : BagproService) {
+                          private servicioBagPro : BagproService,
+                            private dtEntradasRollosService : DetallesEntradaRollosService,) {
 
     this.formularioOT = this.frmBuilder.group({
       idDocumento : [null],
@@ -845,45 +847,35 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
       });
     } else if (fechaincial != null) {
-      if(fechaincial < '2022-05-01') {
-        setTimeout(() => {
-          Swal.fire(`Solo se muestran OT's desde el inicio de las asignaciones de Materia Prima (2022-05-01)`);
-        }, 4800);
-      } else {
+      if (fechaincial < '2022-05-01') setTimeout(() => { Swal.fire(`Solo se muestran OT's desde el inicio de las asignaciones de Materia Prima (2022-05-01)`); }, 4800);
+      else {
         this.estadosProcesos_OTService.srvObtenerListaPorFecha(fechaincial).subscribe(datos_ot => {
-          if(datos_ot.length == 0) {
-            setTimeout(() => {
-              Swal.fire(`No se encontraron OTs creadas el día ${fechaincial}`);
-            }, 4800);
-          } else {
+          if(datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OTs creadas el día ${fechaincial}`); }, 4800);
+          else {
             for (let i = 0; i < datos_ot.length; i++) {
               this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                              datos_ot[i].estProcOT_ExtrusionKg,
-                              datos_ot[i].estProcOT_ImpresionKg,
-                              datos_ot[i].estProcOT_RotograbadoKg,
-                              datos_ot[i].estProcOT_DobladoKg,
-                              datos_ot[i].estProcOT_LaminadoKg,
-                              datos_ot[i].estProcOT_CorteKg,
-                              datos_ot[i].estProcOT_EmpaqueKg,
-                              datos_ot[i].estProcOT_SelladoKg,
-                              datos_ot[i].estProcOT_WiketiadoKg,
-                              datos_ot[i].estProcOT_CantidadPedida,
-                              datos_ot[i].falla_Nombre,
-                              datos_ot[i].estProcOT_Observacion,
-                              datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,);
+                datos_ot[i].estProcOT_ExtrusionKg,
+                datos_ot[i].estProcOT_ImpresionKg,
+                datos_ot[i].estProcOT_RotograbadoKg,
+                datos_ot[i].estProcOT_DobladoKg,
+                datos_ot[i].estProcOT_LaminadoKg,
+                datos_ot[i].estProcOT_CorteKg,
+                datos_ot[i].estProcOT_EmpaqueKg,
+                datos_ot[i].estProcOT_SelladoKg,
+                datos_ot[i].estProcOT_WiketiadoKg,
+                datos_ot[i].estProcOT_CantidadPedida,
+                datos_ot[i].falla_Nombre,
+                datos_ot[i].estProcOT_Observacion,
+                datos_ot[i].estado_Nombre,
+                datos_ot[i].estProcOT_FechaCreacion);
             }
           };
         });
-        }
-
+      }
     } else if (fallas != null) {
       this.estadosProcesos_OTService.srvObtenerListaPorFallas(fallas).subscribe(datos_ot => {
-        if(datos_ot.length == 0) {
-          setTimeout(() => {
-            Swal.fire('No se encontraron OTs con la falla consultada.');
-          }, 4800);
-        } else {
+        if(datos_ot.length == 0) setTimeout(() => { Swal.fire('No se encontraron OTs con la falla consultada.'); }, 4800);
+        else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
                             datos_ot[i].estProcOT_ExtrusionKg,
@@ -931,38 +923,37 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else {
       this.estadosProcesos_OTService.srvObtenerListaPorFecha(this.today).subscribe(datos_ot => {
-        if(datos_ot.length == 0) {
-          setTimeout(() => {
-            Swal.fire(`No se encontraron OT's creadas del día de hoy.`);
-          }, 4800);
-        } else {
+        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's creadas del día de hoy.`); }, 3000);
+        else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion);
           }
         }
       });
     }
+
     setTimeout(() => {
       this.load = true;
-    }, 5000);
+      if (this.ArrayDocumento.length == 0) Swal.fire("No hay ordenes de trabajo por mostrar");
+    }, 3500);
   }
 
   //Funcion encargada de llenar un array con la informacion de las ordenes de trabajo y el producido de cada area
-  llenarArray(ot : number, ext : number, imp : number, rot : number, dbl : number, lam : number, cor : number, emp : number, sel : number, wik : number, can : number, falla : string, observacion : string, estado : any, fecha : any,){
+  llenarArray(ot : number, ext : number, imp : number, rot : number, dbl : number, lam : number, cor : number, emp : number, sel : number, wik : number, can : number, falla : string, observacion : string, estado : any, fecha : any){
     let info : any = {
       ot : ot,
       ext : ext,
@@ -979,10 +970,28 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       obs : observacion,
       est : estado,
       fecha : fecha.replace("T00:00:00", ""),
+      entrada : 0,
+      salida : 0,
     }
-      this.ArrayDocumento.push(info);
-      this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
-      this.ArrayDocumento.sort((a,b) => Number(a.ot)- Number(b.ot));
+    this.ArrayDocumento.push(info);
+    this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
+    this.ArrayDocumento.sort((a,b) => Number(a.ot)- Number(b.ot));
+    this.load = true;
+
+    this.dtEntradasRollosService.srvConsultarOTEntradas(ot).subscribe(datos_entradas => {
+      for (let j = 0; j < datos_entradas.length; j++) {
+        for (let i = 0; i < this.ArrayDocumento.length; i++) {
+          if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].entrada = datos_entradas[j].sum;
+        }
+      }
+    });
+    this.dtEntradasRollosService.srvConsultarOtSalidas(ot).subscribe(datos_salidas => {
+      for (let k = 0; k < datos_salidas.length; k++) {
+        for (let i = 0; i < this.ArrayDocumento.length; i++) {
+          if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].salida = datos_salidas[k].sum;
+        }
+      }
+    });
   }
 
   // Funcion que va a asignar un valor una variable, el valor será la orden de trabajo sobre la que se le dió click

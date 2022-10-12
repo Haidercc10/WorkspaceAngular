@@ -28,23 +28,23 @@
           <div class="mb-4">
             <div class="row g-3">
             <!--OT-->
-              <div class="form-floating col-md-2">
+              <div class="form-floating col-md">
                 <input formControlName="idDocumento" type="number" class="form-control" id="floatingInput" title="N° de la Orden de Trabajo" required >
                 <label for="floatingInput">OT</label>
               </div>
               <!-- Fecha inicial -->
-              <div class="form-floating col-md-2">
+              <div class="form-floating col-md">
                 <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput" title="Fecha de creación de la Orden de trabajo" required >
                 <label for="floatingInput">Fecha Inicial</label>
               </div>
               <!-- Fecha final -->
-              <div class="form-floating col-md-2">
+              <div class="form-floating col-md">
                 <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
                 <label for="floatingInput">Fecha Final</label>
               </div>
 
               <!-- Estados -->
-              <div class="form-floating col-md-2">
+              <div class="form-floating col-md">
                 <select formControlName="estado" class="form-select form-select-sm" id="floatingSelect" title="Estado de la Orden de Trabajo" required>
                   <option [ngValue]="estado.estado_Id" *ngFor="let estado of estados">{{estado.estado_Nombre}}</option>
                 </select>
@@ -52,7 +52,7 @@
               </div>
 
               <!-- Fallas -->
-              <div class="form-floating col-md-2">
+              <div class="form-floating col-md">
                 <select formControlName="fallasOT" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example">
                   <option [ngValue]="falla.falla_Id" *ngFor="let falla of fallas">{{falla.falla_Nombre}}</option>
                 </select>
@@ -60,7 +60,7 @@
               </div>
 
               <!-- Observación -->
-              <div class="form-floating col-6 col-md">
+              <div class="form-floating col-6 col-md-12">
                 <textarea formControlName="ObservacionOT"  id="floatingTextArea" type="text" class="form-control form-control-sm" maxlength="200" ></textarea>
                 <label for="floatingTextArea">Observación</label>
               </div>
@@ -101,7 +101,7 @@
             <div class="row g-3">
               <!--Inicio Tabla OT-->
               <div class="table-responsive">
-                <table class="table table-bordered table-hover mt-2" id="table">
+                <table class="table table-bordered table-hover mt-2" id="table" style="font-size: 14px;">
                   <thead class="TitulosTabla">
                     <tr>
                       <th id="" scope="col">OT</th>
@@ -114,7 +114,9 @@
                       <th id="" scope="col">Empaque</th>
                       <th id="" scope="col">Sellado</th>
                       <th id="" scope="col">Wiketiado</th>
-                      <th id="" scope="col">Cantidad Producir</th>
+                      <th id="" scope="col">Cant Producir</th>
+                      <th id="" scope="coll">Cant Ingresada</th>
+                      <th id="" scope="coll">Cant Enviada</th>
                       <th id="" scope="col">Fallas</th>
                       <th id="" scope="col">Estados</th>
                       <th id="" scope="col">Fecha Creación</th>
@@ -227,11 +229,17 @@
                         <!-- Cantidad Total a Producir -->
                         <td id="cant" scope="col">{{tabla.cant | number}}</td>
 
+                        <!-- Cantidad Ingresada a Despacho -->
+                        <td id="est" scope="col">{{tabla.entrada | number}}</td>
+
+                        <!-- Cantidad Enviada -->
+                        <td id="est" scope="col">{{tabla.salida | number}}</td>
+
                         <!-- Fallas -->
                         <td id="falla" scope="col" title="{{tabla.obs}}">{{tabla.falla}}</td>
 
                         <!-- Estado OT -->
-                        <td id="est" scope="col">{{tabla.est}}</td>
+                        <td id="est" scope="col">{{tabla.est | uppercase}}</td>
 
                         <!-- Fecha Creacion OT -->
                         <td id="fecha" scope="col">{{tabla.fecha | date : 'yyyy-MM-dd'}}</td>

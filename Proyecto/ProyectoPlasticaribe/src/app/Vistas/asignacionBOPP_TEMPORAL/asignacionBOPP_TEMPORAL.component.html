@@ -13,7 +13,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Asignación de BOPP</h2>
+      <h2 class="tituloRojo">Asignación de BOPP / BOPA / POLIESTER</h2>
     </div>
 
     <div class="mb-4">
@@ -108,7 +108,7 @@
 
       <!-- Titulo Materia Prima -->
       <div class="mb-3">
-        <h4 class="tituloRojo">BOPP</h4>
+        <h4 class="tituloRojo">BOPP / BOPA / POLIESTER</h4>
       </div>
 
       <!-- Asignación de BOPP para la creación de tintas -->
@@ -142,7 +142,7 @@
               <ng-template #notFoundTemplate let-notFound>
                 <div [innerHTML]="notFound"></div>
               </ng-template>
-              <label for="floatingInput" *ngIf="validarInput">Nombre BOPP</label>
+              <label for="floatingInput" *ngIf="validarInput">Nombre Material</label>
             </div>
             <!-- <div class="form-floating col-md">
               <select formControlName="boppNombre" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" (change)="BOPPSeleccionado()">
@@ -156,7 +156,7 @@
         <!-- BOTONES -->
         <div class="mb-4">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposBOPP()">Asignar BOPP</button>
+            <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposBOPP()">Asignar Material</button>
             <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposBOPP()">Limpiar Campos</button>
           </div>
         </div>
@@ -168,7 +168,7 @@
       </div>
 
       <div class="mb-4">
-        <h4 class="tituloRojo">Tabla de materias primas asignadas</h4>
+        <h4 class="tituloRojo">Tabla de material asignado</h4>
       </div>
 
       <!-- Tabla de BOPP por asignar -->

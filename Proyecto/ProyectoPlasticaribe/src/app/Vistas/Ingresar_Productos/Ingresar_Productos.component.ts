@@ -29,6 +29,7 @@ export class Ingresar_ProductosComponent implements OnInit {
 
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  hora : any = moment().format("H:mm:ss"); //Variable que almacenará la hora
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -133,6 +134,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     this.grupoProductos = [];
     this.cargando = true;
     this.Total = 0;
+    this.rollosAsignados = [];
     // window.location.href = "./ingresar-productos";
   }
 
@@ -3490,36 +3492,6 @@ export class Ingresar_ProductosComponent implements OnInit {
     setTimeout(() => { this.GrupoProductos(); }, 500);
   }
 
-  // Funcion que va a seleccionar todo lo de la OT sobre la que se dió click que hay en la tabla
-  selccionarTodoOT(ot){
-    for (let i = 0; i < this.rollos.length; i++) {
-      if (this.rollos[i].Ot == ot) {
-        if (!this.rollos[i].exits) {
-          let info : any = {
-            Ot : this.rollos[i].Ot,
-            Id : this.rollos[i].Id,
-            IdCliente : this.rollos[i].IdCliente,
-            Cliente : this.rollos[i].Cliente,
-            IdProducto : this.rollos[i].IdProducto,
-            Producto : this.rollos[i].Producto,
-            Cantidad : this.rollos[i].Cantidad,
-            Presentacion : this.rollos[i].Presentacion,
-            Estatus : this.rollos[i].Estatus,
-            Proceso : this.rollos[i].Proceso,
-            Fecha : this.rollos[i].Fecha,
-          }
-          this.rollosInsertar.push(info);
-          this.validarRollo.push(this.rollos[i].Id);
-          this.Total += this.rollos[i].Cantidad;
-        }
-      }
-    }
-    for (let i = 0; i < this.rollos.length; i++) {
-      if (this.rollos[i].Ot == ot) this.rollos.splice(i,1);
-    }
-    setTimeout(() => { this.GrupoProductos(); }, 500);
-  }
-
   // Funcion que va a quitar todo lo que hay en la tabla
   quitarTodo(){
     for (const item of this.rollosInsertar) {
@@ -3601,12 +3573,11 @@ export class Ingresar_ProductosComponent implements OnInit {
           Id : this.rollosInsertar[i].IdProducto,
           Nombre : this.rollosInsertar[i].Producto,
           Cantidad : this.formatonumeros(cantidad.toFixed(2)),
-          Cantidad2 : cantidad,
+          Cantidad2 : cantidad.toFixed(4),
           Rollos: this.formatonumeros(cantRollo.toFixed(2)),
           Presentacion : this.rollosInsertar[i].Presentacion,
         }
         this.grupoProductos.push(info);
-        console.log(this.grupoProductos)
       }
     }
   }
@@ -3620,6 +3591,7 @@ export class Ingresar_ProductosComponent implements OnInit {
         EntRolloProd_Fecha : this.today,
         EntRolloProd_Observacion : this.FormConsultarRollos.value.Observacion,
         Usua_Id : this.storage_Id,
+        EntRolloProd_Hora : this.hora,
       }
       this.entradaRolloService.srvGuardar(info).subscribe(datos_entradaRollo => {
         this.entradaRolloService.srvObtenerUltimoId().subscribe(datos_ultEntrada => {
@@ -3768,6 +3740,10 @@ export class Ingresar_ProductosComponent implements OnInit {
               icon: 'success',
               title: '¡Entrada de Rollos registrada con exito!'
             });
+          }, error => {
+            Swal.fire(`¡Error al mover el inventario del Producto ${datos_productos[j].prod_Id}, mover el inventario manualmente!`);
+            this.cargando = true;
+            this.limpiarCampos();
           });
         }
       });
@@ -3781,9 +3757,6 @@ export class Ingresar_ProductosComponent implements OnInit {
     this.dtEntradaRollosService.srvCrearPDFUltimoId(id).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         for (let j = 0; j < this.rollosAsignados.length; j++) {
-          let CantTotal : string = `${this.Total}`;
-          let cantidadAsignadaNueva = CantTotal.indexOf(".");
-          let cantidadAsignadaFinal = CantTotal.substring(0, (cantidadAsignadaNueva + 3));
           const pdfDefinicion : any = {
             info: {
               title: `${id}`
@@ -3899,7 +3872,6 @@ export class Ingresar_ProductosComponent implements OnInit {
     this.dtEntradaRollosService.srvCrearPDFUltimoId(id).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         let info : any = {
-          // OT : datos_factura[i].dtEntRolloProd_OT,
           Rollo : datos_factura[i].rollo_Id,
           Producto : datos_factura[i].prod_Id,
           Nombre : datos_factura[i].prod_Nombre,

@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/AsignacionProductosFactura.service';
@@ -13,13 +14,13 @@ import { ProductoService } from 'src/app/Servicios/producto.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
-import moment from 'moment';
 
 @Component({
   selector: 'app-AsignarProductosFacturas',
   templateUrl: './AsignarProductosFacturas.component.html',
   styleUrls: ['./AsignarProductosFacturas.component.css'],
 })
+
 export class AsignarProductosFacturasComponent implements OnInit {
 
   public FormConsultarProductos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
@@ -28,6 +29,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  hora : any = moment().format("H:mm:ss"); //Variable que almacenará la hora
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -589,7 +591,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
           Id : this.rollosInsertar[i].IdProducto,
           Nombre : this.rollosInsertar[i].Producto,
           Cantidad : this.formatonumeros(cantidad.toFixed(2)),
-          Cantidad2 : cantidad,
+          Cantidad2 : cantidad.toFixed(4),
           Rollos: this.formatonumeros(cantRollo.toFixed(2)),
           Presentacion : this.rollosInsertar[i].Presentacion,
           Cant_Unidades : this.formatonumeros(cantUnidades.toFixed(2)),
@@ -639,7 +641,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
   crearAsignacion(){
     if (this.rollosInsertar.length != 0 && this.FormConsultarProductos.valid) {
       this.cargando = false;
-      console.log(this.FormConsultarProductos.value)
       let factura : string = this.FormConsultarProductos.value.Factura;
       let notaCredito : string = this.FormConsultarProductos.value.NotaCredito;
       let cliente : any = this.FormConsultarProductos.value.Cliente;
@@ -657,6 +658,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         Usua_Conductor : 88,
         AsigProdFV_PlacaCamion : '',
         AsigProdFV_FechaEnvio : this.today,
+        AsigProdFV_Hora : this.hora,
       }
       this.asgProdFactura.srvGuardar(info).subscribe(datos_asignacion => {
         this.asgProdFactura.srvObtenerUltimoId().subscribe(datos_ultimaAsg => { this.crearDetallesAsignacion(datos_ultimaAsg.asigProdFV_Id) });
@@ -806,11 +808,11 @@ export class AsignarProductosFacturasComponent implements OnInit {
           let info : any = {
             Prod_Id: datos_productos[j].prod_Id,
             exProd_Id : datos_productos[j].exProd_Id,
-            ExProd_Cantidad: (datos_productos[j].exProd_Cantidad - parseFloat(this.grupoProductos[i].Cantidad2)),
+            ExProd_Cantidad: (datos_productos[j].exProd_Cantidad - this.grupoProductos[i].Cantidad2),
             UndMed_Id: datos_productos[j].undMed_Id,
             TpBod_Id: datos_productos[j].tpBod_Id,
             ExProd_Precio: datos_productos[j].exProd_Precio,
-            ExProd_PrecioExistencia: (datos_productos[j].exProd_Cantidad - parseFloat(this.grupoProductos[i].Cantidad2)) * datos_productos[j].exProd_PrecioVenta,
+            ExProd_PrecioExistencia: (datos_productos[j].exProd_Cantidad - this.grupoProductos[i].Cantidad2) * datos_productos[j].exProd_PrecioVenta,
             ExProd_PrecioSinInflacion: datos_productos[j].exProd_PrecioSinInflacion,
             TpMoneda_Id: datos_productos[j].tpMoneda_Id,
             ExProd_PrecioVenta: datos_productos[j].exProd_PrecioVenta,

@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesAsignacionProductosFactura.service';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionesProductos.service';
@@ -20,6 +21,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
 
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  hora : any = moment().format("H:mm:ss"); //Variable que almacenará la hora
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -106,10 +108,12 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
   consultarFactura(){
     this.rollos = [];
+    this.cargando = false;
     let factura : string = this.FormConsultarFactura.value.Fact_Id;
     this.dtAsgProdFactura.srvObtenerListaPorCodigoFactura(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         if (datos_factura[i].estado_Id == 21) {
+          this.cargando = true;
           let info : any = {
             Factura : factura.toUpperCase(),
             Id : datos_factura[i].rollo_Id,
@@ -135,7 +139,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
     setTimeout(() => {
       if (this.rollos.length <= 0) Swal.fire(`La factura ${factura} ya devolvió todos los rollos`);
       this.cargando = true;
-    }, 10000);
+    }, 5000);
   }
 
   // Funcion que traerá la informacion del rollo que se esta consultando
@@ -245,7 +249,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
           Id : this.rollosInsertar[i].IdProducto,
           Nombre : this.rollosInsertar[i].Producto,
           Cantidad : this.formatonumeros(cantidad.toFixed(2)),
-          Cantidad2 : cantidad.toFixed(2),
+          Cantidad2 : cantidad.toFixed(4),
           Rollos: this.formatonumeros(cantRollo.toFixed(2)),
           Presentacion : this.rollosInsertar[i].Presentacion,
         }
@@ -266,6 +270,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
         DevProdFact_Observacion : this.FormConsultarFactura.value.Observacion,
         TipoDevProdFact_Id : 1,
         Usua_Id : this.storage_Id,
+        DevProd_Hora : this.hora,
       }
       this.devolcuionesService.srvGuardar(info).subscribe(datos_devolucion => {
         this.devolcuionesService.srvObteneUltimoId().subscribe(datos_devolucion => {
@@ -330,18 +335,63 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
       for (let i = 0; i < this.rollosInsertar.length; i++) {
         this.rollosService.srvObtenerVerificarRollo(this.rollosInsertar[i].Id).subscribe(datos_rollos => {
           for (let j = 0; j < datos_rollos.length; j++) {
-            let info : any = {
-              DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
-              EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
-              Rollo_Id : datos_rollos[j].rollo_Id,
-              DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
-              undMed_Rollo : datos_rollos[j].undMed_Rollo,
-              Estado_Id : 19,
-              dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
-              Prod_Id : datos_rollos[j].prod_Id,
-              UndMed_Prod : datos_rollos[j].undMed_Prod
+            if(this.rollosInsertar[i].Presentacion == 'Paquete') {
+              if (datos_rollos[j].prod_CantPaquetesRestantes != (this.rollosInsertar[i].CantUndRestantes / datos_rollos[j].prod_CantBolsasPaquete)) {
+                let info : any = {
+                  DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
+                  EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
+                  Rollo_Id : datos_rollos[j].rollo_Id,
+                  DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
+                  undMed_Rollo : datos_rollos[j].undMed_Rollo,
+                  Estado_Id : 19,
+                  dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
+                  Prod_Id : datos_rollos[j].prod_Id,
+                  UndMed_Prod : datos_rollos[j].undMed_Prod,
+                  Prod_CantPaquetesRestantes : (datos_rollos[j].dtEntRolloProd_Cantidad + (this.rollosInsertar[i].CantUndRestantes / datos_rollos[j].prod_CantBolsasPaquete)),
+                  Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
+                  Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
+                  Prod_CantBolsasRestates : (datos_rollos[j].prod_CantBolsasRestates + this.rollosInsertar[i].CantUndRestantes),
+                  Prod_CantBolsasFacturadas : (this.rollosInsertar[i].CantUndRestantes - datos_rollos[j].prod_CantBolsasFacturadas),
+                }
+                this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
+              } else if (datos_rollos[j].prod_CantPaquetesRestantes == (this.rollosInsertar[i].CantUndRestantes / datos_rollos[j].prod_CantBolsasPaquete)) {
+                let info : any = {
+                  DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
+                  EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
+                  Rollo_Id : datos_rollos[j].rollo_Id,
+                  DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
+                  undMed_Rollo : datos_rollos[j].undMed_Rollo,
+                  Estado_Id : 19,
+                  dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
+                  Prod_Id : datos_rollos[j].prod_Id,
+                  UndMed_Prod : datos_rollos[j].undMed_Prod,
+                  Prod_CantPaquetesRestantes : (datos_rollos[j].dtEntRolloProd_Cantidad + (this.rollosInsertar[i].CantUndRestantes / datos_rollos[j].prod_CantBolsasPaquete)),
+                  Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
+                  Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
+                  Prod_CantBolsasRestates : (datos_rollos[j].prod_CantBolsasRestates + this.rollosInsertar[i].CantUndRestantes),
+                  Prod_CantBolsasFacturadas : (this.rollosInsertar[i].CantUndRestantes - datos_rollos[j].prod_CantBolsasFacturadas),
+                }
+                this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
+              }
+            } else {
+              let info : any = {
+                DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
+                EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
+                Rollo_Id : datos_rollos[j].rollo_Id,
+                DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
+                undMed_Rollo : datos_rollos[j].undMed_Rollo,
+                Estado_Id : 19,
+                dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
+                Prod_Id : datos_rollos[j].prod_Id,
+                UndMed_Prod : datos_rollos[j].undMed_Prod,
+                Prod_CantPaquetesRestantes : datos_rollos[j].prod_CantPaquetesRestantes,
+                Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
+                Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
+                Prod_CantBolsasRestates : (datos_rollos[j].prod_CantBolsasRestates + this.rollosInsertar[i].CantUndRestantes),
+                Prod_CantBolsasFacturadas : (this.rollosInsertar[i].CantUndRestantes - datos_rollos[j].prod_CantBolsasFacturadas),
+              }
+              this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
             }
-            this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
           }
         });
       }
@@ -357,11 +407,11 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
           let info : any = {
             Prod_Id: datos_productos[j].prod_Id,
             exProd_Id : datos_productos[j].exProd_Id,
-            ExProd_Cantidad: (datos_productos[j].exProd_Cantidad + parseInt(this.grupoProductos[i].Cantidad2)),
+            ExProd_Cantidad: (datos_productos[j].exProd_Cantidad + parseFloat(this.grupoProductos[i].Cantidad2)),
             UndMed_Id: datos_productos[j].undMed_Id,
             TpBod_Id: datos_productos[j].tpBod_Id,
             ExProd_Precio: datos_productos[j].exProd_Precio,
-            ExProd_PrecioExistencia: (datos_productos[j].exProd_Cantidad + parseInt(this.grupoProductos[i].Cantidad2)) * datos_productos[j].exProd_PrecioVenta,
+            ExProd_PrecioExistencia: (datos_productos[j].exProd_Cantidad + parseFloat(this.grupoProductos[i].Cantidad2)) * datos_productos[j].exProd_PrecioVenta,
             ExProd_PrecioSinInflacion: datos_productos[j].exProd_PrecioSinInflacion,
             TpMoneda_Id: datos_productos[j].tpMoneda_Id,
             ExProd_PrecioVenta: datos_productos[j].exProd_PrecioVenta,

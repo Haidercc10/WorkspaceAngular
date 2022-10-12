@@ -4,4 +4,6 @@ export interface modelDevolucionProductos {
   DevProdFact_Fecha : any;
   DevProdFact_Observacion : string;
   TipoDevProdFact_Id : number;
+  Usua_Id : number;
+  DevProd_Hora : string;
 }

@@ -50,6 +50,14 @@ export class DetallesEntradaRollosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/CrearPDFUltimoID/${id}`);
   }
 
+  srvConsultarOTEntradas(ot : number) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/ConsultarOTReporteProcesosActual/${ot}`);
+  }
+
+  srvConsultarOtSalidas(ot : number) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/ConsultarOTReporteProcesosSalidas/${ot}`);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/${id}`, data);
   }

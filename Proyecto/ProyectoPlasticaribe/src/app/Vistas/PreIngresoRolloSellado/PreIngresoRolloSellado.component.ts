@@ -23,6 +23,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
 
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  hora : any = moment().format("H:mm:ss"); //Variable que almacenará la hora
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -1358,6 +1359,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         PreEntRollo_Fecha : this.today,
         PreEntRollo_Observacion : this.FormConsultarRollos.value.Observacion,
         Usua_Id : this.storage_Id,
+        PreEntRollo_Hora : this.hora,
       }
       this.preEntRollosService.srvGuardar(info).subscribe(datos_entradaRollo => {
         this.preEntRollosService.srvObtenerUltimoId().subscribe(datos_ultEntrada => { this.ingresarRollos(datos_entradaRollo.preEntRollo_Id); });

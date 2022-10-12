@@ -47,20 +47,22 @@
  */
 import 'zone.js';  // Included with Angular CLI.
 
+/* RUTA PRINCIPAL DE API */
 export let rutaPlasticaribeAPI = "http://192.168.0.85:9085/api"; //Ruta al servidor de la base de datos nuevas
+
+/* RUTAS DE PRUEBA LOCAL */
 // export let rutaPlasticaribeAPI = "https://localhost:7014/api"; //Ruta local del api de prueba.
+// export let rutaPlasticaribeAPI = "http://192.168.0.153:9085/api"; //Ruta local del api de prueba.
 
 
-//export let rutaPlasticaribeAPI = "http://192.168.0.139:9093/api" /*"http://192.168.0.85:9085/api"; */ //Ruta al servidor de la base de datos nueva
+//export let rutaPlasticaribeAPI = "http://192.168.0.139:9093/api" //Ruta al servidor de la base de datos nueva
+// export let rutaPlasticaribeAPI = "http://192.168.0.139:9093/api"
 
-// export let rutaPlasticaribeAPI = "http://192.168.0.153:9085/api"; //Ruta al servidor de la base de datos nueva
-// export let rutaPlasticaribeAPI = "https://192.168.0.153:7014/api"; //Ruta local del api de prueba
-
-// export let rutaPlasticaribeAPI = /*"http://192.168.0.139:9093/api"*/
-
+/* RUTA PRINCIPAL DE API BAGPRO */
 export let rutaBagPro = "http://192.168.0.85:9095/api"; //Ruta al servidor de la base de datos de BagPro --- SERVIDOR
 // export let rutaBagProLocate = "http://192.168.0.140:9056/api"; //Ruta al servidor de la base de datos de BagPro --- LOCAL
 
+/* RUTA PRINCIPAL DE API ZEUS */
 export let rutaZeus = "http://192.168.0.85:9055/api"; //Ruta al servidor de la base de datos de Zeus --- SERVIDOR
 // export let rutaZeus = "https://localhost:7283/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
 
