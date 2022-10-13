@@ -17,6 +17,7 @@ export class DatosOTStatusComponent implements OnInit {
 
   public ArrayDatosProcesos = [];
   public page : number; //Variable que tendrá el paginado de la tabla en la que se muestran los pedidos consultados
+  ArrayDatosAgrupados : any [] = [] //variable que va a almacenar todos los agrupados de la OT en el proceso seleccionado
 
   constructor() { }
 

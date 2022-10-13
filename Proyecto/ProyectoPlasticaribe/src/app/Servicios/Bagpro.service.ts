@@ -205,7 +205,7 @@ export class BagproService {
 
 /** Servcios de datos consolidados para Estados Procesos OT */
 
-  srvObtenerDataConsolidada_StatusExtrusion(OT : any, Proceso: AnyPtrRecord):Observable<any[]> {
+  srvObtenerDataConsolidada_StatusExtrusion(OT : any, Proceso: any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/MostrarDatosConsolidados_ProcExtrusion/${OT}/${Proceso}`);
   }
 

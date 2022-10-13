@@ -63,16 +63,16 @@
             <th id="producto" scope="col">Operador</th>
             <th id="Peso" scope="col">Peso</th>
             <th id="Unidad" scope="col">Fecha</th>
-            <th id="Operador" scope="col">Status</th>
+            <!-- <th id="Operador" scope="col">Status</th> -->
           </tr>
         </thead>
         <tbody>
-          <tr> <!--*ngFor="let lista of ArrayDatosProcesos; let j = index"-->
-            <th id="id" class="TextosInfoTabla">{{1}}</th>
-            <td id="cliente" class="TextosInfoTabla">{{2}}</td>
-            <td id="producto" class="TextosInfoTabla">{{3}}</td>
-            <td id="peso" class="TextosInfoTabla">{{4}}</td>
-            <td id="unidad" class="TextosInfoTabla">{{5}}</td>
+          <tr *ngFor="let item of ArrayDatosAgrupados; let i=index">
+            <td id="id" class="TextosInfoTabla">{{item.Producto}}</td>
+            <td id="cliente" class="TextosInfoTabla">{{item.Operador}}</td>
+            <td id="producto" class="TextosInfoTabla">{{item.Peso}}</td>
+            <td id="peso" class="TextosInfoTabla">{{item.Fecha}}</td>
+            <!-- <td id="unidad" class="TextosInfoTabla">{{}}</td> -->
           </tr>
         </tbody>
       </table>

@@ -920,6 +920,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   seleccionarOTxStatus(form : any, proceso : any){
     this.otSeleccionada = form.ot;
     this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
+    this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
 
     if (proceso == 'EXTRUSION') {
       this.servicioBagPro.srvObtenerListaPorStatusExtrusion(this.otSeleccionada).subscribe(registros_OT => {
@@ -940,6 +941,21 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             }
             this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
           }
+        }
+      });
+
+      this.servicioBagPro.srvObtenerDataConsolidada_StatusExtrusion(this.otSeleccionada, proceso).subscribe(datos_agrupados => {
+        for (let i = 0; i < datos_agrupados.length; i++) {
+          let info : any = {
+            Ot : datos_agrupados[i].ot,
+            Producto : datos_agrupados[i].clienteItemNombre,
+            Operador : datos_agrupados[i].operador,
+            Peso : datos_agrupados[i].sumaPesoKg,
+            Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
+            Proceso : datos_agrupados[i].nomStatus,
+          }
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
         }
       });
 
