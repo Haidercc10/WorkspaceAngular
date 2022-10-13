@@ -601,7 +601,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               datos_ot[i].estProcOT_FechaCreacion,);
             }
           }
-      });
+        });
       }
     } else if (numOT != null && fechaincial != null) {
       this.estadosProcesos_OTService.srvObtenerListaPorOtFecha(numOT, fechaincial).subscribe(datos_ot => {
@@ -890,25 +890,27 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       entrada : 0,
       salida : 0,
     }
-    this.ArrayDocumento.push(info);
-    this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
-    this.ArrayDocumento.sort((a,b) => Number(a.ot)- Number(b.ot));
-    this.load = true;
+    setTimeout(() => {
+      this.ArrayDocumento.push(info);
+      this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
+      this.ArrayDocumento.sort((a,b) => Number(a.ot)- Number(b.ot));
+      this.load = true;
 
-    this.dtEntradasRollosService.srvConsultarOTEntradas(ot).subscribe(datos_entradas => {
-      for (let j = 0; j < datos_entradas.length; j++) {
-        for (let i = 0; i < this.ArrayDocumento.length; i++) {
-          if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].entrada = datos_entradas[j].sum;
+      this.dtEntradasRollosService.srvConsultarOTEntradas(ot).subscribe(datos_entradas => {
+        for (let j = 0; j < datos_entradas.length; j++) {
+          for (let i = 0; i < this.ArrayDocumento.length; i++) {
+            if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].entrada = datos_entradas[j].sum;
+          }
         }
-      }
-    });
-    this.dtEntradasRollosService.srvConsultarOtSalidas(ot).subscribe(datos_salidas => {
-      for (let k = 0; k < datos_salidas.length; k++) {
-        for (let i = 0; i < this.ArrayDocumento.length; i++) {
-          if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].salida = datos_salidas[k].sum;
+      });
+      this.dtEntradasRollosService.srvConsultarOtSalidas(ot).subscribe(datos_salidas => {
+        for (let k = 0; k < datos_salidas.length; k++) {
+          for (let i = 0; i < this.ArrayDocumento.length; i++) {
+            if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].salida = datos_salidas[k].sum;
+          }
         }
-      }
-    });
+      });
+    }, 200);
   }
 
   // Funcion que va a asignar un valor una variable, el valor será la orden de trabajo sobre la que se le dió click
@@ -950,7 +952,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             Ot : datos_agrupados[i].ot,
             Producto : datos_agrupados[i].clienteItemNombre,
             Operador : datos_agrupados[i].operador,
-            Peso : datos_agrupados[i].sumaPesoKg,
+            Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
             Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
             Proceso : datos_agrupados[i].nomStatus,
           }
@@ -981,6 +983,20 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
 
+      this.servicioBagPro.srvObtenerDataConsolidada_StatusExtrusion(this.otSeleccionada, proceso).subscribe(datos_agrupados => {
+        for (let i = 0; i < datos_agrupados.length; i++) {
+          let info : any = {
+            Ot : datos_agrupados[i].ot,
+            Producto : datos_agrupados[i].clienteItemNombre,
+            Operador : datos_agrupados[i].operador,
+            Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
+            Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
+            Proceso : datos_agrupados[i].nomStatus,
+          }
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
+        }
+      });
     } else if (proceso == 'ROTOGRABADO') {
       this.servicioBagPro.srvObtenerListaPorStatusRotograbado(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
@@ -1003,6 +1019,20 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
 
+      this.servicioBagPro.srvObtenerDataConsolidada_StatusExtrusion(this.otSeleccionada, proceso).subscribe(datos_agrupados => {
+        for (let i = 0; i < datos_agrupados.length; i++) {
+          let info : any = {
+            Ot : datos_agrupados[i].ot,
+            Producto : datos_agrupados[i].clienteItemNombre,
+            Operador : datos_agrupados[i].operador,
+            Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
+            Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
+            Proceso : datos_agrupados[i].nomStatus,
+          }
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
+        }
+      });
     } else if (proceso == 'DOBLADO') {
       this.servicioBagPro.srvObtenerListaPorStatusDoblado(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
@@ -1025,6 +1055,20 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
 
+      this.servicioBagPro.srvObtenerDataConsolidada_StatusExtrusion(this.otSeleccionada, proceso).subscribe(datos_agrupados => {
+        for (let i = 0; i < datos_agrupados.length; i++) {
+          let info : any = {
+            Ot : datos_agrupados[i].ot,
+            Producto : datos_agrupados[i].clienteItemNombre,
+            Operador : datos_agrupados[i].operador,
+            Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
+            Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
+            Proceso : datos_agrupados[i].nomStatus,
+          }
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
+        }
+      });
     } else if (proceso == 'LAMINADO') {
       this.servicioBagPro.srvObtenerListaPorStatusLaminado(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
@@ -1047,6 +1091,20 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
 
+      this.servicioBagPro.srvObtenerDataConsolidada_StatusExtrusion(this.otSeleccionada, proceso).subscribe(datos_agrupados => {
+        for (let i = 0; i < datos_agrupados.length; i++) {
+          let info : any = {
+            Ot : datos_agrupados[i].ot,
+            Producto : datos_agrupados[i].clienteItemNombre,
+            Operador : datos_agrupados[i].operador,
+            Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
+            Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
+            Proceso : datos_agrupados[i].nomStatus,
+          }
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
+        }
+      });
     } else if (proceso == 'CORTE') {
       this.servicioBagPro.srvObtenerListaPorStatusCorte(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
@@ -1069,6 +1127,20 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
 
+      this.servicioBagPro.srvObtenerDataConsolidada_StatusExtrusion(this.otSeleccionada, proceso).subscribe(datos_agrupados => {
+        for (let i = 0; i < datos_agrupados.length; i++) {
+          let info : any = {
+            Ot : datos_agrupados[i].ot,
+            Producto : datos_agrupados[i].clienteItemNombre,
+            Operador : datos_agrupados[i].operador,
+            Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
+            Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
+            Proceso : datos_agrupados[i].nomStatus,
+          }
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
+        }
+      });
     } else if (proceso == 'EMPAQUE') {
       this.servicioBagPro.srvObtenerListaPorStatusEmpaque(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
@@ -1091,6 +1163,20 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
 
+      this.servicioBagPro.srvObtenerDataConsolidada_StatusExtrusion(this.otSeleccionada, proceso).subscribe(datos_agrupados => {
+        for (let i = 0; i < datos_agrupados.length; i++) {
+          let info : any = {
+            Ot : datos_agrupados[i].ot,
+            Producto : datos_agrupados[i].clienteItemNombre,
+            Operador : datos_agrupados[i].operador,
+            Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
+            Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
+            Proceso : datos_agrupados[i].nomStatus,
+          }
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
+        }
+      });
     } else if (proceso == 'SELLADO') {
       this.servicioBagPro.srvObtenerListaPorStatusSellado(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
@@ -1112,7 +1198,20 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
         }
       });
-
+      this.servicioBagPro.srvObtenerDataConsolidada_StatusSellado(this.otSeleccionada, proceso).subscribe(datos_agrupados => {
+        for (let i = 0; i < datos_agrupados.length; i++) {
+          let info : any = {
+            Ot : datos_agrupados[i].ot,
+            Producto : datos_agrupados[i].nomReferencia,
+            Operador : datos_agrupados[i].operario,
+            Peso : `${this.formatonumeros(datos_agrupados[i].sumaCantidad)} UND - ${this.formatonumeros(datos_agrupados[i].sumaPeso)} KG`,
+            Fecha : datos_agrupados[i].fechaEntrada.replace('T00:00:00', ''),
+            Proceso : datos_agrupados[i].nomStatus,
+          }
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
+        }
+      });
     } else if (proceso == 'Wiketiado') {
       this.servicioBagPro.srvObtenerListaPorStatusWiketiado(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
@@ -1132,6 +1231,20 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             }
             this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
           }
+        }
+      });
+      this.servicioBagPro.srvObtenerDataConsolidada_StatusSellado(this.otSeleccionada, proceso).subscribe(datos_agrupados => {
+        for (let i = 0; i < datos_agrupados.length; i++) {
+          let info : any = {
+            Ot : datos_agrupados[i].ot,
+            Producto : datos_agrupados[i].nomReferencia,
+            Operador : datos_agrupados[i].operario,
+            Peso : `${this.formatonumeros(datos_agrupados[i].sumaCantidad)} UND - ${this.formatonumeros(datos_agrupados[i].sumaPeso)} KG`,
+            Fecha : datos_agrupados[i].fechaEntrada.replace('T00:00:00', ''),
+            Proceso : datos_agrupados[i].nomStatus,
+          }
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
+          this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
         }
       });
     }

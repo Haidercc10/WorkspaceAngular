@@ -117,7 +117,7 @@
                     </tr>
                   </thead>
                     <tbody>
-                      <tr *ngFor="let tabla of ArrayDocumento | paginate: {itemsPerPage: 20, currentPage: page} let i=index">
+                      <tr *ngFor="let tabla of ArrayDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
                         <!-- Orden de Trabajo -->
                         <td id="ot" scope="col">{{tabla.ot}}</td>
 
@@ -129,7 +129,7 @@
                           <td id="ext" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.ext == 0 && tabla.ext < tabla.cant">
-                          <td id="ext" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
+                          <td id="ext" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
                         </ng-container>
 
                         <!-- Impresion -->
