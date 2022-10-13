@@ -91,6 +91,7 @@ import { BuscarInventarioXProductoPipe } from './Pipes/BuscarInventarioXProducto
 import { EstadosOT_VendedoresComponent } from './Vistas/EstadosOT_Vendedores/EstadosOT_Vendedores.component';
 import { FiltroXClientes_OTVendedoresPipe } from './Pipes/FiltroXClientes_OTVendedores.pipe';
 import { FiltroXProducto_OTVendedoresPipe } from './Pipes/FiltroXProducto_OTVendedores.pipe';
+import { DatosOTStatusComponent } from './Vistas/DatosOT-Status/DatosOT-Status.component';
 
 
 export const routes: Routes = [
@@ -237,6 +238,7 @@ export const routes: Routes = [
     EstadosOT_VendedoresComponent,
     FiltroXClientes_OTVendedoresPipe,
     FiltroXProducto_OTVendedoresPipe,
+    DatosOTStatusComponent,
   ],
 
 

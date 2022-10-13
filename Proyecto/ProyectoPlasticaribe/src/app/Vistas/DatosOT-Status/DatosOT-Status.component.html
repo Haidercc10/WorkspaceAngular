@@ -1,0 +1,39 @@
+
+<!-- Inicio tabla datos OT -->
+<div class="mb-3">
+  <div class="row g-3">
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover mt-2" >
+        <thead class="TitulosTabla">
+          <tr >
+            <th scope="col" class="idProducto">Item</th>
+            <th id="Cliente" scope="col">Cliente</th>
+            <th id="producto" scope="col" class="">producto</th>
+            <th id="Peso" scope="col">Peso</th>
+            <th id="Unidad" scope="col">Unidad</th>
+            <th id="Operador" scope="col">Operador</th>
+            <th id="Maquina" scope="col">Maquina</th>
+            <th id="Turno" scope="col">Turno</th>
+            <th id="Status" scope="col">Status</th>
+            <th id="Fecha" scope="col">Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let lista of ArrayDatosProcesos; let j = index">
+            <th id="id" class="TextosInfoTabla">{{lista.Rollo}}</th>
+            <td id="cliente" class="TextosInfoTabla">{{lista.Cliente}}</td>
+            <td id="producto" class="TextosInfoTabla">{{lista.Producto}}</td>
+            <td id="peso" class="TextosInfoTabla">{{lista.Peso}}</td>
+            <td id="unidad" class="TextosInfoTabla">{{lista.Unidad}}</td>
+            <td id="operador" class="TextosInfoTabla">{{lista.Operador}}</td>
+            <td id="maquina" class="TextosInfoTabla">1{{lista.Maquina}}</td>
+            <td id="turno" class="TextosInfoTabla">{{lista.Turno}}</td>
+            <td id="status" class="TextosInfoTabla">{{lista.Status}}</td>
+            <td id="fecha" class="TextosInfoTabla">{{lista.Fecha}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- Fin tabla datos OT -->

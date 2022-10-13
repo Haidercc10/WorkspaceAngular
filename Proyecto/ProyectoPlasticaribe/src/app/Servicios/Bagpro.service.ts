@@ -162,7 +162,44 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/Procdesperdicio/OT/${ot}`);
   }
 
+  /** Consultas por NomStatus en ProcExtrusion */
 
+  srvObtenerListaPorStatusExtrusion(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxExtrusion/${OT}`);
+  }
 
+  srvObtenerListaPorStatusImpresion(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxImpresion/${OT}`);
+  }
+
+  srvObtenerListaPorStatusRotograbado(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxRotograbado/${OT}`);
+  }
+
+  srvObtenerListaPorStatusDoblado(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxDoblado/${OT}`);
+  }
+
+  srvObtenerListaPorStatusLaminado(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxLaminado/${OT}`);
+  }
+
+  srvObtenerListaPorStatusCorte(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxCorte/${OT}`);
+  }
+
+  srvObtenerListaPorStatusEmpaque(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/ObtenerDatosOTxEmpaque/${OT}`);
+  }
+
+  /** Consultas por NomStatus en ProcSellado*/
+
+  srvObtenerListaPorStatusSellado(ot : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ObtenerDatosOTxSellado/${ot}`);
+  }
+
+  srvObtenerListaPorStatusWiketiado(ot : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ObtenerDatosOTxWiketiado/${ot}`);
+  }
 
 }

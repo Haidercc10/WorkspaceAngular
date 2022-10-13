@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
@@ -11,6 +11,11 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
+import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.component';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-Reporte_Procesos_OT',
@@ -18,6 +23,8 @@ import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaR
   styleUrls: ['./Reporte_Procesos_OT.component.css']
 })
 export class Reporte_Procesos_OTComponent implements OnInit {
+
+  @ViewChild(DatosOTStatusComponent) MostrarDatosOTxStatus : DatosOTStatusComponent;
 
   public formularioOT !: FormGroup;
   public page : number; //Variable que tendrá el paginado de la tabla en la que se muestran los pedidos consultados
@@ -32,6 +39,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   fallas : any = []; //Variable que almacenará las posibles fallas que puede tener una orden de trabajo en produccion
   otSeleccionada : number = 0; //Variable que almacenará el numero de la OT que fue previamente seleccionada
   estados : any = []; //VAriable que almacenará los estados de las ordenes de trabajo
+  public modal_DatosStatusOT : boolean = false;
+  public arrayDatosOT = [];
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -998,6 +1007,233 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   seleccionarFilaTabla(form : any){
     this.otSeleccionada = form.ot;
   }
+
+  /**   */
+  seleccionarOTxStatus(form : any, proceso : any){
+    //this.llamarModalStatusOT();
+    this.otSeleccionada = form.ot;
+
+    console.log(2222);
+        if (proceso == 'EXTRUSION') {
+          console.log(1);
+          this.servicioBagPro.srvObtenerListaPorStatusExtrusion(this.otSeleccionada).subscribe(registros_OT => {
+            console.log(registros_OT)
+            if(registros_OT.length == 0)  Swal.fire(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+            else {
+              for (let index = 0; index < registros_OT.length; index++) {
+                const Info : any = {
+                  Rollo : registros_OT[index].item,
+                  Cliente : registros_OT[index].clienteNombre,
+                  Producto : registros_OT[index].clienteItemNombre,
+                  Peso : registros_OT[index].extnetokg,
+                  Unidad : 'Kg',
+                  Operador : registros_OT[index].operador,
+                  Maquina : registros_OT[index].maquina,
+                  Turno : registros_OT[index].turno,
+                  Status : registros_OT[index].nomStatus,
+                  Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
+                }
+                this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
+                console.log(this.arrayDatosOT);
+              }
+            }
+          });
+
+        } else if (proceso == 'IMPRESION') {
+          this.servicioBagPro.srvObtenerListaPorStatusImpresion(this.otSeleccionada).subscribe(registros_OT => {
+            if(registros_OT.length == 0)  Swal.fire(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+            else {
+              for (let index = 0; index < registros_OT.length; index++) {
+                const Info : any = {
+                  Rollo : registros_OT[index].item,
+                  Cliente : registros_OT[index].clienteNombre,
+                  Producto : registros_OT[index].clienteItemNombre,
+                  Peso : registros_OT[index].extnetoKg,
+                  Unidad : 'Kg',
+                  Operador : registros_OT[index].operador,
+                  Maquina : registros_OT[index].maquina,
+                  Turno : registros_OT[index].turno,
+                  Status : registros_OT[index].nomStatus,
+                  Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
+                }
+                this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
+                console.log(this.arrayDatosOT);
+              }
+            }
+          });
+
+        } else if (proceso == 'ROTOGRABADO') {
+          this.servicioBagPro.srvObtenerListaPorStatusRotograbado(this.otSeleccionada).subscribe(registros_OT => {
+            if(registros_OT.length == 0)  Swal.fire(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+            else {
+              for (let index = 0; index < registros_OT.length; index++) {
+                const Info : any = {
+                  Rollo : registros_OT[index].item,
+                  Cliente : registros_OT[index].clienteNombre,
+                  Producto : registros_OT[index].clienteItemNombre,
+                  Peso : registros_OT[index].extnetoKg,
+                  Unidad : 'Kg',
+                  Operador : registros_OT[index].operador,
+                  Maquina : registros_OT[index].maquina,
+                  Turno : registros_OT[index].turno,
+                  Status : registros_OT[index].nomStatus,
+                  Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
+                }
+                this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
+                console.log(this.arrayDatosOT);
+              }
+            }
+          });
+
+        } else if (proceso == 'DOBLADO') {
+          this.servicioBagPro.srvObtenerListaPorStatusDoblado(this.otSeleccionada).subscribe(registros_OT => {
+            if(registros_OT.length == 0)  Swal.fire(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+            else {
+              for (let index = 0; index < registros_OT.length; index++) {
+                const Info : any = {
+                  Rollo : registros_OT[index].item,
+                  Cliente : registros_OT[index].clienteNombre,
+                  Producto : registros_OT[index].clienteItemNombre,
+                  Peso : registros_OT[index].extnetoKg,
+                  Unidad : 'Kg',
+                  Operador : registros_OT[index].operador,
+                  Maquina : registros_OT[index].maquina,
+                  Turno : registros_OT[index].turno,
+                  Status : registros_OT[index].nomStatus,
+                  Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
+                }
+                this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
+                console.log(this.arrayDatosOT);
+              }
+            }
+          });
+
+        } else if (proceso == 'LAMINADO') {
+          this.servicioBagPro.srvObtenerListaPorStatusLaminado(this.otSeleccionada).subscribe(registros_OT => {
+            if(registros_OT.length == 0)  Swal.fire(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+            else {
+              for (let index = 0; index < registros_OT.length; index++) {
+                const Info : any = {
+                  Rollo : registros_OT[index].item,
+                  Cliente : registros_OT[index].clienteNombre,
+                  Producto : registros_OT[index].clienteItemNombre,
+                  Peso : registros_OT[index].extnetoKg,
+                  Unidad : 'Kg',
+                  Operador : registros_OT[index].operador,
+                  Maquina : registros_OT[index].maquina,
+                  Turno : registros_OT[index].turno,
+                  Status : registros_OT[index].nomStatus,
+                  Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
+                }
+                this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
+                console.log(this.arrayDatosOT);
+              }
+            }
+          });
+
+        } else if (proceso == 'CORTE') {
+          this.servicioBagPro.srvObtenerListaPorStatusCorte(this.otSeleccionada).subscribe(registros_OT => {
+            if(registros_OT.length == 0)  Swal.fire(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+            else {
+              for (let index = 0; index < registros_OT.length; index++) {
+                const Info : any = {
+                  Rollo : registros_OT[index].item,
+                  Cliente : registros_OT[index].clienteNombre,
+                  Producto : registros_OT[index].clienteItemNombre,
+                  Peso : registros_OT[index].extnetoKg,
+                  Unidad : 'Kg',
+                  Operador : registros_OT[index].operador,
+                  Maquina : registros_OT[index].maquina,
+                  Turno : registros_OT[index].turno,
+                  Status : registros_OT[index].nomStatus,
+                  Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
+                }
+                this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
+                console.log(this.arrayDatosOT);
+              }
+            }
+          });
+
+        } else if (proceso == 'EMPAQUE') {
+          this.servicioBagPro.srvObtenerListaPorStatusEmpaque(this.otSeleccionada).subscribe(registros_OT => {
+            if(registros_OT.length == 0)  Swal.fire(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+            else {
+              for (let index = 0; index < registros_OT.length; index++) {
+                const Info : any = {
+                  Rollo : registros_OT[index].item,
+                  Cliente : registros_OT[index].clienteNombre,
+                  Producto : registros_OT[index].clienteItemNombre,
+                  Peso : registros_OT[index].extnetoKg,
+                  Unidad : 'Kg',
+                  Operador : registros_OT[index].operador,
+                  Maquina : registros_OT[index].maquina,
+                  Turno : registros_OT[index].turno,
+                  Status : registros_OT[index].nomStatus,
+                  Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
+                }
+                this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
+                console.log(this.arrayDatosOT);
+              }
+            }
+          });
+
+        } else if (proceso == 'SELLADO') {
+          this.servicioBagPro.srvObtenerListaPorStatusSellado(this.otSeleccionada).subscribe(registros_OT => {
+            if(registros_OT.length == 0)  Swal.fire(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+            else {
+              for (let index = 0; index < registros_OT.length; index++) {
+                const Info : any = {
+                  Rollo : registros_OT[index].item,
+                  Cliente : registros_OT[index].cliente,
+                  Producto : registros_OT[index].nomReferencia,
+                  Peso : registros_OT[index].qty,
+                  Unidad : registros_OT[index].unidad,
+                  Operador : registros_OT[index].operario,
+                  Maquina : registros_OT[index].maquina,
+                  Turno : registros_OT[index].turnos,
+                  Status : registros_OT[index].nomStatus,
+                  Fecha : registros_OT[index].fechaEntrada.replace("T00:00:00", " ") + registros_OT[index].hora,
+                }
+                this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
+                console.log(this.arrayDatosOT);
+              }
+            }
+          });
+
+        } else if (proceso == 'Wiketiado') {
+          this.servicioBagPro.srvObtenerListaPorStatusWiketiado(this.otSeleccionada).subscribe(registros_OT => {
+            if(registros_OT.length == 0) Swal.fire(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
+            else {
+              for (let index = 0; index < registros_OT.length; index++) {
+                const Info : any = {
+                  Rollo : registros_OT[index].item,
+                  Cliente : registros_OT[index].cliente,
+                  Producto : registros_OT[index].nomReferencia,
+                  Peso : registros_OT[index].qty,
+                  Unidad : registros_OT[index].unidad,
+                  Operador : registros_OT[index].operario,
+                  Maquina : registros_OT[index].maquina,
+                  Turno : registros_OT[index].turnos,
+                  Status : registros_OT[index].nomStatus,
+                  Fecha : registros_OT[index].fechaEntradareplace("T00:00:00", " ") + registros_OT[index].hora,
+                }
+                this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
+                console.log(this.arrayDatosOT);
+              }
+            }
+          });
+
+        } else {
+          console.log(`No se encontraron registros de la OT ${this.otSeleccionada}`);
+        }
+        setTimeout(() => {
+          this.load = true;
+        }, 5000);
+    }
+
+    llamarModalStatusOT() {
+      this.modal_DatosStatusOT = true;
+    }
 
   // Funcion que va a añadir una falla o observacion a una ot
   anadirFalla(){
