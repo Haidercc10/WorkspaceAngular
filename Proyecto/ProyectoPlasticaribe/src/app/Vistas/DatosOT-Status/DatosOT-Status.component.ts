@@ -16,6 +16,8 @@ export class DatosOTStatusComponent implements OnInit {
   @ViewChild(Reporte_Procesos_OTComponent) Reporte_ProcesosOT : Reporte_Procesos_OTComponent;
 
   public ArrayDatosProcesos = [];
+  public page : number; //Variable que tendrá el paginado de la tabla en la que se muestran los pedidos consultados
+
   constructor() { }
 
   ngOnInit() {

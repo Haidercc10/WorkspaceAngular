@@ -123,3 +123,10 @@ a {
   border: none;
   width: 100%;
 }
+
+@media (min-width: 1200px){
+  .modal-xl {
+    max-width: 1440px;
+    font-size: smaller;
+  }
+}
