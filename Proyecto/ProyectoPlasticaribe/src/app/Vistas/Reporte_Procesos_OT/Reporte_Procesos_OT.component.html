@@ -129,101 +129,101 @@
 
                         <!-- Extrusion -->
                         <ng-container *ngIf="tabla.ext >= tabla.cant">
-                          <td id="ext" scope="col" style="background-color: rgb(185, 255, 185);"  (click)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
+                          <td id="ext" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.ext < tabla.cant && tabla.ext > 0">
-                          <td id="ext" scope="col" style="background-color: rgb(255, 201, 143);"  (click)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
+                          <td id="ext" scope="col" style="background-color: rgb(255, 201, 143);"(click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.ext == 0 && tabla.ext < tabla.cant">
-                          <td id="ext" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
+                          <td id="ext" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
                         </ng-container>
 
                         <!-- Impresion -->
                         <ng-container *ngIf="tabla.imp >= tabla.cant">
-                          <td id="imp" scope="col" style="background-color: rgb(185, 255, 185);"  (dblclick)="seleccionarOTxStatus(tabla, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{tabla.imp | number}}</td>
+                          <td id="imp" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{tabla.imp | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.imp < tabla.cant && tabla.imp > 0">
-                          <td id="imp" scope="col" style="background-color: rgb(255, 201, 143);" (dblclick)="seleccionarOTxStatus(tabla, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.imp | number}}</td>
+                          <td id="imp" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.imp | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.imp == 0 && tabla.imp < tabla.cant">
-                          <td id="imp" scope="col" style="background-color: rgb(255, 146, 146);"  (dblclick)="seleccionarOTxStatus(tabla, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.imp | number}}</td>
+                          <td id="imp" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.imp | number}}</td>
                         </ng-container>
 
                         <!-- Rotograbado -->
                         <ng-container *ngIf="tabla.rot >= tabla.cant">
-                          <td id="rot" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)"  (dblclick)="seleccionarOTxStatus(tabla, 'ROTOGRABADO')">{{tabla.rot | number}}</td>
+                          <td id="rot" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'ROTOGRABADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{tabla.rot | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.rot < tabla.cant && tabla.rot > 0">
-                          <td id="rot" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)"  (dblclick)="seleccionarOTxStatus(tabla, 'ROTOGRABADO')">{{tabla.rot | number}}</td>
+                          <td id="rot" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)"  (dblclick)="seleccionarOTxStatus(tabla, 'ROTOGRABADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{tabla.rot | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.rot == 0 && tabla.rot < tabla.cant">
-                          <td id="rot" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)"  (dblclick)="seleccionarOTxStatus(tabla, 'ROTOGRABADO')">{{tabla.rot | number}}</td>
+                          <td id="rot" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)"  (dblclick)="seleccionarOTxStatus(tabla, 'ROTOGRABADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{tabla.rot | number}}</td>
                         </ng-container>
 
                         <!-- Doblado -->
                         <ng-container *ngIf="tabla.dbl >= tabla.cant">
-                          <td id="dbl" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'DOBLADO')" >{{tabla.dbl | number}}</td>
+                          <td id="dbl" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'DOBLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.dbl | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.dbl < tabla.cant && tabla.dbl > 0">
-                          <td id="dbl" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'DOBLADO')" >{{tabla.dbl | number}}</td>
+                          <td id="dbl" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'DOBLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.dbl | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.dbl == 0 && tabla.dbl < tabla.cant">
-                          <td id="dbl" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'DOBLADO')" >{{tabla.dbl | number}}</td>
+                          <td id="dbl" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'DOBLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.dbl | number}}</td>
                         </ng-container>
 
                         <!-- laminado -->
                         <ng-container *ngIf="tabla.lam >= tabla.cant">
-                          <td id="lam" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'LAMINADO')" >{{tabla.lam | number}}</td>
+                          <td id="lam" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'LAMINADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.lam | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.lam < tabla.cant && tabla.lam > 0">
-                          <td id="lam" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'LAMINADO')" >{{tabla.lam | number}}</td>
+                          <td id="lam" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'LAMINADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.lam | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.lam == 0 && tabla.lam < tabla.cant">
-                          <td id="lam" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'LAMINADO')" >{{tabla.lam | number}}</td>
+                          <td id="lam" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'LAMINADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.lam | number}}</td>
                         </ng-container>
 
                         <!-- Corte -->
                         <ng-container *ngIf="tabla.cor >= tabla.cant">
-                          <td id="cor" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'CORTE')" >{{tabla.cor | number}}</td>
+                          <td id="cor" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'CORTE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.cor | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.cor < tabla.cant && tabla.cor > 0">
-                          <td id="cor" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'CORTE')" >{{tabla.cor | number}}</td>
+                          <td id="cor" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'CORTE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.cor | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.cor == 0 && tabla.cor < tabla.cant">
-                          <td id="cor" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'CORTE')" >{{tabla.cor | number}}</td>
+                          <td id="cor" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'CORTE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.cor | number}}</td>
                         </ng-container>
 
                         <!-- Empaque -->
                         <ng-container *ngIf="tabla.emp >= (tabla.cant + (tabla.cant * -0.10))">
-                          <td id="emp" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'EMPAQUE')" >{{tabla.emp | number}}</td>
+                          <td id="emp" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.emp | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.emp < (tabla.cant + (tabla.cant * -0.10)) && tabla.emp > 0">
-                          <td id="emp" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'EMPAQUE')" >{{tabla.emp | number}}</td>
+                          <td id="emp" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.emp | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.emp == 0 && tabla.emp < tabla.cant">
-                          <td id="emp" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'EMPAQUE')" >{{tabla.emp | number}}</td>
+                          <td id="emp" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.emp | number}}</td>
                         </ng-container>
 
                         <!-- Sellado -->
                         <ng-container *ngIf="tabla.sel >= (tabla.cant + (tabla.cant * -0.10))">
-                          <td id="sel" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'SELLADO')" >{{tabla.sel | number}}</td>
+                          <td id="sel" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.sel < (tabla.cant + (tabla.cant * -0.10)) && tabla.sel > 0">
-                          <td id="sel" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'SELLADO')" >{{tabla.sel | number}}</td>
+                          <td id="sel" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.sel == 0 && tabla.sel < tabla.cant">
-                          <td id="sel" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'SELLADO')" >{{tabla.sel}}</td>
+                          <td id="sel" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}}</td>
                         </ng-container>
 
                         <!-- Wiketiado -->
                         <ng-container *ngIf="tabla.wik >= (tabla.cant + (tabla.cant * -0.10))">
-                          <td id="wik" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'Wiketiado')" >{{tabla.wik | number}}</td>
+                          <td id="wik" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{tabla.wik | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.wik < (tabla.cant + (tabla.cant * -0.10)) && tabla.wik > 0">
-                          <td id="wik" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'Wiketiado')" >{{tabla.wik | number}}</td>
+                          <td id="wik" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{tabla.wik | number}}</td>
                         </ng-container>
                         <ng-container *ngIf="tabla.wik == 0 && tabla.wik < tabla.cant">
-                          <td id="wik" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'Wiketiado')" >{{tabla.wik | number}}</td>
+                          <td id="wik" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarFilaTabla(tabla)" (dblclick)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
                         </ng-container>
 
                         <!-- Cantidad Total a Producir -->

@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AnyPtrRecord } from 'dns';
 import { Observable } from 'rxjs';
 import { rutaBagPro } from 'src/polyfills';
 import internal from 'stream';
@@ -201,5 +202,16 @@ export class BagproService {
   srvObtenerListaPorStatusWiketiado(ot : any) {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ObtenerDatosOTxWiketiado/${ot}`);
   }
+
+/** Servcios de datos consolidados para Estados Procesos OT */
+
+  srvObtenerDataConsolidada_StatusExtrusion(OT : any, Proceso: AnyPtrRecord):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/MostrarDatosConsolidados_ProcExtrusion/${OT}/${Proceso}`);
+  }
+
+  srvObtenerDataConsolidada_StatusSellado(OT : any, Proceso: any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcSellado/MostrarDatosConsolidados_ProcSellado/${OT}/${Proceso}`);
+  }
+
 
 }

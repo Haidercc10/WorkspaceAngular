@@ -1011,11 +1011,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   /**   */
   seleccionarOTxStatus(form : any, proceso : any){
     //this.llamarModalStatusOT();
+    this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
     this.otSeleccionada = form.ot;
 
-    console.log(2222);
+
         if (proceso == 'EXTRUSION') {
-          console.log(1);
           this.servicioBagPro.srvObtenerListaPorStatusExtrusion(this.otSeleccionada).subscribe(registros_OT => {
             console.log(registros_OT)
             if(registros_OT.length == 0)  Swal.fire(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
@@ -1034,7 +1034,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
                 }
                 this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
-                console.log(this.arrayDatosOT);
               }
             }
           });
@@ -1057,7 +1056,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
                 }
                 this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
-                console.log(this.arrayDatosOT);
               }
             }
           });
@@ -1080,7 +1078,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
                 }
                 this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
-                console.log(this.arrayDatosOT);
               }
             }
           });
@@ -1103,7 +1100,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
                 }
                 this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
-                console.log(this.arrayDatosOT);
               }
             }
           });
@@ -1126,7 +1122,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
                 }
                 this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
-                console.log(this.arrayDatosOT);
               }
             }
           });
@@ -1149,7 +1144,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
                 }
                 this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
-                console.log(this.arrayDatosOT);
               }
             }
           });
@@ -1172,7 +1166,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   Fecha : registros_OT[index].fecha.replace("T00:00:00", " ") + registros_OT[index].hora,
                 }
                 this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
-                console.log(this.arrayDatosOT);
               }
             }
           });
@@ -1195,7 +1188,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   Fecha : registros_OT[index].fechaEntrada.replace("T00:00:00", " ") + registros_OT[index].hora,
                 }
                 this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
-                console.log(this.arrayDatosOT);
               }
             }
           });
@@ -1218,7 +1210,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   Fecha : registros_OT[index].fechaEntradareplace("T00:00:00", " ") + registros_OT[index].hora,
                 }
                 this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
-                console.log(this.arrayDatosOT);
               }
             }
           });
