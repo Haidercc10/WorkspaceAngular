@@ -1,4 +1,9 @@
 
+<!--Titulo-->
+<div class="mb-3">
+  <h3 class="">Datos de la Orden de Trabajo</h3>
+</div>
+
 <!-- Inicio tabla datos OT -->
 <div class="mb-3">
   <div class="row g-3">
@@ -41,4 +46,37 @@
     </div>
   </div>
 </div>
-<!-- Fin tabla datos OT -->
+
+<!--Titulo 2-->
+<div class="mb-3">
+  <h3 class="">Información Consolidada de la OT.</h3>
+</div>
+
+<!-- Inicio tabla de Datos consolidados -->
+<div class="mb-3">
+  <div class="row g-3">
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover mt-2" >
+        <thead class="TitulosTabla">
+          <tr>
+            <th id="Cliente" scope="col">Producto</th>
+            <th id="producto" scope="col">Operador</th>
+            <th id="Peso" scope="col">Peso</th>
+            <th id="Unidad" scope="col">Fecha</th>
+            <th id="Operador" scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr> <!--*ngFor="let lista of ArrayDatosProcesos; let j = index"-->
+            <th id="id" class="TextosInfoTabla">{{1}}</th>
+            <td id="cliente" class="TextosInfoTabla">{{2}}</td>
+            <td id="producto" class="TextosInfoTabla">{{3}}</td>
+            <td id="peso" class="TextosInfoTabla">{{4}}</td>
+            <td id="unidad" class="TextosInfoTabla">{{5}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
