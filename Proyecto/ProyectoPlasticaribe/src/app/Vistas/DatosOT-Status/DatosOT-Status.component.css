@@ -1,3 +1,11 @@
 .TextosInfoTabla {
   font-size: 13px;
 }
+
+.tituloRojo{
+  color:  #d83542;
+ }
+
+ .Linea {
+  color: #777;
+}

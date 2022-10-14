@@ -112,6 +112,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         const title = `Reporte de OT por Procesos - ${this.today}`;
         const header = ["OT", "Extrusión", "Impresión", "Rotograbado", "Laminado", "Doblado", "Corte", "Empaque", "Sellado", "Wiketiado", "Cant. Producir", "Cant. Ingresada", "Cant. Enviada", "Fallas", "Observación", "Estado", "Fecha Creación"]
         let datos : any =[];
+
         for (const item of this.ArrayDocumento) {
           const datos1  : any = [item.ot, item.ext, item.imp, item.rot, item.lam, item.dbl, item.cor, item.emp, item.sel, item.wik, item.cant, item.entrada, item.salida, item.falla, item.obs, item.est, item.fecha];
           datos.push(datos1);
@@ -356,6 +357,55 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           row.getCell(13).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
 
+        /** Significado info colores. */
+       /* worksheet.getCell('S3').value = "Info. Colores"
+        worksheet.getCell('S3').fill = {
+          type: 'pattern',
+          pattern:'darkVertical',
+          bgColor:{argb:'eeeeee'},
+          fgColor:{argb:'eeeeee'},
+        };
+        worksheet.getCell('S3').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+
+        worksheet.getCell('S4').value = "Abierta"
+        worksheet.getCell('S4').fill = {
+          type: 'pattern',
+          pattern:'darkVertical',
+          bgColor:{argb:'FDCD7A'},
+          fgColor:{argb:'FDCD7A'},
+        };
+        worksheet.getCell('S5').value = "En Proceso"
+        worksheet.getCell('S5').fill = {
+          type: 'pattern',
+          pattern:'solid',
+          bgColor:{argb:'FF837B'},
+          fgColor:{argb:'FF837B'},
+        };
+
+        worksheet.getCell('S6').value = "Terminada"
+        worksheet.getCell('S6').fill = {
+          type: 'pattern',
+          pattern:'solid',
+          fgColor:{argb:'C7FD7A'},
+          bgColor:{argb:'C7FD7A'},
+        };
+
+        worksheet.getCell('S7').value = "Cerrada"
+        worksheet.getCell('S7').fill = {
+          type: 'pattern',
+          pattern:'solid',
+          fgColor:{argb:'FDCD7A'},
+          bgColor:{argb:'FDCD7A'},
+        };
+
+        worksheet.getCell('S8').value = "Asignada"
+        worksheet.getCell('S8').fill = {
+          type: 'pattern',
+          pattern:'solid',
+          fgColor:{argb:'FF837B'},
+          bgColor:{argb:'FF837B'},
+        };*/
+
         worksheet.getColumn(1).width = 10;
         worksheet.getColumn(2).width = 12;
         worksheet.getColumn(3).width = 12;
@@ -373,6 +423,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         worksheet.getColumn(15).width = 20;
         worksheet.getColumn(16).width = 15;
         worksheet.getColumn(17).width = 15;
+        worksheet.getColumn(19).width = 15;
+
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
