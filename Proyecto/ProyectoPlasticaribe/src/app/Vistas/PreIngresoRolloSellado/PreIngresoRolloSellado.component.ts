@@ -1359,7 +1359,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         PreEntRollo_Fecha : this.today,
         PreEntRollo_Observacion : this.FormConsultarRollos.value.Observacion,
         Usua_Id : this.storage_Id,
-        PreEntRollo_Hora : this.hora,
+        // PreEntRollo_Hora : this.hora,
       }
       this.preEntRollosService.srvGuardar(info).subscribe(datos_entradaRollo => {
         this.preEntRollosService.srvObtenerUltimoId().subscribe(datos_ultEntrada => { this.ingresarRollos(datos_entradaRollo.preEntRollo_Id); });
@@ -1692,6 +1692,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
 
   // Funcion que traerá los rollos que fueron asignados a la factura creada
   buscarRolloPDF(id : number){
+    this.rollosAsignados = [];
     this.dtPreEntRollosService.srvCrearPDFUltimoId(id).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         let info : any = {

@@ -24,7 +24,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let lista of ArrayDatosProcesos | paginate: {itemsPerPage: 30, currentPage: page} let j = index">
+          <tr *ngFor="let lista of ArrayDatosProcesos let j = index">
             <th id="id" class="TextosInfoTabla">{{lista.Rollo}}</th>
             <td id="cliente" class="TextosInfoTabla">{{lista.Cliente}}</td>
             <td id="producto" class="TextosInfoTabla">{{lista.Producto}}</td>
@@ -38,11 +38,11 @@
           </tr>
         </tbody>
       </table>
-      <div class="mb-2">
+      <!-- <div class="mb-2">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
           <pagination-controls (pageChange)="page = $event"></pagination-controls>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </div>

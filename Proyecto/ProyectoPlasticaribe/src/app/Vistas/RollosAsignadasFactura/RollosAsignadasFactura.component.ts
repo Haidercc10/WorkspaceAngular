@@ -308,6 +308,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
             Usua_Conductor : conductor,
             AsigProdFV_PlacaCamion : placa.toUpperCase(),
             AsigProdFV_FechaEnvio : this.today,
+            // AsigProdFV_FechaHora : datos_factura[i].asigProdFV_FechaHora,
           }
           this.facturaService.srvActualizarFactura(factura, info).subscribe(datos_facturaActualizada => { this.cambiarEstado(); }, error => {
             const Toast = Swal.mixin({
@@ -338,83 +339,138 @@ export class RollosAsignadasFacturaComponent implements OnInit {
       for (let i = 0; i < this.rollosInsertar.length; i++) {
         this.rollosService.srvObtenerVerificarRollo(this.rollosInsertar[i].Id).subscribe(datos_rollos => {
           for (let j = 0; j < datos_rollos.length; j++) {
-            let info : any = {
-              DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
-              EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
-              Rollo_Id : datos_rollos[j].rollo_Id,
-              DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
-              undMed_Rollo : datos_rollos[j].undMed_Rollo,
-              Estado_Id : 21,
-              dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
-              Prod_Id : datos_rollos[j].prod_Id,
-              UndMed_Prod : datos_rollos[j].undMed_Prod,
-              Prod_CantPaquetesRestantes : datos_rollos[j].prod_CantPaquetesRestantes,
-              Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
-              Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
-              Prod_CantBolsasRestates : datos_rollos[j].prod_CantBolsasRestates,
-              Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
+            if (datos_rollos[j].prod_CantBolsasRestates == 0) {
+              let info : any = {
+                DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
+                EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
+                Rollo_Id : datos_rollos[j].rollo_Id,
+                DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
+                undMed_Rollo : datos_rollos[j].undMed_Rollo,
+                Estado_Id : 21,
+                dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
+                Prod_Id : datos_rollos[j].prod_Id,
+                UndMed_Prod : datos_rollos[j].undMed_Prod,
+                Prod_CantPaquetesRestantes : datos_rollos[j].prod_CantPaquetesRestantes,
+                Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
+                Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
+                Prod_CantBolsasRestates : datos_rollos[j].prod_CantBolsasRestates,
+                Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
+
+              }
+              this.Total += datos_rollos[j].dtEntRolloProd_Cantidad;
+              this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
+                const Toast = Swal.mixin({
+                  toast: true,
+                  position: 'center',
+                  showConfirmButton: false,
+                  timer: 2500,
+                  timerProgressBar: true,
+                  didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                  }
+                });
+                Toast.fire({
+                  icon: 'success',
+                  title: '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!'
+                });
+              }, error => {
+                const Toast = Swal.mixin({
+                  toast: true,
+                  position: 'center',
+                  showConfirmButton: false,
+                  timer: 2500,
+                  timerProgressBar: true,
+                  didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                  }
+                });
+                Toast.fire({
+                  icon: 'error',
+                  title: '¡Error al despachar los rollos!'
+                });
+                this.cargando = true;
+              });
+            } else {
+              let info : any = {
+                DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
+                EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
+                Rollo_Id : datos_rollos[j].rollo_Id,
+                DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
+                undMed_Rollo : datos_rollos[j].undMed_Rollo,
+                Estado_Id : datos_rollos[j].estado_Id,
+                dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
+                Prod_Id : datos_rollos[j].prod_Id,
+                UndMed_Prod : datos_rollos[j].undMed_Prod,
+                Prod_CantPaquetesRestantes : datos_rollos[j].prod_CantPaquetesRestantes,
+                Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
+                Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
+                Prod_CantBolsasRestates : datos_rollos[j].prod_CantBolsasRestates,
+                Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
+              }
+              this.Total += datos_rollos[j].dtEntRolloProd_Cantidad;
+              this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
+                const Toast = Swal.mixin({
+                  toast: true,
+                  position: 'center',
+                  showConfirmButton: false,
+                  timer: 2500,
+                  timerProgressBar: true,
+                  didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                  }
+                });
+                Toast.fire({
+                  icon: 'success',
+                  title: '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!'
+                });
+              }, error => {
+                const Toast = Swal.mixin({
+                  toast: true,
+                  position: 'center',
+                  showConfirmButton: false,
+                  timer: 2500,
+                  timerProgressBar: true,
+                  didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                  }
+                });
+                Toast.fire({
+                  icon: 'error',
+                  title: '¡Error al despachar los rollos!'
+                });
+                this.cargando = true;
+              });
             }
-            this.Total += datos_rollos[j].dtEntRolloProd_Cantidad;
-            this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
-              const Toast = Swal.mixin({
-                toast: true,
-                position: 'center',
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                  toast.addEventListener('mouseenter', Swal.stopTimer)
-                  toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-              });
-              Toast.fire({
-                icon: 'success',
-                title: '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!'
-              });
-            }, error => {
-              const Toast = Swal.mixin({
-                toast: true,
-                position: 'center',
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                  toast.addEventListener('mouseenter', Swal.stopTimer)
-                  toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-              });
-              Toast.fire({
-                icon: 'error',
-                title: '¡Error al despachar los rollos!'
-              });
-              this.cargando = true;
-            });
           }
         });
       }
       if (this.rollosInsertar.length > 100) {
         setTimeout(() => {
-          this.cambiarEstadoRollosNoVerificados();
+          //this.cambiarEstadoRollosNoVerificados();
           this.buscarRolloPDF();
         }, 7000);
       } else if (this.rollosInsertar.length > 70) {
         setTimeout(() => {
-          this.cambiarEstadoRollosNoVerificados();
+          //this.cambiarEstadoRollosNoVerificados();
           this.buscarRolloPDF();
         }, 6000);
       } else if (this.rollosInsertar.length > 50) {
         setTimeout(() => {
-          this.cambiarEstadoRollosNoVerificados();
+          //this.cambiarEstadoRollosNoVerificados();
           this.buscarRolloPDF();
         }, 5000);
       } else if (this.rollosInsertar.length > 20) {
         setTimeout(() => {
-          this.cambiarEstadoRollosNoVerificados();
+          //this.cambiarEstadoRollosNoVerificados();
           this.buscarRolloPDF();
         }, 4000);
       } else {
         setTimeout(() => {
-          this.cambiarEstadoRollosNoVerificados();
+          //this.cambiarEstadoRollosNoVerificados();
           this.buscarRolloPDF();
         }, 3000);
       }

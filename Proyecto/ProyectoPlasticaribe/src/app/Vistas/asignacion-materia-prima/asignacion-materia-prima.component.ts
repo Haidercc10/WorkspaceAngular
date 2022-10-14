@@ -436,7 +436,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
     if (this.ArrayMateriaPrimaRetirada.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla")
     else {
-      if (proceso == 'IMP' || proceso == 'ROT') {
+      // if (proceso == 'IMP' || proceso == 'ROT') {
         const datosDetallesAsignacionTintas : any = {
           AsigMp_Id : idAsignacion,
           Tinta_Id : idMp,
@@ -448,7 +448,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(datos_asignacionTintas => {});
         this.moverInventarioTintas(idMp, cantidad);
 
-      } else {
+      // } else {
         const datosDetallesAsignacion : any = {
           AsigMp_Id : idAsignacion,
           MatPri_Id : idMp,
@@ -460,7 +460,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {
         });
         this.moverInventarioMpPedida(idMp, cantidad);
-      }
+      // }
     }
   }
 
@@ -481,14 +481,11 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let subtotalProd : number = precioMateriaPrima * cantidad;
     let proceso : string = this.FormMateriaPrimaRetirada.value.ProcesoRetiro;
 
-    this.cantidadAsignada = this.cantidadAsignada + cantidad;
-
     this.procesosService.srvObtenerLista().subscribe(datos_proceso => {
       for (let i = 0; i < datos_proceso.length; i++) {
         if (datos_proceso[i].proceso_Nombre == proceso) {
-
           if (this.categoria == 7) {
-            if (proceso == 'Impresion' || proceso == 'Rotograbado') {
+            if (true) {
               if (cantidad <= stock) {
                 let productoExt : any = {
                   Id : idMateriaPrima,
@@ -559,7 +556,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                   }
                 }
               }
-
+              this.cantidadAsignada = this.cantidadAsignada + cantidad;
               this.FormMateriaPrimaRetirada.setValue({
                 MpIdRetirada : '',
                 MpNombreRetirada: '',
@@ -656,6 +653,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         Tinta_Precio : datos_tintas.tinta_Precio,
         CatMP_Id : datos_tintas.catMP_Id,
         TpBod_Id : datos_tintas.tpBod_Id,
+        Tinta_InvInicial : datos_tintas.tinta_InvInicial
       }
 
       this.tintasService.srvActualizar(idMateriaPrima, datosTintas).subscribe(datos_tintasActualizada => {});

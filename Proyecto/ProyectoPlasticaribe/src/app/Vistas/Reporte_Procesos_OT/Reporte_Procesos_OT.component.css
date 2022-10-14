@@ -124,9 +124,49 @@ a {
   width: 100%;
 }
 
-@media (min-width: 1200px){
+.amarillo {
+  background-color: #F9FC5B;
+}
+
+.naranja {
+  background-color: rgb(255, 201, 143);
+}
+
+.rojo {
+  background-color: rgb(255, 146, 146);
+}
+
+.verde {
+  background-color: rgb(185, 255, 185);
+}
+
+.azul {
+  background-color: lightblue;
+}
+
+
+@media (min-width: 1370px){
+  .tableColores {
+    max-width: 125px;
+    position: fixed;
+    bottom: 15px;
+    left: 15px;
+    text-align: center;
+  }
+
+  .tableColores td .collapse{
+    margin-top: 10%;
+    text-align: start;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1369px){
   .modal-xl {
     max-width: 1440px;
     font-size: smaller;
+  }
+  .tableColores {
+    text-align: center;
   }
 }

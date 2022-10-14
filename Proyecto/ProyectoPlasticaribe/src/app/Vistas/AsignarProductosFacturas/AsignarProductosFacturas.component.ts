@@ -626,7 +626,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       if (this.rollosInsertar[i].Id == item.Id) {
         if (cantidad <= this.rollosInsertar[i].CantPaqRestantesEnviar && cantidad > 0 && cantidad != null && cantidad != undefined) {
           this.rollosInsertar[i].CantPaqRestantes = cantidad;
-          this.rollosInsertar[i].CantUndRestantes = (this.rollosInsertar[i].CantPaqRestantes * this.rollosInsertar[i].CantUndPaquetes)
+          this.rollosInsertar[i].CantUndRestantes = (this.rollosInsertar[i].CantPaqRestantes * this.rollosInsertar[i].CantUndPaquetes);
           this.GrupoProductos();
         } else {
           Swal.fire("¡La cantidad ingresada no es valida!");
@@ -658,7 +658,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         Usua_Conductor : 88,
         AsigProdFV_PlacaCamion : '',
         AsigProdFV_FechaEnvio : this.today,
-        AsigProdFV_Hora : this.hora,
+        // AsigProdFV_FechaHora : this.hora,
       }
       this.asgProdFactura.srvGuardar(info).subscribe(datos_asignacion => {
         this.asgProdFactura.srvObtenerUltimoId().subscribe(datos_ultimaAsg => { this.crearDetallesAsignacion(datos_ultimaAsg.asigProdFV_Id) });
