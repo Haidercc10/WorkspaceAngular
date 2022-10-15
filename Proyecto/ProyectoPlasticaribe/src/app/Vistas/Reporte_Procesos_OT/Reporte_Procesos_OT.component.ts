@@ -304,7 +304,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorWik;
           if (+qtyWik.value >=  (+CantPedida + (+CantPedida * -0.10))) colorWik = 'C7FD7A'; //Terminada
-          else if (+qtyWik.value <  (+CantPedida + (+CantPedida * -0.10)) && +qtyWik.value > 0) colorSel = 'F9FC5B'; //Iniciada
+          else if (+qtyWik.value < (+CantPedida + (+CantPedida * -0.10)) && +qtyWik.value > 0) colorWik = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorWik = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorWik = 'ADD8E6'; //Asignada
           else if (+qtyWik.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorWik = 'FF837B'; //No Iniciada
@@ -1338,7 +1338,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               Maquina : registros_OT[index].maquina,
               Turno : registros_OT[index].turnos,
               Status : registros_OT[index].nomStatus,
-              Fecha : registros_OT[index].fechaEntradareplace("T00:00:00", " ") + registros_OT[index].hora,
+              Fecha : registros_OT[index].fechaEntrada.replace("T00:00:00", " ") + registros_OT[index].hora,
             }
             this.MostrarDatosOTxStatus.ArrayDatosProcesos.push(Info);
           }

@@ -431,55 +431,6 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                 }
               });
 
-              // this.bagProService.srvObtenerListaProcSelladoFechas(fechaInicial, fechaFinal).subscribe(datos_ot => {
-              //   for (let i = 0; i < datos_ot.length; i++) {
-              //     this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-              //       if (datos_rollos.length == 0) {
-              //         if (!RollosConsultados.includes(datos_ot[i].item)){
-              //           this.idProducto = datos_ot[i].referencia;
-              //           if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
-              //           if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
-              //           if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-              //           if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-              //           if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
-              //           if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
-              //           if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
-              //           if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
-              //           if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
-              //           if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-              //           if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-              //           if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
-              //           let info : any = {
-              //             Ot : datos_ot[i].ot,
-              //             Id : datos_ot[i].item,
-              //             IdCliente : datos_ot[i].identNro,
-              //             Cliente : datos_ot[i].nombreComercial,
-              //             IdProducto : datos_ot[i].referencia,
-              //             Producto : datos_ot[i].nomReferencia,
-              //             Cantidad : datos_ot[i].qty,
-              //             Presentacion : this.presentacionProducto,
-              //             Estatus : datos_ot[i].nomStatus,
-              //             Proceso : proceso,
-              //           }
-              //           if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //           otTemporral = datos_ot[i].ot;
-              //           this.rollos.push(info);
-              //           RollosConsultados.push(datos_ot[i].item);
-              //           this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //           this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //           this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //           this.FormConsultarRollos.setValue({
-              //             OT_Id: ot,
-              //             fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //             fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //             Observacion : this.FormConsultarRollos.value.Observacion,
-              //             Proceso : this.FormConsultarRollos.value.Proceso,
-              //           });
-              //         }
-              //       }
-              //     });
-              //   }
-              // });
             }
           } else if (ot != null && fechaInicial != null) {
             if (ProcConsulta == "1"){
@@ -1170,11 +1121,11 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
               // });
             }
           }
-        }, 2000);
-        setTimeout(() => {
-          if (this.rollos.length <= 0) Swal.fire(`No hay rollos por ingresar`);
-          this.cargando = true;
-        }, 10000);
+          setTimeout(() => {
+            if (this.rollos.length == 0) Swal.fire(`No hay rollos por ingresar`);
+            this.cargando = true;
+          }, 10000);
+        }, 3000);
       } else Swal.fire("¡La fecha seleccionada no es valida!");
     } else Swal.fire("¡Seleccione un proceso!");
   }

@@ -94,7 +94,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.limpiarCampos();
+    // this.limpiarCampos();
     this.fecha();
     this.lecturaStorage();
     this.ObtenerUsuariosConductores();
@@ -568,7 +568,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
     });
     setTimeout(() => {
       if (this.rollos.length <= 0) Swal.fire(`El producto ${id} no tiene rollos disponibles`);
-    }, 1700);
+    }, 700);
   }
 
   // Funcion que permitirá ver el total de lo escogido para cada producto
