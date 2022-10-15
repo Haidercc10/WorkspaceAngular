@@ -311,12 +311,6 @@ export class ReporteCostosOTComponent implements OnInit {
     this.diferencia = 0;
     this.diferenciaPorcentaje = 0;
     this.cantidadSellandoUnidad = 0;
-    let cantExtruida : number;
-    let cantImpresa : number;
-    let cantSellada : number;
-    let cantDoblada : number;
-    let cantRotograbada : number;
-    let cantWiketiado : number;
     this.cantidadTotalExt = 0;
     this.cantidadTotalImp = 0;
     this.cantidadTotalDbl = 0;
@@ -330,40 +324,23 @@ export class ReporteCostosOTComponent implements OnInit {
 
     this.bagProServices.srvObtenerListaProcExtOt(ot).subscribe(datos_procesos => {
       for (let index = 0; index < datos_procesos.length; index++) {
-        if (datos_procesos[index].nomStatus == "EXTRUSION") {
-          cantExtruida = datos_procesos[index].extnetokg;
-          this.cantidadTotalExt = cantExtruida + this.cantidadTotalExt;
-        } else if (datos_procesos[index].nomStatus == "IMPRESION") {
-          cantImpresa = datos_procesos[index].extnetokg;
-          this.cantidadTotalImp = cantImpresa + this.cantidadTotalImp;
-        } else if (datos_procesos[index].nomStatus == "DOBLADO") {
-          cantDoblada = datos_procesos[index].extnetokg;
-          this.cantidadTotalDbl = cantDoblada + this.cantidadTotalDbl;
-        } else if (datos_procesos[index].nomStatus == "ROTOGRABADO") {
-          cantRotograbada = datos_procesos[index].extnetokg;
-          this.cantidadTotalRot = cantRotograbada + this.cantidadTotalRot;
-        } else if (datos_procesos[index].nomStatus == "EMPAQUE") {
-          cantRotograbada = datos_procesos[index].extnetokg;
-          this.cantidadTotalEmpaque = cantRotograbada + this.cantidadTotalEmpaque;
-        } else if (datos_procesos[index].nomStatus == "CORTE") {
-          cantRotograbada = datos_procesos[index].extnetokg;
-          this.cantidadTotalCorte = cantRotograbada + this.cantidadTotalCorte;
-        } else if (datos_procesos[index].nomStatus == "LAMINADO") {
-          cantRotograbada = datos_procesos[index].extnetokg;
-          this.cantidadTotalLaminado = cantRotograbada + this.cantidadTotalLaminado;
-        }
+        if (datos_procesos[index].nomStatus == "EXTRUSION") this.cantidadTotalExt += datos_procesos[index].extnetokg;
+        else if (datos_procesos[index].nomStatus == "IMPRESION") this.cantidadTotalImp += datos_procesos[index].extnetokg;
+        else if (datos_procesos[index].nomStatus == "DOBLADO") this.cantidadTotalDbl += datos_procesos[index].extnetokg;
+        else if (datos_procesos[index].nomStatus == "ROTOGRABADO") this.cantidadTotalRot += datos_procesos[index].extnetokg;
+        else if (datos_procesos[index].nomStatus == "EMPAQUE") this.cantidadTotalEmpaque += datos_procesos[index].extnetokg;
+        else if (datos_procesos[index].nomStatus == "CORTE") this.cantidadTotalCorte += datos_procesos[index].extnetokg;
+        else if (datos_procesos[index].nomStatus == "LAMINADO") this.cantidadTotalLaminado += datos_procesos[index].extnetokg;
       }
       //SELLADO Y WIKETIADO
       this.bagProServices.srvObtenerListaProcSelladoOT(ot).subscribe(datos_selado => {
         for (let i = 0; i < datos_selado.length; i++) {
           if (datos_selado[i].nomStatus == "SELLADO") {
-            cantSellada = datos_selado[i].peso;
-            this.cantidadTotalSella = cantSellada + this.cantidadTotalSella;
-            this.cantidadSellandoUnidad = this.cantidadSellandoUnidad + datos_selado[i].qty;
+            this.cantidadTotalSella += datos_selado[i].peso;
+            this.cantidadSellandoUnidad += datos_selado[i].qty;
           } else if (datos_selado[i].nomStatus == "Wiketiado") {
-            cantWiketiado = datos_selado[i].peso;
-            this.cantidadTotalWiketiado = cantWiketiado + this.cantidadTotalWiketiado;
-            this.cantidadWiketiadoUnidad = this.cantidadWiketiadoUnidad + datos_selado[i].qty;
+            this.cantidadTotalWiketiado += datos_selado[i].peso;
+            this.cantidadWiketiadoUnidad += datos_selado[i].qty;
           }
         }
         this.cantidadPorcPerdidaProcesoaProceso(ot);
@@ -427,9 +404,7 @@ export class ReporteCostosOTComponent implements OnInit {
           }
         });
         if (this.presentacionProducto == 'Kilo') this.valorFinalOT = item.Emp * this.valorUnitarioProdKg;
-        else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo' || this.presentacionProducto == 'Paquete') {
-          this.valorFinalOT = item.Emp * this.valorUnitarioProdUnd;
-        }
+        else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo' || this.presentacionProducto == 'Paquete') this.valorFinalOT = item.Emp * this.valorUnitarioProdUnd;
       } else if (SelladoFinal != 0 && item.Emp == 0 && wiketiadoFinal == 0) {
         this.bagProServices.srvObtenerListaProcSelladoOT_FechaFinal(ot).subscribe(datos_sellado => {
           let sellado : any = [];
@@ -460,9 +435,7 @@ export class ReporteCostosOTComponent implements OnInit {
           }
         });
         if (this.presentacionProducto == 'Kilo') this.valorFinalOT = SelladoFinal * this.valorUnitarioProdKg;
-        else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') {
-          this.valorFinalOT = this.cantidadSellandoUnidad * this.valorUnitarioProdUnd;
-        }
+        else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') this.valorFinalOT = this.cantidadSellandoUnidad * this.valorUnitarioProdUnd;
       } else if (SelladoFinal == 0 && item.Emp == 0 && wiketiadoFinal != 0) {
         this.bagProServices.srvObtenerListaProcSelladoOT_FechaFinal(ot).subscribe(datos_sellado => {
           let sellado : any = [];
@@ -493,9 +466,7 @@ export class ReporteCostosOTComponent implements OnInit {
           }
         });
         if (this.presentacionProducto == 'Kilo') this.valorFinalOT = wiketiadoFinal * this.valorUnitarioProdKg;
-        else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') {
-          this.valorFinalOT = this.cantidadWiketiadoUnidad * this.valorUnitarioProdUnd;
-        }
+        else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') this.valorFinalOT = this.cantidadWiketiadoUnidad * this.valorUnitarioProdUnd;
       } else if (SelladoFinal != 0 && item.Emp == 0 && wiketiadoFinal != 0) {
         this.bagProServices.srvObtenerListaProcSelladoOT_FechaFinal(ot).subscribe(datos_sellado => {
           let sellado : any = [];
@@ -526,40 +497,13 @@ export class ReporteCostosOTComponent implements OnInit {
           }
         });
         if (this.presentacionProducto == 'Kilo') this.valorFinalOT = (wiketiadoFinal * this.valorUnitarioProdKg) + (SelladoFinal * this.valorUnitarioProdKg);
-        else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') {
-          this.valorFinalOT = (this.cantidadWiketiadoUnidad * this.valorUnitarioProdUnd) + (this.cantidadSellandoUnidad * this.valorUnitarioProdUnd);
-        }
+        else if (this.presentacionProducto == 'Unidad' || this.presentacionProducto == 'Rollo'|| this.presentacionProducto == 'Paquete') this.valorFinalOT = (this.cantidadWiketiadoUnidad * this.valorUnitarioProdUnd) + (this.cantidadSellandoUnidad * this.valorUnitarioProdUnd);
       }
     }
     this.diferencia = this.valorFinalOT - this.ValorMPEntregada;
     Math.round(this.diferenciaPorcentaje = (this.diferencia / this.valorFinalOT) * 100);
     this.load = true;
   }
-
-  // llenarTablaMP(formulario : any, CantDevuelta : number){
-  //   if (formulario.sum == 0) this.load = true;
-  //   else {
-  //     this.materiaPrimaService.srvObtenerListaPorId(formulario.matPri_Id).subscribe(datos_materiaPrima => {
-  //       const infoDoc : any = {
-  //         Id : datos_materiaPrima.matPri_Id,
-  //         Nombre : datos_materiaPrima.matPri_Nombre,
-  //         Cantidad : (formulario.sum - CantDevuelta),
-  //         Presentacion : datos_materiaPrima.undMed_Id,
-  //         PrecioUnd : this.formatonumeros(datos_materiaPrima.matPri_Precio),
-  //         SubTotal : this.formatonumeros(Math.round((formulario.sum - CantDevuelta) * datos_materiaPrima.matPri_Precio)),
-  //         Proceso : formulario.proceso_Nombre,
-  //       }
-
-  //       this.totalMPEntregada = (this.totalMPEntregada + infoDoc.Cantidad) - CantDevuelta;
-  //       this.ValorMPEntregada = this.ValorMPEntregada + ((formulario.sum - CantDevuelta) * datos_materiaPrima.matPri_Precio);
-  //       this.ArrayMateriaPrima.push(infoDoc);
-  //       this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-  //       this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
-  //     });
-  //     this.load = true;
-  //     this.devolucion = 0;
-  //   }
-  // }
 
   // Funcion para llenar la tabla con la materia prima que se ha pedido para la OT consultada
   llenarTablaMP(formulario : any){

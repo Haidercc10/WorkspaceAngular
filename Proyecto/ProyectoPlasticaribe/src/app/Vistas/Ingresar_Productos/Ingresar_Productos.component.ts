@@ -135,7 +135,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     this.cargando = true;
     this.Total = 0;
     this.rollosAsignados = [];
-    // window.location.href = "./ingresar-productos";
+    window.location.href = "./ingresar-productos";
   }
 
   // funcion que va a limpiar los campos del formulario
@@ -3573,7 +3573,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           Id : this.rollosInsertar[i].IdProducto,
           Nombre : this.rollosInsertar[i].Producto,
           Cantidad : this.formatonumeros(cantidad.toFixed(2)),
-          Cantidad2 : cantidad.toFixed(4),
+          Cantidad2 : cantidad,
           Rollos: this.formatonumeros(cantRollo.toFixed(2)),
           Presentacion : this.rollosInsertar[i].Presentacion,
         }
@@ -3859,7 +3859,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           }
           const pdf = pdfMake.createPdf(pdfDefinicion);
           pdf.open();
-          setTimeout(() => { (this.limpiarCampos()); }, 4000);
+          setTimeout(() => { (this.limpiarCampos()); }, 1200);
           break;
         }
         break;

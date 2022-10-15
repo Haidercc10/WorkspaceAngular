@@ -125,80 +125,42 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
         const Colores = ['Iniciado', 'Abierta', 'No Iniciado', 'Terminada', 'Asignada'];
 
-        // // Color Amarillo
-        // const amarilloTitle = 'Iniciado';
-        // let amarilloRow = worksheet.addRow([amarilloTitle]);
-        // amarilloRow.font = { name: 'Calibri', family: 4, size: 12, bold: true };
-        // amarilloRow.eachCell((cell, number) => {
-        //   cell.fill = {
-        //     type: 'pattern',
-        //     pattern: 'solid',
-        //     fgColor: { argb: 'F9FC5B' }
-        //   }
-        //   cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-        // });
-        // // Color Naranja
-        // const naranjaTitle = 'Abierta';
-        // let naranjaRow = worksheet.addRow([naranjaTitle]);
-        // naranjaRow.font = { name: 'Calibri', family: 4, size: 12, bold: true };
-        // naranjaRow.eachCell((cell, number) => {
-        //   cell.fill = {
-        //     type: 'pattern',
-        //     pattern: 'solid',
-        //     fgColor: { argb: 'FDCD7A' }
-        //   }
-        //   cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-        // });
-        // // Color Rojo
-        // const rojoTitle = 'No Iniciado';
-        // let rojoRow = worksheet.addRow([rojoTitle]);
-        // rojoRow.font = { name: 'Calibri', family: 4, size: 12, bold: true };
-        // rojoRow.eachCell((cell, number) => {
-        //   cell.fill = {
-        //     type: 'pattern',
-        //     pattern: 'solid',
-        //     fgColor: { argb: 'FF837B' }
-        //   }
-        //   cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-        // });
-
         let coloresRow = worksheet.addRow(Colores);
-          let iniciado = coloresRow.getCell(1);
-          let abierta = coloresRow.getCell(2);
-          let noIniciado = coloresRow.getCell(3);
-          let terminado = coloresRow.getCell(4);
-          let asignado = coloresRow.getCell(5);
+        let iniciado = coloresRow.getCell(1);
+        let abierta = coloresRow.getCell(2);
+        let noIniciado = coloresRow.getCell(3);
+        let terminado = coloresRow.getCell(4);
+        let asignado = coloresRow.getCell(5);
 
-          iniciado.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'F9FC5B' }
-          }
+        iniciado.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'F9FC5B' }
+        }
 
-          abierta.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FDCD7A' }
-          }
+        abierta.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FDCD7A' }
+        }
 
-          noIniciado.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FF837B' }
-          }
+        noIniciado.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FF837B' }
+        }
 
-          terminado.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'C7FD7A' }
-          }
+        terminado.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'C7FD7A' }
+        }
 
-          asignado.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'ADD8E6' }
-          }
-
+        asignado.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'ADD8E6' }
+        }
 
         let headerRow = worksheet.addRow(header);
         headerRow.eachCell((cell, number) => {

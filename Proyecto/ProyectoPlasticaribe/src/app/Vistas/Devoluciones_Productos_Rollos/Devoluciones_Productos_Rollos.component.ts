@@ -102,7 +102,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
     this.rollosInsertar = [];
     this.validarRollo = [];
     this.cargando = true;
-    // window.location.href = "./devolucion-rollos-productos";
+    window.location.href = "./devolucion-rollos-productos";
   }
 
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo

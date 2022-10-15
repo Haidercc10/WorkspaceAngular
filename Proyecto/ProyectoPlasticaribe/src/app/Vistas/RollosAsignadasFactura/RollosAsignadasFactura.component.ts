@@ -105,7 +105,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
     this.grupoProductos = [];
     this.cargando = true;
     this.Total = 0;
-    // window.location.href = "./factura-rollos-productos";
+    window.location.href = "./factura-rollos-productos";
   }
 
   //Funcion que a mostrar los usuarios de tipo conductor

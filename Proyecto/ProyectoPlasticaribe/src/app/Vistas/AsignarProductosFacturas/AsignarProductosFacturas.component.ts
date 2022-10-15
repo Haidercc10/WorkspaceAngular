@@ -210,6 +210,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.cargando = true;
     this.validarInputClientes = true;
     this.Total = 0;
+    window.location.href = "./asignacion-productos-facturas";
   }
 
   //Funcion que va a agregar Productos en la tabla
@@ -591,7 +592,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
           Id : this.rollosInsertar[i].IdProducto,
           Nombre : this.rollosInsertar[i].Producto,
           Cantidad : this.formatonumeros(cantidad.toFixed(2)),
-          Cantidad2 : cantidad.toFixed(4),
+          Cantidad2 : cantidad,
           Rollos: this.formatonumeros(cantRollo.toFixed(2)),
           Presentacion : this.rollosInsertar[i].Presentacion,
           Cant_Unidades : this.formatonumeros(cantUnidades.toFixed(2)),
@@ -625,8 +626,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       if (this.rollosInsertar[i].Id == item.Id) {
         if (cantidad <= this.rollosInsertar[i].CantPaqRestantesEnviar && cantidad > 0 && cantidad != null && cantidad != undefined) {
-          this.rollosInsertar[i].CantPaqRestantes = cantidad;
-          this.rollosInsertar[i].CantUndRestantes = (this.rollosInsertar[i].CantPaqRestantes * this.rollosInsertar[i].CantUndPaquetes);
+          this.rollosInsertar[i].CantPaqRestantes -= cantidad;
+          this.rollosInsertar[i].CantUndRestantes -= (this.rollosInsertar[i].CantPaqRestantes * this.rollosInsertar[i].CantUndPaquetes);
           this.GrupoProductos();
         } else {
           Swal.fire("¡La cantidad ingresada no es valida!");
