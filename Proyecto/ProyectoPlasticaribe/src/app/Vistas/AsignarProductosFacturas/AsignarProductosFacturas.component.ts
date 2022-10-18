@@ -626,8 +626,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       if (this.rollosInsertar[i].Id == item.Id) {
         if (cantidad <= this.rollosInsertar[i].CantPaqRestantesEnviar && cantidad > 0 && cantidad != null && cantidad != undefined) {
-          this.rollosInsertar[i].CantPaqRestantes -= cantidad;
-          this.rollosInsertar[i].CantUndRestantes -= (this.rollosInsertar[i].CantPaqRestantes * this.rollosInsertar[i].CantUndPaquetes);
+          this.rollosInsertar[i].CantPaqRestantes = cantidad;
+          this.rollosInsertar[i].CantUndRestantes = (this.rollosInsertar[i].CantPaqRestantes * this.rollosInsertar[i].CantUndPaquetes);
           this.GrupoProductos();
         } else {
           Swal.fire("¡La cantidad ingresada no es valida!");
