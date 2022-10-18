@@ -96,9 +96,9 @@
                       Tabla de Colores
                     </th>
                   </tr>
-                  <tr>
+                  <!-- <tr> -->
                     <td class="amarillo">
-                      <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>Iniciado</b></a>
+                      <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Iniciado <b>{{cantidadOTIniciada}}</b></a>
                       <div class="row">
                         <div class="col">
                           <div class="collapse multi-collapse" id="multiCollapseExample1">
@@ -109,10 +109,10 @@
                         </div>
                       </div>
                     </td>
-                  </tr>
-                  <tr>
+                  <!-- </tr> -->
+                  <!-- <tr> -->
                     <td class="naranja">
-                      <a class="btn naranja" data-bs-toggle="collapse" href="#multiCollapseExample2" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>Abierta</b></a>
+                      <a class="btn naranja" data-bs-toggle="collapse" href="#multiCollapseExample2" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Abierta <b>{{catidadOTAbiertas}}</b></a>
                       <div class="row">
                         <div class="col">
                           <div class="collapse multi-collapse" id="multiCollapseExample2">
@@ -123,24 +123,10 @@
                         </div>
                       </div>
                     </td>
-                  </tr>
-                  <tr>
-                    <td class="rojo">
-                      <a class="btn rojo" data-bs-toggle="collapse" href="#multiCollapseExample3" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>No iniciado</b></a>
-                      <div class="row">
-                        <div class="col">
-                          <div class="collapse multi-collapse" id="multiCollapseExample3">
-                            <div class="card card-body">
-                              Este color indica la OT ya inició su producción en otros procesos, pero no ha llegado aún al proceso con este color.
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
+                  <!-- </tr> -->
+                  <!-- <tr> -->
                     <td class="verde">
-                      <a class="btn verde" data-bs-toggle="collapse" href="#multiCollapseExample4" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>Terminada</b></a>
+                      <a class="btn verde" data-bs-toggle="collapse" href="#multiCollapseExample4" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Terminada <b>{{cantidadOTTerminada}}</b></a>
                       <div class="row">
                         <div class="col">
                           <div class="collapse multi-collapse" id="multiCollapseExample4">
@@ -151,10 +137,10 @@
                         </div>
                       </div>
                     </td>
-                  </tr>
-                  <tr>
+                  <!-- </tr> -->
+                  <!-- <tr> -->
                     <td class="azul">
-                      <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample5" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>Asignada</b></a>
+                      <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample5" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Asignada <b>{{cantidadOTAsignadas}}</b></a>
                       <div class="row">
                         <div class="col">
                           <div class="collapse multi-collapse" id="multiCollapseExample5">
@@ -165,7 +151,35 @@
                         </div>
                       </div>
                     </td>
-                  </tr>
+                  <!-- </tr> -->
+                  <!-- <tr> -->
+                    <td class="rojo">
+                      <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample6" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Anualda <b>{{cantidadOtAnulada}}</b></a>
+                      <div class="row">
+                        <div class="col">
+                          <div class="collapse multi-collapse" id="multiCollapseExample6">
+                            <div class="card card-body">
+                              Este color indica que la orden de trabajo está asignada, es decir, ya se hicieron asignaciones perono ha empazado su producción.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  <!-- </tr> -->
+                  <!-- <tr> -->
+                    <td class="gris">
+                      <a class="btn gris" data-bs-toggle="collapse" href="#multiCollapseExample3" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>No iniciado</b></a>
+                      <div class="row">
+                        <div class="col">
+                          <div class="collapse multi-collapse" id="multiCollapseExample3">
+                            <div class="card card-body">
+                              Este color indica la OT ya inició su producción en otros procesos, pero no ha llegado aún al proceso con este color.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  <!-- </tr> -->
                 </thead>
               </table>
             </div>
@@ -216,7 +230,7 @@
                         </ng-container>
                         <!-- Iniciada -->
                         <ng-container *ngIf="tabla.ext < tabla.cant && tabla.ext > 0">
-                          <td id="ext" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
+                          <td id="ext" scope="col" style="background-color: #F3FC20;" (click)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
                         </ng-container>
                         <!-- Abierta / Asignada -->
                         <ng-container *ngIf="(tabla.ext + tabla.imp + tabla.rot + tabla.dbl + tabla.lam + tabla.cor + tabla.emp  + tabla.sel + tabla.wik) == 0; else fila1">
@@ -229,7 +243,7 @@
                         </ng-container>
                         <!-- No iniciado -->
                         <ng-template #fila1>
-                          <td *ngIf="tabla.ext == 0 && tabla.ext < tabla.cant" id="ext" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
+                          <td *ngIf="tabla.ext == 0 && tabla.ext < tabla.cant" id="ext" scope="col" style="background-color: #DDDDDD" (click)="seleccionarOTxStatus(tabla, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.ext | number}}</td>
                         </ng-template>
 
                         <!-- Impresion -->
@@ -252,7 +266,7 @@
                         </ng-container>
                         <!-- No iniciado -->
                         <ng-template #fila2>
-                          <td *ngIf="tabla.imp == 0 && tabla.imp < tabla.cant" id="imp" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarOTxStatus(tabla, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.imp | number}}</td>
+                          <td *ngIf="tabla.imp == 0 && tabla.imp < tabla.cant" id="imp" scope="col" style="background-color: #DDDDDD" (click)="seleccionarOTxStatus(tabla, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.imp | number}}</td>
                         </ng-template>
 
                         <!-- Rotograbado -->
@@ -275,7 +289,7 @@
                         </ng-container>
                         <!-- No iniciado -->
                         <ng-template #fila3>
-                          <td *ngIf="tabla.rot == 0 && tabla.rot < tabla.cant" id="rot" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarOTxStatus(tabla, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.rot | number}}</td>
+                          <td *ngIf="tabla.rot == 0 && tabla.rot < tabla.cant" id="rot" scope="col" style="background-color: #DDDDDD" (click)="seleccionarOTxStatus(tabla, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.rot | number}}</td>
                         </ng-template>
 
                         <!-- Doblado -->
@@ -298,7 +312,7 @@
                         </ng-container>
                         <!-- No iniciado -->
                         <ng-template #fila4>
-                          <td *ngIf="tabla.dbl == 0 && tabla.dbl < tabla.cant" id="dbl" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarOTxStatus(tabla, 'DOBLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.dbl | number}}</td>
+                          <td *ngIf="tabla.dbl == 0 && tabla.dbl < tabla.cant" id="dbl" scope="col" style="background-color: #DDDDDD" (click)="seleccionarOTxStatus(tabla, 'DOBLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.dbl | number}}</td>
                         </ng-template>
 
                         <!-- laminado -->
@@ -321,7 +335,7 @@
                         </ng-container>
                         <!-- No iniciado -->
                         <ng-template #fila5>
-                          <td *ngIf="tabla.lam == 0 && tabla.lam < tabla.cant" id="lam" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarOTxStatus(tabla, 'LAMINADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.lam | number}}</td>
+                          <td *ngIf="tabla.lam == 0 && tabla.lam < tabla.cant" id="lam" scope="col" style="background-color: #DDDDDD" (click)="seleccionarOTxStatus(tabla, 'LAMINADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.lam | number}}</td>
                         </ng-template>
 
                         <!-- Corte -->
@@ -344,16 +358,16 @@
                         </ng-container>
                         <!-- No iniciado -->
                         <ng-template #fila6>
-                          <td *ngIf="tabla.cor == 0 && tabla.cor < tabla.cant" id="cor" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarOTxStatus(tabla, 'CORTE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.cor | number}}</td>
+                          <td *ngIf="tabla.cor == 0 && tabla.cor < tabla.cant" id="cor" scope="col" style="background-color: #DDDDDD" (click)="seleccionarOTxStatus(tabla, 'CORTE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.cor | number}}</td>
                         </ng-template>
 
                         <!-- Empaque -->
                         <!-- Termianda -->
-                        <ng-container *ngIf="tabla.emp >= (tabla.cant + (tabla.cant * -0.10))">
+                        <ng-container *ngIf="tabla.emp >= (tabla.cant + (tabla.cant * -0.05))">
                           <td id="emp" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarOTxStatus(tabla, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.emp | number}}</td>
                         </ng-container>
                         <!-- Iniciada -->
-                        <ng-container *ngIf="tabla.emp < (tabla.cant + (tabla.cant * -0.10)) && tabla.emp > 0">
+                        <ng-container *ngIf="tabla.emp < (tabla.cant + (tabla.cant * -0.05)) && tabla.emp > 0">
                           <td id="emp" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(tabla, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.emp | number}}</td>
                         </ng-container>
                         <!-- Abierta / Asignada -->
@@ -367,16 +381,16 @@
                         </ng-container>
                         <!-- No iniciado -->
                         <ng-template #fila7>
-                          <td *ngIf="tabla.emp == 0 && tabla.emp < tabla.cant" id="emp" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarOTxStatus(tabla, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.emp | number}}</td>
+                          <td *ngIf="tabla.emp == 0 && tabla.emp < tabla.cant" id="emp" scope="col" style="background-color: #DDDDDD" (click)="seleccionarOTxStatus(tabla, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.emp | number}}</td>
                         </ng-template>
 
                         <!-- Sellado -->
                         <!-- Termianda -->
-                        <ng-container *ngIf="tabla.sel >= (tabla.cant + (tabla.cant * -0.10))">
+                        <ng-container *ngIf="tabla.sel >= (tabla.cant + (tabla.cant * -0.05))">
                           <td id="sel" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}}</td>
                         </ng-container>
                         <!-- Iniciada -->
-                        <ng-container *ngIf="tabla.sel < (tabla.cant + (tabla.cant * -0.10)) && tabla.sel > 0">
+                        <ng-container *ngIf="tabla.sel < (tabla.cant + (tabla.cant * -0.05)) && tabla.sel > 0">
                           <td id="sel" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}}</td>
                         </ng-container>
                         <!-- Abierta / Asignada -->
@@ -390,16 +404,16 @@
                         </ng-container>
                         <!-- No iniciado -->
                         <ng-template #fila8>
-                          <td *ngIf="tabla.sel == 0 && tabla.sel < tabla.cant" id="sel" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}}</td>
+                          <td *ngIf="tabla.sel == 0 && tabla.sel < tabla.cant" id="sel" scope="col" style="background-color: #DDDDDD" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}}</td>
                         </ng-template>
 
                         <!-- Wiketiado -->
                         <!-- Termianda -->
-                        <ng-container *ngIf="tabla.wik >= (tabla.cant + (tabla.cant * -0.10))">
+                        <ng-container *ngIf="tabla.wik >= (tabla.cant + (tabla.cant * -0.05))">
                           <td id="wik" scope="col" style="background-color: rgb(185, 255, 185);" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
                         </ng-container>
                         <!-- Iniciada -->
-                        <ng-container *ngIf="tabla.wik < (tabla.cant + (tabla.cant * -0.10)) && tabla.wik > 0">
+                        <ng-container *ngIf="tabla.wik < (tabla.cant + (tabla.cant * -0.05)) && tabla.wik > 0">
                           <td id="wik" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
                         </ng-container>
                         <!-- Asignada -->
@@ -414,11 +428,11 @@
                         </ng-container>
                         <!-- No iniciado -->
                         <ng-template #fila9>
-                          <td *ngIf="tabla.wik == 0 && tabla.wik < tabla.cant" id="wik" scope="col" style="background-color: rgb(255, 146, 146);" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
+                          <td *ngIf="tabla.wik == 0 && tabla.wik < tabla.cant" id="wik" scope="col" style="background-color: #DDDDDD" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
                         </ng-template>
 
                         <!-- Cantidad Total a Producir -->
-                        <td id="cant" scope="col">{{tabla.cant | number}}</td>
+                        <td id="cant" scope="col"><b>{{tabla.cant | number}}</b></td>
 
                         <!-- Cantidad Ingresada a Despacho -->
                         <td id="est" scope="col">{{tabla.entrada | number}}</td>
@@ -433,7 +447,7 @@
                         <!--<td id="est" scope="col">{{tabla.est | uppercase}}</td>-->
 
                          <!-- Terminada -->
-                         <ng-container *ngIf="tabla.est == 'Terminada' ">
+                        <ng-container *ngIf="tabla.est == 'Terminada' ">
                           <td id="est" scope="col" style="background-color: rgb(185, 255, 185);">{{tabla.est | uppercase}}</td>
                         </ng-container>
                         <!-- Iniciada -->
@@ -441,17 +455,17 @@
                           <td id="est" scope="col" style="background-color: #F9FC5B;" >{{tabla.est | uppercase}}</td>
                         </ng-container>
                         <!-- Asignada -->
-                          <ng-container *ngIf="tabla.est == 'Asignada'">
-                            <td id="est" scope="col" style="background-color: lightblue;">{{tabla.est | uppercase}}</td>
-                          </ng-container>
-                          <!-- Abierta -->
-                          <ng-container *ngIf="tabla.est == 'Abierta' ">
-                            <td id="est" scope="col" style="background-color: rgb(255, 201, 143);">{{tabla.est | uppercase}}</td>
-                          </ng-container>
+                        <ng-container *ngIf="tabla.est == 'Asignada'">
+                          <td id="est" scope="col" style="background-color: lightblue;">{{tabla.est | uppercase}}</td>
+                        </ng-container>
+                        <!-- Abierta -->
+                        <ng-container *ngIf="tabla.est == 'Abierta' ">
+                          <td id="est" scope="col" style="background-color: rgb(255, 201, 143);">{{tabla.est | uppercase}}</td>
+                        </ng-container>
 
                         <!-- No iniciado -->
                         <ng-template #fila9>
-                          <td *ngIf="tabla.est != 'Abierta' && tabla.est != 'Asignada' && tabla.est != 'En Proceso' && tabla.est != 'Terminada'" id="est" scope="col" style="background-color: rgb(255, 146, 146);" >{{'No iniciada' | uppercase}}</td>
+                          <td *ngIf="tabla.est != 'Abierta' && tabla.est != 'Asignada' && tabla.est != 'En Proceso' && tabla.est != 'Terminada'" id="est" scope="col" style="background-color: #DDDDDD" >{{'No iniciada' | uppercase}}</td>
                         </ng-template>
 
                         <!-- Fecha Creacion OT -->

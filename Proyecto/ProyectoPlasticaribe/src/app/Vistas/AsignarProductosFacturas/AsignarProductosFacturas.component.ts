@@ -640,9 +640,9 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   // Funcion para cargar en la base de datos la informacion de una factura a la que se le asignarán rollos
   crearAsignacion(){
-    if (this.rollosInsertar.length != 0 && this.FormConsultarProductos.valid) {
+    if (this.rollosInsertar.length != 0 && this.FormConsultarProductos.valid && this.FormConsultarProductos.value.Factura != '') {
       this.cargando = false;
-      let factura : string = this.FormConsultarProductos.value.Factura;
+      let factura : string = this.FormConsultarProductos.value.Factura.trim;
       let notaCredito : string = this.FormConsultarProductos.value.NotaCredito;
       let cliente : any = this.FormConsultarProductos.value.Cliente;
       let observacion : string = this.FormConsultarProductos.value.Observacion;

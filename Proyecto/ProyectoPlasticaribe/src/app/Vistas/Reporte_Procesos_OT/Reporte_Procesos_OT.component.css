@@ -125,48 +125,62 @@ a {
 }
 
 .amarillo {
-  background-color: #F9FC5B;
+  background-color: #F3FC20;
 }
 
 .naranja {
-  background-color: rgb(255, 201, 143);
+  background-color: #F6D45D;
 }
 
 .rojo {
-  background-color: rgb(255, 146, 146);
+  background-color: #FF7878;
 }
 
 .verde {
-  background-color: rgb(185, 255, 185);
+  background-color: #8AFC9B;
 }
 
 .azul {
-  background-color: lightblue;
+  background-color: #83D3FF;
+}
+
+.gris{
+  background-color: #DDDDDD;
 }
 
 
 @media (min-width: 1370px){
   .tableColores {
-    max-width: 125px;
+    /* max-width: 125px;
     position: fixed;
     bottom: 15px;
     left: 15px;
-    text-align: center;
+    text-align: center; */
+    max-height: 10px;
+    max-width: 1255px;
   }
 
   .tableColores td .collapse{
     margin-top: 10%;
     text-align: start;
     font-size: 11px;
+
   }
 }
 
 @media (max-width: 1369px){
-  .modal-xl {
+  /* .modal-xl {
     max-width: 1440px;
     font-size: smaller;
-  }
+  } */
+
   .tableColores {
+    text-align: center;
+  }
+
+  .tableColores td .collapse{
+    margin-top: 2%;
+    font-size: 11px;
     text-align: center;
   }
 }
