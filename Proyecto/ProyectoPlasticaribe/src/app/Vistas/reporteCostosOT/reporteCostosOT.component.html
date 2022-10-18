@@ -1,4 +1,6 @@
-<app-menuLateral></app-menuLateral>
+<ng-container *ngIf="!modeModal">
+  <app-menuLateral></app-menuLateral>
+</ng-container>
 
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
@@ -11,7 +13,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Reporte de Costos de Orden de Trabajo</h2>
+      <h2 class="tituloRojo">Reporte de Costos OT</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -66,7 +68,7 @@
         <!-- Cantidad Producto Con Margen-->
         <div class="form-floating col-md-2">
           <input formControlName="cantProductoConMargen" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
-          <label for="floatingInput">Cant. Kg Prod. con Margen</label>
+          <label for="floatingInput">Cant. Kg con Margen</label>
         </div>
         <!-- Presentacion Producto -->
         <div class="form-floating col-md-2">
@@ -76,12 +78,12 @@
         <!-- Valor Unidad Producto -->
         <div class="form-floating col-md-2">
           <input formControlName="ValorUnidadProductoUnd" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
-          <label for="floatingInput">Valor Unidad Producto</label>
+          <label for="floatingInput">$ Und Producto</label>
         </div>
         <!-- Valor Kg Producto -->
         <div class="form-floating col-md-2">
           <input formControlName="ValorUnidadProductoKg" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
-          <label for="floatingInput">Valor Kg Producto</label>
+          <label for="floatingInput">$ Kg Producto</label>
         </div>
         <!-- Valor Estimado OT -->
         <div class="form-floating col-md-2">

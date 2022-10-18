@@ -113,16 +113,17 @@ export class EstadosOT_VendedoresComponent implements OnInit {
   }
 
   // Funcion que exportará a excel todo el contenido de la tabla
-  exportToExcel(): void {
+  exportToExcel() : void {
     if (this.ArrayDocumento.length == 0) Swal.fire("¡Para poder crear el archivo de Excel primero debe cargar minimo un OT en la tabla!");
     else {
       this.load = false;
       setTimeout(() => {
         const title = `Reporte de OT por Procesos - ${this.today}`;
-        const header = ["OT", "Cliente", "Producto", "Extrusión", "Impresión", "Rotograbado", "Laminado", "Doblado", "Corte", "Empaque", "Sellado", "Wiketiado", "Cant. Producir", "Fallas", "Observación", "Estado", "Fecha Creación"]
-        let datos: any = [];
+        const header = ["OT", "Extrusión", "Impresión", "Rotograbado", "Laminado", "Doblado", "Corte", "Empaque", "Sellado", "Wiketiado", "Cant. Producir", "Estado", "Fecha Creación"]
+        let datos : any =[];
+
         for (const item of this.ArrayDocumento) {
-          const datos1: any = [item.ot, item.cli, item.prod, item.ext, item.imp, item.rot, item.lam, item.dbl, item.cor, item.emp, item.sel, item.wik, item.cant, item.falla, item.obs, item.est, item.fecha];
+          const datos1  : any = [item.ot, item.ext, item.imp, item.rot, item.lam, item.dbl, item.cor, item.emp, item.sel, item.wik, item.cant, item.est, item.fecha];
           datos.push(datos1);
         }
         let workbook = new Workbook();
@@ -181,39 +182,41 @@ export class EstadosOT_VendedoresComponent implements OnInit {
         });
         worksheet.mergeCells('A1:Q2');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+
         datos.forEach(d => {
           let row = worksheet.addRow(d);
-          let CantPedida = row.getCell(13);
+          let CantPedida = row.getCell(11);
 
-          let qtyExt = row.getCell(4);
-          let qtyImp = row.getCell(5);
-          let qtyRot = row.getCell(6);
-          let qtyLam = row.getCell(7);
-          let qtyDbl = row.getCell(8);
-          let qtyCor = row.getCell(9);
-          let qtyEmp = row.getCell(10);
-          let qtySel = row.getCell(11);
-          let qtyWik = row.getCell(12);
+          let qtyExt = row.getCell(2);
+          let qtyImp = row.getCell(3);
+          let qtyRot = row.getCell(4);
+          let qtyLam = row.getCell(5);
+          let qtyDbl = row.getCell(6);
+          let qtyCor = row.getCell(7);
+          let qtyEmp = row.getCell(8);
+          let qtySel = row.getCell(9);
+          let qtyWik = row.getCell(10);
+          let qtyEstado = row.getCell(13);
 
           // Extrusion
-          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(2).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorExt;
-          if (+qtyExt.value >= d[12]) colorExt = 'C7FD7A'; //Terminada
-          else if (+qtyExt.value < d[12] && +qtyExt.value > 0) colorExt = 'F9FC5B'; //Iniciada
+          if (+qtyExt.value >= d[10]) colorExt = 'C7FD7A'; //Terminada
+          else if (+qtyExt.value < d[10] && +qtyExt.value > 0) colorExt = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorExt = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorExt = 'ADD8E6'; //Asignada
           else if (+qtyExt.value == 0 && (qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorExt = 'FF837B'; //No Iniciada
-
           qtyExt.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: colorExt }
           }
+
           // Impresion
-          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorImp;
-          if (+qtyImp.value >= d[12]) colorImp = 'C7FD7A'; //Terminada
-          else if (+qtyImp.value < d[12] && +qtyImp.value > 0) colorImp = 'F9FC5B'; //Iniciada
+          if (+qtyImp.value >= d[10]) colorImp = 'C7FD7A'; //Terminada
+          else if (+qtyImp.value < d[10] && +qtyImp.value > 0) colorImp = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorImp = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorImp = 'ADD8E6'; //Asignada
           else if (+qtyImp.value == 0 && (qtyExt.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorImp = 'FF837B'; //No Iniciada
@@ -222,11 +225,12 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             pattern: 'solid',
             fgColor: { argb: colorImp }
           }
+
           //Rotograbado
-          row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorRot;
-          if (+qtyRot.value >= d[12]) colorRot = 'C7FD7A'; //Terminada
-          else if (+qtyRot.value < d[12] && +qtyRot.value > 0) colorRot = 'F9FC5B'; //Iniciada
+          if (+qtyRot.value >= d[10]) colorRot = 'C7FD7A'; //Terminada
+          else if (+qtyRot.value < d[10] && +qtyRot.value > 0) colorRot = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorRot = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorRot = 'ADD8E6'; //Asignada
           else if (+qtyRot.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorRot = 'FF837B'; //No Iniciada
@@ -235,11 +239,12 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             pattern: 'solid',
             fgColor: { argb: colorRot }
           }
+
           //Laminado
-          row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorLam;
-          if (+qtyLam.value >= d[12]) colorLam = 'C7FD7A'; //Terminada
-          else if (+qtyLam.value < d[12] && +qtyLam.value > 0) colorLam = 'F9FC5B'; //Iniciada
+          if (+qtyLam.value >= d[10]) colorLam = 'C7FD7A'; //Terminada
+          else if (+qtyLam.value < d[10] && +qtyLam.value > 0) colorLam = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorLam = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorLam = 'ADD8E6'; //Asignada
           else if (+qtyLam.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorLam = 'FF837B'; //No Iniciada
@@ -248,11 +253,12 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             pattern: 'solid',
             fgColor: { argb: colorLam }
           }
+
           // Doblado
-          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorDbl;
-          if (+qtyDbl.value >= d[12]) colorDbl = 'C7FD7A'; //Terminada
-          else if (+qtyDbl.value < d[12] && +qtyDbl.value > 0) colorDbl = 'F9FC5B'; //Iniciada
+          if (+qtyDbl.value >= d[10]) colorDbl = 'C7FD7A'; //Terminada
+          else if (+qtyDbl.value < d[10] && +qtyDbl.value > 0) colorDbl = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorDbl = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorDbl = 'ADD8E6'; //Asignada
           else if (+qtyDbl.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorDbl = 'FF837B'; //No Iniciada
@@ -261,11 +267,12 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             pattern: 'solid',
             fgColor: { argb: colorDbl }
           }
+
           // Corte
-          row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorCor;
-          if (+qtyCor.value >= d[12]) colorCor = 'C7FD7A'; //Terminada
-          else if (+qtyCor.value < d[12] && +qtyCor.value > 0) colorCor = 'F9FC5B'; //Iniciada
+          if (+qtyCor.value >= d[10]) colorCor = 'C7FD7A'; //Terminada
+          else if (+qtyCor.value < d[10] && +qtyCor.value > 0) colorCor = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorCor = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorCor = 'ADD8E6'; //Asignada
           else if (+qtyCor.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorCor = 'FF837B'; //No Iniciada
@@ -274,8 +281,9 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             pattern: 'solid',
             fgColor: { argb: colorCor }
           }
+
           // Empaque
-          row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorEmp;
           if (+qtyEmp.value >=  (+CantPedida + (+CantPedida * -0.10))) colorEmp = 'C7FD7A'; //Terminada
           else if (+qtyEmp.value <  (+CantPedida + (+CantPedida * -0.10)) && +qtyEmp.value > 0) colorEmp = 'F9FC5B'; //Iniciada
@@ -287,8 +295,9 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             pattern: 'solid',
             fgColor: { argb: colorEmp }
           }
+
           // Sellado
-          row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorSel;
           if (+qtySel.value >= (+CantPedida + (+CantPedida * -0.10))) colorSel = 'C7FD7A'; //Terminada
           else if (+qtySel.value <  (+CantPedida + (+CantPedida * -0.10)) && +qtySel.value > 0) colorSel = 'F9FC5B'; //Iniciada
@@ -300,11 +309,12 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             pattern: 'solid',
             fgColor: { argb: colorSel }
           }
+
           // Wiketiado
-          row.getCell(12).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorWik;
           if (+qtyWik.value >=  (+CantPedida + (+CantPedida * -0.10))) colorWik = 'C7FD7A'; //Terminada
-          else if (+qtyWik.value <  (+CantPedida + (+CantPedida * -0.10)) && +qtyWik.value > 0) colorWik = 'F9FC5B'; //Iniciada
+          else if (+qtyWik.value < (+CantPedida + (+CantPedida * -0.10)) && +qtyWik.value > 0) colorWik = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorWik = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorWik = 'ADD8E6'; //Asignada
           else if (+qtyWik.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorWik = 'FF837B'; //No Iniciada
@@ -314,9 +324,69 @@ export class EstadosOT_VendedoresComponent implements OnInit {
             fgColor: { argb: colorWik }
           }
 
+          // Estado
+          let colorEstado;
+          if (d[12] == 'Terminada') colorEstado = 'C7FD7A'; //Terminada
+          else if (d[12] == 'En proceso') colorEstado = 'F9FC5B'; //Iniciada
+          else if (d[12] == 'Abierta') colorEstado = 'FDCD7A'; //Abierta
+          else if (d[12] == 'Asignada') colorEstado = 'ADD8E6'; //Asignada
+          qtyEstado.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: colorEstado }
+          }
 
           row.getCell(13).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
+
+        /** Significado info colores. */
+       /* worksheet.getCell('S3').value = "Info. Colores"
+        worksheet.getCell('S3').fill = {
+          type: 'pattern',
+          pattern:'darkVertical',
+          bgColor:{argb:'eeeeee'},
+          fgColor:{argb:'eeeeee'},
+        };
+        worksheet.getCell('S3').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+
+        worksheet.getCell('S4').value = "Abierta"
+        worksheet.getCell('S4').fill = {
+          type: 'pattern',
+          pattern:'darkVertical',
+          bgColor:{argb:'FDCD7A'},
+          fgColor:{argb:'FDCD7A'},
+        };
+        worksheet.getCell('S5').value = "En Proceso"
+        worksheet.getCell('S5').fill = {
+          type: 'pattern',
+          pattern:'solid',
+          bgColor:{argb:'FF837B'},
+          fgColor:{argb:'FF837B'},
+        };
+
+        worksheet.getCell('S6').value = "Terminada"
+        worksheet.getCell('S6').fill = {
+          type: 'pattern',
+          pattern:'solid',
+          fgColor:{argb:'C7FD7A'},
+          bgColor:{argb:'C7FD7A'},
+        };
+
+        worksheet.getCell('S7').value = "Cerrada"
+        worksheet.getCell('S7').fill = {
+          type: 'pattern',
+          pattern:'solid',
+          fgColor:{argb:'FDCD7A'},
+          bgColor:{argb:'FDCD7A'},
+        };
+
+        worksheet.getCell('S8').value = "Asignada"
+        worksheet.getCell('S8').fill = {
+          type: 'pattern',
+          pattern:'solid',
+          fgColor:{argb:'FF837B'},
+          bgColor:{argb:'FF837B'},
+        };*/
 
         worksheet.getColumn(1).width = 10;
         worksheet.getColumn(2).width = 55;
@@ -328,13 +398,15 @@ export class EstadosOT_VendedoresComponent implements OnInit {
         worksheet.getColumn(8).width = 12;
         worksheet.getColumn(9).width = 12;
         worksheet.getColumn(10).width = 12;
-        worksheet.getColumn(11).width = 12;
-        worksheet.getColumn(12).width = 12;
+        worksheet.getColumn(11).width = 15;
+        worksheet.getColumn(12).width = 15;
         worksheet.getColumn(13).width = 15;
         worksheet.getColumn(14).width = 20;
         worksheet.getColumn(15).width = 20;
         worksheet.getColumn(16).width = 15;
         worksheet.getColumn(17).width = 15;
+        worksheet.getColumn(19).width = 15;
+
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

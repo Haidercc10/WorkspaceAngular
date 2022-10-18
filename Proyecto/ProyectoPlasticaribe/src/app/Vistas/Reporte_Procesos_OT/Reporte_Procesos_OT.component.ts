@@ -12,6 +12,7 @@ import * as fs from 'file-saver';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.component';
+import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.component';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +26,7 @@ import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.compone
 export class Reporte_Procesos_OTComponent implements OnInit {
 
   @ViewChild(DatosOTStatusComponent) MostrarDatosOTxStatus : DatosOTStatusComponent;
+  @ViewChild(ReporteCostosOTComponent) reporteCostos : ReporteCostosOTComponent;
 
   public formularioOT !: FormGroup;
   public page1 : number; //Variable que tendrá el paginado de la tabla en la que se muestran los pedidos consultados
@@ -187,6 +189,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           let qtyEmp = row.getCell(8);
           let qtySel = row.getCell(9);
           let qtyWik = row.getCell(10);
+          let qtyEstado = row.getCell(16);
 
           // Extrusion
           row.getCell(2).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
@@ -312,6 +315,18 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: colorWik }
+          }
+
+          // Estado
+          let colorEstado;
+          if (d[15] == 'Terminada') colorEstado = 'C7FD7A'; //Terminada
+          else if (d[15] == 'En proceso') colorEstado = 'F9FC5B'; //Iniciada
+          else if (d[15] == 'Abierta') colorEstado = 'FDCD7A'; //Abierta
+          else if (d[15] == 'Asignada') colorEstado = 'ADD8E6'; //Asignada
+          qtyEstado.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: colorEstado }
           }
 
           row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
@@ -1426,5 +1441,29 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       }
     });
+  }
+
+  reporteOT(ot : number){
+    this.reporteCostos.load = false;
+    this.otSeleccionada = ot;
+    this.reporteCostos.modeModal = true;
+    this.reporteCostos.infoOT.setValue({
+      ot : ot,
+      cliente : '',
+      IdProducto : '',
+      NombreProducto : '',
+      cantProductoSinMargenUnd : '',
+      cantProductoSinMargenKg : '',
+      margenAdicional : '',
+      cantProductoConMargen : '',
+      PresentacionProducto : '',
+      ValorUnidadProductoUnd : '',
+      ValorUnidadProductoKg : '',
+      ValorEstimadoOt : '',
+      fechaInicioOT : '',
+      fechaFinOT : '',
+      estadoOT : '',
+    });
+    setTimeout(() => { this.reporteCostos.consultaOTBagPro()}, 500);
   }
 }

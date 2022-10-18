@@ -60,6 +60,7 @@ export class ReporteCostosOTComponent implements OnInit {
   sumaValorImpresion : number = 0; //Variable que servirá para mostrar el valor total de materia prima utilizada en impresión
   sumaValorRotograbado : number = 0; //Variable que servirá para mostrar el valor total de la materia prima utilizada en rotograbado
   devolucion : number = 0; //Varibale que almacenará la cantidad de materia prima que fue devuelta en una OT
+  modeModal : boolean = false;
 
   // Variables globlales que almacenarán la informacion general de la orden de trabajo que se mostrará en el PDF
   ordenTrabajo : number = 0;
