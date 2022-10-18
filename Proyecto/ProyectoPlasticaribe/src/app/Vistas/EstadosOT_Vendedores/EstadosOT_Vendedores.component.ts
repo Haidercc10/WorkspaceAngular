@@ -119,10 +119,10 @@ export class EstadosOT_VendedoresComponent implements OnInit {
       this.load = false;
       setTimeout(() => {
         const title = `Reporte de OT por Procesos - ${this.today}`;
-        const header = ["OT", "Extrusión", "Impresión", "Rotograbado", "Laminado", "Doblado", "Corte", "Empaque", "Sellado", "Wiketiado", "Cant. Producir", "Fallas", "Observación", "Estado", "Fecha Creación"]
+        const header = ["OT", "Cliente", "Producto", "Extrusión", "Impresión", "Rotograbado", "Laminado", "Doblado", "Corte", "Empaque", "Sellado", "Wiketiado", "Cant. Producir", "Fallas", "Observación", "Estado", "Fecha Creación"]
         let datos: any = [];
         for (const item of this.ArrayDocumento) {
-          const datos1: any = [item.ot, item.ext, item.imp, item.rot, item.lam, item.dbl, item.cor, item.emp, item.sel, item.wik, item.cant, item.falla, item.obs, item.est, item.fecha];
+          const datos1: any = [item.ot, item.cli, item.prod, item.ext, item.imp, item.rot, item.lam, item.dbl, item.cor, item.emp, item.sel, item.wik, item.cant, item.falla, item.obs, item.est, item.fecha];
           datos.push(datos1);
         }
         let workbook = new Workbook();
@@ -130,6 +130,46 @@ export class EstadosOT_VendedoresComponent implements OnInit {
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
         worksheet.addRow([]);
+
+        const Colores = ['Iniciado', 'Abierta', 'No Iniciado', 'Terminada', 'Asignada'];
+        let coloresRow = worksheet.addRow(Colores);
+          let iniciado = coloresRow.getCell(1);
+          let abierta = coloresRow.getCell(2);
+          let noIniciado = coloresRow.getCell(3);
+          let terminado = coloresRow.getCell(4);
+          let asignado = coloresRow.getCell(5);
+
+          iniciado.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'F9FC5B' }
+          }
+
+          abierta.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FDCD7A' }
+          }
+
+          noIniciado.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FF837B' }
+          }
+
+          terminado.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'C7FD7A' }
+          }
+
+          asignado.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'ADD8E6' }
+          }
+
+
         let headerRow = worksheet.addRow(header);
         headerRow.eachCell((cell, number) => {
           cell.fill = {
@@ -139,150 +179,135 @@ export class EstadosOT_VendedoresComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:O2');
+        worksheet.mergeCells('A1:Q2');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
         datos.forEach(d => {
           let row = worksheet.addRow(d);
-          let CantPedida = row.getCell(11)
+          let CantPedida = row.getCell(13);
+
+          let qtyExt = row.getCell(4);
+          let qtyImp = row.getCell(5);
+          let qtyRot = row.getCell(6);
+          let qtyLam = row.getCell(7);
+          let qtyDbl = row.getCell(8);
+          let qtyCor = row.getCell(9);
+          let qtyEmp = row.getCell(10);
+          let qtySel = row.getCell(11);
+          let qtyWik = row.getCell(12);
+
           // Extrusion
-          let qtyExt = row.getCell(2);
-          row.getCell(2).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorExt;
-          if (+qtyExt.value >= d[10]) {
-            colorExt = 'C7FD7A';
-          } else if (+qtyExt.value < d[10] && +qtyExt.value > 0) {
-            colorExt = 'FDCD7A'
-          } else if (+qtyExt.value == 0) {
-            colorExt = 'FF837B'
-          }
+          if (+qtyExt.value >= d[12]) colorExt = 'C7FD7A'; //Terminada
+          else if (+qtyExt.value < d[12] && +qtyExt.value > 0) colorExt = 'F9FC5B'; //Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorExt = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorExt = 'ADD8E6'; //Asignada
+          else if (+qtyExt.value == 0 && (qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorExt = 'FF837B'; //No Iniciada
+
           qtyExt.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: colorExt }
           }
           // Impresion
-          let qtyImp = row.getCell(3);
-          row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorImp;
-          if (+qtyImp.value >= d[10]) {
-            colorImp = 'C7FD7A';
-          } else if (+qtyImp.value < d[10] && +qtyImp.value > 0) {
-            colorImp = 'FDCD7A'
-          } else if (+qtyImp.value == 0) {
-            colorImp = 'FF837B'
-          }
+          if (+qtyImp.value >= d[12]) colorImp = 'C7FD7A'; //Terminada
+          else if (+qtyImp.value < d[12] && +qtyImp.value > 0) colorImp = 'F9FC5B'; //Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorImp = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorImp = 'ADD8E6'; //Asignada
+          else if (+qtyImp.value == 0 && (qtyExt.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorImp = 'FF837B'; //No Iniciada
           qtyImp.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: colorImp }
           }
           //Rotograbado
-          let qtyRot = row.getCell(4);
-          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorRot;
-          if (+qtyRot.value >= d[10]) {
-            colorRot = 'C7FD7A';
-          } else if (+qtyRot.value < d[10] && +qtyRot.value > 0) {
-            colorRot = 'FDCD7A'
-          } else if (+qtyRot.value == 0) {
-            colorRot = 'FF837B'
-          }
+          if (+qtyRot.value >= d[12]) colorRot = 'C7FD7A'; //Terminada
+          else if (+qtyRot.value < d[12] && +qtyRot.value > 0) colorRot = 'F9FC5B'; //Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorRot = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorRot = 'ADD8E6'; //Asignada
+          else if (+qtyRot.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorRot = 'FF837B'; //No Iniciada
           qtyRot.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: colorRot }
           }
           //Laminado
-          let qtyLam = row.getCell(5);
-          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorLam;
-          if (+qtyLam.value >= d[10]) {
-            colorLam = 'C7FD7A';
-          } else if (+qtyLam.value < d[10] && +qtyLam.value > 0) {
-            colorLam = 'FDCD7A'
-          } else if (+qtyLam.value == 0) {
-            colorLam = 'FF837B'
-          }
+          if (+qtyLam.value >= d[12]) colorLam = 'C7FD7A'; //Terminada
+          else if (+qtyLam.value < d[12] && +qtyLam.value > 0) colorLam = 'F9FC5B'; //Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorLam = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorLam = 'ADD8E6'; //Asignada
+          else if (+qtyLam.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorLam = 'FF837B'; //No Iniciada
           qtyLam.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: colorLam }
           }
           // Doblado
-          let qtyDbl = row.getCell(6);
-          row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorDbl;
-          if (+qtyDbl.value >= d[10]) {
-            colorDbl = 'C7FD7A';
-          } else if (+qtyDbl.value < d[10] && +qtyDbl.value > 0) {
-            colorDbl = 'FDCD7A'
-          } else if (+qtyDbl.value == 0) {
-            colorDbl = 'FF837B'
-          }
+          if (+qtyDbl.value >= d[12]) colorDbl = 'C7FD7A'; //Terminada
+          else if (+qtyDbl.value < d[12] && +qtyDbl.value > 0) colorDbl = 'F9FC5B'; //Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorDbl = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorDbl = 'ADD8E6'; //Asignada
+          else if (+qtyDbl.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorDbl = 'FF837B'; //No Iniciada
           qtyDbl.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: colorDbl }
           }
           // Corte
-          let qtyCor = row.getCell(7);
-          row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorCor;
-          if (+qtyCor.value >= d[10]) {
-            colorCor = 'C7FD7A';
-          } else if (+qtyCor.value < d[10] && +qtyCor.value > 0) {
-            colorCor = 'FDCD7A'
-          } else if (+qtyCor.value == 0) {
-            colorCor = 'FF837B'
-          }
+          if (+qtyCor.value >= d[12]) colorCor = 'C7FD7A'; //Terminada
+          else if (+qtyCor.value < d[12] && +qtyCor.value > 0) colorCor = 'F9FC5B'; //Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorCor = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorCor = 'ADD8E6'; //Asignada
+          else if (+qtyCor.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorCor = 'FF837B'; //No Iniciada
           qtyCor.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: colorCor }
           }
           // Empaque
-          let qtyEmp = row.getCell(8);
-          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorEmp;
-          if (+qtyEmp.value >= (+CantPedida + (+CantPedida * -0.10))) {
-            colorEmp = 'C7FD7A';
-          } else if (+qtyEmp.value < (+CantPedida + (+CantPedida * -0.10)) && +qtyEmp.value > 0) {
-            colorEmp = 'FDCD7A'
-          } else if (+qtyEmp.value == 0) {
-            colorEmp = 'FF837B'
-          }
+          if (+qtyEmp.value >=  (+CantPedida + (+CantPedida * -0.10))) colorEmp = 'C7FD7A'; //Terminada
+          else if (+qtyEmp.value <  (+CantPedida + (+CantPedida * -0.10)) && +qtyEmp.value > 0) colorEmp = 'F9FC5B'; //Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorEmp = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorEmp = 'ADD8E6'; //Asignada
+          else if (+qtyEmp.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorEmp = 'FF837B'; //No Iniciada
           qtyEmp.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: colorEmp }
           }
           // Sellado
-          let qtySel = row.getCell(9);
-          row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorSel;
-          if (+qtySel.value >= (+CantPedida + (+CantPedida * -0.10))) {
-            colorSel = 'C7FD7A';
-          } else if (+qtySel.value < (+CantPedida + (+CantPedida * -0.10)) && +qtySel.value > 0) {
-            colorSel = 'FDCD7A'
-          } else if (+qtySel.value == 0) {
-            colorSel = 'FF837B'
-          }
+          if (+qtySel.value >= (+CantPedida + (+CantPedida * -0.10))) colorSel = 'C7FD7A'; //Terminada
+          else if (+qtySel.value <  (+CantPedida + (+CantPedida * -0.10)) && +qtySel.value > 0) colorSel = 'F9FC5B'; //Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorSel = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorSel = 'ADD8E6'; //Asignada
+          else if (+qtySel.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorSel = 'FF837B'; //No Iniciada
           qtySel.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: colorSel }
           }
           // Wiketiado
-          let qtyWik = row.getCell(10);
-          row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(12).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorWik;
-          if (+qtyWik.value >= (+CantPedida + (+CantPedida * -0.10))) {
-            colorWik = 'C7FD7A';
-          } else if (+qtyWik.value < (+CantPedida + (+CantPedida * -0.10)) && +qtyWik.value > 0) {
-            colorWik = 'FDCD7A'
-          } else if (+qtyWik.value == 0) {
-            colorWik = 'FF837B'
-          }
+          if (+qtyWik.value >=  (+CantPedida + (+CantPedida * -0.10))) colorWik = 'C7FD7A'; //Terminada
+          else if (+qtyWik.value <  (+CantPedida + (+CantPedida * -0.10)) && +qtyWik.value > 0) colorWik = 'F9FC5B'; //Iniciada
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorWik = 'FDCD7A'; //Abierta
+          else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorWik = 'ADD8E6'; //Asignada
+          else if (+qtyWik.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorWik = 'FF837B'; //No Iniciada
           qtyWik.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -290,12 +315,12 @@ export class EstadosOT_VendedoresComponent implements OnInit {
           }
 
 
-          row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(13).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
 
         worksheet.getColumn(1).width = 10;
-        worksheet.getColumn(2).width = 12;
-        worksheet.getColumn(3).width = 12;
+        worksheet.getColumn(2).width = 55;
+        worksheet.getColumn(3).width = 55;
         worksheet.getColumn(4).width = 12;
         worksheet.getColumn(5).width = 12;
         worksheet.getColumn(6).width = 12;
@@ -303,11 +328,13 @@ export class EstadosOT_VendedoresComponent implements OnInit {
         worksheet.getColumn(8).width = 12;
         worksheet.getColumn(9).width = 12;
         worksheet.getColumn(10).width = 12;
-        worksheet.getColumn(11).width = 15;
-        worksheet.getColumn(12).width = 20;
-        worksheet.getColumn(13).width = 20;
-        worksheet.getColumn(14).width = 15;
-        worksheet.getColumn(15).width = 15;
+        worksheet.getColumn(11).width = 12;
+        worksheet.getColumn(12).width = 12;
+        worksheet.getColumn(13).width = 15;
+        worksheet.getColumn(14).width = 20;
+        worksheet.getColumn(15).width = 20;
+        worksheet.getColumn(16).width = 15;
+        worksheet.getColumn(17).width = 15;
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

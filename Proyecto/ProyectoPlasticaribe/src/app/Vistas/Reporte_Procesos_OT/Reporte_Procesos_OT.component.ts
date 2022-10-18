@@ -320,7 +320,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         });
 
         /** Significado info colores. */
-       /* worksheet.getCell('S3').value = "Info. Colores"
+       /*worksheet.getCell('S3').value = "Info. Colores"
         worksheet.getCell('S3').fill = {
           type: 'pattern',
           pattern:'darkVertical',
@@ -329,43 +329,43 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         };
         worksheet.getCell('S3').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
 
-        worksheet.getCell('S4').value = "Abierta"
+        worksheet.getCell('S4').value = "Iniciada"
         worksheet.getCell('S4').fill = {
           type: 'pattern',
           pattern:'darkVertical',
-          bgColor:{argb:'FDCD7A'},
-          fgColor:{argb:'FDCD7A'},
+          bgColor:{argb:'F9FC5B'},
+          fgColor:{argb:'F9FC5B'},
         };
-        worksheet.getCell('S5').value = "En Proceso"
+        worksheet.getCell('S5').value = "Abierta"
         worksheet.getCell('S5').fill = {
           type: 'pattern',
           pattern:'solid',
-          bgColor:{argb:'FF837B'},
-          fgColor:{argb:'FF837B'},
+          bgColor:{argb:'FDCD7A'},
+          fgColor:{argb:'FDCD7A'},
         };
 
-        worksheet.getCell('S6').value = "Terminada"
+        worksheet.getCell('S6').value = "No iniciada"
         worksheet.getCell('S6').fill = {
+          type: 'pattern',
+          pattern:'solid',
+          fgColor:{argb:'FF837B'},
+          bgColor:{argb:'FF837B'},
+        };
+
+        worksheet.getCell('S7').value = "Terminada"
+        worksheet.getCell('S7').fill = {
           type: 'pattern',
           pattern:'solid',
           fgColor:{argb:'C7FD7A'},
           bgColor:{argb:'C7FD7A'},
         };
 
-        worksheet.getCell('S7').value = "Cerrada"
-        worksheet.getCell('S7').fill = {
-          type: 'pattern',
-          pattern:'solid',
-          fgColor:{argb:'FDCD7A'},
-          bgColor:{argb:'FDCD7A'},
-        };
-
         worksheet.getCell('S8').value = "Asignada"
         worksheet.getCell('S8').fill = {
           type: 'pattern',
           pattern:'solid',
-          fgColor:{argb:'FF837B'},
-          bgColor:{argb:'FF837B'},
+          fgColor:{argb:'ADD8E6'},
+          bgColor:{argb:'ADD8E6'},
         };*/
 
         worksheet.getColumn(1).width = 10;

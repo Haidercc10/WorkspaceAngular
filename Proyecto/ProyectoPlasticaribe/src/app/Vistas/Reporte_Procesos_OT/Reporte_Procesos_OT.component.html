@@ -402,11 +402,12 @@
                         <ng-container *ngIf="tabla.wik < (tabla.cant + (tabla.cant * -0.10)) && tabla.wik > 0">
                           <td id="wik" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
                         </ng-container>
-                        <!-- Abierta -->
+                        <!-- Asignada -->
                         <ng-container *ngIf="(tabla.ext + tabla.imp + tabla.rot + tabla.dbl + tabla.lam + tabla.cor + tabla.emp  + tabla.sel + tabla.wik) == 0; else fila9">
                           <ng-container *ngIf="tabla.est == 'Asignada'">
                             <td id="wik" scope="col" style="background-color: lightblue;" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
                           </ng-container>
+                          <!-- Abierta -->
                           <ng-container *ngIf="tabla.est == 'Abierta'">
                             <td id="wik" scope="col" style="background-color: rgb(255, 201, 143);" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
                           </ng-container>
@@ -429,7 +430,29 @@
                         <td id="falla" scope="col" title="{{tabla.obs}}" (click)="seleccionarFilaTabla(tabla)">{{tabla.falla}}</td>
 
                         <!-- Estado OT -->
-                        <td id="est" scope="col">{{tabla.est | uppercase}}</td>
+                        <!--<td id="est" scope="col">{{tabla.est | uppercase}}</td>-->
+
+                         <!-- Terminada -->
+                         <ng-container *ngIf="tabla.est == 'Terminada' ">
+                          <td id="est" scope="col" style="background-color: rgb(185, 255, 185);">{{tabla.est | uppercase}}</td>
+                        </ng-container>
+                        <!-- Iniciada -->
+                        <ng-container *ngIf="tabla.est == 'En proceso' ">
+                          <td id="est" scope="col" style="background-color: #F9FC5B;" >{{tabla.est | uppercase}}</td>
+                        </ng-container>
+                        <!-- Asignada -->
+                          <ng-container *ngIf="tabla.est == 'Asignada'">
+                            <td id="est" scope="col" style="background-color: lightblue;">{{tabla.est | uppercase}}</td>
+                          </ng-container>
+                          <!-- Abierta -->
+                          <ng-container *ngIf="tabla.est == 'Abierta' ">
+                            <td id="est" scope="col" style="background-color: rgb(255, 201, 143);">{{tabla.est | uppercase}}</td>
+                          </ng-container>
+
+                        <!-- No iniciado -->
+                        <ng-template #fila9>
+                          <td *ngIf="tabla.est != 'Abierta' && tabla.est != 'Asignada' && tabla.est != 'En Proceso' && tabla.est != 'Terminada'" id="est" scope="col" style="background-color: rgb(255, 146, 146);" >{{'No iniciada' | uppercase}}</td>
+                        </ng-template>
 
                         <!-- Fecha Creacion OT -->
                         <td id="fecha" scope="col">{{tabla.fecha | date : 'yyyy-MM-dd'}}</td>
