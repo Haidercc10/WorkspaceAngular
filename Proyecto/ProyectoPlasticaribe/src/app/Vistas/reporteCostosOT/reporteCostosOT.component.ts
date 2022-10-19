@@ -546,11 +546,6 @@ export class ReporteCostosOTComponent implements OnInit {
     }
   }
 
-  // Funcion que servirá para llenar la tabla de materias primas utilizadas con las tintas que se asignaron para la OT consultada
-  llenarTablaTintas(){
-
-  }
-
   // funcion que se encagará de llenar la tabla de los productos en el pdf
   buildTableBody(data, columns) {
     var body = [];

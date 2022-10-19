@@ -13,6 +13,7 @@ import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.component';
 import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.component';
+import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +50,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   cantidadOTNoIniciada : number = 0;
   cantidadOTTerminada : number = 0;
   cantidadOtAnulada : number = 0;
+  cantTotalMp : number = 0;
+  cantPage : number = 30;
+  modalProcesos : boolean = false;
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -57,7 +61,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                       private estadosProcesos_OTService : EstadosProcesos_OTService,
                         private estadosService : EstadosService,
                           private servicioBagPro : BagproService,
-                            private dtEntradasRollosService : DetallesEntradaRollosService,) {
+                            private dtEntradasRollosService : DetallesEntradaRollosService,
+                              private detallesAsignacionService : DetallesAsignacionService,) {
 
     this.formularioOT = this.frmBuilder.group({
       idDocumento : [null],
@@ -118,11 +123,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       this.load = false;
       setTimeout(() => {
         const title = `Reporte de OT por Procesos - ${this.today}`;
-        const header = ["OT", "Extrusión", "Impresión", "Rotograbado", "Laminado", "Doblado", "Corte", "Empaque", "Sellado", "Wiketiado", "Cant. Producir", "Cant. Ingresada", "Cant. Enviada", "Fallas", "Observación", "Estado", "Fecha Creación"]
+        const header = ["OT", "Mat. Prima", "Extrusión", "Impresión", "Rotograbado", "Laminado", "Doblado", "Corte", "Empaque", "Sellado", "Wiketiado", "Cant. Producir", "Cant. Ingresada", "Cant. Enviada", "Fallas", "Observación", "Estado", "Fecha Creación", "Fecha Inicio", "Fecha Fin"]
         let datos : any =[];
 
         for (const item of this.ArrayDocumento) {
-          const datos1  : any = [item.ot, item.ext, item.imp, item.rot, item.lam, item.dbl, item.cor, item.emp, item.sel, item.wik, item.cant, item.entrada, item.salida, item.falla, item.obs, item.est, item.fecha];
+          const datos1  : any = [item.ot, item.Mp, item.ext, item.imp, item.rot, item.lam, item.dbl, item.cor, item.emp, item.sel, item.wik, item.cant, item.entrada, item.salida, item.falla, item.obs, item.est, item.fecha, item.fechaInicial, item.fechaFinal];
           datos.push(datos1);
         }
         let workbook = new Workbook();
@@ -179,29 +184,29 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:Q2');
+        worksheet.mergeCells('A1:T2');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
 
         datos.forEach(d => {
           let row = worksheet.addRow(d);
-          let CantPedida = row.getCell(11);
+          let CantPedida = row.getCell(12);
 
-          let qtyExt = row.getCell(2);
-          let qtyImp = row.getCell(3);
-          let qtyRot = row.getCell(4);
-          let qtyLam = row.getCell(5);
-          let qtyDbl = row.getCell(6);
-          let qtyCor = row.getCell(7);
-          let qtyEmp = row.getCell(8);
-          let qtySel = row.getCell(9);
-          let qtyWik = row.getCell(10);
-          let qtyEstado = row.getCell(16);
+          let qtyExt = row.getCell(3);
+          let qtyImp = row.getCell(4);
+          let qtyRot = row.getCell(5);
+          let qtyLam = row.getCell(6);
+          let qtyDbl = row.getCell(7);
+          let qtyCor = row.getCell(8);
+          let qtyEmp = row.getCell(9);
+          let qtySel = row.getCell(10);
+          let qtyWik = row.getCell(11);
+          let qtyEstado = row.getCell(17);
 
           // Extrusion
-          row.getCell(2).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorExt;
-          if (+qtyExt.value >= d[10]) colorExt = 'C7FD7A'; //Terminada
-          else if (+qtyExt.value < d[10] && +qtyExt.value > 0) colorExt = 'F9FC5B'; //Iniciada
+          if (+qtyExt.value >= d[11]) colorExt = 'C7FD7A'; //Terminada
+          else if (+qtyExt.value < d[11] && +qtyExt.value > 0) colorExt = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorExt = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorExt = 'ADD8E6'; //Asignada
           else if (+qtyExt.value == 0 && (qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorExt = 'DDDDDD'; //No Iniciada
@@ -212,10 +217,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
 
           // Impresion
-          row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorImp;
-          if (+qtyImp.value >= d[10]) colorImp = 'C7FD7A'; //Terminada
-          else if (+qtyImp.value < d[10] && +qtyImp.value > 0) colorImp = 'F9FC5B'; //Iniciada
+          if (+qtyImp.value >= d[11]) colorImp = 'C7FD7A'; //Terminada
+          else if (+qtyImp.value < d[11] && +qtyImp.value > 0) colorImp = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorImp = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorImp = 'ADD8E6'; //Asignada
           else if (+qtyImp.value == 0 && (qtyExt.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorImp = 'DDDDDD'; //No Iniciada
@@ -226,10 +231,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
 
           //Rotograbado
-          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorRot;
-          if (+qtyRot.value >= d[10]) colorRot = 'C7FD7A'; //Terminada
-          else if (+qtyRot.value < d[10] && +qtyRot.value > 0) colorRot = 'F9FC5B'; //Iniciada
+          if (+qtyRot.value >= d[11]) colorRot = 'C7FD7A'; //Terminada
+          else if (+qtyRot.value < d[11] && +qtyRot.value > 0) colorRot = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorRot = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorRot = 'ADD8E6'; //Asignada
           else if (+qtyRot.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorRot = 'DDDDDD'; //No Iniciada
@@ -240,10 +245,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
 
           //Laminado
-          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorLam;
-          if (+qtyLam.value >= d[10]) colorLam = 'C7FD7A'; //Terminada
-          else if (+qtyLam.value < d[10] && +qtyLam.value > 0) colorLam = 'F9FC5B'; //Iniciada
+          if (+qtyLam.value >= d[11]) colorLam = 'C7FD7A'; //Terminada
+          else if (+qtyLam.value < d[11] && +qtyLam.value > 0) colorLam = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorLam = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorLam = 'ADD8E6'; //Asignada
           else if (+qtyLam.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyDbl.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorLam = 'DDDDDD'; //No Iniciada
@@ -254,10 +259,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
 
           // Doblado
-          row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorDbl;
-          if (+qtyDbl.value >= d[10]) colorDbl = 'C7FD7A'; //Terminada
-          else if (+qtyDbl.value < d[10] && +qtyDbl.value > 0) colorDbl = 'F9FC5B'; //Iniciada
+          if (+qtyDbl.value >= d[11]) colorDbl = 'C7FD7A'; //Terminada
+          else if (+qtyDbl.value < d[11] && +qtyDbl.value > 0) colorDbl = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorDbl = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorDbl = 'ADD8E6'; //Asignada
           else if (+qtyDbl.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyCor.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorDbl = 'DDDDDD'; //No Iniciada
@@ -268,10 +273,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
 
           // Corte
-          row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorCor;
-          if (+qtyCor.value >= d[10]) colorCor = 'C7FD7A'; //Terminada
-          else if (+qtyCor.value < d[10] && +qtyCor.value > 0) colorCor = 'F9FC5B'; //Iniciada
+          if (+qtyCor.value >= d[11]) colorCor = 'C7FD7A'; //Terminada
+          else if (+qtyCor.value < d[11] && +qtyCor.value > 0) colorCor = 'F9FC5B'; //Iniciada
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0 && d[15] == 'Abierta') colorCor = 'FDCD7A'; //Abierta
           else if (+qtyExt.value == 0 && qtyImp.value == 0 && qtyRot.value == 0 && qtyLam.value == 0 && qtyDbl.value == 0 && qtyCor.value == 0 && qtyEmp.value == 0 && qtySel.value == 0 && qtyWik.value == 0  && d[15] == 'Asignada') colorCor = 'ADD8E6'; //Asignada
           else if (+qtyCor.value == 0 && (qtyExt.value == 0 || qtyImp.value == 0 || qtyRot.value == 0 || qtyLam.value == 0 || qtyDbl.value == 0 || qtyEmp.value == 0 || qtySel.value == 0 || qtyWik.value == 0 ) && d[15] != 'Asignada' && d[15] != 'Abierta') colorCor = 'DDDDDD'; //No Iniciada
@@ -282,7 +287,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
 
           // Empaque
-          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorEmp;
           if (+qtyEmp.value >=  (+CantPedida + (+CantPedida * -0.05))) colorEmp = 'C7FD7A'; //Terminada
           else if (+qtyEmp.value <  (+CantPedida + (+CantPedida * -0.05)) && +qtyEmp.value > 0) colorEmp = 'F9FC5B'; //Iniciada
@@ -296,7 +301,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
 
           // Sellado
-          row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorSel;
           if (+qtySel.value >= (+CantPedida + (+CantPedida * -0.05))) colorSel = 'C7FD7A'; //Terminada
           else if (+qtySel.value <  (+CantPedida + (+CantPedida * -0.05)) && +qtySel.value > 0) colorSel = 'F9FC5B'; //Iniciada
@@ -310,7 +315,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
 
           // Wiketiado
-          row.getCell(10).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           let colorWik;
           if (+qtyWik.value >=  (+CantPedida + (+CantPedida * -0.05))) colorWik = 'C7FD7A'; //Terminada
           else if (+qtyWik.value < (+CantPedida + (+CantPedida * -0.05)) && +qtyWik.value > 0) colorWik = 'F9FC5B'; //Iniciada
@@ -325,16 +330,17 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
           // Estado
           let colorEstado;
-          if (d[15] == 'Terminada') colorEstado = 'C7FD7A'; //Terminada
-          else if (d[15] == 'En proceso') colorEstado = 'F9FC5B'; //Iniciada
-          else if (d[15] == 'Abierta') colorEstado = 'FDCD7A'; //Abierta
-          else if (d[15] == 'Asignada') colorEstado = 'ADD8E6'; //Asignada
+          if (d[16] == 'Terminada') colorEstado = 'C7FD7A'; //Terminada
+          else if (d[16] == 'En proceso') colorEstado = 'F9FC5B'; //Iniciada
+          else if (d[16] == 'Abierta') colorEstado = 'FDCD7A'; //Abierta
+          else if (d[16] == 'Asignada') colorEstado = 'ADD8E6'; //Asignada
           qtyEstado.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: colorEstado }
           }
 
+          row.getCell(2).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           row.getCell(11).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           row.getCell(12).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           row.getCell(13).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
@@ -406,7 +412,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         worksheet.getColumn(15).width = 20;
         worksheet.getColumn(16).width = 15;
         worksheet.getColumn(17).width = 15;
-        worksheet.getColumn(19).width = 15;
+        worksheet.getColumn(18).width = 15;
+        worksheet.getColumn(19).width = 20;
 
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
@@ -494,7 +501,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               datos_ot[i].falla_Nombre,
                               datos_ot[i].estProcOT_Observacion,
                               datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,);
+                              datos_ot[i].estProcOT_FechaCreacion,
+                              datos_ot[i].estProcOT_FechaInicio,
+                              datos_ot[i].estProcOT_FechaFinal);
             }
           }
         }
@@ -518,7 +527,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             datos_ot[i].falla_Nombre,
                             datos_ot[i].estProcOT_Observacion,
                             datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+                            datos_ot[i].estProcOT_FechaCreacion,
+                              datos_ot[i].estProcOT_FechaInicio,
+                              datos_ot[i].estProcOT_FechaFinal);
           }
         }
       });
@@ -541,7 +552,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             datos_ot[i].falla_Nombre,
                             datos_ot[i].estProcOT_Observacion,
                             datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+                            datos_ot[i].estProcOT_FechaCreacion,
+                              datos_ot[i].estProcOT_FechaInicio,
+                              datos_ot[i].estProcOT_FechaFinal);
           }
         }
       });
@@ -565,7 +578,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               datos_ot[i].falla_Nombre,
                               datos_ot[i].estProcOT_Observacion,
                               datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,);
+                              datos_ot[i].estProcOT_FechaCreacion,
+                              datos_ot[i].estProcOT_FechaInicio,
+                              datos_ot[i].estProcOT_FechaFinal);
             }
           }
         }
@@ -589,7 +604,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             datos_ot[i].falla_Nombre,
                             datos_ot[i].estProcOT_Observacion,
                             datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+                            datos_ot[i].estProcOT_FechaCreacion,
+                              datos_ot[i].estProcOT_FechaInicio,
+                              datos_ot[i].estProcOT_FechaFinal);
           }
         }
       });
@@ -612,7 +629,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             datos_ot[i].falla_Nombre,
                             datos_ot[i].estProcOT_Observacion,
                             datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
           }
         }
       });
@@ -636,7 +655,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               datos_ot[i].falla_Nombre,
                               datos_ot[i].estProcOT_Observacion,
                               datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,);
+                              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
             }
           }
         }
@@ -660,7 +681,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             datos_ot[i].falla_Nombre,
                             datos_ot[i].estProcOT_Observacion,
                             datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
           }
         }
       });
@@ -683,7 +706,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               datos_ot[i].falla_Nombre,
                               datos_ot[i].estProcOT_Observacion,
                               datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,);
+                              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
             }
         }
       });
@@ -707,7 +732,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               datos_ot[i].falla_Nombre,
                               datos_ot[i].estProcOT_Observacion,
                               datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,);
+                              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
             }
           }
         }
@@ -735,7 +762,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               datos_ot[i].falla_Nombre,
                               datos_ot[i].estProcOT_Observacion,
                               datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,);
+                              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
             }
           }
         });
@@ -759,7 +788,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             datos_ot[i].falla_Nombre,
                             datos_ot[i].estProcOT_Observacion,
                             datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
           }
         }
       });
@@ -782,7 +813,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             datos_ot[i].falla_Nombre,
                             datos_ot[i].estProcOT_Observacion,
                             datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
           }
         }
       });
@@ -805,7 +838,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             datos_ot[i].falla_Nombre,
                             datos_ot[i].estProcOT_Observacion,
                             datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
           }
         });
       }
@@ -829,7 +864,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               datos_ot[i].falla_Nombre,
                               datos_ot[i].estProcOT_Observacion,
                               datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,);
+                              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
             }
           }
         }
@@ -853,7 +890,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             datos_ot[i].falla_Nombre,
                             datos_ot[i].estProcOT_Observacion,
                             datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
           }
         }
       });
@@ -877,7 +916,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               datos_ot[i].falla_Nombre,
                               datos_ot[i].estProcOT_Observacion,
                               datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,);
+                              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
             }
           }
         }
@@ -901,7 +942,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             datos_ot[i].falla_Nombre,
                             datos_ot[i].estProcOT_Observacion,
                             datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
           }
         }
 
@@ -927,7 +970,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].falla_Nombre,
                 datos_ot[i].estProcOT_Observacion,
                 datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion);
+                datos_ot[i].estProcOT_FechaCreacion,
+                datos_ot[i].estProcOT_FechaInicio,
+                datos_ot[i].estProcOT_FechaFinal);
             }
           };
         });
@@ -951,7 +996,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             datos_ot[i].falla_Nombre,
                             datos_ot[i].estProcOT_Observacion,
                             datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+                            datos_ot[i].estProcOT_FechaCreacion,
+                            datos_ot[i].estProcOT_FechaInicio,
+                            datos_ot[i].estProcOT_FechaFinal);
           }
         }
       });
@@ -974,7 +1021,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             datos_ot[i].falla_Nombre,
                             datos_ot[i].estProcOT_Observacion,
                             datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,);
+                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
           }
         }
       });
@@ -997,7 +1046,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].falla_Nombre,
               datos_ot[i].estProcOT_Observacion,
               datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion);
+              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal);
           }
         }
       });
@@ -1007,9 +1058,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   }
 
   //Funcion encargada de llenar un array con la informacion de las ordenes de trabajo y el producido de cada area
-  llenarArray(ot : number, ext : number, imp : number, rot : number, dbl : number, lam : number, cor : number, emp : number, sel : number, wik : number, can : number, falla : string, observacion : string, estado : any, fecha : any){
+  llenarArray(ot : number, ext : number, imp : number, rot : number, dbl : number, lam : number, cor : number, emp : number, sel : number, wik : number, can : number, falla : string, observacion : string, estado : any, fecha : any, fechaInicio : any, fechaFinal : any){
     let info : any = {
       ot : ot,
+      Mp : 0,
       ext : ext,
       imp : imp,
       rot : rot,
@@ -1026,6 +1078,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       fecha : fecha.replace("T00:00:00", ""),
       entrada : 0,
       salida : 0,
+      fechaInicio : fechaInicio,
+      fechaFinal : fechaFinal,
     }
     this.ArrayDocumento.push(info);
     this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
@@ -1046,6 +1100,15 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
         }
       });
+      this.detallesAsignacionService.srvObtenerListaPorAsignacionesOT(ot).subscribe(datos_asignacionMP => {
+        if (datos_asignacionMP.length != 0){
+          for (let j = 0; j < datos_asignacionMP.length; j++) {
+            for (let i = 0; i < this.ArrayDocumento.length; i++) {
+              if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].Mp += datos_asignacionMP[j].cantMP;
+            }
+          }
+        }
+      });
     }, 1200);
 
     if (estado == 'Abierta') this.catidadOTAbiertas += 1;
@@ -1053,7 +1116,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     if (estado == 'Terminada') this.cantidadOTTerminada += 1;
     if (estado == 'En proceso') this.cantidadOTIniciada += 1;
     if (estado == 'Finalizada') this.cantidadOtAnulada += 1;
-    // if ()
   }
 
   // Funcion que va a asignar un valor una variable, el valor será la orden de trabajo sobre la que se le dió click
@@ -1063,6 +1125,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   //
   seleccionarOTxStatus(form : any, proceso : any){
+    this.modal_DatosStatusOT = true;
     this.otSeleccionada = form.ot;
     this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
     this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
@@ -1071,6 +1134,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       this.servicioBagPro.srvObtenerListaPorStatusExtrusion(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
+          // this.modalProcesos = true;
           for (let index = 0; index < registros_OT.length; index++) {
             const Info : any = {
               Rollo : registros_OT[index].item,
@@ -1391,7 +1455,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
     }
-    if (this.MostrarDatosOTxStatus.ArrayDatosProcesos.length != 0) this.modal_DatosStatusOT = true;
   }
 
   // Funcion que va a cerrar el modal cuando no haya información

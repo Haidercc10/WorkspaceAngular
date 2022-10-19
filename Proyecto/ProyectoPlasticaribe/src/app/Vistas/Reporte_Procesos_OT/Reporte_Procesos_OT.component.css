@@ -148,20 +148,31 @@ a {
   background-color: #DDDDDD;
 }
 
+a {
+  color: #000;
+}
+
+a:hover {
+  color: #555;
+}
+
+#tableProcesos td{
+ /* max-width: 50px; */
+ font-size: 13px;
+}
 
 @media (min-width: 1370px){
   .tableColores {
     /* max-width: 125px;
     position: fixed;
     bottom: 15px;
-    left: 15px;
-    text-align: center; */
-    max-height: 10px;
+    left: 15px;*/
+    text-align: center;
     max-width: 1255px;
   }
 
   .tableColores td .collapse{
-    margin-top: 10%;
+    margin-top: 1%;
     text-align: start;
     font-size: 11px;
 
@@ -179,8 +190,12 @@ a {
   }
 
   .tableColores td .collapse{
-    margin-top: 2%;
+    margin-top: 1%;
     font-size: 11px;
     text-align: center;
   }
+}
+
+.titulos_Paginador{
+  display: flex;
 }

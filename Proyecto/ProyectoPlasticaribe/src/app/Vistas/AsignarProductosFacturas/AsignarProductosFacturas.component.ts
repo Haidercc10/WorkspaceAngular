@@ -642,7 +642,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   crearAsignacion(){
     if (this.rollosInsertar.length != 0 && this.FormConsultarProductos.valid && this.FormConsultarProductos.value.Factura != '') {
       this.cargando = false;
-      let factura : string = this.FormConsultarProductos.value.Factura.trim;
+      let factura : string = this.FormConsultarProductos.value.Factura;
       let notaCredito : string = this.FormConsultarProductos.value.NotaCredito;
       let cliente : any = this.FormConsultarProductos.value.Cliente;
       let observacion : string = this.FormConsultarProductos.value.Observacion;
