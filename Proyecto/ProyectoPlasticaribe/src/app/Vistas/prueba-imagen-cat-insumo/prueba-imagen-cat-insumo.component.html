@@ -1,96 +1,21 @@
-<!-- <input type="number" [(ngModel)]="cantPage">
-
-
-<ng-container>
-  <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteClientes">
-    <ng-autocomplete
-      class=""
-      [data]="arrayClientes"
-      [searchKeyword]="keywordClientes"
-      [itemTemplate]="itemTemplateCL"
-      [notFoundTemplate]="notFoundTemplate"
-      id="floatingInput">
-    </ng-autocomplete>
-    <ng-template #itemTemplateCL let-item>
-      <a [innerHTML]="item.cli_Nombre"></a>
-    </ng-template>
-    <ng-template #notFoundTemplate let-notFound>
-      <div [innerHTML]="notFound"></div>
-    </ng-template>
-  </div>
-</ng-container>
-
-<form>
-  <mat-form-field class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteClientes" style="margin-left: 50%;">
-    <input type="text"
-           placeholder="Pick one"
-           matInput
-           [formControl]="myControl"
-           [matAutocomplete]="auto">
-    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-      <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-        {{option}}
-      </mat-option>
-    </mat-autocomplete>
-  </mat-form-field>
-</form>
-
-
-<div class="wrap">
-  <input list="colores" name="colores" type="text" placeholder="Elige un color">
-  <datalist id="colores">
-    <option value={{item.cli_Id}} *ngFor="let item of arrayClientes">{{item.cli_Nombre}}</option>
-  </datalist>
-</div>
-</div> -->
-
-
-<form class="example-form">
-  <input type="text"
-         placeholder="Search for a street"
-         [formControl]="control"
-         [matAutocomplete]="auto">
-  <mat-autocomplete #auto="matAutocomplete">
-    <mat-option *ngFor="let street of filteredStreets | async" [value]="street">
-      {{street}}
-    </mat-option>
-  </mat-autocomplete>
-</form>
-
-<br>
-
-<select class="selectpicker" data-live-search="true">
-  <option data-tokens="ketchup mustard">Hot Dog, Fries and a Soda</option>
-  <option data-tokens="mustard">Burger, Shake and a Smile</option>
-  <option data-tokens="frosting">Sugar, Spice and all things nice</option>
-</select>
-
-
-<div class="modal-body">
-  <h2 class="fs-5">Popover in a modal</h2>
-  <p>This <a role="button" class="btn btn-secondary" data-bs-toggle="popover" title="Popover title" data-bs-content="Popover body content is set in this attribute.">button</a> triggers a popover on click.</p>
-  <hr>
-</div>
-
-<a class="btn btn-primary" aria-disabled="true" role="button" data-bs-toggle="popover" title="Popover title" data-bs-content="Popover body content is set in this attribute.">Disabled toggle link</a>
-
-
-<p>
-  <a class="btn btn-primary" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Toggle first element</a>
-</p>
-<div class="row">
-  <div class="col">
-    <div class="collapse multi-collapse" id="multiCollapseExample1">
-      <div class="card card-body">
-        Some placeholder content for the first collapse component of this multi-collapse example. This panel is hidden by default but revealed when the user activates the relevant trigger.
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="collapse multi-collapse" id="multiCollapseExample2">
-      <div class="card card-body">
-        Some placeholder content for the second collapse component of this multi-collapse example. This panel is hidden by default but revealed when the user activates the relevant trigger.
-      </div>
-    </div>
-  </div>
-</div>
+<p-table [columns]="selectedColumns" [value]="products">
+  <ng-template pTemplate="caption">
+    <p-multiSelect [options]="cols" [(ngModel)]="selectedColumns" optionLabel="header" selectedItemsLabel="{0} columns selected" [style]="{minWidth: '200px'}" placeholder="Choose Columns"></p-multiSelect>
+  </ng-template>
+  <ng-template pTemplate="header" let-columns>
+    <tr>
+      <th>Code</th>
+      <th *ngFor="let col of columns">
+        {{col.header}}
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-product let-columns="columns">
+    <tr>
+      <td>{{product.code}}</td>
+      <td *ngFor="let col of columns">
+        {{product[col.field]}}
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

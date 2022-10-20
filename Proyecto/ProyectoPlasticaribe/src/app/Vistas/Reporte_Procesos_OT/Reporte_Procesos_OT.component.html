@@ -28,31 +28,55 @@
         <div class="mb-4">
           <div class="row g-3">
           <!--OT-->
-            <div class="form-floating col-md">
+            <div class="form-floating col-md-2">
               <input formControlName="idDocumento" type="number" class="form-control" id="floatingInput" title="N° de la Orden de Trabajo" required >
               <label for="floatingInput">OT</label>
             </div>
             <!-- Fecha inicial -->
-            <div class="form-floating col-md">
+            <div class="form-floating col-md-2">
               <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput" title="Fecha de creación de la Orden de trabajo" required >
               <label for="floatingInput">Fecha Inicial</label>
             </div>
             <!-- Fecha final -->
-            <div class="form-floating col-md">
+            <div class="form-floating col-md-2">
               <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
               <label for="floatingInput">Fecha Final</label>
             </div>
 
+            <div class="ng-autocomplete form-floating col-md form-control form-control-sm" *ngIf="ValidarRol == 1">
+              <ng-autocomplete
+                class=""
+                [data]="vendedores"
+                [searchKeyword]="keyword"
+                [itemTemplate]="itemTemplate"
+                [notFoundTemplate]="notFoundTemplate"
+                id="floatingInput"
+                placeholder="Nombre Vendedor"
+                formControlName="Vendedor">
+              </ng-autocomplete>
+              <ng-template #itemTemplate let-item>
+                <a [innerHTML]="item.usua_Nombre"></a>
+              </ng-template>
+              <ng-template #notFoundTemplate let-notFound>
+                <div [innerHTML]="notFound"></div>
+              </ng-template>
+              <!-- <label for="floatingInput" >Nombre Vendedor</label> -->
+            </div>
+
             <!-- Estados -->
-            <div class="form-floating col-md">
+            <div class="form-floating col-md-2">
               <select formControlName="estado" class="form-select form-select-sm" id="floatingSelect" title="Estado de la Orden de Trabajo" required>
                 <option [ngValue]="estado.estado_Id" *ngFor="let estado of estados">{{estado.estado_Nombre}}</option>
               </select>
               <label for="floatingSelect">Estado OT</label>
             </div>
+          </div>
+        </div>
 
+        <div class="mb-4">
+          <div class="row g-3">
             <!-- Fallas -->
-            <div class="form-floating col-md">
+            <div class="form-floating col-md-3">
               <select formControlName="fallasOT" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example">
                 <option [ngValue]="falla.falla_Id" *ngFor="let falla of fallas">{{falla.falla_Nombre}}</option>
               </select>
@@ -60,7 +84,7 @@
             </div>
 
             <!-- Observación -->
-            <div class="form-floating col-6 col-md-12">
+            <div class="form-floating col-6 col-md">
               <textarea formControlName="ObservacionOT" id="floatingTextArea" type="text" class="form-control form-control-sm"></textarea>
               <label for="floatingTextArea">Observación</label>
             </div>
