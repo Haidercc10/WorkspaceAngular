@@ -205,6 +205,7 @@
                 <table class="table table-bordered table-hover mt-2" id="tableProcesos" style="font-size: 14px;">
                   <thead class="TitulosTabla">
                     <tr>
+                      <th id="" scope="col">Vendedor</th>
                       <th id="" scope="col">OT</th>
                       <th id="" scope="col">Materia Prima</th>
                       <th id="" scope="col">Extrusión</th>
@@ -216,7 +217,9 @@
                       <th id="" scope="col">Empaque</th>
                       <th id="" scope="col">Sellado</th>
                       <th id="" scope="col">Wiketiado</th>
-                      <th id="" scope="col">Cant Producir</th>
+                      <th id="" scope="col">Cant. Producir</th>
+                      <th id="" scope="col">Cant. Producir Und</th>
+                      <th id="" scope="col">Medida</th>
                       <th id="" scope="coll">Cant Ingresada Desp.</th>
                       <th id="" scope="coll">Cant Facturada</th>
                       <th id="" scope="col">Fallas</th>
@@ -226,6 +229,8 @@
                   </thead>
                   <tbody>
                     <tr *ngFor="let tabla of ArrayDocumento | paginate: {itemsPerPage: cantPage, currentPage: page1} let i=index">
+
+                      <td id="usu" scope="col" title="{{tabla.nombreUsu}}"><b>{{tabla.usu}}</b></td>
                       <!-- Orden de Trabajo -->
                       <th id="ot" scope="col" data-bs-toggle="modal" data-bs-target="#reporteCostos" (click)="reporteOT(tabla.ot)">{{tabla.ot}}</th>
 
@@ -444,6 +449,12 @@
 
                       <!-- Cantidad Total a Producir -->
                       <td id="cant" scope="col"><b>{{tabla.cant | number}}</b></td>
+
+                      <!-- Cantidad Total a Producir en unidades -->
+                      <td id="cantUnd" scope="col"><b>{{tabla.cantUnd | number}}</b></td>
+
+                      <!-- unidad medida -->
+                      <td id="und" scope="col"><b>{{tabla.und}}</b></td>
 
                       <!-- Cantidad Ingresada a Despacho -->
                       <td id="est" scope="col">{{tabla.entrada | number}}</td>

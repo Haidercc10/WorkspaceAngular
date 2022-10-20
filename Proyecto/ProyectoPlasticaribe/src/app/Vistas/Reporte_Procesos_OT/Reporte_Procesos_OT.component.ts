@@ -512,7 +512,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               datos_ot[i].estado_Nombre,
                               datos_ot[i].estProcOT_FechaCreacion,
                               datos_ot[i].estProcOT_FechaInicio,
-                              datos_ot[i].estProcOT_FechaFinal);
+                              datos_ot[i].estProcOT_FechaFinal,
+                              datos_ot[i].estProcOT_CantidadPedidaUnd,
+                              datos_ot[i].undMed_Id,
+                              datos_ot[i].usua_Id,
+                              datos_ot[i].usua_Nombre);
             }
           }
         }
@@ -523,22 +527,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,
-                              datos_ot[i].estProcOT_FechaInicio,
-                              datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         }
       });
@@ -548,22 +556,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,
-                              datos_ot[i].estProcOT_FechaInicio,
-                              datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         }
       });
@@ -574,22 +586,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].estado_Id == estado){
               this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                              datos_ot[i].estProcOT_ExtrusionKg,
-                              datos_ot[i].estProcOT_ImpresionKg,
-                              datos_ot[i].estProcOT_RotograbadoKg,
-                              datos_ot[i].estProcOT_DobladoKg,
-                              datos_ot[i].estProcOT_LaminadoKg,
-                              datos_ot[i].estProcOT_CorteKg,
-                              datos_ot[i].estProcOT_EmpaqueKg,
-                              datos_ot[i].estProcOT_SelladoKg,
-                              datos_ot[i].estProcOT_WiketiadoKg,
-                              datos_ot[i].estProcOT_CantidadPedida,
-                              datos_ot[i].falla_Nombre,
-                              datos_ot[i].estProcOT_Observacion,
-                              datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,
-                              datos_ot[i].estProcOT_FechaInicio,
-                              datos_ot[i].estProcOT_FechaFinal);
+                datos_ot[i].estProcOT_ExtrusionKg,
+                datos_ot[i].estProcOT_ImpresionKg,
+                datos_ot[i].estProcOT_RotograbadoKg,
+                datos_ot[i].estProcOT_DobladoKg,
+                datos_ot[i].estProcOT_LaminadoKg,
+                datos_ot[i].estProcOT_CorteKg,
+                datos_ot[i].estProcOT_EmpaqueKg,
+                datos_ot[i].estProcOT_SelladoKg,
+                datos_ot[i].estProcOT_WiketiadoKg,
+                datos_ot[i].estProcOT_CantidadPedida,
+                datos_ot[i].falla_Nombre,
+                datos_ot[i].estProcOT_Observacion,
+                datos_ot[i].estado_Nombre,
+                datos_ot[i].estProcOT_FechaCreacion,
+                datos_ot[i].estProcOT_FechaInicio,
+                datos_ot[i].estProcOT_FechaFinal,
+                datos_ot[i].estProcOT_CantidadPedidaUnd,
+                datos_ot[i].undMed_Id,
+                datos_ot[i].usua_Id,
+                datos_ot[i].usua_Nombre);
             }
           }
         }
@@ -600,22 +616,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,
-                              datos_ot[i].estProcOT_FechaInicio,
-                              datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         }
       });
@@ -625,22 +645,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
               datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         }
       });
@@ -651,22 +675,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           for (let i = 0; i < datos_ot.length; i++) {
             if (estado == datos_ot[i].estado_Id) {
               this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                              datos_ot[i].estProcOT_ExtrusionKg,
-                              datos_ot[i].estProcOT_ImpresionKg,
-                              datos_ot[i].estProcOT_RotograbadoKg,
-                              datos_ot[i].estProcOT_DobladoKg,
-                              datos_ot[i].estProcOT_LaminadoKg,
-                              datos_ot[i].estProcOT_CorteKg,
-                              datos_ot[i].estProcOT_EmpaqueKg,
-                              datos_ot[i].estProcOT_SelladoKg,
-                              datos_ot[i].estProcOT_WiketiadoKg,
-                              datos_ot[i].estProcOT_CantidadPedida,
-                              datos_ot[i].falla_Nombre,
-                              datos_ot[i].estProcOT_Observacion,
-                              datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+                datos_ot[i].estProcOT_ExtrusionKg,
+                datos_ot[i].estProcOT_ImpresionKg,
+                datos_ot[i].estProcOT_RotograbadoKg,
+                datos_ot[i].estProcOT_DobladoKg,
+                datos_ot[i].estProcOT_LaminadoKg,
+                datos_ot[i].estProcOT_CorteKg,
+                datos_ot[i].estProcOT_EmpaqueKg,
+                datos_ot[i].estProcOT_SelladoKg,
+                datos_ot[i].estProcOT_WiketiadoKg,
+                datos_ot[i].estProcOT_CantidadPedida,
+                datos_ot[i].falla_Nombre,
+                datos_ot[i].estProcOT_Observacion,
+                datos_ot[i].estado_Nombre,
+                datos_ot[i].estProcOT_FechaCreacion,
+                datos_ot[i].estProcOT_FechaInicio,
+                datos_ot[i].estProcOT_FechaFinal,
+                datos_ot[i].estProcOT_CantidadPedidaUnd,
+                datos_ot[i].undMed_Id,
+                datos_ot[i].usua_Id,
+                datos_ot[i].usua_Nombre);
             }
           }
         }
@@ -677,22 +705,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
               datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         }
       });
@@ -702,22 +734,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         else {
             for (let i = 0; i < datos_ot.length; i++) {
               this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                              datos_ot[i].estProcOT_ExtrusionKg,
-                              datos_ot[i].estProcOT_ImpresionKg,
-                              datos_ot[i].estProcOT_RotograbadoKg,
-                              datos_ot[i].estProcOT_DobladoKg,
-                              datos_ot[i].estProcOT_LaminadoKg,
-                              datos_ot[i].estProcOT_CorteKg,
-                              datos_ot[i].estProcOT_EmpaqueKg,
-                              datos_ot[i].estProcOT_SelladoKg,
-                              datos_ot[i].estProcOT_WiketiadoKg,
-                              datos_ot[i].estProcOT_CantidadPedida,
-                              datos_ot[i].falla_Nombre,
-                              datos_ot[i].estProcOT_Observacion,
-                              datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+                datos_ot[i].estProcOT_ExtrusionKg,
+                datos_ot[i].estProcOT_ImpresionKg,
+                datos_ot[i].estProcOT_RotograbadoKg,
+                datos_ot[i].estProcOT_DobladoKg,
+                datos_ot[i].estProcOT_LaminadoKg,
+                datos_ot[i].estProcOT_CorteKg,
+                datos_ot[i].estProcOT_EmpaqueKg,
+                datos_ot[i].estProcOT_SelladoKg,
+                datos_ot[i].estProcOT_WiketiadoKg,
+                datos_ot[i].estProcOT_CantidadPedida,
+                datos_ot[i].falla_Nombre,
+                datos_ot[i].estProcOT_Observacion,
+                datos_ot[i].estado_Nombre,
+                datos_ot[i].estProcOT_FechaCreacion,
+                datos_ot[i].estProcOT_FechaInicio,
+                datos_ot[i].estProcOT_FechaFinal,
+                datos_ot[i].estProcOT_CantidadPedidaUnd,
+                datos_ot[i].undMed_Id,
+                datos_ot[i].usua_Id,
+                datos_ot[i].usua_Nombre);
             }
         }
       });
@@ -728,22 +764,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].estado_Id == estado) {
               this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                              datos_ot[i].estProcOT_ExtrusionKg,
-                              datos_ot[i].estProcOT_ImpresionKg,
-                              datos_ot[i].estProcOT_RotograbadoKg,
-                              datos_ot[i].estProcOT_DobladoKg,
-                              datos_ot[i].estProcOT_LaminadoKg,
-                              datos_ot[i].estProcOT_CorteKg,
-                              datos_ot[i].estProcOT_EmpaqueKg,
-                              datos_ot[i].estProcOT_SelladoKg,
-                              datos_ot[i].estProcOT_WiketiadoKg,
-                              datos_ot[i].estProcOT_CantidadPedida,
-                              datos_ot[i].falla_Nombre,
-                              datos_ot[i].estProcOT_Observacion,
-                              datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+                datos_ot[i].estProcOT_ExtrusionKg,
+                datos_ot[i].estProcOT_ImpresionKg,
+                datos_ot[i].estProcOT_RotograbadoKg,
+                datos_ot[i].estProcOT_DobladoKg,
+                datos_ot[i].estProcOT_LaminadoKg,
+                datos_ot[i].estProcOT_CorteKg,
+                datos_ot[i].estProcOT_EmpaqueKg,
+                datos_ot[i].estProcOT_SelladoKg,
+                datos_ot[i].estProcOT_WiketiadoKg,
+                datos_ot[i].estProcOT_CantidadPedida,
+                datos_ot[i].falla_Nombre,
+                datos_ot[i].estProcOT_Observacion,
+                datos_ot[i].estado_Nombre,
+                datos_ot[i].estProcOT_FechaCreacion,
+                datos_ot[i].estProcOT_FechaInicio,
+                datos_ot[i].estProcOT_FechaFinal,
+                datos_ot[i].estProcOT_CantidadPedidaUnd,
+                datos_ot[i].undMed_Id,
+                datos_ot[i].usua_Id,
+                datos_ot[i].usua_Nombre);
             }
           }
         }
@@ -758,23 +798,28 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           else {
             for (let i = 0; i < datos_ot.length; i++) {
               this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                              datos_ot[i].estProcOT_ExtrusionKg,
-                              datos_ot[i].estProcOT_ImpresionKg,
-                              datos_ot[i].estProcOT_RotograbadoKg,
-                              datos_ot[i].estProcOT_DobladoKg,
-                              datos_ot[i].estProcOT_LaminadoKg,
-                              datos_ot[i].estProcOT_CorteKg,
-                              datos_ot[i].estProcOT_EmpaqueKg,
-                              datos_ot[i].estProcOT_SelladoKg,
-                              datos_ot[i].estProcOT_WiketiadoKg,
-                              datos_ot[i].estProcOT_CantidadPedida,
-                              datos_ot[i].falla_Nombre,
-                              datos_ot[i].estProcOT_Observacion,
-                              datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+                datos_ot[i].estProcOT_ExtrusionKg,
+                datos_ot[i].estProcOT_ImpresionKg,
+                datos_ot[i].estProcOT_RotograbadoKg,
+                datos_ot[i].estProcOT_DobladoKg,
+                datos_ot[i].estProcOT_LaminadoKg,
+                datos_ot[i].estProcOT_CorteKg,
+                datos_ot[i].estProcOT_EmpaqueKg,
+                datos_ot[i].estProcOT_SelladoKg,
+                datos_ot[i].estProcOT_WiketiadoKg,
+                datos_ot[i].estProcOT_CantidadPedida,
+                datos_ot[i].falla_Nombre,
+                datos_ot[i].estProcOT_Observacion,
+                datos_ot[i].estado_Nombre,
+                datos_ot[i].estProcOT_FechaCreacion,
+                datos_ot[i].estProcOT_FechaInicio,
+                datos_ot[i].estProcOT_FechaFinal,
+                datos_ot[i].estProcOT_CantidadPedidaUnd,
+                datos_ot[i].undMed_Id,
+                datos_ot[i].usua_Id,
+                datos_ot[i].usua_Nombre);
             }
+
           }
         });
       }
@@ -784,22 +829,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
               datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         }
       });
@@ -809,22 +858,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
               datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         }
       });
@@ -834,22 +887,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         this.estadosProcesos_OTService.srvObtenerListaPorOtFechaFalla(fechaincial, fallas).subscribe(datos_ot => {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
               datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         });
       }
@@ -860,22 +917,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].estado_Id == estado) {
               this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                              datos_ot[i].estProcOT_ExtrusionKg,
-                              datos_ot[i].estProcOT_ImpresionKg,
-                              datos_ot[i].estProcOT_RotograbadoKg,
-                              datos_ot[i].estProcOT_DobladoKg,
-                              datos_ot[i].estProcOT_LaminadoKg,
-                              datos_ot[i].estProcOT_CorteKg,
-                              datos_ot[i].estProcOT_EmpaqueKg,
-                              datos_ot[i].estProcOT_SelladoKg,
-                              datos_ot[i].estProcOT_WiketiadoKg,
-                              datos_ot[i].estProcOT_CantidadPedida,
-                              datos_ot[i].falla_Nombre,
-                              datos_ot[i].estProcOT_Observacion,
-                              datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+                datos_ot[i].estProcOT_ExtrusionKg,
+                datos_ot[i].estProcOT_ImpresionKg,
+                datos_ot[i].estProcOT_RotograbadoKg,
+                datos_ot[i].estProcOT_DobladoKg,
+                datos_ot[i].estProcOT_LaminadoKg,
+                datos_ot[i].estProcOT_CorteKg,
+                datos_ot[i].estProcOT_EmpaqueKg,
+                datos_ot[i].estProcOT_SelladoKg,
+                datos_ot[i].estProcOT_WiketiadoKg,
+                datos_ot[i].estProcOT_CantidadPedida,
+                datos_ot[i].falla_Nombre,
+                datos_ot[i].estProcOT_Observacion,
+                datos_ot[i].estado_Nombre,
+                datos_ot[i].estProcOT_FechaCreacion,
+                datos_ot[i].estProcOT_FechaInicio,
+                datos_ot[i].estProcOT_FechaFinal,
+                datos_ot[i].estProcOT_CantidadPedidaUnd,
+                datos_ot[i].undMed_Id,
+                datos_ot[i].usua_Id,
+                datos_ot[i].usua_Nombre);
             }
           }
         }
@@ -886,22 +947,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
               datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         }
       });
@@ -912,22 +977,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].estado_Id == estado) {
               this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                              datos_ot[i].estProcOT_ExtrusionKg,
-                              datos_ot[i].estProcOT_ImpresionKg,
-                              datos_ot[i].estProcOT_RotograbadoKg,
-                              datos_ot[i].estProcOT_DobladoKg,
-                              datos_ot[i].estProcOT_LaminadoKg,
-                              datos_ot[i].estProcOT_CorteKg,
-                              datos_ot[i].estProcOT_EmpaqueKg,
-                              datos_ot[i].estProcOT_SelladoKg,
-                              datos_ot[i].estProcOT_WiketiadoKg,
-                              datos_ot[i].estProcOT_CantidadPedida,
-                              datos_ot[i].falla_Nombre,
-                              datos_ot[i].estProcOT_Observacion,
-                              datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+                datos_ot[i].estProcOT_ExtrusionKg,
+                datos_ot[i].estProcOT_ImpresionKg,
+                datos_ot[i].estProcOT_RotograbadoKg,
+                datos_ot[i].estProcOT_DobladoKg,
+                datos_ot[i].estProcOT_LaminadoKg,
+                datos_ot[i].estProcOT_CorteKg,
+                datos_ot[i].estProcOT_EmpaqueKg,
+                datos_ot[i].estProcOT_SelladoKg,
+                datos_ot[i].estProcOT_WiketiadoKg,
+                datos_ot[i].estProcOT_CantidadPedida,
+                datos_ot[i].falla_Nombre,
+                datos_ot[i].estProcOT_Observacion,
+                datos_ot[i].estado_Nombre,
+                datos_ot[i].estProcOT_FechaCreacion,
+                datos_ot[i].estProcOT_FechaInicio,
+                datos_ot[i].estProcOT_FechaFinal,
+                datos_ot[i].estProcOT_CantidadPedidaUnd,
+                datos_ot[i].undMed_Id,
+                datos_ot[i].usua_Id,
+                datos_ot[i].usua_Nombre);
             }
           }
         }
@@ -938,22 +1007,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
               datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         }
 
@@ -981,7 +1054,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].estado_Nombre,
                 datos_ot[i].estProcOT_FechaCreacion,
                 datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal);
+                datos_ot[i].estProcOT_FechaFinal,
+                datos_ot[i].estProcOT_CantidadPedidaUnd,
+                datos_ot[i].undMed_Id,
+                datos_ot[i].usua_Id,
+                datos_ot[i].usua_Nombre);
             }
           };
         });
@@ -992,22 +1069,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,
-                            datos_ot[i].estProcOT_FechaInicio,
-                            datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         }
       });
@@ -1017,22 +1098,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                            datos_ot[i].estProcOT_ExtrusionKg,
-                            datos_ot[i].estProcOT_ImpresionKg,
-                            datos_ot[i].estProcOT_RotograbadoKg,
-                            datos_ot[i].estProcOT_DobladoKg,
-                            datos_ot[i].estProcOT_LaminadoKg,
-                            datos_ot[i].estProcOT_CorteKg,
-                            datos_ot[i].estProcOT_EmpaqueKg,
-                            datos_ot[i].estProcOT_SelladoKg,
-                            datos_ot[i].estProcOT_WiketiadoKg,
-                            datos_ot[i].estProcOT_CantidadPedida,
-                            datos_ot[i].falla_Nombre,
-                            datos_ot[i].estProcOT_Observacion,
-                            datos_ot[i].estado_Nombre,
-                            datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
               datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         }
       });
@@ -1057,7 +1142,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estado_Nombre,
               datos_ot[i].estProcOT_FechaCreacion,
               datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal);
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre);
           }
         }
       });
@@ -1067,7 +1156,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   }
 
   //Funcion encargada de llenar un array con la informacion de las ordenes de trabajo y el producido de cada area
-  llenarArray(ot : number, ext : number, imp : number, rot : number, dbl : number, lam : number, cor : number, emp : number, sel : number, wik : number, can : number, falla : string, observacion : string, estado : any, fecha : any, fechaInicio : any, fechaFinal : any){
+  llenarArray(ot : number, ext : number, imp : number, rot : number, dbl : number, lam : number, cor : number, emp : number, sel : number, wik : number, can : number, falla : string, observacion : string, estado : any, fecha : any, fechaInicio : any, fechaFinal : any, cantUnd: any, und : any, usu : any, nombreUsu : any){
     let info : any = {
       ot : ot,
       Mp : 0,
@@ -1089,6 +1178,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       salida : 0,
       fechaInicio : fechaInicio,
       fechaFinal : fechaFinal,
+      cantUnd : cantUnd,
+      und : und,
+      usu : usu,
+      nombreUsu : nombreUsu
     }
     this.ArrayDocumento.push(info);
     this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
@@ -1501,7 +1594,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           EstProcOT_WiketiadoKg : datos_ot[i].estProcOT_WiketiadoKg,
           EstProcOT_WiketiadoUnd : datos_ot[i].estProcOT_WiketiadoUnd,
           EstProcOT_CantidadPedida : datos_ot[i].estProcOT_CantidadPedida,
-          UndMed_Id : datos_ot[i].undMed_Id,
+          undMed_Id : datos_ot[i].undMed_Id,
           Estado_Id : datos_ot[i].estado_Id,
           Falla_Id : falla,
           EstProcOT_Observacion : observacion,
