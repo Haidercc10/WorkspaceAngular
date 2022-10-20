@@ -426,6 +426,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
                 Proceso_Id : 'CORTE',
                 DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
                 Estado_OrdenTrabajo : 14,
+                TpDoc_Id : 'ASIGBOPP',
               }
               setTimeout(() => {
                 this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
@@ -467,6 +468,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
                   Proceso_Id : 'CORTE',
                   DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
                   Estado_OrdenTrabajo : 14,
+                  TpDoc_Id : 'ASIGBOPP',
                 }
                 setTimeout(() => {
                   this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => {
@@ -503,6 +505,7 @@ export class ModalEditarAsignacionesBOPPComponent implements OnInit {
                   Proceso_Id : 'CORTE',
                   DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
                   Estado_OrdenTrabajo : 14,
+                  TpDoc_Id : 'ASIGBOPP',
                 }
                 setTimeout(() => {
                   this.detallesAsignacionBOPPService.srvActualizar(this.idAsignacion, datos).subscribe(datos_detallesAsignacion => {

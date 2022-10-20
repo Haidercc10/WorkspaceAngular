@@ -162,6 +162,10 @@ a:hover {
 }
 
 @media (min-width: 1370px){
+  .tablaDatos{
+    width: 1500px;
+  }
+
   .tableColores {
     /* max-width: 125px;
     position: fixed;

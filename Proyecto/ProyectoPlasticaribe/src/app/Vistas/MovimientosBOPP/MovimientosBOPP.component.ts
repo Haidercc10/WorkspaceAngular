@@ -49,7 +49,7 @@ export class MovimientosBOPPComponent implements OnInit {
   kgOT : number = 0; //Variable que va a almacenar la cantidad total de kilos que se estipularon para una orden de trabajo
   ArrayMpPDF : any = [] //Variable que almacenará las materias primas del pdf que se esé consultando
 
-  modalBOPP : any = 1;
+  modalBOPP : any = false;
   public identificadorAsignacion : number;
   public modalEdicionAsignacionBOPP : boolean = false;
   arrayOT : any = [];
@@ -314,6 +314,7 @@ export class MovimientosBOPPComponent implements OnInit {
     let bopp : any;
     if (this.FormDocumentos.value.bopp.bopP_Id == undefined) bopp = null;
     else bopp = this.FormDocumentos.value.bopp.bopP_Id;
+    console.log(bopp)
     let estado : any = this.FormDocumentos.value.estado;
 
     if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && bopp != null && estado != null) {
@@ -965,7 +966,7 @@ export class MovimientosBOPPComponent implements OnInit {
   //
   editarAsignacion(formulario : any){
     if (formulario.tipoId == 'ASIGBOPP') {
-      this.modalBOPP = 2;
+      this.modalBOPP = true;
       this.identificadorAsignacion = formulario.id;
       this.arrayOT = [];
       let boppAsignada : any = [];
@@ -1007,7 +1008,7 @@ export class MovimientosBOPPComponent implements OnInit {
   //
   limpiarCamposAlCerrarModal() {
     this.EditarAsignacionesBOPP.limpiarTodosLosCampos();
-    this.modalBOPP = 1;
+    this.modalBOPP = false;
     this.identificadorAsignacion = 0;
   }
 

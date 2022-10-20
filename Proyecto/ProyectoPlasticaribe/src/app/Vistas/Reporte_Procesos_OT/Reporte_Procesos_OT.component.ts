@@ -50,6 +50,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   cantidadOTNoIniciada : number = 0;
   cantidadOTTerminada : number = 0;
   cantidadOtAnulada : number = 0;
+  cantidadOTFinalizada : number = 0;
   cantTotalMp : number = 0;
   cantPage : number = 30;
   modalProcesos : boolean = false;
@@ -136,7 +137,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
         worksheet.addRow([]);
 
-        const Colores = ['Iniciado', 'Abierta', 'No Iniciado', 'Terminada', 'Asignada'];
+        const Colores = ['Iniciado', 'Abierta', 'No Iniciado', 'Terminada', 'Asignada', 'Anulado'];
 
         let coloresRow = worksheet.addRow(Colores);
         let iniciado = coloresRow.getCell(1);
@@ -144,6 +145,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         let noIniciado = coloresRow.getCell(3);
         let terminado = coloresRow.getCell(4);
         let asignado = coloresRow.getCell(5);
+        let anulada = coloresRow.getCell(6);
 
         iniciado.fill = {
           type: 'pattern',
@@ -154,7 +156,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         abierta.fill = {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: 'FDCD7A' }
+          fgColor: { argb: 'F6D45D' }
         }
 
         noIniciado.fill = {
@@ -166,13 +168,19 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         terminado.fill = {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: 'C7FD7A' }
+          fgColor: { argb: '8AFC9B' }
         }
 
         asignado.fill = {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: 'ADD8E6' }
+          fgColor: { argb: '83D3FF' }
+        }
+
+        anulada.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FF7878' }
         }
 
         let headerRow = worksheet.addRow(header);
@@ -334,6 +342,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           else if (d[16] == 'En proceso') colorEstado = 'F9FC5B'; //Iniciada
           else if (d[16] == 'Abierta') colorEstado = 'FDCD7A'; //Abierta
           else if (d[16] == 'Asignada') colorEstado = 'ADD8E6'; //Asignada
+          else if (d[16] == 'Anaulado') colorEstado = 'FF7878' //Anulada
           qtyEstado.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -1115,7 +1124,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     if (estado == 'Asignada') this.cantidadOTAsignadas += 1;
     if (estado == 'Terminada') this.cantidadOTTerminada += 1;
     if (estado == 'En proceso') this.cantidadOTIniciada += 1;
-    if (estado == 'Finalizada') this.cantidadOtAnulada += 1;
+    if (estado == 'Anulado') this.cantidadOtAnulada += 1;
+    if (estado == 'Finalizada') this.cantidadOTFinalizada += 1;
   }
 
   // Funcion que va a asignar un valor una variable, el valor será la orden de trabajo sobre la que se le dió click
@@ -1129,12 +1139,13 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.otSeleccionada = form.ot;
     this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
     this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
+    this.modalProcesos = true;
 
     if (proceso == 'EXTRUSION') {
       this.servicioBagPro.srvObtenerListaPorStatusExtrusion(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
-          // this.modalProcesos = true;
+          this.modalProcesos = true;
           for (let index = 0; index < registros_OT.length; index++) {
             const Info : any = {
               Rollo : registros_OT[index].item,

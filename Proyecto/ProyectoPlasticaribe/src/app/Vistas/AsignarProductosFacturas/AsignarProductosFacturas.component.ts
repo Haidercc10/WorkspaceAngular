@@ -29,7 +29,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
   today : any = new Date(); //Variable que se usará para llenar la fecha actual
-  hora : any = moment().format("H:mm:ss"); //Variable que almacenará la hora
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -646,7 +645,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       let notaCredito : string = this.FormConsultarProductos.value.NotaCredito;
       let cliente : any = this.FormConsultarProductos.value.Cliente;
       let observacion : string = this.FormConsultarProductos.value.Observacion;
-      let facturaMayuscula = `${factura}`;
+      let facturaMayuscula : string = `${factura}`;
       if (notaCredito == '' || notaCredito == null) notaCredito = '';
       else if (notaCredito != '' || notaCredito != null) notaCredito.toUpperCase();
       let info : any = {
@@ -659,7 +658,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         Usua_Conductor : 88,
         AsigProdFV_PlacaCamion : '',
         AsigProdFV_FechaEnvio : this.today,
-        // AsigProdFV_FechaHora : this.hora,
+        // AsigProdFV_Hora : moment().format("H:mm:ss"),
       }
       this.asgProdFactura.srvGuardar(info).subscribe(datos_asignacion => {
         this.asgProdFactura.srvObtenerUltimoId().subscribe(datos_ultimaAsg => { this.crearDetallesAsignacion(datos_ultimaAsg.asigProdFV_Id) });
@@ -780,7 +779,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
               dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
               Prod_Id : datos_rollos[j].prod_Id,
               UndMed_Prod : datos_rollos[j].undMed_Prod,
-              Prod_CantPaquetesRestantes : datos_rollos[j].prod_CantPaquetesRestantes,
+              Prod_CantPaquetesRestantes : (datos_rollos[j].prod_CantPaquetesRestantes - this.rollosInsertar[i].CantUndRestantes),
               Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
               Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
               Prod_CantBolsasRestates : (datos_rollos[j].prod_CantBolsasRestates - this.rollosInsertar[i].CantUndRestantes),

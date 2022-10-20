@@ -191,10 +191,14 @@
           </div>
         </div>
         <h4 class="tituloRojo" *ngIf="otSeleccionada != 0">OT Seleccionada: <b>{{otSeleccionada}}</b></h4>
+      </div>
+    </div>
 
+    <div class="container-fluid tablaDatos">
+      <div>
         <!-- Tabla donde se mostrarán las OT Consultadas -->
         <div *ngIf="load">
-          <div class="mb-4">
+          <div class="mb-4 ">
             <div class="row g-3">
               <!--Inicio Tabla OT-->
               <div class="table-responsive">
@@ -470,7 +474,7 @@
                         <td id="est" scope="col" style="background-color: #F6D45D;">{{tabla.est | uppercase}}</td>
                       </ng-container>
                       <!-- Finalizada -->
-                      <ng-container *ngIf="tabla.est != 'Abierta' && tabla.est != 'En proceso' && tabla.est != 'Terminada' && tabla.est != 'Asignada'">
+                      <ng-container *ngIf="tabla.est == 'Anulado'">
                         <td id="est" scope="col" style="background-color: #FF7878">{{tabla.est | uppercase}}</td>
                       </ng-container>
 
@@ -488,7 +492,7 @@
                 <!--Fin Tabla OT's-->
 
                 <!-- Inicio Modal -->
-                <!-- <ng-container *ngIf="modalProcesos == true"> -->
+                <ng-container *ngIf="modalProcesos">
                   <div class="modal fade" id="staticBackdrop2" data-bs-keyboard="false" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-xl">
                       <div class="modal-content">
@@ -502,7 +506,7 @@
                       </div>
                     </div>
                   </div>
-                <!-- </ng-container> -->
+                </ng-container>
 
                 <div class="modal fade" id="reporteCostos" data-bs-keyboard="false" aria-labelledby="reporteCostos" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered modal-xl">
