@@ -516,7 +516,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               datos_ot[i].estProcOT_CantidadPedidaUnd,
                               datos_ot[i].undMed_Id,
                               datos_ot[i].usua_Id,
-                              datos_ot[i].usua_Nombre);
+                              datos_ot[i].usua_Nombre,
+                              datos_ot[i].estProcOT_SelladoUnd,
+                              datos_ot[i].estProcOT_WiketiadoUnd);
             }
           }
         }
@@ -546,7 +548,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         }
       });
@@ -575,7 +579,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         }
       });
@@ -605,7 +611,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].estProcOT_CantidadPedidaUnd,
                 datos_ot[i].undMed_Id,
                 datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre);
+                datos_ot[i].usua_Nombre,
+                datos_ot[i].estProcOT_SelladoUnd,
+                datos_ot[i].estProcOT_WiketiadoUnd);
             }
           }
         }
@@ -635,7 +643,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         }
       });
@@ -664,7 +674,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         }
       });
@@ -694,7 +706,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].estProcOT_CantidadPedidaUnd,
                 datos_ot[i].undMed_Id,
                 datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre);
+                datos_ot[i].usua_Nombre,
+                datos_ot[i].estProcOT_SelladoUnd,
+                datos_ot[i].estProcOT_WiketiadoUnd);
             }
           }
         }
@@ -724,7 +738,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         }
       });
@@ -753,7 +769,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].estProcOT_CantidadPedidaUnd,
                 datos_ot[i].undMed_Id,
                 datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre);
+                datos_ot[i].usua_Nombre,
+                datos_ot[i].estProcOT_SelladoUnd,
+                datos_ot[i].estProcOT_WiketiadoUnd);
             }
         }
       });
@@ -783,7 +801,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].estProcOT_CantidadPedidaUnd,
                 datos_ot[i].undMed_Id,
                 datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre);
+                datos_ot[i].usua_Nombre,
+                datos_ot[i].estProcOT_SelladoUnd,
+                datos_ot[i].estProcOT_WiketiadoUnd);
             }
           }
         }
@@ -817,7 +837,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].estProcOT_CantidadPedidaUnd,
                 datos_ot[i].undMed_Id,
                 datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre);
+                datos_ot[i].usua_Nombre,
+                datos_ot[i].estProcOT_SelladoUnd,
+                datos_ot[i].estProcOT_WiketiadoUnd);
             }
 
           }
@@ -848,7 +870,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         }
       });
@@ -877,7 +901,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         }
       });
@@ -906,7 +932,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         });
       }
@@ -936,7 +964,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].estProcOT_CantidadPedidaUnd,
                 datos_ot[i].undMed_Id,
                 datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre);
+                datos_ot[i].usua_Nombre,
+                datos_ot[i].estProcOT_SelladoUnd,
+                datos_ot[i].estProcOT_WiketiadoUnd);
             }
           }
         }
@@ -966,7 +996,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         }
       });
@@ -996,7 +1028,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].estProcOT_CantidadPedidaUnd,
                 datos_ot[i].undMed_Id,
                 datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre);
+                datos_ot[i].usua_Nombre,
+                datos_ot[i].estProcOT_SelladoUnd,
+                datos_ot[i].estProcOT_WiketiadoUnd);
             }
           }
         }
@@ -1026,7 +1060,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         }
 
@@ -1058,7 +1094,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].estProcOT_CantidadPedidaUnd,
                 datos_ot[i].undMed_Id,
                 datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre);
+                datos_ot[i].usua_Nombre,
+                datos_ot[i].estProcOT_SelladoUnd,
+                datos_ot[i].estProcOT_WiketiadoUnd);
             }
           };
         });
@@ -1088,7 +1126,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         }
       });
@@ -1117,7 +1157,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         }
       });
@@ -1146,7 +1188,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].estProcOT_CantidadPedidaUnd,
               datos_ot[i].undMed_Id,
               datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre);
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
         }
       });
@@ -1156,7 +1200,32 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   }
 
   //Funcion encargada de llenar un array con la informacion de las ordenes de trabajo y el producido de cada area
-  llenarArray(ot : number, ext : number, imp : number, rot : number, dbl : number, lam : number, cor : number, emp : number, sel : number, wik : number, can : number, falla : string, observacion : string, estado : any, fecha : any, fechaInicio : any, fechaFinal : any, cantUnd: any, und : any, usu : any, nombreUsu : any){
+  llenarArray(ot : number,
+                ext : number,
+                  imp : number,
+                    rot : number,
+                      dbl : number,
+                        lam : number,
+                          cor : number,
+                            emp : number,
+                              sel : number,
+                                wik : number,
+                                  can : number,
+                                    falla : string,
+                                      observacion : string,
+                                        estado : any,
+                                          fecha : any,
+                                            fechaInicio : any,
+                                              fechaFinal : any,
+                                                cantUnd: any,
+                                                  und : any,
+                                                    usu : any,
+                                                      nombreUsu : any,
+                                                        selUnd : any,
+                                                          wikUnd : any){
+    usu = `${usu}`
+    if (usu.length == 2) usu = `0${usu}`;
+    else if (usu.length == 1) usu = `00${usu}`;
     let info : any = {
       ot : ot,
       Mp : 0,
@@ -1168,7 +1237,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       cor : cor,
       emp : emp,
       sel : sel,
+      selUnd : selUnd,
       wik : wik,
+      wikUnd : wikUnd,
       cant : can,
       falla : falla,
       obs : observacion,

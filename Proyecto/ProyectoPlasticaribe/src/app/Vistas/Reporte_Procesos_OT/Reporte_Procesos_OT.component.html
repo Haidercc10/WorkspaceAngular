@@ -399,48 +399,48 @@
                     <!-- Sellado -->
                     <!-- Termianda -->
                     <ng-container *ngIf="tabla.sel >= (tabla.cant + (tabla.cant * -0.05)) && tabla.est != 'Abierta'  && tabla.est != 'Asignada'">
-                      <td id="sel" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}}</td>
+                      <td id="sel" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}} Kg - {{tabla.selUnd | number}} Und</td>
                     </ng-container>
                     <!-- Iniciada -->
                     <ng-container *ngIf="tabla.sel < (tabla.cant + (tabla.cant * -0.05)) && tabla.sel > 0">
-                      <td id="sel" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}}</td>
+                      <td id="sel" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}} Kg - {{tabla.selUnd | number}} Und</td>
                     </ng-container>
                     <!-- Abierta / Asignada -->
                     <ng-container *ngIf="(tabla.ext + tabla.imp + tabla.rot + tabla.dbl + tabla.lam + tabla.cor + tabla.emp  + tabla.sel + tabla.wik) == 0; else fila8">
                       <ng-container *ngIf="tabla.est == 'Asignada'">
-                        <td id="sel" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}}</td>
+                        <td id="sel" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}} Kg - {{tabla.selUnd | number}} Und</td>
                       </ng-container>
                       <ng-container *ngIf="tabla.est == 'Abierta'">
-                        <td id="sel" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}}</td>
+                        <td id="sel" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}} Kg - {{tabla.selUnd | number}} Und</td>
                       </ng-container>
                     </ng-container>
                     <!-- No iniciado -->
                     <ng-template #fila8>
-                      <td *ngIf="tabla.sel == 0 && tabla.sel < tabla.cant" id="sel" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}}</td>
+                      <td *ngIf="tabla.sel == 0 && tabla.sel < tabla.cant" id="sel" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(tabla, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.sel | number}} Kg - {{tabla.selUnd | number}} Und</td>
                     </ng-template>
 
                     <!-- Wiketiado -->
                     <!-- Termianda -->
                     <ng-container *ngIf="tabla.wik >= (tabla.cant + (tabla.cant * -0.05)) && tabla.est != 'Abierta'  && tabla.est != 'Asignada'">
-                      <td id="wik" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
+                      <td id="wik" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}} Kg - {{tabla.wikUnd | number}} Und</td>
                     </ng-container>
                     <!-- Iniciada -->
                     <ng-container *ngIf="tabla.wik < (tabla.cant + (tabla.cant * -0.05)) && tabla.wik > 0">
-                      <td id="wik" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
+                      <td id="wik" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}} Kg - {{tabla.wikUnd | number}} Und</td>
                     </ng-container>
                     <!-- Asignada -->
                     <ng-container *ngIf="(tabla.ext + tabla.imp + tabla.rot + tabla.dbl + tabla.lam + tabla.cor + tabla.emp  + tabla.sel + tabla.wik) == 0; else fila9">
                       <ng-container *ngIf="tabla.est == 'Asignada'">
-                        <td id="wik" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
+                        <td id="wik" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}} Kg - {{tabla.wikUnd | number}} Und</td>
                       </ng-container>
                       <!-- Abierta -->
                       <ng-container *ngIf="tabla.est == 'Abierta'">
-                        <td id="wik" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
+                        <td id="wik" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}} Kg - {{tabla.wikUnd | number}} Und</td>
                       </ng-container>
                     </ng-container>
                     <!-- No iniciado -->
                     <ng-template #fila9>
-                      <td *ngIf="tabla.wik == 0 && tabla.wik < tabla.cant" id="wik" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}}</td>
+                      <td *ngIf="tabla.wik == 0 && tabla.wik < tabla.cant" id="wik" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(tabla, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{tabla.wik | number}} Kg - {{tabla.wikUnd | number}} Und</td>
                     </ng-template>
 
                     <!-- <ng-container *ngIf="tabla.est != 'Abierta' && tabla.est != 'En proceso' && tabla.est != 'Teminada' && tabla.est != 'Asignada'">

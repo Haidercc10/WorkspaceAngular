@@ -160,35 +160,42 @@ export class EntradaBOPPComponent implements OnInit {
       let ancho : number = this.FormEntradaBOPP.value.ancho;
       let categoria : number = this.FormEntradaBOPP.value.Categoria;
 
-      this.categoriaService.srvObtenerListaPorId(categoria).subscribe(datos_categorias => {
-        let productoExt : any = {
-          Serial : serial,
-          Nombre : nombre,
-          Descripcion : descripcion,
-          Ancho : ancho,
-          Cant : cantidad,
-          UndCant : 'µm',
-          CantKg : cantidadKg,
-          UndCantKg : 'Kg',
-          Precio : precio,
-          Cat_Id : categoria,
-          Cat : datos_categorias.catMP_Nombre,
-        }
-        this.ArrayBOPP.push(productoExt);
+      this.entradaBOPPService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
+        if (datos_bopp.length != 0) {
+          Swal.fire(`¡Ya existe un bopp con el serial ${serial}, por favor colocar un serial distinto!`);
+          this.load = true;;
+        } else {
+          this.categoriaService.srvObtenerListaPorId(categoria).subscribe(datos_categorias => {
+            let productoExt : any = {
+              Serial : serial,
+              Nombre : nombre,
+              Descripcion : descripcion,
+              Ancho : ancho,
+              Cant : cantidad,
+              UndCant : 'µm',
+              CantKg : cantidadKg,
+              UndCantKg : 'Kg',
+              Precio : precio,
+              Cat_Id : categoria,
+              Cat : datos_categorias.catMP_Nombre,
+            }
+            this.ArrayBOPP.push(productoExt);
 
-        this.FormEntradaBOPP = this.frmBuilder.group({
-          Nombre : '',
-          serial : '',
-          cantidad : '',
-          cantidadKG : '',
-          precio : '',
-          ancho : '',
-          undMed : '',
-          Fecha : this.today,
-          Observacion : '',
-          Categoria : '',
-        });
-        this.load = true;
+            this.FormEntradaBOPP = this.frmBuilder.group({
+              Nombre : '',
+              serial : '',
+              cantidad : '',
+              cantidadKG : '',
+              precio : '',
+              ancho : '',
+              undMed : '',
+              Fecha : this.today,
+              Observacion : '',
+              Categoria : '',
+            });
+            this.load = true;
+          });
+        }
       });
     } else Swal.fire("¡Hay campos vacios!");
   }
