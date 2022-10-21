@@ -518,6 +518,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOTAsignadas = 0;
     this.cantidadOTTerminada = 0;
     this.cantidadOTIniciada = 0;
+    this.cantidadOtAnulada = 0;
+    this.cantidadOTFinalizada = 0;
 
     if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && estado != null) {
       this.estadosProcesos_OTService.srvObtenerListaPorOtFechasFallas(numOT, fechaincial, fechaFinal, fallas).subscribe(datos_ot => {

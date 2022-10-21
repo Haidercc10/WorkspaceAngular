@@ -104,6 +104,7 @@ import {ButtonModule} from 'primeng/button';
 import {DropdownModule} from 'primeng/dropdown';
 import {ProgressBarModule} from 'primeng/progressbar';
 import {InputTextModule} from 'primeng/inputtext';
+import { AutoCompleteModule } from 'primeng/autocomplete';
 
 export const routes: Routes = [
 
@@ -279,6 +280,7 @@ export const routes: Routes = [
 		ToastModule,
     InputTextModule,
     ProgressBarModule,
+    AutoCompleteModule,
   ],
 
   providers: [
