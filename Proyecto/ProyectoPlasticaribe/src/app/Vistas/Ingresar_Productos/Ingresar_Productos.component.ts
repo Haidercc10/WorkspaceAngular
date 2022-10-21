@@ -3699,12 +3699,12 @@ export class Ingresar_ProductosComponent implements OnInit {
         }
       });
     }
-    if (this.rollosInsertar.length > 500) setTimeout(() => { this.InventarioProductos(idEntrada); }, 60000);
-    else if (this.rollosInsertar.length > 400) setTimeout(() => { this.InventarioProductos(idEntrada); }, 30000);
-    else if (this.rollosInsertar.length > 300) setTimeout(() => { this.InventarioProductos(idEntrada); }, 20000);
-    else if (this.rollosInsertar.length > 200) setTimeout(() => { this.InventarioProductos(idEntrada); }, 15000);
-    else if (this.rollosInsertar.length > 100) setTimeout(() => { this.InventarioProductos(idEntrada); }, 10000);
-    else setTimeout(() => { this.InventarioProductos(idEntrada); }, 5000);
+    if (this.rollosInsertar.length > 500) setTimeout(() => { this.InventarioProductos(idEntrada); }, 40000);
+    else if (this.rollosInsertar.length > 400) setTimeout(() => { this.InventarioProductos(idEntrada); }, 25000);
+    else if (this.rollosInsertar.length > 300) setTimeout(() => { this.InventarioProductos(idEntrada); }, 17000);
+    else if (this.rollosInsertar.length > 200) setTimeout(() => { this.InventarioProductos(idEntrada); }, 12000);
+    else if (this.rollosInsertar.length > 100) setTimeout(() => { this.InventarioProductos(idEntrada); }, 8000);
+    else setTimeout(() => { this.InventarioProductos(idEntrada); }, 3000);
   }
 
   // Funcion para mover el inventario de los productos

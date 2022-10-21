@@ -225,13 +225,17 @@
       <div *ngIf="load" id="tableProcesos" style="font-size: 14px;">
         <div class="mb-4 ">
           <div class="row g-3">
-            <!--Inicio Tabla OT-->
+            <!--Botones superiores de Paginado-->
             <div class="mb-3">
               <p-button type="button" icon="pi pi-chevron-left" (click)="prev()" [disabled]="isFirstPage()" styleClass="p-button-text"></p-button>
               <p-button type="button" icon="pi pi-refresh" (click)="reset()" styleClass="p-button-text"></p-button>
               <p-button type="button" icon="pi pi-chevron-right" (click)="next()" [disabled]="isLastPage()" styleClass="p-button-text"></p-button>
             </div>
-            <p-table [columns]="columnasSeleccionada"
+
+            <!-- Tabla con información de la orden de trabajo -->
+            <p-table
+              #dt
+              [columns]="columnasSeleccionada"
               [value]="ArrayDocumento"
               [resizableColumns]="true"
               columnResizeMode="expand"
@@ -244,34 +248,36 @@
               responsiveLayout="scroll"
               currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
               [rowsPerPageOptions]="[10,20,30,50,70,100]"
-              selectionMode="single" >
+              [rowHover]="true"
+              dataKey="id">
+              <!-- Buscador de columnas -->
               <ng-template pTemplate="caption">
                 <p-multiSelect
                   [options]="columnas"
                   [(ngModel)]="columnasSeleccionada"
                   optionLabel="header"
-                  selectedItemsLabel="{0} columns selected"
+                  selectedItemsLabel="{0} columnas seleccionadas"
                   [style]="{minWidth: '330px'}"
                   placeholder="Elige las columnas que quieres ver"></p-multiSelect>
               </ng-template>
               <!-- Titulos -->
               <ng-template pTemplate="header" let-columns>
                 <tr>
-                  <th id="" scope="col" pSortableColumn="ot">OT<p-sortIcon field="ot" title="Order por OT"></p-sortIcon></th>
-                  <th id="" scope="col" pResizableColumn>Extrusión</th>
-                  <th id="" scope="col" pResizableColumn>Impresión</th>
-                  <th id="" scope="col" pResizableColumn>Rotograbado</th>
-                  <th id="" scope="col" pResizableColumn>Doblado</th>
-                  <th id="" scope="col" pResizableColumn>Laminado</th>
-                  <th id="" scope="col" pResizableColumn>Corte</th>
-                  <th id="" scope="col" pResizableColumn>Empaque</th>
-                  <th id="" scope="col" pResizableColumn>Sellado</th>
-                  <th id="" scope="col" pResizableColumn>Wiketiado</th>
-                  <th id="" scope="col" pResizableColumn>Cant. Producir</th>
-                  <th id="" scope="col" pResizableColumn>Cant. Producir Und</th>
-                  <th id="" scope="col" pResizableColumn>Estados</th>
-                  <th id="" scope="col" pResizableColumn>Fecha Creación</th>
-                  <th *ngFor="let col of columns" pResizableColumn>
+                  <th id="" scope="col" pSortableColumn="ot" style="font-size: 12px;">OT<p-sortIcon field="ot" title="Order por OT"></p-sortIcon></th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Extrusión</th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Impresión</th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Rotograbado</th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Doblado</th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Laminado</th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Corte</th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Empaque</th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Sellado</th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Wiketiado</th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Cant. Producir</th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Cant. Producir Und</th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Estados</th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Fecha Creación</th>
+                  <th *ngFor="let col of columns" pResizableColumn style="font-size: 12px;">
                     {{col.header}}
                   </th>
                 </tr>
@@ -494,7 +500,7 @@
                   <td id="cantUnd" scope="col"><b>{{ArrayDocumento.cantUnd | number}}</b></td>
 
                   <!-- Terminada -->
-                  <ng-container *ngIf="ArrayDocumento.est == 'Terminada'">
+                  <ng-container *ngIf="ArrayDocumento.est == 'Terminada' || ArrayDocumento.est == 'Cerrada'">
                     <td id="est" scope="col" style="background-color: #8AFC9B;">{{ArrayDocumento.est | uppercase}}</td>
                   </ng-container>
                   <!-- Iniciada -->
@@ -517,19 +523,67 @@
                   <!-- Fecha Creacion OT -->
                   <td id="fecha" scope="col">{{ArrayDocumento.fecha | date : 'yyyy-MM-dd'}}</td>
 
-                  <td *ngFor="let col of columns">
-                    {{ArrayDocumento[col.field]}}
+                  <td *ngFor="let col of columns">{{ArrayDocumento[col.field]}}</td>
+
+                  <td>
+                    <button pButton pRipple icon="pi pi-pencil" [style]="{width: '40px', height: '15px'}" class="p-button-rounded p-button-success p-mr-2" (click)="editProduct(ArrayDocumento)"></button>
                   </td>
                 </tr>
               </ng-template>
+              <!-- Suma total de registros -->
               <ng-template pTemplate="summary">
                 <div class="p-d-flex p-ai-center p-jc-between">
-                    En total hay {{ArrayDocumento ? ArrayDocumento.length : 0 | number}} ordenes de trabajo.
+                  En total hay {{ArrayDocumento ? ArrayDocumento.length : 0 | number}} orden(es) de trabajo.
                 </div>
-            </ng-template>
+              </ng-template>
             </p-table>
-          <!-- </ng-container> -->
 
+            <!-- Modal Para cambiar el estado de la orden de trabajo -->
+            <p-dialog [(visible)]="ArrayDocumentoDialog" [style]="{width: '450px'}" header="Cambio de estado de OT" [modal]="true" styleClass="p-fluid">
+              <ng-template pTemplate="content">
+                <div class="p-field">
+                  <h6 for="name">Orden de Trabajo <b>{{otSeleccionada}}</b></h6>
+                </div>
+
+                <div class="p-field">
+                  <label class="p-mb-3">Estados de las ordenes de trabajo</label>
+                  <div class="p-formgrid p-grid">
+                    <div class="p-field-radiobutton p-col-6">
+                      <p-radioButton id="category1" name="category" value="15" [(ngModel)]="otInfo.est"></p-radioButton>
+                      <label for="category1">Abierta&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    </div>
+                    <div class="p-field-radiobutton p-col-6">
+                      <p-radioButton id="category2" name="category" value="3" [(ngModel)]="otInfo.est"></p-radioButton>
+                      <label for="category1">Anulada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    </div>
+                    <div class="p-field-radiobutton p-col-6">
+                      <p-radioButton id="category3" name="category" value="14" [(ngModel)]="otInfo.est"></p-radioButton>
+                      <label for="category2">Asignada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    </div>
+                    <div class="p-field-radiobutton p-col-6">
+                      <p-radioButton id="category4" name="category" value="18" [(ngModel)]="otInfo.est"></p-radioButton>
+                      <label for="category2">Cerrada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    </div>
+                    <div class="p-field-radiobutton p-col-6">
+                      <p-radioButton id="category5" name="category" value="16" [(ngModel)]="otInfo.est"></p-radioButton>
+                      <label for="category3">En Proceso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    </div>
+                    <div class="p-field-radiobutton p-col-6">
+                      <p-radioButton id="category6" name="category" value="17" [(ngModel)]="otInfo.est"></p-radioButton>
+                      <label for="category4">Terminada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+
+              <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+                <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="cambiarEstado()"></button>
+              </ng-template>
+            </p-dialog>
+            <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+
+            <!-- Modales de informacion detallada de la orden de trabajo -->
             <div class="modal fade" id="reporteCostos" data-bs-keyboard="false" aria-labelledby="reporteCostos" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered modal-xl">
                 <div class="modal-content">

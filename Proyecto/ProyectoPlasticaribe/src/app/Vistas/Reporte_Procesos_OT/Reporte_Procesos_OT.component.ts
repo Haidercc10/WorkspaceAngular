@@ -62,6 +62,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   _columnasSeleccionada : any [] = [];
   first = 0;
   rows = 10;
+  estadosActualizar : any [] = [];
+  statuses: any [];
+  ArrayDocumentoDialog: boolean;
+  submitted: boolean = false;
+  otInfo : any;
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -499,7 +504,14 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   obtenerEstados(){
     this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
       for (let i = 0; i < datos_estados.length; i++) {
-        if (datos_estados[i].tpEstado_Id == 4 || datos_estados[i].estado_Id == 3) this.estados.push(datos_estados[i]);
+        if (datos_estados[i].tpEstado_Id == 4 || datos_estados[i].estado_Id == 3) {
+          let info : any = {
+            label: datos_estados[i].estado_Nombre.toUpperCase(),
+            value: datos_estados[i].estado_Id
+          }
+          this.estadosActualizar.push(info);
+          this.estados.push(datos_estados[i]);
+        }
         this.estados.sort((a,b) => a.estado_Nombre.localeCompare(b.estado_Nombre));
       }
     })
@@ -1739,10 +1751,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       nombreUsu : nombreUsu
     }
     this.columnas = [
-      { header: 'Und Medida', field: 'und'},
+      { header: 'Presentación', field: 'und'},
       { header: 'Vendedor', field: 'usu' },
       { header: 'Materia Prima', field: 'Mp'},
-      { header: 'Cant Ingresada Desp.', field: 'entrada'},
+      { header: 'Cant Ingresada a Despacho', field: 'entrada'},
       { header: 'Cant Facturada', field: 'salida'},
       { header: 'Fallas', field: 'falla'},
       { header: 'Fecha Inicio OT', field: 'fechaInicio'},
@@ -1751,21 +1763,21 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
     this.ArrayDocumento.push(info);
     this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
-    this.ArrayDocumento.sort((a,b) => Number(a.ot)- Number(b.ot));
+    this.ArrayDocumento.sort((a,b) => Number(a.ot) - Number(b.ot));
     // this._columnasSeleccionada = this.columnas;
     this.load = true;
     setTimeout(() => {
       this.dtEntradasRollosService.srvConsultarOTEntradas(ot).subscribe(datos_entradas => {
         for (let j = 0; j < datos_entradas.length; j++) {
           for (let i = 0; i < this.ArrayDocumento.length; i++) {
-            if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].entrada = datos_entradas[j].sum;
+            if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].entrada = this.formatonumeros(datos_entradas[j].sum);
           }
         }
       });
       this.dtEntradasRollosService.srvConsultarOtSalidas(ot).subscribe(datos_salidas => {
         for (let k = 0; k < datos_salidas.length; k++) {
           for (let i = 0; i < this.ArrayDocumento.length; i++) {
-            if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].salida = datos_salidas[k].sum;
+            if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].salida = this.formatonumeros(datos_salidas[k].sum);
           }
         }
       });
@@ -2227,23 +2239,113 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this._columnasSeleccionada = this.columnas.filter(col => val.includes(col));
   }
 
+  // Pasa a la siguiente pagina de la tabla
   next() {
     this.first = this.first + this.rows;
   }
 
+  // Pasa a la pagina anterior de la tabla
   prev() {
     this.first = this.first - this.rows;
   }
 
+  // Reinicia el paginado y te devuelve a la pagina numero 1
   reset() {
     this.first = 0;
   }
 
+  // Pasa a la ultima pagina de la tabla
   isLastPage(): boolean {
     return this.ArrayDocumento ? this.first === (this.ArrayDocumento.length - this.rows): true;
   }
 
+  // Pasa a la primera pagina de la tabla
   isFirstPage(): boolean {
     return this.ArrayDocumento ? this.first === 0 : true;
   }
+
+  // Sirve para abrir el modal en el que se editará el estado de la orden de trabajo
+  editProduct(dato) {
+    this.otInfo = {...dato};
+    this.otSeleccionada = dato.ot;
+    this.ArrayDocumentoDialog = true;
+  }
+
+  // Cambia el estado de la orden de trabajo en la nueva base de datos
+  cambiarEstado() {
+    this.submitted = true;
+    let estado = this.otInfo.est;
+    this.estadosProcesos_OTService.srvObtenerListaPorOT(this.otInfo.ot).subscribe(datos_ot => {
+      for (let i = 0; i < datos_ot.length; i++) {
+        let info : any = {
+          EstProcOT_OrdenTrabajo : datos_ot[i].estProcOT_OrdenTrabajo,
+          EstProcOT_ExtrusionKg : datos_ot[i].estProcOT_ExtrusionKg,
+          EstProcOT_ImpresionKg : datos_ot[i].estProcOT_ImpresionKg,
+          EstProcOT_RotograbadoKg : datos_ot[i].estProcOT_RotograbadoKg,
+          EstProcOT_LaminadoKg : datos_ot[i].estProcOT_LaminadoKg,
+          EstProcOT_CorteKg : datos_ot[i].estProcOT_CorteKg ,
+          EstProcOT_DobladoKg : datos_ot[i].estProcOT_DobladoKg,
+          EstProcOT_SelladoKg : datos_ot[i].estProcOT_SelladoKg,
+          EstProcOT_SelladoUnd : datos_ot[i].estProcOT_SelladoUnd,
+          EstProcOT_WiketiadoKg : datos_ot[i].estProcOT_WiketiadoKg,
+          EstProcOT_WiketiadoUnd : datos_ot[i].estProcOT_WiketiadoUnd,
+          EstProcOT_CantidadPedida : datos_ot[i].estProcOT_CantidadPedida,
+          UndMed_Id : datos_ot[i].undMed_Id,
+          Estado_Id : estado,
+          Falla_Id : datos_ot[i].falla_Id,
+          EstProcOT_Observacion : datos_ot[i].estProcOT_Observacion,
+          EstProcOT_FechaCreacion : datos_ot[i].estProcOT_FechaCreacion,
+          EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
+        }
+        this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
+          this.consultarOT();
+          this.cambiarEstadoBagPro();
+          this.ArrayDocumentoDialog = false;
+        });
+      }
+    });
+  }
+
+  // Camvia el estado de una orden de trabajo en la base de datos de bagpro
+  cambiarEstadoBagPro(){
+    let estado = this.otInfo.est;
+    if (estado == 18) estado = '1'; //Cerrada
+    if (estado != 18 && estado != 3) estado = '0'; //Abierta
+    if (estado == 3) estado = '4'; //Anulada
+    this.servicioBagPro.srvObtenerListaClienteOT_Item(this.otInfo.ot).subscribe(datos_ot => {
+      for (let i = 0; i < datos_ot.length; i++) {
+        const data : any = {
+          item : this.otInfo.ot,
+          clienteNom : datos_ot[i].clienteNom,
+          clienteItemsNom : datos_ot[i].clienteItemsNom,
+          usrCrea : datos_ot[i].usrCrea,
+          estado : estado,
+        }
+        this.servicioBagPro.srvActualizar(this.otInfo.ot, data, estado).subscribe(datos_clientesOT => {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'center',
+            showConfirmButton: false,
+            timer: 2200,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer);
+              toast.addEventListener('mouseleave', Swal.resumeTimer);
+            }
+          });
+          Toast.fire({
+            icon: 'success',
+            title: '¡Actualizacion de OT exitosa!'
+          });
+        });
+      }
+    });
+  }
+
+  // cierra el modal de cambio de estado de ordenes de trabajo
+  hideDialog() {
+    this.ArrayDocumentoDialog = false;
+    this.submitted = false;
+  }
+
 }
