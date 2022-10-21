@@ -1,4 +1,4 @@
-import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, Injectable, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
@@ -58,6 +58,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   modalProcesos : boolean = false;
   vendedores : any [] = []; //Varibale que va a almacenar la informacion de los vendedores
   keyword : any = 'usua_Nombre';
+  columnas : any [] = [];
+  _columnasSeleccionada : any [] = [];
+  first = 0;
+  rows = 10;
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -495,7 +499,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   obtenerEstados(){
     this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
       for (let i = 0; i < datos_estados.length; i++) {
-        if (datos_estados[i].tpEstado_Id == 4) this.estados.push(datos_estados[i]);
+        if (datos_estados[i].tpEstado_Id == 4 || datos_estados[i].estado_Id == 3) this.estados.push(datos_estados[i]);
         this.estados.sort((a,b) => a.estado_Nombre.localeCompare(b.estado_Nombre));
       }
     })
@@ -1734,9 +1738,21 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       usu : usu,
       nombreUsu : nombreUsu
     }
+    this.columnas = [
+      { header: 'Und Medida', field: 'und'},
+      { header: 'Vendedor', field: 'usu' },
+      { header: 'Materia Prima', field: 'Mp'},
+      { header: 'Cant Ingresada Desp.', field: 'entrada'},
+      { header: 'Cant Facturada', field: 'salida'},
+      { header: 'Fallas', field: 'falla'},
+      { header: 'Fecha Inicio OT', field: 'fechaInicio'},
+      { header: 'Fecha Fin OT', field: 'fechaFinal'}
+    ];
+
     this.ArrayDocumento.push(info);
     this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
     this.ArrayDocumento.sort((a,b) => Number(a.ot)- Number(b.ot));
+    // this._columnasSeleccionada = this.columnas;
     this.load = true;
     setTimeout(() => {
       this.dtEntradasRollosService.srvConsultarOTEntradas(ot).subscribe(datos_entradas => {
@@ -2178,6 +2194,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     });
   }
 
+  //
   reporteOT(ot : number){
     this.reporteCostos.load = false;
     this.otSeleccionada = ot;
@@ -2200,5 +2217,33 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       estadoOT : '',
     });
     setTimeout(() => { this.reporteCostos.consultaOTBagPro()}, 500);
+  }
+
+  @Input() get columnasSeleccionada(): any[] {
+    return this._columnasSeleccionada;
+  }
+
+  set columnasSeleccionada(val: any[]) {
+    this._columnasSeleccionada = this.columnas.filter(col => val.includes(col));
+  }
+
+  next() {
+    this.first = this.first + this.rows;
+  }
+
+  prev() {
+    this.first = this.first - this.rows;
+  }
+
+  reset() {
+    this.first = 0;
+  }
+
+  isLastPage(): boolean {
+    return this.ArrayDocumento ? this.first === (this.ArrayDocumento.length - this.rows): true;
+  }
+
+  isFirstPage(): boolean {
+    return this.ArrayDocumento ? this.first === 0 : true;
   }
 }

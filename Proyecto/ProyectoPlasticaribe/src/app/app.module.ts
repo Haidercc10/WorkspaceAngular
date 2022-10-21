@@ -105,6 +105,16 @@ import {DropdownModule} from 'primeng/dropdown';
 import {ProgressBarModule} from 'primeng/progressbar';
 import {InputTextModule} from 'primeng/inputtext';
 import { AutoCompleteModule } from 'primeng/autocomplete';
+import {DockModule} from 'primeng/dock';
+import {FileUploadModule} from 'primeng/fileupload';
+import {ToolbarModule} from 'primeng/toolbar';
+import {RatingModule} from 'primeng/rating';
+import {RadioButtonModule} from 'primeng/radiobutton';
+import {InputNumberModule} from 'primeng/inputnumber';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 
 export const routes: Routes = [
 
@@ -281,11 +291,36 @@ export const routes: Routes = [
     InputTextModule,
     ProgressBarModule,
     AutoCompleteModule,
+    DockModule,
+    BrowserModule,
+    BrowserAnimationsModule,
+    TableModule,
+    CalendarModule,
+		SliderModule,
+		DialogModule,
+		MultiSelectModule,
+		ContextMenuModule,
+		DropdownModule,
+		ButtonModule,
+		ToastModule,
+    InputTextModule,
+    ProgressBarModule,
+    HttpClientModule,
+    FileUploadModule,
+    ToolbarModule,
+    RatingModule,
+    FormsModule,
+    RadioButtonModule,
+    InputNumberModule,
+    ConfirmDialogModule,
+    InputTextareaModule,
   ],
 
   providers: [
     ServicioAreasService,
     CookieService,
+    MessageService,
+    ConfirmationService
   ],
 
   bootstrap: [AppComponent]
