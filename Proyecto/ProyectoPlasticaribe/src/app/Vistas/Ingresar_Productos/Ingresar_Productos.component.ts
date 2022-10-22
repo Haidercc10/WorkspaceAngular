@@ -135,7 +135,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     this.cargando = true;
     this.Total = 0;
     this.rollosAsignados = [];
-    window.location.href = "./ingresar-productos";
+    // window.location.href = "./ingresar-productos";
   }
 
   // funcion que va a limpiar los campos del formulario
@@ -3641,8 +3641,7 @@ export class Ingresar_ProductosComponent implements OnInit {
               Prod_CantBolsasRestates : (this.rollosInsertar[i].Cantidad * item.prod_CantBolsasPaquete),
               Prod_CantBolsasFacturadas : 0,
             }
-            this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => {
-            }, error => {
+            this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => { }, error => {
               const Toast = Swal.mixin({
                 toast: true,
                 position: 'center',
@@ -3676,8 +3675,7 @@ export class Ingresar_ProductosComponent implements OnInit {
               Prod_CantBolsasRestates : this.rollosInsertar[i].Cantidad,
               Prod_CantBolsasFacturadas : 0,
             }
-            this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => {
-            }, error => {
+            this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => { }, error => {
               const Toast = Swal.mixin({
                 toast: true,
                 position: 'center',

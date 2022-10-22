@@ -186,6 +186,20 @@
                 </td>
                 <!-- </tr> -->
                 <!-- <tr> -->
+                <td class="verde2">
+                  <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample6" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Cerrada <b>{{cantidadOTCerrada}}</b></a>
+                  <div class="row">
+                    <div class="col">
+                      <div class="collapse multi-collapse" id="multiCollapseExample6">
+                        <div class="card card-body">
+                          Este color indica que la orden de trabajo está cerrada, es decir, ya se finalizó su producción y se cerró la orden para que no haya más producción.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <!-- </tr> -->
+                <!-- <tr> -->
                 <td class="gris">
                   <a class="btn gris" data-bs-toggle="collapse" href="#multiCollapseExample3" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>No iniciado</b></a>
                   <div class="row">
@@ -264,6 +278,7 @@
               <ng-template pTemplate="header" let-columns>
                 <tr>
                   <th id="" scope="col" pSortableColumn="ot" style="font-size: 12px;">OT<p-sortIcon field="ot" title="Order por OT"></p-sortIcon></th>
+                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Materia Prima</th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Extrusión</th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Impresión</th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Rotograbado</th>
@@ -274,7 +289,6 @@
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Sellado</th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Wiketiado</th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Cant. Producir</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Cant. Producir Und</th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Estados</th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Fecha Creación</th>
                   <th *ngFor="let col of columns" pResizableColumn style="font-size: 12px;">
@@ -286,6 +300,7 @@
               <ng-template pTemplate="body" let-ArrayDocumento let-columns="columns">
                 <tr>
                   <td id="ot" scope="col" data-bs-toggle="modal" data-bs-target="#reporteCostos" (click)="reporteOT(ArrayDocumento.ot)"><b>{{ArrayDocumento.ot}}</b></td>
+                  <td id="mp" scope="col">{{ArrayDocumento.Mp | number : '1.2-2'}}</td>
                   <!-- Extrusion -->
                   <!-- Termianda -->
                   <ng-container *ngIf="ArrayDocumento.ext >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
@@ -473,34 +488,31 @@
                   <!-- Wiketiado -->
                   <!-- Termianda -->
                   <ng-container *ngIf="ArrayDocumento.wik >= (ArrayDocumento.cant + (ArrayDocumento.cant * -0.05)) && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
-                    <td id="wik" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wik | number}} Kg - {{ArrayDocumento.wikUnd | number}} Und</td>
+                    <td id="wik" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wikUnd | number}} Und</td>
                   </ng-container>
                   <!-- Iniciada -->
                   <ng-container *ngIf="ArrayDocumento.wik < (ArrayDocumento.cant + (ArrayDocumento.cant * -0.05)) && ArrayDocumento.wik > 0">
-                    <td id="wik" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wik | number}} Kg - {{ArrayDocumento.wikUnd | number}} Und</td>
+                    <td id="wik" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wikUnd | number}} Und</td>
                   </ng-container>
                   <!-- Asignada -->
                   <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila9">
                     <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                      <td id="wik" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wik | number}} Kg - {{ArrayDocumento.wikUnd | number}} Und</td>
+                      <td id="wik" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wikUnd | number}} Und</td>
                     </ng-container>
                     <!-- Abierta -->
                     <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                      <td id="wik" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wik | number}} Kg - {{ArrayDocumento.wikUnd | number}} Und</td>
+                      <td id="wik" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wikUnd | number}} Und</td>
                     </ng-container>
                   </ng-container>
                   <!-- No iniciado -->
                   <ng-template #fila9>
-                    <td *ngIf="ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wik | number}} Kg - {{ArrayDocumento.wikUnd | number}} Und</td>
+                    <td *ngIf="ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wikUnd | number}} Und</td>
                   </ng-template>
 
-                  <td id="cant" scope="col"><b>{{ArrayDocumento.cant | number}}</b></td>
-
-                  <!-- Cantidad Total a Producir en unidades -->
-                  <td id="cantUnd" scope="col"><b>{{ArrayDocumento.cantUnd | number}}</b></td>
+                  <td id="cant" scope="col"><b>{{ArrayDocumento.cantUnd}}</b></td>
 
                   <!-- Terminada -->
-                  <ng-container *ngIf="ArrayDocumento.est == 'Terminada' || ArrayDocumento.est == 'Cerrada'">
+                  <ng-container *ngIf="ArrayDocumento.est == 'Terminada'">
                     <td id="est" scope="col" style="background-color: #8AFC9B;">{{ArrayDocumento.est | uppercase}}</td>
                   </ng-container>
                   <!-- Iniciada -->
@@ -518,6 +530,10 @@
                   <!-- Finalizada -->
                   <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
                     <td id="est" scope="col" style="background-color: #FF7878">{{ArrayDocumento.est | uppercase}}</td>
+                  </ng-container>
+                  <!-- Cerradas -->
+                  <ng-container *ngIf="ArrayDocumento.est == 'Cerrada'">
+                    <td id="est" scope="col" style="background-color: #53CC48; color: #FFF">{{ArrayDocumento.est | uppercase}}</td>
                   </ng-container>
 
                   <!-- Fecha Creacion OT -->

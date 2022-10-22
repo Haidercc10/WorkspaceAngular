@@ -2538,23 +2538,6 @@ export class MovimientoMPComponent implements OnInit {
     }
   }
 
-  // Funcion que genera la tabla donde se mostrará la información de las OT
-  // tableAsignacionOT(data, columns) {
-  //   return {
-  //     table: {
-  //       headerRows: 1,
-  //       widths: [40, '*', '*', 30, 30, 30],
-  //       body: this.buildTableBody(data, columns),
-  //     },
-  //     fontSize: 9,
-  //     layout: {
-  //       fillColor: function (rowIndex, node, columnIndex) {
-  //         return (rowIndex == 0) ? '#CCCCCC' : null;
-  //       }
-  //     }
-  //   }
-  // }
-
   // Funcion para llenar el pdf con información de la base de datos dependiendo el pedido
   llenarPDFConBD(formulario : any){
     let id : number = formulario.id;

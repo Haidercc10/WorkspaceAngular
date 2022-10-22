@@ -94,8 +94,6 @@ export class MovimientoMatPrimaComponent implements OnInit {
   onChangeSearchMp(val: string) {
     if (val != '') this.validarInputMp = false;
     else this.validarInputMp = true;
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
   }
 
   //
@@ -183,7 +181,11 @@ export class MovimientoMatPrimaComponent implements OnInit {
   obtenerTipoDocumento(){
     this.tipoDocuemntoService.srvObtenerLista().subscribe(datos_tiposDocumentos => {
       for (let index = 0; index < datos_tiposDocumentos.length; index++) {
-        if (datos_tiposDocumentos[index].tpDoc_Id != 'ASIGBOPP') this.tipoDocumento.push(datos_tiposDocumentos[index])
+        if (datos_tiposDocumentos[index].tpDoc_Id == 'ASIGMP'
+        || datos_tiposDocumentos[index].tpDoc_Id == 'DEVMP'
+        || datos_tiposDocumentos[index].tpDoc_Id == 'FCO'
+        || datos_tiposDocumentos[index].tpDoc_Id == 'RECP'
+        || datos_tiposDocumentos[index].tpDoc_Id == 'REM') this.tipoDocumento.push(datos_tiposDocumentos[index])
       }
     });
   }
@@ -800,7 +802,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
       }
     } else if (fechaIncial != null && materiaPrima != null) {
       // Asignación de materia prima
-      this.dtAsgMP.srvObtenerConsultaMov5(fechaIncial, materiaPrima).subscribe(datos_asignacion => {
+      this.dtAsgMP.srvObtenerConsultaMov8(fechaIncial, fechaIncial, materiaPrima).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
           this.llenarTabla(datos_asignacion[i], 'ASIGMP');
         }

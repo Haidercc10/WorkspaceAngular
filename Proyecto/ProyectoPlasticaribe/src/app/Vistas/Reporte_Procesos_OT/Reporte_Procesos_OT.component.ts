@@ -53,6 +53,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   cantidadOTTerminada : number = 0;
   cantidadOtAnulada : number = 0;
   cantidadOTFinalizada : number = 0;
+  cantidadOTCerrada : number = 0;
   cantTotalMp : number = 0;
   cantPage : number = 30;
   modalProcesos : boolean = false;
@@ -1737,6 +1738,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       wik : wik,
       wikUnd : wikUnd,
       cant : can,
+      cantUnd : `${this.formatonumeros(can)} Kg - ${this.formatonumeros(cantUnd)} Und`,
       falla : falla,
       obs : observacion,
       est : estado,
@@ -1745,18 +1747,21 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       salida : 0,
       fechaInicio : fechaInicio,
       fechaFinal : fechaFinal,
-      cantUnd : cantUnd,
       und : und,
       usu : usu,
-      nombreUsu : nombreUsu
+      nombreUsu : nombreUsu,
+      cli : '',
+      prod : '',
     }
     this.columnas = [
       { header: 'Presentación', field: 'und'},
       { header: 'Vendedor', field: 'usu' },
-      { header: 'Materia Prima', field: 'Mp'},
+      // { header: 'Materia Prima', field: 'Mp'},
       { header: 'Cant Ingresada a Despacho', field: 'entrada'},
       { header: 'Cant Facturada', field: 'salida'},
       { header: 'Fallas', field: 'falla'},
+      { header: 'Cliente', field: 'cli'},
+      { header: 'Producto', field: 'prod'},
       { header: 'Fecha Inicio OT', field: 'fechaInicio'},
       { header: 'Fecha Fin OT', field: 'fechaFinal'}
     ];
@@ -1777,7 +1782,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       this.dtEntradasRollosService.srvConsultarOtSalidas(ot).subscribe(datos_salidas => {
         for (let k = 0; k < datos_salidas.length; k++) {
           for (let i = 0; i < this.ArrayDocumento.length; i++) {
-            if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].salida = this.formatonumeros(datos_salidas[k].sum);
+            if (this.ArrayDocumento[i].ot == ot && und != 'Paquete') this.ArrayDocumento[i].salida = this.formatonumeros(datos_salidas[k].sumTotal);
+            else if (this.ArrayDocumento[i].ot == ot && und == 'Paquete') this.ArrayDocumento[i].salida = this.formatonumeros(datos_salidas[k].sumPqt);
           }
         }
       });
@@ -1790,6 +1796,16 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
         }
       });
+      this.servicioBagPro.srvObtenerListaClienteOT_Item(ot).subscribe(datos_ot => {
+        for (let i = 0; i < datos_ot.length; i++) {
+          for (let j = 0; j < this.ArrayDocumento.length; j++) {
+            if (ot == this.ArrayDocumento[j].ot) {
+              this.ArrayDocumento[j].cli = datos_ot[i].clienteNom;
+              this.ArrayDocumento[j].prod = datos_ot[i].clienteItemsNom;
+            }
+          }
+        }
+      });
     }, 1200);
 
     if (estado == 'Abierta') this.catidadOTAbiertas += 1;
@@ -1798,6 +1814,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     if (estado == 'En proceso') this.cantidadOTIniciada += 1;
     if (estado == 'Anulado') this.cantidadOtAnulada += 1;
     if (estado == 'Finalizada') this.cantidadOTFinalizada += 1;
+    if (estado == 'Cerrada') this.cantidadOTCerrada += 1;
   }
 
   // Funcion que va a asignar un valor una variable, el valor será la orden de trabajo sobre la que se le dió click
