@@ -209,7 +209,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.cargando = true;
     this.validarInputClientes = true;
     this.Total = 0;
-    window.location.href = "./asignacion-productos-facturas";
+    // window.location.href = "./asignacion-productos-facturas";
   }
 
   //Funcion que va a agregar Productos en la tabla

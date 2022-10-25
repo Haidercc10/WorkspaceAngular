@@ -34,6 +34,10 @@ export class ProductoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/IdProducto/${id}`)
   }
 
+  obtenerProductos(): Observable<any> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/consultaGeneral`)
+  }
+
   //Metodo agregar Productos
   srvAgregar(datos_Productos:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Producto', datos_Productos)

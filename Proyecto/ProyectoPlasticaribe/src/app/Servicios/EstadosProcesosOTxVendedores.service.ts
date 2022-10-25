@@ -35,6 +35,14 @@ export class EstadosProcesosOTxVendedoresService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultarPorEstadosVendedor/${estado}/${vendedor}`);
   }
 
+  srvObtenerListaPorClienteEstado(cliente : any, estado : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaEstadoCliente/${cliente}/${estado}`);
+  }
+
+  srvObtenerListaPorProductoEstado(producto : any, estado : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaProductoEstado/${producto}/${estado}`);
+  }
+
   srvObtenerListaPorFechasEstado(fecha1 : any, fecha2 : any, estado : any, vendedor : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorFechasEstadoVendedor/${fecha1}/${fecha2}/${estado}/${vendedor}`);
   }

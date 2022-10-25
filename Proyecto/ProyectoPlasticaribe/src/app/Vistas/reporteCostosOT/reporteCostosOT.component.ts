@@ -242,14 +242,14 @@ export class ReporteCostosOTComponent implements OnInit {
         this.load = true;
       } else {
         for (const item of datos_OT) {
-          porcentajeMargen = (item.datosmargenKg / item.datoscantKg) * 100;
+          porcentajeMargen = (item.datosmargenKg / item.datosotKg) * 100;
 
           this.ordenTrabajo = ot;
           this.NombreCliente = item.clienteNom;
           this.idProducto = item.clienteItems;
           this.nombreProducto = item.clienteItemsNom;
           this.cantProdSinMargenUnd = item.datoscantBolsa;
-          this.cantProdSinMargenKg = item.datoscantKg;
+          this.cantProdSinMargenKg = (item.datosotKg - ((item.datosotKg * porcentajeMargen) / 100));
           this.CantidadMargen = Math.round(porcentajeMargen);
           this.cantProdConMargenKg = item.datosotKg;
           this.presentacionProducto = item.ptPresentacionNom;
@@ -270,9 +270,9 @@ export class ReporteCostosOTComponent implements OnInit {
             cliente : item.clienteNom,
             IdProducto : item.clienteItems,
             NombreProducto : item.clienteItemsNom,
-            cantProductoSinMargenUnd : item.datoscantBolsa,
-            cantProductoSinMargenKg : item.datoscantKg,
-            margenAdicional : Math.round(porcentajeMargen) + "%",
+            cantProductoSinMargenUnd : this.formatonumeros(item.datoscantBolsa),
+            cantProductoSinMargenKg : this.formatonumeros((item.datosotKg - ((item.datosotKg * porcentajeMargen) / 100)).toFixed(2)),
+            margenAdicional : this.formatonumeros(porcentajeMargen.toFixed(2)) + "%",
             cantProductoConMargen : this.formatonumeros(item.datosotKg),
             PresentacionProducto : item.ptPresentacionNom,
             ValorUnidadProductoUnd : this.formatonumeros(item.datosvalorBolsa),
@@ -580,7 +580,7 @@ export class ReporteCostosOTComponent implements OnInit {
 
   // Funcion que cargará el PDF con la infomración de la OT
   CargarPDF(){
-    if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe buscar una OT para crear el reporte")
+    if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe buscar una OT para crear el reporte");
     else {
       for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
         for (const item of this.ArrayProcesos) {

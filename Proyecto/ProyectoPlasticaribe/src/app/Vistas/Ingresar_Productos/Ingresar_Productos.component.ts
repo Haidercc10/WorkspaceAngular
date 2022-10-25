@@ -3403,7 +3403,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           setTimeout(() => {
             if (this.rollos.length <= 0) Swal.fire(`No hay rollos por ingresar`);
             this.cargando = true;
-          }, 10000);
+          }, 5000);
         }, 4000);
       } else Swal.fire("¡La fecha seleccionada no es valida!");
     } else Swal.fire("¡Seleccione un proceso!");

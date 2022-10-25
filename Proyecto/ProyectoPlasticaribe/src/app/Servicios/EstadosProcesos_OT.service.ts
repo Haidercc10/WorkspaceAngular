@@ -73,6 +73,14 @@ export class EstadosProcesos_OTService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultarPorEstados/${estado}`);
   }
 
+  srvObtenerListaPorCliente(cliente : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorClientes/${cliente}`);
+  }
+
+  srvObtenerListaPorProductos(prod : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorProductos/${prod}`);
+  }
+
   srvObtenerListaPorOtEstadoFalla(estado : any, falla : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorEstadosFallas/${estado}/${falla}`);
   }

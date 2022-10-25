@@ -75,8 +75,30 @@
 
         <div class="mb-4">
           <div class="row g-3">
-            <!-- Fallas -->
+            <!-- Clientes -->
             <div class="form-floating col-md-3">
+              <input formControlName="cliente" class="form-control" list="clientes" id="floatingInput" (change)='selectEventCliente()'>
+              <datalist id="clientes">
+                <option value={{item.cli_Id}} *ngFor="let item of clientes">{{item.cli_Nombre}}</option>
+              </datalist>
+              <label for="floatingInput">Cliente</label>
+            </div>
+
+            <!-- Producto -->
+            <div class="form-floating col-md-2">
+              <input formControlName="producto" type="number" class="form-control" id="floatingInput" title="N° del productos" required >
+              <label for="floatingInput">Producto</label>
+            </div>
+            <!-- <div class="form-floating col-md-3">
+              <input formControlName="producto" class="form-control" list="producto" id="floatingInput">
+              <datalist id="producto">
+                <option value={{item.prod_Id}} *ngFor="let item of producto">{{item.prod_Nombre}}</option>
+              </datalist>
+              <label for="floatingInput">Producto</label>
+            </div> -->
+
+            <!-- Fallas -->
+            <div class="form-floating col-md-2">
               <select formControlName="fallasOT" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example">
                 <option [ngValue]="falla.falla_Id" *ngFor="let falla of fallas">{{falla.falla_Nombre}}</option>
               </select>
@@ -187,10 +209,10 @@
                 <!-- </tr> -->
                 <!-- <tr> -->
                 <td class="verde2">
-                  <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample6" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Cerrada <b>{{cantidadOTCerrada}}</b></a>
+                  <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample8" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Cerrada <b>{{cantidadOTCerrada}}</b></a>
                   <div class="row">
                     <div class="col">
-                      <div class="collapse multi-collapse" id="multiCollapseExample6">
+                      <div class="collapse multi-collapse" id="multiCollapseExample8">
                         <div class="card card-body">
                           Este color indica que la orden de trabajo está cerrada, es decir, ya se finalizó su producción y se cerró la orden para que no haya más producción.
                         </div>
@@ -295,6 +317,12 @@
                     {{col.header}}
                   </th>
                 </tr>
+                <!-- <tr>
+                  <th>
+                    <p-columnFilter type="text" field="cli"></p-columnFilter>
+                  </th>
+                  <th><p-columnFilter type="text" field="prod"></p-columnFilter></th>
+                </tr> -->
               </ng-template>
               <!-- Cuerpo -->
               <ng-template pTemplate="body" let-ArrayDocumento let-columns="columns">
@@ -310,7 +338,7 @@
                   <ng-container *ngIf="ArrayDocumento.ext < ArrayDocumento.cant && ArrayDocumento.ext > 0">
                     <td id="ext" scope="col" style="background-color: #F3FC20;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.ext | number}}</td>
                   </ng-container>
-                  <!-- Abierta / Asignada -->
+                  <!-- Abierta / Asignada / Anulada -->
                   <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila1">
                     <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
                       <td id="ext" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.ext | number}}</td>
@@ -318,10 +346,14 @@
                     <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
                       <td id="ext" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.ext | number}}</td>
                     </ng-container>
+                    <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                      <td id="ext" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.ext | number}}</td>
+                    </ng-container>
                   </ng-container>
                   <!-- No iniciado -->
                   <ng-template #fila1>
-                    <td *ngIf="ArrayDocumento.ext == 0 && ArrayDocumento.ext < ArrayDocumento.cant" id="ext" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.ext | number}}</td>
+                    <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.ext == 0 && ArrayDocumento.ext < ArrayDocumento.cant" id="ext" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.ext | number}}</td>
+                    <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.ext == 0 && ArrayDocumento.ext < ArrayDocumento.cant" id="ext" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.ext | number}}</td>
                   </ng-template>
 
                   <!-- Impresion -->
@@ -333,7 +365,7 @@
                   <ng-container *ngIf="ArrayDocumento.imp < ArrayDocumento.cant && ArrayDocumento.imp > 0">
                     <td id="imp" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.imp | number}}</td>
                   </ng-container>
-                  <!-- Abierta / Asignada -->
+                  <!-- Abierta / Asignada / Anulada -->
                   <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila2">
                     <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
                       <td id="imp" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.imp | number}}</td>
@@ -341,10 +373,14 @@
                     <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
                       <td id="imp" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.imp | number}}</td>
                     </ng-container>
+                    <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                      <td id="imp" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.imp | number}}</td>
+                    </ng-container>
                   </ng-container>
                   <!-- No iniciado -->
                   <ng-template #fila2>
-                    <td *ngIf="ArrayDocumento.imp == 0 && ArrayDocumento.imp < ArrayDocumento.cant" id="imp" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.imp | number}}</td>
+                    <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.imp == 0 && ArrayDocumento.imp < ArrayDocumento.cant" id="imp" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.imp | number}}</td>
+                    <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.imp == 0 && ArrayDocumento.imp < ArrayDocumento.cant" id="imp" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.imp | number}}</td>
                   </ng-template>
 
                   <!-- Rotograbado -->
@@ -356,7 +392,7 @@
                   <ng-container *ngIf="ArrayDocumento.rot < ArrayDocumento.cant && ArrayDocumento.rot > 0">
                     <td id="rot" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
                   </ng-container>
-                  <!-- Abierta / Asignada -->
+                  <!-- Abierta / Asignada / Anulada -->
                   <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila3">
                     <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
                       <td id="rot" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
@@ -364,10 +400,14 @@
                     <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
                       <td id="rot" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
                     </ng-container>
+                    <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                      <td id="rot" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
+                    </ng-container>
                   </ng-container>
                   <!-- No iniciado -->
                   <ng-template #fila3>
-                    <td *ngIf="ArrayDocumento.rot == 0 && ArrayDocumento.rot < ArrayDocumento.cant" id="rot" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
+                    <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.rot == 0 && ArrayDocumento.rot < ArrayDocumento.cant" id="rot" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
+                    <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.rot == 0 && ArrayDocumento.rot < ArrayDocumento.cant" id="rot" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
                   </ng-template>
 
                   <!-- Doblado -->
@@ -379,7 +419,7 @@
                   <ng-container *ngIf="ArrayDocumento.dbl < ArrayDocumento.cant && ArrayDocumento.dbl > 0">
                     <td id="dbl" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.dbl | number}}</td>
                   </ng-container>
-                  <!-- Abierta / Asignada -->
+                  <!-- Abierta / Asignada / Anulado -->
                   <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila4">
                     <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
                       <td id="dbl" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.dbl | number}}</td>
@@ -387,10 +427,14 @@
                     <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
                       <td id="dbl" scope="col" style="background-color: #F6D45D;;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.dbl | number}}</td>
                     </ng-container>
+                    <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                      <td id="dbl" scope="col" style="background-color: #FF7878;;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.dbl | number}}</td>
+                    </ng-container>
                   </ng-container>
                   <!-- No iniciado -->
                   <ng-template #fila4>
-                    <td *ngIf="ArrayDocumento.dbl == 0 && ArrayDocumento.dbl < ArrayDocumento.cant" id="dbl" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.dbl | number}}</td>
+                    <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.dbl == 0 && ArrayDocumento.dbl < ArrayDocumento.cant" id="dbl" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.dbl | number}}</td>
+                    <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.dbl == 0 && ArrayDocumento.dbl < ArrayDocumento.cant" id="dbl" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.dbl | number}}</td>
                   </ng-template>
 
                   <!-- laminado -->
@@ -402,7 +446,7 @@
                   <ng-container *ngIf="ArrayDocumento.lam < ArrayDocumento.cant && ArrayDocumento.lam > 0">
                     <td id="lam" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.lam | number}}</td>
                   </ng-container>
-                  <!-- Abierta / Asignada -->
+                  <!-- Abierta / Asignada / Anulado -->
                   <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila5">
                     <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
                       <td id="lam" scope="col" style="background-color: #83D3FF" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.lam | number}}</td>
@@ -410,10 +454,14 @@
                     <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
                       <td id="lam" scope="col" style="background-color: #F6D45D" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.lam | number}}</td>
                     </ng-container>
+                    <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                      <td id="lam" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.lam | number}}</td>
+                    </ng-container>
                   </ng-container>
                   <!-- No iniciado -->
                   <ng-template #fila5>
-                    <td *ngIf="ArrayDocumento.lam == 0 && ArrayDocumento.lam < ArrayDocumento.cant" id="lam" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.lam | number}}</td>
+                    <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.lam == 0 && ArrayDocumento.lam < ArrayDocumento.cant" id="lam" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.lam | number}}</td>
+                    <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.lam == 0 && ArrayDocumento.lam < ArrayDocumento.cant" id="lam" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.lam | number}}</td>
                   </ng-template>
 
                   <!-- Corte -->
@@ -425,7 +473,7 @@
                   <ng-container *ngIf="ArrayDocumento.cor < ArrayDocumento.cant && ArrayDocumento.cor > 0">
                     <td id="cor" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.cor | number}}</td>
                   </ng-container>
-                  <!-- Abierta / Asignada -->
+                  <!-- Abierta / Asignada / Anulado -->
                   <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila6">
                     <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
                       <td id="cor" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.cor | number}}</td>
@@ -433,22 +481,26 @@
                     <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
                       <td id="cor" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.cor | number}}</td>
                     </ng-container>
+                    <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                      <td id="cor" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.cor | number}}</td>
+                    </ng-container>
                   </ng-container>
                   <!-- No iniciado -->
                   <ng-template #fila6>
-                    <td *ngIf="ArrayDocumento.cor == 0 && ArrayDocumento.cor < ArrayDocumento.cant" id="cor" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.cor | number}}</td>
+                    <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.cor == 0 && ArrayDocumento.cor < ArrayDocumento.cant" id="cor" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.cor | number}}</td>
+                    <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.cor == 0 && ArrayDocumento.cor < ArrayDocumento.cant" id="cor" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.cor | number}}</td>
                   </ng-template>
 
                   <!-- Empaque -->
                   <!-- Termianda -->
-                  <ng-container *ngIf="ArrayDocumento.emp >= (ArrayDocumento.cant + (ArrayDocumento.cant * -0.05)) && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                  <ng-container *ngIf="ArrayDocumento.emp >= (ArrayDocumento.cant + (ArrayDocumento.cant)) && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
                     <td id="emp" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.emp | number}}</td>
                   </ng-container>
                   <!-- Iniciada -->
-                  <ng-container *ngIf="ArrayDocumento.emp < (ArrayDocumento.cant + (ArrayDocumento.cant * -0.05)) && ArrayDocumento.emp > 0">
+                  <ng-container *ngIf="ArrayDocumento.emp < (ArrayDocumento.cant + (ArrayDocumento.cant)) && ArrayDocumento.emp > 0">
                     <td id="emp" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.emp | number}}</td>
                   </ng-container>
-                  <!-- Abierta / Asignada -->
+                  <!-- Abierta / Asignada / Anulada -->
                   <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila7">
                     <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
                       <td id="emp" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.emp | number}}</td>
@@ -456,22 +508,26 @@
                     <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
                       <td id="emp" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.emp | number}}</td>
                     </ng-container>
+                    <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                      <td id="emp" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.emp | number}}</td>
+                    </ng-container>
                   </ng-container>
                   <!-- No iniciado -->
                   <ng-template #fila7>
-                    <td *ngIf="ArrayDocumento.emp == 0 && ArrayDocumento.emp < ArrayDocumento.cant" id="emp" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.emp | number}}</td>
+                    <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.emp == 0 && ArrayDocumento.emp < ArrayDocumento.cant" id="emp" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.emp | number}}</td>
+                    <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.emp == 0 && ArrayDocumento.emp < ArrayDocumento.cant" id="emp" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.emp | number}}</td>
                   </ng-template>
 
                   <!-- Sellado -->
                   <!-- Termianda -->
-                  <ng-container *ngIf="ArrayDocumento.sel >= (ArrayDocumento.cant + (ArrayDocumento.cant * -0.05)) && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                  <ng-container *ngIf="ArrayDocumento.sel >= (ArrayDocumento.cant + (ArrayDocumento.cant)) && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
                     <td id="sel" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
                   </ng-container>
                   <!-- Iniciada -->
-                  <ng-container *ngIf="ArrayDocumento.sel < (ArrayDocumento.cant + (ArrayDocumento.cant * -0.05)) && ArrayDocumento.sel > 0">
+                  <ng-container *ngIf="ArrayDocumento.sel < (ArrayDocumento.cant + (ArrayDocumento.cant)) && ArrayDocumento.sel > 0">
                     <td id="sel" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
                   </ng-container>
-                  <!-- Abierta / Asignada -->
+                  <!-- Abierta / Asignada / Anulada -->
                   <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila8">
                     <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
                       <td id="sel" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
@@ -479,19 +535,23 @@
                     <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
                       <td id="sel" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
                     </ng-container>
+                    <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                      <td id="sel" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
+                    </ng-container>
                   </ng-container>
                   <!-- No iniciado -->
                   <ng-template #fila8>
-                    <td *ngIf="ArrayDocumento.sel == 0 && ArrayDocumento.sel < ArrayDocumento.cant" id="sel" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
+                    <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.sel == 0 && ArrayDocumento.sel < ArrayDocumento.cant" id="sel" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
+                    <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.sel == 0 && ArrayDocumento.sel < ArrayDocumento.cant" id="sel" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
                   </ng-template>
 
                   <!-- Wiketiado -->
                   <!-- Termianda -->
-                  <ng-container *ngIf="ArrayDocumento.wik >= (ArrayDocumento.cant + (ArrayDocumento.cant * -0.05)) && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                  <ng-container *ngIf="ArrayDocumento.wik >= (ArrayDocumento.cant + (ArrayDocumento.cant)) && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
                     <td id="wik" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wikUnd | number}} Und</td>
                   </ng-container>
                   <!-- Iniciada -->
-                  <ng-container *ngIf="ArrayDocumento.wik < (ArrayDocumento.cant + (ArrayDocumento.cant * -0.05)) && ArrayDocumento.wik > 0">
+                  <ng-container *ngIf="ArrayDocumento.wik < (ArrayDocumento.cant + (ArrayDocumento.cant)) && ArrayDocumento.wik > 0">
                     <td id="wik" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wikUnd | number}} Und</td>
                   </ng-container>
                   <!-- Asignada -->
@@ -503,10 +563,15 @@
                     <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
                       <td id="wik" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wikUnd | number}} Und</td>
                     </ng-container>
+                    <!-- Anulada -->
+                    <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                      <td id="wik" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wikUnd | number}} Und</td>
+                    </ng-container>
                   </ng-container>
                   <!-- No iniciado -->
                   <ng-template #fila9>
-                    <td *ngIf="ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wikUnd | number}} Und</td>
+                    <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wikUnd | number}} Und</td>
+                    <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.wikUnd | number}} Und</td>
                   </ng-template>
 
                   <td id="cant" scope="col"><b>{{ArrayDocumento.cantUnd}}</b></td>
