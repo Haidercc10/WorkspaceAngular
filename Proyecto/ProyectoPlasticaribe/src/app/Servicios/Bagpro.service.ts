@@ -213,5 +213,10 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/MostrarDatosConsolidados_ProcSellado/${OT}/${Proceso}`);
   }
 
+  /* Rutas para consultas a la tabla de ProcImpresion_RolloBOPP*/
+  consultarOTImpresion(ot : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcImpresionRollosBopp/consultaOtImpresion/${ot}`);
+  }
+
 
 }

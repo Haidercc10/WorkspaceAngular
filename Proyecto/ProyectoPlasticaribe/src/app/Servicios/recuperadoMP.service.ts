@@ -74,6 +74,10 @@ export class RecuperadoMPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/pdfMovimientos/${id}`);
   }
 
+  consultaRecuperado(fecha1 : any, fecha2 : any, operario : any, turno : any, materiaPrima : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/`);
+  }
+
 //Metodo agregar proveedor
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/DetalleRecuperado_MateriaPrima', data)

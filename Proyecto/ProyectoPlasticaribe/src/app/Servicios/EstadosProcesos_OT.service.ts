@@ -102,6 +102,16 @@ export class EstadosProcesos_OTService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaPorFechasVendedor/${fecha1}/${fecha2}/${vendedor}`);
   }
 
+  // Funcion que enviará los parametros de la consulta
+  consultarPorProductoVendedor(producto : any, vendedor : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaVendedorProducto/${producto}/${vendedor}`);
+  }
+
+  // Funcion que enviará los parametros de la consulta
+  consultarPorClienteVendedor(cliente : any, vendedor : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaVendedorCliente/${cliente}/${vendedor}`);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/${id}`, data);
   }

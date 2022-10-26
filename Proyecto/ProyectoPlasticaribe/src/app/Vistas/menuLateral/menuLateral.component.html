@@ -63,7 +63,7 @@
         </ng-container>
 
         <!-- Despacho -->
-        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10">
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12">
           <li>
             <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample8" role="button" aria-expanded="false" (click)="clickIcon8()" aria-controls="collapseExample">
               <ng-container *ngIf="subir8; then thenTemplate8; else elseTemplate8"></ng-container>
@@ -109,7 +109,7 @@
                 </div>
               </ng-container>
 
-              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9">
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9 || ValidarRol == 12">
                 <div class="mb-2 sangria">
                   <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample8_1" role="button" (click)="clickIcon8_1()" aria-expanded="false" aria-controls="collapseExample">
                     <ng-container *ngIf="subir8_1; then thenTemplate8_1; else elseTemplate8_1"></ng-container>
@@ -131,7 +131,7 @@
                       </div>
                     </div>
                   </ng-container>
-                  <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 8 || ValidarRol == 9">
+                  <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 8 || ValidarRol == 9 || ValidarRol == 12">
                     <div class="collapse" id="collapseExample8_1">
                       <div class="mb-2 subSangria">
                         <a class="fst-normal" data-bs-toggle="" href="/preingreso-sellado" role="button" aria-expanded="false" aria-controls="">
@@ -332,7 +332,7 @@
         </ng-container>
 
         <!-- REPORTES -->
-        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10">
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12">
           <li>
             <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7" role="button" (click)="clickIcon7()" aria-expanded="false" aria-controls="collapseExample">
               <ng-container *ngIf="subir7; then thenTemplate7; else elseTemplate7"></ng-container>
@@ -450,7 +450,7 @@
              </ng-container>
 
               <!-- Reporte de Procesos de Ordenes de trabajo -->
-              <ng-container *ngIf="ValidarRol == 1">
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 12">
                  <div class="mb-2 sangria">
                   <a class="fst-normal" data-bs-toggle="" href="/reportes-procesos-ot" role="button" aria-expanded="false" aria-controls="">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
