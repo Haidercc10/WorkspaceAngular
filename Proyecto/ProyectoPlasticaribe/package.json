@@ -60,7 +60,7 @@
     "primeng": "^14.1.2",
     "rest-mssql-nodejs": "^1.0.10",
     "rxjs": "~7.5.7",
-    "sweetalert2": "^11.6.0",
+    "sweetalert2": "^11.6.1",
     "tedious": "^15.1.0",
     "tslib": "^2.4.0",
     "xlsx": "^0.18.5",

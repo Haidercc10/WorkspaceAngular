@@ -26,7 +26,6 @@ import { CrearSedesClientesComponent } from './Vistas/crear-sedes-clientes/crear
 import { ProductoComponent } from './Vistas/producto/producto.component';
 import { CookieService } from 'ngx-cookie-service';
 import { EstadosComponent } from './Vistas/estados/estados.component';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { ValidacionLoginGuard } from './Guards/validacion-login.guard';
 import { StorageServiceModule } from 'ngx-webstorage-service';
@@ -92,6 +91,7 @@ import { EstadosOT_VendedoresComponent } from './Vistas/EstadosOT_Vendedores/Est
 import { FiltroXClientes_OTVendedoresPipe } from './Pipes/FiltroXClientes_OTVendedores.pipe';
 import { FiltroXProducto_OTVendedoresPipe } from './Pipes/FiltroXProducto_OTVendedores.pipe';
 import { DatosOTStatusComponent } from './Vistas/DatosOT-Status/DatosOT-Status.component';
+import { Reporte_RecuperadoMPComponent } from './Vistas/Reporte_RecuperadoMP/Reporte_RecuperadoMP.component';
 
 import {TableModule} from 'primeng/table';
 import {ToastModule} from 'primeng/toast';
@@ -115,6 +115,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+
 
 export const routes: Routes = [
 
@@ -179,6 +180,7 @@ export const routes: Routes = [
   {path: 'reporte-despacho', canActivate : [ValidacionLoginGuard], component : ReporteDespachoComponent}, // Ingresar Productos
   {path: 'inventario-productos', canActivate : [ValidacionLoginGuard], component : InventarioProductosPBDDComponent}, // Ingresar Productos
   {path: 'estados-ot-vendedores', canActivate : [ValidacionLoginGuard], component : EstadosOT_VendedoresComponent}, // Estados OT Vendedores
+  {path: 'reporte-recuperado-mp', canActivate : [ValidacionLoginGuard], component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
 ]
 
 @NgModule({
@@ -261,6 +263,7 @@ export const routes: Routes = [
     FiltroXClientes_OTVendedoresPipe,
     FiltroXProducto_OTVendedoresPipe,
     DatosOTStatusComponent,
+    Reporte_RecuperadoMPComponent
   ],
 
 

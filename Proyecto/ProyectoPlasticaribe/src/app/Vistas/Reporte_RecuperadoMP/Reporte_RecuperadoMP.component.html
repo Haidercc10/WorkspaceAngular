@@ -1,0 +1,169 @@
+<!--Navegador parte superior -->
+<app-menuLateral></app-menuLateral>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Materias Primas</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+<div class="contain">
+<!-- Navegador fin de parte superior -->
+<div class="container-fluid">
+  <div class="container">
+
+
+    <div class="mb-4">
+      <h4 class="tituloRojo">Crear Materias Primas</h4>
+    </div>
+    <!-- FORMULARIO DE MATERIAS PRIMAS -->
+    <form [formGroup]="formReporteRMP">
+      <!-- Inicio fila 1 de campos -->
+      <div class="mb-4">
+        <div class="row g-3">
+          <!-- Nombre -->
+          <div class="form-floating col-md">
+            <input formControlName="MatPriNombre" type="text" class="form-control form-control-sm" id="floatingInput" required >
+            <label for="floatingInput">Nombre</label>
+          </div>
+          <!-- Descripción -->
+          <div class="form-floating col-md">
+            <textarea formControlName="MatPriDescripcion" type="text" class="form-control form-control-sm" id="floatingInput" required ></textarea>
+            <label for="floatingInput">Descripción</label>
+          </div>
+          <!-- Stock -->
+          <div class="form-floating col-md-2">
+            <input formControlName="MatPriStock" type="text" class="form-control form-control-sm" id="floatingInput" required >
+            <label for="floatingInput">Stock</label>
+          </div>
+            <!--Categoria -->
+            <div class="form-floating col-md-2">
+            <select formControlName="MatPriUnidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <!--<option [ngValue]="unidadMedidas" *ngFor="let unidadMedidas of unidadMedida">{{unidadMedidas}}</option>-->
+            </select>
+            <label for="floatingSelect">Unidad Medida</label>
+          </div>
+        </div>
+      </div>
+      <!-- Fin fila 1 de campos -->
+
+       <!-- Inicio fila 2 de campos -->
+      <div class="mb-3">
+        <div class="row g-3">
+          <!-- Stock -->
+          <div class="form-floating col-md-2">
+            <select formControlName="MatPriCategoria" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <!--<option [ngValue]="Categoria.catMP_Id" *ngFor="let Categoria of nombreCategoriasMP">{{Categoria.catMP_Nombre}}</option>-->
+            </select>
+            <label for="floatingSelect">Categoria</label>
+          </div>
+          <!-- Precio -->
+          <div class="form-floating col-md-2">
+            <input formControlName="MatPriPrecio" type="number" class="form-control form-control-sm" id="floatingInput" required >
+            <label for="floatingInput">Precio</label>
+          </div>
+        </div>
+      </div>
+      <!-- Fin fila 2 de campos -->
+
+      <!-- Botones para crear materias primas -->
+      <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class="boton_guardar btn btn-danger btn-danger-sm" type="submit">1</button>
+          <button class="boton_limpiar btn btn-secondary btn-secondary-sm" type="button" expand="full">Limpiar campos</button>
+        </div>
+      </div>
+
+    </form>
+
+      <div class="mb-3">
+          <hr class="colorLinea">
+      </div>
+
+      <!--Fin consulta de materias primas -->
+      <div class="mb-4">
+        <hr class="colorLinea">
+     </div>
+
+      <div class="mb-4">
+          <h4 class="tituloRojo">Listado de Materias Primas</h4>
+      </div>
+
+      <!-- Tabla donde se mostrarán las materias primas existentes -->
+      <div class="mb-4">
+          <div class="row g-3">
+            <!--Inicio Tabla Mat. Primas-->
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover mt-2" >
+                  <thead class="TitulosTabla">
+                    <tr > <!-- *ngFor="let columnas of titulosTabla let i = index"-->
+                      <th id="idMateriaPrima" scope="col">a</th>
+                      <th id="nombreMateriaPrima" scope="col">b</th>
+                      <th id="cantidadMateriaPrima" scope="col">c</th>
+                      <th id="UnidadMedida" scope="col">c</th>
+                      <th id="precioMateriaPrima" scope="col" >c</th>
+                      <th id="subTotalMateriaPrima" scope="col">c</th>
+                    </tr>
+                  </thead>
+                    <tbody>
+                      <tr *ngFor="let materiaPrima of ArrayMateriaPrima let i=index" >
+                        <td id="idMateriaPrima" >1</td>
+                        <td id="nombreMateriaPrima" >2</td>
+                        <th id="cantidadMateriaPrima" >3</th>
+                        <td id="UnidadMedida" >4</td>
+                        <td id="precioMateriaPrima" >4</td>
+                        <td id="subTotalMateriaPrima" >4</td>
+                      </tr>
+                    </tbody>
+                </table>
+                <!--Fin Tabla Mat. Primas-->
+              </div>
+
+          </div>
+      </div>
+
+  <!-- Modal de crear Categoria -->
+  <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel2">Crear Categoria</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!--Carga componente crear Categoria<app-crear-categorias-mp></app-crear-categorias-mp>-->
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Fin Modal de crear Crear Categoria -->
+
+  <!-- Modal de crear Unidad Medida -->
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel2">Crear Unidad Medida</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!--Carga componente crear Unidad Medida<app-crear-unidades-medidas></app-crear-unidades-medidas>-->
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Fin Modal de crear Crear Unidad Medida-->
+
+  </div>
+</div>
+</div>
+
+
+
