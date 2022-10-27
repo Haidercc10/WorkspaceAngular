@@ -115,6 +115,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { Modal_RptRecuperadoMPComponent } from './Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
 
 
 export const routes: Routes = [
@@ -181,6 +182,7 @@ export const routes: Routes = [
   {path: 'inventario-productos', canActivate : [ValidacionLoginGuard], component : InventarioProductosPBDDComponent}, // Ingresar Productos
   {path: 'estados-ot-vendedores', canActivate : [ValidacionLoginGuard], component : EstadosOT_VendedoresComponent}, // Estados OT Vendedores
   {path: 'reporte-recuperado-mp', canActivate : [ValidacionLoginGuard], component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
+  {path: 'modal-rptrecuperado-mp', canActivate : [ValidacionLoginGuard], component : Modal_RptRecuperadoMPComponent},
 ]
 
 @NgModule({
@@ -263,7 +265,8 @@ export const routes: Routes = [
     FiltroXClientes_OTVendedoresPipe,
     FiltroXProducto_OTVendedoresPipe,
     DatosOTStatusComponent,
-    Reporte_RecuperadoMPComponent
+    Reporte_RecuperadoMPComponent,
+    Modal_RptRecuperadoMPComponent
   ],
 
 
