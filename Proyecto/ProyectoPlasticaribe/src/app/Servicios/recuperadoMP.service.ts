@@ -78,6 +78,10 @@ export class RecuperadoMPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/MostrarMPRecuperada/${fecha1}/${fecha2}/${operario}/${turno}/${materiaPrima}`);
   }
 
+  consultaRecuperadoModal(fecha1 : any, fecha2 : any, turno : any, materiaPrima : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/MostrarRecuperadoModal/${fecha1}/${fecha2}/${turno}/${materiaPrima}`);
+  }
+
 //Metodo agregar proveedor
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/DetalleRecuperado_MateriaPrima', data)

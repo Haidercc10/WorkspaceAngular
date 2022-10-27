@@ -11,27 +11,10 @@ import { Component, Injectable, OnInit } from '@angular/core';
 })
 export class Modal_RptRecuperadoMPComponent implements OnInit {
 
-  public titulosTabla = [];
+  arrayRegistros : any = []; //Variable que va a contener la infomacion de los registrada
   constructor() { }
 
   ngOnInit() {
-    this.columnasTablaDatos();
-  }
-
-
-  columnasTablaDatos() {
-
-    this.titulosTabla = []
-
-    let info : any = {
-      OT : "OT",
-      MP : "Mat. Prima",
-      FechaAsgMP : "Fecha Asignación",
-      Usuario : "Usuario",
-      CantidadAsg : "Cantidad",
-    }
-
-    this.titulosTabla.push(info);
   }
 
 }

@@ -128,7 +128,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
     this.dtAsgProdFactura.srvObtenerListaPorCodigoFactura(factura.toUpperCase()).subscribe(datos_factura => {
       if (datos_factura.length == 0) Swal.fire(`¡La factura ${factura} no existe!`);
       for (let i = 0; i < datos_factura.length; i++) {
-        if (datos_factura[i].estado_Id == 20 || datos_factura[i].estado_Id == 19) {
+        if ((datos_factura[i].estado_Id == 20 || datos_factura[i].estado_Id == 19) && datos_factura[i].asigProdFV_PlacaCamion == '') {
           let info : any = {
             Id : datos_factura[i].rollo_Id,
             IdProducto : datos_factura[i].prod_Id,

@@ -2247,17 +2247,14 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   //
   seleccionarOTxStatus(form : any, proceso : any){
-    this.modal_DatosStatusOT = true;
     this.otSeleccionada = form.ot;
-    this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
-    this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
-    this.modalProcesos = true;
 
-    if (proceso == 'EXTRUSION') {
+    if (proceso == 'EXTRUSION' && form.ext > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusExtrusion(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
           this.modalProcesos = true;
+          this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
           for (let index = 0; index < registros_OT.length; index++) {
             const Info : any = {
               Rollo : registros_OT[index].item,
@@ -2277,6 +2274,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
 
       this.servicioBagPro.srvObtenerDataConsolidada_StatusExtrusion(this.otSeleccionada, proceso).subscribe(datos_agrupados => {
+        this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
         for (let i = 0; i < datos_agrupados.length; i++) {
           let info : any = {
             Ot : datos_agrupados[i].ot,
@@ -2291,10 +2289,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
 
-    } else if (proceso == 'IMPRESION') {
+    } else if (proceso == 'IMPRESION' && form.imp > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusImpresion(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
+          this.modalProcesos = true;
+          this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
           for (let index = 0; index < registros_OT.length; index++) {
             const Info : any = {
               Rollo : registros_OT[index].item,
@@ -2327,10 +2327,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
         }
       });
-    } else if (proceso == 'ROTOGRABADO') {
+    } else if (proceso == 'ROTOGRABADO' && form.rot > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusRotograbado(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
+          this.modalProcesos = true;
+          this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
           for (let index = 0; index < registros_OT.length; index++) {
             const Info : any = {
               Rollo : registros_OT[index].item,
@@ -2363,10 +2365,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
         }
       });
-    } else if (proceso == 'DOBLADO') {
+    } else if (proceso == 'DOBLADO' && form.dbl > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusDoblado(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
+          this.modalProcesos = true;
+          this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
           for (let index = 0; index < registros_OT.length; index++) {
             const Info : any = {
               Rollo : registros_OT[index].item,
@@ -2399,10 +2403,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
         }
       });
-    } else if (proceso == 'LAMINADO') {
+    } else if (proceso == 'LAMINADO' && form.lam > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusLaminado(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
+          this.modalProcesos = true;
+          this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
           for (let index = 0; index < registros_OT.length; index++) {
             const Info : any = {
               Rollo : registros_OT[index].item,
@@ -2435,10 +2441,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
         }
       });
-    } else if (proceso == 'CORTE') {
+    } else if (proceso == 'CORTE' && form.cor > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusCorte(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
+          this.modalProcesos = true;
+          this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
           for (let index = 0; index < registros_OT.length; index++) {
             const Info : any = {
               Rollo : registros_OT[index].item,
@@ -2471,10 +2479,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
         }
       });
-    } else if (proceso == 'EMPAQUE') {
+    } else if (proceso == 'EMPAQUE' && form.emp > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusEmpaque(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
+          this.modalProcesos = true;
+          this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
           for (let index = 0; index < registros_OT.length; index++) {
             const Info : any = {
               Rollo : registros_OT[index].item,
@@ -2507,10 +2517,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
         }
       });
-    } else if (proceso == 'SELLADO') {
+    } else if (proceso == 'SELLADO' && form.sel > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusSellado(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
+          this.modalProcesos = true;
+          this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
           for (let index = 0; index < registros_OT.length; index++) {
             const Info : any = {
               Rollo : registros_OT[index].item,
@@ -2542,10 +2554,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
         }
       });
-    } else if (proceso == 'Wiketiado') {
+    } else if (proceso == 'Wiketiado' && form.wik > 0) {
       this.servicioBagPro.srvObtenerListaPorStatusWiketiado(this.otSeleccionada).subscribe(registros_OT => {
         if (registros_OT.length == 0) this.cerrarModal(`No se encontraron registros de la OT ${this.otSeleccionada} en el proceso de ${proceso}`);
         else {
+          this.modalProcesos = true;
+          this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
           for (let index = 0; index < registros_OT.length; index++) {
             const Info : any = {
               Rollo : registros_OT[index].item,
@@ -2578,6 +2592,13 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
     }
+  }
+
+  // Funcion que se encargará de limpiar los campos del modal de procesos
+  limpiarModalProcesos(){
+    this.modalProcesos = false;
+    this.MostrarDatosOTxStatus.ArrayDatosProcesos = [];
+    this.MostrarDatosOTxStatus.ArrayDatosAgrupados = [];
   }
 
   // Funcion que va a cerrar el modal cuando no haya información

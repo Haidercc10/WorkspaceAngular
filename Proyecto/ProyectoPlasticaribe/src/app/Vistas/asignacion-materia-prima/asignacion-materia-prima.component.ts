@@ -369,7 +369,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           let adicional : number = datos_procesos[index].datosotKg * 0.1;
           this.kgOT = datos_procesos[index].datosotKg + adicional;
           this.estadoOT = datos_procesos[index].estado;
-          this.FormMateriaPrimaRetiro.setValue({
+          this.FormMateriaPrimaRetiro.patchValue({
             OTRetiro : this.FormMateriaPrimaRetiro.value.OTRetiro,
             OTImp : this.FormMateriaPrimaRetiro.value.OTImp,
             FechaRetiro : this.FormMateriaPrimaRetiro.value.FechaRetiro,
@@ -600,40 +600,41 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         MatPri_Precio : datos_materiaPrima.matPri_Precio,
         TpBod_Id : datos_materiaPrima.tpBod_Id,
       }
-      this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).subscribe(datos_mp_creada => {});
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: '¡Registro de Asignación creado con exito!'
-      });
-
-      setTimeout(() => {
-        this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
-          OTRetiro : '',
-          FechaRetiro : this.today,
-          Maquina : '',
-          UsuarioRetiro : '',
-          kgOt : '',
-          EstadoRetiro : '',
-          ObservacionRetiro : '',
+      this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).subscribe(datos_mp_creada => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 1500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
         });
-        this.ArrayMateriaPrimaRetirada= [];
-        this.FormMateriaPrimaRetirada.reset();
-        this.cantidadAsignada = 0;
-        this.cantRestante = 0;
-        this.kgOT = 0;
-        this.load = true;
-      }, 2500);
+        Toast.fire({
+          icon: 'success',
+          title: '¡Registro de Asignación creado con exito!'
+        });
+
+        setTimeout(() => {
+          this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
+            OTRetiro : '',
+            FechaRetiro : this.today,
+            Maquina : '',
+            UsuarioRetiro : '',
+            kgOt : '',
+            EstadoRetiro : '',
+            ObservacionRetiro : '',
+          });
+          this.ArrayMateriaPrimaRetirada= [];
+          this.FormMateriaPrimaRetirada.reset();
+          this.cantidadAsignada = 0;
+          this.cantRestante = 0;
+          this.kgOT = 0;
+          this.load = true;
+        }, 2500);
+      });
     });
   }
 
@@ -658,34 +659,35 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         Tinta_InvInicial : datos_tintas.tinta_InvInicial
       }
 
-      this.tintasService.srvActualizar(idMateriaPrima, datosTintas).subscribe(datos_tintasActualizada => {});
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
+      this.tintasService.srvActualizar(idMateriaPrima, datosTintas).subscribe(datos_tintasActualizada => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 1500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+        Toast.fire({
+          icon: 'success',
+          title: '¡Registro de Asignación creado con exito!'
+        });
+        this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
+          OTRetiro : '',
+          FechaRetiro : this.today,
+          Maquina : '',
+          UsuarioRetiro : '',
+          kgOt : '',
+          EstadoRetiro : '',
+          ObservacionRetiro : '',
+        });
+        this.ArrayMateriaPrimaRetirada= [];
+        this.FormMateriaPrimaRetirada.reset();
+        this.load = true;
       });
-      Toast.fire({
-        icon: 'success',
-        title: '¡Registro de Asignación creado con exito!'
-      });
-      this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
-        OTRetiro : '',
-        FechaRetiro : this.today,
-        Maquina : '',
-        UsuarioRetiro : '',
-        kgOt : '',
-        EstadoRetiro : '',
-        ObservacionRetiro : '',
-      });
-      this.ArrayMateriaPrimaRetirada= [];
-      this.FormMateriaPrimaRetirada.reset();
-      this.load = true;
     });
   }
 

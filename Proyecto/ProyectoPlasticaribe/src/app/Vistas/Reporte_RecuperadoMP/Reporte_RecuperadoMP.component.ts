@@ -1,13 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
-import {AutoCompleteModule} from 'primeng/autocomplete';
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { RecuperadoService } from 'src/app/Servicios/recuperado.service';
 import { RecuperadoMPService } from 'src/app/Servicios/recuperadoMP.service';
 import { TurnosService } from 'src/app/Servicios/Turnos.service';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
+import { Modal_RptRecuperadoMPComponent } from 'src/app/Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
 
 
 @Component({
@@ -16,6 +15,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./Reporte_RecuperadoMP.component.css']
 })
 export class Reporte_RecuperadoMPComponent implements OnInit {
+  @ViewChild(Modal_RptRecuperadoMPComponent) modalRecuperado : Modal_RptRecuperadoMPComponent;
 
   public formReporteRMP !: FormGroup; /** Formulario de filtros */
   public materiasPrimas = []; /** Array que contendrá los datos de la consulta */
@@ -27,7 +27,8 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
   idMateriaPrima : number = null; //Variable que va a almacenar el id de la materia prima escogida
   first = 0;
   rows = 20;
-
+  consultaTurno : string = '';
+  modalInfoRecuperado : boolean = false;
 
   constructor(private frmBuilder : FormBuilder,
                 private materiaPrimaService : MateriaPrimaService,
@@ -42,8 +43,7 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
       Turno : [null],
       Operario : [null],
     });
-   }
-
+  }
 
   ngOnInit() {
     this.obtenerMateriaPrima();
@@ -51,11 +51,10 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     this.obtenerOperarios();
 
     this.columnas = [
-      { header: 'Registrada Por', field: 'usua_Nombre'},
-      { header: 'Fecha', field: 'fecha' },
+      { header: 'Id Materia Prima', field: 'idMatPrima'},
       { header: 'Materia Prima', field: 'matPrima'},
       { header: 'Cantidad', field: 'cant'},
-      { header: 'Presentacion', field: 'undMed'},
+      { header: 'Presentación', field: 'undMed'},
     ];
   }
 
@@ -130,6 +129,7 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     this.columnas = [];
     this.idMateriaPrima = null;
     this.idOperario = null;
+    this.consultaTurno = ''
   }
 
   // Funcion que va a Consultar segun los filtros que le pasemos
@@ -150,34 +150,120 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     this.recuperadoService.consultaRecuperado(fechaInicial, fechaFinal, operario, turno, materiaPrima).subscribe(datos_recuperado => {
       if (datos_recuperado.length <= 0) Swal.fire(`No se encontraron registros para los filtros consultados`);
       for (let i = 0; i < datos_recuperado.length; i++) {
+        let dia : number = 0;
+        let noche : number = 0;
+        if (datos_recuperado[i].sumaDia.length != 0) {
+          for (let j = 0; j < datos_recuperado[i].sumaDia.length; j++) {
+            dia = datos_recuperado[i].sumaDia[j].suma;
+          }
+        }
+
+        if (datos_recuperado[i].sumaNoche.length != 0) {
+          for (let j = 0; j < datos_recuperado[i].sumaNoche.length; j++) {
+            noche = datos_recuperado[i].sumaNoche[j].suma;
+          }
+        }
         this.llenarArray(
-          datos_recuperado[i].usua_Nombre,
-          datos_recuperado[i].recMp_FechaIngreso,
+          datos_recuperado[i].matPri_Id,
           datos_recuperado[i].matPri_Nombre,
           datos_recuperado[i].sumaCantidad,
-          datos_recuperado[i].undMed_Id
+          dia,
+          noche,
+          datos_recuperado[i].undMed_Id,
+          datos_recuperado[i].turno_Id
         );
       }
     });
   }
 
   // Funcion que se encargará de llenar la informacio que se mostrará en la tabla
-  llenarArray(usua : any, fecha : any, mp : any, cant : any, undMed : any){
+  llenarArray(id : any, mp : any, cant : any, dia : any, noche : any, undMed : any, turno : any){
     let info : any = {
-      usua_Nombre : usua,
-      fecha : fecha.replace('T00:00:00', ''),
+      idMatPrima : id,
       matPrima : mp,
       cant : this.formatonumeros(cant),
+      cantDia : dia,
+      cantNoche : noche,
       undMed : undMed,
+      turno : turno,
     }
     this.columnas = [
-      { header: 'Registrada Por', field: 'usua_Nombre'},
-      { header: 'Fecha', field: 'fecha' },
+      { header: 'Id Materia Prima', field: 'idMatPrima'},
       { header: 'Materia Prima', field: 'matPrima'},
       { header: 'Cantidad', field: 'cant'},
-      { header: 'Presentacion', field: 'undMed'},
+      { header: 'Presentación', field: 'undMed'},
     ];
     this.registros.push(info);
-    this.registros.sort((a,b) => a.fecha.localeCompare(b.fecha));
+    this.registros.sort((a,b) => a.matPrima.localeCompare(b.matPrima));
+  }
+
+  //
+  validarModal(item : any, turno : any){
+    this.modalInfoRecuperado = false;
+    // this.modalRecuperado.arrayRegistros = [];
+    if (turno == 'DIA' && item.cantDia > 0) this.consultarPeletizadoDia(item);
+    if (turno == 'NOCHE' && item.cantNoche > 0) this.consultarPeletizadoNoche(item);
+  }
+
+  //
+  limpiarModal(){
+    this.modalInfoRecuperado = false;
+    this.modalRecuperado.arrayRegistros = [];
+  }
+
+  //
+  consultarPeletizadoDia(item : any){
+    if (item.cantDia > 0) {
+      this.modalInfoRecuperado = true;
+      this.modalRecuperado.arrayRegistros = [];
+      this.consultaTurno = 'Día';
+      let fechaInicial : any = this.formReporteRMP.value.FechaInicial;
+      let fechaFinal : any = this.formReporteRMP.value.FechaFinal;
+      if (fechaInicial != null && fechaFinal == null) fechaFinal = fechaInicial;
+      if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
+      if (fechaFinal == null) fechaFinal = moment().format('YYYY-MM-DD');
+      this.recuperadoService.consultaRecuperadoModal(fechaInicial, fechaFinal, "DIA", item.idMatPrima).subscribe(datos_recuperado => {
+        for (let i = 0; i < datos_recuperado.length; i++) {
+          let info = {
+            id : datos_recuperado[i].matPri_Id,
+            nombreMp : datos_recuperado[i].matPri_Nombre,
+            cantidad : datos_recuperado[i].recMatPri_Cantidad,
+            undMed : datos_recuperado[i].undMed_Id,
+            fecha : datos_recuperado[i].recMp_FechaEntrega.replace('T00:00:00', ''),
+            operario : datos_recuperado[i].usua_Nombre,
+          }
+          this.modalRecuperado.arrayRegistros.push(info);
+        }
+      });
+    } else if (item.cantDia <= 0) this.modalInfoRecuperado = false;
+  }
+
+  //
+  consultarPeletizadoNoche(item : any){
+    this.modalInfoRecuperado = false;
+    console.log(item)
+    if (item.cantNoche > 0) {
+      this.modalInfoRecuperado = true;
+      this.modalRecuperado.arrayRegistros = [];
+      this.consultaTurno = 'Noche';
+      let fechaInicial : any = this.formReporteRMP.value.FechaInicial;
+      let fechaFinal : any = this.formReporteRMP.value.FechaFinal;
+      if (fechaInicial != null && fechaFinal == null) fechaFinal = fechaInicial;
+      if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
+      if (fechaFinal == null) fechaFinal = moment().format('YYYY-MM-DD');
+      this.recuperadoService.consultaRecuperadoModal(fechaInicial, fechaFinal, "NOCHE", item.idMatPrima).subscribe(datos_recuperado => {
+        for (let i = 0; i < datos_recuperado.length; i++) {
+          let info = {
+            id : datos_recuperado[i].matPri_Id,
+            nombreMp : datos_recuperado[i].matPri_Nombre,
+            cantidad : datos_recuperado[i].recMatPri_Cantidad,
+            undMed : datos_recuperado[i].undMed_Id,
+            fecha : datos_recuperado[i].recMp_FechaEntrega.replace('T00:00:00', ''),
+            operario : datos_recuperado[i].usua_Nombre,
+          }
+          this.modalRecuperado.arrayRegistros.push(info);
+        }
+      });
+    } else if (item.cantNoche <= 0) this.modalInfoRecuperado = false;
   }
 }

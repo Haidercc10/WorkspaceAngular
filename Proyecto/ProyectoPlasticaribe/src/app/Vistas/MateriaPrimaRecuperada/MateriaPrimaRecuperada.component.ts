@@ -343,6 +343,22 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
 
     this.recuperadoService.srvGuardar(datosRecuperado).subscribe(datos_RecuperadoCreada => {
       this.obtenerUltimoIdRecuperado();
+    }, error => {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'center',
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+      Toast.fire({
+        icon: 'error',
+        title: '¡Error al ingresar el peletizado!'
+      });
     });
   }
 
@@ -427,6 +443,22 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
           TpRecu_Id : tipoRecuperado,
         }
         this.recuperadoMPService.srvGuardar(datosRecuperadoMp).subscribe(datos_recuperadoMpCreada => {
+        }, error => {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'center',
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer)
+              toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+          });
+          Toast.fire({
+            icon: 'error',
+            title: '¡Error al ingresar el peletizado!'
+          });
         });
         this.moverInventarioMpAgregada();
       }
@@ -472,6 +504,22 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
             title: '¡Registro De Materia Prima Recuperada Creado Con Exito!'
           });
           this.limpiarTodosCampos();
+        }, error => {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'center',
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer)
+              toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+          });
+          Toast.fire({
+            icon: 'error',
+            title: '¡Peletizado ingresado correctamente, Error al mover el inventarios del peletizado!'
+          });
         });
       });
     }

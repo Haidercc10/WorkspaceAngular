@@ -1,32 +1,26 @@
 <div class="table-responsive">
   <table class="table table-bordered table-hover mt-2">
     <thead class="TitulosTabla">
-      <tr *ngFor="let columnas of titulosTabla let i = index">
-        <th id="OT" scope="col">{{columnas.OT}}</th>
-        <th id="MatPrima" scope="col">{{columnas.MP}}</th>
-        <th id="Cantidad" scope="col">{{columnas.CantidadAsg}}</th>
-        <th id="Fecha" scope="col">{{columnas.FechaAsgMP}}</th>
-        <th id="Usuario" scope="col">{{columnas.Usuario}}</th>
-        <!--<th id="ver" scope="col" >{{columnas.Ver}}</th>-->
+      <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Materia Prima</th>
+        <th scope="col">Cantidad</th>
+        <th scope="col">Und. Medida</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Operario</th>
       </tr>
       </thead>
     <tbody>
-      <tr > <!-- *ngFor="let doc of ArrayDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index" -->
-        <td id="OT"></td>
-        <td id="MatPrima"></td>
-        <td id="Fecha"></td>
-        <td id="Usuario"></td>
-        <td id="Cantidad"></td>
-         <!--<ng-container *ngIf="ValidarRol == 1 && this.estadoOt != ''">
-          <td id="mp"></td>
-        </ng-container>-->
-        <!--<td id="subTotalMateriaPrima"><input class="btn btn-danger btn-danger-sm" type="button" value="Ver" (click)="llenarDocumento(doc)"></td>-->
+      <tr *ngFor="let item of arrayRegistros; let i=index">
+        <td>{{item.id}}</td>
+        <td>{{item.nombreMp}}</td>
+        <td>{{item.cantidad | number}}</td>
+        <td>{{item.undMed}}</td>
+        <td>{{item.fecha}}</td>
+        <td>{{item.operario}}</td>
       </tr>
     </tbody>
   </table>
   <div class="mb-2">
-    <!--<div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <pagination-controls (pageChange)="page = $event"></pagination-controls>
-    </div>-->
   </div>
 </div>
