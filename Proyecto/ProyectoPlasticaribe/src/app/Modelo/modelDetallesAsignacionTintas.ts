@@ -4,4 +4,5 @@ export interface modelDetallesAsignacionTintas{
   DtAsigTinta_Cantidad : number;
   UndMed_Id : string;
   Proceso_Id : string;
+  DtAsigTinta_OTImpresion : number;
 }

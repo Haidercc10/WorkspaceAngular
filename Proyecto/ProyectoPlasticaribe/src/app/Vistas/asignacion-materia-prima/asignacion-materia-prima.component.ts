@@ -93,6 +93,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   acumuladoraTintas = 0;
 
   categoria = 0; // Variable para identificar a que categoria pertenece la materia prima que se ha introduciodo en la tabla
+  otImpresion : any [] = []; //Variable que va a almacenar las diferentes ordenes de trabajo que contiene la orden de trabajo de impresión
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -117,6 +118,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : ['', Validators.required],
+      OTImp : [''],
       FechaRetiro : ['', Validators.required],
       Maquina : ['', Validators.required],
       UsuarioRetiro : ['', Validators.required],
@@ -174,6 +176,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : '',
+      OTImp : '',
       FechaRetiro : this.today,
       Maquina : '',
       UsuarioRetiro : '',
@@ -205,20 +208,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     return number.toString().replace(exp,rep);
   }
 
-  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
-  confimacionSalida(){
-    Swal.fire({
-      title: '¿Seguro que desea salir?',
-      showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: 'Salir',
-      denyButtonText: `No Salir`,
-    }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
-      if (result.isConfirmed) window.location.href = "./";
-    })
-  }
-
   // Funcion que limpia los todos los campos de la vista
   LimpiarCampos() {
     this.FormMateriaPrimaRetirada.setValue({
@@ -236,6 +225,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   limpiarCamposMP(){
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : '',
+      OTImp : '',
       FechaRetiro : this.today,
       Maquina : '',
       UsuarioRetiro : '',
@@ -381,6 +371,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.estadoOT = datos_procesos[index].estado;
           this.FormMateriaPrimaRetiro.setValue({
             OTRetiro : this.FormMateriaPrimaRetiro.value.OTRetiro,
+            OTImp : this.FormMateriaPrimaRetiro.value.OTImp,
             FechaRetiro : this.FormMateriaPrimaRetiro.value.FechaRetiro,
             Maquina : this.FormMateriaPrimaRetiro.value.Maquina,
             UsuarioRetiro : this.FormMateriaPrimaRetiro.value.UsuarioRetiro,
@@ -424,6 +415,16 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     });
   }
 
+  // Funcion que treará la informacion de las ordenes de trabajo de impresion
+  infoOTImpresion(){
+    let otImp : string = `${this.FormMateriaPrimaRetiro.value.OTImp}`;
+    this.bagProServices.consultarOTImpresion(otImp).subscribe(datos_otImp => {
+      for (let i = 0; i < datos_otImp.length; i++) {
+        if (datos_otImp[i].ot.trim() != '') this.otImpresion.push(datos_otImp[i].ot.trim());
+      }
+    });
+  }
+
   validarCamposVaciosRetirada(){
     let ot : string = this.FormMateriaPrimaRetiro.value.OTRetiro;
     if (this.FormMateriaPrimaRetiro.valid) this.asignacionMateriaPrima();
@@ -437,29 +438,30 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     if (this.ArrayMateriaPrimaRetirada.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla")
     else {
       // if (proceso == 'IMP' || proceso == 'ROT') {
-        const datosDetallesAsignacionTintas : any = {
-          AsigMp_Id : idAsignacion,
-          Tinta_Id : idMp,
-          DtAsigTinta_Cantidad : cantidad,
-          UndMed_Id : presentacion,
-          Proceso_Id : proceso,
-        }
+      const datosDetallesAsignacionTintas : any = {
+        AsigMp_Id : idAsignacion,
+        Tinta_Id : idMp,
+        DtAsigTinta_Cantidad : cantidad,
+        UndMed_Id : presentacion,
+        Proceso_Id : proceso,
+      }
 
-        this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(datos_asignacionTintas => {});
-        this.moverInventarioTintas(idMp, cantidad);
+      this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(datos_asignacionTintas => {});
+      this.moverInventarioTintas(idMp, cantidad);
 
       // } else {
-        const datosDetallesAsignacion : any = {
-          AsigMp_Id : idAsignacion,
-          MatPri_Id : idMp,
-          DtAsigMp_Cantidad : cantidad,
-          UndMed_Id : presentacion,
-          Proceso_Id : proceso,
-        }
+      const datosDetallesAsignacion : any = {
+        AsigMp_Id : idAsignacion,
+        MatPri_Id : idMp,
+        DtAsigMp_Cantidad : cantidad,
+        UndMed_Id : presentacion,
+        Proceso_Id : proceso,
+        // DtAsigTinta_OTImpresion : 123456,
+      }
 
-        this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {
-        });
-        this.moverInventarioMpPedida(idMp, cantidad);
+      this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {
+      });
+      this.moverInventarioMpPedida(idMp, cantidad);
       // }
     }
   }
@@ -484,7 +486,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.procesosService.srvObtenerLista().subscribe(datos_proceso => {
       for (let i = 0; i < datos_proceso.length; i++) {
         if (datos_proceso[i].proceso_Nombre == proceso) {
-          if (this.categoria == 7) {
+          if (this.categoria == 7 || this.categoria == 13 || this.categoria == 8) {
             if (true) {
               if (cantidad <= stock) {
                 let productoExt : any = {
@@ -756,7 +758,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   //Funcion que llenará la infomacion de materia prima buscada o seleccionada y pasará la informacion a la vista
   cargarInfoMP(){
     for (const Mp of this.materiaPrimaSeleccionada) {
-      if (Mp.catMP_Id == 7) {
+      if (Mp.catMP_Id == 7 || Mp.catMP_Id == 8) {
         this.FormMateriaPrimaRetirada.setValue({
           MpIdRetirada : Mp.tinta_Id,
           MpNombreRetirada: Mp.tinta_Nombre,

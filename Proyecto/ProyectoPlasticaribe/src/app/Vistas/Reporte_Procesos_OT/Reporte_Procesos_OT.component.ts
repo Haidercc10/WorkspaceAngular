@@ -521,6 +521,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOtAnulada = 0;
     this.cantidadOTFinalizada = 0;
     this.cantidadOTCerrada = 0;
+    this.clienteSeleccionado = 0;
   }
 
   // Funcion que obtendrá los clientes
@@ -775,41 +776,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
         }
       });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal, vendedor).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 4800);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-              for (let j = 0; j < datos_bagpro.length; j++) {
-                this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                  datos_ot[i].estProcOT_ExtrusionKg,
-                  datos_ot[i].estProcOT_ImpresionKg,
-                  datos_ot[i].estProcOT_RotograbadoKg,
-                  datos_ot[i].estProcOT_DobladoKg,
-                  datos_ot[i].estProcOT_LaminadoKg,
-                  datos_ot[i].estProcOT_CorteKg,
-                  datos_ot[i].estProcOT_EmpaqueKg,
-                  datos_ot[i].estProcOT_SelladoKg,
-                  datos_ot[i].estProcOT_WiketiadoKg,
-                  datos_ot[i].estProcOT_CantidadPedida,
-                  datos_ot[i].falla_Nombre,
-                  datos_ot[i].estProcOT_Observacion,
-                  datos_ot[i].estado_Nombre,
-                  datos_ot[i].estProcOT_FechaCreacion,
-                  datos_ot[i].estProcOT_FechaInicio,
-                  datos_ot[i].estProcOT_FechaFinal,
-                  datos_ot[i].estProcOT_CantidadPedidaUnd,
-                  datos_ot[i].undMed_Id,
-                  datos_ot[i].usua_Id,
-                  datos_ot[i].usua_Nombre,
-                  datos_ot[i].estProcOT_SelladoUnd,
-                  datos_ot[i].estProcOT_WiketiadoUnd);
-              }
-            });
-          }
-        }
-      });
     } else if (fechaincial != null && fechaFinal != null && estado != null && vendedor != null) {
       this.srvEstadosOTVendedores.srvObtenerListaPorFechasEstado(fechaincial, fechaFinal, estado, vendedor).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
@@ -848,6 +814,41 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
 
+    } else if (numOT   != null && fechaincial != null && fechaFinal != null && vendedor != null) {
+      this.srvEstadosOTVendedores.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal, vendedor).subscribe(datos_ot => {
+        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 4800);
+        else {
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
+              for (let j = 0; j < datos_bagpro.length; j++) {
+                this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+                  datos_ot[i].estProcOT_ExtrusionKg,
+                  datos_ot[i].estProcOT_ImpresionKg,
+                  datos_ot[i].estProcOT_RotograbadoKg,
+                  datos_ot[i].estProcOT_DobladoKg,
+                  datos_ot[i].estProcOT_LaminadoKg,
+                  datos_ot[i].estProcOT_CorteKg,
+                  datos_ot[i].estProcOT_EmpaqueKg,
+                  datos_ot[i].estProcOT_SelladoKg,
+                  datos_ot[i].estProcOT_WiketiadoKg,
+                  datos_ot[i].estProcOT_CantidadPedida,
+                  datos_ot[i].falla_Nombre,
+                  datos_ot[i].estProcOT_Observacion,
+                  datos_ot[i].estado_Nombre,
+                  datos_ot[i].estProcOT_FechaCreacion,
+                  datos_ot[i].estProcOT_FechaInicio,
+                  datos_ot[i].estProcOT_FechaFinal,
+                  datos_ot[i].estProcOT_CantidadPedidaUnd,
+                  datos_ot[i].undMed_Id,
+                  datos_ot[i].usua_Id,
+                  datos_ot[i].usua_Nombre,
+                  datos_ot[i].estProcOT_SelladoUnd,
+                  datos_ot[i].estProcOT_WiketiadoUnd);
+              }
+            });
+          }
+        }
+      });
     } else if (numOT != null && fechaincial != null && estado != null && vendedor != null) {
       this.srvEstadosOTVendedores.srvObtenerListaPorOtFecha(numOT, fechaincial, vendedor).subscribe(datos_ot => {
         if(datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
@@ -950,6 +951,181 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
         }
       });
+    } else if (fechaincial != null && fechaFinal != null && estado != null) {
+      this.estadosProcesos_OTService.srvObtenerListaPorFechasEstado(fechaincial, fechaFinal, estado).subscribe(datos_ot => {
+        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
+        else {
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
+          }
+        }
+      });
+    } else if (fechaincial != null && fallas != null && estado != null) {
+      this.estadosProcesos_OTService.srvObtenerListaPorFechaEstadoFalla(fechaincial, estado, fallas).subscribe(datos_ot => {
+        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
+        else {
+            for (let i = 0; i < datos_ot.length; i++) {
+              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+                datos_ot[i].estProcOT_ExtrusionKg,
+                datos_ot[i].estProcOT_ImpresionKg,
+                datos_ot[i].estProcOT_RotograbadoKg,
+                datos_ot[i].estProcOT_DobladoKg,
+                datos_ot[i].estProcOT_LaminadoKg,
+                datos_ot[i].estProcOT_CorteKg,
+                datos_ot[i].estProcOT_EmpaqueKg,
+                datos_ot[i].estProcOT_SelladoKg,
+                datos_ot[i].estProcOT_WiketiadoKg,
+                datos_ot[i].estProcOT_CantidadPedida,
+                datos_ot[i].falla_Nombre,
+                datos_ot[i].estProcOT_Observacion,
+                datos_ot[i].estado_Nombre,
+                datos_ot[i].estProcOT_FechaCreacion,
+                datos_ot[i].estProcOT_FechaInicio,
+                datos_ot[i].estProcOT_FechaFinal,
+                datos_ot[i].estProcOT_CantidadPedidaUnd,
+                datos_ot[i].undMed_Id,
+                datos_ot[i].usua_Id,
+                datos_ot[i].usua_Nombre,
+                datos_ot[i].estProcOT_SelladoUnd,
+                datos_ot[i].estProcOT_WiketiadoUnd);
+            }
+        }
+      });
+    } else if (fechaincial != null && estado != null && vendedor != null) {
+      this.srvEstadosOTVendedores.srvObtenerListaPorFecha(fechaincial, vendedor).subscribe(datos_ot => {
+        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
+        else{
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
+              if (datos_ot[i].estado_Id == estado){
+                for (let j = 0; j < datos_bagpro.length; j++) {
+                  this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+                    datos_ot[i].estProcOT_ExtrusionKg,
+                    datos_ot[i].estProcOT_ImpresionKg,
+                    datos_ot[i].estProcOT_RotograbadoKg,
+                    datos_ot[i].estProcOT_DobladoKg,
+                    datos_ot[i].estProcOT_LaminadoKg,
+                    datos_ot[i].estProcOT_CorteKg,
+                    datos_ot[i].estProcOT_EmpaqueKg,
+                    datos_ot[i].estProcOT_SelladoKg,
+                    datos_ot[i].estProcOT_WiketiadoKg,
+                    datos_ot[i].estProcOT_CantidadPedida,
+                    datos_ot[i].falla_Nombre,
+                    datos_ot[i].estProcOT_Observacion,
+                    datos_ot[i].estado_Nombre,
+                    datos_ot[i].estProcOT_FechaCreacion,
+                    datos_ot[i].estProcOT_FechaInicio,
+                    datos_ot[i].estProcOT_FechaFinal,
+                    datos_ot[i].estProcOT_CantidadPedidaUnd,
+                    datos_ot[i].undMed_Id,
+                    datos_ot[i].usua_Id,
+                    datos_ot[i].usua_Nombre,
+                    datos_ot[i].estProcOT_SelladoUnd,
+                    datos_ot[i].estProcOT_WiketiadoUnd);
+                }
+              }
+            });
+          }
+        }
+      });
+    } else if (fechaincial != null && fechaFinal != null && vendedor != null) {
+      if (fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') setTimeout(() => {Swal.fire('Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)');}, 4800);
+      else if (fechaFinal < fechaincial) setTimeout(() => {Swal.fire('La fecha final debe ser mayor que la fecha inicial');}, 4800);
+      else {
+        this.srvEstadosOTVendedores.srvObtenerListaPorFechas(fechaincial, fechaFinal, vendedor).subscribe(datos_ot => {
+          if(datos_ot.length == 0) {setTimeout(() => {Swal.fire('No existen OTs creadas en las fechas consultadas.')}, 4800);
+          } else {
+            for (let i = 0; i < datos_ot.length; i++) {
+              this.servicioBagPro.srvObtenerListaClienteOT_Item(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
+                  for (let j = 0; j < datos_bagpro.length; j++) {
+                    this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+                      datos_ot[i].estProcOT_ExtrusionKg,
+                      datos_ot[i].estProcOT_ImpresionKg,
+                      datos_ot[i].estProcOT_RotograbadoKg,
+                      datos_ot[i].estProcOT_DobladoKg,
+                      datos_ot[i].estProcOT_LaminadoKg,
+                      datos_ot[i].estProcOT_CorteKg,
+                      datos_ot[i].estProcOT_EmpaqueKg,
+                      datos_ot[i].estProcOT_SelladoKg,
+                      datos_ot[i].estProcOT_WiketiadoKg,
+                      datos_ot[i].estProcOT_CantidadPedida,
+                      datos_ot[i].falla_Nombre,
+                      datos_ot[i].estProcOT_Observacion,
+                      datos_ot[i].estado_Nombre,
+                      datos_ot[i].estProcOT_FechaCreacion,
+                      datos_ot[i].estProcOT_FechaInicio,
+                      datos_ot[i].estProcOT_FechaFinal,
+                      datos_ot[i].estProcOT_CantidadPedidaUnd,
+                      datos_ot[i].undMed_Id,
+                      datos_ot[i].usua_Id,
+                      datos_ot[i].usua_Nombre,
+                      datos_ot[i].estProcOT_SelladoUnd,
+                      datos_ot[i].estProcOT_WiketiadoUnd);
+                }
+              });
+            }
+          }
+      });
+    }
+    } else if (estado != null && numOT != null && vendedor != null) {
+      this.srvEstadosOTVendedores.srvObtenerListaPorOT(numOT, vendedor).subscribe(datos_ot => {
+        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
+        else {
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
+              if (datos_ot[i].estado_Id == estado){
+                for (let j = 0; j < datos_bagpro.length; j++) {
+                  this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+                    datos_ot[i].estProcOT_ExtrusionKg,
+                    datos_ot[i].estProcOT_ImpresionKg,
+                    datos_ot[i].estProcOT_RotograbadoKg,
+                    datos_ot[i].estProcOT_DobladoKg,
+                    datos_ot[i].estProcOT_LaminadoKg,
+                    datos_ot[i].estProcOT_CorteKg,
+                    datos_ot[i].estProcOT_EmpaqueKg,
+                    datos_ot[i].estProcOT_SelladoKg,
+                    datos_ot[i].estProcOT_WiketiadoKg,
+                    datos_ot[i].estProcOT_CantidadPedida,
+                    datos_ot[i].falla_Nombre,
+                    datos_ot[i].estProcOT_Observacion,
+                    datos_ot[i].estado_Nombre,
+                    datos_ot[i].estProcOT_FechaCreacion,
+                    datos_ot[i].estProcOT_FechaInicio,
+                    datos_ot[i].estProcOT_FechaFinal,
+                    datos_ot[i].estProcOT_CantidadPedidaUnd,
+                    datos_ot[i].undMed_Id,
+                    datos_ot[i].usua_Id,
+                    datos_ot[i].usua_Nombre,
+                    datos_ot[i].estProcOT_SelladoUnd,
+                    datos_ot[i].estProcOT_WiketiadoUnd);
+                }
+              }
+            });
+          }
+        }
+      });
     } else if (numOT != null && fechaincial != null && fechaFinal != null) {
       this.estadosProcesos_OTService.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
@@ -1014,107 +1190,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
         }
       });
-    } else if (fechaincial != null && fechaFinal != null && estado != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorFechasEstado(fechaincial, fechaFinal, estado).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
-          }
-        }
-      });
-    } else if (fechaincial != null && fallas != null && estado != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorFechaEstadoFalla(fechaincial, estado, fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-            for (let i = 0; i < datos_ot.length; i++) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
-            }
-        }
-      });
-    } else if (fechaincial != null && fechaFinal != null && vendedor != null) {
-      if (fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') setTimeout(() => {Swal.fire('Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)');}, 4800);
-      else if (fechaFinal < fechaincial) setTimeout(() => {Swal.fire('La fecha final debe ser mayor que la fecha inicial');}, 4800);
-      else {
-        this.srvEstadosOTVendedores.srvObtenerListaPorFechas(fechaincial, fechaFinal, vendedor).subscribe(datos_ot => {
-          if(datos_ot.length == 0) {setTimeout(() => {Swal.fire('No existen OTs creadas en las fechas consultadas.')}, 4800);
-          } else {
-            for (let i = 0; i < datos_ot.length; i++) {
-              this.servicioBagPro.srvObtenerListaClienteOT_Item(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-                  for (let j = 0; j < datos_bagpro.length; j++) {
-                    this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                      datos_ot[i].estProcOT_ExtrusionKg,
-                      datos_ot[i].estProcOT_ImpresionKg,
-                      datos_ot[i].estProcOT_RotograbadoKg,
-                      datos_ot[i].estProcOT_DobladoKg,
-                      datos_ot[i].estProcOT_LaminadoKg,
-                      datos_ot[i].estProcOT_CorteKg,
-                      datos_ot[i].estProcOT_EmpaqueKg,
-                      datos_ot[i].estProcOT_SelladoKg,
-                      datos_ot[i].estProcOT_WiketiadoKg,
-                      datos_ot[i].estProcOT_CantidadPedida,
-                      datos_ot[i].falla_Nombre,
-                      datos_ot[i].estProcOT_Observacion,
-                      datos_ot[i].estado_Nombre,
-                      datos_ot[i].estProcOT_FechaCreacion,
-                      datos_ot[i].estProcOT_FechaInicio,
-                      datos_ot[i].estProcOT_FechaFinal,
-                      datos_ot[i].estProcOT_CantidadPedidaUnd,
-                      datos_ot[i].undMed_Id,
-                      datos_ot[i].usua_Id,
-                      datos_ot[i].usua_Nombre,
-                      datos_ot[i].estProcOT_SelladoUnd,
-                      datos_ot[i].estProcOT_WiketiadoUnd);
-                }
-              });
-            }
-          }
-      });
-    }
     } else if (numOT != null && fechaincial != null && vendedor != null) {
       this.srvEstadosOTVendedores.srvObtenerListaPorOtFecha(numOT, fechaincial, vendedor).subscribe(datos_ot => {
         if(datos_ot.length == 0){setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
@@ -1146,80 +1221,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                     datos_ot[i].estProcOT_SelladoUnd,
                     datos_ot[i].estProcOT_WiketiadoUnd);
                 }
-            });
-          }
-        }
-      });
-    } else if (estado != null && numOT != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorOT(numOT, vendedor).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-              if (datos_ot[i].estado_Id == estado){
-                for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                    datos_ot[i].estProcOT_ExtrusionKg,
-                    datos_ot[i].estProcOT_ImpresionKg,
-                    datos_ot[i].estProcOT_RotograbadoKg,
-                    datos_ot[i].estProcOT_DobladoKg,
-                    datos_ot[i].estProcOT_LaminadoKg,
-                    datos_ot[i].estProcOT_CorteKg,
-                    datos_ot[i].estProcOT_EmpaqueKg,
-                    datos_ot[i].estProcOT_SelladoKg,
-                    datos_ot[i].estProcOT_WiketiadoKg,
-                    datos_ot[i].estProcOT_CantidadPedida,
-                    datos_ot[i].falla_Nombre,
-                    datos_ot[i].estProcOT_Observacion,
-                    datos_ot[i].estado_Nombre,
-                    datos_ot[i].estProcOT_FechaCreacion,
-                    datos_ot[i].estProcOT_FechaInicio,
-                    datos_ot[i].estProcOT_FechaFinal,
-                    datos_ot[i].estProcOT_CantidadPedidaUnd,
-                    datos_ot[i].undMed_Id,
-                    datos_ot[i].usua_Id,
-                    datos_ot[i].usua_Nombre,
-                    datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd);
-                }
-              }
-            });
-          }
-        }
-      });
-    } else if (fechaincial != null && estado != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorFecha(fechaincial, vendedor).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-              if (datos_ot[i].estado_Id == estado){
-                for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                    datos_ot[i].estProcOT_ExtrusionKg,
-                    datos_ot[i].estProcOT_ImpresionKg,
-                    datos_ot[i].estProcOT_RotograbadoKg,
-                    datos_ot[i].estProcOT_DobladoKg,
-                    datos_ot[i].estProcOT_LaminadoKg,
-                    datos_ot[i].estProcOT_CorteKg,
-                    datos_ot[i].estProcOT_EmpaqueKg,
-                    datos_ot[i].estProcOT_SelladoKg,
-                    datos_ot[i].estProcOT_WiketiadoKg,
-                    datos_ot[i].estProcOT_CantidadPedida,
-                    datos_ot[i].falla_Nombre,
-                    datos_ot[i].estProcOT_Observacion,
-                    datos_ot[i].estado_Nombre,
-                    datos_ot[i].estProcOT_FechaCreacion,
-                    datos_ot[i].estProcOT_FechaInicio,
-                    datos_ot[i].estProcOT_FechaFinal,
-                    datos_ot[i].estProcOT_CantidadPedidaUnd,
-                    datos_ot[i].undMed_Id,
-                    datos_ot[i].usua_Id,
-                    datos_ot[i].usua_Nombre,
-                    datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd);
-                }
-              }
             });
           }
         }
@@ -1258,42 +1259,68 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
 
-    } else if (fechaincial != null && fechaFinal != null) {
-      if (fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') setTimeout(() => { Swal.fire('Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)'); }, 3000);
-      else if(fechaFinal < fechaincial) setTimeout(() => { Swal.fire('La fecha final debe ser mayor que la fecha inicial');}, 3000);
-      else{
-        this.estadosProcesos_OTService.srvObtenerListaPorFechas(fechaincial, fechaFinal).subscribe(datos_ot => {
-          if (datos_ot.length == 0) setTimeout(() => { Swal.fire('No existen OTs creadas en las fechas consultadas.'); }, 3000);
-          else {
-            for (let i = 0; i < datos_ot.length; i++) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
-            }
-
+    } else if (producto != null && vendedor != null) {
+      this.estadosProcesos_OTService.consultarPorProductoVendedor(producto, vendedor).subscribe(datos_ot => {
+        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
+        else{
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
           }
-        });
-      }
+        }
+      });
+    } else if (cliente != null && vendedor != null) {
+      this.estadosProcesos_OTService.consultarPorClienteVendedor(cliente, vendedor).subscribe(datos_ot => {
+        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
+        else{
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
+          }
+        }
+      });
     } else if (numOT != null && fechaincial != null) {
       this.estadosProcesos_OTService.srvObtenerListaPorOtFecha(numOT, fechaincial).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
@@ -1356,37 +1383,107 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
         }
       });
-    } else if (fechaincial != null && fallas != null) {
-      if (fechaincial < '2022-05-01') setTimeout(() => { Swal.fire(`Solo se muestran OT's desde el inicio de las asignaciones de Materia Prima (01/05/2022)`); }, 3000);
-      else {
-        this.estadosProcesos_OTService.srvObtenerListaPorOtFechaFalla(fechaincial, fallas).subscribe(datos_ot => {
+    } else if (numOT != null && producto != null) {
+      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
+        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
+        else {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+            if (datos_ot[i].prod_Id == producto) {
+              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+                datos_ot[i].estProcOT_ExtrusionKg,
+                datos_ot[i].estProcOT_ImpresionKg,
+                datos_ot[i].estProcOT_RotograbadoKg,
+                datos_ot[i].estProcOT_DobladoKg,
+                datos_ot[i].estProcOT_LaminadoKg,
+                datos_ot[i].estProcOT_CorteKg,
+                datos_ot[i].estProcOT_EmpaqueKg,
+                datos_ot[i].estProcOT_SelladoKg,
+                datos_ot[i].estProcOT_WiketiadoKg,
+                datos_ot[i].estProcOT_CantidadPedida,
+                datos_ot[i].falla_Nombre,
+                datos_ot[i].estProcOT_Observacion,
+                datos_ot[i].estado_Nombre,
+                datos_ot[i].estProcOT_FechaCreacion,
+                datos_ot[i].estProcOT_FechaInicio,
+                datos_ot[i].estProcOT_FechaFinal,
+                datos_ot[i].estProcOT_CantidadPedidaUnd,
+                datos_ot[i].undMed_Id,
+                datos_ot[i].usua_Id,
+                datos_ot[i].usua_Nombre,
+                datos_ot[i].estProcOT_SelladoUnd,
+                datos_ot[i].estProcOT_WiketiadoUnd);
+            }
           }
-        });
-      }
+        }
+      });
+    } else if (numOT != null && cliente != null) {
+      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
+        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
+        else {
+          for (let i = 0; i < datos_ot.length; i++) {
+            if (datos_ot[i].cli_Id == cliente) {
+              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+                datos_ot[i].estProcOT_ExtrusionKg,
+                datos_ot[i].estProcOT_ImpresionKg,
+                datos_ot[i].estProcOT_RotograbadoKg,
+                datos_ot[i].estProcOT_DobladoKg,
+                datos_ot[i].estProcOT_LaminadoKg,
+                datos_ot[i].estProcOT_CorteKg,
+                datos_ot[i].estProcOT_EmpaqueKg,
+                datos_ot[i].estProcOT_SelladoKg,
+                datos_ot[i].estProcOT_WiketiadoKg,
+                datos_ot[i].estProcOT_CantidadPedida,
+                datos_ot[i].falla_Nombre,
+                datos_ot[i].estProcOT_Observacion,
+                datos_ot[i].estado_Nombre,
+                datos_ot[i].estProcOT_FechaCreacion,
+                datos_ot[i].estProcOT_FechaInicio,
+                datos_ot[i].estProcOT_FechaFinal,
+                datos_ot[i].estProcOT_CantidadPedidaUnd,
+                datos_ot[i].undMed_Id,
+                datos_ot[i].usua_Id,
+                datos_ot[i].usua_Nombre,
+                datos_ot[i].estProcOT_SelladoUnd,
+                datos_ot[i].estProcOT_WiketiadoUnd);
+            }
+          }
+        }
+      });
+    } else if (numOT != null && vendedor != null) {
+      this.srvEstadosOTVendedores.srvObtenerListaPorOT(numOT, vendedor).subscribe(datos_ot => {
+        if(datos_ot.length == 0) setTimeout(() => { Swal.fire('No se encontró la OT consultada.'); }, 4800);
+        else {
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo,).subscribe(datos_bagpro => {
+              for (let j = 0; j < datos_bagpro.length; j++) {
+                this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+                  datos_ot[i].estProcOT_ExtrusionKg,
+                  datos_ot[i].estProcOT_ImpresionKg,
+                  datos_ot[i].estProcOT_RotograbadoKg,
+                  datos_ot[i].estProcOT_DobladoKg,
+                  datos_ot[i].estProcOT_LaminadoKg,
+                  datos_ot[i].estProcOT_CorteKg,
+                  datos_ot[i].estProcOT_EmpaqueKg,
+                  datos_ot[i].estProcOT_SelladoKg,
+                  datos_ot[i].estProcOT_WiketiadoKg,
+                  datos_ot[i].estProcOT_CantidadPedida,
+                  datos_ot[i].falla_Nombre,
+                  datos_ot[i].estProcOT_Observacion,
+                  datos_ot[i].estado_Nombre,
+                  datos_ot[i].estProcOT_FechaCreacion,
+                  datos_ot[i].estProcOT_FechaInicio,
+                  datos_ot[i].estProcOT_FechaFinal,
+                  datos_ot[i].estProcOT_CantidadPedidaUnd,
+                  datos_ot[i].undMed_Id,
+                  datos_ot[i].usua_Id,
+                  datos_ot[i].usua_Nombre,
+                  datos_ot[i].estProcOT_SelladoUnd,
+                  datos_ot[i].estProcOT_WiketiadoUnd);
+              }
+            });
+          }
+        }
+      });
     } else if (estado != null && numOT != null) {
       this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
@@ -1453,7 +1550,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (estado != null && cliente != null) {
       this.srvEstadosOTVendedores.srvObtenerListaPorClienteEstado(cliente, estado).subscribe(datos_ot => {
-        if(datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con el Estado consultado.`); }, 2000);
+        if(datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 2000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
@@ -1484,7 +1581,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (estado != null && producto != null) {
       this.srvEstadosOTVendedores.srvObtenerListaPorProductoEstado(producto, estado).subscribe(datos_ot => {
-        if(datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con el Estado consultado.`); }, 2000);
+        if(datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 2000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
@@ -1550,41 +1647,73 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
         }
       });
-    } else if (numOT != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorOT(numOT, vendedor).subscribe(datos_ot => {
-        if(datos_ot.length == 0) setTimeout(() => { Swal.fire('No se encontró la OT consultada.'); }, 4800);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo,).subscribe(datos_bagpro => {
-              for (let j = 0; j < datos_bagpro.length; j++) {
-                this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                  datos_ot[i].estProcOT_ExtrusionKg,
-                  datos_ot[i].estProcOT_ImpresionKg,
-                  datos_ot[i].estProcOT_RotograbadoKg,
-                  datos_ot[i].estProcOT_DobladoKg,
-                  datos_ot[i].estProcOT_LaminadoKg,
-                  datos_ot[i].estProcOT_CorteKg,
-                  datos_ot[i].estProcOT_EmpaqueKg,
-                  datos_ot[i].estProcOT_SelladoKg,
-                  datos_ot[i].estProcOT_WiketiadoKg,
-                  datos_ot[i].estProcOT_CantidadPedida,
-                  datos_ot[i].falla_Nombre,
-                  datos_ot[i].estProcOT_Observacion,
-                  datos_ot[i].estado_Nombre,
-                  datos_ot[i].estProcOT_FechaCreacion,
-                  datos_ot[i].estProcOT_FechaInicio,
-                  datos_ot[i].estProcOT_FechaFinal,
-                  datos_ot[i].estProcOT_CantidadPedidaUnd,
-                  datos_ot[i].undMed_Id,
-                  datos_ot[i].usua_Id,
-                  datos_ot[i].usua_Nombre,
-                  datos_ot[i].estProcOT_SelladoUnd,
-                  datos_ot[i].estProcOT_WiketiadoUnd);
-              }
-            });
+    } else if (fechaincial != null && fechaFinal != null) {
+      if (fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') setTimeout(() => { Swal.fire('Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)'); }, 3000);
+      else if(fechaFinal < fechaincial) setTimeout(() => { Swal.fire('La fecha final debe ser mayor que la fecha inicial');}, 3000);
+      else{
+        this.estadosProcesos_OTService.srvObtenerListaPorFechas(fechaincial, fechaFinal).subscribe(datos_ot => {
+          if (datos_ot.length == 0) setTimeout(() => { Swal.fire('No existen OTs creadas en las fechas consultadas.'); }, 3000);
+          else {
+            for (let i = 0; i < datos_ot.length; i++) {
+              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+                datos_ot[i].estProcOT_ExtrusionKg,
+                datos_ot[i].estProcOT_ImpresionKg,
+                datos_ot[i].estProcOT_RotograbadoKg,
+                datos_ot[i].estProcOT_DobladoKg,
+                datos_ot[i].estProcOT_LaminadoKg,
+                datos_ot[i].estProcOT_CorteKg,
+                datos_ot[i].estProcOT_EmpaqueKg,
+                datos_ot[i].estProcOT_SelladoKg,
+                datos_ot[i].estProcOT_WiketiadoKg,
+                datos_ot[i].estProcOT_CantidadPedida,
+                datos_ot[i].falla_Nombre,
+                datos_ot[i].estProcOT_Observacion,
+                datos_ot[i].estado_Nombre,
+                datos_ot[i].estProcOT_FechaCreacion,
+                datos_ot[i].estProcOT_FechaInicio,
+                datos_ot[i].estProcOT_FechaFinal,
+                datos_ot[i].estProcOT_CantidadPedidaUnd,
+                datos_ot[i].undMed_Id,
+                datos_ot[i].usua_Id,
+                datos_ot[i].usua_Nombre,
+                datos_ot[i].estProcOT_SelladoUnd,
+                datos_ot[i].estProcOT_WiketiadoUnd);
+            }
+
           }
-        }
-      });
+        });
+      }
+    } else if (fechaincial != null && fallas != null) {
+      if (fechaincial < '2022-05-01') setTimeout(() => { Swal.fire(`Solo se muestran OT's desde el inicio de las asignaciones de Materia Prima (01/05/2022)`); }, 3000);
+      else {
+        this.estadosProcesos_OTService.srvObtenerListaPorOtFechaFalla(fechaincial, fallas).subscribe(datos_ot => {
+          for (let i = 0; i < datos_ot.length; i++) {
+            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
+              datos_ot[i].estProcOT_ExtrusionKg,
+              datos_ot[i].estProcOT_ImpresionKg,
+              datos_ot[i].estProcOT_RotograbadoKg,
+              datos_ot[i].estProcOT_DobladoKg,
+              datos_ot[i].estProcOT_LaminadoKg,
+              datos_ot[i].estProcOT_CorteKg,
+              datos_ot[i].estProcOT_EmpaqueKg,
+              datos_ot[i].estProcOT_SelladoKg,
+              datos_ot[i].estProcOT_WiketiadoKg,
+              datos_ot[i].estProcOT_CantidadPedida,
+              datos_ot[i].falla_Nombre,
+              datos_ot[i].estProcOT_Observacion,
+              datos_ot[i].estado_Nombre,
+              datos_ot[i].estProcOT_FechaCreacion,
+              datos_ot[i].estProcOT_FechaInicio,
+              datos_ot[i].estProcOT_FechaFinal,
+              datos_ot[i].estProcOT_CantidadPedidaUnd,
+              datos_ot[i].undMed_Id,
+              datos_ot[i].usua_Id,
+              datos_ot[i].usua_Nombre,
+              datos_ot[i].estProcOT_SelladoUnd,
+              datos_ot[i].estProcOT_WiketiadoUnd);
+          }
+        });
+      }
     } else if (fechaincial != null && vendedor != null) {
       if (fechaincial < '2022-05-01') setTimeout(() => { Swal.fire(`Solo se muestran OT's desde el inicio de las asignaciones de Materia Prima (2022-05-01)`); }, 4800);
       else {
@@ -1887,7 +2016,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (cliente != null) {
       this.estadosProcesos_OTService.srvObtenerListaPorCliente(cliente).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con el Estado consultado.`);}, 3000);
+        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con el Cliente consultado.`);}, 3000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
@@ -1918,7 +2047,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (producto != null) {
       this.estadosProcesos_OTService.srvObtenerListaPorProductos(producto).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con el Estado consultado.`);}, 3000);
+        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con el producto consultado.`);}, 3000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
@@ -2659,6 +2788,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.submitted = false;
   }
 
+  // Funcion para filtrar en el autocompletado
   filterCountry(event) {
     let filtered: any[] = [];
     let query = event.query;

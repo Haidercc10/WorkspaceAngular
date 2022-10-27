@@ -25,48 +25,34 @@
     <!-- Inicio Fila 1 Agregar producto -->
     <div class="mb-3">
       <div class="row g-3">
-        <!-- <div class="form-floating col-md-2">
-          <input formControlName="ConsecutivoFactura" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" readonly onmousedown="return false;">
-          <label for="floatingSelect">Concecutivo</label>
-        </div> -->
-
-        <!-- Nombre Proveedor -->
+        <!-- Id Operario -->
+        <div class="form-floating col-md-3">
+          <input formControlName="usuarioId" (keyup.enter)="llenarUsuarioId()"type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+          <label for="floatingSelect">ID Operario</label>
+        </div>
+        <!-- Nombre Operario -->
         <div class="form-floating col-md-4">
           <select formControlName="usuarioNombre" id="floatingSelect" type="text" (change)="llenarUsuarioSeleccionado()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
             <option [ngValue]="usuario.usua_Id" *ngFor="let usuario of usuarios">{{usuario.usua_Nombre}}</option>
           </select>
           <label for="floatingSelect">Nombre Operario</label>
         </div>
-        <!-- Proveedor -->
-        <div class="form-floating col-md-3">
-          <input formControlName="usuarioId" (keyup.enter)="llenarUsuarioId()"type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
-          <label for="floatingSelect">ID Operario</label>
-        </div>
-        <!-- Tipo Documento -->
-        <div class="form-floating col-md-3">
-          <select formControlName="proceso" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="proceso.proceso_Id" *ngFor="let proceso of procesos">{{proceso.proceso_Nombre}}</option>
+        <!-- Maquina -->
+        <!-- <div class="form-floating col-md-2">
+          <input formControlName="Maquina" type="number" class="form-control form-control-sm" id="floatingInput">
+          <label for="floatingSelect">Maquina</label>
+        </div> -->
+        <div class="form-floating col-md-2">
+          <select formControlName="Turno" id="floatingSelect" type="text" (change)="llenarUsuarioSeleccionado()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="turno.turno_Id" *ngFor="let turno of turnos">{{turno.turno_Nombre}}</option>
           </select>
-          <label for="floatingSelect">Proceso</label>
+          <label for="floatingSelect">Turno</label>
         </div>
         <!-- Fecha Ingreso -->
-        <div class="form-floating col-md-2">
-          <input formControlName="MpingresoFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso" readonly onmousedown="return false;">
+        <div class="form-floating col-md-3">
+          <input formControlName="MpingresoFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso">
           <label for="floatingInput">Fecha Ingreso</label>
         </div>
-
-        <!-- Estado -->
-        <!-- <div class="form-floating col-md-3">
-          <select formControlName="MpEstados" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="estados" *ngFor="let estados of estado">{{estados}}</option>
-          </select>
-          <label for="floatingSelect">Estado Factura</label>
-        </div> -->
-        <!-- Operario -->
-        <!-- <div class="form-floating col-md-3">
-          <input formControlName="MpOperario" type="text" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso" readonly onmousedown="return false;">
-          <label for="floatingInput">Operario</label>
-        </div> -->
         <!-- Campo Observacion -->
         <div class="form-floating col-md">
           <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm" name="MpObservacion"></textarea>

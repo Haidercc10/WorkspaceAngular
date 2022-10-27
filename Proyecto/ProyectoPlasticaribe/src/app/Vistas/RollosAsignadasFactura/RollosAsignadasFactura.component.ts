@@ -339,7 +339,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
       for (let i = 0; i < this.rollosInsertar.length; i++) {
         this.rollosService.srvObtenerVerificarRollo(this.rollosInsertar[i].Id).subscribe(datos_rollos => {
           for (let j = 0; j < datos_rollos.length; j++) {
-            if (datos_rollos[j].prod_CantBolsasRestates == 0) {
+            if (datos_rollos[j].prod_CantBolsasRestates <= 0) {
               let info : any = {
                 DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
                 EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
@@ -355,7 +355,6 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                 Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
                 Prod_CantBolsasRestates : datos_rollos[j].prod_CantBolsasRestates,
                 Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
-
               }
               this.Total += datos_rollos[j].dtEntRolloProd_Cantidad;
               this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
@@ -392,7 +391,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                 });
                 this.cargando = true;
               });
-            } else {
+            } else if (datos_rollos[j].prod_CantBolsasRestates > 0) {
               let info : any = {
                 DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
                 EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,

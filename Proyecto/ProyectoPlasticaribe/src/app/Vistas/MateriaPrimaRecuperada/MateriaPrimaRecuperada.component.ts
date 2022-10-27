@@ -25,6 +25,7 @@ import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
 import { TipoBodegaService } from 'src/app/Servicios/tipoBodega.service';
 import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
 import { TipoRecuperadoService } from 'src/app/Servicios/tipoRecuperado.service';
+import { TurnosService } from 'src/app/Servicios/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
@@ -83,6 +84,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   cantidadTotalImp : number; //Variable que va a almacenar el total de la cantidad impresa en una OT
   cantidadTotalDbl : number; //Variable que va a almacenar el total de la cantidad doblada en una OT
   proceso : string = ''; //Variable ayudará a almacenar el proceso del cuela se está consultando la ot
+  turnos : any [] = []; //Variable que almacenará los diferentes turnos que se trabajan en la empresa
   proveedor = [];
   tipodocuemnto = [];
   tipoRecuperado = [];
@@ -105,36 +107,34 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
                     private unidadMedidaService : UnidadMedidaService,
                       private usuarioService : UsuarioService,
                         private procesosService : ProcesosService,
-                            private rolService : RolesService,
-                              private frmBuilderMateriaPrima : FormBuilder,
-                                @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                  private recuperadoService : RecuperadoService,
-                                    private recuperadoMPService : RecuperadoMPService,
-                                        private tipoDocumentoService : TipoDocumentoService,
-                                          private tipoRecuperadoService : TipoRecuperadoService) {
+                          private rolService : RolesService,
+                            private frmBuilderMateriaPrima : FormBuilder,
+                              @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                                private recuperadoService : RecuperadoService,
+                                  private recuperadoMPService : RecuperadoMPService,
+                                      private tipoDocumentoService : TipoDocumentoService,
+                                        private tipoRecuperadoService : TipoRecuperadoService,
+                                          private turnosService : TurnosService,) {
 
     this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
-      //MateriaPrima
-      ConsecutivoFactura : new FormControl(),
-      MpingresoFecha: new FormControl(),
-      usuarioNombre: new FormControl(),
-      usuarioId: new FormControl(),
-      proceso: new FormControl(),
-      MpObservacion : new FormControl(),
+      ConsecutivoFactura : ['', Validators.required],
+      MpingresoFecha: ['', Validators.required],
+      usuarioNombre: ['', Validators.required],
+      usuarioId: ['', Validators.required],
+      MpObservacion : ['', Validators.required],
+      Turno : ['', Validators.required],
+      Maquina : ['', Validators.required],
     });
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
-      MpId : new FormControl(),
-      MpNombre: new FormControl(),
-      MpCantidad: new FormControl(),
-      //tipoRecuperado: new FormControl(),
-      MpUnidadMedida:new FormControl(),
+      MpId : ['', Validators.required],
+      MpNombre: ['', Validators.required],
+      MpCantidad : ['', Validators.required],
+      MpUnidadMedida: ['', Validators.required],
     });
   }
 
-
   ngOnInit(): void {
-    this.initForms();
     this.lecturaStorage();
     this.fecha();
     this.ColumnasTabla();
@@ -143,25 +143,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     this.obtenerUsuarios();
     this.obtenerProcesos();
     this.obtenerTipoRecuperado();
-  }
-
-  initForms() {
-    this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
-      ConsecutivoFactura : ['', Validators.required],
-      MpingresoFecha: ['', Validators.required],
-      usuarioNombre: ['', Validators.required],
-      usuarioId: ['', Validators.required],
-      proceso: ['', Validators.required],
-      MpObservacion : ['', Validators.required],
-    });
-
-    this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
-      MpId : ['', Validators.required],
-      MpNombre: ['', Validators.required],
-      MpCantidad : ['', Validators.required],
-      //tipoRecuperado: ['', Validators.required],
-      MpUnidadMedida: ['', Validators.required],
-    });
+    this.obtenerTurnos();
   }
 
   onChangeSearch(val: string) {
@@ -186,15 +168,6 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
     this.today = yyyy + '-' + mm + '-' + dd;
-
-    this.FormMateriaPrimaRecuperada.setValue({
-      ConsecutivoFactura : this.ultimoIdRecuperado,
-      MpingresoFecha: this.today,
-      usuarioNombre: '',
-      usuarioId: '',
-      proceso : '',
-      MpObservacion : '',
-    });
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -240,9 +213,20 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
       MpingresoFecha: this.today,
       usuarioNombre: '',
       usuarioId: '',
-      proceso : '',
       MpObservacion : '',
+      Turno : '',
+      Maquina : '',
     });
+  }
+
+  // Funcion que se encargará de trar los turnos de la empresa
+  obtenerTurnos(){
+     this.turnos = [];
+     this.turnosService.srvObtenerLista().subscribe(datos_turnos => {
+      for (let i = 0; i < datos_turnos.length; i++) {
+        if (datos_turnos[i].turno_Nombre != 'N/E') this.turnos.push(datos_turnos[i]);
+      }
+     });
   }
 
   //Funcion que limpiará los campos de la materia pirma entrante
@@ -285,9 +269,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   obtenerUsuarios(){
     this.usuarioService.srvObtenerListaUsuario().subscribe(datos_usuarios => {
       for (let index = 0; index < datos_usuarios.length; index++) {
-        if (datos_usuarios[index].rolUsu_Id == 3) {
-          this.usuarios.push(datos_usuarios[index]);
-        }
+        if (datos_usuarios[index].rolUsu_Id == 3) this.usuarios.push(datos_usuarios[index]);
       }
     });
   }
@@ -300,8 +282,9 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         MpingresoFecha: this.FormMateriaPrimaRecuperada.value.MpingresoFecha,
         usuarioNombre : this.FormMateriaPrimaRecuperada.value.usuarioNombre,
         usuarioId: datos_usuario.usua_Id,
-        proceso : this.FormMateriaPrimaRecuperada.value.proceso,
         MpObservacion: this.FormMateriaPrimaRecuperada.value.MpObservacion,
+        Turno : this.FormMateriaPrimaRecuperada.value.Turno,
+        Maquina : this.FormMateriaPrimaRecuperada.value.Maquina,
       });
     })
   }
@@ -314,8 +297,9 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         MpingresoFecha: this.today,
         usuarioNombre :datos_usuario.usua_Nombre,
         usuarioId:this.FormMateriaPrimaRecuperada.value.usuarioId,
-        proceso : this.FormMateriaPrimaRecuperada.value.proceso,
         MpObservacion: this.FormMateriaPrimaRecuperada.value.MpObservacion,
+        Turno : this.FormMateriaPrimaRecuperada.value.Turno,
+        Maquina : this.FormMateriaPrimaRecuperada.value.Maquina,
       });
 
     });
@@ -342,27 +326,33 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   registrarRecuperado(){
     let idUsuario: number = this.FormMateriaPrimaRecuperada.value.usuarioId;
     let observacion : string = this.FormMateriaPrimaRecuperada.value.MpObservacion;
-    let proceso : string = this.FormMateriaPrimaRecuperada.value.proceso;
+    let fecha : any = this.FormMateriaPrimaRecuperada.value.MpingresoFecha;
+    let turno : string = this.FormMateriaPrimaRecuperada.value.Turno;
 
     const datosRecuperado : any = {
       RecMp_FechaIngreso : this.today,
-      Usua_Id : idUsuario,
+      Usua_Id : this.storage_Id,
       RecMp_Observacion : observacion,
-      Proc_Id : proceso,
+      Proc_Id : 'RECUP',
+      RecMp_FechaEntrega : fecha,
+      RecMp_HoraIngreso : moment().format("H:mm:ss"),
+      RecMp_Maquina : 0,
+      Turno_Id : turno,
+      Usua_Operador: idUsuario,
     }
 
     this.recuperadoService.srvGuardar(datosRecuperado).subscribe(datos_RecuperadoCreada => {
       this.obtenerUltimoIdRecuperado();
     });
-
-
   }
 
   // Funcion que se encargará de obtener el ultimo Id de las facturas
   obtenerUltimoIdRecuperado(){
     this.recuperadoService.srvObtenerUltimaAsignacion().subscribe(datos_recuperados => {
-      for (let index = 0; index < datos_recuperados.length; index++) {
-        this.ultimoIdRecuperado = (datos_recuperados[index].recMp_Id);
+      let datos : any = [];
+      datos.push(datos_recuperados);
+      for (let index = 0; index < datos.length; index++) {
+        this.ultimoIdRecuperado = (datos[index].recMp_Id);
       }
       this.creacionRecuperadoMateriaPrima(this.ultimoIdRecuperado);
     });
@@ -382,18 +372,14 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
 
   //
   validarCamposVaciosMP(){
-    if (this.FormMateriaPrima.valid) this.cargarFormMpEnTablas(this.ArrayMateriaPrima)
-
-    else Swal.fire("Hay campos de la Materi Prima vacios"),
-    console.log(this.ArrayMateriaPrima),
-    console.log(this.FormMateriaPrima);
+    if (this.FormMateriaPrima.valid) this.cargarFormMpEnTablas(this.ArrayMateriaPrima);
+    else Swal.fire("Hay campos de la Materi Prima vacios");
   }
 
   //Funcion que envia la informacion de los productos a la tabla.
   cargarFormMpEnTablas(formulario : any){
     let idMateriaPrima : number = this.FormMateriaPrima.value.MpId;
     this.nombreMateriaPrima = this.FormMateriaPrima.value.MpNombre;
-    //let tipoRecuperado = this.FormMateriaPrima.value.tipoRecuperado;
     let presentacion : string = this.FormMateriaPrima.value.MpUnidadMedida;
     let cantidad : number = this.FormMateriaPrima.value.MpCantidad;
 
@@ -402,25 +388,11 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
       Nombre : this.nombreMateriaPrima,
       Cant : cantidad,
       UndCant : presentacion,
-      //mpTipoRecup : tipoRecuperado,
     }
 
-    this.FormMateriaPrimaRecuperada.setValue({
-      ConsecutivoFactura : this.FormMateriaPrimaRecuperada.value.ConsecutivoFactura,
-      MpingresoFecha: this.today,
-      usuarioNombre :this.FormMateriaPrimaRecuperada.value.usuarioNombre,
-      usuarioId:this.FormMateriaPrimaRecuperada.value.usuarioId,
-      proceso : this.FormMateriaPrimaRecuperada.value.proceso,
-      MpObservacion: this.FormMateriaPrimaRecuperada.value.MpObservacion,
-    });
-
-    if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length == 0) {
-      this.ArrayMateriaPrima.push(productoExt);
-
-    } else if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length != 0){
-      this.ArrayMateriaPrima.push(productoExt);
-      productoExt = [];
-    } else {
+    if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length == 0) this.ArrayMateriaPrima.push(productoExt);
+    else if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length != 0) this.ArrayMateriaPrima.push(productoExt);
+    else {
       for (let index = 0; index < formulario.length; index++) {
         if(productoExt.Id == this.ArrayMateriaPrima[index].Id) {
           this.ArrayMateriaPrima.splice(index, 1);
@@ -447,8 +419,6 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         idMateriaPrima = this.ArrayMateriaPrima[index].Id;
         cantidadMateriaPrima = this.ArrayMateriaPrima[index].Cant;
         presentacionMateriaPrima = this.ArrayMateriaPrima[index].UndCant;
-
-
         const datosRecuperadoMp : any = {
           RecMp_Id : idRecuperado,
           MatPri_Id : idMateriaPrima,
@@ -456,9 +426,6 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
           UndMed_Id : presentacionMateriaPrima,
           TpRecu_Id : tipoRecuperado,
         }
-
-        console.log(tipoRecuperado);
-
         this.recuperadoMPService.srvGuardar(datosRecuperadoMp).subscribe(datos_recuperadoMpCreada => {
         });
         this.moverInventarioMpAgregada();
@@ -513,11 +480,12 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   limpiarTodosCampos(){
     this.FormMateriaPrimaRecuperada.setValue({
       ConsecutivoFactura : this.ultimoIdRecuperado,
-      MpingresoFecha: this.today,
+      MpingresoFecha: '',
       usuarioNombre: '',
       usuarioId: '',
-      proceso : '',
       MpObservacion : '',
+      Turno : '',
+      Maquina : '',
     });
     this.FormMateriaPrima.reset();
     this.ArrayMateriaPrima = [];

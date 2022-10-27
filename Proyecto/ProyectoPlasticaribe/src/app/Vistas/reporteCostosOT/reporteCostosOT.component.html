@@ -76,17 +76,17 @@
           <label for="floatingInput">Presentacion Producto</label>
         </div>
         <!-- Valor Unidad Producto -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md-2" *ngIf="ValidarRol == 1">
           <input formControlName="ValorUnidadProductoUnd" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
           <label for="floatingInput">$ Und Producto</label>
         </div>
         <!-- Valor Kg Producto -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md-2" *ngIf="ValidarRol == 1">
           <input formControlName="ValorUnidadProductoKg" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
           <label for="floatingInput">$ Kg Producto</label>
         </div>
         <!-- Valor Estimado OT -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md-2" *ngIf="ValidarRol == 1">
           <input formControlName="ValorEstimadoOt" type="text" class="form-control" id="floatingInput" readonly onmousedown="return false;" >
           <label for="floatingInput">Valor OT</label>
         </div>
@@ -119,9 +119,9 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="CargarPDF()">Reporte en PDF</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="CargarPDF()" *ngIf="ValidarRol == 1">Reporte en PDF</button>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="cambiarEstado()">Cambiar Estado</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="cambiarEstado()" *ngIf="ValidarRol == 1">Cambiar Estado</button>
       </div>
     </div>
   </form>
@@ -147,8 +147,8 @@
                 <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
                 <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
                 <th id="proceso" scope="col">{{columnas.mpProceso}}</th>
-                <th id="PrecioUnidad" scope="col">{{columnas.mpPrecioU}}</th>
-                <th id="mpSubTotal" scope="col">{{columnas.mpSubTotal}}</th>
+                <th id="PrecioUnidad" scope="col" *ngIf="ValidarRol == 1">{{columnas.mpPrecioU}}</th>
+                <th id="mpSubTotal" scope="col" *ngIf="ValidarRol == 1">{{columnas.mpSubTotal}}</th>
               </tr>
             </thead>
             <tbody>
@@ -158,8 +158,8 @@
                   <td id="cantidadMateriaPrima">{{materiaPrima.Cantidad | number}}</td>
                   <td id="UnidadMedida">{{materiaPrima.Presentacion}}</td>
                   <td id="proceso">{{materiaPrima.Proceso}}</td>
-                  <td id="precio">${{materiaPrima.PrecioUnd}}</td>
-                  <td id="subtotal">${{materiaPrima.SubTotal}}</td>
+                  <td id="precio" *ngIf="ValidarRol == 1">${{materiaPrima.PrecioUnd}}</td>
+                  <td id="subtotal" *ngIf="ValidarRol == 1">${{materiaPrima.SubTotal}}</td>
                 </tr>
             </tbody>
           </table>
@@ -171,7 +171,7 @@
         <label class="labelMateriaPrima">
           <b>Total Materia Prima Entregada:</b> {{totalMPEntregada | number}} KG
         </label>
-        <label class="labelMateriaPrima">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <label class="labelMateriaPrima" *ngIf="ValidarRol == 1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <b>Valor Materia Prima Entregada:</b> {{ValorMPEntregada | currency}}
         </label>
       </div>
@@ -222,7 +222,7 @@
       </div>
     </div>
   </div>
-  <div class="mb-1">
+  <div class="mb-1" *ngIf="ValidarRol == 1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
       <label><b>Valor Final OT:</b> {{valorFinalOT | currency}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
       <label><b>Diferencia:</b> ${{diferencia | number}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>

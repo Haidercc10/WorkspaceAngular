@@ -3702,7 +3702,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     else if (this.rollosInsertar.length > 300) setTimeout(() => { this.InventarioProductos(idEntrada); }, 17000);
     else if (this.rollosInsertar.length > 200) setTimeout(() => { this.InventarioProductos(idEntrada); }, 12000);
     else if (this.rollosInsertar.length > 100) setTimeout(() => { this.InventarioProductos(idEntrada); }, 8000);
-    else setTimeout(() => { this.InventarioProductos(idEntrada); }, 3000);
+    else setTimeout(() => { this.InventarioProductos(idEntrada); }, 5000);
   }
 
   // Funcion para mover el inventario de los productos

@@ -574,6 +574,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   GrupoProductos(){
     let producto : any = [];
     this.grupoProductos = [];
+    this.Total = 0;
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       if (!producto.includes(this.rollosInsertar[i].IdProducto)) {
         let cantidad : number = 0;
@@ -596,6 +597,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
           Presentacion : this.rollosInsertar[i].Presentacion,
           Cant_Unidades : this.formatonumeros(cantUnidades.toFixed(2)),
         }
+        this.Total += cantidad;
         this.grupoProductos.push(info);
       }
     }
@@ -769,13 +771,15 @@ export class AsignarProductosFacturasComponent implements OnInit {
               this.dtEntradaRollo.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
             }
           } else {
+            let estado : number = 20;
+            if (this.rollosInsertar[i].CantUndRestantes < datos_rollos[j].prod_CantPaquetesRestantes) estado = 19;
             let info : any = {
               DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
               EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
               Rollo_Id : datos_rollos[j].rollo_Id,
               DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
               undMed_Rollo : datos_rollos[j].undMed_Rollo,
-              Estado_Id : 20,
+              Estado_Id : estado,
               dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
               Prod_Id : datos_rollos[j].prod_Id,
               UndMed_Prod : datos_rollos[j].undMed_Prod,

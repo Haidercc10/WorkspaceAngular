@@ -43,7 +43,7 @@
               <label for="floatingInput">Fecha Final</label>
             </div>
 
-            <div class="ng-autocomplete form-floating col-md form-control form-control-sm" *ngIf="ValidarRol == 1">
+            <div class="ng-autocomplete form-floating col-md form-control form-control-sm">
               <ng-autocomplete
                 class=""
                 [data]="vendedores"
@@ -606,7 +606,7 @@
 
                   <td *ngFor="let col of columns">{{ArrayDocumento[col.field]}}</td>
 
-                  <td>
+                  <td *ngIf="ValidarRol == 1">
                     <button pButton pRipple icon="pi pi-pencil" [style]="{width: '40px', height: '15px'}" class="p-button-rounded p-button-success p-mr-2" (click)="editProduct(ArrayDocumento)"></button>
                   </td>
                 </tr>
