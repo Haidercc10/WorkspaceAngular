@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import moment from 'moment';
 import {AutoCompleteModule} from 'primeng/autocomplete';
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
 import { RecuperadoService } from 'src/app/Servicios/recuperado.service';
@@ -55,11 +56,18 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     ];
   }
 
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => {
+    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
+    const rep = '$1,';
+    return number.toString().replace(exp,rep);
+  }
+
   // Funcion que va a obtener los diferentes turnos y los almacenará en una variable
   obtenerTurnos(){
     this.turnosService.srvObtenerLista().subscribe(datos_turnos => {
       for (let i = 0; i < datos_turnos.length; i++) {
-        this.turnos.push(datos_turnos[i]);
+        if (datos_turnos[i].turno_Id != 'NE') this.turnos.push(datos_turnos[i]);
       }
     });
   }
@@ -123,16 +131,29 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
 
   // Funcion que va a Consultar segun los filtros que le pasemos
   consultar(){
-    let fechaInicial : any = this.formReporteRMP.value.FechaFinal;
+    this.registros = [];
+    let fechaInicial : any = this.formReporteRMP.value.FechaInicial;
     let fechaFinal : any = this.formReporteRMP.value.FechaFinal;
     let materiaPrima : any = this.idMateriaPrima;
     let turno : any = this.formReporteRMP.value.Turno;
     let operario : any = this.idOperario;
+    if (materiaPrima == null) materiaPrima = 0;
+    if (operario == null) operario = 0;
+    if (turno == null) turno = 'NE';
+    if (fechaInicial != null && fechaFinal == null) fechaFinal = fechaInicial;
+    if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
+    if (fechaFinal == null) fechaFinal = moment().format('YYYY-MM-DD');
 
     this.recuperadoService.consultaRecuperado(fechaInicial, fechaFinal, operario, turno, materiaPrima).subscribe(datos_recuperado => {
       if (datos_recuperado.length <= 0) Swal.fire(`No se encontraron registros para los filtros consultados`);
       for (let i = 0; i < datos_recuperado.length; i++) {
-
+        this.llenarArray(
+          datos_recuperado[i].usua_Nombre,
+          datos_recuperado[i].recMp_FechaIngreso,
+          datos_recuperado[i].matPri_Nombre,
+          datos_recuperado[i].sumaCantidad,
+          datos_recuperado[i].undMed_Id
+        );
       }
     });
   }
@@ -143,9 +164,16 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
       usua_Nombre : usua,
       fecha : fecha.replace('T00:00:00', ''),
       matPrima : mp,
-      cant : cant,
+      cant : this.formatonumeros(cant),
       undMed : undMed,
     }
+    this.columnas = [
+      { header: 'Registrada Por', field: 'usua_Nombre'},
+      { header: 'Fecha', field: 'fecha' },
+      { header: 'Materia Prima', field: 'matPrima'},
+      { header: 'Cantidad', field: 'cant'},
+      { header: 'Presentacion', field: 'undMed'},
+    ];
     this.registros.push(info);
     this.registros.sort((a,b) => a.fecha.localeCompare(b.fecha));
   }

@@ -75,7 +75,7 @@ export class RecuperadoMPService {
   }
 
   consultaRecuperado(fecha1 : any, fecha2 : any, operario : any, turno : any, materiaPrima : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleRecuperado_MateriaPrima/MostrarMPRecuperada/${fecha1}/${fecha2}/${operario}/${turno}/${materiaPrima}`);
   }
 
 //Metodo agregar proveedor
