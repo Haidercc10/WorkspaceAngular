@@ -102,11 +102,26 @@
           </ng-template>
           <ng-template pTemplate="body" let-rowData let-columns="columns">
             <tr>
-              <td *ngFor="let col of columns">{{rowData[col.field]}}</td>
+              <td *ngFor="let col of columns" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{rowData[col.field]}}</td>
             </tr>
           </ng-template>
         </p-table>
       </div>
     </div>
+
+    <div class="modal fade" id="staticBackdrop2" data-bs-keyboard="false" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel2">Datos Peletizado</h5>
+            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <app-Modal_RptRecuperadoMP></app-Modal_RptRecuperadoMP>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
