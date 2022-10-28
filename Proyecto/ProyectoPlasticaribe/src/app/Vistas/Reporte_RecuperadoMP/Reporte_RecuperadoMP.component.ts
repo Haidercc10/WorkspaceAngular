@@ -142,7 +142,7 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     let operario : any = this.idOperario;
     if (materiaPrima == null) materiaPrima = 0;
     if (operario == null) operario = 0;
-    if (turno == null) turno = 'NE';
+    if (turno == null) turno = 'DIA';
     if (fechaInicial != null && fechaFinal == null) fechaFinal = fechaInicial;
     if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
     if (fechaFinal == null) fechaFinal = moment().format('YYYY-MM-DD');

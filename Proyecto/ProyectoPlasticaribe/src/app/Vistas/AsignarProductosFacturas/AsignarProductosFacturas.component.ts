@@ -520,7 +520,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
             this.rollos.push(info);
             rollosExistentes.push(datos_rollos[i].rollo_Id);
             this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-            this.cantTotalProducto += datos_rollos[i].dtEntRolloProd_Cantidad;
+            this.cantTotalProducto += datos_rollos[i].prod_CantPaquetesRestantes;
             this.presentacionProducto = datos_rollos[i].undMed_Rollo;
             this.FormConsultarProductos.setValue({
               Factura : this.FormConsultarProductos.value.Factura,
