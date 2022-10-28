@@ -169,6 +169,9 @@
               <select formControlName="tipoDoc" id="floatingSelect" type="text" [(ngModel)]="TipoDocumento" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
                 <option></option>
                 <option [ngValue]="tipoDocu.tpDoc_Nombre" *ngFor="let tipoDocu of arrayTipoDoc">{{tipoDocu.tpDoc_Nombre}}</option>
+                <option value="Pre Cargue Empaque" *ngIf="ValidarRol == 1 || ValidarRol == 9 || ValidarRol == 12">Pre Cargue Empaque</option>
+                <option value="Pre Cargue Sellado" *ngIf="ValidarRol == 1 || ValidarRol == 8">Pre Cargue Sellado</option>
+                <option value="Pre Cargue Extrusión" *ngIf="ValidarRol == 1 || ValidarRol == 7">Pre Cargue Extrusión</option>
               </select>
               <label for="floatingSelect">Tipo Doc.</label>
             </div>

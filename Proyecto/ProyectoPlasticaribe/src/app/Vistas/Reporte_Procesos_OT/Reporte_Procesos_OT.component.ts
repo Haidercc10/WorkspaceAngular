@@ -2283,6 +2283,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
             Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
             Proceso : datos_agrupados[i].nomStatus,
+            Count : datos_agrupados[i].count,
           }
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
@@ -2322,6 +2323,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
             Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
             Proceso : datos_agrupados[i].nomStatus,
+            Count : datos_agrupados[i].count,
           }
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
@@ -2360,6 +2362,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
             Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
             Proceso : datos_agrupados[i].nomStatus,
+            Count : datos_agrupados[i].count,
           }
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
@@ -2398,6 +2401,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
             Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
             Proceso : datos_agrupados[i].nomStatus,
+            Count : datos_agrupados[i].count,
           }
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
@@ -2436,6 +2440,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
             Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
             Proceso : datos_agrupados[i].nomStatus,
+            Count : datos_agrupados[i].count,
           }
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
@@ -2474,6 +2479,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
             Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
             Proceso : datos_agrupados[i].nomStatus,
+            Count : datos_agrupados[i].count,
           }
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
@@ -2512,6 +2518,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             Peso : this.formatonumeros(datos_agrupados[i].sumaPesoKg),
             Fecha : datos_agrupados[i].fecha.replace('T00:00:00', ''),
             Proceso : datos_agrupados[i].nomStatus,
+            Count : datos_agrupados[i].count,
           }
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
@@ -2549,6 +2556,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             Peso : `${this.formatonumeros(datos_agrupados[i].sumaCantidad)} UND - ${this.formatonumeros(datos_agrupados[i].sumaPeso)} KG`,
             Fecha : datos_agrupados[i].fechaEntrada.replace('T00:00:00', ''),
             Proceso : datos_agrupados[i].nomStatus,
+            Count : datos_agrupados[i].count,
           }
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));
@@ -2586,6 +2594,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
             Peso : `${this.formatonumeros(datos_agrupados[i].sumaCantidad)} UND - ${this.formatonumeros(datos_agrupados[i].sumaPeso)} KG`,
             Fecha : datos_agrupados[i].fechaEntrada.replace('T00:00:00', ''),
             Proceso : datos_agrupados[i].nomStatus,
+            Count : datos_agrupados[i].count,
           }
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.push(info);
           this.MostrarDatosOTxStatus.ArrayDatosAgrupados.sort((a,b) => a.Operador.localeCompare(b.Operador));

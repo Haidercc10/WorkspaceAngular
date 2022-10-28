@@ -46,6 +46,10 @@ export class DetallesEntradaRollosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/CrearPdf/${dato}`);
   }
 
+  srvObtenerCrearPDF2(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/CrearPdf2/${dato}`);
+  }
+
   srvCrearPDFUltimoId(id : number) {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/CrearPDFUltimoID/${id}`);
   }

@@ -25,6 +25,17 @@ export class DtPreEntregaRollosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetallePreEntrega_RolloDespacho');
   }
 
+  srvCrearPDF(ot : number, proceso : string) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/crearpdf/${ot}/${proceso}`);
+  }
+
+  srvCrearPDF2(ot : number, proceso : string) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/crearpdf2/${ot}/${proceso}`);
+  }
+
+  cantidadRollosPorOT(ot : number, proceso : string) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/cantidadRollosPorOT/${ot}/${proceso}`);
+  }
 
   srvCrearPDFUltimoId(id : number) {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/CrearPDFUltimoID/${id}`);

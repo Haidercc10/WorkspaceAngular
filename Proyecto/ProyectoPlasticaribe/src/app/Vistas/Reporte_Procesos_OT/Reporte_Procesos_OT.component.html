@@ -248,14 +248,8 @@
 
       <div class="mb-4 titulos_Paginador">
         <h4 class="tituloRojo" style="width: 90%;">Ordenes de Trabajo</h4>
-        <!-- <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <div class="form-floating col-md">
-            <input type="number" class="form-control form-control-sm" id="floatingInput" [(ngModel)]="cantPage">
-            <label for="floatingInput">N° Filas</label>
-          </div>
-        </div> -->
       </div>
-      <h4 class="tituloRojo" *ngIf="otSeleccionada != 0">OT Seleccionada: <b>{{otSeleccionada}}</b></h4>
+      <h4 class="tituloRojo">OT Seleccionada: <b>{{otSeleccionada}}</b></h4>
 
       <!-- Tabla donde se mostrarán las OT Consultadas -->
       <div *ngIf="load" id="tableProcesos" style="font-size: 14px;">
