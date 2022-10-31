@@ -355,6 +355,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                 Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
                 Prod_CantBolsasRestates : datos_rollos[j].prod_CantBolsasRestates,
                 Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
+                Proceso_Id : datos_rollos[j].proceso_Id,
               }
               this.Total += datos_rollos[j].dtEntRolloProd_Cantidad;
               this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
@@ -407,6 +408,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                 Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
                 Prod_CantBolsasRestates : datos_rollos[j].prod_CantBolsasRestates,
                 Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
+                Proceso_Id : datos_rollos[j].proceso_Id,
               }
               this.Total += datos_rollos[j].dtEntRolloProd_Cantidad;
               this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {

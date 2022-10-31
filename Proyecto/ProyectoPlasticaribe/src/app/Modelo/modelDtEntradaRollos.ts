@@ -12,4 +12,5 @@ export interface modelDtEntradaRollos {
   Prod_CantBolsasBulto : number;
   Prod_CantBolsasRestates : number;
   Prod_CantBolsasFacturadas : number;
+  Proceso_Id : string;
 }

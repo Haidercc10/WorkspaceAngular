@@ -263,8 +263,7 @@ export class AsignacionBOPPComponent implements OnInit {
   ajusteOT(){
     let anchoOT : number = this.FormAsignacionBopp.value.AsgBopp_Ancho;
     for (let i = 0; i < this.ordenesTrabajo.length; i++) {
-      this.ordenesTrabajo[i].ancho = this.ordenesTrabajo[i].ancho + anchoOT;
-      // this.infoOT();
+      this.ordenesTrabajo[i].ancho += anchoOT;
     }
   }
 
@@ -314,19 +313,6 @@ export class AsignacionBOPPComponent implements OnInit {
     this.ancho = 0;
     this.cantidadKG = 0;
     this.arrayOT = [];
-  }
-
-  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
-  confimacionSalida(){
-    Swal.fire({
-      title: '¿Seguro que desea salir?',
-      showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: 'Salir',
-      denyButtonText: `No Salir`,
-    }).then((result) => {
-      if (result.isConfirmed) window.location.href = "./";
-    });
   }
 
   //
@@ -399,17 +385,15 @@ export class AsignacionBOPPComponent implements OnInit {
         if (itemOT.kg != 0) {
           if (itemOT.ot == item.ot) {
             if (stock != 0) {
-              cantidadAsignada = `${item.ancho / this.anchoBOPP * stock}`;
-              let cantidadAsignadaNueva = cantidadAsignada.indexOf(".");
-              let cantidadAsignadaFinal = cantidadAsignada.substring(0, (cantidadAsignadaNueva + 3));
-              itemOT.kg = itemOT.kg - cantidadAsignada;
+              cantidadAsignada = (item.ancho / this.anchoBOPP * stock);
+              itemOT.kg -= cantidadAsignada;
               if (cantidadAsignada <= stock) {
                 let bopp : any = {
                   Ot : item.ot,
                   Serial : serial,
                   Nombre : nombre,
                   CantTotal : item.ancho / this.anchoBOPP * stock,
-                  Cant : cantidadAsignadaFinal,
+                  Cant : (item.ancho / this.anchoBOPP * stock).toFixed(2),
                   UndCant : 'Kg',
                 }
 
@@ -422,7 +406,7 @@ export class AsignacionBOPPComponent implements OnInit {
               } else Swal.fire("¡No se puede asignar una cantidad mayor a la que hay en stock!");
             }
           }
-        } else continue;
+        }
       }
     }
   }
@@ -463,6 +447,7 @@ export class AsignacionBOPPComponent implements OnInit {
               proceso_Id : 'CORTE',
               dtAsigBOPP_OrdenTrabajo : this.ArrayBoppPedida[j].Ot,
               estado_OrdenTrabajo : 14,
+              TpDoc_Id : 'ASIGBOPP',
             }
             setTimeout(() => {
               this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => { });
@@ -491,9 +476,7 @@ export class AsignacionBOPPComponent implements OnInit {
       }
       else {
         for (let b = 0; b < serialCantBOPP.length; b++) {
-          if (serialCantBOPP[b].serial == this.ArrayBoppPedida[i].Serial) {
-            serialCantBOPP[b].Cant += this.ArrayBoppPedida[i].CantTotal;
-          }
+          if (serialCantBOPP[b].serial == this.ArrayBoppPedida[i].Serial) serialCantBOPP[b].Cant += this.ArrayBoppPedida[i].CantTotal;
         }
       }
     }
@@ -536,7 +519,7 @@ export class AsignacionBOPPComponent implements OnInit {
               });
               Toast.fire({
                 icon: 'success',
-                title: 'Asignación de BOPP registrada con exito!'
+                title: '¡Asignación de BOPP registrada con exito!'
               });
               this.limpiarTodosLosCampos();
               this.load = true;

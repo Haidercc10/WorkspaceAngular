@@ -88,8 +88,6 @@ export class AsignacionTintasComponent implements OnInit {
     this.obtenerTintas();
   }
 
-
-
   onChangeSearchTinta(val: string) {
     if (val != '') this.validarInputTintas = false;
     else this.validarInputTintas = true;
@@ -150,20 +148,6 @@ export class AsignacionTintasComponent implements OnInit {
     });
   }
 
-  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
-  confimacionSalida(){
-    Swal.fire({
-      title: '¿Seguro que desea salir?',
-      showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: 'Salir',
-      denyButtonText: `No Salir`,
-    }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
-      if (result.isConfirmed) window.location.href = "./";
-    })
-  }
-
   // Funcion limpiará todos los campos de vista
   limpiarTodosLosCampos(){
     this.FormAsignacionMP = this.frmBuilder.group({
@@ -194,8 +178,6 @@ export class AsignacionTintasComponent implements OnInit {
       undMedMateriaPrima : '',
     });
   }
-
-
 
   // Funcion que buscará las tintas que se utilizan en la empresa
   obtenerTintas(){
@@ -242,23 +224,6 @@ export class AsignacionTintasComponent implements OnInit {
       console.log(this.materiasPrimas);
     });
   }
-
-  // Función que buscará las materias primas que se utilizan para crear tintas
-  /*obtenerMateriaPrima(){
-
-    this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiasPrimas => {
-      for (let i = 0; i < datos_materiasPrimas.length; i++) {
-        if (datos_materiasPrimas[i]) {
-          let mp : any = {
-            id : datos_materiasPrimas[i].matPri_Id,
-            name : datos_materiasPrimas[i].matPri_Nombre,
-          }
-          this.materiasPrimas.push(mp);
-        }
-      }
-      console.log(this.materiasPrimas);
-    });
-  }*/
 
   //Funcion para  obtener las unidades de medidas
   obtenerUnidadesMedida() {
@@ -420,16 +385,6 @@ export class AsignacionTintasComponent implements OnInit {
 
   // Funcion que servirá para poder obtener el ultimo Id de la asignacion creada y pasarlo a la funcion de creacion de AsignacionMP para que pueda tener el ID de la asignacion
   obtenerUltimoIdAsignacion(){
-    /*let idsAsignaciones = [];
-    this.asignacionMPxTintas.srvObtenerLista().subscribe(datos_asignaciones => {
-      for (let index = 0; index < datos_asignaciones.length; index++) {
-        idsAsignaciones.push(datos_asignaciones[index].asigMPxTinta_Id);
-      }
-      let ultimoId : number = Math.max.apply(null, idsAsignaciones);
-      this.mpAsignada(ultimoId);
-      console.log(ultimoId);
-    });*/
-
      this.asignacionMPxTintas.srvObtenerUltimaAsignacion().subscribe(datos_asignaciones => {
        this.mpAsignada(datos_asignaciones.asigMPxTinta_Id);
      });
@@ -467,7 +422,6 @@ export class AsignacionTintasComponent implements OnInit {
 
   // Funcion que moverá el inventario de la materia prima que se está asignando para la creacion de la tintas
   moverInventarioMP(){
-
     let stockMateriaPrimaInicial : number;
     let stockMateriaPrimaFinal : number;
 
@@ -532,19 +486,13 @@ export class AsignacionTintasComponent implements OnInit {
 
   //Función que restará a las tintas de categoria diferente a TINTAS TIPO COLORES.
   moverInventarioTintas(){
-
-    let stockMateriaPrimaInicial : number;
     let stockMateriaPrimaFinal : number;
 
     for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
        this.tintasService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Tinta).subscribe(datos_tinta => {
-        stockMateriaPrimaInicial = datos_tinta.tinta_Stock;
 
-        if(this.ArrayMateriaPrima[index].Tinta == 2001) {
-          stockMateriaPrimaFinal = 0
-        } else {
-          stockMateriaPrimaFinal = stockMateriaPrimaInicial - this.ArrayMateriaPrima[index].Cant;
-        }
+        if (this.ArrayMateriaPrima[index].Tinta == 2001) stockMateriaPrimaFinal = 0
+        else stockMateriaPrimaFinal = datos_tinta.tinta_Stock - this.ArrayMateriaPrima[index].Cant;
          const datosTintaActualizada : any = {
           Tinta_Id : this.ArrayMateriaPrima[index].Tinta,
           Tinta_Nombre : datos_tinta.tinta_Nombre,

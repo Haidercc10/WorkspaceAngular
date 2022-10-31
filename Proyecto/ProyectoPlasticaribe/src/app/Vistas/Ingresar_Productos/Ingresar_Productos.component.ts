@@ -157,9 +157,12 @@ export class Ingresar_ProductosComponent implements OnInit {
     let fechaInicial : any = this.FormConsultarRollos.value.fechaDoc;
     let fechaFinal : any = this.FormConsultarRollos.value.fechaFinalDoc;
     let rollo : number = this.FormConsultarRollos.value.IdRollo;
+    let proceso = this.FormConsultarRollos.value.Proceso;
+    if (proceso == '1') proceso = 'EMP';
+    if (proceso == '2') proceso = 'EXT';
+    if (proceso == '3') proceso = 'SELLA';
     this.rollosSinIngresar = 0;
     this.rollosIngresados = 0;
-    let totalRollos = 0;
     let rollos : any = [];
 
     if (ProcConsulta != null) {
@@ -169,11 +172,16 @@ export class Ingresar_ProductosComponent implements OnInit {
         let otTemporral : number = 0;
         this.cargando = false;
         this.cantidadOT = 0;
-        let proceso : string = '';
 
-        this.dtEntradaRollosService.srvObtenerLista().subscribe(datos_rollos => {
+        // this.dtEntradaRollosService.srvObtenerLista().subscribe(datos_rollos => {
+        //   for (let i = 0; i < datos_rollos.length; i++) {
+        //     rollos.push(datos_rollos[i].rollo_Id);
+        //   }
+        // });
+
+        this.dtEntradaRollosService.getRollosProceso(proceso).subscribe(datos_rollos => {
           for (let i = 0; i < datos_rollos.length; i++) {
-            rollos.push(datos_rollos[i].rollo_Id);
+            rollos.push(datos_rollos[i]);
           }
         });
 
@@ -2181,6 +2189,7 @@ export class Ingresar_ProductosComponent implements OnInit {
                       exits : false,
                       Fecha : datos_ot[i].fecha.replace('T00:00:00', ''),
                     }
+                    this.rollosSinIngresar += 1;
                     if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
                     otTemporral = datos_ot[i].ot;
                     this.rollos.push(info);
@@ -2211,6 +2220,7 @@ export class Ingresar_ProductosComponent implements OnInit {
                       exits : true,
                       Fecha : datos_ot[i].fecha.replace('T00:00:00', ''),
                     }
+                    this.rollosIngresados += 1;
                     if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
                     otTemporral = datos_ot[i].ot;
                     this.rollos.push(info);
@@ -3309,94 +3319,6 @@ export class Ingresar_ProductosComponent implements OnInit {
                   }
                 }
               });
-
-              // this.bagProService.srvObtenerListaProcSelladoFechas(this.today, this.today).subscribe(datos_ot => {
-              //   for (let i = 0; i < datos_ot.length; i++) {
-              //     this.dtEntradaRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-              //       if (datos_rollos.length == 0) {
-              //         if (!RollosConsultados.includes(datos_ot[i].item)){
-              //           this.idProducto = datos_ot[i].referencia;
-              //           if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
-              //           if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
-              //           if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-              //           if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-              //           if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
-              //           let info : any = {
-              //             Ot : datos_ot[i].ot,
-              //             Id : datos_ot[i].item,
-              //             IdCliente : datos_ot[i].identNro,
-              //             Cliente : datos_ot[i].nombreComercial,
-              //             IdProducto : datos_ot[i].referencia,
-              //             Producto : datos_ot[i].nomReferencia,
-              //             Cantidad : datos_ot[i].qty,
-              //             Presentacion : this.presentacionProducto,
-              //             Estatus : datos_ot[i].nomStatus,
-              //             Proceso : proceso,
-              //             exits : false,
-              //             Fecha : datos_ot[i].fechaEntrada.replace('T00:00:00', ''),
-              //           }
-              //           this.rollosSinIngresar += 1;
-              //           if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //           otTemporral = datos_ot[i].ot;
-              //           this.rollos.push(info);
-              //           RollosConsultados.push(datos_ot[i].item);
-              //           this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //           this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //           this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //           this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-              //           this.FormConsultarRollos.setValue({
-              //             OT_Id: this.FormConsultarRollos.value.OT_Id,
-              //             IdRollo : this.FormConsultarRollos.value.IdRollo,
-              //             fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //             fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //             Observacion : this.FormConsultarRollos.value.Observacion,
-              //             Proceso : this.FormConsultarRollos.value.Proceso,
-              //           });
-              //         }
-              //       } else {
-              //         if (!RollosConsultados.includes(datos_ot[i].item)){
-              //           this.idProducto = datos_ot[i].referencia;
-              //           if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
-              //           if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
-              //           if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-              //           if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-              //           if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
-              //           let info : any = {
-              //             Ot : datos_ot[i].ot,
-              //             Id : datos_ot[i].item,
-              //             IdCliente : datos_ot[i].identNro,
-              //             Cliente : datos_ot[i].nombreComercial,
-              //             IdProducto : datos_ot[i].referencia,
-              //             Producto : datos_ot[i].nomReferencia,
-              //             Cantidad : datos_ot[i].qty,
-              //             Presentacion : this.presentacionProducto,
-              //             Estatus : datos_ot[i].nomStatus,
-              //             Proceso : proceso,
-              //             exits : true,
-              //             Fecha : datos_ot[i].fechaEntrada.replace('T00:00:00', ''),
-              //           }
-              //           this.rollosIngresados += 1;
-              //           if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //           otTemporral = datos_ot[i].ot;
-              //           this.rollos.push(info);
-              //           RollosConsultados.push(datos_ot[i].item);
-              //           this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //           this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //           this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //           this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-              //           this.FormConsultarRollos.setValue({
-              //             OT_Id: this.FormConsultarRollos.value.OT_Id,
-              //             IdRollo : this.FormConsultarRollos.value.IdRollo,
-              //             fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //             fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //             Observacion : this.FormConsultarRollos.value.Observacion,
-              //             Proceso : this.FormConsultarRollos.value.Proceso,
-              //           });
-              //         }
-              //       }
-              //     });
-              //   }
-              // });
             }
           }
 
@@ -3620,6 +3542,10 @@ export class Ingresar_ProductosComponent implements OnInit {
 
   // Funcion par ingresar los rollos
   ingresarRollos(idEntrada : number){
+    let proceso = this.FormConsultarRollos.value.Proceso;
+    if (proceso == '1') proceso = 'EMP';
+    if (proceso == '2') proceso = 'EXT';
+    if (proceso == '3') proceso = 'SELLA';
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       this.productosService.srvObtenerListaPorId(parseInt(this.rollosInsertar[i].IdProducto.trim())).subscribe(datos_producto => {
         let productos : any = [];
@@ -3640,6 +3566,7 @@ export class Ingresar_ProductosComponent implements OnInit {
               Prod_CantBolsasBulto : item.prod_CantBolsasBulto,
               Prod_CantBolsasRestates : (this.rollosInsertar[i].Cantidad * item.prod_CantBolsasPaquete),
               Prod_CantBolsasFacturadas : 0,
+              Proceso_Id : proceso,
             }
             this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => { }, error => {
               const Toast = Swal.mixin({
@@ -3674,6 +3601,7 @@ export class Ingresar_ProductosComponent implements OnInit {
               Prod_CantBolsasBulto : item.prod_CantBolsasBulto,
               Prod_CantBolsasRestates : this.rollosInsertar[i].Cantidad,
               Prod_CantBolsasFacturadas : 0,
+              Proceso_Id : proceso,
             }
             this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => { }, error => {
               const Toast = Swal.mixin({

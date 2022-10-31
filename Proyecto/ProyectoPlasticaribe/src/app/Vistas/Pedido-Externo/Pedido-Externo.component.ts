@@ -193,7 +193,7 @@ export class PedidoExternoComponent implements OnInit {
   //Cargar al iniciar.
   ngOnInit(): void {
     if (this.storage.get('Rol') == 1 || this.storage.get('Rol') == 2) {
-      this.consultarExistenciasProductos();
+      // this.consultarExistenciasProductos();
       this.clientesComboBox();
       this.obtenerEmpresa();
       this.ObtenerUltimoPedido();
@@ -819,7 +819,7 @@ export class PedidoExternoComponent implements OnInit {
 
   // Funcion que mostrará un modal con la informacion del pedido
   confirmarPedido(){
-    this.consultarExistenciasProductos();
+    // this.consultarExistenciasProductos();
     let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
     let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
@@ -1663,44 +1663,44 @@ export class PedidoExternoComponent implements OnInit {
   }
 
   //Funcion que consultará las existencias de los productos para luego enviarle la información a otra funcion que se encargará de actualizar dichas existencias
-  consultarExistenciasProductos(){
-    let presentacion : any;
-    this.zeus.srvObtenerExistenciasArticulosZeus().subscribe(datos_inventarioZeus => {
-      for (let i = 0; i < datos_inventarioZeus.length; i++) {
-        if (datos_inventarioZeus[i].presentacion == 'KLS' || datos_inventarioZeus[i].presentacion == 'KLG') presentacion = 'Kg';
-        else if (datos_inventarioZeus[i].presentacion == 'UND' || datos_inventarioZeus[i].presentacion == 'UNID') presentacion = 'Und';
-        else if (datos_inventarioZeus[i].presentacion == 'PAQ' || datos_inventarioZeus[i].presentacion == 'PAQT') presentacion = 'Paquete';
-        this.existenciasProductosServices.srvObtenerListaPorIdProductoPresentacion(datos_inventarioZeus[i].codigo, presentacion).subscribe(datos_productos => {
-          for (let j = 0; j < datos_productos.length; j++) {
-            setTimeout(() => {
-              this.actualizarExistenciasProductos(datos_inventarioZeus[i].codigo,
-                                                  datos_productos[j].exProd_Id,
-                                                  datos_inventarioZeus[i].existencias,
-                                                  presentacion,
-                                                  datos_productos[j].tpBod_Id,
-                                                  datos_inventarioZeus[i].precio_Total,
-                                                  datos_productos[j].tpMoneda_Id,
-                                                  datos_inventarioZeus[i].precioVenta);
-            }, 100);
-          }
-        });
-      }
-    });
-  }
+  // consultarExistenciasProductos(){
+  //   let presentacion : any;
+  //   this.zeus.srvObtenerExistenciasArticulosZeus().subscribe(datos_inventarioZeus => {
+  //     for (let i = 0; i < datos_inventarioZeus.length; i++) {
+  //       if (datos_inventarioZeus[i].presentacion == 'KLS' || datos_inventarioZeus[i].presentacion == 'KLG') presentacion = 'Kg';
+  //       else if (datos_inventarioZeus[i].presentacion == 'UND' || datos_inventarioZeus[i].presentacion == 'UNID') presentacion = 'Und';
+  //       else if (datos_inventarioZeus[i].presentacion == 'PAQ' || datos_inventarioZeus[i].presentacion == 'PAQT') presentacion = 'Paquete';
+  //       this.existenciasProductosServices.srvObtenerListaPorIdProductoPresentacion(datos_inventarioZeus[i].codigo, presentacion).subscribe(datos_productos => {
+  //         for (let j = 0; j < datos_productos.length; j++) {
+  //           setTimeout(() => {
+  //             this.actualizarExistenciasProductos(datos_inventarioZeus[i].codigo,
+  //                                                 datos_productos[j].exProd_Id,
+  //                                                 datos_inventarioZeus[i].existencias,
+  //                                                 presentacion,
+  //                                                 datos_productos[j].tpBod_Id,
+  //                                                 datos_inventarioZeus[i].precio_Total,
+  //                                                 datos_productos[j].tpMoneda_Id,
+  //                                                 datos_inventarioZeus[i].precioVenta);
+  //           }, 100);
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
 
-  // Función que se encargará de actualizar las existencias de los productos
-  actualizarExistenciasProductos(id : number, exId : number, cantidad : number, presentacion : string, bodega : number, total : number, moneda : string, precio : number){
-    const datosExistencias = {
-      Prod_Id: id,
-      exProd_Id: exId,
-      ExProd_Cantidad: cantidad,
-      UndMed_Id: presentacion,
-      TpBod_Id: bodega,
-      ExProd_PrecioExistencia: total,
-      TpMoneda_Id: moneda,
-      exProd_PrecioVenta : precio,
-    }
-    this.existenciasProductosServices.srvActualizarExistencia(exId, datosExistencias).subscribe(actualizacionExistencias => { });
-  }
+  // // Función que se encargará de actualizar las existencias de los productos
+  // actualizarExistenciasProductos(id : number, exId : number, cantidad : number, presentacion : string, bodega : number, total : number, moneda : string, precio : number){
+  //   const datosExistencias = {
+  //     Prod_Id: id,
+  //     exProd_Id: exId,
+  //     ExProd_Cantidad: cantidad,
+  //     UndMed_Id: presentacion,
+  //     TpBod_Id: bodega,
+  //     ExProd_PrecioExistencia: total,
+  //     TpMoneda_Id: moneda,
+  //     exProd_PrecioVenta : precio,
+  //   }
+  //   this.existenciasProductosServices.srvActualizarExistencia(exId, datosExistencias).subscribe(actualizacionExistencias => { });
+  // }
 
 }

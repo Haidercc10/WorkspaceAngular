@@ -749,6 +749,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
                 Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
                 Prod_CantBolsasRestates : (datos_rollos[j].prod_CantBolsasRestates - this.rollosInsertar[i].CantUndRestantes),
                 Prod_CantBolsasFacturadas : (this.rollosInsertar[i].CantUndRestantes + datos_rollos[j].prod_CantBolsasFacturadas),
+                Proceso_Id : datos_rollos[j].proceso_Id,
               }
               this.dtEntradaRollo.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
             } else if (datos_rollos[j].prod_CantPaquetesRestantes == (this.rollosInsertar[i].CantUndRestantes / datos_rollos[j].prod_CantBolsasPaquete)) {
@@ -767,6 +768,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
                 Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
                 Prod_CantBolsasRestates : (datos_rollos[j].prod_CantBolsasRestates - this.rollosInsertar[i].CantUndRestantes),
                 Prod_CantBolsasFacturadas : (this.rollosInsertar[i].CantUndRestantes + datos_rollos[j].prod_CantBolsasFacturadas),
+                Proceso_Id : datos_rollos[j].proceso_Id,
               }
               this.dtEntradaRollo.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
             }
@@ -788,6 +790,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
               Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
               Prod_CantBolsasRestates : (datos_rollos[j].prod_CantBolsasRestates - this.rollosInsertar[i].CantUndRestantes),
               Prod_CantBolsasFacturadas : (this.rollosInsertar[i].CantUndRestantes + datos_rollos[j].prod_CantBolsasFacturadas),
+              Proceso_Id : datos_rollos[j].proceso_Id,
             }
             this.dtEntradaRollo.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
           }

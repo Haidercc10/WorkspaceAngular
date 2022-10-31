@@ -67,56 +67,18 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.lecturaStorage();
     this.ColumnasTabla();
-    this.fecha();
     this.InventarioExistenciaZeus();
     //this.FormEditarCantMinima.disable();
-  }
-
-  //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
-  fecha(){
-    this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
   }
 
   // Funcion que calculará cual es la fecha segun los parametros especificados
   fechaBuscada(){
     let cantidad : number = this.FormExistencias.value.cantidad;
     let filtroFechas : any = this.FormExistencias.value.filtroFechas;
-
     if (filtroFechas == 1) this.fechaBusqueda = moment().subtract(cantidad, 'week').format('YYYY-MM-DD');
     else if (filtroFechas == 2) this.fechaBusqueda = moment().subtract(cantidad, 'month').format('YYYY-MM-DD');
     else if (filtroFechas == 3) this.fechaBusqueda = moment().subtract(cantidad, 'years').format('YYYY-MM-DD');
-  }
-
-  //
-  lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    let rol = this.storage.get('Rol');
-    setTimeout(() => {
-      this.rolService.srvObtenerLista().subscribe(datos_roles => {
-        for (let index = 0; index < datos_roles.length; index++) {
-          if (datos_roles[index].rolUsu_Id == rol) {
-            this.ValidarRol = rol;
-            this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-          }
-        }
-      });
-    }, 100);
-  }
-
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
   }
 
   //
@@ -253,25 +215,26 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
               this.existencias_ProductosService.srvObtenerListaPorIdProducto2(datosCLOTI[cl].clienteItems).subscribe(datos_existenciasProd => {
                 for (let i = 0; i < datos_existenciasProd.length; i++) {
-
-                  const datosInventario: any = {
-                    codigoItem : datosCLOTI[cl].clienteItems,
-                    nombreItem : datosCLOTI[cl].clienteItemsNom,
-                    PrecioItem : datosExistencias[exi].precioVenta,
-                    cantidadItem : datosExistencias[exi].existencias,
-                    stock_real : datos_existenciasProd[i].exProd_Cantidad,
-                    presentacion : datosExistencias[exi].presentacion,
-                    PrecioTotalItem : datosExistencias[exi].precio_Total,
-                    ClienteNombre : datosCLOTI[cl].clienteNom,
-                    cantMinima : datos_existenciasProd[i].exProd_CantMinima,
-                    fechaModificacion : '',
+                  if (datosExistencias[exi].existencias >= 1) {
+                    const datosInventario: any = {
+                      codigoItem : datosCLOTI[cl].clienteItems,
+                      nombreItem : datosCLOTI[cl].clienteItemsNom,
+                      PrecioItem : datosExistencias[exi].precioVenta,
+                      cantidadItem : datosExistencias[exi].existencias,
+                      stock_real : datos_existenciasProd[i].exProd_Cantidad,
+                      presentacion : datosExistencias[exi].presentacion,
+                      PrecioTotalItem : datosExistencias[exi].precio_Total,
+                      ClienteNombre : datosCLOTI[cl].clienteNom,
+                      cantMinima : datos_existenciasProd[i].exProd_CantMinima,
+                      fechaModificacion : '',
+                    }
+                    this.ArrayProductoZeus.push(datosInventario);
+                    this.ArrayProductoZeus.sort((a,b) => a.nombreItem.localeCompare(b.nombreItem));
+                    this.ArrayProductoZeus.sort((a,b) => Number(b.cantidadItem < b.cantMinima) - Number(a.cantidadItem < a.cantMinima));
+                    this.totalProductos += datosExistencias[exi].precio_Total;
+                    this.TotalStockReal += (datos_existenciasProd[i].exProd_Cantidad * datosExistencias[exi].precioVenta);
+                    break;
                   }
-                  this.ArrayProductoZeus.push(datosInventario);
-                  this.ArrayProductoZeus.sort((a,b) => a.nombreItem.localeCompare(b.nombreItem));
-                  this.ArrayProductoZeus.sort((a,b) => Number(b.cantidadItem < b.cantMinima) - Number(a.cantidadItem < a.cantMinima));
-                  this.totalProductos += datosExistencias[exi].precio_Total;
-                  this.TotalStockReal += (datos_existenciasProd[i].exProd_Cantidad * datosExistencias[exi].precioVenta);
-                  break;
                 }
               });
             }

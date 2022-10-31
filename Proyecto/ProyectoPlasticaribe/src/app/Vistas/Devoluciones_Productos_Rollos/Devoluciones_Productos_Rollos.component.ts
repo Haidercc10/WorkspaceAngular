@@ -350,7 +350,8 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
                 Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
                 Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
                 Prod_CantBolsasRestates : datos_rollos[j].prod_CantBolsasRestates + (this.rollosInsertar[i].Cantidad * datos_rollos[j].prod_CantBolsasPaquete),
-                Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasRestates - (this.rollosInsertar[i].Cantidad * datos_rollos[j].prod_CantBolsasPaquete)
+                Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasRestates - (this.rollosInsertar[i].Cantidad * datos_rollos[j].prod_CantBolsasPaquete),
+                Proceso_Id : datos_rollos[j].proceso_Id,
               }
               this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
             } else {
@@ -369,6 +370,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
                 Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
                 Prod_CantBolsasRestates : (datos_rollos[j].prod_CantBolsasRestates + this.rollosInsertar[i].Cantidad),
                 Prod_CantBolsasFacturadas : (this.rollosInsertar[i].Cantidad - datos_rollos[j].prod_CantBolsasFacturadas),
+                Proceso_Id : datos_rollos[j].proceso_Id,
               }
               this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
             }
