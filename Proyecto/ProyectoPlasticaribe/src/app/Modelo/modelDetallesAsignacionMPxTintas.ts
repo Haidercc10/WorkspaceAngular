@@ -4,4 +4,5 @@ export interface modelDetallesAsignacionMPxTintas {
   DetAsigMPxTinta_Cantidad : number;
   UndMed_Id : string;
   Proceso_Id : string;
+  Tinta_Id : number;
 }

@@ -487,11 +487,11 @@
 
                   <!-- Empaque -->
                   <!-- Termianda -->
-                  <ng-container *ngIf="ArrayDocumento.emp >= (ArrayDocumento.cant) && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                  <ng-container *ngIf="ArrayDocumento.emp >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
                     <td id="emp" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.emp | number}}</td>
                   </ng-container>
                   <!-- Iniciada -->
-                  <ng-container *ngIf="ArrayDocumento.emp < (ArrayDocumento.cant) && ArrayDocumento.emp > 0">
+                  <ng-container *ngIf="ArrayDocumento.emp < ArrayDocumento.cant && ArrayDocumento.emp > 0">
                     <td id="emp" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.emp | number}}</td>
                   </ng-container>
                   <!-- Abierta / Asignada / Anulada -->
@@ -514,11 +514,11 @@
 
                   <!-- Sellado -->
                   <!-- Termianda -->
-                  <ng-container *ngIf="ArrayDocumento.sel >= (ArrayDocumento.cant) && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                  <ng-container *ngIf="ArrayDocumento.sel >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
                     <td id="sel" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
                   </ng-container>
                   <!-- Iniciada -->
-                  <ng-container *ngIf="ArrayDocumento.sel < (ArrayDocumento.cant) && ArrayDocumento.sel > 0">
+                  <ng-container *ngIf="ArrayDocumento.sel < ArrayDocumento.cant && ArrayDocumento.sel > 0">
                     <td id="sel" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
                   </ng-container>
                   <!-- Abierta / Asignada / Anulada -->

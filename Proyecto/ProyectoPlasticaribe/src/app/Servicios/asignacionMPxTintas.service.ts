@@ -51,8 +51,18 @@ export class AsignacionMPxTintasService {
   }
 
   //
-  srvGuardar(data : modelAsignacionMPxTintas): Observable<any> {
+  srvGuardar(data : any /*modelAsignacionMPxTintas*/): Observable<any> {
     return this.http.post(this.rutaPlasticaribeAPI + '/Asignacion_MatPrimaXTinta', data)
+  }
+
+  /** Obtener lista de tintas y materias primas juntas */
+  srvObtenerListaMatPrimas():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Asignacion_MatPrimaXTinta/CargarTintas_MatPrimas/');
+  }
+
+
+  srvObtenerListaMatPrimasPorId(ID : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Asignacion_MatPrimaXTinta/CargarMatPrimasXId/${ID}`);
   }
 
 }

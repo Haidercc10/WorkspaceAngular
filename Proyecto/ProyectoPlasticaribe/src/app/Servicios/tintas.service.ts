@@ -49,4 +49,9 @@ export class TintasService {
     return this.http.post(this.rutaPlasticaribeAPI + '/Tinta', data)
   }
 
+  /** Lista de tintas tipo solventes. */
+  srvObtenerListaXColores():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tinta/TintasColores');
+  }
+
 }
