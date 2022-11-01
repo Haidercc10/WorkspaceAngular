@@ -55,16 +55,14 @@ export class AsignacionTintasComponent implements OnInit {
                       private materiaPrimaService : MateriaPrimaService,
                         private tintasService : TintasService,
                           private asignacionMPxTintas : AsignacionMPxTintasService,
-                            private detallesAsignacionMPxTintas : DetallesAsignacionMPxTintasService,
-                            private crearMateriaPrima : CrearMateriaprimaService,
-                             private categoriasMP : CategoriaMateriaPrimaService)  {
+                            private detallesAsignacionMPxTintas : DetallesAsignacionMPxTintasService,)  {
 
     this.FormAsignacionMP = this.frmBuilder.group({
-      Tinta : ['', Validators.required],
-      cantidadTinta : ['', Validators.required],
-      undMedTinta : ['', Validators.required],
-      Observacion : ['', Validators.required],
-      Fecha : ['', Validators.required],
+      Tinta : [null, Validators.required],
+      cantidadTinta : [null, Validators.required],
+      undMedTinta : [null, Validators.required],
+      Observacion : [''],
+      Fecha : [null, Validators.required],
     });
 
     this.FormMateriaPrima = this.frmBuilder.group({
@@ -125,9 +123,9 @@ export class AsignacionTintasComponent implements OnInit {
     this.today = yyyy + '-' + mm + '-' + dd;
 
     this.FormAsignacionMP = this.frmBuilder.group({
-      Tinta : '',
-      cantidadTinta : '',
-      undMedTinta : '',
+      Tinta : null,
+      cantidadTinta : null,
+      undMedTinta : null,
       Observacion : '',
       Fecha : this.today,
     });
@@ -221,7 +219,6 @@ export class AsignacionTintasComponent implements OnInit {
           this.materiasPrimas.push(mp);
         }
       }
-      console.log(this.materiasPrimas);
     });
   }
 
@@ -312,8 +309,8 @@ export class AsignacionTintasComponent implements OnInit {
     let IdMatPrimaReal : number = 84;
     let IdTintaReal : number = 2001;
 
-    if (idMateriaPrima > 2000) { IdTintaReal = idMateriaPrima; }
-    else { IdMatPrimaReal = idMateriaPrima; }
+    if (idMateriaPrima > 2000) IdTintaReal = idMateriaPrima;
+    else IdMatPrimaReal = idMateriaPrima;
 
     if (cantidad <= stock) {
       let productoExt : any = {
@@ -326,13 +323,9 @@ export class AsignacionTintasComponent implements OnInit {
         Tinta : IdTintaReal,
       }
 
-      if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length == 0) {
-        this.ArrayMateriaPrima.push(productoExt);
-
-      } else if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length != 0){
-        this.ArrayMateriaPrima.push(productoExt);
-        productoExt = [];
-      } else {
+      if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length == 0) this.ArrayMateriaPrima.push(productoExt);
+      else if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length != 0) this.ArrayMateriaPrima.push(productoExt);
+      else {
         for (let index = 0; index < formulario.length; index++) {
           if(productoExt.Id == this.ArrayMateriaPrima[index].Id) {
             this.ArrayMateriaPrima.splice(index, 1);
@@ -356,31 +349,32 @@ export class AsignacionTintasComponent implements OnInit {
 
   //Funcion que almacenará en la base de datos la informacion general sobre la asignacion de materia prima
   asignarMPCrearTintas(){
-    this.load = false;
+    if (this.FormAsignacionMP.valid && this.ArrayMateriaPrima.length > 0) {
+      this.load = false;
+      let tinta : any = this.FormAsignacionMP.value.Tinta;
+      let cantidad : number = this.FormAsignacionMP.value.cantidadTinta;
+      let presentacion : string = this.FormAsignacionMP.value.undMedTinta;
+      let Observacion : string = this.FormAsignacionMP.value.Observacion;
+      let usuario : number = this.storage_Id;
+      let fecha : Date = this.today;
 
-    let tinta : any = this.FormAsignacionMP.value.Tinta;
-    let cantidad : number = this.FormAsignacionMP.value.cantidadTinta;
-    let presentacion : string = this.FormAsignacionMP.value.undMedTinta;
-    let Observacion : string = this.FormAsignacionMP.value.Observacion;
-    let usuario : number = this.storage_Id;
-    let fecha : Date = this.today;
+      let datos_asignacionMP : modelAsignacionMPxTintas = {
+        AsigMPxTinta_Id: 0,
+        Tinta_Id: tinta.id,
+        AsigMPxTinta_Cantidad: cantidad,
+        UndMed_Id: presentacion,
+        AsigMPxTinta_FechaEntrega: fecha,
+        AsigMPxTinta_Observacion: Observacion,
+        Usua_Id: usuario,
+        Estado_Id: 13
+      }
+      this.arrayTintaAsignada.push(datos_asignacionMP)
 
-    let datos_asignacionMP : modelAsignacionMPxTintas = {
-      AsigMPxTinta_Id: 0,
-      Tinta_Id: tinta.id,
-      AsigMPxTinta_Cantidad: cantidad,
-      UndMed_Id: presentacion,
-      AsigMPxTinta_FechaEntrega: fecha,
-      AsigMPxTinta_Observacion: Observacion,
-      Usua_Id: usuario,
-      Estado_Id: 13
-    }
-    this.arrayTintaAsignada.push(datos_asignacionMP)
-
-    this.asignacionMPxTintas.srvGuardar(datos_asignacionMP).subscribe(datos_asignacionMPxTintas => {
-      this.obtenerUltimoIdAsignacion();
-      this.sumarInventarioTintas();
-    });
+      this.asignacionMPxTintas.srvGuardar(datos_asignacionMP).subscribe(datos_asignacionMPxTintas => {
+        this.obtenerUltimoIdAsignacion();
+        setTimeout(() => { this.sumarInventarioTintas(); }, 3000);
+      });
+    } else Swal.fire("¡Hay campos vacios!");
   }
 
   // Funcion que servirá para poder obtener el ultimo Id de la asignacion creada y pasarlo a la funcion de creacion de AsignacionMP para que pueda tener el ID de la asignacion
@@ -392,10 +386,8 @@ export class AsignacionTintasComponent implements OnInit {
 
   // Funcion que creará el resgitro donde queda detallado que materia prima se pidio, cuanto y a qye asignacion pertenece
   mpAsignada(idAsignacion : any){
-    if (this.ArrayMateriaPrima.length == 0) {
-      this.load = true;
-      Swal.fire("Debe cargar minimo una materia prima en la tabla");
-    } else {
+    if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla");
+    else {
       for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
         let materiaPrima : number = this.ArrayMateriaPrima[i].Materia_Prima;
         let tinta : number = this.ArrayMateriaPrima[i].Tinta;
@@ -429,11 +421,8 @@ export class AsignacionTintasComponent implements OnInit {
       this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Materia_Prima).subscribe(datos_materiaPrima => {
         stockMateriaPrimaInicial = datos_materiaPrima.matPri_Stock;
 
-        if(this.ArrayMateriaPrima[index].Materia_Prima == 84) {
-          stockMateriaPrimaFinal = 0
-        } else {
-          stockMateriaPrimaFinal = stockMateriaPrimaInicial - this.ArrayMateriaPrima[index].Cant;
-        }
+        if(this.ArrayMateriaPrima[index].Materia_Prima == 84) stockMateriaPrimaFinal = 0
+        else stockMateriaPrimaFinal = stockMateriaPrimaInicial - this.ArrayMateriaPrima[index].Cant;
         const datosMPActualizada : any = {
           MatPri_Id : this.ArrayMateriaPrima[index].Materia_Prima,
           MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
@@ -481,7 +470,6 @@ export class AsignacionTintasComponent implements OnInit {
       });
     });
     }
-    this.load = true;
   }
 
   //Función que restará a las tintas de categoria diferente a TINTAS TIPO COLORES.
@@ -503,6 +491,7 @@ export class AsignacionTintasComponent implements OnInit {
           CatMP_Id : datos_tinta.catMP_Id,
           Tinta_Precio : datos_tinta.tinta_Precio,
           TpBod_Id : datos_tinta.tpBod_Id,
+          tinta_InvInicial : datos_tinta.tinta_InvInicial,
         }
 
         this.tintasService.srvActualizar(this.ArrayMateriaPrima[index].Tinta, datosTintaActualizada).subscribe(datos_mp_creada => {

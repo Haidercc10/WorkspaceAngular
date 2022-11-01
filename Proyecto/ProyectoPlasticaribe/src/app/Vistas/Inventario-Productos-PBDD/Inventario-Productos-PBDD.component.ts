@@ -23,7 +23,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
   public datosCodigo : string;
   ArrayProductosBDNueva = [];
   public page : number;
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   fechaBusqueda : any = new Date(); // Variable que va a ayudar al momento de saber hasta que fecha se va a buscar
   mostrarColumna : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador

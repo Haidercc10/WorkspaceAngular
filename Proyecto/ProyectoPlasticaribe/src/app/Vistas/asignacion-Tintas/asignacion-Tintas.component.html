@@ -79,19 +79,19 @@
             </div> -->
             <!-- Cantidad Tinta -->
             <div class="form-floating col-md">
-              <input formControlName="cantidadTinta" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" required title="Maquina">
+              <input formControlName="cantidadTinta" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" title="Maquina">
               <label for="floatingInput">Cantidad (Kg) Tinta</label>
             </div>
             <!-- Unidad medida-->
             <div class="form-floating col-md">
-              <select formControlName="undMedTinta" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
+              <select formControlName="undMedTinta" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida">
                 <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
               </select>
               <label for="floatingSelect">Und. Medida</label>
             </div>
             <!-- Fecha entrega -->
             <div class="form-floating col-md">
-              <input formControlName="Fecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" readonly onmousedown="return false;">
+              <input formControlName="Fecha" type="date" class="form-control form-control-sm" id="floatingInput" title="Fecha Retiro" readonly onmousedown="return false;">
               <label for="floatingInput">Fecha Retiro</label>
             </div>
             <!-- Campo Observacion -->

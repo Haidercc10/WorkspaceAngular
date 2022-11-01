@@ -510,10 +510,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       fallasOT : [null],
       ObservacionOT : [''],
       Vendedor : [''],
-      cliente : [''],
-      producto : [''],
+      cliente : [null],
+      producto : [null],
     });
-    this.otSeleccionada = 0;
+
     this.catidadOTAbiertas = 0;
     this.cantidadOTAsignadas = 0;
     this.cantidadOTTerminada = 0;
@@ -521,7 +521,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOtAnulada = 0;
     this.cantidadOTFinalizada = 0;
     this.cantidadOTCerrada = 0;
-    this.clienteSeleccionado = 0;
+    this.otSeleccionada = 0;
   }
 
   // Funcion que obtendrá los clientes

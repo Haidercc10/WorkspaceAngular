@@ -26,7 +26,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   public datosCodigo : string;
   ArrayProductoZeus = [];
   public page : number;
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   fechaBusqueda : any = new Date(); // Variable que va a ayudar al momento de saber hasta que fecha se va a buscar
   mostrarColumna : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -130,10 +130,10 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
       this.load = false;
       setTimeout(() => {
         const title = `Inventario de Productos Terminados ${this.today}`;
-        const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Stock Real", "Presentación", "Subtotal", "Cantidad Minima", "Ult. Modificación"]
+        const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal", "Cantidad Minima", "Ult. Modificación"]
         let datos : any =[];
         for (const item of this.ArrayProductoZeus) {
-          const datos1  : any = [item.codigoItem, item.ClienteNombre, item.nombreItem, item.PrecioItem, item.cantidadItem, item.stock_real, item.presentacion, item.PrecioTotalItem, item.cantMinima, item.fechaModificacion];
+          const datos1  : any = [item.codigoItem, item.ClienteNombre, item.nombreItem, item.PrecioItem, item.cantidadItem, item.presentacion, item.PrecioTotalItem, item.cantMinima, item.fechaModificacion];
           datos.push(datos1);
         }
         let workbook = new Workbook();
@@ -150,7 +150,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:J2');
+        worksheet.mergeCells('A1:I2');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
         datos.forEach(d => {
           let row = worksheet.addRow(d);
@@ -174,8 +174,8 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           }
           row.getCell(4).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
           row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(8).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
         worksheet.getColumn(1).width = 10;
@@ -184,10 +184,9 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         worksheet.getColumn(4).width = 20;
         worksheet.getColumn(5).width = 20;
         worksheet.getColumn(6).width = 20;
-        worksheet.getColumn(7).width = 10;
+        worksheet.getColumn(7).width = 20;
         worksheet.getColumn(8).width = 20;
         worksheet.getColumn(9).width = 20;
-        worksheet.getColumn(10).width = 20;
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

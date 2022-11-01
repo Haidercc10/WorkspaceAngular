@@ -201,7 +201,8 @@ export class MovimientosTintasComponent implements OnInit {
   obtenerTipoDocumento(){
     this.tipoDocuemntoService.srvObtenerLista().subscribe(datos_tiposDocumentos => {
       for (let index = 0; index < datos_tiposDocumentos.length; index++) {
-        if (datos_tiposDocumentos[index].tpDoc_Id != 'ASIGBOPP') this.tipoDocumento.push(datos_tiposDocumentos[index])
+        if (datos_tiposDocumentos[index].tpDoc_Id == 'ASIGTINTAS'
+        || datos_tiposDocumentos[index].tpDoc_Id == 'CRTINTAS') this.tipoDocumento.push(datos_tiposDocumentos[index]);
       }
     });
   }
@@ -240,7 +241,6 @@ export class MovimientosTintasComponent implements OnInit {
     });
   }
 
-
   /** */
   sumarCantidadesMatPrima_Tintas(OT : number){
     this.dtAsgTinta.srvObtenerSumaCantidadesTintas_MatPrimas(OT).subscribe(registrosTintas_MatPrima => {
@@ -271,7 +271,7 @@ export class MovimientosTintasComponent implements OnInit {
     let estado : any = this.FormDocumentos.value.estado;
 
     if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null && estado != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.consultaOTBagPro(ot);
 
         this.dtAsgTinta.srvObtenerConsultaMov10(ot, fechaIncial, fechaFinal, tintaConsulta, estado).subscribe(datos_asignacion => {
@@ -282,29 +282,35 @@ export class MovimientosTintasComponent implements OnInit {
             }, 1200);
           }
         });
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
 
     } else if (tipoDoc != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null && estado != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov4(fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado_OrdenTrabajo == estado && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].estado_OrdenTrabajo == estado && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }
         });
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (ot != null && tipoDoc != null && fechaIncial != null && tintaConsulta != null && estado != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00','') == fechaIncial
+              if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial
               && datos_asignacion[i].tinta_Id == tintaConsulta
-              && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+              && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
             }, 1500);
           }
         });
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (ot != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null && estado != null) {
       this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
@@ -312,149 +318,117 @@ export class MovimientosTintasComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }, 1500);
         }
       });
     } else if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && estado != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+              if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
             }, 1500);
           }
         });
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+              if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
             }, 1500);
           }
         });
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (fechaIncial != null && fechaFinal != null && tintaConsulta != null && estado != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov9(fechaIncial, fechaFinal, tintaConsulta, estado).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
         }
       });
     } else if (tipoDoc != null && fechaIncial != null && tintaConsulta != null && estado != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov2(tintaConsulta, fechaIncial).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }
         });
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (tipoDoc != null && fechaIncial != null && fechaFinal != null && estado != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov7(fechaIncial, fechaFinal, estado).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }
         });
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (tipoDoc != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov8(fechaIncial, fechaFinal, tintaConsulta).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }
         });
-      /*} else if (tipoDoc == 'DEVMP') {
-        this.dtDevMP.srvObtenerConsultaMov6(fechaIncial, fechaFinal, tintaConsulta).subscribe(datos_devolucion => {
-          for (let i = 0; i < datos_devolucion.length; i++) {
-            this.llenarTabla(datos_devolucion[i], 'DEVMP');
-          }
-        });
-      } else if (tipoDoc == 'FCO') {
-        this.dtFacturaMP.srvObtenerConsultaMov6(fechaIncial, fechaFinal, tintaConsulta).subscribe(datos_factura => {
-          for (let i = 0; i < datos_factura.length; i++) {
-            this.llenarTabla(datos_factura[i], 'FCO');
-          }
-        });
-      } else if (tipoDoc == 'REM') {
-        this.dtRemision.srvObtenerConsultaMov6(fechaIncial, fechaFinal, tintaConsulta).subscribe(datos_remision => {
-          for (let i = 0; i < datos_remision.length; i++) {
-            this.llenarTabla(datos_remision[i], 'REM');
-          }
-        });
-      } else if (tipoDoc == 'RECP') {
-        this.dtRecuperado.srvObtenerConsultaMov6(fechaIncial, fechaFinal, tintaConsulta).subscribe(datos_recuperado => {
-          for (let i = 0; i < datos_recuperado.length; i++) {
-            this.llenarTabla(datos_recuperado[i], 'RECP');
-          }
-        });*/
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (ot != null && tipoDoc != null && tintaConsulta != null && estado != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
 
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+              if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
             }, 1500);
           }
         });
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (ot != null && tipoDoc != null && fechaIncial != null && estado != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00', '') == fechaIncial && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+              if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
             }, 1500);
           }
         });
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (ot != null && tipoDoc != null && fechaIncial != null && tintaConsulta != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00', '') == fechaIncial && datos_asignacion[i].matPri_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+              if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial && datos_asignacion[i].matPri_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
             }, 1500);
           }
         });
-      } else if (tipoDoc == 'DEVMP') {
-        this.dtDevMP.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
-          for (let i = 0; i < datos_devolucion.length; i++) {
-            if (datos_devolucion[i].devMatPri_Fecha.replace('T00:00:00', '') == fechaIncial && datos_devolucion[i].matPri_Id == tintaConsulta) this.llenarTabla(datos_devolucion[i], 'DEVMP');
-          }
-        });
-      } else if (tipoDoc == 'FCO') {
-        this.dtFacturaMP.srvObtenerListaMov2(ot).subscribe(datos_factura => {
-          for (let i = 0; i < datos_factura.length; i++) {
-            if (datos_factura[i].facco_FechaFactura.replace('T00:00:00', '') == fechaIncial && datos_factura[i].matPri_Id == tintaConsulta) this.llenarTabla(datos_factura[i], 'FCO');
-          }
-        });
-      } else if (tipoDoc == 'REM') {
-        this.dtRemision.srvObtenerListaMov2(ot).subscribe(datos_remision => {
-          for (let i = 0; i < datos_remision.length; i++) {
-            if (datos_remision[i].rem_Fecha.replace('T00:00:00', '') == fechaIncial && datos_remision[i].matPri_Id == tintaConsulta) this.llenarTabla(datos_remision[i], 'REM');
-          }
-        });
-      } else if (tipoDoc == 'RECP') {
-        this.dtRecuperado.srvObtenerConsultaMov2(ot).subscribe(datos_recuperado => {
-          for (let i = 0; i < datos_recuperado.length; i++) {
-            if (datos_recuperado[i].recMp_FechaIngreso.replace('T00:00:00', '') == fechaIncial && datos_recuperado[i].matPri_Id == tintaConsulta) this.llenarTabla(datos_recuperado[i], 'RECP');
-          }
-        });
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (ot != null && fechaIncial != null && fechaFinal != null && estado != null) {
       // Asignación de materia prima
@@ -463,7 +437,7 @@ export class MovimientosTintasComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }, 1500);
         }
       });
@@ -472,7 +446,7 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
+          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].ASIGTINTAS_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
               this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
               break;
@@ -480,180 +454,66 @@ export class MovimientosTintasComponent implements OnInit {
           });
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }, 1500);
         }
       });
-      /* // Devolución de materia prima
-      this.dtDevMP.srvObtenerConsultaMov5(ot, fechaIncial, fechaFinal).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          if (datos_devolucion[i].matPri_Id == materiaPrima) this.llenarTabla(datos_devolucion[i], 'DEVMP');
-        }
-      });
-      // Entradas de materia prima
-      // Factura
-      this.dtFacturaMP.srvObtenerConsultaMov5(ot, fechaIncial, fechaFinal).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          if (datos_factura[i].matPri_Id == materiaPrima) this.llenarTabla(datos_factura[i], 'FCO');
-        }
-      });
-      // Remision
-      this.dtRemision.srvObtenerConsultaMov5(ot, fechaIncial, fechaFinal).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          if (datos_remision[i].matPri_Id == materiaPrima) this.llenarTabla(datos_remision[i], 'REM');
-        }
-      });
-      // Recuperado
-      this.dtRecuperado.srvObtenerConsultaMov5(ot,fechaIncial, fechaFinal).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          if (datos_recuperado[i].matPri_Id == materiaPrima) this.llenarTabla(datos_recuperado[i], 'RECP');
-        }
-      });*/
     } else if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
-              this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+              this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
             }, 1500);
           }
         });
-     /* } else if (tipoDoc == 'DEVMP') {
-        this.dtDevMP.srvObtenerConsultaMov5(ot, fechaIncial, fechaFinal).subscribe(datos_devolucion => {
-          for (let i = 0; i < datos_devolucion.length; i++) {
-            this.llenarTabla(datos_devolucion[i], 'DEVMP');
-          }
-        });
-      } else if (tipoDoc == 'FCO') {
-        this.dtFacturaMP.srvObtenerConsultaMov5(ot, fechaIncial, fechaFinal).subscribe(datos_factura => {
-          for (let i = 0; i < datos_factura.length; i++) {
-            this.llenarTabla(datos_factura[i], 'FCO');
-          }
-        });
-      } else if (tipoDoc == 'REM') {
-        this.dtRemision.srvObtenerConsultaMov5(ot, fechaIncial, fechaFinal).subscribe(datos_remision => {
-          for (let i = 0; i < datos_remision.length; i++) {
-            this.llenarTabla(datos_remision[i], 'REM');
-          }
-        });
-      } else if (tipoDoc == 'RECP') {
-        this.dtRecuperado.srvObtenerConsultaMov5(ot,fechaIncial, fechaFinal).subscribe(datos_recuperado => {
-          for (let i = 0; i < datos_recuperado.length; i++) {
-            this.llenarTabla(datos_recuperado[i], 'RECP');
-          }
-        });*/
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (fechaIncial != null && fechaFinal != null && estado != null) {
       this.dtAsgTinta.srvObtenerConsultaMov7(fechaIncial, fechaFinal, estado).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
         }
       });
     } else if (fechaIncial != null && fechaFinal != null && tintaConsulta != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov8(fechaIncial, fechaFinal, tintaConsulta).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
         }
       });
-      /* // Devolución de materia prima
-      this.dtDevMP.srvObtenerConsultaMov6(fechaIncial, fechaFinal, materiaPrima).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          this.llenarTabla(datos_devolucion[i], 'DEVMP');
-        }
-      });
-      // Entradas de materia prima
-      // Factura
-      this.dtFacturaMP.srvObtenerConsultaMov6(fechaIncial, fechaFinal, materiaPrima).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i], 'FCO');
-        }
-      });
-      // Remision
-      this.dtRemision.srvObtenerConsultaMov6(fechaIncial, fechaFinal, materiaPrima).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          this.llenarTabla(datos_remision[i], 'REM');
-        }
-      });
-      // Recuperado
-      this.dtRecuperado.srvObtenerConsultaMov6(fechaIncial, fechaFinal, materiaPrima).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          this.llenarTabla(datos_recuperado[i], 'RECP');
-        }
-      });*/
     } else if (tipoDoc != null && fechaIncial != null && estado != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }
         });
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (tipoDoc != null && fechaIncial != null && tintaConsulta != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }
         });
-     /* } else if (tipoDoc == 'DEVMP') {
-        this.dtDevMP.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_devolucion => {
-          for (let i = 0; i < datos_devolucion.length; i++) {
-            if (datos_devolucion[i].matPri_Id == materiaPrima) this.llenarTabla(datos_devolucion[i], 'DEVMP');
-          }
-        });
-      } else if (tipoDoc == 'FCO') {
-        this.dtFacturaMP.srvObtenerListaMov0(fechaIncial).subscribe(datos_factura => {
-          for (let i = 0; i < datos_factura.length; i++) {
-            if (datos_factura[i].matPri_Id == materiaPrima) this.llenarTabla(datos_factura[i], 'FCO');
-          }
-        });
-      } else if (tipoDoc == 'REM') {
-        this.dtRemision.srvObtenerListaMov0(fechaIncial).subscribe(datos_remision => {
-          for (let i = 0; i < datos_remision.length; i++) {
-            if (datos_remision[i].matPri_Id == materiaPrima) this.llenarTabla(datos_remision[i], 'REM');
-          }
-        });
-      } else if (tipoDoc == 'RECP') {
-        this.dtRecuperado.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_recuperado => {
-          for (let i = 0; i < datos_recuperado.length; i++) {
-            if (datos_recuperado[i].matPri_Id == materiaPrima) this.llenarTabla(datos_recuperado[i], 'RECP');
-          }
-        });*/
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (tipoDoc != null && fechaIncial != null && fechaFinal != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov4(fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }
         });
-      /*} else if (tipoDoc == 'DEVMP') {
-        this.dtDevMP.srvObtenerConsultaMov3(fechaIncial, fechaFinal).subscribe(datos_devolucion => {
-          for (let i = 0; i < datos_devolucion.length; i++) {
-            this.llenarTabla(datos_devolucion[i], 'DEVMP');
-          }
-        });
-      } else if (tipoDoc == 'FCO') {
-        this.dtFacturaMP.srvObtenerListaMov3(fechaIncial, fechaFinal).subscribe(datos_factura => {
-          for (let i = 0; i < datos_factura.length; i++) {
-            this.llenarTabla(datos_factura[i], 'FCO');
-          }
-        });
-      } else if (tipoDoc == 'REM') {
-        this.dtRemision.srvObtenerListaMov3(fechaIncial, fechaFinal).subscribe(datos_remision => {
-          for (let i = 0; i < datos_remision.length; i++) {
-            this.llenarTabla(datos_remision[i], 'REM');
-          }
-        });
-      } else if (tipoDoc == 'RECP') {
-        this.dtRecuperado.srvObtenerConsultaMov3(fechaIncial, fechaFinal).subscribe(datos_recuperado => {
-          for (let i = 0; i < datos_recuperado.length; i++) {
-            this.llenarTabla(datos_recuperado[i], 'RECP');
-          }
-        });*/
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (ot != null && tintaConsulta != null && estado != null) {
       // Asignación de materia prima
@@ -662,7 +522,7 @@ export class MovimientosTintasComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }, 1500);
         }
       });
@@ -671,7 +531,7 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
+          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].ASIGTINTAS_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
               this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
               break;
@@ -679,7 +539,7 @@ export class MovimientosTintasComponent implements OnInit {
           });
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00','') == fechaIncial && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }, 1500);
         }
       });
@@ -690,35 +550,10 @@ export class MovimientosTintasComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00','') == fechaIncial && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }, 1500);
         }
       });
-      /* // Devolución de materia prima
-      this.dtDevMP.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          if (datos_devolucion[i].devMatPri_Fecha.replace('T00:00:00', '') == fechaIncial && datos_devolucion[i].matPri_Id == materiaPrima) this.llenarTabla(datos_devolucion[i], 'DEVMP');
-        }
-      });
-      // Entradas de materia prima
-      // Factura
-      this.dtFacturaMP.srvObtenerListaMov2(ot).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          if (datos_factura[i].facco_FechaFactura.replace('T00:00:00', '') == fechaIncial && datos_factura[i].matPri_Id == materiaPrima) this.llenarTabla(datos_factura[i], 'FCO');
-        }
-      });
-      // Remision
-      this.dtRemision.srvObtenerListaMov2(ot).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          if (datos_remision[i].rem_Fecha.replace('T00:00:00', '') == fechaIncial && datos_remision[i].matPri_Id == materiaPrima) this.llenarTabla(datos_remision[i], 'REM');
-        }
-      });
-      // Recuperado
-      this.dtRecuperado.srvObtenerConsultaMov2(ot).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          if (datos_recuperado[i].recMp_FechaIngreso.replace('T00:00:00', '') == fechaIncial && datos_recuperado[i].matPri_Id == materiaPrima) this.llenarTabla(datos_recuperado[i], 'RECP');
-        }
-      });*/
     } else if (ot != null && fechaIncial != null && fechaFinal != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
@@ -726,248 +561,86 @@ export class MovimientosTintasComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
-            this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }, 1500);
         }
       });
-      // Devolución de materia prima
-     /* this.dtDevMP.srvObtenerConsultaMov5(ot, fechaIncial, fechaFinal).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          this.llenarTabla(datos_devolucion[i], 'DEVMP');
-        }
-      });
-      // Entradas de materia prima
-      // Factura
-      this.dtFacturaMP.srvObtenerConsultaMov5(ot, fechaIncial, fechaFinal).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i], 'FCO');
-        }
-      });
-      // Remision
-      this.dtRemision.srvObtenerConsultaMov5(ot, fechaIncial, fechaFinal).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          this.llenarTabla(datos_remision[i], 'REM');
-        }
-      });
-      // Recuperado
-      this.dtRecuperado.srvObtenerConsultaMov5(ot,fechaIncial, fechaFinal).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          this.llenarTabla(datos_recuperado[i], 'RECP');
-        }
-      });*/
     } else if (ot != null && tipoDoc != null && estado != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         // Asignación de materia prima
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+              if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
             }, 1500);
           }
         });
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (ot != null && tipoDoc != null && tintaConsulta != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov2(tintaConsulta, this.today).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].asigMP_OrdenTrabajo == ot) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+              if (datos_asignacion[i].ASIGTINTAS_OrdenTrabajo == ot) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
             }, 1500);
           }
         });
-      /*} else if (tipoDoc == 'DEVMP') {
-        this.dtDevMP.srvObtenerConsultaMov1(materiaPrima, this.today).subscribe(datos_devolucion => {
-          for (let i = 0; i < datos_devolucion.length; i++) {
-            if (datos_devolucion[i].devMatPri_OrdenTrabajo == ot) this.llenarTabla(datos_devolucion[i], 'DEVMP');
-          }
-        });
-      } else if (tipoDoc == 'FCO') {
-        this.dtFacturaMP.srvObtenerListaMov1(materiaPrima, this.today).subscribe(datos_factura => {
-          for (let i = 0; i < datos_factura.length; i++) {
-            if (datos_factura[i].facco_Codigo == ot) this.llenarTabla(datos_factura[i], 'FCO');
-          }
-        });
-      } else if (tipoDoc == 'REM') {
-        this.dtRemision.srvObtenerListaMov1(materiaPrima, this.today).subscribe(datos_remision => {
-          for (let i = 0; i < datos_remision.length; i++) {
-            if (datos_remision[i].rem_Codigo == ot) this.llenarTabla(datos_remision[i], 'REM');
-          }
-        });
-      } else if (tipoDoc == 'RECP') {
-        this.dtRecuperado.srvObtenerConsultaMov1(materiaPrima, this.today).subscribe(datos_recuperado => {
-          for (let i = 0; i < datos_recuperado.length; i++) {
-            if (datos_recuperado[i].recMp_Id == ot) this.llenarTabla(datos_recuperado[i], 'RECP');
-          }
-        });*/
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (ot != null && tipoDoc != null && fechaIncial != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+              if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
             }, 1500);
           }
         });
-      /*} else if (tipoDoc == 'DEVMP') {
-        this.dtDevMP.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
-          for (let i = 0; i < datos_devolucion.length; i++) {
-            if (datos_devolucion[i].devMatPri_Fecha.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_devolucion[i], 'DEVMP');
-          }
-        });
-      } else if (tipoDoc == 'FCO') {
-        this.dtFacturaMP.srvObtenerListaMov2(ot).subscribe(datos_factura => {
-          for (let i = 0; i < datos_factura.length; i++) {
-            if (datos_factura[i].facco_FechaFactura.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_factura[i], 'FCO');
-          }
-        });
-      } else if (tipoDoc == 'REM') {
-        this.dtRemision.srvObtenerListaMov2(ot).subscribe(datos_remision => {
-          for (let i = 0; i < datos_remision.length; i++) {
-            if (datos_remision[i].rem_Fecha.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_remision[i], 'REM');
-          }
-        });
-      } else if (tipoDoc == 'RECP') {
-        this.dtRecuperado.srvObtenerConsultaMov2(ot).subscribe(datos_recuperado => {
-          for (let i = 0; i < datos_recuperado.length; i++) {
-            if (datos_recuperado[i].recMp_FechaIngreso.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_recuperado[i], 'RECP');
-          }
-        });*/
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (fechaIncial != null && tintaConsulta != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov2(fechaIncial, materiaPrima).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
         }
       });
-      /* // Devolución de materia prima
-      this.dtDevMP.srvObtenerConsultaMov4(fechaIncial, tintaConsulta).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          this.llenarTabla(datos_devolucion[i], 'DEVMP');
-        }
-      });
-      // Entradas de materia prima
-      // Factura
-      this.dtFacturaMP.srvObtenerConsultaMov4(fechaIncial, tintaConsulta).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i], 'FCO');
-        }
-      });
-      // Remision
-      this.dtRemision.srvObtenerConsultaMov4(fechaIncial, tintaConsulta).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          this.llenarTabla(datos_remision[i], 'REM');
-        }
-      });
-      // Recuperado
-      this.dtRecuperado.srvObtenerConsultaMov4(fechaIncial, tintaConsulta).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          this.llenarTabla(datos_recuperado[i], 'RECP');
-        }
-      });*/
     } else if (fechaIncial != null && fechaFinal != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov4(fechaIncial, fechaFinal).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
         }
       });
-      /*// Devolución de materia prima
-      this.dtDevMP.srvObtenerConsultaMov3(fechaIncial, fechaFinal).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          this.llenarTabla(datos_devolucion[i], 'DEVMP');
-        }
-      });
-      // Entradas de materia prima
-      // Factura
-      this.dtFacturaMP.srvObtenerListaMov3(fechaIncial, fechaFinal).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i], 'FCO');
-        }
-      });
-      // Remision
-      this.dtRemision.srvObtenerListaMov3(fechaIncial, fechaFinal).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          this.llenarTabla(datos_remision[i], 'REM');
-        }
-      });
-      // Recuperado
-      this.dtRecuperado.srvObtenerConsultaMov3(fechaIncial, fechaFinal).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          this.llenarTabla(datos_recuperado[i], 'RECP');
-        }
-      });*/
     } else if (tipoDoc != null && tintaConsulta != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov2(tintaConsulta, this.today).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }
         });
-      /*} else if (tipoDoc == 'DEVMP') {
-        this.dtDevMP.srvObtenerConsultaMov1(tintaConsulta, this.today).subscribe(datos_devolucion => {
-          for (let i = 0; i < datos_devolucion.length; i++) {
-            this.llenarTabla(datos_devolucion[i], 'DEVMP');
-          }
-        });
-      } else if (tipoDoc == 'FCO') {
-        this.dtFacturaMP.srvObtenerListaMov1(tintaConsulta, this.today).subscribe(datos_factura => {
-          for (let i = 0; i < datos_factura.length; i++) {
-            this.llenarTabla(datos_factura[i], 'FCO');
-          }
-        });
-      } else if (tipoDoc == 'REM') {
-        this.dtRemision.srvObtenerListaMov1(tintaConsulta, this.today).subscribe(datos_remision => {
-          for (let i = 0; i < datos_remision.length; i++) {
-            this.llenarTabla(datos_remision[i], 'REM');
-          }
-        });
-      } else if (tipoDoc == 'RECP') {
-        this.dtRecuperado.srvObtenerConsultaMov1(tintaConsulta, this.today).subscribe(datos_recuperado => {
-          for (let i = 0; i < datos_recuperado.length; i++) {
-            this.llenarTabla(datos_recuperado[i], 'RECP');
-          }
-        });*/
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (tipoDoc != null && fechaIncial != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }
         });
-      /*
-      } else if (tipoDoc == 'DEVMP') {
-        this.dtDevMP.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_devolucion => {
-          for (let i = 0; i < datos_devolucion.length; i++) {
-            this.llenarTabla(datos_devolucion[i], 'DEVMP');
-          }
-        });
-      } else if (tipoDoc == 'FCO') {
-        this.dtFacturaMP.srvObtenerListaMov0(fechaIncial).subscribe(datos_factura => {
-          for (let i = 0; i < datos_factura.length; i++) {
-            this.llenarTabla(datos_factura[i], 'FCO');
-          }
-        });
-      } else if (tipoDoc == 'REM') {
-        this.dtRemision.srvObtenerListaMov0(fechaIncial).subscribe(datos_remision => {
-          for (let i = 0; i < datos_remision.length; i++) {
-            this.llenarTabla(datos_remision[i], 'REM');
-          }
-        });
-      } else if (tipoDoc == 'RECP') {
-        this.dtRecuperado.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_recuperado => {
-          for (let i = 0; i < datos_recuperado.length; i++) {
-            this.llenarTabla(datos_recuperado[i], 'RECP');
-          }
-        });*/
+      } else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (ot != null && estado != null) {
       // Asignación de materia prima
@@ -976,7 +649,7 @@ export class MovimientosTintasComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }, 1500);
         }
       });
@@ -987,35 +660,10 @@ export class MovimientosTintasComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }, 1500);
         }
       });
-      /* // Devolución de materia prima
-      this.dtDevMP.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          if (datos_devolucion[i].matPri_Id == materiaPrima) this.llenarTabla(datos_devolucion[i], 'DEVMP');
-        }
-      });
-      // Entradas de materia prima
-      // Factura
-      this.dtFacturaMP.srvObtenerListaMov2(ot).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          if (datos_factura[i].matPri_Id == materiaPrima) this.llenarTabla(datos_factura[i], 'FCO');
-        }
-      });
-      // Remision
-      this.dtRemision.srvObtenerListaMov2(ot).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          if (datos_remision[i].matPri_Id == materiaPrima) this.llenarTabla(datos_remision[i], 'REM');
-        }
-      });
-      // Recuperado
-      this.dtRecuperado.srvObtenerConsultaMov2(ot).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          if (datos_recuperado[i].matPri_Id == materiaPrima) this.llenarTabla(datos_recuperado[i], 'RECP');
-        }
-      });*/
     } else if (ot != null && fechaIncial != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
@@ -1023,77 +671,30 @@ export class MovimientosTintasComponent implements OnInit {
         for (let i = 0; i < datos_asignacion.length; i++) {
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00','') == fechaIncial) this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }, 1500);
         }
       });
-      // Devolución de materia prima
-      this.dtDevMP.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          if (datos_devolucion[i].devMatPri_Fecha.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_devolucion[i], 'DEVMP');
-        }
-      });
-      // Entradas de materia prima
-      // Factura
-      this.dtFacturaMP.srvObtenerListaMov2(ot).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          if (datos_factura[i].facco_FechaFactura.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_factura[i], 'FCO');
-        }
-      });
-      // Remision
-      this.dtRemision.srvObtenerListaMov2(ot).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          if (datos_remision[i].rem_Fecha.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_remision[i], 'REM');
-        }
-      });
-      // Recuperado
-      this.dtRecuperado.srvObtenerConsultaMov2(ot).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          if (datos_recuperado[i].recMp_FechaIngreso.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_recuperado[i], 'RECP');
-        }
-      });
     } else if (ot != null && tipoDoc != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
             setTimeout(() => {
               this.cantRestante = this.kgOT - this.totalMPEntregada;
-              this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+              this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
             }, 1500);
           }
         });
-      } else if (tipoDoc == 'DEVMP') {
-        this.dtDevMP.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
-          for (let i = 0; i < datos_devolucion.length; i++) {
-            this.llenarTabla(datos_devolucion[i], 'DEVMP');
-          }
-        });
-      } else if (tipoDoc == 'FCO') {
-        this.dtFacturaMP.srvObtenerListaMov2(ot).subscribe(datos_factura => {
-          for (let i = 0; i < datos_factura.length; i++) {
-            this.llenarTabla(datos_factura[i], 'FCO');
-          }
-        });
-      } else if (tipoDoc == 'REM') {
-        this.dtRemision.srvObtenerListaMov2(ot).subscribe(datos_remision => {
-          for (let i = 0; i < datos_remision.length; i++) {
-            this.llenarTabla(datos_remision[i], 'REM');
-          }
-        });
-      } else if (tipoDoc == 'RECP') {
-        this.dtRecuperado.srvObtenerConsultaMov2(ot).subscribe(datos_recuperado => {
-          for (let i = 0; i < datos_recuperado.length; i++) {
-            this.llenarTabla(datos_recuperado[i], 'RECP');
-          }
-        });
+      }  else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (ot != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].asigMp_Id).subscribe(datos_asig => {
+          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].ASIGTINTAS_Id).subscribe(datos_asig => {
             for (let j = 0; j < datos_asig.length; j++) {
               this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
               break;
@@ -1101,168 +702,46 @@ export class MovimientosTintasComponent implements OnInit {
           });
           setTimeout(() => {
             this.cantRestante = this.kgOT - this.totalMPEntregada;
-            this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }, 2000);
         }
       });
-      // Devolución de materia prima
-      this.dtDevMP.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          this.llenarTabla(datos_devolucion[i], 'DEVMP');
-        }
-      });
-      // Entradas de materia prima
-      // Factura
-      this.dtFacturaMP.srvObtenerListaMov2(ot).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i], 'FCO');
-        }
-      });
-      // Remision
-      this.dtRemision.srvObtenerListaMov2(ot).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          this.llenarTabla(datos_remision[i], 'REM');
-        }
-      });
-      // Recuperado
-      this.dtRecuperado.srvObtenerConsultaMov2(ot).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          this.llenarTabla(datos_recuperado[i], 'RECP');
-        }
-      });
     } else if (tipoDoc != null) {
-      if (tipoDoc == 'ASIGMP') {
+      if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov0(this.today).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
           }
         });
-      } else if (tipoDoc == 'DEVMP') {
-        this.dtDevMP.srvObtenerConsultaMov0(this.today).subscribe(datos_devolucion => {
-          for (let i = 0; i < datos_devolucion.length; i++) {
-            this.llenarTabla(datos_devolucion[i], 'DEVMP');
-          }
-        });
-      } else if (tipoDoc == 'FCO') {
-        this.dtFacturaMP.srvObtenerListaMov0(this.today).subscribe(datos_factura => {
-          for (let i = 0; i < datos_factura.length; i++) {
-            this.llenarTabla(datos_factura[i], 'FCO');
-          }
-        });
-      } else if (tipoDoc == 'REM') {
-        this.dtRemision.srvObtenerListaMov0(this.today).subscribe(datos_remision => {
-          for (let i = 0; i < datos_remision.length; i++) {
-            this.llenarTabla(datos_remision[i], 'REM');
-          }
-        });
-      } else if (tipoDoc == 'RECP') {
-        this.dtRecuperado.srvObtenerConsultaMov0(this.today).subscribe(datos_recuperado => {
-          for (let i = 0; i < datos_recuperado.length; i++) {
-            this.llenarTabla(datos_recuperado[i], 'RECP');
-          }
-        });
+      }  else if (tipoDoc == 'CRTINTAS'){
+
       }
     } else if (fechaIncial != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
         }
       });
-      /*  // Devolución de materia prima
-      this.dtDevMP.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          this.llenarTabla(datos_devolucion[i], 'DEVMP');
-        }
-      });
-      // Entradas de materia prima
-      // Factura
-      this.dtFacturaMP.srvObtenerListaMov0(fechaIncial).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i], 'FCO');
-        }
-      });
-      // Remision
-      this.dtRemision.srvObtenerListaMov0(fechaIncial).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          this.llenarTabla(datos_remision[i], 'REM');
-        }
-      });
-      // Recuperado
-      this.dtRecuperado.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          this.llenarTabla(datos_recuperado[i], 'RECP');
-        }
-      });*/
     } else if (tintaConsulta != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov2(tintaConsulta, this.today).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
         }
       });
-      // Devolución de materia prima
-      this.dtDevMP.srvObtenerConsultaMov1(materiaPrima, this.today).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          this.llenarTabla(datos_devolucion[i], 'DEVMP');
-        }
-      });
-      /* // Entradas de materia prima
-      // Factura
-      this.dtFacturaMP.srvObtenerListaMov1(materiaPrima, this.today).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i], 'FCO');
-        }
-      });
-      // Remision
-      this.dtRemision.srvObtenerListaMov1(materiaPrima, this.today).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          this.llenarTabla(datos_remision[i], 'REM');
-        }
-      });
-      // Recuperado
-      this.dtRecuperado.srvObtenerConsultaMov1(tintaConsulta, this.today).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          this.llenarTabla(datos_recuperado[i], 'RECP');
-        }
-      });*/
     } else if (estado != null) {
       // Asignacion de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov1(estado).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGMP');
+          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
         }
       });
     } else {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov0(this.today).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGMP');
-        }
-      });
-      // Devolución de materia prima
-      this.dtDevMP.srvObtenerConsultaMov0(this.today).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          this.llenarTabla(datos_devolucion[i], 'DEVMP');
-        }
-      });
-      // Entradas de materia prima
-      // Factura
-      this.dtFacturaMP.srvObtenerListaMov0(this.today).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i], 'FCO');
-        }
-      });
-      // Remision
-      this.dtRemision.srvObtenerListaMov0(this.today).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          this.llenarTabla(datos_remision[i], 'REM');
-        }
-      });
-      // Recuperado
-      this.dtRecuperado.srvObtenerConsultaMov0(this.today).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          this.llenarTabla(datos_recuperado[i], 'RECP');
+          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
         }
       });
     }
@@ -1271,10 +750,10 @@ export class MovimientosTintasComponent implements OnInit {
 
   // Funcion para llenar la tabla con la informcion consultada
   llenarTabla(datos : any, tipoDoc : any){
-    if (tipoDoc == 'ASIGMP') {
+    if (tipoDoc == 'ASIGTINTAS') {
       let info : any = {
         ot : datos.asigMP_OrdenTrabajo,
-        tipoId : 'ASIGMP',
+        tipoId : 'ASIGTINTAS',
         tipo : 'Asignación de Materia Prima',
         fecha : datos.asigMp_FechaEntrega,
         usuario : datos.usua_Nombre,
@@ -1282,54 +761,6 @@ export class MovimientosTintasComponent implements OnInit {
         cant : datos.dtAsigTinta_Cantidad,
         estado : datos.estado_Nombre,
       }
-      //this.ArrayInfoConsulta.push(info);
-      /*} else if (tipoDoc == 'DEVMP') {
-      let info : any = {
-        ot : datos.devMatPri_OrdenTrabajo,
-        tipoId : 'DEVMP',
-        tipo : 'Devolución de Materia Prima',
-        fecha : datos.devMatPri_Fecha,
-        usuario : datos.usua_Nombre,
-        matPrima : datos.matPri_Nombre,
-        cant : datos.dtDevMatPri_CantidadDevuelta,
-        estado : '',
-      }
-      this.ArrayInfoConsulta.push(info);
-    } else if (tipoDoc == 'FCO') {
-      let info : any = {
-        ot : datos.facco_Codigo,
-        tipoId : 'FCO',
-        tipo : 'Factura de compra de MP',
-        fecha : datos.facco_FechaFactura,
-        usuario : datos.usua_Nombre,
-        matPrima : datos.matPri_Nombre,
-        cant : datos.faccoMatPri_Cantidad,
-        estado : '',
-      }
-      this.ArrayInfoConsulta.push(info);
-    } else if (tipoDoc == 'REM') {
-      let info : any = {
-        ot : datos.rem_Codigo,
-        tipoId : 'REM',
-        tipo : 'Remisión de MP',
-        fecha : datos.rem_Fecha,
-        usuario : datos.usua_Nombre,
-        matPrima : datos.matPri_Nombre,
-        cant : datos.remiMatPri_Cantidad,
-        estado : '',
-      }
-      this.ArrayInfoConsulta.push(info);
-    } else if (tipoDoc == 'RECP') {
-      let info : any = {
-        ot : datos.recMp_Id,
-        tipoId : 'RECP',
-        tipo : 'Recuperado',
-        fecha : datos.recMp_FechaIngreso,
-        usuario : datos.usua_Nombre,
-        matPrima : datos.matPri_Nombre,
-        cant : datos.recMatPri_Cantidad,
-        estado : '',
-      }*/
       this.ArrayInfoConsulta.push(info);
     }
     this.ArrayInfoConsulta.sort((a,b) => Number(a.ot) - Number(b.ot));
@@ -1340,7 +771,7 @@ export class MovimientosTintasComponent implements OnInit {
   articulosPdf(data : any){
     this.ArrayMpPDF = [];
     this.load = false;
-    if (data.tipoId == 'ASIGMP') {
+    if (data.tipoId == 'ASIGTINTAS') {
       this.dtAsgTinta.srvObtenerTintasAsignadasxOT(data.ot).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
           let items : any = {
@@ -1353,74 +784,18 @@ export class MovimientosTintasComponent implements OnInit {
         }
         setTimeout(() => { this.verPDF(data); }, 2000);
       });
-   /* } else if (data.tipoId == 'DEVMP') {
-      this.dtDevMP.srvObtenerpdfMovimientos(data.ot).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          let items : any = {
-            Id : datos_devolucion[i].matPri_Id,
-            Nombre : datos_devolucion[i].matPri_Nombre,
-            Cant : this.formatonumeros(datos_devolucion[i].dtDevMatPri_CantidadDevuelta),
-            UndCant : datos_devolucion[i].undMed_Id,
-          }
-          this.ArrayMpPDF.push(items);
-        }
-        setTimeout(() => { this.verPDF(data); }, 2000);
-      });
-    } else if (data.tipoId == 'FCO') {
-      this.dtFacturaMP.srvObtenerpdfMovimientos(data.ot).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          let items : any = {
-            Id : datos_factura[i].matPri_Id,
-            Nombre : datos_factura[i].matPri_Nombre,
-            Cant : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad),
-            UndCant : datos_factura[i].undMed_Id,
-            PrecioUnd : this.formatonumeros(datos_factura[i].faccoMatPri_ValorUnitario),
-            SubTotal : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad * datos_factura[i].faccoMatPri_ValorUnitario),
-          }
-          this.ArrayMpPDF.push(items);
-        }
-        setTimeout(() => { this.verPDF(data); }, 2000);
-      });
-    } else if (data.tipoId == 'REM') {
-      this.dtRemision.srvObtenerpdfMovimientos(data.ot).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          let items : any = {
-            Id : datos_remision[i].matPri_Id,
-            Nombre : datos_remision[i].matPri_Nombre,
-            Cant : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad),
-            UndCant : datos_remision[i].undMed_Id,
-            PrecioUnd : this.formatonumeros(datos_remision[i].remiMatPri_ValorUnitario),
-            SubTotal : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad * datos_remision[i].remiMatPri_ValorUnitario),
-          }
-          this.ArrayMpPDF.push(items);
-        }
-        setTimeout(() => { this.verPDF(data); }, 2000);
-      });
-    } else if (data.tipoId == 'RECP') {
-      this.dtRecuperado.srvObtenerpdfMovimientos(data.ot).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          let items : any = {
-            Id : datos_recuperado[i].matPri_Id,
-            Nombre : datos_recuperado[i].matPri_Nombre,
-            Cant : this.formatonumeros(datos_recuperado[i].recMatPri_Cantidad),
-            UndCant : datos_recuperado[i].undMed_Id,
-          }
-          this.ArrayMpPDF.push(items);
-        }
-        setTimeout(() => { this.verPDF(data); }, 2000);
-      });*/
     }
   }
 
   // Funcion que permitirá ver la informacion del documento en un formato PDF
   verPDF(data : any){
-    if (data.tipoId == 'ASIGMP') {
+    if (data.tipoId == 'ASIGTINTAS') {
       this.dtAsgTinta.srvObtenerpdfMovimientos(data.ot).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
           for (let j = 0; j < this.ArrayMpPDF.length; j++) {
             const pdfDefinicion : any = {
               info: {
-                title: `${datos_asignacion[i].asigMp_Id}`
+                title: `${datos_asignacion[i].ASIGTINTAS_Id}`
               },
               content : [
                 {
@@ -1430,7 +805,7 @@ export class MovimientosTintasComponent implements OnInit {
                 },
                 '\n \n',
                 {
-                  text: `Fecha de registro: ${datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00', '')}`,
+                  text: `Fecha de registro: ${datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '')}`,
                   style: 'header',
                   alignment: 'right',
                 },
@@ -1452,8 +827,8 @@ export class MovimientosTintasComponent implements OnInit {
                     style: 'header',
                     body: [
                       [
-                        `OT: ${datos_asignacion[i].asigMP_OrdenTrabajo}`,
-                        `Maquina: ${datos_asignacion[i].asigMp_Maquina}`,
+                        `OT: ${datos_asignacion[i].ASIGTINTAS_OrdenTrabajo}`,
+                        `Maquina: ${datos_asignacion[i].ASIGTINTAS_Maquina}`,
                         `Proceso: ${datos_asignacion[i].proceso_Nombre}`
                       ]
                     ]
@@ -1462,7 +837,7 @@ export class MovimientosTintasComponent implements OnInit {
                   fontSize: 12,
                 },
                 {
-                  text: `\n \nObservación: \n ${datos_asignacion[i].asigMp_Observacion}\n`,
+                  text: `\n \nObservación: \n ${datos_asignacion[i].ASIGTINTAS_Observacion}\n`,
                   style: 'header',
                 },
                 {
@@ -1492,336 +867,6 @@ export class MovimientosTintasComponent implements OnInit {
           break;
         }
       });
-     /*
-    } else if (data.tipoId == 'DEVMP') {
-      this.dtDevMP.srvObtenerpdfMovimientos(data.ot).subscribe(datos_devolucion => {
-        for (let i = 0; i < datos_devolucion.length; i++) {
-          for (let j = 0; j < this.ArrayMpPDF.length; j++) {
-            const pdfDefinicion : any = {
-              info: {
-                title: `${datos_devolucion[i].devMatPri_OrdenTrabajo}`
-              },
-              content : [
-                {
-                  text: `Plasticaribe S.A.S ---- Devolución de Materia Prima`,
-                  alignment: 'center',
-                  style: 'titulo',
-                },
-                '\n \n',
-                {
-                  text: `Fecha de registro: ${datos_devolucion[i].devMatPri_Fecha.replace('T00:00:00', '')}`,
-                  style: 'header',
-                  alignment: 'right',
-                },
-                {
-                  text: `Registrado Por: ${datos_devolucion[i].usua_Nombre}\n`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                {
-                  text: `\n Información la Asignación \n \n`,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  style: 'tablaCliente',
-                  table: {
-                    widths: ['*', '*', '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        `Orden de Trabajo: ${datos_devolucion[i].devMatPri_OrdenTrabajo}`,
-                        ``,
-                        ``
-                      ]
-                    ]
-                  },
-                  layout: 'lightHorizontalLines',
-                  fontSize: 9,
-                },
-                {
-                  text: `\n \nObervación sobre la remisión: \n ${datos_devolucion[i].devMatPri_Motivo}\n`,
-                  style: 'header',
-                },
-                {
-                  text: `\n Información detallada de Materia(s) Prima(s) asignada(s) \n `,
-                  alignment: 'center',
-                  style: 'header'
-                },
-
-                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant']),
-              ],
-              styles: {
-                header: {
-                  fontSize: 8,
-                  bold: true
-                },
-                titulo: {
-                  fontSize: 15,
-                  bold: true
-                }
-              }
-            }
-            const pdf = pdfMake.createPdf(pdfDefinicion);
-            pdf.open();
-            break;
-          }
-        }
-      });
-    } else if (data.tipoId == 'FCO') {
-      this.dtFacturaMP.srvObtenerpdfMovimientos(data.ot).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          for (let mp = 0; mp < this.ArrayMpPDF.length; mp++) {
-            const pdfDefinicion : any = {
-              info: {
-                title: `${data.ot}`
-              },
-              content : [
-                {
-                  text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
-                  alignment: 'center',
-                  style: 'titulo',
-                },
-                '\n \n',
-                {
-                  text: `Fecha de registro: ${datos_factura[i].facco_FechaFactura.replace('T00:00:00', '')}`,
-                  style: 'header',
-                  alignment: 'right',
-                },
-                {
-                  text: `Registrado Por: ${datos_factura[i].usua_Nombre}\n`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                {
-                  text: `\n Información detallada del Proveedor \n \n`,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  style: 'tablaCliente',
-                  table: {
-                    widths: ['*', '*', '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        `ID: ${datos_factura[i].prov_Id}`,
-                        `Tipo de ID: ${datos_factura[i].tipoIdentificacion_Id}`,
-                        `Tipo de Proveedor: ${datos_factura[i].tpProv_Nombre}`
-                      ],
-                      [
-                        `Nombre: ${datos_factura[i].prov_Nombre}`,
-                        `Telefono: ${datos_factura[i].prov_Telefono}`,
-                        `Ciudad: ${datos_factura[i].prov_Ciudad}`
-                      ],
-                      [
-                        `E-mail: ${datos_factura[i].prov_Email}`,
-                        ``,
-                        ``
-                      ]
-                    ]
-                  },
-                  layout: 'lightHorizontalLines',
-                  fontSize: 9,
-                },
-                {
-                  text: `\n \nObervación sobre la factura: \n ${datos_factura[i].facco_Observacion}\n`,
-                  style: 'header',
-                },
-                {
-                  text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
-                  alignment: 'center',
-                  style: 'header'
-                },
-
-                this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
-
-                {
-                  text: `\n\nValor Total Factura: $${this.formatonumeros(datos_factura[i].facco_ValorTotal)}`,
-                  alignment: 'right',
-                  style: 'header',
-                }
-              ],
-              styles: {
-                header: {
-                  fontSize: 8,
-                  bold: true
-                },
-                titulo: {
-                  fontSize: 15,
-                  bold: true
-                }
-              }
-            }
-            const pdf = pdfMake.createPdf(pdfDefinicion);
-            pdf.open();
-            break;
-          }
-          break;
-        }
-      });
-    } else if (data.tipoId == 'REM') {
-      this.dtRemision.srvObtenerpdfMovimientos(data.ot).subscribe(datos_remision => {
-        for (let i = 0; i < datos_remision.length; i++) {
-          for (let j = 0; j < this.ArrayMpPDF.length; j++) {
-            const pdfDefinicion : any = {
-              info: {
-                title: `${data.ot}`
-              },
-              content : [
-                {
-                  text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
-                  alignment: 'center',
-                  style: 'titulo',
-                },
-                '\n \n',
-                {
-                  text: `Fecha de registro: ${datos_remision[i].rem_Fecha.replace('T00:00:00', '')}`,
-                  style: 'header',
-                  alignment: 'right',
-                },
-                {
-                  text: `Registrado Por: ${datos_remision[i].usua_Nombre}\n`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                {
-                  text: `\n Información detallada del Proveedor \n \n`,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  style: 'tablaCliente',
-                  table: {
-                    widths: ['*', '*', '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        `ID: ${datos_remision[i].prov_Id}`,
-                        `Tipo de ID: ${datos_remision[i].tipoIdentificacion_Id}`,
-                        `Tipo de Proveedor: ${datos_remision[i].tpProv_Nombre}`
-                      ],
-                      [
-                        `Nombre: ${datos_remision[i].prov_Nombre}`,
-                        `Telefono: ${datos_remision[i].prov_Telefono}`,
-                        `Ciudad: ${datos_remision[i].prov_Ciudad}`
-                      ],
-                      [
-                        `E-mail: ${datos_remision[i].prov_Email}`,
-                        ``,
-                        ``
-                      ]
-                    ]
-                  },
-                  layout: 'lightHorizontalLines',
-                  fontSize: 9,
-                },
-                {
-                  text: `\n \nObervación sobre la remisión: \n ${datos_remision[i].rem_Observacion}\n`,
-                  style: 'header',
-                },
-                {
-                  text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
-                  alignment: 'center',
-                  style: 'header'
-                },
-
-                this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
-              ],
-              styles: {
-                header: {
-                  fontSize: 8,
-                  bold: true
-                },
-                titulo: {
-                  fontSize: 15,
-                  bold: true
-                }
-              }
-            }
-            const pdf = pdfMake.createPdf(pdfDefinicion);
-            pdf.open();
-            break;
-          }
-          break;
-        }
-      });
-    } else if (data.tipoId == 'RECP') {
-      this.dtRecuperado.srvObtenerpdfMovimientos(data.ot).subscribe(datos_recuperado => {
-        for (let i = 0; i < datos_recuperado.length; i++) {
-          for (let j = 0; j < this.ArrayMpPDF.length; j++) {
-            const pdfDefinicion : any = {
-              info: {
-                title: `${datos_recuperado[i].recMp_Id}`
-              },
-              content : [
-                {
-                  text: `Plasticaribe S.A.S ---- Recuperado de Materia Prima`,
-                  alignment: 'center',
-                  style: 'titulo',
-                },
-                '\n \n',
-                {
-                  text: `Fecha de registro: ${datos_recuperado[i]}`,
-                  style: 'header',
-                  alignment: 'right',
-                },
-                {
-                  text: `Registrado Por: ${datos_recuperado[i].usua_Nombre}\n`,
-                  alignment: 'right',
-                  style: 'header',
-                },
-                {
-                  text: `\n Información la Asignación \n \n`,
-                  alignment: 'center',
-                  style: 'header'
-                },
-                {
-                  style: 'tablaCliente',
-                  table: {
-                    widths: ['*', '*', '*'],
-                    style: 'header',
-                    body: [
-                      [
-                        `Proceso: ${datos_recuperado[i].proceso_Nombre}`,
-                        ``,
-                        ``
-                      ]
-                    ]
-                  },
-                  layout: 'lightHorizontalLines',
-                  fontSize: 9,
-                },
-                {
-                  text: `\n \nObervación sobre la remisión: \n ${datos_recuperado[i].recMp_Observacion}\n`,
-                  style: 'header',
-                },
-                {
-                  text: `\n Información detallada de Materia(s) Prima(s) asignada(s) \n `,
-                  alignment: 'center',
-                  style: 'header'
-                },
-
-                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant']),
-              ],
-              styles: {
-                header: {
-                  fontSize: 8,
-                  bold: true
-                },
-                titulo: {
-                  fontSize: 15,
-                  bold: true
-                }
-              }
-            }
-            const pdf = pdfMake.createPdf(pdfDefinicion);
-            pdf.open();
-            break;
-          }
-          break;
-        }
-      });*/
     }
     setTimeout(() => { this.load = true; }, 1000);
   }
