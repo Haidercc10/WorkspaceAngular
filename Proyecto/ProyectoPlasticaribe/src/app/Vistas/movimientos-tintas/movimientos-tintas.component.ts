@@ -165,11 +165,11 @@ export class MovimientosTintasComponent implements OnInit {
   ColumnasTabla(){
     this.titulosTabla = [];
     this.titulosTabla = [{
-      idFact : "OT / COD. DOCUMENTO",
+      idFact : "OT / Tinta Creada",
       tipo : "Tipo de Movimiento",
       FechaFact : "Fecha Registro",
       usuario : "Registrado Por:",
-      mp : "Materia Prima",
+      mp : "Tinta / Materia Prima",
       cant : "Cantidad",
       estado : "Estado OT",
       Ver : "Ver",
@@ -263,267 +263,215 @@ export class MovimientosTintasComponent implements OnInit {
     let tipoDoc : string = this.FormDocumentos.value.TipoDocumento;
     let fechaIncial : any = this.FormDocumentos.value.fecha;
     let fechaFinal : any = this.FormDocumentos.value.fechaFinal;
-    let materiaPrima : any;
     let tintaConsulta : any;
-
     if (this.FormDocumentos.value.tintas.tinta_Id == undefined) tintaConsulta = null;
     else tintaConsulta = this.FormDocumentos.value.tintas.tinta_Id;
     let estado : any = this.FormDocumentos.value.estado;
 
     if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null && estado != null) {
       if (tipoDoc == 'ASIGTINTAS') {
-        this.consultaOTBagPro(ot);
-
         this.dtAsgTinta.srvObtenerConsultaMov10(ot, fechaIncial, fechaFinal, tintaConsulta, estado).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            setTimeout(() => {
-              this.cantRestante = this.kgOT - this.totalMPEntregada;
-              this.llenarTabla(datos_asignacion[i], tipoDoc);
-            }, 1200);
+            this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
       }
-
     } else if (tipoDoc != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null && estado != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov4(fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado_OrdenTrabajo == estado && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+            if (datos_asignacion[i].estado_OrdenTrabajo == estado && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
       }
     } else if (ot != null && tipoDoc != null && fechaIncial != null && tintaConsulta != null && estado != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-          this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            setTimeout(() => {
-              this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial
-              && datos_asignacion[i].tinta_Id == tintaConsulta
-              && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-            }, 1500);
+            if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial
+                && datos_asignacion[i].tinta_Id == tintaConsulta
+                && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
       }
     } else if (ot != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null && estado != null) {
       this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
-        this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          setTimeout(() => {
-            this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-          }, 1500);
+          if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && estado != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
-          this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            setTimeout(() => {
-              this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-            }, 1500);
+            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
       }
     } else if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
-          this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            setTimeout(() => {
-              this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-            }, 1500);
+            if (datos_asignacion[i].estado != 'Creación Tintas' && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
+      } else if (tipoDoc == 'CRTINTAS') {
+        this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
+          for (let i = 0; i < datos_asignacion.length; i++) {
+            if (datos_asignacion[i].estado == 'Creación Tintas' && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
+          }
+        });
       }
     } else if (fechaIncial != null && fechaFinal != null && tintaConsulta != null && estado != null) {
-      // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov9(fechaIncial, fechaFinal, tintaConsulta, estado).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+          this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (tipoDoc != null && fechaIncial != null && tintaConsulta != null && estado != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov2(tintaConsulta, fechaIncial).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
       }
     } else if (tipoDoc != null && fechaIncial != null && fechaFinal != null && estado != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov7(fechaIncial, fechaFinal, estado).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+            this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
       }
     } else if (tipoDoc != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov8(fechaIncial, fechaFinal, tintaConsulta).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+            if (datos_asignacion[i].estado != 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
+      } else if (tipoDoc == 'CRTINTAS') {
+        this.dtAsgTinta.srvObtenerConsultaMov8(fechaIncial, fechaFinal, tintaConsulta).subscribe(datos_asignacion => {
+          for (let i = 0; i < datos_asignacion.length; i++) {
+            if (datos_asignacion[i].estado == 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
+          }
+        });
       }
     } else if (ot != null && tipoDoc != null && tintaConsulta != null && estado != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-          this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-
-            setTimeout(() => {
-              this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-            }, 1500);
+            if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
       }
     } else if (ot != null && tipoDoc != null && fechaIncial != null && estado != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-          this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            setTimeout(() => {
-              this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-            }, 1500);
+            if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
       }
     } else if (ot != null && tipoDoc != null && fechaIncial != null && tintaConsulta != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-          this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            setTimeout(() => {
-              this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial && datos_asignacion[i].matPri_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-            }, 1500);
+            if (datos_asignacion[i].estado != 'Creación Tintas'
+                && datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial
+                && datos_asignacion[i].matPri_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
+      } else if (tipoDoc == 'CRTINTAS') {
+        this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
+          for (let i = 0; i < datos_asignacion.length; i++) {
+            if (datos_asignacion[i].estado == 'Creación Tintas'
+                && datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial
+                && datos_asignacion[i].matPri_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
+          }
+        });
       }
     } else if (ot != null && fechaIncial != null && fechaFinal != null && estado != null) {
-      // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
-        this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          setTimeout(() => {
-            this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-          }, 1500);
+          if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (ot != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null) {
-      // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
-        this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].ASIGTINTAS_Id).subscribe(datos_asig => {
-            for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-              break;
-            }
-          });
-          setTimeout(() => {
-            this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-          }, 1500);
+          if (datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
-          this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            setTimeout(() => {
-              this.cantRestante = this.kgOT - this.totalMPEntregada;
-              this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-            }, 1500);
+            if (datos_asignacion[i].estado != 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
+      } else if (tipoDoc == 'CRTINTAS') {
+        this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
+          for (let i = 0; i < datos_asignacion.length; i++) {
+            if (datos_asignacion[i].estado == 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
+          }
+        });
       }
     } else if (fechaIncial != null && fechaFinal != null && estado != null) {
       this.dtAsgTinta.srvObtenerConsultaMov7(fechaIncial, fechaFinal, estado).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+          this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (fechaIncial != null && fechaFinal != null && tintaConsulta != null) {
-      // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov8(fechaIncial, fechaFinal, tintaConsulta).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+          this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (tipoDoc != null && fechaIncial != null && estado != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
       }
     } else if (tipoDoc != null && fechaIncial != null && tintaConsulta != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+            if (datos_asignacion[i].estado != 'Creación Tintas' && datos_asignacion[i].tinta == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
+      } else if (tipoDoc == 'CRTINTAS') {
+        this.dtAsgTinta.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_asignacion => {
+          for (let i = 0; i < datos_asignacion.length; i++) {
+            if (datos_asignacion[i].estado == 'Creación Tintas' && datos_asignacion[i].tinta == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
+          }
+        });
       }
     } else if (tipoDoc != null && fechaIncial != null && fechaFinal != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov4(fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+            if (datos_asignacion[i].estado != 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
+      } else if (tipoDoc == 'CRTINTAS') {
+        this.dtAsgTinta.srvObtenerConsultaMov4(fechaIncial, fechaFinal).subscribe(datos_asignacion => {
+          for (let i = 0; i < datos_asignacion.length; i++) {
+            if (datos_asignacion[i].estado == 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
+          }
+        });
       }
     } else if (ot != null && tintaConsulta != null && estado != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          setTimeout(() => {
-            this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-          }, 1500);
+          if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (ot != null && fechaIncial != null && estado != null) {
@@ -531,217 +479,176 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
         this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].ASIGTINTAS_Id).subscribe(datos_asig => {
-            for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-              break;
-            }
-          });
-          setTimeout(() => {
-            this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-          }, 1500);
+          if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (ot != null && fechaIncial != null && tintaConsulta != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-        this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          setTimeout(() => {
-            this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-          }, 1500);
+          if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (ot != null && fechaIncial != null && fechaFinal != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
-        this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          setTimeout(() => {
-            this.cantRestante = this.kgOT - this.totalMPEntregada;
-            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-          }, 1500);
+          this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (ot != null && tipoDoc != null && estado != null) {
       if (tipoDoc == 'ASIGTINTAS') {
-        // Asignación de materia prima
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-          this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            setTimeout(() => {
-              this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-            }, 1500);
+            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
       }
     } else if (ot != null && tipoDoc != null && tintaConsulta != null) {
       if (tipoDoc == 'ASIGTINTAS') {
-        this.dtAsgTinta.srvObtenerConsultaMov2(tintaConsulta, this.today).subscribe(datos_asignacion => {
-          this.consultaOTBagPro(ot);
+        this.dtAsgTinta.srvObtenerConsultaMov2(this.today, tintaConsulta).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            setTimeout(() => {
-              this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].ASIGTINTAS_OrdenTrabajo == ot) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-            }, 1500);
+            if (datos_asignacion[i].estado != 'Creación Tintas' && datos_asignacion[i].tinta == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
+      } else if (tipoDoc == 'CRTINTAS') {
+        this.dtAsgTinta.srvObtenerConsultaMov2(this.today, tintaConsulta).subscribe(datos_asignacion => {
+          for (let i = 0; i < datos_asignacion.length; i++) {
+            if (datos_asignacion[i].estado == 'Creación Tintas' && datos_asignacion[i].tinta == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
+          }
+        });
       }
     } else if (ot != null && tipoDoc != null && fechaIncial != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-          this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            setTimeout(() => {
-              this.cantRestante = this.kgOT - this.totalMPEntregada;
-              if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-            }, 1500);
+            if (datos_asignacion[i].estado != 'Creación Tintas' && datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
+      } else if (tipoDoc == 'CRTINTAS') {
+        this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
+          for (let i = 0; i < datos_asignacion.length; i++) {
+            if (datos_asignacion[i].estado == 'Creación Tintas' && datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_asignacion[i]);
+          }
+        });
       }
     } else if (fechaIncial != null && tintaConsulta != null) {
-      // Asignación de materia prima
-      this.dtAsgTinta.srvObtenerConsultaMov2(fechaIncial, materiaPrima).subscribe(datos_asignacion => {
+      this.dtAsgTinta.srvObtenerConsultaMov2(fechaIncial, tintaConsulta).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+          this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (fechaIncial != null && fechaFinal != null) {
-      // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov4(fechaIncial, fechaFinal).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+          this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (tipoDoc != null && tintaConsulta != null) {
       if (tipoDoc == 'ASIGTINTAS') {
-        this.dtAsgTinta.srvObtenerConsultaMov2(tintaConsulta, this.today).subscribe(datos_asignacion => {
+        this.dtAsgTinta.srvObtenerConsultaMov2(this.today, tintaConsulta).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+            if (datos_asignacion[i].estado != 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
+      } else if (tipoDoc == 'CRTINTAS') {
+        this.dtAsgTinta.srvObtenerConsultaMov2(this.today, tintaConsulta).subscribe(datos_asignacion => {
+          for (let i = 0; i < datos_asignacion.length; i++) {
+            if (datos_asignacion[i].estado == 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
+          }
+        });
       }
     } else if (tipoDoc != null && fechaIncial != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+            if (datos_asignacion[i].estado != 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
           }
         });
-      } else if (tipoDoc == 'CRTINTAS'){
-
+      } else if (tipoDoc == 'CRTINTAS') {
+        this.dtAsgTinta.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_asignacion => {
+          for (let i = 0; i < datos_asignacion.length; i++) {
+            if (datos_asignacion[i].estado == 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
+          }
+        });
       }
     } else if (ot != null && estado != null) {
-      // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-        this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          setTimeout(() => {
-            this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-          }, 1500);
+          if (datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (ot != null && tintaConsulta != null) {
-      // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-        this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          setTimeout(() => {
-            this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-          }, 1500);
+          if (datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (ot != null && fechaIncial != null) {
-      // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-        this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          setTimeout(() => {
-            this.cantRestante = this.kgOT - this.totalMPEntregada;
-            if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial) this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-          }, 1500);
+          if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial) this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (ot != null && tipoDoc != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-          this.consultaOTBagPro(ot);
           for (let i = 0; i < datos_asignacion.length; i++) {
-            setTimeout(() => {
-              this.cantRestante = this.kgOT - this.totalMPEntregada;
-              this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-            }, 1500);
+            if (datos_asignacion[i].estado != 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
           }
         });
-      }  else if (tipoDoc == 'CRTINTAS'){
-
+      } else if (tipoDoc == 'CRTINTAS') {
+        this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
+          for (let i = 0; i < datos_asignacion.length; i++) {
+            if (datos_asignacion[i].estado == 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
+          }
+        });
       }
     } else if (ot != null) {
-      // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-        this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.dtAsgTinta.srvObtenerListaPor_Asignacion(datos_asignacion[i].ASIGTINTAS_Id).subscribe(datos_asig => {
-            for (let j = 0; j < datos_asig.length; j++) {
-              this.totalMPEntregada += datos_asig[j+i].dtAsigTinta_Cantidad;
-              break;
-            }
-          });
-          setTimeout(() => {
-            this.cantRestante = this.kgOT - this.totalMPEntregada;
-            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
-          }, 2000);
+          this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (tipoDoc != null) {
       if (tipoDoc == 'ASIGTINTAS') {
         this.dtAsgTinta.srvObtenerConsultaMov0(this.today).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+            if (datos_asignacion[i].estado != 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
           }
         });
-      }  else if (tipoDoc == 'CRTINTAS'){
-
+      } else if (tipoDoc == 'CRTINTAS') {
+        this.dtAsgTinta.srvObtenerConsultaMov0(this.today).subscribe(datos_asignacion => {
+          for (let i = 0; i < datos_asignacion.length; i++) {
+            if (datos_asignacion[i].estado == 'Creación Tintas') this.llenarTabla(datos_asignacion[i]);
+          }
+        });
       }
     } else if (fechaIncial != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+          this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (tintaConsulta != null) {
-      // Asignación de materia prima
-      this.dtAsgTinta.srvObtenerConsultaMov2(tintaConsulta, this.today).subscribe(datos_asignacion => {
+      this.dtAsgTinta.srvObtenerConsultaMov2(this.today, tintaConsulta).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+          this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else if (estado != null) {
       // Asignacion de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov1(estado).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+          this.llenarTabla(datos_asignacion[i]);
         }
       });
     } else {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov0(this.today).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
-          this.llenarTabla(datos_asignacion[i], 'ASIGTINTAS');
+          this.llenarTabla(datos_asignacion[i]);
         }
       });
     }
@@ -749,19 +656,45 @@ export class MovimientosTintasComponent implements OnInit {
   }
 
   // Funcion para llenar la tabla con la informcion consultada
-  llenarTabla(datos : any, tipoDoc : any){
-    if (tipoDoc == 'ASIGTINTAS') {
+  llenarTabla(datos : any, tipoDoc? : any){
+    if (datos.estado != 'Creación Tintas') {
       let info : any = {
-        ot : datos.asigMP_OrdenTrabajo,
+        ot : datos.ot,
         tipoId : 'ASIGTINTAS',
-        tipo : 'Asignación de Materia Prima',
-        fecha : datos.asigMp_FechaEntrega,
-        usuario : datos.usua_Nombre,
-        matPrima : datos.tinta_Nombre,
-        cant : datos.dtAsigTinta_Cantidad,
-        estado : datos.estado_Nombre,
+        tipo : 'Asignación de Tintas',
+        fecha : datos.fecha,
+        usuario : datos.usuario_Nombre,
+        matPrima : datos.nombreTinta,
+        cant : datos.cantidad,
+        estado : datos.estado,
       }
       this.ArrayInfoConsulta.push(info);
+    } else if (datos.estado == 'Creación Tintas'){
+      if (datos.materiaPrima == 84 && datos.tinta2 != 2001){
+        let info : any = {
+          ot : `${datos.ot} - ${datos.nombreTinta}`,
+          tipoId : 'TINTAS',
+          tipo : 'Creación de Tintas',
+          fecha : datos.fecha,
+          usuario : datos.usuario_Nombre,
+          matPrima : datos.nombre_Tinta2,
+          cant : datos.cantidadAsignada,
+          estado : '',
+        }
+        this.ArrayInfoConsulta.push(info);
+      } else if (datos.materiaPrima != 84 && datos.tinta2 == 2001){
+        let info : any = {
+          ot : `${datos.ot} - ${datos.nombreTinta}`,
+          tipoId : 'TINTAS',
+          tipo : 'Creación de Tintas',
+          fecha : datos.fecha,
+          usuario : datos.usuario_Nombre,
+          matPrima : datos.nombre_MateriaPrima,
+          cant : datos.cantidadAsignada,
+          estado : '',
+        }
+        this.ArrayInfoConsulta.push(info);
+      }
     }
     this.ArrayInfoConsulta.sort((a,b) => Number(a.ot) - Number(b.ot));
     this.ArrayInfoConsulta.sort((a,b) => b.fecha.localeCompare(a.fecha));

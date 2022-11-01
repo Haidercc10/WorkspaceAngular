@@ -349,7 +349,7 @@ export class AsignacionTintasComponent implements OnInit {
 
   //Funcion que almacenará en la base de datos la informacion general sobre la asignacion de materia prima
   asignarMPCrearTintas(){
-    if (this.FormAsignacionMP.valid && this.ArrayMateriaPrima.length > 0) {
+    // if (this.FormAsignacionMP.valid && this.ArrayMateriaPrima.length > 0) {
       this.load = false;
       let tinta : any = this.FormAsignacionMP.value.Tinta;
       let cantidad : number = this.FormAsignacionMP.value.cantidadTinta;
@@ -374,7 +374,7 @@ export class AsignacionTintasComponent implements OnInit {
         this.obtenerUltimoIdAsignacion();
         setTimeout(() => { this.sumarInventarioTintas(); }, 3000);
       });
-    } else Swal.fire("¡Hay campos vacios!");
+    // } else Swal.fire("¡Hay campos vacios!");
   }
 
   // Funcion que servirá para poder obtener el ultimo Id de la asignacion creada y pasarlo a la funcion de creacion de AsignacionMP para que pueda tener el ID de la asignacion
@@ -530,7 +530,6 @@ export class AsignacionTintasComponent implements OnInit {
       });
     });
     }
-    this.load = true;
   }
 
   /** Función que sumará cantidad en inventario a la tinta a la que se le asigne Mat. Prima. */

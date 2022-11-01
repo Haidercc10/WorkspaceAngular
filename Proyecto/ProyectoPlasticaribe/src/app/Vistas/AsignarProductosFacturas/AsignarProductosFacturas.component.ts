@@ -231,8 +231,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
       this.rollosInsertar.push(info);
       this.validarRollo.push(item.Id);
-      this.Total += item.Cantidad;
-      this.cantTotalProducto -= item.Cantidad;
+      this.Total += item.CantPaqRestantes;
+      this.cantTotalProducto -= item.CantPaqRestantes;
       this.presentacionProducto = item.Presentacion;
     } else {
       if (!this.validarRollo.includes(item.Id)) {
@@ -252,7 +252,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         this.rollosInsertar.push(info);
         this.validarRollo.push(item.Id);
         this.Total += item.Cantidad;
-        this.cantTotalProducto -= item.Cantidad;
+        this.cantTotalProducto -= item.CantPaqRestantes;
         this.presentacionProducto = item.Presentacion;
       } else if (this.validarRollo.includes(item.Id)) {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
@@ -261,8 +261,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
         for (let i = 0; i < this.validarRollo.length; i++) {
           if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
         }
-        this.Total -= item.Cantidad;
-        this.cantTotalProducto -= item.Cantidad;
+        this.Total -= item.CantPaqRestantes;
+        this.cantTotalProducto -= item.CantPaqRestantes;
         this.presentacionProducto = item.Presentacion;
       }
     }
@@ -290,7 +290,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         CantPaqRestantesEnviar : item.CantPaqRestantesEnviar,
         suma : item.suma,
       }
-      this.Total += item.Cantidad;
+      this.Total += item.CantPaqRestantes;
       this.rollosInsertar.push(info);
       this.validarRollo.push(item.Id);
     }
@@ -314,8 +314,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
       suma : item.suma,
     }
     this.rollos.push(info);
-    this.Total -= item.Cantidad;
-    this.cantTotalProducto += item.Cantidad;
+    this.Total -= item.CantPaqRestantes;
+    this.cantTotalProducto += item.CantPaqRestantes;
     this.presentacionProducto = item.Presentacion;
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
@@ -342,7 +342,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         CantPaqRestantesEnviar : item.CantPaqRestantesEnviar,
         suma : item.suma,
       }
-      this.cantTotalProducto += item.Cantidad;
+      this.cantTotalProducto += item.CantPaqRestantes;
       this.presentacionProducto = item.Presentacion;
       this.rollos.push(info);
       this.Total = 0;
@@ -549,7 +549,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
             this.rollos.push(info);
             rollosExistentes.push(datos_rollos[i].rollo_Id);
             this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-            this.cantTotalProducto += datos_rollos[i].dtEntRolloProd_Cantidad;
+            this.cantTotalProducto += datos_rollos[i].prod_CantPaquetesRestantes;
             this.presentacionProducto = datos_rollos[i].undMed_Rollo;
             this.FormConsultarProductos.setValue({
               Factura : this.FormConsultarProductos.value.Factura,
@@ -797,13 +797,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
         }
       });
     }
-    // if (this.rollosInsertar.length > 500) setTimeout(() => { this.moverInventarioProductos(); }, 40000);
-    // else if (this.rollosInsertar.length > 400) setTimeout(() => { this.moverInventarioProductos(); }, 20000);
-    // else if (this.rollosInsertar.length > 300) setTimeout(() => { this.moverInventarioProductos(); }, 15000);
-    // else if (this.rollosInsertar.length > 200) setTimeout(() => { this.moverInventarioProductos(); }, 10000);
-    // else if (this.rollosInsertar.length > 100) setTimeout(() => { this.moverInventarioProductos(); }, 5000);
-    // else if (this.rollosInsertar.length > 50) setTimeout(() => { this.moverInventarioProductos(); }, 4000);
-    // else setTimeout(() => { this.moverInventarioProductos(); }, 3000);
     setTimeout(() => { this.moverInventarioProductos(); }, 4000);
   }
 
