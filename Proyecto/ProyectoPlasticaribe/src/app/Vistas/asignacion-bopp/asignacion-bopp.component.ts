@@ -43,6 +43,8 @@ export class AsignacionBOPPComponent implements OnInit {
   keyword = 'name';
   public historyHeading: string = 'Seleccionado Recientemente';
   validarInput : any;
+  kgRollo : number = 0;
+  ArrayConsolidadoOT : any [] = [];
 
   constructor(private appComponent : AppComponent,
                 private FormBuilderAsignacion : FormBuilder,
@@ -362,10 +364,23 @@ export class AsignacionBOPPComponent implements OnInit {
   cargarBOPP(){
     for (const item of this.boppSeleccionado) {
       this.anchoBOPP = item.bopP_Ancho;
+      this.kgRollo = item.bopP_Stock;
       this.FormularioBOPP.setValue({
         boppSerial: item.bopP_Serial,
         boppNombre : item.bopP_Nombre,
         boppStock: item.bopP_Stock,
+      });
+    }
+  }
+
+  // Funcion que validará el total de los kilogramas totales de cada rollo
+  cambiarCantidad(){
+    let cantidadActual : number = this.FormularioBOPP.value.boppStock;
+    if (cantidadActual > this.kgRollo){
+      this.FormularioBOPP.setValue({
+        boppSerial: this.FormularioBOPP.value.boppSerial,
+        boppNombre : this.FormularioBOPP.value.boppNombre,
+        boppStock: this.kgRollo,
       });
     }
   }
@@ -386,6 +401,9 @@ export class AsignacionBOPPComponent implements OnInit {
     let cantidadAsignada : any;
     let otAsignadas : any [] = [];
 
+    for (let i = 0; i < this.ArrayConsolidadoOT.length; i++) {
+      otAsignadas.push(this.ArrayConsolidadoOT[i].Ot);
+    }
     for (const item of this.ordenesTrabajo) {
       const otInfo : any = {
         ot : item.ot,
@@ -400,6 +418,18 @@ export class AsignacionBOPPComponent implements OnInit {
               cantidadAsignada = (item.ancho / this.anchoBOPP * stockInicial);
               itemOT.kg -= cantidadAsignada;
               if (cantidadAsignada <= stock) {
+                if (otAsignadas.includes(item.ot)) {
+                  for (let i = 0; i < this.ArrayConsolidadoOT.length; i++) {
+                    if (this.ArrayConsolidadoOT[i].Ot == item.ot) this.ArrayConsolidadoOT[i].Cant += (item.ancho / this.anchoBOPP * stock);
+                  }
+                } else {
+                  let bopp : any = {
+                    Ot : item.ot,
+                    Cant : (item.ancho / this.anchoBOPP * stock),
+                    UndCant : 'Kg',
+                  }
+                  this.ArrayConsolidadoOT.push(bopp);
+                }
                 let bopp : any = {
                   Ot : item.ot,
                   Serial : serial,
@@ -422,6 +452,11 @@ export class AsignacionBOPPComponent implements OnInit {
         }
       }
     }
+    setTimeout(() => {
+      for (let i = 0; i < this.ArrayBOPP.length; i++) {
+        if (this.ArrayBOPP[i].name == nombre) this.ArrayBOPP.splice(i, 1);
+      }
+    }, 1000);
   }
 
   //Funcion que enviará a la base de datos la informaión general de la asignacion

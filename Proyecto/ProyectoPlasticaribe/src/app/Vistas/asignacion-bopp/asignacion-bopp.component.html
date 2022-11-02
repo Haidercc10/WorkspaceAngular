@@ -174,7 +174,7 @@
             </div> -->
               <!-- stock -->
             <div class="form-floating col-md-2">
-              <input formControlName="boppStock" type="number" id="floatingInput" class="form-control form-control-sm" name="MapStock" placeholder="Stock" required>
+              <input formControlName="boppStock" type="number" id="floatingInput" class="form-control form-control-sm" (keyup)="cambiarCantidad()" required>
               <label for="floatingInput">Stock (Kg)</label>
             </div>
           </div>
@@ -188,6 +188,39 @@
           </div>
         </div>
       </form>
+
+      <!--Linea -->
+      <div class="mb-4">
+        <hr class="colorLinea">
+      </div>
+
+      <div class="mb-4">
+        <h4 class="tituloRojo">Tabla de Consolidado OT</h4>
+      </div>
+
+      <!-- Tabla de BOPP por asignar -->
+      <div class="mb-2">
+        <div class="row g-1">
+          <div class="table-responsive">
+            <table class="table table-bordered" >
+              <thead class="TitulosTabla">
+                <tr>
+                  <th id="idMateriaPrima" scope="col">OT</th>
+                  <th id="cantidadMateriaPrima" scope="col">Cantidad</th>
+                  <th id="UnidadMedida" scope="col">Und Medida</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let bopp of ArrayConsolidadoOT let i = index">
+                  <td id="idMateriaPrima">{{bopp.Ot}}</td>
+                  <th id="cantidadMateriaPrima">{{bopp.Cant | number : '1.2-2'}}</th>
+                  <td id="UnidadMedida">{{bopp.UndCant}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
       <!--Linea -->
       <div class="mb-4">
@@ -232,13 +265,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Gif de Carga -->
-      <!-- <div class="overlay" *ngIf="!load">
-        <div class="spinner ">
-          <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
-        </div>
-      </div> -->
 
       <div *ngIf="load">
         <div class="mb-3">

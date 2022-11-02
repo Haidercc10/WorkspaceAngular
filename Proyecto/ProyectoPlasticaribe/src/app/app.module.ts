@@ -116,6 +116,7 @@ import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { Modal_RptRecuperadoMPComponent } from './Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
+import { IngresoRollos_ExtrusionComponent } from './Vistas/IngresoRollos_Extrusion/IngresoRollos_Extrusion.component';
 
 
 export const routes: Routes = [
@@ -182,6 +183,9 @@ export const routes: Routes = [
   {path: 'inventario-productos', canActivate : [ValidacionLoginGuard], component : InventarioProductosPBDDComponent}, // Ingresar Productos
   {path: 'estados-ot-vendedores', canActivate : [ValidacionLoginGuard], component : EstadosOT_VendedoresComponent}, // Estados OT Vendedores
   {path: 'reporte-recuperado-mp', canActivate : [ValidacionLoginGuard], component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
+
+  // Ingreso de Rollos a Extrusion y Asignacion de Rollos a otros Procesos
+  {path: 'IngresoRollos-Extrusion', canActivate : [ValidacionLoginGuard], component : IngresoRollos_ExtrusionComponent}, // Ingreso de Rollos a Extrusion.
 ]
 
 @NgModule({
@@ -265,7 +269,8 @@ export const routes: Routes = [
     FiltroXProducto_OTVendedoresPipe,
     DatosOTStatusComponent,
     Reporte_RecuperadoMPComponent,
-    Modal_RptRecuperadoMPComponent
+    Modal_RptRecuperadoMPComponent,
+    IngresoRollos_ExtrusionComponent
   ],
 
 
