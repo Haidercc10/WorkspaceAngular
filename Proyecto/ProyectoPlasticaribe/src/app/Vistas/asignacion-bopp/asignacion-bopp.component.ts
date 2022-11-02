@@ -16,7 +16,7 @@ import Swal from 'sweetalert2';
 })
 export class AsignacionBOPPComponent implements OnInit {
 
-  public load: boolean;
+  public load: boolean = true;
   public FormAsignacionBopp !: FormGroup;
   public FormularioBOPP !: FormGroup;
   public comboUnidadMedida = []; /** Combobox unidad de medida */
@@ -68,18 +68,15 @@ export class AsignacionBOPPComponent implements OnInit {
       boppStock: ['', Validators.required],
     });
 
-    this.load = true;
-    this.validarInput = true;
   }
 
   ngOnInit(): void {
-    if (this.storage.get('Rol') === 1 || this.storage.get('Rol') === 4) {
-      this.fecha();
-      this.lecturaStorage();
-      this.obtenerBOPP();
-    } else window.location.href = "./home";
+    this.fecha();
+    this.lecturaStorage();
+    this.obtenerBOPP();
   }
 
+  //
   onChangeSearch(val: string) {
     if (val != '') this.validarInput = false;
     else this.validarInput = true;
@@ -87,6 +84,7 @@ export class AsignacionBOPPComponent implements OnInit {
     // And reassign the 'data' which is binded to 'data' property.
   }
 
+  //
   onFocused(e){
     if (!e.isTrusted) this.validarInput = false;
     else this.validarInput = true;
@@ -134,6 +132,7 @@ export class AsignacionBOPPComponent implements OnInit {
     });
   }
 
+  //Funcion que buscará la información de las ordenes de trabajo consultadas
   infoOT(){
     this.load = false;
     let ordenTrabajo : number = this.FormAsignacionBopp.value.AsgBopp_OT;
@@ -141,6 +140,7 @@ export class AsignacionBOPPComponent implements OnInit {
 
     if (this.ordenesTrabajo.length == 0) {
       this.bagProService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
+        if (datos_OT.length == 0) Swal.fire(`¡La OT ${ordenTrabajo} no ha sido encontrada!`);
         for (const item of datos_OT) {
           this.arrayOT.push(ordenTrabajo);
           if (item.estado == null || item.estado == '' || item.estado == '0') {
@@ -171,11 +171,9 @@ export class AsignacionBOPPComponent implements OnInit {
                   AsgBopp_Observacion: '',
                   AsgBopp_Estado: '',
                 });
-                this.load = true;
-              } else Swal.fire(`¡No se le puede asignar material a la OT ${ordenTrabajo}, ya se le ha asignado la cantidad máxima!`)
+              } else Swal.fire(`¡No se le puede asignar material a la OT ${ordenTrabajo}, ya se le ha asignado la cantidad máxima!`);
             }, 900);
           } else if (item.estado == 4 || item.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
-          this.load = true;
         }
       });
     } else {
@@ -211,20 +209,17 @@ export class AsignacionBOPPComponent implements OnInit {
                     AsgBopp_Observacion: '',
                     AsgBopp_Estado: '',
                   });
-                  this.load = true;
-                } else Swal.fire(`¡No se le puede asignar material a la OT ${ordenTrabajo}, ya se le ha asignado la cantidad máxima!`)
+                } else Swal.fire(`¡No se le puede asignar material a la OT ${ordenTrabajo}, ya se le ha asignado la cantidad máxima!`);
               }, 1200);
             } else if (itemOT.estado == 4 || itemOT.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
-            this.load = true;
           }
         });
-      } else {
-        Swal.fire(`La OT ${ordenTrabajo} ya se encuentra en la tabla`);
-        this.load = true;
-      }
+      } else Swal.fire(`La OT ${ordenTrabajo} ya se encuentra en la tabla`);
     }
+    setTimeout(() => { this.load = true; }, 900);
   }
 
+  // Funcion que va a quitar un rollo
   quitarBOPP(index : number, formulario : any){
     Swal.fire({
       title: '¿Estás seguro de eliminar la Materia Prima de la Asignación?',
@@ -259,7 +254,7 @@ export class AsignacionBOPPComponent implements OnInit {
     });
   }
 
-
+  //
   ajusteOT(){
     let anchoOT : number = this.FormAsignacionBopp.value.AsgBopp_Ancho;
     for (let i = 0; i < this.ordenesTrabajo.length; i++) {
@@ -345,6 +340,21 @@ export class AsignacionBOPPComponent implements OnInit {
           this.cargarBOPP();
         }
       }
+    }, error => {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'center',
+        showConfirmButton: false,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+      Toast.fire({
+        icon: 'error',
+        title: '¡Rollo no encontradao!' + error
+      });
+      this.load = true;
     });
   }
 
@@ -363,16 +373,18 @@ export class AsignacionBOPPComponent implements OnInit {
   //
   validarCamposBOPP(){
     if (this.ordenesTrabajo.length != 0) this.cargarBOPPTabla();
-    else Swal.fire("¡Debe cargar minimo unorden de trabajo en la tabla para realizar la asignación de BOPP!");
+    else Swal.fire("¡Debe cargar minimo una orden de trabajo en la tabla para realizar la asignación del rollo!");
   }
 
-  //
+  //Funcion que asignará un rollo a cada orden de trabajo, colocando la cantidad que debe tener el la orden dependiendo del rollo
   cargarBOPPTabla(){
     let serial : string = this.FormularioBOPP.value.boppSerial;
     let nombre : string = this.FormularioBOPP.value.boppNombre;
     let stock : number = this.FormularioBOPP.value.boppStock;
+    let stockInicial : number = stock;
     let ot : any = [];
     let cantidadAsignada : any;
+    let otAsignadas : any [] = [];
 
     for (const item of this.ordenesTrabajo) {
       const otInfo : any = {
@@ -384,8 +396,8 @@ export class AsignacionBOPPComponent implements OnInit {
       for (const itemOT of ot) {
         if (itemOT.kg != 0) {
           if (itemOT.ot == item.ot) {
-            if (stock != 0) {
-              cantidadAsignada = (item.ancho / this.anchoBOPP * stock);
+            if (stock > 0) {
+              cantidadAsignada = (item.ancho / this.anchoBOPP * stockInicial);
               itemOT.kg -= cantidadAsignada;
               if (cantidadAsignada <= stock) {
                 let bopp : any = {
@@ -396,6 +408,7 @@ export class AsignacionBOPPComponent implements OnInit {
                   Cant : (item.ancho / this.anchoBOPP * stock).toFixed(2),
                   UndCant : 'Kg',
                 }
+                stock -= cantidadAsignada;
 
                 this.ArrayBoppPedida.push(bopp);
                 this.FormularioBOPP.setValue({
@@ -403,7 +416,7 @@ export class AsignacionBOPPComponent implements OnInit {
                   boppSerial: '',
                   boppStock: '',
                 });
-              } else Swal.fire("¡No se puede asignar una cantidad mayor a la que hay en stock!");
+              } else Swal.fire(`¡No se puede asignar el rollo a la OT ${itemOT.ot}, porque la cantidad a asignar excede la cantidad restante del rollo!`);
             }
           }
         }
@@ -411,7 +424,7 @@ export class AsignacionBOPPComponent implements OnInit {
     }
   }
 
-  //
+  //Funcion que enviará a la base de datos la informaión general de la asignacion
   asignarBOPP(){
     this.load = false;
     let observacion : string = this.FormAsignacionBopp.value.AsgBopp_Observacion;
@@ -424,15 +437,32 @@ export class AsignacionBOPPComponent implements OnInit {
     }
     this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => {
       this.obtenerIdUltimaAsignacion();
+    }, error => {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'center',
+        showConfirmButton: false,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+      Toast.fire({
+        icon: 'error',
+        title: '¡Error al registrar la información de la asignación!' + error
+      });
+      this.load = true;
     });
   }
 
+  //Funcion que pedirá a la base de datos la información de la ultima asignacion
   obtenerIdUltimaAsignacion(){
     this.asignacionBOPPService.srvObtenerListaUltimoId().subscribe(datos_asignaciones => {
       this.detallesAsginacionBOPP(datos_asignaciones);
     });
   }
 
+  //Funcion que enviará a la base de datos la informacion detalla de los rollos asignados
   detallesAsginacionBOPP(asignacion : any){
     let idAsignacion : number = asignacion.asigBOPP_Id;
     for (let j = 0; j < this.ArrayBoppPedida.length; j++) {
@@ -450,17 +480,31 @@ export class AsignacionBOPPComponent implements OnInit {
               TpDoc_Id : 'ASIGBOPP',
             }
             setTimeout(() => {
-              this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => { });
+              this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => { }, error => {
+                const Toast = Swal.mixin({
+                  toast: true,
+                  position: 'center',
+                  showConfirmButton: false,
+                  didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                  }
+                });
+                Toast.fire({
+                  icon: 'error',
+                  title: '¡Error al ingresar el rollo(s) asignado!' + error
+                });
+                this.load = true;
+              });
             }, 1111);
           }
         }
       });
     }
-    setTimeout(() => {
-      this.moverInventarioBOPP();
-    }, 1500);
+    setTimeout(() => { this.moverInventarioBOPP(); }, 1500);
   }
 
+  //Funcion que mueve el inventario de los rollos asignados
   moverInventarioBOPP(){
     let boppActualizada : any = [];
     let serialCantBOPP : any = [];
@@ -473,8 +517,7 @@ export class AsignacionBOPPComponent implements OnInit {
       if (!boppActualizada.includes(this.ArrayBoppPedida[i].Serial)) {
         serialCantBOPP.push(dataBOPP);
         boppActualizada.push(this.ArrayBoppPedida[i].Serial);
-      }
-      else {
+      } else {
         for (let b = 0; b < serialCantBOPP.length; b++) {
           if (serialCantBOPP[b].serial == this.ArrayBoppPedida[i].Serial) serialCantBOPP[b].Cant += this.ArrayBoppPedida[i].CantTotal;
         }
@@ -519,11 +562,26 @@ export class AsignacionBOPPComponent implements OnInit {
               });
               Toast.fire({
                 icon: 'success',
-                title: '¡Asignación de BOPP registrada con exito!'
+                title: '¡Asignación de rollo(s) registrada con exito!'
               });
               this.limpiarTodosLosCampos();
               this.load = true;
-             }, error => { console.log(error); });
+             }, error => {
+              const Toast = Swal.mixin({
+                toast: true,
+                position: 'center',
+                showConfirmButton: false,
+                didOpen: (toast) => {
+                  toast.addEventListener('mouseenter', Swal.stopTimer)
+                  toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+              });
+              Toast.fire({
+                icon: 'error',
+                title: '¡Error al mover el inventario de rollo(s)!' + error
+              });
+              this.load = true;
+            });
           }
         });
       }

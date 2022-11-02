@@ -414,6 +414,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
               icon: 'success',
               title: 'Devolución de Rollos registrada con exito!'
             });
+            this.limpiarCampos();
           });
         }
       });
