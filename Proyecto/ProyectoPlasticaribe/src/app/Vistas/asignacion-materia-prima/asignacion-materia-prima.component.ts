@@ -307,7 +307,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
       setTimeout(() => {
         this.load = false;
-        if (this.cantidadAsignada <= this.cantRestante) {
+        if (this.cantidadAsignada <= this.cantRestante || idOrdenTrabajo == 124230) {
           const datosAsignacion : any = {
             AsigMP_OrdenTrabajo : idOrdenTrabajo,
             AsigMp_FechaEntrega : fechaEntrega,

@@ -31,6 +31,10 @@ export class DtIngRollos_ExtrusionService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/consultaRollos`);
   }
 
+  crearPdf(id : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getCrearPDFUltimoId/${id}`);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/${id}`, data);
   }

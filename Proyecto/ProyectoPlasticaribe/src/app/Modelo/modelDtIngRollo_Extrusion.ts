@@ -6,4 +6,5 @@ export interface modelDtIngRollo_Extrusion {
   DtIngRollo_OT : number;
   Estado_Id : string;
   Proceso_Id : string;
+  Prod_Id : number;
 }
