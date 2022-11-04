@@ -21,21 +21,25 @@ export class DetallesAsgRollos_ExtrusionService {
   }
 
   srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/');
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetallesAsgRollos_Extrusion');
   }
   srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `//${dato}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/${dato}`);
+  }
+
+  crearPdf(id : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/getCrearPDFUltimoId/${id}`);
   }
 
   srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `//${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/${id}`, data);
   }
 
   srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `//${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/${id}`);
   }
 
   srvGuardar(data : modelDtAsgRollos_Extrusion): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/', data);
+   return this.http.post(this.rutaPlasticaribeAPI + '/DetallesAsgRollos_Extrusion', data);
   }
 }

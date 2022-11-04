@@ -23,7 +23,7 @@
   <div class="container-fluid bajarPagina">
     <div class="container">
       <div class="mb-4">
-        <h4 class="tituloRojo">Consultar OT</h4>
+        <h4 class="tituloRojo">Consultar Rollos</h4>
       </div>
       <!-- Formulario para consultar una orden de trabajo -->
       <form [formGroup]="FormConsultarRollos">
@@ -60,6 +60,15 @@
 
             <div class="form-floating col-md btn-limpiarForm">
               <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarForm()">Limpiar Campos</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="row g-3">
+            <div class="form-floating col-md">
+              <textarea formControlName="Observacion" class="form-control" id="floatingInput"></textarea>
+              <label for="floatingInput">Observación</label>
             </div>
           </div>
         </div>
@@ -172,6 +181,7 @@
             [(selection)]="rollos">
             <ng-template pTemplate="header">
               <tr>
+                <th scope="col">OT</th>
                 <th scope="col">ID Rollo</th>
                 <th scope="col">ID Producto</th>
                 <th scope="col">Producto</th>
@@ -184,6 +194,7 @@
             </ng-template>
             <ng-template pTemplate="body" let-rollosInsertar>
               <tr *ngIf="!rollosInsertar.exits">
+                <td>{{rollosInsertar.Ot}}</td>
                 <td>{{rollosInsertar.Id}}</td>
                 <td>{{rollosInsertar.IdProducto}}</td>
                 <td>{{rollosInsertar.Producto}}</td>
@@ -222,15 +233,17 @@
             [value]="grupoProductos">
             <ng-template pTemplate="header">
               <tr>
+                <th scope="col">OT</th>
                 <th scope="col">ID Producto</th>
-                  <th scope="col">Producto</th>
-                  <th scope="col">Cantidad</th>
-                  <th scope="col">N° Rollos</th>
-                  <th scope="col">Presentación</th>
+                <th scope="col">Producto</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">N° Rollos</th>
+                <th scope="col">Presentación</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-grupoProductos>
               <tr>
+                <td>{{grupoProductos.Ot}}</td>
                 <td>{{grupoProductos.Id}}</td>
                 <td>{{grupoProductos.Nombre}}</td>
                 <td>{{grupoProductos.Cantidad}}</td>
@@ -240,7 +253,7 @@
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>
-                  <td colspan="2" class="text-right">Totales</td>
+                  <td colspan="3" class="text-right">Totales</td>
                   <td>{{totalCantidad | number}}</td>
                   <td>{{totalRollos | number}}</td>
                   <td>Kg</td>

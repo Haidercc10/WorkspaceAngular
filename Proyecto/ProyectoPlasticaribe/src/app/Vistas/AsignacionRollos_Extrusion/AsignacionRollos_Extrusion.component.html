@@ -32,13 +32,13 @@
           <div class="row g-3">
             <!-- OT -->
             <div class="form-floating col-md-2">
-              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput">
+              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" (keyup.Enter)="consultarRollos()" id="floatingInput">
               <label for="floatingInput">Nro. OT</label>
             </div>
 
             <!-- Id Rolo -->
             <div class="form-floating col-md">
-              <input formControlName="IdRollo" type="number" class="form-control form-control-sm" id="floatingInput">
+              <input formControlName="IdRollo" type="number" class="form-control form-control-sm" (keyup.Enter)="consultarRollos()" id="floatingInput">
               <label for="floatingInput">N° Rollo</label>
             </div>
 
@@ -55,11 +55,29 @@
             </div>
 
             <div class="form-floating col-md btn-consultar">
-              <!-- <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Rollos</button> -->
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarRollos()">Consultar Rollos</button>
             </div>
 
             <div class="form-floating col-md btn-limpiarForm">
-              <!-- <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarForm()">Limpiar Campos</button> -->
+              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarForm()">Limpiar Campos</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="row g-3">
+            <!-- Procesos -->
+            <div class="form-floating col-md-2">
+              <select formControlName="Proceso" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option [ngValue]="proceso.proceso_Id" *ngFor="let proceso of procesos">{{proceso.proceso_Nombre}}</option>
+              </select>
+              <label for="floatingSelect">Procesos</label>
+            </div>
+
+            <!-- Observacion -->
+            <div class="form-floating col-md">
+              <textarea formControlName="Observacion" class="form-control" id="floatingInput"></textarea>
+              <label for="floatingInput">Observación</label>
             </div>
           </div>
         </div>
@@ -71,18 +89,6 @@
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4 tabla1">
         <h4 class="tituloRojo" style="width: 68%;">Tabla de Rollos</h4>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-right: 5%;">
-          <div class="form-floating col-md">
-            <input type="number" class="form-control form-control-sm" id="floatingInput"[(ngModel)]="rollosIngresados" readonly>
-            <label for="floatingInput">Rollos ingresados</label>
-          </div>
-        </div>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <div class="form-floating col-md">
-            <input type="number" class="form-control form-control-sm" id="floatingInput"[(ngModel)]="rollosSinIngresar" readonly>
-            <label for="floatingInput">Rollos No ingresados</label>
-          </div>
-        </div>
       </div>
 
       <!--Inicio tabla Rollos creados en OT -->
@@ -91,15 +97,16 @@
           <p-table
               #dt
               [value]="rollos"
-              [resizableColumns]="true"
-              columnResizeMode="expand"
               styleClass="p-datatable-gridlines p-datatable-sm"
               responsiveLayout="scroll"
               [paginator]="true"
-              [rows]="rows"
-              [(first)]="first"
-              [rowsPerPageOptions]="[20,30,50,70,100]"
-              [rowHover]="true">
+              [rows]="10"
+              [showCurrentPageReport]="true"
+              currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos"
+              [rowsPerPageOptions]="[10,25,50]"
+              [rowHover]="true"
+              dataKey="Id"
+              [(selection)]="rollosInsertar">
             <ng-template pTemplate="header">
               <tr>
                 <th scope="col">OT</th>
@@ -109,25 +116,35 @@
                 <th scope="col">Fecha Ingreso</th>
                 <th scope="col">Cantidad</th>
                 <th scope="col">Presentacion</th>
-                <th scope="col">Proceso</th>
                 <th style="width: 3rem">
-                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                  <p-tableHeaderCheckbox (click)="seleccionarTodosRollos(rollos)"></p-tableHeaderCheckbox>
                 </th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-rollo>
               <tr>
-                <td>{{rollo.Ot}}</td>
-                <td>{{rollo.Id}}</td>
-                <td>{{rollo.IdProducto}}</td>
-                <td>{{rollo.Producto}}</td>
-                <td>{{rollo.Fecha}}</td>
-                <td>{{rollo.Cantidad | number}}</td>
-                <td>{{rollo.Presentacion}}</td>
-                <td>{{rollo.Estatus}}</td>
-                <td>
-                  <p-tableCheckbox [value]="rollo"></p-tableCheckbox>
-                </td>
+                <ng-container *ngIf="rollo.exits; then thenTemplate; else elseTemplate"></ng-container>
+                <ng-template #thenTemplate>
+                  <td style="background-color: rgb(255, 146, 146);">{{rollo.Ot}}</td>
+                  <td style="background-color: rgb(255, 146, 146);">{{rollo.Id}}</td>
+                  <td style="background-color: rgb(255, 146, 146);">{{rollo.IdProducto}}</td>
+                  <td style="background-color: rgb(255, 146, 146);">{{rollo.Producto}}</td>
+                  <td style="background-color: rgb(255, 146, 146);">{{rollo.Fecha}}</td>
+                  <td style="background-color: rgb(255, 146, 146);">{{rollo.Cantidad | number}}</td>
+                  <td style="background-color: rgb(255, 146, 146);">{{rollo.Presentacion}}</td>
+                </ng-template>
+                <ng-template #elseTemplate>
+                  <td>{{rollo.Ot}}</td>
+                  <td>{{rollo.Id}}</td>
+                  <td>{{rollo.IdProducto}}</td>
+                  <td>{{rollo.Producto}}</td>
+                  <td>{{rollo.Fecha}}</td>
+                  <td>{{rollo.Cantidad | number}}</td>
+                  <td>{{rollo.Presentacion}}</td>
+                  <td>
+                    <p-tableCheckbox [value]="rollo" (click)="llenarRollosAIngresar(rollo)"></p-tableCheckbox>
+                  </td>
+                </ng-template>
               </tr>
             </ng-template>
           </p-table>
@@ -147,37 +164,38 @@
         <div class="row g-3">
           <p-table
             #dt
-            [resizableColumns]="true"
-            columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
             [paginator]="true"
-            [rows]="rows"
-            [(first)]="first"
-            [rowsPerPageOptions]="[20,30,50,70,100]"
+            [rows]="10"
+            [rowsPerPageOptions]="[10,25,50]"
             [rowHover]="true"
-            [value]="rollosInsertar">
+            [value]="rollosInsertar"
+            dataKey="Id"
+            [(selection)]="rollos">
             <ng-template pTemplate="header">
               <tr>
+                <th scope="col">OT</th>
                 <th scope="col">ID Rollo</th>
                 <th scope="col">ID Producto</th>
                 <th scope="col">Producto</th>
                 <th scope="col">Cantidad</th>
                 <th scope="col">Presentación</th>
                 <th style="width: 3rem">
-                  <!-- <p-tableHeaderCheckbox (click)="quitarTodosRollos(rollosInsertar)"></p-tableHeaderCheckbox> -->
+                  <p-tableHeaderCheckbox (click)="quitarTodosRollos(rollosInsertar)"></p-tableHeaderCheckbox>
                 </th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-rollosInsertar>
-              <tr>
+              <tr *ngIf="!rollosInsertar.exits">
+                <td>{{rollosInsertar.Ot}}</td>
                 <td>{{rollosInsertar.Id}}</td>
                 <td>{{rollosInsertar.IdProducto}}</td>
                 <td>{{rollosInsertar.Producto}}</td>
                 <td>{{rollosInsertar.Cantidad | number}}</td>
                 <td>{{rollosInsertar.Presentacion}}</td>
                 <td>
-                  <!-- <p-tableCheckbox [value]="rollosInsertar" (click)="quitarRollosAIngresar(rollosInsertar)"></p-tableCheckbox> -->
+                  <p-tableCheckbox [value]="rollosInsertar" (click)="quitarRollosAIngresar(rollosInsertar)"></p-tableCheckbox>
                 </td>
               </tr>
             </ng-template>
@@ -204,25 +222,35 @@
             styleClass="p-datatable-gridlines p-datatable-sm"
             responsiveLayout="scroll"
             [paginator]="true"
-            [rows]="rows"
+            [rows]="20"
             [rowHover]="true"
             [value]="grupoProductos">
             <ng-template pTemplate="header">
               <tr>
+                <th scope="col">OT</th>
                 <th scope="col">ID Producto</th>
-                  <th scope="col">Producto</th>
-                  <th scope="col">Cantidad</th>
-                  <th scope="col">N° Rollos</th>
-                  <th scope="col">Presentación</th>
+                <th scope="col">Producto</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">N° Rollos</th>
+                <th scope="col">Presentación</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-grupoProductos>
               <tr>
+                <td>{{grupoProductos.Ot}}</td>
                 <td>{{grupoProductos.Id}}</td>
                 <td>{{grupoProductos.Nombre}}</td>
                 <td>{{grupoProductos.Cantidad}}</td>
                 <td>{{grupoProductos.Rollos}}</td>
                 <td>{{grupoProductos.Presentacion}}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                  <td colspan="3" class="text-right">Totales</td>
+                  <td>{{totalCantidad | number}}</td>
+                  <td>{{totalRollos | number}}</td>
+                  <td>Kg</td>
               </tr>
             </ng-template>
           </p-table>
@@ -233,8 +261,8 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <!-- <button class=" btn btn-danger btn-danger-sm" type="button" (click)="ingresaroRollos()">Ingresar Rollos</button>
-          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button> -->
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="salidaRollos()">Ingresar Rollos</button>
+          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>
     </div>

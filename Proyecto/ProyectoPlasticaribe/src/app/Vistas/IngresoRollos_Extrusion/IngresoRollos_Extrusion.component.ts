@@ -33,7 +33,6 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
   validarRollo : any [] = []; //Variable para validará que el rollo no esté en la tabla
   first = 0;
   rows = 20;
-  infoCookies : any; //variable que almacenará la información de la cookie que dejará mostrar o no el modal informativo
   totalRollos : number = 0;
   totalCantidad : number = 0;
   rollosPDF : any [] = [];
@@ -58,39 +57,6 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.cookiesinformativas();
-  }
-
-  // Cookies informativas
-  cookiesinformativas(){
-    do {
-      if (this.infoCookies == '') {
-        this.cookieServices.set('Info_Aceptada', `No`);
-        Swal.fire({
-          title: 'Información!',
-          text: 'Si cargas muchos rollos puede tomar un tiempo ingresaarlos todos, se paciente',
-          icon: 'warning',
-          confirmButtonText: 'Ok',
-          allowOutsideClick: false,
-          allowEscapeKey : false,
-          allowEnterKey : false,
-        });
-        this.cookieServices.set('Info_Aceptada', `Si`);
-        this.infoCookies = 'Si'
-      } else if (this.infoCookies == 'No') {
-        Swal.fire({
-          title: 'Información!',
-          text: 'Si cargas muchos rollos puede tomar un tiempo ingresaarlos todos, se paciente',
-          icon: 'warning',
-          confirmButtonText: 'Ok',
-          allowOutsideClick: false,
-          allowEscapeKey : false,
-          allowEnterKey : false,
-        });
-        this.cookieServices.set('Info_Aceptada', `Si`);
-        this.infoCookies = 'Si'
-      } else if (this.infoCookies == 'Si') break;
-    } while (this.infoCookies == 'Si');
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -105,8 +71,6 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
     let rol = this.storage.get('Rol');
-    this.infoCookies = this.cookieServices.get('Info_Aceptada');
-    this.cookieServices.get('1');
     this.rolService.srvObtenerLista().subscribe(datos_roles => {
       for (let index = 0; index < datos_roles.length; index++) {
         if (datos_roles[index].rolUsu_Id == rol) {
@@ -648,7 +612,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         setTimeout(() => {
           if (consulta <= 0) Swal.fire(`No hay rollos por ingresar`);
           this.cargando = true;
-        }, 2000);
+        }, 4000);
       }, 3000);
     } else Swal.fire("¡La fecha seleccionada no es valida!");
   }
@@ -715,6 +679,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         if (cantRollo > 0){
           producto.push(this.rollosInsertar[i].IdProducto);
           let info : any = {
+            Ot: this.rollosInsertar[i].Ot,
             Id : this.rollosInsertar[i].IdProducto,
             Nombre : this.rollosInsertar[i].Producto,
             Cantidad : this.formatonumeros(cantidad.toFixed(2)),
@@ -728,6 +693,8 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
       }
     }
     setTimeout(() => {
+      this.rollosInsertar.sort((a,b) => Number(a.Ot) - Number(b.Ot));
+      this.grupoProductos.sort((a,b) => Number(a.Ot) - Number(b.Ot));
       this.calcularTotalRollos();
       this.calcularTotalCantidad();
     }, 500);
@@ -824,12 +791,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         });
       }
     }
-    if (this.rollosInsertar.length > 500) setTimeout(() => { this.finalizarInsercion(id); }, 30000);
-    else if (this.rollosInsertar.length > 400) setTimeout(() => { this.finalizarInsercion(id); }, 20000);
-    else if (this.rollosInsertar.length > 300) setTimeout(() => { this.finalizarInsercion(id); }, 15000);
-    else if (this.rollosInsertar.length > 200) setTimeout(() => { this.finalizarInsercion(id); }, 10000);
-    else if (this.rollosInsertar.length > 100) setTimeout(() => { this.finalizarInsercion(id); }, 7000);
-    else setTimeout(() => { this.finalizarInsercion(id); }, 3000);
+    setTimeout(() => { this.finalizarInsercion(id); }, 5000);
   }
 
   //Funcion que se encargará de lenviar el mensaje de confirmación del envio y limpiará los campos
@@ -969,6 +931,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que traerá los rollos que fueron ingresados
   buscarRolloPDF(id : number){
+    this.rollosPDF = [];
     this.dtIngRollosService.crearPdf(id).subscribe(datos_ingreso => {
       for (let i = 0; i < datos_ingreso.length; i++) {
         let info : any = {

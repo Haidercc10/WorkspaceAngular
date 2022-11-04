@@ -31,8 +31,28 @@ export class DtIngRollos_ExtrusionService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/consultaRollos`);
   }
 
+  consultarRollo(rollo : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/consultaRollo/${rollo}`);
+  }
+
   crearPdf(id : number){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getCrearPDFUltimoId/${id}`);
+  }
+
+  getRollosDisponibles(hoy : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponibles/${hoy}`);
+  }
+
+  getRollosDisponiblesOT(ot : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponiblesOT/${ot}`);
+  }
+
+  getRollosDisponiblesRollo(rollo : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponiblesRollo/${rollo}`);
+  }
+
+  getRollosDisponiblesFechas(fechaInicial : any, fechaFinal : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponiblesFechas/${fechaInicial}/${fechaFinal}`);
   }
 
   srvActualizar(id:number|string, data:any) {
