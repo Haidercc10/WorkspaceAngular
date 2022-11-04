@@ -118,6 +118,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { Modal_RptRecuperadoMPComponent } from './Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
 import { IngresoRollos_ExtrusionComponent } from './Vistas/IngresoRollos_Extrusion/IngresoRollos_Extrusion.component';
 import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_Extrusion/AsignacionRollos_Extrusion.component';
+import { ReporteBodegaExtrusionComponent } from './Vistas/ReporteBodegaExtrusion/ReporteBodegaExtrusion.component';
 
 
 export const routes: Routes = [
@@ -188,6 +189,7 @@ export const routes: Routes = [
   // Ingreso de Rollos a Extrusion y Asignacion de Rollos a otros Procesos
   {path: 'IngresoRollos-Extrusion', canActivate : [ValidacionLoginGuard], component : IngresoRollos_ExtrusionComponent}, // Ingreso de Rollos a Extrusion.
   {path: 'AsignacionRollos-Extrusion', canActivate : [ValidacionLoginGuard], component : AsignacionRollos_ExtrusionComponent}, // Asignación de rollos desde la bodega de extrusión.
+  {path: 'ReporteRollos-Extrusion', canActivate : [ValidacionLoginGuard], component : ReporteBodegaExtrusionComponent}, // Reporte de la bodega de extrusión.
 
 ]
 
@@ -274,7 +276,8 @@ export const routes: Routes = [
     Reporte_RecuperadoMPComponent,
     Modal_RptRecuperadoMPComponent,
     IngresoRollos_ExtrusionComponent,
-    AsignacionRollos_ExtrusionComponent
+    AsignacionRollos_ExtrusionComponent,
+    ReporteBodegaExtrusionComponent
   ],
 
 

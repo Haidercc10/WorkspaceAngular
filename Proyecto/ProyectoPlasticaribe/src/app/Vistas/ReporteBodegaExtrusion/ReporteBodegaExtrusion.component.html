@@ -1,0 +1,161 @@
+<app-menuLateral></app-menuLateral>
+
+<div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Reporte de Extrusión</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="contain">
+  <!--Inicio info OT-->
+  <div class="container-fluid bajarPagina">
+    <div class="container">
+      <div class="mb-4">
+        <h4 class="tituloRojo">Filtros de búsqueda</h4>
+      </div>
+
+      <!-- Formulario para consultar filtros -->
+      <form [formGroup]="FormConsultarFiltros">
+
+        <!-- Primera Fila -->
+        <div class="mb-3">
+          <div class="row g-3">
+
+            <!-- Factura -->
+            <div class="form-floating col-md-2">
+              <input formControlName="Documento" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Orden de Trabajo</label>
+            </div>
+
+             <!-- Fecha Factura -->
+             <div class="form-floating col-md-2">
+              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput" >
+              <label for="floatingInput">Fecha inicial</label>
+            </div>
+
+            <!-- Fecha ingreso rollo -->
+            <div class="form-floating col-md-2">
+              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput" >
+              <label for="floatingInput">Fecha Final</label>
+            </div>
+
+            <!-- Producto Input-->
+            <div class="form-floating col-md">
+              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput" name="Producto">
+              <label for="floatingInput">Producto</label>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Fila 2 -->
+        <div class="mb-3">
+          <div class="row g-3">
+
+            <!-- Producto -->
+            <div class="form-floating col-md-2">
+              <input formControlName="Rollo" type="text" class="form-control form-control-sm" id="floatingInput">
+              <label for="floatingInput">Rollo</label>
+            </div>
+
+             <!-- Tipo Documento -->
+             <div class="form-floating col-md-2">
+              <select formControlName="tipoDoc" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
+                <option></option>
+                <option value="Ingreso de Rollos">Ingreso de Rollos</option>
+                <option value="Salida de Rollos">Salida de Rollos</option>
+              </select>
+              <label for="floatingSelect">Tipo Doc.</label>
+            </div>
+
+            <!-- Estado rollo -->
+            <div class="form-floating col-md-2">
+              <select formControlName="estadoRollo" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
+                <option></option>
+                <option [ngValue]="estado.estado_Nombre" *ngFor="let estado of estados">{{estado.estado_Nombre}}</option>
+              </select>
+              <label for="floatingSelect">Estado rollo</label>
+            </div>
+
+          </div>
+        </div>
+      </form>
+
+      <!-- Botones -->
+      <div class="mb-3" *ngIf="cargando">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarFiltros()">Consultar</button>
+          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+          <!-- <button class=" btn btn-danger btn-danger-sm" type="button">Exportar Excel</button> -->
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <hr class="Linea">
+      </div>
+      <!-- titulo tabla producto -->
+      <div class="mb-4">
+        <h4 class="tituloRojo">Registros consultados</h4>
+      </div>
+
+      <!-- Inicio tabla de registros consultados -->
+      <!--Inicio tabla Rollos a Insertar -->
+      <div class="mb-3" *ngIf="cargando">
+        <div class="row g-3">
+          <div class="table-responsive">
+            <p-table
+            #dt
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="20"
+            [rowHover]="true"
+            [value]="registrosConsultados">
+            <ng-template pTemplate="header">
+              <tr>
+                <th scope="col">OT</th>
+                <th scope="col">ID Producto</th>
+                <th scope="col">Producto</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">N° Rollos</th>
+                <th scope="col">Presentación</th>
+                <th scope="col">Tipo</th>
+                <th>Ver</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-registros>
+              <tr>
+                <td>{{registros.Ot}}</td>
+                <td>{{registros.Id}}</td>
+                <td>{{registros.Nombre}}</td>
+                <td>{{registros.Fecha}}</td>
+                <td>{{registros.Cantidad}}</td>
+                <td>{{registros.Rollos}}</td>
+                <td>{{registros.Presentacion}}</td>
+                <td>{{registros.Tipo}}</td>
+                <td><a><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver PDF"></i></a></td>
+              </tr>
+            </ng-template>
+          </p-table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

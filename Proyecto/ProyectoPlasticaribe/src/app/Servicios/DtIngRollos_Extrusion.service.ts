@@ -55,6 +55,14 @@ export class DtIngRollos_ExtrusionService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponiblesFechas/${fechaInicial}/${fechaFinal}`);
   }
 
+  getconsultaRollosFechas(fechaInicial : any, fechaFinal : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getconsultaRollosFechas/${fechaInicial}/${fechaFinal}`);
+  }
+
+  getconsultaRollosOT(ot : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getconsultaRollosOT/${ot}`);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/${id}`, data);
   }

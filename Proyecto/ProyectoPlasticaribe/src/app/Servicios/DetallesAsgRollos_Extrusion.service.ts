@@ -31,6 +31,14 @@ export class DetallesAsgRollos_ExtrusionService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/getCrearPDFUltimoId/${id}`);
   }
 
+  getconsultaRollosFechas(fechaInicial : any, fechaFinal : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/getconsultaRollosFechas/${fechaInicial}/${fechaFinal}`);
+  }
+
+  getconsultaRollosOT(ot : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/getconsultaRollosOT/${ot}`);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/DetallesAsgRollos_Extrusion/${id}`, data);
   }
