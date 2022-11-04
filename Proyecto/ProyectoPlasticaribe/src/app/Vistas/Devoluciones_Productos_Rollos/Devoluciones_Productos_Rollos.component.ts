@@ -112,7 +112,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
     let factura : string = this.FormConsultarFactura.value.Fact_Id;
     this.dtAsgProdFactura.srvObtenerListaPorCodigoFactura(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
-        // if (datos_factura[i].estado_Id == 21) {
+        if (datos_factura[i].estado_Id != 24) {
           this.cargando = true;
           let info : any = {
             Factura : factura.toUpperCase(),
@@ -133,7 +133,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
             Cliente : datos_factura[i].cli_Nombre,
             Observacion : this.FormConsultarFactura.value.Observacion,
           });
-        // }
+        }
       }
     });
     setTimeout(() => {
@@ -342,7 +342,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
                 Rollo_Id : datos_rollos[j].rollo_Id,
                 DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
                 undMed_Rollo : datos_rollos[j].undMed_Rollo,
-                Estado_Id : 19,
+                Estado_Id : 24,
                 dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
                 Prod_Id : datos_rollos[j].prod_Id,
                 UndMed_Prod : datos_rollos[j].undMed_Prod,

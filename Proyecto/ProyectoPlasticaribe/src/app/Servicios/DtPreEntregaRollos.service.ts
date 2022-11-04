@@ -45,6 +45,17 @@ export class DtPreEntregaRollosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/VerificarRollo/${dato}`);
   }
 
+  getRollosPreEntregadosFechas(fecha1 : any, fecha2 : any, proceso : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/getRollosPreEntregadosFechas/${fecha1}/${fecha2}/${proceso}`);
+  }
+
+  getRollosPreEntregadosRollo(rollo : any, proceso : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/getRollosPreEntregadosRollo/${rollo}/${proceso}`);
+  }
+
+  getRollosPreEntregadosOT(ot : any, proceso : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/getRollosPreEntregadosOT/${ot}/${proceso}`);
+  }
   srvObtenerListaPorId(dato : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/${dato}`);
   }

@@ -25,6 +25,42 @@
           </a>
         </li>
 
+        <ng-container *ngIf="ValidarRol == 1">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample9" role="button" aria-expanded="false" (click)="clickIcon9()" aria-controls="collapseExample">
+              <ng-container *ngIf="subir9; then thenTemplate9; else elseTemplate9"></ng-container>
+              <ng-template #thenTemplate9>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-bottom: 10px;  margin-right: 3%;"><path d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z"/></svg>
+              </ng-template>
+              <ng-template #elseTemplate9>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="width: 10px; padding-top: 10px;  margin-right: 3%;"><path d="M279 224H41c-21.4 0-32.1-25.9-17-41L143 64c9.4-9.4 24.6-9.4 33.9 0l119 119c15.2 15.1 4.5 41-16.9 41z"/></svg>
+              </ng-template>
+              <b>Bodega de Extrusión</b>
+            </a>
+            <div class="collapse" id="collapseExample9">
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/IngresoRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
+                    Ingreso de Rollos
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/AsignacionRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 5px; padding-bottom: 1%;"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512z"/></svg>
+                    Salida de Rollos
+                  </a>
+                </div>
+              </ng-container>
+               <div class="mb-2 sangria">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
         <!-- BOPP / BOPA / POLIESTER -->
         <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
           <li>

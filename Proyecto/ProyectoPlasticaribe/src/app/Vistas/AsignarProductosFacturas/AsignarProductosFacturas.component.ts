@@ -405,7 +405,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       console.log(9)
       let rollosExistentes : any [] = [];
       for (let i = 0; i < datos_rollos.length; i++) {
-        if (datos_rollos[i].estado_Id == 19) {
+        if (datos_rollos[i].estado_Id == 19 || datos_rollos[i].estado_Id == 24) {
           if (datos_rollos[i].undMed_Rollo == 'Paquete') {
             let info : any = {
               Id : datos_rollos[i].rollo_Id,
@@ -502,7 +502,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.dtEntradaRollo.srvConsultarProducto(id).subscribe(datos_rollos => {
       let rollosExistentes : any [] = [];
       for (let i = 0; i < datos_rollos.length; i++) {
-        if (datos_rollos[i].estado_Id == 19) {
+        if (datos_rollos[i].estado_Id == 19 || datos_rollos[i].estado_Id == 24) {
           if (datos_rollos[i].undMed_Rollo == 'Paquete') {
             let info : any = {
               Id : datos_rollos[i].rollo_Id,
