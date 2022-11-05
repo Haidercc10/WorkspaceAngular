@@ -60,8 +60,10 @@ export class ProductoService {
 
   /** Obtener Info Producto de existencias */
   srvObtenerPresentacionProducto(id : number|String):Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/ConsultaProductoExistencia/${id}`)
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/ConsultaProductoExistencia/${id}`);
   }
 
-
+  obtenerNombreProductos(idProducto : any): Observable<any> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/consultaNombreProducto/${idProducto}`);
+  }
 }
