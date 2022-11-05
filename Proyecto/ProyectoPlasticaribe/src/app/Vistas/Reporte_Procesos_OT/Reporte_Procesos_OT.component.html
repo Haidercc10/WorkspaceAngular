@@ -293,7 +293,9 @@
               <!-- Titulos -->
               <ng-template pTemplate="header" let-columns>
                 <tr>
-                  <th id="" scope="col" pSortableColumn="ot" style="font-size: 12px;">OT<p-sortIcon field="ot" title="Order por OT"></p-sortIcon></th>
+                  <th id="" scope="col" pSortableColumn="ot" style="font-size: 12px;">OT
+                    <p-sortIcon field="ot" title="Order por OT"></p-sortIcon>
+                    <p-columnFilter type="text" field="ot" display="menu"></p-columnFilter></th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Materia Prima</th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Extrusión</th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Impresión</th>

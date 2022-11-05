@@ -58,27 +58,8 @@
               <label for="floatingInput">Fecha Final</label>
             </div>
 
-            <!-- Producto Input-->
-            <div class="form-floating col-md">
-              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput" name="Producto" [(ngModel)]="Producto">
-              <label for="floatingInput">Producto</label>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Fila 2 -->
-        <div class="mb-3">
-          <div class="row g-3">
-
-            <!-- Producto -->
+            <!-- Tipo Documento -->
             <div class="form-floating col-md-2">
-              <input formControlName="Rollo" type="text" class="form-control form-control-sm" id="floatingInput" [(ngModel)]="Rollo">
-              <label for="floatingInput">Rollo</label>
-            </div>
-
-             <!-- Tipo Documento -->
-             <div class="form-floating col-md-2">
               <select formControlName="tipoDoc" id="floatingSelect" type="text" [(ngModel)]="TipoDocumento" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
                 <option></option>
                 <option [ngValue]="tipoDocu.tpDoc_Nombre" *ngFor="let tipoDocu of arrayTipoDoc">{{tipoDocu.tpDoc_Nombre}}</option>
@@ -88,16 +69,6 @@
               </select>
               <label for="floatingSelect">Tipo Doc.</label>
             </div>
-
-            <!-- Estado rollo -->
-            <div class="form-floating col-md-2">
-              <select formControlName="estadoRollo" id="floatingSelect" type="text" [(ngModel)]="Estado" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-                <option></option>
-                <option [ngValue]="estRollo.estado_Nombre" *ngFor="let estRollo of arrayEstadoRollo">{{estRollo.estado_Nombre}}</option>-->
-              </select>
-              <label for="floatingSelect">Estado rollo</label>
-            </div>
-
           </div>
         </div>
       </form>
@@ -127,29 +98,17 @@
               <thead class="TitulosTabla">
                 <tr>
                   <th scope="col">Codigo</th>
-                  <!-- <th scope="col">Cliente</th> -->
-                  <th scope="col">Id Producto</th>
-                  <th scope="col">Nombre Producto</th>
-                  <th scope="col">Rollo</th>
-                  <th scope="col">Cantidad</th>
-                  <th scope="col">Medida</th>
+                  <th scope="col">Registrado por:</th>
                   <th scope="col">Fecha</th>
-                  <th scope="col">Estado Rollo</th>
                   <th scope="col">Tipo Doc.</th>
                   <th scope="col">Ver</th>
                 </tr>
               </thead>
               <tbody style="font-size: 14px;">
-               <tr *ngFor="let item of infoDoc | filtroXFacturas : Codigo | filtroXRollo_RptDespacho : Rollo | filtroXProducto_RptDespacho : Producto | filtroXTipoDocumento : TipoDocumento | filtroXEstadoDespacho : Estado | filtroXClienteDespacho : Cliente | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
+               <tr *ngFor="let item of infoDoc | filtroXFacturas : Codigo | filtroXTipoDocumento : TipoDocumento | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
                   <th>{{item.Codigo}}</th>
-                  <!-- <td>{{item.Cliente}}</td> -->
-                  <td>{{item.IdProducto}}</td>
-                  <td>{{item.Producto}}</td>
-                  <td>{{item.Rollo}}</td>
-                  <td>{{item.Cantidad | number}}</td>
-                  <td>{{item.Presentacion}}</td>
+                  <td>{{item.Usuario}}</td>
                   <td>{{item.Fecha}}</td>
-                  <td>{{item.EstadoRollo}}</td>
                   <td>{{item.TipoDoc}}</td>
                   <td><a><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver PDF" (click)="tipoDocumento(item)"></i></a></td>
                 </tr>

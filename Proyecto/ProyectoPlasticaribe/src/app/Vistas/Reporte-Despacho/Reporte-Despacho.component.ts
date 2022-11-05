@@ -302,96 +302,55 @@ export class ReporteDespachoComponent implements OnInit {
     if (datos.tipo == 'ASIGPRODFV' && (this.ValidarRol == 1 || this.ValidarRol == 6)) {
       let info : any = {
         Codigo : datos.documento,
-        IdCliente : datos.cli_Id,
-        Cliente : datos.cli_Nombre,
-        IdProducto : datos.prod_Id,
-        Producto : datos.prod_Nombre,
-        Rollo : datos.rollo,
-        Cantidad : datos.cantidad,
-        Presentacion : datos.presentacion,
         Fecha : datos.fecha.replace('T00:00:00', ''),
-        EstadoRollo : datos.estado_Rollo,
         IdTipoDoc : 'ASIGPRODFV',
-        TipoDoc : 'Factura'
+        TipoDoc : 'Factura',
+        Usuario : datos.usuario
       }
       this.infoDoc.push(info);
     } else if (datos.tipo == 'DEVPRODFAC' && (this.ValidarRol == 1 || this.ValidarRol == 10 || this.ValidarRol == 7 || this.ValidarRol == 8 || this.ValidarRol == 9)) {
       let info : any = {
         Codigo : datos.documento,
-        IdCliente : datos.cli_Id,
-        Cliente : datos.cli_Nombre,
-        IdProducto : datos.prod_Id,
-        Producto : datos.prod_Nombre,
-        Rollo : datos.rollo,
-        Cantidad : datos.cantidad,
-        Presentacion : datos.presentacion,
         Fecha : datos.fecha.replace('T00:00:00', ''),
-        EstadoRollo : datos.estado_Rollo,
         IdTipoDoc : 'DEVPRODFAC',
-        TipoDoc : 'Devolución'
+        TipoDoc : 'Devolución',
+        Usuario : datos.usuario
       }
       this.infoDoc.push(info);
     } else if (datos.tipo == 'ENTROLLO' && (this.ValidarRol == 1 || this.ValidarRol == 10 || this.ValidarRol == 7 || this.ValidarRol == 8 || this.ValidarRol == 9)) {
       let info : any = {
         Codigo : datos.documento,
-        IdCliente : datos.cli_Id,
-        IdProducto : datos.prod_Id,
-        Producto : datos.prod_Nombre,
-        Rollo : datos.rollo,
-        Cantidad : datos.cantidad,
-        Presentacion : datos.presentacion,
         Fecha : datos.fecha.replace('T00:00:00', ''),
-        EstadoRollo : datos.estado_Rollo,
         IdTipoDoc : 'ENTROLLO',
-        TipoDoc : 'Entrada'
+        TipoDoc : 'Entrada',
+        Usuario : datos.usuario
       }
       this.infoDoc.push(info);
     } else if (datos.tipo == 'Sellado' && (this.ValidarRol == 1 || this.ValidarRol == 8)) {
       let info : any = {
         Codigo : datos.documento,
-        IdCliente : datos.cli_Id,
-        IdProducto : datos.prod_Id,
-        Producto : datos.prod_Nombre,
-        Rollo : datos.rollo,
-        Cantidad : datos.cantidad,
-        Presentacion : datos.presentacion,
         Fecha : datos.fecha.replace('T00:00:00', ''),
-        EstadoRollo : datos.estado_Rollo,
         IdTipoDoc : 'PRECARGUE',
         TipoDoc : 'Pre Cargue Sellado',
-        Proceso : datos.tipo,
+        Usuario : datos.usuario
       }
       this.infoDoc.push(info);
     } else if (datos.tipo == 'Empaque' && (this.ValidarRol == 1 || this.ValidarRol == 9 || this.ValidarRol == 12)) {
       let info : any = {
         Codigo : datos.documento,
-        IdCliente : datos.cli_Id,
-        IdProducto : datos.prod_Id,
-        Producto : datos.prod_Nombre,
-        Rollo : datos.rollo,
-        Cantidad : datos.cantidad,
-        Presentacion : datos.presentacion,
         Fecha : datos.fecha.replace('T00:00:00', ''),
-        EstadoRollo : datos.estado_Rollo,
         IdTipoDoc : 'PRECARGUE',
         TipoDoc : 'Pre Cargue Empaque',
-        Proceso : datos.tipo,
+        Usuario : datos.usuario
       }
       this.infoDoc.push(info);
     } else if (datos.tipo == 'Extrusion' && (this.ValidarRol == 1 || this.ValidarRol == 7)) {
       let info : any = {
         Codigo : datos.documento,
-        IdCliente : datos.cli_Id,
-        IdProducto : datos.prod_Id,
-        Producto : datos.prod_Nombre,
-        Rollo : datos.rollo,
-        Cantidad : datos.cantidad,
-        Presentacion : datos.presentacion,
         Fecha : datos.fecha.replace('T00:00:00', ''),
-        EstadoRollo : datos.estado_Rollo,
         IdTipoDoc : 'PRECARGUE',
         TipoDoc : 'Pre Cargue Extrusion',
-        Proceso : datos.tipo,
+        Usuario : datos.usuario
       }
       this.infoDoc.push(info);
     }
@@ -754,7 +713,7 @@ export class ReporteDespachoComponent implements OnInit {
             },
             content : [
               {
-                text: `Rollos Ingresados de la OT ${ot}`,
+                text: `Rollos Ingresados N° ${ot}`,
                 alignment: 'right',
                 style: 'titulo',
               },
@@ -898,7 +857,7 @@ export class ReporteDespachoComponent implements OnInit {
             },
             content : [
               {
-                text: `Rollos Pre Ingresados de la OT ${ot}`,
+                text: `Rollos Pre Ingresados N° ${ot}`,
                 alignment: 'right',
                 style: 'titulo',
               },
@@ -944,18 +903,6 @@ export class ReporteDespachoComponent implements OnInit {
                         border: [false, false, false, true],
                         text: `${datos_factura[i].empresa_Ciudad}`
                       },
-                    ],
-                    [
-                      {
-                        border: [false, false, false, false],
-                        text: `Proceso`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `${proceso}`
-                      },
-                      {},
-                      {},
                     ],
                   ]
                 },

@@ -1,5 +1,6 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { PrimeNGConfig } from 'primeng/api';
 
 @Component({
   selector: 'app-root',
@@ -23,7 +24,8 @@ export class AppComponent implements OnInit{
   rutaPlasticaribeAPI : string = "http://192.168.0.85:9085/api"; //Ruta al servidor de la base de datos nueva
   public data:any=[];
 
-  constructor (@Inject(SESSION_STORAGE) private storage: WebStorageService) { }
+  constructor (@Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private config: PrimeNGConfig) { }
 
   ngOnInit(): void {
     this.inactividad();

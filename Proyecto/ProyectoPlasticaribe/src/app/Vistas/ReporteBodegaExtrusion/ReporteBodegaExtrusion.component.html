@@ -51,42 +51,14 @@
               <label for="floatingInput">Fecha Final</label>
             </div>
 
-            <!-- Producto Input-->
-            <div class="form-floating col-md">
-              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput" name="Producto">
-              <label for="floatingInput">Producto</label>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Fila 2 -->
-        <div class="mb-3">
-          <div class="row g-3">
-
-            <!-- Producto -->
+            <!-- Tipo Documento -->
             <div class="form-floating col-md-2">
-              <input formControlName="Rollo" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Rollo</label>
-            </div>
-
-             <!-- Tipo Documento -->
-             <div class="form-floating col-md-2">
               <select formControlName="tipoDoc" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
                 <option></option>
                 <option value="Ingreso de Rollos">Ingreso de Rollos</option>
                 <option value="Salida de Rollos">Salida de Rollos</option>
               </select>
               <label for="floatingSelect">Tipo Doc.</label>
-            </div>
-
-            <!-- Estado rollo -->
-            <div class="form-floating col-md-2">
-              <select formControlName="estadoRollo" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-                <option></option>
-                <option [ngValue]="estado.estado_Nombre" *ngFor="let estado of estados">{{estado.estado_Nombre}}</option>
-              </select>
-              <label for="floatingSelect">Estado rollo</label>
             </div>
 
           </div>
@@ -111,12 +83,11 @@
       </div>
 
       <!-- Inicio tabla de registros consultados -->
-      <!--Inicio tabla Rollos a Insertar -->
       <div class="mb-3" *ngIf="cargando">
         <div class="row g-3">
           <div class="table-responsive">
             <p-table
-            #dt
+            #dt1
             [resizableColumns]="true"
             columnResizeMode="expand"
             styleClass="p-datatable-gridlines p-datatable-sm"
@@ -125,28 +96,33 @@
             [rows]="20"
             [rowHover]="true"
             [value]="registrosConsultados">
+            <ng-template pTemplate="caption">
+              <div class="flex">
+                <button pButton label="Limpiar" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
+              </div>
+            </ng-template>
             <ng-template pTemplate="header">
               <tr>
-                <th scope="col">OT</th>
-                <th scope="col">ID Producto</th>
-                <th scope="col">Producto</th>
-                <th scope="col">Fecha</th>
-                <th scope="col">Cantidad</th>
-                <th scope="col">N° Rollos</th>
-                <th scope="col">Presentación</th>
-                <th scope="col">Tipo</th>
+                <th scope="col">Código
+                  <p-columnFilter type="text" field="Ot" display="menu"></p-columnFilter>
+                </th>
+                <th scope="col">Usuario
+                  <p-columnFilter type="text" field="Usuario" display="menu"></p-columnFilter>
+                </th>
+                <th scope="col">Fecha
+                  <p-columnFilter type="date" field="Fecha" display="menu"></p-columnFilter>
+                </th>
+                <th scope="col">Tipo
+                  <p-columnFilter type="text" field="Tipo" display="menu"></p-columnFilter>
+                </th>
                 <th>Ver</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-registros>
               <tr>
                 <td>{{registros.Ot}}</td>
-                <td>{{registros.Id}}</td>
-                <td>{{registros.Nombre}}</td>
+                <td>{{registros.Usuario}}</td>
                 <td>{{registros.Fecha}}</td>
-                <td>{{registros.Cantidad}}</td>
-                <td>{{registros.Rollos}}</td>
-                <td>{{registros.Presentacion}}</td>
                 <td>{{registros.Tipo}}</td>
                 <td><a><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver PDF"></i></a></td>
               </tr>

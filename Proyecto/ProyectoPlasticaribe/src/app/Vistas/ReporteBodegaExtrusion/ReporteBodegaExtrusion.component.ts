@@ -1,13 +1,18 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { Table } from 'primeng/table';
 import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollos_Extrusion.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DtIngRollos_Extrusion.service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
 import { ProductoService } from 'src/app/Servicios/producto.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-ReporteBodegaExtrusion',
@@ -147,14 +152,15 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   llenarTabla(data : any){
     let info : any = {
       Ot : data.ot,
-      Id : data.prod_Id,
-      Nombre : data.prod_Nombre,
       Fecha : data.fecha.replace('T00:00:00', ''),
-      Cantidad : data.cantidad,
-      Rollos : data.rollos,
-      Presentacion : data.undMed_Id,
-      Tipo : data.tipo
+      Tipo : data.tipo,
+      Usuario : data.usuario,
     }
     this.registrosConsultados.push(info)
+  }
+
+  // Funcion que limpiará la tabla de cualquier filtro que se le haya aplicado
+  clear(table: Table) {
+    table.clear();
   }
 }
