@@ -218,5 +218,22 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcImpresionRollosBopp/consultaOtImpresion/${ot}`);
   }
 
+  /** Operarios */
+  srvObtenerListaOperariosExtrusion() {
+    return this.http.get<any>(this.rutaBagPro + '/OperariosProcesos/NombreOperarios');
+  }
 
+  srvObtenerListaOperariosExtrusion2(nombre : any) {
+    return this.http.get<any>(this.rutaBagPro + `/OperariosProcesos/NombreOperarios2/${nombre}`);
+  }
+
+  /** Clientes */
+
+  srvObtenerListaUltimosClientes(fecha : any) {
+    return this.http.get<any>(this.rutaBagPro + `/Clientes/UltimosClientes/${fecha}`);
+  }
+
+  srvObtenerListaUltimosClientes2(fecha : any, cliente : any) {
+    return this.http.get<any>(this.rutaBagPro + `/Clientes/UltimosClientes2/${fecha}/${cliente}`);
+  }
 }

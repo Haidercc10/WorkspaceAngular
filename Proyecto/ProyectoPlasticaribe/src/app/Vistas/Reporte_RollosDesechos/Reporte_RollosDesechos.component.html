@@ -1,0 +1,264 @@
+<app-menuLateral></app-menuLateral>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Rollos eliminados (Extrusión)</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="mb-4">
+    <h4 class="tituloRojo">Filtros de búsqueda</h4>
+  </div>
+
+  <form [formGroup]="formConsultaRollos">
+    <div class="mb-3">
+      <div class="row g-3">
+
+        <!-- ID Documento -->
+        <div class="form-floating col-md-2">
+          <input formControlName="OT" type="number" class="form-control" id="floatingInput"  required >
+          <label for="floatingInput">OT</label>
+        </div>
+
+        <!-- Rollo -->
+        <div class="form-floating col-md-2">
+          <input formControlName="rollo" type="number" class="form-control" id="floatingInput" required >
+          <label for="floatingInput">Rollo</label>
+        </div>
+
+        <!-- Fecha inicial -->
+        <div class="form-floating col-md-2">
+          <input formControlName="fecha" type="date" min="0" (change)="buscarSegunFechaIngreso()" class="form-control" id="floatingInput"required >
+          <label for="floatingInput">Fecha Inicial</label>
+        </div>
+
+        <!-- Fecha final -->
+        <div class="form-floating col-md-2">
+          <input formControlName="fechaFinal" type="date" min="0"  class="form-control" id="floatingInput"required > <!--(change)="buscarBOPPSegunFecha()"-->
+          <label for="floatingInput">Fecha Final</label>
+        </div>
+
+        <!-- Turno -->
+        <div class="form-floating col-md-2">
+          <select formControlName="turno" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+            <option [ngValue]="null" disabled selected>Seleccione Turno</option>
+             <option [ngValue]="turn.turno_Id" *ngFor="let turn of arrayTurnos">{{turn.turno_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Turno</label>
+        </div>
+
+        <!-- Producto -->
+        <div class="form-floating col-md-2">
+          <input formControlName="producto" type="number" class="form-control" id="floatingInput"required (keyup.enter)="buscarRollosEliminadosPorItem()">
+          <label for="floatingInput">Nro. Item</label>
+        </div>
+
+        <!-- Operario -->
+        <!--<div class="form-floating col-md">
+          <input formControlName="operario" class="form-control" list="operarios" id="floatingInput" (change)='selectEventOperario()' autocomplete="off">
+          <datalist id="operarios">
+            <option value={{item.nombre}} *ngFor="let item of arrayOperarios">{{item.nombre}}</option>
+          </datalist>
+          <label for="floatingInput">Operario</label>
+         </div>-->
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <div class="row g-3">
+          <!-- Cliente -->
+          <div class="form-floating col-md-3">
+            <input formControlName="cliente" class="form-control" list="clientes" id="floatingInput" type="text" (change)='selectEventCliente()' autocomplete="off">
+            <datalist id="clientes">
+              <option value={{item.nombreComercial}} *ngFor="let item of arrayClientes">{{item.nombreComercial}}</option>
+            </datalist>
+            <label for="floatingInput">Cliente</label>
+          </div>
+
+
+          <!--<div class="form-floating col-md-3">
+            <input formControlName="producto" class="form-control" list="productos" id="floatingInput" (change)='selectEventProducto()'>
+            <datalist id="productos">
+              <option value={{item.prod_Id}} *ngFor="let item of arrayProductos">{{item.prod_Nombre}}</option>
+            </datalist>
+            <label for="floatingInput">Producto</label>
+          </div>-->
+
+          <!-- Material -->
+        <div class="form-floating col-md-2">
+          <select formControlName="material" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+            <option [ngValue]="null" disabled selected>Seleccione Material</option>
+             <option [ngValue]="materialMP.material_Id" *ngFor="let materialMP of arrayMaterial">{{materialMP.material_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Material</label>
+        </div>
+      </div>
+    </div>
+
+        <!-- Proveedores -->
+       <!-- <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <div class="ng-autocomplete form-floating col-md form-control form-control-sm">
+            <ng-autocomplete
+              class=""
+              [data]="ArrayMateriaPrimaRetirada"
+              (selected)='selectEventMp($event)'
+              (inputChanged)='onChangeSearchMp($event)'
+              (inputFocused)='onFocusedMp($event)'
+              historyIdentifier="countriesTemplateList"
+              [historyHeading]="historyHeading"
+              [historyListMaxNumber]="3"
+              [searchKeyword]="keywordMp"
+              [itemTemplate]="itemTemplate"
+              [notFoundTemplate]="notFoundTemplate"
+              id="floatingInput"
+              formControlName="materiaPrima">
+            </ng-autocomplete>
+            <ng-template #itemTemplate let-item>
+              <a [innerHTML]="item.matPri_Nombre"></a>
+            </ng-template>
+            <ng-template #notFoundTemplate let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+            <label for="floatingInput" *ngIf="validarInputMp">Materia Prima</label>
+          </div> -->
+          <!-- <div class="form-floating col-md">
+            <select formControlName="materiaPrima" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+              <option [ngValue]="mp.matPri_Id" *ngFor="let mp of ArrayMateriaPrimaRetirada">{{mp.matPri_Nombre}}</option>
+            </select>
+            <label for="floatingSelect">Materia prima</label>
+          </div>
+       </ng-container>-->
+        <!--<ng-container *ngIf="ValidarRol == 1 || ValidarRol == 4">
+          <div class="ng-autocomplete form-floating col-md-4 form-control form-control-sm">
+            <ng-autocomplete
+              class=""
+              [data]="ArrayBopp"
+              (selected)='selectEventBOPP($event)'
+              (inputChanged)='onChangeSearchBOPP($event)'
+              (inputFocused)='onFocusedBOPP($event)'
+              historyIdentifier="countriesTemplateList"
+              [historyHeading]="historyHeading"
+              [historyListMaxNumber]="3"
+              [searchKeyword]="keywordBOPP"
+              [itemTemplate]="itemTemplate"
+              [notFoundTemplate]="notFoundTemplate"
+              id="floatingInput"
+              formControlName="bopp">
+            </ng-autocomplete>
+            <ng-template #itemTemplate let-item>
+              <a [innerHTML]="item.bopP_Nombre"></a>
+            </ng-template>
+            <ng-template #notFoundTemplate let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+            <label for="floatingInput" *ngIf="validarInputBOPP">BOPP</label>
+          </div>
+        </ng-container>-->
+          <!--<div class="form-floating col-md-4">
+            <select formControlName="bopp" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+              <option [ngValue]="mp.bopP_Id" *ngFor="let mp of ArrayBopp">{{mp.bopP_Nombre}}</option>
+            </select>
+            <label for="floatingSelect">BOPP</label>
+          </div> -->
+       <!-- </ng-container>
+        <ng-container *ngIf="ValidarRol == 1">
+          <div class="form-floating col-md-3">
+            <select formControlName="estado" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required> -->
+              <!-- <option>Abierta</option> -->
+             <!-- <option title="Este estado indica que OT tiene asignaciones de materia prima pero no ha empezado su producción.">Asignada</option>
+              <option title="Este estado indica que OT tiene asignaciones de materia prima y ha empezado su producción.">En Proceso</option>
+              <option title="Este estado indica que OT ha culminado su producción">Terminada</option>
+              <option title="Este estado indica que OT ha sido cerrada">Cerrada</option>
+            </select>
+            <label for="floatingSelect">Estado OT</label>
+          </div>
+        </ng-container>-->
+     <!-- </div>
+    </div> -->
+
+    <!-- BOTONES -->
+    <div class="mb-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarConsulta()">Consultar Documento</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="mb-4 ">
+    <div class="row g-3">
+      <!--Botones superiores de Paginado-->
+      <div class="mb-3">
+        <p-button type="button" icon="pi pi-chevron-left" (click)="prev()" [disabled]="isFirstPage()" styleClass="p-button-text"></p-button>
+        <p-button type="button" icon="pi pi-refresh" (click)="reset()" styleClass="p-button-text"></p-button>
+        <p-button type="button" icon="pi pi-chevron-right" (click)="next()" [disabled]="isLastPage()" styleClass="p-button-text"></p-button>
+      </div>
+
+      <!-- Tabla con información de la orden de trabajo -->
+      <p-table
+        #dt
+        [columns]="columnas"
+        [value]="ArrayDocumento"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="rows"
+        [showCurrentPageReport]="true"
+        [(first)]="first"
+        responsiveLayout="scroll"
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+        [rowsPerPageOptions]="[10,20,30,50,70,100]"
+        [rowHover]="true"
+        dataKey="id">
+        <!-- Buscador de columnas -->
+        <ng-template pTemplate="caption">
+          <p-multiSelect
+            [options]="columnas"
+            [(ngModel)]="columnasSeleccionada"
+            optionLabel="header"
+            selectedItemsLabel="{0} columnas seleccionadas"
+            [style]="{minWidth: '330px'}"
+            placeholder="Elige las columnas que quieres ver"></p-multiSelect>
+        </ng-template>
+        <!-- Titulos -->
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th *ngFor="let col of columns" style="font-size: 14px;">
+            <!--<th id="" scope="col" pSortableColumn="ot" style="font-size: 13px;">OT<p-sortIcon field="ot" title="Order por OT"></p-sortIcon></th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Rollo</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Cliente</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Item</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Ancho</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Largo</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Fuelle</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Medida</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Neto Kg</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Material</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Calibre</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Operador</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Fecha</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Turno</th>
+            <th *ngFor="let col of columns" pResizableColumn style="font-size: 12px;">-->
+              {{col.header}}
+            </th>
+        </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowData let-ArrayDocumento let-columns="columns">
+          <tr>
+            <td *ngFor="let col of columns" style="font-size: 13px;">{{rowData[col.field]}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+</div>
