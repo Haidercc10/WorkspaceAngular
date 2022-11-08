@@ -168,15 +168,15 @@
     <div class="mb-3">
       <div class="row g-3">
         <div class="form-floating col-md-2">
-          <input formControlName="MpId" type="number" min="0" (keyup.enter)="buscarMpId()" class="form-control" id="floatingInput"required >
+          <input formControlName="MpId" type="number" min="0" (keyup.enter)="buscarMpId2()" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Id Materia Prima</label>
         </div>
         <!-- ID/Nombre Producto -->
         <div class="ng-autocomplete form-floating col-md-1 form-control form-control-sm">
           <ng-autocomplete
             class=""
-            [data]="materiasPrimasRetiradas"
-            (selected)='buscarMpSeleccionada($event)'
+            [data]="materiasPrimas"
+            (selected)='buscarMpSeleccionada2($event)'
             (inputChanged)='onChangeSearchMP($event)'
             (inputFocused)='onFocusedMP($event)'
             [searchKeyword]="keywordMP"
@@ -187,13 +187,13 @@
           </ng-autocomplete>
 
           <ng-template #itemTemplate let-item>
-            <a [innerHTML]="item.matPri_Nombre"></a>
+            <a [innerHTML]="item.name"></a>
           </ng-template>
 
           <ng-template #notFoundTemplate let-notFound>
             <div [innerHTML]="notFound"></div>
           </ng-template>
-          <label for="floatingInput" *ngIf="validarInputMP">Nombre Materia Prima</label>
+          <label for="floatingInput" *ngIf="validarInputMP">{{NombreMatPrima}}</label>
         </div>
         <!-- <div class="form-floating col-md-4">
           <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>

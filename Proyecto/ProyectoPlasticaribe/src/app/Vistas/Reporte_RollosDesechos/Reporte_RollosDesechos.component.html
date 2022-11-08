@@ -49,16 +49,16 @@
         </div>
 
         <!-- Turno -->
-        <div class="form-floating col-md-2">
+        <!--<div class="form-floating col-md-2">
           <select formControlName="turno" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
             <option [ngValue]="null" disabled selected>Seleccione Turno</option>
              <option [ngValue]="turn.turno_Id" *ngFor="let turn of arrayTurnos">{{turn.turno_Nombre}}</option>
           </select>
           <label for="floatingSelect">Turno</label>
-        </div>
+        </div>-->
 
         <!-- Producto -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="producto" type="number" class="form-control" id="floatingInput"required (keyup.enter)="buscarRollosEliminadosPorItem()">
           <label for="floatingInput">Nro. Item</label>
         </div>
@@ -74,17 +74,16 @@
       </div>
     </div>
 
-    <div class="mb-3">
-      <div class="row g-3">
+    <!--<div class="mb-3">
+      <div class="row g-3">-->
           <!-- Cliente -->
-          <div class="form-floating col-md-3">
+          <!--<div class="form-floating col-md-3">
             <input formControlName="cliente" class="form-control" list="clientes" id="floatingInput" type="text" (change)='selectEventCliente()' autocomplete="off">
             <datalist id="clientes">
               <option value={{item.nombreComercial}} *ngFor="let item of arrayClientes">{{item.nombreComercial}}</option>
             </datalist>
             <label for="floatingInput">Cliente</label>
-          </div>
-
+          </div>-->
 
           <!--<div class="form-floating col-md-3">
             <input formControlName="producto" class="form-control" list="productos" id="floatingInput" (change)='selectEventProducto()'>
@@ -95,15 +94,15 @@
           </div>-->
 
           <!-- Material -->
-        <div class="form-floating col-md-2">
+        <!--<div class="form-floating col-md-2">
           <select formControlName="material" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
             <option [ngValue]="null" disabled selected>Seleccione Material</option>
              <option [ngValue]="materialMP.material_Id" *ngFor="let materialMP of arrayMaterial">{{materialMP.material_Nombre}}</option>
           </select>
           <label for="floatingSelect">Material</label>
-        </div>
-      </div>
-    </div>
+        </div>-->
+      <!--</div>
+    </div>-->
 
         <!-- Proveedores -->
        <!-- <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
