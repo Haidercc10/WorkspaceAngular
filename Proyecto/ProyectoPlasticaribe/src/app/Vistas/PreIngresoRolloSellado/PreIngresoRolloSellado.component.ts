@@ -170,6 +170,9 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
     let fechaInicial : any = this.FormConsultarRollos.value.fechaDoc;
     let fechaFinal : any = this.FormConsultarRollos.value.fechaFinalDoc;
     let rollos : any = [];
+    if (ProcConsulta == '1') ProcConsulta = 'EMP';
+    if (ProcConsulta == '2') ProcConsulta = 'EXT';
+    if (ProcConsulta == '3') ProcConsulta = 'SELLA';
 
     if (ProcConsulta != null) {
       if (!moment(fechaInicial).isBefore('2022-09-25', 'days') && !moment(fechaFinal).isBefore('2022-09-25', 'days')) {
@@ -182,9 +185,9 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         this.cantidadOT = 0;
         let proceso : string = '';
 
-        this.dtPreEntRollosService.srvObtenerLista().subscribe(datos_rollos => {
+        this.dtPreEntRollosService.getRollosProceso(ProcConsulta).subscribe(datos_rollos => {
           for (let i = 0; i < datos_rollos.length; i++) {
-            rollos.push(datos_rollos[i].rollo_Id);
+            rollos.push(datos_rollos[i]);
           }
         });
 
@@ -192,88 +195,47 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           if (ot != null && fechaInicial != null && fechaFinal != null) {
             if (ProcConsulta == "1"){
               this.bagProService.srvObtenerListaProcExtrusionFechasOT(fechaInicial, fechaFinal, ot).subscribe(datos_ot => {
+                setTimeout(() => {
+                  if (datos_ot.length == 0) Swal.fire(`No hay rollos por ingresar`);
+                  this.cargando = true;
+                }, 1000);
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (datos_ot[i].nomStatus == 'EMPAQUE') {
-                    if (!rollos.includes(datos_ot[i].item)) {
-                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-                      let info : any = {
-                        Ot : datos_ot[i].ot,
-                        Id : datos_ot[i].item,
-                        IdCliente : datos_ot[i].identNro,
-                        Cliente : datos_ot[i].nombreComercial,
-                        IdProducto : datos_ot[i].clienteItem,
-                        Producto : datos_ot[i].clienteItemNombre,
-                        Cantidad : datos_ot[i].extnetokg,
-                        Presentacion : datos_ot[i].unidad,
-                        Estatus : datos_ot[i].nomStatus,
-                        Proceso : proceso,
-                      }
-                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                      otTemporral = datos_ot[i].ot;
-                      this.rollos.push(info);
-                      RollosConsultados.push(datos_ot[i].item);
-                      rollos.push(datos_ot[i].item);
-                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                      this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
-                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                        Observacion : this.FormConsultarRollos.value.Observacion,
-                        Proceso : this.FormConsultarRollos.value.Proceso,
-                      });
+                  if (!rollos.includes(datos_ot[i].item) && !RollosConsultados.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'EMPAQUE') {
+                    let info : any = {
+                      Ot : datos_ot[i].ot,
+                      Id : datos_ot[i].item,
+                      IdCliente : datos_ot[i].identNro,
+                      Cliente : datos_ot[i].nombreComercial,
+                      IdProducto : datos_ot[i].clienteItem,
+                      Producto : datos_ot[i].clienteItemNombre,
+                      Cantidad : datos_ot[i].extnetokg,
+                      Presentacion : datos_ot[i].unidad,
+                      Estatus : datos_ot[i].nomStatus,
+                      Proceso : 'EMP',
                     }
+                    if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                    otTemporral = datos_ot[i].ot;
+                    this.rollos.push(info);
+                    RollosConsultados.push(datos_ot[i].item);
+                    rollos.push(datos_ot[i].item);
+                    this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                    this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                   }
                 }
               });
-
-              // this.bagProService.srvObtenerListaProcExtrusionFechasOT(fechaInicial, fechaFinal, ot).subscribe(datos_ot => {
-              //   for (let i = 0; i < datos_ot.length; i++) {
-              //     this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-              //       if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
-              //         if (!RollosConsultados.includes(datos_ot[i].item)){
-              //           if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-              //           let info : any = {
-              //             Ot : datos_ot[i].ot,
-              //             Id : datos_ot[i].item,
-              //             IdCliente : datos_ot[i].identNro,
-              //             Cliente : datos_ot[i].nombreComercial,
-              //             IdProducto : datos_ot[i].clienteItem,
-              //             Producto : datos_ot[i].clienteItemNombre,
-              //             Cantidad : datos_ot[i].extnetokg,
-              //             Presentacion : datos_ot[i].unidad,
-              //             Estatus : datos_ot[i].nomStatus,
-              //             Proceso : proceso,
-              //           }
-              //           if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //           otTemporral = datos_ot[i].ot;
-              //           this.rollos.push(info);
-              //           RollosConsultados.push(datos_ot[i].item);
-              //           this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //           this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //           this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //           this.FormConsultarRollos.setValue({
-              //             OT_Id: ot,
-              //             fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //             fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //             Observacion : this.FormConsultarRollos.value.Observacion,
-              //             Proceso : this.FormConsultarRollos.value.Proceso,
-              //           });
-              //         }
-              //       }
-              //     });
-              //   }
-              // });
             } else if (ProcConsulta == "2") {
               this.bagProService.srvObtenerListaProcSelladoFechasOT(fechaInicial, fechaFinal, ot).subscribe(datos_ot => {
+                setTimeout(() => {
+                  if (datos_ot.length == 0) Swal.fire(`No hay rollos por ingresar`);
+                  this.cargando = true;
+                }, 1000);
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (!rollos.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
+                  if (!rollos.includes(datos_ot[i].item) && !RollosConsultados.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
                     this.idProducto = datos_ot[i].referencia;
                     if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
                     if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
                     if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-                    if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
                     let info : any = {
                       Ot : datos_ot[i].ot,
                       Id : datos_ot[i].item,
@@ -284,7 +246,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       Cantidad : datos_ot[i].qty,
                       Presentacion : this.presentacionProducto,
                       Estatus : datos_ot[i].nomStatus,
-                      Proceso : proceso,
+                      Proceso : 'SELLA',
                     }
                     this.rollos.push(info);
                     rollos.push(datos_ot[i].item)
@@ -292,110 +254,50 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                     this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                    this.FormConsultarRollos.setValue({
-                      OT_Id: ot,
-                      fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                      fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                      Observacion : this.FormConsultarRollos.value.Observacion,
-                      Proceso : this.FormConsultarRollos.value.Proceso,
-                    });
-                    this.cargando = true;
                   }
                 }
               });
-
-              // this.bagProService.srvObtenerListaProcSelladoFechasOT(fechaInicial, fechaFinal, ot).subscribe(datos_ot => {
-              //   for (let i = 0; i < datos_ot.length; i++) {
-              //     this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-              //       if (datos_rollos.length == 0) {
-              //           if (!RollosConsultados.includes(datos_ot[i].item)){
-              //             this.idProducto = datos_ot[i].referencia;
-              //             if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
-              //             if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
-              //             if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-              //             if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-              //             if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
-              //             if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
-              //             if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
-              //             if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
-              //             if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
-              //             if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-              //             if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-              //             if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
-              //             let info : any = {
-              //               Ot : datos_ot[i].ot,
-              //               Id : datos_ot[i].item,
-              //               IdCliente : datos_ot[i],
-              //               Cliente : datos_ot[i],
-              //               IdProducto : datos_ot[i].referencia,
-              //               Producto : datos_ot[i].nomReferencia,
-              //               Cantidad : datos_ot[i].qty,
-              //               Presentacion : this.presentacionProducto,
-              //               Estatus : datos_ot[i].nomStatus,
-              //               Proceso : proceso,
-              //             }
-              //             if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //             otTemporral = datos_ot[i].ot;
-              //             this.rollos.push(info);
-              //             RollosConsultados.push(datos_ot[i].item);
-              //             this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //             this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //             this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //             this.FormConsultarRollos.setValue({
-              //               OT_Id: ot,
-              //               fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //               fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //               Observacion : this.FormConsultarRollos.value.Observacion,
-              //               Proceso : this.FormConsultarRollos.value.Proceso,
-              //             });
-              //           }
-              //       }
-              //     });
-              //   }
-              // });
             }
           } else if (fechaInicial != null &&  fechaFinal != null) {
             if (ProcConsulta == "1"){
               this.bagProService.srvObtenerListaProcExtrusionFechas(fechaInicial, fechaFinal).subscribe(datos_ot => {
+                setTimeout(() => {
+                  if (datos_ot.length == 0) Swal.fire(`No hay rollos por ingresar`);
+                  this.cargando = true;
+                }, 1000);
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (datos_ot[i].nomStatus == 'EMPAQUE') {
-                    if (!rollos.includes(datos_ot[i].item)) {
-                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-                      let info : any = {
-                        Ot : datos_ot[i].ot,
-                        Id : datos_ot[i].item,
-                        IdCliente : datos_ot[i].identNro,
-                        Cliente : datos_ot[i].nombreComercial,
-                        IdProducto : datos_ot[i].clienteItem,
-                        Producto : datos_ot[i].clienteItemNombre,
-                        Cantidad : datos_ot[i].extnetokg,
-                        Presentacion : datos_ot[i].unidad,
-                        Estatus : datos_ot[i].nomStatus,
-                        Proceso : proceso,
-                      }
-                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                      otTemporral = datos_ot[i].ot;
-                      this.rollos.push(info);
-                      RollosConsultados.push(datos_ot[i].item);
-                      rollos.push(datos_ot[i].item);
-                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                      this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
-                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                        Observacion : this.FormConsultarRollos.value.Observacion,
-                        Proceso : this.FormConsultarRollos.value.Proceso,
-                      });
+                  if (!rollos.includes(datos_ot[i].item) && !RollosConsultados.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'EMPAQUE') {
+                    let info : any = {
+                      Ot : datos_ot[i].ot,
+                      Id : datos_ot[i].item,
+                      IdCliente : datos_ot[i].identNro,
+                      Cliente : datos_ot[i].nombreComercial,
+                      IdProducto : datos_ot[i].clienteItem,
+                      Producto : datos_ot[i].clienteItemNombre,
+                      Cantidad : datos_ot[i].extnetokg,
+                      Presentacion : datos_ot[i].unidad,
+                      Estatus : datos_ot[i].nomStatus,
+                      Proceso : 'EMP',
                     }
+                    if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                    otTemporral = datos_ot[i].ot;
+                    this.rollos.push(info);
+                    RollosConsultados.push(datos_ot[i].item);
+                    rollos.push(datos_ot[i].item);
+                    this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                    this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                   }
                 }
               });
             } else if (ProcConsulta == "2") {
               this.bagProService.srvObtenerListaProcSelladoFechas(fechaInicial, fechaFinal).subscribe(datos_ot => {
+                setTimeout(() => {
+                  if (datos_ot.length == 0) Swal.fire(`No hay rollos por ingresar`);
+                  this.cargando = true;
+                }, 1000);
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (!rollos.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
+                  if (!rollos.includes(datos_ot[i].item) && !RollosConsultados.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
                     this.idProducto = datos_ot[i].referencia;
                     if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
                     if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
@@ -411,7 +313,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       Cantidad : datos_ot[i].qty,
                       Presentacion : this.presentacionProducto,
                       Estatus : datos_ot[i].nomStatus,
-                      Proceso : proceso,
+                      Proceso : 'SELLA',
                     }
                     this.rollos.push(info);
                     rollos.push(datos_ot[i].item)
@@ -419,14 +321,6 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                     this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                    this.FormConsultarRollos.setValue({
-                      OT_Id: ot,
-                      fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                      fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                      Observacion : this.FormConsultarRollos.value.Observacion,
-                      Proceso : this.FormConsultarRollos.value.Proceso,
-                    });
-                    this.cargando = true;
                   }
                 }
               });
@@ -435,97 +329,47 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
           } else if (ot != null && fechaInicial != null) {
             if (ProcConsulta == "1"){
               this.bagProService.srvObtenerListaProcExtrusionFechasOT(fechaInicial, fechaInicial, ot).subscribe(datos_ot => {
+                setTimeout(() => {
+                  if (datos_ot.length == 0) Swal.fire(`No hay rollos por ingresar`);
+                  this.cargando = true;
+                }, 1000);
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (datos_ot[i].nomStatus == 'EMPAQUE') {
-                    if (!rollos.includes(datos_ot[i].item)) {
-                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-                      let info : any = {
-                        Ot : datos_ot[i].ot,
-                        Id : datos_ot[i].item,
-                        IdCliente : datos_ot[i].identNro,
-                        Cliente : datos_ot[i].nombreComercial,
-                        IdProducto : datos_ot[i].clienteItem,
-                        Producto : datos_ot[i].clienteItemNombre,
-                        Cantidad : datos_ot[i].extnetokg,
-                        Presentacion : datos_ot[i].unidad,
-                        Estatus : datos_ot[i].nomStatus,
-                        Proceso : proceso,
-                      }
-                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                      otTemporral = datos_ot[i].ot;
-                      this.rollos.push(info);
-                      RollosConsultados.push(datos_ot[i].item);
-                      rollos.push(datos_ot[i].item);
-                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                      this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
-                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                        Observacion : this.FormConsultarRollos.value.Observacion,
-                        Proceso : this.FormConsultarRollos.value.Proceso,
-                      });
+                  if (!rollos.includes(datos_ot[i].item) && !RollosConsultados.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'EMPAQUE') {
+                    let info : any = {
+                      Ot : datos_ot[i].ot,
+                      Id : datos_ot[i].item,
+                      IdCliente : datos_ot[i].identNro,
+                      Cliente : datos_ot[i].nombreComercial,
+                      IdProducto : datos_ot[i].clienteItem,
+                      Producto : datos_ot[i].clienteItemNombre,
+                      Cantidad : datos_ot[i].extnetokg,
+                      Presentacion : datos_ot[i].unidad,
+                      Estatus : datos_ot[i].nomStatus,
+                      Proceso : 'EMP',
                     }
+                    if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                    otTemporral = datos_ot[i].ot;
+                    this.rollos.push(info);
+                    RollosConsultados.push(datos_ot[i].item);
+                    rollos.push(datos_ot[i].item);
+                    this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                    this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                   }
                 }
               });
-
-
-              // this.bagProService.srvObtenerListaProcExtrusionFechasOT(fechaInicial, fechaInicial, ot).subscribe(datos_ot => {
-              //   for (let i = 0; i < datos_ot.length; i++) {
-              //     this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-              //       if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
-              //         if (!RollosConsultados.includes(datos_ot[i].item)){
-              //           if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-              //           if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
-              //           if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
-              //           if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
-              //           if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
-              //           if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
-              //           if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-              //           if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-              //           if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
-              //           let info : any = {
-              //             Ot : datos_ot[i].ot,
-              //             Id : datos_ot[i].item,
-              //             IdCliente : datos_ot[i].identNro,
-              //             Cliente : datos_ot[i].nombreComercial,
-              //             IdProducto : datos_ot[i].clienteItem,
-              //             Producto : datos_ot[i].clienteItemNombre,
-              //             Cantidad : datos_ot[i].extnetokg,
-              //             Presentacion : datos_ot[i].unidad,
-              //             Estatus : datos_ot[i].nomStatus,
-              //             Proceso : proceso,
-              //           }
-              //           if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //           otTemporral = datos_ot[i].ot;
-              //           this.rollos.push(info);
-              //           RollosConsultados.push(datos_ot[i].item);
-              //           this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //           this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //           this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //           this.FormConsultarRollos.setValue({
-              //             OT_Id: ot,
-              //             fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //             fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //             Observacion : this.FormConsultarRollos.value.Observacion,
-              //             Proceso : this.FormConsultarRollos.value.Proceso,
-              //           });
-              //         }
-              //       }
-              //     });
-              //   }
-              // });
             } else if (ProcConsulta == "2") {
               this.bagProService.srvObtenerListaProcSelladoFechasOT(fechaInicial, fechaInicial, ot).subscribe(datos_ot => {
+                setTimeout(() => {
+                  if (datos_ot.length == 0) Swal.fire(`No hay rollos por ingresar`);
+                  this.cargando = true;
+                }, 1000);
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (!rollos.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
+                  if (!rollos.includes(datos_ot[i].item) && !RollosConsultados.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
                     this.idProducto = datos_ot[i].referencia;
                     if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
                     if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
                     if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-                    if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
                     let info : any = {
                       Ot : datos_ot[i].ot,
                       Id : datos_ot[i].item,
@@ -536,7 +380,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       Cantidad : datos_ot[i].qty,
                       Presentacion : this.presentacionProducto,
                       Estatus : datos_ot[i].nomStatus,
-                      Proceso : proceso,
+                      Proceso : 'SELLA',
                     }
                     this.rollos.push(info);
                     rollos.push(datos_ot[i].item)
@@ -544,154 +388,54 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                     this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                    this.FormConsultarRollos.setValue({
-                      OT_Id: ot,
-                      fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                      fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                      Observacion : this.FormConsultarRollos.value.Observacion,
-                      Proceso : this.FormConsultarRollos.value.Proceso,
-                    });
-                    this.cargando = true;
                   }
                 }
               });
-
-              // this.bagProService.srvObtenerListaProcSelladoFechasOT(fechaInicial, fechaInicial, ot).subscribe(datos_ot => {
-              //   for (let i = 0; i < datos_ot.length; i++) {
-              //     this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-              //       if (datos_rollos.length == 0) {
-
-              //           if (!RollosConsultados.includes(datos_ot[i].item)){
-              //             this.idProducto = datos_ot[i].referencia;
-              //             if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
-              //             if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
-              //             if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-              //             if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-              //             let info : any = {
-              //               Ot : datos_ot[i].ot,
-              //               Id : datos_ot[i].item,
-              //               IdCliente : datos_ot[i],
-              //               Cliente : datos_ot[i],
-              //               IdProducto : datos_ot[i].referencia,
-              //               Producto : datos_ot[i].nomReferencia,
-              //               Cantidad : datos_ot[i].qty,
-              //               Presentacion : this.presentacionProducto,
-              //               Estatus : datos_ot[i].nomStatus,
-              //               Proceso : proceso,
-              //             }
-              //             if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //             otTemporral = datos_ot[i].ot;
-              //             this.rollos.push(info);
-              //             RollosConsultados.push(datos_ot[i].item);
-              //             this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //             this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //             this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //             this.FormConsultarRollos.setValue({
-              //               OT_Id: ot,
-              //               fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //               fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //               Observacion : this.FormConsultarRollos.value.Observacion,
-              //               Proceso : this.FormConsultarRollos.value.Proceso,
-              //             });
-              //           }
-              //       }
-              //     });
-              //   }
-              // });
             }
           } else if (fechaInicial != null) {
             if (ProcConsulta == "1"){
               this.bagProService.srvObtenerListaProcExtrusionFechas(fechaInicial, fechaInicial).subscribe(datos_ot => {
+                setTimeout(() => {
+                  if (datos_ot.length == 0) Swal.fire(`No hay rollos por ingresar`);
+                  this.cargando = true;
+                }, 1000);
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (datos_ot[i].nomStatus == 'EMPAQUE') {
-                    if (!rollos.includes(datos_ot[i].item)) {
-                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-                      let info : any = {
-                        Ot : datos_ot[i].ot,
-                        Id : datos_ot[i].item,
-                        IdCliente : datos_ot[i].identNro,
-                        Cliente : datos_ot[i].nombreComercial,
-                        IdProducto : datos_ot[i].clienteItem,
-                        Producto : datos_ot[i].clienteItemNombre,
-                        Cantidad : datos_ot[i].extnetokg,
-                        Presentacion : datos_ot[i].unidad,
-                        Estatus : datos_ot[i].nomStatus,
-                        Proceso : proceso,
-                      }
-                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                      otTemporral = datos_ot[i].ot;
-                      this.rollos.push(info);
-                      RollosConsultados.push(datos_ot[i].item);
-                      rollos.push(datos_ot[i].item);
-                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                      this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
-                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                        Observacion : this.FormConsultarRollos.value.Observacion,
-                        Proceso : this.FormConsultarRollos.value.Proceso,
-                      });
+                  if (!rollos.includes(datos_ot[i].item) && !RollosConsultados.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'EMPAQUE') {
+                    let info : any = {
+                      Ot : datos_ot[i].ot,
+                      Id : datos_ot[i].item,
+                      IdCliente : datos_ot[i].identNro,
+                      Cliente : datos_ot[i].nombreComercial,
+                      IdProducto : datos_ot[i].clienteItem,
+                      Producto : datos_ot[i].clienteItemNombre,
+                      Cantidad : datos_ot[i].extnetokg,
+                      Presentacion : datos_ot[i].unidad,
+                      Estatus : datos_ot[i].nomStatus,
+                      Proceso : 'EMP',
                     }
+                    if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                    otTemporral = datos_ot[i].ot;
+                    this.rollos.push(info);
+                    RollosConsultados.push(datos_ot[i].item);
+                    rollos.push(datos_ot[i].item);
+                    this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                    this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                   }
                 }
               });
-
-              // this.bagProService.srvObtenerListaProcExtrusionFechas(fechaInicial, fechaInicial).subscribe(datos_ot => {
-              //   for (let i = 0; i < datos_ot.length; i++) {
-              //     this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-              //       if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
-              //         if (!RollosConsultados.includes(datos_ot[i].item)){
-              //           if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-              //           if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
-              //           if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
-              //           if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
-              //           if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
-              //           if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
-              //           if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-              //           if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-              //           if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
-              //           let info : any = {
-              //             Ot : datos_ot[i].ot,
-              //             Id : datos_ot[i].item,
-              //             IdCliente : datos_ot[i].identNro,
-              //             Cliente : datos_ot[i].nombreComercial,
-              //             IdProducto : datos_ot[i].clienteItem,
-              //             Producto : datos_ot[i].clienteItemNombre,
-              //             Cantidad : datos_ot[i].extnetokg,
-              //             Presentacion : datos_ot[i].unidad,
-              //             Estatus : datos_ot[i].nomStatus,
-              //             Proceso : proceso,
-              //           }
-              //           if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //           otTemporral = datos_ot[i].ot;
-              //           this.rollos.push(info);
-              //           RollosConsultados.push(datos_ot[i].item);
-              //           this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //           this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //           this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //           this.FormConsultarRollos.setValue({
-              //             OT_Id: ot,
-              //             fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //             fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //             Observacion : this.FormConsultarRollos.value.Observacion,
-              //             Proceso : this.FormConsultarRollos.value.Proceso,
-              //           });
-              //         }
-              //       }
-              //     });
-              //   }
-              // });
             } else if (ProcConsulta == "2") {
               this.bagProService.srvObtenerListaProcSelladoFechas(fechaInicial, fechaInicial).subscribe(datos_ot => {
+                setTimeout(() => {
+                  if (datos_ot.length == 0) Swal.fire(`No hay rollos por ingresar`);
+                  this.cargando = true;
+                }, 1000);
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (!rollos.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
+                  if (!rollos.includes(datos_ot[i].item) && !RollosConsultados.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
                     this.idProducto = datos_ot[i].referencia;
                     if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
                     if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
                     if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-                    if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
                     let info : any = {
                       Ot : datos_ot[i].ot,
                       Id : datos_ot[i].item,
@@ -702,7 +446,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       Cantidad : datos_ot[i].qty,
                       Presentacion : this.presentacionProducto,
                       Estatus : datos_ot[i].nomStatus,
-                      Proceso : proceso,
+                      Proceso : 'SELLA',
                     }
                     this.rollos.push(info);
                     rollos.push(datos_ot[i].item)
@@ -710,161 +454,54 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                     this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                    this.FormConsultarRollos.setValue({
-                      OT_Id: ot,
-                      fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                      fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                      Observacion : this.FormConsultarRollos.value.Observacion,
-                      Proceso : this.FormConsultarRollos.value.Proceso,
-                    });
-                    this.cargando = true;
                   }
                 }
               });
-
-              // this.bagProService.srvObtenerListaProcSelladoFechas(fechaInicial, fechaInicial).subscribe(datos_ot => {
-              //   for (let i = 0; i < datos_ot.length; i++) {
-              //     this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-              //       if (datos_rollos.length == 0) {
-              //         if (!RollosConsultados.includes(datos_ot[i].item)){
-              //           this.idProducto = datos_ot[i].referencia;
-              //           if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
-              //           if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
-              //           if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-              //           if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-              //           if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
-              //           if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
-              //           if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
-              //           if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
-              //           if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
-              //           if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-              //           if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-              //           if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
-              //           let info : any = {
-              //             Ot : datos_ot[i].ot,
-              //             Id : datos_ot[i].item,
-              //             IdCliente : datos_ot[i].identNro,
-              //             Cliente : datos_ot[i].nombreComercial,
-              //             IdProducto : datos_ot[i].referencia,
-              //             Producto : datos_ot[i].nomReferencia,
-              //             Cantidad : datos_ot[i].qty,
-              //             Presentacion : this.presentacionProducto,
-              //             Estatus : datos_ot[i].nomStatus,
-              //             Proceso : proceso,
-              //           }
-              //           if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //           otTemporral = datos_ot[i].ot;
-              //           this.rollos.push(info);
-              //           RollosConsultados.push(datos_ot[i].item);
-              //           this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //           this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //           this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //           this.FormConsultarRollos.setValue({
-              //             OT_Id: ot,
-              //             fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //             fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //             Observacion : this.FormConsultarRollos.value.Observacion,
-              //             Proceso : this.FormConsultarRollos.value.Proceso,
-              //           });
-              //         }
-              //       }
-              //     });
-              //   }
-              // });
             }
           } else if (ot != null) {
             if (ProcConsulta == "1"){
               this.bagProService.srvObtenerListaProcExtrusionRollosOT(ot).subscribe(datos_ot => {
+                setTimeout(() => {
+                  if (datos_ot.length == 0) Swal.fire(`No hay rollos por ingresar`);
+                  this.cargando = true;
+                }, 1000);
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (datos_ot[i].nomStatus == 'EMPAQUE') {
-                    if (!rollos.includes(datos_ot[i].item)) {
-                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-                      let info : any = {
-                        Ot : datos_ot[i].ot,
-                        Id : datos_ot[i].item,
-                        IdCliente : datos_ot[i].identNro,
-                        Cliente : datos_ot[i].nombreComercial,
-                        IdProducto : datos_ot[i].clienteItem,
-                        Producto : datos_ot[i].clienteItemNombre,
-                        Cantidad : datos_ot[i].extnetokg,
-                        Presentacion : datos_ot[i].unidad,
-                        Estatus : datos_ot[i].nomStatus,
-                        Proceso : proceso,
-                      }
-                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                      otTemporral = datos_ot[i].ot;
-                      this.rollos.push(info);
-                      RollosConsultados.push(datos_ot[i].item);
-                      rollos.push(datos_ot[i].item);
-                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                      this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
-                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                        Observacion : this.FormConsultarRollos.value.Observacion,
-                        Proceso : this.FormConsultarRollos.value.Proceso,
-                      });
+                  if (!rollos.includes(datos_ot[i].item) && !RollosConsultados.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'EMPAQUE') {
+                    let info : any = {
+                      Ot : datos_ot[i].ot,
+                      Id : datos_ot[i].item,
+                      IdCliente : datos_ot[i].identNro,
+                      Cliente : datos_ot[i].nombreComercial,
+                      IdProducto : datos_ot[i].clienteItem,
+                      Producto : datos_ot[i].clienteItemNombre,
+                      Cantidad : datos_ot[i].extnetokg,
+                      Presentacion : datos_ot[i].unidad,
+                      Estatus : datos_ot[i].nomStatus,
+                      Proceso : 'EMP',
                     }
+                    if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                    otTemporral = datos_ot[i].ot;
+                    this.rollos.push(info);
+                    RollosConsultados.push(datos_ot[i].item);
+                    rollos.push(datos_ot[i].item);
+                    this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                    this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                   }
                 }
               });
-
-              // this.bagProService.srvObtenerListaProcExtrusionRollosOT(ot).subscribe(datos_ot => {
-              //   for (let i = 0; i < datos_ot.length; i++) {
-              //     this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-              //       if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
-              //         if (!RollosConsultados.includes(datos_ot[i].item)){
-              //           if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-              //           if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
-              //           if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
-              //           if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
-              //           if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
-              //           if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
-              //           if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-              //           if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-              //           if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
-              //           let info : any = {
-              //             Ot : datos_ot[i].ot,
-              //             Id : datos_ot[i].item,
-              //             IdCliente : datos_ot[i].identNro,
-              //             Cliente : datos_ot[i].nombreComercial,
-              //             IdProducto : datos_ot[i].clienteItem,
-              //             Producto : datos_ot[i].clienteItemNombre,
-              //             Cantidad : datos_ot[i].extnetokg,
-              //             Presentacion : datos_ot[i].unidad,
-              //             Estatus : datos_ot[i].nomStatus,
-              //             Proceso : proceso,
-              //           }
-              //           if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //           otTemporral = datos_ot[i].ot;
-              //           this.rollos.push(info);
-              //           RollosConsultados.push(datos_ot[i].item);
-              //           this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //           this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //           this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //           this.FormConsultarRollos.setValue({
-              //             OT_Id: ot,
-              //             fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //             fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //             Observacion : this.FormConsultarRollos.value.Observacion,
-              //             Proceso : this.FormConsultarRollos.value.Proceso,
-              //           });
-              //         }
-              //       }
-              //     });
-              //   }
-              // });
             } else if (ProcConsulta == "2") {
               this.bagProService.srvObtenerListaProcSelladoRollosOT(ot).subscribe(datos_ot => {
+                setTimeout(() => {
+                  if (datos_ot.length == 0) Swal.fire(`No hay rollos por ingresar`);
+                  this.cargando = true;
+                }, 1000);
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (!rollos.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
+                  if (!rollos.includes(datos_ot[i].item) && !RollosConsultados.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
                     this.idProducto = datos_ot[i].referencia;
                     if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
                     if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
                     if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-                    if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
                     let info : any = {
                       Ot : datos_ot[i].ot,
                       Id : datos_ot[i].item,
@@ -875,7 +512,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       Cantidad : datos_ot[i].qty,
                       Presentacion : this.presentacionProducto,
                       Estatus : datos_ot[i].nomStatus,
-                      Proceso : proceso,
+                      Proceso : 'SELLA',
                     }
                     this.rollos.push(info);
                     rollos.push(datos_ot[i].item)
@@ -883,163 +520,54 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                     this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                    this.FormConsultarRollos.setValue({
-                      OT_Id: ot,
-                      fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                      fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                      Observacion : this.FormConsultarRollos.value.Observacion,
-                      Proceso : this.FormConsultarRollos.value.Proceso,
-                    });
-                    this.cargando = true;
                   }
                 }
               });
-
-              // this.bagProService.srvObtenerListaProcSelladoRollosOT(ot).subscribe(datos_ot => {
-              //   for (let i = 0; i < datos_ot.length; i++) {
-              //     this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-              //       if (datos_rollos.length == 0) {
-              //         if (!RollosConsultados.includes(datos_ot[i].item)){
-              //           this.idProducto = datos_ot[i].referencia;
-              //           if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
-              //           if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
-              //           if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-              //           if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-              //           if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
-              //           if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
-              //           if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
-              //           if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
-              //           if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
-              //           if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-              //           if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-              //           if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
-              //           let info : any = {
-              //             Ot : datos_ot[i].ot,
-              //             Id : datos_ot[i].item,
-              //             IdCliente : datos_ot[i].identNro,
-              //             Cliente : datos_ot[i].nombreComercial,
-              //             IdProducto : datos_ot[i].referencia,
-              //             Producto : datos_ot[i].nomReferencia,
-              //             Cantidad : datos_ot[i].qty,
-              //             Presentacion : this.presentacionProducto,
-              //             Estatus : datos_ot[i].nomStatus,
-              //             Proceso : proceso,
-              //             exits : false,
-              //           }
-              //           if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //           otTemporral = datos_ot[i].ot;
-              //           this.rollos.push(info);
-              //           RollosConsultados.push(datos_ot[i].item);
-              //           this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //           this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //           this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //           this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-              //           this.FormConsultarRollos.setValue({
-              //             OT_Id: this.FormConsultarRollos.value.OT_Id,
-              //             fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //             fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //             Observacion : this.FormConsultarRollos.value.Observacion,
-              //             Proceso : '1',
-              //           });
-              //         }
-              //       }
-              //     });
-              //   }
-              // });
             }
           } else {
             if (ProcConsulta == "1"){
               this.bagProService.srvObtenerListaProcExtrusionFechas(this.today, this.today).subscribe(datos_ot => {
+                setTimeout(() => {
+                  if (datos_ot.length == 0) Swal.fire(`No hay rollos por ingresar`);
+                  this.cargando = true;
+                }, 1000);
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (datos_ot[i].nomStatus == 'EMPAQUE') {
-                    if (!rollos.includes(datos_ot[i].item)) {
-                      if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-                      let info : any = {
-                        Ot : datos_ot[i].ot,
-                        Id : datos_ot[i].item,
-                        IdCliente : datos_ot[i].identNro,
-                        Cliente : datos_ot[i].nombreComercial,
-                        IdProducto : datos_ot[i].clienteItem,
-                        Producto : datos_ot[i].clienteItemNombre,
-                        Cantidad : datos_ot[i].extnetokg,
-                        Presentacion : datos_ot[i].unidad,
-                        Estatus : datos_ot[i].nomStatus,
-                        Proceso : proceso,
-                      }
-                      if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                      otTemporral = datos_ot[i].ot;
-                      this.rollos.push(info);
-                      RollosConsultados.push(datos_ot[i].item);
-                      rollos.push(datos_ot[i].item);
-                      this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                      this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                      this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                      this.FormConsultarRollos.setValue({
-                        OT_Id: ot,
-                        fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                        fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                        Observacion : this.FormConsultarRollos.value.Observacion,
-                        Proceso : this.FormConsultarRollos.value.Proceso,
-                      });
+                  if (!rollos.includes(datos_ot[i].item) && !RollosConsultados.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'EMPAQUE') {
+                    let info : any = {
+                      Ot : datos_ot[i].ot,
+                      Id : datos_ot[i].item,
+                      IdCliente : datos_ot[i].identNro,
+                      Cliente : datos_ot[i].nombreComercial,
+                      IdProducto : datos_ot[i].clienteItem,
+                      Producto : datos_ot[i].clienteItemNombre,
+                      Cantidad : datos_ot[i].extnetokg,
+                      Presentacion : datos_ot[i].unidad,
+                      Estatus : datos_ot[i].nomStatus,
+                      Proceso : 'EMP',
                     }
+                    if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                    otTemporral = datos_ot[i].ot;
+                    this.rollos.push(info);
+                    RollosConsultados.push(datos_ot[i].item);
+                    rollos.push(datos_ot[i].item);
+                    this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+                    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+                    this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
                   }
                 }
               });
-
-              // this.bagProService.srvObtenerListaProcExtrusionFechas(this.today, this.today).subscribe(datos_ot => {
-              //   for (let i = 0; i < datos_ot.length; i++) {
-              //     this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-              //       if (datos_rollos.length == 0 && datos_ot[i].nomStatus == 'EMPAQUE') {
-              //         if (!RollosConsultados.includes(datos_ot[i].item)){
-              //           if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-              //           if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
-              //           if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
-              //           if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
-              //           if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
-              //           if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
-              //           if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-              //           if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-              //           if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
-              //           let info : any = {
-              //             Ot : datos_ot[i].ot,
-              //             Id : datos_ot[i].item,
-              //             IdCliente : datos_ot[i].identNro,
-              //             Cliente : datos_ot[i].nombreComercial,
-              //             IdProducto : datos_ot[i].clienteItem,
-              //             Producto : datos_ot[i].clienteItemNombre,
-              //             Cantidad : datos_ot[i].extnetokg,
-              //             Presentacion : datos_ot[i].unidad,
-              //             Estatus : datos_ot[i].nomStatus,
-              //             Proceso : proceso,
-              //           }
-              //           if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //           otTemporral = datos_ot[i].ot;
-              //           this.rollos.push(info);
-              //           RollosConsultados.push(datos_ot[i].item);
-              //           this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //           this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //           this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //           this.FormConsultarRollos.setValue({
-              //             OT_Id: ot,
-              //             fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //             fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //             Observacion : this.FormConsultarRollos.value.Observacion,
-              //             Proceso : this.FormConsultarRollos.value.Proceso,
-              //           });
-              //         }
-              //       }
-              //     });
-              //   }
-              // });
             } else if (ProcConsulta == "2") {
               this.bagProService.srvObtenerListaProcSelladoFechas(this.today, this.today).subscribe(datos_ot => {
+                setTimeout(() => {
+                  if (datos_ot.length == 0) Swal.fire(`No hay rollos por ingresar`);
+                  this.cargando = true;
+                }, 1000);
                 for (let i = 0; i < datos_ot.length; i++) {
-                  if (!rollos.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
+                  if (!rollos.includes(datos_ot[i].item) && !RollosConsultados.includes(datos_ot[i].item) && datos_ot[i].nomStatus == 'SELLADO') {
                     this.idProducto = datos_ot[i].referencia;
                     if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
                     if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
                     if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-                    if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
                     let info : any = {
                       Ot : datos_ot[i].ot,
                       Id : datos_ot[i].item,
@@ -1050,7 +578,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                       Cantidad : datos_ot[i].qty,
                       Presentacion : this.presentacionProducto,
                       Estatus : datos_ot[i].nomStatus,
-                      Proceso : proceso,
+                      Proceso : 'SELLA',
                     }
                     this.rollos.push(info);
                     rollos.push(datos_ot[i].item)
@@ -1058,73 +586,11 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
                     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
                     this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                    this.FormConsultarRollos.setValue({
-                      OT_Id: ot,
-                      fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                      fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                      Observacion : this.FormConsultarRollos.value.Observacion,
-                      Proceso : this.FormConsultarRollos.value.Proceso,
-                    });
-                    this.cargando = true;
                   }
                 }
               });
-
-              // this.bagProService.srvObtenerListaProcSelladoFechas(this.today, this.today).subscribe(datos_ot => {
-              //   for (let i = 0; i < datos_ot.length; i++) {
-              //     this.dtPreEntRollosService.srvObtenerVerificarRollo(datos_ot[i].item).subscribe(datos_rollos => {
-              //       if (datos_rollos.length == 0) {
-              //         if (!RollosConsultados.includes(datos_ot[i].item)){
-              //           this.idProducto = datos_ot[i].referencia;
-              //           if (datos_ot[i].unidad == 'UND') this.presentacionProducto = 'Und';
-              //           if (datos_ot[i].unidad == 'PAQ') this.presentacionProducto = 'Paquete';
-              //           if (datos_ot[i].unidad == 'KLS') this.presentacionProducto = 'Kg';
-              //           if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-              //           if (datos_ot[i].nomStatus == 'IMPRESION') proceso = 'IMP'
-              //           if (datos_ot[i].nomStatus == 'ROTOGRABADO') proceso = 'ROT'
-              //           if (datos_ot[i].nomStatus == 'DOBLADO') proceso = 'DBLD'
-              //           if (datos_ot[i].nomStatus == 'LAMINADO') proceso = 'LAM'
-              //           if (datos_ot[i].nomStatus == 'CORTE') proceso = 'CORTE'
-              //           if (datos_ot[i].nomStatus == 'EMPAQUE') proceso = 'EMP'
-              //           if (datos_ot[i].nomStatus == 'SELLADO') proceso = 'SELLA'
-              //           if (datos_ot[i].nomStatus == 'Wiketiado') proceso = 'WIKE'
-              //           let info : any = {
-              //             Ot : datos_ot[i].ot,
-              //             Id : datos_ot[i].item,
-              //             IdCliente : datos_ot[i].identNro,
-              //             Cliente : datos_ot[i].nombreComercial,
-              //             IdProducto : datos_ot[i].referencia,
-              //             Producto : datos_ot[i].nomReferencia,
-              //             Cantidad : datos_ot[i].qty,
-              //             Presentacion : this.presentacionProducto,
-              //             Estatus : datos_ot[i].nomStatus,
-              //             Proceso : proceso,
-              //           }
-              //           if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-              //           otTemporral = datos_ot[i].ot;
-              //           this.rollos.push(info);
-              //           RollosConsultados.push(datos_ot[i].item);
-              //           this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-              //           this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-              //           this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-              //           this.FormConsultarRollos.setValue({
-              //             OT_Id: ot,
-              //             fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-              //             fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-              //             Observacion : this.FormConsultarRollos.value.Observacion,
-              //             Proceso : this.FormConsultarRollos.value.Proceso,
-              //           });
-              //         }
-              //       }
-              //     });
-              //   }
-              // });
             }
           }
-          setTimeout(() => {
-            if (this.rollos.length == 0) Swal.fire(`No hay rollos por ingresar`);
-            this.cargando = true;
-          }, 10000);
         }, 3000);
       } else Swal.fire("¡La fecha seleccionada no es valida!");
     } else Swal.fire("¡Seleccione un proceso!");
@@ -1195,6 +661,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
       }
       this.rollosInsertar.push(info);
       this.validarRollo.push(item.Id);
+      console.log(this.rollosInsertar)
     }
     setTimeout(() => { this.rollos = []; }, 500);
     setTimeout(() => { this.GrupoProductos(); }, 500);
@@ -1368,140 +835,24 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         this.cargando = true;
       });
     }
-    if (this.rollosInsertar.length > 1000) {
-      setTimeout(() => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'success',
-          title: '¡Pre Entrada de Rollos registrada con exito!'
-        });
-        this.buscarRolloPDF(idEntrada);
-      }, 60000);
-    }  else if (this.rollosInsertar.length > 600) {
-      setTimeout(() => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'success',
-          title: '¡Pre Entrada de Rollos registrada con exito!'
-        });
-        this.buscarRolloPDF(idEntrada);
-      }, 30000);
-    } else if (this.rollosInsertar.length > 500) {
-      setTimeout(() => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'success',
-          title: '¡Pre Entrada de Rollos registrada con exito!'
-        });
-        this.buscarRolloPDF(idEntrada);
-      }, 20000);
-    } else if (this.rollosInsertar.length > 400) {
-      setTimeout(() => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'success',
-          title: '¡Pre Entrada de Rollos registrada con exito!'
-        });
-        this.buscarRolloPDF(idEntrada);
-      }, 15000);
-    } else if (this.rollosInsertar.length > 250) {
-      setTimeout(() => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'success',
-          title: '¡Pre Entrada de Rollos registrada con exito!'
-        });
-        this.buscarRolloPDF(idEntrada);
-      }, 10000);
-    } else if (this.rollosInsertar.length > 100) {
-      setTimeout(() => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'success',
-          title: '¡Pre Entrada de Rollos registrada con exito!'
-        });
-        this.buscarRolloPDF(idEntrada);
-      }, 6000);
-    } else {
-      setTimeout(() => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'success',
-          title: '¡Pre Entrada de Rollos registrada con exito!'
-        });
-        this.buscarRolloPDF(idEntrada);
-      }, 3000);
-    }
+    setTimeout(() => {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'center',
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+      Toast.fire({
+        icon: 'success',
+        title: '¡Pre Entrada de Rollos registrada con exito!'
+      });
+      this.buscarRolloPDF(idEntrada);
+    }, this.rollosInsertar.length * 30);
   }
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
@@ -1509,9 +860,6 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
     this.dtPreEntRollosService.srvCrearPDFUltimoId(id).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         for (let j = 0; j < this.rollosAsignados.length; j++) {
-          let CantTotal : string = `${this.Total}`;
-          let cantidadAsignadaNueva = CantTotal.indexOf(",");
-          let cantidadAsignadaFinal = CantTotal.substring(0, (cantidadAsignadaNueva + 3));
           const pdfDefinicion : any = {
             info: {
               title: `${datos_factura[i].preEntRollo_Id}`

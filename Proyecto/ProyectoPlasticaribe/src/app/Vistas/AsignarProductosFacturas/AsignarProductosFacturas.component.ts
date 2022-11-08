@@ -660,7 +660,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         Usua_Conductor : 88,
         AsigProdFV_PlacaCamion : '',
         AsigProdFV_FechaEnvio : this.today,
-        // AsigProdFV_Hora : moment().format("H:mm:ss"),
+        AsigProdFV_Hora : moment().format("H:mm:ss"),
       }
       this.asgProdFactura.srvGuardar(info).subscribe(datos_asignacion => {
         this.asgProdFactura.srvObtenerUltimoId().subscribe(datos_ultimaAsg => { this.crearDetallesAsignacion(datos_ultimaAsg.asigProdFV_Id) });
@@ -716,15 +716,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         this.cargando = true;
       });
     }
-    // setTimeout(() => { this.cambiarEstado(); }, (diferenciaFecha * this.rollosInsertar.length));
-    setTimeout(() => { this.cambiarEstado(); }, 5000);
-  //  if (this.rollosInsertar.length > 500) setTimeout(() => { this.cambiarEstado(); }, 60000);
-  //  else if (this.rollosInsertar.length > 400) setTimeout(() => { this.cambiarEstado(); }, 30000);
-  //  else if (this.rollosInsertar.length > 300) setTimeout(() => { this.cambiarEstado(); }, 20000);
-  //  else if (this.rollosInsertar.length > 200) setTimeout(() => { this.cambiarEstado(); }, 15000);
-  //  else if (this.rollosInsertar.length > 100) setTimeout(() => { this.cambiarEstado(); }, 10000);
-  //  else if (this.rollosInsertar.length > 50) setTimeout(() => { this.cambiarEstado(); }, 5000);
-  //  else setTimeout(() => { this.cambiarEstado(); }, 3000);
+    setTimeout(() => { this.cambiarEstado(); }, this.rollosInsertar.length * 50);
   }
 
   // Funcion que va a cambiar el estado de los rollos que estan siendo asignados a una factura

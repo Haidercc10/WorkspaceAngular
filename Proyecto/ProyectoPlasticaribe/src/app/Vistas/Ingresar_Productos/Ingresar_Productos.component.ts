@@ -186,6 +186,10 @@ export class Ingresar_ProductosComponent implements OnInit {
         setTimeout(() => {
           if (ot != null && fechaInicial != null && fechaFinal != null) {
             this.dtPreEntregaService.getRollosPreEntregadosOT(ot, proceso).subscribe(datos_ot => {
+              setTimeout(() => {
+                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                this.cargando = true;
+              }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
                 if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id) && moment(datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', '')).isBetween(fechaInicial, fechaFinal)) {
                   let info : any = {
@@ -230,6 +234,10 @@ export class Ingresar_ProductosComponent implements OnInit {
             });
           } else if (fechaInicial != null &&  fechaFinal != null) {
             this.dtPreEntregaService.getRollosPreEntregadosFechas(fechaInicial, fechaFinal, proceso).subscribe(datos_ot => {
+              setTimeout(() => {
+                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                this.cargando = true;
+              }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
                 if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
                   let info : any = {
@@ -274,6 +282,10 @@ export class Ingresar_ProductosComponent implements OnInit {
             });
           } else if (ot != null && fechaInicial != null) {
             this.dtPreEntregaService.getRollosPreEntregadosOT(ot, proceso).subscribe(datos_ot => {
+              setTimeout(() => {
+                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                this.cargando = true;
+              }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
                 if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id) && fechaInicial == datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', '')) {
                   let info : any = {
@@ -318,6 +330,10 @@ export class Ingresar_ProductosComponent implements OnInit {
             });
           } else if (fechaInicial != null) {
             this.dtPreEntregaService.getRollosPreEntregadosFechas(fechaInicial, fechaInicial, proceso).subscribe(datos_ot => {
+              setTimeout(() => {
+                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                this.cargando = true;
+              }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
                 if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
                   let info : any = {
@@ -362,6 +378,10 @@ export class Ingresar_ProductosComponent implements OnInit {
             });
           } else if (ot != null) {
             this.dtPreEntregaService.getRollosPreEntregadosOT(ot, proceso).subscribe(datos_ot => {
+              setTimeout(() => {
+                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                this.cargando = true;
+              }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
                 if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
                   let info : any = {
@@ -406,6 +426,10 @@ export class Ingresar_ProductosComponent implements OnInit {
             });
           } else if (rollo != null) {
             this.dtPreEntregaService.getRollosPreEntregadosRollo(rollo, proceso).subscribe(datos_ot => {
+              setTimeout(() => {
+                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                this.cargando = true;
+              }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
                 if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
                   let info : any = {
@@ -450,6 +474,10 @@ export class Ingresar_ProductosComponent implements OnInit {
             });
           } else {
             this.dtPreEntregaService.getRollosPreEntregadosFechas(this.fechaBusqueda, this.today, proceso).subscribe(datos_ot => {
+              setTimeout(() => {
+                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                this.cargando = true;
+              }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
                 if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
                   let info : any = {
@@ -493,11 +521,6 @@ export class Ingresar_ProductosComponent implements OnInit {
               }
             });
           }
-
-          setTimeout(() => {
-            if (this.rollos.length <= 0) Swal.fire(`No hay rollos por ingresar`);
-            this.cargando = true;
-          }, 5000);
         }, 4000);
       } else Swal.fire("¡La fecha seleccionada no es valida!");
     } else Swal.fire("¡Seleccione un proceso!");
@@ -797,12 +820,7 @@ export class Ingresar_ProductosComponent implements OnInit {
         }
       });
     }
-    if (this.rollosInsertar.length > 500) setTimeout(() => { this.InventarioProductos(idEntrada); }, 40000);
-    else if (this.rollosInsertar.length > 400) setTimeout(() => { this.InventarioProductos(idEntrada); }, 25000);
-    else if (this.rollosInsertar.length > 300) setTimeout(() => { this.InventarioProductos(idEntrada); }, 17000);
-    else if (this.rollosInsertar.length > 200) setTimeout(() => { this.InventarioProductos(idEntrada); }, 12000);
-    else if (this.rollosInsertar.length > 100) setTimeout(() => { this.InventarioProductos(idEntrada); }, 8000);
-    else setTimeout(() => { this.InventarioProductos(idEntrada); }, 5000);
+    setTimeout(() => { this.InventarioProductos(idEntrada); }, (50 * this.rollosInsertar.length));
   }
 
   // Funcion para mover el inventario de los productos
@@ -980,7 +998,7 @@ export class Ingresar_ProductosComponent implements OnInit {
         this.rollosAsignados.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
     });
-    setTimeout(() => { this.crearPDF(id); }, 1200);
+    setTimeout(() => { this.crearPDF(id); }, 2000);
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -988,11 +1006,11 @@ export class Ingresar_ProductosComponent implements OnInit {
     var body = [];
     body.push(columns);
     data.forEach(function(row) {
-        var dataRow = [];
-        columns.forEach(function(column) {
-            dataRow.push(row[column].toString());
-        });
-        body.push(dataRow);
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
     });
 
     return body;
