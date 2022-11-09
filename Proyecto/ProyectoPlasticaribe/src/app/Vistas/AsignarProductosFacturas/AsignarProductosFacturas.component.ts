@@ -726,6 +726,9 @@ export class AsignarProductosFacturasComponent implements OnInit {
         for (let j = 0; j < datos_rollos.length; j++) {
           if(this.rollosInsertar[i].Presentacion == 'Paquete') {
             if (datos_rollos[j].prod_CantPaquetesRestantes != (this.rollosInsertar[i].CantUndRestantes / datos_rollos[j].prod_CantBolsasPaquete)) {
+              let paquetesRestantes : number = datos_rollos[j].prod_CantPaquetesRestantes;
+              if (paquetesRestantes == 0) paquetesRestantes =  (this.rollosInsertar[i].CantUndRestantes + datos_rollos[j].prod_CantBolsasFacturadas) - datos_rollos[j].dtEntRolloProd_Cantidad;
+              else paquetesRestantes =  datos_rollos[j].dtEntRolloProd_Cantidad - (this.rollosInsertar[i].CantUndRestantes + datos_rollos[j].prod_CantBolsasFacturadas)
               let info : any = {
                 DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
                 EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
@@ -736,7 +739,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
                 dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
                 Prod_Id : datos_rollos[j].prod_Id,
                 UndMed_Prod : datos_rollos[j].undMed_Prod,
-                Prod_CantPaquetesRestantes : (datos_rollos[j].dtEntRolloProd_Cantidad - (this.rollosInsertar[i].CantUndRestantes + datos_rollos[j].prod_CantBolsasFacturadas)),
+                Prod_CantPaquetesRestantes : (paquetesRestantes),
                 Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
                 Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
                 Prod_CantBolsasRestates : (datos_rollos[j].prod_CantBolsasRestates - this.rollosInsertar[i].CantUndRestantes),
@@ -755,7 +758,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
                 dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
                 Prod_Id : datos_rollos[j].prod_Id,
                 UndMed_Prod : datos_rollos[j].undMed_Prod,
-                Prod_CantPaquetesRestantes : (datos_rollos[j].dtEntRolloProd_Cantidad - (this.rollosInsertar[i].CantUndRestantes + datos_rollos[j].prod_CantBolsasFacturadas)),
+                Prod_CantPaquetesRestantes : (0),
                 Prod_CantBolsasPaquete : datos_rollos[j].prod_CantBolsasPaquete,
                 Prod_CantBolsasBulto : datos_rollos[j].prod_CantBolsasBulto,
                 Prod_CantBolsasRestates : (datos_rollos[j].prod_CantBolsasRestates - this.rollosInsertar[i].CantUndRestantes),

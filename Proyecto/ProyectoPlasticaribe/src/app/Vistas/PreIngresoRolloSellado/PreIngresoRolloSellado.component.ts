@@ -170,9 +170,9 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
     let fechaInicial : any = this.FormConsultarRollos.value.fechaDoc;
     let fechaFinal : any = this.FormConsultarRollos.value.fechaFinalDoc;
     let rollos : any = [];
-    if (ProcConsulta == '1') ProcConsulta = 'EMP';
-    if (ProcConsulta == '2') ProcConsulta = 'EXT';
-    if (ProcConsulta == '3') ProcConsulta = 'SELLA';
+    let proceso : any = ProcConsulta;
+    if (ProcConsulta == '1') proceso = 'EMP';
+    if (ProcConsulta == '2') proceso = 'SELLA';
 
     if (ProcConsulta != null) {
       if (!moment(fechaInicial).isBefore('2022-09-25', 'days') && !moment(fechaFinal).isBefore('2022-09-25', 'days')) {
@@ -183,9 +183,8 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         let otTemporral : number = 0;
         this.cargando = false;
         this.cantidadOT = 0;
-        let proceso : string = '';
 
-        this.dtPreEntRollosService.getRollosProceso(ProcConsulta).subscribe(datos_rollos => {
+        this.dtPreEntRollosService.getRollosProceso(proceso).subscribe(datos_rollos => {
           for (let i = 0; i < datos_rollos.length; i++) {
             rollos.push(datos_rollos[i]);
           }
@@ -591,6 +590,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
               });
             }
           }
+          this.cargando = true;
         }, 3000);
       } else Swal.fire("¡La fecha seleccionada no es valida!");
     } else Swal.fire("¡Seleccione un proceso!");

@@ -30,6 +30,10 @@ export class DetallesAsignacionMPxTintasService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MatPrimaXTinta/${id}`);
   }
 
+  getCreatPdf(id : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `DetalleAsignacion_MatPrimaXTinta/getCreatPdf/${id}`)
+  }
+
   //Metodo agregar Productos
   srvAgregar(data : any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_MatPrimaXTinta', data)

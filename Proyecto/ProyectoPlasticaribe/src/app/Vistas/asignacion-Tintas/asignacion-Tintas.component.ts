@@ -61,7 +61,7 @@ export class AsignacionTintasComponent implements OnInit {
       Tinta : [null, Validators.required],
       cantidadTinta : [null, Validators.required],
       undMedTinta : [null, Validators.required],
-      Observacion : [''],
+      Observacion : [null],
       Fecha : [null, Validators.required],
     });
 
@@ -126,7 +126,7 @@ export class AsignacionTintasComponent implements OnInit {
       Tinta : null,
       cantidadTinta : null,
       undMedTinta : null,
-      Observacion : '',
+      Observacion : null,
       Fecha : this.today,
     });
   }
@@ -149,18 +149,18 @@ export class AsignacionTintasComponent implements OnInit {
   // Funcion limpiará todos los campos de vista
   limpiarTodosLosCampos(){
     this.FormAsignacionMP = this.frmBuilder.group({
-      Tinta : '',
-      cantidadTinta : '',
-      undMedTinta : '',
-      Observacion : '',
+      Tinta : null,
+      cantidadTinta : null,
+      undMedTinta : null,
+      Observacion : null,
       Fecha : this.today,
     });
     this.FormMateriaPrima.setValue({
-      idMateriaPrima : '',
-      nombreMateriaPrima : '',
-      stockMateriaPrima : '',
-      cantidadMateriaPrima : '',
-      undMedMateriaPrima : '',
+      idMateriaPrima : null,
+      nombreMateriaPrima : null,
+      stockMateriaPrima : null,
+      cantidadMateriaPrima : null,
+      undMedMateriaPrima :null,
     });
     this.ArrayMateriaPrima = [];
     this.AccionBoton = 'Agregar'
@@ -349,7 +349,8 @@ export class AsignacionTintasComponent implements OnInit {
 
   //Funcion que almacenará en la base de datos la informacion general sobre la asignacion de materia prima
   asignarMPCrearTintas(){
-    // if (this.FormAsignacionMP.valid && this.ArrayMateriaPrima.length > 0) {
+    console.log(this.FormAsignacionMP.value)
+    if (this.FormAsignacionMP.valid && this.ArrayMateriaPrima.length > 0) {
       this.load = false;
       let tinta : any = this.FormAsignacionMP.value.Tinta;
       let cantidad : number = this.FormAsignacionMP.value.cantidadTinta;
@@ -374,7 +375,7 @@ export class AsignacionTintasComponent implements OnInit {
         this.obtenerUltimoIdAsignacion();
         setTimeout(() => { this.sumarInventarioTintas(); }, 3000);
       });
-    // } else Swal.fire("¡Hay campos vacios!");
+    } else Swal.fire("¡Hay campos vacios!");
   }
 
   // Funcion que servirá para poder obtener el ultimo Id de la asignacion creada y pasarlo a la funcion de creacion de AsignacionMP para que pueda tener el ID de la asignacion

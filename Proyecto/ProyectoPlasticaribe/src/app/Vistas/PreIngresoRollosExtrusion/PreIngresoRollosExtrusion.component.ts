@@ -141,11 +141,8 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     this.cargando = false;
     this.cantidadOT = 0;
     let proceso : string = '';
-    if (ProcConsulta == '1') ProcConsulta = 'EMP';
-    if (ProcConsulta == '2') ProcConsulta = 'EXT';
-    if (ProcConsulta == '3') ProcConsulta = 'SELLA';
     if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
-      this.dtPreEntRollosService.getRollosProceso(ProcConsulta).subscribe(datos_rollos => {
+      this.dtPreEntRollosService.getRollosProceso('EXT').subscribe(datos_rollos => {
         for (let i = 0; i < datos_rollos.length; i++) {
           rollos.push(datos_rollos[i]);
         }

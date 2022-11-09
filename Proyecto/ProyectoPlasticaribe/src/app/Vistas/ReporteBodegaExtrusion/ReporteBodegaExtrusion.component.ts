@@ -1,7 +1,9 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { timeStamp } from 'console';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
 import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollos_Extrusion.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DtIngRollos_Extrusion.service';
@@ -30,6 +32,10 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   estados : any [] = []; //Variable que almacenará los estados que pueden tener los rollos en esta bodega
   registrosConsultados : any [] = []; //Variable que va a almacenar los diferentes registros consultados
+  rollosPdf : any [] = []; //Variable que va a almacenar los rollos que se consultar de una asignacion
+  rollosAgrupados : any [] = []; //Variable que va a almacen
+  totalRollos : number = 0; //Variable que almacenará el total de rollos
+  totalCantidad : number = 0; //Variable que almacenará la cantidad de total de kg de los rollos
 
   constructor(private frmBuilder : FormBuilder,
                 private rolService : RolesService,
@@ -87,9 +93,13 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
 
   //
   limpiarCampos(){
-    this.cargando = false;
+    this.cargando = true;
     this.FormConsultarFiltros.reset();
     this.registrosConsultados = [];
+    this.rollosAgrupados = [];
+    this.rollosPdf = [];
+    this.totalCantidad = 0;
+    this.totalRollos = 0;
   }
 
   // Funcion que va a consultar por los filtros que se busquen
@@ -101,6 +111,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
     let fechaFin : any = this.FormConsultarFiltros.value.fechaFinalDoc;
 
     if (fechaIni != null && fechaFin != null) {
+      console.log(1)
       this.ingRollosService.getconsultaRollosFechas(fechaIni, fechaFin).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
           this.llenarTabla(datos_factura[i]);
@@ -112,6 +123,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
         }
       });
     } else if (ot != null) {
+      console.log(2)
       this.ingRollosService.getconsultaRollosOT(ot).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
           this.llenarTabla(datos_factura[i]);
@@ -123,6 +135,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
         }
       });
     } else if (fechaIni != null) {
+      console.log(3)
       this.ingRollosService.getconsultaRollosFechas(fechaIni, fechaIni).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
           this.llenarTabla(datos_factura[i]);
@@ -134,6 +147,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
         }
       });
     } else {
+      console.log(4)
       this.ingRollosService.getconsultaRollosFechas(this.today, this.today).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
           this.llenarTabla(datos_factura[i]);
@@ -156,11 +170,402 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
       Tipo : data.tipo,
       Usuario : data.usuario,
     }
-    this.registrosConsultados.push(info)
+    this.registrosConsultados.push(info);
+    this.registrosConsultados.sort((a,b) => Number(a.Ot) - Number(b.Ot));
   }
 
   // Funcion que limpiará la tabla de cualquier filtro que se le haya aplicado
   clear(table: Table) {
     table.clear();
+  }
+
+  //Funcion que enviará a una funcion u otra dependiendo del tipo de documento que se desea ver
+  tipoPdf(datos : any){
+    this.totalCantidad = 0;
+    this.totalRollos = 0;
+    this.cargando = false;
+    this.rollosPdf = [];
+    this.rollosAgrupados = [];
+    if (datos.Tipo == 'Ingreso de Rollos') this.buscarInfoIngreso(datos.Ot);
+    else if (datos.Tipo == 'Salida de Rollos') this.buscarRolloPDFSalida(datos.Ot);
+  }
+
+  // Funcion que va a buscar la informacion de los rollos que fueron ingresados
+  buscarInfoIngreso(id : number){
+    this.ingRollosService.crearPdf(id).subscribe(datos_ingreso => {
+      for (let i = 0; i < datos_ingreso.length; i++) {
+        let info : any = {
+          OT : datos_ingreso[i].dtIngRollo_OT,
+          Producto : datos_ingreso[i].prod_Id,
+          Nombre : datos_ingreso[i].prod_Nombre,
+          Rollo : datos_ingreso[i].rollo_Id,
+          Cantidad : this.formatonumeros(datos_ingreso[i].dtIngRollo_Cantidad),
+          Cantidad2 : datos_ingreso[i].dtIngRollo_Cantidad,
+          Presentacion : datos_ingreso[i].undMed_Id,
+          Proceso : 'Extrusión',
+        }
+        this.rollosPdf.push(info);
+        this.rollosPdf.sort((a,b) => Number(a.OT) - Number(b.OT));
+      }
+    });
+    setTimeout(() => { this.AgruparRollos(); }, 1000);
+    setTimeout(() => { this.crearPdfEntrada(id) }, 3000);
+  }
+
+  // Funcion que traerá los rollos que fueron asignados
+  buscarRolloPDFSalida(id : number){
+    this.salidaRollosService.crearPdf(id).subscribe(datos_ingreso => {
+      for (let i = 0; i < datos_ingreso.length; i++) {
+        let info : any = {
+          OT : datos_ingreso[i].dtAsgRollos_OT,
+          Producto : datos_ingreso[i].prod_Id,
+          Nombre : datos_ingreso[i].prod_Nombre,
+          Rollo : datos_ingreso[i].rollo_Id,
+          Cantidad : this.formatonumeros(datos_ingreso[i].dtAsgRollos_Cantidad),
+          Cantidad2 : datos_ingreso[i].dtAsgRollos_Cantidad,
+          Presentacion : datos_ingreso[i].undMed_Id,
+          Proceso : datos_ingreso[i].proceso_Nombre,
+        }
+        this.rollosPdf.push(info);
+        this.rollosPdf.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
+      }
+    });
+    setTimeout(() => { this.AgruparRollos(); }, 1000);
+    setTimeout(() => { this.crearPDFSalida(id); }, 3000);
+  }
+
+  // Funcion que va a agrupar los rollos consultados
+  AgruparRollos(){
+    let producto : any = [];
+    for (let i = 0; i < this.rollosPdf.length; i++) {
+      if (!producto.includes(this.rollosPdf[i].OT)) {
+        let cantidad : number = 0;
+        let cantRollo : number = 0;
+        for (let j = 0; j < this.rollosPdf.length; j++) {
+          if (this.rollosPdf[i].Producto == this.rollosPdf[j].Producto) {
+            cantidad += this.rollosPdf[j].Cantidad2;
+            cantRollo += 1;
+          }
+        }
+        if (cantRollo > 0){
+          producto.push(this.rollosPdf[i].OT);
+          let info : any = {
+            OT: this.rollosPdf[i].OT,
+            Producto : this.rollosPdf[i].Producto,
+            Nombre : this.rollosPdf[i].Nombre,
+            Cantidad : this.formatonumeros(cantidad.toFixed(2)),
+            Cantidad2 : cantidad,
+            Rollos: this.formatonumeros(cantRollo),
+            Rollos2: cantRollo,
+            Presentacion : this.rollosPdf[i].Presentacion,
+          }
+          this.rollosAgrupados.push(info);
+        }
+      }
+    }
+    setTimeout(() => {
+      this.rollosPdf.sort((a,b) => Number(a.OT) - Number(b.OT));
+      this.rollosAgrupados.sort((a,b) => Number(a.OT) - Number(b.OT));
+      this.calcularTotalRollos();
+      this.calcularTotalCantidad();
+    }, 500);
+  }
+
+  // Funcion que calculará el total de rollos
+  calcularTotalRollos() {
+    let total = 0;
+    console.log(this.rollosAgrupados)
+    for(let sale of this.rollosAgrupados) {
+        total += sale.Rollos2;
+    }
+    this.totalRollos = total;
+  }
+
+  // Funcion que calculará el total de la kg
+  calcularTotalCantidad() {
+    let total = 0;
+    for(let sale of this.rollosAgrupados) {
+      total += sale.Cantidad2;
+    }
+    this.totalCantidad = total;
+  }
+
+  // Funcion que creará el pdf del ingreso
+  crearPdfEntrada(id : any){
+    this.ingRollosService.crearPdf(id).subscribe(datos_ingreso => {
+      for (let i = 0; i < datos_ingreso.length; i++) {
+        for (let j = 0; j < this.rollosPdf.length; j++) {
+          const pdfDefinicion : any = {
+            info: {
+              title: `${id}`
+            },
+            pageSize: {
+              width: 630,
+              height: 760
+            },
+            content : [
+              {
+                text: `Ingreso de Rollos a Bodega de Extrusión`,
+                alignment: 'right',
+                style: 'titulo',
+              },
+              '\n \n',
+              {
+                style: 'tablaEmpresa',
+                table: {
+                  widths: [90, '*', 90, '*'],
+                  style: 'header',
+                  body: [
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Nombre Empresa`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `Plasticaribe S.A.S`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: `Fecha`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_ingreso[i].ingRollo_Fecha.replace('T00:00:00', '')} ${datos_ingreso[i].ingRollo_Hora}`
+                      },
+                    ],
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Dirección`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_ingreso[i].empresa_Direccion}`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: `Ciudad`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_ingreso[i].empresa_Ciudad}`
+                      },
+                    ],
+                  ]
+                },
+                layout: {
+                  defaultBorder: false,
+                },
+                fontSize: 9,
+              },
+              '\n \n',
+              {
+                text: `Ingresado Por: ${datos_ingreso[i].nombreCreador}\n`,
+                alignment: 'left',
+                style: 'header',
+              },
+              {
+                text: `\n\n Consolidado de producto(s) \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+              this.table2(this.rollosAgrupados, ['OT', 'Producto', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion']),
+              {
+                text: `\n\n Información detallada de los Rollos \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+
+              this.table(this.rollosPdf, ['OT', 'Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion', 'Proceso']),
+              {
+                text: `\nCant. Total: ${this.formatonumeros(this.totalCantidad.toFixed(2))}\n Rollos Totales: ${this.formatonumeros(this.totalRollos.toFixed(2))}`,
+                alignment: 'right',
+                style: 'header',
+              },
+            ],
+            styles: {
+              header: {
+                fontSize: 10,
+                bold: true
+              },
+              titulo: {
+                fontSize: 20,
+                bold: true
+              }
+            }
+          }
+          const pdf = pdfMake.createPdf(pdfDefinicion);
+          pdf.open();
+          setTimeout(() => { (this.cargando = true); }, 1200);
+          break;
+        }
+        break;
+      }
+    });
+  }
+
+  //Funcion que creará el pdf de la asignacion
+  crearPDFSalida(id : number){
+    this.salidaRollosService.crearPdf(id).subscribe(datos_ingreso => {
+      for (let i = 0; i < datos_ingreso.length; i++) {
+        for (let j = 0; j < this.rollosPdf.length; j++) {
+          const pdfDefinicion : any = {
+            info: {
+              title: `${id}`
+            },
+            pageSize: {
+              width: 630,
+              height: 760
+            },
+            content : [
+              {
+                text: `Salida de Rollos a Bodega de Extrusión`,
+                alignment: 'right',
+                style: 'titulo',
+              },
+              '\n \n',
+              {
+                style: 'tablaEmpresa',
+                table: {
+                  widths: [90, '*', 90, '*'],
+                  style: 'header',
+                  body: [
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Nombre Empresa`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `Plasticaribe S.A.S`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: `Fecha`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_ingreso[i].asgRollos_Fecha.replace('T00:00:00', '')} ${datos_ingreso[i].asgRollos_Hora}`
+                      },
+                    ],
+                    [
+                      {
+                        border: [false, false, false, false],
+                        text: `Dirección`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_ingreso[i].empresa_Direccion}`
+                      },
+                      {
+                        border: [false, false, false, false],
+                        text: `Ciudad`
+                      },
+                      {
+                        border: [false, false, false, true],
+                        text: `${datos_ingreso[i].empresa_Ciudad}`
+                      },
+                    ],
+                  ]
+                },
+                layout: {
+                  defaultBorder: false,
+                },
+                fontSize: 9,
+              },
+              '\n \n',
+              {
+                text: `Ingresado Por: ${datos_ingreso[i].nombreCreador}\n`,
+                alignment: 'left',
+                style: 'header',
+              },
+              {
+                text: `\n\n Consolidado de producto(s) \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+              this.table2(this.rollosAgrupados, ['OT', 'Producto', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion']),
+              {
+                text: `\n\n Información detallada de los Rollos \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+
+              this.table(this.rollosPdf, ['OT', 'Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion', 'Proceso']),
+              {
+                text: `\nCant. Total: ${this.formatonumeros(this.totalCantidad.toFixed(2))}\n Rollos Totales: ${this.formatonumeros(this.totalRollos.toFixed(2))}`,
+                alignment: 'right',
+                style: 'header',
+              },
+            ],
+            styles: {
+              header: {
+                fontSize: 10,
+                bold: true
+              },
+              titulo: {
+                fontSize: 20,
+                bold: true
+              }
+            }
+          }
+          const pdf = pdfMake.createPdf(pdfDefinicion);
+          pdf.open();
+          setTimeout(() => { (this.cargando = true); }, 1200);
+          break;
+        }
+        break;
+      }
+    });
+  }
+
+  // funcion que se encagará de llenar la tabla de los rollos en el pdf
+  buildTableBody(data, columns) {
+    var body = [];
+    body.push(columns);
+    data.forEach(function(row) {
+        var dataRow = [];
+        columns.forEach(function(column) {
+            dataRow.push(row[column].toString());
+        });
+        body.push(dataRow);
+    });
+
+    return body;
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los rollos
+  table(data, columns) {
+    return {
+        table: {
+          headerRows: 1,
+          widths: [40, 40, 40, 221, 40, 50, 60],
+          body: this.buildTableBody(data, columns),
+        },
+        fontSize: 7,
+        layout: {
+          fillColor: function (rowIndex, node, columnIndex) {
+            return (rowIndex == 0) ? '#CCCCCC' : null;
+          }
+        }
+    };
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los rollos
+  table2(data, columns) {
+    return {
+        table: {
+          headerRows: 1,
+          widths: [60, 50, 240, 60, 40, 50],
+          body: this.buildTableBody(data, columns),
+        },
+        fontSize: 7,
+        layout: {
+          fillColor: function (rowIndex, node, columnIndex) {
+            return (rowIndex == 0) ? '#CCCCCC' : null;
+          }
+        }
+    };
   }
 }

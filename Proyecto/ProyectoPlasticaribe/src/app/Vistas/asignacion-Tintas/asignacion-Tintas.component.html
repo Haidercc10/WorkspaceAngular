@@ -59,7 +59,8 @@
                 [itemTemplate]="itemTemplate"
                 [notFoundTemplate]="notFoundTemplate"
                 id="floatingInput"
-                formControlName="Tinta">
+                formControlName="Tinta"
+                required>
               </ng-autocomplete>
 
               <ng-template #itemTemplate let-item>
@@ -71,12 +72,7 @@
               </ng-template>
               <label for="floatingInput" *ngIf="validarInputTintas">Tinta</label>
             </div>
-            <!-- <div class="form-floating col-md-5">
-              <select formControlName="Tinta" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
-                <option [ngValue]="tinta" *ngFor="let tinta of tintas">{{tinta}}</option>
-              </select>
-              <label for="floatingSelect">Nombre de Tinta</label>
-            </div> -->
+
             <!-- Cantidad Tinta -->
             <div class="form-floating col-md">
               <input formControlName="cantidadTinta" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" title="Maquina">
@@ -141,12 +137,7 @@
               </ng-template>
               <label for="floatingInput" *ngIf="validarInputMp">{{NombreMatPrima}}</label>
             </div>
-            <!-- <div class="form-floating col-md-4">
-              <select formControlName="nombreMateriaPrima" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" (change)="buscarMpSeleccionada()">
-                <option [ngValue]="materiaPrima" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima}}</option>
-              </select>
-              <label for="floatingSelect">Nombre de la Materia Prima</label>
-            </div> -->
+
               <!-- stock DE MATERIA PRIMA  -->
             <div class="form-floating col-md-2">
               <input formControlName="stockMateriaPrima" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapStock" placeholder="Stock" required  readonly onmousedown="return false;">
@@ -215,13 +206,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Gif de Carga -->
-      <!-- <div class="overlay" *ngIf="!load">
-        <div class="spinner ">
-          <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
-        </div>
-      </div> -->
 
       <div *ngIf="load">
         <div class="mb-3">

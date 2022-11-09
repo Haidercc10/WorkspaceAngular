@@ -1249,29 +1249,33 @@ export class MovimientoMatPrimaComponent implements OnInit {
       }
       this.ArrayInfoConsulta.push(info);
     } else if (tipoDoc == 'FCO') {
-      let info : any = {
-        ot : datos.facco_Codigo,
-        tipoId : 'FCO',
-        tipo : 'Factura de compra de MP',
-        fecha : datos.facco_FechaFactura,
-        usuario : datos.usua_Nombre,
-        matPrima : datos.matPri_Nombre,
-        cant : datos.faccoMatPri_Cantidad,
-        estado : '',
+      if (datos.matPri_Nombre != 'NO APLICA') {
+        let info : any = {
+          ot : datos.facco_Codigo,
+          tipoId : 'FCO',
+          tipo : 'Factura de compra de MP',
+          fecha : datos.facco_FechaFactura,
+          usuario : datos.usua_Nombre,
+          matPrima : datos.matPri_Nombre,
+          cant : datos.faccoMatPri_Cantidad,
+          estado : '',
+        }
+        this.ArrayInfoConsulta.push(info);
       }
-      this.ArrayInfoConsulta.push(info);
     } else if (tipoDoc == 'REM') {
-      let info : any = {
-        ot : datos.rem_Codigo,
-        tipoId : 'REM',
-        tipo : 'Remisión de MP',
-        fecha : datos.rem_Fecha,
-        usuario : datos.usua_Nombre,
-        matPrima : datos.matPri_Nombre,
-        cant : datos.remiMatPri_Cantidad,
-        estado : '',
+      if (datos.matPri_Nombre != 'NO APLICA') {
+        let info : any = {
+          ot : datos.rem_Codigo,
+          tipoId : 'REM',
+          tipo : 'Remisión de MP',
+          fecha : datos.rem_Fecha,
+          usuario : datos.usua_Nombre,
+          matPrima : datos.matPri_Nombre,
+          cant : datos.remiMatPri_Cantidad,
+          estado : '',
+        }
+        this.ArrayInfoConsulta.push(info);
       }
-      this.ArrayInfoConsulta.push(info);
     } else if (tipoDoc == 'RECP') {
       let info : any = {
         ot : datos.recMp_Id,
