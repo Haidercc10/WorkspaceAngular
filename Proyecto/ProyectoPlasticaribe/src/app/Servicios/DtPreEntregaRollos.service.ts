@@ -56,6 +56,11 @@ export class DtPreEntregaRollosService {
   getRollosPreEntregadosOT(ot : any, proceso : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/getRollosPreEntregadosOT/${ot}/${proceso}`);
   }
+
+  getRollosProceso(proceso : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/getconsultaProceso/${proceso}`);
+  }
+
   srvObtenerListaPorId(dato : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/${dato}`);
   }

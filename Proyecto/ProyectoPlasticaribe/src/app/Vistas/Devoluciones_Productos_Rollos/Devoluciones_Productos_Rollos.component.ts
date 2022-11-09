@@ -361,7 +361,7 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
                 Rollo_Id : datos_rollos[j].rollo_Id,
                 DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
                 undMed_Rollo : datos_rollos[j].undMed_Rollo,
-                Estado_Id : 19,
+                Estado_Id : 24,
                 dtEntRolloProd_OT : datos_rollos[j].dtEntRolloProd_OT,
                 Prod_Id : datos_rollos[j].prod_Id,
                 UndMed_Prod : datos_rollos[j].undMed_Prod,
