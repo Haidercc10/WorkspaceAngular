@@ -23,6 +23,11 @@ export class DtIngRollos_ExtrusionService {
   srvObtenerLista() {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetallesIngRollos_Extrusion');
   }
+
+  srvObtenerListaRollosDisponible() {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetallesIngRollos_Extrusion/getTodosRollosDisponibles');
+  }
+
   srvObtenerListaPorId(dato : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/${dato}`);
   }

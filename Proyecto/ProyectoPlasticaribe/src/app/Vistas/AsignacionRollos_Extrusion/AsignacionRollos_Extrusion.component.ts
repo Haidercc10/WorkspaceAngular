@@ -257,7 +257,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
           }
         });
       } else {
-        this.dtIngRollosService.getRollosDisponibles(this.today).subscribe(datos_Rollos => {
+        this.dtIngRollosService.srvObtenerListaRollosDisponible().subscribe(datos_Rollos => {
           consulta = datos_Rollos.length;
           for (let i = 0; i < datos_Rollos.length; i++) {
             if (!rollos.includes(datos_Rollos[i].rollo_Id)) {

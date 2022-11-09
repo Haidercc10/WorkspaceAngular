@@ -70,26 +70,19 @@ constructor(private http : HttpClient,
 
     /** Fechas + item + 1 parametro */
 
-    srvObtenerListaRollosxFechasxItemxOT(fechaIni : any, fechaFin : any, item : any, OT):Observable<any[]> {
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxItemxOT/${fechaIni}/${fechaFin}/${item}/${OT}`);
-    }
+  srvObtenerListaRollosxFechasxItemxOT(fechaIni : any, fechaFin : any, item : any, OT):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxItemxOT/${fechaIni}/${fechaFin}/${item}/${OT}`);
+  }
 
 
-/*
+  srvObtenerListaRollosxFechasxRolloxItemxOT(fechaIni : any, fechaFin : any, rollo : any, item : any, OT):Observable<any[]> {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxItemxOT/${fechaIni}/${fechaFin}/${rollo}/${item}/${OT}`);
+  }
 
-    srvObtenerListaRollosxFechasxMaterialxCliente(fechaIni : any, fechaFin : any, material : any, cliente : any):Observable<any[]> {
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxItem/${fechaIni}/${fechaFin}/${material}/${cliente}`);
-    }
-
-    srvObtenerListaRollosxFechasxMaterialxOT(fechaIni : any, fechaFin : any, material : any, OT):Observable<any[]> {
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxCliente/${fechaIni}/${fechaFin}/${material}/${OT}`);
-    }
-
-    srvObtenerListaRollosxFechasxMaterialxTurno(fechaIni : any, fechaFin : any, material : any, turno):Observable<any[]> {
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxMaterial/${fechaIni}/${fechaFin}/${material}/${turno}`);
-    }
-*/
-
+  /** OT y Rollo */
+  srvObtenerListaRollosxOTxRollo(OT: any, rollo : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxOTxRollo/${OT}/${rollo}`);
+  }
 
 }
 

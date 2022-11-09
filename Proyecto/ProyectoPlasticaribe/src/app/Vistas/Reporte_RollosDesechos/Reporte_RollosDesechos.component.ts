@@ -73,12 +73,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       { header: 'OT', field: 'Orden'},
       { header: 'Rollo', field: 'Rollo'},
       { header: 'Cliente', field: 'Cliente'},
+      { header: 'Nro. Item', field: 'ItemId'},
       { header: 'Item', field: 'Item'},
       { header: 'Ancho', field: 'Ancho'},
       { header: 'Largo', field: 'Largo'},
       { header: 'Fuelle', field: 'Fuelle'},
       { header: 'Medida', field: 'Medida'},
       { header: 'Peso', field: 'Peso'},
+      { header: 'Und.', field: 'Kg'},
       { header: 'Material', field: 'Material'},
       { header: 'Calibre', field: 'Calibre'},
       { header: 'Operario', field: 'Operario'},
@@ -175,16 +177,17 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       OT : null,
       fecha : null,
       fechaFinal : null,
-      turno : null,
-      cliente: null ,
+      //turno : null,
+      //cliente: null ,
       producto: null,
       rollo : null,
       //operario: null,
-      material : null,
+      //material : null,
     });
 
   }
 
+  /**  */
   validarConsulta() {
     this.load = false;
     this.ArrayDocumento = [];
@@ -194,7 +197,32 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     let fecha2 : any  = this.formConsultaRollos.value.fechaFinal;
     let productoConsulta : number = this.formConsultaRollos.value.producto;
 
-    if(fecha1 != null && fecha2 != null && rolloEliminado != null && productoConsulta != null) {
+    if(fecha1 != null && fecha2 != null && rolloEliminado != null && productoConsulta != null && ordenTrabajo != null) {
+      this.servicioRollos.srvObtenerListaRollosxFechasxRolloxItemxOT(fecha1, fecha2, rolloEliminado, productoConsulta, ordenTrabajo).subscribe(dataRollos => {
+        if(dataRollos.length == 0) Swal.fire(`No se encontró el rollo ${rolloEliminado} para el producto ${productoConsulta} y la OT ${ordenTrabajo} entre las fechas consultadas`);
+        else
+        for (let index = 0; index < dataRollos.length; index++) {
+          this.parametrosTablaRollos(
+            dataRollos[index].rollo_OT,
+            dataRollos[index].rollo_Id,
+            dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
+            dataRollos[index].prod_Nombre,
+            dataRollos[index].rollo_Ancho,
+            dataRollos[index].rollo_Largo,
+            dataRollos[index].rollo_Fuelle,
+            dataRollos[index].undMed_Id,
+            dataRollos[index].rollo_PesoNeto,
+            'Kg',
+            dataRollos[index].material_Nombre,
+            dataRollos[index].rollo_Calibre,
+            dataRollos[index].rollo_Operario,
+            dataRollos[index].rollo_FechaIngreso,
+            dataRollos[index].turno_Id,
+          )
+        }
+      });
+    } else if(fecha1 != null && fecha2 != null && rolloEliminado != null && productoConsulta != null) {
       this.servicioRollos.srvObtenerListaRollosxFechasxRolloxItem(fecha1, fecha2, rolloEliminado, productoConsulta).subscribe(dataRollos => {
         if(dataRollos.length == 0) Swal.fire(`No se encontró el rollo ${rolloEliminado} para el producto ${productoConsulta} entre las fechas consultadas`);
         else
@@ -203,12 +231,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -218,7 +248,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         }
       });
     } else if(fecha1 != null && fecha2 != null && rolloEliminado != null && ordenTrabajo != null) {
-      this.servicioRollos.srvObtenerListaRollosxFechasxRolloxItem(fecha1, fecha2, rolloEliminado, ordenTrabajo).subscribe(dataRollos => {
+      this.servicioRollos.srvObtenerListaRollosxFechasxRolloxOT(fecha1, fecha2, rolloEliminado, ordenTrabajo).subscribe(dataRollos => {
         if(dataRollos.length == 0) Swal.fire(`No se encontró el rollo ${rolloEliminado} en la OT ${ordenTrabajo} entre las fechas consultadas`);
         else
         for (let index = 0; index < dataRollos.length; index++) {
@@ -226,12 +256,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -249,12 +281,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -272,12 +306,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -295,12 +331,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -318,12 +356,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -342,12 +382,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -358,19 +400,21 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       });
     } else if(fecha1 != null && ordenTrabajo != null) {
       this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha1, ordenTrabajo).subscribe(dataRollos => {
-        if(dataRollos.length == 0) setTimeout(() => {Swal.fire(`No se encontraron rollos eliminados entre las fechas consultadas para la OT ${ordenTrabajo}`);}, 3000);
+        if(dataRollos.length == 0) setTimeout(() => {Swal.fire(`No se encontraron rollos eliminados en la fecha consultada para la OT ${ordenTrabajo}`);}, 3000);
         else
         for (let index = 0; index < dataRollos.length; index++) {
           this.parametrosTablaRollos(
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -381,19 +425,21 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       });
     } else if(fecha1 != null && rolloEliminado != null) {
       this.servicioRollos.srvObtenerListaRollosxFechasxRollo(fecha1, fecha1, rolloEliminado).subscribe(dataRollos => {
-        if(dataRollos.length == 0) setTimeout(() => {Swal.fire(`No se encontraron rollos eliminados entre las fechas consultadas para la OT ${ordenTrabajo}`);}, 3000);
+        if(dataRollos.length == 0) setTimeout(() => {Swal.fire(`No se encontró el rollo ${rolloEliminado} en la fecha consultada`);}, 3000);
         else
         for (let index = 0; index < dataRollos.length; index++) {
           this.parametrosTablaRollos(
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -404,25 +450,108 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       });
     } else if(fecha1 != null && productoConsulta != null) {
       this.servicioRollos.srvObtenerListaRollosxFechasxItem(fecha1, fecha1, productoConsulta).subscribe(dataRollos => {
-        if(dataRollos.length == 0) setTimeout(() => {Swal.fire(`No se encontraron rollos eliminados entre las fechas consultadas para la OT ${ordenTrabajo}`);}, 3000);
+        if(dataRollos.length == 0) setTimeout(() => {Swal.fire(`No se encontraron rollos eliminados en la fecha consultada para el item ${productoConsulta}`);}, 3000);
         else
         for (let index = 0; index < dataRollos.length; index++) {
           this.parametrosTablaRollos(
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
             dataRollos[index].rollo_FechaIngreso,
             dataRollos[index].turno_Id,
           )
+        }
+      });
+
+
+    } else if(ordenTrabajo != null && rolloEliminado != null) {
+      this.servicioRollos.srvObtenerListaRollosxOTxRollo(ordenTrabajo, rolloEliminado).subscribe(dataRollos => {
+        if(dataRollos.length == 0) Swal.fire(`No se encontró el rollo ${rolloEliminado} con la OT ${ordenTrabajo}.`);
+        else
+        for (let index = 0; index < dataRollos.length; index++) {
+            this.parametrosTablaRollos(
+            dataRollos[index].rollo_OT,
+            dataRollos[index].rollo_Id,
+            dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
+            dataRollos[index].prod_Nombre,
+            dataRollos[index].rollo_Ancho,
+            dataRollos[index].rollo_Largo,
+            dataRollos[index].rollo_Fuelle,
+            dataRollos[index].undMed_Id,
+            dataRollos[index].rollo_PesoNeto,
+            'Kg',
+            dataRollos[index].material_Nombre,
+            dataRollos[index].rollo_Calibre,
+            dataRollos[index].rollo_Operario,
+            dataRollos[index].rollo_FechaIngreso,
+            dataRollos[index].turno_Id,
+            )
+        }
+      });
+    } else if(ordenTrabajo != null && productoConsulta != null) {
+      this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
+        if(dataRollos.length == 0) Swal.fire(`No se encontraron rollos eliminados con la OT ${ordenTrabajo}.`);
+        else
+        for (let index = 0; index < dataRollos.length; index++) {
+          if(productoConsulta == dataRollos[index].prod_Id) {
+            this.parametrosTablaRollos(
+            dataRollos[index].rollo_OT,
+            dataRollos[index].rollo_Id,
+            dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
+            dataRollos[index].prod_Nombre,
+            dataRollos[index].rollo_Ancho,
+            dataRollos[index].rollo_Largo,
+            dataRollos[index].rollo_Fuelle,
+            dataRollos[index].undMed_Id,
+            dataRollos[index].rollo_PesoNeto,
+            'Kg',
+            dataRollos[index].material_Nombre,
+            dataRollos[index].rollo_Calibre,
+            dataRollos[index].rollo_Operario,
+            dataRollos[index].rollo_FechaIngreso,
+            dataRollos[index].turno_Id,
+            )
+          } else Swal.fire(`No se encontraron rollos eliminados de la OT ${ordenTrabajo} para el producto ${productoConsulta}.`);
+        }
+      });
+    } else if(rolloEliminado != null && productoConsulta != null) {
+      this.servicioRollos.srvObtenerListaRollosxRollo(rolloEliminado).subscribe(dataRollos => {
+        if(dataRollos.length == 0) Swal.fire(`No se encontró el rollo ${rolloEliminado}.`);
+        else
+        for (let index = 0; index < dataRollos.length; index++) {
+          if(productoConsulta == dataRollos[index].prod_Id) {
+            this.parametrosTablaRollos(
+              dataRollos[index].rollo_OT,
+            dataRollos[index].rollo_Id,
+            dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
+            dataRollos[index].prod_Nombre,
+            dataRollos[index].rollo_Ancho,
+            dataRollos[index].rollo_Largo,
+            dataRollos[index].rollo_Fuelle,
+            dataRollos[index].undMed_Id,
+            dataRollos[index].rollo_PesoNeto,
+            'Kg',
+            dataRollos[index].material_Nombre,
+            dataRollos[index].rollo_Calibre,
+            dataRollos[index].rollo_Operario,
+            dataRollos[index].rollo_FechaIngreso,
+            dataRollos[index].turno_Id,
+            )
+          } else Swal.fire(`No se encontraron rollos eliminados del producto ${productoConsulta}`);
         }
       });
     } else if(ordenTrabajo != null) {
@@ -434,12 +563,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -457,12 +588,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -480,12 +613,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -496,19 +631,21 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       });
     } else if(productoConsulta != null) {
       this.servicioRollos.srvObtenerListaRollosxItem(productoConsulta).subscribe(dataRollos => {
-        if(dataRollos.length == 0) Swal.fire(`No se encontraron rollos eliminados del cliente ${productoConsulta}`);
+        if(dataRollos.length == 0) Swal.fire(`No se encontraron rollos eliminados del producto ${productoConsulta}`);
         else
         for (let index = 0; index < dataRollos.length; index++) {
           this.parametrosTablaRollos(
             dataRollos[index].rollo_OT,
             dataRollos[index].rollo_Id,
             dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
             dataRollos[index].prod_Nombre,
             dataRollos[index].rollo_Ancho,
             dataRollos[index].rollo_Largo,
             dataRollos[index].rollo_Fuelle,
             dataRollos[index].undMed_Id,
             dataRollos[index].rollo_PesoNeto,
+            'Kg',
             dataRollos[index].material_Nombre,
             dataRollos[index].rollo_Calibre,
             dataRollos[index].rollo_Operario,
@@ -518,7 +655,30 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         }
       });
     } else {
-
+      this.servicioRollos.srvObtenerListaRollosxFecha(this.today).subscribe(dataRollos => {
+        if(dataRollos.length == 0) Swal.fire(`No se encontraron rollos eliminados el día de hoy`);
+        else
+        for (let index = 0; index < dataRollos.length; index++) {
+          this.parametrosTablaRollos(
+            dataRollos[index].rollo_OT,
+            dataRollos[index].rollo_Id,
+            dataRollos[index].rollo_Cliente,
+            dataRollos[index].prod_Id,
+            dataRollos[index].prod_Nombre,
+            dataRollos[index].rollo_Ancho,
+            dataRollos[index].rollo_Largo,
+            dataRollos[index].rollo_Fuelle,
+            dataRollos[index].undMed_Id,
+            dataRollos[index].rollo_PesoNeto,
+            'Kg',
+            dataRollos[index].material_Nombre,
+            dataRollos[index].rollo_Calibre,
+            dataRollos[index].rollo_Operario,
+            dataRollos[index].rollo_FechaIngreso,
+            dataRollos[index].turno_Id,
+          )
+        }
+      });
     }
 
   }
@@ -552,17 +712,19 @@ export class Reporte_RollosDesechosComponent implements OnInit {
   }
 
   /** */
-  parametrosTablaRollos(OT: any, rollo : any, cliente: any, item : any, ancho: any, largo : any, fuelle: any, und : any, peso : any, material : any, calibre: any, operario : any, fecha: any, turno : any) {
+  parametrosTablaRollos(OT: any, rollo : any, cliente: any, itemId : any, item : any, ancho: any, largo : any, fuelle: any, und : any, peso : any, kg : any, material : any, calibre: any, operario : any, fecha: any, turno : any) {
     let info : any = {
       Orden : OT,
       Rollo : rollo,
       Cliente : cliente,
+      ItemId : itemId,
       Item : item,
       Ancho : ancho,
       Largo : largo,
       Fuelle : fuelle,
       Medida : und,
       Peso: peso,
+      Kg: kg,
       Material : material,
       Calibre : calibre,
       Operario : operario,
