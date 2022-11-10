@@ -23,11 +23,13 @@
   <form [formGroup]="FormMateriaPrima">
     <div class="mb-3">
       <div class="row g-3">
+        <!-- Id de Materia Prima -->
         <div class="form-floating col-md-2">
           <input formControlName="MpId" type="number" min="0"  class="form-control" id="floatingInput"required > <!-- (change)="buscarMpId()" -->
           <label for="floatingInput">Id Materia Prima</label>
         </div>
-        <!-- ID/Nombre Producto -->
+
+        <!-- Nombre de la materia prima -->
         <div class="ng-autocomplete form-floating col-md-2 form-control form-control-sm">
           <ng-autocomplete
             class=""
@@ -41,22 +43,15 @@
             id="floatingInput"
             formControlName="MpNombre">
           </ng-autocomplete>
-
           <ng-template #itemTemplate let-item>
             <a [innerHTML]="item.Nombre"></a>
           </ng-template>
-
           <ng-template #notFoundTemplate let-notFound>
             <div [innerHTML]="notFound"></div>
           </ng-template>
           <label for="floatingInput" *ngIf="validarInput">Materia Prima</label>
         </div>
-        <!-- <div class="form-floating col-md">
-          <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
-            <option [ngValue]="materiaPrima.Id" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima.Nombre}}</option>
-          </select>
-          <label for="floatingSelect">Nombre de la Materia Prima</label>
-        </div> -->
+
         <!-- Categoria Producto -->
         <div class="form-floating col-md-2">
           <select formControlName="MpCategoria" (change)="cargarComboMatPrimaSegunCategorias()" class="form-select form-select-sm" id="floatingSelect"  aria-label="Floating label select example" required>
@@ -64,23 +59,21 @@
           </select>
           <label for="floatingSelect">Categorias de Materia Prima</label>
         </div>
+
         <!-- Bodegas -->
         <div class="form-floating col-md-2">
           <select formControlName="MpBodega" class="form-select form-select-sm" id="floatingSelect"  aria-label="Floating label select example" required>
-            <!-- <option [ngValue]="null" disabled selected>Seleccione Bodega</option> -->
             <option [ngValue]="item.tpBod_Id" *ngFor="let item of bodegas">{{item.tpBod_Nombre}}</option>
-            <!-- <option value="3" *ngIf="ValidarRol == 1 || ValidarRol == 3">Bodega BOPP</option>
-            <option value="4" *ngIf="ValidarRol == 1 || ValidarRol == 3">Bodega Chips y Solventes</option>
-            <option value="1" *ngIf="ValidarRol == 1 || ValidarRol == 3">Bodega Polipropileno</option>
-            <option value="2" *ngIf="ValidarRol == 1 || ValidarRol == 3">Bodega Tintas</option> -->
           </select>
           <label for="floatingSelect">Bodegas</label>
         </div>
+
         <!-- Fecha inicial -->
         <div class="form-floating col-md-2">
           <input formControlName="fecha" type="date" min="0" class="form-control" (change)="buscarBOPPSegunFecha()" id="floatingInput"required >
           <label for="floatingInput">Fecha Inicial</label>
         </div>
+
         <!-- Fecha final -->
         <div class="form-floating col-md-2">
           <input formControlName="fechaFinal" type="date" min="0" class="form-control" (change)="buscarBOPPSegunFecha()" id="floatingInput"required >
@@ -88,6 +81,7 @@
         </div>
       </div>
     </div>
+
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
@@ -97,16 +91,10 @@
     </div>
   </form>
 
-  <!-- <div class="overlay" *ngIf="!load">
-    <div class="spinner ">
-      <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
-    </div>
-  </div> -->
   <div *ngIf="load">
     <div class="mb-2">
       <div class="row g-1">
         <div class="table-responsive">
-          <!-- <div id="html2Pdf"> -->
           <table class="table table-bordered table-hover mt-2" id="table">
             <thead class="TitulosTabla">
               <tr *ngFor="let columnas of titulosTabla let i = index">
@@ -145,11 +133,6 @@
               </tr>
             </tbody>
           </table>
-          <!-- <div class="mb-2">
-            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <pagination-controls (pageChange)="page = $event"></pagination-controls>
-            </div>
-          </div> -->
         </div>
       </div>
 

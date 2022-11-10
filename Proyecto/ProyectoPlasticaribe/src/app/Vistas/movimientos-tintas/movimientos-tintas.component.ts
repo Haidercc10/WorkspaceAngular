@@ -1301,7 +1301,7 @@ export class MovimientosTintasComponent implements OnInit {
 
   // Funcion que genera la tabla donde se mostrará la información de las tintas.
   tableAsignacion(data, columns) {
-  return {
+    return {
       table: {
         headerRows: 1,
         widths: [70, '*', 100, 50],
@@ -1313,7 +1313,7 @@ export class MovimientosTintasComponent implements OnInit {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
-  };
+    };
   }
 
 }

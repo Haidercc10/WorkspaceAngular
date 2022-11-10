@@ -48,6 +48,10 @@ export class MateriaPrimaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/ConsultaInventario3/${fecha1}/${id}/${categoria}`);
   }
 
+  GetConsultaMateriaPrimaF(fecha1 : any, fecha2 : any, id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/GetConsultaMateriaPrimaFI/${fecha1}/${fecha2}/${id}`);
+  }
+
   //Metodo agregar Productos
   srvAgregar(data : any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data)

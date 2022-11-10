@@ -46,7 +46,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   cantidadOT : number = 0; //
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
   cantTotalProducto : number = 0; //Variable que servirá para mostrar la cantidad total de existencias de un producto consultado
-  idCliente : number = 0; //variable que va a almacenar el id del cliente seleccionado
+  idCliente : any = 0; //variable que va a almacenar el id del cliente seleccionado
 
   keywordNombresProductos = 'prod_Nombre'; /** Variable de palabra clave para Input Producto. */
   validarInputNombresProductos : any = true; /** Variable para validar input producto */
@@ -121,19 +121,21 @@ export class AsignarProductosFacturasComponent implements OnInit {
   }
 
   selectEventCliente() {
+    let datosNumeros : any = /^[0-9]*(\.?)[ 0-9]+$/;
     this.idCliente = this.FormConsultarProductos.value.Cliente;
-    this.servicioClientes.srvObtenerListaPorId(this.FormConsultarProductos.value.Cliente).subscribe(datos_cliente => {
-      this.FormConsultarProductos = this.frmBuilderPedExterno.group({
-        Factura : this.FormConsultarProductos.value.Factura,
-        NotaCredito : this.FormConsultarProductos.value.NotaCredito,
-        IdProducto : this.FormConsultarProductos.value.IdProducto,
-        CantidadProducto : this.FormConsultarProductos.value.CantidadProducto,
-        ProdNombre: this.FormConsultarProductos.value.ProdNombre,
-        Cliente: datos_cliente.cli_Nombre,
-        Observacion : this.FormConsultarProductos.value.Observacion,
+    if (this.idCliente.match(datosNumeros) != null){
+      this.servicioClientes.srvObtenerListaPorId(this.FormConsultarProductos.value.Cliente).subscribe(datos_cliente => {
+        this.FormConsultarProductos = this.frmBuilderPedExterno.group({
+          Factura : this.FormConsultarProductos.value.Factura,
+          NotaCredito : this.FormConsultarProductos.value.NotaCredito,
+          IdProducto : this.FormConsultarProductos.value.IdProducto,
+          CantidadProducto : this.FormConsultarProductos.value.CantidadProducto,
+          ProdNombre: this.FormConsultarProductos.value.ProdNombre,
+          Cliente: datos_cliente.cli_Nombre,
+          Observacion : this.FormConsultarProductos.value.Observacion,
+        });
       });
-    });
-    // do something with selected item
+    }
   }
 
 
