@@ -932,7 +932,7 @@ export class MovimientosTintasComponent implements OnInit {
     } else if (data.tipoId == 'TINTAS') {
       this.dtCreacionTinta.getCreatPdf(data.Id).subscribe(datos_creacion => {
         for (let i = 0; i < datos_creacion.length; i++) {
-          if (datos_creacion[i].materiaPrima != 84 && datos_creacion[i].tinta2 == 2001){
+          if (datos_creacion[i].matPri_Id != 84 && datos_creacion[i].tinta_Id == 2001){
             let info : any = {
               Id : datos_creacion[i].matPri_Id,
               Nombre : datos_creacion[i].matPri_Nombre,
@@ -941,7 +941,8 @@ export class MovimientosTintasComponent implements OnInit {
             }
             this.ArrayMpPDF.push(info);
             this.ArrayMpPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-          } else if (datos_creacion[i].materiaPrima == 84 && datos_creacion[i].tinta2 != 2001){
+          } else if (datos_creacion[i].matPri_Id == 84 && datos_creacion[i].tinta_Id != 2001){
+            console.log(1)
             let info : any = {
               Id : datos_creacion[i].tinta_Id,
               Nombre : datos_creacion[i].tinta_Nombre,
@@ -1216,53 +1217,68 @@ export class MovimientosTintasComponent implements OnInit {
         }
       });
     } else if (data.tipoId == 'TINTAS') {
-      this.creacionTintasService.srvObtenerListaPorId(data.Id).subscribe(datos_creacion => {
-        const pdfDefinicion : any = {
-          info: {
-            title: `${data.ot}`
-          },
-          content : [
-            {
-              text: `Plasticaribe S.A.S ---- Creación de Tinta`,
-              alignment: 'center',
-              style: 'titulo',
+      this.dtCreacionTinta.getCreatPdf(data.Id).subscribe(datos_creacion => {
+        for (let i = 0; i < datos_creacion.length; i++) {
+          const pdfDefinicion : any = {
+            info: {
+              title: `${data.ot}`
             },
-            '\n \n',
-            {
-              text: `Fecha de registro: ${datos_creacion.asigMPxTinta_FechaEntrega.replace('T00:00:00', '')}`,
-              style: 'header',
-              alignment: 'right',
-            },
-            {
-              text: `Registrado Por: ${datos_creacion.usua_Nombre}\n`,
-              alignment: 'right',
-              style: 'header',
-            },
-            {
-              text: `\n \nObervación sobre la remisión: \n ${datos_creacion.asigMPxTinta_Observacion}\n`,
-              style: 'header',
-            },
-            {
-              text: `\n Información detallada de la Tinta Creada \n `,
-              alignment: 'center',
-              style: 'header'
-            },
-
-            this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cantidad', 'Presentacion']),
-          ],
-          styles: {
-            header: {
-              fontSize: 8,
-              bold: true
-            },
-            titulo: {
-              fontSize: 15,
-              bold: true
+            content : [
+              {
+                text: `Plasticaribe S.A.S ---- Creación de Tinta`,
+                alignment: 'center',
+                style: 'titulo',
+              },
+              '\n \n',
+              {
+                text: `Fecha de registro: ${datos_creacion[i].asigMPxTinta_FechaEntrega.replace('T00:00:00', '')}`,
+                style: 'header',
+                alignment: 'right',
+              },
+              {
+                text: `Registrado Por: ${datos_creacion[i].usua_Nombre}\n`,
+                alignment: 'right',
+                style: 'header',
+              },
+              {
+                text: `\n \nObervación sobre la remisión: \n ${datos_creacion[i].asigMPxTinta_Observacion}\n`,
+                style: 'header',
+              },
+              {
+                text: `\n Información detallada de la Tinta Creada \n `,
+                alignment: 'center',
+                style: 'header'
+              },
+              {
+                text: `\n La tinta creada fue: \n `,
+                alignment: 'left',
+                style: 'header'
+              },
+              {
+                text: `ID: ${datos_creacion[i].tinta_Creada} \n Nombre: ${datos_creacion[i].nombre_TintaCreada} \n Cantidad: ${datos_creacion[i].cantidad_Creada} Kg \n `,
+                alignment: 'left',
+                style: 'tintaCreada'
+              },
+              this.tableCreacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cantidad', 'Presentacion']),
+            ],
+            styles: {
+              header: {
+                fontSize: 10,
+                bold: true
+              },
+              titulo: {
+                fontSize: 15,
+                bold: true
+              },
+              tintaCreada: {
+                fontSize: 9
+              }
             }
           }
+          const pdf = pdfMake.createPdf(pdfDefinicion);
+          pdf.open();
+          break;
         }
-        const pdf = pdfMake.createPdf(pdfDefinicion);
-        pdf.open();
       });
     }
     setTimeout(() => { this.load = true; }, 1000);
@@ -1291,6 +1307,23 @@ export class MovimientosTintasComponent implements OnInit {
         body: this.buildTableBody(data, columns),
       },
       fontSize: 9,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+    };
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  tableCreacion(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: [100, 220, 100, 60],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 8,
       layout: {
         fillColor: function (rowIndex, node, columnIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;

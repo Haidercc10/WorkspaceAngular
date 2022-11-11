@@ -57,7 +57,7 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcSellado/ContarOtEnSellado/${ot}`);
   }
 
-  /* PROCEXTRUSION */
+  /**************************************** PROCEXTRUSION *************************************************/
 
   srvObtenerListaProcExt():Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + '/ProcExtrusion');
@@ -96,12 +96,24 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/FechasRollos/${fecha1}/${fecha2}`);
   }
 
+  consultarFechas(fecha1 : any, fecha2 : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/Fechas/${fecha1}/${fecha2}`);
+  }
+
   srvObtenerListaProcExtrusionFechasOT(fecha1 : any, fecha2 : any, ot : any):Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/FechasOTRollos/${fecha1}/${fecha2}/${ot}`);
   }
 
+  consultarRollo(rollo : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/consultarRollo/${rollo}`);
+  }
 
-  /* CLIENTESOT */
+  EliminarRollExtrusion(id : any) {
+    return this.http.delete(this.rutaBagPro + `/ProcExtrusion/EliminarRollExtrusion/${id}`);
+  }
+
+
+  /*************************************************************** CLIENTESOT *******************************************************************/
 
   srvActualizar(id:number|String, data:any, estado : any) {
     return this.http.put(this.rutaBagPro + `/ClientesOt/CambioEstadoOT/${id}?Estado=${estado}`, data);

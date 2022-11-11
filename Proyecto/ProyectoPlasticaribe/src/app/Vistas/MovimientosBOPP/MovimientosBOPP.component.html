@@ -135,7 +135,7 @@
                 <ng-container *ngIf="ValidarRol == 1">
                   <td id="mp" (click)="editarAsignacion(doc)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.estado}}</td>
                 </ng-container>
-                <td id="subTotalMateriaPrima"><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver archivo" (click)="articulosPdf(doc)"></i></td>
+                <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" (click)="articulosPdf(doc)"></a></td>
               </tr>
             </tbody>
           </table>
@@ -148,13 +148,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Imagen de Carga -->
-  <!-- <div class="overlay" *ngIf="!load">
-    <div class="spinner ">
-      <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
-    </div>
-  </div> -->
 
   <!-- Labels con información -->
   <div *ngIf="load">

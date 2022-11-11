@@ -10,7 +10,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Salida de Rollos</h2>
+      <h2 class="tituloRojo">Eliminar Rollos</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -60,24 +60,6 @@
 
             <div class="form-floating col-md btn-limpiarForm">
               <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarForm()">Limpiar Campos</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <div class="row g-3">
-            <!-- Procesos -->
-            <div class="form-floating col-md-2">
-              <select formControlName="Proceso" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="proceso.proceso_Id" *ngFor="let proceso of procesos">{{proceso.proceso_Nombre}}</option>
-              </select>
-              <label for="floatingSelect">Procesos</label>
-            </div>
-
-            <!-- Observacion -->
-            <div class="form-floating col-md">
-              <textarea formControlName="Observacion" class="form-control" id="floatingInput"></textarea>
-              <label for="floatingInput">Observación</label>
             </div>
           </div>
         </div>
@@ -261,7 +243,7 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="salidaRollos()">Asignación de Rollos</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="eliminarRollos()">Eliminar Rollos</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>

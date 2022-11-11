@@ -120,6 +120,7 @@ import { IngresoRollos_ExtrusionComponent } from './Vistas/IngresoRollos_Extrusi
 import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_Extrusion/AsignacionRollos_Extrusion.component';
 import { ReporteBodegaExtrusionComponent } from './Vistas/ReporteBodegaExtrusion/ReporteBodegaExtrusion.component';
 import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
+import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
 
 
 
@@ -192,7 +193,9 @@ export const routes: Routes = [
   {path: 'IngresoRollos-Extrusion', canActivate : [ValidacionLoginGuard], component : IngresoRollos_ExtrusionComponent}, // Ingreso de Rollos a Extrusion.
   {path: 'AsignacionRollos-Extrusion', canActivate : [ValidacionLoginGuard], component : AsignacionRollos_ExtrusionComponent}, // Asignación de rollos desde la bodega de extrusión.
   {path: 'ReporteRollos-Extrusion', canActivate : [ValidacionLoginGuard], component : ReporteBodegaExtrusionComponent}, // Reporte de la bodega de extrusión.
+  {path: 'Eliminar-rollos', canActivate : [ValidacionLoginGuard], component : EliminarRollos_ExtrusionComponent}, //Eliminar Rollos de Extrusion
   {path: 'reporte-rollos-eliminados', canActivate : [ValidacionLoginGuard], component :Reporte_RollosDesechosComponent}, /** Reporte de rollos eliminados en extrusión */
+
 
 ]
 
@@ -281,6 +284,7 @@ export const routes: Routes = [
     IngresoRollos_ExtrusionComponent,
     AsignacionRollos_ExtrusionComponent,
     ReporteBodegaExtrusionComponent,
+    EliminarRollos_ExtrusionComponent,
     Reporte_RollosDesechosComponent,
   ],
 

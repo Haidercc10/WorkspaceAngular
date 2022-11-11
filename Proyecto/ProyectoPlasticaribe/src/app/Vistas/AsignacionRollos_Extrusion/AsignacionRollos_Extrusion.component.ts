@@ -40,13 +40,11 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
-                  private cookieServices : CookieService,
-                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                      private bagProService : BagproService,
-                        private dtIngRollosService : DtIngRollos_ExtrusionService,
-                          private procesosService : ProcesosService,
-                            private asgRollos : AsignacionRollos_ExtrusionService,
-                              private dtAsgRollos : DetallesAsgRollos_ExtrusionService,) {
+                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                    private dtIngRollosService : DtIngRollos_ExtrusionService,
+                      private procesosService : ProcesosService,
+                        private asgRollos : AsignacionRollos_ExtrusionService,
+                          private dtAsgRollos : DetallesAsgRollos_ExtrusionService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -136,11 +134,9 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
     let consulta : number;
     this.rollos = [];
     this.cargando = false;
-
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       rollos.push(this.rollosInsertar[i].Id);
     }
-
     setTimeout(() => {
       if (ot != null && fechaInicial != null && fechaFinal != null) {
         this.dtIngRollosService.getRollosDisponiblesOT(ot).subscribe(datos_Rollos => {
@@ -286,7 +282,6 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que colocará los rollos que se van a insertar
   llenarRollosAIngresar(item : any){
-    // this.rollosInsertar.push(item);
     for (let i = 0; i < this.rollos.length; i++) {
       if (this.rollos[i].Id == item.Id) this.rollos.splice(i, 1);
     }
@@ -298,10 +293,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   // Funcion que seleccionará y colocará todos los rollos que se van a insertar
   seleccionarTodosRollos(item : any){
     for (let i = 0; i < item.length; i++) {
-      if (item[i].exits != true) {
-        // this.rollosInsertar.push(item[i]);
-        this.rollos = [];
-      }
+      if (item[i].exits != true) this.rollos = [];
     }
     for (let i = 0; i < item.length; i++) {
       if (item[i].exits == true) this.rollos.push(item[i]);
@@ -371,7 +363,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   calcularTotalRollos() {
     let total = 0;
     for(let sale of this.grupoProductos) {
-        total += sale.Rollos2;
+      total += sale.Rollos2;
     }
     this.totalRollos = total;
   }
@@ -398,9 +390,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         Usua_Id : this.storage_Id,
       }
       this.asgRollos.srvGuardar(info).subscribe(datos_rollos => {
-        this.asgRollos.obtenerUltimoId().subscribe(datos_salida => {
-          this.dtSalidaRollos(datos_salida.asgRollos_Id);
-        });
+        this.asgRollos.obtenerUltimoId().subscribe(datos_salida => { this.dtSalidaRollos(datos_salida.asgRollos_Id); });
       }, error => {
         const Toast = Swal.mixin({
           toast: true,
@@ -436,9 +426,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
           Proceso_Id : procesos,
           Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
         }
-        this.dtAsgRollos.srvGuardar(info).subscribe(datos_rollos => {
-
-        }, error => {
+        this.dtAsgRollos.srvGuardar(info).subscribe(datos_rollos => {  }, error => {
           const Toast = Swal.mixin({
             toast: true,
             position: 'center',
@@ -527,112 +515,109 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   crearPDF(id : number){
     this.dtAsgRollos.crearPdf(id).subscribe(datos_ingreso => {
       for (let i = 0; i < datos_ingreso.length; i++) {
-        for (let j = 0; j < this.rollosPDF.length; j++) {
-          const pdfDefinicion : any = {
-            info: {
-              title: `${id}`
+        const pdfDefinicion : any = {
+          info: {
+            title: `${id}`
+          },
+          pageSize: {
+            width: 630,
+            height: 760
+          },
+          content : [
+            {
+              text: `Salida de Rollos a Bodega de Extrusión`,
+              alignment: 'right',
+              style: 'titulo',
             },
-            pageSize: {
-              width: 630,
-              height: 760
-            },
-            content : [
-              {
-                text: `Salida de Rollos a Bodega de Extrusión`,
-                alignment: 'right',
-                style: 'titulo',
-              },
-              '\n \n',
-              {
-                style: 'tablaEmpresa',
-                table: {
-                  widths: [90, '*', 90, '*'],
-                  style: 'header',
-                  body: [
-                    [
-                      {
-                        border: [false, false, false, false],
-                        text: `Nombre Empresa`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `Plasticaribe S.A.S`
-                      },
-                      {
-                        border: [false, false, false, false],
-                        text: `Fecha`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `${datos_ingreso[i].asgRollos_Fecha.replace('T00:00:00', '')} ${datos_ingreso[i].asgRollos_Hora}`
-                      },
-                    ],
-                    [
-                      {
-                        border: [false, false, false, false],
-                        text: `Dirección`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `${datos_ingreso[i].empresa_Direccion}`
-                      },
-                      {
-                        border: [false, false, false, false],
-                        text: `Ciudad`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `${datos_ingreso[i].empresa_Ciudad}`
-                      },
-                    ],
-                  ]
-                },
-                layout: {
-                  defaultBorder: false,
-                },
-                fontSize: 9,
-              },
-              '\n \n',
-              {
-                text: `Ingresado Por: ${datos_ingreso[i].nombreCreador}\n`,
-                alignment: 'left',
+            '\n \n',
+            {
+              style: 'tablaEmpresa',
+              table: {
+                widths: [90, '*', 90, '*'],
                 style: 'header',
+                body: [
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `Nombre Empresa`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `Plasticaribe S.A.S`
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `Fecha`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_ingreso[i].asgRollos_Fecha.replace('T00:00:00', '')} ${datos_ingreso[i].asgRollos_Hora}`
+                    },
+                  ],
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `Dirección`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_ingreso[i].empresa_Direccion}`
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `Ciudad`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_ingreso[i].empresa_Ciudad}`
+                    },
+                  ],
+                ]
               },
-              {
-                text: `\n\n Consolidado de producto(s) \n `,
-                alignment: 'center',
-                style: 'header'
+              layout: {
+                defaultBorder: false,
               },
-              this.table2(this.grupoProductos, ['Id', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion']),
-              {
-                text: `\n\n Información detallada de los Rollos \n `,
-                alignment: 'center',
-                style: 'header'
-              },
+              fontSize: 9,
+            },
+            '\n \n',
+            {
+              text: `Ingresado Por: ${datos_ingreso[i].nombreCreador}\n`,
+              alignment: 'left',
+              style: 'header',
+            },
+            {
+              text: `\n\n Consolidado de producto(s) \n `,
+              alignment: 'center',
+              style: 'header'
+            },
+            this.table2(this.grupoProductos, ['Id', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion']),
+            {
+              text: `\n\n Información detallada de los Rollos \n `,
+              alignment: 'center',
+              style: 'header'
+            },
 
-              this.table(this.rollosPDF, ['OT', 'Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion', 'Proceso']),
-              {
-                text: `\nCant. Total: ${this.formatonumeros(this.totalCantidad.toFixed(2))}\n Rollos Totales: ${this.formatonumeros(this.totalRollos.toFixed(2))}`,
-                alignment: 'right',
-                style: 'header',
-              },
-            ],
-            styles: {
-              header: {
-                fontSize: 10,
-                bold: true
-              },
-              titulo: {
-                fontSize: 20,
-                bold: true
-              }
+            this.table(this.rollosPDF, ['OT', 'Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion', 'Proceso']),
+            {
+              text: `\nCant. Total: ${this.formatonumeros(this.totalCantidad.toFixed(2))}\n Rollos Totales: ${this.formatonumeros(this.totalRollos.toFixed(2))}`,
+              alignment: 'right',
+              style: 'header',
+            },
+          ],
+          styles: {
+            header: {
+              fontSize: 10,
+              bold: true
+            },
+            titulo: {
+              fontSize: 20,
+              bold: true
             }
           }
-          const pdf = pdfMake.createPdf(pdfDefinicion);
-          pdf.open();
-          setTimeout(() => { (this.limpiarCampos()); }, 1200);
-          break;
         }
+        const pdf = pdfMake.createPdf(pdfDefinicion);
+        pdf.open();
+        setTimeout(() => { (this.limpiarCampos()); }, 1200);
         break;
       }
     });
@@ -664,11 +649,11 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
     var body = [];
     body.push(columns);
     data.forEach(function(row) {
-        var dataRow = [];
-        columns.forEach(function(column) {
-            dataRow.push(row[column].toString());
-        });
-        body.push(dataRow);
+      var dataRow = [];
+      columns.forEach(function(column) {
+          dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
     });
 
     return body;
@@ -677,34 +662,34 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   // Funcion que genera la tabla donde se mostrará la información de los rollos
   table(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [50, 50, 50, 218, 40, 45, 42],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 7,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [50, 50, 50, 218, 40, 45, 42],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 7,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los rollos
   table2(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [60, 260, 70, 40, 80],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 7,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [60, 260, 70, 40, 80],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 7,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
   }
 

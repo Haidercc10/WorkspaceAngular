@@ -349,8 +349,7 @@ export class AsignacionTintasComponent implements OnInit {
 
   //Funcion que almacenará en la base de datos la informacion general sobre la asignacion de materia prima
   asignarMPCrearTintas(){
-    console.log(this.FormAsignacionMP.value)
-    if (this.FormAsignacionMP.valid && this.ArrayMateriaPrima.length > 0) {
+    if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
       this.load = false;
       let tinta : any = this.FormAsignacionMP.value.Tinta;
       let cantidad : number = this.FormAsignacionMP.value.cantidadTinta;

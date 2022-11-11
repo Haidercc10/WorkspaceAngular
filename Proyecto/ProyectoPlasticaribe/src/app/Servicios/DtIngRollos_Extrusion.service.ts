@@ -76,8 +76,8 @@ export class DtIngRollos_ExtrusionService {
     return this.http.put(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/${id}`, data);
   }
 
-  srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/${id}`);
+  EliminarRollExtrusion(id : any) {
+    return this.http.delete(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/EliminarRolloIngresados/${id}`);
   }
 
   srvGuardar(data : modelDtIngRollo_Extrusion): Observable<any> {

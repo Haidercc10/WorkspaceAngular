@@ -31,7 +31,7 @@ export class DetallesAsignacionMPxTintasService {
   }
 
   getCreatPdf(id : number){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `DetalleAsignacion_MatPrimaXTinta/getCreatPdf/${id}`)
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MatPrimaXTinta/getCreatPdf/${id}`)
   }
 
   //Metodo agregar Productos
