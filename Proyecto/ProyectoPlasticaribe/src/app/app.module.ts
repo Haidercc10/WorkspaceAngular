@@ -139,7 +139,7 @@ export const routes: Routes = [
   {path: 'opedido', canActivate: [ValidacionLoginGuard], component: OpedidoComponent},
   {path: 'opedidoproducto', canActivate: [ValidacionLoginGuard], component: OpedidoproductoComponent},
   {path: 'pedido-externo', canActivate: [ValidacionLoginGuard], component: PedidoExternoComponent},
-  {path: 'ocompra', canActivate: [ValidacionLoginGuard], component: OcompraComponent},
+  {path: 'ocompra-materiaPrima', canActivate: [ValidacionLoginGuard], component: OcompraComponent},
   {path: 'usuario', canActivate: [ValidacionLoginGuard], component:UsuarioComponent},
   {path: 'pedidomateriaprima', canActivate: [ValidacionLoginGuard], component:PedidomateriaprimaComponent},
   {path: 'crearproducto', canActivate: [ValidacionLoginGuard], component:CrearProductoComponent},

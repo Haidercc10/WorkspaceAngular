@@ -411,7 +411,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
         });
         Toast.fire({
           icon: 'error',
-          title: `¡No fue posible eliminar los rollos de la base de datos nueva!`
+          title: `¡No fue posible eliminar los rollos de la base de datos nueva dado que no fueron encontrados allí!`
         });
         this.cargando = true;
       });
@@ -437,7 +437,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
         });
         Toast.fire({
           icon: 'error',
-          title: `¡No fue posible eliminar el rollo ${this.rollosInsertar[i].Id} de BagPro!`
+          title: `¡No fue posible eliminar los rollos de BagPro dado que no fueron encontrados allí!`
         });
         this.cargando = true;
       });

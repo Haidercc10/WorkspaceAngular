@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { AreaService } from 'src/app/Servicios/area.service';
@@ -18,7 +18,11 @@ import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
 import { TipoBodegaService } from 'src/app/Servicios/tipoBodega.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
-import { PedidomateriaprimaComponent } from '../pedidomateriaprima/pedidomateriaprima.component';
+import Swal from 'sweetalert2';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-crear-materiaprima',
@@ -54,8 +58,7 @@ export class CrearMateriaprimaComponent implements OnInit {
                                 private facturaMpService : FacturaMpService,
                                     private asignacionMPService : AsignacionMPService,
                                       private detallesAsignacionService : DetallesAsignacionService,
-                                        private bagProServices : BagproService,
-                                          private pedidoMP : PedidomateriaprimaComponent) {
+                                        private bagProServices : BagproService,) {
 
     this.materiPrima = this.frmBuilderMateriaPrima.group({
       //MateriaPrima
@@ -135,10 +138,61 @@ export class CrearMateriaprimaComponent implements OnInit {
     let bodega : number = 4;
     let proveedor : number = this.materiPrima.value.mpProveedor;
 
-    this.pedidoMP.CreacionMateriaPrima(nombreMateriaPrima, descripcionMateriaPrima, stockMateriaPrima, undMed, categoriaMateriaPrima, precioMateriaPrima, bodega, proveedor);
+    this.CreacionMateriaPrima(nombreMateriaPrima, descripcionMateriaPrima, stockMateriaPrima, undMed, categoriaMateriaPrima, precioMateriaPrima, bodega, proveedor);
     this.materiPrima.reset();
   }
 
+  //Funacion que crea una materia prima y la guarda en la base de datos
+  CreacionMateriaPrima(nombreMateriaPrima : string,
+    descripcionMateriaPrima : string,
+    stockMateriaPrima : number,
+    undMed : any,
+    categoriaMateriaPrima : number,
+    precioMateriaPrima : number,
+    proveedor : number,
+    bodega : any){
+
+    const datosMP : any = {
+      MatPri_Nombre : nombreMateriaPrima,
+      MatPri_Descripcion : descripcionMateriaPrima,
+      MatPri_Stock : stockMateriaPrima,
+      UndMed_Id : 'Kg',
+      CatMP_Id : categoriaMateriaPrima,
+      MatPri_Precio : precioMateriaPrima,
+      TpBod_Id : 4,
+    }
+
+    this.materiaPrimaService.srvGuardar(datosMP).subscribe(datos_mp_creada => {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'center',
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+      Toast.fire({
+        icon: 'success',
+        title: '¡Materia Prima creada con exito!'
+      });
+    });
+  }
+
+
+  //Funcion qu creará la relacion de materia prima y proveedores
+  creacionMpProveedor(idMateriaPrima : number, proveedor : number){
+    const datosMpProveedor = {
+      Prov_Id : proveedor,
+      MatPri_Id : idMateriaPrima,
+    }
+
+    this.proveedorMPService.srvGuardar(datosMpProveedor).subscribe(datos_MpProveedorCreado => {
+
+    });
+  }
 
 
 }

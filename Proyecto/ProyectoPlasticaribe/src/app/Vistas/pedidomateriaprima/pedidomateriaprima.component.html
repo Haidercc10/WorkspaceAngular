@@ -18,20 +18,6 @@
       <hr class="colorLinea">
     </div>
   </div>
-  <ng-container *ngIf="ValidarRol == 1">
-    <!-- Inicio Botones que llama el modal de crear proveedor y Materia Prima-->
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
-        (click)="LlamarModalCrearProveedor()" title="¡Crealo aquí!">
-        Crear Proveedor
-      </button>
-      <br>
-      <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-        (click)="LlamarModalCrearMateriaPrima()" title="¡Crealo aquí!">
-        Crear Materia Prima
-      </button>
-    </div>
-  </ng-container>
 
   <!-- Inicio titulo -->
   <div class="mb-4">
@@ -319,37 +305,4 @@
     <hr class="colorLinea">
   </div>
 
-  <!-- Modal de crear Proveedor -->
-  <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel2">Crear Proveedor</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!--Carga componente crear Proveedor-->
-          <app-crear-proveedor></app-crear-proveedor>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Fin Modal de crear Crear Proveedor-->
-
-  <!-- Modal de crear Materia Prima -->
-  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel2">Crear Materia Prima</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!--Carga componente crear Proveedor-->
-          <app-crear-materiaprima></app-crear-materiaprima>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Fin Modal de crear Crear Proveedor-->
 </div>

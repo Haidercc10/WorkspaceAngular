@@ -22,32 +22,31 @@ export class ProveedorService {
   }
 
   //Metodo buscar lista de proveedor
-    srvObtenerLista():Observable<any[]> {
-        return this.http.get<any>(this.rutaPlasticaribeAPI + '/Proveedor')
-    }
+  srvObtenerLista():Observable<any[]> {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + '/Proveedor')
+  }
 
-    srvObtenerListaPorId(id : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Proveedor/${id}`);
-    }
+  srvObtenerListaPorId(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Proveedor/${id}`);
+  }
 
-  //Metodo agregar proveedor
-    srvAgregar(data:any) {
-      return this.http.post(this.rutaPlasticaribeAPI + '/Proveedor', data)
-    }
+  getProveedorLike(nombre : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Proveedor/getProveedorLike/${nombre}`);
+  }
 
   //Metodo actualzar proveedor
-    srvActualizar(id:number|String, data:any) {
-      return this.http.put(this.rutaPlasticaribeAPI + `/Proveedor/${id}`, data);
+  srvActualizar(id:number|String, data:any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/Proveedor/${id}`, data);
     }
 
   //Metodo eliminar proveedor
-    srvEliminar(id:number|String) {
-      return this.http.delete(this.rutaPlasticaribeAPI + `/Proveedor/${id}`);
-    }
+  srvEliminar(id:number|String) {
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Proveedor/${id}`);
+  }
 
-    //Metodo Guardar proveedor con un modelo
-    srvGuardar(data : modelProveedor): Observable<any> {
-     return this.http.post(this.rutaPlasticaribeAPI + '/Proveedor', data);
+  //Metodo Guardar proveedor con un modelo
+  srvGuardar(data : modelProveedor): Observable<any> {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Proveedor', data);
    }
 
 }

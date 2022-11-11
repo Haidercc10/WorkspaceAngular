@@ -1,10 +1,14 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import {PedidomateriaprimaComponent} from 'src/app/Vistas/pedidomateriaprima/pedidomateriaprima.component';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { TipoIdentificacionService } from 'src/app/Servicios/tipo-identificacion.service';
 import { Tipo_ProveedorService } from 'src/app/Servicios/tipo_Proveedor.service';
 import Swal from 'sweetalert2';
+import { ProveedorService } from 'src/app/Servicios/proveedor.service';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-crear-proveedor',
@@ -19,33 +23,11 @@ export class CrearProveedorComponent implements OnInit {
   tiposProveedores = [];
 
   constructor(private formBuilderCrearProveedor : FormBuilder,
-              private Crearproveerdor : PedidomateriaprimaComponent,
-              @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                private tipoIdentificacionService : TipoIdentificacionService,
-                  private tipoProveedorService : Tipo_ProveedorService,
-                    public pedidoMP : PedidomateriaprimaComponent) {
+                private Crearproveerdor : ProveedorService,
+                  private tipoIdentificacionService : TipoIdentificacionService,
+                    private tipoProveedorService : Tipo_ProveedorService,) {
 
     //Creación formulario crear proveedor en modal.
-    this.FormCrearProveedor = this.formBuilderCrearProveedor.group({
-      provId: new FormControl(),
-      ProvNombre: new FormControl(),
-      provTipoId: new FormControl(),
-      TipoProv: new FormControl(),
-      ProvCiudad: new FormControl(),
-      ProvTelefono: new FormControl(),
-      ProvEmail: new FormControl(),
-    });
-   }
-
-   //Todo lo que se carga al iniciar la página.
-  ngOnInit(): void {
-    this.initFormsCrearProveedor();
-    this.tipoIdntificacion();
-    this.tipoProveedor();
-  }
-
-  //Inicializando formulario de Crear Proveedores en modal.
-  initFormsCrearProveedor(){
     this.FormCrearProveedor = this.formBuilderCrearProveedor.group({
       provId: ['', Validators.required],
       ProvNombre: ['', Validators.required],
@@ -55,6 +37,12 @@ export class CrearProveedorComponent implements OnInit {
       ProvTelefono: ['', Validators.required],
       ProvEmail: ['', Validators.required],
     });
+   }
+
+   //Todo lo que se carga al iniciar la página.
+  ngOnInit(): void {
+    this.tipoIdntificacion();
+    this.tipoProveedor();
   }
 
   tipoIdntificacion() {
@@ -92,7 +80,45 @@ export class CrearProveedorComponent implements OnInit {
     let telefono : string = this.FormCrearProveedor.value.ProvTelefono;
     let email : string = this.FormCrearProveedor.value.ProvEmail;
 
-    this.pedidoMP.CreacionProveedor(id, tipoId, nombre, tipoProveedor, ciudad, telefono, email);
+    this.CreacionProveedor(id, tipoId, nombre, tipoProveedor, ciudad, telefono, email);
     this.FormCrearProveedor.reset();
   }
+
+  //Funcion que creará un proveedor y lo guardará en la base de datos
+  CreacionProveedor( idProveedor : number,
+    TipoIdProveedor : string,
+    nombreProveedor : string,
+    tipoproveedor : number,
+    ciudadProveedor : string,
+    telefonoProveedor : string,
+    emailProveedor : string){
+
+   const datosProveedor : any = {
+     Prov_Id : idProveedor,
+     TipoIdentificacion_Id : TipoIdProveedor,
+     Prov_Nombre : nombreProveedor,
+     TpProv_Id : tipoproveedor,
+     Prov_Ciudad : ciudadProveedor,
+     Prov_Telefono : telefonoProveedor,
+     Prov_Email : emailProveedor,
+   }
+
+   this.Crearproveerdor.srvGuardar(datosProveedor).subscribe(datos_nuevoProveedor => {
+     const Toast = Swal.mixin({
+       toast: true,
+       position: 'center',
+       showConfirmButton: false,
+       timer: 1500,
+       timerProgressBar: true,
+       didOpen: (toast) => {
+         toast.addEventListener('mouseenter', Swal.stopTimer)
+         toast.addEventListener('mouseleave', Swal.resumeTimer)
+       }
+     });
+     Toast.fire({
+       icon: 'success',
+       title: '¡Proveedor creado con exito!'
+     });
+   });
+ }
 }

@@ -183,7 +183,6 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.obtenerProcesos();
     this.obtenerProveeedor();
     this.obtenerDocumetno();
-    this.obtenerUltimpIDMP();
     this.obtenerMateriaPrima2();
   }
 
@@ -489,106 +488,6 @@ export class PedidomateriaprimaComponent implements OnInit {
         proveedor: '',
         proveedorNombre: '',
         MpObservacion : '',
-      });
-    });
-  }
-
-  obtenerUltimpIDMP(){
-    let idsMP = [];
-    this.materiaPrimaService.srvObtenerLista().subscribe(datos_MP => {
-      for (let index = 0; index < datos_MP.length; index++) {
-        idsMP.push(datos_MP[index].facco_Id);
-      }
-      this.ultimoIdMateriaPrima = Math.max.apply(null, idsMP);
-      this.ultimoIdMateriaPrima = this.ultimoIdFactura + 1;
-    });
-  }
-
-  //Funacion que crea una materia prima y la guarda en la base de datos
-  CreacionMateriaPrima(nombreMateriaPrima : string,
-    descripcionMateriaPrima : string,
-    stockMateriaPrima : number,
-    undMed : any,
-    categoriaMateriaPrima : number,
-    precioMateriaPrima : number,
-    proveedor : number,
-    bodega : any){
-
-    const datosMP : any = {
-      MatPri_Nombre : nombreMateriaPrima,
-      MatPri_Descripcion : descripcionMateriaPrima,
-      MatPri_Stock : stockMateriaPrima,
-      UndMed_Id : 'Kg',
-      CatMP_Id : categoriaMateriaPrima,
-      MatPri_Precio : precioMateriaPrima,
-      TpBod_Id : 4,
-    }
-
-    this.materiaPrimaService.srvGuardar(datosMP).subscribe(datos_mp_creada => {
-      this.creacionMpProveedor(this.ultimoIdMateriaPrima, proveedor);
-    });
-  }
-
-  //Funcion que creará un proveedor y lo guardará en la base de datos
-  CreacionProveedor( idProveedor : number,
-     TipoIdProveedor : string,
-     nombreProveedor : string,
-     tipoproveedor : number,
-     ciudadProveedor : string,
-     telefonoProveedor : string,
-     emailProveedor : string){
-
-    const datosProveedor : any = {
-      Prov_Id : idProveedor,
-      TipoIdentificacion_Id : TipoIdProveedor,
-      Prov_Nombre : nombreProveedor,
-      TpProv_Id : tipoproveedor,
-      Prov_Ciudad : ciudadProveedor,
-      Prov_Telefono : telefonoProveedor,
-      Prov_Email : emailProveedor,
-    }
-
-    this.proveedorservices.srvGuardar(datosProveedor).subscribe(datos_nuevoProveedor => {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: '¡Proveedor creado con exito!'
-      });
-    });
-  }
-
-  //Funcion qu creará la relacion de materia prima y proveedores
-  creacionMpProveedor(idMateriaPrima : number, proveedor : number){
-    const datosMpProveedor = {
-      Prov_Id : proveedor,
-      MatPri_Id : idMateriaPrima,
-    }
-
-    this.proveedorMPService.srvGuardar(datosMpProveedor).subscribe(datos_MpProveedorCreado => {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: '¡Materia Prima creada con exito!'
       });
     });
   }
@@ -1389,14 +1288,5 @@ export class PedidomateriaprimaComponent implements OnInit {
     });
   }
 
-  // Funcion para llamar el modal que crea clientes
-  LlamarModalCrearProveedor() {
-    this.ModalCrearProveedor = true;
-  }
-
-  // Funcion para llamar el modal que crea clientes
-  LlamarModalCrearMateriaPrima(){
-    this.ModalCrearMateriaPrima = true;
-  }
 
 }
