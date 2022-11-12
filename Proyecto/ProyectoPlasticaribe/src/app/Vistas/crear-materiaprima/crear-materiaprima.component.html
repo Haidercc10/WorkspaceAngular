@@ -2,24 +2,17 @@
   <!-- Inicio Fila 1 Agregar Materia Prima -->
   <div class="mb-3">
     <div class="row g-3">
-        <!-- Nombre Materia Prima -->
-        <div class="form-floating col-md">
-          <input formControlName="mpNombre" type="text" class="form-control form-control-sm" id="floatingInput">
-          <label for="floatingInput">Nombre</label>
-        </div>
+      <!-- Nombre Materia Prima -->
+      <div class="form-floating col-md">
+        <input formControlName="mpNombre" type="text" class="form-control form-control-sm" id="floatingInput">
+        <label for="floatingInput">Nombre</label>
+      </div>
 
       <!-- Descripción -->
       <div class="form-floating col-md">
         <input formControlName="mpDescripcion" class="form-control form-control-sm" id="floatingInput" name="mapDescripcion" placeholder="Descripción" required>
-          <!-- <option [ngValue]="operarios.prod_Id" *ngFor="let operarios of Operario"></option> -->
         <label for="floatingInput">Descripción</label>
       </div>
-
-        <!-- Fecha Ingreso -->
-        <!-- <div class="form-floating col-md-2">
-          <input formControlName="mpStock" type="number" class="form-control form-control-sm" id="floatingInput" name="mapStock" placeholder="Stock" required >
-          <label for="floatingInput">Stock</label>
-        </div> -->
     </div>
   </div>
   <!-- Fin Fila 1 -->
@@ -42,40 +35,14 @@
       </div>
       <!-- Proveedor -->
       <div class="form-floating col-md-5">
-        <select formControlName="mpProveedor" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+        <select formControlName="mpProveedor" id="floatingSelect" type="text" class="form-select form-select-sm" required>
           <option [ngValue]="prov.prov_Id" *ngFor="let prov of proveedores">{{prov.prov_Nombre}}</option>
         </select>
         <label for="floatingSelect">Proveedor</label>
       </div>
-
-        <!-- Stock  -->
-        <!-- <div class="form-floating col-md">
-          <input formControlName="mpStock" type="number" class="form-control form-control-sm" id="floatingInput" name="mapStock" placeholder="Stock" required>
-          <label for="floatingInput">Stock</label>
-        </div> -->
-
-        <!-- Unidad medida-->
-        <!-- <div class="form-floating col-md">
-          <select formControlName="mpUnidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" name="mapUnidadMedida" aria-label=".form-select-sm example" >
-            <option [ngValue]="unidadMedidas" *ngFor="let unidadMedidas of unidadMedida">{{unidadMedidas}}</option>
-          </select>
-          <label for="floatingSelect">Und. Medida</label>
-        </div> -->
-        <!-- Campo Observacion -->
-      <!-- <div class="form-floating col-md-6">
-        <textarea formControlName="MpObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" maxlength="200" placeholder="Observacion" name="MpObservacion"></textarea>
-        <label for="floatingTextarea">Observación</label>
-      </div> -->
     </div>
   </div>
   <!--Fin Fila 2 -->
-
-  <div class="mb-3">
-    <div class="row g-3">
-      <!-- Bodega  -->
-
-    </div>
-  </div>
 
   <!--Inicio Fila 3 Botones y Limpiar Campos-->
   <div class="mb-1">

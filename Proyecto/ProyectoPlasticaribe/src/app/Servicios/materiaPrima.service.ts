@@ -28,6 +28,16 @@ export class MateriaPrimaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Materia_Prima');
   }
 
+  //Metodo buscar lista de Productos
+  getMpTintaBopp():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Materia_Prima/getMpTintaBopp');
+  }
+
+  //Metodo buscar lista de Productos
+  getInfoMpTintaBopp(id : any) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMpTintaBopp/${id}`);
+  }
+
   srvObtenerListaPorId(id : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`);
   }

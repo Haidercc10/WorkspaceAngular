@@ -7,17 +7,17 @@
 
           <!-- Nombre -->
         <div class="form-floating col-md">
-          <input formControlName="TintaNombre" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off" required>
+          <input formControlName="TintaNombre" type="text" class="form-control form-control-sm" id="floatingInput" required>
           <label for="floatingInput">Nombre</label>
         </div>
         <!-- Descripción -->
         <div class="form-floating col-md">
-          <input formControlName="TintaDescripcion" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off" required>
+          <input formControlName="TintaDescripcion" type="text" class="form-control form-control-sm" id="floatingInput" required>
           <label for="floatingInput">Descripción</label>
         </div>
          <!-- Código Hexadecimal -->
         <div class="form-floating col-md-2">
-          <input formControlName="TintaCodigoHexa" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off">
+          <input formControlName="TintaCodigoHexa" type="text" class="form-control form-control-sm" id="floatingInput">
           <label for="floatingInput" alt="Si no conoce el código Hexadecimal para este color, puede omitir este campo">Código Hexa</label>
         </div>
         <!-- Unidad Medida -->
@@ -27,9 +27,16 @@
           </select>
           <label for="floatingSelect">Und. Medida</label>
         </div>
+        <!-- Categorias -->
+        <div class="form-floating col-md-2">
+          <select formControlName="TintaCategoria" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="cat.catMP_Id" *ngFor="let cat of categorias">{{cat.catMP_Nombre}}</option> <!--  {{unidadMedidas}} -->
+          </select>
+          <label for="floatingSelect">Categorias</label>
+        </div>
         <!-- Precio -->
         <div class="form-floating col-md-2">
-          <input formControlName="TintaPrecio" class="form-control form-control-sm" id="floatingInput" type="number" autocomplete="off" required>
+          <input formControlName="TintaPrecio" class="form-control form-control-sm" id="floatingInput" type="number" required>
           <label for="floatingInput">Precio</label>
         </div>
 
@@ -42,6 +49,12 @@
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button class="btn btn-danger btn-danger-sm" type="submit">Agregar Tinta</button>
       <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+    </div>
+  </div>
+
+  <div class="mb-1" *ngIf="tintaCreada">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <h6>{{informacion}}</h6>
     </div>
   </div>
   <!--Fin Fila 2-->

@@ -1,7 +1,9 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
+import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra_MateriaPrima.service';
 import { ProveedorService } from 'src/app/Servicios/proveedor.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
@@ -23,8 +25,10 @@ export class OcompraComponent implements OnInit {
   FormMateriaPrima : FormGroup; //Formulario de Materia Prima
 
   //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
-  public ModalCrearProveedor: boolean = false;
-  public ModalCrearMateriaPrima: boolean= false;
+  ModalCrearProveedor: boolean = false;
+  ModalCrearMateriaPrima: boolean= false;
+  ModalCrearBOPP: boolean= false;
+  ModalCrearTintas: boolean= false;
 
   cargando : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -45,7 +49,8 @@ export class OcompraComponent implements OnInit {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private proveedorService : ProveedorService,
                       private materiaPrimaService : MateriaPrimaService,
-                        private undMedidaService : UnidadMedidaService,) {
+                        private undMedidaService : UnidadMedidaService,
+                          private ordenCompraService : OrdenCompra_MateriaPrimaService,) {
 
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -143,9 +148,10 @@ export class OcompraComponent implements OnInit {
 
   // Funcion que va a consultar la materia prima
   obtenerMateriaPrima(){
-    this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrimas => {
+    this.materiaPrimaService.getMpTintaBopp().subscribe(datos_materiaPrimas => {
       for (let i = 0; i < datos_materiaPrimas.length; i++) {
         this.materiaPrima.push(datos_materiaPrimas[i]);
+        this.materiaPrima.sort((a,b) => a.nombre.localeCompare(b.nombre));
       }
     });
   }
@@ -162,15 +168,17 @@ export class OcompraComponent implements OnInit {
   //Funcion que va a mostrar el nombre de la materia prima
   cambiarNombreMateriaPrima(){
     let id : number = this.FormMateriaPrima.value.Nombre;
-    this.materiaPrimaService.srvObtenerListaPorId(id).subscribe(datos_materiaPrima => {
-      this.FormMateriaPrima = this.frmBuilder.group({
-        Id : datos_materiaPrima.matPri_Id,
-        Nombre : datos_materiaPrima.matPri_Nombre,
-        Cantidad : 0,
-        UndMedida : datos_materiaPrima.undMed_Id,
-        Precio : this.formatonumeros((datos_materiaPrima.matPri_Precio).toFixed(2)),
-        PrecioOculto : datos_materiaPrima.matPri_Precio,
-      });
+    this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
+      for (let i = 0; i < datos_materiaPrima.length; i++) {
+        this.FormMateriaPrima = this.frmBuilder.group({
+          Id : datos_materiaPrima[i].id,
+          Nombre : datos_materiaPrima[i].nombre,
+          Cantidad : 0,
+          UndMedida : datos_materiaPrima[i].undMedida,
+          Precio : this.formatonumeros(parseFloat(datos_materiaPrima[i].precio).toFixed(2)),
+          PrecioOculto : parseFloat(datos_materiaPrima[i].precio).toFixed(2),
+        });
+      }
     });
   }
 
@@ -244,7 +252,25 @@ export class OcompraComponent implements OnInit {
 
   // Funcion para llamar el modal que crea clientes
   LlamarModalCrearMateriaPrima(){
-    this.ModalCrearMateriaPrima = true;
+    Swal.fire({
+      title: '¿Qué desea crear?',
+      text: "¡Presione el botón de la materia prima que quiere crear!",
+      icon: 'question',
+      allowOutsideClick: false,
+      showCancelButton: true,
+      showDenyButton: true,
+      showCloseButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#3085d6',
+      denyButtonColor: '#3085d6',
+      confirmButtonText: 'Polietilenos',
+      cancelButtonText: 'BOPP / BOPA/ Poliester',
+      denyButtonText: 'Tintas / Chips / Solventes',
+    }).then((result) => {
+      if (result.isConfirmed) this.ModalCrearMateriaPrima = true;
+      else if (result.dismiss) this.ModalCrearBOPP = true;
+      else if (result.isDenied) this.ModalCrearTintas = true;
+    })
   }
 
   // Funcion que va a validar que los campos necesarios esten llenos para crear la ORden de Compra
@@ -257,11 +283,47 @@ export class OcompraComponent implements OnInit {
 
   // Funcion que va a crear la orden de compra
   crearOrdenCompra(){
-
+    this.cargando = false;
+    let info : any = {
+      Usua_Id : this.storage_Id,
+      Oc_Fecha : moment().format('YYYY-MM-DD'),
+      Oc_Hora : moment().format("H:mm:ss"),
+      Prov_Id : this.FormOrdenCompra.value.Id_Proveedor,
+      Estado_Id : 11,
+      Oc_ValorTotal : this.cantidadTotalPrecio,
+      Oc_PesoTotal : this.catidadTotalPeso,
+      TpDoc_Id : 'OCMP',
+      Oc_Observacion : this.FormOrdenCompra.value.Observacion,
+    }
+    this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => { this.crearDtOrdenCompra(); }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        html:
+        '<b>¡Error al Crear la Orden de Compra!</b><hr> ' +
+        `<spam style="color : #f00;">${error.message}</spam> `,
+      });
+      this.cargando = false;
+    });
   }
 
   // Funcion que va a rear detalles de Orden de Compra
   crearDtOrdenCompra(){
-
+    this.ordenCompraService.getUltimoId_OrdenCompra().subscribe(datos_ordenCompra => {
+      for (let i = 0; i < datos_ordenCompra.length; i++) {
+        for (let j = 0; j < this.materiasPrimasSeleccionadas.length; j++) {
+        }
+      }
+    }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        html:
+        '<b>¡Error al consultar el ultimo consecutivo de las ordenes de compra!</b><hr> ' +
+        `<spam style="color : #f00;">${error.message}</spam> `,
+        showCloseButton: true,
+      });
+      this.cargando = false;
+    });
   }
 }
