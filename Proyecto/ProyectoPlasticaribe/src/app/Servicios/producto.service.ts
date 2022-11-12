@@ -66,4 +66,8 @@ export class ProductoService {
   obtenerNombreProductos(idProducto : any): Observable<any> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/consultaNombreProducto/${idProducto}`);
   }
+
+  obtenerItemsLike(letras : any): Observable<any> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/consultaNombreItem/${letras}`);
+  }
 }

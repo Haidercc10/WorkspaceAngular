@@ -1,5 +1,11 @@
 <app-menuLateral></app-menuLateral>
 
+<div class="d-flex justify-content-center overlay" *ngIf="!load">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
 <div class="contain">
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
@@ -38,7 +44,7 @@
 
         <!-- Fecha inicial -->
         <div class="form-floating col-md-2">
-          <input formControlName="fecha" type="date" min="0" (change)="buscarSegunFechaIngreso()" class="form-control" id="floatingInput"required >
+          <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Fecha Inicial</label>
         </div>
 
@@ -46,6 +52,14 @@
         <div class="form-floating col-md-2">
           <input formControlName="fechaFinal" type="date" min="0"  class="form-control" id="floatingInput"required > <!--(change)="buscarBOPPSegunFecha()"-->
           <label for="floatingInput">Fecha Final</label>
+        </div>
+
+        <div class="form-floating col-md">
+          <input formControlName="producto" class="form-control" list="items" id="floatingInput" (change)='selectEventProducto()' [(ngModel)]="Item" (keyup)="obtenerProductos()" autocomplete="off">
+          <datalist id="items">
+            <option value={{item.prod_Id}} *ngFor="let item of arrayProductos">{{item.prod_Nombre}}</option>
+          </datalist>
+          <label for="floatingInput">Item</label>
         </div>
 
         <!-- Turno -->
@@ -57,11 +71,17 @@
           <label for="floatingSelect">Turno</label>
         </div>-->
 
-        <!-- Producto -->
+        <!-- Producto
         <div class="form-floating col-md">
-          <input formControlName="producto" type="number" class="form-control" id="floatingInput"required (keyup.enter)="buscarRollosEliminadosPorItem()">
+          <input formControlName="producto" type="number" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Nro. Item</label>
-        </div>
+        </div>-->
+
+        <!-- Producto -->
+        <!--<div class="form-floating col-md">
+          <input formControlName="producto" type="text" class="form-control" id="floatingInput" [(ngModel)]="Item" (keyup)="obtenerProductos()" required >
+          <label for="floatingInput">Item</label>
+        </div>-->
 
         <!-- Operario -->
         <!--<div class="form-floating col-md">
@@ -77,13 +97,7 @@
     <!--<div class="mb-3">
       <div class="row g-3">-->
           <!-- Cliente -->
-          <!--<div class="form-floating col-md-3">
-            <input formControlName="cliente" class="form-control" list="clientes" id="floatingInput" type="text" (change)='selectEventCliente()' autocomplete="off">
-            <datalist id="clientes">
-              <option value={{item.nombreComercial}} *ngFor="let item of arrayClientes">{{item.nombreComercial}}</option>
-            </datalist>
-            <label for="floatingInput">Cliente</label>
-          </div>-->
+
 
           <!--<div class="form-floating col-md-3">
             <input formControlName="producto" class="form-control" list="productos" id="floatingInput" (change)='selectEventProducto()'>
@@ -190,10 +204,12 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarConsulta()">Consultar Documento</button>
         <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" title="Generar archivo Excel/PDF" (click)="elegirFormatoExportacion()">Exportar</button>
       </div>
     </div>
   </form>
 
+  <div id="tableProcesos" *ngIf="load">
   <div class="mb-4">
     <div class="row g-3">
       <!--Botones superiores de Paginado-->
@@ -206,7 +222,7 @@
       <!-- Tabla con información de la orden de trabajo -->
       <p-table
         #dt
-        [columns]="columnas"
+        [columns]="columnasSeleccionada"
         [value]="ArrayDocumento"
         [resizableColumns]="true"
         columnResizeMode="expand"
@@ -234,30 +250,43 @@
         <!-- Titulos -->
         <ng-template pTemplate="header" let-columns>
           <tr>
-            <th *ngFor="let col of columns" style="font-size: 14px;">
-            <!--<th id="" scope="col" pSortableColumn="ot" style="font-size: 13px;">OT<p-sortIcon field="ot" title="Order por OT"></p-sortIcon></th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Rollo</th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Cliente</th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Item</th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Ancho</th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Largo</th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Fuelle</th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Medida</th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Neto Kg</th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Material</th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Calibre</th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Operador</th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Fecha</th>
-            <th id="" scope="col" pResizableColumn style="font-size: 12px;">Turno</th>
-            <th *ngFor="let col of columns" pResizableColumn style="font-size: 12px;">-->
+            <th id="" scope="col" pSortableColumn="ot" style="font-size: 12px;">OT
+              <p-sortIcon field="ot" title="Order por OT"></p-sortIcon>
+              <p-columnFilter type="text" field="ot" display="menu"></p-columnFilter></th>
+            <th id="" scope="col" pResizableColumn style="font-size: 13px;">Rollo</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 13px;">Cliente</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 13px;">Item</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 13px;">Nombre Item</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 13px;">Ancho</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 13px;">Largo</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 13px;">Fuelle</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 13px;">Medida</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 13px;">Peso</th>
+            <th id="" scope="col" pResizableColumn style="font-size: 13px;">Und.</th>
+             <th id="" scope="col" pResizableColumn style="font-size: 13px;">Fecha</th>
+            <th *ngFor="let col of columns" pResizableColumn style="font-size: 13px;">
               {{col.header}}
             </th>
         </tr>
         </ng-template>
         <ng-template pTemplate="body" let-rowData let-ArrayDocumento let-columns="columns">
-          <tr>
-            <td *ngFor="let col of columns" style="font-size: 13px;">{{rowData[col.field]}}</td>
+          <tr style="font-size: 13px;">
+            <!--<td *ngFor="let col of columns" style="font-size: 13px;">{{rowData[col.field]}}</td>-->
+            <td id="OT" scope="col">{{ArrayDocumento.Orden}}</td>
+            <td id="Rollo" scope="col">{{ArrayDocumento.Rollo}}</td>
+            <td id="Cliente" scope="col">{{ArrayDocumento.Cliente}}</td>
+            <td id="ItemId" scope="col">{{ArrayDocumento.ItemId}}</td>
+            <td id="Item" scope="col">{{ArrayDocumento.Item}}</td>
+            <td id="Ancho" scope="col">{{ArrayDocumento.Ancho}}</td>
+            <td id="Largo" scope="col">{{ArrayDocumento.Largo}}</td>
+            <td id="Fuelle" scope="col">{{ArrayDocumento.Fuelle}}</td>
+            <td id="Medida" scope="col">{{ArrayDocumento.Medida}}</td>
+            <td id="Neto" scope="col">{{ArrayDocumento.Peso}}</td>
+            <td id="Und" scope="col">{{ArrayDocumento.Kg}}</td>
+            <td id="Fecha" scope="col">{{ArrayDocumento.Fecha}}</td>
+            <td *ngFor="let col of columns">{{ArrayDocumento[col.field]}}</td>
           </tr>
         </ng-template>
       </p-table>
+  </div>
 </div>
