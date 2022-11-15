@@ -31,6 +31,15 @@ export class OrdenCompra_MateriaPrimaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `//${dato}`);
   }
 
+    //Metodo buscar lista de OC por Id
+  getListaOrdenesComprasxId(IdOrden : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_OrdenCompra/InfoOrdenCompraxId/${IdOrden}`);
+  }
+
+  getListaFacturasxOC(IdOrden : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/OrdenesCompras_FacturasCompras/InfoFacturaxOC/${IdOrden}`);
+  }
+
   //Metodo actualzar
   putId_OrdenCompra(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `//${id}`, data);

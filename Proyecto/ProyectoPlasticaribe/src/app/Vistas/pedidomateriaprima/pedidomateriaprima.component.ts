@@ -23,6 +23,9 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import { RemisionFacturaService } from 'src/app/Servicios/remisionFactura.service';
 import { AsignacionMPxTintasService } from 'src/app/Servicios/asignacionMPxTintas.service';
 import { TintasService } from 'src/app/Servicios/tintas.service';
+import { Srv_OrdenesComprasService } from 'src/app/Servicios/Srv_OrdenesCompras.service';
+import { ThisReceiver } from '@angular/compiler';
+import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra_MateriaPrima.service';
 
 @Component({
   selector: 'app.pedidomateriaprima.component',
@@ -101,6 +104,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   public historyHeading: string = 'Seleccionado Recientemente';
   NombreMatPrima : string = 'Materia Prima';
   public load: boolean;
+  public arrayOrdenCompra = [];
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -123,13 +127,15 @@ export class PedidomateriaprimaComponent implements OnInit {
                                                   private remisionMPService : RemisionesMPService,
                                                     private remisionFacturaService : RemisionFacturaService,
                                                       private tintasService : TintasService,
-                                                        private asignacionMPxTintas : AsignacionMPxTintasService) {
+                                                        private asignacionMPxTintas : AsignacionMPxTintasService,
+                                                          private servicioOCMatPrima : OrdenCompra_MateriaPrimaService) {
 
     this.FormMateriaPrimaFactura = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
+      OrdenCompra : ['', Validators.required],
       MpFactura: [Validators.required],
       MpRemision : [Validators.required],
-      MpingresoFecha: ['', Validators.required],
+      //MpingresoFecha: ['', Validators.required],
       proveedor: ['', Validators.required],
       proveedorNombre: ['', Validators.required],
       MpObservacion : ['', Validators.required],
@@ -224,9 +230,10 @@ export class PedidomateriaprimaComponent implements OnInit {
 
     this.FormMateriaPrimaFactura.setValue({
       ConsecutivoFactura : this.ultimoIdFactura,
+      OrdenCompra : null,
       MpFactura: null,
       MpRemision : null,
-      MpingresoFecha: this.today,
+      //MpingresoFecha: this.today,
       proveedor: '',
       proveedorNombre: '',
       MpObservacion : '',
@@ -259,9 +266,10 @@ export class PedidomateriaprimaComponent implements OnInit {
   LimpiarCampos() {
     this.FormMateriaPrimaFactura.setValue({
       ConsecutivoFactura : this.ultimoIdFactura,
+      OrdenCompra : null,
       MpFactura: null,
       MpRemision : null,
-      MpingresoFecha: this.today,
+      //MpingresoFecha: this.today,
       proveedor: '',
       proveedorNombre: '',
       MpObservacion : '',
@@ -422,9 +430,10 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.proveedorservices.srvObtenerListaPorId(proveedorID).subscribe(datos_proveedores => {
       this.FormMateriaPrimaFactura.setValue({
         ConsecutivoFactura : this.FormMateriaPrimaFactura.value.ConsecutivoFactura,
+        OrdenCompra : this.FormMateriaPrimaFactura.value.OrdenCompra,
         MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
         MpRemision : this.FormMateriaPrimaFactura.value.MpRemision,
-        MpingresoFecha: this.today,
+        //MpingresoFecha: this.today,
         proveedor :this.FormMateriaPrimaFactura.value.proveedor,
         proveedorNombre:datos_proveedores.prov_Nombre,
         MpObservacion: this.FormMateriaPrimaFactura.value.MpObservacion,
@@ -482,9 +491,10 @@ export class PedidomateriaprimaComponent implements OnInit {
       this.ultimoIdFactura = this.ultimoIdFactura + 1;
       this.FormMateriaPrimaFactura.setValue({
         ConsecutivoFactura : this.ultimoIdFactura,
+        OrdenCompra : '',
         MpFactura: '',
         MpRemision : '',
-        MpingresoFecha: this.today,
+        //MpingresoFecha: this.today,
         proveedor: '',
         proveedorNombre: '',
         MpObservacion : '',
@@ -587,9 +597,10 @@ export class PedidomateriaprimaComponent implements OnInit {
 
     this.FormMateriaPrimaFactura.setValue({
       ConsecutivoFactura : this.FormMateriaPrimaFactura.value.ConsecutivoFactura,
+      OrdenCompra :  this.FormMateriaPrimaFactura.value.OrdenCompra,
       MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
       MpRemision : this.FormMateriaPrimaFactura.value.MpRemision,
-      MpingresoFecha: this.today,
+      //MpingresoFecha: this.today,
       proveedor :this.FormMateriaPrimaFactura.value.proveedor,
       proveedorNombre:this.FormMateriaPrimaFactura.value.proveedorNombre,
       MpObservacion: this.FormMateriaPrimaFactura.value.MpObservacion,
@@ -666,8 +677,9 @@ export class PedidomateriaprimaComponent implements OnInit {
       this.ultimoIdRemision = this.ultimoIdRemision + 1;
       this.FormMateriaPrimaFactura.setValue({
         MpFactura: '',
+        OrdenCompra : '',
         MpRemision : '',
-        MpingresoFecha: this.today,
+        //MpingresoFecha: this.today,
         proveedor: '',
         proveedorNombre: '',
         MpObservacion : '',
@@ -921,9 +933,10 @@ export class PedidomateriaprimaComponent implements OnInit {
   limpiarTodosCampos(){
     this.FormMateriaPrimaFactura.setValue({
       ConsecutivoFactura : this.ultimoIdFactura,
+      OrdenCompra : '',
       MpFactura: '',
       MpRemision : '',
-      MpingresoFecha: this.today,
+      //MpingresoFecha: this.today,
       proveedor: '',
       proveedorNombre: '',
       MpObservacion : '',
@@ -1287,6 +1300,113 @@ export class PedidomateriaprimaComponent implements OnInit {
       });
     });
   }
+
+  cargarInfoOrdenCompraEnTabla() {
+    this.arrayOrdenCompra = [];
+    let facturas : any = [];
+    let arrayOC : any = [];
+    let Orden_Compra : any = this.FormMateriaPrimaFactura.value.OrdenCompra;
+    let matPrimaFacco : number;
+    let MPReal : any;
+    let MPNombreReal : any;
+    let MPNoAplica1 : any;
+    let MPNombreNA1 : any ;
+    let MPNoAplica2 : any;
+    let MPNombreNA2 : any;
+
+    if (Orden_Compra != null) {
+      this.servicioOCMatPrima.getListaFacturasxOC(Orden_Compra).subscribe(dataFacturas => {
+        if(dataFacturas.length > 0) {
+           for (let i = 0; i < dataFacturas.length; i++) {
+            //facturas.push(dataFacturas[i].facco_Id);
+            this.facturaMpService.srvObtenerListaPorFacId(dataFacturas[i].facco_Id).subscribe(dataFacComprasMP => {
+              for (let fcmp = 0; fcmp < dataFacComprasMP.length; fcmp++) {
+
+                if(dataFacComprasMP[fcmp].matPri_Id == 84) matPrimaFacco = dataFacComprasMP[fcmp].tinta_Id;
+                else if (dataFacComprasMP[fcmp].tinta_Id == 2001) matPrimaFacco = dataFacComprasMP[fcmp].matPri_Id;
+
+                let info : any = {
+                  MatPrima : matPrimaFacco,
+                  CantidadPedida : dataFacComprasMP[fcmp].faccoMatPri_Cantidad,
+                  Unidad : dataFacComprasMP[fcmp].undMed_Id,
+                }
+
+              }
+            })
+           }
+        }
+      });
+      //console.log(`facturas: ${facturas}`);
+
+      this.servicioOCMatPrima.getListaOrdenesComprasxId(Orden_Compra).subscribe(dataOrdenCompra => {
+        if(dataOrdenCompra.length == 0) this.modalInfoNoEncontrada();
+        else {
+          for (let index = 0; index < dataOrdenCompra.length; index++) {
+
+            if (dataOrdenCompra[index].tinta_Id == 2001 && dataOrdenCompra[index].bopP_Id == 1)
+            {
+              MPReal = dataOrdenCompra[index].matPri_Id;
+              MPNombreReal = dataOrdenCompra[index].matPri_Nombre;
+              MPNoAplica1 = dataOrdenCompra[index].tinta_Id;
+              MPNombreNA1 = dataOrdenCompra[index].tinta_Nombre;
+              MPNoAplica2 = dataOrdenCompra[index].bopP_Id;
+              MPNombreNA2 = dataOrdenCompra[index].boppGen_Nombre;
+            }
+            else if (dataOrdenCompra[index].tinta_Id == 2001 && dataOrdenCompra[index].matPri_Id == 84)
+            {
+              MPReal = dataOrdenCompra[index].bopP_Id;
+              MPNombreReal = dataOrdenCompra[index].boppGen_Nombre;
+              MPNoAplica1 = dataOrdenCompra[index].tinta_Id;
+              MPNombreNA1 = dataOrdenCompra[index].tinta_Nombre;
+              MPNoAplica2 =  dataOrdenCompra[index].matPri_Id;
+              MPNombreNA2 =  dataOrdenCompra[index].matPri_Id;
+            }
+            else if (dataOrdenCompra[index].matPri_Id == 84 && dataOrdenCompra[index].bopP_Id == 1)
+            {
+              MPReal = dataOrdenCompra[index].tinta_Id;
+              MPNombreReal = dataOrdenCompra[index].tinta_Nombre;
+              MPNoAplica1 = dataOrdenCompra[index].matPri_Id;
+              MPNombreNA1 = dataOrdenCompra[index].matPri_Nombre;
+              MPNoAplica2 = dataOrdenCompra[index].bopP_Id;
+              MPNombreNA2 = dataOrdenCompra[index].boppGen_Nombre
+            }
+
+            const InfoOcMatPrima : any = {
+                  MatPrima1 : MPReal,
+                  Nombre : MPNombreReal,
+                  Cantidad : dataOrdenCompra[index].doc_CantidadPedida,
+                  Presentacion : dataOrdenCompra[index].undMed_Id,
+                  MatPrima2 : MPNoAplica1,
+                  MatPrima3 : MPNoAplica2,
+            }
+              this.arrayOrdenCompra.push(InfoOcMatPrima);
+              console.log(arrayOC);
+          }
+        }
+      });
+    } else Swal.fire('Debe llenar el campo Nro. Orden Compra');
+  }
+
+  modalInfoNoEncontrada() {
+    Swal.fire('No se encontró la Orden de Compra solicitada');
+  }
+
+  ingresarTodo_OrdenCompra(item : any) {
+
+  }
+
+  ingresoxItem_OrdenCompra(){
+
+  }
+
+  quitarTodosLosItems_Factura() {
+
+  }
+
+  quitarItem_Factura(){
+
+  }
+
 
 
 }
