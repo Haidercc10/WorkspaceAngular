@@ -1224,7 +1224,7 @@ export class PedidoExternoComponent implements OnInit {
                         fontSize: 8,
                       },
                       {
-                        text: `\n \nObervación sobre el pedido: \n ${this.FormPedidoExternoClientes.value.PedObservacion}\n`,
+                        text: `\n \nObservación sobre el pedido: \n ${this.FormPedidoExternoClientes.value.PedObservacion}\n`,
                         style: 'header',
                       }
                     ],

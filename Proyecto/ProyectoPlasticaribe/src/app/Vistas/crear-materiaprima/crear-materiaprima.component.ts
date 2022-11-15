@@ -39,6 +39,8 @@ export class CrearMateriaprimaComponent implements OnInit {
   unidadMedida = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
   estado = []; //Variable que va a almacenar todos los tipos de estados de documentos
   proveedores = [];
+  tintaCreada = false;
+  informacion : string = '';
 
   constructor(private materiaPrimaService : MateriaPrimaService,
     private categoriMpService : CategoriaMateriaPrimaService,
@@ -61,30 +63,6 @@ export class CrearMateriaprimaComponent implements OnInit {
                                         private bagProServices : BagproService,) {
 
     this.materiPrima = this.frmBuilderMateriaPrima.group({
-      //MateriaPrima
-      mpNombre: new FormControl(),
-      mpDescripcion: new FormControl(),
-      mpStock: new FormControl(),
-      mpCategoria: new FormControl(),
-      mpEstado: new FormControl(),
-      mpProveedor: new FormControl(),
-      mpValor: new FormControl(),
-      Stock : new FormControl(),
-      mpUnidadMedida : new FormControl(),
-      MpObservacion : new FormControl(),
-    });
-  }
-
-  ngOnInit(): void {
-    this.initForms();
-    this.obtenerNombreCategoriasMp();
-    this.obtenerUnidadMedida();
-    this.obtenerProceedor();
-  }
-
-  //Inicializando formulario de Crear Proveedores en modal.
-  initForms(){
-    this.materiPrima = this.frmBuilderMateriaPrima.group({
       mpNombre: ['', Validators.required],
       mpDescripcion: ['', Validators.required],
       mpStock: ['', Validators.required],
@@ -96,6 +74,12 @@ export class CrearMateriaprimaComponent implements OnInit {
       mpUnidadMedida : ['', Validators.required],
       MpObservacion : ['', Validators.required],
     });
+  }
+
+  ngOnInit(): void {
+    this.obtenerNombreCategoriasMp();
+    this.obtenerUnidadMedida();
+    this.obtenerProceedor();
   }
 
   //Funcion que va almacenar todas las unidades de medida existentes en la empresa
@@ -163,21 +147,11 @@ export class CrearMateriaprimaComponent implements OnInit {
     }
 
     this.materiaPrimaService.srvGuardar(datosMP).subscribe(datos_mp_creada => {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: '¡Materia Prima creada con exito!'
-      });
+      this.tintaCreada = true;
+      this.informacion = `¡La materia prima fue creada con exito! \n\n `;
+    }, error => {
+      this.tintaCreada = true;
+      this.informacion = `¡Fallo al crear la materia prima! \n\n ${error.message}`;
     });
   }
 

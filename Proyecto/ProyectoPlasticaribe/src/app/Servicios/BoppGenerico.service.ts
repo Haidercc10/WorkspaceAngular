@@ -21,26 +21,26 @@ export class BoppGenericoService {
   }
 
   srvObtenerLista() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/');
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Bopp_Generico');
   }
   srvObtenerListaPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `//${dato}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Bopp_Generico/${dato}`);
   }
 
   obtenerUltimoId(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `//`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Bopp_Generico/`);
   }
 
   srvActualizar(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `//${id}`, data);
+    return this.http.put(this.rutaPlasticaribeAPI + `/Bopp_Generico/${id}`, data);
   }
 
   srvEliminar(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `//${id}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Bopp_Generico/${id}`);
   }
 
   srvGuardar(data : modelBoppGenerico): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/', data);
+   return this.http.post(this.rutaPlasticaribeAPI + '/Bopp_Generico', data);
   }
 
 }

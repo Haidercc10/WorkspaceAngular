@@ -1,7 +1,10 @@
+import { ThisReceiver } from '@angular/compiler';
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import pdfMake from 'pdfmake/build/pdfmake';
+import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenesCompra.service';
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
 import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra_MateriaPrima.service';
 import { ProveedorService } from 'src/app/Servicios/proveedor.service';
@@ -43,6 +46,7 @@ export class OcompraComponent implements OnInit {
   cantidadTotalPrecio : number = 0; //Variable que almacenará la sumatoria del precio de todas las materias primas seleccionadas
   materiasPrimasSeleccionada_ID : any [] = []; //Variable que almacenará los ID de las materias primas que se han seleccionado para que no puedan ser elegidas nuevamente
   consecutivoOrdenCompra : any = 0; //Variable que almacenará el consecutivo de la orden de compra
+  informacionPDF : any [] = []; //Variable que tendrá la informacion de la materia prima pedida en la orden de compra
 
   constructor(private frmBuilder : FormBuilder,
                 private rolService : RolesService,
@@ -50,7 +54,8 @@ export class OcompraComponent implements OnInit {
                     private proveedorService : ProveedorService,
                       private materiaPrimaService : MateriaPrimaService,
                         private undMedidaService : UnidadMedidaService,
-                          private ordenCompraService : OrdenCompra_MateriaPrimaService,) {
+                          private ordenCompraService : OrdenCompra_MateriaPrimaService,
+                            private dtOrdenCompraService : DetallesOrdenesCompraService,) {
 
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -66,6 +71,7 @@ export class OcompraComponent implements OnInit {
       UndMedida : [null, Validators.required],
       Precio : [null, Validators.required],
       PrecioOculto : [null, Validators.required],
+      Categoria : [null, Validators.required],
     });
   }
 
@@ -138,11 +144,23 @@ export class OcompraComponent implements OnInit {
 
   // Generar Consecutivo de Orden de Compra
   generarConsecutivo(){
-    this.FormOrdenCompra = this.frmBuilder.group({
-      ConsecutivoOrden : this.consecutivoOrdenCompra,
-      Proveedor : this.FormOrdenCompra.value.Proveedor,
-      Id_Proveedor : this.FormOrdenCompra.value.Id_Proveedor,
-      Observacion : this.FormOrdenCompra.value.Observacion,
+    this.ordenCompraService.getUltimoId_OrdenCompra().subscribe(datos_ordenCompra => {
+      this.FormOrdenCompra = this.frmBuilder.group({
+        ConsecutivoOrden : datos_ordenCompra + 1,
+        Proveedor : this.FormOrdenCompra.value.Proveedor,
+        Id_Proveedor : this.FormOrdenCompra.value.Id_Proveedor,
+        Observacion : this.FormOrdenCompra.value.Observacion,
+      });
+    }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        html:
+        '<b>¡Error al consultar el ultimo consecutivo de las ordenes de compra!</b><hr> ' +
+        `<spam style="color : #f00;">${error.message}</spam> `,
+        showCloseButton: true,
+      });
+      this.cargando = false;
     });
   }
 
@@ -177,6 +195,7 @@ export class OcompraComponent implements OnInit {
           UndMedida : datos_materiaPrima[i].undMedida,
           Precio : this.formatonumeros(parseFloat(datos_materiaPrima[i].precio).toFixed(2)),
           PrecioOculto : parseFloat(datos_materiaPrima[i].precio).toFixed(2),
+          Categoria : datos_materiaPrima[i].categoria,
         });
       }
     });
@@ -184,17 +203,24 @@ export class OcompraComponent implements OnInit {
 
   // Funcion que va a añadir la materia prima a la tabla
   cargarMateriaPrima(){
+    let categoria : number = this.FormMateriaPrima.value.Categoria;
     if (this.FormMateriaPrima.valid){
       if (!this.materiasPrimasSeleccionada_ID.includes(this.FormMateriaPrima.value.Id)) {
         if (this.FormMateriaPrima.value.Cantidad > 0){
           let info : any = {
-            Id: this.FormMateriaPrima.value.Id,
+            Id : this.FormMateriaPrima.value.Id,
+            Id_Mp: 84,
+            Id_Tinta: 2001,
+            Id_Bopp: 1,
             Nombre : this.FormMateriaPrima.value.Nombre,
             Cantidad : this.FormMateriaPrima.value.Cantidad,
             Und_Medida : this.FormMateriaPrima.value.UndMedida,
             Precio : this.FormMateriaPrima.value.PrecioOculto,
             SubTotal : (this.FormMateriaPrima.value.Cantidad * this.FormMateriaPrima.value.PrecioOculto),
           }
+          if (categoria == 7 || categoria == 8 || categoria == 13) info.Id_Tinta = info.Id;
+          else if (categoria == 1 || categoria == 2 || categoria == 3 || categoria == 4 || categoria == 5 || categoria == 9 || categoria == 10) info.Id_Mp = info.Id;
+          else if (categoria == 6 || categoria == 14 || categoria == 15) info.Id_Bopp = info.Id;
           this.materiasPrimasSeleccionada_ID.push(this.FormMateriaPrima.value.Id);
           this.materiasPrimasSeleccionadas.push(info);
           this.catidadTotalPeso += this.FormMateriaPrima.value.Cantidad;
@@ -309,21 +335,299 @@ export class OcompraComponent implements OnInit {
 
   // Funcion que va a rear detalles de Orden de Compra
   crearDtOrdenCompra(){
-    this.ordenCompraService.getUltimoId_OrdenCompra().subscribe(datos_ordenCompra => {
-      for (let i = 0; i < datos_ordenCompra.length; i++) {
-        for (let j = 0; j < this.materiasPrimasSeleccionadas.length; j++) {
+    for (let j = 0; j < this.materiasPrimasSeleccionadas.length; j++) {
+      let info : any = {
+        Oc_Id : this.FormOrdenCompra.value.ConsecutivoOrden,
+        MatPri_Id : this.materiasPrimasSeleccionadas[j].Id_Mp,
+        Tinta_Id : this.materiasPrimasSeleccionadas[j].Id_Tinta,
+        BOPP_Id : this.materiasPrimasSeleccionadas[j].Id_Bopp,
+        Doc_CantidadPedida : this.materiasPrimasSeleccionadas[j].Cantidad,
+        UndMed_Id : this.materiasPrimasSeleccionadas[j].Und_Medida,
+        Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[j].Precio,
+      }
+      this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => { this.GuardadoExitoso(); }, error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          html:
+          '<b>¡Error al insertar la(s) materia(s) prima(s) pedida(s)!</b><hr> ' +
+          `<spam style="color : #f00;">${error.message}</spam> `,
+          showCloseButton: true,
+        });
+        this.cargando = false;
+      });
+    }
+  }
+
+  // Funcion que mostrará el mensaje de que todo el proceso de guardado fue exitoso
+  GuardadoExitoso(){
+    Swal.fire({
+      icon: 'success',
+      title: '¡Guardado Exitoso!',
+      html:
+      `<b>¡Orden de compra Creada con exito!</b><hr>`,
+      showCloseButton: true,
+      showConfirmButton: true,
+      showCancelButton : true,
+      confirmButtonColor : '#d44',
+      cancelButtonText : `Cerrar`,
+      confirmButtonText : 'Ver PDF <i class="pi pi-file-pdf"></i>',
+    }).then((result) => {
+      if (result.isConfirmed) this.buscarinfoOrdenCompra();
+    });
+    this.limpiarTodo();
+  }
+
+  //Buscar informacion de la orden de compra creada
+  buscarinfoOrdenCompra(){
+    this.cargando = true;
+    this.dtOrdenCompraService.GetUltimaOrdenCompra().subscribe(datos_orden => {
+      for (let i = 0; i < datos_orden.length; i++) {
+        let info : any = {
+          Id : 0,
+          Id_Mp: datos_orden[i].mP_Id,
+          Id_Tinta: datos_orden[i].tinta_Id,
+          Id_Bopp: datos_orden[i].bopp_Id,
+          Nombre : '',
+          Cantidad : this.formatonumeros(datos_orden[i].cantidad),
+          Medida : datos_orden[i].unidad_Medida,
+          Precio : `$${this.formatonumeros(datos_orden[i].precio_Unitario)}`,
+          SubTotal : `${this.formatonumeros(datos_orden[i].cantidad * datos_orden[i].precio_Unitario)}`,
+        }
+        if (info.Id_Mp != 84) {
+          info.Id = info.Id_Mp;
+          info.Nombre = datos_orden[i].mp;
+        } else if (info.Id_Tinta != 2001) {
+          info.Id = info.Id_Tinta;
+          info.Nombre = datos_orden[i].tinta;
+        } else if (info.Id_Bopp != 1) {
+          info.Id = info.Id_Bopp;
+          info.Nombre = datos_orden[i].bopp;
+        }
+        this.informacionPDF.push(info);
+        this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+      }
+    });
+    setTimeout(() => {this.generarPDF(); }, 2500);
+  }
+
+  // Funcion que se encargará de poner la informcaion en el PDF y generarlo
+  generarPDF(){
+    this.dtOrdenCompraService.GetUltimaOrdenCompra().subscribe(datos_orden => {
+      for (let i = 0; i < datos_orden.length; i++) {
+        const pdfDefinicion : any = {
+          info: {
+            title: `Orden de Compra N° ${datos_orden[i].consecutivo}`
+          },
+          pageSize: {
+            width: 630,
+            height: 760
+          },
+          content : [
+            {
+              text: `Orden de Compra de Materia Prima`,
+              alignment: 'right',
+              style: 'titulo',
+            },
+            '\n \n',
+            {
+              style: 'tablaEmpresa',
+              table: {
+                widths: [90, '*', 90, '*'],
+                style: 'header',
+                body: [
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `Nombre Empresa`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_orden[i].empresa}`
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `Fecha`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_orden[i].fecha.replace('T00:00:00', ``)} ${datos_orden[i].hora}`
+                    },
+                  ],
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `Dirección`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_orden[i].empresa_Direccion}`
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `No. de Orden`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_orden[i].consecutivo}`
+                    },
+                  ],
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `Ciudad`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_orden[i].empresa_Ciudad}`
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: ``
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: ``
+                    },
+                  ]
+                ]
+              },
+              layout: {
+                defaultBorder: false,
+              },
+              fontSize: 9,
+            },
+            '\n \n',
+            {
+              text: `Usuario: ${datos_orden[i].usuario}\n`,
+              alignment: 'left',
+              style: 'header',
+            },
+            '\n \n',
+            {
+              text: `\n Información detallada del Proveedor \n \n`,
+              alignment: 'center',
+              style: 'header'
+            },
+            {
+              style: 'tablaCliente',
+              table: {
+                widths: ['*', '*', '*'],
+                style: 'header',
+                body: [
+                  [
+                    `ID: ${datos_orden[i].proveedor_Id}`,
+                    `Tipo de ID: ${datos_orden[i].tipo_Id}`,
+                    `Tipo de Proveedor: ${datos_orden[i].tipo_Proveedor}`
+                  ],
+                  [
+                    `Nombre: ${datos_orden[i].proveedor}`,
+                    `Telefono: ${datos_orden[i].telefono_Proveedor}`,
+                    `Ciudad: ${datos_orden[i].ciudad_Proveedor}`
+                  ],
+                  [
+                    `E-mail: ${datos_orden[i].correo_Proveedor}`,
+                    '',
+                    ''
+                  ]
+                ]
+              },
+              layout: 'lightHorizontalLines',
+              fontSize: 9,
+            },
+            {
+              text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
+              alignment: 'center',
+              style: 'header'
+            },
+
+            this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Medida', 'Precio', 'SubTotal']),
+
+            {
+              style: 'tablaTotales',
+              table: {
+                widths: [197, '*', 50, '*', '*', 98],
+                style: 'header',
+                body: [
+                  [
+                    '',
+                    {
+                      border: [true, false, true, true],
+                      text: `Peso Total`
+                    },
+                    {
+                      border: [false, false, true, true],
+                      text: `${this.formatonumeros(datos_orden[i].peso_Total)}`
+                    },
+                    '',
+                    {
+                      border: [true, false, true, true],
+                      text: `Valor Total`
+                    },
+                    {
+                      border: [false, false, true, true],
+                      text: `$${this.formatonumeros(datos_orden[i].valor_Total)}`
+                    },
+                  ],
+                ]
+              },
+              layout: {
+                defaultBorder: false,
+              },
+              fontSize: 8,
+            },
+            {
+              text: `\n \nObservación sobre la Orden: \n ${datos_orden[i].observacion}\n`,
+              style: 'header',
+            }
+          ],
+          styles: {
+            header: {
+              fontSize: 10,
+              bold: true
+            },
+            titulo: {
+              fontSize: 20,
+              bold: true
+            }
+          }
+        }
+        const pdf = pdfMake.createPdf(pdfDefinicion);
+        pdf.open();
+        this.cargando = false;
+        break;
+      }
+    });
+  }
+
+  // funcion que se encagará de llenar la tabla de los productos en el pdf
+  buildTableBody(data : any, columns : any) {
+    var body = [];
+    body.push(columns);
+    data.forEach(function(row) {
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: [50, 197, 50, 50, 50, 98],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
-    }, error => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        html:
-        '<b>¡Error al consultar el ultimo consecutivo de las ordenes de compra!</b><hr> ' +
-        `<spam style="color : #f00;">${error.message}</spam> `,
-        showCloseButton: true,
-      });
-      this.cargando = false;
-    });
+    };
   }
 }
