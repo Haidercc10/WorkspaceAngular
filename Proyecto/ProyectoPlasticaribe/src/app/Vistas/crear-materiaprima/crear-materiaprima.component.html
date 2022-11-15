@@ -51,5 +51,11 @@
       <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="limpiarCampos()">
     </div>
   </div>
+
+  <div class="mb-1" *ngIf="tintaCreada">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <h6>{{informacion}}</h6>
+    </div>
+  </div>
   <!--Fin Fila 3-->
 </form>

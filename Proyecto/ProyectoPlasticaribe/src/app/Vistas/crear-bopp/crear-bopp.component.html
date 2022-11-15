@@ -19,20 +19,17 @@
         <label for="floatingInput">Micras</label>
       </div>
 
-      <!-- CATEGORIA  -->
-      <div class="form-floating col-md-">
-        <select formControlName="mpCategoria" id="floatingSelect" type="text" name="mapCategoria" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-          <option [ngValue]="Categoria.catMP_Id" *ngFor="let Categoria of categorias">{{Categoria.catMP_Nombre}}</option>
-        </select>
-        <label for="floatingSelect">Categoria</label>
-      </div>
-
       <div class="mb-1">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
           <input class="btn btn-danger btn-danger-sm" type="submit" value="Agregar">
           <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="limpiarCampos()">
         </div>
       </div>
+    </div>
+  </div>
+  <div class="mb-1" *ngIf="tintaCreada">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <h6>{{informacion}}</h6>
     </div>
   </div>
 </form>

@@ -14,6 +14,8 @@ export class CrearBoppComponent implements OnInit {
   FormBopp : FormGroup;
   categorias : any [] = [];
   unidadMedida : any []= [];
+  tintaCreada = false;
+  informacion : string = '';
 
   constructor(private frmBuilder : FormBuilder,
                 private boppGenericoService : BoppGenericoService,
@@ -46,8 +48,21 @@ export class CrearBoppComponent implements OnInit {
     });
   }
 
-
+  // Funcion que creará el bopp generico en la base de datos
   crearBoppGenerico(){
-
+    if (this.FormBopp.valid){
+      let info : any = {
+        BoppGen_Nombre : this.FormBopp.value.Nombre,
+        BoppGen_Ancho : this.FormBopp.value.Ancho,
+        BoppGen_Micra : this.FormBopp.value.Micras,
+      }
+      this.boppGenericoService.srvGuardar(info).subscribe(datos_bopp => {
+        this.tintaCreada = true;
+        this.informacion = `¡El rollo ha sido creado con exito!`;
+      }, error => {
+        this.tintaCreada = true;
+        this.informacion = `¡Fallo al crear la rollo! \n\n ${error.message}`;
+      });
+    }
   }
 }
