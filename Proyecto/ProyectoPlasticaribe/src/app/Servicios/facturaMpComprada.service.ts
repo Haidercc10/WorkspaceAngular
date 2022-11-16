@@ -27,6 +27,10 @@ export class FactuaMpCompradaService {
         return this.http.get<any>(this.rutaPlasticaribeAPI + '/Factura_Compra')
     }
 
+    UltimoIdFactura():Observable<any[]> {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + '/Factura_Compra/UltimoIdFactura')
+    }
+
     srvObtenerListaPorId(dato : any){
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/Factura_Compra/${dato}`);
     }

@@ -319,7 +319,7 @@ export class OcompraComponent implements OnInit {
       Oc_ValorTotal : this.cantidadTotalPrecio,
       Oc_PesoTotal : this.catidadTotalPeso,
       TpDoc_Id : 'OCMP',
-      Oc_Observacion : this.FormOrdenCompra.value.Observacion,
+      Oc_Observacion : (this.FormOrdenCompra.value.Observacion).toUpperCase(),
     }
     this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => { this.crearDtOrdenCompra(); }, error => {
       Swal.fire({

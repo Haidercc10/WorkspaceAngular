@@ -23,9 +23,8 @@
   <div class="mb-4">
     <h4 class="tituloRojo">Ingresar Factura de Materia Prima</h4>
   </div>
-  <!-- Fin titulo -->
+
   <form [formGroup]="FormMateriaPrimaFactura">
-    <!-- Inicio Fila 1 Agregar producto -->
     <div class="mb-3">
       <div class="row g-3">
 
@@ -34,97 +33,34 @@
           <label for="floatingSelect">Nro. OC</label>
         </div>
 
-        <!--<div class="form-floating col-md-2">
-          <input formControlName="ConsecutivoFactura" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" readonly onmousedown="return false;">
-          <label for="floatingSelect">Consecutivo</label>
-        </div>-->
+        <!-- Factura -->
+        <div class="form-floating col-md-2">
+          <input formControlName="MpFactura" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+          <label for="floatingSelect">Nro. Factura</label>
+        </div>
+        <!-- Remision -->
+        <div class="form-floating col-md-2">
+          <input formControlName="MpRemision" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
+          <label for="floatingSelect">Nro. Remisión</label>
+        </div>
 
-        <ng-container *ngIf="validarCamposFacRem == 1">
-          <div class="form-floating col-md-2">
-            <input formControlName="MpFactura" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" readonly onmousedown="return false;">
-            <label for="floatingSelect">Nro. Factura</label>
-          </div>
-          <!-- Remision -->
-          <div class="form-floating col-md-2">
-            <input formControlName="MpRemision" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
-            <label for="floatingSelect">Nro. Remisión</label>
-          </div>
-        </ng-container>
-
-        <ng-container *ngIf="validarCamposFacRem == 2">
-          <div class="form-floating col-md-2">
-            <input formControlName="MpFactura" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid">
-            <label for="floatingSelect">Nro. Factura</label>
-          </div>
-          <!-- Remision -->
-          <div class="form-floating col-md-2">
-            <input formControlName="MpRemision" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" readonly onmousedown="return false;">
-            <label for="floatingSelect">Nro. Remisión</label>
-          </div>
-        </ng-container>
-
-        <ng-container *ngIf="validarCamposFacRem == 3">
-          <div class="form-floating col-md">
-            <input formControlName="MpFactura" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
-            <label for="floatingSelect">Nro. Factura</label>
-          </div>
-          <!-- Remision -->
-          <div class="form-floating col-md-2">
-            <input formControlName="MpRemision" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
-            <label for="floatingSelect">Nro. Remisión</label>
-          </div>
-        </ng-container>
-
-        <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm">
-          <ng-autocomplete
-            class=""
-            [data]="proveedor"
-            (selected)='llenarProveedorSeleccionado($event)'
-            (inputChanged)='onChangeSearchProveedor($event)'
-            (inputFocused)='onFocusedProveedor($event)'
-            historyIdentifier="countriesTemplateList"
-            [historyHeading]="historyHeading"
-            [historyListMaxNumber]="3"
-            [searchKeyword]="keywordProveedor"
-            [itemTemplate]="itemTemplatePrv"
-            [notFoundTemplate]="notFoundTemplate"
-            id="floatingInput"
-            formControlName="proveedorNombre">
-          </ng-autocomplete>
-
-          <ng-template #itemTemplatePrv let-item>
-            <a [innerHTML]="item.prov_Nombre"></a>
-          </ng-template>
-
-          <ng-template #notFoundTemplate let-notFound>
-            <div [innerHTML]="notFound"></div>
-          </ng-template>
-          <label for="floatingInput" *ngIf="validarInputProveedor">Nombre Proveedor</label>
+        <div class="form-floating col-md">
+          <input formControlName="proveedorNombre" class="form-control" list="clientes" id="floatingInput" (change)="cambiarNombreProveedor()" title="Nombre del Proveedor" required>
+          <datalist id="clientes">
+            <option value={{item.prov_Id}} *ngFor="let item of proveedor">{{item.prov_Nombre}}</option>
+          </datalist>
+          <label for="floatingInput">Proveedor</label>
         </div>
       </div>
     </div>
 
-        <!-- Proveedor -->
-        <!--<div class="form-floating col-md-3">
-          <input formControlName="proveedor" (keyup.enter)="llenarProvedorId()"type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
-          <label for="floatingSelect">ID Proveedor</label>
-        </div>-->
     <div class="mb-3">
       <div class="row g-3">
-
         <!-- Campo Observacion -->
         <div class="form-floating col-md">
           <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm" name="MpObservacion"></textarea>
           <label for="floatingTextarea">Observación</label>
         </div>
-
-
-        <!-- Fecha Ingreso -->
-        <!--<div class="form-floating col-md-2">
-          <input formControlName="MpingresoFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso" readonly onmousedown="return false;">
-          <label for="floatingInput">Fecha Ingreso</label>
-        </div>-->
-
       </div>
     </div>
   </form>
@@ -134,52 +70,48 @@
   </div>
 
   <!--Inicio tabla Mat. Primas de la OC -->
-  <div class="mb-3" > <!--*ngIf="cargando"-->
-    <div class="row g-3" style="font-size: 14px;">
+  <div class="mb-3" *ngIf="load">
+    <div class="row g-3">
       <p-table
-          #dt
-          [value]="arrayOrdenCompra"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          responsiveLayout="scroll"
-          [paginator]="true"
-          [rows]="10"
-          [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} materias primas"
-          [rowsPerPageOptions]="[10,25,50]"
-          [rowHover]="true"
-          dataKey="Id"
-          >
+      #dt
+      [value]="arrayOrdenCompra"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+      responsiveLayout="scroll"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords}"
+      [rowsPerPageOptions]="[10,25,50]"
+      [rowHover]="true"
+      dataKey="Id"
+      [(selection)]="ArrayMateriaPrima">
         <ng-template pTemplate="header">
           <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Materia Prima</th>
+            <th scope="col">Id</th>
+            <th scope="col">Nombre</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Presentación</th>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox>(click)="ingresarTodo_OrdenCompra(arrayOrdenCompra)"</p-tableHeaderCheckbox><!--(click)="seleccionarTodosRollos(rollos)"-->
+              <p-tableHeaderCheckbox (click)="seleccionarTodosMateriaPrima(arrayOrdenCompra)"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-rollo>
+        <ng-template pTemplate="body" let-arrayOrdenCompra>
           <tr>
-            <ng-container ></ng-container>
+            <ng-container *ngIf="arrayOrdenCompra.Exits; then thenTemplate; else elseTemplate"></ng-container>
             <ng-template #thenTemplate>
-              <td style="background-color: rgb(255, 146, 146);"></td>
-              <td style="background-color: rgb(255, 146, 146);"></td>
-              <td style="background-color: rgb(255, 146, 146);"></td>
-              <td style="background-color: rgb(255, 146, 146);"></td>
-              <td style="background-color: rgb(255, 146, 146);"></td>
+              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Id}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Nombre}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad | number}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Medida}}</td>
             </ng-template>
             <ng-template #elseTemplate>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
+              <td>{{arrayOrdenCompra.Id}}</td>
+              <td>{{arrayOrdenCompra.Nombre}}</td>
+              <td>{{arrayOrdenCompra.Cantidad | number}}</td>
+              <td>{{arrayOrdenCompra.Medida}}</td>
               <td>
-                <p-tableCheckbox></p-tableCheckbox> <!--(click)="llenarRollosAIngresar(rollo)"-->
+                <p-tableCheckbox [value]="arrayOrdenCompra" (click)="llenarMateriaPrimaAIngresar(arrayOrdenCompra)"></p-tableCheckbox>
               </td>
             </ng-template>
           </tr>
@@ -188,151 +120,69 @@
     </div>
   </div>
 
-  <!--
-  <form [formGroup]="FormMateriaPrima">
-    <div class="mb-3">
-      <div class="row g-3">
-        <div class="form-floating col-md-2">
-          <input formControlName="MpId" type="number" min="0" (keyup.enter)="buscarMpId2()" class="form-control" id="floatingInput"required >
-          <label for="floatingInput">Id Materia Prima</label>
-        </div>
-
-        <div class="ng-autocomplete form-floating col-md-1 form-control form-control-sm">
-          <ng-autocomplete
-            class=""
-            [data]="materiasPrimas"
-            (selected)='buscarMpSeleccionada2($event)'
-            (inputChanged)='onChangeSearchMP($event)'
-            (inputFocused)='onFocusedMP($event)'
-            [searchKeyword]="keywordMP"
-            [itemTemplate]="itemTemplate"
-            [notFoundTemplate]="notFoundTemplate"
-            id="floatingInput"
-            formControlName="MpNombre">
-          </ng-autocomplete>
-
-          <ng-template #itemTemplate let-item>
-            <a [innerHTML]="item.name"></a>
-          </ng-template>
-
-          <ng-template #notFoundTemplate let-notFound>
-            <div [innerHTML]="notFound"></div>
-          </ng-template>
-          <label for="floatingInput" *ngIf="validarInputMP">{{NombreMatPrima}}</label>
-        </div>
-
-
-        <div class="form-floating col-md-2">
-          <input formControlName="MpCantidad" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" >
-          <label for="floatingInput">Cantidad de Materia Prima</label>
-        </div>
-
-
-        <div class="form-floating col-md-2">
-          <select formControlName="MpUnidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" >
-            <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
-          </select>
-          <label for="floatingSelect">Und. Medida</label>
-        </div>
-
-
-        <div class="form-floating col-md-2">
-          <input formControlName="MpPrecio" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" >
-          <label for="floatingInput">Precio Materia Prima</label>
-        </div>
-      </div>
-    </div>
-
-    <div class="mb-1">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVaciosMP()">{{AccionBoton}} Materia Prima</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMP()">Limpiar Campos Materia Prima</button>
-      </div>
-    </div>
-  </form>
--->
-
-<div class="mb-4">
-  <hr class="Linea">
-</div>
+  <div class="mb-4">
+    <hr class="Linea">
+  </div>
 
   <div class="mb-4">
     <h4 class="tituloRojo">Tabla Ingreso</h4>
   </div>
 
-  <p-table [value]="" dataKey="id" > <!--[tableStyle]="{'min-width': '50rem'}"-->
-    <ng-template pTemplate="header">
-        <tr>
-            <th style="width:25%">ID</th>
-            <th style="width:25%">Materia Prima</th>
-            <th style="width:25%">Cantidad</th>
-            <th style="width:25%">Presentación</th>
+  <div class="mb-3" *ngIf="load">
+    <div class="row g-3">
+      <p-table
+        #dt1
+        [value]="ArrayMateriaPrima"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[10,25,50]"
+        [rowHover]="true"
+        dataKey="Id"
+        [(selection)]="arrayOrdenCompra">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Presentación</th>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox ></p-tableHeaderCheckbox><!--(click)="seleccionarTodosRollos(rollos)"-->
+              <p-tableHeaderCheckbox (click)="quitarTodosMateriaPrima(ArrayMateriaPrima)"></p-tableHeaderCheckbox>
             </th>
-        </tr>
-    </ng-template>
-        <tr>
-          <ng-template>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ArrayMateriaPrima>
+          <tr *ngIf="!ArrayMateriaPrima.Exits">
+            <td>{{ArrayMateriaPrima.Id}}</td>
+            <td>{{ArrayMateriaPrima.Nombre}}</td>
             <td pEditableColumn>
               <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <input pInputText > <!--[(ngModel)]="product.inventoryStatus"-->
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                     <!-- {{product.inventoryStatus}} -->
-                  </ng-template>
+                <ng-template pTemplate="input">
+                  <p-inputNumber [(ngModel)]="ArrayMateriaPrima.Cantidad" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="ArrayMateriaPrima.Cantidad_Oculta" [maxFractionDigits]="2"></p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ArrayMateriaPrima.Cantidad | number}}
+                </ng-template>
               </p-cellEditor>
-          </td>
-          </ng-template>
-        </tr>
-  </p-table>
-
-
-  <!--
-  <div class="mb-2">
-    <div class="row g-1">
-      <div class="table-responsive">
-
-        <table class="table table-bordered" >
-          <thead class="TitulosTabla">
-            <tr *ngFor="let columnas of titulosTabla let i = index">
-              <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
-              <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
-              <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
-              <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
-              <th id="precioMateriaPrima" scope="col">{{columnas.mpPrecioU}}</th>
-              <th id="subTotalMateriaPrima" scope="col">{{columnas.mpSubTotal}}</th>
-              <th id="editar" scope="col">Editar</th>
-              <th id="eliminar" scope="col">Eliminar</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let materiaPrima of ArrayMateriaPrima let i = index">
-              <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
-              <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
-              <td id="cantidadMateriaPrima">{{materiaPrima.Cant}}</td>
-              <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
-              <td id="precioMateriaPrima">{{materiaPrima.PrecioUnd | currency : 'COP'}}</td>
-              <td id="subTotalMateriaPrima">{{materiaPrima.SubTotal | currency : 'COP'}}</td>
-              <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" (click)="EditarProductoTabla(materiaPrima)" title="Editar Materia Prima"></i></a></td>
-              <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" (click)="QuitarProductoTabla(i, materiaPrima)" title="Quitar Materia Prima de la tabla"></i></a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+            </td>
+            <td>{{ArrayMateriaPrima.Medida}}</td>
+            <td>
+              <p-tableCheckbox [value]="ArrayMateriaPrima" (click)="quitarMateriaPrimaAIngresar(ArrayMateriaPrima)"></p-tableCheckbox>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="3" class="text-right">Totales</td>
+            <!-- <td>{{totalCantidad | number}}</td>
+            <td>{{totalRollos | number}}</td>
+            <td>Kg</td> -->
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
   </div>
-
-
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <label for=""><b>Valor total: $</b></label>
-    <label for="">${{valorTotal | currency : 'COP'}}</label>
-  </div>-->
-  <!--Fin valor total-->
 
   <div class="mb-4">
     <hr class="colorLinea">
@@ -366,14 +216,10 @@
                 <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remTipoDoc}}</th>
                 <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remPrecio}}</th>
                 <th id="archivo" scope="col">Archivo</th>
-
               </tr>
-              </thead>
+            </thead>
             <tbody>
-              <!-- <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" > -->
-              <!-- <tr *ngFor= "let item of IngresoMateriaP " > -->
               <tr *ngFor="let remisiones of ArrayRemisiones let i = index">
-
                 <td id="idMateriaPrima">{{remisiones.remisionId}}</td>
                 <td id="nombreMateriaPrima">{{remisiones.remisionCodigo}}</td>
                 <td id="cantidadMateriaPrima">{{remisiones.remisionFecha | date : 'yyyy-MM-dd'}}</td>
@@ -405,5 +251,4 @@
   <div class="mb-4">
     <hr class="colorLinea">
   </div>
-
 </div>

@@ -22,49 +22,53 @@ export class RemisionService {
   }
 
   //Metodo buscar lista de proveedor
-    srvObtenerLista():Observable<any[]> {
-        return this.http.get<any>(this.rutaPlasticaribeAPI + '/Remision')
-    }
+  srvObtenerLista():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Remision')
+  }
 
-    srvObtenerListaPorId(id : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/${id}`);
-    }
+  UltimoIdRemision():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Remision/UltimoIdRemision')
+  }
 
-    srvObtenerListaPorProv(id : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/P/${id}`);
-    }
+  srvObtenerListaPorId(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/${id}`);
+  }
 
-    srvObtenerListaPorFecha(id : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/fecha/${id}`);
-    }
+  srvObtenerListaPorProv(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/P/${id}`);
+  }
 
-    srvObtenerListaPorFechas(fecha1 : any, fecha2 : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/fecha?Rem_Fecha1=${fecha1}&Rem_Fecha2=${fecha2}`);
-    }
+  srvObtenerListaPorFecha(id : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/fecha/${id}`);
+  }
 
-    srvObtenerListaPorcodigo(codigo : any){
-      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/codigo/${codigo}`);
-    }
+  srvObtenerListaPorFechas(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/fecha?Rem_Fecha1=${fecha1}&Rem_Fecha2=${fecha2}`);
+  }
+
+  srvObtenerListaPorcodigo(codigo : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision/codigo/${codigo}`);
+  }
 
   //Metodo agregar proveedor
-    srvAgregar(data:any) {
-      return this.http.post(this.rutaPlasticaribeAPI + '/Remision', data)
-    }
+  srvAgregar(data:any) {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Remision', data)
+  }
 
   //Metodo actualzar proveedor
-    srvActualizar(id:number|String, data:any) {
-      return this.http.put(this.rutaPlasticaribeAPI + `/Remision/${id}`, data);
-    }
+  srvActualizar(id:number|String, data:any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/Remision/${id}`, data);
+  }
 
   //Metodo eliminar proveedor
-    srvEliminar(id:number|String) {
-      return this.http.delete(this.rutaPlasticaribeAPI + `/Remision/${id}`);
-    }
+  srvEliminar(id:number|String) {
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Remision/${id}`);
+  }
 
-    //Metodo Guardar proveedor con un modelo
-    srvGuardar(data : modelRemision): Observable<any> {
-     return this.http.post(this.rutaPlasticaribeAPI + '/Remision', data);
-   }
+  //Metodo Guardar proveedor con un modelo
+  srvGuardar(data : modelRemision): Observable<any> {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Remision', data);
+  }
 
 
 }
