@@ -40,6 +40,10 @@ export class OrdenCompra_MateriaPrimaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/OrdenesCompras_FacturasCompras/InfoFacturaxOC/${IdOrden}`);
   }
 
+  getFacturasAsociadasAOC(IdOrden : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/OrdenesCompras_FacturasCompras/FacturasAsociadasAOC/${IdOrden}`);
+  }
+
   //Metodo actualzar
   putId_OrdenCompra(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Orden_Compra/${id}`, data);
@@ -52,5 +56,6 @@ export class OrdenCompra_MateriaPrimaService {
   insert_OrdenCompra(data : modelOrdenCompra): Observable<any> {
    return this.http.post(this.rutaPlasticaribeAPI + '/Orden_Compra', data);
   }
+
 
 }
