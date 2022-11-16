@@ -56,6 +56,8 @@ export class PedidomateriaprimaComponent implements OnInit {
   NombreMatPrima : string = 'Materia Prima';
   public load: boolean;
   public arrayOrdenCompra : any [] = [];
+  public arrayMatPrimaFactura : any [] = [];
+  public arrayInfoMatPrima : any [] = [];
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private usuarioService : UsuarioService,
@@ -70,7 +72,7 @@ export class PedidomateriaprimaComponent implements OnInit {
                                   private remisionMPService : RemisionesMPService,
                                     private remisionFacturaService : RemisionFacturaService,
                                       private tintasService : TintasService,
-                                        private servicioOCMatPrima : OrdenCompra_MateriaPrimaService) {
+                                        private servicioOCMatPrima : OrdenCompra_MateriaPrimaService,) {
 
     this.FormMateriaPrimaFactura = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
@@ -203,68 +205,141 @@ export class PedidomateriaprimaComponent implements OnInit {
   // Funcion que se va a encargar de colocar las materias primas que vienen de la orden de trabajo
   cargarInfoOrdenCompraEnTabla() {
     this.arrayOrdenCompra = [];
+    this.arrayMatPrimaFactura = [];
+    this.arrayInfoMatPrima = [];
+    let arrayIdsMatPrima: any = [];
+    let arrayCantidades : any = [];
     this.load = false;
     let Orden_Compra : any = this.FormMateriaPrimaFactura.value.OrdenCompra;
-    let matPrimaFacco : number;
 
     if (Orden_Compra != null) {
-      // this.servicioOCMatPrima.getListaFacturasxOC(Orden_Compra).subscribe(dataFacturas => {
-      //   if(dataFacturas.length > 0) {
-      //      for (let i = 0; i < dataFacturas.length; i++) {
-      //       //facturas.push(dataFacturas[i].facco_Id);
-      //       this.facturaMpService.srvObtenerListaPorFacId(dataFacturas[i].facco_Id).subscribe(dataFacComprasMP => {
-      //         for (let fcmp = 0; fcmp < dataFacComprasMP.length; fcmp++) {
-
-      //           if(dataFacComprasMP[fcmp].matPri_Id == 84) matPrimaFacco = dataFacComprasMP[fcmp].tinta_Id;
-      //           else if (dataFacComprasMP[fcmp].tinta_Id == 2001) matPrimaFacco = dataFacComprasMP[fcmp].matPri_Id;
-
-      //           let info : any = {
-      //             MatPrima : matPrimaFacco,
-      //             CantidadPedida : dataFacComprasMP[fcmp].faccoMatPri_Cantidad,
-      //             Unidad : dataFacComprasMP[fcmp].undMed_Id,
-      //           }
-
-      //         }
-      //       })
-      //      }
-      //   }
-      // });
-
-      this.servicioOCMatPrima.getListaOrdenesComprasxId(Orden_Compra).subscribe(datos_orden => {
-        if(datos_orden.length > 0) {
-          setTimeout(() => {
-            for (let i = 0; i < datos_orden.length; i++) {
-              let info : any = {
-                Id : 0,
-                Id_Mp: datos_orden[i].matPri_Id,
-                Id_Tinta: datos_orden[i].tinta_Id,
-                Id_Bopp: datos_orden[i].bopP_Id,
-                Nombre : '',
-                Cantidad : (datos_orden[i].doc_CantidadPedida),
-                Cantidad_Oculta : datos_orden[i].doc_CantidadPedida,
-                Medida : datos_orden[i].undMed_Id,
-                Precio : datos_orden[i].doc_PrecioUnitario,
-                Exits : false,
-              }
-              if (info.Id_Mp != 84) {
-                info.Id = info.Id_Mp;
-                info.Nombre = datos_orden[i].matPri_Nombre;
-              } else if (info.Id_Tinta != 2001) {
-                info.Id = info.Id_Tinta;
-                info.Nombre = datos_orden[i].tinta_Nombre;
-              } else if (info.Id_Bopp != 1) {
-                info.Id = info.Id_Bopp;
-                info.Nombre = datos_orden[i].boppGen_Nombre;
-              }
-              this.arrayOrdenCompra.push(info);
-              this.arrayOrdenCompra.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+      this.servicioOCMatPrima.getFacturasComprasAsociadasAOC(Orden_Compra).subscribe(dataFact => {
+        if(dataFact.length > 0) {
+          for (let index = 0; index < dataFact.length; index++) {
+            let infoFac: any = {
+              Id : 0,
+              MatPrima : dataFact[index].matPri_Id,
+              Tinta : dataFact[index].tinta_Id,
+              cantidadFactura : dataFact[index].faccoMatPri_Cantidad,
+              Und : dataFact[index].undMed_Id,
             }
-          }, 500);
-        } else Swal.fire('No se encontró la Orden de Compra solicitada');
+            if (infoFac.MatPrima != 84) {
+              infoFac.Id = dataFact[index].matPri_Id;
+              //infoFac.Nombre = dataFact[index].matPri_Nombre;
+            } else if (infoFac.Tinta != 2001) {
+              infoFac.Id = dataFact[index].tinta_Id;
+              //infoFac.Nombre = dataFact[index].tinta_Nombre;
+            }
+            this.arrayMatPrimaFactura.push(infoFac);
+            arrayIdsMatPrima.push(this.arrayMatPrimaFactura[index].Id)
+          }
+
+          console.log(arrayIdsMatPrima);
+          console.log(arrayCantidades);
+
+          this.servicioOCMatPrima.getListaOrdenesComprasxId(Orden_Compra).subscribe(datos_orden => {
+              setTimeout(() => {
+                for (let i = 0; i < datos_orden.length; i++) {
+                  let info : any = {
+                    Id : 0,
+                    Id_Mp: datos_orden[i].matPri_Id,
+                    Id_Tinta: datos_orden[i].tinta_Id,
+                    Id_Bopp: datos_orden[i].bopP_Id,
+                    Nombre : '',
+                    Cantidad : (datos_orden[i].doc_CantidadPedida),
+                    Cantidad_Oculta : datos_orden[i].doc_CantidadPedida,
+                    Medida : datos_orden[i].undMed_Id,
+                    Precio : datos_orden[i].doc_PrecioUnitario,
+                    Exits : false,
+                  }
+                  if (info.Id_Mp != 84) {
+                    info.Id = info.Id_Mp;
+                    info.Nombre = datos_orden[i].matPri_Nombre;
+                  } else if (info.Id_Tinta != 2001) {
+                    info.Id = info.Id_Tinta;
+                    info.Nombre = datos_orden[i].tinta_Nombre;
+                  } else if (info.Id_Bopp != 1) {
+                    info.Id = info.Id_Bopp;
+                    info.Nombre = datos_orden[i].boppGen_Nombre;
+                  }
+                  this.arrayInfoMatPrima.push(info);
+                  console.log(this.arrayInfoMatPrima);
+                  //this.arrayOrdenCompra.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+                }
+                //Bajar Materia Prima
+                for (let inx = 0; inx < this.arrayInfoMatPrima.length; inx++) {
+
+                  if(arrayIdsMatPrima.includes(this.arrayInfoMatPrima[inx].Id)) {
+                    let infoNueva : any = {
+                      Id : this.arrayInfoMatPrima[inx].Id,
+                      Nombre : this.arrayInfoMatPrima[inx].Nombre,
+                      Cantidad : this.arrayInfoMatPrima[inx].Cantidad,
+                      Medida : this.arrayInfoMatPrima[inx].Medida,
+                      Exits : true,
+                    }
+                    this.arrayOrdenCompra.push(infoNueva);
+                  } else if (!arrayIdsMatPrima.includes(this.arrayInfoMatPrima[inx].Id) ) {
+                    let infoNueva : any = {
+                      Id : this.arrayInfoMatPrima[inx].Id,
+                      Nombre : this.arrayInfoMatPrima[inx].Nombre,
+                      Cantidad : this.arrayInfoMatPrima[inx].Cantidad,
+                      Medida : this.arrayInfoMatPrima[inx].Medida,
+                      Exits : false,
+                    }
+                    this.arrayOrdenCompra.push(infoNueva);
+                  }  else if (arrayIdsMatPrima.includes(this.arrayInfoMatPrima[inx].Id)) {
+                    let infoNueva : any = {
+                      Id : this.arrayInfoMatPrima[inx].Id,
+                      Nombre : this.arrayInfoMatPrima[inx].Nombre,
+                      Cantidad : this.arrayInfoMatPrima[inx].Cantidad,
+                      Medida : this.arrayInfoMatPrima[inx].Medida,
+                      Exits : false,
+                    }
+                    this.arrayOrdenCompra.push(infoNueva);
+                  }
+                  //console.log(this.arrayOrdenCompra);
+                }
+              }, 500);
+          });
+
+        } else {
+          this.servicioOCMatPrima.getListaOrdenesComprasxId(Orden_Compra).subscribe(datos_orden => {
+            if(datos_orden.length > 0) {
+              setTimeout(() => {
+                for (let i = 0; i < datos_orden.length; i++) {
+                  let info : any = {
+                    Id : 0,
+                    Id_Mp: datos_orden[i].matPri_Id,
+                    Id_Tinta: datos_orden[i].tinta_Id,
+                    Id_Bopp: datos_orden[i].bopP_Id,
+                    Nombre : '',
+                    Cantidad : (datos_orden[i].doc_CantidadPedida),
+                    Cantidad_Oculta : datos_orden[i].doc_CantidadPedida,
+                    Medida : datos_orden[i].undMed_Id,
+                    Precio : datos_orden[i].doc_PrecioUnitario,
+                    Exits : false,
+                  }
+                  if (info.Id_Mp != 84) {
+                    info.Id = info.Id_Mp;
+                    info.Nombre = datos_orden[i].matPri_Nombre;
+                  } else if (info.Id_Tinta != 2001) {
+                    info.Id = info.Id_Tinta;
+                    info.Nombre = datos_orden[i].tinta_Nombre;
+                  } else if (info.Id_Bopp != 1) {
+                    info.Id = info.Id_Bopp;
+                    info.Nombre = datos_orden[i].boppGen_Nombre;
+                  }
+                  this.arrayOrdenCompra.push(info);
+                  this.arrayOrdenCompra.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+                }
+              }, 500);
+            } else Swal.fire('No se encontró la Orden de Compra solicitada');
+          });
+        }
       });
-    } else Swal.fire('Debe llenar el campo Nro. Orden Compra');
     setTimeout(() => { this.load = true; }, 1000);
   }
+}
 
   //Funcion que va a seleccionar una materia prima
   llenarMateriaPrimaAIngresar(item : any){

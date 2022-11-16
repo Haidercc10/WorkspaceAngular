@@ -57,5 +57,13 @@ export class OrdenCompra_MateriaPrimaService {
    return this.http.post(this.rutaPlasticaribeAPI + '/Orden_Compra', data);
   }
 
+    /** 2 formas de obtener las facturas que se encuentran asociadas a una OC.  */
+  getFacturasComprasAsociadasAOC(IdOrden : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/OrdenesCompras_FacturasCompras/FacturasAsociadasAOC/${IdOrden}`);
+  }
+
+  getFacturasComprasAsociadasAOrden(IdOrden : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/OrdenesCompras_FacturasCompras/FacturasComprasAsociadasAOC/${IdOrden}`);
+  }
 
 }

@@ -23,12 +23,4 @@ export class Srv_OrdenesComprasService {
     return this.httpAreas.get<any>(this.rutaPlasticaribeAPI + `/Orden_Compra/${IdOrden}`)
   }
 
-  /** 2 formas de obtener las facturas que se encuentran asociadas a una OC.  */
-  getFacturasAsociadasAOC(IdOrden : any):Observable<any[]> {
-    return this.httpAreas.get<any>(this.rutaPlasticaribeAPI + `/OrdenesCompras_FacturasCompras/FacturasAsociadasAOC/${IdOrden}`);
-  }
-
-  getFacturasAsociadasAOC2(IdOrden : any):Observable<any[]> {
-    return this.httpAreas.get<any>(this.rutaPlasticaribeAPI + `/OrdenesCompras_FacturasCompras/FacturasComprasAsociadasAOC/${IdOrden}`);
-  }
 }
