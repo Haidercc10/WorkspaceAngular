@@ -337,7 +337,10 @@ export class PedidomateriaprimaComponent implements OnInit {
           });
         }
       });
-    setTimeout(() => { this.load = true; }, 1000);
+    setTimeout(() => {
+      this.load = true;
+      this.cambiarNombreProveedor();
+    }, 1000);
   }
 }
 
@@ -387,62 +390,6 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.ArrayMateriaPrima = [];
   }
 
-  //Consultar Remisiones por Codigo
-  consultarIdRemisiones(){
-    let idRemision : number = this.FormRemisiones.value.idRemision;
-    this.remision = [];
-    this.remConFac = [];
-    this.load = false;
-
-    this.remisionService.srvObtenerLista().subscribe(datos_remision => {
-      for (let index = 0; index < datos_remision.length; index++) {
-        if (idRemision == datos_remision[index].rem_Codigo) this.remision.push(datos_remision[index].rem_Id);
-      }
-    });
-    // Llenado de Array con Remisiones con Facturas
-    this.remisionFacturaService.srvObtenerLista().subscribe(datos_remisionesFacturas => {
-      for (let i = 0; i < datos_remisionesFacturas.length; i++) {
-        this.remConFac.push(datos_remisionesFacturas[i].rem_Id);
-      }
-    });
-    // Se esperan unos segundos a que termine el llenado
-    setTimeout(() => {
-      for (let m = 0; m < this.remConFac.length; m++) {
-        for (let l = 0; l < this.remision.length; l++) {
-          if (this.remConFac.includes(this.remision[l])) {
-            if (this.remision[l] == this.remConFac[m]) this.remision = [];
-          }
-        }
-      }
-      if (this.remision.length == 0) Swal.fire(`La remision con el código ${idRemision} ya tiene una factura asignada`)
-      else {
-        // Recorre el Array de Remisiones y busca cada id para mostrarlo en la tabla
-        for (let k = 0; k < this.remision.length; k++) {
-          this.remisionService.srvObtenerListaPorId(this.remision[k]).subscribe(datos_remision => {
-            this.proveedorservices.srvObtenerListaPorId(datos_remision.prov_Id).subscribe(datos_proveedor => {
-              this.usuarioService.srvObtenerListaPorId(datos_remision.usua_Id).subscribe(datos_usuario => {
-                this.tipoDocumentoService.srvObtenerListaPorId(datos_remision.tpDoc_Id).subscribe(datos_tipoDocumento => {
-                  let datosTablaRemisiones : any = {
-                  remisionId : datos_remision.rem_Id,
-                  remisionCodigo : datos_remision.rem_Codigo,
-                  remisionFecha : datos_remision.rem_Fecha,
-                  remisionProveedor : datos_proveedor.prov_Nombre,
-                  remisionUsuario :  datos_usuario.usua_Nombre,
-                  remisionDocumento : datos_tipoDocumento.tpDoc_Nombre,
-                  remisionPrecio : datos_remision.rem_PrecioEstimado
-                }
-                  this.precioRemision = datosTablaRemisiones.remisionPrecio
-                  this.ArrayRemisiones.push(datosTablaRemisiones);
-                });
-              });
-            });
-          });
-        }
-      }
-      this.load = true;
-    }, 2000);
-  }
-
   //Funcion que validará el campo sobre el que se está colocando del consecutivo, factura o remisimos
   validarCampos(){
     if (this.FormMateriaPrimaFactura.value.MpRemision == '' && this.FormMateriaPrimaFactura.value.MpFactura == '') Swal.fire("Los campos 'N° Factura' y 'N° Remisión' no pueden tener información al mismo tiempo, por favor llenar solo uno de estos.");
@@ -456,6 +403,7 @@ export class PedidomateriaprimaComponent implements OnInit {
       Facco_Codigo : this.FormMateriaPrimaFactura.value.MpFactura,
       Facco_FechaFactura : this.today,
       Facco_FechaVencimiento : this.today,
+      Facco_Hora : moment().format('H:mm:ss'),
       Prov_Id : this.FormMateriaPrimaFactura.value.proveedor,
       Facco_ValorTotal : this.valorTotal,
       Facco_Observacion : this.FormMateriaPrimaFactura.value.MpObservacion,
@@ -463,15 +411,29 @@ export class PedidomateriaprimaComponent implements OnInit {
       Usua_Id : this.storage_Id,
       TpDoc_Id : 'FCO',
     }
-    this.facturaMpComService.srvGuardar(datosFactura).subscribe(datos_facturaCreada => {
-      this.obtenerUltimoIdFacturaCompra();
+    this.facturaMpComService.srvGuardar(datosFactura).subscribe(datos_facturaCreada => { this.obtenerUltimoIdFacturaCompra(); }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        html:
+        '<b>¡Error al crear la  facura!</b><hr> ' +
+        `<spam style="color : #f00;">${error.message}</spam> `,
+      });
+      this.load = false;
     });
   }
 
   // Funicion que va a colocar el id de la ultimo factura
   obtenerUltimoIdFacturaCompra(){
-    this.facturaMpComService.UltimoIdFactura().subscribe(datos_facturas => {
-      this.creacionFacturaMateriaPrima(this.ultimoIdFactura);
+    this.facturaMpComService.UltimoIdFactura().subscribe(datos_facturas => { this.creacionFacturaMateriaPrima(this.ultimoIdFactura); }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        html:
+        '<b>¡Error al obtener la ultima factura creada!</b><hr> ' +
+        `<spam style="color : #f00;">${error.message}</spam> `,
+      });
+      this.load = false;
     });
   }
 
@@ -484,11 +446,19 @@ export class PedidomateriaprimaComponent implements OnInit {
           Facco_Id : idFactura,
           MatPri_Id : this.ArrayMateriaPrima[index].Id_Mp,
           Tinta_Id : this.ArrayMateriaPrima[index].Id_Tinta,
-          FaccoMatPri_Cantidad : this.ArrayMateriaPrima[index].Cantidad_Oculta,
+          FaccoMatPri_Cantidad : this.ArrayMateriaPrima[index].Cantidad,
           UndMed_Id : this.ArrayMateriaPrima[index].Medida,
-          FaccoMatPri_ValorUnitario : this.ArrayMateriaPrima[index].PrecioUnd,
+          FaccoMatPri_ValorUnitario : this.ArrayMateriaPrima[index].Precio,
         }
-        this.facturaMpService.srvGuardar(datosFacturaMp).subscribe(datos_facturaMpCreada => {
+        this.facturaMpService.srvGuardar(datosFacturaMp).subscribe(datos_facturaMpCreada => {  }, error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            html:
+            '<b>¡Error al crear la facturas con las materia primas seleccionadas!</b><hr> ' +
+            `<spam style="color : #f00;">${error.message}</spam> `,
+          });
+          this.load = false;
         });
         this.cargarRemisionEnFactura(idFactura);
         this.moverInventarioMP();
@@ -504,7 +474,16 @@ export class PedidomateriaprimaComponent implements OnInit {
         Rem_Id : rem.remisionId,
         Facco_Id : idFactura,
       }
-      this.remisionFacturaService.srvGuardar(datosFacRem).subscribe(datosFacRemision => { });
+      this.remisionFacturaService.srvGuardar(datosFacRem).subscribe(datosFacRemision => { }, error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          html:
+          '<b>¡Error al añadir la(s) remision(es) a la factura!</b><hr> ' +
+          `<spam style="color : #f00;">${error.message}</spam> `,
+        });
+        this.load = false;
+      });
     }
   }
 
@@ -513,6 +492,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     const datosRemision : any = {
       Rem_Codigo : this.FormMateriaPrimaFactura.value.MpRemision,
       Rem_Fecha : this.today,
+      Rem_Hora : moment().format('H:mm:ss'),
       Rem_PrecioEstimado : this.valorTotal,
       Prov_Id : this.FormMateriaPrimaFactura.value.proveedor,
       Estado_Id : 12,
@@ -520,13 +500,29 @@ export class PedidomateriaprimaComponent implements OnInit {
       TpDoc_Id : 'REM',
       Rem_Observacion : this.FormMateriaPrimaFactura.value.MpObservacion,
     }
-    this.remisionService.srvGuardar(datosRemision).subscribe(datos_remisionCreada => { this.obtenerUltimoIdRemision(); });
+    this.remisionService.srvGuardar(datosRemision).subscribe(datos_remisionCreada => { this.obtenerUltimoIdRemision(); }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        html:
+        '<b>¡Error al crear la remisión!</b><hr> ' +
+        `<spam style="color : #f00;">${error.message}</spam> `,
+      });
+      this.load = false;
+    });
   }
 
   // Funcion que se encargará de obtener el ultimo Id de las facturas
   obtenerUltimoIdRemision(){
-    this.remisionService.UltimoIdRemision().subscribe(datos_remision => {
-      this.creacionRemisionMateriaPrima(datos_remision);
+    this.remisionService.UltimoIdRemision().subscribe(datos_remision => { this.creacionRemisionMateriaPrima(datos_remision); }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        html:
+        '<b>¡Error al obtener el Id de la ultima remisión!</b><hr> ' +
+        `<spam style="color : #f00;">${error.message}</spam> `,
+      });
+      this.load = false;
     });
   }
 
@@ -539,11 +535,19 @@ export class PedidomateriaprimaComponent implements OnInit {
           Rem_Id : idRemision,
           MatPri_Id : this.ArrayMateriaPrima[index].Id_Mp,
           Tinta_Id : this.ArrayMateriaPrima[index].Id_Tinta,
-          RemiMatPri_Cantidad : this.ArrayMateriaPrima[index].Cantidad_Oculta,
+          RemiMatPri_Cantidad : this.ArrayMateriaPrima[index].Cantidad,
           UndMed_Id : this.ArrayMateriaPrima[index].Medida,
-          RemiMatPri_ValorUnitario : this.ArrayMateriaPrima[index].PrecioUnd,
+          RemiMatPri_ValorUnitario : this.ArrayMateriaPrima[index].Precio,
         }
-        this.remisionMPService.srvGuardar(datosRemisionMp).subscribe(datos_remisionMpCreada => {
+        this.remisionMPService.srvGuardar(datosRemisionMp).subscribe(datos_remisionMpCreada => { }, error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            html:
+            '<b>¡Error al añadir la(s) materia(s) prima(s) a la remisión!</b><hr> ' +
+            `<spam style="color : #f00;">${error.message}</spam> `,
+          });
+          this.load = false;
         });
         this.moverInventarioMP();
         this.moverInventarioTintas();
@@ -554,50 +558,37 @@ export class PedidomateriaprimaComponent implements OnInit {
   // Funcion que va a mosver el inventario de materia prima
   moverInventarioMP(){
     for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
-      this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].MatPrima).subscribe(datos_materiaPrima => {
+      this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Id_Mp).subscribe(datos_materiaPrima => {
         const datosMPActualizada : any = {
-          MatPri_Id : this.ArrayMateriaPrima[index].MatPrima,
+          MatPri_Id : datos_materiaPrima.matPri_Id,
           MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
           MatPri_Descripcion : datos_materiaPrima.matPri_Descripcion,
-          MatPri_Stock : (datos_materiaPrima.matPri_Stock + this.ArrayMateriaPrima[index].Cant),
+          MatPri_Stock : (datos_materiaPrima.matPri_Stock + this.ArrayMateriaPrima[index].Cantidad),
           UndMed_Id : datos_materiaPrima.undMed_Id,
           CatMP_Id : datos_materiaPrima.catMP_Id,
           MatPri_Precio : datos_materiaPrima.matPri_Precio,
           TpBod_Id : datos_materiaPrima.tpBod_Id,
         }
 
-        this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].MatPrima, datosMPActualizada).subscribe(datos_mp_creada => { }, error => {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          });
-          Toast.fire({
+        this.materiaPrimaService.srvActualizar(datos_materiaPrima.matPri_Id, datosMPActualizada).subscribe(datos_mp_creada => { }, error => {
+          Swal.fire({
             icon: 'error',
-            title: '¡No restó al inventario de materias primas!'
+            title: 'Oops...',
+            html:
+            `<b>¡No se ha podido actualizar la existencia de la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!</b><hr> ` +
+            `<spam style="color : #f00;">${error.message}</spam> `,
           });
+          this.load = false;
         });
-      }, error => { const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 1200,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'error',
-        title: 'Materia prima no encontrada!'
-      });
+      }, error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          html:
+          `<b>¡La materia prima ${this.ArrayMateriaPrima[index].Id_Mp} no se ha encontrado!</b><hr> ` +
+          `<spam style="color : #f00;">${error.message}</spam> `,
+        });
+        this.load = false;
       });
     }
   }
@@ -605,12 +596,12 @@ export class PedidomateriaprimaComponent implements OnInit {
   //Función que restará a las tintas de categoria diferente a TINTAS TIPO COLORES.
   moverInventarioTintas(){
     for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
-      this.tintasService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Tinta).subscribe(datos_tinta => {
+      this.tintasService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Id_Tinta).subscribe(datos_tinta => {
         const datosTintaActualizada : any = {
-          Tinta_Id : this.ArrayMateriaPrima[index].Tinta,
+          Tinta_Id : datos_tinta.tinta_Id,
           Tinta_Nombre : datos_tinta.tinta_Nombre,
           Tinta_Descripcion : datos_tinta.tinta_Descripcion,
-          Tinta_Stock : (datos_tinta.tinta_Stock + this.ArrayMateriaPrima[index].Cant),
+          Tinta_Stock : (datos_tinta.tinta_Stock + this.ArrayMateriaPrima[index].Cantidad),
           Tinta_CodigoHexadecimal : datos_tinta.tinta_CodigoHexadecimal,
           UndMed_Id : datos_tinta.undMed_Id,
           CatMP_Id : datos_tinta.catMP_Id,
@@ -619,7 +610,7 @@ export class PedidomateriaprimaComponent implements OnInit {
           tinta_InvInicial : datos_tinta.tinta_InvInicial,
         }
 
-        this.tintasService.srvActualizar(this.ArrayMateriaPrima[index].Tinta, datosTintaActualizada).subscribe(datos_mp_creada => {
+        this.tintasService.srvActualizar(datos_tinta.tinta_Id, datosTintaActualizada).subscribe(datos_mp_creada => {
           const Toast = Swal.mixin({
             toast: true,
             position: 'center',
@@ -637,40 +628,51 @@ export class PedidomateriaprimaComponent implements OnInit {
           });
           this.limpiarTodosCampos();
         }, error => {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          });
-          Toast.fire({
+          Swal.fire({
             icon: 'error',
-            title: '¡No sumó al inventario de tintas!'
+            title: 'Oops...',
+            html:
+            `<b>¡No se ha podido actualizar la existencia de la materia prima ${this.ArrayMateriaPrima[index].Id_Tinta}!</b><hr> ` +
+            `<spam style="color : #f00;">${error.message}</spam> `,
           });
+          this.load = false;
         });
       }, error => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 1200,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
+        Swal.fire({
           icon: 'error',
-          title: '¡Tinta no encontrada!'
+          title: 'Oops...',
+          html:
+          `<b>¡No se ha podido encontrar la materia prima ${this.ArrayMateriaPrima[index].Id_Mp}!</b><hr> ` +
+          `<spam style="color : #f00;">${error.message}</spam> `,
         });
+        this.load = false;
       });
     }
+  }
+
+  //Consultar Remisiones por Codigo
+  consultarIdRemisiones(){
+    let idRemision : number = this.FormRemisiones.value.idRemision;
+    this.remision = [];
+    this.remConFac = [];
+    this.load = false;
+
+    this.remisionMPService.GetRemisionSinFactura(idRemision).subscribe(datos_remision => {
+      for (let i = 0; i < datos_remision.length; i++) {
+        let datosTablaRemisiones : any = {
+          remisionId : datos_remision[i].rem_Id,
+          remisionCodigo : datos_remision[i].rem_Codigo,
+          remisionFecha : datos_remision[i].rem_Fecha,
+          remisionProveedor : datos_remision[i].prov_Nombre,
+          remisionUsuario :  datos_remision[i].usua_Nombre,
+          remisionDocumento : datos_remision[i].tpDoc_Nombre,
+          remisionPrecio : datos_remision[i].rem_PrecioEstimado
+        }
+        this.precioRemision = datosTablaRemisiones.remisionPrecio
+        this.ArrayRemisiones.push(datosTablaRemisiones);
+        this.load = true;
+      }
+    });
   }
 
   //
@@ -822,17 +824,17 @@ export class PedidomateriaprimaComponent implements OnInit {
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: ['*', '*', '*', '*', '*', '*'],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 9,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: ['*', '*', '*', '*', '*', '*'],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 9,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
   }
 
