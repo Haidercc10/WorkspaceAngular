@@ -27,11 +27,11 @@
       <div class="row g-3">
         <div class="form-floating col-md-2">
           <input formControlName="ot" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid">
-          <label for="floatingSelect">Orde de trabajo</label>
+          <label for="floatingSelect">OT</label>
         </div>
         <!-- Campo Observacion -->
         <div class="form-floating col-md">
-          <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion" name="MpObservacion"></textarea>
+          <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm" name="MpObservacion"></textarea>
           <label for="floatingTextarea">Observación</label>
         </div>
         <div class="form-floating col-md-2">
@@ -76,7 +76,7 @@
           <ng-template #notFoundTemplate let-notFound>
             <div [innerHTML]="notFound"></div>
           </ng-template>
-          <label for="floatingInput" *ngIf="validarInput">Materia Prima</label>
+          <label for="floatingInput" *ngIf="validarInput">{{tituloCampoMP}}</label>
         </div>
         <!-- <div class="form-floating col-md-4">
           <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
@@ -146,7 +146,7 @@
               <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
               <td id="cantidadMateriaPrima">{{materiaPrima.Cant | number}}</td>
               <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
-              <td id="mpTipoRecup">{{materiaPrima.Proceso}}</td>
+              <td id="mpTipoRecup" >{{materiaPrima.Proceso}}</td>
               <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" (click)="EditarProductoTabla(materiaPrima)" title="Editar Materia Prima"></i></a></td>
               <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" (click)="QuitarProductoTabla(i, materiaPrima)" title="Quitar Materia Prima de la tabla"></i></a></td>
             </tr>

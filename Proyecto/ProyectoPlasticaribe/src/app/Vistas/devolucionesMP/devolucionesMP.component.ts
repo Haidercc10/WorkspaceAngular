@@ -1,5 +1,7 @@
+import { ThisReceiver } from '@angular/compiler';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { info } from 'console';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { AsignacionMPService } from 'src/app/Servicios/asignacionMP.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
@@ -9,6 +11,7 @@ import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service'
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
 import { ProcesosService } from 'src/app/Servicios/procesos.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
+import { TintasService } from 'src/app/Servicios/tintas.service';
 import { TipoBodegaService } from 'src/app/Servicios/tipoBodega.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
 import Swal from 'sweetalert2';
@@ -84,9 +87,11 @@ export class DevolucionesMPComponent implements OnInit {
   idMateriaPrima : number;
   cantidadMateriaPrima : number;
   presentacionMateriaPrima : string;
+  idTinta : number;
   validarInput : boolean = true;
   keyword = 'name';
   public historyHeading: string = 'Seleccionado Recientemente';
+  public tituloCampoMP : string = 'Materia Prima';
 
 
   constructor(private materiaPrimaService : MateriaPrimaService,
@@ -100,7 +105,8 @@ export class DevolucionesMPComponent implements OnInit {
                               private devolucionMPService : DevolucionesMPService,
                                 private asignacionService : AsignacionMPService,
                                   private asignacionMPService : DetallesAsignacionService,
-                                    private procesosService : ProcesosService,) {
+                                    private procesosService : ProcesosService,
+                                      private servicioTintas : TintasService,) {
 
     this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
       //MateriaPrima
@@ -227,11 +233,11 @@ export class DevolucionesMPComponent implements OnInit {
 
   //Funcion que va a recorrer las materias primas para almacenar el nombre de todas
   obtenerMateriasPrimasRetiradas(){
-    this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
+    this.materiaPrimaService.getMatPrimasConTintas().subscribe(datos_materiaPrima => {
       for (let index = 0; index < datos_materiaPrima.length; index++) {
         let mp : any = {
-          id : datos_materiaPrima[index].matPri_Id,
-          name : datos_materiaPrima[index].matPri_Nombre,
+          id : datos_materiaPrima[index].id,
+          name : datos_materiaPrima[index].nombre,
         }
         this.materiasPrimas.push(mp);
       }
@@ -262,21 +268,21 @@ export class DevolucionesMPComponent implements OnInit {
     let observacion : string = this.FormMateriaPrimaRecuperada.value.MpObservacion;
     let ot : string = this.FormMateriaPrimaRecuperada.value.ot;
 
-    const datosdevolcuion : any = {
+    const datosDevolucion : any = {
       DevMatPri_OrdenTrabajo : ot,
       DevMatPri_Fecha : this.today,
       DevMatPri_Motivo : observacion,
       Usua_Id : this.storage_Id,
     }
 
-    this.devolucionService.srvGuardar(datosdevolcuion).subscribe(datos_DevolucionCreada => {
-      this.obtenerUltimoIdDevolcuion();
+    this.devolucionService.srvGuardar(datosDevolucion).subscribe(datos_DevolucionCreada => {
+      this.obtenerUltimoIdDevolucion();
     });
   }
 
   // Funcion que se encargará de obtener el ultimo Id de las facturas
-  obtenerUltimoIdDevolcuion(){
-    this.devolucionService.srvObtenerUltimaAsignacion().subscribe(datos_devolucion => {
+  obtenerUltimoIdDevolucion(){
+    this.devolucionService.srvObtenerUltimaDevolucion().subscribe(datos_devolucion => {
       this.ultimoIDevolucion = datos_devolucion.devMatPri_Id;
       this.obtenerIdProceso();
     });
@@ -297,7 +303,7 @@ export class DevolucionesMPComponent implements OnInit {
   //
   validarCamposVaciosMP(){
     if (this.FormMateriaPrima.valid) this.cargarFormMpEnTablas(this.ArrayMateriaPrima);
-    else Swal.fire("Hay campos de la Materi Prima vacios");
+    else Swal.fire("Hay campos de Materia Prima vacios");
   }
 
   //Funcion que envia la informacion de los productos a la tabla.
@@ -307,20 +313,27 @@ export class DevolucionesMPComponent implements OnInit {
     let presentacion : string = this.FormMateriaPrima.value.MpUnidadMedida;
     let cantidad : number = this.FormMateriaPrima.value.MpCantidad;
     let proceso : string = this.FormMateriaPrima.value.Proceso;
+    //let mpTinta : number = 2001;
+    //let mpMatPrima : number = 84;
 
     let productoExt : any = {
       Id : idMateriaPrima,
+      MatPrima : 0,
+      Tinta : 0,
       Nombre : this.nombreMateriaPrima,
       Cant : cantidad,
       UndCant : presentacion,
       Proceso : proceso,
     }
+    if(productoExt.Id != 84) {
+      productoExt.MatPrima = idMateriaPrima;
+      productoExt.Tinta = 2001;
+    } else {
+      productoExt.Tinta = idMateriaPrima;
+      productoExt.MatPrima = 84;
+    }
 
-    this.FormMateriaPrimaRecuperada.setValue({
-      ot : this.FormMateriaPrimaRecuperada.value.ot,
-      MpingresoFecha: this.today,
-      MpObservacion: this.FormMateriaPrimaRecuperada.value.MpObservacion,
-    });
+    this.setearFormularioSuperior();
 
     if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length == 0) {
       this.ArrayMateriaPrima.push(productoExt);
@@ -342,25 +355,36 @@ export class DevolucionesMPComponent implements OnInit {
     this.FormMateriaPrima.reset();
   }
 
+  setearFormularioSuperior() {
+    this.FormMateriaPrimaRecuperada.setValue({
+      ot : this.FormMateriaPrimaRecuperada.value.ot,
+      MpingresoFecha: this.today,
+      MpObservacion: this.FormMateriaPrimaRecuperada.value.MpObservacion,
+    });
+  }
+
   obtenerIdProceso(){
     let procesoNombre : string;
     this.idMateriaPrima = 0;
     this.cantidadMateriaPrima = 0;
     this.presentacionMateriaPrima = '';
     this.procesoID = '';
+
     for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
       procesoNombre = this.ArrayMateriaPrima[index].Proceso;
 
-      this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
+     this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
         for (let i = 0; i < datos_procesos.length; i++) {
           if (datos_procesos[i].proceso_Nombre == this.ArrayMateriaPrima[index].Proceso) {
             this.procesoID = '';
-            this.idMateriaPrima = this.ArrayMateriaPrima[index].Id;
+            this.idMateriaPrima = this.ArrayMateriaPrima[index].MatPrima;
+            this.idTinta = this.ArrayMateriaPrima[index].Tinta;
             this.cantidadMateriaPrima = this.ArrayMateriaPrima[index].Cant;
             this.presentacionMateriaPrima = this.ArrayMateriaPrima[index].UndCant;
             let procesoId = datos_procesos[i].proceso_Id;
             this.creacionDevolucionMateriaPrima(this.ultimoIDevolucion,
                                                 this.idMateriaPrima,
+                                                this.idTinta,
                                                 this.cantidadMateriaPrima,
                                                 this.presentacionMateriaPrima,
                                                 procesoId);
@@ -373,7 +397,7 @@ export class DevolucionesMPComponent implements OnInit {
   }
 
   //Funcion que creará el registro de la materia que viene en un pedido
-  creacionDevolucionMateriaPrima(idDevolucion : number, idMp : number, cantidad : number, undMed : string, proceso : string,){
+  creacionDevolucionMateriaPrima(idDevolucion : number, idMp : number, idTinta : number,  cantidad : number, undMed : string, proceso : string,){
     let ot : string = this.FormMateriaPrimaRecuperada.value.ot;
 
     if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla");
@@ -382,6 +406,7 @@ export class DevolucionesMPComponent implements OnInit {
       const datosDevolucionMp : any = {
         DevMatPri_Id : idDevolucion,
         MatPri_Id : idMp,
+        Tinta_Id : idTinta,
         DtDevMatPri_CantidadDevuelta : cantidad,
         UndMed_Id : undMed,
         Proceso_Id : proceso,
@@ -411,23 +436,25 @@ export class DevolucionesMPComponent implements OnInit {
           });*/
         });
       this.moverInventarioMpAgregada();
+      this.moverInventarioTintas();
     }
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima entrante
   moverInventarioMpAgregada(){
-    let idMateriaPrima : number;
-    let cantidadMateriaPrima : number;
     let stockMateriaPrimaInicial : number;
     let stockMateriaPrimaFinal : number;
 
     for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
 
-      this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Id).subscribe(datos_materiaPrima => {
+      this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].MatPrima).subscribe(datos_materiaPrima => {
         stockMateriaPrimaInicial = datos_materiaPrima.matPri_Stock;
-        stockMateriaPrimaFinal = stockMateriaPrimaInicial + this.ArrayMateriaPrima[index].Cant;
+
+        if(this.ArrayMateriaPrima[index].Materia_Prima == 84) stockMateriaPrimaFinal = 0
+        else stockMateriaPrimaFinal = stockMateriaPrimaInicial + this.ArrayMateriaPrima[index].Cant;
+
         const datosMP : any = {
-          MatPri_Id : this.ArrayMateriaPrima[index].Id,
+          MatPri_Id : this.ArrayMateriaPrima[index].MatPrima,
           MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
           MatPri_Descripcion : datos_materiaPrima.matPri_Descripcion,
           MatPri_Stock : stockMateriaPrimaFinal,
@@ -436,7 +463,7 @@ export class DevolucionesMPComponent implements OnInit {
           MatPri_Precio : datos_materiaPrima.matPri_Precio,
           TpBod_Id : datos_materiaPrima.tpBod_Id,
         }
-        this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].Id, datosMP).subscribe(datos_mp_creada => {
+        this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].MatPrima, datosMP).subscribe(datos_mp_creada => {
           const Toast = Swal.mixin({
             toast: true,
             position: 'center',
@@ -450,7 +477,7 @@ export class DevolucionesMPComponent implements OnInit {
           });
           Toast.fire({
             icon: 'success',
-            title: '¡Registro De Materia Prima Devuleta Creado Con Exito!'
+            title: '¡Registro De Materia Prima Devuelta Creado Con Exito!'
           });
           this.limpiarTodosCampos();
         });
@@ -458,6 +485,51 @@ export class DevolucionesMPComponent implements OnInit {
     }
   }
 
+  moverInventarioTintas() {
+    let stockMateriaPrimaInicial : number;
+    let stockMateriaPrimaFinal : number;
+
+    for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
+
+      this.servicioTintas.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Tinta).subscribe(datos_tinta => {
+        stockMateriaPrimaInicial = datos_tinta.tinta_Stock;
+
+        if(this.ArrayMateriaPrima[index].Tinta == 2001) stockMateriaPrimaFinal = 0
+        else stockMateriaPrimaFinal = stockMateriaPrimaInicial - this.ArrayMateriaPrima[index].Cant;
+
+        const datosTintaActualizada : any = {
+          Tinta_Id : this.ArrayMateriaPrima[index].Tinta,
+          Tinta_Nombre : datos_tinta.tinta_Nombre,
+          Tinta_Descripcion : datos_tinta.tinta_Descripcion,
+          Tinta_Stock : stockMateriaPrimaFinal,
+          Tinta_CodigoHexadecimal : datos_tinta.tinta_CodigoHexadecimal,
+          UndMed_Id : datos_tinta.undMed_Id,
+          CatMP_Id : datos_tinta.catMP_Id,
+          Tinta_Precio : datos_tinta.tinta_Precio,
+          TpBod_Id : datos_tinta.tpBod_Id,
+          tinta_InvInicial : datos_tinta.tinta_InvInicial,
+        }
+        this.servicioTintas.srvActualizar(this.ArrayMateriaPrima[index].Tinta, datosTintaActualizada).subscribe(datos_mp_creada => {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'center',
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer)
+              toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+          });
+          Toast.fire({
+            icon: 'success',
+            title: '¡Registro De Materia Prima Devuelta Creado Con Exito!'
+          });
+          this.limpiarTodosCampos();
+        });
+      });
+    }
+  }
 
   limpiarTodosCampos(){
     this.FormMateriaPrimaRecuperada.setValue({
@@ -502,10 +574,9 @@ export class DevolucionesMPComponent implements OnInit {
   buscarMpId(){
     let idMateriaPrima : number = this.FormMateriaPrima.value.MpId;
     this.materiaPrimaSeleccionada = [];
-    this.categoriaMPBuscadaID = '';
-    this.tipobodegaMPBuscadaId = '';
-
-    this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
+    //this.categoriaMPBuscadaID = '';
+    //this.tipobodegaMPBuscadaId = '';
+    /*this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
       this.categoriMpService.srvObtenerListaPorId(datos_materiaPrima.catMP_Id).subscribe(datos_categoria => {
         this.tipoBodegaService.srvObtenerListaPorId(datos_materiaPrima.tpBod_Id).subscribe(datos_bodega => {
           this.materiaPrimaSeleccionada.push(datos_materiaPrima);
@@ -515,7 +586,32 @@ export class DevolucionesMPComponent implements OnInit {
           this.cargarInfoMP();
         });
       });
+    });*/
+
+    this.materiaPrimaService.getMatPrimasConTintasxId(idMateriaPrima).subscribe(dataMPTintas => {
+      for (let index = 0; index < dataMPTintas.length; index++) {
+        let info : any = {
+          IdReal : 0,
+          IdNoAplica : 0,
+          IdMatPrima : dataMPTintas[index].id,
+          Nombre : dataMPTintas[index].nombre,
+          Presentacion : dataMPTintas[index].medida,
+        }
+        if (info.IdMatPrima > 2000) { info.IdReal = info.IdMatPrima; info.IdNoAplica = 84 }
+        else { info.IdReal = info.IdMatPrima; info.IdNoAplica = 2001 }
+
+        this.materiaPrimaSeleccionada.push(info);
+      }
+
+      if(this.materiaPrimaSeleccionada.length == 0){
+        this.limpiarCamposMP();
+        Swal.fire('No se encontró la materia prima consultada.');
+      } else {
+        this.tituloCampoMP = '';
+        this.cargarInfoMP();
+      }
     });
+
   }
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
@@ -526,7 +622,7 @@ export class DevolucionesMPComponent implements OnInit {
     let idMateriaPrima : number; //En el HTML se pasará el nombre de la materia prima pero el input tendrá como valor el Id de la materia prima
     this.materiaPrimaSeleccionada = [];
 
-    this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiasPrimas => {
+    /*this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiasPrimas => {
       for (let index = 0; index < datos_materiasPrimas.length; index++) {
         if (datos_materiasPrimas[index].matPri_Nombre == nombreMateriaPrima) {
           this.categoriMpService.srvObtenerListaPorId(datos_materiasPrimas[index].catMP_Id).subscribe(datos_categoria => {
@@ -539,17 +635,36 @@ export class DevolucionesMPComponent implements OnInit {
           });
         }
       }
+    });*/
+
+    this.materiaPrimaService.getMatPrimasConTintas().subscribe(dataMPTintas => {
+      for (let index = 0; index < dataMPTintas.length; index++) {
+        if(nombreMateriaPrima == dataMPTintas[index].nombre) {
+          let info : any = {
+            IdReal : 0,
+            IdNoAplica : 0,
+            IdMatPrima : dataMPTintas[index].id,
+            Nombre : dataMPTintas[index].nombre,
+            Presentacion : dataMPTintas[index].medida,
+          }
+          info.IdReal = info.IdMatPrima;
+          this.materiaPrimaSeleccionada.push(info);
+        }
+      }
+      this.tituloCampoMP = '';
+      this.cargarInfoMP();
     });
+
   }
 
   //Funcion que llenará la infomacion de materia prima buscada o seleccionada y pasará la informacion a la vista
   cargarInfoMP(){
     for (const Mp of this.materiaPrimaSeleccionada) {
       this.FormMateriaPrima.setValue({
-        MpId : Mp.matPri_Id,
-        MpNombre: Mp.matPri_Nombre,
+        MpId : Mp.IdReal,
+        MpNombre: Mp.Nombre,
         MpCantidad: '',
-        MpUnidadMedida : Mp.undMed_Id,
+        MpUnidadMedida : Mp.Presentacion,
         Proceso : '',
       });
     }

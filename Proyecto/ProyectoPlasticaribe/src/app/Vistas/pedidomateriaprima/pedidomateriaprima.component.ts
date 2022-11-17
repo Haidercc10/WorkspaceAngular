@@ -268,7 +268,6 @@ export class PedidomateriaprimaComponent implements OnInit {
                 }
                 //Bajar Materia Prima
                 for (let inx = 0; inx < this.arrayInfoMatPrima.length; inx++) {
-
                   if(arrayIdsMatPrima.includes(this.arrayInfoMatPrima[inx].Id)) {
                     let infoNueva : any = {
                       Id : this.arrayInfoMatPrima[inx].Id,
@@ -279,15 +278,6 @@ export class PedidomateriaprimaComponent implements OnInit {
                     }
                     this.arrayOrdenCompra.push(infoNueva);
                   } else if (!arrayIdsMatPrima.includes(this.arrayInfoMatPrima[inx].Id) ) {
-                    let infoNueva : any = {
-                      Id : this.arrayInfoMatPrima[inx].Id,
-                      Nombre : this.arrayInfoMatPrima[inx].Nombre,
-                      Cantidad : this.arrayInfoMatPrima[inx].Cantidad,
-                      Medida : this.arrayInfoMatPrima[inx].Medida,
-                      Exits : false,
-                    }
-                    this.arrayOrdenCompra.push(infoNueva);
-                  }  else if (arrayIdsMatPrima.includes(this.arrayInfoMatPrima[inx].Id)) {
                     let infoNueva : any = {
                       Id : this.arrayInfoMatPrima[inx].Id,
                       Nombre : this.arrayInfoMatPrima[inx].Nombre,
