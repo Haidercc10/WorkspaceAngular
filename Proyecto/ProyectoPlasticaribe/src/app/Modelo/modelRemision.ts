@@ -1,6 +1,7 @@
 export interface modelRemision {
   Rem_Codigo : string;
   Rem_Fecha : Date;
+  Rem_Hora : string;
   Rem_PrecioEstimado : number;
   Prov_Id : number;
   Estado_Id : number;

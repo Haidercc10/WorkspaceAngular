@@ -90,6 +90,8 @@
             <th scope="col">Id</th>
             <th scope="col">Nombre</th>
             <th scope="col">Cantidad</th>
+            <th scope="col">Cant. Ingresada</th>
+            <th scope="col">Cantidad Faltante</th>
             <th scope="col">Presentación</th>
             <th style="width: 3rem">
               <p-tableHeaderCheckbox (click)="seleccionarTodosMateriaPrima(arrayOrdenCompra)"></p-tableHeaderCheckbox>
@@ -98,17 +100,21 @@
         </ng-template>
         <ng-template pTemplate="body" let-arrayOrdenCompra>
           <tr>
-            <ng-container *ngIf="arrayOrdenCompra.Exits; then thenTemplate; else elseTemplate"></ng-container>
+            <ng-container *ngIf="arrayOrdenCompra.Exits && arrayOrdenCompra.Cantidad_Ingresada == arrayOrdenCompra.Cantidad; then thenTemplate; else elseTemplate"></ng-container>
             <ng-template #thenTemplate>
               <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Id}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Nombre}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad | number}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Medida}}</td>
             </ng-template>
             <ng-template #elseTemplate>
               <td>{{arrayOrdenCompra.Id}}</td>
               <td>{{arrayOrdenCompra.Nombre}}</td>
-              <td>{{arrayOrdenCompra.Cantidad | number}}</td>
+              <td>{{arrayOrdenCompra.Cantidad_Oculta | number}}</td>
+              <td>{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
+              <td>{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
               <td>{{arrayOrdenCompra.Medida}}</td>
               <td>
                 <p-tableCheckbox [value]="arrayOrdenCompra" (click)="llenarMateriaPrimaAIngresar(arrayOrdenCompra)"></p-tableCheckbox>
@@ -147,6 +153,7 @@
             <th scope="col">Nombre</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Presentación</th>
+            <th scope="col" *ngIf="ValidarRol == 1">Precio Unitario</th>
             <th style="width: 3rem">
               <p-tableHeaderCheckbox (click)="quitarTodosMateriaPrima(ArrayMateriaPrima)"></p-tableHeaderCheckbox>
             </th>
@@ -159,25 +166,24 @@
             <td pEditableColumn>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <p-inputNumber [(ngModel)]="ArrayMateriaPrima.Cantidad" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="ArrayMateriaPrima.Cantidad_Oculta" [maxFractionDigits]="2"></p-inputNumber>
+                  <p-inputNumber [(ngModel)]="ArrayMateriaPrima.Cantidad_Faltante" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="ArrayMateriaPrima.Cantidad_Oculta" [maxFractionDigits]="2"></p-inputNumber>
                 </ng-template>
                 <ng-template pTemplate="output">
-                  {{ArrayMateriaPrima.Cantidad | number}}
+                  {{ArrayMateriaPrima.Cantidad_Faltante | number}}
                 </ng-template>
               </p-cellEditor>
             </td>
             <td>{{ArrayMateriaPrima.Medida}}</td>
+            <td *ngIf="ValidarRol == 1">{{ArrayMateriaPrima.Precio | number}}</td>
             <td>
               <p-tableCheckbox [value]="ArrayMateriaPrima" (click)="quitarMateriaPrimaAIngresar(ArrayMateriaPrima)"></p-tableCheckbox>
             </td>
           </tr>
         </ng-template>
-        <ng-template pTemplate="footer">
+        <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
           <tr>
-            <td colspan="3" class="text-right">Totales</td>
-            <!-- <td>{{totalCantidad | number}}</td>
-            <td>{{totalRollos | number}}</td>
-            <td>Kg</td> -->
+            <td colspan="4" class="text-right">Totales</td>
+            <td>{{valorTotal | number}}</td>
           </tr>
         </ng-template>
       </p-table>
@@ -188,56 +194,59 @@
     <hr class="colorLinea">
   </div>
 
-  <form [formGroup]="FormRemisiones">
-    <div class="form-floating col-md-2">
-      <input formControlName="idRemision" (keyup.enter)="consultarIdRemisiones()" type="text"  class="form-control form-control-sm" id="floatingInput">
-      <label for="floatingInput">Número Remisión</label>
-    </div>
-  </form>
-
-  <div class="mb-4">
-    <h4 class="tituloRojo">Tabla Remisiones</h4>
-  </div>
-
-  <div *ngIf="load">
-    <!-- TABLA DE REMISIONES -->
-    <div class="mb-2">
-      <div class="row g-1">
-        <div class="table-responsive">
-          <!-- <div id="html2Pdf"> -->
-          <table class="table table-bordered" >
-            <thead class="TitulosTabla">
-              <tr *ngFor="let remColumnas of titulosTablaRemisiones let i = index">
-                <th id="idMateriaPrima" scope="col">{{remColumnas.remId}}</th>
-                <th id="nombreMateriaPrima" scope="col">{{remColumnas.remCodigo}}</th>
-                <th id="cantidadMateriaPrima" scope="col">{{remColumnas.remFecha}}</th>
-                <th id="UnidadMedida" scope="col">{{remColumnas.remProveedor}}</th>
-                <th id="precioMateriaPrima" scope="col">{{remColumnas.remUsuario}}</th>
-                <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remTipoDoc}}</th>
-                <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remPrecio}}</th>
-                <th id="archivo" scope="col">Archivo</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let remisiones of ArrayRemisiones let i = index">
-                <td id="idMateriaPrima">{{remisiones.remisionId}}</td>
-                <td id="nombreMateriaPrima">{{remisiones.remisionCodigo}}</td>
-                <td id="cantidadMateriaPrima">{{remisiones.remisionFecha | date : 'yyyy-MM-dd'}}</td>
-                <td id="UnidadMedida">{{remisiones.remisionProveedor}}</td>
-                <td id="precioMateriaPrima">{{remisiones.remisionUsuario}}</td>
-                <td id="subTotalMateriaPrima">{{remisiones.remisionDocumento}}</td>
-                <td id="subTotalMateriaPrima">{{remisiones.remisionPrecio | currency}}</td>
-                <td id="archivo"><a><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver archivo" (click)="llenarDocumento(remisiones)"></i></a></td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- <div class="mb-2">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <pagination-controls (pageChange)="page = $event"></pagination-controls>
-          </div> -->
+  <!-- Buscar remisiones para añadirlas a una factura -->
+  <p-accordion>
+    <p-accordionTab header="Añadir Remisiones a una Factura">
+      <div class="mb-4">
+        <h4 class="tituloRojo">Buscar Remisiones</h4>
+      </div>
+      <form [formGroup]="FormRemisiones">
+        <div class="form-floating col-md-2">
+          <input formControlName="idRemision" (keyup.enter)="consultarIdRemisiones()" type="text"  class="form-control form-control-sm" id="floatingInput">
+          <label for="floatingInput">Número Remisión</label>
+        </div>
+      </form>
+      <br>
+      <div *ngIf="load">
+        <div class="mb-2">
+          <div class="row g-1">
+            <div class="table-responsive">
+              <table class="table table-bordered" >
+                <thead class="TitulosTabla">
+                  <tr *ngFor="let remColumnas of titulosTablaRemisiones let i = index">
+                    <th id="idMateriaPrima" scope="col">{{remColumnas.remId}}</th>
+                    <th id="nombreMateriaPrima" scope="col">{{remColumnas.remCodigo}}</th>
+                    <th id="cantidadMateriaPrima" scope="col">{{remColumnas.remFecha}}</th>
+                    <th id="UnidadMedida" scope="col">{{remColumnas.remProveedor}}</th>
+                    <th id="precioMateriaPrima" scope="col">{{remColumnas.remUsuario}}</th>
+                    <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remTipoDoc}}</th>
+                    <th id="subTotalMateriaPrima" scope="col">{{remColumnas.remPrecio}}</th>
+                    <th id="archivo" scope="col">Archivo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let remisiones of ArrayRemisiones let i = index">
+                    <td id="idMateriaPrima">{{remisiones.remisionId}}</td>
+                    <td id="nombreMateriaPrima">{{remisiones.remisionCodigo}}</td>
+                    <td id="cantidadMateriaPrima">{{remisiones.remisionFecha | date : 'yyyy-MM-dd'}}</td>
+                    <td id="UnidadMedida">{{remisiones.remisionProveedor}}</td>
+                    <td id="precioMateriaPrima">{{remisiones.remisionUsuario}}</td>
+                    <td id="subTotalMateriaPrima">{{remisiones.remisionDocumento}}</td>
+                    <td id="subTotalMateriaPrima">{{remisiones.remisionPrecio | currency}}</td>
+                    <td id="archivo"><a><i style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" aria-hidden="true" (click)="llenarDocumento(remisiones)"></i></a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+
+    </p-accordionTab>
+  </p-accordion>
+
+  <div class="mb-4">
+    <hr class="colorLinea">
   </div>
 
   <!-- BOTONES -->
@@ -246,9 +255,5 @@
       <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCampos()">Agregar Factura</button>
       <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosCampos()">Limpiar Todos los Campos</button>
     </div>
-  </div>
-
-  <div class="mb-4">
-    <hr class="colorLinea">
   </div>
 </div>

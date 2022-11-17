@@ -122,6 +122,7 @@ import { ReporteBodegaExtrusionComponent } from './Vistas/ReporteBodegaExtrusion
 import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
 import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
+import {AccordionModule} from 'primeng/accordion';
 
 
 
@@ -362,6 +363,7 @@ export const routes: Routes = [
     InputNumberModule,
     ConfirmDialogModule,
     InputTextareaModule,
+    AccordionModule
   ],
 
   providers: [
