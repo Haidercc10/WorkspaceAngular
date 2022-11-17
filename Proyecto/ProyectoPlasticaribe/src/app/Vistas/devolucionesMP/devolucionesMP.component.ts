@@ -82,6 +82,7 @@ export class DevolucionesMPComponent implements OnInit {
   titulosTablaRemisiones = [];
   valorTotalRem = 0;
   mpAgregada = [];
+  cargando : boolean = true;
 
   procesoID : string;
   idMateriaPrima : number;
@@ -325,14 +326,13 @@ export class DevolucionesMPComponent implements OnInit {
       UndCant : presentacion,
       Proceso : proceso,
     }
-    if(productoExt.Id != 84) {
-      productoExt.MatPrima = idMateriaPrima;
-      productoExt.Tinta = 2001;
-    } else {
+    if(productoExt.Id > 2000) {
       productoExt.Tinta = idMateriaPrima;
       productoExt.MatPrima = 84;
+    } else {
+      productoExt.Tinta = 2001;
+      productoExt.MatPrima = idMateriaPrima;
     }
-
     this.setearFormularioSuperior();
 
     if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length == 0) {
@@ -351,10 +351,12 @@ export class DevolucionesMPComponent implements OnInit {
         }
       }
     }
+    console.log(this.ArrayMateriaPrima);
     this.ArrayMateriaPrima.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
     this.FormMateriaPrima.reset();
   }
 
+  /** Dejar los campos del primer formulario con los valores que tiene en ese momento. */
   setearFormularioSuperior() {
     this.FormMateriaPrimaRecuperada.setValue({
       ot : this.FormMateriaPrimaRecuperada.value.ot,
@@ -363,7 +365,9 @@ export class DevolucionesMPComponent implements OnInit {
     });
   }
 
+  /** Obtener Id del proceso, ya que en la tabla se carga el nombre */
   obtenerIdProceso(){
+    this.cargando = false;
     let procesoNombre : string;
     this.idMateriaPrima = 0;
     this.cantidadMateriaPrima = 0;
@@ -394,6 +398,14 @@ export class DevolucionesMPComponent implements OnInit {
         }
       });
     }
+
+    setTimeout(() => {
+    this.moverInventarioMpAgregada();
+    this.moverInventarioTintas();
+    setTimeout(() => {
+      this.limpiarTodosCampos();
+    }, 1500);
+    }, 3000);
   }
 
   //Funcion que creará el registro de la materia que viene en un pedido
@@ -402,7 +414,6 @@ export class DevolucionesMPComponent implements OnInit {
 
     if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla");
     else {
-
       const datosDevolucionMp : any = {
         DevMatPri_Id : idDevolucion,
         MatPri_Id : idMp,
@@ -411,7 +422,6 @@ export class DevolucionesMPComponent implements OnInit {
         UndMed_Id : undMed,
         Proceso_Id : proceso,
       }
-
         this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(datos_recuperadoMpCreada => {
           /* BUSCA EN LA TABLA DE ASIGNACIONES LA OT QUE ESTÁ DEVOLVIENDO MATERIA PRIMA Y LE RESTA LA CANTIDAD QUE SE ESTÁ DEVOLVIENDO
           AL REGISTRO DE ASIGNACION, EJEMPLO: SI SE DEVUELVEN 2KG DE UNA ASIGNACION QUE TENIA 3KG, EL REGISTRO DE ESTA ASIGNACION AHORA
@@ -435,8 +445,6 @@ export class DevolucionesMPComponent implements OnInit {
             }
           });*/
         });
-      this.moverInventarioMpAgregada();
-      this.moverInventarioTintas();
     }
   }
 
@@ -464,7 +472,7 @@ export class DevolucionesMPComponent implements OnInit {
           TpBod_Id : datos_materiaPrima.tpBod_Id,
         }
         this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].MatPrima, datosMP).subscribe(datos_mp_creada => {
-          const Toast = Swal.mixin({
+          /*const Toast = Swal.mixin({
             toast: true,
             position: 'center',
             showConfirmButton: false,
@@ -479,7 +487,7 @@ export class DevolucionesMPComponent implements OnInit {
             icon: 'success',
             title: '¡Registro De Materia Prima Devuelta Creado Con Exito!'
           });
-          this.limpiarTodosCampos();
+          this.limpiarTodosCampos();*/
         });
       });
     }
@@ -495,7 +503,7 @@ export class DevolucionesMPComponent implements OnInit {
         stockMateriaPrimaInicial = datos_tinta.tinta_Stock;
 
         if(this.ArrayMateriaPrima[index].Tinta == 2001) stockMateriaPrimaFinal = 0
-        else stockMateriaPrimaFinal = stockMateriaPrimaInicial - this.ArrayMateriaPrima[index].Cant;
+        else stockMateriaPrimaFinal = stockMateriaPrimaInicial + this.ArrayMateriaPrima[index].Cant;
 
         const datosTintaActualizada : any = {
           Tinta_Id : this.ArrayMateriaPrima[index].Tinta,
@@ -509,29 +517,36 @@ export class DevolucionesMPComponent implements OnInit {
           TpBod_Id : datos_tinta.tpBod_Id,
           tinta_InvInicial : datos_tinta.tinta_InvInicial,
         }
+        console.log(this.ArrayMateriaPrima[index].Tinta);
         this.servicioTintas.srvActualizar(this.ArrayMateriaPrima[index].Tinta, datosTintaActualizada).subscribe(datos_mp_creada => {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 1500,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          });
-          Toast.fire({
-            icon: 'success',
-            title: '¡Registro De Materia Prima Devuelta Creado Con Exito!'
-          });
-          this.limpiarTodosCampos();
+          this.mensajeRegistroExitoso();
         });
       });
     }
   }
 
+  /** Mostrar mensaje de confirmación de registro exitoso */
+  mensajeRegistroExitoso() {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'center',
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
+    Toast.fire({
+      icon: 'success',
+      title: '¡Registro de devolución de Materia Prima creado con éxito!'
+    });
+  }
+
+  /** Limpiar todos los campos al momento de terminar la devolución. */
   limpiarTodosCampos(){
+    this.cargando = true;
     this.FormMateriaPrimaRecuperada.setValue({
       ot : '',
       MpingresoFecha: this.today,
@@ -544,7 +559,7 @@ export class DevolucionesMPComponent implements OnInit {
   // Función para quitar un producto de la tabla
   QuitarProductoTabla(index : number, formulario : any) {
     Swal.fire({
-      title: '¿Estás seguro de eliminar la Materia Prima de la Factura/Remisión?',
+      title: '¿Está seguro de eliminar la Materia Prima de la Devolución?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',

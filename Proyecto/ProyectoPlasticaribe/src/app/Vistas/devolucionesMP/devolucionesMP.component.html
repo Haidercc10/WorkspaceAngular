@@ -1,6 +1,12 @@
  <!-- Inicio Contenedor total -->
  <app-menuLateral></app-menuLateral>
 
+ <div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
  <div class="contain">
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
@@ -55,7 +61,7 @@
           <label for="floatingInput">Id Materia Prima</label>
         </div>
         <!-- ID/Nombre Producto -->
-        <div class="ng-autocomplete form-floating col-md-2 form-control form-control-sm">
+        <div class="ng-autocomplete form-floating col-md form-control form-control-sm">
           <ng-autocomplete
             class=""
             [data]="materiasPrimas"
@@ -96,8 +102,13 @@
           </select>
           <label for="floatingSelect">Und. Medida</label>
         </div>
-        <!-- Proceso -->
-        <div class="form-floating col-md-2">
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <div class="row g-3">
+         <!-- Proceso -->
+         <div class="form-floating col-md-2">
           <select formControlName="Proceso" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
             <option [ngValue]="proceso.proceso_Nombre" *ngFor="let proceso of procesos">{{proceso.proceso_Nombre}}</option>
           </select>
@@ -124,7 +135,7 @@
 
   <!-- TABLA DE INGRESO -->
   <div class="mb-2">
-    <div class="row g-1">
+    <div class="row g-3">
       <div class="table-responsive">
         <!-- <div id="html2Pdf"> -->
         <table class="table table-bordered" >
