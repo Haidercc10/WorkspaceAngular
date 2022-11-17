@@ -4,7 +4,6 @@ import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { LazyLoadEvent } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DtIngRollos_Extrusion.service';
 import { IngRollos_ExtrusuionService } from 'src/app/Servicios/IngRollos_Extrusuion.service';
@@ -619,7 +618,6 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que colocará los rollos que se van a insertar
   llenarRollosAIngresar(item : any){
-    // this.rollosInsertar.push(item);
     for (let i = 0; i < this.rollos.length; i++) {
       if (this.rollos[i].Id == item.Id) this.rollos.splice(i, 1);
     }
@@ -630,12 +628,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que seleccionará y colocará todos los rollos que se van a insertar
   seleccionarTodosRollos(item : any){
-    for (let i = 0; i < item.length; i++) {
-      if (item[i].exits != true) {
-        // this.rollosInsertar.push(item[i]);
-        this.rollos = [];
-      }
-    }
+    this.rollos = [];
     for (let i = 0; i < item.length; i++) {
       if (item[i].exits == true) this.rollos.push(item[i]);
     }

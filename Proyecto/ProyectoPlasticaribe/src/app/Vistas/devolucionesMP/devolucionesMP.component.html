@@ -1,13 +1,13 @@
  <!-- Inicio Contenedor total -->
- <app-menuLateral></app-menuLateral>
+<app-menuLateral></app-menuLateral>
 
- <div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+<div class="d-flex justify-content-center overlay" *ngIf="load">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
     <span class="visually-hidden">Cargando...</span>
   </div>
 </div>
 
- <div class="contain">
+<div class="contain">
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <!-- principal -->
@@ -27,100 +27,21 @@
     <h4 class="tituloRojo">Ingresar Materia Prima Devuelta</h4>
   </div>
   <!-- Fin titulo -->
-  <form [formGroup]="FormMateriaPrimaRecuperada">
+  <form [formGroup]="FormDevolucion">
     <!-- Inicio Fila 1 Agregar producto -->
     <div class="mb-3">
       <div class="row g-3">
-        <div class="form-floating col-md-2">
-          <input formControlName="ot" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid">
+        <!-- Orden de TRabajo -->
+        <div class="form-floating col-md-3">
+          <input formControlName="ot" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarOt()">
           <label for="floatingSelect">OT</label>
         </div>
+
         <!-- Campo Observacion -->
         <div class="form-floating col-md">
           <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm" name="MpObservacion"></textarea>
           <label for="floatingTextarea">Observación</label>
         </div>
-        <div class="form-floating col-md-2">
-          <!-- Fecha de Ingreso -->
-          <input formControlName="MpingresoFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso" readonly onmousedown="return false;">
-          <label for="floatingInput">Fecha Ingreso</label>
-        </div>
-      </div>
-    </div>
-  </form>
-
-  <div class="mb-4">
-    <h4 class="tituloRojo">Materia Prima</h4>
-  </div>
-
-  <form [formGroup]="FormMateriaPrima">
-    <div class="mb-3">
-      <div class="row g-3">
-        <div class="form-floating col-md-2">
-          <input formControlName="MpId" type="number" min="0" (keyup.enter)="buscarMpId()" class="form-control" id="floatingInput"required >
-          <label for="floatingInput">Id Materia Prima</label>
-        </div>
-        <!-- ID/Nombre Producto -->
-        <div class="ng-autocomplete form-floating col-md form-control form-control-sm">
-          <ng-autocomplete
-            class=""
-            [data]="materiasPrimas"
-            (selected)='buscarMpSeleccionada($event)'
-            (inputChanged)='onChangeSearch($event)'
-            (inputFocused)='onFocused($event)'
-            [searchKeyword]="keyword"
-            [itemTemplate]="itemTemplate"
-            [notFoundTemplate]="notFoundTemplate"
-            id="floatingInput"
-            formControlName="MpNombre">
-          </ng-autocomplete>
-
-          <ng-template #itemTemplate let-item>
-            <a [innerHTML]="item.name"></a>
-          </ng-template>
-
-          <ng-template #notFoundTemplate let-notFound>
-            <div [innerHTML]="notFound"></div>
-          </ng-template>
-          <label for="floatingInput" *ngIf="validarInput">{{tituloCampoMP}}</label>
-        </div>
-        <!-- <div class="form-floating col-md-4">
-          <select formControlName="MpNombre" class="form-select form-select-sm" id="floatingSelect" (change)="buscarMpSeleccionada()" aria-label="Floating label select example" required>
-            <option [ngValue]="materiaPrima.matPri_Nombre" *ngFor="let materiaPrima of materiasPrimas">{{materiaPrima.matPri_Nombre}}</option>
-          </select>
-          <label for="floatingSelect">Nombre de la Materia Prima</label>
-        </div> -->
-        <!-- CANTIDAD DE MATERIA PRIMA  -->
-        <div class="form-floating col-md-2">
-          <input formControlName="MpCantidad" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" >
-          <label for="floatingInput">Cantidad de Materia Prima</label>
-        </div>
-        <!-- Unidad medida-->
-        <div class="form-floating col-md-2">
-          <select formControlName="MpUnidadMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" >
-            <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
-          </select>
-          <label for="floatingSelect">Und. Medida</label>
-        </div>
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <div class="row g-3">
-         <!-- Proceso -->
-         <div class="form-floating col-md-2">
-          <select formControlName="Proceso" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="proceso.proceso_Nombre" *ngFor="let proceso of procesos">{{proceso.proceso_Nombre}}</option>
-          </select>
-          <label for="floatingSelect">Proceso</label>
-        </div>
-      </div>
-    </div>
-    <!-- BOTONES -->
-    <div class="mb-1">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVaciosMP()">{{AccionBoton}} Materia Prima</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMP()">Limpiar Campos Materia Prima</button>
       </div>
     </div>
   </form>
@@ -133,41 +54,44 @@
     <h4 class="tituloRojo">Tabla Materia Prima Devuelta</h4>
   </div>
 
-  <!-- TABLA DE INGRESO -->
-  <div class="mb-2">
+  <div class="mb-3" *ngIf="!load">
     <div class="row g-3">
-      <div class="table-responsive">
-        <!-- <div id="html2Pdf"> -->
-        <table class="table table-bordered" >
-          <thead class="TitulosTabla">
-            <tr *ngFor="let columnas of titulosTabla let i = index">
-              <th id="idMateriaPrima" scope="col">{{columnas.mpId}}</th>
-              <th id="nombreMateriaPrima" scope="col">{{columnas.mpNombre}}</th>
-              <th id="cantidadMateriaPrima" scope="col">{{columnas.mpCantidad}}</th>
-              <th id="UnidadMedida" scope="col">{{columnas.mpUndMedCant}}</th>
-              <th id="mpProceso" scope="col">{{columnas.mpProceso}}</th>
-              <th id="editar" scope="col">Editar</th>
-              <th id="eliminar" scope="col">Eliminar</th>
-            </tr>
-            </thead>
-          <tbody>
-            <!-- <tr *ngFor="let item of pedidosProductos | paginate: {itemsPerPage: 5, currentPage: page} let i=index" > -->
-            <tr *ngFor="let materiaPrima of ArrayMateriaPrima let i = index">
-              <td id="idMateriaPrima">{{materiaPrima.Id}}</td>
-              <td id="nombreMateriaPrima">{{materiaPrima.Nombre}}</td>
-              <td id="cantidadMateriaPrima">{{materiaPrima.Cant | number}}</td>
-              <td id="UnidadMedida">{{materiaPrima.UndCant}}</td>
-              <td id="mpTipoRecup" >{{materiaPrima.Proceso}}</td>
-              <td id="Editar"><a><i class="fa fa-pencil" aria-hidden="true" (click)="EditarProductoTabla(materiaPrima)" title="Editar Materia Prima"></i></a></td>
-              <td id="Eliminar"><a><i class="fa fa-trash" aria-hidden="true" (click)="QuitarProductoTabla(i, materiaPrima)" title="Quitar Materia Prima de la tabla"></i></a></td>
-            </tr>
-          </tbody>
-        </table>
-        <!-- <div class="mb-2">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <pagination-controls (pageChange)="page = $event"></pagination-controls>
-        </div> -->
-      </div>
+      <p-table
+        #dt1
+        [value]="materiasPrimas"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="25"
+        [rowsPerPageOptions]="[10,25,50]"
+        [rowHover]="true"
+        dataKey="Id"
+        [(selection)]="materiasPrimasRetiradas">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Presentación</th>
+            <th scope="col" *ngIf="ValidarRol == 1">Precio Unitario</th>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox (click)="quitarTodosMateriaPrima(materiasPrimas)"></p-tableHeaderCheckbox>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-materiasPrimas>
+          <tr *ngIf="!materiasPrimas.Exits">
+            <td>{{materiasPrimas.Id}}</td>
+            <td>{{materiasPrimas.Nombre}}</td>
+            <td>{{materiasPrimas.Cantidad | number}}</td>
+            <td>{{materiasPrimas.Unidad_Medida}}</td>
+            <td>{{materiasPrimas.Proceso_Nombre}}</td>
+            <td>
+              <p-tableCheckbox [value]="materiasPrimas" (click)="quitarMateriaPrimaAIngresar(materiasPrimas)"></p-tableCheckbox>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
   </div>
 

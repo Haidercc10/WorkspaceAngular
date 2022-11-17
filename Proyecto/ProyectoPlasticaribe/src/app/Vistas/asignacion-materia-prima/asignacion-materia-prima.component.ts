@@ -423,32 +423,32 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
     if (this.ArrayMateriaPrimaRetirada.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla")
     else {
-      // if (proceso == 'IMP' || proceso == 'ROT') {
-      const datosDetallesAsignacionTintas : any = {
-        AsigMp_Id : idAsignacion,
-        Tinta_Id : idMp,
-        DtAsigTinta_Cantidad : cantidad,
-        UndMed_Id : presentacion,
-        Proceso_Id : proceso,
+      if (idMp < 2000) {
+        const datosDetallesAsignacionTintas : any = {
+          AsigMp_Id : idAsignacion,
+          Tinta_Id : idMp,
+          DtAsigTinta_Cantidad : cantidad,
+          UndMed_Id : presentacion,
+          Proceso_Id : proceso,
+        }
+
+        this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(datos_asignacionTintas => {});
+        this.moverInventarioTintas(idMp, cantidad);
+
+      } else {
+        const datosDetallesAsignacion : any = {
+          AsigMp_Id : idAsignacion,
+          MatPri_Id : idMp,
+          DtAsigMp_Cantidad : cantidad,
+          UndMed_Id : presentacion,
+          Proceso_Id : proceso,
+          // DtAsigTinta_OTImpresion : 123456,
+        }
+
+        this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {
+        });
+        this.moverInventarioMpPedida(idMp, cantidad);
       }
-
-      this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(datos_asignacionTintas => {});
-      this.moverInventarioTintas(idMp, cantidad);
-
-      // } else {
-      const datosDetallesAsignacion : any = {
-        AsigMp_Id : idAsignacion,
-        MatPri_Id : idMp,
-        DtAsigMp_Cantidad : cantidad,
-        UndMed_Id : presentacion,
-        Proceso_Id : proceso,
-        // DtAsigTinta_OTImpresion : 123456,
-      }
-
-      this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {
-      });
-      this.moverInventarioMpPedida(idMp, cantidad);
-      // }
     }
   }
 
