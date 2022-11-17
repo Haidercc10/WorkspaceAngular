@@ -3,7 +3,6 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { AreaService } from 'src/app/Servicios/area.service';
 import { AsignacionMPService } from 'src/app/Servicios/asignacionMP.service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
@@ -11,20 +10,12 @@ import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.
 import { DetallesAsignacionTintasService } from 'src/app/Servicios/detallesAsignacionTintas.service';
 import { DevolucionesService } from 'src/app/Servicios/devoluciones.service';
 import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service';
-import { EstadosService } from 'src/app/Servicios/estados.service';
-import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
-import { FactuaMpCompradaService } from 'src/app/Servicios/facturaMpComprada.service';
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { MpProveedorService } from 'src/app/Servicios/MpProveedor.service';
 import { ProcesosService } from 'src/app/Servicios/procesos.service';
-import { ProveedorService } from 'src/app/Servicios/proveedor.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { TintasService } from 'src/app/Servicios/tintas.service';
-import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
 import { TipoBodegaService } from 'src/app/Servicios/tipoBodega.service';
-import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -99,22 +90,17 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 private categoriMpService : CategoriaMateriaPrimaService,
                   private tipoBodegaService : TipoBodegaService,
                     private unidadMedidaService : UnidadMedidaService,
-                      private estadoService : EstadosService,
-                        private tipoEstadoService : TipoEstadosService,
-                          private usuarioService : UsuarioService,
-                            private procesosService : ProcesosService,
-                              private areasService : AreaService,
-                                private rolService : RolesService,
-                                  private frmBuilderMateriaPrima : FormBuilder,
-                                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                      private proveedorMPService : MpProveedorService,
-                                        private asignacionMPService : AsignacionMPService,
-                                          private detallesAsignacionService : DetallesAsignacionService,
-                                            private bagProServices : BagproService,
-                                              private tintasService : TintasService,
-                                                private detallesAsignacionTintas : DetallesAsignacionTintasService,
-                                                  private devolucionesService : DevolucionesService,
-                                                    private devolucionesMPService : DevolucionesMPService, ) {
+                      private procesosService : ProcesosService,
+                          private rolService : RolesService,
+                            private frmBuilderMateriaPrima : FormBuilder,
+                              @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                                private asignacionMPService : AsignacionMPService,
+                                  private detallesAsignacionService : DetallesAsignacionService,
+                                    private bagProServices : BagproService,
+                                      private tintasService : TintasService,
+                                        private detallesAsignacionTintas : DetallesAsignacionTintasService,
+                                          private devolucionesService : DevolucionesService,
+                                            private devolucionesMPService : DevolucionesMPService, ) {
 
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : ['', Validators.required],
@@ -397,7 +383,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             for (let i = 0; i < datos_devoluciones.length; i++) {
               this.devolucionesMPService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_devolucionesMP => {
                 for (let j = 0; j < datos_devolucionesMP.length; j++) {
-                  devolucionMP += datos_devolucionesMP[j].dtDevMatPri_CantidadDevuelta;
+                  if (datos_devolucionesMP[j].tinta_Id == 2001 && datos_devolucionesMP[j].matPri_Id != 84) devolucionMP += datos_devolucionesMP[j].dtDevMatPri_CantidadDevuelta;
                 }
               });
             }

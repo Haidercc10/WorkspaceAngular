@@ -23,6 +23,7 @@ import { OrdenFactura_RelacionService } from 'src/app/Servicios/OrdenFactura_Rel
   templateUrl: './pedidomateriaprima.component.html',
   styleUrls: ['./Pedidomateriaprima.component.css']
 })
+
 export class PedidomateriaprimaComponent implements OnInit {
 
   public FormMateriaPrimaFactura !: FormGroup;
@@ -664,134 +665,112 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   //
   cargarPDF(formulario : any){
-    let id : any = formulario.remisionId;
-    this.remisionService.srvObtenerListaPorId(id).subscribe(datos_remision => {
-      this.remisionMPService.srvObtenerLista().subscribe(datos_remisionMP => {
-        for (let index = 0; index < datos_remisionMP.length; index++) {
-          if (datos_remisionMP[index].rem_Id == id) {
-            this.usuarioService.srvObtenerListaPorId(datos_remision.usua_Id).subscribe(datos_usuario => {
-              this.proveedorservices.srvObtenerListaPorId(datos_remision.prov_Id).subscribe(datos_proveedor => {
-                this.materiaPrimaService.srvObtenerListaPorId(datos_remisionMP[index].matPri_Id).subscribe(datos_materiPrima => {
-                  for (let mp = 0; mp < this.mpAgregada.length; mp++) {
-                    const pdfDefinicion : any = {
-                      info: {
-                        title: `${datos_remision.rem_Id}`
-                      },
-                      content : [
-                        {
-                          text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
-                          alignment: 'center',
-                          style: 'titulo',
-                        },
-                        '\n \n',
-                        {
-                          text: `Fecha de registro: ${datos_remision.rem_Fecha.replace('T00:00:00', '')}`,
-                          style: 'header',
-                          alignment: 'right',
-                        },
-                        {
-                          text: `Registrado Por: ${datos_usuario.usua_Nombre}\n`,
-                          alignment: 'right',
-                          style: 'header',
-                        },
-                        {
-                          text: `\n Información detallada del Proveedor \n \n`,
-                          alignment: 'center',
-                          style: 'header'
-                        },
-                        {
-                          style: 'tablaCliente',
-                          table: {
-                            widths: ['*', '*', '*'],
-                            style: 'header',
-                            body: [
-                              [
-                                `ID: ${datos_proveedor.prov_Id}`,
-                                `Tipo de ID: ${datos_proveedor.tipoIdentificacion_Id}`,
-                                `Tipo de Cliente: ${datos_proveedor.tpProv_Id}`
-                              ],
-                              [
-                                `Nombre: ${datos_proveedor.prov_Nombre}`,
-                                `Telefono: ${datos_proveedor.prov_Telefono}`,
-                                `Ciudad: ${datos_proveedor.prov_Ciudad}`
-                              ],
-                              [
-                                `E-mail: ${datos_proveedor.prov_Email}`,
-                                ``,
-                                ``
-                              ]
-                            ]
-                          },
-                          layout: 'lightHorizontalLines',
-                          fontSize: 9,
-                        },
-                        {
-                          text: `\n \nObervación sobre la remisión: \n ${datos_remision.rem_Observacion}\n`,
-                          style: 'header',
-                        },
-                        {
-                          text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
-                          alignment: 'center',
-                          style: 'header'
-                        },
+    let id : any = formulario.remisionCodigo;
+    this.remisionMPService.srvObtenerpdfMovimientos(id).subscribe(datos_remision => {
+      for (let i = 0; i < datos_remision.length; i++) {
+        for (let j = 0; j < this.mpAgregada.length; j++) {
+          const pdfDefinicion : any = {
+            info: {
+              title: `${id}`
+            },
+            content : [
+              {
+                text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
+                alignment: 'center',
+                style: 'titulo',
+              },
+              '\n \n',
+              {
+                text: `Fecha de registro: ${datos_remision[i].rem_Fecha.replace('T00:00:00', '')}`,
+                style: 'header',
+                alignment: 'right',
+              },
+              {
+                text: `Registrado Por: ${datos_remision[i].usua_Nombre}\n`,
+                alignment: 'right',
+                style: 'header',
+              },
+              {
+                text: `\n Información detallada del Proveedor \n \n`,
+                alignment: 'center',
+                style: 'header'
+              },
+              {
+                style: 'tablaCliente',
+                table: {
+                  widths: ['*', '*', '*'],
+                  style: 'header',
+                  body: [
+                    [
+                      `ID: ${datos_remision[i].prov_Id}`,
+                      `Tipo de ID: ${datos_remision[i].tipoIdentificacion_Id}`,
+                      `Tipo de Proveedor: ${datos_remision[i].tpProv_Nombre}`
+                    ],
+                    [
+                      `Nombre: ${datos_remision[i].prov_Nombre}`,
+                      `Telefono: ${datos_remision[i].prov_Telefono}`,
+                      `Ciudad: ${datos_remision[i].prov_Ciudad}`
+                    ],
+                    [
+                      `E-mail: ${datos_remision[i].prov_Email}`,
+                      ``,
+                      ``
+                    ]
+                  ]
+                },
+                layout: 'lightHorizontalLines',
+                fontSize: 9,
+              },
+              {
+                text: `\n \nObervación sobre la remisión: \n ${datos_remision[i].rem_Observacion}\n`,
+                style: 'header',
+              },
+              {
+                text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
+                alignment: 'center',
+                style: 'header'
+              },
 
-                        this.table(this.mpAgregada, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
-
-                        {
-                          text: `\n\nValor Total Remisión: $${this.formatonumeros(datos_remision.rem_PrecioEstimado)}`,
-                          alignment: 'right',
-                          style: 'header',
-                        },
-                      ],
-                      styles: {
-                        header: {
-                          fontSize: 8,
-                          bold: true
-                        },
-                        titulo: {
-                          fontSize: 15,
-                          bold: true
-                        }
-                      }
-                    }
-                    const pdf = pdfMake.createPdf(pdfDefinicion);
-                    pdf.open();
-                    break;
-                  }
-                });
-              });
-            });
-            break
+              this.table(this.mpAgregada, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+            ],
+            styles: {
+              header: {
+                fontSize: 8,
+                bold: true
+              },
+              titulo: {
+                fontSize: 15,
+                bold: true
+              }
+            }
           }
+          const pdf = pdfMake.createPdf(pdfDefinicion);
+          pdf.open();
+          break;
         }
-      });
+        break;
+      }
     });
   }
 
   //
   llenarDocumento(formulario : any){
-    let id : any = formulario.remisionId;
+    let id : any = formulario.remisionCodigo;
     this.mpAgregada = [];
-    this.remisionMPService.srvObtenerLista().subscribe(datos_remisionMP => {
-      for (let index = 0; index < datos_remisionMP.length; index++) {
-        if (datos_remisionMP[index].rem_Id == id) {
-          this.materiaPrimaService.srvObtenerListaPorId(datos_remisionMP[index].matPri_Id).subscribe(datos_materiPrima => {
-            const mpFactura : any = {
-              Id : datos_materiPrima.matPri_Id,
-              Nombre : datos_materiPrima.matPri_Nombre,
-              Cant : this.formatonumeros(datos_remisionMP[index].remiMatPri_Cantidad),
-              UndCant : datos_remisionMP[index].undMed_Id,
-              Stock : datos_materiPrima.matPri_Stock,
-              UndStock : datos_materiPrima.undMed_Id,
-              PrecioUnd : this.formatonumeros(datos_remisionMP[index].remiMatPri_ValorUnitario),
-              SubTotal : this.formatonumeros(datos_remisionMP[index].remiMatPri_Cantidad * datos_remisionMP[index].remiMatPri_ValorUnitario),
-            }
-            this.mpAgregada.push(mpFactura);
-          });
+    this.remisionMPService.srvObtenerpdfMovimientos(id).subscribe(datos_remision => {
+      for (let i = 0; i < datos_remision.length; i++) {
+        let items : any = {
+          Id : datos_remision[i].matPri_Id,
+          Nombre : datos_remision[i].matPri_Nombre,
+          Cant : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad),
+          UndCant : datos_remision[i].undMed_Id,
+          PrecioUnd : this.formatonumeros(datos_remision[i].remiMatPri_ValorUnitario),
+          SubTotal : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad * datos_remision[i].remiMatPri_ValorUnitario),
         }
+        this.mpAgregada.push(items);
       }
+      setTimeout(() => { this.cargarPDF(formulario); }, 2000);
     });
-    this.cargarPDF(formulario);
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -801,7 +780,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     data.forEach(function(row) {
       var dataRow = [];
       columns.forEach(function(column) {
-        dataRow.push(row[column].toString());
+          dataRow.push(row[column].toString());
       });
       body.push(dataRow);
     });
@@ -813,7 +792,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: ['*', '*', '*', '*', '*', '*'],
+        widths: [30, '*', 70, 50, 50, 80],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 9,

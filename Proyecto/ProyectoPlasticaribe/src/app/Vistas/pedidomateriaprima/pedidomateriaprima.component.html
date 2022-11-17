@@ -233,7 +233,7 @@
                     <td id="precioMateriaPrima">{{remisiones.remisionUsuario}}</td>
                     <td id="subTotalMateriaPrima">{{remisiones.remisionDocumento}}</td>
                     <td id="subTotalMateriaPrima">{{remisiones.remisionPrecio | currency}}</td>
-                    <td id="archivo"><a><i class="fa fa-file-pdf-o" aria-hidden="true" title="Ver archivo" (click)="llenarDocumento(remisiones)"></i></a></td>
+                    <td id="archivo"><a><i style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" aria-hidden="true" (click)="llenarDocumento(remisiones)"></i></a></td>
                   </tr>
                 </tbody>
               </table>
