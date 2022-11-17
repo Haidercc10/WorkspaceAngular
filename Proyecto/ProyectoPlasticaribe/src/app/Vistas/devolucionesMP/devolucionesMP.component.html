@@ -1,7 +1,7 @@
  <!-- Inicio Contenedor total -->
 <app-menuLateral></app-menuLateral>
 
-<div class="d-flex justify-content-center overlay" *ngIf="load">
+<div class="d-flex justify-content-center overlay" *ngIf="!load">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
     <span class="visually-hidden">Cargando...</span>
   </div>
@@ -51,10 +51,10 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Tabla Materia Prima Devuelta</h4>
+    <h4 class="tituloRojo">Tabla Materia Prima Asignada</h4>
   </div>
 
-  <div class="mb-3" *ngIf="!load">
+  <div class="mb-3" *ngIf="load">
     <div class="row g-3">
       <p-table
         #dt1
@@ -73,7 +73,7 @@
             <th scope="col">Nombre</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Presentación</th>
-            <th scope="col" *ngIf="ValidarRol == 1">Precio Unitario</th>
+            <th scope="col">Proceso</th>
             <th style="width: 3rem">
               <p-tableHeaderCheckbox (click)="quitarTodosMateriaPrima(materiasPrimas)"></p-tableHeaderCheckbox>
             </th>
@@ -88,6 +88,66 @@
             <td>{{materiasPrimas.Proceso_Nombre}}</td>
             <td>
               <p-tableCheckbox [value]="materiasPrimas" (click)="quitarMateriaPrimaAIngresar(materiasPrimas)"></p-tableCheckbox>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <hr class="Linea">
+  </div>
+
+  <div class="mb-4" ><!--*ngIf="!load"-->
+    <h4 class="tituloRojo">Materias Primas a devolver</h4>
+  </div>
+
+  <!--Inicio tabla Rollos a Insertar -->
+  <div class="mb-3" *ngIf="load"> <!---->
+    <div class="row g-3">
+      <p-table
+        #dt
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[10,25,50]"
+        [rowHover]="true"
+        [value]="materiasPrimasRetiradas"
+        dataKey="Id"
+        [(selection)]="materiasPrimas">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Presentación</th>
+            <th scope="col">Precio Unitario</th>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox (click)="seleccionarTodosMateriaPrima(materiasPrimasRetiradas)"></p-tableHeaderCheckbox> <!---->
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-materiasPrimasRetiradas>
+          <tr *ngIf="!materiasPrimasRetiradas.Exits"> <!---->
+            <td>{{materiasPrimasRetiradas.Id}}</td>
+            <td>{{materiasPrimasRetiradas.Nombre}}</td>
+            <!--<td>{{materiasPrimasRetiradas.Cantidad}}</td>-->
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber [(ngModel)]="materiasPrimasRetiradas.Cantidad" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="materiasPrimasRetiradas.Cantidad" [maxFractionDigits]="2"></p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{materiasPrimasRetiradas.Cantidad | number}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>{{materiasPrimasRetiradas.Unidad_Medida}}</td>
+            <td>{{materiasPrimasRetiradas.Proceso_Nombre}}</td>
+            <td>
+              <p-tableCheckbox [value]="materiasPrimasRetiradas" (click)="llenarMateriaPrimaAIngresar(materiasPrimasRetiradas)"></p-tableCheckbox> <!---->
             </td>
           </tr>
         </ng-template>

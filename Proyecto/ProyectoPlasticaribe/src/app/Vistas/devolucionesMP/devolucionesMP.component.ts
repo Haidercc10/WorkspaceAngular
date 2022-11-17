@@ -29,7 +29,7 @@ export class DevolucionesMPComponent implements OnInit {
   materiasPrimas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   materiasPrimasRetiradas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  load : boolean = false;
+  load : boolean;
 
 
   constructor(private materiaPrimaService : MateriaPrimaService,
@@ -47,6 +47,8 @@ export class DevolucionesMPComponent implements OnInit {
       MpingresoFecha: [this.today, Validators.required],
       MpObservacion : ['', Validators.required],
     });
+
+    this.load = true;
   }
 
   ngOnInit(): void {
@@ -86,7 +88,7 @@ export class DevolucionesMPComponent implements OnInit {
 
   // Funcion que va a consultar todas las materia primas asignadas a una orden de trabajo
   consultarOt(){
-    this.load = true;
+    this.load = false;
     let ot : number = this.FormDevolucion.value.ot;
     this.detallesAsignacionService.srvObtenerListaPorAsignacionesOT(ot).subscribe(datos_asignacionMP => {
       if (datos_asignacionMP.length != 0){
@@ -115,12 +117,15 @@ export class DevolucionesMPComponent implements OnInit {
         `<spam style="color : #f00;">${error.message}</spam> `,
       });
     });
-    setTimeout(() => { this.load = false; }, 2000);
+    setTimeout(() => { this.load = true; }, 2000);
   }
 
   //Funcion que va a seleccionar una materia prima
   llenarMateriaPrimaAIngresar(item : any){
     this.load = false;
+    for (let i = 0; i < this.materiasPrimasRetiradas.length; i++) {
+      if (this.materiasPrimasRetiradas[i].Id == item.Id) this.materiasPrimasRetiradas.splice(i, 1);
+    }
     this.materiasPrimas.sort((a,b) => Number(a.Id) - Number(b.Id) );
     setTimeout(() => { this.load = true; }, 50);
   }
@@ -136,6 +141,9 @@ export class DevolucionesMPComponent implements OnInit {
   //Funcion que va a quitar lo MateriaPrima que se van a insertar
   quitarMateriaPrimaAIngresar(item : any){
     this.load = false;
+    for (let i = 0; i < this.materiasPrimas.length; i++) {
+      if (this.materiasPrimas[i].Id == item.Id) this.materiasPrimas.splice(i, 1);
+    }
     this.materiasPrimasRetiradas.sort((a,b) => Number(a.Id) - Number(b.Id) );
     setTimeout(() => { this.load = true; }, 50);
   }
@@ -143,6 +151,9 @@ export class DevolucionesMPComponent implements OnInit {
   // Funcion que va a quitar todos los MateriaPrima que se van a insertar
   quitarTodosMateriaPrima(item : any){
     this.load = false;
+    for (let index = 0; index < item.length; index++) {
+      if (item[index].Exits == true) this.materiasPrimas.push(item[index]);
+    }
     this.materiasPrimasRetiradas.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.materiasPrimas = [];
     setTimeout(() => { this.load = true; }, 50);
