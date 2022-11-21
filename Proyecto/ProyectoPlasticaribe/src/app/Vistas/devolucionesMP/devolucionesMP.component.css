@@ -86,7 +86,11 @@ a {
 }
 
 .TextosInfoTabla {
-  font-size: smaller;
+  font-size: medium;
+}
+
+.titulosTablasNuevas{
+  font-size: medium;
 }
 
 .precios{

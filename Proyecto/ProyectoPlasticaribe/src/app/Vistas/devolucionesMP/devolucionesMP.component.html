@@ -24,7 +24,7 @@
 <div class="container">
   <!-- Inicio titulo -->
   <div class="mb-4">
-    <h4 class="tituloRojo">Ingresar Materia Prima Devuelta</h4>
+    <h4 class="tituloRojo">Ingresar Materia Prima devuelta</h4>
   </div>
   <!-- Fin titulo -->
   <form [formGroup]="FormDevolucion">
@@ -32,7 +32,7 @@
     <div class="mb-3">
       <div class="row g-3">
         <!-- Orden de TRabajo -->
-        <div class="form-floating col-md-3">
+        <div class="form-floating col-md-2">
           <input formControlName="ot" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarOt()">
           <label for="floatingSelect">OT</label>
         </div>
@@ -51,7 +51,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Tabla Materia Prima Asignada</h4>
+    <h4 class="tituloRojo">Tabla Materia Prima asignada</h4>
   </div>
 
   <div class="mb-3" *ngIf="load">
@@ -68,7 +68,7 @@
         dataKey="Id"
         [(selection)]="materiasPrimasRetiradas">
         <ng-template pTemplate="header">
-          <tr>
+          <tr class="titulosTablasNuevas">
             <th scope="col">Id</th>
             <th scope="col">Nombre</th>
             <th scope="col">Cantidad</th>
@@ -80,7 +80,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-materiasPrimas>
-          <tr *ngIf="!materiasPrimas.Exits">
+          <tr *ngIf="!materiasPrimas.Exits" class="TextosInfoTabla">
             <td>{{materiasPrimas.Id}}</td>
             <td>{{materiasPrimas.Nombre}}</td>
             <td>{{materiasPrimas.Cantidad | number}}</td>
@@ -118,7 +118,7 @@
         dataKey="Id"
         [(selection)]="materiasPrimas">
         <ng-template pTemplate="header">
-          <tr>
+          <tr class="titulosTablasNuevas">
             <th scope="col">Id</th>
             <th scope="col">Nombre</th>
             <th scope="col">Cantidad</th>
@@ -130,17 +130,17 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-materiasPrimasRetiradas>
-          <tr *ngIf="!materiasPrimasRetiradas.Exits"> <!---->
+          <tr *ngIf="!materiasPrimasRetiradas.Exits" class="TextosInfoTabla"> <!---->
             <td>{{materiasPrimasRetiradas.Id}}</td>
             <td>{{materiasPrimasRetiradas.Nombre}}</td>
             <!--<td>{{materiasPrimasRetiradas.Cantidad}}</td>-->
             <td pEditableColumn>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <p-inputNumber [(ngModel)]="materiasPrimasRetiradas.Cantidad" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="materiasPrimasRetiradas.Cantidad" [maxFractionDigits]="2"></p-inputNumber>
+                  <p-inputNumber [(ngModel)]="materiasPrimasRetiradas.Cantidad_Devuelta" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="materiasPrimasRetiradas.Cantidad_Oculta" [maxFractionDigits]="2"></p-inputNumber>
                 </ng-template>
                 <ng-template pTemplate="output">
-                  {{materiasPrimasRetiradas.Cantidad | number}}
+                  {{materiasPrimasRetiradas.Cantidad_Devuelta | number}}
                 </ng-template>
               </p-cellEditor>
             </td>
