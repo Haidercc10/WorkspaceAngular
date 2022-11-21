@@ -23,6 +23,7 @@ import { modelCliente } from 'src/app/Modelo/modelCliente';
 import { MaterialProductoService } from 'src/app/Servicios/materialProducto.service';
 import { PigmentoProductoService } from 'src/app/Servicios/pigmentoProducto.service';
 import { InventarioZeusService } from 'src/app/Servicios/inventario-zeus.service';
+import moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -889,6 +890,7 @@ export class PedidoExternoComponent implements OnInit {
           PedExt_Descuento: this.FormPedidoExternoClientes.value.PedDescuento,
           PedExt_Iva: this.iva,
           PedExt_PrecioTotalFinal : this.valorfinal,
+          PedExt_HoraCreacion : moment().format('H:mm:ss'),
         }
 
         if(!this.ArrayProducto.length) Swal.fire('Debe cargar al menos un producto en la tabla.');
@@ -1382,7 +1384,9 @@ export class PedidoExternoComponent implements OnInit {
                   Cli_Email: email,
                   TPCli_Id: datos_tipoCliente[index].tpCli_Id,
                   Usua_Id: datos_usuario[index].usua_Id,
-                  Estado_Id : 8
+                  Estado_Id : 8,
+                  Cli_Fecha : moment().format('YYYY-MM-DD'),
+                  Cli_Hora : moment().format('H:mm:ss'),
                 }
                 this.clientesService.srvGuardar(datosClientes).subscribe(datos => { Swal.fire('Cliente guardado con éxito!'); }, error => { console.log(error); });
               }else if (this.ValidarRol == 1){
@@ -1394,7 +1398,9 @@ export class PedidoExternoComponent implements OnInit {
                   Cli_Email: email,
                   TPCli_Id: datos_tipoCliente[index].tpCli_Id,
                   Usua_Id: datos_usuario[index].usua_Id,
-                  Estado_Id : 1
+                  Estado_Id : 1,
+                  Cli_Fecha : moment().format('YYYY-MM-DD'),
+                  Cli_Hora : moment().format('H:mm:ss'),
                 }
                 this.clientesService.srvGuardar(datosClientes).subscribe(datos => { Swal.fire('Cliente guardado con éxito!'); }, error => { console.log(error); });
               }
@@ -1472,7 +1478,9 @@ export class PedidoExternoComponent implements OnInit {
                     Estado_Id: 9,
                     Prod_Largo: largo,
                     Pigmt_Id: datos_pigmentos[pigm].pigmt_Id,
-                    Material_Id: datos_material[mat].material_Id
+                    Material_Id: datos_material[mat].material_Id,
+                    Prod_Fecha : this.today,
+                    Prod_Hora : moment().format('H:mm:ss'),
                   };
                   this.clientesService.srvObtenerListaPorNombreCliente(cliente).subscribe(datos_clientes => {
                     for (let i = 0; i < datos_clientes.length; i++) {

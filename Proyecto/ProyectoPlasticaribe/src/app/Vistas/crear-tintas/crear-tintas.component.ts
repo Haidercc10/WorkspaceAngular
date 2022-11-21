@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
 import { modelTintas } from 'src/app/Modelo/modelTintas';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
 import { TintasService } from 'src/app/Servicios/tintas.service';
@@ -80,6 +81,8 @@ export class CrearTintasComponent implements OnInit {
         CatMP_Id: this.formularioTintas.value.TintaCategoria,
         TpBod_Id: bodegaId,
         Tinta_InvInicial : cantidadTinta,
+        Tinta_FechaIngreso : moment().format('YYYY-MM-DD'),
+        Tinta_Hora : moment().format('H:mm:ss'),
       }
       this.servicioTintas.srvGuardar(datosTintas).subscribe(datosTintas => {
         this.tintaCreada = true;

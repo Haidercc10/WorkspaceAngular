@@ -708,7 +708,7 @@ export class Ingresar_ProductosComponent implements OnInit {
         EntRolloProd_Fecha : this.today,
         EntRolloProd_Observacion : this.FormConsultarRollos.value.Observacion,
         Usua_Id : this.storage_Id,
-        EntRolloProd_Hora : this.hora,
+        EntRolloProd_Hora : moment().format('H:mm:ss'),
       }
       this.entradaRolloService.srvGuardar(info).subscribe(datos_entradaRollo => {
         this.entradaRolloService.srvObtenerUltimoId().subscribe(datos_ultEntrada => {

@@ -7,4 +7,5 @@ export interface modelAsignacionMPxTintas {
   AsigMPxTinta_Observacion : string;
   Usua_Id : number;
   Estado_Id : number;
+  AsigMPxTinta_Hora : string;
 }

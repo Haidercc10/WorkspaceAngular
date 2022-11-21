@@ -96,23 +96,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                       private rolService : RolesService,
                         private frmBuilderMateriaPrima : FormBuilder,
                           @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                            private remisionService : RemisionService,
-                              private remisionMpService : RemisionesMPService,
-                                private facturaCompraService : FactuaMpCompradaService,
-                                  private facturaCompraMPService : FacturaMpService,
-                                    private asignacionService : AsignacionMPService,
-                                      private asignacionMpService : DetallesAsignacionService,
-                                        private asignacionTintasService : DetallesAsignacionTintasService,
-                                          private recuperadoService : RecuperadoService,
-                                            private recuperadoMPService : RecuperadoMPService,
-                                              private inventInicialDiaService : InventInicialDiaService,
-                                                private boppService : EntradaBOPPService,
-                                                  private asignacionBOPPService : AsignacionBOPPService,
-                                                    private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,
-                                                      private devolucionesService : DevolucionesService,
-                                                        private detallesDevolucionesService : DevolucionesMPService,
-                                                          private entradaTintasService : Entrada_TintaService,
-                                                            private detallesEntTintas : Detalles_EntradaTintasService,) {
+                            private boppService : EntradaBOPPService,
+                              private asignacionBOPPService : AsignacionBOPPService,
+                                private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : ['', Validators.required],
@@ -192,7 +178,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            fs.saveAs(blob, `Inventario Materia_Prima - ${this.today}.xlsx`);
+            fs.saveAs(blob, `Inventario Materia Prima - ${this.today}.xlsx`);
           });
           this.load = true;
         }, 1000);

@@ -38,7 +38,7 @@ export class AppComponent implements OnInit{
     this.storage_Nombre = this.storage.get('Nombre');
     let rol = this.storage.get('Rol');
     this.storage_Bd = this.storage.get('BD');
-    this.saveInLocal('Ruta', rol);
+    this.saveInLocal('Ruta', window.location.href);
   }
 
   //Funcio para verificar la inactividad de un usuario, cuando pasa mas de 30 minutos sin actividad se cierra la sesion

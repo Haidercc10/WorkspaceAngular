@@ -222,7 +222,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             for (let i = 0; i < datos_devoluciones.length; i++) {
               this.devolucionesMPService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_devolucionesMP => {
                 for (let j = 0; j < datos_devolucionesMP.length; j++) {
-                  if (datos_devolucionesMP[j].tinta_Id == 2001 && datos_devolucionesMP[j].matPri_Id != 84) devolucionMP += datos_devolucionesMP[j].dtDevMatPri_CantidadDevuelta;
+                  if (datos_devolucionesMP[j].tinta_Id == 2001 && datos_devolucionesMP[j].matPri_Id != 84 && datos_devolucionesMP[j].bopp_Id == 449) devolucionMP += datos_devolucionesMP[j].dtDevMatPri_CantidadDevuelta;
                 }
               });
             }
@@ -383,6 +383,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               AsigMp_Maquina : this.FormMateriaPrimaRetiro.value.Maquina,
               Usua_Id : this.storage_Id,
               Estado_OrdenTrabajo : 14,
+              AsigMp_Hora : moment().format('H:mm:ss'),
             }
             this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => { this.obtenerUltimoIdAsignacaion(); }, error => {
               this.error = true;

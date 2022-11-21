@@ -6,5 +6,7 @@ export interface modelCliente{
     Cli_Email: string;
     TPCli_Id: number;
     Usua_Id: number;
-    Estado_Id : number
+    Estado_Id : number;
+    Cli_Fecha : any;
+    Cli_Hora : string;
 }

@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/AsignacionProductosFactura.service';
@@ -303,12 +304,13 @@ export class RollosAsignadasFacturaComponent implements OnInit {
             NotaCredito_Id : datos_factura[i].notaCredito_Id,
             Usua_Id : datos_factura[i].usua_Id,
             AsigProdFV_Fecha : datos_factura[i].asigProdFV_Fecha,
+            AsigProdFV_FechaHora : datos_factura[i].asigProdFV_FechaHora,
             AsigProdFV_Observacion : datos_factura[i].asigProdFV_Observacion,
             Cli_Id : datos_factura[i].cli_Id,
             Usua_Conductor : conductor,
             AsigProdFV_PlacaCamion : placa.toUpperCase(),
             AsigProdFV_FechaEnvio : this.today,
-            // AsigProdFV_FechaHora : datos_factura[i].asigProdFV_FechaHora,
+            AsigProdFV_HoraEnvio : moment().format('H:mm:ss'),
           }
           this.facturaService.srvActualizarFactura(factura, info).subscribe(datos_facturaActualizada => { this.cambiarEstado(); }, error => {
             const Toast = Swal.mixin({

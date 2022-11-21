@@ -5,6 +5,7 @@ import { TipoIdentificacionService } from 'src/app/Servicios/tipo-identificacion
 import { Tipo_ProveedorService } from 'src/app/Servicios/tipo_Proveedor.service';
 import Swal from 'sweetalert2';
 import { ProveedorService } from 'src/app/Servicios/proveedor.service';
+import moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -101,6 +102,8 @@ export class CrearProveedorComponent implements OnInit {
      Prov_Ciudad : ciudadProveedor,
      Prov_Telefono : telefonoProveedor,
      Prov_Email : emailProveedor,
+     Prov_Fecha : moment().format('YYYY-MM-DD'),
+     Prov_Hora : moment().format('H:mm:ss'),
    }
 
    this.Crearproveerdor.srvGuardar(datosProveedor).subscribe(datos_nuevoProveedor => {

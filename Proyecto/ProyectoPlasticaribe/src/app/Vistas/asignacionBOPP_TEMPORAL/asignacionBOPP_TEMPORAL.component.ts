@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
@@ -343,6 +344,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       AsigBOPP_Observacion : observacion,
       Usua_Id : this.storage_Id,
       Estado_Id : 13,
+      AsigBOPP_Hora : moment().format('H:mm:ss'),
     }
     this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => { this.obtenerIdUltimaAsignacion(); });
   }

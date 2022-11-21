@@ -18,6 +18,7 @@ export class LoginComponentComponent implements OnInit {
 
   public formularioUsuario !: FormGroup;
   public data:any=[];
+  ruta : any;
 
   /* SE INSTANCIA LA VARIABLE "empresas" QUE VA A SER DE TIPO "EmpresaService" Y TAMBIEN SERÁ UN ARRAY
   AQUÍ SE GUARDARÁN LOS NOMBRES DE LAS EMPRESAS QUE HAY EN LA BASE DE DATOS */
@@ -38,9 +39,11 @@ export class LoginComponentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.ruta = this.storage.get('Ruta');
     this.storage.clear();
+    this.saveInLocal('Ruta', this.ruta);
     this.cargaDatosComboBox();
-   }
+  }
 
   saveInLocal(key, val): void {
     this.storage.set(key, val);
@@ -95,7 +98,8 @@ export class LoginComponentComponent implements OnInit {
                 this.saveInLocal('Nombre', nombre);
                 this.saveInLocal('Rol', rol);
                 this.clear();
-                window.location.href = "./home";
+                if (this.ruta == 'http://192.168.0.153:4600/Login' || this.ruta == 'http://192.168.0.153:4600' || this.ruta == 'http://192.168.0.153:4600/') window.location.href = "./home";
+                else window.location.href = this.ruta;
                 break;
               } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena){
                 Swal.fire("EL número de identificacion no coincide con la contraseña");

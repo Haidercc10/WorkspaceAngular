@@ -8,4 +8,6 @@ export interface modelTintas{
   CatMP_Id : number;
   TpBod_Id : number;
   Tinta_InvInicial : number;
+  Tinta_FechaIngreso : any;
+  Tinta_Hora : string;
 }

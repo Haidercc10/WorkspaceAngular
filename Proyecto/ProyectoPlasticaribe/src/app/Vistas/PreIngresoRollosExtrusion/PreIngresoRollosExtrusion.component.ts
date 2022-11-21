@@ -580,7 +580,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         PreEntRollo_Fecha : this.today,
         PreEntRollo_Observacion : this.FormConsultarRollos.value.Observacion,
         Usua_Id : this.storage_Id,
-        // PreEntRollo_Hora : this.hora,
+        PreEntRollo_Hora : moment().format('H:mm:ss'),
       }
       this.preEntRollosService.srvGuardar(info).subscribe(datos_entradaRollo => {
         this.preEntRollosService.srvObtenerUltimoId().subscribe(datos_ultEntrada => {

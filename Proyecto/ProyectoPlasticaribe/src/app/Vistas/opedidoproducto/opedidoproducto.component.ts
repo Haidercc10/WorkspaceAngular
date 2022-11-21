@@ -26,6 +26,7 @@ import { MaterialProductoService } from 'src/app/Servicios/materialProducto.serv
 import { PigmentoProductoService } from 'src/app/Servicios/pigmentoProducto.service';
 import { OrdenesTrabajoComponent } from '../ordenes-trabajo/ordenes-trabajo.component';
 import { Orden_TrabajoService } from 'src/app/Servicios/Orden_Trabajo.service';
+import moment from 'moment';
 //import * as XLSX from 'xlsx';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -1343,7 +1344,8 @@ export class OpedidoproductoComponent implements OnInit {
               Estado_Id: datos_estado[j].estado_Id,
               PedExt_Observacion: this.FormPedidoExternoClientes.get('PedObservacion')?.value,
               PedExt_PrecioTotal: this.valorTotal,
-              PedExt_Archivo: 0
+              PedExt_Archivo: 0,
+              PedExt_HoraCreacion : moment().format('H:mm:ss'),
             }
 
             if(!this.ArrayProducto.length) Swal.fire('Debe cargar al menos un producto en la tabla.');
@@ -1925,7 +1927,9 @@ export class OpedidoproductoComponent implements OnInit {
                   Cli_Email: email,
                   TPCli_Id: datos_tipoCliente[index].tpCli_Id,
                   Usua_Id: datos_usuario[index].usua_Id,
-                  Estado_Id : 8
+                  Estado_Id : 8,
+                  Cli_Fecha : moment().format('YYYY-MM-DD'),
+                  Cli_Hora : moment().format('H:mm:ss'),
                 }
                 this.clientesService.srvGuardar(datosClientes).subscribe(datos => { Swal.fire('Cliente guardado con éxito!'); }, error => { console.log(error); });
               }else if (this.ValidarRol == 1){
@@ -1937,7 +1941,9 @@ export class OpedidoproductoComponent implements OnInit {
                   Cli_Email: email,
                   TPCli_Id: datos_tipoCliente[index].tpCli_Id,
                   Usua_Id: datos_usuario[index].usua_Id,
-                  Estado_Id : 1
+                  Estado_Id : 1,
+                  Cli_Fecha : moment().format('YYYY-MM-DD'),
+                  Cli_Hora : moment().format('H:mm:ss'),
                 }
                 this.clientesService.srvGuardar(datosClientes).subscribe(datos => { Swal.fire('Cliente guardado con éxito!'); }, error => { console.log(error); });
               }
@@ -1967,6 +1973,8 @@ export class OpedidoproductoComponent implements OnInit {
           SedeCliente_Direccion: direccionSede,
           SedeCli_CodPostal: codigoPostal,
           Cli_Id : id,
+          SedeCli_Fecha : this.today,
+          SedeCli_Hora : moment().format('H:mm:ss'),
         }
         this.sedesClientesService.srvGuardar(datosSedes).subscribe(datos_sede => {
           this.clientesComboBox();
@@ -2015,7 +2023,9 @@ export class OpedidoproductoComponent implements OnInit {
                     Estado_Id: 9,
                     Prod_Largo: largo,
                     Pigmt_Id: datos_pigmentos[pigm].pigmt_Id,
-                    Material_Id: datos_material[mat].material_Id
+                    Material_Id: datos_material[mat].material_Id,
+                    Prod_Fecha : this.today,
+                    Prod_Hora : moment().format('H:mm:ss'),
                   };
                   this.clientesService.srvObtenerListaPorNombreCliente(cliente).subscribe(datos_clientes => {
                     for (let i = 0; i < datos_clientes.length; i++) {

@@ -1,5 +1,6 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { AreaService } from 'src/app/Servicios/area.service';
 import { AsignacionMPService } from 'src/app/Servicios/asignacionMP.service';
@@ -144,6 +145,8 @@ export class CrearMateriaprimaComponent implements OnInit {
       CatMP_Id : categoriaMateriaPrima,
       MatPri_Precio : precioMateriaPrima,
       TpBod_Id : 4,
+      MatPri_Fecha : moment().format('YYYY-MM-DD'),
+      MatPri_Hora : moment().format('H:mm:ss'),
     }
 
     this.materiaPrimaService.srvGuardar(datosMP).subscribe(datos_mp_creada => {

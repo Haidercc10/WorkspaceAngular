@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
 import { BoppGenericoService } from 'src/app/Servicios/BoppGenerico.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
 import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
@@ -55,6 +56,8 @@ export class CrearBoppComponent implements OnInit {
         BoppGen_Nombre : this.FormBopp.value.Nombre,
         BoppGen_Ancho : this.FormBopp.value.Ancho,
         BoppGen_Micra : this.FormBopp.value.Micras,
+        BoppGen_FechaIngreso : moment().format('YYYY-MM-DD'),
+        BoppGen_Hora : moment().format('H:mm:ss'),
       }
       this.boppGenericoService.srvGuardar(info).subscribe(datos_bopp => {
         this.tintaCreada = true;

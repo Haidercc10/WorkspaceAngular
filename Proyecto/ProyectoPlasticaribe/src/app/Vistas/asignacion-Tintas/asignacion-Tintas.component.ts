@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { modelAsignacionMPxTintas } from 'src/app/Modelo/modelAsignacionMPxTintas';
 import { modelDetallesAsignacionMPxTintas } from 'src/app/Modelo/modelDetallesAsignacionMPxTintas';
@@ -366,7 +367,8 @@ export class AsignacionTintasComponent implements OnInit {
         AsigMPxTinta_FechaEntrega: fecha,
         AsigMPxTinta_Observacion: Observacion,
         Usua_Id: usuario,
-        Estado_Id: 13
+        Estado_Id: 13,
+        AsigMPxTinta_Hora : moment().format('H:mm:ss'),
       }
       this.arrayTintaAsignada.push(datos_asignacionMP)
 

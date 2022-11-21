@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
 import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
@@ -226,6 +227,7 @@ export class EntradaBOPPComponent implements OnInit {
           undMed_Kg : 'Kg',
           bopP_CantidadInicialKg : this.ArrayBOPP[i].CantKg,
           Usua_Id : this.storage_Id,
+          BOPP_Hora : moment().format('H:mm:ss'),
         }
 
         this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(datos_BOPP => {

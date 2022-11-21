@@ -30,6 +30,7 @@ import { EmpresaService } from 'src/app/Servicios/empresa.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { table } from 'console';
 import { faListSquares } from '@fortawesome/free-solid-svg-icons';
+import moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -1385,6 +1386,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             Ot_Corte : cyrelOT,
             Mezcla_Id : mezclaId,
             UndMed_Id : presentacion,
+            Ot_Hora : moment().format('H:mm:ss'),
           }
           this.ordenTrabajoService.srvGuardar(infoOT).subscribe(datos_ot => {
             //Inicio informacion OT_Extrusion

@@ -657,12 +657,13 @@ export class AsignarProductosFacturasComponent implements OnInit {
         NotaCredito_Id : notaCredito,
         Usua_Id : this.storage_Id,
         AsigProdFV_Fecha : this.today,
+        AsigProdFV_Hora : moment().format("H:mm:ss"),
         AsigProdFV_Observacion : observacion,
         Cli_Id : this.idCliente,
         Usua_Conductor : 88,
         AsigProdFV_PlacaCamion : '',
         AsigProdFV_FechaEnvio : this.today,
-        AsigProdFV_Hora : moment().format("H:mm:ss"),
+        AsigProdFV_HoraEnvio : moment().format('H:mm:ss'),
       }
       this.asgProdFactura.srvGuardar(info).subscribe(datos_asignacion => {
         this.asgProdFactura.srvObtenerUltimoId().subscribe(datos_ultimaAsg => { this.crearDetallesAsignacion(datos_ultimaAsg.asigProdFV_Id) });
@@ -723,14 +724,13 @@ export class AsignarProductosFacturasComponent implements OnInit {
 
   // Funcion que va a cambiar el estado de los rollos que estan siendo asignados a una factura
   cambiarEstado(){
+    let estado : number = 20;
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       this.dtEntradaRollo.srvObtenerVerificarRollo(this.rollosInsertar[i].Id).subscribe(datos_rollos => {
         for (let j = 0; j < datos_rollos.length; j++) {
           if(this.rollosInsertar[i].Presentacion == 'Paquete') {
-            let estado : number;
             let paquetesRestantes : number = datos_rollos[j].prod_CantPaquetesRestantes - this.rollosInsertar[i].CantPaqRestantes;
             if (paquetesRestantes > 0) estado = 19;
-            else if (paquetesRestantes == 0) estado = 20;
             let info : any = {
               DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
               EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
@@ -750,7 +750,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
             }
             this.dtEntradaRollo.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => { });
           } else {
-            let estado : number = 20;
+            estado = 20;
             if (this.rollosInsertar[i].CantUndRestantes < datos_rollos[j].prod_CantPaquetesRestantes) estado = 19;
             let info : any = {
               DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
