@@ -86,9 +86,10 @@ export class DevolucionesMPComponent implements OnInit {
     });
   }
 
-  // Funcion que va a consultar todas las materia primas asignadas a una orden de trabajo
+  // Funcion que va a consultar por OT todas las materia primas asignadas a una orden de trabajo
   consultarOt(){
     this.load = false;
+    this.materiasPrimas = [];
     let ot : number = this.FormDevolucion.value.ot;
     this.detallesAsignacionService.srvObtenerListaPorAsignacionesOT(ot).subscribe(datos_asignacionMP => {
       if (datos_asignacionMP.length != 0){
@@ -100,12 +101,32 @@ export class DevolucionesMPComponent implements OnInit {
             Id_Bopp : datos_asignacionMP[i].bopp_Id,
             Nombre : datos_asignacionMP[i].nombreMP,
             Cantidad : datos_asignacionMP[i].cantMP,
+            Cantidad_Oculta : datos_asignacionMP[i].cantMP,
             Cantidad_Devuelta : 0,
             Unidad_Medida : datos_asignacionMP[i].undMedida,
             Proceso : datos_asignacionMP[i].proceso,
             Proceso_Nombre : datos_asignacionMP[i].nombreProceso,
           }
+
+          if (info.Id != 84 && info.Id < 100) {
+            info.Id_MateriaPrima = info.Id;
+            info.Id_Tinta = 2001;
+            info.Id_Bopp = 449;
+          } else if (info.Id > 2001) {
+            info.Id_Tinta = info.Id;
+            info.Id_MateriaPrima = 84;
+            info.Id_Bopp = 449;
+          } else if (info.Id != 449 && info.Id > 100) {
+            info.Id_Bopp = info.Id;
+            info.Id_MateriaPrima = 84;
+            info.Id_Tinta = 2001;
+          }
+          console.log(info);
           this.materiasPrimas.push(info);
+
+          for (let index = 0; index < this.materiasPrimas.length; index++) {
+            this.materiasPrimas[index].Cantidad_Devuelta = this.materiasPrimas[index].Cantidad_Oculta;
+          }
         }
       }
     }, error => {
@@ -169,6 +190,7 @@ export class DevolucionesMPComponent implements OnInit {
         DevMatPri_Motivo : this.FormDevolucion.value.MpObservacion,
         Usua_Id : this.storage_Id,
       }
+
       this.devolucionService.srvGuardar(datosDevolucion).subscribe(datos_DevolucionCreada => { this.creacionDevolucionMateriaPrima(); }, error => {
         Swal.fire({
           icon: 'error',
@@ -208,9 +230,11 @@ export class DevolucionesMPComponent implements OnInit {
     setTimeout(() => {
       this.moverInventarioMpAgregada();
       this.moverInventarioTintas();
-      this.moverInventaioBopp();
-      setTimeout(() => { this.limpiarTodosCampos(); }, (1000));
-    }, (10 * this.materiasPrimasRetiradas.length));
+      this.moverInventarioBopp();
+      setTimeout(() => {
+        this.limpiarTodosCampos();
+      }, (1000));
+    }, (20 * this.materiasPrimasRetiradas.length));
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima devuelta
@@ -248,7 +272,7 @@ export class DevolucionesMPComponent implements OnInit {
               `<b>¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!</b><hr> ` +
               `<spam style="color : #f00;">${error.message}</spam> `,
             });
-            this.load = false;
+            this.load = true;
           });
         });
       }
@@ -262,7 +286,7 @@ export class DevolucionesMPComponent implements OnInit {
       if (this.materiasPrimasRetiradas[index].Id_Tinta != 2001) {
         this.servicioTintas.srvObtenerListaPorId(this.materiasPrimasRetiradas[index].Id_Tinta).subscribe(datos_tinta => {
 
-          if(this.materiasPrimasRetiradas[index].Id_Tinta == 84) stockMateriaPrimaFinal = 0
+          if(this.materiasPrimasRetiradas[index].Id_Tinta == 2001) stockMateriaPrimaFinal = 0
           else stockMateriaPrimaFinal = datos_tinta.tinta_Stock + this.materiasPrimasRetiradas[index].Cantidad_Devuelta;
 
           const datosTintaActualizada : any = {
@@ -292,7 +316,7 @@ export class DevolucionesMPComponent implements OnInit {
               `<b>¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!</b><hr> ` +
               `<spam style="color : #f00;">${error.message}</spam> `,
             });
-            this.load = false;
+            this.load = true;
           });
         });
       }
@@ -300,16 +324,15 @@ export class DevolucionesMPComponent implements OnInit {
   }
 
   // Funcion que va a mover el inventario de bopp con base a la materia prima devuelta
-  moverInventaioBopp(){
+  moverInventarioBopp(){
     let stockMateriaPrimaFinal : number;
     for (let i = 0; i < this.materiasPrimasRetiradas.length; i++) {
-      if (this.materiasPrimasRetiradas[i].Id_Bopp != 0) {
+      if (this.materiasPrimasRetiradas[i].Id_Bopp != 449) {
         this.boppService.srvObtenerListaPorId(this.materiasPrimasRetiradas[i].Id_Bopp).subscribe(datos_bopp => {
           let bopp : any = [];
           bopp.push(datos_bopp);
           for (const item of bopp) {
-
-            if(this.materiasPrimasRetiradas[i].Id_Bopp == 0) stockMateriaPrimaFinal = 0
+            if(this.materiasPrimasRetiradas[i].Id_Bopp == 449) stockMateriaPrimaFinal = 0
             else stockMateriaPrimaFinal = item.bopP_Stock + this.materiasPrimasRetiradas[i].Cantidad_Devuelta;
 
             let datosBOPP : any = {
@@ -327,6 +350,7 @@ export class DevolucionesMPComponent implements OnInit {
               bopP_Stock : stockMateriaPrimaFinal,
               UndMed_Kg : item.undMed_Kg,
               bopP_CantidadInicialKg : item.bopP_CantidadInicialKg,
+              Usua_Id : item.usua_Id
             }
             this.boppService.srvActualizar(this.materiasPrimasRetiradas[i].Id_Bopp, datosBOPP).subscribe(datos_boppActualizado => {
               Swal.fire({
@@ -343,7 +367,7 @@ export class DevolucionesMPComponent implements OnInit {
                 `<b>¡No se ha podido mover el inventario del bopp ${this.materiasPrimasRetiradas[i].Nombre}!</b><hr> ` +
                 `<spam style="color : #f00;">${error.message}</spam> `,
               });
-              this.load = false;
+              this.load = true;
             });
           }
         });
@@ -353,7 +377,7 @@ export class DevolucionesMPComponent implements OnInit {
 
   // Funcion que va a limpiar todos los campos
   limpiarTodosCampos(){
-    this.load = false;
+    this.load = true;
     this.FormDevolucion.setValue({
       ot : '',
       MpingresoFecha: this.today,
