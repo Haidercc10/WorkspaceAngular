@@ -147,6 +147,13 @@ export class AsignacionTintasComponent implements OnInit {
     });
   }
 
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => {
+    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
+    const rep = '$1,';
+    return number.toString().replace(exp,rep);
+  }
+
   // Funcion limpiará todos los campos de vista
   limpiarTodosLosCampos(){
     this.FormAsignacionMP = this.frmBuilder.group({
@@ -348,6 +355,28 @@ export class AsignacionTintasComponent implements OnInit {
     } else Swal.fire("La cantidad a asignar no debe superar lo que hay en stock ");
   }
 
+  // Funcion que validará la asignación
+  validarAsignacion(){
+    if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
+      this.tintasService.srvObtenerListaPorId(this.FormAsignacionMP.value.Tinta.id).subscribe(datos_tinta => {
+        Swal.fire({
+          icon: 'warning',
+          title: '¡Confirmación!',
+          html:
+          `<b>¡Creación de ${this.formatonumeros(this.FormAsignacionMP.value.cantidadTinta)} Kg de la Tinta ${datos_tinta.tinta_Nombre}!</b><hr>`,
+          showCloseButton: true,
+          showConfirmButton: true,
+          showCancelButton : true,
+          confirmButtonColor : '#d44',
+          cancelButtonText : `Cerrar`,
+          confirmButtonText : 'Crear Tinta <i class="pi pi-arrow-right"></i>',
+        }).then((result) => {
+          if (result.isConfirmed) this.asignarMPCrearTintas();
+        });
+      });
+    } else Swal.fire("¡Hay campos vacios!");
+  }
+
   //Funcion que almacenará en la base de datos la informacion general sobre la asignacion de materia prima
   asignarMPCrearTintas(){
     if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
@@ -479,25 +508,24 @@ export class AsignacionTintasComponent implements OnInit {
     let stockMateriaPrimaFinal : number;
 
     for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
-       this.tintasService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Tinta).subscribe(datos_tinta => {
-
+      this.tintasService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Tinta).subscribe(datos_tinta => {
         if (this.ArrayMateriaPrima[index].Tinta == 2001) stockMateriaPrimaFinal = 0
-        else stockMateriaPrimaFinal = datos_tinta.tinta_Stock - this.ArrayMateriaPrima[index].Cant;
-         const datosTintaActualizada : any = {
+        const datosTintaActualizada : any = {
           Tinta_Id : this.ArrayMateriaPrima[index].Tinta,
           Tinta_Nombre : datos_tinta.tinta_Nombre,
           Tinta_Descripcion : datos_tinta.tinta_Descripcion,
-          Tinta_Stock : stockMateriaPrimaFinal,
+          Tinta_Stock : datos_tinta.tinta_Stock - this.ArrayMateriaPrima[index].Cant,
           Tinta_CodigoHexadecimal : datos_tinta.tinta_CodigoHexadecimal,
           UndMed_Id : datos_tinta.undMed_Id,
           CatMP_Id : datos_tinta.catMP_Id,
           Tinta_Precio : datos_tinta.tinta_Precio,
           TpBod_Id : datos_tinta.tpBod_Id,
           tinta_InvInicial : datos_tinta.tinta_InvInicial,
+          Tinta_Fecha : datos_tinta.tinta_FechaIngreso,
+          Tinta_Hora : datos_tinta.tinta_Hora,
         }
 
-        this.tintasService.srvActualizar(this.ArrayMateriaPrima[index].Tinta, datosTintaActualizada).subscribe(datos_mp_creada => {
-        }, error => {
+        this.tintasService.srvActualizar(this.ArrayMateriaPrima[index].Tinta, datosTintaActualizada).subscribe(datos_mp_creada => { }, error => {
           const Toast = Swal.mixin({
           toast: true,
           position: 'center',
@@ -513,8 +541,7 @@ export class AsignacionTintasComponent implements OnInit {
           icon: 'error',
           title: '¡No restó al inventario de tintas!'
         });
-      });
-      //Buscar Tinta
+        });
       }, error => { const Toast = Swal.mixin({
         toast: true,
         position: 'center',
@@ -530,32 +557,27 @@ export class AsignacionTintasComponent implements OnInit {
         icon: 'error',
         title: '¡Tinta no encontrada!'
       });
-    });
+      });
     }
   }
 
   /** Función que sumará cantidad en inventario a la tinta a la que se le asigne Mat. Prima. */
   sumarInventarioTintas() {
-
-    let stockMateriaPrimaInicial : number;
-    let stockMateriaPrimaFinal : number;
-
     for (let index = 0; index < this.arrayTintaAsignada.length; index++) {
       this.tintasService.srvObtenerListaPorId(this.arrayTintaAsignada[index].Tinta_Id).subscribe(datos_tinta => {
-
-        stockMateriaPrimaInicial = datos_tinta.tinta_Stock;
-        stockMateriaPrimaFinal = stockMateriaPrimaInicial + this.arrayTintaAsignada[index].AsigMPxTinta_Cantidad;
-
         const datosTintaCreada : any = {
           Tinta_Id : this.arrayTintaAsignada[index].Tinta_Id,
           Tinta_Nombre : datos_tinta.tinta_Nombre,
           Tinta_Descripcion : datos_tinta.tinta_Descripcion,
-          Tinta_Stock : stockMateriaPrimaFinal,
+          Tinta_Stock : datos_tinta.tinta_Stock + this.FormAsignacionMP.value.cantidadTinta,
           Tinta_CodigoHexadecimal : datos_tinta.tinta_CodigoHexadecimal,
           UndMed_Id : datos_tinta.undMed_Id,
           CatMP_Id : datos_tinta.catMP_Id,
           Tinta_Precio : datos_tinta.tinta_Precio,
           TpBod_Id : datos_tinta.tpBod_Id,
+          tinta_InvInicial : datos_tinta.tinta_InvInicial,
+          Tinta_FechaIngreso : datos_tinta.tinta_FechaIngreso,
+          Tinta_Hora : datos_tinta.tinta_Hora,
         }
         this.tintasService.srvActualizar(this.arrayTintaAsignada[index].Tinta_Id, datosTintaCreada).subscribe(datos_mp_creada => {
           const Toast = Swal.mixin({
@@ -599,8 +621,8 @@ export class AsignacionTintasComponent implements OnInit {
             title: '¡No Sumó el inventario de tintas!'
           });
         });
-
       });
+      break;
     }
     this.load = true;
   }

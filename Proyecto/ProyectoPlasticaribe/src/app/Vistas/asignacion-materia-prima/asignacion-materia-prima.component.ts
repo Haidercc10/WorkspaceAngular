@@ -545,20 +545,20 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   //Funcion que va a mover el inventario de una tinta
   moverInventarioTintas(idMateriaPrima : number, cantidad : number){
     if(!this.error) {
-      let stockTintaFinal : number;
       this.tintasService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_tintas => {
-        stockTintaFinal = datos_tintas.tinta_Stock - cantidad;
         const datosTintas : any = {
           Tinta_Id: idMateriaPrima,
           Tinta_Nombre : datos_tintas.tinta_Nombre,
           Tinta_Descripcion : datos_tintas.tinta_Descripcion,
           Tinta_CodigoHexadecimal : datos_tintas.tinta_CodigoHexadecimal,
-          Tinta_Stock : stockTintaFinal,
+          Tinta_Stock : datos_tintas.tinta_Stock - cantidad,
           UndMed_Id : datos_tintas.undMed_Id,
           Tinta_Precio : datos_tintas.tinta_Precio,
           CatMP_Id : datos_tintas.catMP_Id,
           TpBod_Id : datos_tintas.tpBod_Id,
-          Tinta_InvInicial : datos_tintas.tinta_InvInicial
+          Tinta_InvInicial : datos_tintas.tinta_InvInicial,
+          Tinta_Fecha : datos_tintas.tinta_FechaIngreso,
+          Tinta_Hora : datos_tintas.tinta_Hora,
         }
         this.tintasService.srvActualizar(idMateriaPrima, datosTintas).subscribe(datos_tintasActualizada => { }, error => {
           this.error = true;

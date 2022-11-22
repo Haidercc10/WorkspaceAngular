@@ -639,7 +639,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+                datos_ot[i].estProcOT_CantProdFacturada,
+                datos_ot[i].estProcOT_CantProdIngresada,
+                datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             } else Swal.fire('No se encontró la OT consultada.');
           }
         }
@@ -672,7 +677,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                               datos_ot[i].usua_Id,
                               datos_ot[i].usua_Nombre,
                               datos_ot[i].estProcOT_SelladoUnd,
-                              datos_ot[i].estProcOT_WiketiadoUnd);
+                              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
           }
         }
@@ -707,7 +717,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                     datos_ot[i].usua_Id,
                     datos_ot[i].usua_Nombre,
                     datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd);
+                    datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
                 }
               }
             });
@@ -741,7 +756,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -772,7 +792,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -806,7 +831,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                     datos_ot[i].usua_Id,
                     datos_ot[i].usua_Nombre,
                     datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd);
+                    datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
                 }
               }
             });
@@ -843,7 +873,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   datos_ot[i].usua_Id,
                   datos_ot[i].usua_Nombre,
                   datos_ot[i].estProcOT_SelladoUnd,
-                  datos_ot[i].estProcOT_WiketiadoUnd);
+                  datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
               }
             });
           }
@@ -879,7 +914,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                       datos_ot[i].usua_Id,
                       datos_ot[i].usua_Nombre,
                       datos_ot[i].estProcOT_SelladoUnd,
-                      datos_ot[i].estProcOT_WiketiadoUnd);
+                      datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
                   }
                 }
               });
@@ -915,7 +955,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
           }
         }
@@ -947,7 +992,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -978,7 +1028,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -1009,7 +1064,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
         }
       });
@@ -1043,7 +1103,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                     datos_ot[i].usua_Id,
                     datos_ot[i].usua_Nombre,
                     datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd);
+                    datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
                 }
               }
             });
@@ -1082,7 +1147,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                       datos_ot[i].usua_Id,
                       datos_ot[i].usua_Nombre,
                       datos_ot[i].estProcOT_SelladoUnd,
-                      datos_ot[i].estProcOT_WiketiadoUnd);
+                      datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
                 }
               });
             }
@@ -1119,7 +1189,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                     datos_ot[i].usua_Id,
                     datos_ot[i].usua_Nombre,
                     datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd);
+                    datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
                 }
               }
             });
@@ -1153,7 +1228,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -1185,7 +1265,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
           }
         }
@@ -1219,7 +1304,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                     datos_ot[i].usua_Id,
                     datos_ot[i].usua_Nombre,
                     datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd);
+                    datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
                 }
             });
           }
@@ -1253,7 +1343,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
           }
         }
@@ -1286,7 +1381,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -1317,7 +1417,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -1348,7 +1453,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -1379,7 +1489,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -1411,7 +1526,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
           }
         }
@@ -1444,7 +1564,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
           }
         }
@@ -1478,7 +1603,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   datos_ot[i].usua_Id,
                   datos_ot[i].usua_Nombre,
                   datos_ot[i].estProcOT_SelladoUnd,
-                  datos_ot[i].estProcOT_WiketiadoUnd);
+                  datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
               }
             });
           }
@@ -1512,7 +1642,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
           }
         }
@@ -1544,7 +1679,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -1575,7 +1715,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -1606,7 +1751,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -1640,7 +1790,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                     datos_ot[i].usua_Id,
                     datos_ot[i].usua_Nombre,
                     datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd);
+                    datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
                 }
               }
             });
@@ -1677,7 +1832,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
 
           }
@@ -1710,7 +1870,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         });
       }
@@ -1745,7 +1910,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                     datos_ot[i].usua_Id,
                     datos_ot[i].usua_Nombre,
                     datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd);
+                    datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
 
                 }
               });
@@ -1781,7 +1951,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
           }
         }
@@ -1814,7 +1989,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
           }
         }
@@ -1847,7 +2027,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+                datos_ot[i].estProcOT_CantProdFacturada,
+                datos_ot[i].estProcOT_CantProdIngresada,
+                datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
           }
         }
@@ -1879,7 +2064,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -1912,7 +2102,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                 datos_ot[i].usua_Id,
                 datos_ot[i].usua_Nombre,
                 datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd);
+                datos_ot[i].estProcOT_WiketiadoUnd,
+                datos_ot[i].estProcOT_CantProdFacturada,
+                datos_ot[i].estProcOT_CantProdIngresada,
+                datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
             }
           };
         });
@@ -1944,7 +2139,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -1977,7 +2177,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                   datos_ot[i].usua_Id,
                   datos_ot[i].usua_Nombre,
                   datos_ot[i].estProcOT_SelladoUnd,
-                  datos_ot[i].estProcOT_WiketiadoUnd);
+                  datos_ot[i].estProcOT_WiketiadoUnd,
+                  datos_ot[i].estProcOT_CantProdFacturada,
+                  datos_ot[i].estProcOT_CantProdIngresada,
+                  datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
               }
             });
           }
@@ -2010,7 +2215,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -2041,7 +2251,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -2072,7 +2287,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -2103,7 +2323,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               datos_ot[i].usua_Id,
               datos_ot[i].usua_Nombre,
               datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd);
+              datos_ot[i].estProcOT_WiketiadoUnd,
+              datos_ot[i].estProcOT_CantProdFacturada,
+              datos_ot[i].estProcOT_CantProdIngresada,
+              datos_ot[i].estProcOT_CantMatPrimaAsignada,
+              datos_ot[i].estProcOT_Cliente,
+datos_ot[i].prod_Nombre,);
           }
         }
       });
@@ -2135,7 +2360,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                                                     usu : any,
                                                       nombreUsu : any,
                                                         selUnd : any,
-                                                          wikUnd : any){
+                                                          wikUnd : any,
+                                                            cantFacturada : any,
+                                                              cantIngresada : any,
+                                                                cantAsignada : any,
+                                                                  cliente : any,
+                                                                    producto : any){
     usu = `${usu}`
     if (usu.length == 2) usu = `0${usu}`;
     else if (usu.length == 1) usu = `00${usu}`;
@@ -2148,7 +2378,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
     let info : any = {
       ot : ot,
-      Mp : 0,
+      Mp : cantAsignada,
       ext : ext,
       imp : imp,
       rot : rot,
@@ -2166,15 +2396,15 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       obs : observacion,
       est : estado,
       fecha : fecha.replace("T00:00:00", ""),
-      entrada : 0,
-      salida : 0,
+      entrada : this.formatonumeros(cantIngresada),
+      salida : this.formatonumeros(cantFacturada),
       fechaInicio : fechaInicio,
       fechaFinal : fechaFinal,
       und : und,
       usu : usu,
       nombreUsu : nombreUsu,
-      cli : '',
-      prod : '',
+      cli : cliente,
+      prod : producto,
     }
     this.columnas = [
       { header: 'Presentación', field: 'und'},
@@ -2194,42 +2424,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.ArrayDocumento.sort((a,b) => Number(a.ot) - Number(b.ot));
     // this._columnasSeleccionada = this.columnas;
     this.load = true;
-    setTimeout(() => {
-      this.dtEntradasRollosService.srvConsultarOTEntradas(ot).subscribe(datos_entradas => {
-        for (let j = 0; j < datos_entradas.length; j++) {
-          for (let i = 0; i < this.ArrayDocumento.length; i++) {
-            if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].entrada = this.formatonumeros(datos_entradas[j].sum);
-          }
-        }
-      });
-      this.dtEntradasRollosService.srvConsultarOtSalidas(ot).subscribe(datos_salidas => {
-        for (let k = 0; k < datos_salidas.length; k++) {
-          for (let i = 0; i < this.ArrayDocumento.length; i++) {
-            if (this.ArrayDocumento[i].ot == ot && und != 'Paquete') this.ArrayDocumento[i].salida = this.formatonumeros(datos_salidas[k].sumTotal);
-            else if (this.ArrayDocumento[i].ot == ot && und == 'Paquete') this.ArrayDocumento[i].salida = this.formatonumeros(datos_salidas[k].sumPqt);
-          }
-        }
-      });
-      this.detallesAsignacionService.srvObtenerListaPorAsignacionesOT(ot).subscribe(datos_asignacionMP => {
-        if (datos_asignacionMP.length != 0){
-          for (let j = 0; j < datos_asignacionMP.length; j++) {
-            for (let i = 0; i < this.ArrayDocumento.length; i++) {
-              if (this.ArrayDocumento[i].ot == ot) this.ArrayDocumento[i].Mp += datos_asignacionMP[j].cantMP;
-            }
-          }
-        }
-      });
-      this.servicioBagPro.srvObtenerListaClienteOT_Item(ot).subscribe(datos_ot => {
-        for (let i = 0; i < datos_ot.length; i++) {
-          for (let j = 0; j < this.ArrayDocumento.length; j++) {
-            if (ot == this.ArrayDocumento[j].ot) {
-              this.ArrayDocumento[j].cli = datos_ot[i].clienteNom;
-              this.ArrayDocumento[j].prod = datos_ot[i].clienteItemsNom;
-            }
-          }
-        }
-      });
-    }, 1200);
 
     if (estado == 'Abierta') this.catidadOTAbiertas += 1;
     if (estado == 'Asignada') this.cantidadOTAsignadas += 1;
@@ -2642,6 +2836,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           EstProcOT_SelladoUnd : datos_ot[i].estProcOT_SelladoUnd,
           EstProcOT_WiketiadoKg : datos_ot[i].estProcOT_WiketiadoKg,
           EstProcOT_WiketiadoUnd : datos_ot[i].estProcOT_WiketiadoUnd,
+          EstProcOT_CantProdFacturada : datos_ot[i].estProcOT_CantProdFacturada,
+          EstProcOT_CantProdIngresada : datos_ot[i].estProcOT_CantProdIngresada,
+          EstProcOT_CantMatPrimaAsignada : datos_ot[i].estProcOT_CantMatPrimaAsignada,
           EstProcOT_CantidadPedida : datos_ot[i].estProcOT_CantidadPedida,
           undMed_Id : datos_ot[i].undMed_Id,
           Estado_Id : datos_ot[i].estado_Id,
@@ -2759,6 +2956,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           EstProcOT_SelladoUnd : datos_ot[i].estProcOT_SelladoUnd,
           EstProcOT_WiketiadoKg : datos_ot[i].estProcOT_WiketiadoKg,
           EstProcOT_WiketiadoUnd : datos_ot[i].estProcOT_WiketiadoUnd,
+          EstProcOT_CantProdFacturada : datos_ot[i].estProcOT_CantProdFacturada,
+          EstProcOT_CantProdIngresada : datos_ot[i].estProcOT_CantProdIngresada,
+          EstProcOT_CantMatPrimaAsignada : datos_ot[i].estProcOT_CantMatPrimaAsignada,
           EstProcOT_CantidadPedida : datos_ot[i].estProcOT_CantidadPedida,
           UndMed_Id : datos_ot[i].undMed_Id,
           Estado_Id : estado,
