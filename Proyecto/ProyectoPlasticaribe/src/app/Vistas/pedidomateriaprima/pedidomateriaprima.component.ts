@@ -41,7 +41,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   titulosTabla = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
   ArrayMateriaPrima : any [] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
   valorTotal : number = 0; //Variable que guardará el valor total de la factura de entrada de materia prima
-  proveedor = [];
+  proveedor = []; //Variable que almacenará los diferentes proveedores de materia prima
   ultimoIdFactura : number = 0;
   ultimoIdRemision : number = 0;
   ArrayRemisiones = [];
@@ -53,7 +53,6 @@ export class PedidomateriaprimaComponent implements OnInit {
   remision : any = [];
   remConFac : any = [];
 
-  NombreMatPrima : string = 'Materia Prima';
   public load: boolean;
   public arrayOrdenCompra : any [] = [];
   public arrayMatPrimaFactura : any [] = [];
@@ -271,12 +270,12 @@ export class PedidomateriaprimaComponent implements OnInit {
           }, 500);
         });
       });
-    setTimeout(() => {
-      this.load = true;
-      this.cambiarNombreProveedor();
-    }, 1000);
+      setTimeout(() => {
+        this.load = true;
+        this.cambiarNombreProveedor();
+      }, 1000);
+    }
   }
-}
 
   //Funcion que va a seleccionar una materia prima
   llenarMateriaPrimaAIngresar(item : any){
@@ -395,7 +394,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   //Funcion que creará el registro de la materia que viene en un pedido
   creacionFacturaMateriaPrima(idFactura : any){
     let errorConsulta : boolean;
-    if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla")
+    if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla");
     else {
       for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
         const datosFacturaMp : any = {
@@ -424,8 +423,11 @@ export class PedidomateriaprimaComponent implements OnInit {
       if (!errorConsulta) {
         this.relacionOrdenFactura(idFactura);
         this.cargarRemisionEnFactura(idFactura);
-        this.moverInventarioMP();
-        this.moverInventarioTintas();
+        setTimeout(() => {
+          this.estadoOrdenCompra();
+          this.moverInventarioMP();
+          this.moverInventarioTintas();
+        }, 2000);
       }
     }, 3500);
   }
@@ -446,6 +448,49 @@ export class PedidomateriaprimaComponent implements OnInit {
       });
       this.load = false;
     });
+  }
+
+  // Funcion que le a cambiar el estado a la orden de compra
+  estadoOrdenCompra(){
+    let Orden_Compra : any = this.FormMateriaPrimaFactura.value.OrdenCompra;
+    let cantidadIngresada : number = 0;
+    let estado : number;
+
+    if (Orden_Compra != null) {
+      this.servicioOCMatPrima.getFacturasComprasAsociadasAOC(Orden_Compra).subscribe(dataFact => {
+        for (let index = 0; index < dataFact.length; index++) {
+          cantidadIngresada += dataFact[index].suma;
+        }
+
+        this.servicioOCMatPrima.getId_OrdenCompra(Orden_Compra).subscribe(datos_orden => {
+          if (datos_orden.oc_PesoTotal <= cantidadIngresada) estado = 5;
+          else if (datos_orden.oc_PesoTotal > cantidadIngresada && cantidadIngresada != 0) estado = 12;
+          else if (datos_orden.oc_PesoTotal > cantidadIngresada && cantidadIngresada == 0) estado = 11;
+          let info : any = {
+            Oc_Id : datos_orden.oc_Id,
+            Usua_Id : datos_orden.usua_Id,
+            Oc_Fecha : datos_orden.oc_Fecha,
+            Oc_Hora : datos_orden.oc_Hora,
+            Prov_Id : datos_orden.prov_Id,
+            Estado_Id : estado,
+            Oc_ValorTotal : datos_orden.oc_ValorTotal,
+            Oc_PesoTotal : datos_orden.oc_PesoTotal,
+            TpDoc_Id : datos_orden.tpDoc_Id,
+            Oc_Observacion : datos_orden.oc_Observacion,
+          }
+          this.servicioOCMatPrima.putId_OrdenCompra(Orden_Compra, info).subscribe(datos_ordenActualizada => { }, error => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              html:
+              '<b>¡Error al cambiar el estado de la orden de compra!</b><hr> ' +
+              `<spam style="color : #f00;">${error.message}</spam> `,
+            });
+            this.load = false;
+          });
+        });
+      });
+    }
   }
 
   // Funcion que se encargará de la relacion entre la(s) remision(es) o factura(s)

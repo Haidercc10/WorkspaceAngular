@@ -124,6 +124,7 @@ import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extru
 import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
 import {AccordionModule} from 'primeng/accordion';
 import { RoleGuardServiceGuard } from './Guards/role-guard-service.guard';
+import { Reporte_OrdenCompraComponent } from './Vistas/Reporte_OrdenCompra/reporte_OrdenCompra/reporte_OrdenCompra.component';
 
 
 
@@ -166,6 +167,7 @@ export const routes: Routes = [
   {path: 'reporte-Materia-Prima-OT', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReporteMpOtComponent},
   {path: 'reporte-facturas-remisiones-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ConsultaFac_Rem_MPComponent},
   {path: 'reporte-recuperado-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
+  {path: 'reporte-orden-compra', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: Reporte_OrdenCompraComponent},
 
   /************************************************************************ DESPACHO ************************************************************************/
   // Pre ingresos
@@ -313,6 +315,7 @@ export const routes: Routes = [
     EliminarRollos_ExtrusionComponent,
     Reporte_RollosDesechosComponent,
     CrearBoppComponent,
+    Reporte_OrdenCompraComponent,
   ],
 
 

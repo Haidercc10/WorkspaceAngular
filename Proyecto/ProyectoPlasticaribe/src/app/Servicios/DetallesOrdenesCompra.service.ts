@@ -30,6 +30,26 @@ export class DetallesOrdenesCompraService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_OrdenCompra/GetUltimaOrdenCompra`);
   }
 
+  // Funcion que consultará la informacion de una orden de trabajo por su consecutivo
+  GetOrdenCompra(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_OrdenCompra/GetOrdenCompra/${dato}`);
+  }
+
+  // Funcion que consultará la informacion de una orden de trabajo por su consecutivo
+  GetOrdenCompra_fechas(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_OrdenCompra/GetOrdenCompra_fechas/${fecha1}/${fecha2}`);
+  }
+
+  // Funcion que consultará la informacion de una orden de trabajo por su consecutivo
+  GetOrdenCompra_Estado(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_OrdenCompra/GetOrdenCompra_Estado/${dato}`);
+  }
+
+  // Funcion que consultará la informacion de una orden de trabajo por su consecutivo
+  GetOrdenCompra_EstadoFechas(dato : any, fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_OrdenCompra/GetOrdenCompra_EstadoFechas/${dato}/${fecha1}/${fecha2}`);
+  }
+
   //Metodo actualzar
   putId_DtOrdenCompra(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Detalle_OrdenCompra/${id}`, data);
