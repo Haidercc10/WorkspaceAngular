@@ -112,6 +112,14 @@ export class BagproService {
     return this.http.delete(this.rutaBagPro + `/ProcExtrusion/EliminarRollExtrusion/${id}`);
   }
 
+  DeleteRollosExtrusion_Empaque(id : any) {
+    return this.http.delete(this.rutaBagPro + `/ProcExtrusion/EliminarRollosExtrusion_Empaque/${id}`);
+  }
+
+  DeleteRollosSellado_Wiketiado(id : any) {
+    return this.http.delete(this.rutaBagPro + `/ProcSellado/EliminarRollosSellado_Wiketiado/${id}`);
+  }
+
 
   /*************************************************************** CLIENTESOT *******************************************************************/
 
@@ -247,5 +255,26 @@ export class BagproService {
 
   srvObtenerListaUltimosClientes2(fecha : any, cliente : any) {
     return this.http.get<any>(this.rutaBagPro + `/Clientes/UltimosClientes2/${fecha}/${cliente}`);
+  }
+
+  /**  Obtener datos por NomStatus  */
+  getDatosxNomStatus(status : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxNomStatus/${status}`);
+  }
+
+  getDatosxFechasxNomStatus(fecha1 : any, fecha2 : any, status : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxFechasxNomStatus/${fecha1}/${fecha2}/${status}`);
+  }
+
+  getDatosxRolloxNomStatus(rollo : any, status : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxRolloxNomStatus/${rollo}/${status}`);
+  }
+
+  getDatosxOTxNomStatus(OT : any, status : any) {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/DatosxOTxNomStatus/${OT}/${status}`);
+  }
+
+  srvObtenerListaProcExtrusionOT(ot : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/Orden_Trabajo/${ot}`);
   }
 }

@@ -150,3 +150,10 @@ a {
   bottom: 15px;
   right: 15px;
  }
+
+ .botonModal{
+  border-radius:10px;
+  outline:none;
+  border-color: white;
+  border-style: none;
+ }

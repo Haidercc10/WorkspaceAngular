@@ -36,36 +36,57 @@
               <label for="floatingInput">Nro. OT</label>
             </div>
 
-            <!-- Id Rolo -->
-            <div class="form-floating col-md">
+            <!-- Id Rollo -->
+            <div class="form-floating col-md-2">
               <input formControlName="IdRollo" type="number" class="form-control form-control-sm" (keyup.Enter)="consultarRollos()" id="floatingInput">
               <label for="floatingInput">N° Rollo</label>
             </div>
 
+              <!-- Procesos -->
+              <div class="form-floating col-md-2">
+                <select formControlName="Proceso" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                  <option [ngValue]="proceso.proceso_Nombre" *ngFor="let proceso of arrayProcesos">{{proceso.proceso_Nombre}}</option>
+                </select>
+                <label for="floatingSelect">Proceso</label>
+              </div>
+
+              <!-- Procesos -->
+              <div class="form-floating col-md-2">
+                <select formControlName="Bodega" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                  <option value="EXT">Bodega Extrusion</option>
+                  <option value="DESP">Bodega Despacho</option>
+                </select>
+                <label for="floatingSelect">Bodega</label>
+              </div>
+
              <!-- Fecha -->
              <div class="form-floating col-md-2">
-              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <input formControlName="fechaDoc" type="date" class="form-control" id="floatingInput">
               <label for="floatingInput">Fecha inicial</label>
             </div>
 
             <!-- Fecha -->
             <div class="form-floating col-md-2">
-              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <input formControlName="fechaFinalDoc" type="date" class="form-control" id="floatingInput">
               <label for="floatingInput">Fecha Final</label>
-            </div>
-
-            <div class="form-floating col-md btn-consultar">
-              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarRollos()">Consultar Rollos</button>
-            </div>
-
-            <div class="form-floating col-md btn-limpiarForm">
-              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarForm()">Limpiar Campos</button>
             </div>
           </div>
         </div>
+      <!-- Botones -->
+      <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <div class="form-floating">
+            <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarRollos()">Consultar rollos</button>
+          </div>
+
+          <div class="form-floating">
+            <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarForm()">Limpiar campos</button>
+          </div>
+        </div>
+      </div>
       </form>
 
-      <div class="mb-4">
+      <div class="mb-3">
         <hr class="Linea">
       </div>
       <!-- Inicio titulo tabla producto -->
@@ -133,11 +154,11 @@
         </div>
       </div>
 
-      <div class="mb-4" *ngIf="cargando">
+      <div class="mb-4">
         <hr class="Linea">
       </div>
       <!-- Inicio titulo tabla producto -->
-      <div class="mb-4" *ngIf="cargando">
+      <div class="mb-4">
         <h4 class="tituloRojo">Tabla de Rollos por Ingresar</h4>
       </div>
 
@@ -243,10 +264,22 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="eliminarRollos()">Eliminar Rollos</button>
-          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+          <button type="button" class="btn btn-danger" (click)="showDialog()" icon="pi pi-info-circle" label="Show">Eliminar rollos</button>
+           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>
+      <!--<p-dialog header="Confirmación" [(visible)]="display">
+        <div class="mb-3">
+        ¿De qué Base de Datos desea eliminar los rollos?
+        </div>
+        <div class="mb-3">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button type="button" class="btn btn-danger" (click)="eliminarRolloBagpro()" icon="pi pi-info-circle" label="Show">BD BagPro</button>
+            <button type="button" class="btn btn-danger" (click)="eliminarRolloIngresado()" icon="pi pi-info-circle" label="Show">BD Nueva</button>
+          </div>
+        </div>
+      </p-dialog>-->
+
     </div>
   </div>
 </div>

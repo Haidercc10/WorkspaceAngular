@@ -77,4 +77,7 @@ export class DtPreEntregaRollosService {
    return this.http.post(this.rutaPlasticaribeAPI + '/DetallePreEntrega_RolloDespacho', data);
   }
 
+  deleteRollosPreEntregados(id : any) {
+    return this.http.delete(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/EliminarRollo/${id}`);
+  }
 }

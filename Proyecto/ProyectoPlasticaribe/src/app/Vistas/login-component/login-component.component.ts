@@ -98,7 +98,7 @@ export class LoginComponentComponent implements OnInit {
                 this.saveInLocal('Nombre', nombre);
                 this.saveInLocal('Rol', rol);
                 this.clear();
-                if (this.ruta == 'http://192.168.0.153:4600/Login' || this.ruta == 'http://192.168.0.153:4600' || this.ruta == 'http://192.168.0.153:4600/') window.location.href = "./home";
+                if (this.ruta == 'http://localhost:4600/Login' || this.ruta == 'http://localhost:4600' || this.ruta == 'http://localhost:4600/' || this.ruta == 'http://localhost:4200/') window.location.href = "./home";
                 else window.location.href = this.ruta;
                 break;
               } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena){

@@ -78,4 +78,7 @@ export class DetallesEntradaRollosService {
    return this.http.post(this.rutaPlasticaribeAPI + '/DetalleEntradaRollo_Producto', data);
   }
 
+  deleteRollosDespacho(id : any) {
+    return this.http.delete(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/EliminarRollo/${id}`);
+  }
 }
