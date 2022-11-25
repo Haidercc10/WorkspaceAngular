@@ -1,7 +1,8 @@
 import { Component, OnInit, Input, Injectable } from '@angular/core';
 import { ProductService } from './productservice';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, ConfirmEventType } from 'primeng/api';
 import { MessageService } from 'primeng/api';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -15,22 +16,35 @@ import { MessageService } from 'primeng/api';
 
 
 export class PruebaImagenCatInsumoComponent implements OnInit {
+  position: string;
 
-  products: any
-
-  selectedProducts:any [];
-  first = 0;
-  rows = 10;
-
-  constructor(private productService: ProductService, private messageService: MessageService, private confirmationService: ConfirmationService) { }
-
-  ngOnInit() {
-    this.products = this.productService.getProducts();
-
+  constructor(private confirmationService: ConfirmationService, private messageService: MessageService) {}
+  ngOnInit(): void {
+    // throw new Error('Method not implemented.');
   }
 
-  click(){
-    console.log(this.selectedProducts)
+  confirm1() {
+    this.confirmationService.confirm({
+      message: 'a',
+      header: 'Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        // this.messageService.add({severity:'info', summary:'Confirmed', detail:'You have accepted'});
+        console.log(3)
+      },
+      reject: (type) => {
+        switch(type) {
+          case ConfirmEventType.REJECT:
+            // this.messageService.add({severity:'error', summary:'Rejected', detail:'You have rejected'});
+            console.log(1)
+          break;
+          case ConfirmEventType.CANCEL:
+            // this.messageService.add({severity:'warn', summary:'Cancelled', detail:'You have cancelled'});
+            console.log(2)
+          break;
+        }
+      }
+    });
   }
 
 }

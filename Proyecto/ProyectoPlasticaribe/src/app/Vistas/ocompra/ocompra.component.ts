@@ -28,12 +28,13 @@ export class OcompraComponent implements OnInit {
   FormMateriaPrima : FormGroup; //Formulario de Materia Prima
 
   //Llamar modales, inicializados como falsos para que no se carguen al ingresar a la pagina.
-  ModalCrearProveedor: boolean = false;
-  ModalCrearMateriaPrima: boolean= false;
-  ModalCrearBOPP: boolean= false;
-  ModalCrearTintas: boolean= false;
+  ModalCrearProveedor: boolean = false; //Variable para validar que se abra el modal de creacion de proveedores
+  modalCreacionMateriaPrima : boolean = false; //Variable para validar que se abra el modal en que se pregusntará que se creará
+  ModalCrearMateriaPrima: boolean= false; //Variable para validar que se abra el modal de creacion de polietileno
+  ModalCrearBOPP: boolean= false; //Variable para validar que se abra el modal de creacion de bopp, bopa y/o poliester
+  ModalCrearTintas: boolean= false; //Variable para validar que se abra el modal de creacion de tintas, chips, solvenets
 
-  cargando : boolean = false;
+  cargando : boolean = false; //Variable para validar que aparezca o no el icono de carga
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -152,13 +153,20 @@ export class OcompraComponent implements OnInit {
         Observacion : this.FormOrdenCompra.value.Observacion,
       });
     }, error => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        html:
-        '<b>¡Error al consultar el ultimo consecutivo de las ordenes de compra!</b><hr> ' +
-        `<spam style="color : #f00;">${error.message}</spam> `,
-        showCloseButton: true,
+      console.log(error);
+      // Swal.fire({
+      //   icon: 'error',
+      //   title: 'Oops...',
+      //   html:
+      //   '<b>¡Error al consultar el ultimo consecutivo de las ordenes de compra!</b><hr> ' +
+      //   `<spam style="color : #f00;">${error.message}</spam> `,
+      //   showCloseButton: true,
+      // });
+      this.FormOrdenCompra = this.frmBuilder.group({
+        ConsecutivoOrden : 1,
+        Proveedor : this.FormOrdenCompra.value.Proveedor,
+        Id_Proveedor : this.FormOrdenCompra.value.Id_Proveedor,
+        Observacion : this.FormOrdenCompra.value.Observacion,
       });
       this.cargando = false;
     });
@@ -226,7 +234,7 @@ export class OcompraComponent implements OnInit {
           this.catidadTotalPeso += this.FormMateriaPrima.value.Cantidad;
           this.cantidadTotalPrecio += (this.FormMateriaPrima.value.Cantidad * this.FormMateriaPrima.value.PrecioOculto);
           this.FormMateriaPrima.reset();
-        } else Swal.fire(`¿La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
+        } else Swal.fire(`¡La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
       } else Swal.fire(`¡La materia prima '${this.FormMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
     } else Swal.fire(`¡Hay campos vacios!`);
   }
@@ -271,32 +279,51 @@ export class OcompraComponent implements OnInit {
     });
   }
 
-  // Funcion para llamar el modal que crea clientes
+  // Funcion para llamar el modal que crea proveedores
   LlamarModalCrearProveedor() {
     this.ModalCrearProveedor = true;
   }
 
-  // Funcion para llamar el modal que crea clientes
+  // Funcion para llamar el modal que pregunta que materia prima se va a crear
   LlamarModalCrearMateriaPrima(){
-    Swal.fire({
-      title: '¿Qué desea crear?',
-      text: "¡Presione el botón de la materia prima que quiere crear!",
-      icon: 'question',
-      allowOutsideClick: false,
-      showCancelButton: true,
-      showDenyButton: true,
-      showCloseButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#3085d6',
-      denyButtonColor: '#3085d6',
-      confirmButtonText: 'Polietilenos',
-      cancelButtonText: 'BOPP / BOPA/ Poliester',
-      denyButtonText: 'Tintas / Chips / Solventes',
-    }).then((result) => {
-      if (result.isConfirmed) this.ModalCrearMateriaPrima = true;
-      else if (result.dismiss) this.ModalCrearBOPP = true;
-      else if (result.isDenied) this.ModalCrearTintas = true;
-    })
+    // Swal.fire({
+    //   title: '¿Qué desea crear?',
+    //   text: "¡Presione el botón de la materia prima que quiere crear!",
+    //   icon: 'question',
+    //   allowOutsideClick: false,
+    //   showCancelButton: true,
+    //   showDenyButton: true,
+    //   showCloseButton: true,
+    //   confirmButtonColor: '#3085d6',
+    //   cancelButtonColor: '#3085d6',
+    //   denyButtonColor: '#3085d6',
+    //   confirmButtonText: 'Polietilenos',
+    //   cancelButtonText: 'BOPP / BOPA/ Poliester',
+    //   denyButtonText: 'Tintas / Chips / Solventes',
+    // }).then((result) => {
+    //   if (result.isConfirmed) this.ModalCrearMateriaPrima = true;
+    //   else if (result.dismiss) this.ModalCrearBOPP = true;
+    //   else if (result.isDenied) this.ModalCrearTintas = true;
+    // })
+    this.modalCreacionMateriaPrima = true;
+  }
+
+  // Funcion para llamar el modal que crea polientileno
+  crearPolientileno(){
+    this.modalCreacionMateriaPrima = false;
+    this.ModalCrearMateriaPrima = true;
+  }
+
+  // Funcion para llamar el modal que crea bopp
+  crearBopp(){
+    this.modalCreacionMateriaPrima = false;
+    this.ModalCrearBOPP = true;
+  }
+
+  // Funcion para llamar el modal que crea tintas
+  creartinta(){
+    this.modalCreacionMateriaPrima = false;
+    this.ModalCrearTintas = true;
   }
 
   // Funcion que va a validar que los campos necesarios esten llenos para crear la ORden de Compra
@@ -335,28 +362,30 @@ export class OcompraComponent implements OnInit {
 
   // Funcion que va a rear detalles de Orden de Compra
   crearDtOrdenCompra(){
-    for (let j = 0; j < this.materiasPrimasSeleccionadas.length; j++) {
-      let info : any = {
-        Oc_Id : this.FormOrdenCompra.value.ConsecutivoOrden,
-        MatPri_Id : this.materiasPrimasSeleccionadas[j].Id_Mp,
-        Tinta_Id : this.materiasPrimasSeleccionadas[j].Id_Tinta,
-        BOPP_Id : this.materiasPrimasSeleccionadas[j].Id_Bopp,
-        Doc_CantidadPedida : this.materiasPrimasSeleccionadas[j].Cantidad,
-        UndMed_Id : this.materiasPrimasSeleccionadas[j].Und_Medida,
-        Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[j].Precio,
-      }
-      this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => { this.GuardadoExitoso(); }, error => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          html:
-          '<b>¡Error al insertar la(s) materia(s) prima(s) pedida(s)!</b><hr> ' +
-          `<spam style="color : #f00;">${error.message}</spam> `,
-          showCloseButton: true,
+    this.ordenCompraService.getUltimoId_OrdenCompra().subscribe(datos_ordenCompra => {
+      for (let j = 0; j < this.materiasPrimasSeleccionadas.length; j++) {
+        let info : any = {
+          Oc_Id : datos_ordenCompra,
+          MatPri_Id : this.materiasPrimasSeleccionadas[j].Id_Mp,
+          Tinta_Id : this.materiasPrimasSeleccionadas[j].Id_Tinta,
+          BOPP_Id : this.materiasPrimasSeleccionadas[j].Id_Bopp,
+          Doc_CantidadPedida : this.materiasPrimasSeleccionadas[j].Cantidad,
+          UndMed_Id : this.materiasPrimasSeleccionadas[j].Und_Medida,
+          Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[j].Precio,
+        }
+        this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => { this.GuardadoExitoso(); }, error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            html:
+            '<b>¡Error al insertar la(s) materia(s) prima(s) pedida(s)!</b><hr> ' +
+            `<spam style="color : #f00;">${error.message}</spam> `,
+            showCloseButton: true,
+          });
+          this.cargando = false;
         });
-        this.cargando = false;
-      });
-    }
+      }
+    });
   }
 
   // Funcion que mostrará el mensaje de que todo el proceso de guardado fue exitoso
@@ -425,7 +454,7 @@ export class OcompraComponent implements OnInit {
           },
           content : [
             {
-              text: `Orden de Compra de Materia Prima`,
+              text: `Orden de Compra de Materia Prima N° ${datos_orden[i].consecutivo}`,
               alignment: 'right',
               style: 'titulo',
             },

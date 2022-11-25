@@ -40,10 +40,6 @@
             <div class="row g-3">
               <!-- Cantidad Minima -->
              <label *ngIf="numeroIdProd != 0">Item: <b>{{numeroIdProd}}</b></label>
-            <!--   <div class="form-floating col-md-3">
-                <input type="number" formControlName="cantMinima" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="actualizarCantMinima()">
-                <label for="floatingInput">Cantidad Minima Item</label>
-              </div>-->
 
               <div class="form-floating col-md-1">
                 <input type="number" formControlName="cantidad" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="actualizarCantMinima()">
@@ -63,7 +59,7 @@
           <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarCantMinima()">Actualizar</button>
-              <button class="btn btn-danger btn-danger-sm" type="button" (click)="exportarExcel()">Exportar Excel</button>
+              <button type="button" style="width: 160px;" pButton pRipple icon="pi pi-file-excel" (click)="exportarExcel()" class="p-button-success mr" pTooltip="Exportar a Excel" tooltipPosition="bottom">Exporta a Excel</button>
               <button class="btn btn-danger btn-danger-sm" type="button" (click)="buscarPrecios()">Ult. Actualización</button>
               <!-- <button class="btn btn-secondary btn-secondary-sm" type="button">Limpiar campos</button> -->
             </div>
@@ -130,4 +126,3 @@
     </div>
   </div>
 </div>
-

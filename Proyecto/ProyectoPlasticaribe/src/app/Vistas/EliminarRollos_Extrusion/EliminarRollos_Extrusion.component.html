@@ -42,22 +42,22 @@
               <label for="floatingInput">N° Rollo</label>
             </div>
 
-              <!-- Procesos -->
-              <div class="form-floating col-md-2">
-                <select formControlName="Proceso" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                  <option [ngValue]="proceso.proceso_Nombre" *ngFor="let proceso of arrayProcesos">{{proceso.proceso_Nombre}}</option>
-                </select>
-                <label for="floatingSelect">Proceso</label>
-              </div>
+            <!-- Procesos -->
+            <div class="form-floating col-md-2">
+              <select formControlName="Proceso" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option [ngValue]="proceso.proceso_Nombre" *ngFor="let proceso of arrayProcesos">{{proceso.proceso_Nombre}}</option>
+              </select>
+              <label for="floatingSelect">Proceso</label>
+            </div>
 
-              <!-- Procesos -->
-              <div class="form-floating col-md-2">
-                <select formControlName="Bodega" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                  <option value="EXT">Bodega Extrusion</option>
-                  <option value="DESP">Bodega Despacho</option>
-                </select>
-                <label for="floatingSelect">Bodega</label>
-              </div>
+            <!-- Procesos -->
+            <div class="form-floating col-md-2">
+              <select formControlName="Bodega" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option value="EXT">Bodega Extrusion</option>
+                <option value="DESP">Bodega Despacho</option>
+              </select>
+              <label for="floatingSelect">Bodega</label>
+            </div>
 
              <!-- Fecha -->
              <div class="form-floating col-md-2">
@@ -72,18 +72,18 @@
             </div>
           </div>
         </div>
-      <!-- Botones -->
-      <div class="mb-3">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <div class="form-floating">
-            <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarRollos()">Consultar rollos</button>
-          </div>
+        <!-- Botones -->
+        <div class="mb-3">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <div class="form-floating">
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarRollos()">Consultar rollos</button>
+            </div>
 
-          <div class="form-floating">
-            <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarForm()">Limpiar campos</button>
+            <div class="form-floating">
+              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarForm()">Limpiar campos</button>
+            </div>
           </div>
         </div>
-      </div>
       </form>
 
       <div class="mb-3">
@@ -119,6 +119,7 @@
                 <th scope="col">Fecha Ingreso</th>
                 <th scope="col">Cantidad</th>
                 <th scope="col">Presentacion</th>
+                <th scope="col">Proceso</th>
                 <th style="width: 3rem">
                   <p-tableHeaderCheckbox (click)="seleccionarTodosRollos(rollos)"></p-tableHeaderCheckbox>
                 </th>
@@ -135,6 +136,7 @@
                   <td style="background-color: rgb(255, 146, 146);">{{rollo.Fecha}}</td>
                   <td style="background-color: rgb(255, 146, 146);">{{rollo.Cantidad | number}}</td>
                   <td style="background-color: rgb(255, 146, 146);">{{rollo.Presentacion}}</td>
+                  <td style="background-color: rgb(255, 146, 146);">{{rollo.Proceso}}</td>
                 </ng-template>
                 <ng-template #elseTemplate>
                   <td>{{rollo.Ot}}</td>
@@ -144,6 +146,7 @@
                   <td>{{rollo.Fecha}}</td>
                   <td>{{rollo.Cantidad | number}}</td>
                   <td>{{rollo.Presentacion}}</td>
+                  <td>{{rollo.Proceso}}</td>
                   <td>
                     <p-tableCheckbox [value]="rollo" (click)="llenarRollosAIngresar(rollo)"></p-tableCheckbox>
                   </td>
@@ -184,6 +187,7 @@
                 <th scope="col">Producto</th>
                 <th scope="col">Cantidad</th>
                 <th scope="col">Presentación</th>
+                <th scope="col">Proceso</th>
                 <th style="width: 3rem">
                   <p-tableHeaderCheckbox (click)="quitarTodosRollos(rollosInsertar)"></p-tableHeaderCheckbox>
                 </th>
@@ -197,6 +201,7 @@
                 <td>{{rollosInsertar.Producto}}</td>
                 <td>{{rollosInsertar.Cantidad | number}}</td>
                 <td>{{rollosInsertar.Presentacion}}</td>
+                <td>{{rollosInsertar.Proceso}}</td>
                 <td>
                   <p-tableCheckbox [value]="rollosInsertar" (click)="quitarRollosAIngresar(rollosInsertar)"></p-tableCheckbox>
                 </td>
@@ -268,18 +273,6 @@
            <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>
-      <!--<p-dialog header="Confirmación" [(visible)]="display">
-        <div class="mb-3">
-        ¿De qué Base de Datos desea eliminar los rollos?
-        </div>
-        <div class="mb-3">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button type="button" class="btn btn-danger" (click)="eliminarRolloBagpro()" icon="pi pi-info-circle" label="Show">BD BagPro</button>
-            <button type="button" class="btn btn-danger" (click)="eliminarRolloIngresado()" icon="pi pi-info-circle" label="Show">BD Nueva</button>
-          </div>
-        </div>
-      </p-dialog>-->
-
     </div>
   </div>
 </div>

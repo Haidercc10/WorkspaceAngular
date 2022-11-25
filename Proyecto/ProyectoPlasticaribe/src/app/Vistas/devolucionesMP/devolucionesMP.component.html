@@ -130,10 +130,9 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-materiasPrimasRetiradas>
-          <tr *ngIf="!materiasPrimasRetiradas.Exits" class="TextosInfoTabla"> <!---->
+          <tr *ngIf="!materiasPrimasRetiradas.Exits && materiasPrimasRetiradas.Cantidad > 0" class="TextosInfoTabla"> <!---->
             <td>{{materiasPrimasRetiradas.Id}}</td>
             <td>{{materiasPrimasRetiradas.Nombre}}</td>
-            <!--<td>{{materiasPrimasRetiradas.Cantidad}}</td>-->
             <td pEditableColumn>
               <p-cellEditor>
                 <ng-template pTemplate="input">

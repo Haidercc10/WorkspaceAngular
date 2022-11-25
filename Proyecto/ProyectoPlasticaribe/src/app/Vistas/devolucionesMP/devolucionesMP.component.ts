@@ -94,14 +94,15 @@ export class DevolucionesMPComponent implements OnInit {
     this.detallesAsignacionService.srvObtenerListaPorAsignacionesOT(ot).subscribe(datos_asignacionMP => {
       if (datos_asignacionMP.length != 0){
         for (let i = 0; i < datos_asignacionMP.length; i++) {
+          let cantidad : number = datos_asignacionMP[i].cantMP;
           let info : any = {
             Id : datos_asignacionMP[i].materiaPrima,
             Id_MateriaPrima : datos_asignacionMP[i].matPri_Id,
             Id_Tinta : datos_asignacionMP[i].tinta_Id,
             Id_Bopp : datos_asignacionMP[i].bopp_Id,
             Nombre : datos_asignacionMP[i].nombreMP,
-            Cantidad : datos_asignacionMP[i].cantMP,
-            Cantidad_Oculta : datos_asignacionMP[i].cantMP,
+            Cantidad : cantidad,
+            Cantidad_Oculta : cantidad,
             Cantidad_Devuelta : 0,
             Unidad_Medida : datos_asignacionMP[i].undMedida,
             Proceso : datos_asignacionMP[i].proceso,
@@ -121,9 +122,7 @@ export class DevolucionesMPComponent implements OnInit {
             info.Id_MateriaPrima = 84;
             info.Id_Tinta = 2001;
           }
-          console.log(info);
           this.materiasPrimas.push(info);
-
           for (let index = 0; index < this.materiasPrimas.length; index++) {
             this.materiasPrimas[index].Cantidad_Devuelta = this.materiasPrimas[index].Cantidad_Oculta;
           }
@@ -138,7 +137,29 @@ export class DevolucionesMPComponent implements OnInit {
         `<spam style="color : #f00;">${error.message}</spam> `,
       });
     });
-    setTimeout(() => { this.load = true; }, 2000);
+    setTimeout(() => {
+
+      this.devolucionMPService.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
+        for (let j = 0; j < datos_devolucion.length; j++) {
+          for (let i = 0; i < this.materiasPrimas.length; i++) {
+            if (this.materiasPrimas[i].Id == datos_devolucion[j].matPri_Id) {
+              this.materiasPrimas[i].Cantidad -= datos_devolucion[j].dtDevMatPri_CantidadDevuelta;
+              this.materiasPrimas[i].Cantidad_Oculta -= datos_devolucion[j].dtDevMatPri_CantidadDevuelta;
+              this.materiasPrimas[i].Cantidad_Devuelta = this.materiasPrimas[i].Cantidad;
+            }
+          }
+        }
+      }, error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          html:
+          `<b>¡Error al obtener las devoluciones de la ot ${ot}!</b><hr> ` +
+          `<spam style="color : #f00;">${error.message}</spam> `,
+        });
+      });
+      this.load = true;
+    }, 2500);
   }
 
   //Funcion que va a seleccionar una materia prima
@@ -200,31 +221,40 @@ export class DevolucionesMPComponent implements OnInit {
           `<spam style="color : #f00;">${error.message}</spam> `,
         });
       });
-    } else Swal.fire(`¡Debe seleccionar minimo 1 materia prima para devolver!`);
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        html:
+        `<b>¡Debe seleccionar minimo 1 materia prima para devolver!</b><hr> `,
+      });
+    }
   }
 
   //Funcion que creará el registro de la materia que viene en un pedido
   creacionDevolucionMateriaPrima(){
     this.devolucionService.srvObtenerUltimaDevolucion().subscribe(datos_devolucion => {
       for (let i = 0; i < this.materiasPrimasRetiradas.length; i++) {
-        const datosDevolucionMp : any = {
-          DevMatPri_Id : datos_devolucion.devMatPri_Id,
-          MatPri_Id : this.materiasPrimasRetiradas[i].Id_MateriaPrima,
-          Tinta_Id : this.materiasPrimasRetiradas[i].Id_Tinta,
-          BOPP_Id : this.materiasPrimasRetiradas[i].Id_Bopp,
-          DtDevMatPri_CantidadDevuelta : this.materiasPrimasRetiradas[i].Cantidad_Devuelta,
-          UndMed_Id : this.materiasPrimasRetiradas[i].Unidad_Medida,
-          Proceso_Id : this.materiasPrimasRetiradas[i].Proceso,
-        }
-        this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(datos_recuperadoMpCreada => {  }, error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            html:
-            `<b>¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!</b><hr> ` +
-            `<spam style="color : #f00;">${error.message}</spam> `,
+        if (this.materiasPrimasRetiradas[i].Cantidad > 0 && !this.materiasPrimasRetiradas[i].Exits) {
+          const datosDevolucionMp : any = {
+            DevMatPri_Id : datos_devolucion.devMatPri_Id,
+            MatPri_Id : this.materiasPrimasRetiradas[i].Id_MateriaPrima,
+            Tinta_Id : this.materiasPrimasRetiradas[i].Id_Tinta,
+            BOPP_Id : this.materiasPrimasRetiradas[i].Id_Bopp,
+            DtDevMatPri_CantidadDevuelta : this.materiasPrimasRetiradas[i].Cantidad_Devuelta,
+            UndMed_Id : this.materiasPrimasRetiradas[i].Unidad_Medida,
+            Proceso_Id : this.materiasPrimasRetiradas[i].Proceso,
+          }
+          this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(datos_recuperadoMpCreada => {  }, error => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              html:
+              `<b>¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!</b><hr> ` +
+              `<spam style="color : #f00;">${error.message}</spam> `,
+            });
           });
-        });
+        }
       }
     });
     setTimeout(() => {

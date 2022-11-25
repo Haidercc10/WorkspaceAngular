@@ -36,17 +36,17 @@
         </div>
 
         <div class="form-floating col-md">
-          <input formControlName="OTImp" class="form-control form-control-sm" (keyup.enter)="infoOTImpresion()" id="floatingInput" type="number" min="100000" max="999999" required>
+          <input formControlName="OTImp" class="form-control form-control-sm" (keyup.enter)="infoOTImpresion()" id="floatingInput" type="number" min="100000" max="999999">
           <label for="floatingInput">OT Impresión</label>
         </div>
         <!-- Maquina -->
         <div class="form-floating col-md">
-          <input formControlName="Maquina" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" required title="Maquina">
+          <input formControlName="Maquina" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" title="Maquina" required>
           <label for="floatingInput">Maquina</label>
         </div>
         <!-- Kg OT -->
         <div class="form-floating col-md">
-          <input formControlName="kgOt" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" required title="Maquina" readonly onmousedown="return false;">
+          <input formControlName="kgOt" type="number" class="form-control form-control-sm" id="floatingInput" title="Maquina" readonly onmousedown="return false;" required="">
           <label for="floatingInput">KG OT</label>
           <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <label for=""><b>Kg Restante: {{cantRestante | number}}</b></label>
@@ -54,7 +54,7 @@
         </div>
         <!-- Fecha entrega -->
         <div class="form-floating col-md">
-          <input formControlName="FechaRetiro" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Retiro" readonly onmousedown="return false;">
+          <input formControlName="FechaRetiro" type="date" class="form-control form-control-sm" id="floatingInput" title="Fecha Retiro" readonly onmousedown="return false;" required="">
           <label for="floatingInput">Fecha Retiro</label>
         </div>
       </div>

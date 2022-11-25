@@ -30,7 +30,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  load: boolean;
+  load: boolean; //Variable para validar que aparezca el icono de carga o no
   materiaPrima = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   materiasPrimasSeleccionadas : any [] = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   materiasPrimasSeleccionada_ID : any [] = []; //Variable que almacenará los ID de las materias primas que se han seleccionado para que no puedan ser elegidas nuevamente
@@ -60,14 +60,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                                       private devolucionesMPService : DevolucionesMPService, ) {
 
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
-      OTRetiro : ['', Validators.required],
+      OTRetiro : [null, Validators.required],
       OTImp : [''],
       FechaRetiro : [this.today, Validators.required],
-      Maquina : ['', Validators.required],
-      UsuarioRetiro : ['', Validators.required],
-      kgOt : ['', Validators.required],
-      EstadoRetiro : ['', Validators.required],
-      ObservacionRetiro : ['', Validators.required],
+      Maquina : [null, Validators.required],
+      kgOt : [null, Validators.required],
+      ObservacionRetiro : [''],
     });
 
     this.FormMateriaPrimaRetirada = this.frmBuilderMateriaPrima.group({
@@ -116,14 +114,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   LimpiarCampos() {
     this.FormMateriaPrimaRetirada.reset();
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
-      OTRetiro : '',
-      OTImp : '',
+      OTRetiro : null,
+      OTImp : null,
       FechaRetiro : this.today,
-      Maquina : '',
-      UsuarioRetiro : '',
-      kgOt : '',
-      EstadoRetiro : '',
-      ObservacionRetiro : '',
+      Maquina : null,
+      kgOt : null,
+      ObservacionRetiro : null,
     });
     this.cantidadAsignada = 0;
     this.cantRestante = 0;
@@ -183,14 +179,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           let adicional : number = datos_procesos[index].datosotKg * 0.1;
           this.kgOT = datos_procesos[index].datosotKg + adicional;
           this.estadoOT = datos_procesos[index].estado;
-          this.FormMateriaPrimaRetiro.patchValue({
+          this.FormMateriaPrimaRetiro.setValue({
             OTRetiro : this.FormMateriaPrimaRetiro.value.OTRetiro,
             OTImp : this.FormMateriaPrimaRetiro.value.OTImp,
             FechaRetiro : this.FormMateriaPrimaRetiro.value.FechaRetiro,
             Maquina : this.FormMateriaPrimaRetiro.value.Maquina,
-            UsuarioRetiro : this.FormMateriaPrimaRetiro.value.UsuarioRetiro,
-            kgOt : this.kgOT,
-            EstadoRetiro : this.FormMateriaPrimaRetiro.value.EstadoRetiro,
+            kgOt : parseFloat(datos_procesos[index].datosotKg + adicional),
             ObservacionRetiro : this.FormMateriaPrimaRetiro.value.ObservacionRetiro,
           });
           this.asignacionMPService.srvObtenerListaPorOt(ot).subscribe(datos_asignaciones => {
@@ -199,7 +193,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 if (datos_asignaciones[index].asigMP_OrdenTrabajo == ot) {
                   this.detallesAsignacionService.srvObtenerListaPorAsigId(datos_asignaciones[index].asigMp_Id).subscribe(datos_asignacionMp => {
                     for (let i = 0; i < datos_asignacionMp.length; i++) {
-                      cantAsig = cantAsig + datos_asignacionMp[i].dtAsigMp_Cantidad;
+                      cantAsig += datos_asignacionMp[i].dtAsigMp_Cantidad;
                     }
                   });
                 }
@@ -217,7 +211,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               showCloseButton: true,
             });
           });
-
           this.devolucionesService.srvObtenerListaPorOT(ot).subscribe(datos_devoluciones => {
             for (let i = 0; i < datos_devoluciones.length; i++) {
               this.devolucionesMPService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_devolucionesMP => {
@@ -310,11 +303,46 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               this.materiasPrimasSeleccionada_ID.push(this.FormMateriaPrimaRetirada.value.MpIdRetirada);
               this.materiasPrimasSeleccionadas.push(info);
               this.FormMateriaPrimaRetirada.reset();
-            } else Swal.fire(`¡La cantidad a asignar supera a la cantidad en stock!`);
-          } else Swal.fire(`¡Debe seleccionar hacia que proceso va la materia prima!`);
-        } else Swal.fire(`¡La materia prima ${this.FormMateriaPrimaRetirada.value.MpNombreRetirada} ya ha sido seleccionada!`);
-      } else Swal.fire("¡La cantidad a asignar no puede ser cero!");
-    } else Swal.fire("Hay campos de la Materia Prima vacios")
+            } else {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Oops...',
+                html:
+                `<b>¡La cantidad a asignar supera a la cantidad en stock!</b><hr> `,
+              });
+            }
+          } else {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Oops...',
+              html:
+              `<b>¡Debe seleccionar hacia que proceso va la materia prima!</b><hr> `,
+            });
+          }
+        } else {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Oops...',
+            html:
+            `<b>¡La materia prima ${this.FormMateriaPrimaRetirada.value.MpNombreRetirada} ya ha sido seleccionada!</b><hr> `,
+          });
+        }
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          html:
+          `<b>¡La cantidad a asignar debe ser mayor a cero (0)!</b><hr> `,
+        });
+      }
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        html:
+        `<b>¡Hay campos de la materia prima vacios!</b><hr> `,
+      });
+    }
   }
 
   // Funcion que va a quitar la materia prima
@@ -357,13 +385,45 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   // Funcion que hará validaciones antes de realizar la asignación
   validarCamposVaciosRetirada(){
-    let ot : string = this.FormMateriaPrimaRetiro.value.OTRetiro;
-    if (this.materiasPrimasSeleccionadas.length != 0){
-      if (this.FormMateriaPrimaRetiro.valid) {
-        if (ot.length >= 6) this.asignacionMateriaPrima();
-        else Swal.fire("La OT debe tener mas de 6 digitos");
-      } else Swal.fire("Hay campos de la Materia Prima vacios");
-    } else Swal.fire("¡Debe seleccionar minimo una materia prima para crear la asignación!");
+    let ot : any = this.FormMateriaPrimaRetiro.value.OTRetiro;
+    let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina
+    if (this.FormMateriaPrimaRetiro.valid) {
+      if (this.materiasPrimasSeleccionadas.length != 0){
+        if (ot.length >= 6) {
+          if (maquina >= 1 && maquina != 0) this.asignacionMateriaPrima();
+          else {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Oops...',
+              html:
+              `<b>¡El numero de la maquina no es valido!</b><hr> `,
+            });
+          }
+        } else {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Oops...',
+            html:
+            `<b>¡La Orden de trabajo debe tener mas de 6 digitos!</b><hr> `,
+          });
+        }
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          html:
+          `<b>¡Debe selccionar minimo una materia prima para crear la asignación!</b><hr> `,
+        });
+      }
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        html:
+        `<b>¡Hay campos vaios!</b><hr> `,
+      });
+    }
+    console.log(this.FormMateriaPrimaRetiro)
   }
 
   //Funcion que asignará la materia prima a una Orden de trabajo y Proceso y lo guardará en la base de datos
@@ -402,7 +462,13 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             Swal.fire(`La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}`);
           }
         }, 2000);
-      } else if (this.estadoOT == 4 || this.estadoOT == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${idOrdenTrabajo} se encuentra cerrada.`);
+      } else if (this.estadoOT == 4 || this.estadoOT == 1) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          html:`<b>¡No es podible asignar a esta orden de trabajo, la OT ${idOrdenTrabajo} se encuentra cerrada.!</b><hr> `,
+        });
+      }
     }
   }
 

@@ -19,6 +19,7 @@
     </div>
   </div>
 </div>
+
 <div class="container">
   <form [formGroup]="FormMateriaPrima">
     <div class="mb-3">
@@ -30,32 +31,19 @@
         </div>
 
         <!-- Nombre de la materia prima -->
-        <div class="ng-autocomplete form-floating col-md-2 form-control form-control-sm">
-          <ng-autocomplete
-            class=""
-            [data]="materiasPrimas"
-            (selected)='buscarMpSeleccionada($event)'
-            (inputChanged)='onChangeSearch($event)'
-            (inputFocused)='onFocused($event)'
-            [searchKeyword]="keyword"
-            [itemTemplate]="itemTemplate"
-            [notFoundTemplate]="notFoundTemplate"
-            id="floatingInput"
-            formControlName="MpNombre">
-          </ng-autocomplete>
-          <ng-template #itemTemplate let-item>
-            <a [innerHTML]="item.Nombre"></a>
-          </ng-template>
-          <ng-template #notFoundTemplate let-notFound>
-            <div [innerHTML]="notFound"></div>
-          </ng-template>
-          <label for="floatingInput" *ngIf="validarInput">Materia Prima</label>
+        <div class="form-floating col-md-6">
+          <input formControlName="MpNombre" class="form-control form-control-sm" list="materiaprima" id="floatingInput" title="Nombre de la Materia Prima" (keyup)="obtenerMateriasPrimasRetiradas()" (change)="cambiarNombreMateriaPrima()">
+          <datalist id="materiaprima">
+            <option value={{item.id}} *ngFor="let item of materiasPrimas">{{item.nombre}}</option>
+          </datalist>
+          <label for="floatingInput">Materia Prima</label>
         </div>
 
         <!-- Categoria Producto -->
         <div class="form-floating col-md-2">
-          <select formControlName="MpCategoria" (change)="cargarComboMatPrimaSegunCategorias()" class="form-select form-select-sm" id="floatingSelect"  aria-label="Floating label select example" required>
+          <select formControlName="MpCategoria" class="form-select form-select-sm" id="floatingSelect"  aria-label="Floating label select example" required>
             <option [ngValue]="categoria.catMP_Id" *ngFor="let categoria of categorias">{{categoria.catMP_Nombre}}</option>
+            <option value="0">Con Existencias</option>
           </select>
           <label for="floatingSelect">Categorias de Materia Prima</label>
         </div>
@@ -87,11 +75,126 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarConsulta()">Consultar Materia Prima</button>
         <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos</button>
+        <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-danger mr" pTooltip="Exportar a Excel" tooltipPosition="bottom"></button>
       </div>
     </div>
   </form>
+</div>
 
-  <div *ngIf="load">
+<div class="container-fluid" style="font-size: 14px;">
+  <div class="mb-3" *ngIf="load">
+    <div class="row g-3" id="table" style="font-size: 14px;">
+      <p-table
+          #dt
+          [value]="ArrayMateriaPrima"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [paginator]="true"
+          [rows]="ArrayMateriaPrima.length"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando de {first} a la {last} de {totalRecords} Materias Primas"
+          [rowsPerPageOptions]="[10,25,50,100,ArrayMateriaPrima.length]"
+          [rowHover]="true"
+          dataKey="Id">
+        <ng-template pTemplate="caption">
+          <div class="flex">
+            <button pButton label="Limpiar Filtros" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">ID
+              <p-columnFilter type="text" field="Id" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Nombre
+              <p-columnFilter type="text" field="Nombre" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Ancho
+              <p-columnFilter type="text" field="Ancho" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Inicial
+              <p-columnFilter type="text" field="Inicial" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Entrada
+              <p-columnFilter type="text" field="Entrada" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Salida
+              <p-columnFilter type="text" field="Salida" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Existencias
+              <p-columnFilter type="text" field="Cant" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Diferencia
+              <p-columnFilter type="text" field="Diferencia" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Und. Medida
+              <p-columnFilter type="text" field="UndCant" display="menu"></p-columnFilter>
+            </th>
+            <ng-container *ngIf="ValidarRol == 1">
+              <th scope="col">Precio Unitario
+                <p-columnFilter type="numeric" currency="COP" field="PrecioUnd" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col" (dblclick)="organizacionPrecioDblClick()" (click)="organizacionPrecio()">SubTotal
+                <p-columnFilter type="numeric" currency="COP" field="SubTotal" display="menu"></p-columnFilter>
+              </th>
+            </ng-container>
+            <th scope="col">Categoria
+              <p-columnFilter type="text" field="Categoria" display="menu"></p-columnFilter>
+
+              <!-- <p-columnFilter field="Categoria" matchMode="in" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                <ng-template pTemplate="header">
+                    <div class="px-3 pt-3 pb-0">
+                      <span class="font-bold" style="color:black">Filtrar Categorias</span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-multiSelect [ngModel]="value" [options]="categorias" placeholder="Todos" (onChange)="filter($event.value)" optionLabel="catMP_Nombre">
+                    <ng-template let-option pTemplate="item">
+                      <div class="p-multiselect-Categoria-option">
+                        <span style="color:black" class="ml-1">{{option.catMP_Nombre}}</span>
+                      </div>
+                    </ng-template>
+                  </p-multiSelect>
+                </ng-template>
+              </p-columnFilter> -->
+            </th>
+            <th>
+              <button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-materiaPrima>
+          <tr>
+            <td>{{materiaPrima.Id}}</td>
+            <td>{{materiaPrima.Nombre}}</td>
+            <td>{{materiaPrima.Ancho}}</td>
+            <td>{{materiaPrima.Inicial | number}}</td>
+            <td>{{materiaPrima.Entrada | number}}</td>
+            <td>{{materiaPrima.Salida | number}}</td>
+            <th class="columnaCantidad">{{materiaPrima.Cant | number}}</th>
+            <td>{{materiaPrima.Diferencia | number}}</td>
+            <td>{{materiaPrima.UndCant}}</td>
+            <ng-container *ngIf="ValidarRol == 1">
+              <td>{{materiaPrima.PrecioUnd | number}}</td>
+              <td>{{materiaPrima.SubTotal | number}}</td>
+            </ng-container>
+            <td>{{materiaPrima.Categoria}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="10" class="text-right">Totales</td>
+            <td>{{valorTotal | number}}</td>
+            <td>COP</td>
+            <td><button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<!-- <div *ngIf="load">
     <div class="mb-2">
       <div class="row g-1">
         <div class="table-responsive">
@@ -148,6 +251,5 @@
         </div>
       </div>
     </div>
-  </div>
-</div>
+</div> -->
 

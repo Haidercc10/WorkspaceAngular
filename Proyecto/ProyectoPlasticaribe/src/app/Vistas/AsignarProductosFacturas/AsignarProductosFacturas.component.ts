@@ -100,26 +100,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.llenadoClientes();
   }
 
-  selectEventProducto(item) {
-    this.FormConsultarProductos.value.ProdNombre = item.prod_Id;
-    if (this.FormConsultarProductos.value.ProdNombre != '') this.validarInputNombresProductos = false;
-    else this.validarInputNombresProductos = true;
-    // do something with selected item
-  }
-
-  onChangeSearchNombreProductos(val: string) {
-    if (val != '') this.validarInputNombresProductos = false;
-    else this.validarInputNombresProductos = true;
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
-  }
-
-  onFocusedNombreProductos(e){
-    if (!e.isTrusted) this.validarInputNombresProductos = false;
-    else this.validarInputNombresProductos = true;
-    // do something when input is focused
-  }
-
+  //
   selectEventCliente() {
     let datosNumeros : any = /^[0-9]*(\.?)[ 0-9]+$/;
     this.idCliente = this.FormConsultarProductos.value.Cliente;
@@ -136,20 +117,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
         });
       });
     }
-  }
-
-
-  onChangeSearchClientes(val: string) {
-    if (val != '') this.validarInputClientes = false;
-    else this.validarInputClientes = true;
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
-  }
-
-  onFocusedNombreClientes(e){
-    if (!e.isTrusted) this.validarInputClientes = false;
-    else this.validarInputClientes = true;
-    // do something when input is focused
   }
 
   //Funcion que hará que la pagina baje
@@ -519,7 +486,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
               CantPaqRestantesEnviar : datos_rollos[i].prod_CantPaquetesRestantes,
               suma : false,
             }
-            this.rollos.push(info);
+            if (info.CantPaqRestantes > 0) this.rollos.push(info);
             rollosExistentes.push(datos_rollos[i].rollo_Id);
             this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
             this.cantTotalProducto += datos_rollos[i].prod_CantPaquetesRestantes;
@@ -548,7 +515,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
               CantPaqRestantesEnviar : datos_rollos[i].prod_CantPaquetesRestantes,
               suma : false,
             }
-            this.rollos.push(info);
+            if (info.CantPaqRestantes > 0) this.rollos.push(info);
             rollosExistentes.push(datos_rollos[i].rollo_Id);
             this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
             this.cantTotalProducto += datos_rollos[i].prod_CantPaquetesRestantes;
