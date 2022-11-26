@@ -1,15 +1,11 @@
-import { ThisReceiver } from '@angular/compiler';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { ConfirmationService } from 'primeng/api';
-import { modelRollosDesechos } from 'src/app/Modelo/modelRollosDesechos';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DtIngRollos_Extrusion.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DtPreEntregaRollos.service';
-import { PreEntregaRollosService } from 'src/app/Servicios/PreEntregaRollos.service';
 import { ProcesosService } from 'src/app/Servicios/procesos.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import Swal from 'sweetalert2';

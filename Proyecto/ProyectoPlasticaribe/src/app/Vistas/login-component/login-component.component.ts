@@ -112,7 +112,7 @@ export class LoginComponentComponent implements OnInit {
                     || this.ruta == 'http://localhost:4200/Login'
                     || this.ruta == 'http://localhost:4200'
                     || this.ruta == 'http://localhost:4200/') window.location.href = "./home";
-              else window.location.href = this.ruta;
+                else window.location.href = this.ruta;
                 break;
               } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena){
                 Swal.fire({
