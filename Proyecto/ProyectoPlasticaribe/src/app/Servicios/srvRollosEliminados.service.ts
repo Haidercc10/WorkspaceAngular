@@ -40,6 +40,10 @@ constructor(private http : HttpClient,
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxItem/${producto}`);
   }
 
+  srvObtenerListaRollosxProceso(proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxProceso/${proceso}`);
+  }
+
 /** Fechas y un parametro */
   srvObtenerListaRollosxFechas(fechaIni : any, fechaFin : any):Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechas/${fechaIni}/${fechaFin}`);

@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Rollos eliminados (Extrusión)</h2>
+      <h2 class="tituloRojo">Rollos eliminados</h2>
     </div>
 
     <div class="mb-4">
@@ -31,30 +31,38 @@
       <div class="row g-3">
 
         <!-- ID Documento -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="OT" type="number" class="form-control" id="floatingInput"  required >
           <label for="floatingInput">OT</label>
         </div>
 
         <!-- Rollo -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="rollo" type="number" class="form-control" id="floatingInput" required >
           <label for="floatingInput">Rollo</label>
         </div>
 
         <!-- Fecha inicial -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Fecha Inicial</label>
         </div>
 
         <!-- Fecha final -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="fechaFinal" type="date" min="0"  class="form-control" id="floatingInput"required > <!--(change)="buscarBOPPSegunFecha()"-->
           <label for="floatingInput">Fecha Final</label>
         </div>
 
+        <!-- Procesos -->
         <div class="form-floating col-md">
+          <select formControlName="Proceso" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+            <option [ngValue]="proceso.proceso_Id" *ngFor="let proceso of arrayProcesos">{{proceso.proceso_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Proceso</label>
+        </div>
+
+        <div class="form-floating col-md-4">
           <input formControlName="producto" class="form-control" list="items" id="floatingInput" (change)='selectEventProducto()' [(ngModel)]="Item" (keyup)="obtenerProductos()" autocomplete="off">
           <datalist id="items">
             <option value={{item.prod_Id}} *ngFor="let item of arrayProductos">{{item.prod_Nombre}}</option>
