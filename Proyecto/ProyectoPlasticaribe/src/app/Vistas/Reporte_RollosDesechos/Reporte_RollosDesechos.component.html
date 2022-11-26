@@ -136,6 +136,7 @@
               <th id="" scope="col" pResizableColumn style="font-size: 13px;">Peso</th>
               <th id="" scope="col" pResizableColumn style="font-size: 13px;">Und.</th>
               <th id="" scope="col" pResizableColumn style="font-size: 13px;">Fecha</th>
+              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Proceso</th>
               <th *ngFor="let col of columns" pResizableColumn style="font-size: 13px;">
                 {{col.header}}
               </th>
@@ -155,6 +156,7 @@
               <td id="Neto" scope="col">{{ArrayDocumento.Peso}}</td>
               <td id="Und" scope="col">{{ArrayDocumento.Kg}}</td>
               <td id="Fecha" scope="col">{{ArrayDocumento.Fecha}}</td>
+              <td id="Fecha" scope="col">{{ArrayDocumento.Proceso}}</td>
               <td *ngFor="let col of columns">{{ArrayDocumento[col.field]}}</td>
             </tr>
           </ng-template>
