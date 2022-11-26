@@ -88,6 +88,71 @@ constructor(private http : HttpClient,
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxOTxRollo/${OT}/${rollo}`);
   }
 
+  /** Consulta por PROCESOS */
+  getRollosxFechasxRolloxItemxOTXProceso(fecha1: any, fecha2 : any, rollo: any, item : any, OT: any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxItemxOTXProceso/${fecha1}/${fecha2}/${rollo}/${item}/${OT}/${proceso}`);
+  }
+
+  getRollosxFechasxRolloxItemxProceso(fecha1: any, fecha2 : any, rollo: any, item : any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxItemxProceso/${fecha1}/${fecha2}/${rollo}/${item}/${proceso}`);
+  }
+
+  getRollosxFechasxRolloxOTxProceso(fecha1: any, fecha2 : any, rollo: any, OT : any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxOTxProceso/${fecha1}/${fecha2}/${rollo}/${OT}/${proceso}`);
+  }
+
+  getRollosxFechasxItemxOTxProceso(fecha1: any, fecha2 : any, item: any, OT : any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxOTxProceso/${fecha1}/${fecha2}/${item}/${OT}/${proceso}`);
+  }
+
+  getRollosxFechasxRolloxProceso(fecha1: any, fecha2 : any, rollo: any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxRolloxProceso/${fecha1}/${fecha2}/${rollo}/${proceso}`);
+  }
+
+  getRollosxFechasxItemxProceso(fecha1: any, fecha2 : any, item: any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxItemxProceso/${fecha1}/${fecha2}/${item}/${proceso}`);
+  }
+
+  getRollosxFechasxOTxProceso(fecha1: any, fecha2 : any, OT: any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxOTxProceso/${fecha1}/${fecha2}/${OT}/${proceso}`);
+  }
+
+  getRollosxFechasxProceso(fecha1: any, fecha2 : any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechasxProceso/${fecha1}/${fecha2}/${proceso}`);
+  }
+
+  getRollosxFechaxOTxProceso(fecha1: any, OT : any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechaxOTxProceso/${fecha1}/${OT}/${proceso}`);
+  }
+
+  getRollosxFechaxRolloxProceso(fecha1: any, rollo : any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechaxRolloxProceso/${fecha1}/${rollo}/${proceso}`);
+  }
+
+  getRollosxFechaxItemxProceso(fecha1: any, item : any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFechaxItemxProceso/${fecha1}/${item}/${proceso}`);
+  }
+
+  getRollosxOTxRolloxProceso(OT: any, rollo : any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxOTxRolloxProceso/${OT}/${rollo}/${proceso}`);
+  }
+
+  getRollosxOTxItemxProceso(OT: any, item : any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxOTxItemxProceso/${OT}/${item}/${proceso}`);
+  }
+
+
+
+  /** Proceso e Item */
+  srvObtenerListaRollosxProcesoxItem(proceso: any, item : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxProcesoxItem/${proceso}/${item}`);
+  }
+
+  /** fechas y proceso */
+  srvObtenerListaRollosxFechasxProceso(fecha1: any, fecha2: any, proceso : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rollo_Desecho/RollosxFProcesoxItem/${fecha1}/${fecha2}/${proceso}`);
+  }
+
 }
 
 
