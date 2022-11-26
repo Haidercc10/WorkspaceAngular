@@ -21,8 +21,8 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
-  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  estados : any [] = []; //Variable que almacenará los estados que pueden tener los rollos en esta bodega
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol
+  estados : any [] = []; //Variable que almacenará los estados que pueden tener las ordenes de compra de materia prima
   registrosConsultados : any [] = []; //Variable que va a almacenar los diferentes registros consultados
   datosPdf : any [] = []; //variable que va a almacenar la informacion de la orden de compra consultada
 
@@ -76,7 +76,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     });
   }
 
-  //
+  // funcion que limpiará todo
   limpiarCampos(){
     this.cargando = false;
     this.FormConsultarFiltros.reset();
@@ -84,9 +84,11 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     this.registrosConsultados = [];
   }
 
-  //
+  // funcion que va a consultar los filtros utilizados para traer ka informacion
   consultarFiltros(){
     this.cargando = true;
+    this.registrosConsultados = [];
+    let ocConsultadas : number [] = [];
     let size_query : number;
     let oc : number = this.FormConsultarFiltros.value.Documento;
     let fechaInicial : any = this.FormConsultarFiltros.value.fechaDoc;
@@ -97,28 +99,32 @@ export class Reporte_OrdenCompraComponent implements OnInit {
       this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
         size_query = datos_orden.length;
         for (let i = 0; i < datos_orden.length; i++) {
-          this.llenarTabla(datos_orden[i]);
+          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
+          ocConsultadas.push(datos_orden[i].consecutivo);
         }
       });
     } else if (oc != null && fechaFinal != null && fechaInicial) {
       this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
         size_query = datos_orden.length;
         for (let i = 0; i < datos_orden.length; i++) {
-          this.llenarTabla(datos_orden[i]);
+          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
+          ocConsultadas.push(datos_orden[i].consecutivo);
         }
       });
     } else if (oc != null && fechaInicial != null && estado != null) {
       this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
         size_query = datos_orden.length;
         for (let i = 0; i < datos_orden.length; i++) {
-          if (datos_orden[i].estado_Id == estado && datos_orden[i].fecha == fechaInicial) this.llenarTabla(datos_orden[i]);
+          if (datos_orden[i].estado_Id == estado && datos_orden[i].fecha == fechaInicial) if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
+          ocConsultadas.push(datos_orden[i].consecutivo);
         }
       });
     } else if (fechaFinal != null && fechaInicial != null && estado != null) {
       this.dtOrdenCompraService.GetOrdenCompra_EstadoFechas(estado, fechaInicial, fechaFinal).subscribe(datos_orden => {
         size_query = datos_orden.length;
         for (let i = 0; i < datos_orden.length; i++) {
-          this.llenarTabla(datos_orden[i]);
+          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
+          ocConsultadas.push(datos_orden[i].consecutivo);
         }
       });
     } else if (oc != null && fechaInicial != null) {
@@ -132,49 +138,56 @@ export class Reporte_OrdenCompraComponent implements OnInit {
       this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
         size_query = datos_orden.length;
         for (let i = 0; i < datos_orden.length; i++) {
-          if (datos_orden[i].estado_Id == estado) this.llenarTabla(datos_orden[i]);
+          if (datos_orden[i].estado_Id == estado) if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
+          ocConsultadas.push(datos_orden[i].consecutivo);
         }
       });
     } else if (fechaInicial != null && estado != null) {
       this.dtOrdenCompraService.GetOrdenCompra_EstadoFechas(estado, fechaInicial, fechaFinal).subscribe(datos_orden => {
         size_query = datos_orden.length;
         for (let i = 0; i < datos_orden.length; i++) {
-          this.llenarTabla(datos_orden[i]);
+          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
+          ocConsultadas.push(datos_orden[i].consecutivo);
         }
       });
     } else if (fechaInicial != null && fechaFinal != null) {
       this.dtOrdenCompraService.GetOrdenCompra_fechas(fechaInicial, fechaFinal).subscribe(datos_orden => {
         size_query = datos_orden.length;
         for (let i = 0; i < datos_orden.length; i++) {
-          this.llenarTabla(datos_orden[i]);
+          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
+          ocConsultadas.push(datos_orden[i].consecutivo);
         }
       });
     } else if (oc != null) {
       this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {
         size_query = datos_orden.length;
         for (let i = 0; i < datos_orden.length; i++) {
-          this.llenarTabla(datos_orden[i]);
+          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
+          ocConsultadas.push(datos_orden[i].consecutivo);
         }
       });
     } else if (fechaInicial != null) {
       this.dtOrdenCompraService.GetOrdenCompra_fechas(fechaInicial, fechaInicial).subscribe(datos_orden => {
         size_query = datos_orden.length;
         for (let i = 0; i < datos_orden.length; i++) {
-          this.llenarTabla(datos_orden[i]);
+          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
+          ocConsultadas.push(datos_orden[i].consecutivo);
         }
       });
     } else if (estado != null) {
       this.dtOrdenCompraService.GetOrdenCompra_Estado(estado).subscribe(datos_orden => {
         size_query = datos_orden.length;
         for (let i = 0; i < datos_orden.length; i++) {
-          this.llenarTabla(datos_orden[i]);
+          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
+          ocConsultadas.push(datos_orden[i].consecutivo);
         }
       });
     } else {
       this.dtOrdenCompraService.GetOrdenCompra_fechas(this.today, this.today).subscribe(datos_orden => {
         size_query = datos_orden.length;
         for (let i = 0; i < datos_orden.length; i++) {
-          this.llenarTabla(datos_orden[i]);
+          if (!ocConsultadas.includes(datos_orden[i].consecutivo)) this.llenarTabla(datos_orden[i]);
+          ocConsultadas.push(datos_orden[i].consecutivo);
         }
       });
     }
@@ -193,7 +206,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     this.registrosConsultados.sort((a,b) => Number(a.Oc) - Number(b.Oc));
   }
 
-  //
+  // Funcion que limpiará los filtros utilizados en la tabla
   clear(table: Table) {
     table.clear();
   }
@@ -246,7 +259,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
           },
           content : [
             {
-              text: `Orden de Compra de Materia Prima`,
+              text: `Orden de Compra de Materia Prima N° ${datos_orden[i].consecutivo}`,
               alignment: 'right',
               style: 'titulo',
             },

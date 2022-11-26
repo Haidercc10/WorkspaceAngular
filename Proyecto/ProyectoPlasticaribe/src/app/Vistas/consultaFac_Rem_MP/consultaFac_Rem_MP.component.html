@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Consulta de Facturas y Remisiones de Materia Prima</h2>
+      <h2 class="tituloRojo">Consultar Facturas y Remisiones de Materia Prima</h2>
     </div>
 
     <div class="mb-4">
@@ -19,64 +19,50 @@
     </div>
   </div>
 </div>
+
 <div class="container">
   <form [formGroup]="FormDocumentos">
     <div class="mb-3">
       <div class="row g-3">
         <!-- ID Documento -->
-        <div class="form-floating col-md-3">
-          <input formControlName="idDocumento" type="number" class="form-control" id="floatingInput"required >
+        <div class="form-floating col-md-2">
+          <input formControlName="idDocumento" type="number" class="form-control" id="floatingInput">
           <label for="floatingInput">Id Documento</label>
         </div>
+
         <!-- Fecha -->
         <div class="form-floating col-md-2">
-          <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput"required >
+          <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput">
           <label for="floatingInput">Fecha</label>
         </div>
+
+        <!-- Fecha Final -->
+        <div class="form-floating col-md-2">
+          <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput">
+          <label for="floatingInput">Fecha</label>
+        </div>
+
         <!-- Tipo Docuemtno -->
         <div class="form-floating col-md-2">
-          <select formControlName="TipoDocumento" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+          <select formControlName="TipoDocumento" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example">
             <option [ngValue]="tiposDocumentos.tpDoc_Id" *ngFor="let tiposDocumentos of tipoDocumento">{{tiposDocumentos.tpDoc_Nombre}}</option>
-            <option>Remisiones sin Factura</option>
-            <option>Facturas sin Remisiones</option>
+            <!-- <option>Remisiones sin Factura</option>
+            <option>Facturas sin Remisiones</option> -->
           </select>
           <label for="floatingSelect">Tipo de Documento</label>
         </div>
+
         <!-- Proveedores -->
-        <div class="ng-autocomplete form-floating col-md form-control form-control-sm">
-          <ng-autocomplete
-            class=""
-            [data]="proveedor"
-            (selected)='selectEvent($event)'
-            (inputChanged)='onChangeSearch($event)'
-            (inputFocused)='onFocused($event)'
-            historyIdentifier="countriesTemplateList"
-            [historyHeading]="historyHeading"
-            [historyListMaxNumber]="3"
-            [searchKeyword]="keyword"
-            [itemTemplate]="itemTemplate"
-            [notFoundTemplate]="notFoundTemplate"
-            id="floatingInput"
-            formControlName="proveedores">
-          </ng-autocomplete>
-
-          <ng-template #itemTemplate let-item>
-            <a [innerHTML]="item.name"></a>
-          </ng-template>
-
-          <ng-template #notFoundTemplate let-notFound>
-            <div [innerHTML]="notFound"></div>
-          </ng-template>
-          <label for="floatingInput" *ngIf="validarInput">Proveedor</label>
+        <div class="form-floating col-md">
+          <input formControlName="proveedorNombre" class="form-control" list="Proveedor" id="floatingInput" (keyup)="consultarProveedores()" (change)="cambiarNombreProveedor()" title="Nombre del Proveedor" required>
+          <datalist id="Proveedor">
+            <option value={{item.prov_Id}} *ngFor="let item of proveedor">{{item.prov_Id}} - {{item.prov_Nombre}}</option>
+          </datalist>
+          <label for="floatingInput">Proveedor</label>
         </div>
-        <!-- <div class="form-floating col-md">
-          <select formControlName="proveedores" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
-            <option [ngValue]="proveedores.prov_Id" *ngFor="let proveedores of proveedor">{{proveedores.prov_Nombre}}</option>
-          </select>
-          <label for="floatingSelect">Proveedor</label>
-        </div> -->
       </div>
     </div>
+
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
@@ -85,12 +71,6 @@
       </div>
     </div>
   </form>
-
-  <!-- <div class="overlay" *ngIf="!load">
-    <div class="spinner ">
-      <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
-    </div>
-  </div> -->
 
   <div *ngIf="load">
     <div class="mb-2">
@@ -119,7 +99,7 @@
                 <ng-container *ngIf="ValidarRol == 1">
                   <td id="subTotal">{{doc.subTotal | currency : 'COP '}}</td>
                 </ng-container>
-                <td id="subTotalMateriaPrima"><input class="btn btn-danger btn-danger-sm" type="button" value="Ver" (click)="llenarDocumento(doc)"></td>
+                <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" (click)="llenarDocumento(doc)"></a></td>
               </tr>
             </tbody>
           </table>

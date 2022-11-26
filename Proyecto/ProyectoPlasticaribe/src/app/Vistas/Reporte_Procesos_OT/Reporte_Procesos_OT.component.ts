@@ -2966,6 +2966,16 @@ datos_ot[i].prod_Nombre,);
           EstProcOT_Observacion : datos_ot[i].estProcOT_Observacion,
           EstProcOT_FechaCreacion : datos_ot[i].estProcOT_FechaCreacion,
           EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
+          Usua_Id : datos_ot[i].usua_Id,
+          EstProcOT_FechaFinal : datos_ot[i].estProcOT_FechaFinal,
+          EstProcOT_FechaInicio: datos_ot[i].estProcOT_FechaInicio,
+          EstProcOT_CantidadPedidaUnd : datos_ot[i].estProcOT_CantidadPedidaUnd,
+          EstProcOT_HoraFinal : datos_ot[i].estProcOT_HoraFinal,
+          EstProcOT_HoraInicio : datos_ot[i].estProcOT_HoraInicio,
+          EstProcOT_DiffDiasInicio_Fin : datos_ot[i].estProcOT_DiffDiasInicio_Fin,
+          Cli_Id : datos_ot[i].cli_Id,
+          Prod_Id : datos_ot[i].prod_Id,
+          EstProcOT_CLiente : datos_ot[i].estProcOT_Cliente,
         }
         this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
           this.consultarOT();

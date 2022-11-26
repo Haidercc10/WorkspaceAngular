@@ -92,7 +92,17 @@ import { FiltroXClientes_OTVendedoresPipe } from './Pipes/FiltroXClientes_OTVend
 import { FiltroXProducto_OTVendedoresPipe } from './Pipes/FiltroXProducto_OTVendedores.pipe';
 import { DatosOTStatusComponent } from './Vistas/DatosOT-Status/DatosOT-Status.component';
 import { Reporte_RecuperadoMPComponent } from './Vistas/Reporte_RecuperadoMP/Reporte_RecuperadoMP.component';
+import { RoleGuardServiceGuard } from './Guards/role-guard-service.guard';
+import { Reporte_OrdenCompraComponent } from './Vistas/Reporte_OrdenCompra/reporte_OrdenCompra.component';
+import { Modal_RptRecuperadoMPComponent } from './Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
+import { IngresoRollos_ExtrusionComponent } from './Vistas/IngresoRollos_Extrusion/IngresoRollos_Extrusion.component';
+import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_Extrusion/AsignacionRollos_Extrusion.component';
+import { ReporteBodegaExtrusionComponent } from './Vistas/ReporteBodegaExtrusion/ReporteBodegaExtrusion.component';
+import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
+import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
+import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
 
+// Prime NG
 import {TableModule} from 'primeng/table';
 import {ToastModule} from 'primeng/toast';
 import {CalendarModule} from 'primeng/calendar';
@@ -115,27 +125,17 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { InputTextareaModule } from 'primeng/inputtextarea';
-import { Modal_RptRecuperadoMPComponent } from './Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
-import { IngresoRollos_ExtrusionComponent } from './Vistas/IngresoRollos_Extrusion/IngresoRollos_Extrusion.component';
-import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_Extrusion/AsignacionRollos_Extrusion.component';
-import { ReporteBodegaExtrusionComponent } from './Vistas/ReporteBodegaExtrusion/ReporteBodegaExtrusion.component';
-import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
-import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
-import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
 import {AccordionModule} from 'primeng/accordion';
-import { RoleGuardServiceGuard } from './Guards/role-guard-service.guard';
-import { Reporte_OrdenCompraComponent } from './Vistas/Reporte_OrdenCompra/reporte_OrdenCompra/reporte_OrdenCompra.component';
-
+//
 
 
 export const routes: Routes = [
 
   /******************************************************************** Inicio y Login **********************************************************************/
-  {path: 'inicio', component: InicioComponent},
+  // {path: 'inicio', component: InicioComponent},
   {path: 'Login', component: LoginComponentComponent},
   {path: '', component: LoginComponentComponent},
   {path: 'home', component: PaginaPrincipalComponent},
-  {path: 'menu-lateral', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: MenuLateralComponent},
   {path: 'Archivos', component: ArchivosComponent},
 
   /******************************************************************* Materia Prima ************************************************************************/
@@ -207,24 +207,24 @@ export const routes: Routes = [
   {path: 'crearproducto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component:CrearProductoComponent},
   {path: 'crear-clientes', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component:ClientesComponent},
 
-  {path: 'registro', component: RegistroComponentComponent},
-  {path: 'areas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: AreasComponentComponent},
-  {path: 'reportes', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReportesComponent},
-  {path: 'roles', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: RolesComponentComponent},
-  {path: 'eps', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: EpsComponent},
-  {path: 'fpension', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: FpensionComponent},
-  {path: 'cajacompensacion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: CajacompensacionComponent},
-  {path: 'opedido', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: OpedidoComponent},
-  {path: 'usuario', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component:UsuarioComponent},
-  {path: 'producto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component:ProductoComponent},
-  {path: 'estados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: EstadosComponent},
-  {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: DesperdicioComponent},
-  {path: 'prueba', component: PruebasComponent},
-  {path: 'desperdicio', component: DesperdicioComponent},
+ /************************************************************************************************************************************************************/
   {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
-  {path: 'reporte-estados-ot', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReporteEstadosOTComponent},
-  {path: 'Categorias', component: CrearCategoriasComponent},
-
+  // {path: 'registro', component: RegistroComponentComponent},
+  // {path: 'areas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: AreasComponentComponent},
+  // {path: 'reportes', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReportesComponent},
+  // {path: 'roles', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: RolesComponentComponent},
+  // {path: 'eps', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: EpsComponent},
+  // {path: 'fpension', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: FpensionComponent},
+  // {path: 'cajacompensacion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: CajacompensacionComponent},
+  // {path: 'opedido', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: OpedidoComponent},
+  // {path: 'usuario', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component:UsuarioComponent},
+  // {path: 'producto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component:ProductoComponent},
+  // {path: 'estados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: EstadosComponent},
+  // {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: DesperdicioComponent},
+  // {path: 'prueba', component: PruebasComponent},
+  // {path: 'desperdicio', component: DesperdicioComponent},
+  // {path: 'reporte-estados-ot', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReporteEstadosOTComponent},
+  // {path: 'Categorias', component: CrearCategoriasComponent},
 ]
 
 @NgModule({
@@ -333,7 +333,6 @@ export const routes: Routes = [
     MaterialExampleModule,
     NgxMatSelectSearchModule,
     AutocompleteLibModule,
-
     TableModule,
     CalendarModule,
 		SliderModule,

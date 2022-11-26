@@ -68,73 +68,12 @@
               </datalist>
               <label for="floatingInput" *ngIf="validarInputClientes">Cliente</label>
              </div>
-            <!-- <ng-container>
-              <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteClientes">
-                <ng-autocomplete
-                  class=""
-                  [data]="arrayClientes"
-                  (selected)='selectEventCliente($event)'
-                  (inputChanged)='onChangeSearchClientes($event)'
-                  (inputFocused)='onFocusedNombreClientes($event)'
-                  [searchKeyword]="keywordClientes"
-                  [itemTemplate]="itemTemplateCL"
-                  [notFoundTemplate]="notFoundTemplate"
-                  id="floatingInput"
-                  formControlName="Cliente">
-                </ng-autocomplete>
-                <ng-template #itemTemplateCL let-item>
-                  <a [innerHTML]="item.cli_Nombre"></a>
-                </ng-template>
-                <ng-template #notFoundTemplate let-notFound>
-                  <div [innerHTML]="notFound"></div>
-                </ng-template>
-                <label for="floatingInput" *ngIf="validarInputClientes">Cliente</label>
-              </div>
-            </ng-container> -->
-
-             <!-- Producto -->
-            <!-- <ng-container>
-              <div class="ng-autocomplete form-floating col-md form-control form-control-sm autoCompleteProductos" style="margin-left: 1%; margin-right: 1%;">
-                <ng-autocomplete
-                  class=""
-                  [data]="arrayProducto"
-                  (selected)='mostrarRollos($event)'
-                  (inputChanged)='onChangeSearchNombreProductos($event)'
-                  (inputFocused)='onFocusedNombreProductos($event)'
-                  [searchKeyword]="keywordNombresProductos"
-                  [itemTemplate]="itemTemplate1"
-                  [notFoundTemplate]="notFoundTemplate"
-                  id="floatingInput"
-                  formControlName="ProdNombre">
-                </ng-autocomplete>
-                <ng-template #itemTemplate1 let-item>
-                  <a [innerHTML]="item.prod_Nombre"></a>
-                </ng-template>
-                <ng-template #notFoundTemplate let-notFound>
-                  <div [innerHTML]="notFound"></div>
-                </ng-template>
-                <label for="floatingInput" *ngIf="validarInputNombresProductos">Producto</label>
-              </div>
-            </ng-container> -->
           </div>
         </div>
 
         <!--Fila 2-->
         <div class="mb-4">
           <div class="row g-3">
-           <!-- Conductor -->
-            <!-- <div class="form-floating col-md-3">
-              <select formControlName="Conductor" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-                <option [ngValue]="conductor.usua_Id" *ngFor="let conductor of arrayConductor">{{conductor.usua_Nombre}}</option>
-              </select>
-              <label for="floatingSelect">Conductor</label>
-            </div> -->
-
-            <!--Placa camión-->
-            <!-- <div class="form-floating col-md-2">
-              <input formControlName="PlacaCamion" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Placa Camión</label>
-            </div> -->
 
             <!-- Nota Credito -->
             <div class="form-floating col-md-2">

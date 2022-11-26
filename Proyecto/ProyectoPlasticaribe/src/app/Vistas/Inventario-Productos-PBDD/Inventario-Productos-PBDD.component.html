@@ -23,29 +23,10 @@
           <div class="mb-3">
             <div class="row g-3" style="margin-right: auto; margin-left: auto;">
 
-              <!--
-              <div class="">
-                <h5 class="tituloRojo">Filtro de búsqueda</h5>
-              </div> -->
-
-              <div class="form-floating col-md-4">
-                <input type="text" name="NombrePT" formControlName="filtroProducto" [(ngModel)]="NombrePT" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
-                <label for="floatingInput">Nombre Producto</label>
-              </div>
-
-              <!--
-              <div class="">
-                <h5 class="tituloRojo">Actualizar Cant. Minima</h5>
-              </div> -->
-              <!--
-              <label *ngIf="numeroIdProd != 0">Item seleccionado: <b>{{numeroIdProd}}</b></label>
-              <div class="form-floating col-md-3">
-                <input type="number" formControlName="cantMinima" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="actualizarCantMinima()">
-                <label for="floatingInput">Cantidad Minima Item</label>
-              </div>
-              -->
-
-
+            <div class="form-floating col-md-4">
+              <input type="text" name="NombrePT" formControlName="filtroProducto" [(ngModel)]="NombrePT" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
+              <label for="floatingInput">Nombre Producto</label>
+            </div>
 
             <div class="form-floating col-md-1">
               <input type="number" formControlName="cantidad" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="actualizarCantMinima()">
@@ -64,7 +45,7 @@
               <div class="mb-3">
                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                  <!-- <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarCantMinima()">Actualizar</button> -->
-                  <button class="btn btn-danger btn-danger-sm" type="button" (click)="exportarExcel()">Exportar Excel</button>
+                 <button type="button" style="width: 160px;" pButton pRipple icon="pi pi-file-excel" (click)="exportarExcel()" class="p-button-success mr" pTooltip="Exportar a Excel" tooltipPosition="bottom">Exporta a Excel</button>
                   <button class="btn btn-danger btn-danger-sm" type="button" (click)="buscarPrecios()">Ult. Actualización</button>
                 </div>
               </div>
@@ -77,12 +58,6 @@
         </div>
       </form>
 
-      <!-- <div class="overlay" *ngIf="!load">
-        <div class="spinner ">
-          <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
-        </div>
-      </div> -->
-
     <div *ngIf="load">
       <div class="mb-4">
         <div class="row g-3">
@@ -91,7 +66,6 @@
               <thead class="TitulosTabla">
                 <tr *ngFor="let columnas of titulosTabla let i = index">
                   <th scope="col" class="idProducto">{{columnas.invItem}}</th>
-                  <!--<th id="Cliente" scope="col" (dblclick)="organizarCliente_A_Z()" (click)="organizarCliente_Z_A()">{{columnas.invCliente}}</th>-->
                   <th id="nombre" scope="col" (dblclick)="organizarProducto_A_Z()" (click)="organizarProducto_Z_A()">{{columnas.invNombre}}</th>
                   <th id="precio" scope="col">{{columnas.invPrecio}}</th>
                   <th id="existencias" scope="col"><button class="existencias" (dblclick)="organizarExistenciasDobleClick()" (click)="organizarExistenciasUnClick()"><b>{{columnas.invStock}}</b></button></th>
@@ -107,7 +81,6 @@
               <tbody>
                 <tr *ngFor="let prodBDNueva of ArrayProductosBDNueva | BuscarInventarioXProducto: NombrePT let i=index">
                   <th id="id" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.Item}}</th>
-                  <!--<td id="cliente" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.ClienteNombre}}</td>-->
                   <td id="Nombre" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.NombreItem}}</td>
                   <td id="precio" class="TextosInfoTabla" (click)="seleccionarProducto(prodBDNueva)">{{prodBDNueva.PrecioItem | number : '1.2-2'}}</td>
 
@@ -131,7 +104,6 @@
                 </tr>
               </tbody>
             </table>
-
           </div>
         </div>
       </div>

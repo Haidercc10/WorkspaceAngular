@@ -1,12 +1,9 @@
-import { ThisReceiver } from '@angular/compiler';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { AsignacionRollos_ExtrusionService } from 'src/app/Servicios/AsignacionRollos_Extrusion.service';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollos_Extrusion.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DtIngRollos_Extrusion.service';
 import { ProcesosService } from 'src/app/Servicios/procesos.service';
@@ -274,7 +271,14 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
       }
 
       setTimeout(() => {
-        if (consulta <= 0) Swal.fire(`No hay rollos por salir`);
+        if (consulta <= 0){
+          Swal.fire({
+            icon: 'warning',
+            title: 'Oops...',
+            html:
+            `<b>¡No hay rollos por salir!</b><hr> `,
+          });
+        }
         this.cargando = true;
       }, 2000);
     }, 3000);
@@ -390,22 +394,22 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         Usua_Id : this.storage_Id,
       }
       this.asgRollos.srvGuardar(info).subscribe(datos_rollos => {
-        this.asgRollos.obtenerUltimoId().subscribe(datos_salida => { this.dtSalidaRollos(datos_salida.asgRollos_Id); });
-      }, error => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
+        this.asgRollos.obtenerUltimoId().subscribe(datos_salida => { this.dtSalidaRollos(datos_salida.asgRollos_Id); }, error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            html:
+            `<b>¡Error al obtener el último Id de asignación!</b><hr>` +
+            `<b style="color: #f00">${error.message}</b>`,
+          });
         });
-        Toast.fire({
+      }, error => {
+        Swal.fire({
           icon: 'error',
-          title: '¡Error al dar salida a los rollos!'
+          title: 'Oops...',
+          html:
+          `<b>¡Error al dar salida a los rollos!</b><hr>` +
+          `<b style="color: #f00">${error.message}</b>`,
         });
         this.cargando = true;
       });
@@ -427,20 +431,12 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
           Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
         }
         this.dtAsgRollos.srvGuardar(info).subscribe(datos_rollos => {  }, error => {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 2500,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          });
-          Toast.fire({
+          Swal.fire({
             icon: 'error',
-            title: '¡Error al dar salida a los rollos!'
+            title: 'Oops...',
+            html:
+            `<b>¡Error al dar salida a los rollos!</b><hr>` +
+            `<b style="color: #f00">${error.message}</b>`,
           });
           this.cargando = true;
         });
@@ -466,20 +462,12 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
             Prod_Id : datos_Rollos[j].prod_Id,
           }
           this.dtIngRollosService.srvActualizar(datos_Rollos[j].dtIngRollo_Id, info).subscribe(datos_actualizados => {  }, error => {
-            const Toast = Swal.mixin({
-              toast: true,
-              position: 'center',
-              showConfirmButton: false,
-              timer: 4500,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-              }
-            });
-            Toast.fire({
+            Swal.fire({
               icon: 'error',
-              title: '¡No fue posible actualizar el estado de los rollos!'
+              title: 'Oops...',
+              html:
+              `<b>¡No fue posible actualizar el estado de los rollos!</b><hr>` +
+              `<b style="color: #f00">${error.message}</b>`,
             });
             this.cargando = true;
           });
@@ -492,20 +480,11 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   finalizarInsercion(id : number){
     this.cambioEstado();
     setTimeout(() => {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 4000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
+      Swal.fire({
         icon: 'success',
-        title: `¡${this.totalRollos} rollos han sido asignados correctamente!`
+        title: 'Oops...',
+        html:
+        `<b>¡${this.totalRollos} fueron asignados correctamente!</b><hr>`,
       });
       this.buscarRolloPDF(id);
     }, 2000);

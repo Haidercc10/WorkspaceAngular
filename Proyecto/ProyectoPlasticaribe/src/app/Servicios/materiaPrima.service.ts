@@ -70,6 +70,10 @@ export class MateriaPrimaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMatPrimasYTintasxId/${Id}`);
   }
 
+  GetMateriaPrima_LikeNombre(nombre : string){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/GetMateriaPrima_LikeNombre/${nombre}`);
+  }
+
   //Metodo agregar Productos
   srvAgregar(data : any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data)

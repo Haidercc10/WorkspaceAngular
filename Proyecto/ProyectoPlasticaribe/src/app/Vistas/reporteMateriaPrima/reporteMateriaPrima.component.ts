@@ -26,6 +26,7 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import { Entrada_TintaService } from 'src/app/Servicios/Entrada_Tinta.service';
 import { Detalles_EntradaTintasService } from 'src/app/Servicios/Detalles_EntradaTintas.service';
+import { Table } from 'primeng/table/table';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -102,7 +103,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : ['', Validators.required],
-      MpNombre: [, Validators.required],
+      MpNombre: ['', Validators.required],
       MpCantidad : ['', Validators.required],
       MpPrecio: ['', Validators.required],
       MpUnidadMedida: ['', Validators.required],
@@ -193,9 +194,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.fecha();
     this.obtenerCategorias();
     setTimeout(() => {
-      this.obtenerBOPP();
-      this.obtenerTintas();
-      this.obtenerMateriasPrimasRetiradas();
       this.obtenerBodegas();
     }, 500);
   }
@@ -326,18 +324,33 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion para obtener las materias primas registradas
   obtenerMateriasPrimasRetiradas(){
-    if (this.ValidarRol == 1 || this.ValidarRol == 3){
-      this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
-        for (let index = 0; index < datos_materiaPrima.length; index++) {
-          const mp : any = {
-            Id : datos_materiaPrima[index].matPri_Id,
-            Nombre : datos_materiaPrima[index].matPri_Nombre,
-          }
-          this.materiasPrimas.push(mp);
-          this.materiasPrimas.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-        }
-      });
-    }
+    this.materiasPrimas = [];
+    let nombre : string = this.FormMateriaPrima.value.MpNombre;
+    this.materiaPrimaService.GetMateriaPrima_LikeNombre(nombre).subscribe(datos_materiaPrima => {
+      for (let i = 0; i < datos_materiaPrima.length; i++) {
+        this.materiasPrimas.push(datos_materiaPrima[i]);
+      }
+    });
+  }
+
+  //Funcion que va a mostrar el nombre de la materia prima
+  cambiarNombreMateriaPrima(){
+    let id : number = this.FormMateriaPrima.value.MpNombre;
+    this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
+      for (let i = 0; i < datos_materiaPrima.length; i++) {
+        this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
+          MpId : datos_materiaPrima[i].id,
+          MpNombre: datos_materiaPrima[i].nombre,
+          MpCantidad : this.FormMateriaPrima.value.MpCantidad,
+          MpPrecio: this.FormMateriaPrima.value.MpPrecio,
+          MpUnidadMedida: this.FormMateriaPrima.value.MpUnidadMedida,
+          fecha: this.FormMateriaPrima.value.fecha,
+          fechaFinal: this.FormMateriaPrima.value.fechaFinal,
+          MpCategoria : this.FormMateriaPrima.value.MpCategoria,
+          MpBodega : this.FormMateriaPrima.value.MpBodega,
+        });
+      }
+    });
   }
 
   // Funcion para buscar por id una materia prima o bopp o tinta
@@ -625,7 +638,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   }
 
   cargarTabla(id : number, nombre : string, ancho : number, inicial : number, entrada : number, salida : number, stock : number, diferencia : number, presentacion : string, precio : number, subtotal : number, categoria : string){
-    if (!this.idMateriasPrimas.includes(id)){
+    if (!this.idMateriasPrimas.includes(id) && id != 84 && id != 2001 && id != 88 && id != 89 && id != 2072){
       this.valorTotal = this.valorTotal + precio * stock;
       let productoExt : any = {
         Id : id,
@@ -665,40 +678,78 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.categoriaBOPP = '';
 
     if (fecha != null && fechaFinal != null && (materiaPrima != null || idMateriaPrima != null) && categoria != null) {
-      if (materiaPrima != null) {
-        this.materiaPrimaService.srvObtenerListaNumero1(fecha, fechaFinal, materiaPrima, categoria).subscribe(datos_materiaPrima => {
-          for (let i = 0; i < datos_materiaPrima.length; i++) {
-            this.cargarTabla(datos_materiaPrima[i].id,
-              datos_materiaPrima[i].nombre,
-              datos_materiaPrima[i].ancho,
-              datos_materiaPrima[i].inicial,
-              datos_materiaPrima[i].entrada,
-              datos_materiaPrima[i].salida,
-              datos_materiaPrima[i].stock,
-              datos_materiaPrima[i].diferencia,
-              datos_materiaPrima[i].presentacion,
-              datos_materiaPrima[i].precio,
-              datos_materiaPrima[i].subTotal,
-              datos_materiaPrima[i].categoria);
-          }
-        });
-      } else if (idMateriaPrima != null) {
-        this.materiaPrimaService.srvObtenerListaNumero1(fecha, fechaFinal, idMateriaPrima, categoria).subscribe(datos_materiaPrima => {
-          for (let i = 0; i < datos_materiaPrima.length; i++) {
-            this.cargarTabla(datos_materiaPrima[i].id,
-              datos_materiaPrima[i].nombre,
-              datos_materiaPrima[i].ancho,
-              datos_materiaPrima[i].inicial,
-              datos_materiaPrima[i].entrada,
-              datos_materiaPrima[i].salida,
-              datos_materiaPrima[i].stock,
-              datos_materiaPrima[i].diferencia,
-              datos_materiaPrima[i].presentacion,
-              datos_materiaPrima[i].precio,
-              datos_materiaPrima[i].subTotal,
-              datos_materiaPrima[i].categoria);
-          }
-        });
+      if (categoria != 0) {
+        if (materiaPrima != null) {
+          this.materiaPrimaService.srvObtenerListaNumero1(fecha, fechaFinal, materiaPrima, categoria).subscribe(datos_materiaPrima => {
+            for (let i = 0; i < datos_materiaPrima.length; i++) {
+              this.cargarTabla(datos_materiaPrima[i].id,
+                datos_materiaPrima[i].nombre,
+                datos_materiaPrima[i].ancho,
+                datos_materiaPrima[i].inicial,
+                datos_materiaPrima[i].entrada,
+                datos_materiaPrima[i].salida,
+                datos_materiaPrima[i].stock,
+                datos_materiaPrima[i].diferencia,
+                datos_materiaPrima[i].presentacion,
+                datos_materiaPrima[i].precio,
+                datos_materiaPrima[i].subTotal,
+                datos_materiaPrima[i].categoria);
+            }
+          });
+        } else if (idMateriaPrima != null) {
+          this.materiaPrimaService.srvObtenerListaNumero1(fecha, fechaFinal, idMateriaPrima, categoria).subscribe(datos_materiaPrima => {
+            for (let i = 0; i < datos_materiaPrima.length; i++) {
+              this.cargarTabla(datos_materiaPrima[i].id,
+                datos_materiaPrima[i].nombre,
+                datos_materiaPrima[i].ancho,
+                datos_materiaPrima[i].inicial,
+                datos_materiaPrima[i].entrada,
+                datos_materiaPrima[i].salida,
+                datos_materiaPrima[i].stock,
+                datos_materiaPrima[i].diferencia,
+                datos_materiaPrima[i].presentacion,
+                datos_materiaPrima[i].precio,
+                datos_materiaPrima[i].subTotal,
+                datos_materiaPrima[i].categoria);
+            }
+          });
+        }
+      } else if (categoria == 0) {
+        if (materiaPrima != null) {
+          this.materiaPrimaService.GetConsultaMateriaPrimaF(fecha, fecha, materiaPrima).subscribe(datos_consulta => {
+            for (let j = 0; j < datos_consulta.length; j++) {
+              if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                datos_consulta[j].nombre,
+                                                                datos_consulta[j].ancho,
+                                                                datos_consulta[j].inicial,
+                                                                datos_consulta[j].entrada,
+                                                                datos_consulta[j].salida,
+                                                                datos_consulta[j].stock,
+                                                                datos_consulta[j].diferencia,
+                                                                datos_consulta[j].presentacion,
+                                                                datos_consulta[j].precio,
+                                                                datos_consulta[j].subTotal,
+                                                                datos_consulta[j].categoria);
+            }
+          });
+        } else if (idMateriaPrima != null) {
+          this.materiaPrimaService.GetConsultaMateriaPrimaF(fecha, fecha, idMateriaPrima).subscribe(datos_consulta => {
+            for (let j = 0; j < datos_consulta.length; j++) {
+              if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                datos_consulta[j].nombre,
+                                                                datos_consulta[j].ancho,
+                                                                datos_consulta[j].inicial,
+                                                                datos_consulta[j].entrada,
+                                                                datos_consulta[j].salida,
+                                                                datos_consulta[j].stock,
+                                                                datos_consulta[j].diferencia,
+                                                                datos_consulta[j].presentacion,
+                                                                datos_consulta[j].precio,
+                                                                datos_consulta[j].subTotal,
+                                                                datos_consulta[j].categoria);
+            }
+          });
+        }
       }
     } else if (fecha != null && fechaFinal != null && (materiaPrima != null || idMateriaPrima != null)) {
       if (materiaPrima != null) {
@@ -737,40 +788,78 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         });
       }
     } else if (fecha != null && (materiaPrima != null || idMateriaPrima != null) && categoria != null) {
-      if (materiaPrima != null) {
-        this.materiaPrimaService.srvObtenerListaNumero1(fecha, fecha, materiaPrima, categoria).subscribe(datos_materiaPrima => {
-          for (let i = 0; i < datos_materiaPrima.length; i++) {
-            this.cargarTabla(datos_materiaPrima[i].id,
-              datos_materiaPrima[i].nombre,
-              datos_materiaPrima[i].ancho,
-              datos_materiaPrima[i].inicial,
-              datos_materiaPrima[i].entrada,
-              datos_materiaPrima[i].salida,
-              datos_materiaPrima[i].stock,
-              datos_materiaPrima[i].diferencia,
-              datos_materiaPrima[i].presentacion,
-              datos_materiaPrima[i].precio,
-              datos_materiaPrima[i].subTotal,
-              datos_materiaPrima[i].categoria);
-          }
-        });
-      } else if (idMateriaPrima != null) {
-        this.materiaPrimaService.srvObtenerListaNumero1(fecha, fecha, idMateriaPrima, categoria).subscribe(datos_materiaPrima => {
-          for (let i = 0; i < datos_materiaPrima.length; i++) {
-            this.cargarTabla(datos_materiaPrima[i].id,
-              datos_materiaPrima[i].nombre,
-              datos_materiaPrima[i].ancho,
-              datos_materiaPrima[i].inicial,
-              datos_materiaPrima[i].entrada,
-              datos_materiaPrima[i].salida,
-              datos_materiaPrima[i].stock,
-              datos_materiaPrima[i].diferencia,
-              datos_materiaPrima[i].presentacion,
-              datos_materiaPrima[i].precio,
-              datos_materiaPrima[i].subTotal,
-              datos_materiaPrima[i].categoria);
-          }
-        });
+      if (categoria != 0) {
+        if (materiaPrima != null) {
+          this.materiaPrimaService.srvObtenerListaNumero1(fecha, fecha, materiaPrima, categoria).subscribe(datos_materiaPrima => {
+            for (let i = 0; i < datos_materiaPrima.length; i++) {
+              this.cargarTabla(datos_materiaPrima[i].id,
+                datos_materiaPrima[i].nombre,
+                datos_materiaPrima[i].ancho,
+                datos_materiaPrima[i].inicial,
+                datos_materiaPrima[i].entrada,
+                datos_materiaPrima[i].salida,
+                datos_materiaPrima[i].stock,
+                datos_materiaPrima[i].diferencia,
+                datos_materiaPrima[i].presentacion,
+                datos_materiaPrima[i].precio,
+                datos_materiaPrima[i].subTotal,
+                datos_materiaPrima[i].categoria);
+            }
+          });
+        } else if (idMateriaPrima != null) {
+          this.materiaPrimaService.srvObtenerListaNumero1(fecha, fecha, idMateriaPrima, categoria).subscribe(datos_materiaPrima => {
+            for (let i = 0; i < datos_materiaPrima.length; i++) {
+              this.cargarTabla(datos_materiaPrima[i].id,
+                datos_materiaPrima[i].nombre,
+                datos_materiaPrima[i].ancho,
+                datos_materiaPrima[i].inicial,
+                datos_materiaPrima[i].entrada,
+                datos_materiaPrima[i].salida,
+                datos_materiaPrima[i].stock,
+                datos_materiaPrima[i].diferencia,
+                datos_materiaPrima[i].presentacion,
+                datos_materiaPrima[i].precio,
+                datos_materiaPrima[i].subTotal,
+                datos_materiaPrima[i].categoria);
+            }
+          });
+        }
+      } else if (categoria == 0) {
+        if (materiaPrima != null) {
+          this.materiaPrimaService.GetConsultaMateriaPrimaF(fecha, fecha, materiaPrima).subscribe(datos_consulta => {
+            for (let j = 0; j < datos_consulta.length; j++) {
+              if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                datos_consulta[j].nombre,
+                                                                datos_consulta[j].ancho,
+                                                                datos_consulta[j].inicial,
+                                                                datos_consulta[j].entrada,
+                                                                datos_consulta[j].salida,
+                                                                datos_consulta[j].stock,
+                                                                datos_consulta[j].diferencia,
+                                                                datos_consulta[j].presentacion,
+                                                                datos_consulta[j].precio,
+                                                                datos_consulta[j].subTotal,
+                                                                datos_consulta[j].categoria);
+            }
+          });
+        } else if (idMateriaPrima != null) {
+          this.materiaPrimaService.GetConsultaMateriaPrimaF(fecha, fecha, idMateriaPrima).subscribe(datos_consulta => {
+            for (let j = 0; j < datos_consulta.length; j++) {
+              if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                datos_consulta[j].nombre,
+                                                                datos_consulta[j].ancho,
+                                                                datos_consulta[j].inicial,
+                                                                datos_consulta[j].entrada,
+                                                                datos_consulta[j].salida,
+                                                                datos_consulta[j].stock,
+                                                                datos_consulta[j].diferencia,
+                                                                datos_consulta[j].presentacion,
+                                                                datos_consulta[j].precio,
+                                                                datos_consulta[j].subTotal,
+                                                                datos_consulta[j].categoria);
+            }
+          });
+        }
       }
     } else if (fecha != null && (materiaPrima != null || idMateriaPrima != null)) {
       if (materiaPrima != null) {
@@ -809,107 +898,208 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         });
       }
     } else if (fecha != null && fechaFinal != null && categoria != null) {
-      this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrimas => {
-        for (let i = 0; i < datos_materiaPrimas.length; i++) {
-          if (datos_materiaPrimas[i].catMP_Id == categoria) {
-            this.materiaPrimaService.srvObtenerListaNumero1(fecha, fechaFinal, datos_materiaPrimas[i].matPri_Id, categoria).subscribe(datos_consulta => {
+      if (categoria != 0) {
+        this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrimas => {
+          for (let i = 0; i < datos_materiaPrimas.length; i++) {
+            if (datos_materiaPrimas[i].catMP_Id == categoria) {
+              this.materiaPrimaService.srvObtenerListaNumero1(fecha, fechaFinal, datos_materiaPrimas[i].matPri_Id, categoria).subscribe(datos_consulta => {
+                for (let j = 0; j < datos_consulta.length; j++) {
+                  this.cargarTabla(datos_consulta[j].id,
+                    datos_consulta[j].nombre,
+                    datos_consulta[j].ancho,
+                    datos_consulta[j].inicial,
+                    datos_consulta[j].entrada,
+                    datos_consulta[j].salida,
+                    datos_consulta[j].stock,
+                    datos_consulta[j].diferencia,
+                    datos_consulta[j].presentacion,
+                    datos_consulta[j].precio,
+                    datos_consulta[j].subTotal,
+                    datos_consulta[j].categoria);
+                }
+              });
+            }
+          }
+        });
+        this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+          for (let i = 0; i < datos_bopp.length; i++) {
+            if (datos_bopp[i].catMP_Id == categoria) {
+              this.materiaPrimaService.srvObtenerListaNumero1(fecha, fechaFinal, datos_bopp[i].bopP_Serial, categoria).subscribe(datos_consulta => {
+                for (let j = 0; j < datos_consulta.length; j++) {
+                  this.cargarTabla(datos_consulta[j].id,
+                    datos_consulta[j].nombre,
+                    datos_consulta[j].ancho,
+                    datos_consulta[j].inicial,
+                    datos_consulta[j].entrada,
+                    datos_consulta[j].salida,
+                    datos_consulta[j].stock,
+                    datos_consulta[j].diferencia,
+                    datos_consulta[j].presentacion,
+                    datos_consulta[j].precio,
+                    datos_consulta[j].subTotal,
+                    datos_consulta[j].categoria);
+                }
+              });
+            }
+          }
+        });
+        this.tintasService.srvObtenerLista().subscribe(datos_tinta => {
+          for (let i = 0; i < datos_tinta.length; i++) {
+            if (datos_tinta[i].catMP_Id == categoria) {
+              this.materiaPrimaService.srvObtenerListaNumero1(fecha, fechaFinal, datos_tinta[i].tinta_Id, categoria).subscribe(datos_consulta => {
+                for (let j = 0; j < datos_consulta.length; j++) {
+                  this.cargarTabla(datos_consulta[j].id,
+                    datos_consulta[j].nombre,
+                    datos_consulta[j].ancho,
+                    datos_consulta[j].inicial,
+                    datos_consulta[j].entrada,
+                    datos_consulta[j].salida,
+                    datos_consulta[j].stock,
+                    datos_consulta[j].diferencia,
+                    datos_consulta[j].presentacion,
+                    datos_consulta[j].precio,
+                    datos_consulta[j].subTotal,
+                    datos_consulta[j].categoria);
+                }
+              });
+            }
+          }
+        });
+      } else if (categoria == 0){
+        this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
+          for (let i = 0; i < datos_materiaPrima.length; i++) {
+            this.materiaPrimaService.GetConsultaMateriaPrimaF(fecha, fechaFinal, datos_materiaPrima[i].matPri_Id).subscribe(datos_consulta => {
               for (let j = 0; j < datos_consulta.length; j++) {
-                this.cargarTabla(datos_consulta[j].id,
-                  datos_consulta[j].nombre,
-                  datos_consulta[j].ancho,
-                  datos_consulta[j].inicial,
-                  datos_consulta[j].entrada,
-                  datos_consulta[j].salida,
-                  datos_consulta[j].stock,
-                  datos_consulta[j].diferencia,
-                  datos_consulta[j].presentacion,
-                  datos_consulta[j].precio,
-                  datos_consulta[j].subTotal,
-                  datos_consulta[j].categoria);
+                if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                  datos_consulta[j].nombre,
+                                                                  datos_consulta[j].ancho,
+                                                                  datos_consulta[j].inicial,
+                                                                  datos_consulta[j].entrada,
+                                                                  datos_consulta[j].salida,
+                                                                  datos_consulta[j].stock,
+                                                                  datos_consulta[j].diferencia,
+                                                                  datos_consulta[j].presentacion,
+                                                                  datos_consulta[j].precio,
+                                                                  datos_consulta[j].subTotal,
+                                                                  datos_consulta[j].categoria);
               }
             });
           }
-        }
-      });
-      this.boppService.srvObtenerLista().subscribe(datos_bopp => {
-        for (let i = 0; i < datos_bopp.length; i++) {
-          if (datos_bopp[i].catMP_Id == categoria) {
-            this.materiaPrimaService.srvObtenerListaNumero1(fecha, fechaFinal, datos_bopp[i].bopP_Serial, categoria).subscribe(datos_consulta => {
+        });
+        this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+          for (let i = 0; i < datos_bopp.length; i++) {
+            this.materiaPrimaService.GetConsultaMateriaPrimaF(fecha, fechaFinal, datos_bopp[i].bopP_Serial).subscribe(datos_consulta => {
               for (let j = 0; j < datos_consulta.length; j++) {
-                this.cargarTabla(datos_consulta[j].id,
-                  datos_consulta[j].nombre,
-                  datos_consulta[j].ancho,
-                  datos_consulta[j].inicial,
-                  datos_consulta[j].entrada,
-                  datos_consulta[j].salida,
-                  datos_consulta[j].stock,
-                  datos_consulta[j].diferencia,
-                  datos_consulta[j].presentacion,
-                  datos_consulta[j].precio,
-                  datos_consulta[j].subTotal,
-                  datos_consulta[j].categoria);
+                if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                  datos_consulta[j].nombre,
+                                                                  datos_consulta[j].ancho,
+                                                                  datos_consulta[j].inicial,
+                                                                  datos_consulta[j].entrada,
+                                                                  datos_consulta[j].salida,
+                                                                  datos_consulta[j].stock,
+                                                                  datos_consulta[j].diferencia,
+                                                                  datos_consulta[j].presentacion,
+                                                                  datos_consulta[j].precio,
+                                                                  datos_consulta[j].subTotal,
+                                                                  datos_consulta[j].categoria);
               }
             });
           }
-        }
-      });
-      this.tintasService.srvObtenerLista().subscribe(datos_tinta => {
-        for (let i = 0; i < datos_tinta.length; i++) {
-          if (datos_tinta[i].catMP_Id == categoria) {
-            this.materiaPrimaService.srvObtenerListaNumero1(fecha, fechaFinal, datos_tinta[i].tinta_Id, categoria).subscribe(datos_consulta => {
+        });
+        this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
+          for (let i = 0; i < datos_tintas.length; i++) {
+            this.materiaPrimaService.GetConsultaMateriaPrimaF(fecha, fechaFinal, datos_tintas[i].tinta_Id).subscribe(datos_consulta => {
               for (let j = 0; j < datos_consulta.length; j++) {
-                this.cargarTabla(datos_consulta[j].id,
-                  datos_consulta[j].nombre,
-                  datos_consulta[j].ancho,
-                  datos_consulta[j].inicial,
-                  datos_consulta[j].entrada,
-                  datos_consulta[j].salida,
-                  datos_consulta[j].stock,
-                  datos_consulta[j].diferencia,
-                  datos_consulta[j].presentacion,
-                  datos_consulta[j].precio,
-                  datos_consulta[j].subTotal,
-                  datos_consulta[j].categoria);
+                if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                  datos_consulta[j].nombre,
+                                                                  datos_consulta[j].ancho,
+                                                                  datos_consulta[j].inicial,
+                                                                  datos_consulta[j].entrada,
+                                                                  datos_consulta[j].salida,
+                                                                  datos_consulta[j].stock,
+                                                                  datos_consulta[j].diferencia,
+                                                                  datos_consulta[j].presentacion,
+                                                                  datos_consulta[j].precio,
+                                                                  datos_consulta[j].subTotal,
+                                                                  datos_consulta[j].categoria);
               }
             });
           }
-        }
-      });
+        });
+      }
     } else if ((materiaPrima != null || idMateriaPrima != null) && categoria != null) {
-      if (materiaPrima != null) {
-        this.materiaPrimaService.srvObtenerListaNumero1(this.today, this.today, materiaPrima, categoria).subscribe(datos_materiaPrima => {
-          for (let i = 0; i < datos_materiaPrima.length; i++) {
-            this.cargarTabla(datos_materiaPrima[i].id,
-              datos_materiaPrima[i].nombre,
-              datos_materiaPrima[i].ancho,
-              datos_materiaPrima[i].inicial,
-              datos_materiaPrima[i].entrada,
-              datos_materiaPrima[i].salida,
-              datos_materiaPrima[i].stock,
-              datos_materiaPrima[i].diferencia,
-              datos_materiaPrima[i].presentacion,
-              datos_materiaPrima[i].precio,
-              datos_materiaPrima[i].subTotal,
-              datos_materiaPrima[i].categoria);
-          }
-        });
-      } else if (idMateriaPrima != null) {
-        this.materiaPrimaService.srvObtenerListaNumero1(this.today, this.today, idMateriaPrima, categoria).subscribe(datos_materiaPrima => {
-          for (let i = 0; i < datos_materiaPrima.length; i++) {
-            this.cargarTabla(datos_materiaPrima[i].id,
-              datos_materiaPrima[i].nombre,
-              datos_materiaPrima[i].ancho,
-              datos_materiaPrima[i].inicial,
-              datos_materiaPrima[i].entrada,
-              datos_materiaPrima[i].salida,
-              datos_materiaPrima[i].stock,
-              datos_materiaPrima[i].diferencia,
-              datos_materiaPrima[i].presentacion,
-              datos_materiaPrima[i].precio,
-              datos_materiaPrima[i].subTotal,
-              datos_materiaPrima[i].categoria);
-          }
-        });
+      if (categoria != 0) {
+        if (materiaPrima != null) {
+          this.materiaPrimaService.srvObtenerListaNumero1(this.today, this.today, materiaPrima, categoria).subscribe(datos_materiaPrima => {
+            for (let i = 0; i < datos_materiaPrima.length; i++) {
+              this.cargarTabla(datos_materiaPrima[i].id,
+                datos_materiaPrima[i].nombre,
+                datos_materiaPrima[i].ancho,
+                datos_materiaPrima[i].inicial,
+                datos_materiaPrima[i].entrada,
+                datos_materiaPrima[i].salida,
+                datos_materiaPrima[i].stock,
+                datos_materiaPrima[i].diferencia,
+                datos_materiaPrima[i].presentacion,
+                datos_materiaPrima[i].precio,
+                datos_materiaPrima[i].subTotal,
+                datos_materiaPrima[i].categoria);
+            }
+          });
+        } else if (idMateriaPrima != null) {
+          this.materiaPrimaService.srvObtenerListaNumero1(this.today, this.today, idMateriaPrima, categoria).subscribe(datos_materiaPrima => {
+            for (let i = 0; i < datos_materiaPrima.length; i++) {
+              this.cargarTabla(datos_materiaPrima[i].id,
+                datos_materiaPrima[i].nombre,
+                datos_materiaPrima[i].ancho,
+                datos_materiaPrima[i].inicial,
+                datos_materiaPrima[i].entrada,
+                datos_materiaPrima[i].salida,
+                datos_materiaPrima[i].stock,
+                datos_materiaPrima[i].diferencia,
+                datos_materiaPrima[i].presentacion,
+                datos_materiaPrima[i].precio,
+                datos_materiaPrima[i].subTotal,
+                datos_materiaPrima[i].categoria);
+            }
+          });
+        }
+      } else if (categoria == 0) {
+        if (materiaPrima != null) {
+          this.materiaPrimaService.GetConsultaMateriaPrimaF(fecha, fecha, materiaPrima).subscribe(datos_consulta => {
+            for (let j = 0; j < datos_consulta.length; j++) {
+              if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                datos_consulta[j].nombre,
+                                                                datos_consulta[j].ancho,
+                                                                datos_consulta[j].inicial,
+                                                                datos_consulta[j].entrada,
+                                                                datos_consulta[j].salida,
+                                                                datos_consulta[j].stock,
+                                                                datos_consulta[j].diferencia,
+                                                                datos_consulta[j].presentacion,
+                                                                datos_consulta[j].precio,
+                                                                datos_consulta[j].subTotal,
+                                                                datos_consulta[j].categoria);
+            }
+          });
+        } else if (idMateriaPrima != null) {
+          this.materiaPrimaService.GetConsultaMateriaPrimaF(fecha, fecha, idMateriaPrima).subscribe(datos_consulta => {
+            for (let j = 0; j < datos_consulta.length; j++) {
+              if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                datos_consulta[j].nombre,
+                                                                datos_consulta[j].ancho,
+                                                                datos_consulta[j].inicial,
+                                                                datos_consulta[j].entrada,
+                                                                datos_consulta[j].salida,
+                                                                datos_consulta[j].stock,
+                                                                datos_consulta[j].diferencia,
+                                                                datos_consulta[j].presentacion,
+                                                                datos_consulta[j].precio,
+                                                                datos_consulta[j].subTotal,
+                                                                datos_consulta[j].categoria);
+            }
+          });
+        }
       }
     } else if (fecha != null && fechaFinal != null) {
       this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
@@ -973,72 +1163,135 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       });
     } else if (fecha != null && categoria != null) {
-      this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrimas => {
-        for (let i = 0; i < datos_materiaPrimas.length; i++) {
-          if (datos_materiaPrimas[i].catMP_Id == categoria) {
-            this.materiaPrimaService.srvObtenerListaNumero1(fecha, fecha, datos_materiaPrimas[i].matPri_Id, categoria).subscribe(datos_consulta => {
+      if (categoria != 0) {
+        this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrimas => {
+          for (let i = 0; i < datos_materiaPrimas.length; i++) {
+            if (datos_materiaPrimas[i].catMP_Id == categoria) {
+              this.materiaPrimaService.srvObtenerListaNumero1(fecha, fecha, datos_materiaPrimas[i].matPri_Id, categoria).subscribe(datos_consulta => {
+                for (let j = 0; j < datos_consulta.length; j++) {
+                  this.cargarTabla(datos_consulta[j].id,
+                    datos_consulta[j].nombre,
+                    datos_consulta[j].ancho,
+                    datos_consulta[j].inicial,
+                    datos_consulta[j].entrada,
+                    datos_consulta[j].salida,
+                    datos_consulta[j].stock,
+                    datos_consulta[j].diferencia,
+                    datos_consulta[j].presentacion,
+                    datos_consulta[j].precio,
+                    datos_consulta[j].subTotal,
+                    datos_consulta[j].categoria);
+                }
+              });
+            }
+          }
+        });
+        this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+          for (let i = 0; i < datos_bopp.length; i++) {
+            if (datos_bopp[i].catMP_Id == categoria) {
+              this.materiaPrimaService.srvObtenerListaNumero1(fecha, fecha, datos_bopp[i].bopP_Serial, categoria).subscribe(datos_consulta => {
+                for (let j = 0; j < datos_consulta.length; j++) {
+                  this.cargarTabla(datos_consulta[j].id,
+                    datos_consulta[j].nombre,
+                    datos_consulta[j].ancho,
+                    datos_consulta[j].inicial,
+                    datos_consulta[j].entrada,
+                    datos_consulta[j].salida,
+                    datos_consulta[j].stock,
+                    datos_consulta[j].diferencia,
+                    datos_consulta[j].presentacion,
+                    datos_consulta[j].precio,
+                    datos_consulta[j].subTotal,
+                    datos_consulta[j].categoria);
+                }
+              });
+            }
+          }
+        });
+        this.tintasService.srvObtenerLista().subscribe(datos_tinta => {
+          for (let i = 0; i < datos_tinta.length; i++) {
+            if (datos_tinta[i].catMP_Id == categoria) {
+              this.materiaPrimaService.srvObtenerListaNumero1(fecha, fecha, datos_tinta[i].tinta_Id, categoria).subscribe(datos_consulta => {
+                for (let j = 0; j < datos_consulta.length; j++) {
+                  this.cargarTabla(datos_consulta[j].id,
+                    datos_consulta[j].nombre,
+                    datos_consulta[j].ancho,
+                    datos_consulta[j].inicial,
+                    datos_consulta[j].entrada,
+                    datos_consulta[j].salida,
+                    datos_consulta[j].stock,
+                    datos_consulta[j].diferencia,
+                    datos_consulta[j].presentacion,
+                    datos_consulta[j].precio,
+                    datos_consulta[j].subTotal,
+                    datos_consulta[j].categoria);
+                }
+              });
+            }
+          }
+        });
+      } else if (categoria == 0){
+        this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
+          for (let i = 0; i < datos_materiaPrima.length; i++) {
+            this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_materiaPrima[i].matPri_Id).subscribe(datos_consulta => {
               for (let j = 0; j < datos_consulta.length; j++) {
-                this.cargarTabla(datos_consulta[j].id,
-                  datos_consulta[j].nombre,
-                  datos_consulta[j].ancho,
-                  datos_consulta[j].inicial,
-                  datos_consulta[j].entrada,
-                  datos_consulta[j].salida,
-                  datos_consulta[j].stock,
-                  datos_consulta[j].diferencia,
-                  datos_consulta[j].presentacion,
-                  datos_consulta[j].precio,
-                  datos_consulta[j].subTotal,
-                  datos_consulta[j].categoria);
+                if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                  datos_consulta[j].nombre,
+                                                                  datos_consulta[j].ancho,
+                                                                  datos_consulta[j].inicial,
+                                                                  datos_consulta[j].entrada,
+                                                                  datos_consulta[j].salida,
+                                                                  datos_consulta[j].stock,
+                                                                  datos_consulta[j].diferencia,
+                                                                  datos_consulta[j].presentacion,
+                                                                  datos_consulta[j].precio,
+                                                                  datos_consulta[j].subTotal,
+                                                                  datos_consulta[j].categoria);
               }
             });
           }
-        }
-      });
-      this.boppService.srvObtenerLista().subscribe(datos_bopp => {
-        for (let i = 0; i < datos_bopp.length; i++) {
-          if (datos_bopp[i].catMP_Id == categoria) {
-            this.materiaPrimaService.srvObtenerListaNumero1(fecha, fecha, datos_bopp[i].bopP_Serial, categoria).subscribe(datos_consulta => {
+        });
+        this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+          for (let i = 0; i < datos_bopp.length; i++) {
+            this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_bopp[i].bopP_Serial).subscribe(datos_consulta => {
               for (let j = 0; j < datos_consulta.length; j++) {
-                this.cargarTabla(datos_consulta[j].id,
-                  datos_consulta[j].nombre,
-                  datos_consulta[j].ancho,
-                  datos_consulta[j].inicial,
-                  datos_consulta[j].entrada,
-                  datos_consulta[j].salida,
-                  datos_consulta[j].stock,
-                  datos_consulta[j].diferencia,
-                  datos_consulta[j].presentacion,
-                  datos_consulta[j].precio,
-                  datos_consulta[j].subTotal,
-                  datos_consulta[j].categoria);
+                if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                  datos_consulta[j].nombre,
+                                                                  datos_consulta[j].ancho,
+                                                                  datos_consulta[j].inicial,
+                                                                  datos_consulta[j].entrada,
+                                                                  datos_consulta[j].salida,
+                                                                  datos_consulta[j].stock,
+                                                                  datos_consulta[j].diferencia,
+                                                                  datos_consulta[j].presentacion,
+                                                                  datos_consulta[j].precio,
+                                                                  datos_consulta[j].subTotal,
+                                                                  datos_consulta[j].categoria);
               }
             });
           }
-        }
-      });
-      this.tintasService.srvObtenerLista().subscribe(datos_tinta => {
-        for (let i = 0; i < datos_tinta.length; i++) {
-          if (datos_tinta[i].catMP_Id == categoria) {
-            this.materiaPrimaService.srvObtenerListaNumero1(fecha, fecha, datos_tinta[i].tinta_Id, categoria).subscribe(datos_consulta => {
+        });
+        this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
+          for (let i = 0; i < datos_tintas.length; i++) {
+            this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_tintas[i].tinta_Id).subscribe(datos_consulta => {
               for (let j = 0; j < datos_consulta.length; j++) {
-                this.cargarTabla(datos_consulta[j].id,
-                  datos_consulta[j].nombre,
-                  datos_consulta[j].ancho,
-                  datos_consulta[j].inicial,
-                  datos_consulta[j].entrada,
-                  datos_consulta[j].salida,
-                  datos_consulta[j].stock,
-                  datos_consulta[j].diferencia,
-                  datos_consulta[j].presentacion,
-                  datos_consulta[j].precio,
-                  datos_consulta[j].subTotal,
-                  datos_consulta[j].categoria);
+                if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                  datos_consulta[j].nombre,
+                                                                  datos_consulta[j].ancho,
+                                                                  datos_consulta[j].inicial,
+                                                                  datos_consulta[j].entrada,
+                                                                  datos_consulta[j].salida,
+                                                                  datos_consulta[j].stock,
+                                                                  datos_consulta[j].diferencia,
+                                                                  datos_consulta[j].presentacion,
+                                                                  datos_consulta[j].precio,
+                                                                  datos_consulta[j].subTotal,
+                                                                  datos_consulta[j].categoria);
               }
             });
           }
-        }
-      });
+        });
+      }
     } else if (fecha != null) {
       this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrimas => {
         for (let i = 0; i < datos_materiaPrimas.length; i++) {
@@ -1101,72 +1354,135 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
       });
     } else if (categoria != null)  {
-      this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrimas => {
-        for (let i = 0; i < datos_materiaPrimas.length; i++) {
-          if (datos_materiaPrimas[i].catMP_Id == categoria) {
-            this.materiaPrimaService.srvObtenerListaNumero1(this.today, this.today, datos_materiaPrimas[i].matPri_Id, categoria).subscribe(datos_consulta => {
+      if (categoria != 0) {
+        this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrimas => {
+          for (let i = 0; i < datos_materiaPrimas.length; i++) {
+            if (datos_materiaPrimas[i].catMP_Id == categoria) {
+              this.materiaPrimaService.srvObtenerListaNumero1(this.today, this.today, datos_materiaPrimas[i].matPri_Id, categoria).subscribe(datos_consulta => {
+                for (let j = 0; j < datos_consulta.length; j++) {
+                  this.cargarTabla(datos_consulta[j].id,
+                    datos_consulta[j].nombre,
+                    datos_consulta[j].ancho,
+                    datos_consulta[j].inicial,
+                    datos_consulta[j].entrada,
+                    datos_consulta[j].salida,
+                    datos_consulta[j].stock,
+                    datos_consulta[j].diferencia,
+                    datos_consulta[j].presentacion,
+                    datos_consulta[j].precio,
+                    datos_consulta[j].subTotal,
+                    datos_consulta[j].categoria);
+                }
+              });
+            }
+          }
+        });
+        this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+          for (let i = 0; i < datos_bopp.length; i++) {
+            if (datos_bopp[i].catMP_Id == categoria) {
+              this.materiaPrimaService.srvObtenerListaNumero1(this.today, this.today, datos_bopp[i].bopP_Serial, categoria).subscribe(datos_consulta => {
+                for (let j = 0; j < datos_consulta.length; j++) {
+                  this.cargarTabla(datos_consulta[j].id,
+                    datos_consulta[j].nombre,
+                    datos_consulta[j].ancho,
+                    datos_consulta[j].inicial,
+                    datos_consulta[j].entrada,
+                    datos_consulta[j].salida,
+                    datos_consulta[j].stock,
+                    datos_consulta[j].diferencia,
+                    datos_consulta[j].presentacion,
+                    datos_consulta[j].precio,
+                    datos_consulta[j].subTotal,
+                    datos_consulta[j].categoria);
+                }
+              });
+            }
+          }
+        });
+        this.tintasService.srvObtenerLista().subscribe(datos_tinta => {
+          for (let i = 0; i < datos_tinta.length; i++) {
+            if (datos_tinta[i].catMP_Id == categoria) {
+              this.materiaPrimaService.srvObtenerListaNumero1(this.today, this.today, datos_tinta[i].tinta_Id, categoria).subscribe(datos_consulta => {
+                for (let j = 0; j < datos_consulta.length; j++) {
+                  this.cargarTabla(datos_consulta[j].id,
+                    datos_consulta[j].nombre,
+                    datos_consulta[j].ancho,
+                    datos_consulta[j].inicial,
+                    datos_consulta[j].entrada,
+                    datos_consulta[j].salida,
+                    datos_consulta[j].stock,
+                    datos_consulta[j].diferencia,
+                    datos_consulta[j].presentacion,
+                    datos_consulta[j].precio,
+                    datos_consulta[j].subTotal,
+                    datos_consulta[j].categoria);
+                }
+              });
+            }
+          }
+        });
+      } else if (categoria == 0){
+        this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
+          for (let i = 0; i < datos_materiaPrima.length; i++) {
+            this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_materiaPrima[i].matPri_Id).subscribe(datos_consulta => {
               for (let j = 0; j < datos_consulta.length; j++) {
-                this.cargarTabla(datos_consulta[j].id,
-                  datos_consulta[j].nombre,
-                  datos_consulta[j].ancho,
-                  datos_consulta[j].inicial,
-                  datos_consulta[j].entrada,
-                  datos_consulta[j].salida,
-                  datos_consulta[j].stock,
-                  datos_consulta[j].diferencia,
-                  datos_consulta[j].presentacion,
-                  datos_consulta[j].precio,
-                  datos_consulta[j].subTotal,
-                  datos_consulta[j].categoria);
+                if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                  datos_consulta[j].nombre,
+                                                                  datos_consulta[j].ancho,
+                                                                  datos_consulta[j].inicial,
+                                                                  datos_consulta[j].entrada,
+                                                                  datos_consulta[j].salida,
+                                                                  datos_consulta[j].stock,
+                                                                  datos_consulta[j].diferencia,
+                                                                  datos_consulta[j].presentacion,
+                                                                  datos_consulta[j].precio,
+                                                                  datos_consulta[j].subTotal,
+                                                                  datos_consulta[j].categoria);
               }
             });
           }
-        }
-      });
-      this.boppService.srvObtenerLista().subscribe(datos_bopp => {
-        for (let i = 0; i < datos_bopp.length; i++) {
-          if (datos_bopp[i].catMP_Id == categoria) {
-            this.materiaPrimaService.srvObtenerListaNumero1(this.today, this.today, datos_bopp[i].bopP_Serial, categoria).subscribe(datos_consulta => {
+        });
+        this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+          for (let i = 0; i < datos_bopp.length; i++) {
+            this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_bopp[i].bopP_Serial).subscribe(datos_consulta => {
               for (let j = 0; j < datos_consulta.length; j++) {
-                this.cargarTabla(datos_consulta[j].id,
-                  datos_consulta[j].nombre,
-                  datos_consulta[j].ancho,
-                  datos_consulta[j].inicial,
-                  datos_consulta[j].entrada,
-                  datos_consulta[j].salida,
-                  datos_consulta[j].stock,
-                  datos_consulta[j].diferencia,
-                  datos_consulta[j].presentacion,
-                  datos_consulta[j].precio,
-                  datos_consulta[j].subTotal,
-                  datos_consulta[j].categoria);
+                if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                  datos_consulta[j].nombre,
+                                                                  datos_consulta[j].ancho,
+                                                                  datos_consulta[j].inicial,
+                                                                  datos_consulta[j].entrada,
+                                                                  datos_consulta[j].salida,
+                                                                  datos_consulta[j].stock,
+                                                                  datos_consulta[j].diferencia,
+                                                                  datos_consulta[j].presentacion,
+                                                                  datos_consulta[j].precio,
+                                                                  datos_consulta[j].subTotal,
+                                                                  datos_consulta[j].categoria);
               }
             });
           }
-        }
-      });
-      this.tintasService.srvObtenerLista().subscribe(datos_tinta => {
-        for (let i = 0; i < datos_tinta.length; i++) {
-          if (datos_tinta[i].catMP_Id == categoria) {
-            this.materiaPrimaService.srvObtenerListaNumero1(this.today, this.today, datos_tinta[i].tinta_Id, categoria).subscribe(datos_consulta => {
+        });
+        this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
+          for (let i = 0; i < datos_tintas.length; i++) {
+            this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_tintas[i].tinta_Id).subscribe(datos_consulta => {
               for (let j = 0; j < datos_consulta.length; j++) {
-                this.cargarTabla(datos_consulta[j].id,
-                  datos_consulta[j].nombre,
-                  datos_consulta[j].ancho,
-                  datos_consulta[j].inicial,
-                  datos_consulta[j].entrada,
-                  datos_consulta[j].salida,
-                  datos_consulta[j].stock,
-                  datos_consulta[j].diferencia,
-                  datos_consulta[j].presentacion,
-                  datos_consulta[j].precio,
-                  datos_consulta[j].subTotal,
-                  datos_consulta[j].categoria);
+                if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j].id,
+                                                                  datos_consulta[j].nombre,
+                                                                  datos_consulta[j].ancho,
+                                                                  datos_consulta[j].inicial,
+                                                                  datos_consulta[j].entrada,
+                                                                  datos_consulta[j].salida,
+                                                                  datos_consulta[j].stock,
+                                                                  datos_consulta[j].diferencia,
+                                                                  datos_consulta[j].presentacion,
+                                                                  datos_consulta[j].precio,
+                                                                  datos_consulta[j].subTotal,
+                                                                  datos_consulta[j].categoria);
               }
             });
           }
-        }
-      });
+        });
+      }
     } else if (bodega != null) {
       this.load = false;
       if (bodega == 10) {
@@ -1388,4 +1704,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     });
   }
 
+  // Funcion que limpiará los filtros utilizados en la tabla
+  clear(table: Table) {
+    table.clear();
+  }
 }

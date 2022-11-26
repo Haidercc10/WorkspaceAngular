@@ -65,7 +65,14 @@ export class LoginComponentComponent implements OnInit {
   // SI NO HAY CAMPOS VACIOS ENTRARÍA A EL METODO Consulta()
   validarCamposVacios() : any{
     if(this.formularioUsuario.valid) this.Consulta();
-    else Swal.fire("HAY CAMPOS VACIOS");
+    else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        html:
+        `<b>¡Hay Campos Vacios!</b><hr> `,
+      });
+    }
   }
 
   // FUNCION PARA LIMPIAR LOS CAMPOS DEL FORMULARIO.
@@ -73,7 +80,6 @@ export class LoginComponentComponent implements OnInit {
 
   // FUNCION PARA HACER LA VALIDACION DE LA ENTRADA DE USUARIOS, SE VERIFICAN LOS CAMPOS DIGITADOS CON LA BASE DE DATOS.
   Consulta(){
-    // FUNCION QUE CONSULTA LOS DATOS EN LA BASE DE DATOS
     try {
       let empresa : string = this.formularioUsuario.value.Empresa;
       this.saveInLocal('BD', 1);
@@ -83,11 +89,10 @@ export class LoginComponentComponent implements OnInit {
           for (let index = 0; index < datos_empresa.length; index++) {
             if (datos_empresa[index].empresa_Nombre == empresa) {
               if (this.formularioUsuario.value.Contrasena == datos_usuarios.usua_Contrasena && datos_usuarios.empresa_Id == datos_empresa[index].empresa_Id) {
-                // CREACIÓN DE COOKIES PARA MANTENER EL ROL DEL USUARIO Y MOSTRAR CIERTOS COMPONENTES
                 let idUsuario : number = datos_usuarios.usua_Id;
                 let nombre: string = datos_usuarios.usua_Nombre;
                 let rol: number = datos_usuarios.rolUsu_Id;
-                var medianoche = new Date();
+                // var medianoche = new Date();
                 // medianoche.setHours(23,59,59,0);
                 // console.log(medianoche);
                 // this.cookieServices.set('Id', `${idUsuario}`, {expires: medianoche} );
@@ -98,21 +103,46 @@ export class LoginComponentComponent implements OnInit {
                 this.saveInLocal('Nombre', nombre);
                 this.saveInLocal('Rol', rol);
                 this.clear();
-                if (this.ruta == 'http://localhost:4600/Login' || this.ruta == 'http://localhost:4600' || this.ruta == 'http://localhost:4600/' || this.ruta == 'http://localhost:4200/') window.location.href = "./home";
-                else window.location.href = this.ruta;
+                if (this.ruta == 'http://192.168.0.153:4600/Login'
+                    || this.ruta == 'http://192.168.0.153:4600'
+                    || this.ruta == 'http://192.168.0.153:4600/'
+                    || this.ruta == 'http://192.168.0.85:4700/Login'
+                    || this.ruta == 'http://192.168.0.85:4700'
+                    || this.ruta == 'http://192.168.0.85:4700/'
+                    || this.ruta == 'http://localhost:4200/Login'
+                    || this.ruta == 'http://localhost:4200'
+                    || this.ruta == 'http://localhost:4200/') window.location.href = "./home";
+              else window.location.href = this.ruta;
                 break;
               } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena){
-                Swal.fire("EL número de identificacion no coincide con la contraseña");
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Oops...',
+                  html:
+                  `<b>¡EL número de identificacion no coincide con la contraseña!</b><hr> `,
+                });
                 break;
               }
               else{
-                Swal.fire(`El número de identificación ${this.formularioUsuario.value.Identificacion} no se encuentra asociado a la empresa ${empresa}`);
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Oops...',
+                  html:
+                  `<b>¡El número de identificación ${this.formularioUsuario.value.Identificacion} no se encuentra asociado a la empresa ${empresa}!</b><hr> `,
+                });
                 break;
               }
             }
           }
         });
-      }, error =>{ Swal.fire('El número de identificación no se encuentra registrado'); });
+      }, error =>{
+        Swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          html:
+          `<b>¡El número de identificación no se encuentra registrado!</b><hr> `,
+        });
+      });
     } catch (error) {
       console.log(error);
     }

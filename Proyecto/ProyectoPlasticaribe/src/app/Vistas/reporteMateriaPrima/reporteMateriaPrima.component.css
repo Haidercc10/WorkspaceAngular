@@ -125,3 +125,7 @@ a {
 .columnaCantidad {
   background-color: #90c0f1;
 }
+
+#table td, th{
+  font-size: 13px;
+}
