@@ -111,7 +111,10 @@ export class LoginComponentComponent implements OnInit {
                     || this.ruta == 'http://192.168.0.85:4700/'
                     || this.ruta == 'http://localhost:4200/Login'
                     || this.ruta == 'http://localhost:4200'
-                    || this.ruta == 'http://localhost:4200/') window.location.href = "./home";
+                    || this.ruta == 'http://localhost:4200/'
+                    || this.ruta == 'http://192.168.0.153:4700/Login'
+                    || this.ruta == 'http://192.168.0.153:4700'
+                    || this.ruta == 'http://192.168.0.153:4700/') window.location.href = "./home";
                 else window.location.href = this.ruta;
                 break;
               } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena){
