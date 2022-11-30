@@ -944,6 +944,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
           Presentacion : datos_factura[i].undMed_Id,
           Cant_Unidades : `${this.formatonumeros(datos_factura[i].prod_CantidadUnidades)} Und`
         }
+        console.log(info);
         this.rollosAsignados.push(info);
         this.rollosAsignados.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }

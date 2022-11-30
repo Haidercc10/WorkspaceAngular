@@ -1,5 +1,4 @@
 
-
 .TitulosTabla {
   font-size: smaller;
 }
@@ -45,6 +44,10 @@ a {
 
 .Titulo{
  text-align: center;
+}
+
+.titulo14 {
+  font-size: 14px;
 }
 
 .tituloRojo{
@@ -102,6 +105,10 @@ a {
   font-size: 14px;
  }
 
+ .labelMateriaPrima{
+  font-size: 16px;
+ }
+
  .overlay{
   z-index: 2;
   position: fixed;
@@ -120,45 +127,12 @@ a {
   transform: translate(-50%, -50%)
 }
 
-.ng-autocomplete ::ng-deep .autocomplete-container {
-  box-shadow: none;
+.card-text {
+  font-size: 13px;
 }
 
-.autoCompleteProductos{
-  margin-right: 0.8%;
+.centrarImagen {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
-
-.autoCompleteConductor {
-  width: 50%;
-}
-
-.tabla1{
-  display: flex;
-}
-
-.tablaInicial{
-  margin-top: -5%;
-}
-
-.totalProd{
-  margin-top: -5%;
-  margin-bottom: -2%;
-}
-
-.scroll {
-  position: fixed;
-  bottom: 15px;
-  right: 15px;
- }
-
- .botonModal{
-  border-radius:10px;
-  outline:none;
-  border-color: white;
-  border-style: none;
- }
-
- .noScroll{
-  position: fixed;
- }
-

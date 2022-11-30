@@ -126,6 +126,7 @@ import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import {AccordionModule} from 'primeng/accordion';
+import { Ventas_TemporalesComponent } from './Vistas/Ventas_Temporales/Ventas_Temporales.component';
 //
 
 
@@ -209,7 +210,8 @@ export const routes: Routes = [
 
  /************************************************************************************************************************************************************/
   {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
-  // {path: 'registro', component: RegistroComponentComponent},
+  {path: 'registro-usuario', component: RegistroComponentComponent},
+  {path: 'reporte-ventas', component: Ventas_TemporalesComponent},
   // {path: 'areas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: AreasComponentComponent},
   // {path: 'reportes', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReportesComponent},
   // {path: 'roles', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: RolesComponentComponent},
@@ -316,6 +318,7 @@ export const routes: Routes = [
     Reporte_RollosDesechosComponent,
     CrearBoppComponent,
     Reporte_OrdenCompraComponent,
+    Ventas_TemporalesComponent,
   ],
 
 

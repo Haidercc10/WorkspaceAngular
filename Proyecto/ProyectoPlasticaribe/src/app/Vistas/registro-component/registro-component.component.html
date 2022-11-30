@@ -8,76 +8,80 @@
       <h5 class="tituloRojo">Regístrate</h5>
     </div>
     <!--Formulario-->
-    <form>
+    <form [formGroup]="FormUsuarios">
+
+      <!-- Fecha ingreso rollo -->
+      <!--<div class="form-floating col-md-2 mb-3">
+        <input formControlName="usuId" type="number" class="form-control" id="floatingInput">
+        <label for="floatingInput">ID Usuarios</label>
+      </div>
+
+      <div class="form-floating col-md-2 mb-3">
+        <select formControlName="estadoDoc" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example">
+          <option [ngValue]="item.estado_Id" *ngFor="let item of estados">{{item.estado_Nombre}}</option>
+        </select>
+        <label for="floatingSelect">Estados</label>
+      </div>-->
+
        <!--Identificación-->
       <div class="mb-3">
-        <input id="usuId" class="form-control form-control-sm" type="number" placeholder="Identificación Usuario" aria-label=".form-control-sm example">
+        <input formControlName ="usuId" class="form-control form-control-sm" type="number" placeholder="Id. Usuario" aria-label=".form-control-sm example">
       </div>
 
       <!--Nombre-->
       <div class="mb-3">
-        <input id="usuNombre" class="form-control form-control-sm" type="text" placeholder="Nombre y apellido" aria-label=".form-control-sm example">
+        <input formControlName ="usuNombre" class="form-control form-control-sm" type="text" placeholder="Nombre y apellido" aria-label=".form-control-sm example">
       </div>
 
       <!--Tipo-->
       <div class="mb-3">
-        <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select formControlName = "usuTipo" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona tipo</option>
           <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
         </select>
       </div>
 
       <!--area-->
       <div class="mb-3">
-        <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select formControlName="usuArea" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona área</option>
           <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
         </select>
       </div>
 
        <!--rol-->
       <div class="mb-3">
-        <select id="usuRol" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select formControlName ="usuRol" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona rol</option>
           <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
         </select>
       </div>
 
 
       <!--Correo-->
       <div class="mb-3">
-        <input id="usuCorreo" class="form-control form-control-sm" type="email" placeholder="Correo" aria-label=".form-control-sm example">
+        <input formControlName="usuCorreo" class="form-control form-control-sm" type="email" placeholder="Correo" aria-label=".form-control-sm example">
       </div>
 
       <!-- Password  -->
       <div class="mb-3">
-        <input class="form-control form-control-sm" type="password" placeholder="Contraseña" aria-label=".form-control-sm example" >
+        <input formControlName="usuPassword" class="form-control form-control-sm" type="password" placeholder="Contraseña" aria-label=".form-control-sm example" >
       </div>
 
        <!-- EPS  -->
       <div class="mb-3">
-        <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select formControlName="UsuEPS" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona EPS</option>
           <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
         </select>
       </div>
 
 
    <!-- Fondo Pensional  -->
    <div class="mb-3">
-    <select id="usuFondoP" class="form-select form-select-sm" aria-label=".form-select-sm example">
+    <select formControlName="usuFondoP" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option selected>Selecciona Fondo Pensional</option>
           <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
   </select>
   </div>
 
@@ -85,10 +89,7 @@
        <!-- Caja de compensacion  -->
       <div class="mb-3">
         <select id="usuCajaComp" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option selected>Selecciona caja de compensación</option>
           <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
         </select>
         </div>
 

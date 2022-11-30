@@ -19,7 +19,7 @@ import Swal from 'sweetalert2';
 export class EliminarRollos_ExtrusionComponent implements OnInit {
 
   public FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
-  cargando : boolean; //Variable para validar que salga o no la imagen de carga
+  cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -64,6 +64,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerProcesos();
+    this.evitarMovimientoScroll();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -505,6 +506,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
     this.rollosInsertar.sort((a,b) => Number(a.exits) - Number(b.exits) );
     this.GrupoProductos();
     setTimeout(() => { this.cargando = true; }, 50);
+
   }
 
   //Funcion que va a quitar lo rollos que se van a insertar
@@ -727,5 +729,11 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
         }
       });
     } else Swal.fire({ icon: 'warning', title: 'Advertencia', text: 'Debe cargar al menos un rollo en la tabla!', confirmButtonColor: '#f29643', });
+  }
+
+  evitarMovimientoScroll() {
+    let idTabla : any = document.getElementById('dt');
+
+    console.log();
   }
 }
