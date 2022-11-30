@@ -1,16 +1,12 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { table } from 'console';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DtPreEntregaRollos.service';
 import { EntradaRollosService } from 'src/app/Servicios/EntradaRollos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
-import { PreEntregaRollosService } from 'src/app/Servicios/PreEntregaRollos.service';
 import { ProductoService } from 'src/app/Servicios/producto.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import Swal from 'sweetalert2';
@@ -55,13 +51,10 @@ export class Ingresar_ProductosComponent implements OnInit {
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private bagProService : BagproService,
                       private ExistenciasProdService : ExistenciasProductosService,
                         private entradaRolloService : EntradaRollosService,
                           private dtEntradaRollosService : DetallesEntradaRollosService,
-                            private cliProdService : ClientesProductosService,
                               private productosService : ProductoService,
-                                private preEntregaSerive : PreEntregaRollosService,
                                   private dtPreEntregaService : DtPreEntregaRollosService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
@@ -676,6 +669,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     let producto : any = [];
     this.grupoProductos = [];
     for (let i = 0; i < this.rollosInsertar.length; i++) {
+      console.log(this.rollosInsertar[i]);
       if (!producto.includes(this.rollosInsertar[i].IdProducto)) {
         let cantidad : number = 0;
         let cantRollo : number = 0;
@@ -737,11 +731,11 @@ export class Ingresar_ProductosComponent implements OnInit {
 
   // Funcion par ingresar los rollos
   ingresarRollos(idEntrada : number){
-    let proceso = this.FormConsultarRollos.value.Proceso;
-    if (proceso == '1') proceso = 'EMP';
-    if (proceso == '2') proceso = 'EXT';
-    if (proceso == '3') proceso = 'SELLA';
     for (let i = 0; i < this.rollosInsertar.length; i++) {
+      let proceso = this.rollosInsertar[i].Estatus;
+      if (proceso == 'Empaque') proceso = 'EMP';
+      if (proceso == 'Extrusion') proceso = 'EXT';
+      if (proceso == 'Sellado') proceso = 'SELLA';
       this.productosService.srvObtenerListaPorId(parseInt(this.rollosInsertar[i].IdProducto)).subscribe(datos_producto => {
         let productos : any = [];
         productos.push(datos_producto);

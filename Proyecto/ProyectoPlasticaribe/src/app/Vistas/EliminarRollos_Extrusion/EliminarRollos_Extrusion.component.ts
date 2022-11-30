@@ -39,6 +39,8 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   public bodegaDespacho : boolean = false;
   public bdNueva : boolean;
   public bdBagpro : boolean;
+  scrolly : number = 0;
+  scrollx : number = 0;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
@@ -64,6 +66,13 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.obtenerProcesos();
+    window.onscroll = function() {
+      this.scrolly = window.scrollY;
+      this.scrollx = window.scrollX;
+      console.log("Vertical: " + this.scrolly);
+      console.log("Horizontal: " + this.scrollx);
+    };
+    console.log(navigator)
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

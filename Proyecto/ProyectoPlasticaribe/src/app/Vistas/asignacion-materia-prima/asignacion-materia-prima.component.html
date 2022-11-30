@@ -31,17 +31,17 @@
       <div class="row g-3">
         <!-- OT -->
         <div class="form-floating col-md">
-          <input formControlName="OTRetiro" class="form-control form-control-sm" (keyup.enter)="infoOT()" id="floatingInput" type="number" min="100000" max="999999" required>
+          <input formControlName="OTRetiro" class="form-control form-control-sm" (keyup.enter)="infoOT()" id="floatingInput" type="number" required>
           <label for="floatingInput">OT</label>
         </div>
 
         <div class="form-floating col-md">
-          <input formControlName="OTImp" class="form-control form-control-sm" (keyup.enter)="infoOTImpresion()" id="floatingInput" type="number" min="100000" max="999999">
+          <input formControlName="OTImp" class="form-control form-control-sm" (keyup.enter)="infoOTImpresion()" id="floatingInput" type="number" >
           <label for="floatingInput">OT Impresión</label>
         </div>
         <!-- Maquina -->
         <div class="form-floating col-md">
-          <input formControlName="Maquina" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" title="Maquina" required>
+          <input formControlName="Maquina" type="number" class="form-control form-control-sm" id="floatingInput" title="Maquina" required>
           <label for="floatingInput">Maquina</label>
         </div>
         <!-- Kg OT -->
