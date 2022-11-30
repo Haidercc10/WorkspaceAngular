@@ -196,6 +196,15 @@
           </li>
         </ng-container>
 
+        <!-- GERENCIA -->
+        <ng-container *ngIf="ValidarRol == 1">
+          <li>
+            <a class="fw-normal" href="reporte-ventas" role="button">
+              <i class="pi pi-chart-line" style="margin-right: 2%;"></i>
+              <b>Gerencia</b>
+            </a>
+          </li>
+        </ng-container>
         <!-- GESTOR DE ARCHIVOS -->
         <li>
           <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" (click)="clickIcon2()" aria-controls="collapseExample">
