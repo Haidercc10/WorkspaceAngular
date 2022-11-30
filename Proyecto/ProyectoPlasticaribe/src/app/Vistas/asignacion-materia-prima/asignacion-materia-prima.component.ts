@@ -389,22 +389,13 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina
     if (this.FormMateriaPrimaRetiro.valid) {
       if (this.materiasPrimasSeleccionadas.length != 0){
-        if (ot.length >= 6) {
-          if (maquina >= 1 && maquina != 0) this.asignacionMateriaPrima();
-          else {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Oops...',
-              html:
-              `<b>¡El numero de la maquina no es valido!</b><hr> `,
-            });
-          }
-        } else {
+        if (maquina >= 1 && maquina != 0) this.asignacionMateriaPrima();
+        else {
           Swal.fire({
             icon: 'warning',
             title: 'Oops...',
             html:
-            `<b>¡La Orden de trabajo debe tener mas de 6 digitos!</b><hr> `,
+            `<b>¡El numero de la maquina no es valido!</b><hr> `,
           });
         }
       } else {
@@ -423,7 +414,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         `<b>¡Hay campos vaios!</b><hr> `,
       });
     }
-    console.log(this.FormMateriaPrimaRetiro)
   }
 
   //Funcion que asignará la materia prima a una Orden de trabajo y Proceso y lo guardará en la base de datos
@@ -434,32 +424,34 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       if (this.estadoOT == null || this.estadoOT == '' || this.estadoOT == '0') {
         setTimeout(() => {
           this.load = false;
-          if (this.cantidadAsignada <= this.cantRestante || idOrdenTrabajo == 124230) {
-            const datosAsignacion : any = {
-              AsigMP_OrdenTrabajo : this.FormMateriaPrimaRetiro.value.OTRetiro,
-              AsigMp_FechaEntrega : this.today,
-              AsigMp_Observacion : this.FormMateriaPrimaRetiro.value.ObservacionRetiro,
-              Estado_Id : 13,
-              AsigMp_Maquina : this.FormMateriaPrimaRetiro.value.Maquina,
-              Usua_Id : this.storage_Id,
-              Estado_OrdenTrabajo : 14,
-              AsigMp_Hora : moment().format('H:mm:ss'),
-            }
-            this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => { this.obtenerUltimoIdAsignacaion(); }, error => {
-              this.error = true;
-              this.load = true;
-              Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                html:
-                '<b>¡Error al crear la asignación de materia prima!</b><hr> ' +
-                `<spam style="color : #f00;">${error.message}</spam> `,
-                showCloseButton: true,
-              });
-            });
-          } else {
+          if (this.cantidadAsignada <= this.cantRestante) this.crearAsignacion();
+          else {
             this.load = true;
-            Swal.fire(`La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}`);
+            if (this.ValidarRol != 1) {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Advertencia',
+                html:
+                `<b>¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}!</b><hr> ` +
+                `<spam>Debe solicitar permisos a un usuario administrador.</spam>`,
+              })
+            } else if (this.ValidarRol == 1) {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Advertencia',
+                html:
+                `<b>¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}!</b><hr> ` +
+                `<spam>¿Desea asignar de todas formas?</spam>`,
+                showCloseButton: true,
+                showCancelButton: true,
+                showConfirmButton: true,
+                showDenyButton: true,
+                confirmButtonText: 'Si',
+                denyButtonText: 'No'
+              }).then((result) => {
+                if (result.isConfirmed) this.crearAsignacion();
+              });
+            }
           }
         }, 2000);
       } else if (this.estadoOT == 4 || this.estadoOT == 1) {
@@ -470,6 +462,33 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         });
       }
     }
+  }
+
+  // Crear Asignacion
+  crearAsignacion(){
+    this.load = false;
+    const datosAsignacion : any = {
+      AsigMP_OrdenTrabajo : this.FormMateriaPrimaRetiro.value.OTRetiro,
+      AsigMp_FechaEntrega : this.today,
+      AsigMp_Observacion : this.FormMateriaPrimaRetiro.value.ObservacionRetiro,
+      Estado_Id : 13,
+      AsigMp_Maquina : this.FormMateriaPrimaRetiro.value.Maquina,
+      Usua_Id : this.storage_Id,
+      Estado_OrdenTrabajo : 14,
+      AsigMp_Hora : moment().format('H:mm:ss'),
+    }
+    this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => { this.obtenerUltimoIdAsignacaion(); }, error => {
+      this.error = true;
+      this.load = true;
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        html:
+        '<b>¡Error al crear la asignación de materia prima!</b><hr> ' +
+        `<spam style="color : #f00;">${error.message}</spam> `,
+        showCloseButton: true,
+      });
+    });
   }
 
   //Funcion que va a buscar y obtener el id de la ultima asignacion

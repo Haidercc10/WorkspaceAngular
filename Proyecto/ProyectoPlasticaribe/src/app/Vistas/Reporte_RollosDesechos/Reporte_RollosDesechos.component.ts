@@ -668,9 +668,9 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         this.arrayDataConsolidada.push(infoConsolidada);
         this.PesoTotalKg += infoConsolidada.Peso;
         console.log(this.PesoTotalKg);
+      }
     }
   }
-}
 
   /** Función que cargará los nombres de los operarios */
   obtenerOperariosExtrusion() {
