@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
@@ -30,23 +31,10 @@ export class MovimientosBOPPComponent implements OnInit {
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   tipoDocumento = []; //Variable que almacenará los diferentes tipos d documentos que pueden ser consultados
   ArrayBopp : any [] = []; //Variable que tendrá la informacion de los BOPP
-  keywordBOPP = 'bopP_Nombre'; //Variable que va a almacenar la propieda por la cual se va a filtrar del bopp al momento de ser consultada por el campo de bopp
-  validarInputBOPP : any; //Variable que va a permitir si se ve el titulo del campo de bopp o no
   load : boolean = true; //Variabel para permitir que se vea o no una imagen de carga
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
-  titulosTabla = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   ArrayInfoConsulta : any [] = []; //Variable que tendrá la informacion de los resultados de la consulta realizada
-  valorTotal : number = 0; //Variable que guardará el valor total de la factura de entrada de bopp
-  totalMPEntregada = 0; //Vairble que almacenará la cantidad de bopp entregada para una orden de trabajo
-  cantRestante : number = 0; //Variable que tendrá la cantidad de kilos de bopp que hacen falta por entregar pára una orden de trabajo
-  kgProduciodosOT : number = 0; //Variable que almacenará la cantidad de kilos producidos por una orden de trabajo
-  estadoOt : string = ''; //Variable que almacenará el estado de la orden de trabajo (Abierta, Asignada, En proceso, Terminada o Finalizada)
-  cantidadTotalSella : number = 0; //Variable que va a almacenar el total de la cantidad sellada en una OT
-  cantidadTotalEmpaque : number = 0; //Variable que va a almacenar el total de la cantidad empacada en una OT
-  cantidadTotalWiketiado : number = 0; //Variable que va a almacenar el total de la cantidad cantidad Tota wiketeada en una OT
-  cantidadTotalKgOT = 0; //Variable que almacenará la cantidad de kilos que pidió una orden de trabajo
   ArrayEstados : any = []; //Variable en la que se almacenaran los estados que puede tener una orden de trabajo
-  kgOT : number = 0; //Variable que va a almacenar la cantidad total de kilos que se estipularon para una orden de trabajo
   ArrayMpPDF : any = [] //Variable que almacenará las materias primas del pdf que se esé consultando
 
   modalBOPP : any = false;
@@ -72,52 +60,35 @@ export class MovimientosBOPPComponent implements OnInit {
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null, Validators.required],
       TipoDocumento: [null, Validators.required],
+      boppId : [null, Validators.required],
       bopp: ['', Validators.required],
       fecha: [null, Validators.required],
       fechaFinal : [null, Validators.required],
       estado : [null, Validators.required],
     });
-    this.validarInputBOPP = true;
   }
 
   ngOnInit() {
-    this.obtenerBOPP();
     this.lecturaStorage();
-    this.ColumnasTabla();
-    this.fecha();
     this.obtenerTipoDocumento();
     this.obtenerEstados();
   }
 
-  selectEventBOPP(item) {
-    this.FormDocumentos.value.bopp = item.bopP_Id;
-    if (this.FormDocumentos.value.bopp != '') this.validarInputBOPP = false;
-    else this.validarInputBOPP = true;
-    // do something with selected item
-  }
-
-  onChangeSearchBOPP(val: string) {
-    if (val != '') this.validarInputBOPP = false;
-    else this.validarInputBOPP = true;
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
-  }
-
-  onFocusedBOPP(e){
-    if (!e.isTrusted) this.validarInputBOPP = false;
-    else this.validarInputBOPP = true;
-    // do something when input is focused
-  }
-
-  //Funcion que colocará la fecha actual
-  fecha(){
-    this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
+  //funcion que va a cambiar el nombre del rollo seleccionado
+  cambiarNombrebopp() {
+    this.boppService.srvObtenerListaPorSerial(this.FormDocumentos.value.bopp).subscribe(datos_bopp => {
+      for (let i = 0; i < datos_bopp.length; i++) {
+        this.FormDocumentos.setValue({
+          idDocumento : this.FormDocumentos.value.idDocumento,
+          TipoDocumento: this.FormDocumentos.value.TipoDocumento,
+          boppId : datos_bopp[i].bopP_Id,
+          bopp: datos_bopp[i].bopP_Nombre,
+          fecha: this.FormDocumentos.value.fecha,
+          fechaFinal : this.FormDocumentos.value.fechaFinal,
+          estado : this.FormDocumentos.value.estado,
+        });
+      }
+    });
   }
 
   // Funcion que va a limpiar los campos
@@ -131,10 +102,6 @@ export class MovimientosBOPPComponent implements OnInit {
       estado : null,
     });
     this.ArrayInfoConsulta = [];
-    this.valorTotal = 0;
-    this.totalMPEntregada = 0;
-    this.cantRestante = 0;
-    this.kgProduciodosOT = 0;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -157,21 +124,6 @@ export class MovimientosBOPPComponent implements OnInit {
         }
       }
     });
-  }
-
-  //Funcion que colocará el nombre a las columnas de la tabla en la cual se muestran los productos pedidos por los clientes
-  ColumnasTabla(){
-    this.titulosTabla = [];
-    this.titulosTabla = [{
-      idFact : "OT / COD. DOCUMENTO",
-      tipo : "Tipo de Movimiento",
-      FechaFact : "Fecha Registro",
-      usuario : "Registrado Por:",
-      mp : "Materia Prima",
-      cant : "Cantidad",
-      estado : "Estado OT",
-      Ver : "Ver",
-    }]
   }
 
   //Funcion para obtener los diferentes tipos de documentos que podemos encontrar
@@ -197,7 +149,9 @@ export class MovimientosBOPPComponent implements OnInit {
 
   //Funvion que ayudará a obtener el bopp
   obtenerBOPP(){
-    this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+    this.ArrayBopp = [];
+    let data : string = this.FormDocumentos.value.bopp;
+    this.boppService.GetRollosLike(data).subscribe(datos_bopp => {
       for (let i = 0; i < datos_bopp.length; i++) {
         this.ArrayBopp.push(datos_bopp[i]);
         this.ArrayBopp.sort((a,b) => a.bopP_Nombre.localeCompare(b.bopP_Nombre));
@@ -277,44 +231,14 @@ export class MovimientosBOPPComponent implements OnInit {
     }
   }
 
-  // Funcion que consultará en bagpro la ot para validar la cantidad de kg que se pidió por cada ot
-  consultaOTBagPro(ot : any){
-    this.bagProServices.srvObtenerListaClienteOT_Item(ot).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        this.kgOT = datos_ot[i].datosotKg;
-      }
-    });
-
-    this.bagProServices.srvObtenerListaProcExtOt(ot).subscribe(datos_OT => {
-      for (let index = 0; index < datos_OT.length; index++) {
-        this.kgProduciodosOT += datos_OT[index].extnetokg;
-      }
-    });
-
-    this.bagProServices.srvObtenerListaProcSelladoOT(ot).subscribe(datos_OT => {
-      for (let index = 0; index < datos_OT.length; index++) {
-        this.kgProduciodosOT += datos_OT[index].peso;
-      }
-    });
-  }
-
   // Funcion que va a consultar por cada la combinacion de filtro que se le idequen
   consultar(){
     this.load = false;
-    this.kgOT = 0;
-    this.totalMPEntregada = 0;
-    this.ArrayInfoConsulta = [];
-    this.kgProduciodosOT = 0;
-    this.cantRestante = 0;
-    this.estadoOt = '';
     let ot : number = this.FormDocumentos.value.idDocumento;
     let tipoDoc : string = this.FormDocumentos.value.TipoDocumento;
     let fechaIncial : any = this.FormDocumentos.value.fecha;
     let fechaFinal : any = this.FormDocumentos.value.fechaFinal;
-    let bopp : any;
-    if (this.FormDocumentos.value.bopp.bopP_Id == undefined) bopp = null;
-    else bopp = this.FormDocumentos.value.bopp.bopP_Id;
-    console.log(bopp)
+    let bopp : any = this.FormDocumentos.value.boppId;
     let estado : any = this.FormDocumentos.value.estado;
 
     if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && bopp != null && estado != null) {
@@ -690,7 +614,7 @@ export class MovimientosBOPPComponent implements OnInit {
           }
         });
       } else if (tipoDoc == 'ENTBOPP') {
-        this.boppService.srvObtenerConsultaMov0(this.fecha).subscribe(datos_entradaBopp => {
+        this.boppService.srvObtenerConsultaMov0(this.today).subscribe(datos_entradaBopp => {
           for (let i = 0; i < datos_entradaBopp.length; i++) {
             this.llenarTabla(datos_entradaBopp[i], 'ENTBOPP');
           }

@@ -6,14 +6,11 @@ import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesos_OT.
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import Swal from 'sweetalert2';
-import * as XLSX from 'xlsx';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.component';
 import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.component';
-import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
 import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import { EstadosProcesosOTxVendedoresService } from 'src/app/Servicios/EstadosProcesosOTxVendedores.service';
 import { ClientesService } from 'src/app/Servicios/clientes.service';
@@ -86,12 +83,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                         private srvEstadosOTVendedores : EstadosProcesosOTxVendedoresService,
                           private estadosService : EstadosService,
                             private servicioBagPro : BagproService,
-                              private dtEntradasRollosService : DetallesEntradaRollosService,
-                                private detallesAsignacionService : DetallesAsignacionService,
-                                  private usuarioService : UsuarioService,
-                                    private clientesService : ClientesService,
-                                      private productosService : ProductoService,
-                                        private filterService: FilterService) {
+                              private usuarioService : UsuarioService,
+                                private clientesService : ClientesService,
+                                  private productosService : ProductoService,) {
 
     this.formularioOT = this.frmBuilder.group({
       idDocumento : [null],
@@ -407,56 +401,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           row.getCell(16).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           row.getCell(17).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
-
-        /** Significado info colores. */
-       /*worksheet.getCell('S3').value = "Info. Colores"
-        worksheet.getCell('S3').fill = {
-          type: 'pattern',
-          pattern:'darkVertical',
-          bgColor:{argb:'eeeeee'},
-          fgColor:{argb:'eeeeee'},
-        };
-        worksheet.getCell('S3').border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-
-        worksheet.getCell('S4').value = "Iniciada"
-        worksheet.getCell('S4').fill = {
-          type: 'pattern',
-          pattern:'darkVertical',
-          bgColor:{argb:'F9FC5B'},
-          fgColor:{argb:'F9FC5B'},
-        };
-        worksheet.getCell('S5').value = "Abierta"
-        worksheet.getCell('S5').fill = {
-          type: 'pattern',
-          pattern:'solid',
-          bgColor:{argb:'FDCD7A'},
-          fgColor:{argb:'FDCD7A'},
-        };
-
-        worksheet.getCell('S6').value = "No iniciada"
-        worksheet.getCell('S6').fill = {
-          type: 'pattern',
-          pattern:'solid',
-          fgColor:{argb:'DDDDDD'},
-          bgColor:{argb:'DDDDDD'},
-        };
-
-        worksheet.getCell('S7').value = "Terminada"
-        worksheet.getCell('S7').fill = {
-          type: 'pattern',
-          pattern:'solid',
-          fgColor:{argb:'C7FD7A'},
-          bgColor:{argb:'C7FD7A'},
-        };
-
-        worksheet.getCell('S8').value = "Asignada"
-        worksheet.getCell('S8').fill = {
-          type: 'pattern',
-          pattern:'solid',
-          fgColor:{argb:'ADD8E6'},
-          bgColor:{argb:'ADD8E6'},
-        };*/
-                                            //VEND
         worksheet.getColumn(1).width = 12;  //OT
         worksheet.getColumn(2).width = 12;  //MP
         worksheet.getColumn(3).width = 12;  //EXT
@@ -617,34 +561,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
               && vendedor == datos_ot[i].usua_Id
               && cliente == datos_ot[i].cli_Id
               && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-                datos_ot[i].estProcOT_CantProdFacturada,
-                datos_ot[i].estProcOT_CantProdIngresada,
-                datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             } else Swal.fire('No se encontró la OT consultada.');
           }
         }
@@ -655,34 +572,7 @@ datos_ot[i].prod_Nombre,);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].estado_Id == estado) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                              datos_ot[i].estProcOT_ExtrusionKg,
-                              datos_ot[i].estProcOT_ImpresionKg,
-                              datos_ot[i].estProcOT_RotograbadoKg,
-                              datos_ot[i].estProcOT_DobladoKg,
-                              datos_ot[i].estProcOT_LaminadoKg,
-                              datos_ot[i].estProcOT_CorteKg,
-                              datos_ot[i].estProcOT_EmpaqueKg,
-                              datos_ot[i].estProcOT_SelladoKg,
-                              datos_ot[i].estProcOT_WiketiadoKg,
-                              datos_ot[i].estProcOT_CantidadPedida,
-                              datos_ot[i].falla_Nombre,
-                              datos_ot[i].estProcOT_Observacion,
-                              datos_ot[i].estado_Nombre,
-                              datos_ot[i].estProcOT_FechaCreacion,
-                              datos_ot[i].estProcOT_FechaInicio,
-                              datos_ot[i].estProcOT_FechaFinal,
-                              datos_ot[i].estProcOT_CantidadPedidaUnd,
-                              datos_ot[i].undMed_Id,
-                              datos_ot[i].usua_Id,
-                              datos_ot[i].usua_Nombre,
-                              datos_ot[i].estProcOT_SelladoUnd,
-                              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
           }
         }
@@ -695,34 +585,7 @@ datos_ot[i].prod_Nombre,);
             this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
               for (let j = 0; j < datos_bagpro.length; j++) {
                 if (datos_ot[i].estado_Id == estado) {
-                  this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                    datos_ot[i].estProcOT_ExtrusionKg,
-                    datos_ot[i].estProcOT_ImpresionKg,
-                    datos_ot[i].estProcOT_RotograbadoKg,
-                    datos_ot[i].estProcOT_DobladoKg,
-                    datos_ot[i].estProcOT_LaminadoKg,
-                    datos_ot[i].estProcOT_CorteKg,
-                    datos_ot[i].estProcOT_EmpaqueKg,
-                    datos_ot[i].estProcOT_SelladoKg,
-                    datos_ot[i].estProcOT_WiketiadoKg,
-                    datos_ot[i].estProcOT_CantidadPedida,
-                    datos_ot[i].falla_Nombre,
-                    datos_ot[i].estProcOT_Observacion,
-                    datos_ot[i].estado_Nombre,
-                    datos_ot[i].estProcOT_FechaCreacion,
-                    datos_ot[i].estProcOT_FechaInicio,
-                    datos_ot[i].estProcOT_FechaFinal,
-                    datos_ot[i].estProcOT_CantidadPedidaUnd,
-                    datos_ot[i].undMed_Id,
-                    datos_ot[i].usua_Id,
-                    datos_ot[i].usua_Nombre,
-                    datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+                  this.llenarArray(datos_ot[i]);
                 }
               }
             });
@@ -734,34 +597,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -770,34 +606,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -809,34 +618,7 @@ datos_ot[i].prod_Nombre,);
             this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
               if (datos_ot[i].estado_Id == estado){
                 for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                    datos_ot[i].estProcOT_ExtrusionKg,
-                    datos_ot[i].estProcOT_ImpresionKg,
-                    datos_ot[i].estProcOT_RotograbadoKg,
-                    datos_ot[i].estProcOT_DobladoKg,
-                    datos_ot[i].estProcOT_LaminadoKg,
-                    datos_ot[i].estProcOT_CorteKg,
-                    datos_ot[i].estProcOT_EmpaqueKg,
-                    datos_ot[i].estProcOT_SelladoKg,
-                    datos_ot[i].estProcOT_WiketiadoKg,
-                    datos_ot[i].estProcOT_CantidadPedida,
-                    datos_ot[i].falla_Nombre,
-                    datos_ot[i].estProcOT_Observacion,
-                    datos_ot[i].estado_Nombre,
-                    datos_ot[i].estProcOT_FechaCreacion,
-                    datos_ot[i].estProcOT_FechaInicio,
-                    datos_ot[i].estProcOT_FechaFinal,
-                    datos_ot[i].estProcOT_CantidadPedidaUnd,
-                    datos_ot[i].undMed_Id,
-                    datos_ot[i].usua_Id,
-                    datos_ot[i].usua_Nombre,
-                    datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+                  this.llenarArray(datos_ot[i]);
                 }
               }
             });
@@ -851,34 +633,7 @@ datos_ot[i].prod_Nombre,);
           for (let i = 0; i < datos_ot.length; i++) {
             this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
               for (let j = 0; j < datos_bagpro.length; j++) {
-                this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                  datos_ot[i].estProcOT_ExtrusionKg,
-                  datos_ot[i].estProcOT_ImpresionKg,
-                  datos_ot[i].estProcOT_RotograbadoKg,
-                  datos_ot[i].estProcOT_DobladoKg,
-                  datos_ot[i].estProcOT_LaminadoKg,
-                  datos_ot[i].estProcOT_CorteKg,
-                  datos_ot[i].estProcOT_EmpaqueKg,
-                  datos_ot[i].estProcOT_SelladoKg,
-                  datos_ot[i].estProcOT_WiketiadoKg,
-                  datos_ot[i].estProcOT_CantidadPedida,
-                  datos_ot[i].falla_Nombre,
-                  datos_ot[i].estProcOT_Observacion,
-                  datos_ot[i].estado_Nombre,
-                  datos_ot[i].estProcOT_FechaCreacion,
-                  datos_ot[i].estProcOT_FechaInicio,
-                  datos_ot[i].estProcOT_FechaFinal,
-                  datos_ot[i].estProcOT_CantidadPedidaUnd,
-                  datos_ot[i].undMed_Id,
-                  datos_ot[i].usua_Id,
-                  datos_ot[i].usua_Nombre,
-                  datos_ot[i].estProcOT_SelladoUnd,
-                  datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+                this.llenarArray(datos_ot[i]);
               }
             });
           }
@@ -892,34 +647,7 @@ datos_ot[i].prod_Nombre,);
               this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                 if (datos_ot[i].estado_Id == estado){
                   for (let j = 0; j < datos_bagpro.length; j++) {
-                    this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                      datos_ot[i].estProcOT_ExtrusionKg,
-                      datos_ot[i].estProcOT_ImpresionKg,
-                      datos_ot[i].estProcOT_RotograbadoKg,
-                      datos_ot[i].estProcOT_DobladoKg,
-                      datos_ot[i].estProcOT_LaminadoKg,
-                      datos_ot[i].estProcOT_CorteKg,
-                      datos_ot[i].estProcOT_EmpaqueKg,
-                      datos_ot[i].estProcOT_SelladoKg,
-                      datos_ot[i].estProcOT_WiketiadoKg,
-                      datos_ot[i].estProcOT_CantidadPedida,
-                      datos_ot[i].falla_Nombre,
-                      datos_ot[i].estProcOT_Observacion,
-                      datos_ot[i].estado_Nombre,
-                      datos_ot[i].estProcOT_FechaCreacion,
-                      datos_ot[i].estProcOT_FechaInicio,
-                      datos_ot[i].estProcOT_FechaFinal,
-                      datos_ot[i].estProcOT_CantidadPedidaUnd,
-                      datos_ot[i].undMed_Id,
-                      datos_ot[i].usua_Id,
-                      datos_ot[i].usua_Nombre,
-                      datos_ot[i].estProcOT_SelladoUnd,
-                      datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+                    this.llenarArray(datos_ot[i]);
                   }
                 }
               });
@@ -933,34 +661,7 @@ datos_ot[i].prod_Nombre,);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].estado_Id == estado){
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
           }
         }
@@ -970,34 +671,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -1006,34 +680,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -1042,34 +689,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
             for (let i = 0; i < datos_ot.length; i++) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
         }
       });
@@ -1081,34 +701,7 @@ datos_ot[i].prod_Nombre,);
             this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
               if (datos_ot[i].estado_Id == estado){
                 for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                    datos_ot[i].estProcOT_ExtrusionKg,
-                    datos_ot[i].estProcOT_ImpresionKg,
-                    datos_ot[i].estProcOT_RotograbadoKg,
-                    datos_ot[i].estProcOT_DobladoKg,
-                    datos_ot[i].estProcOT_LaminadoKg,
-                    datos_ot[i].estProcOT_CorteKg,
-                    datos_ot[i].estProcOT_EmpaqueKg,
-                    datos_ot[i].estProcOT_SelladoKg,
-                    datos_ot[i].estProcOT_WiketiadoKg,
-                    datos_ot[i].estProcOT_CantidadPedida,
-                    datos_ot[i].falla_Nombre,
-                    datos_ot[i].estProcOT_Observacion,
-                    datos_ot[i].estado_Nombre,
-                    datos_ot[i].estProcOT_FechaCreacion,
-                    datos_ot[i].estProcOT_FechaInicio,
-                    datos_ot[i].estProcOT_FechaFinal,
-                    datos_ot[i].estProcOT_CantidadPedidaUnd,
-                    datos_ot[i].undMed_Id,
-                    datos_ot[i].usua_Id,
-                    datos_ot[i].usua_Nombre,
-                    datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+                  this.llenarArray(datos_ot[i]);
                 }
               }
             });
@@ -1125,34 +718,7 @@ datos_ot[i].prod_Nombre,);
             for (let i = 0; i < datos_ot.length; i++) {
               this.servicioBagPro.srvObtenerListaClienteOT_Item(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                   for (let j = 0; j < datos_bagpro.length; j++) {
-                    this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                      datos_ot[i].estProcOT_ExtrusionKg,
-                      datos_ot[i].estProcOT_ImpresionKg,
-                      datos_ot[i].estProcOT_RotograbadoKg,
-                      datos_ot[i].estProcOT_DobladoKg,
-                      datos_ot[i].estProcOT_LaminadoKg,
-                      datos_ot[i].estProcOT_CorteKg,
-                      datos_ot[i].estProcOT_EmpaqueKg,
-                      datos_ot[i].estProcOT_SelladoKg,
-                      datos_ot[i].estProcOT_WiketiadoKg,
-                      datos_ot[i].estProcOT_CantidadPedida,
-                      datos_ot[i].falla_Nombre,
-                      datos_ot[i].estProcOT_Observacion,
-                      datos_ot[i].estado_Nombre,
-                      datos_ot[i].estProcOT_FechaCreacion,
-                      datos_ot[i].estProcOT_FechaInicio,
-                      datos_ot[i].estProcOT_FechaFinal,
-                      datos_ot[i].estProcOT_CantidadPedidaUnd,
-                      datos_ot[i].undMed_Id,
-                      datos_ot[i].usua_Id,
-                      datos_ot[i].usua_Nombre,
-                      datos_ot[i].estProcOT_SelladoUnd,
-                      datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+                    this.llenarArray(datos_ot[i]);
                 }
               });
             }
@@ -1167,34 +733,7 @@ datos_ot[i].prod_Nombre,);
             this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
               if (datos_ot[i].estado_Id == estado){
                 for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                    datos_ot[i].estProcOT_ExtrusionKg,
-                    datos_ot[i].estProcOT_ImpresionKg,
-                    datos_ot[i].estProcOT_RotograbadoKg,
-                    datos_ot[i].estProcOT_DobladoKg,
-                    datos_ot[i].estProcOT_LaminadoKg,
-                    datos_ot[i].estProcOT_CorteKg,
-                    datos_ot[i].estProcOT_EmpaqueKg,
-                    datos_ot[i].estProcOT_SelladoKg,
-                    datos_ot[i].estProcOT_WiketiadoKg,
-                    datos_ot[i].estProcOT_CantidadPedida,
-                    datos_ot[i].falla_Nombre,
-                    datos_ot[i].estProcOT_Observacion,
-                    datos_ot[i].estado_Nombre,
-                    datos_ot[i].estProcOT_FechaCreacion,
-                    datos_ot[i].estProcOT_FechaInicio,
-                    datos_ot[i].estProcOT_FechaFinal,
-                    datos_ot[i].estProcOT_CantidadPedidaUnd,
-                    datos_ot[i].undMed_Id,
-                    datos_ot[i].usua_Id,
-                    datos_ot[i].usua_Nombre,
-                    datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+                  this.llenarArray(datos_ot[i]);
                 }
               }
             });
@@ -1206,34 +745,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -1243,34 +755,7 @@ datos_ot[i].prod_Nombre,);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             if (estado == datos_ot[i].estado_Id) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
           }
         }
@@ -1282,34 +767,7 @@ datos_ot[i].prod_Nombre,);
           for (let i = 0; i < datos_ot.length; i++) {
             this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                 for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                    datos_ot[i].estProcOT_ExtrusionKg,
-                    datos_ot[i].estProcOT_ImpresionKg,
-                    datos_ot[i].estProcOT_RotograbadoKg,
-                    datos_ot[i].estProcOT_DobladoKg,
-                    datos_ot[i].estProcOT_LaminadoKg,
-                    datos_ot[i].estProcOT_CorteKg,
-                    datos_ot[i].estProcOT_EmpaqueKg,
-                    datos_ot[i].estProcOT_SelladoKg,
-                    datos_ot[i].estProcOT_WiketiadoKg,
-                    datos_ot[i].estProcOT_CantidadPedida,
-                    datos_ot[i].falla_Nombre,
-                    datos_ot[i].estProcOT_Observacion,
-                    datos_ot[i].estado_Nombre,
-                    datos_ot[i].estProcOT_FechaCreacion,
-                    datos_ot[i].estProcOT_FechaInicio,
-                    datos_ot[i].estProcOT_FechaFinal,
-                    datos_ot[i].estProcOT_CantidadPedidaUnd,
-                    datos_ot[i].undMed_Id,
-                    datos_ot[i].usua_Id,
-                    datos_ot[i].usua_Nombre,
-                    datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+                  this.llenarArray(datos_ot[i]);
                 }
             });
           }
@@ -1321,34 +779,7 @@ datos_ot[i].prod_Nombre,);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].estado_Id == estado) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
           }
         }
@@ -1359,34 +790,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -1395,34 +799,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -1431,34 +808,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -1467,34 +817,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -1504,34 +827,7 @@ datos_ot[i].prod_Nombre,);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].prod_Id == producto) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
           }
         }
@@ -1542,34 +838,7 @@ datos_ot[i].prod_Nombre,);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].cli_Id == cliente) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
           }
         }
@@ -1581,34 +850,7 @@ datos_ot[i].prod_Nombre,);
           for (let i = 0; i < datos_ot.length; i++) {
             this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo,).subscribe(datos_bagpro => {
               for (let j = 0; j < datos_bagpro.length; j++) {
-                this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                  datos_ot[i].estProcOT_ExtrusionKg,
-                  datos_ot[i].estProcOT_ImpresionKg,
-                  datos_ot[i].estProcOT_RotograbadoKg,
-                  datos_ot[i].estProcOT_DobladoKg,
-                  datos_ot[i].estProcOT_LaminadoKg,
-                  datos_ot[i].estProcOT_CorteKg,
-                  datos_ot[i].estProcOT_EmpaqueKg,
-                  datos_ot[i].estProcOT_SelladoKg,
-                  datos_ot[i].estProcOT_WiketiadoKg,
-                  datos_ot[i].estProcOT_CantidadPedida,
-                  datos_ot[i].falla_Nombre,
-                  datos_ot[i].estProcOT_Observacion,
-                  datos_ot[i].estado_Nombre,
-                  datos_ot[i].estProcOT_FechaCreacion,
-                  datos_ot[i].estProcOT_FechaInicio,
-                  datos_ot[i].estProcOT_FechaFinal,
-                  datos_ot[i].estProcOT_CantidadPedidaUnd,
-                  datos_ot[i].undMed_Id,
-                  datos_ot[i].usua_Id,
-                  datos_ot[i].usua_Nombre,
-                  datos_ot[i].estProcOT_SelladoUnd,
-                  datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+                this.llenarArray(datos_ot[i]);
               }
             });
           }
@@ -1620,34 +862,7 @@ datos_ot[i].prod_Nombre,);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].estado_Id == estado) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
           }
         }
@@ -1657,34 +872,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -1693,34 +881,7 @@ datos_ot[i].prod_Nombre,);
         if(datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 2000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -1729,34 +890,7 @@ datos_ot[i].prod_Nombre,);
         if(datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 2000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -1768,34 +902,7 @@ datos_ot[i].prod_Nombre,);
             this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
               for (let j = 0; j < datos_bagpro.length; j++) {
                 if (datos_ot[i].estado_Id == estado){
-                  this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                    datos_ot[i].estProcOT_ExtrusionKg,
-                    datos_ot[i].estProcOT_ImpresionKg,
-                    datos_ot[i].estProcOT_RotograbadoKg,
-                    datos_ot[i].estProcOT_DobladoKg,
-                    datos_ot[i].estProcOT_LaminadoKg,
-                    datos_ot[i].estProcOT_CorteKg,
-                    datos_ot[i].estProcOT_EmpaqueKg,
-                    datos_ot[i].estProcOT_SelladoKg,
-                    datos_ot[i].estProcOT_WiketiadoKg,
-                    datos_ot[i].estProcOT_CantidadPedida,
-                    datos_ot[i].falla_Nombre,
-                    datos_ot[i].estProcOT_Observacion,
-                    datos_ot[i].estado_Nombre,
-                    datos_ot[i].estProcOT_FechaCreacion,
-                    datos_ot[i].estProcOT_FechaInicio,
-                    datos_ot[i].estProcOT_FechaFinal,
-                    datos_ot[i].estProcOT_CantidadPedidaUnd,
-                    datos_ot[i].undMed_Id,
-                    datos_ot[i].usua_Id,
-                    datos_ot[i].usua_Nombre,
-                    datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+                  this.llenarArray(datos_ot[i]);
                 }
               }
             });
@@ -1810,36 +917,8 @@ datos_ot[i].prod_Nombre,);
           if (datos_ot.length == 0) setTimeout(() => { Swal.fire('No existen OTs creadas en las fechas consultadas.'); }, 3000);
           else {
             for (let i = 0; i < datos_ot.length; i++) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
-
           }
         });
       }
@@ -1848,34 +927,7 @@ datos_ot[i].prod_Nombre,);
       else {
         this.estadosProcesos_OTService.srvObtenerListaPorOtFechaFalla(fechaincial, fallas).subscribe(datos_ot => {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         });
       }
@@ -1888,35 +940,7 @@ datos_ot[i].prod_Nombre,);
             for (let i = 0; i < datos_ot.length; i++) {
               this.servicioBagPro.srvObtenerListaClienteOT_Item(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
                 for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                    datos_ot[i].estProcOT_ExtrusionKg,
-                    datos_ot[i].estProcOT_ImpresionKg,
-                    datos_ot[i].estProcOT_RotograbadoKg,
-                    datos_ot[i].estProcOT_DobladoKg,
-                    datos_ot[i].estProcOT_LaminadoKg,
-                    datos_ot[i].estProcOT_CorteKg,
-                    datos_ot[i].estProcOT_EmpaqueKg,
-                    datos_ot[i].estProcOT_SelladoKg,
-                    datos_ot[i].estProcOT_WiketiadoKg,
-                    datos_ot[i].estProcOT_CantidadPedida,
-                    datos_ot[i].falla_Nombre,
-                    datos_ot[i].estProcOT_Observacion,
-                    datos_ot[i].estado_Nombre,
-                    datos_ot[i].estProcOT_FechaCreacion,
-                    datos_ot[i].estProcOT_FechaInicio,
-                    datos_ot[i].estProcOT_FechaFinal,
-                    datos_ot[i].estProcOT_CantidadPedidaUnd,
-                    datos_ot[i].undMed_Id,
-                    datos_ot[i].usua_Id,
-                    datos_ot[i].usua_Nombre,
-                    datos_ot[i].estProcOT_SelladoUnd,
-                    datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
-
+                  this.llenarArray(datos_ot[i]);
                 }
               });
             }
@@ -1929,34 +953,7 @@ datos_ot[i].prod_Nombre,);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].estado_Id == estado) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
           }
         }
@@ -1967,34 +964,7 @@ datos_ot[i].prod_Nombre,);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].cli_Id == cliente) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
           }
         }
@@ -2005,34 +975,7 @@ datos_ot[i].prod_Nombre,);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].prod_Id == producto) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-                datos_ot[i].estProcOT_CantProdFacturada,
-                datos_ot[i].estProcOT_CantProdIngresada,
-                datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
           }
         }
@@ -2042,34 +985,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -2080,34 +996,7 @@ datos_ot[i].prod_Nombre,);
           if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OTs creadas el día ${fechaincial}`); }, 3000);
           else {
             for (let i = 0; i < datos_ot.length; i++) {
-              this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                datos_ot[i].estProcOT_ExtrusionKg,
-                datos_ot[i].estProcOT_ImpresionKg,
-                datos_ot[i].estProcOT_RotograbadoKg,
-                datos_ot[i].estProcOT_DobladoKg,
-                datos_ot[i].estProcOT_LaminadoKg,
-                datos_ot[i].estProcOT_CorteKg,
-                datos_ot[i].estProcOT_EmpaqueKg,
-                datos_ot[i].estProcOT_SelladoKg,
-                datos_ot[i].estProcOT_WiketiadoKg,
-                datos_ot[i].estProcOT_CantidadPedida,
-                datos_ot[i].falla_Nombre,
-                datos_ot[i].estProcOT_Observacion,
-                datos_ot[i].estado_Nombre,
-                datos_ot[i].estProcOT_FechaCreacion,
-                datos_ot[i].estProcOT_FechaInicio,
-                datos_ot[i].estProcOT_FechaFinal,
-                datos_ot[i].estProcOT_CantidadPedidaUnd,
-                datos_ot[i].undMed_Id,
-                datos_ot[i].usua_Id,
-                datos_ot[i].usua_Nombre,
-                datos_ot[i].estProcOT_SelladoUnd,
-                datos_ot[i].estProcOT_WiketiadoUnd,
-                datos_ot[i].estProcOT_CantProdFacturada,
-                datos_ot[i].estProcOT_CantProdIngresada,
-                datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+              this.llenarArray(datos_ot[i]);
             }
           };
         });
@@ -2117,34 +1006,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire('No se encontraron OTs con la falla consultada.'); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -2155,34 +1017,7 @@ datos_ot[i].prod_Nombre,);
           for (let i = 0; i < datos_ot.length; i++) {
             this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
               for (let j = 0; j < datos_bagpro.length; j++) {
-                this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-                  datos_ot[i].estProcOT_ExtrusionKg,
-                  datos_ot[i].estProcOT_ImpresionKg,
-                  datos_ot[i].estProcOT_RotograbadoKg,
-                  datos_ot[i].estProcOT_DobladoKg,
-                  datos_ot[i].estProcOT_LaminadoKg,
-                  datos_ot[i].estProcOT_CorteKg,
-                  datos_ot[i].estProcOT_EmpaqueKg,
-                  datos_ot[i].estProcOT_SelladoKg,
-                  datos_ot[i].estProcOT_WiketiadoKg,
-                  datos_ot[i].estProcOT_CantidadPedida,
-                  datos_ot[i].falla_Nombre,
-                  datos_ot[i].estProcOT_Observacion,
-                  datos_ot[i].estado_Nombre,
-                  datos_ot[i].estProcOT_FechaCreacion,
-                  datos_ot[i].estProcOT_FechaInicio,
-                  datos_ot[i].estProcOT_FechaFinal,
-                  datos_ot[i].estProcOT_CantidadPedidaUnd,
-                  datos_ot[i].undMed_Id,
-                  datos_ot[i].usua_Id,
-                  datos_ot[i].usua_Nombre,
-                  datos_ot[i].estProcOT_SelladoUnd,
-                  datos_ot[i].estProcOT_WiketiadoUnd,
-                  datos_ot[i].estProcOT_CantProdFacturada,
-                  datos_ot[i].estProcOT_CantProdIngresada,
-                  datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+                this.llenarArray(datos_ot[i]);
               }
             });
           }
@@ -2193,34 +1028,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con el Estado consultado.`);}, 3000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -2229,34 +1037,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con el Cliente consultado.`);}, 3000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -2265,34 +1046,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con el producto consultado.`);}, 3000);
         else{
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -2301,34 +1055,7 @@ datos_ot[i].prod_Nombre,);
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's creadas del día de hoy.`); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i].estProcOT_OrdenTrabajo,
-              datos_ot[i].estProcOT_ExtrusionKg,
-              datos_ot[i].estProcOT_ImpresionKg,
-              datos_ot[i].estProcOT_RotograbadoKg,
-              datos_ot[i].estProcOT_DobladoKg,
-              datos_ot[i].estProcOT_LaminadoKg,
-              datos_ot[i].estProcOT_CorteKg,
-              datos_ot[i].estProcOT_EmpaqueKg,
-              datos_ot[i].estProcOT_SelladoKg,
-              datos_ot[i].estProcOT_WiketiadoKg,
-              datos_ot[i].estProcOT_CantidadPedida,
-              datos_ot[i].falla_Nombre,
-              datos_ot[i].estProcOT_Observacion,
-              datos_ot[i].estado_Nombre,
-              datos_ot[i].estProcOT_FechaCreacion,
-              datos_ot[i].estProcOT_FechaInicio,
-              datos_ot[i].estProcOT_FechaFinal,
-              datos_ot[i].estProcOT_CantidadPedidaUnd,
-              datos_ot[i].undMed_Id,
-              datos_ot[i].usua_Id,
-              datos_ot[i].usua_Nombre,
-              datos_ot[i].estProcOT_SelladoUnd,
-              datos_ot[i].estProcOT_WiketiadoUnd,
-              datos_ot[i].estProcOT_CantProdFacturada,
-              datos_ot[i].estProcOT_CantProdIngresada,
-              datos_ot[i].estProcOT_CantMatPrimaAsignada,
-              datos_ot[i].estProcOT_Cliente,
-datos_ot[i].prod_Nombre,);
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
@@ -2338,73 +1065,46 @@ datos_ot[i].prod_Nombre,);
   }
 
   //Funcion encargada de llenar un array con la informacion de las ordenes de trabajo y el producido de cada area
-  llenarArray(ot : number,
-                ext : number,
-                  imp : number,
-                    rot : number,
-                      dbl : number,
-                        lam : number,
-                          cor : number,
-                            emp : number,
-                              sel : number,
-                                wik : number,
-                                  can : number,
-                                    falla : string,
-                                      observacion : string,
-                                        estado : any,
-                                          fecha : any,
-                                            fechaInicio : any,
-                                              fechaFinal : any,
-                                                cantUnd: any,
-                                                  und : any,
-                                                    usu : any,
-                                                      nombreUsu : any,
-                                                        selUnd : any,
-                                                          wikUnd : any,
-                                                            cantFacturada : any,
-                                                              cantIngresada : any,
-                                                                cantAsignada : any,
-                                                                  cliente : any,
-                                                                    producto : any){
-    usu = `${usu}`
-    if (usu.length == 2) usu = `0${usu}`;
-    else if (usu.length == 1) usu = `00${usu}`;
+  llenarArray(data : any){
+    data.usua_Id = `${data.usua_Id}`
+    if (data.usua_Id.length == 2) data.usua_Id = `0${data.usua_Id}`;
+    else if (data.usua_Id.length == 1) data.usua_Id = `00${data.usua_Id}`;
 
-    if (fechaInicio == null) fechaInicio = fechaInicio
-    else fechaInicio = fechaInicio.replace("T00:00:00", "");
+    if (data.estProcOT_FechaInicio == null) data.estProcOT_FechaInicio = data.estProcOT_FechaInicio
+    else data.estProcOT_FechaInicio = data.estProcOT_FechaInicio.replace("T00:00:00", "");
 
-    if (fechaFinal == null) fechaFinal = fechaFinal
-    else fechaFinal = fechaFinal.replace("T00:00:00", "");
+    if (data.estProcOT_FechaFinal == null) data.estProcOT_FechaFinal = data.estProcOT_FechaFinal
+    else data.estProcOT_FechaFinal = data.estProcOT_FechaFinal.replace("T00:00:00", "");
 
     let info : any = {
-      ot : ot,
-      Mp : cantAsignada,
-      ext : ext,
-      imp : imp,
-      rot : rot,
-      dbl : dbl,
-      lam : lam,
-      cor : cor,
-      emp : emp,
-      sel : sel,
-      selUnd : selUnd,
-      wik : wik,
-      wikUnd : wikUnd,
-      cant : can,
-      cantUnd : `${this.formatonumeros(can)} Kg - ${this.formatonumeros(cantUnd)} Und`,
-      falla : falla,
-      obs : observacion,
-      est : estado,
-      fecha : fecha.replace("T00:00:00", ""),
-      entrada : this.formatonumeros(cantIngresada),
-      salida : this.formatonumeros(cantFacturada),
-      fechaInicio : fechaInicio,
-      fechaFinal : fechaFinal,
-      und : und,
-      usu : usu,
-      nombreUsu : nombreUsu,
-      cli : cliente,
-      prod : producto,
+      ot : data.estProcOT_OrdenTrabajo,
+      Mp : data.estProcOT_CantMatPrimaAsignada,
+      ext : data.estProcOT_ExtrusionKg,
+      imp : data.estProcOT_ImpresionKg,
+      rot : data.estProcOT_RotograbadoKg,
+      dbl : data.estProcOT_DobladoKg,
+      lam : data.estProcOT_LaminadoKg,
+      cor : data.estProcOT_CorteKg,
+      emp : data.estProcOT_EmpaqueKg,
+      sel : data.estProcOT_SelladoKg,
+      selUnd : data.estProcOT_SelladoUnd,
+      wik : data.estProcOT_WiketiadoKg,
+      wikUnd : data.estProcOT_WiketiadoUnd,
+      cant : data.estProcOT_CantidadPedida,
+      cantUnd : `${this.formatonumeros(data.estProcOT_CantidadPedida)} Kg - ${this.formatonumeros(data.estProcOT_CantidadPedidaUnd)} Und`,
+      falla : data.falla_Nombre,
+      obs : data.estProcOT_Observacion,
+      est : data.estado_Nombre,
+      fecha : data.estProcOT_FechaCreacion.replace("T00:00:00", ""),
+      entrada : this.formatonumeros(data.estProcOT_CantProdIngresada),
+      salida : this.formatonumeros(data.estProcOT_CantProdFacturada),
+      fechaInicio : data.estProcOT_FechaInicio,
+      fechaFinal : data.estProcOT_FechaFinal,
+      und : data.undMed_Id,
+      usu : data.usua_Id,
+      nombreUsu : data.usua_Nombre,
+      cli : data.estProcOT_Cliente,
+      prod : data.prod_Nombre,
     }
     this.columnas = [
       { header: 'Presentación', field: 'und'},
@@ -2422,16 +1122,15 @@ datos_ot[i].prod_Nombre,);
     this.ArrayDocumento.push(info);
     this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
     this.ArrayDocumento.sort((a,b) => Number(a.ot) - Number(b.ot));
-    // this._columnasSeleccionada = this.columnas;
     this.load = true;
 
-    if (estado == 'Abierta') this.catidadOTAbiertas += 1;
-    if (estado == 'Asignada') this.cantidadOTAsignadas += 1;
-    if (estado == 'Terminada') this.cantidadOTTerminada += 1;
-    if (estado == 'En proceso') this.cantidadOTIniciada += 1;
-    if (estado == 'Anulado') this.cantidadOtAnulada += 1;
-    if (estado == 'Finalizada') this.cantidadOTFinalizada += 1;
-    if (estado == 'Cerrada') this.cantidadOTCerrada += 1;
+    if (data.estado_Nombre == 'Abierta') this.catidadOTAbiertas += 1;
+    if (data.estado_Nombre == 'Asignada') this.cantidadOTAsignadas += 1;
+    if (data.estado_Nombre == 'Terminada') this.cantidadOTTerminada += 1;
+    if (data.estado_Nombre == 'En proceso') this.cantidadOTIniciada += 1;
+    if (data.estado_Nombre == 'Anulado') this.cantidadOtAnulada += 1;
+    if (data.estado_Nombre == 'Finalizada') this.cantidadOTFinalizada += 1;
+    if (data.estado_Nombre == 'Cerrada') this.cantidadOTCerrada += 1;
   }
 
   // Funcion que va a asignar un valor una variable, el valor será la orden de trabajo sobre la que se le dió click
@@ -3028,15 +1727,4 @@ datos_ot[i].prod_Nombre,);
     this.submitted = false;
   }
 
-  // Funcion para filtrar en el autocompletado
-  filterCountry(event) {
-    let filtered: any[] = [];
-    let query = event.query;
-    for (let i = 0; i < this.producto.length; i++) {
-      let cliente = this.producto[i];
-      if (cliente.prod_Nombre.toLowerCase().indexOf(query.toLowerCase()) == 0) filtered.push(cliente);
-    }
-
-    this.filtroClientes = filtered;
-  }
 }

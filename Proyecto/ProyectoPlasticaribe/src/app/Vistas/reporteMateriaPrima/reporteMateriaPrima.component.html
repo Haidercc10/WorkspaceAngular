@@ -32,7 +32,7 @@
 
         <!-- Nombre de la materia prima -->
         <div class="form-floating col-md-6">
-          <input formControlName="MpNombre" class="form-control form-control-sm" list="materiaprima" id="floatingInput" title="Nombre de la Materia Prima" (keyup)="obtenerMateriasPrimasRetiradas()" (change)="cambiarNombreMateriaPrima()">
+          <input formControlName="MpNombre" class="form-control form-control-sm" list="materiaprima" id="floatingInput" title="Nombre de la Materia Prima" (keyup)="obtenerMateriasPrimas()" (change)="cambiarNombreMateriaPrima()">
           <datalist id="materiaprima">
             <option value={{item.id}} *ngFor="let item of materiasPrimas">{{item.nombre}}</option>
           </datalist>
@@ -58,13 +58,13 @@
 
         <!-- Fecha inicial -->
         <div class="form-floating col-md-2">
-          <input formControlName="fecha" type="date" min="0" class="form-control" (change)="buscarBOPPSegunFecha()" id="floatingInput"required >
+          <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Fecha Inicial</label>
         </div>
 
         <!-- Fecha final -->
         <div class="form-floating col-md-2">
-          <input formControlName="fechaFinal" type="date" min="0" class="form-control" (change)="buscarBOPPSegunFecha()" id="floatingInput"required >
+          <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Fecha Final</label>
         </div>
       </div>
@@ -134,29 +134,12 @@
               <th scope="col">Precio Unitario
                 <p-columnFilter type="numeric" currency="COP" field="PrecioUnd" display="menu"></p-columnFilter>
               </th>
-              <th scope="col" (dblclick)="organizacionPrecioDblClick()" (click)="organizacionPrecio()">SubTotal
+              <th scope="col">SubTotal
                 <p-columnFilter type="numeric" currency="COP" field="SubTotal" display="menu"></p-columnFilter>
               </th>
             </ng-container>
             <th scope="col">Categoria
               <p-columnFilter type="text" field="Categoria" display="menu"></p-columnFilter>
-
-              <!-- <p-columnFilter field="Categoria" matchMode="in" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
-                <ng-template pTemplate="header">
-                    <div class="px-3 pt-3 pb-0">
-                      <span class="font-bold" style="color:black">Filtrar Categorias</span>
-                    </div>
-                </ng-template>
-                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                  <p-multiSelect [ngModel]="value" [options]="categorias" placeholder="Todos" (onChange)="filter($event.value)" optionLabel="catMP_Nombre">
-                    <ng-template let-option pTemplate="item">
-                      <div class="p-multiselect-Categoria-option">
-                        <span style="color:black" class="ml-1">{{option.catMP_Nombre}}</span>
-                      </div>
-                    </ng-template>
-                  </p-multiSelect>
-                </ng-template>
-              </p-columnFilter> -->
             </th>
             <th>
               <button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button>

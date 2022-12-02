@@ -4,15 +4,10 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
-import { FactuaMpCompradaService } from 'src/app/Servicios/facturaMpComprada.service';
-import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
 import { ProveedorService } from 'src/app/Servicios/proveedor.service';
-import { RemisionService } from 'src/app/Servicios/Remision.service';
 import { RemisionesMPService } from 'src/app/Servicios/remisionesMP.service';
-import { RemisionFacturaService } from 'src/app/Servicios/remisionFactura.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -40,7 +35,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
   mpAgregada = [];
   remision : any = [];
   remConFac : any = [];
-  public load: boolean;
+  load: boolean = true;;
 
   constructor(private rolService : RolesService,
                 private frmBuilderMateriaPrima : FormBuilder,
@@ -58,8 +53,6 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
       fecha: [null],
       fechaFinal : [null]
     });
-
-    this.load = true;
   }
 
 
@@ -157,7 +150,6 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     let fechaFinal : any = this.FormDocumentos.value.fechaFinal;
     let TipoDocumento : string = this.FormDocumentos.value.TipoDocumento;
     let proveedores : any = this.FormDocumentos.value.proveedorId;
-    let fechaCreacionFinal : any;
 
     if (idDoc != null && fecha != null && fechaFinal != null && TipoDocumento != null && proveedores != null) {
       this.facturaCompraMPService.GetEntradaFacRem_Codigo(idDoc).subscribe(datos_entradas => {
@@ -315,176 +307,6 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
         }
       });
     }
-
-    // if (idDoc != null) {
-    //   this.facturaCompraService.srvObtenerListaPorId(idDoc).subscribe(datos_factura => {
-    //     this.lenarTabla(datos_factura);
-    //   }, error => {
-    //     this.remisionService.srvObtenerListaPorId(idDoc).subscribe(datos_remision => {
-    //       this.lenarTabla(datos_remision);
-    //     });
-    //   });
-    // } else if (fecha != null) {
-    //   this.facturaCompraService.srvObtenerLista().subscribe(datos_factura => {
-    //     for (let index = 0; index < datos_factura.length; index++) {
-    //       let FechaCreacionDatetime = datos_factura[index].facco_FechaFactura;
-    //       let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-    //       fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-    //       if (moment(fechaCreacionFinal).isBetween(fecha, undefined)) {
-    //         this.lenarTabla(datos_factura[index]);
-    //       }
-    //     }
-    //   });
-
-    //   this.remisionService.srvObtenerLista().subscribe(datos_remision => {
-    //     for (let index = 0; index < datos_remision.length; index++) {
-    //       let FechaCreacionDatetime = datos_remision[index].rem_Fecha;
-    //       let FechaCreacionNueva = FechaCreacionDatetime.indexOf("T");
-    //       fechaCreacionFinal = FechaCreacionDatetime.substring(0, FechaCreacionNueva);
-    //       if (moment(fechaCreacionFinal).isBetween(fecha, undefined)) {
-    //         this.lenarTabla(datos_remision[index]);
-    //       }
-    //     }
-    //   })
-    // } else if (TipoDocumento != null) {
-    //   if (TipoDocumento ==  'FCO') {
-    //     this.facturaCompraService.srvObtenerLista().subscribe(datos_factura => {
-    //       for (let index = 0; index < datos_factura.length; index++) {
-    //         this.lenarTabla(datos_factura[index]);
-    //       }
-    //     }, error => { Swal.fire("No hay facturas registradas"); this.load = true;});
-    //   } else if (TipoDocumento ==  'REM') {
-    //     this.remisionService.srvObtenerLista().subscribe(datos_remision => {
-    //       for (let index = 0; index < datos_remision.length; index++) {
-    //         this.lenarTabla(datos_remision[index]);
-    //       }
-    //     }, error => { Swal.fire("No hay remisiones registradas"); this.load = true;});
-    //   } else if (TipoDocumento == 'Remisiones sin Factura') {
-    //     this.load = false;
-    //     // Llenado d Array con Remisiones
-    //     this.remisionService.srvObtenerLista().subscribe(datos_remision => {
-    //       for (let index = 0; index < datos_remision.length; index++) {
-    //         datos_remision[index].tpDoc_Id = 'Remisiones sin Factura';
-    //         this.remision.push(datos_remision[index].rem_Id);
-    //       }
-    //     }, error => { Swal.fire("No hay remisiones registradas"); this.load = true;});
-
-    //     // Llenado de Array con Remisiones con Facturas
-    //     this.remisionFacturaService.srvObtenerLista().subscribe(datos_remisionesFacturas => {
-    //       for (let i = 0; i < datos_remisionesFacturas.length; i++) {
-    //         this.remConFac.push(datos_remisionesFacturas[i].rem_Id);
-    //       }
-    //     }, error => { Swal.fire("No hay remisiones registradas"); this.load = true;});
-
-    //     // Se esperan unos segundos a que termine el llenado
-    //     setTimeout(() => {
-    //       // Variable para validar que un dato en los 2 Array es igual
-    //       let res = 0;
-    //       // Recorre Array con Remisiones
-    //       for (let l = 0; l < this.remision.length; l++) {
-    //         res = 0
-    //         // Recorre Array con Remisiones con Facturas
-    //         for (let m = 0; m < this.remConFac.length; m++) {
-    //           // Pregunta si la remision tiene factura
-    //           if (this.remision.includes(this.remConFac[m])) {
-    //             // Pregunta si el dato de los Arrays es igual
-    //             if (this.remision[l] == this.remConFac[m]) {
-    //               res = 1;
-    //               // Quita el dato que es igual del primer Array
-    //               this.remision.splice(l, 1);
-    //             }
-    //           }
-    //         }
-    //         if (res == 1) continue;
-    //         else continue;
-    //       }
-
-    //       // Recorre el Array de Remisiones y busca cada id para mostrarlo en la tabla
-    //       for (let k = 0; k < this.remision.length; k++) {
-    //         this.remisionService.srvObtenerListaPorId(this.remision[k]).subscribe(datos_remision => {
-    //           this.lenarTabla(datos_remision);
-    //         });
-    //       }
-    //       this.load = true;
-    //     }, 2000);
-    //   } else if (TipoDocumento == 'Facturas sin Remisiones') {
-
-    //     this.load = false;
-    //     let facturas = [];
-    //     this.remConFac = [];
-
-    //     this.facturaCompraService.srvObtenerLista().subscribe(datos_facturas => {
-    //       for (let i = 0; i < datos_facturas.length; i++) {
-    //         facturas.push(datos_facturas[i].facco_Id);
-    //       }
-    //     });
-
-    //     this.remisionFacturaService.srvObtenerLista().subscribe(datos_remisionesFacturas => {
-    //       for (let j = 0; j < datos_remisionesFacturas.length; j++) {
-    //         this.remConFac.push(datos_remisionesFacturas[j].facco_Id);
-    //       }
-    //     });
-
-    //     setTimeout(() => {
-    //       // Variable para validar que un dato en los 2 Array es igual
-    //       let res = 0;
-    //       // Recorre Array con Remisiones
-    //       for (let l = 0; l < facturas.length; l++) {
-    //         res = 0
-    //         // Recorre Array con Remisiones con Facturas
-    //         for (let m = 0; m < this.remConFac.length; m++) {
-    //           // Pregunta si la remision tiene factura
-    //           if (facturas.includes(this.remConFac[m])) {
-    //             // Pregunta si el dato de los Arrays es igual
-    //             if (facturas[l] == this.remConFac[m]) {
-    //               res = 1;
-    //               // Quita el dato que es igual del primer Array
-    //               facturas.splice(l, 1);
-    //             }
-    //           }
-    //         }
-    //         if (res == 1) continue;
-    //         else continue;
-    //       }
-
-    //       // Recorre el Array de Remisiones y busca cada id para mostrarlo en la tabla
-    //       for (let k = 0; k < facturas.length; k++) {
-    //         this.facturaCompraService.srvObtenerListaPorId(facturas[k]).subscribe(datos_factura => {
-    //           this.lenarTabla(datos_factura);
-    //         });
-    //       }
-    //       this.load = true;
-    //     }, 2000);
-    //   }
-    // } else if (proveedores != null) {
-    //   this.facturaCompraService.srvObtenerListaPorProvId(proveedores).subscribe(datos_factura => {
-    //     for (let index = 0; index < datos_factura.length; index++) {
-    //       if (datos_factura[index].prov_Id == proveedores) {
-    //         this.lenarTabla(datos_factura[index]);
-    //       }
-    //     }
-
-    //     this.remisionService.srvObtenerListaPorProv(proveedores).subscribe(datos_remision => {
-    //       for (let index = 0; index < datos_remision.length; index++) {
-    //         if (datos_remision[index].prov_Id == proveedores) {
-    //           this.lenarTabla(datos_remision[index]);
-    //         }
-    //       }
-    //     });
-    //   });
-    // } else {
-    //   this.facturaCompraService.srvObtenerLista().subscribe(datos_factura => {
-    //     for (let index = 0; index < datos_factura.length; index++) {
-    //       this.lenarTabla(datos_factura[index]);
-    //     }
-
-    //     this.remisionService.srvObtenerLista().subscribe(datos_remision => {
-    //       for (let index = 0; index < datos_remision.length; index++) {
-    //         this.lenarTabla(datos_remision[index]);
-    //       }
-    //     });
-    //   });
-    // }
   }
 
   //

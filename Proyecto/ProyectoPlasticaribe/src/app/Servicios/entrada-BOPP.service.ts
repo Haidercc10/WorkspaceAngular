@@ -82,6 +82,9 @@ export class EntradaBOPPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos6/${id}/${fechaIncial}`);
   }
 
+  GetRollosLike(data){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/GetRollosLike/${data}`);
+  }
 
   //Metodo agregar
   srvAgregar(data:any) {

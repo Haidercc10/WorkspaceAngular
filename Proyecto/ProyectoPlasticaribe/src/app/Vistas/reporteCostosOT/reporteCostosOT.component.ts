@@ -1,20 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import Swal from 'sweetalert2';
-import { AsignacionMPService } from 'src/app/Servicios/asignacionMP.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { info } from 'console';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { EstadosService } from 'src/app/Servicios/estados.service';
-import { TintasService } from 'src/app/Servicios/tintas.service';
-import { DetallesAsignacionTintasService } from 'src/app/Servicios/detallesAsignacionTintas.service';
-import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
-import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
-import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/detallesAsignacionBOPP.service';
 import { DevolucionesService } from 'src/app/Servicios/devoluciones.service';
 import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service';
 
@@ -26,7 +18,7 @@ import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service'
 export class ReporteCostosOTComponent implements OnInit {
 
   public infoOT !: FormGroup;
-  public load: boolean;
+  load: boolean = true;
 
   /* Vaiables*/
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -80,21 +72,14 @@ export class ReporteCostosOTComponent implements OnInit {
   usuarioCreador : any;
   estado : any;
 
-  constructor( private frmBuilderMateriaPrima : FormBuilder,
+  constructor(private frmBuilderMateriaPrima : FormBuilder,
                 private bagProServices : BagproService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private rolService : RolesService,
-                      private asignacionMPService : AsignacionMPService,
-                        private detallesAsignacionService : DetallesAsignacionService,
-                          private materiaPrimaService : MateriaPrimaService,
-                            private tintasService : TintasService,
-                              private detallesAsignacionTintasService : DetallesAsignacionTintasService,
-                                private boppService : EntradaBOPPService,
-                                  private asignacionBOPPService : AsignacionBOPPService,
-                                    private detallesAsigBOPPService : DetalleAsignacion_BOPPService,
-                                    private devolucionesService : DevolucionesService,
-                                      private devolucionesMPService : DevolucionesMPService,) {
-
+                      private detallesAsignacionService : DetallesAsignacionService,
+                        private materiaPrimaService : MateriaPrimaService,
+                          private devolucionesService : DevolucionesService,
+                            private devolucionesMPService : DevolucionesMPService,) {
 
     this.infoOT = this.frmBuilderMateriaPrima.group({
       ot : ['',Validators.required],
@@ -113,8 +98,6 @@ export class ReporteCostosOTComponent implements OnInit {
       fechaFinOT : ['', Validators.required],
       estadoOT : ['', Validators.required],
     });
-
-    this.load = true;
   }
 
   ngOnInit() {
@@ -168,20 +151,6 @@ export class ReporteCostosOTComponent implements OnInit {
         }
       }
     });
-  }
-
-  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
-  confimacionSalida(){
-    Swal.fire({
-      title: '¿Seguro que desea salir?',
-      showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: 'Salir',
-      denyButtonText: `No Salir`,
-    }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
-      if (result.isConfirmed) window.location.href = "./";
-    })
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

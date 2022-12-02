@@ -34,16 +34,16 @@ export class EntradaBOPPComponent implements OnInit {
                         private categoriaService : CategoriaMateriaPrimaService,) {
 
     this.FormEntradaBOPP = this.frmBuilder.group({
-      Nombre : ['', Validators.required],
-      serial : ['', Validators.required],
-      cantidad : ['', Validators.required],
-      cantidadKG : ['', Validators.required],
-      precio : ['', Validators.required],
-      ancho : ['', Validators.required],
-      undMed : ['', Validators.required],
-      Fecha : [this.today, Validators.required],
-      Observacion : ['', Validators.required],
-      Categoria : ['', Validators.required],
+      Nombre : [''],
+      serial : [''],
+      cantidad : [''],
+      cantidadKG : [''],
+      precio : [''],
+      ancho : [''],
+      undMed : [''],
+      Fecha : [this.today],
+      Observacion : [''],
+      Categoria : [''],
     });
   }
 
@@ -104,7 +104,7 @@ export class EntradaBOPPComponent implements OnInit {
     this.ArrayBOPP = [];
   }
 
-  //
+  // funcion que va a limpiar los campos
   limpiarCampos(){
     this.FormEntradaBOPP = this.frmBuilder.group({
       Nombre : '',
@@ -120,7 +120,7 @@ export class EntradaBOPPComponent implements OnInit {
     });
   }
 
-  //
+  //Funcion que va a cargar en la tabla el rollo que se va a crear
   cargarBOPPTabla(){
     if (this.FormEntradaBOPP.valid) {
       this.load = false;
@@ -185,7 +185,7 @@ export class EntradaBOPPComponent implements OnInit {
     }
   }
 
-  //
+  // funcion que crea los rollos en la tabla
   crearEntrada(){
     if (this.ArrayBOPP.length == 0) {
       Swal.fire({
@@ -221,39 +221,21 @@ export class EntradaBOPPComponent implements OnInit {
         }
 
         this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(datos_BOPP => {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 1500,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          });
-          Toast.fire({
+          Swal.fire({
             icon: 'success',
-            title: '¡Entrada de BOPP registrada con exito!'
+            title: 'Advertencia',
+            text: "¡Entrada de BOPP registrada con exito!",
+            showCloseButton: true
           });
           this.load = true;
 
           this.limpiarTodosLosCampos();
         }, error => {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 2500,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          });
-          Toast.fire({
+          Swal.fire({
             icon: 'error',
-            title: '¡Error al ingresar el BOPP!'
+            title: 'Opps...',
+            html: `<b>¡Error al ingresar el rollo!</b><hr>` + `<spam style="color: #f00">${error}</spam>`,
+            showCloseButton: true
           });
           this.load = true;
         });
@@ -261,4 +243,21 @@ export class EntradaBOPPComponent implements OnInit {
     }
   }
 
+  // Funcion que va a quitar un rollo de la tabla
+  quitarRollo(data : any){
+    Swal.fire({
+      title: '¿Estás seguro de eliminar la Materia Prima de la Asignación?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Eliminar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        for (let i = 0; i < this.ArrayBOPP.length; i++) {
+          if (data.Serial == this.ArrayBOPP[i].Serial) this.ArrayBOPP.splice(i, 1) ;
+        }
+      }
+    });
+  }
 }

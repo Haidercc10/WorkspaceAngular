@@ -1,14 +1,12 @@
-import { ThisReceiver } from '@angular/compiler';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesAsignacionProductosFactura.service';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionesProductos.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DtPreEntregaRollos.service';
-import { EntradaRollosService } from 'src/app/Servicios/EntradaRollos.service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
 import { ProductoService } from 'src/app/Servicios/producto.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
@@ -29,7 +27,7 @@ export class ReporteDespachoComponent implements OnInit {
   public arrayClientes = [];
   rolloFiltrados : any [] = [];
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -38,14 +36,6 @@ export class ReporteDespachoComponent implements OnInit {
   public page : number; //Variable que tendrá el paginado de la tabla
   rollosAsignados : any [] = []; //Variable que va a almacenar los rollos que fueron asignados
   consolidadoRollo : any [] = []; //Variable que va a almacenar el consolidado de la cantidad de rollos ingresados o facturados
-  keywordProductos = 'prod_Nombre' /** Palabra clave de input productos*/
-  validarInputNombresProductos : any = true;
-  keywordRollo : any = 'rollo_Id' /** Palabra clave de input rollos*/
-  validarInputRollo : any = true;
-  keywordRollo2 = 'rollo_Id';
-
-  keywordCliente = 'cli_Nombre';
-  validarInputCliente : any;
   public Codigo = ''; /** Variable para pipe de documento */
   public Rollo = ''; /** Variable para pipe de Rollo */
   public Producto = ''; /** Variable para pipe de Producto */
@@ -60,13 +50,11 @@ export class ReporteDespachoComponent implements OnInit {
                     @Inject(SESSION_STORAGE) private storage: WebStorageService,
                       private servicioEstados : EstadosService,
                         private servicioTipoDoc : TipoDocumentoService,
-                          private ServicioEntradaRollos :  EntradaRollosService,
-                            private servicioDtlEntradaRollos: DetallesEntradaRollosService,
-                              private dtAsigFactService : DetallesAsignacionProductosFacturaService,
-                                private dtDevolucion : DetallesDevolucionesProductosService,
-                                  private dtEntradaService : DetallesEntradaRollosService,
-                                    private bagProServise : BagproService,
-                                      private preCargueService : DtPreEntregaRollosService,) {
+                          private servicioDtlEntradaRollos: DetallesEntradaRollosService,
+                            private dtAsigFactService : DetallesAsignacionProductosFacturaService,
+                              private dtDevolucion : DetallesDevolucionesProductosService,
+                                private dtEntradaService : DetallesEntradaRollosService,
+                                  private preCargueService : DtPreEntregaRollosService,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -82,18 +70,10 @@ export class ReporteDespachoComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.fecha();
     this.llenadoProducto();
     this.llenadoEstadoRollos();
     this.llenadoTipoDocumento();
-    this.cambioKeyword();
     this.llenadoRollosIngresados();
-    this.cambioKeyword();
-  }
-
-  //
-  cambioKeyword() {
-    this.keywordRollo2 = this.keywordRollo.toString();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -111,90 +91,11 @@ export class ReporteDespachoComponent implements OnInit {
     });
   }
 
-  //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
-  fecha(){
-    this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
-  }
-
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => {
     const exp = /(\d)(?=(\d{3})+(?!\d))/g;
     const rep = '$1,';
     return number.toString().replace(exp,rep);
-  }
-
-  //
-  onChangeSearchProductos(val) {
-    if (val != '') this.validarInputNombresProductos = false;
-    else this.validarInputNombresProductos = true;
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
-  }
-
-  //
-  onFocusedProductos(e) {
-    if (!e.isTrusted) this.validarInputNombresProductos = false;
-    else this.validarInputNombresProductos = true;
-    // do something when input is focused
-  }
-
-  //
-  selectEventProducto(item) {
-    this.FormConsultarFiltros.value.Producto = item.prod_Id;
-    if (this.FormConsultarFiltros.value.ProdNombre != '') this.validarInputNombresProductos = false;
-    else this.validarInputNombresProductos = true;
-    // do something with selected item
-  }
-
-  //
-  onChangeSearchCliente(val) {
-    if (val != '') this.validarInputCliente = false;
-    else this.validarInputCliente = true;
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
-  }
-
-  //
-  onFocusedCliente(e) {
-    if (!e.isTrusted) this.validarInputCliente = false;
-    else this.validarInputCliente = true;
-    // do something when input is focused
-  }
-
-  //
-  selectEventCliente(item) {
-    this.FormConsultarFiltros.value.Cliente = item.cli_Id;
-    if (this.FormConsultarFiltros.value.Cliente != '') this.validarInputCliente = false;
-    else this.validarInputCliente = true;
-    // do something with selected item
-  }
-
-  //
-  onChangeSearchRollo(val) {
-    if (val != '') this.validarInputRollo = false;
-    else this.validarInputRollo = true;
-  }
-
-  //
-  onFocusedRollo(e) {
-    if (!e.isTrusted) this.validarInputRollo = false;
-    else this.validarInputRollo = true;
-    // do something when input is focused
-  }
-
-  //
-  selectEventRollo(item) {
-    this.FormConsultarFiltros.value.Rollo = item.entRolloProd_Id;
-    if (this.FormConsultarFiltros.value.Rollo != '') this.validarInputRollo = false;
-    else this.validarInputRollo = true;
-
-    // do something with selected item
   }
 
   //

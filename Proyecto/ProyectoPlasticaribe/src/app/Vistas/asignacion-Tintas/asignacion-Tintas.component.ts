@@ -1,13 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { modelAsignacionMPxTintas } from 'src/app/Modelo/modelAsignacionMPxTintas';
-import { modelDetallesAsignacionMPxTintas } from 'src/app/Modelo/modelDetallesAsignacionMPxTintas';
-import { AsignacionMPService } from 'src/app/Servicios/asignacionMP.service';
 import { AsignacionMPxTintasService } from 'src/app/Servicios/asignacionMPxTintas.service';
-import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
-import { CrearMateriaprimaService } from 'src/app/Servicios/crear-materiaprima.service';
 import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/detallesAsignacionMPxTintas.service';
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
@@ -22,32 +18,21 @@ import Swal from 'sweetalert2';
 })
 export class AsignacionTintasComponent implements OnInit {
 
-  public load: boolean;
-  public FormAsignacionMP !: FormGroup;
-  public FormMateriaPrima !: FormGroup;
+  load: boolean = false;
+  FormAsignacionMP !: FormGroup;
+  FormMateriaPrima !: FormGroup;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   materiasPrimas = []; //Varibale que almacenará las materias primas que se utilizan para la creacion de tintas
   unidadMedida = []; //Variable que almacenará las unidades de medida
   tintas = []; //Varibale que almacenará las tintas que se pueden crear
   ArrayMateriaPrima = []; //Varibale que almacenará las materias primas que se estan asignando para crear una tinta
-  AccionBoton = "Agregar"; //Varibale para saber si una materia prima está en edicion o no
-  materiaPrimaSeleccionada = []; //Varibale que almacenará temporalmente la materia prima que se buscó por id o se seleccionó para poder llenar el resto de informacion de esta materia prima
-  public componenteCrearTintas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalCrearTintas();
-  public componenteCrearMateriasPrimas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
-  validarInputTintas : boolean = true;
-  keywordTintas = 'name';
-  validarInputMp : boolean = true;
-  keywordMp = 'name';
-  public historyHeading: string = 'Seleccionado Recientemente';
-  NombreMatPrima : string = 'Materia Prima';
-  UltimoId : number;
-  public arrayTintaAsignada = [];
-  public MatPrima: number;
-  public tintaSolvente: number;
+  componenteCrearTintas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalCrearTintas();
+  componenteCrearMateriasPrimas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
+  arrayTintaAsignada = [];
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
@@ -59,6 +44,7 @@ export class AsignacionTintasComponent implements OnInit {
                             private detallesAsignacionMPxTintas : DetallesAsignacionMPxTintasService,)  {
 
     this.FormAsignacionMP = this.frmBuilder.group({
+      Id_Tinta : [null, Validators.required],
       Tinta : [null, Validators.required],
       cantidadTinta : [null, Validators.required],
       undMedTinta : [null, Validators.required],
@@ -72,64 +58,14 @@ export class AsignacionTintasComponent implements OnInit {
       stockMateriaPrima : ['', Validators.required],
       cantidadMateriaPrima : ['', Validators.required],
       undMedMateriaPrima : ['', Validators.required],
-      //idCategoria : ['', Validators.required],
-      //nombreCategoria : ['', Validators.required]
     });
-
-    this.load = true;
   }
 
   ngOnInit(): void {
     this.lecturaStorage();
-    this.fecha();
     this.obtenerMateriaPrima();
     this.obtenerUnidadesMedida();
     this.obtenerTintas();
-  }
-
-  onChangeSearchTinta(val: string) {
-    if (val != '') this.validarInputTintas = false;
-    else this.validarInputTintas = true;
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
-  }
-
-  onFocusedTinta(e){
-    if (!e.isTrusted) this.validarInputTintas = false;
-    else this.validarInputTintas = true;
-    // do something when input is focused
-  }
-
-  onChangeSearchMp(val: string) {
-    if (val != '') this.validarInputMp = false;
-    else this.validarInputMp = true;
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
-  }
-
-  onFocusedMp(e){
-    if (!e.isTrusted) this.validarInputMp = false;
-    else this.validarInputMp = true;
-    // do something when input is focused
-  }
-
-  //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
-  fecha(){
-    this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
-
-    this.FormAsignacionMP = this.frmBuilder.group({
-      Tinta : null,
-      cantidadTinta : null,
-      undMedTinta : null,
-      Observacion : null,
-      Fecha : this.today,
-    });
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -163,26 +99,13 @@ export class AsignacionTintasComponent implements OnInit {
       Observacion : null,
       Fecha : this.today,
     });
-    this.FormMateriaPrima.setValue({
-      idMateriaPrima : null,
-      nombreMateriaPrima : null,
-      stockMateriaPrima : null,
-      cantidadMateriaPrima : null,
-      undMedMateriaPrima :null,
-    });
+    this.FormMateriaPrima.reset();
     this.ArrayMateriaPrima = [];
-    this.AccionBoton = 'Agregar'
   }
 
   // Funcion que limpiará los campos del apartado de Materias Primas
   limpiarCamposMateriaPrima(){
-    this.FormMateriaPrima.setValue({
-      idMateriaPrima : '',
-      nombreMateriaPrima : '',
-      stockMateriaPrima : '',
-      cantidadMateriaPrima : '',
-      undMedMateriaPrima : '',
-    });
+    this.FormMateriaPrima.reset();
   }
 
   // Funcion que buscará las tintas que se utilizan en la empresa
@@ -199,14 +122,12 @@ export class AsignacionTintasComponent implements OnInit {
   }
 
   // funcion que servirá para llenar el campo de unidad de medida de la tinta dependiendo la tinta seleccionada
-  buscarTintaSeleccionada(item){
-    this.validarInputTintas = false;
-    this.FormAsignacionMP.value.Tinta = item.id;
+  buscarTintaSeleccionada(){
     let tinta : any = this.FormAsignacionMP.value.Tinta;
-
     this.tintasService.srvObtenerListaPorId(tinta).subscribe(datos_tinta => {
       this.FormAsignacionMP .setValue({
-        Tinta : this.FormAsignacionMP.value.Tinta,
+        Id_Tinta: datos_tinta.tinta_Id,
+        Tinta : datos_tinta.tinta_Nombre,
         cantidadTinta : this.FormAsignacionMP.value.cantidadTinta,
         undMedTinta : datos_tinta.undMed_Id,
         Observacion : this.FormAsignacionMP.value.Observacion,
@@ -219,7 +140,7 @@ export class AsignacionTintasComponent implements OnInit {
   obtenerMateriaPrima(){
     this.asignacionMPxTintas.srvObtenerListaMatPrimas().subscribe(data_materiasPrimas => {
       for (let i = 0; i < data_materiasPrimas.length; i++) {
-        if (data_materiasPrimas[i]) {
+        if (data_materiasPrimas[i].matPrima != 84 && data_materiasPrimas[i].matPrima != 2001 && data_materiasPrimas[i].matPrima != 88 && data_materiasPrimas[i].matPrima != 89 && data_materiasPrimas[i].matPrima != 2072) {
           let mp : any = {
             id : data_materiasPrimas[i].matPrima,
             name : data_materiasPrimas[i].nombreMP,
@@ -239,76 +160,35 @@ export class AsignacionTintasComponent implements OnInit {
     });
   }
 
-  //Funcion que consultara una materia prima con base a un ID pasado en la vista
-  buscarMpId(){
-    let idMatPrima : number = this.FormMateriaPrima.value.idMateriaPrima;
-    this.materiaPrimaSeleccionada = [];
-
-    this.asignacionMPxTintas.srvObtenerListaMatPrimasPorId(idMatPrima).subscribe(datos_materiaPrima => {
-      for (let index = 0; index < datos_materiaPrima.length; index++) {
-        let infoMatPrima : any = {
-          ID : datos_materiaPrima[index].matPrima,
-          Nombre : datos_materiaPrima[index].nombreMP,
-          Stock : datos_materiaPrima[index].stock,
-          Cantidad : '',
-          Unidad : datos_materiaPrima[index].unidad,
-        }
-        this.materiaPrimaSeleccionada.push(infoMatPrima);
-      }
-        if(this.materiaPrimaSeleccionada.length == 0) {
-          this.limpiarCamposMateriaPrima();
-          Swal.fire('No se encontró la materia prima consultada.');
-        } else this.NombreMatPrima = ''; this.cargarInfoMP();
-    });
-  }
-
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
-  buscarMpSeleccionada(item){
-    this.validarInputMp = false;
-    this.FormMateriaPrima.value.nombreMateriaPrima = item.name;
-    let nombreMateriaPrima : string = this.FormMateriaPrima.value.nombreMateriaPrima;
-    this.materiaPrimaSeleccionada = [];
-
-    this.asignacionMPxTintas.srvObtenerListaMatPrimas().subscribe(datos_materiasPrimas => {
+  buscarMpSeleccionada(){
+    let materiaPrima : string = this.FormMateriaPrima.value.nombreMateriaPrima;
+    this.asignacionMPxTintas.srvObtenerListaMatPrimasPorId(materiaPrima).subscribe(datos_materiasPrimas => {
       for (let index = 0; index < datos_materiasPrimas.length; index++) {
-        if (nombreMateriaPrima == datos_materiasPrimas[index].nombreMP) {
-
-          let infoMatPrima : any = {
-            ID : datos_materiasPrimas[index].matPrima,
-            Nombre : datos_materiasPrimas[index].nombreMP,
-            Stock : datos_materiasPrimas[index].stock,
-            Cantidad : '',
-            Unidad : datos_materiasPrimas[index].unidad,
-          }
-          this.materiaPrimaSeleccionada.push(infoMatPrima);
-          this.cargarInfoMP();
-        }
+        this.FormMateriaPrima.setValue({
+          idMateriaPrima : datos_materiasPrimas[index].matPrima,
+          nombreMateriaPrima : datos_materiasPrimas[index].nombreMP,
+          stockMateriaPrima : datos_materiasPrimas[index].stock,
+          cantidadMateriaPrima : '',
+          undMedMateriaPrima : datos_materiasPrimas[index].unidad,
+        });
       }
     });
-  }
-
-  //Funcion que llenará la infomacion de materia prima buscada o seleccionada y pasará la informacion a la vista
-  cargarInfoMP(){
-    for (const Mp of this.materiaPrimaSeleccionada) {
-      this.FormMateriaPrima.setValue({
-        idMateriaPrima : Mp.ID,
-        nombreMateriaPrima : Mp.Nombre,
-        stockMateriaPrima : Mp.Stock,
-        cantidadMateriaPrima : '',
-        undMedMateriaPrima : Mp.Unidad,
-      });
-    }
   }
 
   //Funcion que validará si alguno de los campos del fomulario de materia prima esta vacio
   validarCamposMateriaPrima(){
-    if (this.FormMateriaPrima.valid) this.cargarMateriaPrimaEnTabla(this.ArrayMateriaPrima);
-    else Swal.fire("Hay campos vacios en el apartado de seleccion de materia prima");
+    if (this.FormMateriaPrima.valid) this.cargarMateriaPrimaEnTabla();
+    else Swal.fire({
+      icon : 'warning',
+      title: 'Advertencia',
+      text: "Hay campos vacios en el apartado de seleccion de materia prima",
+      showCloseButton: true,
+    });
   }
 
   // Funcion que cargará las materias primas en las tabla
-  cargarMateriaPrimaEnTabla(formulario : any){
-
+  cargarMateriaPrimaEnTabla(){
     let idMateriaPrima : number = this.FormMateriaPrima.value.idMateriaPrima;
     let nombreMateriaPrima : string = this.FormMateriaPrima.value.nombreMateriaPrima;
     let presentacion : string = this.FormMateriaPrima.value.undMedMateriaPrima;
@@ -330,29 +210,16 @@ export class AsignacionTintasComponent implements OnInit {
         Materia_Prima : IdMatPrimaReal,
         Tinta : IdTintaReal,
       }
-
-      if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length == 0) this.ArrayMateriaPrima.push(productoExt);
-      else if (this.AccionBoton == "Agregar" && this.ArrayMateriaPrima.length != 0) this.ArrayMateriaPrima.push(productoExt);
-      else {
-        for (let index = 0; index < formulario.length; index++) {
-          if(productoExt.Id == this.ArrayMateriaPrima[index].Id) {
-            this.ArrayMateriaPrima.splice(index, 1);
-            this.AccionBoton = "Agregar";
-            this.ArrayMateriaPrima.push(productoExt);
-            break;
-          }
-        }
-      }
-      this.FormMateriaPrima.setValue({
-        idMateriaPrima : '',
-        nombreMateriaPrima : '',
-        stockMateriaPrima : '',
-        cantidadMateriaPrima : '',
-        undMedMateriaPrima : '',
+      this.ArrayMateriaPrima.push(productoExt);
+      this.FormMateriaPrima.reset();
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Advertencia',
+        text: '¡La cantidad a asignar no debe superar lo que hay en stock!',
+        showCloseButton: true,
       });
-
-      this.ArrayMateriaPrima.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
-    } else Swal.fire("La cantidad a asignar no debe superar lo que hay en stock ");
+    }
   }
 
   // Funcion que validará la asignación
@@ -374,7 +241,14 @@ export class AsignacionTintasComponent implements OnInit {
           if (result.isConfirmed) this.asignarMPCrearTintas();
         });
       });
-    } else Swal.fire("¡Hay campos vacios!");
+    } else {
+        Swal.fire({
+        icon: 'warning',
+        title: 'Advertencia',
+        text: "¡Hay campos vacios!",
+        showCloseButton: true,
+      });
+    }
   }
 
   //Funcion que almacenará en la base de datos la informacion general sobre la asignacion de materia prima
@@ -403,57 +277,68 @@ export class AsignacionTintasComponent implements OnInit {
 
       this.asignacionMPxTintas.srvGuardar(datos_asignacionMP).subscribe(datos_asignacionMPxTintas => {
         this.obtenerUltimoIdAsignacion();
-        setTimeout(() => { this.sumarInventarioTintas(); }, 3000);
+        setTimeout(() => {  }, 3000);
+      }, error => {
+        Swal.fire({
+        icon: 'error',
+        title: 'Oops..',
+        html: `<b>¡Error al registrar la creación de tinta!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
+        showCloseButton: true,
+        });
       });
-    } else Swal.fire("¡Hay campos vacios!");
+    } else {
+      Swal.fire({
+      icon: 'warning',
+      title: 'Advertencia',
+      text: "¡Hay campos vacios!",
+      showCloseButton: true,
+      });
+    }
   }
 
   // Funcion que servirá para poder obtener el ultimo Id de la asignacion creada y pasarlo a la funcion de creacion de AsignacionMP para que pueda tener el ID de la asignacion
   obtenerUltimoIdAsignacion(){
-     this.asignacionMPxTintas.srvObtenerUltimaAsignacion().subscribe(datos_asignaciones => {
-       this.mpAsignada(datos_asignaciones.asigMPxTinta_Id);
-     });
-  }
-
-  // Funcion que creará el resgitro donde queda detallado que materia prima se pidio, cuanto y a qye asignacion pertenece
-  mpAsignada(idAsignacion : any){
-    if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla");
-    else {
+    this.asignacionMPxTintas.srvObtenerUltimaAsignacion().subscribe(datos_asignaciones => {
       for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
-        let materiaPrima : number = this.ArrayMateriaPrima[i].Materia_Prima;
-        let tinta : number = this.ArrayMateriaPrima[i].Tinta;
-        let cantidad : number = this.ArrayMateriaPrima[i].Cant;
-        let presentacion : string = this.ArrayMateriaPrima[i].UndCant;
-
         const datosDetallesAsignacion : any = {
-          asigMPxTinta_Id : idAsignacion,
-          matPri_Id : materiaPrima,
-          tinta_Id : tinta,
-          detAsigMPxTinta_Cantidad : cantidad,
-          undMed_Id : presentacion,
+          asigMPxTinta_Id : datos_asignaciones.asigMPxTinta_Id,
+          matPri_Id : this.ArrayMateriaPrima[i].Materia_Prima,
+          tinta_Id : this.ArrayMateriaPrima[i].Tinta,
+          detAsigMPxTinta_Cantidad : this.ArrayMateriaPrima[i].Cant,
+          undMed_Id : this.ArrayMateriaPrima[i].UndCant,
           proceso_Id : 'TINTAS',
         }
-
         this.detallesAsignacionMPxTintas.srvGuardar(datosDetallesAsignacion).subscribe(datos_detallesAsignacionMPxTintas => {
+        }, error => {
+          Swal.fire({
+          icon: 'error',
+          title: 'Oops..',
+          html: `<b>¡Error al registrar los detalles de la creación de tinta!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
+          showCloseButton: true,
+          });
         });
-
       }
+      this.sumarInventarioTintas();
       this.moverInventarioMP();
       this.moverInventarioTintas();
-    }
+     }, error => {
+      Swal.fire({
+      icon: 'error',
+      title: 'Oops..',
+      html: `<b>¡Error al consultar el último Id de asignación!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
+      showCloseButton: true,
+      });
+    });
   }
 
   // Funcion que moverá el inventario de la materia prima que se está asignando para la creacion de la tintas
   moverInventarioMP(){
-    let stockMateriaPrimaInicial : number;
     let stockMateriaPrimaFinal : number;
 
     for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
       this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Materia_Prima).subscribe(datos_materiaPrima => {
-        stockMateriaPrimaInicial = datos_materiaPrima.matPri_Stock;
-
         if(this.ArrayMateriaPrima[index].Materia_Prima == 84) stockMateriaPrimaFinal = 0
-        else stockMateriaPrimaFinal = stockMateriaPrimaInicial - this.ArrayMateriaPrima[index].Cant;
+        else stockMateriaPrimaFinal = datos_materiaPrima.matPri_Stock - this.ArrayMateriaPrima[index].Cant;
         const datosMPActualizada : any = {
           MatPri_Id : this.ArrayMateriaPrima[index].Materia_Prima,
           MatPri_Nombre : datos_materiaPrima.matPri_Nombre,
@@ -464,42 +349,23 @@ export class AsignacionTintasComponent implements OnInit {
           MatPri_Precio : datos_materiaPrima.matPri_Precio,
           TpBod_Id : datos_materiaPrima.tpBod_Id,
         }
-
         this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].Materia_Prima, datosMPActualizada).subscribe(datos_mp_creada => {
-        }, error => { const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
+        }, error => {
+          Swal.fire({
           icon: 'error',
-          title: '¡No restó al inventario de materias primas!'
+          title: 'Oops..',
+          html: `<b>¡Error al mover el inventario de materia prima!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
+          showCloseButton: true,
+          });
+        });
+      }, error => {
+        Swal.fire({
+        icon: 'error',
+        title: 'Oops..',
+        html: `<b>¡Error al consultar la materia prima!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
+        showCloseButton: true,
         });
       });
-
-      //Buscar Materia Prima
-      }, error => { const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 1200,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'error',
-        title: 'Materia prima no encontrada!'
-      });
-    });
     }
   }
 
@@ -509,12 +375,13 @@ export class AsignacionTintasComponent implements OnInit {
 
     for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
       this.tintasService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Tinta).subscribe(datos_tinta => {
-        if (this.ArrayMateriaPrima[index].Tinta == 2001) stockMateriaPrimaFinal = 0
+        if (this.ArrayMateriaPrima[index].Tinta == 2001) stockMateriaPrimaFinal = 0;
+        else stockMateriaPrimaFinal = datos_tinta.tinta_Stock - this.ArrayMateriaPrima[index].Cant
         const datosTintaActualizada : any = {
           Tinta_Id : this.ArrayMateriaPrima[index].Tinta,
           Tinta_Nombre : datos_tinta.tinta_Nombre,
           Tinta_Descripcion : datos_tinta.tinta_Descripcion,
-          Tinta_Stock : datos_tinta.tinta_Stock - this.ArrayMateriaPrima[index].Cant,
+          Tinta_Stock : stockMateriaPrimaFinal,
           Tinta_CodigoHexadecimal : datos_tinta.tinta_CodigoHexadecimal,
           UndMed_Id : datos_tinta.undMed_Id,
           CatMP_Id : datos_tinta.catMP_Id,
@@ -524,39 +391,21 @@ export class AsignacionTintasComponent implements OnInit {
           Tinta_Fecha : datos_tinta.tinta_FechaIngreso,
           Tinta_Hora : datos_tinta.tinta_Hora,
         }
-
         this.tintasService.srvActualizar(this.ArrayMateriaPrima[index].Tinta, datosTintaActualizada).subscribe(datos_mp_creada => { }, error => {
-          const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
+          Swal.fire({
           icon: 'error',
-          title: '¡No restó al inventario de tintas!'
+          title: 'Oops..',
+          html: `<b>¡Error al mover el invantario de tinta!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
+          showCloseButton: true,
+          });
         });
-        });
-      }, error => { const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 1200,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
+      }, error => {
+        Swal.fire({
         icon: 'error',
-        title: '¡Tinta no encontrada!'
-      });
+        title: 'Oops..',
+        html: `<b>¡Error al consultar la tinta!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
+        showCloseButton: true,
+        });
       });
     }
   }
@@ -580,45 +429,19 @@ export class AsignacionTintasComponent implements OnInit {
           Tinta_Hora : datos_tinta.tinta_Hora,
         }
         this.tintasService.srvActualizar(this.arrayTintaAsignada[index].Tinta_Id, datosTintaCreada).subscribe(datos_mp_creada => {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          });
-          Toast.fire({
+          Swal.fire({
             icon: 'success',
-            title: '¡Registro de Asignación creado con exito!'
+            title: 'Registro Exitoso',
+            html: `<b>¡Registro completado con exito!</b>`,
+            showCloseButton: true,
           });
-          this.FormAsignacionMP.setValue({
-            Tinta : '',
-            cantidadTinta : '',
-            undMedTinta : '',
-            Observacion : '',
-            Fecha : this.today,
-          });
-          this.ArrayMateriaPrima = [];
-          this.FormMateriaPrima.reset();
+          this.limpiarTodosLosCampos();
         }, error => {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          });
-          Toast.fire({
-            icon: 'error',
-            title: '¡No Sumó el inventario de tintas!'
+          Swal.fire({
+          icon: 'error',
+          title: 'Oops..',
+          html: `<b>¡Error al sumar al inventario de la tinta ${datos_tinta.tinta_Nombre}!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
+          showCloseButton: true,
           });
         });
       });
@@ -628,7 +451,7 @@ export class AsignacionTintasComponent implements OnInit {
   }
 
   // Función para quitar una materia prima de la tabla
-  QuitarMateriaPrimaTabla(index : number, formulario : any) {
+  QuitarMateriaPrimaTabla(formulario : any) {
     Swal.fire({
       title: '¿Estás seguro de eliminar la Materia Prima de la Asignación?',
       icon: 'warning',
@@ -638,28 +461,19 @@ export class AsignacionTintasComponent implements OnInit {
       confirmButtonText: 'Eliminar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.ArrayMateriaPrima.splice(index, 1);
-        Swal.fire('Materia Prima eliminada');
+        for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
+          if (this.ArrayMateriaPrima[i].Id == formulario.Id) this.ArrayMateriaPrima.splice(i, 1);
+        }
       }
     });
   }
 
-  // Función para editar una de las materias primas de la tabla
-  EditarMateriaPrimaTabla(formulario : any) {
-    this.AccionBoton = "Editar";
-    this.FormMateriaPrima = this.frmBuilder.group({
-      idMateriaPrima : formulario,
-      nombreMateriaPrima : formulario,
-      stockMateriaPrima : formulario,
-      cantidadMateriaPrima : formulario,
-      undMedMateriaPrima : formulario,
-    });
-  }
-
+  //
   llamarModalMateriasPrimas() {
     this.componenteCrearMateriasPrimas = true;
   }
 
+  //
   llamarModalCrearTintas(){
     this.componenteCrearTintas = true;
   }

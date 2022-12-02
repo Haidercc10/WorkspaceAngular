@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
@@ -32,7 +33,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
   keywordMp = 'matPri_Nombre'; //Variable que va a almacenar la propieda por la cual se va a filtrar la materia prima al momento de ser consultada por el campo de materia prima
   validarInputMp : any; //Variable que va a permitir si se ve el titulo del campo de materia prima o no
   load : boolean = true; //Variabel para permitir que se vea o no una imagen de carga
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   titulosTabla = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
   ArrayInfoConsulta : any [] = []; //Variable que tendrá la informacion de los resultados de la consulta realizada
   valorTotal : number = 0; //Variable que guardará el valor total de la factura de entrada de materia prima
@@ -65,6 +66,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null, Validators.required],
       TipoDocumento: [null, Validators.required],
+      IdMateriaPrima: [null],
       materiaPrima: ['', Validators.required],
       fecha: [null, Validators.required],
       fechaFinal : [null, Validators.required],
@@ -76,53 +78,34 @@ export class MovimientoMatPrimaComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.ColumnasTabla();
-    this.fecha();
     this.obtenerMateriasPrimas();
     this.obtenerTipoDocumento();
     this.obtenerEstados();
   }
 
-  //
-  selectEventMp(item) {
-    this.FormDocumentos.value.materiaPrima = item.matPri_Id;
-    if (this.FormDocumentos.value.materiaPrima != '') this.validarInputMp = false;
-    else this.validarInputMp = true;
-    // do something with selected item
-  }
-
-  //
-  onChangeSearchMp(val: string) {
-    if (val != '') this.validarInputMp = false;
-    else this.validarInputMp = true;
-  }
-
-  //
-  onFocusedMp(e){
-    if (!e.isTrusted) this.validarInputMp = false;
-    else this.validarInputMp = true;
-  }
-
-  //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
-  fecha(){
-    this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
+  // Funcion que va cambiar el nombre de la materia prima
+  cambiarNombreMateriaPrima() {
+    let id : number = this.FormDocumentos.value.materiaPrima
+    this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
+      for (let i = 0; i < datos_materiaPrima.length; i++) {
+        this.FormDocumentos = this.frmBuilderMateriaPrima.group({
+          idDocumento : this.FormDocumentos.value.idDocumento,
+          TipoDocumento: this.FormDocumentos.value.TipoDocumento,
+          IdMateriaPrima: datos_materiaPrima[i].id,
+          materiaPrima : datos_materiaPrima[i].nombre,
+          fecha: this.FormDocumentos.value.fecha,
+          fechaFinal: this.FormDocumentos.value.fechaFinal,
+          estado : this.FormDocumentos.value.estado,
+        });
+      }
+    }, error => {
+      this.load = true;
+    });
   }
 
   // Funcion que va a limpiar los campos
   LimpiarCampos() {
-    this.FormDocumentos.setValue({
-      idDocumento : null,
-      TipoDocumento: null,
-      materiaPrima : '',
-      fecha: null,
-      fechaFinal: null,
-      estado : null,
-    });
+    this.FormDocumentos.reset()
     this.ArrayInfoConsulta = [];
     this.valorTotal = 0;
     this.totalMPEntregada = 0;
@@ -240,9 +223,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
     let tipoDoc : string = this.FormDocumentos.value.TipoDocumento;
     let fechaIncial : any = this.FormDocumentos.value.fecha;
     let fechaFinal : any = this.FormDocumentos.value.fechaFinal;
-    let materiaPrima : any;
-    if (this.FormDocumentos.value.materiaPrima.matPri_Id == undefined) materiaPrima = null;
-    else materiaPrima = this.FormDocumentos.value.materiaPrima.matPri_Id;
+    let materiaPrima : any = this.FormDocumentos.value.IdMateriaPrima;
     let estado : any = this.FormDocumentos.value.estado;
 
     if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && materiaPrima != null && estado != null) {

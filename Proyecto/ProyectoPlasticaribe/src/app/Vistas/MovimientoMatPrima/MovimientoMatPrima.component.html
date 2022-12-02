@@ -56,26 +56,12 @@
         </div>
 
         <!-- Materia Prima -->
-        <div class="ng-autocomplete form-floating col-md form-control form-control-sm" style="width: 500%;">
-          <ng-autocomplete
-            class=""
-            [data]="ArrayMateriaPrima"
-            (selected)='selectEventMp($event)'
-            (inputChanged)='onChangeSearchMp($event)'
-            (inputFocused)='onFocusedMp($event)'
-            [searchKeyword]="keywordMp"
-            [itemTemplate]="itemTemplate"
-            [notFoundTemplate]="notFoundTemplate"
-            id="floatingInput"
-            formControlName="materiaPrima">
-          </ng-autocomplete>
-          <ng-template #itemTemplate let-item>
-            <a [innerHTML]="item.matPri_Nombre"></a>
-          </ng-template>
-          <ng-template #notFoundTemplate let-notFound>
-            <div [innerHTML]="notFound"></div>
-          </ng-template>
-          <label for="floatingInput" *ngIf="validarInputMp">Materia Prima</label>
+        <div class="form-floating col-md">
+          <input formControlName="materiaPrima" class="form-control form-control-sm" list="materiaprima" id="floatingInput" title="Nombre de la Materia Prima" required (change)="cambiarNombreMateriaPrima()">
+          <datalist id="materiaprima">
+            <option value={{item.matPri_Id}} *ngFor="let item of ArrayMateriaPrima">{{item.matPri_Nombre}}</option>
+          </datalist>
+          <label for="floatingInput">Materia Prima</label>
         </div>
       </div>
     </div>
@@ -106,57 +92,51 @@
 
   <!-- Tabla -->
   <div *ngIf="load">
-    <div class="mb-2">
-      <div class="row g-1">
-        <div class="table-responsive">
-          <table class="table table-bordered table-hover mt-2">
-            <thead class="TitulosTabla">
-              <tr *ngFor="let columnas of titulosTabla let i = index">
-                <th id="CodigoFactura" scope="col">{{columnas.idFact}}</th>
-                <th id="Tipo" scope="col">{{columnas.tipo}}</th>
-                <th id="fecha" scope="col">{{columnas.FechaFact}}</th>
-                <th id="proveedor" scope="col">{{columnas.usuario}}</th>
-                <th id="mp" scope="col">{{columnas.mp}}</th>
-                <th id="cantMp" scope="col">{{columnas.cant}}</th>
-                <ng-container *ngIf="ValidarRol == 1">
-                  <th id="estado" scope="col">{{columnas.estado}}</th>
-                </ng-container>
-                <th id="ver" scope="col" >{{columnas.Ver}}</th>
-              </tr>
-              </thead>
-            <tbody>
-              <tr *ngFor="let doc of ArrayInfoConsulta | paginate: {itemsPerPage: 30, currentPage: page} let i=index">
-                <td id="CodigoFactura" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.ot}}</td>
-                <td id="Tipo" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.tipo}}</td>
-                <td id="fecha" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
-                <td id="proveedor" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.usuario}}</td>
-                <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.matPrima}}</td>
-                <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.cant | number}}</td>
-                <ng-container *ngIf="ValidarRol == 1">
-                  <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.estado}}</td>
-                </ng-container>
-                <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" (click)="articulosPdf(doc)"></a></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="mb-2">
-            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <pagination-controls (pageChange)="page = $event"></pagination-controls>
-            </div>
-          </div>
-        </div>
+    <div class="row g-3">
+      <div class="table-responsive">
+        <p-table
+        #dt
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="20"
+        [rowHover]="true"
+        [value]="ArrayInfoConsulta">
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">OT / COD. DOCUMENTO</th>
+              <th scope="col">Tipo de Movimiento</th>
+              <th scope="col">Fecha Registro</th>
+              <th scope="col">Registrado Por:</th>
+              <th scope="col">Materia Prima</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Estado OT</th>
+              <th scope="col">Ver</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-doc>
+            <tr>
+              <td id="CodigoFactura" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.ot}}</td>
+              <td id="Tipo" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.tipo}}</td>
+              <td id="fecha" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
+              <td id="proveedor" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.usuario}}</td>
+              <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.matPrima}}</td>
+              <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.cant | number}}</td>
+              <ng-container *ngIf="ValidarRol == 1">
+                <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.estado}}</td>
+              </ng-container>
+              <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" (click)="articulosPdf(doc)"></a></td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
     </div>
   </div>
 
-  <!-- Imagen de Carga -->
-  <!-- <div class="overlay" *ngIf="!load">
-    <div class="spinner ">
-      <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
-    </div>
-  </div> -->
-
   <!-- Labels con información -->
+  <br>
   <div *ngIf="load">
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">

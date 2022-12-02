@@ -1,17 +1,14 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { AsignacionMPxTintasService } from 'src/app/Servicios/asignacionMPxTintas.service';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
 import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/detallesAsignacionMPxTintas.service';
 import { DetallesAsignacionTintasService } from 'src/app/Servicios/detallesAsignacionTintas.service';
-import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service';
 import { EstadosService } from 'src/app/Servicios/estados.service';
 import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
 import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { RecuperadoMPService } from 'src/app/Servicios/recuperadoMP.service';
 import { RemisionesMPService } from 'src/app/Servicios/remisionesMP.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import { TintasService } from 'src/app/Servicios/tintas.service';
@@ -24,7 +21,6 @@ import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
 })
 export class MovimientosTintasComponent implements OnInit {
 
-
   public FormDocumentos !: FormGroup;
   public page : number; //Variable que tendrá el paginado de la tabla en la que se muestran los pedidos consultados
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -32,25 +28,11 @@ export class MovimientosTintasComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   tipoDocumento = []; //Variable que almacenará los diferentes tipos d documentos que pueden ser consultados
-  ArrayMateriaPrima : any [] = []; //Variable que tendrá la informacion de los productos que se piden para uan OT
   ArrayTintas : any [] = []; /*** Array que tendrá la informacion de las tintas cargadas en el combobox */
-  keywordMp = 'tinta_Nombre'; //Variable que va a almacenar la propieda por la cual se va a filtrar la materia prima al momento de ser consultada por el campo de materia prima
-  validarInputMp : any; //Variable que va a permitir si se ve el titulo del campo de materia prima o no
   load : boolean = true; //Variabel para permitir que se vea o no una imagen de carga
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
-  titulosTabla = []; //Variable que almacenará los titulos de la tabla de productos que se ve al final de la vista
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   ArrayInfoConsulta : any [] = []; //Variable que tendrá la informacion de los resultados de la consulta realizada
-  valorTotal : number = 0; //Variable que guardará el valor total de la factura de entrada de materia prima
-  totalMPEntregada : any; //Vairble que almacenará la cantidad de materia prima entregada para una orden de trabajo
-  cantRestante : number = 0; //Variable que tendrá la cantidad de kilos de materia prima que hacen falta por entregar pára una orden de trabajo
-  kgProduciodosOT : number = 0; //Variable que almacenará la cantidad de kilos producidos por una orden de trabajo
-  estadoOt : string = ''; //Variable que almacenará el estado de la orden de trabajo (Abierta, Asignada, En proceso, Terminada o Finalizada)
-  cantidadTotalSella : number = 0; //Variable que va a almacenar el total de la cantidad sellada en una OT
-  cantidadTotalEmpaque : number = 0; //Variable que va a almacenar el total de la cantidad empacada en una OT
-  cantidadTotalWiketiado : number = 0; //Variable que va a almacenar el total de la cantidad cantidad Tota wiketeada en una OT
-  cantidadTotalKgOT = 0; //Variable que almacenará la cantidad de kilos que pidió una orden de trabajo
   ArrayEstados : any = []; //Variable en la que se almacenaran los estados que puede tener una orden de trabajo
-  kgOT : number = 0; //Variable que va a almacenar la cantidad total de kilos que se estipularon para una orden de trabajo
   ArrayMpPDF : any = [] //Variable que almacenará las materias primas del pdf que se esé consultando
 
   constructor(private rolService : RolesService,
@@ -60,86 +42,52 @@ export class MovimientosTintasComponent implements OnInit {
                       private tipoDocuemntoService : TipoDocumentoService,
                         private bagProServices : BagproService,
                           private estadoService : EstadosService,
-                            private dtAsgMP : DetallesAsignacionService,
-                              private dtDevMP : DevolucionesMPService,
-                                private dtFacturaMP : FacturaMpService,
-                                  private dtRemision : RemisionesMPService,
-                                    private dtRecuperado : RecuperadoMPService,
-                                      private servicioTintas : TintasService,
-                                        private dtAsgTinta : DetallesAsignacionTintasService,
-                                          private dtCreacionTinta : DetallesAsignacionMPxTintasService,
-                                            private creacionTintasService : AsignacionMPxTintasService,) {
+                            private dtFacturaMP : FacturaMpService,
+                              private dtRemision : RemisionesMPService,
+                                private servicioTintas : TintasService,
+                                  private dtAsgTinta : DetallesAsignacionTintasService,
+                                    private dtCreacionTinta : DetallesAsignacionMPxTintasService,) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null, Validators.required],
       TipoDocumento: [null, Validators.required],
-      /***materiaPrima: ['', Validators.required],*/
+      TintaId : [null, Validators.required],
       tintas: ['', Validators.required],
       fecha: [null, Validators.required],
       fechaFinal : [null, Validators.required],
       estado : [null, Validators.required],
     });
-    this.validarInputMp = true;
   }
 
   ngOnInit() {
     this.lecturaStorage();
-    this.ColumnasTabla();
-    this.fecha();
     this.obtenerTipoDocumento();
     this.obtenerEstados();
     this.obtenerTintas();
-
   }
 
   //
-  selectEventMp(item) {
-    this.FormDocumentos.value.tintas = item.tinta_Id;
-    if (this.FormDocumentos.value.tintas != '') this.validarInputMp = false;
-    else this.validarInputMp = true;
-    // do something with selected item
-  }
-
-  //
-  onChangeSearchMp(val: string) {
-    if (val != '') this.validarInputMp = false;
-    else this.validarInputMp = true;
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
-  }
-
-  //
-  onFocusedMp(e){
-    if (!e.isTrusted) this.validarInputMp = false;
-    else this.validarInputMp = true;
-  }
-
-  //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
-  fecha(){
-    this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
+  tintaSeleccionada() {
+    let id : number = this.FormDocumentos.value.tintas;
+    this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
+      for (let i = 0; i < datos_materiaPrima.length; i++) {
+        this.FormDocumentos.setValue({
+          idDocumento : this.FormDocumentos.value.idDocumento,
+          TipoDocumento: this.FormDocumentos.value.TipoDocumento,
+          TintaId : datos_materiaPrima[i].id,
+          tintas: datos_materiaPrima[i].nombre,
+          fecha: this.FormDocumentos.value.fecha,
+          fechaFinal : this.FormDocumentos.value.fechaFinal,
+          estado : this.FormDocumentos.value.estado,
+        });
+      }
+    });
   }
 
   // Funcion que va a limpiar los campos
   LimpiarCampos() {
-    this.FormDocumentos.setValue({
-      idDocumento : null,
-      TipoDocumento: null,
-      tintas : '',
-      fecha: null,
-      fechaFinal: null,
-      estado : null,
-    });
+    this.FormDocumentos.reset();
     this.ArrayInfoConsulta = [];
-    this.valorTotal = 0;
-    this.totalMPEntregada = 0;
-    this.cantRestante = 0;
-    this.kgProduciodosOT = 0;
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -160,31 +108,6 @@ export class MovimientosTintasComponent implements OnInit {
           this.ValidarRol = rol;
           this.storage_Rol = datos_roles[index].rolUsu_Nombre;
         }
-      }
-    });
-  }
-
-  //Funcion que colocará el nombre a las columnas de la tabla en la cual se muestran los productos pedidos por los clientes
-  ColumnasTabla(){
-    this.titulosTabla = [];
-    this.titulosTabla = [{
-      idFact : "OT / Tinta Creada",
-      tipo : "Tipo de Movimiento",
-      FechaFact : "Fecha Registro",
-      usuario : "Registrado Por:",
-      mp : "Tinta / Materia Prima",
-      cant : "Cantidad",
-      estado : "Estado OT",
-      Ver : "Ver",
-    }]
-  }
-
-  // Funcion que va a cargar las materias primas
-  obtenerMateriasPrimas(){
-    this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiasPrimas => {
-      for (let i = 0; i < datos_materiasPrimas.length; i++) {
-        this.ArrayMateriaPrima.push(datos_materiasPrimas[i]);
-        this.ArrayMateriaPrima.sort((a,b) => a.matPri_Nombre.localeCompare(b.matPri_Nombre));
       }
     });
   }
@@ -223,53 +146,16 @@ export class MovimientosTintasComponent implements OnInit {
     });
   }
 
-  // Funcion que consultará en bagpro la ot para validar la cantidad de kg que se pidió por cada ot
-  consultaOTBagPro(ot : any){
-    this.sumarCantidadesMatPrima_Tintas(ot)
-    this.bagProServices.srvObtenerListaClienteOT_Item(ot).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        this.kgOT = datos_ot[i].datosotKg;
-      }
-    });
-
-    this.bagProServices.srvObtenerListaProcExtOt(ot).subscribe(datos_OT => {
-      for (let index = 0; index < datos_OT.length; index++) {
-        this.kgProduciodosOT += datos_OT[index].extnetokg;
-      }
-    });
-
-    this.bagProServices.srvObtenerListaProcSelladoOT(ot).subscribe(datos_OT => {
-      for (let index = 0; index < datos_OT.length; index++) {
-        this.kgProduciodosOT += datos_OT[index].peso;
-      }
-    });
-  }
-
-  /** */
-  sumarCantidadesMatPrima_Tintas(OT : number){
-    this.dtAsgTinta.srvObtenerSumaCantidadesTintas_MatPrimas(OT).subscribe(registrosTintas_MatPrima => {
-      this.totalMPEntregada = registrosTintas_MatPrima;
-
-    })
-
-  }
 
   // Funcion que va a consultar por cada combinacion de filtro que se le indiquen
   consultar(){
     this.load = false;
-    this.kgOT = 0;
-    this.totalMPEntregada = 0;
     this.ArrayInfoConsulta = [];
-    this.kgProduciodosOT = 0;
-    this.cantRestante = 0;
-    this.estadoOt = '';
     let ot : number = this.FormDocumentos.value.idDocumento;
     let tipoDoc : string = this.FormDocumentos.value.TipoDocumento;
     let fechaIncial : any = this.FormDocumentos.value.fecha;
     let fechaFinal : any = this.FormDocumentos.value.fechaFinal;
-    let tintaConsulta : any;
-    if (this.FormDocumentos.value.tintas.tinta_Id == undefined) tintaConsulta = null;
-    else tintaConsulta = this.FormDocumentos.value.tintas.tinta_Id;
+    let tintaConsulta : any = this.FormDocumentos.value.TintaId;
     let estado : any = this.FormDocumentos.value.estado;
 
     if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null && estado != null) {
@@ -549,7 +435,6 @@ export class MovimientosTintasComponent implements OnInit {
     } else if (ot != null && tintaConsulta != null && estado != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-        this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
           if (datos_asignacion[i].tinta_Id == tintaConsulta && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
         }
@@ -557,7 +442,6 @@ export class MovimientosTintasComponent implements OnInit {
     } else if (ot != null && fechaIncial != null && estado != null) {
       // Asignación de materia prima
       this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
-        this.consultaOTBagPro(ot);
         for (let i = 0; i < datos_asignacion.length; i++) {
           if (datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00','') == fechaIncial && datos_asignacion[i].estado_OrdenTrabajo == estado) this.llenarTabla(datos_asignacion[i]);
         }
