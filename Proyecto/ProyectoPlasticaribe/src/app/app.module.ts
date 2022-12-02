@@ -101,6 +101,7 @@ import { ReporteBodegaExtrusionComponent } from './Vistas/ReporteBodegaExtrusion
 import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
 import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
+import { Ventas_TemporalesComponent } from './Vistas/Ventas_Temporales/Ventas_Temporales.component';
 
 // Prime NG
 import {TableModule} from 'primeng/table';
@@ -126,7 +127,9 @@ import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import {AccordionModule} from 'primeng/accordion';
-import { Ventas_TemporalesComponent } from './Vistas/Ventas_Temporales/Ventas_Temporales.component';
+import { SlideMenuModule } from 'primeng/slidemenu';
+import { Inventario_ExtrusionComponent } from './Vistas/Inventario_Extrusion/Inventario_Extrusion.component';
+
 //
 
 
@@ -194,6 +197,7 @@ export const routes: Routes = [
   {path: 'IngresoRollos-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component : IngresoRollos_ExtrusionComponent}, // Ingreso de Rollos a Extrusion.
   {path: 'AsignacionRollos-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component : AsignacionRollos_ExtrusionComponent}, // Asignación de rollos desde la bodega de extrusión.
   {path: 'ReporteRollos-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component : ReporteBodegaExtrusionComponent}, // Reporte de la bodega de extrusión.
+  {path: 'Inventario-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component: Inventario_ExtrusionComponent},
   {path: 'Eliminar-rollos', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component : EliminarRollos_ExtrusionComponent}, //Eliminar Rollos de Extrusion
   {path: 'reporte-rollos-eliminados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component :Reporte_RollosDesechosComponent}, /** Reporte de rollos eliminados en extrusión */
   {path: 'reporte-costos-ot', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReporteCostosOTComponent},
@@ -319,6 +323,7 @@ export const routes: Routes = [
     CrearBoppComponent,
     Reporte_OrdenCompraComponent,
     Ventas_TemporalesComponent,
+    Inventario_ExtrusionComponent,
   ],
 
 
@@ -371,7 +376,8 @@ export const routes: Routes = [
     InputNumberModule,
     ConfirmDialogModule,
     InputTextareaModule,
-    AccordionModule
+    AccordionModule,
+    SlideMenuModule,
   ],
 
   providers: [

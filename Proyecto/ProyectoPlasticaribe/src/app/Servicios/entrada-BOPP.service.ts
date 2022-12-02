@@ -25,6 +25,11 @@ export class EntradaBOPPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP')
   }
 
+  //Metodo buscar lista
+  GetBoppConExistencias():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/GetBoppConExistencias')
+  }
+
   srvObtenerListaPorId(id : any):Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/${id}`)
   }

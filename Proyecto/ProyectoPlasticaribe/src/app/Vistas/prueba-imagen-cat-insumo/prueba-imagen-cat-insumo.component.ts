@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Injectable } from '@angular/core';
 import { ProductService } from './productservice';
-import { ConfirmationService, ConfirmEventType } from 'primeng/api';
+import { ConfirmationService, ConfirmEventType, MenuItem } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import Swal from 'sweetalert2';
 
@@ -16,35 +16,113 @@ import Swal from 'sweetalert2';
 
 
 export class PruebaImagenCatInsumoComponent implements OnInit {
-  position: string;
+  items: MenuItem[];
 
-  constructor(private confirmationService: ConfirmationService, private messageService: MessageService) {}
-  ngOnInit(): void {
-    // throw new Error('Method not implemented.');
-  }
+    ngOnInit() {
+        this.items = [
+            {
+               label:'File',
+               icon:'pi pi-fw pi-file',
+               url: './home',
+            },
+            {
+               label:'Edit',
+               icon:'pi pi-fw pi-pencil',
+               items:[
+                  {
+                     label:'Left',
+                     icon:'pi pi-fw pi-align-left'
+                  },
+                  {
+                     label:'Right',
+                     icon:'pi pi-fw pi-align-right'
+                  },
+                  {
+                     label:'Center',
+                     icon:'pi pi-fw pi-align-center'
+                  },
+                  {
+                     label:'Justify',
+                     icon:'pi pi-fw pi-align-justify'
+                  },
 
-  confirm1() {
-    this.confirmationService.confirm({
-      message: 'a',
-      header: 'Confirmation',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        // this.messageService.add({severity:'info', summary:'Confirmed', detail:'You have accepted'});
-        console.log(3)
-      },
-      reject: (type) => {
-        switch(type) {
-          case ConfirmEventType.REJECT:
-            // this.messageService.add({severity:'error', summary:'Rejected', detail:'You have rejected'});
-            console.log(1)
-          break;
-          case ConfirmEventType.CANCEL:
-            // this.messageService.add({severity:'warn', summary:'Cancelled', detail:'You have cancelled'});
-            console.log(2)
-          break;
-        }
-      }
-    });
-  }
+               ]
+            },
+            {
+               label:'Users',
+               icon:'pi pi-fw pi-user',
+               items:[
+                  {
+                     label:'New',
+                     icon:'pi pi-fw pi-user-plus',
+
+                  },
+                  {
+                     label:'Delete',
+                     icon:'pi pi-fw pi-user-minus',
+
+                  },
+                  {
+                     label:'Search',
+                     icon:'pi pi-fw pi-users',
+                     items:[
+                        {
+                           label:'Filter',
+                           icon:'pi pi-fw pi-filter',
+                           items:[
+                              {
+                                 label:'Print',
+                                 icon:'pi pi-fw pi-print'
+                              }
+                           ]
+                        },
+                        {
+                           icon:'pi pi-fw pi-bars',
+                           label:'List'
+                        }
+                     ]
+                  }
+               ]
+            },
+            {
+               label:'Events',
+               icon:'pi pi-fw pi-calendar',
+               items:[
+                  {
+                     label:'Edit',
+                     icon:'pi pi-fw pi-pencil',
+                     items:[
+                        {
+                           label:'Save',
+                           icon:'pi pi-fw pi-calendar-plus'
+                        },
+                        {
+                           label:'Delete',
+                           icon:'pi pi-fw pi-calendar-minus'
+                        },
+
+                     ]
+                  },
+                  {
+                     label:'Archieve',
+                     icon:'pi pi-fw pi-calendar-times',
+                     items:[
+                        {
+                           label:'Remove',
+                           icon:'pi pi-fw pi-calendar-minus'
+                        }
+                     ]
+                  }
+               ]
+            },
+            {
+               separator:true
+            },
+            {
+               label:'Quit',
+               icon:'pi pi-fw pi-power-off'
+            }
+        ];
+    }
 
 }

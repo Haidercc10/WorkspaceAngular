@@ -15,13 +15,13 @@ import Swal from 'sweetalert2';
 })
 export class EntradaBOPPComponent implements OnInit {
 
-  public load: boolean;
+  load: boolean = true;
   public FormEntradaBOPP !: FormGroup;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   unidadMedida = []; //Variable que almacenará las unidades de medida
   ArrayBOPP = []; //Varibale que almacenará los BOPP que estarán entrando
   categorias : any = []; //Variable que almacenará las categorias que se podrán seleccionar para la materia prima a ingresar
@@ -41,44 +41,16 @@ export class EntradaBOPPComponent implements OnInit {
       precio : ['', Validators.required],
       ancho : ['', Validators.required],
       undMed : ['', Validators.required],
-      Fecha : ['', Validators.required],
+      Fecha : [this.today, Validators.required],
       Observacion : ['', Validators.required],
       Categoria : ['', Validators.required],
     });
-
-    this.load = true;
-
   }
 
   ngOnInit() {
     this.lecturaStorage();
-    this.fecha();
     this.obtenerUnidadesMedida();
     this.obtenerCategorias();
-  }
-
-  //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
-  fecha(){
-    this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
-
-    this.FormEntradaBOPP = this.frmBuilder.group({
-      Nombre : '',
-      serial : '',
-      cantidad : '',
-      cantidadKG : '',
-      precio : '',
-      ancho : '',
-      undMed : '',
-      Fecha : this.today,
-      Observacion : '',
-      Categoria : '',
-    });
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -163,7 +135,12 @@ export class EntradaBOPPComponent implements OnInit {
 
       this.entradaBOPPService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
         if (datos_bopp.length != 0) {
-          Swal.fire(`¡Ya existe un bopp con el serial ${serial}, por favor colocar un serial distinto!`);
+          Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: "¡Ya existe un bopp con el serial ${serial}, por favor colocar un serial distinto!",
+            showCloseButton: true
+          });
           this.load = true;;
         } else {
           this.categoriaService.srvObtenerListaPorId(categoria).subscribe(datos_categorias => {
@@ -198,13 +175,26 @@ export class EntradaBOPPComponent implements OnInit {
           });
         }
       });
-    } else Swal.fire("¡Hay campos vacios!");
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Advertencia',
+        text: "¡Hay campos vacios!",
+        showCloseButton: true
+      });
+    }
   }
 
   //
   crearEntrada(){
-    if (this.ArrayBOPP.length == 0) Swal.fire("Debe cargar minimo un BOPP en la tabla");
-    else {
+    if (this.ArrayBOPP.length == 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Advertencia',
+        text: "¡Debe cargar minimo un BOPP en la tabla!",
+        showCloseButton: true
+      });
+    } else {
       this.load = false
       for (let i = 0; i < this.ArrayBOPP.length; i++) {
         let bodega : number;

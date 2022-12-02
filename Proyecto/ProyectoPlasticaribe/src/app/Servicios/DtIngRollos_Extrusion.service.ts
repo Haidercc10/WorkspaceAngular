@@ -52,6 +52,10 @@ export class DtIngRollos_ExtrusionService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponiblesOT/${ot}`);
   }
 
+  getTodosRollosDisponiblesAgrupados(){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getTodosRollosDisponiblesAgrupados`);
+  }
+
   getRollosDisponiblesRollo(rollo : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallesIngRollos_Extrusion/getRollosDisponiblesRollo/${rollo}`);
   }

@@ -1,0 +1,164 @@
+ <!-- Inicio Contenedor total -->
+ <app-menuLateral></app-menuLateral>
+
+ <div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
+ <div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Inventario Extrusión</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="container-fluid" style="font-size: 14px;">
+    <div class="mb-3" *ngIf="!cargando">
+      <div class="row g-3" id="table" style="font-size: 14px;">
+        <p-table
+            #dt
+            [value]="ArrayRollos"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="ArrayRollos.length"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando de {first} a la {last} de {totalRecords} Materias Primas"
+            [rowsPerPageOptions]="[10,25,50,100,ArrayRollos.length]"
+            [rowHover]="true"
+            dataKey="Id">
+          <ng-template pTemplate="caption">
+            <div class="flex">
+              <button pButton label="Limpiar Filtros" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt)"></button>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col" pSortableColumn="OT">OT
+                <p-sortIcon field="OT" title="Order por OT"></p-sortIcon>
+                <p-columnFilter type="text" field="OT" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col"pSortableColumn="Producto">Producto
+                <p-sortIcon field="Producto" title="Order por OT"></p-sortIcon>
+                <p-columnFilter type="text" field="Producto" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col"pSortableColumn="NombreProducto">Nombre Producto
+                <p-sortIcon field="NombreProducto" title="Order por OT"></p-sortIcon>
+                <p-columnFilter type="text" field="NombreProducto" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col"pSortableColumn="Peso">Peso Total
+                <p-sortIcon field="Peso" title="Order por OT"></p-sortIcon>
+                <p-columnFilter type="text" field="Peso" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col">Und. Medida</th>
+              <th>
+                <button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button>
+              </th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-ArrayRollos>
+            <tr>
+              <td (click)="consultarOrden(ArrayRollos.OT)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayRollos.OT}}</td>
+              <td (click)="consultarOrden(ArrayRollos.OT)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayRollos.Producto}}</td>
+              <td (click)="consultarOrden(ArrayRollos.OT)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayRollos.NombreProducto}}</td>
+              <td (click)="consultarOrden(ArrayRollos.OT)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayRollos.Peso}}</td>
+              <td (click)="consultarOrden(ArrayRollos.OT)" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayRollos.Und}}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr>
+              <td colspan="3" class="text-right">Total</td>
+              <td>{{pesosTotal | number}}</td>
+              <td colspan="1">Kg</td>
+              <td><button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button></td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <!-- Modal -->
+        <ng-container *ngIf="datosOrden">
+          <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="staticBackdropLabel2">Datos OT {{numeroOrden}}</h5>
+                  <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="limpiarModal()"></button>
+                </div>
+                <div class="modal-body">
+                  <p-table
+                  #dt
+                  [value]="ArrayInfoOrden"
+                  styleClass="p-datatable-gridlines p-datatable-sm"
+                  responsiveLayout="scroll"
+                  [paginator]="true"
+                  [rows]="ArrayInfoOrden.length"
+                  [showCurrentPageReport]="true"
+                  currentPageReportTemplate="Mostrando de {first} a la {last} de {totalRecords} Materias Primas"
+                  [rowsPerPageOptions]="[10,25,50,ArrayInfoOrden.length]"
+                  [rowHover]="true"
+                  dataKey="Id">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th scope="col" pSortableColumn="Rollo">Rollo
+                          <p-sortIcon field="OT"></p-sortIcon>
+                        </th>
+                        <th scope="col" pSortableColumn="OT">OT
+                          <p-sortIcon field="OT"></p-sortIcon>
+                        </th>
+                        <th scope="col"pSortableColumn="Producto">Producto
+                          <p-sortIcon field="Producto"></p-sortIcon>
+                        </th>
+                        <th scope="col"pSortableColumn="NombreProducto">Nombre Producto
+                          <p-sortIcon field="NombreProducto"></p-sortIcon>
+                        </th>
+                        <th scope="col"pSortableColumn="Peso">Peso Rollo
+                          <p-sortIcon field="Peso"></p-sortIcon>
+                        </th>
+                        <th scope="col">Und. Medida</th>
+                        <th scope="col"pSortableColumn="Fecha">Fecha
+                          <p-sortIcon field="Peso"></p-sortIcon>
+                        </th>
+                        <th>
+                          <button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcelModal()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button>
+                        </th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-ArrayInfoOrden>
+                      <tr>
+                        <td>{{ArrayInfoOrden.Rollo}}</td>
+                        <td>{{ArrayInfoOrden.OT}}</td>
+                        <td>{{ArrayInfoOrden.Producto}}</td>
+                        <td>{{ArrayInfoOrden.NombreProducto}}</td>
+                        <td>{{ArrayInfoOrden.Peso}}</td>
+                        <td>{{ArrayInfoOrden.Und}}</td>
+                        <td>{{ArrayInfoOrden.Fecha}}</td>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="footer">
+                      <tr>
+                        <td colspan="4" class="text-right">Total</td>
+                        <td>{{pesoTotalOrden | number}}</td>
+                        <td colspan="2">Kg</td>
+                        <td><button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcelModal()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button></td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
