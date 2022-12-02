@@ -1,111 +1,193 @@
+<app-menuLateral></app-menuLateral>
 
-<!--Contenedor Principal-->
-<div class="container-fluid">
-  <!--Contenedor Login-->
-  <div class="contenedorRegistro">
-     <!--Titulo-->
-    <div class="mb-3">
-      <h5 class="tituloRojo">Regístrate</h5>
-    </div>
-    <!--Formulario-->
-    <form [formGroup]="FormUsuarios">
-
-      <!-- Fecha ingreso rollo -->
-      <!--<div class="form-floating col-md-2 mb-3">
-        <input formControlName="usuId" type="number" class="form-control" id="floatingInput">
-        <label for="floatingInput">ID Usuarios</label>
-      </div>
-
-      <div class="form-floating col-md-2 mb-3">
-        <select formControlName="estadoDoc" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option [ngValue]="item.estado_Id" *ngFor="let item of estados">{{item.estado_Nombre}}</option>
-        </select>
-        <label for="floatingSelect">Estados</label>
-      </div>-->
-
-       <!--Identificación-->
-      <div class="mb-3">
-        <input formControlName ="usuId" class="form-control form-control-sm" type="number" placeholder="Id. Usuario" aria-label=".form-control-sm example">
-      </div>
-
-      <!--Nombre-->
-      <div class="mb-3">
-        <input formControlName ="usuNombre" class="form-control form-control-sm" type="text" placeholder="Nombre y apellido" aria-label=".form-control-sm example">
-      </div>
-
-      <!--Tipo-->
-      <div class="mb-3">
-        <select formControlName = "usuTipo" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option selected>Selecciona tipo</option>
-          <option value="1">One</option>
-        </select>
-      </div>
-
-      <!--area-->
-      <div class="mb-3">
-        <select formControlName="usuArea" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option selected>Selecciona área</option>
-          <option value="1">One</option>
-        </select>
-      </div>
-
-       <!--rol-->
-      <div class="mb-3">
-        <select formControlName ="usuRol" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option selected>Selecciona rol</option>
-          <option value="1">One</option>
-        </select>
-      </div>
-
-
-      <!--Correo-->
-      <div class="mb-3">
-        <input formControlName="usuCorreo" class="form-control form-control-sm" type="email" placeholder="Correo" aria-label=".form-control-sm example">
-      </div>
-
-      <!-- Password  -->
-      <div class="mb-3">
-        <input formControlName="usuPassword" class="form-control form-control-sm" type="password" placeholder="Contraseña" aria-label=".form-control-sm example" >
-      </div>
-
-       <!-- EPS  -->
-      <div class="mb-3">
-        <select formControlName="UsuEPS" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option selected>Selecciona EPS</option>
-          <option value="1">One</option>
-        </select>
-      </div>
-
-
-   <!-- Fondo Pensional  -->
-   <div class="mb-3">
-    <select formControlName="usuFondoP" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option selected>Selecciona Fondo Pensional</option>
-          <option value="1">One</option>
-  </select>
+<div class="d-flex justify-content-center overlay" *ngIf="!load">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
   </div>
-
-
-       <!-- Caja de compensacion  -->
-      <div class="mb-3">
-        <select id="usuCajaComp" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option value="1">One</option>
-        </select>
-        </div>
-
-
-      <!--Boton Ingresar al sistema-->
-      <div class="mb-3">
-          <button class="btn btn-danger btn-danger-sm" ><a class="a_redirecion_principal" href="/principal" onclick="validarCampos()">¡Listo!</a></button>
-      </div>
-
-
-
-    </form>
-
-  <!--Fin Formulario-->
-  </div>
-  <!--Contenedor Registro-->
 </div>
-<!--Fin Contenedor Principal-->
+
+<div class="contain">
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Gestión de Usuarios</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid bajarPagina">
+    <div class="container">
+
+      <div class="mb-4">
+        <h4 class="tituloRojo">Tabla de Usuarios</h4>
+      </div>
+
+      <div class="card" *ngIf="load">
+        <p-toolbar styleClass="mb-4 gap-2">
+          <ng-template pTemplate="left">
+              <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success r-2" style="margin-right: 3%;" (click)="cargarModalUsuarios()"></button> <!--(click)="openNew()"-->
+              <button pButton pRipple label="Eliminar" icon="pi pi-trash" *ngIf="usuariosInactivar.length > 0; else inactivo" (click)="advertenciaInactivarVariosUsuarios()" class="p-button-danger"></button>  <!--(click)="deleteSelectedProducts()"   [disabled]="!selectedProducts || !selectedProducts.length"-->
+               <ng-template #inactivo>
+                <button pButton pRipple label="Eliminar" icon="pi pi-trash" [disabled]="true" class="p-button-danger"></button>
+               </ng-template>
+            </ng-template>
+
+          <ng-template pTemplate="right">
+              <button pButton pRipple label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
+          </ng-template>
+        </p-toolbar>
+        <!--Inicio Tabla-->
+        <p-table
+          #dt
+          [value]="arrayUsuarios"
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [paginator]="true"
+          [rows]="rows"
+          [showCurrentPageReport]="true"
+          [(first)]="first"
+          [rowsPerPageOptions]="[10,20,30,50,70,100]"
+          [rowHover]="true"
+          [globalFilterFields]="['Id','Nombre','Area']"
+          [(selection)]="usuariosInactivar"
+          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros" ><!--[showCurrentPageReport]="true"  [value]=""-->
+          <ng-template pTemplate="caption">
+              <div class="flex align-items-center justify-content-between">
+                  <span class="p-input-icon-left">
+                      <i class="pi pi-search"></i>
+                      <input pInputText type="text" placeholder="Buscar Usuarios..." (input)="aplicarfiltroGlobal($event, 'contains')" />  <!--selectedProducts--> <!--products-->
+                  </span>
+              </div>
+          </ng-template>
+          <!--Headers Tabla-->
+          <ng-template pTemplate="header">
+            <tr >
+                <th style="width: 4rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                <th scope="col" pSortableColumn="Id">ID Usuario <p-sortIcon field="Id"></p-sortIcon></th>
+                <th scope="col" pSortableColumn="Nombre">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
+                <th scope="col" pSortableColumn="Tipo">Tipo <p-sortIcon field="Tipo"></p-sortIcon></th>
+                <th scope="col" pSortableColumn="Area">Área <p-sortIcon field="Area"></p-sortIcon></th>
+                <th scope="col" pSortableColumn="Rol">Rol <p-sortIcon field="Rol"></p-sortIcon></th>
+                <th scope="col" pSortableColumn="Estado">Estado <p-sortIcon field="Estado"></p-sortIcon></th>
+                <th scope="col">Editar/Eliminar</th>
+            </tr>
+          </ng-template>
+          <!--Cuerpo Tabla-->
+          <ng-template pTemplate="body" let-arrayUsuarios>
+            <tr>
+                <td><p-tableCheckbox [value]="arrayUsuarios" (click)="seleccionarUsuariosCheck()"></p-tableCheckbox></td>
+                <td>{{arrayUsuarios.Id}}</td>
+                <td>{{arrayUsuarios.Nombre}}</td>
+                <td>{{arrayUsuarios.Tipo}}</td>
+                <td>{{arrayUsuarios.Area}}</td>
+                <td>{{arrayUsuarios.Rol}}</td>
+                <td>{{arrayUsuarios.Estado}}</td>
+                <td style="text-align: center;">
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="cargarModalEditarUsuario(arrayUsuarios)" style="width: 30px; height: 30px; margin-right: 3%;"></button> <!---->
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="advertenciaInactivarUsuario(arrayUsuarios)" style="width: 30px; height: 30px;"></button> <!--(click)="deleteProduct(product)"-->
+                </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="summary">
+              <div class="flex align-items-center justify-content-between">
+                  En total hay {{cantidadUsuarios}} usuarios. <!--{{products ? products.length : 0 }}-->
+              </div>
+          </ng-template>
+        </p-table>
+      </div>
+      <p-dialog [(visible)]="dialogUsuarios" [style]="{width: '450px'}" header="{{accion}} Usuarios" [modal]="true" styleClass="p-fluid">
+        <ng-template pTemplate="content">
+          <form [formGroup]="FormUsuarios">
+
+            <!-- ID -->
+            <div class="form-floating col-md mb-3" *ngIf="accion == 'Crear'; else Editar">
+              <input formControlName="usuId" type="number" class="form-control form-control-sm" id="floatingInput" autocomplete="off" >
+              <label for="floatingInput">ID Usuario</label>
+            </div>
+
+            <ng-template #Editar>
+              <div class="form-floating col-md mb-3">
+                <input formControlName="usuId" type="number" class="form-control form-control-sm" id="floatingInput" autocomplete="off" readonly onmousedown="return false">
+                <label for="floatingInput">ID Usuario</label>
+              </div>
+            </ng-template>
+
+            <!-- Nombre -->
+            <div class="form-floating col-md mb-3">
+              <input formControlName="usuNombre" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off">
+              <label for="floatingInput">Nombre Usuario</label>
+            </div>
+
+            <div class="mb-3">
+              <div class="row g-3">
+                 <!-- Tipo de Usuario -->
+
+                 <div class="form-floating col-md">
+                    <select formControlName="usuTipo" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
+                      <option [ngValue]="item.tpUsu_Id" *ngFor="let item of arrayTiposUsuarios">{{item.tpUsu_Nombre}}</option>
+                    </select>
+                    <label for="floatingSelect">Tipo Usuario</label>
+                  </div>
+
+                  <!-- Area -->
+                  <div class="form-floating col-md">
+                    <select formControlName="usuArea" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
+                      <option [ngValue]="item.area_Id" *ngFor="let item of arrayAreas">{{item.area_Nombre}}</option>
+                    </select>
+                    <label for="floatingSelect">Área</label>
+                  </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <div class="row g-3">
+                  <!-- Rol -->
+                <div class="form-floating col-md">
+                  <select formControlName="usuRol" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
+                    <option [ngValue]="item.rolUsu_Id" *ngFor="let item of arrayRoles">{{item.rolUsu_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Rol Usuario</label>
+                </div>
+                <!-- Estado -->
+                <div class="form-floating col-md">
+                  <select formControlName="usuEstado" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
+                    <option [ngValue]="item.estado_Id" *ngFor="let item of arrayEstados">{{item.estado_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Estado</label>
+                </div>
+              </div>
+            </div>
+            <!-- PassWord -->
+            <div class="input-group col-md mb-3">
+              <input formControlName="usuPassword" type="password" class="form-control form-control-sm" aria-describedby="button-addon2" id="pass" autocomplete="off">
+
+              <ng-container *ngIf="mostrarPass; then noMostrar else mostrar"></ng-container>
+              <ng-template #mostrar>
+                <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="mostrarPassword()"><i class="pi pi-eye"></i></button>
+              </ng-template>
+
+              <ng-template #noMostrar>
+                <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="mostrarPassword()"><i class="pi pi-eye-slash"></i></button>
+              </ng-template>
+
+
+            </div>
+
+            <!--Boton Ingresar al sistema-->
+            <div class="mb-3">
+              <button pButton pRipple label="{{accion}} Usuario" (click)="accionesModal()" class="p-button-success"></button>
+            </div>
+          </form>
+        </ng-template>
+      </p-dialog>
+
+
+    </div>
+  </div>
+</div>
 

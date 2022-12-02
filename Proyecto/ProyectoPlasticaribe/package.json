@@ -32,6 +32,7 @@
     "@types/js-cookie": "^3.0.2",
     "angular-ng-autocomplete": "^2.0.12",
     "bootstrap": "^5.2.2",
+    "bootstrap-icons": "^1.10.2",
     "bootstrap-select": "^1.13.18",
     "crypto-js": "^4.1.1",
     "datalist-css": "^1.0.0",

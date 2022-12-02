@@ -2,7 +2,7 @@
 export interface modelUsuario{
     Usua_Id: number;
     Usua_Codigo: number;
-    TipoIdentificacion_Id: number;
+    TipoIdentificacion_Id: string;
     Usua_Nombre: string;
     Area_Id: number;
     tpUsu_Id: number;
@@ -15,5 +15,7 @@ export interface modelUsuario{
     cajComp_Id: number;
     eps_Id: number;
     fPen_Id: number;
+    Usua_Fecha: string;
+    Usua_Hora: string;
 }
 

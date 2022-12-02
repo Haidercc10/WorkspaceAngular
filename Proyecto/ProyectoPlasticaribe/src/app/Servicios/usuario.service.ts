@@ -56,4 +56,11 @@ export class UsuarioService {
    return this.http.post(this.rutaPlasticaribeAPI + '/Usuarios', data);
   }
 
+  getUsuariosxId(id : any) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/UsuariosxId/${id}`);
+  }
+
+  getUsuarios() {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/UsuariosSinParametros`);
+  }
 }
