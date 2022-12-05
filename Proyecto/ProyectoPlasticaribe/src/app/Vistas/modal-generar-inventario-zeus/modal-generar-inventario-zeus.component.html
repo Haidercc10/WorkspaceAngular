@@ -23,22 +23,22 @@
     <div class="mb-4">
       <div class="row g-3">
 
-        <!-- Nombre Cliente -->
-        <div class="form-floating col-md-4">
+
+        <!--<div class="form-floating col-md-4">
           <input type="text" name="NombreCliente" [(ngModel)]="NombreCliente" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
           <label for="floatingInput">Cliente</label>
         </div>
 
-        <!-- Nombre Producto -->
+
         <div class="form-floating col-md-4">
           <input type="text" name="NombrePT" [(ngModel)]="NombrePT" class="form-control form-control-sm" id="floatingInput" autocomplete="on" required >
           <label for="floatingInput">Nombre Producto</label>
-        </div>
+        </div>-->
 
-        <form [formGroup]="FormExistencias" id="FormExistencias">
+        <!--<form [formGroup]="FormExistencias" id="FormExistencias">
           <div class="mb-3">
             <div class="row g-3">
-              <!-- Cantidad Minima -->
+
              <label *ngIf="numeroIdProd != 0">Item: <b>{{numeroIdProd}}</b></label>
 
               <div class="form-floating col-md-1">
@@ -61,19 +61,96 @@
               <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarCantMinima()">Actualizar</button>
               <button type="button" style="width: 160px;" pButton pRipple icon="pi pi-file-excel" (click)="exportarExcel()" class="p-button-success mr" pTooltip="Exportar a Excel" tooltipPosition="bottom">Exporta a Excel</button>
               <button class="btn btn-danger btn-danger-sm" type="button" (click)="buscarPrecios()">Ult. Actualización</button>
-              <!-- <button class="btn btn-secondary btn-secondary-sm" type="button">Limpiar campos</button> -->
             </div>
 
-              <div style="text-align: right;">
-                <label><b>Total Stock Zeus ${{totalProductos | number : '1.2-2'}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
-              </div>
+
           </div>
-        </form>
+        </form>-->
      </div>
     </div>
     <!-- Fin fila 1 de campos -->
+    <div style="text-align: right;">
+      <label><b>Total Stock Zeus ${{totalProductos | number : '1.2-2'}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
+    </div>
 
-    <div *ngIf="load">
+    <div class="mb-4">
+      <h4 class="tituloRojo">Tabla de Productos</h4>
+    </div>
+
+    <div class="card" *ngIf="load">
+      <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="right">
+            <button pButton pRipple label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
+        </ng-template>
+      </p-toolbar>
+      <!--Inicio Tabla-->
+      <p-table
+        #dt
+        [value]="ArrayProductoZeus"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="rows"
+        [showCurrentPageReport]="true"
+        [(first)]="first"
+        [rowsPerPageOptions]="[10,20,30,50,70,100]"
+        [rowHover]="true"
+        [globalFilterFields]="['codigoItem','nombreItem','Area']"
+
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros" ><!--[showCurrentPageReport]="true"  [value]=""-->
+        <ng-template pTemplate="caption">
+            <div class="flex align-items-center justify-content-between">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" placeholder="Buscar Usuarios..." (input)="aplicarfiltroGlobal($event, 'contains')" />  <!--selectedProducts--> <!--products-->
+                </span>
+            </div>
+        </ng-template>
+        <!--Headers Tabla-->
+        <ng-template pTemplate="header">
+          <tr >
+              <th scope="col" pSortableColumn="Id">Item<p-sortIcon field="Id"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="Nombre">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="Tipo">Precio<p-sortIcon field="Tipo"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="Area">Existencias<p-sortIcon field="Area"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="Rol">Presentación<p-sortIcon field="Rol"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="Estado">Subtotal<p-sortIcon field="Estado"></p-sortIcon></th>
+              <th scope="col">Cant. Minima</th>
+          </tr>
+        </ng-template>
+        <!--Cuerpo Tabla-->
+        <ng-template pTemplate="body" let-ArrayProductoZeus>
+          <tr>
+              <td>{{ArrayProductoZeus.codigoItem}}</td>
+              <td>{{ArrayProductoZeus.nombreItem}}</td>
+              <td>{{ArrayProductoZeus.PrecioItem}}</td>
+              <td>{{ArrayProductoZeus.cantidadItem}}</td>
+              <td>{{ArrayProductoZeus.presentacion}}</td>
+              <td>{{ArrayProductoZeus.PrecioTotalItem}}</td>
+              <td pEditableColumn>
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <p-inputNumber [(ngModel)]="ArrayProductoZeus.cantMinima" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal"  [min]="0" [maxFractionDigits]="2"></p-inputNumber>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ArrayProductoZeus.cantMinima | number}}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="flex align-items-center justify-content-between">
+                En total hay {{cantProductos}} usuarios.
+            </div>
+        </ng-template>
+      </p-table>
+    </div>
+
+
+
+    <!--<div *ngIf="load">
       <div class="mb-4">
         <div class="row g-3">
           <div class="table-responsive">
@@ -123,6 +200,6 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>-->
   </div>
 </div>

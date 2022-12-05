@@ -12,6 +12,7 @@ import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
 import { Table } from 'primeng/table'
+import { Console } from 'console';
 
 @Component({
   selector: 'app-registro-component',
@@ -22,14 +23,14 @@ export class RegistroComponentComponent implements OnInit {
 
   @ViewChild('dt') dt: Table | undefined;
 
-  public FormUsuarios !: FormGroup;
-  public arrayAreas : any = [];
-  public arrayRoles : any = [];
-  public arrayUsuarios : any = [];
-  public arrayEstados : any = [];
-  public arrayTiposUsuarios: any = [];
-  rows = 10;
-  first = 0;
+  public FormUsuarios !: FormGroup; /** Formulario alojado en el modal para editar y eliminar usuarios */
+  public arrayAreas : any = []; /** Array para cargar areas al combobox del formulario de usuarios */
+  public arrayRoles : any = []; /** Array para cargar roles al combobox del formulario de usuarios */
+  public arrayUsuarios : any = []; /** Array para cargar usuarios a la tabla que carga en cuanto se carga el modulo. */
+  public arrayEstados : any = []; /** Array para cargar estados al combobox del formulario de usuarios */
+  public arrayTiposUsuarios: any = [];  /** Array para cargar tipos de usuarios al combobox del formulario de usuarios */
+  rows = 10; /** Filas de la tabla que se cargaran inicialmente  */
+  first = 0; /** variable que mostrará  */
   public dialogUsuarios : boolean;
   public accion : string = ''
   public fechaActual : any = moment().format('YYYY-MM-DD');
@@ -120,6 +121,16 @@ export class RegistroComponentComponent implements OnInit {
           Area : dataUsuarios[index].area_Nombre,
           Rol : dataUsuarios[index].rolUsu_Nombre,
           Estado : dataUsuarios[index].estado_Nombre,
+          Password : dataUsuarios[index].usua_Contrasena,
+          Email : dataUsuarios[index].usua_Email,
+          Telefono : dataUsuarios[index].usua_Telefono,
+          TipoId : dataUsuarios[index].tipoIdentificacion_Id,
+          Empresa : dataUsuarios[index].empresa_Nombre,
+          Caja : dataUsuarios[index].cajComp_Nombre,
+          EPS : dataUsuarios[index].eps_Nombre,
+          FondoP : dataUsuarios[index].fPen_Nombre,
+          Fecha : dataUsuarios[index].usua_Fecha.replace('T00:00:00', ''),
+          Hora : dataUsuarios[index].usua_Hora
         }
         infoUsuarios.Id = `${infoUsuarios.Id}`;
         if(infoUsuarios.Id.length == 1) infoUsuarios.Id = `00${infoUsuarios.Id}`
@@ -164,8 +175,8 @@ export class RegistroComponentComponent implements OnInit {
             Usua_Hora : this.HoraActual,
           }
         console.log(infoUsuarios)
-      this.dialogUsuarios = false;
-      this.servicioUsuarios.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(dataUsu => { this.confirmUsuarioActualizado(); });
+        this.dialogUsuarios = false;
+        this.servicioUsuarios.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(dataUsu => { this.confirmUsuarioActualizado(); });
       }
     });
 
@@ -313,13 +324,13 @@ export class RegistroComponentComponent implements OnInit {
             Usua_Telefono : dataUsuarios[index].usua_Telefono,
             Usua_Contrasena : dataUsuarios[index].usua_Contrasena,
             Usua_Email : dataUsuarios[index].usua_Email,
-            TipoIdentificacion_Id : 'C.C',
-            Empresa_Id : 800188730,
+            TipoIdentificacion_Id : dataUsuarios[index].tipoIdentificacion_Id,
+            Empresa_Id : dataUsuarios[index].empresa_Id,
             cajComp_Id : dataUsuarios[index].cajComp_Id,
             eps_Id : dataUsuarios[index].eps_Id,
             fPen_Id : dataUsuarios[index].fPen_Id,
-            Usua_Fecha : this.fechaActual,
-            Usua_Hora : this.HoraActual,
+            Usua_Fecha : dataUsuarios[index].usua_Fecha,
+            Usua_Hora : dataUsuarios[index].usua_Hora,
         }
           console.log(infoUsuarios)
           this.dialogUsuarios = false;
@@ -328,17 +339,22 @@ export class RegistroComponentComponent implements OnInit {
     });
   }
 
-  seleccionarUsuariosCheck(){
-  }
+  /*seleccionarUsuariosCheck(){
+    this.load = false;
+
+    setTimeout(() => {
+      this.load = true;
+    }, 100);
+  }*/
 
   exportarExcel() {
       this.load = false;
       setTimeout(() => {
         const title = `Listado de Usuarios - Plasticaribe SAS`;
-        const header = ["ID", "Nombre", "Tipo Usuario", "Area", "Rol", "Estado"]
+        const header = ["ID", "Nombre", "Tipo Usuario", "Area", "Rol", "Estado", "Contraseña", "Email", "Teléfono", "Tipo Id", "Empresa", "Caja Compensación", "EPS", "Fondo Pensional", "Fecha Creación", "Hora Creación "]
         let datos : any =[];
         for (const item of this.arrayUsuarios) {
-          const datos1  : any = [item.Id, item.Nombre, item.Tipo, item.Area, item.Rol, item.Estado];
+          const datos1  : any = [item.Id, item.Nombre, item.Tipo, item.Area, item.Rol, item.Estado, item.Password, item.Email, item.Telefono, item.TipoId, item.Empresa, item.Caja, item.EPS, item.FondoP, item.Fecha, item.Hora];
           datos.push(datos1);
         }
         let workbook = new Workbook();
@@ -355,7 +371,7 @@ export class RegistroComponentComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:F2');
+        worksheet.mergeCells('A1:P2');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
         datos.forEach(d => {
           let row = worksheet.addRow(d);
@@ -366,6 +382,17 @@ export class RegistroComponentComponent implements OnInit {
         worksheet.getColumn(4).width = 15;
         worksheet.getColumn(5).width = 25;
         worksheet.getColumn(6).width = 10;
+        worksheet.getColumn(7).width = 20;
+        worksheet.getColumn(8).width = 30;
+        worksheet.getColumn(9).width = 12;
+        worksheet.getColumn(10).width = 8;
+        worksheet.getColumn(11).width = 20;
+        worksheet.getColumn(12).width = 20;
+        worksheet.getColumn(13).width = 20;
+        worksheet.getColumn(14).width = 20;
+        worksheet.getColumn(15).width = 15;
+        worksheet.getColumn(16).width = 15;
+
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -391,23 +418,17 @@ export class RegistroComponentComponent implements OnInit {
             Usua_Telefono : dataUsuarios[index].usua_Telefono,
             Usua_Contrasena : dataUsuarios[index].usua_Contrasena,
             Usua_Email : dataUsuarios[index].usua_Email,
-            TipoIdentificacion_Id : 'C.C',
-            Empresa_Id : 800188730,
+            TipoIdentificacion_Id : dataUsuarios[index].tipoIdentificacion_Id,
+            Empresa_Id : dataUsuarios[index].empresa_Id,
             cajComp_Id : dataUsuarios[index].cajComp_Id,
             eps_Id : dataUsuarios[index].eps_Id,
             fPen_Id : dataUsuarios[index].fPen_Id,
-            Usua_Fecha : this.fechaActual,
-            Usua_Hora : this.HoraActual,
+            Usua_Fecha : dataUsuarios[index].usua_Fecha,
+            Usua_Hora : dataUsuarios[index].usua_Hora,
           }
           console.log(infoUsuarios)
 		      this.dialogUsuarios = false;
-          this.servicioUsuarios.srvActualizarUsuario(this.usuariosInactivar[i].Id, infoUsuarios).subscribe(dataUsu => {
-            setTimeout(() => {
-              this.confirmUsuarioActualizado();
-              this.cargarUsuarios();
-            }, 2000);
-
-          });
+          this.servicioUsuarios.srvActualizarUsuario(this.usuariosInactivar[i].Id, infoUsuarios).subscribe(dataUsu => {this.confirmUsuarioActualizado(); });
         }
 	  });
 	}
