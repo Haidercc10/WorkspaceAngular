@@ -46,6 +46,9 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   public rows: number = 100;
   public first : number = 0;
   public cantProductos : number = 0;
+  opcionFiltroFechas : string [] = ['Elija el filtro', 'Semana(s)', 'Mes(es)', 'Año(s)'];
+  filtroFechas : string;
+  cantidadDias : number;
 
   constructor(private existenciasZeus : InventarioZeusService,
                 private clienteOtItems : BagproService,
@@ -78,11 +81,9 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
   // Funcion que calculará cual es la fecha segun los parametros especificados
   fechaBuscada(){
-    let cantidad : number = this.FormExistencias.value.cantidad;
-    let filtroFechas : any = this.FormExistencias.value.filtroFechas;
-    if (filtroFechas == 1) this.fechaBusqueda = moment().subtract(cantidad, 'week').format('YYYY-MM-DD');
-    else if (filtroFechas == 2) this.fechaBusqueda = moment().subtract(cantidad, 'month').format('YYYY-MM-DD');
-    else if (filtroFechas == 3) this.fechaBusqueda = moment().subtract(cantidad, 'years').format('YYYY-MM-DD');
+    if (this.filtroFechas == 'Semana(s)') this.fechaBusqueda = moment().subtract(this.cantidadDias, 'week').format('YYYY-MM-DD');
+    else if (this.filtroFechas == 'Mes(es)') this.fechaBusqueda = moment().subtract(this.cantidadDias, 'month').format('YYYY-MM-DD');
+    else if (this.filtroFechas == 'Año(s)') this.fechaBusqueda = moment().subtract(this.cantidadDias, 'years').format('YYYY-MM-DD');
   }
 
   //
@@ -105,26 +106,27 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     for (let i = 0; i < this.ArrayProductoZeus.length; i++) {
       this.ArrayProductoZeus[i].fechaModificacion = '';
       this.clienteOtItems.srvObtenerListaConsultarItem(this.fechaBusqueda, this.today, this.ArrayProductoZeus[i].codigoItem, this.ArrayProductoZeus[i].PrecioItem).subscribe(datos_item => {
-        if (datos_item.length != 0){
-          for (let j = 0; j < datos_item.length; j++) {
-            this.mostrarColumna = true;
-            this.ArrayProductoZeus[i].fechaModificacion = datos_item[j].replace('T00:00:00', '');
-            break;
-          }
-        }
+        //if (datos_item.length != 0){
+          //for (let j = 0; j < datos_item.length; j++) {
+            if(datos_item != null) {
+              this.ArrayProductoZeus[i].fechaModificacion = `${datos_item}`.replace('T00:00:00', '');
+            }
+            //break;
+          //}
+        //}
       });
     }
-    setTimeout(() => { this.ordenarItems(); }, 9000);
+    setTimeout(() => { this.ordenarItems(); }, 7000);
   }
 
   //Funcion que ordenará por fecha de la antugua a la mas reciente, y enviará los espacios en blanco al final
   ordenarItems(){
-    this.ArrayProductoZeus.sort((a,b) => a.fechaModificacion.localeCompare(b.fechaModificacion));
+    this.ArrayProductoZeus.sort();
     this.ArrayProductoZeus.sort((a,b) => {
       if (a.fechaModificacion == '' && b.fechaModificacion != '') return 1;
       else return -1;
     });
-    setTimeout(() => { this.load = true; }, 1200);
+     this.load = true;
   }
 
   //
@@ -219,7 +221,6 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
               this.existencias_ProductosService.srvObtenerListaPorIdProducto2(datosCLOTI[cl].clienteItems).subscribe(datos_existenciasProd => {
                 for (let i = 0; i < datos_existenciasProd.length; i++) {
-                  if (datosExistencias[exi].existencias >= 1) {
                     const datosInventario: any = {
                       codigoItem : datosCLOTI[cl].clienteItems,
                       nombreItem : datosCLOTI[cl].clienteItemsNom,
@@ -230,7 +231,6 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                       PrecioTotalItem : datosExistencias[exi].precio_Total,
                       ClienteNombre : datosCLOTI[cl].clienteNom,
                       cantMinima : datos_existenciasProd[i].exProd_CantMinima,
-                      cantVacia : '',
                       fechaModificacion : '',
                     }
                     this.ArrayProductoZeus.push(datosInventario);
@@ -240,7 +240,6 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                     this.TotalStockReal += (datos_existenciasProd[i].exProd_Cantidad * datosExistencias[exi].precioVenta);
                     this.cantProductos += 1;
                     break;
-                  }
                 }
               });
             }
@@ -250,12 +249,13 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     });
     setTimeout(() => {
       this.load = true;
-    }, 6500);
+    }, 14000);
   }
 
   //
   seleccionarProducto(item){
     this.numeroIdProd = item.codigoItem;
+    console.log(this.numeroIdProd);
     //this.FormEditarCantMinima.enable();
     // const a : any = document.createElement("a");
     // document.body.appendChild(a);
@@ -265,38 +265,43 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   }
 
   //
-  actualizarCantMinima(){
-    let cantidad : number = this.FormEditarCantMinima.value.cantMinima;
-    if (this.numeroIdProd == 0) Swal.fire("¡Debe seleccionar un producto!");
-    else {
-      this.existencias_ProductosService.srvObtenerListaPorIdProducto2(this.numeroIdProd).subscribe(datos_existencias => {
-        for (let i = 0; i < datos_existencias.length; i++) {
-          const datosExistencias = {
-            Prod_Id: this.numeroIdProd,
-            exProd_Id: datos_existencias[i].exProd_Id,
-            ExProd_Cantidad: datos_existencias[i].exProd_Cantidad,
-            UndMed_Id: datos_existencias[i].undMed_Id,
-            TpBod_Id: datos_existencias[i].tpBod_Id,
-            ExProd_Precio: datos_existencias[i].exProd_Precio,
-            ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
-            ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
-            ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
-            TpMoneda_Id: datos_existencias[i].tpMoneda_Id,
-            exProd_PrecioVenta : datos_existencias[i].exProd_PrecioVenta,
-            ExProd_CantMinima : cantidad,
+  actualizarCantMinima(fila){
+    console.log(fila.codigoItem)
+    //this.numeroIdProd = fila.codigoItem;
+    //let cantidad : number = this.FormEditarCantMinima.value.cantMinima;
+      for (let index = 0; index < this.ArrayProductoZeus.length; index++) {
+        if(fila.codigoItem == this.ArrayProductoZeus[index].codigoItem)
+          this.existencias_ProductosService.srvObtenerListaPorIdProducto2(this.numeroIdProd).subscribe(datos_existencias => {
+            for (let i = 0; i < datos_existencias.length; i++) {
+              const datosExistencias = {
+                Prod_Id: this.numeroIdProd,
+                exProd_Id: datos_existencias[i].exProd_Id,
+                ExProd_Cantidad: datos_existencias[i].exProd_Cantidad,
+                UndMed_Id: datos_existencias[i].undMed_Id,
+                TpBod_Id: datos_existencias[i].tpBod_Id,
+                ExProd_Precio: datos_existencias[i].exProd_Precio,
+                ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
+                ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
+                ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
+                TpMoneda_Id: datos_existencias[i].tpMoneda_Id,
+                exProd_PrecioVenta : datos_existencias[i].exProd_PrecioVenta,
+                ExProd_CantMinima : this.ArrayProductoZeus[index].cantMinima,
+                ExProd_Fecha : this.ArrayProductoZeus[i].exProd_Fecha,
+                ExProd_Hora : this.ArrayProductoZeus[i].exProd_Hora,
+              }
+              console.log(datosExistencias);
+            this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
+              this.confirmUsuarioCreado();
+              //cantidad = datos_existencias[i].exProd_CantidadMinima
+              //this.numeroIdProd = 0;
+            });
           }
-
-          this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
-            this.InventarioExistenciaZeus();
-            //cantidad = datos_existencias[i].exProd_CantidadMinima
-            this.numeroIdProd = 0;
-          });
-          this.FormEditarCantMinima.reset();
+          //this.FormEditarCantMinima.reset();
           //this.FormEditarCantMinima.disable();
+        });
+      }
 
-        }
-      });
-    }
+
   }
 
   //
@@ -481,5 +486,15 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
   aplicarfiltroGlobal($event, valorCampo : string){
     this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
+  }
+
+  /** */
+  confirmUsuarioCreado() {
+    this.load = false
+    setTimeout(() => {
+      this.load = true;
+      Swal.fire({icon: 'success', title: 'Confirmación', text: '¡Cantidad minima actualizada con éxito!', showConfirmButton: false, timer: 1500 });
+      this.InventarioExistenciaZeus();
+    }, 1000);
   }
 }

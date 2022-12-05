@@ -101,3 +101,14 @@ background-color: lightblue;
   background-color: #ddd;
 }
 
+.buscarActualizacion{
+  margin-left: 30%;
+}
+
+.tamanoTitulosTabla{
+  font-size: 14px;
+}
+
+.tamanoTextosTabla{
+  font-size: 14px;
+}
