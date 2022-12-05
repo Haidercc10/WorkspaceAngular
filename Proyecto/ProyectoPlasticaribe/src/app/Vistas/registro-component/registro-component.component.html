@@ -74,24 +74,24 @@
                 <th scope="col" pSortableColumn="Area">Área <p-sortIcon field="Area"></p-sortIcon></th>
                 <th scope="col" pSortableColumn="Rol">Rol <p-sortIcon field="Rol"></p-sortIcon></th>
                 <th scope="col" pSortableColumn="Estado">Estado <p-sortIcon field="Estado"></p-sortIcon></th>
-                <th scope="col">Editar/Eliminar</th>
+                <th scope="col">Editar</th>
+                <th scope="col">Eliminar</th>
             </tr>
           </ng-template>
           <!--Cuerpo Tabla-->
           <ng-template pTemplate="body" let-arrayUsuarios>
             <tr>
-                <td><p-tableCheckbox [value]="arrayUsuarios" (click)="seleccionarUsuariosCheck()"></p-tableCheckbox></td>
+                <td><p-tableCheckbox [value]="arrayUsuarios"></p-tableCheckbox></td><!--(click)="seleccionarUsuariosCheck()"-->
                 <td>{{arrayUsuarios.Id}}</td>
                 <td>{{arrayUsuarios.Nombre}}</td>
                 <td>{{arrayUsuarios.Tipo}}</td>
                 <td>{{arrayUsuarios.Area}}</td>
                 <td>{{arrayUsuarios.Rol}}</td>
-                <td>{{arrayUsuarios.Estado}}</td>
-                <td style="text-align: center;">
-                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="cargarModalEditarUsuario(arrayUsuarios)" style="width: 30px; height: 30px; margin-right: 3%;"></button> <!---->
-                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="advertenciaInactivarUsuario(arrayUsuarios)" style="width: 30px; height: 30px;"></button> <!--(click)="deleteProduct(product)"-->
-                </td>
-            </tr>
+                <td *ngIf="arrayUsuarios.Estado == 'Activo'; else Inactivo">{{arrayUsuarios.Estado}}</td>
+                <ng-template #Inactivo><td><span class="badge bg-danger1">{{arrayUsuarios.Estado}}</span></td></ng-template>
+                <td style="text-align: center;"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="cargarModalEditarUsuario(arrayUsuarios)" style="width: 30px; height: 30px;"></button></td>
+                <td style="text-align: center;"><button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="advertenciaInactivarUsuario(arrayUsuarios)" style="width: 30px; height: 30px;"></button></td>
+              </tr>
           </ng-template>
           <ng-template pTemplate="summary">
               <div class="flex align-items-center justify-content-between">

@@ -1,4 +1,4 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { FiltrosProductosTerminadosZeusPipe } from 'src/app/Pipes/filtros-productos-terminados-zeus.pipe';
 import { InventarioZeusService } from 'src/app/Servicios/inventario-zeus.service';
@@ -11,6 +11,7 @@ import * as fs from 'file-saver';
 import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -19,7 +20,7 @@ import moment from 'moment';
 })
 
 export class ModalGenerarInventarioZeusComponent implements OnInit {
-
+  @ViewChild('dt') dt: Table | undefined;
   public FormExistencias !: FormGroup;
   public titulosTabla : any = [];
   public arrayInventario = [];
@@ -42,6 +43,9 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   totalProductos : number = 0;
   public FormEditarCantMinima !: FormGroup;
   public cantMinimal : number;
+  public rows: number = 100;
+  public first : number = 0;
+  public cantProductos : number = 0;
 
   constructor(private existenciasZeus : InventarioZeusService,
                 private clienteOtItems : BagproService,
@@ -205,6 +209,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.numeroIdProd = 0;
     this.TotalStockReal = 0;
     this.totalProductos = 0;
+    this.cantProductos = 0;
 
     this.existenciasZeus.srvObtenerExistenciasArticulosZeus().subscribe(datosExistencias => {
       for (let exi = 0; exi < datosExistencias.length; exi++) {
@@ -225,6 +230,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                       PrecioTotalItem : datosExistencias[exi].precio_Total,
                       ClienteNombre : datosCLOTI[cl].clienteNom,
                       cantMinima : datos_existenciasProd[i].exProd_CantMinima,
+                      cantVacia : '',
                       fechaModificacion : '',
                     }
                     this.ArrayProductoZeus.push(datosInventario);
@@ -232,6 +238,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                     this.ArrayProductoZeus.sort((a,b) => Number(b.cantidadItem < b.cantMinima) - Number(a.cantidadItem < a.cantMinima));
                     this.totalProductos += datosExistencias[exi].precio_Total;
                     this.TotalStockReal += (datos_existenciasProd[i].exProd_Cantidad * datosExistencias[exi].precioVenta);
+                    this.cantProductos += 1;
                     break;
                   }
                 }
@@ -470,5 +477,9 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
       icon: 'warning',
       title: 'Ordenado por "Existencia" de menor a mayor.'
     });
+  }
+
+  aplicarfiltroGlobal($event, valorCampo : string){
+    this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
   }
 }
