@@ -102,7 +102,7 @@ background-color: lightblue;
 }
 
 .buscarActualizacion{
-  margin-left: 45%;
+  margin-left: 35%;
 }
 
 
@@ -110,5 +110,25 @@ background-color: lightblue;
   .buscarActualizacion{
     margin-top: 5%;
     margin-left: 0%;
+  }
+}
+
+
+@media (min-width: 1900px){
+  .buscarActualizacion{
+    margin-left: 30%;
+  }
+}
+
+
+@media (min-width: 3900px){
+  .buscarActualizacion{
+    margin-left: 35%;
+  }
+}
+
+@media (min-width: 5000px){
+  .buscarActualizacion{
+    margin-left: 30%;
   }
 }

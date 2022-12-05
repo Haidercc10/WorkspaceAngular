@@ -20,7 +20,7 @@
   </div>
 </div>
 
-<div class="container-fluid" *ngIf="load">
+<div class="container" *ngIf="load">
   <div class="card">
     <p-toolbar styleClass="mb-4 gap-2">
       <button pButton pRipple label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
@@ -54,7 +54,7 @@
         </div>
       </ng-template>
       <ng-template pTemplate="header">
-        <tr>
+        <tr style="font-size: 13px;">
           <th scope="col" pSortableColumn="Item">ID Producto <p-sortIcon field="Item"></p-sortIcon></th>
           <th scope="col" pSortableColumn="NombreItem">Nombre Producto<p-sortIcon field="NombreItem"></p-sortIcon></th>
           <th scope="col" pSortableColumn="PrecioItem">Precio <p-sortIcon field="PrecioItem"></p-sortIcon></th>
@@ -66,7 +66,7 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-arrayUsuarios>
-        <tr>
+        <tr style="font-size: 13px;">
           <td>{{arrayUsuarios.Item}}</td>
           <td pEditableColumn>
             <p-cellEditor>

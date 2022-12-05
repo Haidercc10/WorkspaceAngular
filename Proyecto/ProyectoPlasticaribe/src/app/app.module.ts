@@ -212,25 +212,12 @@ export const routes: Routes = [
   {path: 'crearproducto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component:CrearProductoComponent},
   {path: 'crear-clientes', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component:ClientesComponent},
 
- /************************************************************************************************************************************************************/
+ /***************************************************************** USUARIOS **********************************************************************************/
   {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
-  {path: 'registro-usuario', component: RegistroComponentComponent},
-  {path: 'reporte-ventas', component: Ventas_TemporalesComponent},
-  // {path: 'areas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: AreasComponentComponent},
-  // {path: 'reportes', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReportesComponent},
-  // {path: 'roles', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: RolesComponentComponent},
-  // {path: 'eps', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: EpsComponent},
-  // {path: 'fpension', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: FpensionComponent},
-  // {path: 'cajacompensacion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: CajacompensacionComponent},
-  // {path: 'opedido', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: OpedidoComponent},
-  // {path: 'usuario', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component:UsuarioComponent},
-  // {path: 'producto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component:ProductoComponent},
-  // {path: 'estados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: EstadosComponent},
-  // {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: DesperdicioComponent},
-  // {path: 'prueba', component: PruebasComponent},
-  // {path: 'desperdicio', component: DesperdicioComponent},
-  // {path: 'reporte-estados-ot', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReporteEstadosOTComponent},
-  // {path: 'Categorias', component: CrearCategoriasComponent},
+  {path: 'registro-usuario', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component: RegistroComponentComponent},
+
+ /*************************************************************************************************************************************************************/
+ {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
 ]
 
 @NgModule({

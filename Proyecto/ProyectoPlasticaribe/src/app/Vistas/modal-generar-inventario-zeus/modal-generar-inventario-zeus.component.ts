@@ -249,7 +249,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     });
     setTimeout(() => {
       this.load = true;
-    }, 14000);
+    }, 5000);
   }
 
   //

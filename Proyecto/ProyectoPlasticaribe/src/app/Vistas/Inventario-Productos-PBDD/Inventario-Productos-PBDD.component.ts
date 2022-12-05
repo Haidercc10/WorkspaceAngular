@@ -23,7 +23,6 @@ export class InventarioProductosPBDDComponent implements OnInit {
   public page : number;
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   fechaBusqueda : any = new Date(); // Variable que va a ayudar al momento de saber hasta que fecha se va a buscar
-  mostrarColumna : boolean = false;
   public filtroNombre : any;
   public NombrePT = '';
   public load : boolean = false;
@@ -59,15 +58,10 @@ export class InventarioProductosPBDDComponent implements OnInit {
       for (let i = 0; i < this.ArrayProductosBDNueva.length; i++) {
         this.ArrayProductosBDNueva[i].fechaModificacion = '';
         this.clienteOtItems.srvObtenerListaConsultarItem(this.fechaBusqueda, this.today, this.ArrayProductosBDNueva[i].Item, this.ArrayProductosBDNueva[i].PrecioItem).subscribe(datos_item => {
-          if (datos_item.length != 0){
-            for (let j = 0; j < datos_item.length; j++) {
-              this.mostrarColumna = true;
-              this.ArrayProductosBDNueva[i].fechaModificacion = datos_item[j].replace('T00:00:00', '');
-            }
-          }
+          if (datos_item != null) this.ArrayProductosBDNueva[i].fechaModificacion = `${datos_item}`.replace('T00:00:00','');
         });
       }
-      setTimeout(() => { this.ordenarItems(); }, 7000);
+      setTimeout(() => { this.ordenarItems(); }, 10000);
     }
   }
 
@@ -88,7 +82,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
       this.load = false;
       setTimeout(() => {
         const title = `Inventario de Productos ${this.today}`;
-        const header = ["Item", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal", "Cantidad Minima", "Ult. Modificación"]
+        const header = ["Ítem", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal", "Cantidad Mínima", "Ult. Modificación"]
         let datos : any =[];
         for (const item of this.ArrayProductosBDNueva) {
           const datos1  : any = [item.Item, item.NombreItem, item.PrecioItem, item.Stock, item.Presentacion, item.Subtotal, item.CantMinima, item.fechaModificacion];
@@ -113,7 +107,6 @@ export class InventarioProductosPBDDComponent implements OnInit {
         datos.forEach(d => {
           let row = worksheet.addRow(d);
           let qty = row.getCell(4);
-          let qty9 = row.getCell(7);
           let color = 'ADD8E6';
           if (+qty.value < d[7]) color = 'FF837B';
           qty.fill = {
@@ -140,8 +133,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
             fs.saveAs(blob, `Inventario de Productos ${this.today}.xlsx`);
           });
           this.load = true;
-        }, 1000);
-      }, 3500);
+        }, 500);
+      }, 500);
     }
   }
 
