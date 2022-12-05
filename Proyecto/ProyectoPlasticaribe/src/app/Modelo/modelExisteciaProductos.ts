@@ -9,6 +9,7 @@ export interface modelExistenciaProductos{
   ExProd_PrecioSinInflacion: number;
   TpMoneda_Id: string;
   ExProd_PrecioVenta: number;
-  ExProd_CantBolsasBulto : number;
-  ExProd_CantBolsasPaquete : number;
+  ExProd_CantMinima : number;
+  ExProd_Fecha : any;
+  ExProd_Hora : string;
 }

@@ -6,6 +6,8 @@ import { ExistenciasProductosService } from 'src/app/Servicios/existencias-produ
 import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
 import { Table } from 'primeng/table';
+import { ProductoService } from 'src/app/Servicios/producto.service';
+import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
 
 @Component({
   selector: 'app-Inventario-Productos-PBDD',
@@ -34,7 +36,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
   cantidadDias : number;
 
   constructor(private clienteOtItems : BagproService,
-                private existencias_ProductosService : ExistenciasProductosService,) {
+                private existencias_ProductosService : ExistenciasProductosService,
+                  private productosService : ProductoService,) {
   }
 
   ngOnInit(): void {
@@ -176,28 +179,45 @@ export class InventarioProductosPBDDComponent implements OnInit {
       if (data.Item == this.ArrayProductosBDNueva[i].Item) {
         this.existencias_ProductosService.IdProductoPresentacionInventario(data.Item, data.Presentacion).subscribe(datos_existencias => {
           for (let j = 0; j < datos_existencias.length; j++) {
-            console.log(this.ArrayProductosBDNueva[i]);
-            const datosExistencias = {
+            const datosExistencias : modelExistenciaProductos = {
               Prod_Id: this.ArrayProductosBDNueva[i].Item,
-              exProd_Id: datos_existencias[j].exProd_Id,
+              exProd_Id : datos_existencias[j].exProd_Id,
               ExProd_Cantidad: this.ArrayProductosBDNueva[i].Stock,
               UndMed_Id: datos_existencias[j].undMed_Id,
               TpBod_Id: datos_existencias[j].tpBod_Id,
               ExProd_Precio: datos_existencias[j].exProd_Precio,
               ExProd_PrecioExistencia: this.ArrayProductosBDNueva[i].PrecioItem * this.ArrayProductosBDNueva[i].Stock,
               ExProd_PrecioSinInflacion: datos_existencias[j].exProd_PrecioSinInflacion,
-              ExProd_PrecioTotalFinal: datos_existencias[j].exProd_PrecioTotalFinal,
               TpMoneda_Id: datos_existencias[j].tpMoneda_Id,
-              exProd_PrecioVenta : this.ArrayProductosBDNueva[i].PrecioItem,
+              ExProd_PrecioVenta: this.ArrayProductosBDNueva[i].PrecioItem,
               ExProd_CantMinima : this.ArrayProductosBDNueva[i].CantMinima,
               ExProd_Fecha : datos_existencias[j].exProd_Fecha,
               ExProd_Hora: datos_existencias[j].exProd_Hora,
             }
-
-            this.existencias_ProductosService.srvActualizarExistencia(datos_existencias[j].exProd_Id, datosExistencias).subscribe(datos_existencias => {
+            this.existencias_ProductosService.srvActualizar(datos_existencias[j].exProd_Id, datosExistencias).subscribe(datos_actualizados => {
+              Swal.fire({
+                icon: 'success',
+                title: 'Actualización Exitosa',
+                showCloseButton: true,
+                html: `<b>¡Se actualizó la información del producto ${data.NombreItem}!</b>`,
+              });
               this.InventarioExistenciaBDNueva();
+            }, error => {
+              Swal.fire({
+                icon: 'error',
+                title: 'Opps...',
+                showCloseButton: true,
+                html: `<b>¡Error al actualizar la información del producto ${data.NombreItem}!</b>` + `<spam style="color: #f00">${error.message}</spam>`,
+              });
             });
           }
+        }, error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Opps...',
+            showCloseButton: true,
+            html: `<b>¡Error al buscar la información del producto ${data.NombreItem}!</b>` + `<spam style="color: #f00">${error.message}</spam>`,
+          });
         });
         break;
       }
@@ -207,5 +227,56 @@ export class InventarioProductosPBDDComponent implements OnInit {
   // Funcion que va a filtrar los registros de la tabla
   aplicarfiltroGlobal($event, valorCampo : string){
     this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
+  }
+
+  // Funcion que va a actualizar el nombre de los productos
+  actualizarNombreProducto(data : any){
+    this.productosService.srvObtenerListaPorId(data.Item).subscribe(datos_producto => {
+      let datos : any [] = [datos_producto];
+      for (let i = 0; i < datos.length; i++) {
+        const datosProducto = {
+          Prod_Id : datos[i].prod_Id,
+          Prod_Nombre: data.NombreItem,
+          Prod_Descripcion: datos[i].prod_Descripcion,
+          TpProd_Id: datos[i].tpProd_Id,
+          Prod_Peso_Bruto: datos[i].prod_Peso_Bruto,
+          Prod_Peso_Neto: datos[i].prod_Peso_Neto,
+          UndMedPeso: datos[i].undMedPeso,
+          Prod_Fuelle: datos[i].prod_Fuelle,
+          Prod_Ancho: datos[i].prod_Ancho,
+          Prod_Calibre: datos[i].prod_Calibre,
+          UndMedACF: datos[i].undMedACF,
+          Estado_Id: datos[i].estado_Id,
+          Prod_Largo: datos[i].prod_Largo,
+          Pigmt_Id: datos[i].pigmt_Id,
+          Material_Id: datos[i].material_Id,
+          Prod_Fecha : datos[i].prod_Fecha,
+          Prod_Hora: datos[i].prod_Hora,
+        }
+        this.productosService.srvActualizar(datos[i].prod_Id, datosProducto).subscribe(datos_actualizados => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Actualización Exitosa',
+            showCloseButton: true,
+            html: `<b>¡Se actualizó la información del producto ${data.NombreItem}!</b>`,
+          });
+          this.InventarioExistenciaBDNueva();
+        }, error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Opps...',
+            showCloseButton: true,
+            html: `<b>¡Error al actualizar la información del producto ${data.NombreItem}!</b>` + `<spam style="color: #f00">${error.message}</spam>`,
+          });
+        });
+      }
+    }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Opps...',
+        showCloseButton: true,
+        html: `<b>¡Error al buscar la información del producto ${data.NombreItem}!</b>` + `<spam style="color: #f00">${error.message}</spam>`,
+      });
+    });
   }
 }
