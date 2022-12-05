@@ -104,7 +104,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         if (datos_item.length != 0){
           for (let j = 0; j < datos_item.length; j++) {
             this.mostrarColumna = true;
-            this.ArrayProductoZeus[i].fechaModificacion = datos_item[j].fechaCrea.replace('T00:00:00', '');
+            this.ArrayProductoZeus[i].fechaModificacion = datos_item[j].replace('T00:00:00', '');
             break;
           }
         }

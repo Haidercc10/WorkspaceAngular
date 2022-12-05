@@ -42,6 +42,10 @@ export class ExistenciasProductosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProductoPresentacion/${id}/${presentacion}`)
   }
 
+  IdProductoPresentacionInventario(id : any, presentacion : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Existencia_Productos/IdProductoPresentacionInventario/${id}/${presentacion}`)
+  }
+
   //Metodo agregar
   srvAgregar(datos_Productos:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Existencia_Productos', datos_Productos)

@@ -102,6 +102,7 @@ import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
 import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
 import { Ventas_TemporalesComponent } from './Vistas/Ventas_Temporales/Ventas_Temporales.component';
+import { Inventario_ExtrusionComponent } from './Vistas/Inventario_Extrusion/Inventario_Extrusion.component';
 
 // Prime NG
 import {TableModule} from 'primeng/table';
@@ -128,8 +129,7 @@ import { MessageService } from 'primeng/api';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import {AccordionModule} from 'primeng/accordion';
 import { SlideMenuModule } from 'primeng/slidemenu';
-import { Inventario_ExtrusionComponent } from './Vistas/Inventario_Extrusion/Inventario_Extrusion.component';
-
+import { CascadeSelectModule } from "primeng/cascadeselect";
 //
 
 
@@ -378,6 +378,7 @@ export const routes: Routes = [
     InputTextareaModule,
     AccordionModule,
     SlideMenuModule,
+    CascadeSelectModule,
   ],
 
   providers: [

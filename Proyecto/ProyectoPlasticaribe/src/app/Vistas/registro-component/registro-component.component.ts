@@ -329,11 +329,6 @@ export class RegistroComponentComponent implements OnInit {
   }
 
   seleccionarUsuariosCheck(){
-    this.load = false;
-
-    setTimeout(() => {
-      this.load = true;
-    }, 100);
   }
 
   exportarExcel() {
