@@ -1,4 +1,3 @@
-
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Workbook } from 'exceljs';
@@ -12,7 +11,6 @@ import { UsuarioService } from 'src/app/Servicios/usuario.service';
 import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
 import { Table } from 'primeng/table'
-import { Console } from 'console';
 
 @Component({
   selector: 'app-registro-component',
@@ -32,24 +30,21 @@ export class RegistroComponentComponent implements OnInit {
   rows = 10; /** Filas de la tabla que se cargaran inicialmente  */
   first = 0; /** variable que mostrará  */
   public dialogUsuarios : boolean;
-  public accion : string = ''
-  public fechaActual : any = moment().format('YYYY-MM-DD');
-  public HoraActual : any = moment().format('H:mm:ss');
-  public load : boolean = true;
-  public usuariosInactivar : any = [];
-  public cantidadUsuarios : number = 0;
-  public mostrarPass : boolean = false;
+  public accion : string = '' //Funcion que tomará las acciones de los botones
+  public fechaActual : any = moment().format('YYYY-MM-DD'); //Variable que guardará la la fecha actual
+  public HoraActual : any = moment().format('H:mm:ss'); //Variable que guardará la hora actual
+  public load : boolean = true; //funcion que mostrará o no el icono de carga
+  public usuariosInactivar : any = []; //Funcion que guardará los usuarios que se van a innactivar
+  public cantidadUsuarios : number = 0; //Funcion que guardará la cantidad total de usuarios
+  public mostrarPass : boolean = false; //Funcion que mostrará el un icono u otro para mostrar o no la contraseña
 
   constructor(private formBuilder : FormBuilder,
-    private servicioRoles : RolesService,
-    private servicioAreas : ServicioAreasService,
-    private servicioUsuarios : UsuarioService,
-    private servicioEstados : EstadosService,
-    private servicioTpUsuarios : SrvTipos_UsuariosService) {
-      this.inicializarFormulario();
-    }
+              private servicioRoles : RolesService,
+                private servicioAreas : ServicioAreasService,
+                  private servicioUsuarios : UsuarioService,
+                    private servicioEstados : EstadosService,
+                      private servicioTpUsuarios : SrvTipos_UsuariosService) {
 
-  inicializarFormulario(){
     this.FormUsuarios = this.formBuilder.group({
       usuId:  null,
       usuNombre: null,
@@ -69,7 +64,7 @@ export class RegistroComponentComponent implements OnInit {
     this.cargarTiposUsuarios();
   }
 
-  /** */
+  // Funcion que crgará las areas
   cargarAreas() {
     this.servicioAreas.srvObtenerListaAreas().subscribe(dataAreas => {
       for (let index = 0; index < dataAreas.length; index++) {
@@ -78,7 +73,7 @@ export class RegistroComponentComponent implements OnInit {
     });
   }
 
-  /** */
+  // Funcion que cargará los roles
   cargarRoles() {
     this.servicioRoles.srvObtenerLista().subscribe(dataRoles => {
       for (let index = 0; index < dataRoles.length; index++) {
@@ -87,8 +82,8 @@ export class RegistroComponentComponent implements OnInit {
     });
   }
 
-   /** */
-   cargarEstados() {
+  // Funcion que cargará los estados que pueden tener los usuarios
+  cargarEstados() {
     this.servicioEstados.srvObtenerListaEstados().subscribe(dataEstados => {
       for (let index = 0; index < dataEstados.length; index++) {
         if(dataEstados[index].estado_Nombre == 'Activo' ||
@@ -98,7 +93,7 @@ export class RegistroComponentComponent implements OnInit {
     });
   }
 
-  /** */
+  // Funcion que cargará los tipos de usuarios
   cargarTiposUsuarios() {
     this.servicioTpUsuarios.srvObtenerLista().subscribe(dataTipoUsu => {
       for (let index = 0; index < dataTipoUsu.length; index++) {
@@ -107,7 +102,7 @@ export class RegistroComponentComponent implements OnInit {
     });
   }
 
-  /** */
+  // Funcion que cargará los usuarios
   cargarUsuarios() {
     this.load = false;
     this.cantidadUsuarios = 0;
@@ -129,7 +124,7 @@ export class RegistroComponentComponent implements OnInit {
           Caja : dataUsuarios[index].cajComp_Nombre,
           EPS : dataUsuarios[index].eps_Nombre,
           FondoP : dataUsuarios[index].fPen_Nombre,
-          Fecha : dataUsuarios[index].usua_Fecha.replace('T00:00:00', ''),
+          Fecha : dataUsuarios[index].usua_Fecha,
           Hora : dataUsuarios[index].usua_Hora
         }
         infoUsuarios.Id = `${infoUsuarios.Id}`;
@@ -139,12 +134,10 @@ export class RegistroComponentComponent implements OnInit {
         this.cantidadUsuarios += 1;
       }
     });
-    setTimeout(() => {
-      this.load = true;
-    }, 1000);
+    setTimeout(() => { this.load = true; }, 1000);
   }
 
-  /** */
+  // Funcion que actualizará los usuarios
   actualizarUsuario() {
     let id : number = this.FormUsuarios.value.usuId;
     let nombre : number = this.FormUsuarios.value.usuNombre;
@@ -154,34 +147,33 @@ export class RegistroComponentComponent implements OnInit {
     let estado : number = this.FormUsuarios.value.usuEstado;
     let password : number = this.FormUsuarios.value.usuPassword;
 
-      this.servicioUsuarios.getUsuariosxId(id).subscribe(dataUsuarios => {
-        for (let index = 0; index < dataUsuarios.length; index++) {
-          const infoUsuarios : any = {
-            Usua_Id : dataUsuarios[index].usua_Id,
-            Usua_Nombre : nombre,
-            TpUsu_Id : tipoUsuario,
-            Area_Id : area,
-            RolUsu_Id : rol,
-            Estado_Id : estado,
-            Usua_Telefono : dataUsuarios[index].usua_Telefono,
-            Usua_Contrasena : password,
-            Usua_Email : dataUsuarios[index].usua_Email,
-            TipoIdentificacion_Id : 'C.C',
-            Empresa_Id : 800188730,
-            cajComp_Id : dataUsuarios[index].cajComp_Id,
-            eps_Id : dataUsuarios[index].eps_Id,
-            fPen_Id : dataUsuarios[index].fPen_Id,
-            Usua_Fecha : this.fechaActual,
-            Usua_Hora : this.HoraActual,
-          }
-        console.log(infoUsuarios)
+    this.servicioUsuarios.getUsuariosxId(id).subscribe(dataUsuarios => {
+      for (let index = 0; index < dataUsuarios.length; index++) {
+        const infoUsuarios : any = {
+          Usua_Id : dataUsuarios[index].usua_Id,
+          Usua_Nombre : nombre,
+          TpUsu_Id : tipoUsuario,
+          Area_Id : area,
+          RolUsu_Id : rol,
+          Estado_Id : estado,
+          Usua_Telefono : dataUsuarios[index].usua_Telefono,
+          Usua_Contrasena : password,
+          Usua_Email : dataUsuarios[index].usua_Email,
+          TipoIdentificacion_Id : 'C.C',
+          Empresa_Id : 800188730,
+          cajComp_Id : dataUsuarios[index].cajComp_Id,
+          eps_Id : dataUsuarios[index].eps_Id,
+          fPen_Id : dataUsuarios[index].fPen_Id,
+          Usua_Fecha : this.fechaActual,
+          Usua_Hora : this.HoraActual,
+        }
         this.dialogUsuarios = false;
         this.servicioUsuarios.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(dataUsu => { this.confirmUsuarioActualizado(); });
       }
     });
-
   }
 
+  // Funcion que cargará la informacion del usuario seleccionado en el modal donde se podrá editar
   cargarModalEditarUsuario(item) {
     this.dialogUsuarios = true;
     this.accion = 'Editar'
@@ -199,18 +191,18 @@ export class RegistroComponentComponent implements OnInit {
   }
 
   cargarModalUsuarios() {
-    this.inicializarFormulario();
+    this.FormUsuarios.reset();
     this.accion = 'Crear'
     this.dialogUsuarios = true;
   }
 
+  // Funcion que creará nuevos usuarios
   crearUsuario() {
     let Id : number = this.FormUsuarios.value.usuId;
     if(this.FormUsuarios.valid) {
       this.servicioUsuarios.getUsuariosxId(Id).subscribe(dataUsuarios => {
-        if(dataUsuarios.length > 0) {
-          this.advertenciaUsuarios(Id);
-        } else {
+        if(dataUsuarios.length > 0) this.advertenciaUsuarios(Id);
+        else {
           const data : modelUsuario = {
             Usua_Id: this.FormUsuarios.value.usuId,
             Usua_Codigo: 0,
@@ -234,18 +226,16 @@ export class RegistroComponentComponent implements OnInit {
           this.servicioUsuarios.srvGuardarUsuario(data).subscribe(dataUsuario => { this.confirmUsuarioCreado(); })
         }
       });
-    } else {
-      this.advertenciaCamposVacios();
-    }
+    } else this.advertenciaCamposVacios();
   }
 
+  // Funcion permitirá a una u otra de las funciones que tiene el modal
   accionesModal() {
-    console.log(this.accion)
     if(this.accion == 'Crear') this.crearUsuario();
     else if (this.accion == 'Editar') this.actualizarUsuario();
-    else console.log('Hola');
   }
 
+  // Funcion que mostrará una advertencia
   advertenciaUsuarios(id : any) {
     this.dialogUsuarios = false;
     Swal.fire({
@@ -258,6 +248,7 @@ export class RegistroComponentComponent implements OnInit {
     });
   }
 
+  // Funcion que mostrará una advertencia para cuando se quiere innactivar un usuario
   advertenciaInactivarUsuario(item) {
     Swal.fire({
       icon: 'warning',
@@ -271,6 +262,7 @@ export class RegistroComponentComponent implements OnInit {
     });
   }
 
+  // Funcion que mostrará una advertencia para cuando se quiera innactivar varios usuarios
   advertenciaInactivarVariosUsuarios() {
     Swal.fire({
       icon: 'warning',
@@ -284,10 +276,12 @@ export class RegistroComponentComponent implements OnInit {
     });
   }
 
+  // Funcion que mostrará una advertencia para cuando haya campos vacios en la edicion o creacion de un usuario
   advertenciaCamposVacios() {
     Swal.fire({icon: 'warning',  title: 'Advertencia', text: `Debe llenar los campos vacios.`, confirmButtonColor: '#ffc107', });
   }
 
+  // Funcion que mostrará un mensaje cuando se actualiza un usuario
   confirmUsuarioActualizado() {
     this.load = false
     setTimeout(() => {
@@ -297,6 +291,7 @@ export class RegistroComponentComponent implements OnInit {
     }, 1000);
   }
 
+  // Funcion que mostrará un mensaje cuando se haya creado un nuevo usuario
   confirmUsuarioCreado() {
     this.load = false
     setTimeout(() => {
@@ -306,104 +301,99 @@ export class RegistroComponentComponent implements OnInit {
     }, 1000);
   }
 
+  // Funcion que confirmará la exportacion de los datos de los usuarios a excel
   confirmExportacion() {
     Swal.fire({icon: 'success', title: 'Confirmación', text: '¡Archivo generado con éxito!!', showConfirmButton: false, timer: 1500 });
   }
 
+  // Funcion que va a innactivar un usuario
   colocarUsuarioInactivo(item) {
     this.load = false;
-      this.servicioUsuarios.getUsuariosxId(item).subscribe(dataUsuarios => {
-        for (let index = 0; index < dataUsuarios.length; index++) {
-          const infoUsuarios : any = {
-            Usua_Id : dataUsuarios[index].usua_Id,
-            Usua_Nombre : dataUsuarios[index].usua_Nombre,
-            TpUsu_Id : dataUsuarios[index].tpUsu_Id,
-            Area_Id : dataUsuarios[index].area_Id,
-            RolUsu_Id : dataUsuarios[index].rolUsu_Id,
-            Estado_Id : 8,
-            Usua_Telefono : dataUsuarios[index].usua_Telefono,
-            Usua_Contrasena : dataUsuarios[index].usua_Contrasena,
-            Usua_Email : dataUsuarios[index].usua_Email,
-            TipoIdentificacion_Id : dataUsuarios[index].tipoIdentificacion_Id,
-            Empresa_Id : dataUsuarios[index].empresa_Id,
-            cajComp_Id : dataUsuarios[index].cajComp_Id,
-            eps_Id : dataUsuarios[index].eps_Id,
-            fPen_Id : dataUsuarios[index].fPen_Id,
-            Usua_Fecha : dataUsuarios[index].usua_Fecha,
-            Usua_Hora : dataUsuarios[index].usua_Hora,
+    this.servicioUsuarios.getUsuariosxId(item).subscribe(dataUsuarios => {
+      for (let index = 0; index < dataUsuarios.length; index++) {
+        const infoUsuarios : any = {
+          Usua_Id : dataUsuarios[index].usua_Id,
+          Usua_Nombre : dataUsuarios[index].usua_Nombre,
+          TpUsu_Id : dataUsuarios[index].tpUsu_Id,
+          Area_Id : dataUsuarios[index].area_Id,
+          RolUsu_Id : dataUsuarios[index].rolUsu_Id,
+          Estado_Id : 8,
+          Usua_Telefono : dataUsuarios[index].usua_Telefono,
+          Usua_Contrasena : dataUsuarios[index].usua_Contrasena,
+          Usua_Email : dataUsuarios[index].usua_Email,
+          TipoIdentificacion_Id : dataUsuarios[index].tipoIdentificacion_Id,
+          Empresa_Id : dataUsuarios[index].empresa_Id,
+          cajComp_Id : dataUsuarios[index].cajComp_Id,
+          eps_Id : dataUsuarios[index].eps_Id,
+          fPen_Id : dataUsuarios[index].fPen_Id,
+          Usua_Fecha : dataUsuarios[index].usua_Fecha,
+          Usua_Hora : dataUsuarios[index].usua_Hora,
         }
-          console.log(infoUsuarios)
-          this.dialogUsuarios = false;
-          this.servicioUsuarios.srvActualizarUsuario(item, infoUsuarios).subscribe(dataUsu => { this.confirmUsuarioActualizado(); });
+        this.dialogUsuarios = false;
+        this.servicioUsuarios.srvActualizarUsuario(item, infoUsuarios).subscribe(dataUsu => { this.confirmUsuarioActualizado(); });
       }
     });
   }
 
-  /*seleccionarUsuariosCheck(){
-    this.load = false;
-
-    setTimeout(() => {
-      this.load = true;
-    }, 100);
-  }*/
-
+  // Funcion que va a exportar a excel los datos de los usuarios a excel
   exportarExcel() {
-      this.load = false;
-      setTimeout(() => {
-        const title = `Listado de Usuarios - Plasticaribe SAS`;
-        const header = ["ID", "Nombre", "Tipo Usuario", "Area", "Rol", "Estado", "Contraseña", "Email", "Teléfono", "Tipo Id", "Empresa", "Caja Compensación", "EPS", "Fondo Pensional", "Fecha Creación", "Hora Creación "]
-        let datos : any =[];
-        for (const item of this.arrayUsuarios) {
-          const datos1  : any = [item.Id, item.Nombre, item.Tipo, item.Area, item.Rol, item.Estado, item.Password, item.Email, item.Telefono, item.TipoId, item.Empresa, item.Caja, item.EPS, item.FondoP, item.Fecha, item.Hora];
-          datos.push(datos1);
+    this.load = false;
+    setTimeout(() => {
+      const title = `Listado de Usuarios - Plasticaribe SAS`;
+      const header = ["ID", "Nombre", "Tipo Usuario", "Area", "Rol", "Estado", "Contraseña", "Email", "Teléfono", "Tipo Id", "Empresa", "Caja Compensación", "EPS", "Fondo Pensional", "Fecha Creación", "Hora Creación "]
+      let datos : any =[];
+      for (const item of this.arrayUsuarios) {
+        const datos1  : any = [item.Id, item.Nombre, item.Tipo, item.Area, item.Rol, item.Estado, item.Password, item.Email, item.Telefono, item.TipoId, item.Empresa, item.Caja, item.EPS, item.FondoP, item.Fecha, item.Hora];
+        datos.push(datos1);
+      }
+      let workbook = new Workbook();
+      let worksheet = workbook.addWorksheet(`Listado de Usuarios`);
+      let titleRow = worksheet.addRow([title]);
+      titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+      worksheet.addRow([]);
+      let headerRow = worksheet.addRow(header);
+      headerRow.eachCell((cell, number) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'eeeeee' }
         }
-        let workbook = new Workbook();
-        let worksheet = workbook.addWorksheet(`Listado de Usuarios`);
-        let titleRow = worksheet.addRow([title]);
-        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-        worksheet.addRow([]);
-        let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell, number) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'eeeeee' }
-          }
-          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-        });
-        worksheet.mergeCells('A1:P2');
-        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-        datos.forEach(d => {
-          let row = worksheet.addRow(d);
-        });
-        worksheet.getColumn(1).width = 12;
-        worksheet.getColumn(2).width = 40;
-        worksheet.getColumn(3).width = 25;
-        worksheet.getColumn(4).width = 15;
-        worksheet.getColumn(5).width = 25;
-        worksheet.getColumn(6).width = 10;
-        worksheet.getColumn(7).width = 20;
-        worksheet.getColumn(8).width = 30;
-        worksheet.getColumn(9).width = 12;
-        worksheet.getColumn(10).width = 8;
-        worksheet.getColumn(11).width = 20;
-        worksheet.getColumn(12).width = 20;
-        worksheet.getColumn(13).width = 20;
-        worksheet.getColumn(14).width = 20;
-        worksheet.getColumn(15).width = 15;
-        worksheet.getColumn(16).width = 15;
+        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      });
+      worksheet.mergeCells('A1:P2');
+      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+      datos.forEach(d => {
+        let row = worksheet.addRow(d);
+      });
+      worksheet.getColumn(1).width = 12;
+      worksheet.getColumn(2).width = 40;
+      worksheet.getColumn(3).width = 25;
+      worksheet.getColumn(4).width = 15;
+      worksheet.getColumn(5).width = 25;
+      worksheet.getColumn(6).width = 10;
+      worksheet.getColumn(7).width = 20;
+      worksheet.getColumn(8).width = 30;
+      worksheet.getColumn(9).width = 12;
+      worksheet.getColumn(10).width = 8;
+      worksheet.getColumn(11).width = 20;
+      worksheet.getColumn(12).width = 20;
+      worksheet.getColumn(13).width = 20;
+      worksheet.getColumn(14).width = 20;
+      worksheet.getColumn(15).width = 15;
+      worksheet.getColumn(16).width = 15;
 
-        setTimeout(() => {
-          workbook.xlsx.writeBuffer().then((data) => {
-            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            fs.saveAs(blob, `Listado de usuarios.xlsx`);
-          });
-          this.load = true;
-        }, 1000);
-       }, 3500);
-      setTimeout(() => { this.confirmExportacion(); }, 4000);
+      setTimeout(() => {
+        workbook.xlsx.writeBuffer().then((data) => {
+          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          fs.saveAs(blob, `Listado de usuarios.xlsx`);
+        });
+        this.load = true;
+      }, 1000);
+    }, 3500);
+    setTimeout(() => { this.confirmExportacion(); }, 4000);
   }
 
+  // Funcion que va a innactivar varios usuarios
   inactivarUsuarios() {
 	  for (let i = 0; i < this.usuariosInactivar.length; i++) {
 		  this.servicioUsuarios.getUsuariosxId(this.usuariosInactivar[i].Id).subscribe(dataUsuarios => {
@@ -426,28 +416,29 @@ export class RegistroComponentComponent implements OnInit {
             Usua_Fecha : dataUsuarios[index].usua_Fecha,
             Usua_Hora : dataUsuarios[index].usua_Hora,
           }
-          console.log(infoUsuarios)
 		      this.dialogUsuarios = false;
           this.servicioUsuarios.srvActualizarUsuario(this.usuariosInactivar[i].Id, infoUsuarios).subscribe(dataUsu => {this.confirmUsuarioActualizado(); });
         }
-	  });
-	}
-}
-
-mostrarPassword(){
-  let password : any = document.getElementById('pass');
-
-  if(password.type == 'password') {
-    password.type = 'text';
-    this.mostrarPass = true;
-  } else {
-    password.type = 'password';
-    this.mostrarPass = false;
+      });
+    }
   }
-}
 
-aplicarfiltroGlobal($event, valorCampo : string){
-  this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
-}
+  // Funcin que va a mostrar o no la contraseña del usuario
+  mostrarPassword(){
+    let password : any = document.getElementById('pass');
+
+    if(password.type == 'password') {
+      password.type = 'text';
+      this.mostrarPass = true;
+    } else {
+      password.type = 'password';
+      this.mostrarPass = false;
+    }
+  }
+
+  // Funcion que permitirá filtrar la información de la tabla
+  aplicarfiltroGlobal($event, valorCampo : string){
+    this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
+  }
 
 }

@@ -170,17 +170,17 @@ export class InventarioProductosPBDDComponent implements OnInit {
         this.totalProductos += registrosIPT[index].exProd_Cantidad * registrosIPT[index].exProd_PrecioVenta;
         }
     });
-    setTimeout(() => {  this.load = true; }, 3000);
+    setTimeout(() => { this.load = true; }, 1000);
   }
 
   //Funcion que actualizará un producto
   actualizarExistenciasProducto(data : any){
     for (let i = 0; i < this.ArrayProductosBDNueva.length; i++) {
-      if (data.Item == this.ArrayProductosBDNueva[i].Item) {
+      if (data.Item == this.ArrayProductosBDNueva[i].Item && data.Presentacion == this.ArrayProductosBDNueva[i].Presentacion) {
         this.existencias_ProductosService.IdProductoPresentacionInventario(data.Item, data.Presentacion).subscribe(datos_existencias => {
           for (let j = 0; j < datos_existencias.length; j++) {
             const datosExistencias : modelExistenciaProductos = {
-              Prod_Id: this.ArrayProductosBDNueva[i].Item,
+              Prod_Id: datos_existencias[j].prod_Id,
               exProd_Id : datos_existencias[j].exProd_Id,
               ExProd_Cantidad: this.ArrayProductosBDNueva[i].Stock,
               UndMed_Id: datos_existencias[j].undMed_Id,

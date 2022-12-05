@@ -20,7 +20,7 @@
   </div>
 </div>
 
-<div class="container-fluid">
+<div class="container-fluid" *ngIf="load">
   <div class="card">
     <p-toolbar styleClass="mb-4 gap-2">
       <button pButton pRipple label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
@@ -48,7 +48,7 @@
           </span>
           <span class="p-input-icon-right buscarActualizacion">
             <label>Buscar última actualización&nbsp;&nbsp;&nbsp;</label>
-            <p-inputNumber [(ngModel)]="cantidadDias" placeholder="Cantidad de días"></p-inputNumber>&nbsp;&nbsp;&nbsp;
+            <p-inputNumber [(ngModel)]="cantidadDias" placeholder="Cantidad"></p-inputNumber>&nbsp;&nbsp;&nbsp;
             <p-dropdown [(ngModel)]="filtroFechas" [options]="opcionFiltroFechas" (onChange)="buscarPrecios()"></p-dropdown>
           </span>
         </div>

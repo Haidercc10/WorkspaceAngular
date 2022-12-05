@@ -28,15 +28,15 @@
       <div class="card" *ngIf="load">
         <p-toolbar styleClass="mb-4 gap-2">
           <ng-template pTemplate="left">
-              <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success r-2" style="margin-right: 3%;" (click)="cargarModalUsuarios()"></button> <!--(click)="openNew()"-->
-              <button pButton pRipple label="Eliminar" icon="pi pi-trash" *ngIf="usuariosInactivar.length > 0; else inactivo" (click)="advertenciaInactivarVariosUsuarios()" class="p-button-danger"></button>  <!--(click)="deleteSelectedProducts()"   [disabled]="!selectedProducts || !selectedProducts.length"-->
-               <ng-template #inactivo>
-                <button pButton pRipple label="Eliminar" icon="pi pi-trash" [disabled]="true" class="p-button-danger"></button>
-               </ng-template>
+            <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success r-2" style="margin-right: 3%;" (click)="cargarModalUsuarios()"></button>
+            <button pButton pRipple label="Eliminar" icon="pi pi-trash" *ngIf="usuariosInactivar.length > 0; else inactivo" (click)="advertenciaInactivarVariosUsuarios()" class="p-button-danger"></button>
+            <ng-template #inactivo>
+              <button pButton pRipple label="Eliminar" icon="pi pi-trash" [disabled]="true" class="p-button-danger"></button>
             </ng-template>
+          </ng-template>
 
           <ng-template pTemplate="right">
-              <button pButton pRipple label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
+            <button pButton pRipple label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
           </ng-template>
         </p-toolbar>
         <!--Inicio Tabla-->
@@ -55,48 +55,48 @@
           [rowHover]="true"
           [globalFilterFields]="['Id','Nombre','Area']"
           [(selection)]="usuariosInactivar"
-          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros" ><!--[showCurrentPageReport]="true"  [value]=""-->
+          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros" >
           <ng-template pTemplate="caption">
-              <div class="flex align-items-center justify-content-between">
-                  <span class="p-input-icon-left">
-                      <i class="pi pi-search"></i>
-                      <input pInputText type="text" placeholder="Buscar Usuarios..." (input)="aplicarfiltroGlobal($event, 'contains')" />  <!--selectedProducts--> <!--products-->
-                  </span>
-              </div>
+            <div class="flex align-items-center justify-content-between">
+              <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" placeholder="Buscar Usuarios..." (input)="aplicarfiltroGlobal($event, 'contains')"/>
+              </span>
+            </div>
           </ng-template>
           <!--Headers Tabla-->
           <ng-template pTemplate="header">
             <tr >
-                <th style="width: 4rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
-                <th scope="col" pSortableColumn="Id">ID Usuario <p-sortIcon field="Id"></p-sortIcon></th>
-                <th scope="col" pSortableColumn="Nombre">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
-                <th scope="col" pSortableColumn="Tipo">Tipo <p-sortIcon field="Tipo"></p-sortIcon></th>
-                <th scope="col" pSortableColumn="Area">Área <p-sortIcon field="Area"></p-sortIcon></th>
-                <th scope="col" pSortableColumn="Rol">Rol <p-sortIcon field="Rol"></p-sortIcon></th>
-                <th scope="col" pSortableColumn="Estado">Estado <p-sortIcon field="Estado"></p-sortIcon></th>
-                <th scope="col">Editar</th>
-                <th scope="col">Eliminar</th>
+              <th style="width: 4rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+              <th scope="col" pSortableColumn="Id">ID Usuario <p-sortIcon field="Id"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="Nombre">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="Tipo">Tipo <p-sortIcon field="Tipo"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="Area">Área <p-sortIcon field="Area"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="Rol">Rol <p-sortIcon field="Rol"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="Estado">Estado <p-sortIcon field="Estado"></p-sortIcon></th>
+              <th scope="col">Editar</th>
+              <th scope="col">Eliminar</th>
             </tr>
           </ng-template>
           <!--Cuerpo Tabla-->
           <ng-template pTemplate="body" let-arrayUsuarios>
             <tr>
-                <td><p-tableCheckbox [value]="arrayUsuarios"></p-tableCheckbox></td><!--(click)="seleccionarUsuariosCheck()"-->
-                <td>{{arrayUsuarios.Id}}</td>
-                <td>{{arrayUsuarios.Nombre}}</td>
-                <td>{{arrayUsuarios.Tipo}}</td>
-                <td>{{arrayUsuarios.Area}}</td>
-                <td>{{arrayUsuarios.Rol}}</td>
-                <td *ngIf="arrayUsuarios.Estado == 'Activo'; else Inactivo">{{arrayUsuarios.Estado}}</td>
-                <ng-template #Inactivo><td><span class="badge bg-danger1">{{arrayUsuarios.Estado}}</span></td></ng-template>
-                <td style="text-align: center;"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="cargarModalEditarUsuario(arrayUsuarios)" style="width: 30px; height: 30px;"></button></td>
-                <td style="text-align: center;"><button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="advertenciaInactivarUsuario(arrayUsuarios)" style="width: 30px; height: 30px;"></button></td>
-              </tr>
+              <td><p-tableCheckbox [value]="arrayUsuarios"></p-tableCheckbox></td>
+              <td>{{arrayUsuarios.Id}}</td>
+              <td>{{arrayUsuarios.Nombre}}</td>
+              <td>{{arrayUsuarios.Tipo}}</td>
+              <td>{{arrayUsuarios.Area}}</td>
+              <td>{{arrayUsuarios.Rol}}</td>
+              <td *ngIf="arrayUsuarios.Estado == 'Activo'; else Inactivo">{{arrayUsuarios.Estado}}</td>
+              <ng-template #Inactivo><td><span class="badge bg-danger1">{{arrayUsuarios.Estado}}</span></td></ng-template>
+              <td style="text-align: center;"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="cargarModalEditarUsuario(arrayUsuarios)" style="width: 30px; height: 30px;"></button></td>
+              <td style="text-align: center;"><button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="advertenciaInactivarUsuario(arrayUsuarios)" style="width: 30px; height: 30px;"></button></td>
+            </tr>
           </ng-template>
           <ng-template pTemplate="summary">
-              <div class="flex align-items-center justify-content-between">
-                  En total hay {{cantidadUsuarios}} usuarios. <!--{{products ? products.length : 0 }}-->
-              </div>
+            <div class="flex align-items-center justify-content-between">
+              En total hay {{cantidadUsuarios}} usuarios.
+            </div>
           </ng-template>
         </p-table>
       </div>
@@ -126,27 +126,26 @@
             <div class="mb-3">
               <div class="row g-3">
                  <!-- Tipo de Usuario -->
-
-                 <div class="form-floating col-md">
-                    <select formControlName="usuTipo" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
-                      <option [ngValue]="item.tpUsu_Id" *ngFor="let item of arrayTiposUsuarios">{{item.tpUsu_Nombre}}</option>
-                    </select>
-                    <label for="floatingSelect">Tipo Usuario</label>
-                  </div>
+                <div class="form-floating col-md">
+                  <select formControlName="usuTipo" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
+                    <option [ngValue]="item.tpUsu_Id" *ngFor="let item of arrayTiposUsuarios">{{item.tpUsu_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Tipo Usuario</label>
+                </div>
 
                   <!-- Area -->
-                  <div class="form-floating col-md">
-                    <select formControlName="usuArea" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
-                      <option [ngValue]="item.area_Id" *ngFor="let item of arrayAreas">{{item.area_Nombre}}</option>
-                    </select>
-                    <label for="floatingSelect">Área</label>
-                  </div>
+                <div class="form-floating col-md">
+                  <select formControlName="usuArea" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
+                    <option [ngValue]="item.area_Id" *ngFor="let item of arrayAreas">{{item.area_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Área</label>
+                </div>
               </div>
             </div>
 
             <div class="mb-3">
               <div class="row g-3">
-                  <!-- Rol -->
+                <!-- Rol -->
                 <div class="form-floating col-md">
                   <select formControlName="usuRol" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
                     <option [ngValue]="item.rolUsu_Id" *ngFor="let item of arrayRoles">{{item.rolUsu_Nombre}}</option>
@@ -174,8 +173,6 @@
               <ng-template #noMostrar>
                 <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="mostrarPassword()"><i class="pi pi-eye-slash"></i></button>
               </ng-template>
-
-
             </div>
 
             <!--Boton Ingresar al sistema-->
@@ -185,8 +182,6 @@
           </form>
         </ng-template>
       </p-dialog>
-
-
     </div>
   </div>
 </div>
