@@ -225,7 +225,7 @@ export class AsignacionTintasComponent implements OnInit {
   // Funcion que validará la asignación
   validarAsignacion(){
     if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
-      this.tintasService.srvObtenerListaPorId(this.FormAsignacionMP.value.Tinta.id).subscribe(datos_tinta => {
+      this.tintasService.srvObtenerListaPorId(this.FormAsignacionMP.value.Id_Tinta).subscribe(datos_tinta => {
         Swal.fire({
           icon: 'warning',
           title: '¡Confirmación!',
@@ -255,7 +255,7 @@ export class AsignacionTintasComponent implements OnInit {
   asignarMPCrearTintas(){
     if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
       this.load = false;
-      let tinta : any = this.FormAsignacionMP.value.Tinta;
+      let tinta : any = this.FormAsignacionMP.value.Id_Tinta;
       let cantidad : number = this.FormAsignacionMP.value.cantidadTinta;
       let presentacion : string = this.FormAsignacionMP.value.undMedTinta;
       let Observacion : string = this.FormAsignacionMP.value.Observacion;
@@ -264,7 +264,7 @@ export class AsignacionTintasComponent implements OnInit {
 
       let datos_asignacionMP : modelAsignacionMPxTintas = {
         AsigMPxTinta_Id: 0,
-        Tinta_Id: tinta.id,
+        Tinta_Id: tinta,
         AsigMPxTinta_Cantidad: cantidad,
         UndMed_Id: presentacion,
         AsigMPxTinta_FechaEntrega: fecha,
@@ -412,41 +412,39 @@ export class AsignacionTintasComponent implements OnInit {
 
   /** Función que sumará cantidad en inventario a la tinta a la que se le asigne Mat. Prima. */
   sumarInventarioTintas() {
-    for (let index = 0; index < this.arrayTintaAsignada.length; index++) {
-      this.tintasService.srvObtenerListaPorId(this.arrayTintaAsignada[index].Tinta_Id).subscribe(datos_tinta => {
-        const datosTintaCreada : any = {
-          Tinta_Id : this.arrayTintaAsignada[index].Tinta_Id,
-          Tinta_Nombre : datos_tinta.tinta_Nombre,
-          Tinta_Descripcion : datos_tinta.tinta_Descripcion,
-          Tinta_Stock : datos_tinta.tinta_Stock + this.FormAsignacionMP.value.cantidadTinta,
-          Tinta_CodigoHexadecimal : datos_tinta.tinta_CodigoHexadecimal,
-          UndMed_Id : datos_tinta.undMed_Id,
-          CatMP_Id : datos_tinta.catMP_Id,
-          Tinta_Precio : datos_tinta.tinta_Precio,
-          TpBod_Id : datos_tinta.tpBod_Id,
-          tinta_InvInicial : datos_tinta.tinta_InvInicial,
-          Tinta_FechaIngreso : datos_tinta.tinta_FechaIngreso,
-          Tinta_Hora : datos_tinta.tinta_Hora,
-        }
-        this.tintasService.srvActualizar(this.arrayTintaAsignada[index].Tinta_Id, datosTintaCreada).subscribe(datos_mp_creada => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Registro Exitoso',
-            html: `<b>¡Registro completado con exito!</b>`,
-            showCloseButton: true,
-          });
-          this.limpiarTodosLosCampos();
-        }, error => {
-          Swal.fire({
-          icon: 'error',
-          title: 'Oops..',
-          html: `<b>¡Error al sumar al inventario de la tinta ${datos_tinta.tinta_Nombre}!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
+    let tinta : any = this.FormAsignacionMP.value.Id_Tinta;
+    this.tintasService.srvObtenerListaPorId(tinta).subscribe(datos_tinta => {
+      const datosTintaCreada : any = {
+        Tinta_Id : tinta,
+        Tinta_Nombre : datos_tinta.tinta_Nombre,
+        Tinta_Descripcion : datos_tinta.tinta_Descripcion,
+        Tinta_Stock : datos_tinta.tinta_Stock + this.FormAsignacionMP.value.cantidadTinta,
+        Tinta_CodigoHexadecimal : datos_tinta.tinta_CodigoHexadecimal,
+        UndMed_Id : datos_tinta.undMed_Id,
+        CatMP_Id : datos_tinta.catMP_Id,
+        Tinta_Precio : datos_tinta.tinta_Precio,
+        TpBod_Id : datos_tinta.tpBod_Id,
+        tinta_InvInicial : datos_tinta.tinta_InvInicial,
+        Tinta_FechaIngreso : datos_tinta.tinta_FechaIngreso,
+        Tinta_Hora : datos_tinta.tinta_Hora,
+      }
+      this.tintasService.srvActualizar(tinta, datosTintaCreada).subscribe(datos_mp_creada => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Registro Exitoso',
+          html: `<b>¡Registro completado con exito!</b>`,
           showCloseButton: true,
-          });
+        });
+        this.limpiarTodosLosCampos();
+      }, error => {
+        Swal.fire({
+        icon: 'error',
+        title: 'Oops..',
+        html: `<b>¡Error al sumar al inventario de la tinta ${datos_tinta.tinta_Nombre}!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
+        showCloseButton: true,
         });
       });
-      break;
-    }
+    });
     this.load = true;
   }
 

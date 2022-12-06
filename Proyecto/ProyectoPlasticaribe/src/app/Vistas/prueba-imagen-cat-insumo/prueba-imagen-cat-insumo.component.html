@@ -1,6 +1,10 @@
-<h5>Basic</h5>
-<p-slideMenu [model]="items" [viewportHeight]="250" [style]="{'min-width':'175px'}" ></p-slideMenu>
+<div class="card">
+  <h5>Dynamic</h5>
+  <p-progressBar [value]="value"></p-progressBar>
 
-<h5>Popup</h5>
-<button #btn type="button" pButton icon="pi pi-bars" label="Show" (click)="menu.toggle($event)"></button>
-<p-slideMenu #menu [model]="items" [popup]="true" [viewportHeight]="250" [style]="{'min-width':'175px'}" ></p-slideMenu>
+  <h5>Static</h5>
+  <p-progressBar></p-progressBar>
+
+  <h5>Indeterminate</h5>
+  <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
+</div>
