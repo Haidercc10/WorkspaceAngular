@@ -1,25 +1,23 @@
 span{
   color: #d83542;
+  display: flex;
 }
 
-.container{
-  width: 100%;
-  padding-left: 2%;
-  padding-right: 2%;
+.contenedorLista {
+  width: 55%;
+  margin: auto;
+  border: solid #bbb 3px;
+  border-radius: 1%;
+  margin-top: 8%;
 }
 
-.texto{
-  width: 80%;
-  padding-left: 10%;
+.btnclose {
+  font-size: 25px;
+  padding: 2%;
+  color: #d83542;
+  cursor: pointer;
 }
 
-.textoIntermedio .parrafo b{
-    color: #000;
-    font-size: 40px;
-}
-
-.textoIntermedio .parrafo .plasticaribe_resaltado{
-    color: #d83542;
-    height: 100px;
-    font-size: 40px;
+.btnclose:hover {
+  color: #952731;
 }

@@ -130,6 +130,8 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import {AccordionModule} from 'primeng/accordion';
 import { SlideMenuModule } from 'primeng/slidemenu';
 import { CascadeSelectModule } from "primeng/cascadeselect";
+import {MenuModule} from 'primeng/menu';
+import {PickListModule} from 'primeng/picklist';
 //
 
 
@@ -186,7 +188,7 @@ export const routes: Routes = [
   // Devolucion de Rollos
   {path: 'devolucion-rollos-productos', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,10]}, component : Devoluciones_Productos_RollosComponent},
   // Reporte
-  {path: 'reporte-despacho', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,6,7,8,9,10]}, component : ReporteDespachoComponent}, // Ingresar Productos
+  {path: 'reporte-despacho', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,6,7,8,9,10]}, component : ReporteDespachoComponent}, // Ingresar Productos
 
   /********************************************************************* ORDEN DE TRABAJO ********************************************************************/
   {path: 'ordenes-trabajo', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: OrdenesTrabajoComponent},
@@ -214,7 +216,7 @@ export const routes: Routes = [
 
  /***************************************************************** USUARIOS **********************************************************************************/
   {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
-  {path: 'registro-usuario', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component: RegistroComponentComponent},
+  {path: 'registro-usuario', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: RegistroComponentComponent},
 
  /*************************************************************************************************************************************************************/
  {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
@@ -366,6 +368,8 @@ export const routes: Routes = [
     AccordionModule,
     SlideMenuModule,
     CascadeSelectModule,
+    MenuModule,
+    PickListModule,
   ],
 
   providers: [

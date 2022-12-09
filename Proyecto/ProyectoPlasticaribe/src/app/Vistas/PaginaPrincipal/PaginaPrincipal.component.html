@@ -1,5 +1,5 @@
 <app-menuLateral></app-menuLateral>
-
+<!--
 <div class="row g-3">
   <div class="col md texto">
     <div class="container">
@@ -7,7 +7,7 @@
         <p class="fs-3 parrafo">
           <b>
             ¡Bienvenido al nuevo
-            <span class="plasticaribe_resaltado"> Plasticaribe S.A.S, </span> <b class="negritaEnRojo"> Usuario ingresa!</b>
+            <span class="plasticaribe_resaltado"> Plasticaribe S.A.S, </span> <b class="negritaEnRojo"> {{storage_Nombre}}!</b>
           </b>
         <br>
         <p class="fs-3 parrafo2">¡Estamos innovando!, te dejamos algunas recomendaciones acerca del uso de nuestro nuevo sistema de información  basado en la nube, toma nota.</p>
@@ -35,4 +35,51 @@
       <button class="btn btn-danger float-right">Ver tutorial</button>
     </div>
   </div>
+</div> -->
+<p-toast position="center" key="tc"></p-toast>
+
+<div class="dock-window dock-advanced">
+  <p-dock [model]="dockItems" position="bottom">
+    <ng-template pTemplate="item" let-item>
+      <img [src]="item.icon" [alt]="item.label" width="100%" style="cursor: pointer;">
+    </ng-template>
+  </p-dock>
+
+  <div class="contenedorLista" *ngIf="displayTerminal">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <label class="btnclose pi pi-times" mat-button (click)="cerrar()"></label>
+    </div>
+    <p-pickList
+      [source]="disponiblesMostrar"
+      [target]="targetProducts"
+      [showTargetControls]="false"
+      [showSourceControls]="false"
+      sourceHeader="Disponible"
+      targetHeader="Seleccionado"
+      [dragdrop]="true"
+      [responsive]="true"
+      [sourceStyle]="{'height':'30rem'}"
+      [targetStyle]="{'height':'30rem'}"
+      filterBy="nombre"
+      sourceFilterPlaceholder="Buscar por nombre"
+      targetFilterPlaceholder="Buscar por nombre"
+      (onMoveToTarget)="elegirFavoritos()"
+      (onMoveAllToTarget)="elegirFavoritos()"
+      (onMoveToSource)="elegirFavoritos()"
+      (onMoveAllToSource)="elegirFavoritos()">
+      <ng-template let-product pTemplate="item">
+        <div class="product-item">
+          <div class="product-list-detail">
+            <span>
+              <img [src]="product.icono" [alt]="product.nombre" width="10%">
+              <p style="color: #000; padding-left: 5%;">{{product.nombre}}</p>
+            </span>
+            <p style="color: #d83542; padding-left: 20%;">{{product.categoria}}</p>
+          </div>
+        </div>
+      </ng-template>
+      <button pButton pRipple type="button" label="Secondary" class="p-button-secondary"></button>
+    </p-pickList>
+  </div>
+
 </div>

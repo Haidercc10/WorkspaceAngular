@@ -1,20 +1,12 @@
 <app-menuLateral></app-menuLateral>
 
-<!-- <div class="overlay" *ngIf="!cargando">
-  <div class="spinner ">
-    <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
-  </div>
-</div> -->
-
-
-<div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
     <span class="visually-hidden">Cargando...</span>
   </div>
 </div>
 
 <div class="contain">
-  <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
       <h2 class="tituloRojo">Devolución de Productos/Rollos</h2>
@@ -29,133 +21,111 @@
   <div class="container-fluid bajarPagina">
     <div class="container">
       <div class="mb-4">
-        <h4 class="tituloRojo">Consultar Factura</h4>
-      </div>
-      <!-- Formulario para consultar Factura -->
-      <form [formGroup]="FormConsultarFactura">
-        <!-- Primera Fila -->
-        <div class="mb-3">
-          <div class="row g-3">
-            <!-- Facturas -->
-            <div class="form-floating col-md-2">
-              <input formControlName="Fact_Id" type="text" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarFactura()">
-              <label for="floatingInput">Cod. Factura</label>
-            </div>
-
-            <!-- Rollos -->
-            <div class="form-floating col-md-2">
-              <input formControlName="Rollo_Id" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarRollo()">
-              <label for="floatingInput">Cod. Rollo</label>
-            </div>
-
-            <!-- Cliente -->
-            <!-- <div class="form-floating col-md">
-              <input formControlName="Cliente" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Cliente</label>
-            </div> -->
-          </div>
-        </div>
-
-        <!-- Fila 2 -->
-        <div class="mb-3">
-          <div class="row g-3">
-            <!-- Observacion -->
-            <div class="form-floating col-md">
-              <input formControlName="Observacion" type="text" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarFactura()">
-              <label for="floatingInput">Observación</label>
-            </div>
-          </div>
-        </div>
-      </form>
-
-      <div class="mb-4">
-        <hr class="Linea">
-      </div>
-      <!-- Inicio titulo tabla producto -->
-      <div class="mb-4">
         <h4 class="tituloRojo">Tabla de Rollos</h4>
       </div>
 
-      <!--Inicio tabla Rollos creados en OT -->
-      <div class="mb-3" *ngIf="cargando">
-        <div class="row g-3">
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover mt-2" >
-              <thead class="TitulosTabla">
-                <tr>
-                  <th scope="col">Factura</th>
-                  <th scope="col">Rollo</th>
-                  <!-- <th scope="col">ID Cliente</th>
-                  <th scope="col">Cliente</th> -->
-                  <th scope="col">ID Producto</th>
-                  <th scope="col">Producto</th>
-                  <th scope="col">Cantidad</th>
-                  <th scope="col">Presentacion</th>
-                  <th scope="col"></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of rollos; let i=index">
-                  <th>{{item.Factura}}</th>
-                  <th>{{item.Id}}</th>
-                  <!-- <td>{{item.IdCliente}}</td>
-                  <td>{{item.Cliente}}</td> -->
-                  <td>{{item.IdProducto}}</td>
-                  <td>{{item.Producto}}</td>
-                  <td>{{item.Cantidad | number}}</td>
-                  <td>{{item.Presentacion}}</td>
-                  <td><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+      <div class="card" *ngIf="!cargando">
+        <p-toolbar styleClass="mb-4 gap-2">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input type="text" placeholder="Buscar Factura" class="form-control form-control-sm busquedaFactura" [(ngModel)]="facturaConsultada" (keyup.enter)="consultarFactura()"/>
+          </span>
+          <textarea class="form-control form-control-sm" placeholder="Observación" [(ngModel)]="observacionFactura"></textarea>
+        </p-toolbar>
+        <p-table
+          #dt
+          [value]="rollos"
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [paginator]="true"
+          [rows]="10"
+          [showCurrentPageReport]="true"
+          [rowsPerPageOptions]="[10,20,30,50,70,100]"
+          [rowHover]="true"
+          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros">
+
+          <ng-template pTemplate="header">
+            <tr >
+              <th scope="col">Factura</th>
+              <th scope="col">Rollo</th>
+              <th scope="col">ID Producto</th>
+              <th scope="col">Producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Presentacion</th>
+              <th scope="col"></th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>{{item.Factura}}</td>
+              <td>{{item.Id}}</td>
+              <td>{{item.IdProducto}}</td>
+              <td>{{item.Producto}}</td>
+              <td>{{item.Cantidad | number}}</td>
+              <td>{{item.Presentacion}}</td>
+              <td><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
 
-      <div class="mb-4" *ngIf="cargando">
+      <div class="mb-4">
         <hr class="Linea">
       </div>
       <!-- Inicio titulo tabla producto -->
-      <div class="mb-4" *ngIf="cargando">
+      <div class="mb-4">
         <h4 class="tituloRojo">Tabla de Rollos por Devolver</h4>
       </div>
 
-      <!--Inicio tabla Rollos a Insertar -->
-      <div class="mb-3" *ngIf="cargando">
-        <div class="row g-3">
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover mt-2" >
-              <thead class="TitulosTabla">
-                <tr>
-                  <th scope="col">Rollo</th>
-                  <th scope="col">ID Producto</th>
-                  <th scope="col">Producto</th>
-                  <th scope="col">Cantidad</th>
-                  <th scope="col">Presentación</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of rollosInsertar; let i=index">
-                  <th>{{item.Id}}</th>
-                  <td>{{item.IdProducto}}</td>
-                  <td>{{item.Producto}}</td>
-                  <td>{{item.Cantidad | number}}</td>
-                  <td>{{item.Presentacion}}</td>
-                  <td><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Rollo de la tabla" style="cursor: pointer;" (click)="quitarRollo(item)"></i></a></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+      <div class="card" *ngIf="!cargando">
+        <p-table
+          #dt
+          [value]="rollosInsertar"
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [paginator]="true"
+          [rows]="10"
+          [showCurrentPageReport]="true"
+          [rowsPerPageOptions]="[10,20,30,50,70,100]"
+          [rowHover]="true"
+          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros">
+
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">Rollo</th>
+              <th scope="col">ID Producto</th>
+              <th scope="col">Producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Presentación</th>
+              <th scope="col"></th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>{{item.Id}}</td>
+              <td>{{item.IdProducto}}</td>
+              <td>{{item.Producto}}</td>
+              <td>{{item.Cantidad | number}}</td>
+              <td>{{item.Presentacion}}</td>
+              <td><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="quitarRollo(item)"></td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
 
+      <br>
       <!-- Botones -->
-      <div class="bajarPagina" *ngIf="cargando">
+      <div class="bajarPagina" *ngIf="!cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
           <button class=" btn btn-danger btn-danger-sm" type="button" (click)="creardevolucion()">Crear Devolución</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
         </div>
       </div>
-    </div>
   </div>
 </div>

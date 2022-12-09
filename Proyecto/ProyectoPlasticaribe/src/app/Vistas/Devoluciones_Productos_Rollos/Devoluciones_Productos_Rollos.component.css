@@ -123,3 +123,35 @@ a {
 .ng-autocomplete ::ng-deep .autocomplete-container {
   box-shadow: none;
 }
+
+.autoCompleteProductos{
+  margin-right: 0.8%;
+}
+
+.autoCompleteConductor {
+  width: 50%;
+}
+
+.tabla1{
+  display: flex;
+}
+
+.tablaInicial{
+  margin-top: -5%;
+}
+
+.totalProd{
+  margin-top: -5%;
+  margin-bottom: -2%;
+}
+
+.scroll {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+ }
+
+ .busquedaFactura{
+  padding-left: 25%;
+  width: 180px;
+ }

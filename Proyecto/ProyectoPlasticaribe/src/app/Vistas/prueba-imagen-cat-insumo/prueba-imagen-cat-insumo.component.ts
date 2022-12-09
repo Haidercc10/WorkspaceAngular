@@ -1,8 +1,5 @@
-import { Component, OnInit, Input, Injectable } from '@angular/core';
-import { ProductService } from './productservice';
-import { ConfirmationService, ConfirmEventType, MenuItem } from 'primeng/api';
-import { MessageService } from 'primeng/api';
-import Swal from 'sweetalert2';
+import { Component, OnInit, Injectable } from '@angular/core';
+import { MenuItem } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root'
@@ -14,22 +11,30 @@ import Swal from 'sweetalert2';
   styleUrls: ['./prueba-imagen-cat-insumo.component.css']
 })
 
-
 export class PruebaImagenCatInsumoComponent implements OnInit {
-  value: number = 0;
 
-    constructor(private messageService: MessageService) {}
+  items: MenuItem[];
 
-    ngOnInit() {
-        let interval = setInterval(() => {
-            this.value = this.value + Math.floor(Math.random() * 10) + 1;
-            if (this.value >= 100) {
-                this.value = 100;
-                this.messageService.add({severity: 'info', summary: 'Success', detail: 'Process Completed'});
-                clearInterval(interval);
-            }
-        }, 2000);
-    }
-
-
+  ngOnInit() {
+    this.items = [{
+      label: 'File',
+      items: [
+        {label: 'New', icon: 'pi pi-plus', replaceUrl: true, url: './registro-usuario'},
+        {label: 'Open', icon: 'pi pi-download'}
+      ],
+    },
+    {
+      label: 'Edit',
+      items: [
+        {
+          label: 'Undo',
+          icon: 'pi pi-refresh',
+          command: () => {
+            window.location.href = "./home"
+          }
+        },
+        {label: 'Redo', icon: 'pi pi-repeat'}
+      ]
+    }];
+  }
 }
