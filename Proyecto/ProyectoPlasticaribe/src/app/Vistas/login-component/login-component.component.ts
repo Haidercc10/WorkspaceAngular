@@ -19,6 +19,7 @@ export class LoginComponentComponent implements OnInit {
   public formularioUsuario !: FormGroup;
   public data:any=[];
   ruta : any;
+  public mostrarPass : boolean = false;
 
   /* SE INSTANCIA LA VARIABLE "empresas" QUE VA A SER DE TIPO "EmpresaService" Y TAMBIEN SERÁ UN ARRAY
   AQUÍ SE GUARDARÁN LOS NOMBRES DE LAS EMPRESAS QUE HAY EN LA BASE DE DATOS */
@@ -66,12 +67,7 @@ export class LoginComponentComponent implements OnInit {
   validarCamposVacios() : any{
     if(this.formularioUsuario.valid) this.Consulta();
     else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Oops...',
-        html:
-        `<b>¡Hay Campos Vacios!</b><hr> `,
-      });
+     this.advertenciaCamposVacios();
     }
   }
 
@@ -166,4 +162,23 @@ export class LoginComponentComponent implements OnInit {
       })
     }
   }
+
+    // Funcion que mostrará una advertencia para cuando haya campos vacios en la edicion o creacion de un usuario
+  advertenciaCamposVacios() {
+    Swal.fire({icon: 'warning',  title: 'Advertencia', text: `¡Por favor, debe llenar los campos vacios!`, confirmButtonColor: '#ffc107', });
+  }
+
+   // Funcin que va a mostrar o no la contraseña del usuario
+   mostrarPassword(){
+    let password : any = document.getElementById('pass');
+
+    if(password.type == 'password') {
+      password.type = 'text';
+      this.mostrarPass = true;
+    } else {
+      password.type = 'password';
+      this.mostrarPass = false;
+    }
+  }
+
 }

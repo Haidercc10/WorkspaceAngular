@@ -101,7 +101,7 @@
 
         currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros" >
         <ng-template pTemplate="caption">
-            <div class="flex align-items-center justify-content-between">
+            <div class="flex">
                 <span class="p-input-icon-left">
                     <i class="pi pi-search"></i>
                     <input pInputText type="text" placeholder="Buscar Productos..." (input)="aplicarfiltroGlobal($event, 'contains')" />
@@ -117,14 +117,14 @@
         <!--Headers Tabla-->
         <ng-template pTemplate="header">
           <tr class="tamanoTitulosTabla">
-              <th scope="col" pSortableColumn="Id">Item<p-sortIcon field="Id"></p-sortIcon></th>
-              <th scope="col" pSortableColumn="Nombre">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
-              <th scope="col" pSortableColumn="Tipo">Precio<p-sortIcon field="Tipo"></p-sortIcon></th>
-              <th scope="col" pSortableColumn="Area">Existencias<p-sortIcon field="Area"></p-sortIcon></th>
-              <th scope="col" pSortableColumn="Rol">Presentación<p-sortIcon field="Rol"></p-sortIcon></th>
-              <th scope="col" pSortableColumn="Estado">Subtotal<p-sortIcon field="Estado"></p-sortIcon></th>
-              <th scope="col">Cant. Minima</th>
-              <th scope="col">Última actualización</th>
+              <th scope="col" pSortableColumn="codigoItem">Item<p-sortIcon field="codigoItem"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="nombreItem">Nombre <p-sortIcon field="nombreItem"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="PrecioItem">Precio<p-sortIcon field="PrecioItem"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="cantidadItem">Existencias<p-sortIcon field="cantidadItem"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="presentacion">Presentación<p-sortIcon field="presentacion"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="PrecioTotalItem">Subtotal<p-sortIcon field="PrecioTotalItem"></p-sortIcon></th>
+              <th scope="col"  pSortableColumn="cantMinima">Cant. Minima <p-sortIcon field="cantMinima"></p-sortIcon></th>
+              <th scope="col"  pSortableColumn="fechaModificacion">Última actualización <p-sortIcon field="fechaModificacion"></p-sortIcon></th>
           </tr>
         </ng-template>
         <!--Cuerpo Tabla-->

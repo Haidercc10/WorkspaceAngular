@@ -49,11 +49,11 @@ import 'zone.js';  // Included with Angular CLI.
 
 /* RUTA PRINCIPAL DE API */
 
-// export let rutaPlasticaribeAPI = "http://192.168.0.85:9086/api"; //Ruta al servidor de la base de datos nuevas
+export let rutaPlasticaribeAPI = "http://192.168.0.85:9086/api"; //Ruta al servidor de la base de datos nuevas
 
 // export let rutaPlasticaribeAPI = "https://192.168.0.153:4053/api"; //Ruta local del api de prueba.
 // export let rutaPlasticaribeAPI = "https://localhost:7137/api"; //Ruta local del api de prueba.
-export let rutaPlasticaribeAPI = "http://192.168.0.153:9085/api"; //Ruta local del api de prueba.
+//export let rutaPlasticaribeAPI = "http://192.168.0.153:9085/api"; //Ruta local del api de prueba.
 
 
 

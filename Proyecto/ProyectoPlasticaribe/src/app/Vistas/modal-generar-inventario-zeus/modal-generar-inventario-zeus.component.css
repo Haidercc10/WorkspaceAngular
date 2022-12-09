@@ -102,7 +102,7 @@ background-color: lightblue;
 }
 
 .buscarActualizacion{
-  margin-left: 30%;
+  margin-left: 35%;
 }
 
 .tamanoTitulosTabla{
@@ -111,4 +111,32 @@ background-color: lightblue;
 
 .tamanoTextosTabla{
   font-size: 14px;
+}
+
+@media (max-width: 1370px){
+  .buscarActualizacion{
+    margin-top: 5%;
+    margin-left: 0%;
+  }
+}
+
+
+@media (min-width: 1900px){
+  .buscarActualizacion{
+    margin-left: 30%;
+  }
+}
+
+
+@media (min-width: 3900px){
+  .buscarActualizacion{
+    margin-left: 35%;
+  }
+}
+
+@media (min-width: 5000px){
+  .buscarActualizacion{
+    margin-left: 30%;
+  }
+
 }

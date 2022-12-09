@@ -36,69 +36,107 @@
         <!-- Primera Fila -->
         <div class="mb-3">
           <div class="row g-3">
+
             <!-- OT -->
-            <div class="form-floating col-md-2">
-              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput">
+            <div class="form-floating col-md">
+              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" autocomplete="off">
               <label for="floatingInput">Nro. OT</label>
             </div>
 
-             <!-- Fecha Factura -->
-             <div class="form-floating col-md-2">
-              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput"required >
-              <label for="floatingInput">Fecha inicial</label>
-            </div>
-
-            <!-- Fecha ingreso rollo -->
-            <div class="form-floating col-md-2">
-              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput"required >
-              <label for="floatingInput">Fecha Final</label>
-            </div>
-
-            <!-- Tipo de Proceso -->
-            <div class="form-floating col-md-2">
+             <!-- Tipo de Proceso -->
+             <div class="form-floating col-md">
               <select formControlName="Proceso" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
-                <!-- <option value="0"></option> -->
                 <option value="1" *ngIf="ValidarRol == 9 || ValidarRol == 1 || ValidarRol == 12">Empaque</option>
                 <option value="2" *ngIf="ValidarRol == 8 || ValidarRol == 1">Sellado</option>
               </select>
               <label for="floatingSelect">Proceso</label>
             </div>
 
-            <div class="form-floating col-md-2">
-              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Producción</button>
+             <!-- Fecha Inicial -->
+             <div class="form-floating col-md">
+              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha inicial</label>
             </div>
 
-            <div class="form-floating col-md-2">
-              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+            <!-- Fecha Final -->
+            <div class="form-floating col-md">
+              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha Final</label>
             </div>
+
+            <!-- Observacion -->
+            <div class="form-floating col-md-5">
+              <input formControlName="Observacion" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off">
+              <label for="floatingInput">Observación</label>
+            </div>
+
           </div>
         </div>
 
-        <!-- Fila 2 -->
+        <!-- (Botones) -->
         <div class="mb-3">
-          <div class="row g-3">
-            <!-- Observacion -->
-            <div class="form-floating col-md">
-              <input formControlName="Observacion" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Observación</label>
-            </div>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Producción</button>
+              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
           </div>
         </div>
       </form>
 
+
       <!-- Inicio titulo tabla producto -->
-      <div class="mb-4 tabla1">
+      <div class="mb-0 tabla1">
         <h4 class="tituloRojo" style="width: 90%;">Tabla de Rollos</h4>
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <div class="form-floating col-md">
-            <input type="number" class="form-control form-control-sm" id="floatingInput"[(ngModel)]="cantPage">
+            <input type="number" class="form-control form-control-sm" id="floatingInput" [(ngModel)]="cantPage" autocomplete="off">
             <label for="floatingInput">N° Filas</label>
           </div>
         </div>
       </div>
 
-      <!--Inicio tabla Rollos creados en OT -->
       <div class="mb-3" *ngIf="cargando">
+          <p-table
+          #dt1
+          [value]="rollos"
+          [rows]="cantPage"
+          [paginator]="true"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          [rowHover]="true"
+          [rowsPerPageOptions]="[10, cantPage, 50, 100, 120, 150, rollos.length]"
+          responsiveLayout="scroll"
+          currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
+          [(selection)]="rollosInsertar"
+          dataKey="Id"
+          [showCurrentPageReport]="true">
+              <ng-template pTemplate="header">
+                  <tr>
+                      <th scope="col">OT</th>
+                      <th scope="col">ID Rollo</th>
+                      <th scope="col">ID Producto</th>
+                      <th scope="col">producto</th>
+                      <th scope="col">Cantidad</th>
+                      <th scope="col">Presentación</th>
+                      <th scope="col">Proceso</th>
+                      <th style="width: 4rem"><p-tableHeaderCheckbox (click)="cargarTodosRollosInsertar(rollos)"></p-tableHeaderCheckbox></th>
+                  </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-rollos>
+                  <tr>
+                      <td>{{rollos.Ot}}</td>
+                      <td>{{rollos.Id}}</td>
+                      <td>{{rollos.IdProducto}}</td>
+                      <td>{{rollos.Producto}}</td>
+                      <td>{{rollos.Cantidad}}</td>
+                      <td>{{rollos.Presentacion}}</td>
+                      <td>{{rollos.Estatus}}</td>
+                      <td><p-tableCheckbox [value]="rollos" (click)="cargarRollosInsertar(rollos)"></p-tableCheckbox></td>
+                  </tr>
+              </ng-template>
+          </p-table>
+      </div>
+
+      <!--Inicio tabla Rollos creados en OT -->
+      <!--<div class="mb-3" *ngIf="cargando">
         <div class="row g-3">
           <div class="table-responsive">
             <table class="table table-bordered table-hover mt-2" >
@@ -134,18 +172,59 @@
             </div>
           </div>
         </div>
-      </div>
+      </div>-->
 
       <div class="mb-4" *ngIf="cargando">
         <hr class="Linea">
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Tabla de Rollos por Ingresar</h4>
+        <h4 class="tituloRojo">Tabla de rollos por ingresar</h4>
+      </div>
+
+      <div class="mb-3" *ngIf="cargando">
+        <p-table
+        #dt
+        [value]="rollosInsertar"
+        [rows]="10"
+        dataKey="Id"
+        [paginator]="true"
+        [(selection)]="rollos"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        [rowHover]="true"
+        [rowsPerPageOptions]="[10,25,50]"
+        responsiveLayout="scroll"
+        currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
+        [showCurrentPageReport]="true">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th scope="col">OT</th>
+                    <th scope="col">ID Rollo</th>
+                    <th scope="col">ID Producto</th>
+                    <th scope="col">producto</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Presentación</th>
+                    <th scope="col">Proceso</th>
+                    <th style="width: 4rem"><p-tableHeaderCheckbox (click)="quitarTodosRollosInsertar()"></p-tableHeaderCheckbox></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rollosInsertar>
+                <tr>
+                    <td>{{rollosInsertar.Ot}}</td>
+                    <td>{{rollosInsertar.Id}}</td>
+                    <td>{{rollosInsertar.IdProducto}}</td>
+                    <td>{{rollosInsertar.Producto}}</td>
+                    <td>{{rollosInsertar.Cantidad}}</td>
+                    <td>{{rollosInsertar.Presentacion}}</td>
+                    <td>{{rollosInsertar.Estatus}}</td>
+                    <td><p-tableCheckbox [value]="rollosInsertar" (click)="quitarRollosInsertar(rollosInsertar)"></p-tableCheckbox></td>
+                </tr>
+            </ng-template>
+        </p-table>
       </div>
 
       <!--Inicio tabla Rollos a Insertar -->
-      <div class="mb-3" *ngIf="cargando">
+      <!--<div class="mb-3" *ngIf="cargando">
         <div class="row g-3">
           <div class="table-responsive">
             <table class="table table-bordered table-hover mt-2" >
@@ -174,7 +253,7 @@
             </table>
           </div>
         </div>
-      </div>
+      </div>-->
 
       <div class="mb-4" *ngIf="cargando">
         <hr class="Linea">
@@ -184,8 +263,42 @@
         <h4 class="tituloRojo">Consolidado Productos</h4>
       </div>
 
-      <!--Inicio tabla Rollos a Insertar -->
       <div class="mb-3" *ngIf="cargando">
+        <p-table
+        #dt
+        [value]="grupoProductos"
+        [rows]="10"
+        dataKey="Id"
+        [paginator]="true"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        [rowHover]="true"
+        [rowsPerPageOptions]="[10,25,50]"
+        responsiveLayout="scroll"
+        currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
+        [showCurrentPageReport]="true">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th scope="col">ID Producto</th>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">N° Rollos</th>
+                    <th scope="col">Presentación</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rollosInsertar>
+                <tr>
+                    <td>{{rollosInsertar.Id}}</td>
+                    <td>{{rollosInsertar.Nombre}}</td>
+                    <td>{{rollosInsertar.Cantidad}}</td>
+                    <td>{{rollosInsertar.Rollos}}</td>
+                    <td>{{rollosInsertar.Presentacion}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+      </div>
+
+      <!--Inicio tabla Rollos a Insertar -->
+      <!--<div class="mb-3" *ngIf="cargando">
         <div class="row g-3">
           <div class="table-responsive">
             <table class="table table-bordered table-hover mt-2" >
@@ -210,7 +323,7 @@
             </table>
           </div>
         </div>
-      </div>
+      </div>-->
 
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">

@@ -289,9 +289,11 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                 ExProd_Fecha : this.ArrayProductoZeus[i].exProd_Fecha,
                 ExProd_Hora : this.ArrayProductoZeus[i].exProd_Hora,
               }
+
               console.log(datosExistencias);
-            this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
-              this.confirmUsuarioCreado();
+              this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
+                this.InventarioExistenciaZeus();
+                this.confirmUsuarioCreado(fila.nombreItem);
               //cantidad = datos_existencias[i].exProd_CantidadMinima
               //this.numeroIdProd = 0;
             });
@@ -489,12 +491,11 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   }
 
   /** */
-  confirmUsuarioCreado() {
+  confirmUsuarioCreado(nombre) {
     this.load = false
     setTimeout(() => {
       this.load = true;
-      Swal.fire({icon: 'success', title: 'Confirmación', text: '¡Cantidad minima actualizada con éxito!', showConfirmButton: false, timer: 1500 });
-      this.InventarioExistenciaZeus();
-    }, 1000);
+      Swal.fire({icon: 'success', title: 'Confirmación', text: `¡Cantidad minima del producto ${nombre} actualizada con éxito!`, showConfirmButton: false, timer: 1500 });
+    }, 5500);
   }
 }

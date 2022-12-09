@@ -23,7 +23,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
   public FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
 
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   hora : any = moment().format("H:mm:ss"); //Variable que almacenará la hora
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -91,14 +91,14 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
   fecha(){
-    this.today = new Date();
+    this.today;
+    /*this.today = new Date();
     var dd : any = this.today.getDate();
     var mm : any = this.today.getMonth() + 1;
     var yyyy : any = this.today.getFullYear();
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
-
+    this.today = yyyy + '-' + mm + '-' + dd;*/
     this.FormConsultarRollos.setValue({
       OT_Id: this.FormConsultarRollos.value.OT_Id,
       fechaDoc : this.FormConsultarRollos.value.fechaDoc,
@@ -128,7 +128,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
 
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
   consultarOTbagPro(){
-    let ProcConsulta : any = this.FormConsultarRollos.value.Proceso;
+    //let ProcConsulta : any = this.FormConsultarRollos.value.Proceso;
     let ot : number = this.FormConsultarRollos.value.OT_Id;
     let fechaInicial : any = this.FormConsultarRollos.value.fechaDoc;
     let fechaFinal : any = this.FormConsultarRollos.value.fechaFinalDoc;
@@ -141,6 +141,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     this.cargando = false;
     this.cantidadOT = 0;
     let proceso : string = '';
+
     if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
       this.dtPreEntRollosService.getRollosProceso('EXT').subscribe(datos_rollos => {
         for (let i = 0; i < datos_rollos.length; i++) {
@@ -150,247 +151,102 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
       setTimeout(() => {
         if (ot != null && fechaInicial != null && fechaFinal != null) {
           this.bagProService.srvObtenerListaProcExtrusionFechasOT(fechaInicial, fechaFinal, ot).subscribe(datos_ot => {
-            setTimeout(() => {
-              if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
-              this.cargando = true;
-            }, 1000);
-            setTimeout(() => {
-              if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
-              this.cargando = true;
-            }, 1000);
-            for (let i = 0; i < datos_ot.length; i++) {if (datos_ot[i].nomStatus == 'EXTRUSION') {
-              if (!RollosConsultados.includes(datos_ot[i].item)){
-                if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-                let info : any = {
-                  Ot : datos_ot[i].ot,
-                  Id : datos_ot[i].item,
-                  IdCliente : datos_ot[i].identNro,
-                  Cliente : datos_ot[i].nombreComercial,
-                  IdProducto : datos_ot[i].clienteItem,
-                  Producto : datos_ot[i].clienteItemNombre,
-                  Cantidad : datos_ot[i].extnetokg,
-                  Presentacion : datos_ot[i].unidad,
-                  Estatus : datos_ot[i].nomStatus,
-                  Proceso : proceso,
-                }
-                if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                otTemporral = datos_ot[i].ot;
-                this.rollos.push(info);
-                RollosConsultados.push(datos_ot[i].item);
-                this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                this.FormConsultarRollos.setValue({
-                  OT_Id: ot,
-                  fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                  fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                  Observacion : this.FormConsultarRollos.value.Observacion,
-                  Proceso : this.FormConsultarRollos.value.Proceso,
-                });
-              }
-            }
-            }
-          });
-        } else if (fechaInicial != null &&  fechaFinal != null) {
-          this.bagProService.srvObtenerListaProcExtrusionFechas(fechaInicial, fechaFinal).subscribe(datos_ot => {
-            setTimeout(() => {
-              if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
-              this.cargando = true;
-            }, 1000);
-            setTimeout(() => {
-              if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
-              this.cargando = true;
-            }, 1000);
+            setTimeout(() => { if (datos_ot.length <= 0) this.advertenciaRollos(); this.cargando = true; }, 1000);
+
             for (let i = 0; i < datos_ot.length; i++) {
               if (datos_ot[i].nomStatus == 'EXTRUSION') {
                 if (!RollosConsultados.includes(datos_ot[i].item)){
                   if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-                  let info : any = {
-                    Ot : datos_ot[i].ot,
-                    Id : datos_ot[i].item,
-                    IdCliente : datos_ot[i].identNro,
-                    Cliente : datos_ot[i].nombreComercial,
-                    IdProducto : datos_ot[i].clienteItem,
-                    Producto : datos_ot[i].clienteItemNombre,
-                    Cantidad : datos_ot[i].extnetokg,
-                    Presentacion : datos_ot[i].unidad,
-                    Estatus : datos_ot[i].nomStatus,
-                    Proceso : proceso,
-                  }
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                  this.FormConsultarRollos.setValue({
-                    OT_Id: ot,
-                    fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                    fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                    Observacion : this.FormConsultarRollos.value.Observacion,
-                    Proceso : this.FormConsultarRollos.value.Proceso,
-                  });
+                    this.cargarDatosExtrusion(datos_ot[i], proceso);
+                    if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                    otTemporral = datos_ot[i].ot;
+                    RollosConsultados.push(datos_ot[i].item);
+                    this.organizarInfoRollos(ot);
+                }
+              }
+            }
+          });
+        } else if (fechaInicial != null &&  fechaFinal != null) {
+          this.bagProService.srvObtenerListaProcExtrusionFechas(fechaInicial, fechaFinal).subscribe(datos_ot => {
+            setTimeout(() => { if (datos_ot.length <= 0) this.advertenciaRollos(); this.cargando = true; }, 1000);
+
+            for (let i = 0; i < datos_ot.length; i++) {
+              if (datos_ot[i].nomStatus == 'EXTRUSION') {
+                if (!RollosConsultados.includes(datos_ot[i].item)){
+                  if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
+                    this.cargarDatosExtrusion(datos_ot[i], proceso);
+                    if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                    otTemporral = datos_ot[i].ot;
+                    RollosConsultados.push(datos_ot[i].item);
+                    this.organizarInfoRollos(ot);
                 }
               }
             }
           });
         } else if (ot != null && fechaInicial != null) {
           this.bagProService.srvObtenerListaProcExtrusionFechasOT(fechaInicial, fechaInicial, ot).subscribe(datos_ot => {
-            setTimeout(() => {
-              if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
-              this.cargando = true;
-            }, 1000);
+            setTimeout(() => { if (datos_ot.length <= 0) this.advertenciaRollos(); this.cargando = true; }, 1000);
+
             for (let i = 0; i < datos_ot.length; i++) {
               if (datos_ot[i].nomStatus == 'EXTRUSION') {
                 if (!RollosConsultados.includes(datos_ot[i].item)){
                   if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-                  let info : any = {
-                    Ot : datos_ot[i].ot,
-                    Id : datos_ot[i].item,
-                    IdCliente : datos_ot[i].identNro,
-                    Cliente : datos_ot[i].nombreComercial,
-                    IdProducto : datos_ot[i].clienteItem,
-                    Producto : datos_ot[i].clienteItemNombre,
-                    Cantidad : datos_ot[i].extnetokg,
-                    Presentacion : datos_ot[i].unidad,
-                    Estatus : datos_ot[i].nomStatus,
-                    Proceso : proceso,
-                  }
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                  this.FormConsultarRollos.setValue({
-                    OT_Id: ot,
-                    fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                    fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                    Observacion : this.FormConsultarRollos.value.Observacion,
-                    Proceso : this.FormConsultarRollos.value.Proceso,
-                  });
+                    this.cargarDatosExtrusion(datos_ot[i], proceso);
+                    if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                    otTemporral = datos_ot[i].ot;
+                    RollosConsultados.push(datos_ot[i].item);
+                    this.organizarInfoRollos(ot);
                 }
               }
             }
           });
         } else if (fechaInicial != null) {
           this.bagProService.srvObtenerListaProcExtrusionFechas(fechaInicial, fechaInicial).subscribe(datos_ot => {
-            setTimeout(() => {
-              if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
-              this.cargando = true;
-            }, 1000);
+            setTimeout(() => { if (datos_ot.length <= 0) this.advertenciaRollos(); this.cargando = true; }, 1000);
+
             for (let i = 0; i < datos_ot.length; i++) {
               if (datos_ot[i].nomStatus == 'EXTRUSION') {
                 if (!RollosConsultados.includes(datos_ot[i].item)){
                   if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-                  let info : any = {
-                    Ot : datos_ot[i].ot,
-                    Id : datos_ot[i].item,
-                    IdCliente : datos_ot[i].identNro,
-                    Cliente : datos_ot[i].nombreComercial,
-                    IdProducto : datos_ot[i].clienteItem,
-                    Producto : datos_ot[i].clienteItemNombre,
-                    Cantidad : datos_ot[i].extnetokg,
-                    Presentacion : datos_ot[i].unidad,
-                    Estatus : datos_ot[i].nomStatus,
-                    Proceso : proceso,
-                  }
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                  this.FormConsultarRollos.setValue({
-                    OT_Id: ot,
-                    fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                    fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                    Observacion : this.FormConsultarRollos.value.Observacion,
-                    Proceso : this.FormConsultarRollos.value.Proceso,
-                  });
+                    this.cargarDatosExtrusion(datos_ot[i], proceso);
+                    if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                    otTemporral = datos_ot[i].ot;
+                    RollosConsultados.push(datos_ot[i].item);
+                    this.organizarInfoRollos(ot);
                 }
               }
             }
           });
         } else if (ot != null) {
           this.bagProService.srvObtenerListaProcExtrusionRollosOT(ot).subscribe(datos_ot => {
-            setTimeout(() => {
-              if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
-              this.cargando = true;
-            }, 1000);
+            setTimeout(() => { if (datos_ot.length <= 0) this.advertenciaRollos(); this.cargando = true; }, 1000);
+
             for (let i = 0; i < datos_ot.length; i++) {
               if (datos_ot[i].nomStatus == 'EXTRUSION') {
                 if (!RollosConsultados.includes(datos_ot[i].item)){
                   if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-                  let info : any = {
-                    Ot : datos_ot[i].ot,
-                    Id : datos_ot[i].item,
-                    IdCliente : datos_ot[i].identNro,
-                    Cliente : datos_ot[i].nombreComercial,
-                    IdProducto : datos_ot[i].clienteItem,
-                    Producto : datos_ot[i].clienteItemNombre,
-                    Cantidad : datos_ot[i].extnetokg,
-                    Presentacion : datos_ot[i].unidad,
-                    Estatus : datos_ot[i].nomStatus,
-                    Proceso : proceso,
-                  }
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                  this.FormConsultarRollos.setValue({
-                    OT_Id: ot,
-                    fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                    fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                    Observacion : this.FormConsultarRollos.value.Observacion,
-                    Proceso : this.FormConsultarRollos.value.Proceso,
-                  });
+                    this.cargarDatosExtrusion(datos_ot[i], proceso);
+                    if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                    otTemporral = datos_ot[i].ot;
+                    RollosConsultados.push(datos_ot[i].item);
+                    this.organizarInfoRollos(ot);
                 }
               }
             }
           });
         } else {
           this.bagProService.srvObtenerListaProcExtrusionFechas(this.today, this.today).subscribe(datos_ot => {
-            setTimeout(() => {
-              if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
-              this.cargando = true;
-            }, 1000);
+            setTimeout(() => { if (datos_ot.length <= 0) this.advertenciaRollos(); this.cargando = true; }, 1000);
+
             for (let i = 0; i < datos_ot.length; i++) {
               if (datos_ot[i].nomStatus == 'EXTRUSION') {
                 if (!RollosConsultados.includes(datos_ot[i].item)){
                   if (datos_ot[i].nomStatus == 'EXTRUSION') proceso = 'EXT'
-                  let info : any = {
-                    Ot : datos_ot[i].ot,
-                    Id : datos_ot[i].item,
-                    IdCliente : datos_ot[i].identNro,
-                    Cliente : datos_ot[i].nombreComercial,
-                    IdProducto : datos_ot[i].clienteItem,
-                    Producto : datos_ot[i].clienteItemNombre,
-                    Cantidad : datos_ot[i].extnetokg,
-                    Presentacion : datos_ot[i].unidad,
-                    Estatus : datos_ot[i].nomStatus,
-                    Proceso : proceso,
-                  }
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
-                  this.FormConsultarRollos.setValue({
-                    OT_Id: ot,
-                    fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-                    fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-                    Observacion : this.FormConsultarRollos.value.Observacion,
-                    Proceso : this.FormConsultarRollos.value.Proceso,
-                  });
+                    this.cargarDatosExtrusion(datos_ot[i], proceso);
+                    if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
+                    otTemporral = datos_ot[i].ot;
+                    RollosConsultados.push(datos_ot[i].item);
+                    this.organizarInfoRollos(ot);
                 }
               }
             }
@@ -546,6 +402,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
 
   // Funcion que permitirá ver el total de lo escogido para cada producto
   GrupoProductos(){
+    this.cargando = true;
     let producto : any = [];
     this.grupoProductos = [];
     for (let i = 0; i < this.rollosInsertar.length; i++) {
@@ -587,22 +444,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
           this.ingresarRollos(datos_entradaRollo.preEntRollo_Id);
         });
       }, error => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'error',
-          title: '¡Error al ingresar los rollos!'
-        });
-        this.cargando = true;
+        this.mensajeErrorEncabezado();
       });
     }
   }
@@ -621,43 +463,9 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
         UndMed_Producto : this.rollosInsertar[i].Presentacion,
         preEntRollo_Id : idEntrada,
       }
-      this.dtPreEntRollosService.srvGuardar(info).subscribe(datos_entrada => {  }, error => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'error',
-          title: '¡Error al ingresar los rollos!'
-        });
-        this.cargando = true;
-      });
+      this.dtPreEntRollosService.srvGuardar(info).subscribe(datos_entrada => {  }, error => { this.mensajeError();});
     }
-    setTimeout(() => {
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-      });
-      Toast.fire({
-        icon: 'success',
-        title: '¡Pre Entrada de Rollos registrada con exito!'
-      });
-      this.buscarRolloPDF(idEntrada);
-    }, this.rollosInsertar.length * 30);
+    this.mensajeConfirmacion(idEntrada);
   }
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
@@ -867,6 +675,132 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
           }
         }
     };
+  }
+
+  /** Funcion para cargar datos al array que se mostrará en la tabla al momento de consultar */
+  cargarDatosExtrusion(datos : any, proceso : any){
+    let info : any = {
+      Ot : datos.ot,
+      Id : datos.item,
+      IdCliente : datos.identNro,
+      Cliente : datos.nombreComercial,
+      IdProducto : datos.clienteItem,
+      Producto : datos.clienteItemNombre,
+      Cantidad : datos.extnetokg,
+      Presentacion : datos.unidad,
+      Estatus : datos.nomStatus,
+      Proceso : proceso,
+    }
+    this.rollos.push(info);
+  }
+
+  /** Organizar la información del rollo de menor a mayor */
+  organizarInfoRollos(ordenTrabajo: any){
+    this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
+    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
+
+    this.FormConsultarRollos.setValue({
+      OT_Id: ordenTrabajo,
+      fechaDoc : this.FormConsultarRollos.value.fechaDoc,
+      fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
+      Observacion : this.FormConsultarRollos.value.Observacion,
+      Proceso : this.FormConsultarRollos.value.Proceso,
+    });
+  }
+
+   /** Mensaje de advertencia si no hay rollos para ingresar */
+   advertenciaRollos() {
+    Swal.fire({icon: 'warning',  title: 'Advertencia', text: `No hay rollos por ingresar`, confirmButtonColor: '#ffc107', });
+  }
+
+  /** Mensaje de advertencia si la fecha es invalida */
+  advertenciaFecha() {
+    Swal.fire({icon: 'warning',  title: 'Advertencia', text: `La fecha seleccionada no es válida`, confirmButtonColor: '#ffc107', });
+  }
+
+    /** Función para seleccionar los rollos a insertar (Uno a uno)*/
+  cargarRollosInsertar(item) {
+    let scrollable : number = window.scrollY;
+    this.cargando = false;
+    for (let i = 0; i < this.rollos.length; i++) {
+      if (this.rollos[i].Id == item.Id) this.rollos.splice(i, 1);
+    }
+    this.GrupoProductos();
+    this.rollosInsertar.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    setTimeout(() => { window.scroll(0, scrollable) }, 10);
+  }
+
+
+  /** Función para seleccionar todos los rollos a insertar */
+  cargarTodosRollosInsertar(item){
+    let scrollable : number = window.scrollY;
+    this.cargando = false;
+    this.rollos = [];
+
+    this.GrupoProductos();
+    this.rollosInsertar.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    setTimeout(() => { window.scroll(0, scrollable) }, 10);
+  }
+
+  /** Funcion para quitar rollos que hayan sido seleccionados para insertar previamente. */
+  quitarRollosInsertar(item) {
+    let scrollable : number = window.scrollY;
+    this.cargando = false;
+    for (let i = 0; i < this.rollosInsertar.length; i++) {
+      if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i, 1);
+    }
+    this.GrupoProductos();
+    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    setTimeout(() => { window.scroll(0, scrollable) }, 10);
+  }
+
+
+  /** Funcion para quitar todos los rollos seleccionados para insertar previamente. */
+  quitarTodosRollosInsertar(){
+    let scrollable : number = window.scrollY;
+    this.cargando = false;
+    this.rollosInsertar = [];
+    this.GrupoProductos();
+    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    setTimeout(() => { window.scroll(0, scrollable) }, 10);
+  }
+
+
+  /**Si existe algún problema al momento de guardar el encabezado a la BD se mostrará un mensaje de error  */
+  mensajeErrorEncabezado(){
+    Swal.fire({
+      icon : 'error',
+      title : 'Error',
+      html : '<b>¡No fue posible guardar el encabezado de la entrada de rollos!</b>',
+      position: 'center',
+      showConfirmButton: false,
+      timer: 2000,
+    });
+    this.cargando = true;
+  }
+
+  /**Si existe algún problema al momento de cargar los rollos a la BD se mostrará un mensaje de error  */
+  mensajeError(){
+    Swal.fire({
+      icon : 'error',
+      title : 'Error',
+      html : '<b>¡No fue posible guardar los rollos seleccionados!</b>',
+      position: 'center',
+      showConfirmButton: false,
+      timer: 2000,
+    });
+    this.cargando = true;
+  }
+
+  /** Mensaje luego de haber cargado la información de los rollos a la BD de manera exitosa. */
+  mensajeConfirmacion(IdPreEntrada) {
+    this.cargando = false
+    setTimeout(() => {
+      this.cargando = true;
+      Swal.fire({icon: 'success', title: 'Confirmación', text: '¡Pre-Entrada de rollos registrada con éxito!', showConfirmButton: false, timer: 2000 });
+      this.buscarRolloPDF(IdPreEntrada);
+    }, this.rollosInsertar.length * 30);
   }
 
 }

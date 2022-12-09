@@ -1,6 +1,6 @@
 <form [formGroup]="formularioUsuario" (ngSubmit)="validarCamposVacios()">
   <div class="titulo">
-    <h1>Plasticaribe S.A.S</h1>
+    <h1 class="display-2">Plasticaribe S.A.S</h1>
   </div>
   <!--Contenedor Principal-->
   <div class="container-fluid">
@@ -8,25 +8,47 @@
     <div class="contenedorLogin">
       <!--Titulo-->
       <div class="mb-3">
-        <h5 class="tituloRojo">Accede a tu cuenta</h5>
+        <h4 class="tituloRojo">Accede a tu cuenta</h4>
       </div>
       <!--Formulario-->
-      <div class="mb-3">
+      <!--<div class="mb-3">
         <input formControlName="Identificacion" id="identificacion" class="form-control form-control-sm" type="number" placeholder="Identificación" aria-label=".form-control-sm example" required>
+      </div>-->
+      <div class="form-floating col-md mb-3">
+        <input formControlName="Identificacion" type="number" class="form-control form-control-sm" id="floatingInput" autocomplete="off" required>
+        <label for="floatingInput">ID Usuario</label>
       </div>
-      <div class="mb-3">
-        <input formControlName="Contrasena" id="contrasena" class="form-control form-control-sm" type="password" placeholder="Contraseña" aria-label=".form-control-sm example" required>
+
+      <div class="input-group mb-3">
+        <div class="form-floating">
+          <input formControlName="Contrasena" type="password" class="form-control form-control-sm" id="floatingInputGroup1" placeholder="Username" id="pass">
+          <label for="floatingInputGroup1">Contraseña</label>
+        </div>
+        <ng-container *ngIf="mostrarPass == true then noMostrar; else mostrar"></ng-container>
+        <ng-template #mostrar><span class="input-group-text" (click)="mostrarPassword()"><i class="pi pi-eye"></i></span></ng-template>
+        <ng-template #noMostrar><span class="input-group-text" (click)="mostrarPassword()"><i class="pi pi-eye-slash"></i></span></ng-template>
+
       </div>
-      <div class="mb-3">
-        <select  formControlName="Empresa" name="miselect" class="form-select form-select-sm" aria-label=".form-select-sm example">
+      <!--<div class="mb-3">
+        <input formControlName="Contrasena" id="contrasena" class="form-control form-control-sm inputPassword" type="password" placeholder="Contraseña" aria-label=".form-control-sm example" required>
+      </div>-->
+
+        <!--<select  formControlName="Empresa" name="miselect" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option [ngValue]="null" disabled selected>Seleccione la Empresa</option>
           <option [ngValue]="empresa" *ngFor="let empresa of empresas">{{empresa}}</option>
-          <!-- <option value="Prueba">Pruebas</option> -->
-        </select>
-      </div>
+        </select>-->
+        <div class="form-floating col-md mb-3">
+          <select formControlName="Empresa" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
+            <option [ngValue]="null" disabled selected>Seleccione la Empresa</option>
+            <option [ngValue]="empresa" *ngFor="let empresa of empresas">{{empresa}}</option>
+          </select>
+          <label for="floatingSelect">Empresa</label>
+        </div>
+
+
       <!--Boton Ingresar al sistema-->
-      <div class="mb-3">
-        <input class="btn btn-danger btn-danger-sm" type="submit" value="¡Ingresar!">
+      <div class="d-grid gap-2 mb-3">
+        <button class="btn btn-danger btn-danger-sm" type="submit">¡Ingresar!</button>
       </div>
 
       <div class="mb-3">

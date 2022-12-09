@@ -5,7 +5,7 @@
 
 .titulo h1{
   padding: 5%;
-  color: #a23;
+  color: #d83542;
 }
 
 .contenedorLogin {
@@ -13,12 +13,15 @@
   padding: 2%;
   margin: 0 auto;
   border-radius: 1%;
-  border-color: rgb(240, 240, 240);
+  border-color: rgba(240, 240, 240, 0.603);
   border-style: solid;
+  -webkit-box-shadow: 1px 18px 60px -19px rgba(0,0,0,0.75);
+  -moz-box-shadow: 1px 18px 60px -19px rgba(0,0,0,0.75);
+  box-shadow: 1px 18px 60px -19px rgba(0,0,0,0.75);
 }
 
 .tituloRojo {
-  color: rgb(158, 1, 1);
+  color: #d83542;
   text-align: center;
   padding: 5% 0 5% 0;
 }
@@ -53,19 +56,9 @@ a {
   width: 100%;
 }
 
-.btn{
-  border: #fff;
-  width: 60%;
-  margin-top: 5%;
-
-
-  margin-top: 5%;
-
-}
 
 .btn:hover{
   background-color: rgb(150, 10, 10);
-
 }
 
 .invitado{
@@ -76,4 +69,12 @@ a {
 .invitado:hover{
   color: #f00;
   text-decoration: none;
+}
+
+.form-floating{
+  font-size: 14px;
+}
+
+.inputPassword {
+  height: 50px;
 }
