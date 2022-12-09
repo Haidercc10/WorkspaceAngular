@@ -5,8 +5,6 @@ import { EmpresaService } from 'src/app/Servicios/empresa.service';
 import Swal from 'sweetalert2';
 import { CookieService } from 'ngx-cookie-service';
 import {SESSION_STORAGE, WebStorageService} from 'ngx-webstorage-service';
-import {rutaPlasticaribeAPI} from 'src/polyfills'
-import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -65,14 +63,14 @@ export class LoginComponentComponent implements OnInit {
   // FUNCION PARA HACER VALIDACIONES DE CAMPOS VACIOS, QUE DADO ESTE CASO (EN EL QUE HAYAN CAMPOS VACIOS) SE MOSTRARÁ UN MENSAJE INFOMANDO DE ESTO.
   // SI NO HAY CAMPOS VACIOS ENTRARÍA A EL METODO Consulta()
   validarCamposVacios() : any{
-    if(this.formularioUsuario.valid) this.Consulta();
-    else {
-     this.advertenciaCamposVacios();
-    }
+    if (this.formularioUsuario.valid) this.Consulta();
+    else this.advertenciaCamposVacios();
   }
 
   // FUNCION PARA LIMPIAR LOS CAMPOS DEL FORMULARIO.
-  clear(){ this.formularioUsuario.reset(); }
+  clear(){
+    this.formularioUsuario.reset();
+  }
 
   // FUNCION PARA HACER LA VALIDACION DE LA ENTRADA DE USUARIOS, SE VERIFICAN LOS CAMPOS DIGITADOS CON LA BASE DE DATOS.
   Consulta(){

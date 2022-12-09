@@ -1,11 +1,5 @@
 <app-menuLateral></app-menuLateral>
 
-<!-- <div class="overlay" *ngIf="!cargando">
-  <div class="spinner ">
-    <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
-  </div>
-</div> -->
-
 <div class="d-flex justify-content-center overlay" *ngIf="!cargando">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
     <span class="visually-hidden">Cargando...</span>
@@ -95,7 +89,7 @@
       </div>
 
       <div class="mb-3" *ngIf="cargando">
-          <p-table
+        <p-table
           #dt1
           [value]="rollos"
           [rows]="cantPage"
@@ -108,71 +102,32 @@
           [(selection)]="rollosInsertar"
           dataKey="Id"
           [showCurrentPageReport]="true">
-              <ng-template pTemplate="header">
-                  <tr>
-                      <th scope="col">OT</th>
-                      <th scope="col">ID Rollo</th>
-                      <th scope="col">ID Producto</th>
-                      <th scope="col">producto</th>
-                      <th scope="col">Cantidad</th>
-                      <th scope="col">Presentación</th>
-                      <th scope="col">Proceso</th>
-                      <th style="width: 4rem"><p-tableHeaderCheckbox (click)="cargarTodosRollosInsertar(rollos)"></p-tableHeaderCheckbox></th>
-                  </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-rollos>
-                  <tr>
-                      <td>{{rollos.Ot}}</td>
-                      <td>{{rollos.Id}}</td>
-                      <td>{{rollos.IdProducto}}</td>
-                      <td>{{rollos.Producto}}</td>
-                      <td>{{rollos.Cantidad}}</td>
-                      <td>{{rollos.Presentacion}}</td>
-                      <td>{{rollos.Estatus}}</td>
-                      <td><p-tableCheckbox [value]="rollos" (click)="cargarRollosInsertar(rollos)"></p-tableCheckbox></td>
-                  </tr>
-              </ng-template>
-          </p-table>
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">OT</th>
+              <th scope="col">ID Rollo</th>
+              <th scope="col">ID Producto</th>
+              <th scope="col">producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Presentación</th>
+              <th scope="col">Proceso</th>
+              <th style="width: 4rem"><p-tableHeaderCheckbox (click)="cargarTodosRollosInsertar(rollos)"></p-tableHeaderCheckbox></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rollos>
+            <tr>
+              <td>{{rollos.Ot}}</td>
+              <td>{{rollos.Id}}</td>
+              <td>{{rollos.IdProducto}}</td>
+              <td>{{rollos.Producto}}</td>
+              <td>{{rollos.Cantidad}}</td>
+              <td>{{rollos.Presentacion}}</td>
+              <td>{{rollos.Estatus}}</td>
+              <td><p-tableCheckbox [value]="rollos" (click)="cargarRollosInsertar(rollos)"></p-tableCheckbox></td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
-
-      <!--Inicio tabla Rollos creados en OT -->
-      <!--<div class="mb-3" *ngIf="cargando">
-        <div class="row g-3">
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover mt-2" >
-              <thead class="TitulosTabla">
-                <tr>
-                  <th scope="col">OT</th>
-                  <th scope="col">ID Rollo</th>
-                  <th scope="col">ID Producto</th>
-                  <th scope="col">Producto</th>
-                  <th scope="col">Cantidad</th>
-                  <th scope="col">Presentacion</th>
-                  <th scope="col">Proceso</th>
-                  <th scope="col"><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of rollos | paginate: {itemsPerPage: cantPage, currentPage: page} let i=index">
-                  <th>{{item.Ot}}</th>
-                  <th>{{item.Id}}</th>
-                  <td>{{item.IdProducto}}</td>
-                  <td>{{item.Producto}}</td>
-                  <td>{{item.Cantidad | number}}</td>
-                  <td>{{item.Presentacion}}</td>
-                  <td>{{item.Estatus}}</td>
-                  <td><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="mb-2">
-              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <pagination-controls (pageChange)="page = $event"></pagination-controls>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>-->
 
       <div class="mb-4" *ngIf="cargando">
         <hr class="Linea">
@@ -184,76 +139,44 @@
 
       <div class="mb-3" *ngIf="cargando">
         <p-table
-        #dt
-        [value]="rollosInsertar"
-        [rows]="10"
-        dataKey="Id"
-        [paginator]="true"
-        [(selection)]="rollos"
-        styleClass="p-datatable-gridlines p-datatable-sm"
-        [rowHover]="true"
-        [rowsPerPageOptions]="[10,25,50]"
-        responsiveLayout="scroll"
-        currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
-        [showCurrentPageReport]="true">
-            <ng-template pTemplate="header">
-                <tr>
-                    <th scope="col">OT</th>
-                    <th scope="col">ID Rollo</th>
-                    <th scope="col">ID Producto</th>
-                    <th scope="col">producto</th>
-                    <th scope="col">Cantidad</th>
-                    <th scope="col">Presentación</th>
-                    <th scope="col">Proceso</th>
-                    <th style="width: 4rem"><p-tableHeaderCheckbox (click)="quitarTodosRollosInsertar()"></p-tableHeaderCheckbox></th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-rollosInsertar>
-                <tr>
-                    <td>{{rollosInsertar.Ot}}</td>
-                    <td>{{rollosInsertar.Id}}</td>
-                    <td>{{rollosInsertar.IdProducto}}</td>
-                    <td>{{rollosInsertar.Producto}}</td>
-                    <td>{{rollosInsertar.Cantidad}}</td>
-                    <td>{{rollosInsertar.Presentacion}}</td>
-                    <td>{{rollosInsertar.Estatus}}</td>
-                    <td><p-tableCheckbox [value]="rollosInsertar" (click)="quitarRollosInsertar(rollosInsertar)"></p-tableCheckbox></td>
-                </tr>
-            </ng-template>
+          #dt
+          [value]="rollosInsertar"
+          [rows]="10"
+          dataKey="Id"
+          [paginator]="true"
+          [(selection)]="rollos"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          [rowHover]="true"
+          [rowsPerPageOptions]="[10,25,50]"
+          responsiveLayout="scroll"
+          currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
+          [showCurrentPageReport]="true">
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">OT</th>
+              <th scope="col">ID Rollo</th>
+              <th scope="col">ID Producto</th>
+              <th scope="col">producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Presentación</th>
+              <th scope="col">Proceso</th>
+              <th style="width: 4rem"><p-tableHeaderCheckbox (click)="quitarTodosRollosInsertar()"></p-tableHeaderCheckbox></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rollosInsertar>
+            <tr>
+              <td>{{rollosInsertar.Ot}}</td>
+              <td>{{rollosInsertar.Id}}</td>
+              <td>{{rollosInsertar.IdProducto}}</td>
+              <td>{{rollosInsertar.Producto}}</td>
+              <td>{{rollosInsertar.Cantidad}}</td>
+              <td>{{rollosInsertar.Presentacion}}</td>
+              <td>{{rollosInsertar.Estatus}}</td>
+              <td><p-tableCheckbox [value]="rollosInsertar" (click)="quitarRollosInsertar(rollosInsertar)"></p-tableCheckbox></td>
+            </tr>
+          </ng-template>
         </p-table>
       </div>
-
-      <!--Inicio tabla Rollos a Insertar -->
-      <!--<div class="mb-3" *ngIf="cargando">
-        <div class="row g-3">
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover mt-2" >
-              <thead class="TitulosTabla">
-                <tr>
-                  <th scope="col">OT</th>
-                  <th scope="col">ID Rollo</th>
-                  <th scope="col">ID Producto</th>
-                  <th scope="col">Producto</th>
-                  <th scope="col">Cantidad</th>
-                  <th scope="col">Presentación</th>
-                  <th scope="col"><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of rollosInsertar; let i=index">
-                  <th>{{item.Ot}}</th>
-                  <th>{{item.Id}}</th>
-                  <td>{{item.IdProducto}}</td>
-                  <td>{{item.Producto}}</td>
-                  <td>{{item.Cantidad | number}}</td>
-                  <td>{{item.Presentacion}}</td>
-                  <td><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarRollo(item)"></i></a></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>-->
 
       <div class="mb-4" *ngIf="cargando">
         <hr class="Linea">
@@ -265,65 +188,37 @@
 
       <div class="mb-3" *ngIf="cargando">
         <p-table
-        #dt
-        [value]="grupoProductos"
-        [rows]="10"
-        dataKey="Id"
-        [paginator]="true"
-        styleClass="p-datatable-gridlines p-datatable-sm"
-        [rowHover]="true"
-        [rowsPerPageOptions]="[10,25,50]"
-        responsiveLayout="scroll"
-        currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
-        [showCurrentPageReport]="true">
-            <ng-template pTemplate="header">
-                <tr>
-                    <th scope="col">ID Producto</th>
-                    <th scope="col">Producto</th>
-                    <th scope="col">Cantidad</th>
-                    <th scope="col">N° Rollos</th>
-                    <th scope="col">Presentación</th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-rollosInsertar>
-                <tr>
-                    <td>{{rollosInsertar.Id}}</td>
-                    <td>{{rollosInsertar.Nombre}}</td>
-                    <td>{{rollosInsertar.Cantidad}}</td>
-                    <td>{{rollosInsertar.Rollos}}</td>
-                    <td>{{rollosInsertar.Presentacion}}</td>
-                </tr>
-            </ng-template>
+          #dt
+          [value]="grupoProductos"
+          [rows]="10"
+          dataKey="Id"
+          [paginator]="true"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          [rowHover]="true"
+          [rowsPerPageOptions]="[10,25,50]"
+          responsiveLayout="scroll"
+          currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
+          [showCurrentPageReport]="true">
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">ID Producto</th>
+              <th scope="col">Producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">N° Rollos</th>
+              <th scope="col">Presentación</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rollosInsertar>
+            <tr>
+              <td>{{rollosInsertar.Id}}</td>
+              <td>{{rollosInsertar.Nombre}}</td>
+              <td>{{rollosInsertar.Cantidad}}</td>
+              <td>{{rollosInsertar.Rollos}}</td>
+              <td>{{rollosInsertar.Presentacion}}</td>
+            </tr>
+          </ng-template>
         </p-table>
       </div>
-
-      <!--Inicio tabla Rollos a Insertar -->
-      <!--<div class="mb-3" *ngIf="cargando">
-        <div class="row g-3">
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover mt-2" >
-              <thead class="TitulosTabla">
-                <tr>
-                  <th scope="col">ID Producto</th>
-                  <th scope="col">Producto</th>
-                  <th scope="col">Cantidad</th>
-                  <th scope="col">N° Rollos</th>
-                  <th scope="col">Presentación</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of grupoProductos; let i=index">
-                  <th>{{item.Id}}</th>
-                  <td>{{item.Nombre}}</td>
-                  <td>{{item.Cantidad}}</td>
-                  <td>{{item.Rollos}}</td>
-                  <td>{{item.Presentacion}}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>-->
 
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">

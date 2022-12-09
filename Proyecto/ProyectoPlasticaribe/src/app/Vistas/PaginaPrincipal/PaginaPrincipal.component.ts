@@ -11,28 +11,35 @@ import Swal from 'sweetalert2';
   templateUrl: './PaginaPrincipal.component.html',
   styleUrls: ['./PaginaPrincipal.component.css']
 })
+
 export class PaginaPrincipalComponent implements OnInit {
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  displayTerminal: boolean;
-  dockItems: MenuItem[] = [];
-  responsiveOptions: any[];
-  targetProducts = [];
-  sourceProducts: [];
-  disponibles = [];
-  seleccionados = [];
-  vistasFavoritas : any [] = [];
-  disponiblesMostrar = [];
+  displayTerminal: boolean; //Variable que permitirá mostrar o no el apartado donde se pueden escoger las vistas favoritas
+  dockItems: MenuItem[] = []; //Variable que mostrará las vistas favoritas que feuron escogidas por el usuario logeado
+  responsiveOptions: any[]; //Variable que hará que el docker, donde estan las vistas favoritas, sea responsive
+  targetProducts = []; //Variable que tendrá las vistas seleccionadas por el usuario como favoritas
+  disponibles = []; //Variable que tendrá la información de todas las vistas disponibles
+  seleccionados = []; //Variable que almacenará los id de las vistas seleccionadas por el usuario como favoritas
+  vistasFavoritas : any [] = []; // Variable que almacenará las vistas favoritas del usuario
+  disponiblesMostrar = []; //Variable que almacenará las vistas disponibles para cada usuario segun su rol
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
                   private vistasFavService : VistasFavoritasService,
                     private messageService: MessageService) { }
 
+  ngOnInit() {
+    this.lecturaStorage();
+    this.llenarDatosSeleccionables();
+    this.buscarFavoritos();
+    setTimeout(() => { this.mostrarVistasFav(); }, 1500);
+  }
 
+  // Funcion que leerá la informacion del usuario logeado, infomración que se almacena apenas el usuario incia sesion
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
@@ -45,13 +52,6 @@ export class PaginaPrincipalComponent implements OnInit {
         }
       }
     });
-  }
-
-  ngOnInit() {
-    this.lecturaStorage();
-    this.llenarDatosSeleccionables();
-    this.buscarFavoritos();
-    setTimeout(() => { this.mostrarVistasFav(); }, 1500);
   }
 
   // Llenar datos con todas las opciones de vistas que puede seleccionar como favoritas
@@ -99,7 +99,7 @@ export class PaginaPrincipalComponent implements OnInit {
     ];
   }
 
-  //
+  // Funcion que va a colocar en la vista las vistas escogidas por un usuario como favoritas, las ociones favoritas siempre tendrán predeterminadas, 1: Inicio y 2: Añadir
   mostrarVistasFav(){
     this.dockItems = [];
     this.dockItems.push(
@@ -147,7 +147,6 @@ export class PaginaPrincipalComponent implements OnInit {
         command: () => { this.llenarDatosRol(); }
       }
     );
-
     this.responsiveOptions = [
       {
         breakpoint: '1024px',
@@ -164,7 +163,7 @@ export class PaginaPrincipalComponent implements OnInit {
     ];
   }
 
-  // Funcion que llenará los datos segun el rol del usuario logeado
+  // Funcion que llenará los datos segun el rol del usuario logeado, si no encuentra ninguna vista como favorita no pondrá ninguno en la vista
   llenarDatosRol(){
     this.targetProducts = [];
     this.disponiblesMostrar = [];
@@ -183,21 +182,21 @@ export class PaginaPrincipalComponent implements OnInit {
     setTimeout(() => { this.displayTerminal = true; }, 500);
   }
 
-  // Funcion que validará que solo se puedan elegir 5 vistas favoritas y redireccionará a la funcion que gusrda o actualiza las vistas escogidas
+  // Funcion que validará que solo se puedan elegir 5 vistas favoritas y redireccionará a la funcion que gusada o actualiza las vistas escogidas
   elegirFavoritos(){
     if (this.targetProducts.length > 5) {
       this.messageService.add({key: 'tc', severity:'warn', summary: 'Advertencia', detail: 'Solo puede elegir 5 favoritos'});
       for (let i = 0; i < this.targetProducts.length; i++) {
-        this.disponibles.push(this.targetProducts[i]);
+        this.disponiblesMostrar.push(this.targetProducts[i]);
         this.targetProducts.splice(i, 1);
-        this.disponibles.sort((a,b) => Number(a.id) - Number(b.id));
+        this.disponiblesMostrar.sort((a,b) => Number(a.id) - Number(b.id));
         this.añadirVistasFavoritas();
         break;
       }
     } else if (this.targetProducts.length <= 5) this.añadirVistasFavoritas();
   }
 
-  // funcion que consultará el usuario que inició sesión para saber cuales vistas ha selccionado como favoritas
+  // Funcion que tomará el usuario logeado y lo consultará en la base de datos, en tabla "VistasFavoritas", y buscará las vistas escogidas por el usuario anteriormente
   buscarFavoritos(){
     this.vistasFavoritas = [];
     this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(datos_vistasFav => {
@@ -258,30 +257,15 @@ export class PaginaPrincipalComponent implements OnInit {
     } else {
       this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(datos_vistasFav => {
         for (let i = 0; i < datos_vistasFav.length; i++) {
-          for (let j = 0; j < this.targetProducts.length; j++) {
-            let vista1 : number = this.targetProducts[i];
-            let vista2 : number = this.targetProducts[i + 1];
-            let vista3 : number = this.targetProducts[i + 2];
-            let vista4 : number = this.targetProducts[i + 3];
-            let vista5 : number = this.targetProducts[i + 4];
-            if (vista1 == undefined) vista1 = 0;
-            else vista1 = this.targetProducts[i].id;
-            if (vista2 == undefined) vista2 = 0;
-            else vista2 = this.targetProducts[i + 1].id;
-            if (vista3 == undefined) vista3 = 0;
-            else vista3 = this.targetProducts[i + 2].id;
-            if (vista4 == undefined) vista4 = 0;
-            else vista4 = this.targetProducts[i + 3].id;
-            if (vista5 == undefined) vista5 = 0;
-            else vista5 = this.targetProducts[i + 4].id;
+          if (this.targetProducts.length == 0) {
             let info : any = {
               VistasFav_Id: datos_vistasFav[i].vistasFav_Id ,
               Usua_Id : this.storage_Id,
-              VistaFav_Num1 : vista1,
-              VistaFav_Num2 : vista2,
-              VistaFav_Num3 : vista3,
-              VistaFav_Num4 : vista4,
-              VistaFav_Num5 : vista5,
+              VistaFav_Num1 : 0,
+              VistaFav_Num2 : 0,
+              VistaFav_Num3 : 0,
+              VistaFav_Num4 : 0,
+              VistaFav_Num5 : 0,
               VistaFav_Fecha : moment().format('YYYY-MM-DD'),
               VistaFav_Hora : moment().format('H:mm:ss'),
             }
@@ -296,15 +280,50 @@ export class PaginaPrincipalComponent implements OnInit {
                 html: `<b>¡No se pudieron guardar las vistas elegidas!</b><br>` + `<spam style="color: #f00">${error.message}</spam>`,
               });
             });
-            break;
+          } else {
+            for (let j = 0; j < this.targetProducts.length; j++) {
+              let vista1 : number = this.targetProducts[i];
+              let vista2 : number = this.targetProducts[i + 1];
+              let vista3 : number = this.targetProducts[i + 2];
+              let vista4 : number = this.targetProducts[i + 3];
+              let vista5 : number = this.targetProducts[i + 4];
+              if (vista1 == undefined) vista1 = 0;
+              else vista1 = this.targetProducts[i].id;
+              if (vista2 == undefined) vista2 = 0;
+              else vista2 = this.targetProducts[i + 1].id;
+              if (vista3 == undefined) vista3 = 0;
+              else vista3 = this.targetProducts[i + 2].id;
+              if (vista4 == undefined) vista4 = 0;
+              else vista4 = this.targetProducts[i + 3].id;
+              if (vista5 == undefined) vista5 = 0;
+              else vista5 = this.targetProducts[i + 4].id;
+              let info : any = {
+                VistasFav_Id: datos_vistasFav[i].vistasFav_Id ,
+                Usua_Id : this.storage_Id,
+                VistaFav_Num1 : vista1,
+                VistaFav_Num2 : vista2,
+                VistaFav_Num3 : vista3,
+                VistaFav_Num4 : vista4,
+                VistaFav_Num5 : vista5,
+                VistaFav_Fecha : moment().format('YYYY-MM-DD'),
+                VistaFav_Hora : moment().format('H:mm:ss'),
+              }
+              this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => {
+                this.buscarFavoritos();
+                setTimeout(() => { this.mostrarVistasFav(); }, 1000);
+              }, error => {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Opps...',
+                  showCloseButton : true,
+                  html: `<b>¡No se pudieron guardar las vistas elegidas!</b><br>` + `<spam style="color: #f00">${error.message}</spam>`,
+                });
+              });
+              break;
+            }
           }
         }
       });
     }
-  }
-
-  // Funcion que cerrará el div que permite elegir las vistas favoritas
-  cerrar(){
-    this.displayTerminal = false;
   }
 }

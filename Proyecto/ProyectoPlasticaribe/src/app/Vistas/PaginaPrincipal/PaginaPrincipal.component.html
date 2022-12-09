@@ -39,15 +39,18 @@
 <p-toast position="center" key="tc"></p-toast>
 
 <div class="dock-window dock-advanced">
+  <!-- Docker -->
   <p-dock [model]="dockItems" position="bottom">
     <ng-template pTemplate="item" let-item>
       <img [src]="item.icon" [alt]="item.label" width="100%" style="cursor: pointer;">
     </ng-template>
   </p-dock>
 
+  <!-- PickList -->
   <div class="contenedorLista" *ngIf="displayTerminal">
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <label class="btnclose pi pi-times" mat-button (click)="cerrar()"></label>
+      <!-- Para cerrar el apartado donde se escogen y modifican las vistas favoritas se creó un label que al dar click sobre el dejará de mostrar este apartado -->
+      <label class="btnclose pi pi-times" mat-button (click)="this.displayTerminal = false"></label>
     </div>
     <p-pickList
       [source]="disponiblesMostrar"
@@ -57,6 +60,7 @@
       sourceHeader="Disponible"
       targetHeader="Seleccionado"
       [dragdrop]="true"
+      [metaKeySelection]="false"
       [responsive]="true"
       [sourceStyle]="{'height':'30rem'}"
       [targetStyle]="{'height':'30rem'}"
@@ -64,7 +68,7 @@
       sourceFilterPlaceholder="Buscar por nombre"
       targetFilterPlaceholder="Buscar por nombre"
       (onMoveToTarget)="elegirFavoritos()"
-      (onMoveAllToTarget)="elegirFavoritos()"
+      (onMoveAllToTarget)="llenarDatosRol()"
       (onMoveToSource)="elegirFavoritos()"
       (onMoveAllToSource)="elegirFavoritos()">
       <ng-template let-product pTemplate="item">

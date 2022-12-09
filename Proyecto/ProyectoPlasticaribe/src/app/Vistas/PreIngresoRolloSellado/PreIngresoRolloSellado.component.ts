@@ -48,10 +48,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private bagProService : BagproService,
                       private dtPreEntRollosService : DtPreEntregaRollosService,
-                        private preEntRollosService : PreEntregaRollosService,
-                          private ExistenciasProdService : ExistenciasProductosService,
-                            private entradaRolloService : EntradaRollosService,
-                              private dtEntradaRollosService : DetallesEntradaRollosService,) {
+                        private preEntRollosService : PreEntregaRollosService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -92,15 +89,6 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
 
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
   fecha(){
-    this.today;
-    /*this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;*/
-
     setTimeout(() => {
       if (this.ValidarRol == 8){
         this.FormConsultarRollos.setValue({

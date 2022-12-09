@@ -4,12 +4,8 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DtPreEntregaRollos.service';
-import { EntradaRollosService } from 'src/app/Servicios/EntradaRollos.service';
-import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
 import { PreEntregaRollosService } from 'src/app/Servicios/PreEntregaRollos.service';
-import { ProductoService } from 'src/app/Servicios/producto.service';
 import { RolesService } from 'src/app/Servicios/roles.service';
 import Swal from 'sweetalert2';
 
@@ -46,12 +42,8 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
                 private rolService : RolesService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private bagProService : BagproService,
-                      private ExistenciasProdService : ExistenciasProductosService,
-                        private entradaRolloService : EntradaRollosService,
-                          private dtEntradaRollosService : DetallesEntradaRollosService,
-                            private dtPreEntRollosService : DtPreEntregaRollosService,
-                              private preEntRollosService : PreEntregaRollosService,
-                                private productosService : ProductoService) {
+                      private dtPreEntRollosService : DtPreEntregaRollosService,
+                        private preEntRollosService : PreEntregaRollosService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -63,7 +55,6 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.fecha();
     this.lecturaStorage();
   }
 
@@ -89,24 +80,6 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     });
   }
 
-  //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
-  fecha(){
-    this.today;
-    /*this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;*/
-    this.FormConsultarRollos.setValue({
-      OT_Id: this.FormConsultarRollos.value.OT_Id,
-      fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-      fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-      Observacion : this.FormConsultarRollos.value.Observacion,
-      Proceso : this.FormConsultarRollos.value.Proceso,
-    });
-  }
 
   // Funcion para limpiar los campos de la vista
   limpiarCampos(){
@@ -765,7 +738,6 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
     setTimeout(() => { window.scroll(0, scrollable) }, 10);
   }
-
 
   /**Si existe algún problema al momento de guardar el encabezado a la BD se mostrará un mensaje de error  */
   mensajeErrorEncabezado(){

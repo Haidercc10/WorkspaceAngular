@@ -1,5 +1,5 @@
 import { Component, OnInit, Injectable } from '@angular/core';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root'
@@ -13,28 +13,19 @@ import { MenuItem } from 'primeng/api';
 
 export class PruebaImagenCatInsumoComponent implements OnInit {
 
-  items: MenuItem[];
+  value: number = 0;
 
-  ngOnInit() {
-    this.items = [{
-      label: 'File',
-      items: [
-        {label: 'New', icon: 'pi pi-plus', replaceUrl: true, url: './registro-usuario'},
-        {label: 'Open', icon: 'pi pi-download'}
-      ],
-    },
-    {
-      label: 'Edit',
-      items: [
-        {
-          label: 'Undo',
-          icon: 'pi pi-refresh',
-          command: () => {
-            window.location.href = "./home"
-          }
-        },
-        {label: 'Redo', icon: 'pi pi-repeat'}
-      ]
-    }];
-  }
+    constructor(private messageService: MessageService) {}
+
+    ngOnInit() {
+        let interval = setInterval(() => {
+            this.value = this.value + Math.floor(Math.random() * 10) + 1;
+            if (this.value >= 100) {
+                this.value = 100;
+                this.messageService.add({severity: 'info', summary: 'Success', detail: 'Process Completed'});
+                clearInterval(interval);
+            }
+        }, 2000);
+    }
+
 }
