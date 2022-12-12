@@ -103,6 +103,7 @@ import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extru
 import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
 import { Ventas_TemporalesComponent } from './Vistas/Ventas_Temporales/Ventas_Temporales.component';
 import { Inventario_ExtrusionComponent } from './Vistas/Inventario_Extrusion/Inventario_Extrusion.component';
+import { PedidoMantenimientoComponent } from './Vistas/Pedido-Mantenimiento/Pedido-Mantenimiento.component';
 
 // Prime NG
 import {TableModule} from 'primeng/table';
@@ -220,6 +221,9 @@ export const routes: Routes = [
 
  /*************************************************************************************************************************************************************/
  {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
+
+ /******************************************************************* MANTENIMIENTO ***************************************************************************/
+ {path: 'pedido-mantenimiento', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PedidoMantenimientoComponent,},
 ]
 
 @NgModule({
@@ -313,6 +317,7 @@ export const routes: Routes = [
     Reporte_OrdenCompraComponent,
     Ventas_TemporalesComponent,
     Inventario_ExtrusionComponent,
+    PedidoMantenimientoComponent,
   ],
 
 

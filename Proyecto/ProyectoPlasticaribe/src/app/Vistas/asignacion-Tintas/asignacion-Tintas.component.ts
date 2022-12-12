@@ -321,11 +321,12 @@ export class AsignacionTintasComponent implements OnInit {
       this.sumarInventarioTintas();
       this.moverInventarioMP();
       this.moverInventarioTintas();
+      this.load = false;
      }, error => {
       Swal.fire({
       icon: 'error',
       title: 'Oops..',
-      html: `<b>¡Error al consultar el último Id de asignación!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
+      html: `<b>¡Error al consultar el último Id de asignación!</b><br>` + `<spam style="color: #f00">${error.messages}</spam>`,
       showCloseButton: true,
       });
     });
@@ -445,7 +446,7 @@ export class AsignacionTintasComponent implements OnInit {
         });
       });
     });
-    this.load = true;
+    this.load = false;
   }
 
   // Función para quitar una materia prima de la tabla

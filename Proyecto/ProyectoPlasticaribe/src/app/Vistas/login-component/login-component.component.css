@@ -78,3 +78,7 @@ a {
 .inputPassword {
   height: 50px;
 }
+
+.pi {
+  cursor: pointer;
+}
