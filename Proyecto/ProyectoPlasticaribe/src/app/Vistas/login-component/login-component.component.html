@@ -22,8 +22,9 @@
           <label for="floatingInputGroup1">Contraseña</label>
         </div>
         <ng-container *ngIf="mostrarPass == true then noMostrar; else mostrar"></ng-container>
-        <ng-template #mostrar><span class="input-group-text" (click)="mostrarPassword()"><i class="pi pi-eye"></i></span></ng-template>
-        <ng-template #noMostrar><span class="input-group-text" (click)="mostrarPassword()"><i class="pi pi-eye-slash"></i></span></ng-template>
+        <ng-template #mostrar><span style="cursor: pointer;" class="input-group-text" (click)="mostrarPassword()"><i class="pi pi-eye"></i></span></ng-template>
+        <ng-template #noMostrar><span style="cursor: pointer;" class="input-group-text" (click)="mostrarPassword()"><i class="pi pi-eye-slash"></i></span></ng-template>
+
       </div>
 
       <div class="form-floating col-md mb-3">
@@ -36,7 +37,7 @@
 
       <!--Boton Ingresar al sistema-->
       <div class="d-grid gap-2 mb-3">
-        <button class="btn btn-danger btn-danger-sm" type="submit">¡Ingresar!</button>
+        <button class="btn btn-danger btn-danger-sm" type="submit"><i class="pi pi-check"></i> Ingresar</button>
       </div>
 
       <div class="mb-3">

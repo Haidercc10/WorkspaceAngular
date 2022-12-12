@@ -1,0 +1,127 @@
+
+<app-menuLateral></app-menuLateral>
+
+<div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Mantenimiento de camiones</h2>
+    </div>
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid bajarPagina">
+    <div class="container">
+
+      <div class="mb-4">
+        <h4 class="tituloRojo">Consultar Pedido</h4>
+      </div>
+      <!-- Formulario -->
+      <form [formGroup]="formConsultarPedidoMtto">
+        <!-- Primera Fila -->
+        <div class="mb-3">
+          <div class="row g-3">
+
+            <!-- OT -->
+            <div class="form-floating col-md-2">
+              <input formControlName="idPedido" type="number" class="form-control form-control-sm" id="floatingInput" autocomplete="off">
+              <label for="floatingInput">Nro. Pedido</label>
+            </div>
+
+             <!-- Tipo de Proceso -->
+             <!--<div class="form-floating col-md">
+              <select formControlName="Proceso" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+
+              </select>
+              <label for="floatingSelect">Proceso</label>
+            </div>-->
+
+             <!-- Fecha Inicial -->
+             <!--<div class="form-floating col-md">
+              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha inicial</label>
+            </div>-->
+
+            <!-- Fecha Final -->
+            <!--<div class="form-floating col-md">
+              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput"required >
+              <label for="floatingInput">Fecha Final</label>
+            </div>-->
+
+            <!-- Observacion -->
+            <!--<div class="form-floating col-md-5">
+              <input formControlName="Observacion" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off">
+              <label for="floatingInput">Observación</label>
+            </div>-->
+
+          </div>
+        </div>
+
+        <!-- (Botones) -->
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button class=" btn btn-danger btn-danger-sm" type="button" >Consultar Pedido</button>
+              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" >Limpiar Campos</button>
+          </div>
+
+        <!--<div class="mb-0">
+          <hr class="Linea">
+        </div>-->
+      </form>
+
+      <div class="mb-4" *ngIf="cargando">
+        <h4 class="tituloRojo">Tabla de rollos por ingresar</h4>
+      </div>
+
+        <div class="mb-3" *ngIf="cargando">
+          <p-table
+          #dt
+          [value]=""
+          [rows]="10"
+          dataKey="Id"
+          [paginator]="true"
+
+          styleClass="p-datatable-gridlines p-datatable-sm"
+
+
+          responsiveLayout="scroll"
+          currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros">
+
+              <ng-template pTemplate="header">
+                  <tr>
+                      <th scope="col">ID Pedido</th>
+                      <th scope="col">Fecha Pedido</th>
+                      <th scope="col">Hora Pedido</th>
+                      <th scope="col">Usuario</th>
+                      <th scope="col">Estado</th>
+                      <th scope="col">Observación</th>
+                      <th style="width: 4rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                  </tr>
+              </ng-template>
+              <ng-template pTemplate="body">
+                  <tr>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td><p-tableCheckbox></p-tableCheckbox></td>
+                  </tr>
+              </ng-template>
+          </p-table>
+        </div>
+    </div>
+  </div>
+</div>

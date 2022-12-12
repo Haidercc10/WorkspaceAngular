@@ -104,6 +104,7 @@ import { CrearBoppComponent } from './Vistas/crear-bopp/crear-bopp.component';
 import { Ventas_TemporalesComponent } from './Vistas/Ventas_Temporales/Ventas_Temporales.component';
 import { Inventario_ExtrusionComponent } from './Vistas/Inventario_Extrusion/Inventario_Extrusion.component';
 import { PedidoMantenimientoComponent } from './Vistas/Pedido-Mantenimiento/Pedido-Mantenimiento.component';
+import { Mantenimiento_CamionesComponent } from './Vistas/Mantenimiento_Camiones/Mantenimiento_Camiones.component';
 
 // Prime NG
 import {TableModule} from 'primeng/table';
@@ -223,7 +224,8 @@ export const routes: Routes = [
  {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
 
  /******************************************************************* MANTENIMIENTO ***************************************************************************/
- {path: 'pedido-mantenimiento', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PedidoMantenimientoComponent,},
+ {path: 'pedido-mantenimiento', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PedidoMantenimientoComponent},
+ {path: 'mantenimiento-camiones',  component: Mantenimiento_CamionesComponent },
 ]
 
 @NgModule({
@@ -318,6 +320,7 @@ export const routes: Routes = [
     Ventas_TemporalesComponent,
     Inventario_ExtrusionComponent,
     PedidoMantenimientoComponent,
+    Mantenimiento_CamionesComponent,
   ],
 
 
