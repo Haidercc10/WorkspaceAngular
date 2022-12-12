@@ -1,22 +1,22 @@
 import { Component, OnInit,Inject } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import Swal from 'sweetalert2';
-import { RolesService } from 'src/app/Servicios/roles.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { ProveedorService } from 'src/app/Servicios/proveedor.service';
-import { FactuaMpCompradaService } from 'src/app/Servicios/facturaMpComprada.service';
-import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
-import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
-import { RemisionService } from 'src/app/Servicios/Remision.service';
-import { RemisionesMPService } from 'src/app/Servicios/remisionesMP.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
+import { FactuaMpCompradaService } from 'src/app/Servicios/FacturaMateriaPrima/facturaMpComprada.service';
+import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
+import { RemisionService } from 'src/app/Servicios/Remisiones/Remision.service';
+import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { RemisionFacturaService } from 'src/app/Servicios/remisionFactura.service';
-import { TintasService } from 'src/app/Servicios/tintas.service';
-import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra_MateriaPrima.service';
+import { RemisionFacturaService } from 'src/app/Servicios/Remisiones_Facturas/remisionFactura.service';
+import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
+import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
 import moment from 'moment';
-import { OrdenFactura_RelacionService } from 'src/app/Servicios/OrdenFactura_Relacion.service';
+import { OrdenFactura_RelacionService } from 'src/app/Servicios/OrdenCompra_Facturas/OrdenFactura_Relacion.service';
 
 @Component({
   selector: 'app.pedidomateriaprima.component',

@@ -1,31 +1,31 @@
 import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl} from '@angular/forms';
 import Swal from 'sweetalert2';
-import { OpedidoproductoService } from 'src/app/Servicios/opedidoproducto.service';
-import { ProductoService } from 'src/app/Servicios/producto.service';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
-import { ClientesService } from 'src/app/Servicios/clientes.service';
-import { SedeClienteService } from 'src/app/Servicios/sede-cliente.service';
-import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
-import { TipoProductoService } from 'src/app/Servicios/tipo-producto.service'
-import { TipoMonedaService } from 'src/app/Servicios/tipo-moneda.service';
-import { EstadosService } from 'src/app/Servicios/estados.service';
-import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
-import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
-import { EmpresaService } from 'src/app/Servicios/empresa.service';
-import { PedidoProductosService } from 'src/app/Servicios/pedidoProductos.service'
+import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
+import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
+import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
+import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service'
+import { TipoMonedaService } from 'src/app/Servicios/TipoMoneda/tipo-moneda.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { TipoEstadosService } from 'src/app/Servicios/TipoEstado/tipo-estados.service';
+import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
+import { EmpresaService } from 'src/app/Servicios/Empresa/empresa.service';
+import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service'
 import { CookieService } from 'ngx-cookie-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { TipoClienteService } from 'src/app/Servicios/tipo-cliente.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { TipoClienteService } from 'src/app/Servicios/TipoCliente/tipo-cliente.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.service';
+import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
 import { modelCliente } from 'src/app/Modelo/modelCliente';
-import { MaterialProductoService } from 'src/app/Servicios/materialProducto.service';
-import { PigmentoProductoService } from 'src/app/Servicios/pigmentoProducto.service';
+import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
+import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
 import { OrdenesTrabajoComponent } from '../ordenes-trabajo/ordenes-trabajo.component';
-import { Orden_TrabajoService } from 'src/app/Servicios/Orden_Trabajo.service';
+import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Trabajo.service';
 import moment from 'moment';
 //import * as XLSX from 'xlsx';
 

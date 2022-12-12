@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Workbook } from 'exceljs';
 import moment from 'moment';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
 import { Table } from 'primeng/table';
-import { ProductoService } from 'src/app/Servicios/producto.service';
+import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
 
 @Component({

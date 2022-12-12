@@ -3,12 +3,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
-import { DtPreEntregaRollosService } from 'src/app/Servicios/DtPreEntregaRollos.service';
-import { EntradaRollosService } from 'src/app/Servicios/EntradaRollos.service';
-import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
-import { ProductoService } from 'src/app/Servicios/producto.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
+import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
+import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
+import { EntradaRollosService } from 'src/app/Servicios/IngresoRollosDespacho/EntradaRollos.service';
+import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
+import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({

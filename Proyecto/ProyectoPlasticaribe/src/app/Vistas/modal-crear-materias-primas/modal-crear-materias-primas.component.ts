@@ -2,11 +2,11 @@ import { ThisReceiver } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { modelTintasMateriasPrimas } from 'src/app/Modelo/modelTintasMateriasPrimas';
-import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
-import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { TintasService } from 'src/app/Servicios/tintas.service';
-import { TintasMPService } from 'src/app/Servicios/tintasMP.service';
-import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
+import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
+import { TintasMPService } from 'src/app/Servicios/Tintas_MateriaPrima/tintasMP.service';
+import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
 
 @Component({

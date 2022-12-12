@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { modelCategoriaMP } from 'src/app/Modelo/modelCategoriaMP';
-import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
+import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import Swal from 'sweetalert2';
 
 @Component({

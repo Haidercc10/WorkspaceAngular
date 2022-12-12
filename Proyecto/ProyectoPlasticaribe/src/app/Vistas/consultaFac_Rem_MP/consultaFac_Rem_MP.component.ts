@@ -3,11 +3,11 @@ import { FormGroup, FormBuilder} from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
-import { ProveedorService } from 'src/app/Servicios/proveedor.service';
-import { RemisionesMPService } from 'src/app/Servicios/remisionesMP.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
+import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
+import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
+import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import Swal from 'sweetalert2';
 
 @Component({

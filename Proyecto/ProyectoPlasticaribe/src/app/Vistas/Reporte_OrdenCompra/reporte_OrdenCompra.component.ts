@@ -4,9 +4,9 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
-import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenesCompra.service';
-import { EstadosService } from 'src/app/Servicios/estados.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
+import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCompra/DetallesOrdenesCompra.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 
 @Component({
   selector: 'app-reporte_OrdenCompra',

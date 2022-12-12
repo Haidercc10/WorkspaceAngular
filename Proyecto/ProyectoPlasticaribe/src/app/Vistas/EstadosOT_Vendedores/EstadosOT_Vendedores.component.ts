@@ -2,15 +2,15 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Workbook } from 'exceljs';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { EstadosService } from 'src/app/Servicios/estados.service';
-import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesos_OT.service';
-import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
-import { EstadosProcesosOTxVendedoresService } from 'src/app/Servicios/EstadosProcesosOTxVendedores.service';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
+import { EstadosProcesosOTxVendedoresService } from 'src/app/Servicios/EstadosProcesosOTVendedores/EstadosProcesosOTxVendedores.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Component({
   selector: 'app-EstadosOT_Vendedores',

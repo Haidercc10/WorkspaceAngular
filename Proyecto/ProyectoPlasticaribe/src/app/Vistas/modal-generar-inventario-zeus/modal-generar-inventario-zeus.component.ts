@@ -1,14 +1,14 @@
 import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { FiltrosProductosTerminadosZeusPipe } from 'src/app/Pipes/filtros-productos-terminados-zeus.pipe';
-import { InventarioZeusService } from 'src/app/Servicios/inventario-zeus.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
-import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
+import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';

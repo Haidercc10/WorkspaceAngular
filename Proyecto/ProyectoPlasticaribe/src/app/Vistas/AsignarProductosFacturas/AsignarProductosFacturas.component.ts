@@ -3,16 +3,16 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { AsignacionProductosFacturaService } from 'src/app/Servicios/AsignacionProductosFactura.service';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { ClientesService } from 'src/app/Servicios/clientes.service';
-import { ClientesProductosService } from 'src/app/Servicios/ClientesProductos.service';
-import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesAsignacionProductosFactura.service';
-import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
-import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
-import { ProductoService } from 'src/app/Servicios/producto.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
+import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
+import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
+import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
+import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
+import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
 
 @Component({

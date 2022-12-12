@@ -5,12 +5,12 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
-import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollos_Extrusion.service';
-import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DtIngRollos_Extrusion.service';
-import { EstadosService } from 'src/app/Servicios/estados.service';
-import { ProductoService } from 'src/app/Servicios/producto.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
+import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollosExtrusion/DetallesAsgRollos_Extrusion.service';
+import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 
 @Injectable({
   providedIn: 'root'

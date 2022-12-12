@@ -1,10 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { Detalles_EntradaTintasService } from 'src/app/Servicios/Detalles_EntradaTintas.service';
-import { Entrada_TintaService } from 'src/app/Servicios/Entrada_Tinta.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { TintasService } from 'src/app/Servicios/tintas.service';
+import { Detalles_EntradaTintasService } from 'src/app/Servicios/DetallesEntradasTintas/Detalles_EntradaTintas.service';
+import { Entrada_TintaService } from 'src/app/Servicios/EntradasTintas/Entrada_Tinta.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import Swal from 'sweetalert2';
 
 @Component({

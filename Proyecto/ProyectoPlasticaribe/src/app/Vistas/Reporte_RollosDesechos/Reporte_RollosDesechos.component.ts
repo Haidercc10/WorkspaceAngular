@@ -4,15 +4,15 @@ import { Workbook } from 'exceljs';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { MaterialProductoService } from 'src/app/Servicios/materialProducto.service';
-import { ProductoService } from 'src/app/Servicios/producto.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { SrvRollosEliminadosService } from 'src/app/Servicios/srvRollosEliminados.service';
-import { TurnosService } from 'src/app/Servicios/Turnos.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
+import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { SrvRollosEliminadosService } from 'src/app/Servicios/RollosDesechos/srvRollosEliminados.service';
+import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
-import { ProcesosService } from 'src/app/Servicios/procesos.service';
+import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 
 @Component({
   selector: 'app-Reporte_RollosDesechos',

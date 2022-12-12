@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { BoppGenericoService } from 'src/app/Servicios/BoppGenerico.service';
-import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
-import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
+import { BoppGenericoService } from 'src/app/Servicios/BoppGenerico/BoppGenerico.service';
+import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
+import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 
 @Component({
   selector: 'app-crear-bopp',

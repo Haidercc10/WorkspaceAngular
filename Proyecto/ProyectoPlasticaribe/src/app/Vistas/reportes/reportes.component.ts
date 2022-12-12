@@ -1,10 +1,10 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
-import { TipoEstadosService } from 'src/app/Servicios/tipo-estados.service';
-import { ClientesService } from 'src/app/Servicios/clientes.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { EstadosService } from 'src/app/Servicios/estados.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { TipoEstadosService } from 'src/app/Servicios/TipoEstado/tipo-estados.service';
+import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';

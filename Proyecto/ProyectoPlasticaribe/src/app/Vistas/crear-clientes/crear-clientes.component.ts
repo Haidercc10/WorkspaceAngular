@@ -1,8 +1,8 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { TipoClienteService } from 'src/app/Servicios/tipo-cliente.service';
-import { TipoIdentificacionService } from 'src/app/Servicios/tipo-identificacion.service';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
+import { TipoClienteService } from 'src/app/Servicios/TipoCliente/tipo-cliente.service';
+import { TipoIdentificacionService } from 'src/app/Servicios/TipoIdentificacion/tipo-identificacion.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
 import {OpedidoproductoComponent} from 'src/app/Vistas/opedidoproducto/opedidoproducto.component';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';

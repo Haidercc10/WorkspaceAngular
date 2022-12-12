@@ -2,8 +2,8 @@ import { Component, Inject, OnInit } from '@angular/core';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MenuItem, MessageService } from 'primeng/api';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
 import Swal from 'sweetalert2';
 
 @Component({

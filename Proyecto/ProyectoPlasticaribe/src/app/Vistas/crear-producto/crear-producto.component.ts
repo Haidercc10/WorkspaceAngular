@@ -1,18 +1,18 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ProductoService } from 'src/app/Servicios/producto.service';
-import { TipoMonedaService } from 'src/app/Servicios/tipo-moneda.service';
-import { TipoProductoService } from 'src/app/Servicios/tipo-producto.service';
-import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
+import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { TipoMonedaService } from 'src/app/Servicios/TipoMoneda/tipo-moneda.service';
+import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service';
+import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
 import {OpedidoproductoComponent} from 'src/app/Vistas/opedidoproducto/opedidoproducto.component'
-import { ExistenciasProductosService } from 'src/app/Servicios/existencias-productos.service';
-import { ClientesService } from 'src/app/Servicios/clientes.service';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
+import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
+import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { MaterialProductoService } from 'src/app/Servicios/materialProducto.service';
-import { PigmentoProductoService } from 'src/app/Servicios/pigmentoProducto.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
+import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
 import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 
 @Injectable({

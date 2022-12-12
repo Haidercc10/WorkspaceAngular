@@ -1,20 +1,20 @@
 import { Component, Inject, Injectable, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { EstadosService } from 'src/app/Servicios/estados.service';
-import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesos_OT.service';
-import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DatosOTStatusComponent } from '../DatosOT-Status/DatosOT-Status.component';
 import { ReporteCostosOTComponent } from '../reporteCostosOT/reporteCostosOT.component';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
-import { EstadosProcesosOTxVendedoresService } from 'src/app/Servicios/EstadosProcesosOTxVendedores.service';
-import { ClientesService } from 'src/app/Servicios/clientes.service';
-import { ProductoService } from 'src/app/Servicios/producto.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { EstadosProcesosOTxVendedoresService } from 'src/app/Servicios/EstadosProcesosOTVendedores/EstadosProcesosOTxVendedores.service';
+import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { FilterService } from 'primeng/api';
 
 @Injectable({

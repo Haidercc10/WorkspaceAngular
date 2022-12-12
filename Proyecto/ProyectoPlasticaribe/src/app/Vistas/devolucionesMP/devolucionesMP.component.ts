@@ -2,13 +2,13 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
-import { DevolucionesService } from 'src/app/Servicios/devoluciones.service';
-import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service';
-import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
-import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { TintasService } from 'src/app/Servicios/tintas.service';
+import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
+import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
+import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
+import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import Swal from 'sweetalert2';
 
 @Component({

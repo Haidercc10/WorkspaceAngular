@@ -1,10 +1,10 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { TipoIdentificacionService } from 'src/app/Servicios/tipo-identificacion.service';
-import { Tipo_ProveedorService } from 'src/app/Servicios/tipo_Proveedor.service';
+import { TipoIdentificacionService } from 'src/app/Servicios/TipoIdentificacion/tipo-identificacion.service';
+import { Tipo_ProveedorService } from 'src/app/Servicios/TipoProveedor/tipo_Proveedor.service';
 import Swal from 'sweetalert2';
-import { ProveedorService } from 'src/app/Servicios/proveedor.service';
+import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import moment from 'moment';
 
 @Injectable({

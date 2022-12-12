@@ -4,10 +4,10 @@ import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DtIngRollos_Extrusion.service';
-import { IngRollos_ExtrusuionService } from 'src/app/Servicios/IngRollos_Extrusuion.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
+import { IngRollos_ExtrusuionService } from 'src/app/Servicios/IngresoRollosBodegaExtrusion/IngRollos_Extrusuion.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({

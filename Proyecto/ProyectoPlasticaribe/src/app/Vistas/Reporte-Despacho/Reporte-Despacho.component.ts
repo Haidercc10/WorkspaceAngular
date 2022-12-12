@@ -3,14 +3,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesAsignacionProductosFactura.service';
-import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionesProductos.service';
-import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradaRollos.service';
-import { DtPreEntregaRollosService } from 'src/app/Servicios/DtPreEntregaRollos.service';
-import { EstadosService } from 'src/app/Servicios/estados.service';
-import { ProductoService } from 'src/app/Servicios/producto.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
+import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
+import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
+import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
+import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 
 @Component({
   selector: 'app-Reporte-Despacho',

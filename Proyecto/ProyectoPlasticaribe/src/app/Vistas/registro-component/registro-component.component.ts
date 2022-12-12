@@ -3,14 +3,14 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Workbook } from 'exceljs';
 import moment from 'moment';
 import { modelUsuario } from 'src/app/Modelo/modelUsuario';
-import { EstadosService } from 'src/app/Servicios/estados.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { ServicioAreasService } from 'src/app/Servicios/servicio-areas.service';
-import { SrvTipos_UsuariosService } from 'src/app/Servicios/srvTipos_Usuarios.service';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { SrvTipos_UsuariosService } from 'src/app/Servicios/TiposUsuarios/srvTipos_Usuarios.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
 import { Table } from 'primeng/table'
+import { AreaService } from 'src/app/Servicios/Areas/area.service';
 
 @Component({
   selector: 'app-registro-component',
@@ -40,7 +40,7 @@ export class RegistroComponentComponent implements OnInit {
 
   constructor(private formBuilder : FormBuilder,
               private servicioRoles : RolesService,
-                private servicioAreas : ServicioAreasService,
+                private servicioAreas : AreaService,
                   private servicioUsuarios : UsuarioService,
                     private servicioEstados : EstadosService,
                       private servicioTpUsuarios : SrvTipos_UsuariosService) {
@@ -66,7 +66,7 @@ export class RegistroComponentComponent implements OnInit {
 
   // Funcion que crgará las areas
   cargarAreas() {
-    this.servicioAreas.srvObtenerListaAreas().subscribe(dataAreas => {
+    this.servicioAreas.srvObtenerLista().subscribe(dataAreas => {
       for (let index = 0; index < dataAreas.length; index++) {
         this.arrayAreas.push(dataAreas[index]);
       }

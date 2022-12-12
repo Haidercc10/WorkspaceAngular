@@ -2,17 +2,17 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
-import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { ProcesosService } from 'src/app/Servicios/procesos.service';
-import { RecuperadoService } from 'src/app/Servicios/recuperado.service';
-import { RecuperadoMPService } from 'src/app/Servicios/recuperadoMP.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { TipoBodegaService } from 'src/app/Servicios/tipoBodega.service';
-import { TipoRecuperadoService } from 'src/app/Servicios/tipoRecuperado.service';
-import { TurnosService } from 'src/app/Servicios/Turnos.service';
-import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
+import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
+import { RecuperadoService } from 'src/app/Servicios/Recuperado/recuperado.service';
+import { RecuperadoMPService } from 'src/app/Servicios/DetallesRecuperado/recuperadoMP.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.service';
+import { TipoRecuperadoService } from 'src/app/Servicios/TipoRecuperado/tipoRecuperado.service';
+import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
+import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
 
 @Component({

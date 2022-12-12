@@ -4,12 +4,12 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenesCompra.service';
-import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra_MateriaPrima.service';
-import { ProveedorService } from 'src/app/Servicios/proveedor.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
+import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCompra/DetallesOrdenesCompra.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
+import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
 
 @Injectable({

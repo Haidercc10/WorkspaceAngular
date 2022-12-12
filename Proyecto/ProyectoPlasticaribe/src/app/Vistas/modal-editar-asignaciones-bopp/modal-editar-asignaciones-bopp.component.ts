@@ -2,11 +2,11 @@ import { DataSource } from '@angular/cdk/collections';
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { AsignacionBOPPService } from 'src/app/Servicios/asignacionBOPP.service';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/detallesAsignacionBOPP.service';
-import { EntradaBOPPService } from 'src/app/Servicios/entrada-BOPP.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
+import { AsignacionBOPPService } from 'src/app/Servicios/Asignacion_Bopp/asignacionBOPP.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/DetallesAsgBopp/detallesAsignacionBOPP.service';
+import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({

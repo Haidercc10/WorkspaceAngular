@@ -7,15 +7,12 @@ import { LoginComponentComponent } from './Vistas/login-component/login-componen
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { AreasComponentComponent } from './Vistas/areas-component/areas-component.component';
-import { ServicioAreasService } from './Servicios/servicio-areas.service';
 import { ReportesComponent } from './Vistas/reportes/reportes.component';
 import { InicioComponent } from './Vistas/inicio/inicio.component';
 import { RolesComponentComponent } from './Vistas/roles-component/roles-component.component';
 import { FpensionComponent } from './Vistas/fpension/fpension.component';
 import { EpsComponent } from './Vistas/eps/eps.component';
 import { CajacompensacionComponent } from './Vistas/cajacompensacion/cajacompensacion.component';
-import { OpedidoComponent } from './Vistas/opedido/opedido.component';
 import { OpedidoproductoComponent } from './Vistas/opedidoproducto/opedidoproducto.component';
 import { OcompraComponent } from './Vistas/ocompra/ocompra.component';
 import { UsuarioComponent } from './Vistas/usuario/usuario.component';
@@ -234,13 +231,11 @@ export const routes: Routes = [
     RegistroComponentComponent,
     LoginComponentComponent,
     InicioComponent,
-    AreasComponentComponent,
     InicioComponent,
     RolesComponentComponent,
     FpensionComponent,
     EpsComponent,
     CajacompensacionComponent,
-    OpedidoComponent,
     OpedidoproductoComponent,
     PedidoExternoComponent,
     OcompraComponent,
@@ -381,7 +376,6 @@ export const routes: Routes = [
   ],
 
   providers: [
-    ServicioAreasService,
     CookieService,
     MessageService,
     ConfirmationService

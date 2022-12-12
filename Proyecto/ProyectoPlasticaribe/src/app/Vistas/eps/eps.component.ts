@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { modelEps } from 'src/app/Modelo/modelEps';
-import { EpsService } from 'src/app/Servicios/eps.service';
+import { EpsService } from 'src/app/Servicios/EPS/eps.service';
 import Swal from 'sweetalert2';
 
 @Component({

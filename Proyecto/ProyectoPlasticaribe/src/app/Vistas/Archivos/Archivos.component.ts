@@ -2,9 +2,9 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { AppComponent } from 'src/app/app.component';
-import { ArchivosService } from 'src/app/Servicios/Archivos.service';
-import { Categorias_ArchivosService } from 'src/app/Servicios/Categorias_Archivos.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
+import { ArchivosService } from 'src/app/Servicios/Archivos/Archivos.service';
+import { Categorias_ArchivosService } from 'src/app/Servicios/CategoriasArchivos/Categorias_Archivos.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({

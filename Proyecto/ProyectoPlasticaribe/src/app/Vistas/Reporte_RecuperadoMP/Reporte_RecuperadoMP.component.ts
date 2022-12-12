@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
-import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { RecuperadoMPService } from 'src/app/Servicios/recuperadoMP.service';
-import { TurnosService } from 'src/app/Servicios/Turnos.service';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { RecuperadoMPService } from 'src/app/Servicios/DetallesRecuperado/recuperadoMP.service';
+import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
 import { Modal_RptRecuperadoMPComponent } from 'src/app/Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
 

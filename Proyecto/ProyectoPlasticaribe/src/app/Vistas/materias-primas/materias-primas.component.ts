@@ -3,10 +3,10 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { modelMateriaPrima } from 'src/app/Modelo/modelMateriaPrima';
-import { CategoriaMateriaPrimaService } from 'src/app/Servicios/categoriaMateriaPrima.service';
-import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { UnidadMedidaService } from 'src/app/Servicios/unidad-medida.service';
+import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
 
 @Component({

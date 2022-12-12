@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UsuarioService } from 'src/app/Servicios/usuario.service';
-import { EmpresaService } from 'src/app/Servicios/empresa.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { EmpresaService } from 'src/app/Servicios/Empresa/empresa.service';
 import Swal from 'sweetalert2';
 import { CookieService } from 'ngx-cookie-service';
 import {SESSION_STORAGE, WebStorageService} from 'ngx-webstorage-service';

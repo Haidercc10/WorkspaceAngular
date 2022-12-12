@@ -3,17 +3,17 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { DetallesAsignacionService } from 'src/app/Servicios/detallesAsignacion.service';
-import { DetallesAsignacionTintasService } from 'src/app/Servicios/detallesAsignacionTintas.service';
-import { DevolucionesMPService } from 'src/app/Servicios/devolucionesMP.service';
-import { EstadosService } from 'src/app/Servicios/estados.service';
-import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
-import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { RecuperadoMPService } from 'src/app/Servicios/recuperadoMP.service';
-import { RemisionesMPService } from 'src/app/Servicios/remisionesMP.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
+import { DetallesAsignacionTintasService } from 'src/app/Servicios/DetallesAsgTintas/detallesAsignacionTintas.service';
+import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { RecuperadoMPService } from 'src/app/Servicios/DetallesRecuperado/recuperadoMP.service';
+import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 
 @Component({
   selector: 'app-MovimientoMatPrima',

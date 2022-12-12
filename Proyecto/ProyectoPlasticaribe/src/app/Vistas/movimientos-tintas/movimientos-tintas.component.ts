@@ -3,16 +3,16 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { BagproService } from 'src/app/Servicios/Bagpro.service';
-import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/detallesAsignacionMPxTintas.service';
-import { DetallesAsignacionTintasService } from 'src/app/Servicios/detallesAsignacionTintas.service';
-import { EstadosService } from 'src/app/Servicios/estados.service';
-import { FacturaMpService } from 'src/app/Servicios/facturaMp.service';
-import { MateriaPrimaService } from 'src/app/Servicios/materiaPrima.service';
-import { RemisionesMPService } from 'src/app/Servicios/remisionesMP.service';
-import { RolesService } from 'src/app/Servicios/roles.service';
-import { TintasService } from 'src/app/Servicios/tintas.service';
-import { TipoDocumentoService } from 'src/app/Servicios/tipoDocumento.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/DetallesCreacionTintas/detallesAsignacionMPxTintas.service';
+import { DetallesAsignacionTintasService } from 'src/app/Servicios/DetallesAsgTintas/detallesAsignacionTintas.service';
+import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
+import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 
 @Component({
   selector: 'app-movimientos-tintas',

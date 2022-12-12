@@ -1,8 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl} from '@angular/forms';
-import { DesperdicioService } from 'src/app/Servicios/desperdicio.service';
+import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { RolesService } from 'src/app/Servicios/roles.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -26,13 +26,13 @@ export class DesperdicioComponent implements OnInit {
     storage_Nombre : any;
     storage_Rol : any;
     ValidarRol : number;
-  
+
 
   ngOnInit(): void {
     this.lecturaStorage();
-    
+
   }
- 
+
 
 
 
@@ -92,16 +92,16 @@ export class DesperdicioComponent implements OnInit {
 
      // Funcion para validar los campos vacios de las consultas
   validarCamposVaciosConsulta(){
- 
-    
-    
+
+
+
   }
 
 
   //Funcion encargada de buscar un producto por el id del producto
 buscarProducto(){
    }
-  
+
 
   // Funcion para llenar los datos de los productos en cada uno de los campos
  llenadoProducto(){
@@ -110,18 +110,18 @@ buscarProducto(){
 
     //Funcion que organiza los campos de la tabla de pedidos de menor a mayor
     organizacionPrecio(){
-    
+
   }
 
     // Funcion que limpia los todos los campos de la vista
 LimpiarCampos() {
-      
+
     }
 
 
-     // Funcion para actualizar 
+     // Funcion para actualizar
      actualizarMateriaP(){
-    
-}  
+
+}
 
 }
