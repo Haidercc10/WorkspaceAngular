@@ -1,6 +1,7 @@
 
 <app-menuLateral></app-menuLateral>
 
+<!---->
 <div class="d-flex justify-content-center overlay" *ngIf="!cargando">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
     <span class="visually-hidden">Cargando...</span>
@@ -8,10 +9,9 @@
 </div>
 
 <div class="contain">
-  <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Mantenimiento de camiones</h2>
+      <h2 class="tituloRojo">Mantenimiento de Camiones</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -28,17 +28,16 @@
       </div>
       <!-- Formulario -->
       <form [formGroup]="formConsultarPedidoMtto">
-        <!-- Primera Fila -->
+
         <div class="mb-3">
           <div class="row g-3">
 
-            <!-- OT -->
+            <!-- Pedido -->
             <div class="form-floating col-md-2">
-              <input formControlName="idPedido" type="number" class="form-control form-control-sm" id="floatingInput" autocomplete="off">
+              <input formControlName="idPedido" type="number" class="form-control form-control-sm" id="floatingInput" autocomplete="off" (keyup.enter)="consultarPedido()">
               <label for="floatingInput">Nro. Pedido</label>
             </div>
-
-             <!-- Tipo de Proceso -->
+             <!---->
              <!--<div class="form-floating col-md">
               <select formControlName="Proceso" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
 
@@ -46,32 +45,30 @@
               <label for="floatingSelect">Proceso</label>
             </div>-->
 
-             <!-- Fecha Inicial -->
+             <!--  -->
              <!--<div class="form-floating col-md">
               <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput"required >
               <label for="floatingInput">Fecha inicial</label>
             </div>-->
 
-            <!-- Fecha Final -->
+            <!--  -->
             <!--<div class="form-floating col-md">
               <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput"required >
               <label for="floatingInput">Fecha Final</label>
             </div>-->
 
-            <!-- Observacion -->
+            <!--  -->
             <!--<div class="form-floating col-md-5">
               <input formControlName="Observacion" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off">
               <label for="floatingInput">Observación</label>
             </div>-->
-
           </div>
         </div>
 
-        <!-- (Botones) -->
-
+        <!-- Botones -->
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class=" btn btn-danger btn-danger-sm" type="button" >Consultar Pedido</button>
-              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" >Limpiar Campos</button>
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarPedido()">Consultar Pedido</button>
+              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampoPedido()">Limpiar Campos</button>
           </div>
 
         <!--<div class="mb-0">
@@ -79,21 +76,22 @@
         </div>-->
       </form>
 
+      <!-- Tabla vista inicial -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Tabla de rollos por ingresar</h4>
+        <h4 class="tituloRojo">Tabla de Pedidos</h4>
       </div>
 
         <div class="mb-3" *ngIf="cargando">
           <p-table
           #dt
-          [value]=""
+          [value]="arrayPedido"
           [rows]="10"
-          dataKey="Id"
+          dataKey="pedidoId"
           [paginator]="true"
-
           styleClass="p-datatable-gridlines p-datatable-sm"
-
-
+          [showCurrentPageReport]="true"
+          [rowHover]="true"
+          [rowsPerPageOptions]="[10, 20, 30, 50, 100, 120, 150]"
           responsiveLayout="scroll"
           currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros">
 
@@ -105,23 +103,116 @@
                       <th scope="col">Usuario</th>
                       <th scope="col">Estado</th>
                       <th scope="col">Observación</th>
-                      <th style="width: 4rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                      <th scope="col">Ver</th>
+                      <!--<td style="text-align: center;"><button pButton pRipple icon="pi pi-search" class="p-button-rounded p-button-success mr-2" (click)="cargarModalDetallesPedido(arrayPedido)" style="width: 30px; height: 30px;"></button></td>-->
                   </tr>
               </ng-template>
-              <ng-template pTemplate="body">
+              <ng-template pTemplate="body" let-arrayPedido>
                   <tr>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td><p-tableCheckbox></p-tableCheckbox></td>
+                      <td>{{arrayPedido.pedidoId}}</td>
+                      <td>{{arrayPedido.fecha}}</td>
+                      <td>{{arrayPedido.hora}}</td>
+                      <td>{{arrayPedido.usuario}}</td>
+                      <td>{{arrayPedido.estado}}</td>
+                      <td>{{arrayPedido.observacion}}</td>
+                      <td style="text-align: center;"><button pButton pRipple icon="pi pi-search" class="p-button-rounded p-button-success mr-2" (click)="consultarPedidoEnMtto(arrayPedido)" style="width: 30px; height: 30px;"></button></td>
                   </tr>
               </ng-template>
           </p-table>
         </div>
+
+        <!-- INICIO MODAL PEDIDO-->
+        <p-dialog header="Detalles del Pedido Nro. {{numeroPedido}}" [(visible)]="modal" [style]="{width: '70%'}" [modal]="true" styleClass="p-fluid">
+          <ng-template pTemplate="content">
+            <form [formGroup]="formPedidoCompletado">
+              <div class="mb-3">
+                <div class="row g-3">
+
+                  <!-- Fecha Pedido -->
+                  <div class="form-floating col-md">
+                    <input formControlName="pedFecha" type="date" class="form-control form-control-sm" id="floatingInput" autocomplete="off" readonly onmousedown="return false">
+                    <label for="floatingInput">Fecha Pedido</label>
+                  </div>
+
+                  <!-- Hora Pedido -->
+                  <div class="form-floating col-md">
+                    <input formControlName="pedHora" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off" readonly onmousedown="return false">
+                    <label for="floatingInput">Hora Pedido</label>
+                  </div>
+
+                  <!--Estado-->
+                  <div class="form-floating col-md">
+                    <input formControlName="pedEstado" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off" readonly onmousedown="return false">
+                    <label for="floatingInput">Estado</label>
+                  </div>
+
+                  <!-- Usuario -->
+                  <div class="form-floating col-md-3">
+                    <input formControlName="pedUsuario" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off" readonly onmousedown="return false">
+                    <label for="floatingInput">Usuario</label>
+                  </div>
+
+                  <!--Observación-->
+                  <div class="form-floating col-md-4">
+                    <input formControlName="pedObservacion" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off" readonly onmousedown="return false">
+                    <label for="floatingInput">Observación</label>
+                  </div>
+                </div>
+              </div>
+            </form>
+            <!--Linea-->
+            <div class="mb-3">
+              <hr class="Linea">
+            </div>
+
+            <!-- Tabla -->
+              <div class="mb-3">
+                <p-table
+                #dt2
+                [value]="arrayDetallePedido"
+                [rows]="10"
+                dataKey="pedidoId"
+                [paginator]="true"
+                styleClass="p-datatable-gridlines p-datatable-sm"
+                [showCurrentPageReport]="true"
+                [rowHover]="true"
+                [rowsPerPageOptions]="[10, 20, 30, 50, 100, 120, 150]"
+                responsiveLayout="scroll"
+                currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th scope="col">Nro. Detalle</th>
+                            <th scope="col">Activo</th>
+                            <th scope="col">Serial</th>
+                            <th scope="col">Tipo Mtto.</th>
+                            <th scope="col">Fecha Falla</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-arrayDetallePedido>
+                        <tr>
+                            <td>{{arrayDetallePedido.codigo}}</td>
+                            <td>{{arrayDetallePedido.activo}}</td>
+                            <td>{{arrayDetallePedido.serial}}</td>
+                            <td>{{arrayDetallePedido.tipoMtto}}</td>
+                            <td>{{arrayDetallePedido.fechaFalla}}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+              </div>
+              <!--Botón-->
+              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <button class=" btn btn-danger btn-danger-sm" type="button" (click)="advertenciaAceptarPedido()">Aceptar Pedido</button>
+              </div>
+          </ng-template>
+        </p-dialog>
+        <!-- FIN MODAL -->
+
+        <!-- Inicio Modal Mantenimiento ya aceptado -->
+        <p-dialog header="Detalles del Pedido Nro. {{numeroPedido}}" [(visible)]="modalEditarMtto" [style]="{width: '70%'}" [modal]="true" styleClass="p-fluid">
+          <ng-template pTemplate="content">
+            <p>Hola</p>
+          </ng-template>
+        </p-dialog>
     </div>
   </div>
 </div>

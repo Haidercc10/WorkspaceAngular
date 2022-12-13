@@ -4,9 +4,8 @@ import { Observable } from 'rxjs';
 import { modelDtPedidoMantenimiento } from 'src/app/Modelo/modelDtPedidoMantenimiento';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
 
-@Injectable({
-  providedIn: 'root'
-})
+
+@Injectable({ providedIn: 'root' } )
 
 export class DetallePedido_MantenimientoService {
 
@@ -17,6 +16,10 @@ export class DetallePedido_MantenimientoService {
     GetTodo():Observable<any[]> {
         return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetallePedido_Mantenimiento')
     }
+
+    GetPedidoxId(id : any):Observable<any[]> {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePedido_Mantenimiento/Detalle_PedidoMtto/${id}`)
+  }
 
     Put(id:number|String, data:any) {
       return this.http.put(this.rutaPlasticaribeAPI + `/DetallePedido_Mantenimiento/${id}`, data);

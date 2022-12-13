@@ -4,7 +4,9 @@ import { Observable } from 'rxjs';
 import { modelMantenimiento } from 'src/app/Modelo/modelMantenimiento';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class MantenimientoService {
 
     readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
@@ -13,6 +15,14 @@ export class MantenimientoService {
 
     GetTodo():Observable<any[]> {
         return this.http.get<any>(this.rutaPlasticaribeAPI + '/Mantenimiento')
+    }
+
+    GetUltimoId():Observable<any[]> {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + '/Mantenimiento/ObtenerUltimoId')
+    }
+
+    GetPedidoAceptado(id : any):Observable<any[]> {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mantenimiento/getPedidoMtto/${id}`)
     }
 
     Put(id:number|String, data:any) {
