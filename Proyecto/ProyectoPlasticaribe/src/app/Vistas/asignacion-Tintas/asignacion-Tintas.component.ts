@@ -32,7 +32,6 @@ export class AsignacionTintasComponent implements OnInit {
   ArrayMateriaPrima = []; //Varibale que almacenará las materias primas que se estan asignando para crear una tinta
   componenteCrearTintas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalCrearTintas();
   componenteCrearMateriasPrimas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
-  arrayTintaAsignada = [];
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
@@ -273,7 +272,6 @@ export class AsignacionTintasComponent implements OnInit {
         Estado_Id: 13,
         AsigMPxTinta_Hora : moment().format('H:mm:ss'),
       }
-      this.arrayTintaAsignada.push(datos_asignacionMP)
 
       this.asignacionMPxTintas.srvGuardar(datos_asignacionMP).subscribe(datos_asignacionMPxTintas => {
         this.obtenerUltimoIdAsignacion();

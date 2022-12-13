@@ -1,0 +1,173 @@
+<app-menuLateral></app-menuLateral>
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <!-- Titulo principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Movimientos de Mantenimiento</h2>
+    </div>
+    <!-- Linea principal -->
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Informacion del pedido de mantenimiento -->
+  <div class="mb-4">
+    <h4 class="tituloRojo">Información del Pedido</h4>
+  </div>
+
+  <!-- Formulario del pedido de mantenimiento -->
+  <form [formGroup]="FormMovimientosMantenimiento">
+    <div class="mb-3">
+      <div class="row g-3">
+        <!-- Consecutivo del pedido -->
+        <div class="form-floating col-md-2">
+          <input formControlName="ConsecutivoPedido" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo del Pedido" min="0">
+          <label for="floatingSelect">Concecutivo del Movimiento</label>
+        </div>
+
+        <!-- Tipo de Movimiento -->
+        <div class="form-floating col-md-3">
+          <select formControlName="TipoMovimiento" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+            <option value="1">Pedido de Mantenimiento</option>
+            <option value="2">Mantenimiento</option>
+          </select>
+          <label for="floatingSelect">Tipo de Movimiento</label>
+        </div>
+
+        <!-- Fecha Inicial -->
+        <div class="form-floating col-md-2">
+          <input formControlName="FechaInicial" type="date" class="form-control" id="floatingInput">
+          <label for="floatingInput">Fecha Inicial</label>
+        </div>
+
+        <!-- Fecha Final -->
+        <div class="form-floating col-md-2">
+          <input formControlName="FechaFinal" type="date" class="form-control" id="floatingInput">
+          <label for="floatingInput">Fecha Final</label>
+        </div>
+
+        <!-- Estados -->
+        <div class="form-floating col-md-3">
+          <select formControlName="Estados" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+            <option [ngValue]="item.estado_Id" *ngFor="let item of estados; let i=index">{{item.estado_Nombre}}</option>
+          </select>
+          <label for="floatingSelect">Estados</label>
+        </div>
+
+        <!-- Activos -->
+        <div class="form-floating col-md-3">
+          <input formControlName="Activo" class="form-control" list="Activo" id="floatingInput" title="Nombre del Activo" (change)="buscarActivoSeleccionado()">
+          <datalist id="Activo">
+            <option value={{item.actv_Id}} *ngFor="let item of activos">{{item.actv_Nombre}}</option>
+          </datalist>
+          <label for="floatingInput">Activo</label>
+        </div>
+
+        <!-- Fecha en que presentó el daño -->
+        <div class="form-floating col-md-2">
+          <input formControlName="FechaDaño" type="date" class="form-control" id="floatingInput">
+          <label for="floatingInput">Fecha Daño</label>
+        </div>
+
+        <!-- Tipos de Mantenimientos -->
+        <div class="form-floating col-md-3">
+          <input formControlName="TipoMantenimiento" class="form-control" list="tipos" id="floatingInput" title="Nombre del Tipo de Mantenimiento" (change)="buscarTipoMantenimientoSeleccionado()">
+          <datalist id="tipos">
+            <option value={{item.tpMtto_Id}} *ngFor="let item of tiposMantenimiento">{{item.tpMtto_Nombre}}</option>
+          </datalist>
+          <label for="floatingInput">Tipo de Mantenimiento</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="mb-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="btn btn-danger btn-danger-sm" type="button">Consultar</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button">Limpiar Campos</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="container-fluid" style="font-size: 14px;">
+    <div class="mb-3" *ngIf="!cargando">
+      <div class="row g-3" id="table" style="font-size: 14px;">
+        <p-table
+            #dt
+            [value]="movimientosConsultados"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            responsiveLayout="scroll"
+            [paginator]="true"
+            [rows]="movimientosConsultados.length"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando de {first} al {last} de {totalRecords} Movimientos"
+            [rowsPerPageOptions]="[10,25,50,100,movimientosConsultados.length]"
+            [rowHover]="true"
+            dataKey="Id">
+          <ng-template pTemplate="caption">
+            <div class="flex">
+              <button pButton label="Limpiar Filtros" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt)"></button>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">Consecutivo
+                <p-sortIcon field="Consecutivo" title="Order por Consecutivo"></p-sortIcon>
+                <p-columnFilter type="text" field="Consecutivo" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col">Tipo Movimiento
+                <p-sortIcon field="TipoMov" title="Order por TipoMov"></p-sortIcon>
+                <p-columnFilter type="text" field="TipoMov" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col">Fecha
+                <p-sortIcon field="Fecha" title="Order por Fecha"></p-sortIcon>
+                <p-columnFilter type="date" field="Fecha" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col">Estado
+                <p-sortIcon field="Estado" title="Order por Estado"></p-sortIcon>
+                <p-columnFilter type="text" field="Estado" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col">Activo
+                <p-sortIcon field="Activo" title="Order por Activo"></p-sortIcon>
+                <p-columnFilter type="text" field="Activo" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col">Fecha Daño
+                <p-sortIcon field="FechaDano" title="Order por Fecha Daño"></p-sortIcon>
+                <p-columnFilter type="date" field="FechaDano" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col">Tipo Mtto
+                <p-sortIcon field="TipoMtto" title="Order por Tipo Mantenimiento"></p-sortIcon>
+                <p-columnFilter type="text" field="TipoMtto" display="menu"></p-columnFilter>
+              </th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-movimientos>
+            <tr>
+              <td>{{movimientos.Consecutivo}}</td>
+              <td>{{movimientos.TipoMov}}</td>
+              <td>{{movimientos.Fecha}}</td>
+              <td>{{movimientos.Estado}}</td>
+              <td>{{movimientos.Activo}}</td>
+              <td>{{movimientos.FechaDano}}</td>
+              <td>{{movimientos.TipoMtto}}</td>
+              <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF"></a></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+
+</div>

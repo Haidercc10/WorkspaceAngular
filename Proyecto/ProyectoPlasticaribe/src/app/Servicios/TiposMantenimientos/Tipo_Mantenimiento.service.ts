@@ -14,7 +14,11 @@ export class Tipo_MantenimientoService {
   constructor(private http : HttpClient) { }
 
   GetTodo():Observable<any[]> {
-      return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Mantenimiento')
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Mantenimiento')
+  }
+
+  GetId(id : number) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_Mantenimiento/${id}`);
   }
 
   Put(id:number|String, data:any) {

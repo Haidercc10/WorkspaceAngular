@@ -164,7 +164,7 @@
             <td>{{materiaPrima.Categoria}}</td>
           </tr>
         </ng-template>
-        <ng-template pTemplate="footer">
+        <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
           <tr>
             <td colspan="10" class="text-right">Totales</td>
             <td>{{valorTotal | number}}</td>

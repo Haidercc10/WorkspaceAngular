@@ -4,7 +4,10 @@ import { Observable } from 'rxjs';
 import { modelDtPedidoMantenimiento } from 'src/app/Modelo/modelDtPedidoMantenimiento';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
+
 export class DetallePedido_MantenimientoService {
 
     readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;

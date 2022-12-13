@@ -1,0 +1,94 @@
+<app-menuLateral></app-menuLateral>
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div class="spinner-bOrdenar text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <!-- Titulo principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Reporte de Activos</h2>
+    </div>
+    <!-- Linea principal -->
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid" style="font-size: 14px;">
+  <div class="mb-3" *ngIf="!cargando">
+    <div class="row g-3" id="table" style="font-size: 14px;">
+      <p-table
+        #dt
+        [value]="InformacionActivos"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="InformacionActivos.length"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando de {first} al {last} de {totalRecords} Activos"
+        [rowsPerPageOptions]="[10,25,50,100,InformacionActivos.length]"
+        [rowHover]="true"
+        dataKey="Id">
+        <ng-template pTemplate="caption">Serial
+          <div class="flex">
+            <button pButton label="Limpiar Filtros" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">ID/Placa/Serial
+              <p-sortIcon field="Id" title="Ordenar por ID/Placa/Serial"></p-sortIcon>
+              <p-columnFilter type="text" field="Id" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Nombre
+              <p-sortIcon field="Nombre" title="Ordenar por Nombre"></p-sortIcon>
+              <p-columnFilter type="text" field="Nombre" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Fecha Compra
+              <p-sortIcon field="Fecha" title="Ordenar por Fecha de Compra"></p-sortIcon>
+              <p-columnFilter type="date" field="Fecha" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col"> Fecha Último Mtto
+              <p-sortIcon field="FechaUltMtto" title="Ordenar por Fecha del Último Mantenimiento"></p-sortIcon>
+              <p-columnFilter type="date" field="FechaUltMtto" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Precio Compra
+              <p-sortIcon field="PrecioCompra" title="Ordenar por Precio de Compra"></p-sortIcon>
+              <p-columnFilter type="numeric" field="PrecioCompra" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Precio Ultimo Mtto
+              <p-sortIcon field="PrecioUltMtto" title="Ordenar por Precio del Último Mantenimiento"></p-sortIcon>
+              <p-columnFilter type="numeric" field="PrecioUltMtto" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Precio Total Mtto
+              <p-sortIcon field="PrecioTotalMtto" title="Ordenar por Precio Total de los Mantenimientos"></p-sortIcon>
+              <p-columnFilter type="numeric" field="PrecioTotalMtto" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col">Depreciación
+              <p-sortIcon field="Depreciacion" title="Ordenar por Depreciación"></p-sortIcon>
+              <p-columnFilter type="numeric" field="Depreciacion" display="menu"></p-columnFilter>
+            </th>
+            <th><button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-reporte>
+          <tr>
+            <td>{{reporte.Id}}</td>
+            <td>{{reporte.Nombre}}</td>
+            <td>{{reporte.Fecha}}</td>
+            <td>{{reporte.FechaUltMtto}}</td>
+            <td>{{reporte.PrecioCompra}}</td>
+            <td>{{reporte.PrecioUltMtto}}</td>
+            <td>{{reporte.PrecioTotalMtto}}</td>
+            <td>{{reporte.Depreciacion}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

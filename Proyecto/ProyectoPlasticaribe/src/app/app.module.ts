@@ -131,6 +131,8 @@ import { SlideMenuModule } from 'primeng/slidemenu';
 import { CascadeSelectModule } from "primeng/cascadeselect";
 import {MenuModule} from 'primeng/menu';
 import {PickListModule} from 'primeng/picklist';
+import { Movimientos_MantenimientoComponent } from './Vistas/Movimientos_Mantenimiento/Movimientos_Mantenimiento.component';
+import { Reporte_MantenimientoComponent } from './Vistas/Reporte_Mantenimiento/Reporte_Mantenimiento.component';
 //
 
 
@@ -144,8 +146,8 @@ export const routes: Routes = [
   {path: 'Archivos', component: ArchivosComponent},
 
   /******************************************************************* Materia Prima ************************************************************************/
-  {path: 'ocompra-materiaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: OcompraComponent},
-  {path: 'MateriaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: PedidomateriaprimaComponent},
+  {path: 'ocompra-materiaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: OcompraComponent},
+  {path: 'MateriaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PedidomateriaprimaComponent},
   {path: 'asignacionMP', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: AsignacionMateriaPrimaComponent},
   {path: 'mp-recuperada', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: MateriaPrimaRecuperadaComponent},
   {path: 'mp-devoluciones', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: DevolucionesMPComponent},
@@ -157,10 +159,10 @@ export const routes: Routes = [
   {path: 'entrada-BOPP', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: EntradaBOPPComponent},
   {path: 'AsignacionBOPPTemporal', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: AsignacionBOPP_TEMPORALComponent},
   // Creacion
-  {path: 'crear-proveedor', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: CrearProveedorComponent},
-  {path: 'crear-materiaprima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: CrearMateriaprimaComponent},
-  {path: 'crear-bopp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: CrearBoppComponent},
-  {path: 'crear-tintas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: CrearTintasComponent},
+  {path: 'crear-proveedor', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: CrearProveedorComponent},
+  {path: 'crear-materiaprima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: CrearMateriaprimaComponent},
+  {path: 'crear-bopp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: CrearBoppComponent},
+  {path: 'crear-tintas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: CrearTintasComponent},
   // Movimientos
   {path: 'movimiento-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: MovimientoMPComponent},
   {path: 'movimientos-matprima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component : MovimientoMatPrimaComponent}, // MOVIMIENTOS DE MATERIA PRIMA
@@ -172,7 +174,7 @@ export const routes: Routes = [
   {path: 'reporte-Materia-Prima-OT', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReporteMpOtComponent},
   {path: 'reporte-facturas-remisiones-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ConsultaFac_Rem_MPComponent},
   {path: 'reporte-recuperado-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
-  {path: 'reporte-orden-compra', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: Reporte_OrdenCompraComponent},
+  {path: 'reporte-orden-compra', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: Reporte_OrdenCompraComponent},
 
   /************************************************************************ DESPACHO ************************************************************************/
   // Pre ingresos
@@ -222,6 +224,8 @@ export const routes: Routes = [
 
  /******************************************************************* MANTENIMIENTO ***************************************************************************/
  {path: 'pedido-mantenimiento', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PedidoMantenimientoComponent},
+ {path: 'movimientos-mantenimientos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Movimientos_MantenimientoComponent},
+ {path: 'reporte-mantenimiento', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_MantenimientoComponent},
  {path: 'mantenimiento-camiones',  component: Mantenimiento_CamionesComponent },
 ]
 
@@ -316,6 +320,8 @@ export const routes: Routes = [
     Inventario_ExtrusionComponent,
     PedidoMantenimientoComponent,
     Mantenimiento_CamionesComponent,
+    Movimientos_MantenimientoComponent,
+    Reporte_MantenimientoComponent,
   ],
 
 

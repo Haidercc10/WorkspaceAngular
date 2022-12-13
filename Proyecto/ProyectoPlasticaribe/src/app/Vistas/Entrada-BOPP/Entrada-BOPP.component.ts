@@ -223,7 +223,7 @@ export class EntradaBOPPComponent implements OnInit {
         this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(datos_BOPP => {
           Swal.fire({
             icon: 'success',
-            title: 'Advertencia',
+            title: 'Registro Exitoso',
             text: "¡Entrada de BOPP registrada con exito!",
             showCloseButton: true
           });

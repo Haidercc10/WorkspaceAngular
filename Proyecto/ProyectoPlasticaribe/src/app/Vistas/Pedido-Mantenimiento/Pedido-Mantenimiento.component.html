@@ -33,13 +33,13 @@
       <div class="row g-3">
         <!-- Consecutivo del pedido -->
         <div class="form-floating col-md-2">
-          <input formControlName="ConsecutivoPedido" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo del Pedido" readonly>
+          <input formControlName="ConsecutivoPedido" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo del Pedido" min="0" readonly>
           <label for="floatingSelect">Concecutivo del Pedido</label>
         </div>
 
         <!-- Activos -->
         <div class="form-floating col-md">
-          <input formControlName="Activo" class="form-control" list="Activo" id="floatingInput" title="Nombre del Activo" required>
+          <input formControlName="Activo" class="form-control" list="Activo" id="floatingInput" title="Nombre del Activo" (change)="buscarActivoSeleccionado()" required>
           <datalist id="Activo">
             <option value={{item.actv_Id}} *ngFor="let item of activos">{{item.actv_Nombre}}</option>
           </datalist>
@@ -54,10 +54,11 @@
 
         <!-- Tipos de Mantenimientos -->
         <div class="form-floating col-md-3">
-          <select formControlName="TipoMantenimiento" class="form-select form-select-sm" id="floatingSelect" required>
-            <option [ngValue]="item" *ngFor="let item of tiposMantenimiento">{{item}}</option>
-          </select>
-          <label for="floatingSelect">Tipo de Mantenimiento</label>
+          <input formControlName="TipoMantenimiento" class="form-control" list="tipos" id="floatingInput" title="Nombre del Tipo de Mantenimiento" (change)="buscarTipoMantenimientoSeleccionado()" required>
+          <datalist id="tipos">
+            <option value={{item.tpMtto_Id}} *ngFor="let item of tiposMantenimiento">{{item.tpMtto_Nombre}}</option>
+          </datalist>
+          <label for="floatingInput">Tipo de Mantenimiento</label>
         </div>
 
         <!-- Observacion -->

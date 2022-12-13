@@ -143,6 +143,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.LimpiarCampos();
     this.obtenerCategorias();
     this.obtenerBodegas();
+    this.validarConsulta();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -663,7 +664,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
       });
     }
 
-    setTimeout(() => { this.load = true; }, 3200);
+    setTimeout(() => { this.load = true; }, 2500);
   }
 
   // Funcion que limpiará los filtros utilizados en la tabla
