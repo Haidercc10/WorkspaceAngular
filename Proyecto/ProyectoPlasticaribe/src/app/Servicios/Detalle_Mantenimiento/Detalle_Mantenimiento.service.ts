@@ -9,24 +9,28 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 
 export class Detalle_MantenimientoService {
 
-    readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
+  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
-    constructor(private http : HttpClient) { }
+  constructor(private http : HttpClient) { }
 
-    GetTodo():Observable<any[]> {
-        return this.http.get<any>(this.rutaPlasticaribeAPI + '/Detalle_Mantenimiento')
-    }
+  GetTodo():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Detalle_Mantenimiento');
+  }
 
-    Put(id:number|String, data:any) {
-      return this.http.put(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/${id}`, data);
-    }
+  GetPDFMantenimiento(id : any) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/getPDFMantenimiento/${id}`);
+  }
 
-    Delete(id:number|String) {
-      return this.http.delete(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/${id}`);
-    }
+  Put(id:number|String, data:any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/${id}`, data);
+  }
 
-    Insert(data : modelDtMantenimiento): Observable<any> {
-      return this.http.post(this.rutaPlasticaribeAPI + '/Detalle_Mantenimiento', data);
-    }
+  Delete(id:number|String) {
+    return this.http.delete(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/${id}`);
+  }
+
+  Insert(data : modelDtMantenimiento): Observable<any> {
+    return this.http.post(this.rutaPlasticaribeAPI + '/Detalle_Mantenimiento', data);
+  }
 
 }

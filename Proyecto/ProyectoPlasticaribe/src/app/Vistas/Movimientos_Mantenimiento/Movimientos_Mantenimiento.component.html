@@ -1,4 +1,6 @@
-<app-menuLateral></app-menuLateral>
+<ng-container *ngIf="!modeModal">
+  <app-menuLateral></app-menuLateral>
+</ng-container>
 
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
@@ -32,18 +34,18 @@
       <div class="row g-3">
         <!-- Consecutivo del pedido -->
         <div class="form-floating col-md-2">
-          <input formControlName="ConsecutivoPedido" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo del Pedido" min="0">
+          <input formControlName="ConsecutivoMovimiento" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo del Pedido" min="0">
           <label for="floatingSelect">Concecutivo del Movimiento</label>
         </div>
 
         <!-- Tipo de Movimiento -->
-        <div class="form-floating col-md-3">
+        <!-- <div class="form-floating col-md-3">
           <select formControlName="TipoMovimiento" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
             <option value="1">Pedido de Mantenimiento</option>
             <option value="2">Mantenimiento</option>
           </select>
           <label for="floatingSelect">Tipo de Movimiento</label>
-        </div>
+        </div> -->
 
         <!-- Fecha Inicial -->
         <div class="form-floating col-md-2">
@@ -59,7 +61,7 @@
 
         <!-- Estados -->
         <div class="form-floating col-md-3">
-          <select formControlName="Estados" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+          <select formControlName="Estado" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
             <option [ngValue]="item.estado_Id" *ngFor="let item of estados; let i=index">{{item.estado_Nombre}}</option>
           </select>
           <label for="floatingSelect">Estados</label>
@@ -94,8 +96,8 @@
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button">Consultar</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button">Limpiar Campos</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="consultar()">Consultar</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()">Limpiar Campos</button>
       </div>
     </div>
   </form>
@@ -162,7 +164,7 @@
               <td>{{movimientos.Activo}}</td>
               <td>{{movimientos.FechaDano}}</td>
               <td>{{movimientos.TipoMtto}}</td>
-              <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF"></a></td>
+              <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" (click)="validarPDF(movimientos)"></a></td>
             </tr>
           </ng-template>
         </p-table>

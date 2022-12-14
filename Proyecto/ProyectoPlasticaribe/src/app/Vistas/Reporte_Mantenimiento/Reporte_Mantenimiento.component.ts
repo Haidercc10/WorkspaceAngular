@@ -1,13 +1,15 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Table } from 'primeng/table';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
-import { AreaService } from 'src/app/Servicios/Areas/area.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { Tipo_ActivoService } from 'src/app/Servicios/TiposActivos/Tipo_Activo.service';
 import Swal from 'sweetalert2';
+import { Movimientos_MantenimientoComponent } from '../Movimientos_Mantenimiento/Movimientos_Mantenimiento.component';
 
 @Injectable({
   providedIn: 'root'
@@ -32,13 +34,14 @@ export class Reporte_MantenimientoComponent implements OnInit {
   areas : any [] = []; //Variable que va a almacenar las difrentes areas
   activos : any [] = []; //Variable que va a almacenar los diferentes activos
   InformacionActivos : any [] = []; //Variable que va a almacenar los datos consultados y los mostrará en la tabla
+  modalMovimientos : boolean = false; //Variable que hará que se muestre o no el modal de movimientos de activos
+  @ViewChild(Movimientos_MantenimientoComponent) movimientosActivos : Movimientos_MantenimientoComponent;
 
   constructor(private frmBuilderMateriaPrima : FormBuilder,
                 private rolService : RolesService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private areasService : AreaService,
-                      private activosService : ActivosService,
-                        private tipoActivoService : Tipo_ActivoService,) {
+                    private activosService : ActivosService,
+                      private tipoActivoService : Tipo_ActivoService,) {
 
     this.FormActivos = this.frmBuilderMateriaPrima.group({
       ActivoId : [null, Validators.required],
@@ -52,8 +55,6 @@ export class Reporte_MantenimientoComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.obtenerTiposActivos();
-    this.obtenerAreas();
     this.consultarActivos();
   }
 
@@ -79,52 +80,72 @@ export class Reporte_MantenimientoComponent implements OnInit {
     return number.toString().replace(exp,rep);
   }
 
+  // Funcion que exportará a excel todo el contenido de la tabla
+  exportToExcel() : void {
+    if (this.InformacionActivos.length == 0) this.mensajesAdvertencia(`¡Debe haber activos en la tabla para poder exportar la información a Excel!`);
+    else {
+      this.cargando = true;
+      setTimeout(() => {
+        const title = `Inventario Activos - ${this.today}`;
+        const header = ["Id", "Nombre", "Tipo Activo", "Fecha de Compra", "Precio Compra", "Fecha Último Mtto", "Precio Último Mtto", "Precio Total Mttos", "Depreciacion"]
+        let datos : any =[];
+        for (const item of this.InformacionActivos) {
+          const datos1  : any = [item.Id, item.Nombre, item.TipoActivo, item.Fecha, item.FechaUltMtto, item.PrecioCompra, item.PrecioUltMtto, item.PrecioTotalMtto, item.Depreciacion];
+          datos.push(datos1);
+        }
+        let workbook = new Workbook();
+        let worksheet = workbook.addWorksheet(`Inventario Activos - ${this.today}`);
+        let titleRow = worksheet.addRow([title]);
+        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+        worksheet.addRow([]);
+        let headerRow = worksheet.addRow(header);
+        headerRow.eachCell((cell, number) => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'eeeeee' }
+          }
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+        });
+        worksheet.mergeCells('A1:I2');
+        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+        datos.forEach(d => {
+          let row = worksheet.addRow(d);
+          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          row.getCell(9).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
+          let qty= row.getCell(7);
+          let color = 'ADD8E6';
+          qty.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: color }
+          }
+        });
+        worksheet.getColumn(1).width = 20;
+        worksheet.getColumn(2).width = 60;
+        worksheet.getColumn(3).width = 20;
+        worksheet.getColumn(4).width = 22;
+        worksheet.getColumn(5).width = 20;
+        worksheet.getColumn(6).width = 20;
+        worksheet.getColumn(7).width = 20;
+        worksheet.getColumn(8).width = 20;
+        worksheet.getColumn(9).width = 20;
+        setTimeout(() => {
+          workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            fs.saveAs(blob, `Inventario Activos - ${this.today}.xlsx`);
+          });
+          this.cargando = false;
+        }, 500);
+      }, 2000);
+    }
+  }
+
   // Funcion que va a limpiar todo
   LimpiarCampos() {
     this.FormActivos.reset();
-  }
-
-  // Funcion que obtendrá los tipos de activos
-  obtenerTiposActivos(){
-    this.tipoActivoService.GetTodo().subscribe(datos_tiposActivos => {
-      for (let i = 0; i < datos_tiposActivos.length; i++) {
-        this.tiposActivos.push(datos_tiposActivos[i]);
-      }
-    });
-  }
-
-  // Funcion que va a obtener las areas de la empresa
-  obtenerAreas(){
-    this.areasService.srvObtenerLista().subscribe(datos_areas => {
-      for (let i = 0; i < datos_areas.length; i++) {
-        this.areas.push(datos_areas[i]);
-      }
-    });
-  }
-
-  // Funcion que buscará el nombre de un activo
-  buscarActivo(){
-    this.activos = [];
-    let nombreActivo : string = this.FormActivos.value.ActivoNombre;
-    this.activosService.GetActivoNombre(nombreActivo).subscribe(datos_activos => {
-      for (let i = 0; i < datos_activos.length; i++) {
-        this.activos.push(datos_activos[i]);
-      }
-    }, error => { this.mensajesError(`¡No se encontró informacaión de activos con la información brindada!`, error.message); });
-  }
-
-  // Funcion que tomará el id del activo seleccionado, lo almacenará y cambiará el id por el nombre en el campo de activo
-  buscarActivoSeleccionado(){
-    this.activosService.GetId(this.FormActivos.value.ActivoNombre).subscribe(datos_activo => {
-      this.FormActivos.setValue({
-        ActivoId : datos_activo.actv_Id,
-        ActivoNombre : datos_activo.actv_Nombre,
-        FechaInicial : this.FormActivos.value.FechaInicial,
-        FechaFinal : this.FormActivos.value.FechaFinal,
-        TipoActivo : this.FormActivos.value.TipoActivo,
-        AreasActivos : this.FormActivos.value.AreasActivos,
-      });
-    }, error => { this.mensajesError(`¡No se puede encontrar la información del activo ${this.FormActivos.value.Activo}!`, error.message) });
   }
 
   // Funcion que va a consultar la información de los activos
@@ -145,6 +166,7 @@ export class Reporte_MantenimientoComponent implements OnInit {
     let info : any = {
       Id : datos.activo_Id,
       Nombre : datos.activo_Nombre,
+      TipoActivo : datos.tipo_Activo,
       Fecha : datos.fecha_Compra.replace('T00:00:00', ''),
       FechaUltMtto : datos.fecha_UltMtto.replace('T00:00:00', ''),
       PrecioCompra : datos.precio_Compra,
@@ -158,18 +180,48 @@ export class Reporte_MantenimientoComponent implements OnInit {
 
   // Funcion que va a llenar tabla si el activo consultado no tiene mantenimientos
   llenarTablaSinMantenimientos(datos : any){
-    let info : any = {
-      Id : datos.actv_Serial,
-      Nombre : datos.actv_Nombre,
-      Fecha : datos.actv_FechaCompra.replace('T00:00:00', ''),
-      FechaUltMtto : '',
-      PrecioCompra : datos.actv_PrecioCompra,
-      PrecioUltMtto : 0,
-      PrecioTotalMtto : 0,
-      Depreciacion : datos.actv_Depreciacion,
-    }
-    this.InformacionActivos.push(info);
-    this.cargando = false;
+    this.tipoActivoService.GetId(datos.tpActv_Id).subscribe(datos_tiposActivos => {
+      let info : any = {
+        Id : datos.actv_Serial,
+        Nombre : datos.actv_Nombre,
+        TipoActivo : datos_tiposActivos.TpActv_Nombre,
+        Fecha : datos.actv_FechaCompra.replace('T00:00:00', ''),
+        FechaUltMtto : '',
+        PrecioCompra : datos.actv_PrecioCompra,
+        PrecioUltMtto : 0,
+        PrecioTotalMtto : 0,
+        Depreciacion : datos.actv_Depreciacion,
+      }
+      this.InformacionActivos.push(info);
+      this.cargando = false;
+    });
+  }
+
+  // Funcion que hará que el modal se muestre con la información de los movimientos de un activo
+  mostrarModalMovimientos(data : any){
+    this.modalMovimientos = true;
+    setTimeout(() => {
+      this.movimientosActivos.limpiarTodo();
+      this.movimientosActivos.modeModal = true;
+      let primeraFecha = moment().subtract(1, 'month').format('YYYY-MM-DD');
+      this.activosService.GetActivoSerial(data.Id).subscribe(datos_activo => {
+        for (let i = 0; i < datos_activo.length; i++) {
+          this.movimientosActivos.FormMovimientosMantenimiento.setValue({
+            ConsecutivoMovimiento : null,
+            IdActivo : datos_activo[i].actv_Id,
+            Activo : data.Nombre,
+            IdTipoMantenimiento : null,
+            TipoMantenimiento : null,
+            FechaDaño : null,
+            Estado : null,
+            FechaInicial : primeraFecha,
+            FechaFinal : this.today,
+            TipoMovimiento: null,
+          });
+          this.movimientosActivos.consultar();
+        }
+      }, error => { this.mensajesError(`¡No fue posible buscar el activo ${data.Nombre}!`, error.message) });
+    }, 50);
   }
 
   // Funcion que pasará mensajes de advertencia

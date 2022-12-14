@@ -26,8 +26,16 @@ export class ActivosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Activos/getActivoNombre/${datos}`);
   }
 
+  GetActivoSerial(datos : string) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Activos/getInfoActivoSerial/${datos}`);
+  }
+
   GetInfoActivos(activo : number){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Activos/getInfoActivos/${activo}`);
+  }
+
+  GetMovimiento(fecha1 : any, fecha2 : any, ruta : string) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Activos/getMovimiento/${fecha1}/${fecha2}/${ruta}`);
   }
 
   Put(id:number|String, data:any) {

@@ -14,7 +14,11 @@ export class Tipo_ActivoService {
   constructor(private http : HttpClient) { }
 
   GetTodo():Observable<any[]> {
-      return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Activo')
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tipo_Activo')
+  }
+
+  GetId(id : number) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_Activo/${id}`)
   }
 
   Put(id:number|String, data:any) {

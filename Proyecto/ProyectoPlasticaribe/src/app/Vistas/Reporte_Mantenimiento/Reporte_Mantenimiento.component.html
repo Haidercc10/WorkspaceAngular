@@ -34,7 +34,7 @@
         [rowsPerPageOptions]="[10,25,50,100,InformacionActivos.length]"
         [rowHover]="true"
         dataKey="Id">
-        <ng-template pTemplate="caption">Serial
+        <ng-template pTemplate="caption">
           <div class="flex">
             <button pButton label="Limpiar Filtros" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt)"></button>
           </div>
@@ -49,17 +49,21 @@
               <p-sortIcon field="Nombre" title="Ordenar por Nombre"></p-sortIcon>
               <p-columnFilter type="text" field="Nombre" display="menu"></p-columnFilter>
             </th>
+            <th scope="col">Tipo Activo
+              <p-sortIcon field="TipoActivo" title="Ordenar por Nombre"></p-sortIcon>
+              <p-columnFilter type="text" field="TipoActivo" display="menu"></p-columnFilter>
+            </th>
             <th scope="col">Fecha Compra
               <p-sortIcon field="Fecha" title="Ordenar por Fecha de Compra"></p-sortIcon>
               <p-columnFilter type="date" field="Fecha" display="menu"></p-columnFilter>
             </th>
-            <th scope="col"> Fecha Último Mtto
-              <p-sortIcon field="FechaUltMtto" title="Ordenar por Fecha del Último Mantenimiento"></p-sortIcon>
-              <p-columnFilter type="date" field="FechaUltMtto" display="menu"></p-columnFilter>
-            </th>
             <th scope="col">Precio Compra
               <p-sortIcon field="PrecioCompra" title="Ordenar por Precio de Compra"></p-sortIcon>
               <p-columnFilter type="numeric" field="PrecioCompra" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col"> Fecha Último Mtto
+              <p-sortIcon field="FechaUltMtto" title="Ordenar por Fecha del Último Mantenimiento"></p-sortIcon>
+              <p-columnFilter type="date" field="FechaUltMtto" display="menu"></p-columnFilter>
             </th>
             <th scope="col">Precio Ultimo Mtto
               <p-sortIcon field="PrecioUltMtto" title="Ordenar por Precio del Último Mantenimiento"></p-sortIcon>
@@ -73,16 +77,17 @@
               <p-sortIcon field="Depreciacion" title="Ordenar por Depreciación"></p-sortIcon>
               <p-columnFilter type="numeric" field="Depreciacion" display="menu"></p-columnFilter>
             </th>
-            <th><button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button></th>
+            <th><button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" class="p-button-success mr" (click)="exportToExcel()" pTooltip="XLS" tooltipPosition="bottom"></button></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-reporte>
-          <tr>
+          <tr (click)="mostrarModalMovimientos(reporte)" class="fila">
             <td>{{reporte.Id}}</td>
             <td>{{reporte.Nombre}}</td>
+            <td>{{reporte.TipoActivo}}</td>
             <td>{{reporte.Fecha}}</td>
-            <td>{{reporte.FechaUltMtto}}</td>
             <td>{{reporte.PrecioCompra}}</td>
+            <td>{{reporte.FechaUltMtto}}</td>
             <td>{{reporte.PrecioUltMtto}}</td>
             <td>{{reporte.PrecioTotalMtto}}</td>
             <td>{{reporte.Depreciacion}}</td>
@@ -92,3 +97,9 @@
     </div>
   </div>
 </div>
+
+<p-dialog [(visible)]="modalMovimientos" [style]="{width: '70vw'}" [resizable]="true" header="Movimientos de Activos" [modal]="true" styleClass="p-fluid">
+  <ng-template pTemplate="content">
+    <app-Movimientos_Mantenimiento></app-Movimientos_Mantenimiento>
+  </ng-template>
+</p-dialog>
