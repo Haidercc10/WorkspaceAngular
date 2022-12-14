@@ -21,9 +21,25 @@ export class Detalle_MantenimientoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/getPDFMantenimiento/${id}`);
   }
 
-  Put(id:number|String, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/${id}`, data);
-  }
+    getDetalleMtto(idPedido : any):Observable<any[]> {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/getDetalleMtto/${idPedido}`);
+    }
+
+    getCodigoDetalleMtto(idPedido : any):Observable<any[]> {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/getCodigoMtto/${idPedido}`);
+    }
+
+    Put(id:number|String, data:any) {
+      return this.http.put(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/${id}`, data);
+    }
+
+    PutEstado(id: any, data:any, estado: any) {
+      return this.http.put(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/CambioEstadoDetalleMtto/${id}?Estado=${estado}`, data);
+    }
+
+    PutPrecio(id: any, data:any) {
+      return this.http.put(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/CambioPrecioDetalleMtto/${id}`, data);
+    }
 
   Delete(id:number|String) {
     return this.http.delete(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/${id}`);
