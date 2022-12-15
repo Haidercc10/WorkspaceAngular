@@ -4,4 +4,5 @@ export interface modelDtMantenimiento {
     TpMtto_Id : number;
     DtMtto_Precio: number;
     DtMtto_Descripcion : string;
+    Estado_Id
 }

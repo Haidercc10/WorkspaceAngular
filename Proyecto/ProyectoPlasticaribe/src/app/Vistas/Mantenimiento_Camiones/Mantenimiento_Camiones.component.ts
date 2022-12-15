@@ -297,7 +297,8 @@ export class Mantenimiento_CamionesComponent implements OnInit {
           Actv_Id: this.arrayDetallePedido[index].idActivo,
           TpMtto_Id: this.arrayDetallePedido[index].idTipoMtto,
           DtMtto_Precio: 0,
-          DtMtto_Descripcion: ''
+          DtMtto_Descripcion: '',
+          Estado_Id : 11
         }
         this.servicioDetMtto.Insert(detallePedido).subscribe(data_DetalleMtto => { }, error => { this.mensajeErrorDetalle(); })
       }
