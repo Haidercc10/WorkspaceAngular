@@ -44,6 +44,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   public arrayProveedores : any =[];
   public arrayEstados : any = [];
   public Estados : any = [];
+  public array : any = [];
 
   constructor(private frmBuilder : FormBuilder,
     @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -394,7 +395,6 @@ export class Mantenimiento_CamionesComponent implements OnInit {
         fechaInicial : datosMtto.mtto_FechaInicio.replace('T00:00:00', ''),
         observacion : datosMtto.mtto_Observacion
       }
-
       this.cargarEncabezadoMttoModal(encabezadoMtto);
       this.obtenerDetalleMantenimiento(encabezadoMtto);
     }
@@ -412,6 +412,8 @@ export class Mantenimiento_CamionesComponent implements OnInit {
 
   /** buscar detalle de mantenimiento por Id de pedido para cargar los datos encontrados en el modal */
   obtenerDetalleMantenimiento(item) {
+    this.arrayDetalleMtto = [];
+
     this.servicioDetMtto.getDetalleMtto(item.idPedido).subscribe(dataDetalleMtto => {
       for (let index = 0; index < dataDetalleMtto.length; index++) {
         this.cargarDetalleMttoModal(dataDetalleMtto[index]);
@@ -421,8 +423,6 @@ export class Mantenimiento_CamionesComponent implements OnInit {
 
   /** Cargar tabla del detalle de mantenimiento en el modal */
   cargarDetalleMttoModal(detalleMto : any) {
-    this.arrayDetalleMtto = [];
-
     const detalle : any = {
       codigo : detalleMto.dtMtto_Codigo,
       idActivo : detalleMto.actv_Id,
