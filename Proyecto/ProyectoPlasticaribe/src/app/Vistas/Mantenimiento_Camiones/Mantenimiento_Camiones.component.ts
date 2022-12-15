@@ -81,7 +81,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       });
     }
 
-  /** */
+  /** cargar la información de los proveedores al momento de llamar el modal */
   getProveedores(){
     this.servicioProveedores.srvObtenerLista().subscribe(dataProveedores => {
       for (let index = 0; index < dataProveedores.length; index++) {
@@ -90,7 +90,8 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     });
   }
 
-  /**  */
+
+  /** Cargar Inicialmente los estados del pedido/Mantenimiento */
   getEstados(){
     this.servicioEstados.srvObtenerListaEstados().subscribe(dataEstados => {
       for (let index = 0; index < dataEstados.length; index++) {
@@ -100,6 +101,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     });
   }
 
+  /** Cargar Inicialmente los estados del pedido/Mantenimiento */
   inicializarFormularioEstados(){
     this.formEstados = this.frmBuilder.group({
       estado : [null, Validators.required]
@@ -117,7 +119,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     });
   }
 
-  /** Inicializar formulario que estará cargado en el modal al momento de consultar un pedido*/
+  /** Inicializar formulario de mantenimiento que estará cargado en el modal al momento de consultar*/
   inicializarFormularioMtto(){
     this.formMantenimiento = this.frmBuilder.group({
       mttoProveedor : [null],
@@ -128,6 +130,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     });
   }
 
+  /** Inicializar Formulario de pedidos que estará cargado en el modal al momento de consultar */
   inicializarFormulario2() {
     this.formPedidoCompletado = this.frmBuilder.group({
       pedFecha : [null],
@@ -139,7 +142,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     });
   }
 
-  /** Consultar pedidos de mantenimiento por parte de mecanicos */
+  /** Consultar pedidos / mantenimientos */
   consultar(){
     let pedido : number = this.formConsultarPedidoMtto.value.idPedido;
     let mtto : number = this.formConsultarPedidoMtto.value.idMtto;
@@ -166,19 +169,15 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     } else if(mtto != null && tipoMov != null) {
     } else if(pedido != null && fechaInicio != null) {
     } else if(pedido != null && tipoMov != null) {
-      this.servicioPedidoMtto.getPedidoMtto(pedido).subscribe(data_Pedido => {
-        if(data_Pedido.length == 0) this.advertenciaPedidoNoEncontrado(pedido);
-        else {
-          for (let index = 0; index < data_Pedido.length; index++) { this.cargarTablaInicialPedido(data_Pedido[index]); }
-        }
-      });
     } else if(tipoMov != null) {
     } else if(mtto != null) {
     } else if(fechaInicio != null) {
     } else if(pedido != null) {
       this.servicioPedidoMtto.getPedidoMtto(pedido).subscribe(data_Pedido => {
         if(data_Pedido.length == 0) this.advertenciaPedidoNoEncontrado(pedido);
-        else for (let index = 0; index < data_Pedido.length; index++) { this.cargarTablaInicialPedido(data_Pedido[index]); }
+        else for (let index = 0; index < data_Pedido.length; index++) {
+          this.cargarTablaInicialPedido(data_Pedido[index]);
+        }
       });
     } else {
       this.advertenciaCamposVacios();
@@ -195,7 +194,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     Swal.fire({icon: 'warning',  title: 'Advertencia', text: `No se encontró el pedido ${id}`, confirmButtonColor: '#ffc107', });
   }
 
-  /** Información que se cargará en la tabla luego de realizar la consulta.  */
+  /** Información que se cargará en la tabla inicial luego de realizar la consulta.  */
   cargarTablaInicialPedido(datos : any) {
     this.arrayPedido = [];
     const info : any = {
@@ -207,7 +206,6 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       observacion : datos.pedMtto_Observacion,
     }
     this.arrayPedido.push(info);
-    console.log(this.arrayPedido);
   }
 
    /** Cargar modal con la información detallada del pedido */
@@ -342,6 +340,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       this.cargando = true;
     }
 
+    /** Limpiar todos los campos */
     limpiarCampos(){
       this.formConsultarPedidoMtto.reset();
       this.formPedidoCompletado.reset();
@@ -350,10 +349,13 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       this.arrayPedido =[];
     }
 
+    /** Limpiar campos de la consulta inicial */
     limpiarCampoPedido(){
       this.formConsultarPedidoMtto.reset();
     }
 
+    /** Consultar el id del pedido en la tabla de mantenimientos, si está allí cargará en el modal
+      la info del mantenimiento asociado a ese pedido, sino solo cargará la info del pedido **/
     consultarPedidoEnMtto(item : any){
       this.numeroPedido = 0;
 
@@ -373,6 +375,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       setTimeout(() => {this.cargando = true; }, 500);
     }
 
+    /** Cargar encabezado de mantenimiento en los campos del modal */
     cargarMantenimiento(datosMtto : any){
       this.pedido = false;
       this.getProveedores();
@@ -395,7 +398,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       this.obtenerDetalleMantenimiento(encabezadoMtto);
     }
 
-      /** Cargar los campos del modal con la información del pedido */
+  /** Cargar los campos del modal con la información del pedido */
   cargarEncabezadoMttoModal(encabezadoMto : any){
     this.formMantenimiento.setValue({
       mttoProveedor : encabezadoMto.idProveedor,
@@ -406,6 +409,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     });
   }
 
+  /** buscar detalle de mantenimiento por Id de pedido para cargar los datos encontrados en el modal */
   obtenerDetalleMantenimiento(item) {
     this.servicioDetMtto.getDetalleMtto(item.idPedido).subscribe(dataDetalleMtto => {
       for (let index = 0; index < dataDetalleMtto.length; index++) {
@@ -414,6 +418,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     })
   }
 
+  /** Cargar tabla del detalle de mantenimiento en el modal */
   cargarDetalleMttoModal(detalleMto : any) {
     this.arrayDetalleMtto = [];
 
@@ -429,20 +434,19 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       precioMtto : detalleMto.dtMtto_Precio
     }
     this.arrayDetalleMtto.push(detalle);
-
-    console.log(this.arrayDetalleMtto);
   }
 
+  /** Obtener los datos del detalle del mantenimiento por codigo*/
   obtenerCodigoMantenimiento(item : any) {
     this.servicioDetMtto.getCodigoDetalleMtto(item.codigo).subscribe(dataDetalleMtto => {
       for (let index = 0; index < dataDetalleMtto.length; index++) {
-        this.obtenerDetalleMttoForUpdate(dataDetalleMtto[index], item.estado, item.precioMtto);
+        this.getDetalleMttoForUpdate(dataDetalleMtto[index], item.estado, item.precioMtto);
       }
     });
-    this.mostrarConfirmacion();
   }
 
-  obtenerDetalleMttoForUpdate(detalle : any, estadoMtto : any, precioMtto : any){
+  /** Obtener datos del detalle del mantenimiento por codigo y luego actualizarlo */
+  getDetalleMttoForUpdate(detalle : any, estadoMtto : any, precioMtto : any){
     let estadoNuevo : number;
 
     if(estadoMtto == 'Pendiente') estadoNuevo = 11
@@ -459,15 +463,22 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       DtMtto_Descripcion : detalle.dtMtto_Descripcion,
       DtMtto_Precio : precioMtto,
     }
-    //console.log(detalleMantenimiento);
+
     this.actualizarDetallexCodigo(detalleMantenimiento);
   }
 
+  /** Actualizar campos estado y/o precio de la tabla de mantenimiento. */
   actualizarDetallexCodigo(detalleMtto : any){
-    this.servicioDetMtto.Put(detalleMtto.DtMtto_Codigo, detalleMtto).subscribe(data => {  });
+    this.servicioDetMtto.Put(detalleMtto.DtMtto_Codigo, detalleMtto).subscribe(data => { this.mostrarConfirmacion(); }, error => { this.mostrarError(); });
   }
 
+  /** Mostrar mensaje de confirmación al actualizar un estado/precio/descripcion de la tabla de detalles de mantenimiento */
   mostrarConfirmacion() {
     this.messageService.add({severity:'success', detail:'Registro actualizado con éxito!'});
+  }
+
+  /** Mostrar mensaje de error al actualizar un estado/precio/descripcion de la tabla de detalles de mantenimiento */
+  mostrarError() {
+    this.messageService.add({severity:'error', detail:'Error al actualizar el registro!'});
   }
 }
