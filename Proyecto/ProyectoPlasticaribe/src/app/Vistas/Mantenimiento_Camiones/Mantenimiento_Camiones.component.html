@@ -24,7 +24,7 @@
     <div class="container">
 
       <div class="mb-4">
-        <h4 class="tituloRojo">Consultar Pedido</h4>
+        <h4 class="tituloRojo">Consultar Pedidos/Mantenimientos</h4>
       </div>
       <!-- Formulario -->
       <form [formGroup]="formConsultarPedidoMtto">
@@ -48,7 +48,7 @@
              <div class="form-floating col-md">
               <select formControlName="tipoMov" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
                 <option [ngValue]="1">Pedido de Mantenimiento</option>
-                <option [ngValue]="2">Mantenimiento Aceptado</option>
+                <option [ngValue]="2">Mantenimiento</option>
               </select>
               <label for="floatingSelect">Tipo Movimiento</label>
             </div>
@@ -70,8 +70,8 @@
 
         <!-- Botones -->
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultar()">Consultar Pedido</button>
-              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampoPedido()">Limpiar Campos</button>
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultar()"><i class="pi pi-search"></i> Consultar</button>
+              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampoPedido()"><i class="pi pi-eraser"></i> Limpiar Campos</button>
           </div>
 
         <!--<div class="mb-0">
@@ -81,7 +81,7 @@
 
       <!-- Tabla vista inicial -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Tabla de Pedidos</h4>
+        <h4 class="tituloRojo">Tabla de Pedidos/Mantenimientos</h4>
       </div>
 
         <div class="mb-3" *ngIf="cargando">
@@ -100,9 +100,10 @@
 
               <ng-template pTemplate="header">
                   <tr>
-                      <th scope="col">ID Pedido</th>
-                      <th scope="col">Fecha Pedido</th>
-                      <th scope="col">Hora Pedido</th>
+                      <th scope="col">Consecutivo</th>
+                      <th scope="col">Movimiento</th>
+                      <th scope="col">Fecha</th>
+                      <th scope="col">Hora</th>
                       <th scope="col">Usuario</th>
                       <th scope="col">Estado</th>
                       <th scope="col">Observación</th>
@@ -113,6 +114,7 @@
               <ng-template pTemplate="body" let-arrayPedido>
                   <tr>
                       <td>{{arrayPedido.pedidoId}}</td>
+                      <td>{{arrayPedido.tipoMov}}</td>
                       <td>{{arrayPedido.fecha}}</td>
                       <td>{{arrayPedido.hora}}</td>
                       <td>{{arrayPedido.usuario}}</td>
@@ -125,7 +127,7 @@
         </div>
 
         <!-- INICIO MODAL PEDIDO-->
-        <p-dialog *ngIf="cargando" header="Pedido Nro. {{numeroPedido}}" [(visible)]="modal" [style]="{width: '70%'}" [modal]="true" styleClass="p-fluid">
+        <p-dialog *ngIf="cargando" header="{{PedMtto}} Nro. {{numeroPedido}}" [(visible)]="modal" [style]="{width: '70%'}" [modal]="true" styleClass="p-fluid">
           <ng-container *ngIf="pedido then Pedido else Mantenimiento;" ></ng-container>
 
           <!--Modal Pedido-->
@@ -224,7 +226,7 @@
               </div>
               <!--Botón-->
               <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <button class=" btn btn-danger btn-danger-sm" type="button" (click)="advertenciaAceptarPedido()">Aceptar Pedido</button>
+                <button class=" btn btn-danger btn-danger-sm" type="button" (click)="advertenciaAceptarPedido()"><i class="pi pi-check"></i> Aceptar Pedido</button>
               </div>
           </ng-template>
 
@@ -233,12 +235,18 @@
           <ng-template #Mantenimiento>
             <p-toast position="center"></p-toast>
             <form [formGroup]="formMantenimiento">
+              <!--Fila 1-->
               <div class="mb-3">
                 <div class="row g-3">
+                  <!-- ID Mtto -->
+                  <div class="form-floating col-md">
+                    <input formControlName="mttoId" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off" readonly onmousedown="return false">
+                    <label for="floatingInput">Nro. Mantenimiento</label>
+                  </div>
 
                  <!-- Proveedor -->
-                   <div class="form-floating col-md">
-                    <select formControlName="mttoProveedor" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
+                   <div class="form-floating col-md-3">
+                    <select formControlName="mttoProveedor" class="form-select form-select-sm" id="floatingSelect" (change)="getProveedor_Observacion()" aria-label="Floating label select example" title="Actualizar Proveedor" required>
                       <option [ngValue]="item.prov_Id" *ngFor="let item of arrayProveedores">{{item.prov_Nombre}}</option>
                     </select>
                     <label for="floatingSelect">Proveedor</label>
@@ -257,23 +265,33 @@
                   </div>
 
                   <!-- Usuario -->
-                  <div class="form-floating col-md">
+                  <div class="form-floating col-md-3">
                     <input formControlName="mttoUsuario" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off" readonly onmousedown="return false">
                     <label for="floatingInput">Usuario</label>
                   </div>
 
-                  <!--Observación-->
-                  <div class="form-floating col-md-4">
-                    <textarea formControlName="mttoObservacion" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off"></textarea>
-                    <label for="floatingInput">Observación</label>
+                  <!--Fila 2-->
+                  <div class="mb-3">
+                    <div class="row g-3">
+                      <!--Observación-->
+                        <div class="form-floating col-md">
+                          <textarea formControlName="mttoObservacion" style="height: 70px" type="text" (keyup.enter)="getProveedor_Observacion()" class="form-control form-control-sm" id="floatingInput" autocomplete="off" title="Debe presionar ENTER luego de realizar una observación"></textarea>
+                          <label for="floatingInput">Observación</label>
+                        </div>
+                   </div>
                   </div>
+
+
                 </div>
               </div>
             </form>
-            <!--Linea-->
-            <div class="mb-3">
-              <hr class="Linea">
+
+            <!-- Actualizar Mantenimiento -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center mb-0">
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="getProveedor_Observacion()"><i class="pi pi-sync"></i> Actualizar Encabezado</button>
             </div>
+
+
 
             <!--Titulo-->
             <div class="mb-4">
@@ -301,6 +319,7 @@
                             <th scope="col">Serial</th>
                             <th scope="col">Tipo Mtto.</th>
                             <th scope="col">Estado</th>
+                            <th scope="col">Descripción</th>
                             <th scope="col">Precio</th>
                         </tr>
                     </ng-template>
@@ -310,28 +329,110 @@
                             <td>{{arrayDetalleMtto.activo}}</td>
                             <td>{{arrayDetalleMtto.serial}}</td>
                             <td>{{arrayDetalleMtto.tipoMtto}}</td>
-                            <td pEditableColumn>
-                              <p-cellEditor>
-                                <ng-template pTemplate="input">
-                                    <p-dropdown [options]="arrayEstados" appendTo="body" [(ngModel)]="arrayDetalleMtto.estado" [style]="{'width':'100%'}" (onChange)="obtenerCodigoMantenimiento(arrayDetalleMtto)"></p-dropdown>
-                                </ng-template>
-                                <ng-template pTemplate="output">
-                                    {{arrayDetalleMtto.estado}}
-                                </ng-template>
-                              </p-cellEditor>
-                            </td>
-                            <td pEditableColumn>
-                              <p-cellEditor>
-                                <ng-template pTemplate="input">
-                                    <input pInputText type="text" [(ngModel)]="arrayDetalleMtto.precioMtto" (change)="obtenerCodigoMantenimiento(arrayDetalleMtto)" min="0">
-                                </ng-template>
-                                <ng-template pTemplate="output">
-                                    {{arrayDetalleMtto.precioMtto | currency}}
-                                </ng-template>
-                            </p-cellEditor>
-                            </td>
+                          <!--Inicio Campo Estado-->
+                            <ng-container *ngIf="arrayDetalleMtto.estado == 'Terminada'">
+                              <td pEditableColumn title="Haga clic para desplegar las opciones y actualizar el estado">
+                                <p-cellEditor>
+                                  <ng-template pTemplate="input">
+                                      <p-dropdown [options]="arrayEstados" appendTo="body" [disabled]="true" [(ngModel)]="arrayDetalleMtto.estado" [style]="{'width':'100%'}" (onChange)="obtenerCodigoMantenimiento(arrayDetalleMtto)"></p-dropdown>
+                                  </ng-template>
+                                  <ng-template pTemplate="output">
+                                    <span class="badge bg-success1">{{arrayDetalleMtto.estado}}</span>
+                                  </ng-template>
+                                </p-cellEditor>
+                              </td>
+                            </ng-container>
+
+                            <ng-container *ngIf="arrayDetalleMtto.estado == 'Pendiente'">
+                                <td pEditableColumn title="Haga clic para desplegar las opciones y actualizar el estado">
+                                  <p-cellEditor>
+                                    <ng-template pTemplate="input" >
+                                        <p-dropdown [options]="arrayEstados" appendTo="body" [(ngModel)]="arrayDetalleMtto.estado" [style]="{'width':'100%'}" (onChange)="obtenerCodigoMantenimiento(arrayDetalleMtto)"></p-dropdown>
+                                    </ng-template>
+                                    <ng-template pTemplate="output">
+                                      <span class="badge bg-danger1">{{arrayDetalleMtto.estado}}</span>
+                                    </ng-template>
+                                  </p-cellEditor>
+                                </td>
+                            </ng-container>
+
+                            <ng-container *ngIf="arrayDetalleMtto.estado == 'En proceso'">
+                              <td pEditableColumn title="Haga clic para desplegar las opciones y actualizar el estado">
+                                <p-cellEditor>
+                                  <ng-template pTemplate="input" >
+                                      <p-dropdown [options]="arrayEstados" appendTo="body" [(ngModel)]="arrayDetalleMtto.estado" [style]="{'width':'100%'}" (onChange)="obtenerCodigoMantenimiento(arrayDetalleMtto)"></p-dropdown>
+                                  </ng-template>
+                                  <ng-template pTemplate="output">
+                                    <span class="badge bg-warning1">{{arrayDetalleMtto.estado}}</span>
+                                  </ng-template>
+                                </p-cellEditor>
+                              </td>
+                            </ng-container>
+                            <!--Fin Campo Estado-->
+
+                            <!--Inicio Campo Descripcion-->
+                            <ng-container *ngIf="arrayDetalleMtto.estado == 'Terminada' then Inhabilitado; else habilitado"></ng-container>
+                            <ng-template #Inhabilitado>
+                              <td pEditableColumn>
+                                <p-cellEditor>
+                                  <ng-template pTemplate="input">
+                                      <input pInputText type="text" [disabled]="true" [(ngModel)]="arrayDetalleMtto.descripcionMtto" (change)="obtenerCodigoMantenimiento(arrayDetalleMtto)">
+                                  </ng-template>
+                                  <ng-template pTemplate="output">
+                                      {{arrayDetalleMtto.descripcionMtto}}
+                                  </ng-template>
+                                </p-cellEditor>
+                              </td>
+                            </ng-template>
+                            <ng-template #habilitado>
+                              <td pEditableColumn>
+                                <p-cellEditor>
+                                  <ng-template pTemplate="input">
+                                      <input pInputText type="text" [(ngModel)]="arrayDetalleMtto.descripcionMtto" (change)="obtenerCodigoMantenimiento(arrayDetalleMtto)">
+                                  </ng-template>
+                                  <ng-template pTemplate="output">
+                                      {{arrayDetalleMtto.descripcionMtto}}
+                                  </ng-template>
+                                </p-cellEditor>
+                              </td>
+                            </ng-template>
+                            <!--Fin Campo Descripcion-->
+
+                            <!--Inicio Campo Precio -->
+                            <ng-container *ngIf="arrayDetalleMtto.estado == 'Terminada' then Deshabilitado; else Habilitado"></ng-container>
+                            <ng-template #Deshabilitado>
+                              <td pEditableColumn>
+                                <p-cellEditor>
+                                  <ng-template pTemplate="input">
+                                      <input pInputText type="number" [disabled]="true" [(ngModel)]="arrayDetalleMtto.precioMtto" (change)="obtenerCodigoMantenimiento(arrayDetalleMtto)" min="0">
+                                  </ng-template>
+                                  <ng-template pTemplate="output">
+                                      {{arrayDetalleMtto.precioMtto | currency}}
+                                  </ng-template>
+                                </p-cellEditor>
+                              </td>
+                            </ng-template>
+                            <ng-template #Habilitado>
+                              <td pEditableColumn>
+                                <p-cellEditor>
+                                  <ng-template pTemplate="input">
+                                      <input pInputText type="number" [(ngModel)]="arrayDetalleMtto.precioMtto" (change)="obtenerCodigoMantenimiento(arrayDetalleMtto)" min="0">
+                                  </ng-template>
+                                  <ng-template pTemplate="output">
+                                      {{arrayDetalleMtto.precioMtto | currency}}
+                                  </ng-template>
+                                </p-cellEditor>
+                              </td>
+                            </ng-template>
+                             <!--Fin Campo Precio -->
                         </tr>
                     </ng-template>
+                    <ng-template pTemplate="footer">
+                      <tr>
+                          <td colspan="6" style="text-align: end">Precio Total Mantenimiento</td>
+                          <td>{{precioTotalMtto | currency}} </td>
+                      </tr>
+                  </ng-template>
                 </p-table>
               </div>
           </ng-template>

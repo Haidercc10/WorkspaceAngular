@@ -17,4 +17,6 @@ getPedidoMtto(id : any):Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Pedido_Mantenimiento/getDatosCompletos/${id}`);
   }
 
+
+
 }

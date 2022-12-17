@@ -23,7 +23,7 @@ import {ToastModule} from 'primeng/toast';
 })
 export class Mantenimiento_CamionesComponent implements OnInit {
 
-  public formConsultarPedidoMtto !: FormGroup;
+  public formConsultarPedidoMtto !: FormGroup; /** Formulario de consulta inic */
   public formPedidoCompletado !: FormGroup;
   public formMantenimiento !: FormGroup;
   public formEstados !: FormGroup;
@@ -43,8 +43,9 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   public arrayDetalleMtto : any =[];
   public arrayProveedores : any =[];
   public arrayEstados : any = [];
-  public Estados : any = [];
-  public array : any = [];
+  public identProveedor : number;
+  public precioTotalMtto : number = 0;
+  public PedMtto : string = ''
 
   constructor(private frmBuilder : FormBuilder,
     @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -123,6 +124,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   /** Inicializar formulario de mantenimiento que estará cargado en el modal al momento de consultar*/
   inicializarFormularioMtto(){
     this.formMantenimiento = this.frmBuilder.group({
+      mttoId : [null],
       mttoProveedor : [null],
       mttoFecha: [null],
       mttoEstado: [null],
@@ -145,44 +147,50 @@ export class Mantenimiento_CamionesComponent implements OnInit {
 
   /** Consultar pedidos / mantenimientos */
   consultar(){
+    this.cargando = false;
     let pedido : number = this.formConsultarPedidoMtto.value.idPedido;
     let mtto : number = this.formConsultarPedidoMtto.value.idMtto;
-    let tipoMov : number = this.formConsultarPedidoMtto.value.tipoMov;
+    let tipoMov : string = this.formConsultarPedidoMtto.value.tipoMov;
     let fechaInicio : any = this.formConsultarPedidoMtto.value.fechaInicio;
     let fechaFin : any = this.formConsultarPedidoMtto.value.fechaFin;
+    let ruta : string = ``;
+    this.arrayPedido = [];
 
-    if (pedido != null && mtto != null &&  tipoMov != null && fechaInicio != null && fechaFin != null ) {
-    } else if(pedido != null && mtto != null &&  tipoMov != null && fechaInicio != null) {
-    } else if(pedido != null &&  mtto != null && fechaInicio != null && fechaFin != null) {
-    } else if(pedido != null && tipoMov != null &&  fechaInicio != null && fechaFin != null) {
-    } else if(mtto != null &&  tipoMov != null && fechaInicio != null && fechaFin != null) {
-    } else if(pedido != null && mtto != null &&  tipoMov != null) {
-    } else if(pedido != null && mtto != null &&  fechaInicio != null) {
-    } else if(pedido != null && tipoMov != null &&  fechaInicio != null) {
-    } else if(pedido != null && fechaInicio != null &&  fechaFin != null) {
-    } else if(mtto != null && tipoMov != null &&  fechaInicio != null) {
-    } else if(mtto != null && fechaInicio != null &&  fechaFin != null) {
-    } else if(tipoMov != null && fechaInicio != null &&  fechaFin != null) {
-    } else if(fechaInicio != null &&  fechaFin != null) {
-    } else if(tipoMov != null &&  fechaInicio != null) {
-    } else if(mtto != null &&  fechaInicio != null) {
-    } else if(pedido != null && mtto != null) {
-    } else if(mtto != null && tipoMov != null) {
-    } else if(pedido != null && fechaInicio != null) {
-    } else if(pedido != null && tipoMov != null) {
-    } else if(tipoMov != null) {
-    } else if(mtto != null) {
-    } else if(fechaInicio != null) {
-    } else if(pedido != null) {
-      this.servicioPedidoMtto.getPedidoMtto(pedido).subscribe(data_Pedido => {
-        if(data_Pedido.length == 0) this.advertenciaPedidoNoEncontrado(pedido);
-        else for (let index = 0; index < data_Pedido.length; index++) {
-          this.cargarTablaInicialPedido(data_Pedido[index]);
-        }
-      });
-    } else {
-      this.advertenciaCamposVacios();
+    if(fechaInicio == null) fechaInicio = '2022-12-11' //fechaInicio = this.today;
+    if(fechaFin == null) fechaFin = '2022-12-15' //fechaFin = fechaInicio;
+    if(pedido != null && mtto == null) mtto = -1;
+    if(pedido == null && mtto != null) pedido = -1;
+
+    if (pedido != null && mtto != null &&  tipoMov != null && fechaInicio != null && fechaFin != null ) { ruta = `?consecutivo=${pedido}&consecutivo2=${mtto}&tipoMov=${tipoMov}`
+    } else if(pedido != null && mtto != null &&  tipoMov != null && fechaInicio != null) { ruta = ruta = `?consecutivo=${pedido}&consecutivo2=${mtto}&tipoMov=${tipoMov}`
+    } else if(pedido != null &&  mtto != null && fechaInicio != null && fechaFin != null) { ruta = `?consecutivo=${pedido}&consecutivo2=${mtto}`
+    } else if(pedido != null && tipoMov != null &&  fechaInicio != null && fechaFin != null) { ruta = `?consecutivo=${pedido}&tipoMov=${tipoMov}`
+    } else if(mtto != null &&  tipoMov != null && fechaInicio != null && fechaFin != null) { ruta = `?consecutivo=${pedido}&tipoMov=${tipoMov}`
+    } else if(pedido != null && mtto != null &&  tipoMov != null) { ruta = `?consecutivo=${pedido}&consecutivo2=${mtto}&tipoMov=${tipoMov}`
+    } else if(pedido != null && mtto != null &&  fechaInicio != null) { ruta = `?consecutivo=${pedido}&consecutivo2=${mtto}`
+    } else if(pedido != null && tipoMov != null &&  fechaInicio != null) { ruta = `?consecutivo=${pedido}&tipoMov=${tipoMov}`
+    } else if(pedido != null && fechaInicio != null &&  fechaFin != null) { ruta = `?consecutivo=${pedido}`
+    } else if(mtto != null && tipoMov != null &&  fechaInicio != null) { ruta = `?consecutivo=${pedido}&tipoMov=${tipoMov}`
+    } else if(mtto != null && fechaInicio != null &&  fechaFin != null) { ruta = `?consecutivo2=${mtto}`
+    } else if(tipoMov != null && fechaInicio != null &&  fechaFin != null) { ruta = `?tipoMov=${tipoMov}`
+    } else if(fechaInicio != null &&  fechaFin != null) { ruta = ruta;
+    } else if(tipoMov != null &&  fechaInicio != null) { ruta = `?tipoMov=${tipoMov}`
+    } else if(mtto != null &&  fechaInicio != null) { ruta = `?consecutivo2=${mtto}`
+    } else if(pedido != null && mtto != null) { ruta = `?consecutivo=${pedido}&consecutivo2=${mtto}`
+    } else if(mtto != null && tipoMov != null) { ruta = `?consecutivo2=${mtto}&tipoMov=${tipoMov}`
+    } else if(pedido != null && fechaInicio != null) { ruta = `?consecutivo=${pedido}`
+    } else if(pedido != null && tipoMov != null) { ruta = `?consecutivo=${pedido}&tipoMov=${tipoMov}`
+    } else if(tipoMov != null) {  ruta = `?tipoMov=${tipoMov}`
     }
+
+    this.servicioMtto.GetPedido_Mantenimiento(fechaInicio, fechaFin, ruta).subscribe(dataPedMtto => {
+      if(dataPedMtto.length == 0) this.advertenciaNoEncontrado(fechaInicio, fechaFin);
+      else
+      for (let index = 0; index < dataPedMtto.length; index++) {
+        this.cargarTablaInicial(dataPedMtto[index])
+      }
+    });
+    setTimeout(() => {this.cargando = true}, 1000);
   }
 
   /** Mensaje de advertencia campos vacios */
@@ -191,20 +199,32 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   }
 
   /** Mensaje de advertencia para pedidos no encontrados */
-  advertenciaPedidoNoEncontrado(id : any) {
-    Swal.fire({icon: 'warning',  title: 'Advertencia', text: `No se encontró el pedido ${id}`, confirmButtonColor: '#ffc107', });
+  advertenciaNoEncontrado(fecha1: any, fecha2 : any) {
+    if(fecha1 == this.today) {
+      setTimeout(() => { Swal.fire({icon: 'warning',  title: 'Advertencia', html: `¡No se encontraron resultados de búsqueda <br> del día de hoy!`, confirmButtonColor: '#ffc107', }); }, 950);
+    } else if(fecha1 == this.today && fecha2 == this.today) {
+      setTimeout(() => { Swal.fire({icon: 'warning',  title: 'Advertencia', html: `¡No se encontraron resultados de búsqueda <br> del día de hoy!`, confirmButtonColor: '#ffc107', }); }, 950);
+    } else {
+      setTimeout(() => { Swal.fire({icon: 'warning',  title: 'Advertencia', html: `¡No se encontraron resultados de búsqueda entre las fechas <b> ${fecha1} </b> y <b> ${fecha2} </b> !`, confirmButtonColor: '#ffc107', }); }, 950);
+    }
+
+  }
+
+    /** Mensaje de advertencia para pedidos no encontrados */
+  advertenciaTipoMovimiento() {
+    Swal.fire({icon: 'warning',  title: 'Advertencia', text: `¡Debe especificar el tipo de movimiento!`, confirmButtonColor: '#ffc107', });
   }
 
   /** Información que se cargará en la tabla inicial luego de realizar la consulta.  */
-  cargarTablaInicialPedido(datos : any) {
-    this.arrayPedido = [];
+  cargarTablaInicial(datos : any) {
     const info : any = {
-      pedidoId : datos.pedMtto_Id,
-      fecha : datos.pedMtto_Fecha.replace('T00:00:00', ''),
-      hora : datos.pedMtto_Hora,
-      usuario : datos.usua_Nombre,
-      estado : datos.estado_Nombre,
-      observacion : datos.pedMtto_Observacion,
+      pedidoId : datos.id_Movimiento,
+      tipoMov : datos.tipo_Movimiento,
+      fecha : datos.fecha.replace('T00:00:00', ''),
+      hora : datos.hora,
+      usuario : datos.usuario,
+      estado : datos.estado,
+      observacion : datos.observacion,
     }
     this.arrayPedido.push(info);
   }
@@ -212,6 +232,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
    /** Cargar modal con la información detallada del pedido */
    cargarModalDetallesPedido(item : any){
     this.pedido = true;
+    this.arrayProveedores=[];
     this.getProveedores();
 
     this.cargarEncabezadoPedidoModal(item);
@@ -313,7 +334,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     setTimeout(() => {
       this.cargando = true;
       Swal.fire({icon: 'success', title: 'Confirmación', text: '¡Entrada de mantenimiento aceptada con éxito!', showConfirmButton: false, timer: 2000 });
-    }, 1000);
+    }, 500);
   }
 
     /**  Si existe algún problema al momento de generar el detalle del pedido a la BD se mostrará un mensaje de error*/
@@ -365,21 +386,37 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       this.cargando = false;
       this.numeroPedido = item.pedidoId;
 
-      this.servicioMtto.GetPedidoAceptado(item.pedidoId).subscribe(dataPedAceptado => {
-        if(dataPedAceptado.length == 0) {
-          this.cargarModalDetallesPedido(item);
-        } else {
-          for (let index = 0; index < dataPedAceptado.length; index++) {
-            this.cargarMantenimiento(dataPedAceptado[index]);
+      if(item.tipoMov == 'Mantenimiento') {
+        this.servicioMtto.GetMantenimientoxId(item.pedidoId).subscribe(dataMtto => {
+          for (let index = 0; index < dataMtto.length; index++) {
+            this.cargarMantenimiento(dataMtto[index]);
+            this.PedMtto = 'Mantenimiento';
           }
-        }
-      });
+        });
+      } else if (item.tipoMov == 'Pedido de Mantenimiento') {
+
+        this.servicioMtto.GetPedidoAceptado(item.pedidoId).subscribe(dataPedAceptado => {
+          if(dataPedAceptado.length == 0) {
+            this.cargarModalDetallesPedido(item);
+            this.PedMtto = 'Pedido';
+          } else {
+            for (let index = 0; index < dataPedAceptado.length; index++) {
+              this.cargarMantenimiento(dataPedAceptado[index]);
+              this.PedMtto = 'Pedido';
+            }
+          }
+        });
+
+      }
       setTimeout(() => {this.cargando = true; }, 500);
     }
 
     /** Cargar encabezado de mantenimiento en los campos del modal */
     cargarMantenimiento(datosMtto : any){
       this.pedido = false;
+      this.arrayProveedores =[];
+      this.arrayEstados =[];
+
       this.getProveedores();
       this.getEstados();
 
@@ -402,6 +439,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   /** Cargar los campos del modal con la información del pedido */
   cargarEncabezadoMttoModal(encabezadoMto : any){
     this.formMantenimiento.setValue({
+      mttoId : encabezadoMto.idMtto,
       mttoProveedor : encabezadoMto.idProveedor,
       mttoFecha: encabezadoMto.fechaInicial,
       mttoEstado: encabezadoMto.estado,
@@ -413,10 +451,12 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   /** buscar detalle de mantenimiento por Id de pedido para cargar los datos encontrados en el modal */
   obtenerDetalleMantenimiento(item) {
     this.arrayDetalleMtto = [];
+    this.precioTotalMtto = 0;
 
     this.servicioDetMtto.getDetalleMtto(item.idPedido).subscribe(dataDetalleMtto => {
       for (let index = 0; index < dataDetalleMtto.length; index++) {
         this.cargarDetalleMttoModal(dataDetalleMtto[index]);
+        this.precioTotalMtto += dataDetalleMtto[index].dtMtto_Precio;
       }
     })
   }
@@ -432,45 +472,48 @@ export class Mantenimiento_CamionesComponent implements OnInit {
       tipoMtto : detalleMto.tpMtto_Nombre,
       idEstado : detalleMto.estado_Id,
       estado : detalleMto.estado_Nombre,
-      precioMtto : detalleMto.dtMtto_Precio
+      precioMtto : detalleMto.dtMtto_Precio,
+      descripcionMtto : detalleMto.dtMtto_Descripcion
     }
     this.arrayDetalleMtto.push(detalle);
   }
 
   /** Obtener los datos del detalle del mantenimiento por codigo*/
   obtenerCodigoMantenimiento(item : any) {
+
     this.servicioDetMtto.getCodigoDetalleMtto(item.codigo).subscribe(dataDetalleMtto => {
       for (let index = 0; index < dataDetalleMtto.length; index++) {
-        this.getDetalleMttoForUpdate(dataDetalleMtto[index], item.estado, item.precioMtto);
+        this.getDetalleMttoForUpdate(dataDetalleMtto[index], item.estado, item.precioMtto, item.descripcionMtto);
       }
     });
+    this.obtenerPrecio(this.arrayDetalleMtto);
   }
 
   /** Obtener datos del detalle del mantenimiento por codigo y luego actualizarlo */
-  getDetalleMttoForUpdate(detalle : any, estadoMtto : any, precioMtto : any){
+  getDetalleMttoForUpdate(detalle : any, estadoMtto : any, precioMtto : any, descripcionMtto : any){
     let estadoNuevo : number;
 
-    if(estadoMtto == 'Pendiente') estadoNuevo = 11
-    else if(estadoMtto == 'En proceso') estadoNuevo = 16
+    if(estadoMtto == 'Pendiente') estadoNuevo = 11;
+    else if(estadoMtto == 'En proceso') estadoNuevo = 16;
     else if(estadoMtto == 'Terminada') estadoNuevo = 17;
 
-    console.log(estadoNuevo);
     const detalleMantenimiento : any = {
       DtMtto_Codigo : detalle.dtMtto_Codigo,
       Mtto_Id : detalle.mtto_Id,
       Actv_Id : detalle.actv_Id,
       TpMtto_Id : detalle.tpMtto_Id,
       Estado_Id : estadoNuevo,
-      DtMtto_Descripcion : detalle.dtMtto_Descripcion,
+      DtMtto_Descripcion : descripcionMtto,
       DtMtto_Precio : precioMtto,
     }
 
+    //this.obtenerPrecio(detalleMantenimiento.DtMtto_Precio);
     this.actualizarDetallexCodigo(detalleMantenimiento);
   }
 
   /** Actualizar campos estado y/o precio de la tabla de mantenimiento. */
   actualizarDetallexCodigo(detalleMtto : any){
-    this.servicioDetMtto.Put(detalleMtto.DtMtto_Codigo, detalleMtto).subscribe(data => { this.mostrarConfirmacion(); }, error => { this.mostrarError(); });
+    this.servicioDetMtto.Put(detalleMtto.DtMtto_Codigo, detalleMtto).subscribe(data => { this.mostrarConfirmacion(); setTimeout(() => { this.obtenerNuevoEstadoEncabezado(detalleMtto.Mtto_Id); }, 1000); }, error => { this.mostrarError(); });
   }
 
   /** Mostrar mensaje de confirmación al actualizar un estado/precio/descripcion de la tabla de detalles de mantenimiento */
@@ -481,5 +524,71 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   /** Mostrar mensaje de error al actualizar un estado/precio/descripcion de la tabla de detalles de mantenimiento */
   mostrarError() {
     this.messageService.add({severity:'error', detail:'Error al actualizar el registro!'});
+  }
+
+  /** Obtener el ID del proveedor y la observación de un pedido */
+  getProveedor_Observacion(){
+    let identProveedor : number = this.formMantenimiento.value.mttoProveedor;
+    let Observacion : number = this.formMantenimiento.value.mttoObservacion;
+
+    this.servicioMtto.GetPedidoAceptado(this.numeroPedido).subscribe(dataMatto => {
+      for (let index = 0; index < dataMatto.length; index++) {
+        this.cargarDatosActualizarProveedor(dataMatto[index], identProveedor, Observacion);
+      }
+    });
+  }
+
+  /** cargar la data del pedido para actualizar el proveedor  **/
+  cargarDatosActualizarProveedor(datos : any, idProveedor : any, observacion : any){
+    const encabezadoMtto : any = {
+      Mtto_Id : datos.mtto_Id,
+      PedMtto_Id : datos.pedMtto_Id,
+      Prov_Id : idProveedor,
+      Usua_Id : datos.usua_Id,
+      Estado_Id : datos.estado_Id,
+      Mtto_FechaInicio : datos.mtto_FechaInicio.replace('T00:00:00', ''),
+      Mtto_FechaFin : datos.mtto_FechaFin.replace('T00:00:00', ''),
+      Mtto_PrecioTotal :datos.mtto_PrecioTotal,
+      Mtto_Observacion : observacion,
+      Mtto_CantDias : datos.mtto_CantDias,
+      Mtto_FechaRegistro :datos.mtto_FechaRegistro.replace('T00:00:00', ''),
+      Mtto_HoraRegistro : datos.mtto_HoraRegistro
+    }
+    this.actualizarProveedor(encabezadoMtto);
+  }
+
+  /** Actualizar el proveedor al momento de realizar de hacer clic sobre un proveedor distinto al cargado inicialmente */
+  actualizarProveedor(encabezadoMatto : any){
+    this.servicioMtto.Put(encabezadoMatto.Mtto_Id, encabezadoMatto).subscribe(dataProv => { this.mostrarConfirmacion(); }, error => { this.mostrarError(); });
+  }
+
+  /** Actualizar precio total al momento de cambiar un precio de detalle */
+  obtenerPrecio(datos : any){
+    this.precioTotalMtto = 0;
+    for (let index = 0; index < datos.length; index++) {
+      this.precioTotalMtto += datos[index].precioMtto;
+    }
+  }
+
+  /** Obtener el nuevo estado del  */
+  obtenerNuevoEstadoEncabezado(item : any){
+    this.servicioMtto.GetMantenimientoxId(item).subscribe(dataEstado => {
+      for (let index = 0; index < dataEstado.length; index++) {
+        this.cambiarEstadoEncabezado(dataEstado[index]);
+      }
+    });
+  }
+
+  /** Cambia Estado del Mantenimiento en los campos del encabezado*/
+  cambiarEstadoEncabezado(encabezado){
+    this.formMantenimiento.reset();
+    this.formMantenimiento.patchValue({
+      mttoId : encabezado.mtto_Id,
+      mttoProveedor : encabezado.prov_Id,
+      mttoFecha: encabezado.mtto_FechaInicio.replace('T00:00:00'),
+      mttoEstado: encabezado.estado_Nombre,
+      mttoUsuario: encabezado.usua_Nombre,
+      mttoObservacion : encabezado.mtto_Observacion
+    });
   }
 }

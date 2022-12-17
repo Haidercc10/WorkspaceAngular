@@ -29,6 +29,10 @@ export class Detalle_MantenimientoService {
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/getCodigoMtto/${idPedido}`);
     }
 
+    GetDetalleMantenimiento(id : any):Observable<any[]> {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mantenimiento/getMttoxId/${id}`)
+    }
+
     Put(id:number|String, data:any) {
       return this.http.put(this.rutaPlasticaribeAPI + `/Detalle_Mantenimiento/${id}`, data);
     }

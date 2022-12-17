@@ -25,6 +25,10 @@ export class MantenimientoService {
       return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mantenimiento/getPedidoMtto/${id}`)
     }
 
+    GetMantenimientoxId(id : any):Observable<any[]> {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mantenimiento/getMttos/${id}`)
+    }
+
     Put(id:number|String, data:any) {
       return this.http.put(this.rutaPlasticaribeAPI + `/Mantenimiento/${id}`, data);
     }
@@ -37,4 +41,11 @@ export class MantenimientoService {
       return this.http.post(this.rutaPlasticaribeAPI + '/Mantenimiento', data);
     }
 
+    GetPedido_Mantenimiento(fecha1 : any, fecha2 : any, ruta : string = ``) {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mantenimiento/getPedido_Mantenimiento/${fecha1}/${fecha2}/${ruta}`);
+    }
+
+    getMantenimientosxFecha(fecha : any):Observable<any[]> {
+      return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mantenimiento/getMantenimientosxFecha/${fecha}`);
+    }
 }
