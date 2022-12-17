@@ -585,7 +585,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     this.formMantenimiento.patchValue({
       mttoId : encabezado.mtto_Id,
       mttoProveedor : encabezado.prov_Id,
-      mttoFecha: encabezado.mtto_FechaInicio.replace('T00:00:00'),
+      mttoFecha: encabezado.mtto_FechaInicio.replace('T00:00:00', ''),
       mttoEstado: encabezado.estado_Nombre,
       mttoUsuario: encabezado.usua_Nombre,
       mttoObservacion : encabezado.mtto_Observacion
