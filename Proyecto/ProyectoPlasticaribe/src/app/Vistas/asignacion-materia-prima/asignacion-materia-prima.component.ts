@@ -176,7 +176,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.bagProServices.srvObtenerListaClienteOT_Item(ot).subscribe(datos_procesos => {
       if (datos_procesos.length != 0) {
         for (let index = 0; index < datos_procesos.length; index++) {
-          let adicional : number = datos_procesos[index].datosotKg * 0.1;
+          let adicional : number = datos_procesos[index].datosotKg * 0.02;
           this.kgOT = datos_procesos[index].datosotKg + adicional;
           this.estadoOT = datos_procesos[index].estado;
           this.FormMateriaPrimaRetiro.setValue({
@@ -215,7 +215,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             for (let i = 0; i < datos_devoluciones.length; i++) {
               this.devolucionesMPService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_devolucionesMP => {
                 for (let j = 0; j < datos_devolucionesMP.length; j++) {
-                  if (datos_devolucionesMP[j].tinta_Id == 2001 && datos_devolucionesMP[j].matPri_Id != 84 && datos_devolucionesMP[j].bopp_Id == 449) devolucionMP += datos_devolucionesMP[j].dtDevMatPri_CantidadDevuelta;
+                  if ((datos_devolucionesMP[j].tinta_Id == null || datos_devolucionesMP[j].tinta_Id == 2001) && datos_devolucionesMP[j].matPri_Id != 84 && (datos_devolucionesMP[j].bopp_Id == null || datos_devolucionesMP[j].bopp_Id == 449)) {
+                    devolucionMP += datos_devolucionesMP[j].dtDevMatPri_CantidadDevuelta;
+                    console.log(datos_devolucionesMP[j]);
+                  }
                 }
               });
             }

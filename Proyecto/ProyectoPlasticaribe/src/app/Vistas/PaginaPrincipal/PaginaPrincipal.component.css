@@ -1,6 +1,56 @@
-span{
-  color: #d83542;
+/* *{
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+} */
+
+p-pickList span{
   display: flex;
+}
+
+.banner{
+  background: #F1948A;
+  height: 30px;
+}
+
+.banner:hover{
+  background: #d88981;
+}
+
+.card{
+  cursor: pointer;
+}
+
+.scrollCard{
+  overflow-y: scroll;
+  max-height: 358px;
+}
+
+.scrollCard::-webkit-scrollbar {
+  width: 8px;     /* Tamaño del scroll en vertical */
+  height: 8px;    /* Tamaño del scroll en horizontal */
+}
+
+/* Ponemos un color de fondo y redondeamos las esquinas del thumb */
+.scrollCard::-webkit-scrollbar-thumb {
+  background: #EBEDEF;
+  border-radius: 4px;
+}
+
+/* Cambiamos el fondo y agregamos una sombra cuando esté en hover */
+.scrollCard::-webkit-scrollbar-thumb:hover {
+  background: #D5DBDB;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Cambiamos el fondo cuando esté en active */
+.scrollCard::-webkit-scrollbar-thumb:active {
+  background-color: #E5E8E8;
+}
+
+.card-body:hover{
+  background: #EBF5FB;
 }
 
 .contenedorLista {
@@ -8,6 +58,7 @@ span{
   margin: auto;
   border: solid #bbb 3px;
   border-radius: 1%;
+  z-index: 5000;
 }
 
 .btnclose {
@@ -19,4 +70,147 @@ span{
 
 .btnclose:hover {
   color: #952731;
+}
+
+.card_animations {
+  position: relative;
+  animation: card 0.6s linear;
+}
+
+.contenedorLista_animations {
+  width: 55%;
+  margin: auto;
+  border: solid #bbb 3px;
+  border-radius: 1%;
+  z-index: 5000;
+  position: relative;
+  animation: card 0.5s linear;
+}
+
+.amarillo {
+  background-color: #F3FC20;
+  color: #000;
+  width: 20%;
+  text-align: center;
+  border-radius: 10%;
+}
+
+.naranja {
+  background-color: #F6D45D;
+  color: #000;
+  width: 20%;
+  text-align: center;
+  border-radius: 10%;
+}
+
+.rojo {
+  background-color: #FF7878;
+  color: #000;
+  width: 20%;
+  text-align: center;
+  border-radius: 10%;
+}
+
+.verde {
+  background-color: #8AFC9B;
+  color: #000;
+  width: 20%;
+  text-align: center;
+  border-radius: 10%;
+}
+
+.azul {
+  background-color: #83D3FF;
+  color: #000;
+  width: 20%;
+  text-align: center;
+  border-radius: 10%;
+}
+
+.gris{
+  background-color: #DDDDDD;
+  color: #000;
+  width: 20%;
+  text-align: center;
+  border-radius: 10%;
+}
+
+.verde2 {
+  background-color: #53CC48;
+  color: #000;
+  width: 20%;
+  text-align: center;
+  border-radius: 10%;
+}
+
+.verdeClientes {
+  background-color: #8AFC9B;
+  color: #000;
+  width: 10%;
+  text-align: center;
+  border-radius: 10%;
+}
+
+.contenedorCards{
+  margin-bottom: 15%;
+}
+
+@keyframes card {
+  0%   {left:0px;}
+  25%  {left:25%;}
+  50%  {left:50%;}
+  75%  {left:75%;}
+  100% {left:100%;}
+}
+
+@keyframes contenedorLista {
+  0%   {left:0px;}
+  25%  {left:0px;}
+  50%  {left:25%;}
+  75%  {left:50%}
+  100% {left:75%;}
+}
+
+@media (min-width: 1000px) {
+
+  .flex-container{
+    margin-bottom: 30%;
+    display: flex;
+    flex-wrap: nowrap;
+    z-index: 1;
+  }
+
+  .flex-container > p-card {
+    margin: 10px;
+    font-size: 30px;
+    width: 20%;
+  }
+}
+
+@media screen and (max-width: 576px) {
+
+  .flex-container{
+    display: block;
+    width: 90%;
+    margin: auto;
+    margin-bottom: 30%;
+  }
+
+  .flex-container > p-card {
+    margin-bottom: 5%;
+  }
+
+  .contenedorLista {
+    width: 80%;
+    margin-bottom: 30%;
+  }
+
+  .product-item {
+    flex-wrap: wrap;
+  }
+
+  p-pickList img {
+    margin: 0 0 1rem 0;
+    width: 50px;
+  }
 }

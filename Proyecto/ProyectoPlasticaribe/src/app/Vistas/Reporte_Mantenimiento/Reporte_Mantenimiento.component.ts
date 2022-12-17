@@ -73,13 +73,6 @@ export class Reporte_MantenimientoComponent implements OnInit {
     });
   }
 
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion, los numeros al finalizar serán retornados como string
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
-
   // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
     if (this.InformacionActivos.length == 0) this.mensajesAdvertencia(`¡Debe haber activos en la tabla para poder exportar la información a Excel!`);

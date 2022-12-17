@@ -112,6 +112,26 @@ export class EstadosProcesos_OTService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/consultaVendedorCliente/${cliente}/${vendedor}`);
   }
 
+  // Funcion que va a consultar cuantas ordenes de trabajo se han hecho en el ultimo mes
+  GetCantOrdenesUltimoMes(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getCantOrdenesUltimoMes/${fecha1}/${fecha2}`);
+  }
+
+  // Funcion que va a consultar cuantas ordenes de trabajo se han hecho en el ultimo mes
+  GetProductosOrdenesUltimoMes(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getProductosOrdenesUltimoMes/${fecha1}/${fecha2}`);
+  }
+
+  // Funcion que va a consultar cuantas ordenes de trabajo se han hecho en el ultimo mes
+  GetVendedoresOrdenesUltimoMes(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getVendedoresOrdenesUltimoMes/${fecha1}/${fecha2}`);
+  }
+
+  // Funcion que va a consultar cuantas ordenes de trabajo se han hecho en el ultimo mes
+  GetProcesosOrdenesUltimoMes(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getProcesosOrdenesUltimoMes/${fecha1}/${fecha2}`);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/${id}`, data);
   }

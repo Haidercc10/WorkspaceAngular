@@ -82,52 +82,60 @@ export class LoginComponentComponent implements OnInit {
         this.empresaServices.srvObtenerLista().subscribe(datos_empresa => {
           for (let index = 0; index < datos_empresa.length; index++) {
             if (datos_empresa[index].empresa_Nombre == empresa) {
-              if (this.formularioUsuario.value.Contrasena == datos_usuarios.usua_Contrasena && datos_usuarios.empresa_Id == datos_empresa[index].empresa_Id) {
-                let idUsuario : number = datos_usuarios.usua_Id;
-                let nombre: string = datos_usuarios.usua_Nombre;
-                let rol: number = datos_usuarios.rolUsu_Id;
-                // var medianoche = new Date();
-                // medianoche.setHours(23,59,59,0);
-                // console.log(medianoche);
-                // this.cookieServices.set('Id', `${idUsuario}`, {expires: medianoche} );
-                // this.cookieServices.set('Nombre', `${nombre}`, {expires: medianoche} );
-                // this.cookieServices.set('Rol', `${rol}`, {expires: medianoche});
+              if (datos_usuarios.estado_Id == 1) {
+                if (this.formularioUsuario.value.Contrasena == datos_usuarios.usua_Contrasena && datos_usuarios.empresa_Id == datos_empresa[index].empresa_Id) {
+                  let idUsuario : number = datos_usuarios.usua_Id;
+                  let nombre: string = datos_usuarios.usua_Nombre;
+                  let rol: number = datos_usuarios.rolUsu_Id;
+                  // var medianoche = new Date();
+                  // medianoche.setHours(23,59,59,0);
+                  // console.log(medianoche);
+                  // this.cookieServices.set('Id', `${idUsuario}`, {expires: medianoche} );
+                  // this.cookieServices.set('Nombre', `${nombre}`, {expires: medianoche} );
+                  // this.cookieServices.set('Rol', `${rol}`, {expires: medianoche});
 
-                this.saveInLocal('Id', idUsuario);
-                this.saveInLocal('Nombre', nombre);
-                this.saveInLocal('Rol', rol);
-                this.clear();
-                if (this.ruta == 'http://192.168.0.153:4600/Login'
-                    || this.ruta == 'http://192.168.0.153:4600'
-                    || this.ruta == 'http://192.168.0.153:4600/'
-                    || this.ruta == 'http://192.168.0.85:4700/Login'
-                    || this.ruta == 'http://192.168.0.85:4700'
-                    || this.ruta == 'http://192.168.0.85:4700/'
-                    || this.ruta == 'http://localhost:4200/Login'
-                    || this.ruta == 'http://localhost:4200'
-                    || this.ruta == 'http://localhost:4200/'
-                    || this.ruta == 'http://192.168.0.153:4700/Login'
-                    || this.ruta == 'http://192.168.0.153:4700'
-                    || this.ruta == 'http://192.168.0.153:4700/') window.location.href = "./home";
-                else window.location.href = this.ruta;
-                break;
-              } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena){
-                Swal.fire({
-                  icon: 'warning',
-                  title: 'Oops...',
-                  html:
-                  `<b>¡EL número de identificacion no coincide con la contraseña!</b><hr> `,
-                });
-                break;
-              }
-              else{
+                  this.saveInLocal('Id', idUsuario);
+                  this.saveInLocal('Nombre', nombre);
+                  this.saveInLocal('Rol', rol);
+                  this.clear();
+                  if (this.ruta == 'http://192.168.0.153:4600/Login'
+                      || this.ruta == 'http://192.168.0.153:4600'
+                      || this.ruta == 'http://192.168.0.153:4600/'
+                      || this.ruta == 'http://192.168.0.85:4700/Login'
+                      || this.ruta == 'http://192.168.0.85:4700'
+                      || this.ruta == 'http://192.168.0.85:4700/'
+                      || this.ruta == 'http://localhost:4200/Login'
+                      || this.ruta == 'http://localhost:4200'
+                      || this.ruta == 'http://localhost:4200/'
+                      || this.ruta == 'http://192.168.0.153:4700/Login'
+                      || this.ruta == 'http://192.168.0.153:4700'
+                      || this.ruta == 'http://192.168.0.153:4700/') window.location.href = "./home";
+                  else window.location.href = this.ruta;
+                  break;
+                } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena){
+                  Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops...',
+                    html:
+                    `<b>¡EL número de identificacion no coincide con la contraseña!</b><hr> `,
+                  });
+                  break;
+                } else{
+                  Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops...',
+                    html:
+                    `<b>¡El número de identificación ${this.formularioUsuario.value.Identificacion} no se encuentra asociado a la empresa ${empresa}!</b><hr> `,
+                  });
+                  break;
+                }
+              } else if (datos_usuarios.estado_Id != 1){
                 Swal.fire({
                   icon: 'warning',
                   title: 'Oops...',
                   html:
                   `<b>¡El número de identificación ${this.formularioUsuario.value.Identificacion} no se encuentra asociado a la empresa ${empresa}!</b><hr> `,
                 });
-                break;
               }
             }
           }

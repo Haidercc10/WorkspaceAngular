@@ -1,56 +1,218 @@
 <app-menuLateral></app-menuLateral>
-<!--
-<div class="row g-3">
-  <div class="col md texto">
-    <div class="container">
-      <div class="textoIntermedio">
-        <p class="fs-3 parrafo">
-          <b>
-            ¡Bienvenido al nuevo
-            <span class="plasticaribe_resaltado"> Plasticaribe S.A.S, </span> <b class="negritaEnRojo"> {{storage_Nombre}}!</b>
-          </b>
-        <br>
-        <p class="fs-3 parrafo2">¡Estamos innovando!, te dejamos algunas recomendaciones acerca del uso de nuestro nuevo sistema de información  basado en la nube, toma nota.</p>
-        <p class="fs-3 parrafo2">Para poder ver el menú debes presionar en la parte superior izquierda donde dice <b>Plasti<span>caribe S.A.S</span></b>.</p>
-      </div>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <div class="mb-3 textoPequeno">
-        <p class="textoPequenoP">  Cuida a Plasticaribe S.A.S, como a ti mismo.</p>
-        <ul>
-          <li  type="disc">Evita utilizar letras en campos donde haya que digitar números.</li>
-          <li  type="disc">Evita utilizar carácteres especiales como puntos y comas en los formularios.</li>
-          <li  type="disc">Sacale el máximo provecho a la herramienta.</li>
-          <li  type="disc">Gestiona tus solicitudes de permisos.</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <div class="mb-3">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <br> <br>
-      <button class="btn btn-danger float-right">Ver tutorial</button>
-    </div>
-  </div>
-</div> -->
+
 <p-toast position="center" key="tc"></p-toast>
+
+<p-confirmPopup></p-confirmPopup>
+
+<div class="container-fluid contenedorCards" *ngIf="!displayTerminal" id="card">
+  <p-tabView>
+    <!-- ORDENES DE TRABAJO -->
+    <p-tabPanel
+      header="Ordenes de Trabajo"
+      leftIcon="pi pi-sliders-h"
+      rightIcon="pi pi-star-fill"
+      tooltip="Información de Ordenes de Trabajo"
+      *ngIf="ValidarRol == 1">
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <!-- CANTIDAD ORDENES -->
+        <div class="col">
+          <div class="card h-100">
+            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Ordenes de Trabajo Creadas</h5>
+              <p class="card-text">El último mes (desde el día <b>{{primerDiaMes}}</b> hasta el día <b>{{today}}</b>) se han creado <b>{{totalOrdenesMes | number}}</b> ordenes de trabajo.</p>
+              <p class="card-text">EL costo estimado de las ordenes de trabajo creadas el último mes es de <b>{{costoTotalOrdenesMes | currency : ' COP $'}}</b></p>
+            </div>
+          </div>
+        </div>
+        <!-- ESTADOS ORDENES -->
+        <div class="col">
+          <div class="card h-100">
+            <!-- <img class="banner" src="assets/Imagenes_Cards/costos.png" class="card-img-top" alt="..." height="127.57px"> -->
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Estados de Ordenes de Trabajo</h5>
+              <p class="card-text">De todas las ordenes de trabajo creadas el último mes, hasta el momento hay:</p>
+              <p class="card-text">Ordenes No Iniciadas: <label class="naranja">{{catidadOTAbiertas | number}}</label></p>
+              <p class="card-text">Ordenes con Materia Prima Asignada: <label class="azul">{{cantidadOTAsignadas | number}}</label></p>
+              <p class="card-text">Ordenes Inciadas: <label class="amarillo">{{cantidadOTIniciada | number}}</label></p>
+              <p class="card-text">Ordenes Terminadas: <label class="verde">{{cantidadOTTerminada | number}}</label></p>
+              <p class="card-text">Ordenes Anuladas: <label class="rojo">{{cantidadOtAnulada | number}}</label></p>
+              <p class="card-text">Ordenes Cerradas: <label class="verde2">{{cantidadOTCerrada | number}}</label></p>
+            </div>
+          </div>
+        </div>
+        <!-- PRODUCCION TOTAL DEL MES -->
+        <div class="col">
+          <div class="card h-100">
+            <!-- <img src="..." class="card-img-top" alt="..."> -->
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Cantidad Producida Por Procesos</h5>
+              <p class="card-text">Estas son las cantidades producidas por cada procesos creadas en el último mes:</p>
+              <p class="card-text" *ngFor="let item of procesosOrdenesMes; let i=index">
+                <span class="card-text"><b>Extrusión:</b> {{item.extrusion | number}} Kg</span><br>
+                <span class="card-text"><b>Impresión:</b> {{item.impresion | number}} Kg</span><br>
+                <span class="card-text"><b>Rotograbado</b>: {{item.rotograbado | number}} Kg</span><br>
+                <span class="card-text"><b>Laminado:</b> {{item.laminado | number}} Kg</span><br>
+                <span class="card-text"><b>Corte:</b> {{item.corte | number}} Kg</span><br>
+                <span class="card-text"><b>Doblado:</b> {{item.doblado | number}} Kg</span><br>
+                <span class="card-text"><b>Sellado:</b> {{item.selladoKg | number}} Kg - {{item.selladoUnd | number}} Und</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- ORDENES POR CLIENTES -->
+        <div class="col">
+          <div class="card h-100">
+            <!-- <img src="..." class="card-img-top" alt="..."> -->
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Ordenes de Trabajo Por Cliente</h5>
+              <p class="card-text">Ranking de clientes a los que se le ha hecho más ordenes de trabajo en el último mes:</p>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of clientesOrdenesMes; let i=index;">
+                  <span>{{i + 1}}) <b>{{item.estProcOT_Cliente}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas.</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ORDENES POR PRODUCTOS -->
+        <div class="col">
+          <div class="card h-100">
+            <!-- <img src="..." class="card-img-top" alt="..."> -->
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Ordenes de Trabajo Por Producto</h5>
+              <p class="card-text">Ranking de productos a los que más se le ha hecho ordenes de trabajo en el último mes:</p>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of productosOrdenesMes; let i=index">
+                  <span>{{i + 1}}) <b>{{item.prod_Nombre}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas.</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ORDENES POR VENDEDORES -->
+        <div class="col">
+          <div class="card h-100">
+            <!-- <img class="banner" src="assets/Imagenes_Cards/vendedor.jpg" class="card-img-top" alt="..."> -->
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Ordenes de Trabajo Por Vendedores</h5>
+              <p class="card-text">Ranking de vendedores que más han tenido ordenes de trabajo son: </p>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of vendedorOrdenesMes; let i=index">
+                  <span>{{i + 1}}) <b>{{item.usua_Nombre}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas.</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+    <!-- MATERIA PRIMA -->
+    <p-tabPanel header="Materia Prima" leftIcon="pi pi-box" tooltip="Información de las Materias Primas" *ngIf="ValidarRol == 1">
+      <div class="flex-container">
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <!-- Información General Materias Primas -->
+          <div class="col">
+            <div class="card h-100">
+              <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="card-title">Materias Primas</h5>
+                <p class="card-text">En la bodega de materia prima hay en total <b>{{1 | number}}</b> Kg</p>
+                <p class="card-text">El valor total de las existncias de Materias Primas es de <b>{{1 | currency : ' COP $'}}</b></p>
+              </div>
+            </div>
+          </div>
+          <!-- ESTADOS ORDENES -->
+          <div class="col">
+            <div class="card h-100">
+              <!-- <img class="banner" src="assets/Imagenes_Cards/costos.png" class="card-img-top" alt="..." height="127.57px"> -->
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="card-title">Rollos de polipropileno biorientado</h5>
+                <p class="card-text"></p>
+              </div>
+            </div>
+          </div>
+          <!-- PRODUCCION TOTAL DEL MES -->
+          <div class="col">
+            <div class="card h-100">
+              <!-- <img src="..." class="card-img-top" alt="..."> -->
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="card-title">Materia primas que se movieron hoy</h5>
+                <p class="card-text"></p>
+              </div>
+            </div>
+          </div>
+          <!-- ORDENES POR CLIENTES -->
+          <div class="col">
+            <div class="card h-100">
+              <!-- <img src="..." class="card-img-top" alt="..."> -->
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="card-title">Tintas creadas en el mes y cantidad total de cada una</h5>
+                <p class="card-text"></p>
+              </div>
+            </div>
+          </div>
+          <!-- ORDENES POR PRODUCTOS -->
+          <div class="col">
+            <div class="card h-100">
+              <!-- <img src="..." class="card-img-top" alt="..."> -->
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="card-title">Ranking de materias primas que mas se ha utilizado en el mes, cantidad</h5>
+                <p class="card-text"></p>
+              </div>
+            </div>
+          </div>
+          <!-- ORDENES POR VENDEDORES -->
+          <div class="col">
+            <div class="card h-100">
+              <!-- <img class="banner" src="assets/Imagenes_Cards/vendedor.jpg" class="card-img-top" alt="..."> -->
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="card-title">Ranking de materia primas que mas se utilizan para crear tintas, cantidad</h5>
+                <p class="card-text"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </p-tabPanel>
+    <!-- PRODUCTOS -->
+    <p-tabPanel header="Productos" rightIcon="pi pi-box" tooltip="Información de Productos" *ngIf="ValidarRol == 1">
+        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
+                architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione
+                voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.</p>
+    </p-tabPanel>
+  </p-tabView>
+</div>
 
 <div class="dock-window dock-advanced">
   <!-- Docker -->
-  <p-dock [model]="dockItems" position="bottom">
-    <ng-template pTemplate="item" let-item>
-      <img [src]="item.icon" [alt]="item.label" width="100%" style="cursor: pointer;">
-    </ng-template>
-  </p-dock>
+  <div class="fixed-bottom">
+    <p-dock [model]="dockItems" position="bottom">
+      <ng-template pTemplate="item" let-item>
+        <img [src]="item.icon" [alt]="item.label" width="100%" style="cursor: pointer;">
+      </ng-template>
+    </p-dock>
+  </div>
 
   <!-- PickList -->
-  <div class="contenedorLista" *ngIf="displayTerminal">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  <div class="contenedorLista" id="contenedorLista" *ngIf="displayTerminal">
+    <div class="d-grid gap-2 d-md-flex justify-content-end">
       <!-- Para cerrar el apartado donde se escogen y modifican las vistas favoritas se creó un label que al dar click sobre el dejará de mostrar este apartado -->
-      <label class="btnclose pi pi-times" mat-button (click)="this.displayTerminal = false"></label>
+      <label class="btnclose pi pi-times" mat-button (click)="cerrarLista()"></label>
     </div>
     <p-pickList
       [source]="disponiblesMostrar"
@@ -75,7 +237,7 @@
         <div class="product-item">
           <div class="product-list-detail">
             <span>
-              <img [src]="product.icono" [alt]="product.nombre" width="10%">
+              <img class="image-container" [src]="product.icono" [alt]="product.nombre" width="10%">
               <p style="color: #000; padding-left: 5%;">{{product.nombre}}</p>
             </span>
             <p style="color: #d83542; padding-left: 20%;">{{product.categoria}}</p>

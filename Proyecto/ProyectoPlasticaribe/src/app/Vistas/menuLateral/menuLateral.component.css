@@ -1,6 +1,10 @@
 *{
   list-style: none;
   text-decoration: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 span{
@@ -117,6 +121,28 @@ a, a:hover, a:focus {
     color: #fff;
     transition: all 0.3s;
     overflow-y: scroll;
+}
+
+#sidebar::-webkit-scrollbar {
+  width: 8px;     /* Tamaño del scroll en vertical */
+  height: 8px;    /* Tamaño del scroll en horizontal */
+}
+
+/* Ponemos un color de fondo y redondeamos las esquinas del thumb */
+#sidebar::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+/* Cambiamos el fondo y agregamos una sombra cuando esté en hover */
+#sidebar::-webkit-scrollbar-thumb:hover {
+  background: #b3b3b3;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Cambiamos el fondo cuando esté en active */
+#sidebar::-webkit-scrollbar-thumb:active {
+  background-color: #999999;
 }
 
 #sidebar.active {

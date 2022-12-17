@@ -8,7 +8,6 @@ import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { DetallePedido_MantenimientoService } from 'src/app/Servicios/DetallePedido_Mantenimiento/DetallePedido_Mantenimiento.service';
 import { Detalle_MantenimientoService } from 'src/app/Servicios/Detalle_Mantenimiento/Detalle_Mantenimiento.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { Pedido_MantenimientoService } from 'src/app/Servicios/Pedido_Mantenimiento/Pedido_Mantenimiento.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { Tipo_MantenimientoService } from 'src/app/Servicios/TiposMantenimientos/Tipo_Mantenimiento.service';
 import Swal from 'sweetalert2';
@@ -168,7 +167,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
     let activo : any = this.FormMovimientosMantenimiento.value.IdActivo;
     let fechaDano : any = this.FormMovimientosMantenimiento.value.FechaDaño;
     let tipoMantenimiento : any = this.FormMovimientosMantenimiento.value.IdTipoMantenimiento;
-    let ruta : string;
+    let ruta : string = ``;
 
     if (fechaInicial == null) fechaInicial = this.today;
     if (fechaFinal == null) fechaFinal = fechaInicial;
@@ -203,13 +202,12 @@ export class Movimientos_MantenimientoComponent implements OnInit {
     else if (fechaDano != null) ruta = `?fechaDa%C3%B1o=${fechaDano}`
     else if (tipoMantenimiento != null)  ruta = `?tipoMtto=${tipoMantenimiento}`
     else if (activo != null) ruta = `?activo=${activo}`
-    else ruta = ``
 
     this.activosService.GetMovimiento(fechaInicial, fechaFinal, ruta).subscribe(datos_movimientos => {
       for (let i = 0; i < datos_movimientos.length; i++) {
         this.llenarTabla(datos_movimientos[i]);
       }
-    });
+    }, error => { this.mensajesError(`¡No se ha encontrado información de movimientos entre el día ${fechaInicial} y el día ${fechaFinal}!`, error.message); });
   }
 
   // Funcion que va a llenar la tabla con la información colsutada
