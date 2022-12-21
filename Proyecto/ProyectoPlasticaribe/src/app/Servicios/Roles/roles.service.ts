@@ -29,6 +29,14 @@ export class RolesService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rol_Usuario/${id}`);
   }
 
+  getRolxNombre(nombre : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rol_Usuario/getNombreRol/${nombre}`);
+  }
+
+  likeGetNombre(nombre : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Rol_Usuario/getNombreRolxLike/${nombre}`);
+  }
+
   //Metodo agregar roles
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Rol_Usuario', data)

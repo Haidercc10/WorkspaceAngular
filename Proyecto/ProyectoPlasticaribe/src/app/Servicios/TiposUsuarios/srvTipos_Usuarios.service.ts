@@ -20,4 +20,8 @@ export class SrvTipos_UsuariosService {
   srvObtenerListaPorId(id : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Tipo_Usuario/${id}`);
   }
+
+  Insert(data : any){
+    return this.http.post(this.rutaPlasticaribeAPI + '/Tipo_Usuario/', data);
+  }
 }

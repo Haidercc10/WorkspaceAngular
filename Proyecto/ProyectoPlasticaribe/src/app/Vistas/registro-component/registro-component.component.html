@@ -21,6 +21,11 @@
   <div class="container-fluid bajarPagina">
     <div class="container">
 
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button pButton pRipple label="Nuevo Rol" icon="pi pi-plus" class="p-button-success r-2" (click)="modalRoles_TiposUsuarios()"></button>
+        <button pButton pRipple label="Nueva Area" icon="pi pi-plus" (click)="modalAreas()" class="p-button-success"></button>
+      </div>
+
       <div class="mb-4">
         <h4 class="tituloRojo">Tabla de Usuarios</h4>
       </div>
@@ -181,6 +186,56 @@
             </div>
           </form>
         </ng-template>
+      </p-dialog>
+
+
+      <p-dialog [(visible)]="nuevoDialogo" [style]="{width: '450px'}" header="Crear {{accionDialogoNuevo}}" [modal]="true" styleClass="p-fluid">
+        <ng-container *ngIf="accionDialogoNuevo == 'Rol' then rol; else area"></ng-container>
+        <p-toast position="center"></p-toast>
+        <!-- FORMULARIO ROLES -->
+        <ng-template #rol>
+          <form [formGroup]="formRoles">
+            <!-- Nombre -->
+            <div class="form-floating col-md mb-3">
+              <input formControlName="rolNombre" class="form-control form-control-sm" list="roles" id="floatingInput" required (keyup)="cargarRoles_Like()">
+              <datalist id="roles">
+                <option value={{item.rolUsu_Nombre}} *ngFor="let item of arrayRoles">{{item.rolUsu_Nombre}}</option>
+              </datalist>
+              <label for="floatingInput">Nombre</label>
+            </div>
+
+            <!-- Descripcion -->
+            <div class="form-floating col-md mb-3">
+              <textarea formControlName="rolDescripcion" style="height: 80px;"  type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off"></textarea>
+              <label for="floatingInput">Descripción</label>
+            </div>
+          </form>
+        </ng-template>
+
+        <!-- FORMULARIO AREAS -->
+        <ng-template #area>
+          <form [formGroup]="formAreas">
+            <!-- Nombre -->
+            <div class="form-floating col-md mb-3">
+              <input formControlName="areaNombre" class="form-control form-control-sm" list="areas" id="floatingInput" required (keyup)="cargarAreas_Like()">
+              <datalist id="areas">
+                <option value={{item.area_Nombre}} *ngFor="let item of arrayAreas">{{item.area_Nombre}}</option>
+              </datalist>
+              <label for="floatingInput">Nombre</label>
+            </div>
+
+            <!-- Descripcion -->
+            <div class="form-floating col-md mb-3">
+              <textarea formControlName="areaDescripcion" style="height: 80px;" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off"></textarea>
+              <label for="floatingInput">Descripción</label>
+            </div>
+          </form>
+        </ng-template>
+
+         <!--Boton agregar Rol/Area-->
+         <div class="mb-3">
+          <button pButton pRipple label="Agregar {{accionDialogoNuevo}}" icon="pi pi-plus" (click)="agregar()" class="p-button-success"></button>
+        </div>
       </p-dialog>
     </div>
   </div>

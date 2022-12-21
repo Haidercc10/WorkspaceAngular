@@ -49,4 +49,13 @@ export class AreaService {
      return this.http.post(this.rutaPlasticaribeAPI + '/Areas', data);
    }
 
+   getNombre(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Areas/getNombreArea/${dato}`);
+   }
+
+   likeGetNombreArea(dato : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Areas/getNombreAreaXLike/${dato}`);
+   }
+
 }
+
