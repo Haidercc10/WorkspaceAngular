@@ -161,6 +161,14 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOt/getCostoOrdenesUltimoMes/${fecha1}/${fecha2}`);
   }
 
+  GetCostoOrdenesUltimoMes_Vendedores(fecha1 : any, fecha2 : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/getCostoOredenesUltimoMes_Vendedores/${fecha1}/${fecha2}`);
+  }
+
+  GetCostoOrdenesUltimoMes_Clientes(fecha1 : any, fecha2 : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/getCostoOredenesUltimoMes_Clientes/${fecha1}/${fecha2}`);
+  }
+
   /* CLIENTESOTITEM */
 
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO

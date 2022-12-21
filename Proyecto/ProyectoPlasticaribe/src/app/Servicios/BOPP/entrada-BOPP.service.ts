@@ -50,6 +50,10 @@ export class EntradaBOPPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/BoppAgrupado`)
   }
 
+  GetBoppStockInventario():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getBoppStockInventario`)
+  }
+
   srvObtenerConsultaMov0(fechaIncial : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/consultaMovimientos0/${fechaIncial}`);
   }
@@ -84,6 +88,14 @@ export class EntradaBOPPService {
 
   GetRollosLike(data){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/GetRollosLike/${data}`);
+  }
+
+  GetCantRollosIngresados_Mes(fecha1 : any, fecha2 : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getCantRollosIngresados_Mes/${fecha1}/${fecha2}`)
+  }
+
+  GetCantRollosUtilizados_Mes(fecha1 : any, fecha2 : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getCantRollosUtilizados_Mes/${fecha1}/${fecha2}`)
   }
 
   //Metodo agregar

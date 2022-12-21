@@ -6,6 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule, Routes } from '@angular/router';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
+import { NgChartsModule } from 'ng2-charts';
 import { CookieService } from 'ngx-cookie-service';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -18,6 +19,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
 import { CarouselModule } from 'primeng/carousel';
 import { CascadeSelectModule } from "primeng/cascadeselect";
+import { ChartModule } from 'primeng/chart';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ContextMenuModule } from 'primeng/contextmenu';
@@ -35,6 +37,7 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { RatingModule } from 'primeng/rating';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
+import { SkeletonModule } from 'primeng/skeleton';
 import { SlideMenuModule } from 'primeng/slidemenu';
 import { SliderModule } from 'primeng/slider';
 import { TableModule } from 'primeng/table';
@@ -139,7 +142,7 @@ import { Ventas_TemporalesComponent } from './Vistas/Ventas_Temporales/Ventas_Te
 export const routes: Routes = [
 
   /******************************************************************** Inicio y Login **********************************************************************/
-  // {path: 'inicio', component: InicioComponent},
+  {path: 'inicio', component: InicioComponent},
   {path: 'Login', component: LoginComponentComponent},
   {path: '', component: LoginComponentComponent},
   {path: 'home', component: PaginaPrincipalComponent},
@@ -227,7 +230,7 @@ export const routes: Routes = [
  {path: 'pedido-mantenimiento', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PedidoMantenimientoComponent},
  {path: 'movimientos-mantenimientos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Movimientos_MantenimientoComponent},
  {path: 'reporte-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_MantenimientoComponent},
- {path: 'mantenimiento-camiones', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
+ {path: 'mantenimiento-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
 ]
 
 @NgModule({
@@ -385,6 +388,9 @@ export const routes: Routes = [
     ConfirmPopupModule,
     TabViewModule,
     ScrollPanelModule,
+    NgChartsModule,
+    ChartModule,
+    SkeletonModule,
   ],
 
   providers: [

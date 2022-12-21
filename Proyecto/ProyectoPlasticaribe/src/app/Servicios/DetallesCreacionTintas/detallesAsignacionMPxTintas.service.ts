@@ -34,6 +34,14 @@ export class DetallesAsignacionMPxTintasService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MatPrimaXTinta/getCreatPdf/${id}`)
   }
 
+  GetTintasCreadasMes(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MatPrimaXTinta/getTintasCreadasMes/${fecha1}/${fecha2}`);
+  }
+
+  GetMateriasPrimasCrearTintasMes(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MatPrimaXTinta/getMateriasPrimasCrearTintasMes/${fecha1}/${fecha2}`);
+  }
+
   //Metodo agregar Productos
   srvAgregar(data : any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_MatPrimaXTinta', data)

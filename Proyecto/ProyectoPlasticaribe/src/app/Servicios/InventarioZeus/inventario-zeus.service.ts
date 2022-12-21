@@ -26,4 +26,34 @@ readonly rutaInventarioZeusAPI = rutaZeus;
     return this.http.get<any>(this.rutaInventarioZeusAPI + '/existencias/BusquedaCodigoArticulo');
   }
 
+
+  /************************************************************ DOCUMENTOS ITEMS **************************************************************/
+  GetProductosFacturados(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/DocumentoItems/ProductosFacturados/${fecha1}/${fecha2}`);
+  }
+
+  /************************************************************ FACTURACION DE CLIENTES **************************************************************/
+  GetValorFacturadoHoy(){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/FacturaDeCliente/ValorFacturadoHoy`);
+  }
+  /************************************************************ MOVIMIENTOS ITEMS **************************************************************/
+  GetFacturacionMensual(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/FacturacionMensual/${fecha1}/${fecha2}`);
+  }
+
+  GetFacturacionTodosMeses(mes : number){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/FacturacionTodosMeses/${mes}`);
+  }
+
+  GetIvaVentaMensual(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/GetIvaVentaMensual/${fecha1}/${fecha2}`);
+  }
+
+  GetIvaCompraMensual(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/GetIvaCompraMensual/${fecha1}/${fecha2}`);
+  }
+
+  GetIvaCompraTodosMeses(mes : any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/GetIvaCompraTodosMeses/${mes}`);
+  }
 }

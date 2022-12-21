@@ -1,16 +1,15 @@
 <app-menuLateral></app-menuLateral>
 
+<!-- MENSAJE DE ADVERTENCIA -->
 <p-toast position="center" key="tc"></p-toast>
 
-<p-confirmPopup></p-confirmPopup>
-
+<!-- INFORMACION GENERAL DE LA EMPRESA Y SUS MOVIMIENTOS -->
 <div class="container-fluid contenedorCards" *ngIf="!displayTerminal" id="card">
   <p-tabView>
     <!-- ORDENES DE TRABAJO -->
     <p-tabPanel
       header="Ordenes de Trabajo"
       leftIcon="pi pi-sliders-h"
-      rightIcon="pi pi-star-fill"
       tooltip="Información de Ordenes de Trabajo"
       *ngIf="ValidarRol == 1">
       <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -40,6 +39,8 @@
               <p class="card-text">Ordenes Terminadas: <label class="verde">{{cantidadOTTerminada | number}}</label></p>
               <p class="card-text">Ordenes Anuladas: <label class="rojo">{{cantidadOtAnulada | number}}</label></p>
               <p class="card-text">Ordenes Cerradas: <label class="verde2">{{cantidadOTCerrada | number}}</label></p>
+              <br>
+              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaEstadosOrdenes()"></button>
             </div>
           </div>
         </div>
@@ -50,16 +51,31 @@
             <div class="banner"></div>
             <div class="card-body">
               <h5 class="card-title">Cantidad Producida Por Procesos</h5>
-              <p class="card-text">Estas son las cantidades producidas por cada procesos creadas en el último mes:</p>
-              <p class="card-text" *ngFor="let item of procesosOrdenesMes; let i=index">
-                <span class="card-text"><b>Extrusión:</b> {{item.extrusion | number}} Kg</span><br>
-                <span class="card-text"><b>Impresión:</b> {{item.impresion | number}} Kg</span><br>
-                <span class="card-text"><b>Rotograbado</b>: {{item.rotograbado | number}} Kg</span><br>
-                <span class="card-text"><b>Laminado:</b> {{item.laminado | number}} Kg</span><br>
-                <span class="card-text"><b>Corte:</b> {{item.corte | number}} Kg</span><br>
-                <span class="card-text"><b>Doblado:</b> {{item.doblado | number}} Kg</span><br>
-                <span class="card-text"><b>Sellado:</b> {{item.selladoKg | number}} Kg - {{item.selladoUnd | number}} Und</span>
-              </p>
+              <ng-container *ngIf="totalOrdenesMes == 0; then OrdenesCero; else OrdenesMayorCero"></ng-container>
+              <ng-template #OrdenesCero>
+                <p class="card-text">Estas son las cantidades producidas por cada procesos creadas en el último mes:</p>
+                <p class="card-text">
+                  <span class="card-text"><b>Extrusión:</b> 0 Kg</span><br>
+                  <span class="card-text"><b>Impresión:</b> 0 Kg</span><br>
+                  <span class="card-text"><b>Rotograbado</b>: 0 Kg</span><br>
+                  <span class="card-text"><b>Laminado:</b> 0 Kg</span><br>
+                  <span class="card-text"><b>Corte:</b> 0 Kg</span><br>
+                  <span class="card-text"><b>Doblado:</b> 0 Kg</span><br>
+                  <span class="card-text"><b>Sellado:</b> 0 Kg - 0 Und</span>
+                </p>
+              </ng-template>
+              <ng-template #OrdenesMayorCero>
+                <p class="card-text">Estas son las cantidades producidas por cada procesos creadas en el último mes:</p>
+                <p class="card-text" *ngFor="let item of procesosOrdenesMes; let i=index">
+                  <span class="card-text"><b>Extrusión:</b> {{item.extrusion | number}} Kg</span><br>
+                  <span class="card-text"><b>Impresión:</b> {{item.impresion | number}} Kg</span><br>
+                  <span class="card-text"><b>Rotograbado</b>: {{item.rotograbado | number}} Kg</span><br>
+                  <span class="card-text"><b>Laminado:</b> {{item.laminado | number}} Kg</span><br>
+                  <span class="card-text"><b>Corte:</b> {{item.corte | number}} Kg</span><br>
+                  <span class="card-text"><b>Doblado:</b> {{item.doblado | number}} Kg</span><br>
+                  <span class="card-text"><b>Sellado:</b> {{item.selladoKg | number}} Kg - {{item.selladoUnd | number}} Und</span>
+                </p>
+              </ng-template>
             </div>
           </div>
         </div>
@@ -73,9 +89,11 @@
               <p class="card-text">Ranking de clientes a los que se le ha hecho más ordenes de trabajo en el último mes:</p>
               <div class="scrollCard">
                 <p class="card-text" *ngFor="let item of clientesOrdenesMes; let i=index;">
-                  <span>{{i + 1}}) <b>{{item.estProcOT_Cliente}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas.</span>
+                  <span>{{i + 1}}) <b>{{item.clienteNom}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas por un valor total de <b>{{item.costo | currency : ' COP $'}}</b>.</span>
                 </p>
               </div>
+              <br>
+              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaClientes()"></button>
             </div>
           </div>
         </div>
@@ -102,10 +120,219 @@
             <div class="banner"></div>
             <div class="card-body">
               <h5 class="card-title">Ordenes de Trabajo Por Vendedores</h5>
-              <p class="card-text">Ranking de vendedores que más han tenido ordenes de trabajo son: </p>
+              <p class="card-text">Ranking de vendedores a los que más se les ha hecho ordenes de trabajo en el ultimo mes: </p>
               <div class="scrollCard">
                 <p class="card-text" *ngFor="let item of vendedorOrdenesMes; let i=index">
-                  <span>{{i + 1}}) <b>{{item.usua_Nombre}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas.</span>
+                  <span>{{i + 1}}) <b>{{item.nombreCompleto}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas por un valor total de <b>{{item.costo | currency : ' COP $'}}</b>.</span>
+                </p>
+              </div>
+              <br>
+              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los vendedores" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaVendedores()"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- FACTURACION -->
+    <p-tabPanel
+      header="Facturación"
+      leftIcon="pi pi-wallet"
+      tooltip="Información de las Materias Primas"
+      *ngIf="ValidarRol == 1">
+      <div class="row row-cols-1 row-cols-md-5 g-3">
+        <!-- Facturacion Dia  -->
+        <div class="col">
+          <div class="card h-100">
+            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title"></h5>
+              <h6 class="tituloRojo"><i class="pi pi-truck"></i> Ventas del Mes</h6>
+              <h4><b>{{totalFacuturadoMes | currency : ' COP $'}}</b></h4>
+              <p class="card-text"></p>
+            </div>
+          </div>
+        </div>
+        <!--  -->
+        <div class="col">
+          <div class="card h-100">
+            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title"></h5>
+              <h6 class="tituloRojo"><i class="pi pi-wallet"></i> Iva Ventas del Mes</h6>
+              <h4><b>{{totalIvaVentaMes | currency : ' COP $'}}</b></h4>
+              <p class="card-text"></p>
+            </div>
+          </div>
+        </div>
+        <!--  -->
+        <div class="col">
+          <div class="card h-100">
+            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title"></h5>
+              <h6 class="tituloRojo"><i class="pi pi-money-bill"></i> Total Ventas del Mes</h6>
+              <h4><b>{{totalFacuturadoMes +  totalIvaVentaMes | currency : ' COP $'}}</b></h4>
+              <p class="card-text"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card h-100">
+            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title"></h5>
+              <h6 class="tituloRojo"><i class="pi pi-credit-card"></i> Total Iva Compras del Mes</h6>
+              <h4><b>{{totalIvaCompraMes | currency : ' COP $'}}</b></h4>
+              <p class="card-text"></p>
+            </div>
+          </div>
+        </div>
+
+        <!--  -->
+        <div class="col">
+          <div class="card h-100">
+            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title"></h5>
+              <h6 class="tituloRojo"><i class="pi pi-dollar"></i> Ventas del Día</h6>
+              <h4><b>{{totalFacturadoDia | currency : ' COP $'}}</b></h4>
+              <p class="card-text"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graficas de facturación -->
+      <div class="row row-cols-1 row-cols-md-1 g-3">
+        <p-tabView>
+          <!-- VENTAS -->
+          <p-tabPanel
+            header="Ventas"
+            leftIcon="pi pi-wallet"
+            tooltip="Información de las Materias Primas"
+            *ngIf="ValidarRol == 1">
+            <div class="row row-cols-1 row-cols-md-1 g-3">
+              <div class="card">
+                <p-chart type="line" width="100%" height="100%" [data]="facturasData" [options]="facturasOptions"></p-chart>
+              </div>
+            </div>
+          </p-tabPanel>
+
+          <!-- IVA COMPRA -->
+          <p-tabPanel
+            header="Iva Compra"
+            leftIcon="pi pi-wallet"
+            tooltip="Información de las Materias Primas"
+            *ngIf="ValidarRol == 1">
+            <div class="row row-cols-1 row-cols-md-1 g-3">
+              <div class="card">
+                <p-chart type="line" width="100%" height="100%" [data]="ivaCompraData" [options]="ivaCompraOptions"></p-chart>
+              </div>
+            </div>
+          </p-tabPanel>
+        </p-tabView>
+      </div>
+    </p-tabPanel>
+
+    <!-- MATERIA PRIMA -->
+    <p-tabPanel
+      header="Materia Prima"
+      leftIcon="pi pi-box"
+      tooltip="Información de las Materias Primas"
+      *ngIf="ValidarRol == 1">
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <!--  -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Inventario de Materias Primas.</h5>
+              <p class="card-text">Esta es una breve vista del inventario de materia prima donde se podrá ver la cantidad con la que inició cada materia prima hoy y en cuanto está su inventario actual.</p>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of inventarioMateriaPrima; let i=index">
+                  <span>{{i + 1}}) <b>{{item.nombre_Materia_Prima}}</b> con un inventario inicial de <b>{{item.inicial | number}} Kg</b> y un inventario actual de <b>{{item.actual | number}} Kg</b>. <br></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- INFORMACION ROLLOS DEPOLIPROPILENO BIORIENTADO -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Rollos de polipropileno biorientado.</h5>
+              <p class="card-text">En la bodega de materias primas hay <b>{{cantRollosBopp | number}}</b> rollo de BOPP.</p>
+              <p class="card-text">En la bodega de materias primas hay <b>{{cantRollosBopa | number}}</b> rollo de BOPA.</p>
+              <p class="card-text">En la bodega de materias primas hay <b>{{cantRollosPoliester | number}}</b> rollo de Poliester.</p>
+              <!-- <p class="card-text">El costo de estos rollos de polipropileno biorientado es de {{sumaPrecioRollos | currency : ' COP $'}}.</p> -->
+              <p class="card-text">En el mes (desde el día <b>{{primerDiaMes}}</b> hasta el día <b>{{today}}</b>) se han ingresado <b>{{cantRollosEntrantes | number}}</b> rollo(s) al inventario y se han utilizado <b>{{cantRollosUtilizados | number}}</b> rollo(s) en el mes.</p>
+            </div>
+          </div>
+        </div>
+        <!-- MATERIAS PRIMAS QUE SE MOVIERON DURANTE EL DIA -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Materia primas que se asignaron hoy.</h5>
+              <p class="card-text">Estas son las materias primas que se han asignado el día de hoy:</p>
+              <p *ngIf="materiasPrimasMovidasHoy.length == 0"><b>No ha habido asignaciones de materias primas el día de hoy.</b></p>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of materiasPrimasMovidasHoy; let i = index">
+                  <span>{{i + 1}})<b> {{item.nombre}}</b> ha sido utilizada en <b>{{item.asignaciones | number}}</b> asignacion(es), se han utilizado <label class="rojo">{{item.cantidad | number}}</label> Kg.</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- TINTAS CREADAS DURANTE EL MES Y LA CANTIDAD DE CADA UNA -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Tintas creadas en el mes y cantidad total de cada una.</h5>
+              <p>En lo que va del mes se han creado {{cantTintasCreadas}} tintas las cuales son:</p>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of tintasCreadas; let i=index">
+                  <span>{{i + 1}}) <b>{{item.tinta_Nombre}}</b> con una cantidad de <b>{{item.cantidad | number}} Kg</b></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- MATERIAS PRIMAS MAS UTILIZADAS EN EL MES -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Ranking de materias primas que más se ha utilizado en el mes.</h5>
+              <p>Ranking de materias primas y tintas más utilizadas en el mes</p>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of materiasPrimasMasUtilizadasMes; let i=index">
+                  <span>{{i + 1}}) <b>{{item.nombre}}</b>, se han utilizado <b>{{item.cantidad | number}} Kg.</b> </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- MATERIAS PRIMAS MAS UTILIZADAS PARA LA CREACION DE TINTAS -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Ranking de materia primas que más se utilizan para crear tintas.</h5>
+              <p>Este es el ranking que mas se han utilizado durante el mes para la crecaión de tintas.</p>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of materiasPrimasMasUtilizadasCrearTintaMes; let i=index">
+                  <span>{{i + 1}}) <b>{{item.tinta_Nombre}}</b> con una cantidad de <b>{{item.cantidad | number}} Kg</b>.</span>
                 </p>
               </div>
             </div>
@@ -113,91 +340,32 @@
         </div>
       </div>
     </p-tabPanel>
-    <!-- MATERIA PRIMA -->
-    <p-tabPanel header="Materia Prima" leftIcon="pi pi-box" tooltip="Información de las Materias Primas" *ngIf="ValidarRol == 1">
-      <div class="flex-container">
 
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-          <!-- Información General Materias Primas -->
-          <div class="col">
-            <div class="card h-100">
-              <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
-              <div class="banner"></div>
-              <div class="card-body">
-                <h5 class="card-title">Materias Primas</h5>
-                <p class="card-text">En la bodega de materia prima hay en total <b>{{1 | number}}</b> Kg</p>
-                <p class="card-text">El valor total de las existncias de Materias Primas es de <b>{{1 | currency : ' COP $'}}</b></p>
-              </div>
-            </div>
+
+  </p-tabView>
+
+  <!-- Modal en el que se va a mostrar la grafica con la información que se le pase -->
+  <ng-container *ngIf="mostrarGrafica">
+    <div class="modal fade" id="staticBackdrop2" aria-labelledby="reporteCostos" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel2">{{nombreGrafica}}</h5>
+            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <!-- ESTADOS ORDENES -->
-          <div class="col">
-            <div class="card h-100">
-              <!-- <img class="banner" src="assets/Imagenes_Cards/costos.png" class="card-img-top" alt="..." height="127.57px"> -->
-              <div class="banner"></div>
-              <div class="card-body">
-                <h5 class="card-title">Rollos de polipropileno biorientado</h5>
-                <p class="card-text"></p>
-              </div>
-            </div>
-          </div>
-          <!-- PRODUCCION TOTAL DEL MES -->
-          <div class="col">
-            <div class="card h-100">
-              <!-- <img src="..." class="card-img-top" alt="..."> -->
-              <div class="banner"></div>
-              <div class="card-body">
-                <h5 class="card-title">Materia primas que se movieron hoy</h5>
-                <p class="card-text"></p>
-              </div>
-            </div>
-          </div>
-          <!-- ORDENES POR CLIENTES -->
-          <div class="col">
-            <div class="card h-100">
-              <!-- <img src="..." class="card-img-top" alt="..."> -->
-              <div class="banner"></div>
-              <div class="card-body">
-                <h5 class="card-title">Tintas creadas en el mes y cantidad total de cada una</h5>
-                <p class="card-text"></p>
-              </div>
-            </div>
-          </div>
-          <!-- ORDENES POR PRODUCTOS -->
-          <div class="col">
-            <div class="card h-100">
-              <!-- <img src="..." class="card-img-top" alt="..."> -->
-              <div class="banner"></div>
-              <div class="card-body">
-                <h5 class="card-title">Ranking de materias primas que mas se ha utilizado en el mes, cantidad</h5>
-                <p class="card-text"></p>
-              </div>
-            </div>
-          </div>
-          <!-- ORDENES POR VENDEDORES -->
-          <div class="col">
-            <div class="card h-100">
-              <!-- <img class="banner" src="assets/Imagenes_Cards/vendedor.jpg" class="card-img-top" alt="..."> -->
-              <div class="banner"></div>
-              <div class="card-body">
-                <h5 class="card-title">Ranking de materia primas que mas se utilizan para crear tintas, cantidad</h5>
-                <p class="card-text"></p>
-              </div>
+          <div class="modal-body">
+            <div class="card">
+              <h5 class="titulo_grafica">{{nombreGrafica}}</h5>
+              <p-chart type="bar" width="100%" height="100%" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
             </div>
           </div>
         </div>
-
       </div>
-    </p-tabPanel>
-    <!-- PRODUCTOS -->
-    <p-tabPanel header="Productos" rightIcon="pi pi-box" tooltip="Información de Productos" *ngIf="ValidarRol == 1">
-        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
-                architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione
-                voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.</p>
-    </p-tabPanel>
-  </p-tabView>
+    </div>
+  </ng-container>
 </div>
 
+<!-- DOCKER PARA ELEGIR LAS VISTAS FAVORITAS -->
 <div class="dock-window dock-advanced">
   <!-- Docker -->
   <div class="fixed-bottom">

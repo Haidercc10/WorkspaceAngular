@@ -1,9 +1,13 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/DetallesCreacionTintas/detallesAsignacionMPxTintas.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
 import Swal from 'sweetalert2';
@@ -32,6 +36,20 @@ export class PaginaPrincipalComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
 
+  /* GRAFICA */
+  mostrarGrafica : boolean = false; //Variable que mostrará o no la información graficada
+  nombreGrafica : string = 'Grafica'; //Variable que almacenará el nombre de la grafica
+  multiAxisData: any;
+  multiAxisOptions: any;
+
+  /* GRAFICA DE FACTURACION */
+  facturasData: any; //Variable que almacenará la informacion a graficar de lo facturado cada mes
+  facturasOptions: any; //Variable que almacenará los estilos que tendrá la grafica de lo facturado cada mes
+
+  /* GRAFICA DE IVA COMPRA */
+  ivaCompraData: any; //Variable que almacenará la informacion a graficar del iva de compra de cada mes
+  ivaCompraOptions: any; //Variable que almacenará los estilos que tendrá la grafica del iva d compra de cada mes
+
   /* INFORMACION GENERAL ORDENES DE TRABAJO */
   totalOrdenesMes : number = 0; //Variable que va a almacenar la cantidad de ordenes que se ahn hecho en el ultimo mes
   costoTotalOrdenesMes : number = 0; //Variable que va a almacenar la costo total de las ordenes de trabajo del último mes
@@ -46,19 +64,71 @@ export class PaginaPrincipalComponent implements OnInit {
   vendedorOrdenesMes : any [] = []; //Variable que almacenará los vendedores que han tenido ordenes de trabajo y la cantidad de cada uno
   procesosOrdenesMes : any [] = []; //Variable que va a almcencar la cantidad de que se ha hecho en cada proceso de produccion
 
+  /* INFORMACION GENERAL DE MATERIAS PRIMAS */
+  inventarioMateriaPrima : any [] = []; //Variable que almacenará la informacion de los inventarios inciales ya ctuales de las mterias primas
+  costoTotalMateriasPrimas : number = 0; //Variable que almacenará el costo total de todas las materias primas
+  cantidadMateriasPrimas : number = 0 //Variable que va a almacenar la cantidad de materias primas con existencias
+  cantRollosBopp : number = 0; //Variable que almacenará la cantidad de rollo de bopp que hay en la bodega
+  cantRollosBopa : number = 0; //Variable que almacenará la cantidad de rollos de bopa que hay en la bodega
+  cantRollosPoliester : number = 0; //Variable que almacenará la cantidad de rollos de poliester que hay en la bodega
+  cantRollosUtilizados : number = 0; //Variable que almacenará la cantidad de rollos de polipropileno biorientado que se han utilizado en lo que va del mes
+  cantRollosEntrantes : number = 0; //Variable que almacenará la cantidad e rollo de polipropileno biorientado que han ingrsados durante el mes
+  materiasPrimasMovidasHoy : any [] = []; //Variable que almcenará información acerca de las materias primas que se han asignado el dia de hoy
+  cantMateriasPrimas : any [] = []; //Variable que almacenará las materias primas que se han creado y/o asignado el dia de hoy
+  cantTintasCreadas : number = 0; //Variable que almacenará la cantidad de tintas que se crearon
+  tintasCreadas : any []= []; //Variable que almacenará las tintas creadas
+  materiasPrimasMasUtilizadasMes : any [] = []; //Variable que almacenará las materias primas que mas se utilizaron durandote el mes
+  materiasPrimasMasUtilizadasCrearTintaMes : any [] = []; //variable que almacenará las materias primas utilizadas para la creación de tinas
+
+  /* INFORMACION GENERAL DE LA FACTURACION */
+  totalFacturadoDia : number = 0; //Variable que almacenará la cantidad total de lo que se ha facturado en el día
+  totalFacuturadoMes : number = 0; //Variable que almacenará la cantidad total de lo que se ha facturado en el mes
+  totalIvaVentaMes : number = 0; //Variable que almacenará el iva de ventas del mes
+  totalIvaCompraMes : number = 0; //Varible que almacenará el iva de compra del mes
+  totalFacturado1 : number = 0; //Variable que almacenará lo facturado en el mes de enero
+  totalFacturado2 : number = 0; //Variable que almacenará lo facturado en el mes de febrero
+  totalFacturado3 : number = 0; //Varibal que almacenará lo facturado en el mes de marzo
+  totalFacturado4 : number = 0; //Variable que almcenará lo facturado en el ems de abril
+  totalFacturado5 : number = 0; //Variable que almcenará lo facturado en el ems de mayo
+  totalFacturado6 : number = 0; //Variable que almcenará lo facturado en el ems de junio
+  totalFacturado7 : number = 0; //Variable que almcenará lo facturado en el ems de julio
+  totalFacturado8 : number = 0; //Variable que almcenará lo facturado en el ems de agosto
+  totalFacturado9 : number = 0; //Variable que almcenará lo facturado en el ems de septiembre
+  totalFacturado10 : number = 0; //Variable que almcenará lo facturado en el ems de octubre
+  totalFacturado11 : number = 0; //Variable que almcenará lo facturado en el ems de noviembre
+  totalFacturado12 : number = 0; //Variable que almcenará lo facturado en el ems de diciembre
+  totalIvaCompra1 : number = 0;
+  totalIvaCompra2 : number = 0;
+  totalIvaCompra3 : number = 0;
+  totalIvaCompra4 : number = 0;
+  totalIvaCompra5 : number = 0;
+  totalIvaCompra6 : number = 0;
+  totalIvaCompra7 : number = 0;
+  totalIvaCompra8 : number = 0;
+  totalIvaCompra9 : number = 0;
+  totalIvaCompra10 : number = 0;
+  totalIvaCompra11 : number = 0;
+  totalIvaCompra12 : number = 0;
+
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
                   private vistasFavService : VistasFavoritasService,
                     private messageService: MessageService,
                       private ordenTrabajoService : EstadosProcesos_OTService,
-                        private bagProService : BagproService,) { }
+                        private bagProService : BagproService,
+                          private materiaPrimaService : MateriaPrimaService,
+                            private boppService : EntradaBOPPService,
+                              private tintasCreadasService : DetallesAsignacionMPxTintasService,
+                                private zeusService : InventarioZeusService,) { }
 
   ngOnInit() {
     this.lecturaStorage();
     this.llenarDatosSeleccionables();
     this.buscarFavoritos();
-    setTimeout(() => { this.mostrarVistasFav(); }, 1500);
+    setTimeout(() => { this.mostrarVistasFav(); }, 1000);
     this.cantOrdenesUltimoMes();
+    this.materiasPrimas();
+    this.facturacion()
   }
 
   // Funcion que leerá la informacion del usuario logeado, infomración que se almacena apenas el usuario incia sesion
@@ -375,14 +445,6 @@ export class PaginaPrincipalComponent implements OnInit {
     this.totalOrdenesMes = 0;
     this.costoTotalOrdenesMes = 0;
 
-    this.ordenTrabajoService.GetCantOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        this.clientesOrdenesMes.push(datos_ordenes[i]);
-        this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-        this.totalOrdenesMes += datos_ordenes[i].cantidad;
-      }
-    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes!`, error.message); });
-
     this.ordenTrabajoService.srvObtenerListaPorFechas(this.primerDiaMes, this.today).subscribe(datos_ot => {
       if (datos_ot.length == 0) setTimeout(() => { this.mensajeError('No existen OTs creadas en las el último mes.'); }, 3000);
       else {
@@ -395,7 +457,7 @@ export class PaginaPrincipalComponent implements OnInit {
           if (datos_ot[i].estado_Nombre == 'Cerrada') this.cantidadOTCerrada += 1;
         }
       }
-    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes!`, error.message); });
+    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes y en que estado se encuntran!`, error.message); });
 
     this.ordenTrabajoService.GetProductosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
       for (let i = 0; i < datos_ordenes.length; i++) {
@@ -403,26 +465,470 @@ export class PaginaPrincipalComponent implements OnInit {
         this.productosOrdenesMes.sort((a,b) => a.prod_Nombre.localeCompare(b.prod_Nombre));
         this.productosOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
       }
-    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes!`, error.message); });
-
-    this.ordenTrabajoService.GetVendedoresOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        this.vendedorOrdenesMes.push(datos_ordenes[i]);
-        this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-      }
-    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes!`, error.message); });
+    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada producto!`, error.message); });
 
     this.ordenTrabajoService.GetProcesosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
       for (let i = 0; i < datos_ordenes.length; i++) {
         this.procesosOrdenesMes.push(datos_ordenes[i]);
       }
-    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes!`, error.message); });
+    }, error => { this.mensajeError(`¡No se ha podido consultar la cantidad producida por cada proceso de las ordenes que se crearon el ultimo mes!`, error.message); });
 
     this.bagProService.GetCostoOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
       for (let i = 0; i < datos_ordenes.length; i++) {
         this.costoTotalOrdenesMes += datos_ordenes[i].costo;
       }
     }, error => { this.mensajeError(`¡No se ha podido consultar el costo de las ordenes de trabajo que se han hecho en el último mes!`, error.message); });
+
+    this.bagProService.GetCostoOrdenesUltimoMes_Vendedores(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+      for (let i = 0; i < datos_ordenes.length; i++) {
+        this.vendedorOrdenesMes.push(datos_ordenes[i]);
+        this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+      }
+    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para vendedor!`, error.message); });
+
+    this.bagProService.GetCostoOrdenesUltimoMes_Clientes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+      for (let i = 0; i < datos_ordenes.length; i++) {
+        this.clientesOrdenesMes.push(datos_ordenes[i]);
+        this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+        this.totalOrdenesMes += datos_ordenes[i].cantidad;
+      }
+    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada cliente!`, error.message); });
+  }
+
+  // Funcion que va a consultar toda la información general de materia prima
+  materiasPrimas(){
+    this.inventarioMateriaPrima = [];
+    this.cantMateriasPrimas = [];
+    this.cantRollosBopp = 0;
+    this.cantRollosBopa = 0;
+    this.cantRollosPoliester = 0;
+    this.cantRollosEntrantes = 0;
+    this.cantRollosUtilizados = 0;
+    this.materiasPrimasMovidasHoy = [];
+    this.tintasCreadas = [];
+    this.cantTintasCreadas = 0;
+    this.materiasPrimasMasUtilizadasMes = [];
+
+    this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos_materiaPrima => {
+      for (let i = 0; i < datos_materiaPrima.length; i++) {
+        if (datos_materiaPrima[i].inicial != datos_materiaPrima[i].actual && datos_materiaPrima[i].id_Materia_Prima != 84) this.inventarioMateriaPrima.push(datos_materiaPrima[i]);
+        this.inventarioMateriaPrima.sort((a,b) => a.nombre_Materia_Prima.localeCompare(b.nombre_Materia_Prima));
+      }
+    }, error => { this.mensajeError(`¡No se pudo obtener información de las materias primas!`, error.message); });
+
+    this.boppService.GetBoppStockInventario().subscribe(datos_bopp => {
+      for (let i = 0; i < datos_bopp.length; i++) {
+        if (datos_bopp[i].catMP_Id == 6) this.cantRollosBopp = datos_bopp[i].conteoDescripcion;
+        else if (datos_bopp[i].catMP_Id == 14) this.cantRollosBopa = datos_bopp[i].conteoDescripcion;
+        else if (datos_bopp[i].catMP_Id == 15) this.cantRollosPoliester = datos_bopp[i].conteoDescripcion;
+      }
+    }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos biorientados!`, error.message) });
+
+    this.boppService.GetCantRollosUtilizados_Mes(this.primerDiaMes, this.today).subscribe(datos_bopp => {
+      for (let i = 0; i < datos_bopp.length; i++) {
+        this.cantRollosUtilizados += datos_bopp[i].cantidad;
+      }
+    }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos biorientados!`, error.message) });
+
+    this.boppService.GetCantRollosIngresados_Mes(this.primerDiaMes, this.today).subscribe(datos_bopp => {
+      for (let i = 0; i < datos_bopp.length; i++) {
+        this.cantRollosEntrantes += datos_bopp[i].cantidad;
+      }
+    }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos biorientados!`, error.message) });
+
+    this.materiaPrimaService.GetMateriasPrimasUtilizadasHoy(this.today).subscribe(datos_materiasPrimas => {
+      for (let i = 0; i < datos_materiasPrimas.length; i++) {
+        this.materiasPrimasMovidasHoy.push(datos_materiasPrimas[i]);
+        this.materiasPrimasMovidasHoy.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+      }
+    }, error => { this.mensajeError(`¡No se pudo obtener información de las materias primas que tuvieron asignaciones hoy!`, error.message) });
+
+    this.tintasCreadasService.GetTintasCreadasMes(this.primerDiaMes, this.today).subscribe(datos_tintas => {
+      for (let i = 0; i < datos_tintas.length; i++) {
+        this.tintasCreadas.push(datos_tintas[i]);
+        this.tintasCreadas.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+        this.cantTintasCreadas += 1;
+      }
+    }, error => { this.mensajeError(`¡No se pudo obtener información de las tintas creadas durante las fechas ${this.primerDiaMes} y ${this.today}!`, error.message) });
+
+    this.materiaPrimaService.GetMateriasPrimasUltilizadasMes(this.primerDiaMes, this.today).subscribe(datos_materiasPrimas => {
+      for (let i = 0; i < datos_materiasPrimas.length; i++) {
+        this.materiasPrimasMasUtilizadasMes.push(datos_materiasPrimas[i]);
+        this.materiasPrimasMasUtilizadasMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+      }
+    }, error => { this.mensajeError(`¡No se pudo obtener información de las materias primas más utilizadas durante el mes!`, error.message); });
+
+    this.tintasCreadasService.GetMateriasPrimasCrearTintasMes(this.primerDiaMes, this.today).subscribe(datos_tintas => {
+      for (let i = 0; i < datos_tintas.length; i++) {
+        this.materiasPrimasMasUtilizadasCrearTintaMes.push(datos_tintas[i]);
+        this.materiasPrimasMasUtilizadasCrearTintaMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+      }
+    }, error => { this.mensajeError(`¡No se pudo obtener información de las tintas creadas durante las fechas ${this.primerDiaMes} y ${this.today}!`, error.message) });
+
+  }
+
+  // Funcion que va a consultar la información de la facturación
+  facturacion(){
+    this.totalFacturadoDia = 0;
+    this.totalFacuturadoMes = 0;
+    this.totalIvaVentaMes = 0;
+    this.totalIvaCompraMes = 0;
+
+    this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => {
+      this.totalFacturadoDia = datos_facturacion;
+    }, error => { this.mensajeError(`¡No se pudo obtener información sobre el valor de lo facturado hoy!`, error.message); });
+
+    this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
+      this.totalFacuturadoMes = datos_facturacion;
+    }, error => { this.mensajeError(`¡No se pudo aobtener información sobre lo facturado del mes actual!`, error.message); });
+
+    this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
+      this.totalIvaVentaMes = datos_facturacion;
+    }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las ventas del mes actual!`, error.message); });
+
+    this.zeusService.GetIvaCompraMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
+      this.totalIvaCompraMes = datos_facturacion;
+    }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las compras de mes actual!`, error.message); });
+
+    for (let i = 0; i < 12; i++) {
+      this.zeusService.GetFacturacionTodosMeses(i+ 1).subscribe(datos_facturacion => {
+        if (i == 0) this.totalFacturado1 = datos_facturacion;
+        if (i == 1) this.totalFacturado2 = datos_facturacion;
+        if (i == 2) this.totalFacturado3 = datos_facturacion;
+        if (i == 3) this.totalFacturado4 = datos_facturacion;
+        if (i == 4) this.totalFacturado5 = datos_facturacion;
+        if (i == 5) this.totalFacturado6 = datos_facturacion;
+        if (i == 6) this.totalFacturado7 = datos_facturacion;
+        if (i == 7) this.totalFacturado8 = datos_facturacion;
+        if (i == 8) this.totalFacturado9 = datos_facturacion;
+        if (i == 9) this.totalFacturado10 = datos_facturacion;
+        if (i == 10) this.totalFacturado11 = datos_facturacion;
+        if (i == 11) this.totalFacturado12 = datos_facturacion;
+      }, error => { this.mensajeError(`¡No se pudo obtener información sobre la cantidad facturada en cada uno de los meses del año!`, error.message); });
+    }
+    setTimeout(() => { this.llenarGraficaFacturacion(); }, 1100);
+
+    for (let i = 0; i < 12; i++) {
+      this.zeusService.GetIvaCompraTodosMeses(i+ 1).subscribe(datos_facturacion => {
+        if (i == 0) this.totalIvaCompra1 = datos_facturacion;
+        if (i == 1) this.totalIvaCompra2 = datos_facturacion;
+        if (i == 2) this.totalIvaCompra3 = datos_facturacion;
+        if (i == 3) this.totalIvaCompra4 = datos_facturacion;
+        if (i == 4) this.totalIvaCompra5 = datos_facturacion;
+        if (i == 5) this.totalIvaCompra6 = datos_facturacion;
+        if (i == 6) this.totalIvaCompra7 = datos_facturacion;
+        if (i == 7) this.totalIvaCompra8 = datos_facturacion;
+        if (i == 8) this.totalIvaCompra9 = datos_facturacion;
+        if (i == 9) this.totalIvaCompra10 = datos_facturacion;
+        if (i == 10) this.totalIvaCompra11 = datos_facturacion;
+        if (i == 11) this.totalIvaCompra12 = datos_facturacion;
+      }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las compras de cada uno de los meses del año!`, error.message); });
+    }
+    setTimeout(() => { this.llenarGraficaIvaCompra(); }, 1100);
+  }
+
+  // Funcion que va a llenar la grafica con la información de los vendedores
+  llenarGraficaVendedores(){
+    this.mostrarGrafica = true;
+    this.nombreGrafica = `Grafica de Vendedores`;
+    let vendedores : any = [];
+    let costoVentas : any = [];
+    let cantOt : any = [];
+    for (let i = 0; i < 5; i++) {
+      vendedores.push(this.vendedorOrdenesMes[i].nombreCompleto);
+      costoVentas.push(this.vendedorOrdenesMes[i].costo);
+      cantOt.push(this.vendedorOrdenesMes[i].cantidad);
+    }
+    this.multiAxisData = {
+      labels: vendedores,
+      datasets: [{
+        label: 'Cantidad de Ordenes de Trabajo hechas ',
+        backgroundColor: [ '#42A5F5', ],
+        yAxisID: 'y',
+        data: cantOt
+      },
+      {
+        label: 'Valor Total de Ordenes de Trabajo ',
+        backgroundColor: '#4169E1',
+        yAxisID: 'y1',
+        data: costoVentas
+      }]
+    };
+    this.multiAxisOptions = {
+      plugins: {
+        legend: {
+          labels: { color: '#495057' }
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: true
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#495057' },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: {
+            min: 0,
+            max: 100,
+            color: '#495057'
+          },
+          grid: { color: '#ebedef' }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          grid: {
+            drawOnChartArea: false,
+            color: '#ebedef'
+          },
+          ticks: {
+            min: 0,
+            max: 100,
+            color: '#495057'
+          }
+        }
+      }
+    };
+  }
+
+  // Funcion que va a llenar la grafica con informacion de los clientes
+  llenarGraficaClientes(){
+    this.mostrarGrafica = true;
+    this.nombreGrafica = `Grafica de Clientes`;
+    let clientes : any = [];
+    let costo : any = [];
+    let cantOt : any = [];
+    for (let i = 0; i < 5; i++) {
+      clientes.push(this.clientesOrdenesMes[i].clienteNom);
+      costo.push(this.clientesOrdenesMes[i].costo);
+      cantOt.push(this.clientesOrdenesMes[i].cantidad);
+    }
+    this.multiAxisData = {
+      labels: clientes,
+      datasets: [{
+        label: 'Cantidad de Ordenes de Trabajo hechas ',
+        backgroundColor: [
+          '#AB47BC',
+          '#42A5F5',
+          '#66BB6A',
+          '#FFCA28',
+          '#26A69A'
+        ],
+        yAxisID: 'y',
+        data: cantOt
+      },
+      {
+        label: 'Valor Total de Ordenes de Trabajo ',
+        backgroundColor: [ '#F5B041', ],
+        yAxisID: 'y1',
+        data: costo
+      }]
+    };
+    this.multiAxisOptions = {
+      plugins: {
+        legend: {
+          labels: { color: '#495057' }
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: true
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#495057'
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: {
+            min: 0,
+            max: 100,
+            color: '#495057'
+          },
+          grid: { color: '#ebedef' }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          grid: {
+            drawOnChartArea: false,
+            color: '#ebedef'
+          },
+          ticks: {
+            min: 0,
+            max: 100,
+            color: '#495057'
+          }
+        }
+      }
+    };
+  }
+
+  // Funcion que va a llenar la grafica con información de los estados de las ordenes
+  llenarGraficaEstadosOrdenes(){
+    this.mostrarGrafica = true;
+    this.nombreGrafica = `Grafica de Estados de Ordenes`;
+    this.multiAxisData = {
+      labels: ['Abierta', 'Asignada', 'Terminada', 'En proceso', 'Anulado', 'Cerrada'],
+      datasets: [{
+        label: 'Cantidad de Ordenes de Trabajo',
+        backgroundColor: [
+          '#F6D45D',
+          '#83D3FF',
+          '#F3FC20',
+          '#8AFC9B',
+          '#FF7878',
+          '#53CC48'
+        ],
+        yAxisID: 'y',
+        data: [
+          this.catidadOTAbiertas,
+          this.cantidadOTAsignadas,
+          this.cantidadOTTerminada,
+          this.cantidadOTIniciada,
+          this.cantidadOtAnulada,
+          this.cantidadOTCerrada
+        ]
+      }]
+    };
+    this.multiAxisOptions = {
+      plugins: {
+        legend: {
+          labels: { color: '#495057' }
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: true
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#495057' },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: {
+            min: 0,
+            max: 100,
+            color: '#495057'
+          },
+          grid: { color: '#ebedef' }
+        }
+      }
+    };
+
+  }
+
+  // Funcion que va a llenar la grafica de las cantidades facturadas en cada mes
+  llenarGraficaFacturacion(){
+    this.facturasData = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: [
+        {
+          label: 'Total Vendido en el mes',
+          data: [
+            this.totalFacturado1,
+            this.totalFacturado2,
+            this.totalFacturado3,
+            this.totalFacturado4,
+            this.totalFacturado5,
+            this.totalFacturado6,
+            this.totalFacturado7,
+            this.totalFacturado8,
+            this.totalFacturado9,
+            this.totalFacturado10,
+            this.totalFacturado11,
+            this.totalFacturado12
+          ],
+          fill: true,
+          borderColor: '#FFA726',
+          tension: 0,
+          backgroundColor: 'rgba(255,167,38,0.2)'
+        }
+      ]
+    };
+
+    this.facturasOptions = {
+      plugins: {
+        legend: {
+          labels: { color: '#495057' }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#495057' },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          ticks: { color: '#495057' },
+          grid: { color: '#ebedef' }
+        }
+      }
+    };
+  }
+
+  // Funcion que va a llenar la grafica con la informacion del iva de las compras mensuales
+  llenarGraficaIvaCompra(){
+    this.ivaCompraData = {
+      labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      datasets: [
+        {
+          label: 'Total Iva Compra en el mes ',
+          data: [
+            this.totalIvaCompra1,
+            this.totalIvaCompra2,
+            this.totalIvaCompra3,
+            this.totalIvaCompra4,
+            this.totalIvaCompra5,
+            this.totalIvaCompra6,
+            this.totalIvaCompra7,
+            this.totalIvaCompra8,
+            this.totalIvaCompra9,
+            this.totalIvaCompra10,
+            this.totalIvaCompra11,
+            this.totalIvaCompra12
+          ],
+          fill: true,
+          borderColor: '#FFA726',
+          tension: 0,
+          backgroundColor: 'rgba(255,167,38,0.2)'
+        }
+      ]
+    };
+
+    this.ivaCompraOptions = {
+      plugins: {
+        legend: {
+          labels: { color: '#495057' }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#495057' },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          ticks: { color: '#495057' },
+          grid: { color: '#ebedef' }
+        }
+      }
+    };
   }
 
   // Funcion que tomará unos parametros para mostrar un mensaje de error

@@ -24,7 +24,7 @@ p-pickList span{
 
 .scrollCard{
   overflow-y: scroll;
-  max-height: 358px;
+  max-height: 300px;
 }
 
 .scrollCard::-webkit-scrollbar {
@@ -155,6 +155,13 @@ p-pickList span{
   margin-bottom: 15%;
 }
 
+.titulo_grafica{
+  margin: auto;
+  color: #d83542;
+  padding-bottom: 2%;
+}
+
+
 @keyframes card {
   0%   {left:0px;}
   25%  {left:25%;}
@@ -185,6 +192,13 @@ p-pickList span{
     font-size: 30px;
     width: 20%;
   }
+
+  .modal-xl {
+    width: 80%;
+    max-width: none;
+    height: 70%;
+    margin: auto;
+  }
 }
 
 @media screen and (max-width: 576px) {
@@ -212,5 +226,12 @@ p-pickList span{
   p-pickList img {
     margin: 0 0 1rem 0;
     width: 50px;
+  }
+
+  .modal-xl {
+    width: 200%;
+    max-width: none;
+    height: 80%;
+    margin: auto;
   }
 }
