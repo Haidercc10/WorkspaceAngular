@@ -227,7 +227,7 @@ export const routes: Routes = [
  {path: 'pedido-mantenimiento', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PedidoMantenimientoComponent},
  {path: 'movimientos-mantenimientos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Movimientos_MantenimientoComponent},
  {path: 'reporte-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_MantenimientoComponent},
- {path: 'mantenimiento-camiones', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
+ {path: 'mantenimiento-camiones', component: Mantenimiento_CamionesComponent },
 ]
 
 @NgModule({

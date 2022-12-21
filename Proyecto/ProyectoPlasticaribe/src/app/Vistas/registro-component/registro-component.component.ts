@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Workbook } from 'exceljs';
 import moment from 'moment';
 import { modelUsuario } from 'src/app/Modelo/modelUsuario';
@@ -11,6 +11,10 @@ import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
 import { Table } from 'primeng/table'
 import { AreaService } from 'src/app/Servicios/Areas/area.service';
+import { MessageService } from 'primeng/api';
+import { modelAreas } from 'src/app/Modelo/modelAreas';
+import { modelRol } from 'src/app/Modelo/modelRol';
+import { modelTipoUsuario } from 'src/app/Modelo/modelTipoUsuario';
 
 @Component({
   selector: 'app-registro-component',
@@ -37,13 +41,20 @@ export class RegistroComponentComponent implements OnInit {
   public usuariosInactivar : any = []; //Funcion que guardará los usuarios que se van a innactivar
   public cantidadUsuarios : number = 0; //Funcion que guardará la cantidad total de usuarios
   public mostrarPass : boolean = false; //Funcion que mostrará el un icono u otro para mostrar o no la contraseña
+  public nuevoDialogo : boolean = false; /** Dialogo para crear roles de usuarios y areas */
+  public formRoles !: FormGroup; /** Formulario para crear roles y tipos de usuarios. */
+  public formAreas !: FormGroup; /** Formulario para crear areas */
+  public accionDialogoNuevo : string = ''; /** Acción del dialogo (Modal) nuevo de areas o roles */
+  public arrayNombresRoles : any = []; /** Array que cargará los nombres de los roles en el modal para crear roles. */
+  public arrayNombresAreas : any = []; /** Array que cargará los nombres de las areas en el modal para crear areas. */
 
   constructor(private formBuilder : FormBuilder,
               private servicioRoles : RolesService,
                 private servicioAreas : AreaService,
                   private servicioUsuarios : UsuarioService,
                     private servicioEstados : EstadosService,
-                      private servicioTpUsuarios : SrvTipos_UsuariosService) {
+                      private servicioTpUsuarios : SrvTipos_UsuariosService,
+                       private messageService: MessageService) {
 
     this.FormUsuarios = this.formBuilder.group({
       usuId:  null,
@@ -54,6 +65,9 @@ export class RegistroComponentComponent implements OnInit {
       usuEstado: null,
       usuPassword: null,
     });
+
+    this.inicializarFormularioRoles();
+    this.inicializarFormularioAreas();
   }
 
   ngOnInit() {
@@ -66,6 +80,8 @@ export class RegistroComponentComponent implements OnInit {
 
   // Funcion que crgará las areas
   cargarAreas() {
+    this.arrayAreas = [];
+
     this.servicioAreas.srvObtenerLista().subscribe(dataAreas => {
       for (let index = 0; index < dataAreas.length; index++) {
         this.arrayAreas.push(dataAreas[index]);
@@ -75,6 +91,8 @@ export class RegistroComponentComponent implements OnInit {
 
   // Funcion que cargará los roles
   cargarRoles() {
+    this.arrayRoles = [];
+
     this.servicioRoles.srvObtenerLista().subscribe(dataRoles => {
       for (let index = 0; index < dataRoles.length; index++) {
         this.arrayRoles.push(dataRoles[index]);
@@ -84,6 +102,8 @@ export class RegistroComponentComponent implements OnInit {
 
   // Funcion que cargará los estados que pueden tener los usuarios
   cargarEstados() {
+    this.arrayEstados = [];
+
     this.servicioEstados.srvObtenerListaEstados().subscribe(dataEstados => {
       for (let index = 0; index < dataEstados.length; index++) {
         if(dataEstados[index].estado_Nombre == 'Activo' ||
@@ -95,6 +115,8 @@ export class RegistroComponentComponent implements OnInit {
 
   // Funcion que cargará los tipos de usuarios
   cargarTiposUsuarios() {
+    this.arrayTiposUsuarios = [];
+
     this.servicioTpUsuarios.srvObtenerLista().subscribe(dataTipoUsu => {
       for (let index = 0; index < dataTipoUsu.length; index++) {
         this.arrayTiposUsuarios.push(dataTipoUsu[index]);
@@ -440,5 +462,137 @@ export class RegistroComponentComponent implements OnInit {
   aplicarfiltroGlobal($event, valorCampo : string){
     this.dt!.filterGlobal(($event.target as HTMLInputElement).value, valorCampo);
   }
+
+  /** Cargar modal de crear roles y tipos de usuarios */
+  modalRoles_TiposUsuarios(){
+    this.nuevoDialogo = true;
+    this.accionDialogoNuevo = 'Rol';
+    this.formRoles.reset();
+  }
+
+  /** Cargar modal de crear roles y tipos de usuarios */
+  modalAreas(){
+    this.nuevoDialogo = true;
+    this.accionDialogoNuevo = 'Area';
+    this.formAreas.reset();
+  }
+
+  /** Cargar modal de crear roles y tipos de usuarios */
+  inicializarFormularioRoles(){
+    this.formRoles = this.formBuilder.group({
+      rolNombre : [null, Validators.required],
+      rolDescripcion : [null]
+    })
+  }
+
+  /** Cargar modal de crear areas de usuarios */
+  inicializarFormularioAreas(){
+    this.formAreas = this.formBuilder.group({
+      areaNombre : [null, Validators.required],
+      areaDescripcion : [null]
+    })
+  }
+
+  /** Crear roles de usuarios */
+  crearRoles(){
+    let nombreRol : any = this.formRoles.value.rolNombre;
+    let descripcionRol : any = this.formRoles.value.rolDescripcion;
+
+    if(this.formRoles.valid) {
+      this.servicioRoles.getRolxNombre(nombreRol).subscribe(dataRoles => {
+        if(dataRoles.length > 0) {
+          this.mostrarError(nombreRol);
+        } else {
+          const roles : modelRol = { RolUsu_Id : 0, RolUsu_Nombre : nombreRol, RolUsu_Descripcion : descripcionRol, }
+          const tipoUsu : modelTipoUsuario = { tpUsu_Id: 0, tpUsu_Nombre: nombreRol, tpUsu_Descripcion: descripcionRol, }
+
+          this.servicioRoles.srvGuardar(roles).subscribe(dataRol => {  this.crearTipo_Usuario(tipoUsu); }, error => { this.mostrarError2(); })
+        }
+      });
+    } else {
+      this.camposVacios();
+    }
+  }
+
+  /** Crea tipo de usuario con el mismo nombre de rol */
+  crearTipo_Usuario(tipo_usuario : any) {
+    this.servicioTpUsuarios.Insert(tipo_usuario).subscribe(dataRol => {
+      this.mostrarConfirmacion();
+      this.formRoles.reset();
+      setTimeout(() => { this.cargarRoles(); this.cargarTiposUsuarios();  }, 1000);
+    }, error => { this.mostrarError2(); });
+  }
+
+  /** Crear areas desde el modal */
+  crearAreas(){
+    let nombreArea : any = this.formAreas.value.areaNombre;
+    let descripcionArea : any = this.formAreas.value.areaDescripcion;
+
+    if(this.formAreas.valid){
+      this.servicioAreas.getNombre(nombreArea).subscribe(dataAreas => {
+        if(dataAreas.length > 0) this.mostrarError(nombreArea);
+        else {
+          const areas : modelAreas = {area_Id: 0, area_Nombre: nombreArea, area_Descripcion: descripcionArea, }
+          this.servicioAreas.srvGuardar(areas).subscribe(dataArea => { this.mostrarConfirmacion(); this.formAreas.reset(); setTimeout(() => { this.cargarAreas(); }, 1000); }, error => { this.mostrarError2(); })
+        }
+      });
+    } else {
+      this.camposVacios();
+    }
+  }
+
+  /** Mostrar mensaje de error por nombre de rol duplicado */
+  mostrarError(dato : any) {
+    this.messageService.add({severity:'warn', detail: `El nombre de ${this.accionDialogoNuevo} ${dato} ya existe!`});
+  }
+
+  /** Mostrar mensaje de confirmación al crear rol o area */
+  mostrarConfirmacion() {
+    this.messageService.add({severity:'success', detail:`Registro creado con éxito!`});
+  }
+
+  /** Mostrar mensaje de error por cualquier razón. */
+  mostrarError2() {
+    this.messageService.add({severity:'error', detail: `No fue posible crear el registro.`});
+    this.load = true;
+  }
+
+  /** Mostrar mensaje de campos vacios al momento de guardar un registro */
+  camposVacios() {
+    this.messageService.add({severity:'warn', detail: `Debe llenar los campos vacios en el formulario!`});
+  }
+
+  /** Agregar roles o areas dependiendo la acción del dialogo. */
+  agregar() {
+    if(this.accionDialogoNuevo == 'Rol') this.crearRoles();
+     else this.crearAreas();
+  }
+
+  /** Cargar roles al datalist al momento de escribir en el campo nombre del modal*/
+  cargarRoles_Like(){
+    this.arrayNombresRoles = [];
+    let nombreRol : any = this.formRoles.value.rolNombre;
+    if(nombreRol != null) {
+      this.servicioRoles.likeGetNombre(nombreRol).subscribe(dataRoles => {
+        for (let index = 0; index < dataRoles.length; index++) {
+          this.arrayNombresRoles.push(dataRoles[index]);
+        }
+      });
+    }
+  }
+
+  /** Cargar areas al datalist al momento de escribir en el campo nombre del modal */
+  cargarAreas_Like(){
+    this.arrayNombresAreas = [];
+    let nombreArea : any = this.formAreas.value.areaNombre;
+    if(nombreArea != null) {
+      this.servicioAreas.likeGetNombreArea(nombreArea).subscribe(dataRoles => {
+        for (let index = 0; index < dataRoles.length; index++) {
+          this.arrayNombresAreas.push(dataRoles[index]);
+        }
+      });
+    }
+  }
+
 
 }

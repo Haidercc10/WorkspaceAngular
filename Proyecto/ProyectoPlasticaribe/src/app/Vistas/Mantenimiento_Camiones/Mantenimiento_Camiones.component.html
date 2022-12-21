@@ -24,7 +24,7 @@
     <div class="container">
 
       <div class="mb-4">
-        <h4 class="tituloRojo">Consultar Pedidos/Mantenimientos</h4>
+        <h4 class="tituloRojo">Consultar Filtros</h4>
       </div>
       <!-- Formulario -->
       <form [formGroup]="formConsultarPedidoMtto">
@@ -330,11 +330,23 @@
                             <td>{{arrayDetalleMtto.serial}}</td>
                             <td>{{arrayDetalleMtto.tipoMtto}}</td>
                           <!--Inicio Campo Estado-->
-                            <ng-container *ngIf="arrayDetalleMtto.estado == 'Terminada'">
+                            <ng-container *ngIf="arrayDetalleMtto.estado == 'Terminada' && ValidarRol != 1" > <!--Usuario Normal-->
                               <td pEditableColumn title="Haga clic para desplegar las opciones y actualizar el estado">
                                 <p-cellEditor>
                                   <ng-template pTemplate="input">
                                       <p-dropdown [options]="arrayEstados" appendTo="body" [disabled]="true" [(ngModel)]="arrayDetalleMtto.estado" [style]="{'width':'100%'}" (onChange)="obtenerCodigoMantenimiento(arrayDetalleMtto)"></p-dropdown>
+                                  </ng-template>
+                                  <ng-template pTemplate="output">
+                                    <span class="badge bg-success1">{{arrayDetalleMtto.estado}}</span>
+                                  </ng-template>
+                                </p-cellEditor>
+                              </td>
+                            </ng-container>
+                            <ng-container *ngIf="arrayDetalleMtto.estado == 'Terminada' && ValidarRol == 1"> <!--Usuario Administrador-->
+                              <td pEditableColumn title="Haga clic para desplegar las opciones y actualizar el estado">
+                                <p-cellEditor>
+                                  <ng-template pTemplate="input">
+                                      <p-dropdown [options]="arrayEstados" appendTo="body" [(ngModel)]="arrayDetalleMtto.estado" [style]="{'width':'100%'}" (onChange)="obtenerCodigoMantenimiento(arrayDetalleMtto)"></p-dropdown>
                                   </ng-template>
                                   <ng-template pTemplate="output">
                                     <span class="badge bg-success1">{{arrayDetalleMtto.estado}}</span>
