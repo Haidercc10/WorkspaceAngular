@@ -32,7 +32,6 @@ export class PaginaPrincipalComponent implements OnInit {
   seleccionados = []; //Variable que almacenará los id de las vistas seleccionadas por el usuario como favoritas
   vistasFavoritas : any [] = []; // Variable que almacenará las vistas favoritas del usuario
   disponiblesMostrar = []; //Variable que almacenará las vistas disponibles para cada usuario segun su rol
-  dialogoInformativo : boolean = false;
   today : any = moment().format('YYYY-MM-DD'); //Variable que va a almacenar la fecha del dia de hoy
   primerDiaMes : any = moment().startOf('month').format('YYYY-MM-DD'); //Variable que va a almacenar el primer dia del mes
 
@@ -88,27 +87,27 @@ export class PaginaPrincipalComponent implements OnInit {
   totalFacturado1 : number = 0; //Variable que almacenará lo facturado en el mes de enero
   totalFacturado2 : number = 0; //Variable que almacenará lo facturado en el mes de febrero
   totalFacturado3 : number = 0; //Varibal que almacenará lo facturado en el mes de marzo
-  totalFacturado4 : number = 0; //Variable que almcenará lo facturado en el ems de abril
-  totalFacturado5 : number = 0; //Variable que almcenará lo facturado en el ems de mayo
-  totalFacturado6 : number = 0; //Variable que almcenará lo facturado en el ems de junio
-  totalFacturado7 : number = 0; //Variable que almcenará lo facturado en el ems de julio
-  totalFacturado8 : number = 0; //Variable que almcenará lo facturado en el ems de agosto
-  totalFacturado9 : number = 0; //Variable que almcenará lo facturado en el ems de septiembre
-  totalFacturado10 : number = 0; //Variable que almcenará lo facturado en el ems de octubre
-  totalFacturado11 : number = 0; //Variable que almcenará lo facturado en el ems de noviembre
-  totalFacturado12 : number = 0; //Variable que almcenará lo facturado en el ems de diciembre
-  totalIvaCompra1 : number = 0;
-  totalIvaCompra2 : number = 0;
-  totalIvaCompra3 : number = 0;
-  totalIvaCompra4 : number = 0;
-  totalIvaCompra5 : number = 0;
-  totalIvaCompra6 : number = 0;
-  totalIvaCompra7 : number = 0;
-  totalIvaCompra8 : number = 0;
-  totalIvaCompra9 : number = 0;
-  totalIvaCompra10 : number = 0;
-  totalIvaCompra11 : number = 0;
-  totalIvaCompra12 : number = 0;
+  totalFacturado4 : number = 0; //Variable que almcenará lo facturado en el mes de abril
+  totalFacturado5 : number = 0; //Variable que almcenará lo facturado en el mes de mayo
+  totalFacturado6 : number = 0; //Variable que almcenará lo facturado en el mes de junio
+  totalFacturado7 : number = 0; //Variable que almcenará lo facturado en el mes de julio
+  totalFacturado8 : number = 0; //Variable que almcenará lo facturado en el mes de agosto
+  totalFacturado9 : number = 0; //Variable que almcenará lo facturado en el mes de septiembre
+  totalFacturado10 : number = 0; //Variable que almcenará lo facturado en el mes de octubre
+  totalFacturado11 : number = 0; //Variable que almcenará lo facturado en el mes de noviembre
+  totalFacturado12 : number = 0; //Variable que almcenará lo facturado en el mes de diciembre
+  totalIvaCompra1 : number = 0; //Variable que va a almacenar el iva de compra del mes de enero
+  totalIvaCompra2 : number = 0; //Variable que va a almacenar el iva de compra del mes de febrero
+  totalIvaCompra3 : number = 0; //Variable que va a almacenar el iva de compra del mes de marzo
+  totalIvaCompra4 : number = 0; //Variable que va a almacenar el iva de compra del mes de abril
+  totalIvaCompra5 : number = 0; //Variable que va a almacenar el iva de compra del mes de mayo
+  totalIvaCompra6 : number = 0; //Variable que va a almacenar el iva de compra del mes de junio
+  totalIvaCompra7 : number = 0; //Variable que va a almacenar el iva de compra del mes de julio
+  totalIvaCompra8 : number = 0; //Variable que va a almacenar el iva de compra del mes de agosto
+  totalIvaCompra9 : number = 0; //Variable que va a almacenar el iva de compra del mes de septiembre
+  totalIvaCompra10 : number = 0; //Variable que va a almacenar el iva de compra del mes de octubre
+  totalIvaCompra11 : number = 0; //Variable que va a almacenar el iva de compra del mes de noviembre
+  totalIvaCompra12 : number = 0; //Variable que va a almacenar el iva de compra del mes de diciembre
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
@@ -122,10 +121,10 @@ export class PaginaPrincipalComponent implements OnInit {
                                 private zeusService : InventarioZeusService,) { }
 
   ngOnInit() {
+    setTimeout(() => { this.mostrarVistasFav(); }, 500);
     this.lecturaStorage();
     this.llenarDatosSeleccionables();
     this.buscarFavoritos();
-    setTimeout(() => { this.mostrarVistasFav(); }, 1000);
     this.cantOrdenesUltimoMes();
     this.materiasPrimas();
     this.facturacion()
@@ -143,7 +142,7 @@ export class PaginaPrincipalComponent implements OnInit {
           this.storage_Rol = datos_roles[index].rolUsu_Nombre;
         }
       }
-    });
+    }, error => { this.mensajeError(`¡No se pudo conectar con el API de rubick, por favor recargue la pagina y si el problema persiste concatese con sistemas!`, error.message); });
   }
 
   // Llenar datos con todas las opciones de vistas que puede seleccionar como favoritas
@@ -606,7 +605,7 @@ export class PaginaPrincipalComponent implements OnInit {
         if (i == 11) this.totalFacturado12 = datos_facturacion;
       }, error => { this.mensajeError(`¡No se pudo obtener información sobre la cantidad facturada en cada uno de los meses del año!`, error.message); });
     }
-    setTimeout(() => { this.llenarGraficaFacturacion(); }, 1100);
+    setTimeout(() => { this.llenarGraficaFacturacion(); }, 1500);
 
     for (let i = 0; i < 12; i++) {
       this.zeusService.GetIvaCompraTodosMeses(i+ 1).subscribe(datos_facturacion => {
@@ -624,7 +623,7 @@ export class PaginaPrincipalComponent implements OnInit {
         if (i == 11) this.totalIvaCompra12 = datos_facturacion;
       }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las compras de cada uno de los meses del año!`, error.message); });
     }
-    setTimeout(() => { this.llenarGraficaIvaCompra(); }, 1100);
+    setTimeout(() => { this.llenarGraficaIvaCompra(); }, 1800);
   }
 
   // Funcion que va a llenar la grafica con la información de los vendedores
@@ -867,17 +866,20 @@ export class PaginaPrincipalComponent implements OnInit {
     this.facturasOptions = {
       plugins: {
         legend: {
-          labels: { color: '#495057' }
+          labels: { color: '#495057' },
+          fontSize: 100
         }
       },
       scales: {
         x: {
           ticks: { color: '#495057' },
-          grid: { color: '#ebedef' }
+          grid: { color: '#ebedef' },
+          fontSize: 100
         },
         y: {
           ticks: { color: '#495057' },
-          grid: { color: '#ebedef' }
+          grid: { color: '#ebedef' },
+          fontSize: 100
         }
       }
     };

@@ -138,6 +138,7 @@ import { RolesComponentComponent } from './Vistas/roles-component/roles-componen
 import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura/RollosAsignadasFactura.component';
 import { UsuarioComponent } from './Vistas/usuario/usuario.component';
 import { Ventas_TemporalesComponent } from './Vistas/Ventas_Temporales/Ventas_Temporales.component';
+import {InputSwitchModule} from 'primeng/inputswitch';
 
 export const routes: Routes = [
 
@@ -231,6 +232,9 @@ export const routes: Routes = [
  {path: 'movimientos-mantenimientos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Movimientos_MantenimientoComponent},
  {path: 'reporte-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_MantenimientoComponent},
  {path: 'mantenimiento-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
+
+ /*************************************************************** DESPERDICIO *********************************************************************************/
+  {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: DesperdicioComponent}
 ]
 
 @NgModule({
@@ -391,6 +395,7 @@ export const routes: Routes = [
     NgChartsModule,
     ChartModule,
     SkeletonModule,
+    InputSwitchModule,
   ],
 
   providers: [
