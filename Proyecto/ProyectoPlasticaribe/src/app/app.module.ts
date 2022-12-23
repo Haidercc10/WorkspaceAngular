@@ -6,6 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule, Routes } from '@angular/router';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
+
 import { NgChartsModule } from 'ng2-charts';
 import { CookieService } from 'ngx-cookie-service';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
@@ -129,6 +130,7 @@ import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostos
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { ReporteMpOtComponent } from './Vistas/reporteMpOt/reporteMpOt.component';
 import { ReportesComponent } from './Vistas/reportes/reportes.component';
+import { Reporte_DesperdiciosComponent } from './Vistas/Reporte_Desperdicios/Reporte_Desperdicios.component';
 import { Reporte_MantenimientoComponent } from './Vistas/Reporte_Mantenimiento/Reporte_Mantenimiento.component';
 import { Reporte_OrdenCompraComponent } from './Vistas/Reporte_OrdenCompra/reporte_OrdenCompra.component';
 import { Reporte_Procesos_OTComponent } from './Vistas/Reporte_Procesos_OT/Reporte_Procesos_OT.component';
@@ -233,8 +235,11 @@ export const routes: Routes = [
  {path: 'reporte-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_MantenimientoComponent},
  {path: 'mantenimiento-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
 
+
  /*************************************************************** DESPERDICIO *********************************************************************************/
-  {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: DesperdicioComponent}
+  {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: DesperdicioComponent},
+  {path: 'reporte-desperdicios', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_DesperdiciosComponent },
+
 ]
 
 @NgModule({
@@ -330,6 +335,7 @@ export const routes: Routes = [
     Mantenimiento_CamionesComponent,
     Movimientos_MantenimientoComponent,
     Reporte_MantenimientoComponent,
+    Reporte_DesperdiciosComponent
   ],
 
 

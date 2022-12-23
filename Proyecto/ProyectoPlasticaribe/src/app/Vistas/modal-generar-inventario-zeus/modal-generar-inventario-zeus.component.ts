@@ -56,7 +56,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                     private rolService : RolesService,
                       private existencias_ProductosService : ExistenciasProductosService,
                         private frmBuilder : FormBuilder,
-                        private frmBuilder2 : FormBuilder,) {
+                        private frmBuilder2 : FormBuilder) {
 
     this.FormExistencias = this.frmBuilder.group({
      // cantMinima : [0],

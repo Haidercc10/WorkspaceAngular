@@ -17,6 +17,14 @@ export class DesperdicioService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Desperdicios');
   }
 
+  getDesperdicio(fecha1: any, fecha2 : any, ruta : string = ``):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Desperdicios/getConsultaDesperdicio2/${fecha1}/${fecha2}/${ruta}`);
+  }
+
+  getDesperdicioxOT(OT : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Desperdicios/getConsultaDesperdicioxOT/${OT}`);
+  }
+
   Put(id:number|String, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Desperdicios/${id}`, data);
   }
