@@ -13,6 +13,7 @@ import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-Reporte_RollosDesechos',
@@ -59,7 +60,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
                         private servicioRollos : SrvRollosEliminadosService,
                           @Inject(SESSION_STORAGE) private storage: WebStorageService,
                             private rolService : RolesService,
-                              private servicioProcesos : ProcesosService,) {
+                              private servicioProcesos : ProcesosService,
+                                private appComponent : AppComponent,) {
 
     this.formConsultaRollos = this.formbuilder.group({
       OT : [null],
@@ -756,9 +758,19 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         },
         content : [
           {
-            text: `Plasticaribe S.A.S ---- Reporte rollos eliminados (Extrusión)`,
-            alignment: 'center',
-            style: 'titulo',
+            columns: [
+              {
+                image : this.appComponent.logoParaPdf,
+                width : 100,
+                height : 80
+              },
+              {
+                text: `Plasticaribe S.A.S ---- Reporte rollos eliminados (Extrusión)`,
+                alignment: 'center',
+                style: 'titulo',
+                margin: 30
+              }
+            ]
           },
           '\n \n',
           {

@@ -14,6 +14,7 @@ import { RecuperadoMPService } from 'src/app/Servicios/DetallesRecuperado/recupe
 import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-MovimientoMatPrima',
@@ -61,7 +62,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
                                 private dtFacturaMP : FacturaMpService,
                                   private dtRemision : RemisionesMPService,
                                     private dtRecuperado : RecuperadoMPService,
-                                      private dtTintas : DetallesAsignacionTintasService,) {
+                                      private dtTintas : DetallesAsignacionTintasService,
+                                        private appComponent : AppComponent,) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null, Validators.required],
@@ -1362,9 +1364,19 @@ export class MovimientoMatPrimaComponent implements OnInit {
               },
               content : [
                 {
-                  text: `Plasticaribe S.A.S ---- Asignación de Materia Prima`,
-                  alignment: 'center',
-                  style: 'titulo',
+                  columns: [
+                    {
+                      image : this.appComponent.logoParaPdf,
+                      width : 100,
+                      height : 80
+                    },
+                    {
+                      text: `Plasticaribe S.A.S ---- Asignación de Materia Prima`,
+                      alignment: 'center',
+                      style: 'titulo',
+                      margin: 30
+                    }
+                  ]
                 },
                 '\n \n',
                 {
@@ -1438,9 +1450,19 @@ export class MovimientoMatPrimaComponent implements OnInit {
               },
               content : [
                 {
-                  text: `Plasticaribe S.A.S ---- Devolución de Materia Prima`,
-                  alignment: 'center',
-                  style: 'titulo',
+                  columns: [
+                    {
+                      image : this.appComponent.logoParaPdf,
+                      width : 100,
+                      height : 80
+                    },
+                    {
+                      text: `Plasticaribe S.A.S ---- Devolución de Materia Prima`,
+                      alignment: 'center',
+                      style: 'titulo',
+                      margin: 30
+                    }
+                  ]
                 },
                 '\n \n',
                 {
@@ -1513,9 +1535,19 @@ export class MovimientoMatPrimaComponent implements OnInit {
               },
               content : [
                 {
-                  text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
-                  alignment: 'center',
-                  style: 'titulo',
+                  columns: [
+                    {
+                      image : this.appComponent.logoParaPdf,
+                      width : 100,
+                      height : 80
+                    },
+                    {
+                      text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
+                      alignment: 'center',
+                      style: 'titulo',
+                      margin: 30
+                    }
+                  ]
                 },
                 '\n \n',
                 {
@@ -1605,9 +1637,19 @@ export class MovimientoMatPrimaComponent implements OnInit {
               },
               content : [
                 {
-                  text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
-                  alignment: 'center',
-                  style: 'titulo',
+                  columns: [
+                    {
+                      image : this.appComponent.logoParaPdf,
+                      width : 100,
+                      height : 80
+                    },
+                    {
+                      text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
+                      alignment: 'center',
+                      style: 'titulo',
+                      margin: 30
+                    }
+                  ]
                 },
                 '\n \n',
                 {
@@ -1691,9 +1733,19 @@ export class MovimientoMatPrimaComponent implements OnInit {
               },
               content : [
                 {
-                  text: `Plasticaribe S.A.S ---- Recuperado de Materia Prima`,
-                  alignment: 'center',
-                  style: 'titulo',
+                  columns: [
+                    {
+                      image : this.appComponent.logoParaPdf,
+                      width : 100,
+                      height : 80
+                    },
+                    {
+                      text: `Plasticaribe S.A.S ---- Recuperado de Materia Prima`,
+                      alignment: 'center',
+                      style: 'titulo',
+                      margin: 30
+                    }
+                  ]
                 },
                 '\n \n',
                 {

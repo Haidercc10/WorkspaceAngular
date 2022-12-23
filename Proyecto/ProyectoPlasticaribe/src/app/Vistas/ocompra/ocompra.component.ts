@@ -4,6 +4,7 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { AppComponent } from 'src/app/app.component';
 import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCompra/DetallesOrdenesCompra.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
@@ -34,6 +35,7 @@ export class OcompraComponent implements OnInit {
   ModalCrearBOPP: boolean= false; //Variable para validar que se abra el modal de creacion de bopp, bopa y/o poliester
   ModalCrearTintas: boolean= false; //Variable para validar que se abra el modal de creacion de tintas, chips, solvenets
 
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   cargando : boolean = false; //Variable para validar que aparezca o no el icono de carga
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -56,7 +58,8 @@ export class OcompraComponent implements OnInit {
                       private materiaPrimaService : MateriaPrimaService,
                         private undMedidaService : UnidadMedidaService,
                           private ordenCompraService : OrdenCompra_MateriaPrimaService,
-                            private dtOrdenCompraService : DetallesOrdenesCompraService,) {
+                            private dtOrdenCompraService : DetallesOrdenesCompraService,
+                              private appComponent : AppComponent,) {
 
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -452,11 +455,26 @@ export class OcompraComponent implements OnInit {
             width: 630,
             height: 760
           },
+          footer: {
+            columns: [
+              { text: `Fecha Expedición Documento ${this.today} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8, margin: [0, 0, 20, 0] }
+            ]
+          },
           content : [
             {
-              text: `Orden de Compra de Materia Prima N° ${datos_orden[i].consecutivo}`,
-              alignment: 'right',
-              style: 'titulo',
+              columns: [
+                {
+                  image : this.appComponent.logoParaPdf,
+                  width : 100,
+                  height : 80
+                },
+                {
+                  text: `Orden de Compra de Materia Prima N° ${datos_orden[i].consecutivo}`,
+                  alignment: 'right',
+                  style: 'titulo',
+                  margin: 30
+                }
+              ]
             },
             '\n \n',
             {
@@ -486,22 +504,12 @@ export class OcompraComponent implements OnInit {
                   [
                     {
                       border: [false, false, false, false],
-                      text: `Dirección`
+                      text: `NIT Empresa`
                     },
                     {
                       border: [false, false, false, true],
-                      text: `${datos_orden[i].empresa_Direccion}`
+                      text: `${datos_orden[i].empresa_Id}`
                     },
-                    {
-                      border: [false, false, false, false],
-                      text: `No. de Orden`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_orden[i].consecutivo}`
-                    },
-                  ],
-                  [
                     {
                       border: [false, false, false, false],
                       text: `Ciudad`
@@ -510,14 +518,18 @@ export class OcompraComponent implements OnInit {
                       border: [false, false, false, true],
                       text: `${datos_orden[i].empresa_Ciudad}`
                     },
+                  ],
+                  [
                     {
                       border: [false, false, false, false],
-                      text: ``
+                      text: `Dirección`
                     },
                     {
-                      border: [false, false, false, false],
-                      text: ``
+                      border: [false, false, false, true],
+                      text: `${datos_orden[i].empresa_Direccion}`
                     },
+                    {},
+                    {}
                   ]
                 ]
               },
@@ -545,14 +557,14 @@ export class OcompraComponent implements OnInit {
                 style: 'header',
                 body: [
                   [
+                    `Nombre: ${datos_orden[i].proveedor}`,
                     `ID: ${datos_orden[i].proveedor_Id}`,
                     `Tipo de ID: ${datos_orden[i].tipo_Id}`,
-                    `Tipo de Proveedor: ${datos_orden[i].tipo_Proveedor}`
                   ],
                   [
-                    `Nombre: ${datos_orden[i].proveedor}`,
                     `Telefono: ${datos_orden[i].telefono_Proveedor}`,
-                    `Ciudad: ${datos_orden[i].ciudad_Proveedor}`
+                    `Ciudad: ${datos_orden[i].ciudad_Proveedor}`,
+                    `Tipo de Proveedor: ${datos_orden[i].tipo_Proveedor}`
                   ],
                   [
                     `E-mail: ${datos_orden[i].correo_Proveedor}`,
@@ -562,7 +574,7 @@ export class OcompraComponent implements OnInit {
                 ]
               },
               layout: 'lightHorizontalLines',
-              fontSize: 9,
+              fontSize: 11,
             },
             {
               text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,

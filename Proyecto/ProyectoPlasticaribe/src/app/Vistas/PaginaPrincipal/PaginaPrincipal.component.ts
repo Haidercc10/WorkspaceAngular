@@ -328,17 +328,19 @@ export class PaginaPrincipalComponent implements OnInit {
   // Funcion que tomará el usuario logeado y lo consultará en la base de datos, en tabla "VistasFavoritas", y buscará las vistas escogidas por el usuario anteriormente
   buscarFavoritos(){
     this.vistasFavoritas = [];
-    this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(datos_vistasFav => {
-      for (let i = 0; i < datos_vistasFav.length; i++) {
-        this.vistasFavoritas = [
-          datos_vistasFav[i].vistaFav_Num1,
-          datos_vistasFav[i].vistaFav_Num2,
-          datos_vistasFav[i].vistaFav_Num3,
-          datos_vistasFav[i].vistaFav_Num4,
-          datos_vistasFav[i].vistaFav_Num5,
-        ];
-      }
-    }, error => { this.mensajeError('¡No se pudieron encontrar sus vistas favoritas!', error.message); });
+    if (this.storage_Id != undefined) {
+      this.vistasFavService.getVistasFavUsuario(this.storage_Id).subscribe(datos_vistasFav => {
+        for (let i = 0; i < datos_vistasFav.length; i++) {
+          this.vistasFavoritas = [
+            datos_vistasFav[i].vistaFav_Num1,
+            datos_vistasFav[i].vistaFav_Num2,
+            datos_vistasFav[i].vistaFav_Num3,
+            datos_vistasFav[i].vistaFav_Num4,
+            datos_vistasFav[i].vistaFav_Num5,
+          ];
+        }
+      }, error => { this.mensajeError('¡No se pudieron encontrar sus vistas favoritas!', error.message); });
+    }
   }
 
   // Funcion que añadirá o actualizará la base de datos con las vistas favoritas que ha elegido un usuario
@@ -585,9 +587,9 @@ export class PaginaPrincipalComponent implements OnInit {
       this.totalIvaVentaMes = datos_facturacion;
     }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las ventas del mes actual!`, error.message); });
 
-    this.zeusService.GetIvaCompraMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
-      this.totalIvaCompraMes = datos_facturacion;
-    }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las compras de mes actual!`, error.message); });
+    // this.zeusService.GetIvaCompraMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
+    //   this.totalIvaCompraMes = datos_facturacion;
+    // }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las compras de mes actual!`, error.message); });
 
     for (let i = 0; i < 12; i++) {
       this.zeusService.GetFacturacionTodosMeses(i+ 1).subscribe(datos_facturacion => {

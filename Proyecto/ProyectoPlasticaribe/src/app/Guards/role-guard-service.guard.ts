@@ -14,7 +14,7 @@ export class RoleGuardServiceGuard implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     const expectedRole = route.data['expectedRole'];
     const rol = this.storage.get('Rol');
-    if (!expectedRole.includes(rol)) window.location.href = './home';
+    if (!expectedRole.includes(rol)) window.location.href = './';
     return expectedRole
 
   }

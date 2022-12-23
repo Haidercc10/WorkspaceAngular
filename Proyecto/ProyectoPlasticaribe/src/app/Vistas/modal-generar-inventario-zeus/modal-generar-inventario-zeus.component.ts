@@ -221,25 +221,27 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             if(datosCLOTI[cl].clienteItems == datosExistencias[exi].codigo) {
               this.existencias_ProductosService.srvObtenerListaPorIdProducto2(datosCLOTI[cl].clienteItems).subscribe(datos_existenciasProd => {
                 for (let i = 0; i < datos_existenciasProd.length; i++) {
-                    const datosInventario: any = {
-                      codigoItem : datosCLOTI[cl].clienteItems,
-                      nombreItem : datosCLOTI[cl].clienteItemsNom,
-                      PrecioItem : datosExistencias[exi].precioVenta,
-                      cantidadItem : datosExistencias[exi].existencias,
-                      stock_real : datos_existenciasProd[i].exProd_Cantidad,
-                      presentacion : datosExistencias[exi].presentacion,
-                      PrecioTotalItem : datosExistencias[exi].precio_Total,
-                      ClienteNombre : datosCLOTI[cl].clienteNom,
-                      cantMinima : datos_existenciasProd[i].exProd_CantMinima,
-                      fechaModificacion : '',
-                    }
-                    this.ArrayProductoZeus.push(datosInventario);
-                    this.ArrayProductoZeus.sort((a,b) => a.nombreItem.localeCompare(b.nombreItem));
-                    this.ArrayProductoZeus.sort((a,b) => Number(b.cantidadItem < b.cantMinima) - Number(a.cantidadItem < a.cantMinima));
-                    this.totalProductos += datosExistencias[exi].precio_Total;
-                    this.TotalStockReal += (datos_existenciasProd[i].exProd_Cantidad * datosExistencias[exi].precioVenta);
-                    this.cantProductos += 1;
-                    break;
+                  const datosInventario: any = {
+                    codigoItem : datosCLOTI[cl].clienteItems,
+                    Cliente : datosCLOTI[cl].clienteNom,
+                    nombreItem : datosCLOTI[cl].clienteItemsNom,
+                    PrecioItem : datosExistencias[exi].precioVenta,
+                    cantidadItem : datosExistencias[exi].existencias,
+                    stock_real : datos_existenciasProd[i].exProd_Cantidad,
+                    presentacion : datosExistencias[exi].presentacion,
+                    PrecioTotalItem : datosExistencias[exi].precio_Total,
+                    ClienteNombre : datosCLOTI[cl].clienteNom,
+                    cantMinima : datos_existenciasProd[i].exProd_CantMinima,
+                    fechaModificacion : '',
+                    vendedor: datosCLOTI[cl].nombreCompleto,
+                  }
+                  this.ArrayProductoZeus.push(datosInventario);
+                  this.ArrayProductoZeus.sort((a,b) => a.nombreItem.localeCompare(b.nombreItem));
+                  this.ArrayProductoZeus.sort((a,b) => Number(b.cantidadItem < b.cantMinima) - Number(a.cantidadItem < a.cantMinima));
+                  this.totalProductos += datosExistencias[exi].precio_Total;
+                  this.TotalStockReal += (datos_existenciasProd[i].exProd_Cantidad * datosExistencias[exi].precioVenta);
+                  this.cantProductos += 1;
+                  break;
                 }
               });
             }
@@ -247,9 +249,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         });
       }
     });
-    setTimeout(() => {
-      this.load = true;
-    }, 5000);
+    setTimeout(() => { this.load = true; }, 5000);
   }
 
   //

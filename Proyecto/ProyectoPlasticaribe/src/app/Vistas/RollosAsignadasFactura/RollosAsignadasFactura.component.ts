@@ -10,6 +10,7 @@ import { EntradaRollosService } from 'src/app/Servicios/IngresoRollosDespacho/En
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-RollosAsignadasFactura',
@@ -42,7 +43,8 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                     private dtAsgProdFactura : DetallesAsignacionProductosFacturaService,
                       private rollosService : DetallesEntradaRollosService,
                         private servicioUsuarios : UsuarioService,
-                          private facturaService : AsignacionProductosFacturaService,) {
+                          private facturaService : AsignacionProductosFacturaService,
+                            private appComponent : AppComponent,) {
 
     this.FormConsultarFactura = this.frmBuilderPedExterno.group({
       Fact_Id: ['', Validators.required],
@@ -540,9 +542,19 @@ export class RollosAsignadasFacturaComponent implements OnInit {
             },
             content : [
               {
-                text: `Rollos de la Factura ${factura.toUpperCase()}`,
-                alignment: 'right',
-                style: 'titulo',
+                columns: [
+                  {
+                    image : this.appComponent.logoParaPdf,
+                    width : 100,
+                    height : 80
+                  },
+                  {
+                    text: `Rollos de la Factura ${factura.toUpperCase()}`,
+                    alignment: 'right',
+                    style: 'titulo',
+                    margin: 30
+                  }
+                ]
               },
               '\n \n',
               {

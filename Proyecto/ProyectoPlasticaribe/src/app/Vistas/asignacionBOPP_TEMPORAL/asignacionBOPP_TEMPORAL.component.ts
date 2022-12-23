@@ -135,7 +135,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
               item : item.clienteItemsNom,
               kg : item.datosotKg,
             }
-            this.ordenesTrabajo.push(infoOT);this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
+            this.ordenesTrabajo.push(infoOT);
+            this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
               AsgBopp_OT : '',
               AsgBopp_Ancho : this.FormAsignacionBopp.value.AsgBopp_Ancho,
               AsgBopp_Fecha : this.today,

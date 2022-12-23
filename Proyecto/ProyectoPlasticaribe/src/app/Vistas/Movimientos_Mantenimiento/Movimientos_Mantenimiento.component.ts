@@ -4,6 +4,7 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
+import { AppComponent } from 'src/app/app.component';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { DetallePedido_MantenimientoService } from 'src/app/Servicios/DetallePedido_Mantenimiento/DetallePedido_Mantenimiento.service';
 import { Detalle_MantenimientoService } from 'src/app/Servicios/Detalle_Mantenimiento/Detalle_Mantenimiento.service';
@@ -45,7 +46,8 @@ export class Movimientos_MantenimientoComponent implements OnInit {
                       private tipoMantenimientoService : Tipo_MantenimientoService,
                         private estadosService : EstadosService,
                           private dtMantenimientoService : Detalle_MantenimientoService,
-                            private dtPedidoMttoService : DetallePedido_MantenimientoService,) {
+                            private dtPedidoMttoService : DetallePedido_MantenimientoService,
+                              private appComponent : AppComponent,) {
 
     this.FormMovimientosMantenimiento = this.frmBuilder.group({
       ConsecutivoMovimiento : [null],
@@ -412,9 +414,19 @@ export class Movimientos_MantenimientoComponent implements OnInit {
           },
           content : [
             {
-              text: `Mantenimiento de Activos N° ${datos_mantenimiento[i].mtto_Id}`,
-              alignment: 'right',
-              style: 'titulo',
+              columns: [
+                {
+                  image : this.appComponent.logoParaPdf,
+                  width : 100,
+                  height : 80
+                },
+                {
+                  text: `Mantenimiento de Activos N° ${datos_mantenimiento[i].mtto_Id}`,
+                  alignment: 'right',
+                  style: 'titulo',
+                  margin: 30
+                }
+              ]
             },
             '\n \n',
             {

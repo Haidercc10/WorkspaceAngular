@@ -11,6 +11,7 @@ import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-Reporte-Despacho',
@@ -54,7 +55,8 @@ export class ReporteDespachoComponent implements OnInit {
                             private dtAsigFactService : DetallesAsignacionProductosFacturaService,
                               private dtDevolucion : DetallesDevolucionesProductosService,
                                 private dtEntradaService : DetallesEntradaRollosService,
-                                  private preCargueService : DtPreEntregaRollosService,) {
+                                  private preCargueService : DtPreEntregaRollosService,
+                                    private appComponent : AppComponent,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -283,9 +285,19 @@ export class ReporteDespachoComponent implements OnInit {
             },
             content : [
               {
-                text: `Rollos de la Factura ${factura.toUpperCase()}`,
-                alignment: 'right',
-                style: 'titulo',
+                columns: [
+                  {
+                    image : this.appComponent.logoParaPdf,
+                    width : 100,
+                    height : 80
+                  },
+                  {
+                    text: `Rollos de la Factura ${factura.toUpperCase()}`,
+                    alignment: 'right',
+                    style: 'titulo',
+                    margin: 30
+                  }
+                ]
               },
               '\n \n',
               {
@@ -460,9 +472,19 @@ export class ReporteDespachoComponent implements OnInit {
             },
             content : [
               {
-                text: `Rollos devueltos de la factura ${factura.toUpperCase()}`,
-                alignment: 'right',
-                style: 'titulo',
+                columns: [
+                  {
+                    image : this.appComponent.logoParaPdf,
+                    width : 100,
+                    height : 80
+                  },
+                  {
+                    text: `Rollos devueltos de la factura ${factura.toUpperCase()}`,
+                    alignment: 'right',
+                    style: 'titulo',
+                    margin: 30
+                  }
+                ]
               },
               '\n \n',
               {
@@ -614,9 +636,19 @@ export class ReporteDespachoComponent implements OnInit {
             },
             content : [
               {
-                text: `Rollos Ingresados N° ${ot}`,
-                alignment: 'right',
-                style: 'titulo',
+                columns: [
+                  {
+                    image : this.appComponent.logoParaPdf,
+                    width : 100,
+                    height : 80
+                  },
+                  {
+                    text: `Rollos Ingresados N° ${ot}`,
+                    alignment: 'right',
+                    style: 'titulo',
+                    margin: 30
+                  }
+                ]
               },
               '\n \n',
               {
@@ -758,9 +790,19 @@ export class ReporteDespachoComponent implements OnInit {
             },
             content : [
               {
-                text: `Rollos Pre Ingresados N° ${ot}`,
-                alignment: 'right',
-                style: 'titulo',
+                columns: [
+                  {
+                    image : this.appComponent.logoParaPdf,
+                    width : 100,
+                    height : 80
+                  },
+                  {
+                    text: `Rollos Pre Ingresados N° ${ot}`,
+                    alignment: 'right',
+                    style: 'titulo',
+                    margin: 30
+                  }
+                ]
               },
               '\n \n',
               {

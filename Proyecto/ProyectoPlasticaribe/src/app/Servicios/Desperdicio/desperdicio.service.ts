@@ -17,6 +17,10 @@ export class DesperdicioService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Desperdicios');
   }
 
+  GetUltimoPedido(){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Desperdicios/getUltimoPedido`);
+  }
+
   Put(id:number|String, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Desperdicios/${id}`, data);
   }

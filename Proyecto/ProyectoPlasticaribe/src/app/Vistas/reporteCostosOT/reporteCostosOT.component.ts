@@ -9,6 +9,7 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import pdfMake from 'pdfmake/build/pdfmake';
 import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
 import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -79,7 +80,8 @@ export class ReporteCostosOTComponent implements OnInit {
                       private detallesAsignacionService : DetallesAsignacionService,
                         private materiaPrimaService : MateriaPrimaService,
                           private devolucionesService : DevolucionesService,
-                            private devolucionesMPService : DevolucionesMPService,) {
+                            private devolucionesMPService : DevolucionesMPService,
+                              private appComponent : AppComponent,) {
 
     this.infoOT = this.frmBuilderMateriaPrima.group({
       ot : ['',Validators.required],
@@ -567,9 +569,19 @@ export class ReporteCostosOTComponent implements OnInit {
               },
               content : [
                 {
-                  text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
-                  alignment: 'center',
-                  style: 'titulo',
+                  columns: [
+                    {
+                      image : this.appComponent.logoParaPdf,
+                      width : 100,
+                      height : 80
+                    },
+                    {
+                      text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
+                      alignment: 'center',
+                      style: 'titulo',
+                      margin: 30
+                    }
+                  ]
                 },
                 '\n \n',
                 {
@@ -746,9 +758,19 @@ export class ReporteCostosOTComponent implements OnInit {
               },
               content : [
                 {
-                  text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
-                  alignment: 'center',
-                  style: 'titulo',
+                  columns: [
+                    {
+                      image : this.appComponent.logoParaPdf,
+                      width : 100,
+                      height : 80
+                    },
+                    {
+                      text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
+                      alignment: 'center',
+                      style: 'titulo',
+                      margin: 30
+                    }
+                  ]
                 },
                 '\n \n',
                 {
@@ -926,9 +948,19 @@ export class ReporteCostosOTComponent implements OnInit {
               },
               content : [
                 {
-                  text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
-                  alignment: 'center',
-                  style: 'titulo',
+                  columns: [
+                    {
+                      image : this.appComponent.logoParaPdf,
+                      width : 100,
+                      height : 80
+                    },
+                    {
+                      text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
+                      alignment: 'center',
+                      style: 'titulo',
+                      margin: 30
+                    }
+                  ]
                 },
                 '\n \n',
                 {
