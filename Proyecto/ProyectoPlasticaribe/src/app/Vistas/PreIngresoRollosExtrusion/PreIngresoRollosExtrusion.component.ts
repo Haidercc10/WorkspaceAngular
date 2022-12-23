@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { AppComponent } from 'src/app/app.component';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
 import { PreEntregaRollosService } from 'src/app/Servicios/PreIngresoRollosDespacho/PreEntregaRollos.service';
@@ -43,7 +44,8 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private bagProService : BagproService,
                       private dtPreEntRollosService : DtPreEntregaRollosService,
-                        private preEntRollosService : PreEntregaRollosService,) {
+                        private preEntRollosService : PreEntregaRollosService,
+                          private appComponent : AppComponent,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -459,9 +461,19 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
             },
             content : [
               {
-                text: `Pre Cargue de Rollos`,
-                alignment: 'right',
-                style: 'titulo',
+                columns: [
+                  {
+                    image : this.appComponent.logoParaPdf,
+                    width : 100,
+                    height : 80
+                  },
+                  {
+                    text: `Pre Cargue de Rollos`,
+                    alignment: 'right',
+                    style: 'titulo',
+                    margin: 30
+                  }
+                ]
               },
               '\n \n',
               {

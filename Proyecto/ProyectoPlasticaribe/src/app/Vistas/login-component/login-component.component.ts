@@ -39,8 +39,8 @@ export class LoginComponentComponent implements OnInit {
 
   ngOnInit(): void {
     this.ruta = this.storage.get('Ruta');
-    this.storage.clear();
-    this.saveInLocal('Ruta', this.ruta);
+    // this.storage.clear();
+    // this.saveInLocal('Ruta', this.ruta);
     this.cargaDatosComboBox();
   }
 
@@ -53,8 +53,6 @@ export class LoginComponentComponent implements OnInit {
   cargaDatosComboBox(){
     this.empresaServices.srvObtenerLista().subscribe(datos_empresa=>{
       for (let index = 0; index < datos_empresa.length; index++) {
-        /* LA SIGUIENTE LINEA DE CODIGO HARÁ QUE SE CONSULTEN LOS DATOS DE LAS EMPRESAS PARA FINALMENTE SOLO GUARDAR EL NOMBRE DE LA EMPRESA
-        EN LA VARIABLE "empresas" Y ESTA VARIABLE SE LE PASARÁ EN EL HTML AL COMBOBOX QUE MOSTRARÁ LAS EMPRESAS */
         this.empresas.push(datos_empresa[index].empresa_Nombre);
       }
     }, error =>{ Swal.fire('Ocurrió un error, intentelo de nuevo'); });
@@ -140,33 +138,13 @@ export class LoginComponentComponent implements OnInit {
             }
           }
         });
-      }, error =>{
-        Swal.fire({
-          icon: 'warning',
-          title: 'Oops...',
-          html:
-          `<b>¡El número de identificación no se encuentra registrado!</b><hr> `,
-        });
-      });
-    } catch (error) {
-      console.log(error);
-    }
+      }, error =>{ Swal.fire({ icon: 'warning', title: 'Oops...', html: `<b>¡El número de identificación no se encuentra registrado!</b><hr> `, }); });
+    } catch (error) { console.log(error); }
   }
 
   consulta_insercionAsistencia(){
-    if (!true){
-      Swal.fire({
-        icon: 'error',
-        title: 'Asistencia Registrada!',
-        text: 'La asistencia de la persona X el día Y ha sido registrado con éxito!'
-      })
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'No se ha podido registrar su asistencia!'
-      })
-    }
+    if (!true) Swal.fire({ icon: 'error', title: 'Asistencia Registrada!', text: 'La asistencia de la persona X el día Y ha sido registrado con éxito!' });
+    else Swal.fire({ icon: 'error', title: 'Oops...', text: 'No se ha podido registrar su asistencia!' });
   }
 
     // Funcion que mostrará una advertencia para cuando haya campos vacios en la edicion o creacion de un usuario
@@ -174,8 +152,8 @@ export class LoginComponentComponent implements OnInit {
     Swal.fire({icon: 'warning',  title: 'Advertencia', text: `¡Por favor, debe llenar los campos vacios!`, confirmButtonColor: '#ffc107', });
   }
 
-   // Funcin que va a mostrar o no la contraseña del usuario
-   mostrarPassword(){
+  // Funcin que va a mostrar o no la contraseña del usuario
+  mostrarPassword(){
     let password : any = document.getElementById('pass');
 
     if(password.type == 'password') {

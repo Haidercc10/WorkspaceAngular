@@ -12,6 +12,7 @@ import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProduc
 import { PreEntregaRollosService } from 'src/app/Servicios/PreIngresoRollosDespacho/PreEntregaRollos.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-PreIngresoRolloSellado',
@@ -48,7 +49,8 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private bagProService : BagproService,
                       private dtPreEntRollosService : DtPreEntregaRollosService,
-                        private preEntRollosService : PreEntregaRollosService,) {
+                        private preEntRollosService : PreEntregaRollosService,
+                          private appComponent : AppComponent,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -622,9 +624,19 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
             },
             content : [
               {
-                text: `Pre Cargue de Rollos`,
-                alignment: 'right',
-                style: 'titulo',
+                columns: [
+                  {
+                    image : this.appComponent.logoParaPdf,
+                    width : 100,
+                    height : 80
+                  },
+                  {
+                    text: `Pre Cargue de Rollos`,
+                    alignment: 'right',
+                    style: 'titulo',
+                    margin: 30
+                  }
+                ]
               },
               '\n \n',
               {

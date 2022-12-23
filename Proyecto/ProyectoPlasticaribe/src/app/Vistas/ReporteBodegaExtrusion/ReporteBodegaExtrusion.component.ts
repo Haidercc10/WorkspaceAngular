@@ -5,6 +5,7 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
+import { AppComponent } from 'src/app/app.component';
 import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollosExtrusion/DetallesAsgRollos_Extrusion.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
@@ -42,7 +43,8 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private estadosService : EstadosService,
                       private ingRollosService : DtIngRollos_ExtrusionService,
-                        private salidaRollosService : DetallesAsgRollos_ExtrusionService,) {
+                        private salidaRollosService : DetallesAsgRollos_ExtrusionService,
+                          private appComponent : AppComponent,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -305,9 +307,19 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
             },
             content : [
               {
-                text: `Ingreso de Rollos a Bodega de Extrusión`,
-                alignment: 'right',
-                style: 'titulo',
+                columns: [
+                  {
+                    image : this.appComponent.logoParaPdf,
+                    width : 100,
+                    height : 80
+                  },
+                  {
+                    text: `Ingreso de Rollos a Bodega de Extrusión`,
+                    alignment: 'right',
+                    style: 'titulo',
+                    margin: 30
+                  }
+                ]
               },
               '\n \n',
               {
@@ -420,9 +432,19 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
             },
             content : [
               {
-                text: `Salida de Rollos a Bodega de Extrusión`,
-                alignment: 'right',
-                style: 'titulo',
+                columns: [
+                  {
+                    image : this.appComponent.logoParaPdf,
+                    width : 100,
+                    height : 80
+                  },
+                  {
+                    text: `Salida de Rollos a Bodega de Extrusión`,
+                    alignment: 'right',
+                    style: 'titulo',
+                    margin: 30
+                  }
+                ]
               },
               '\n \n',
               {

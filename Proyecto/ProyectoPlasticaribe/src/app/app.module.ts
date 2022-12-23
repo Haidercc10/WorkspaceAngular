@@ -141,14 +141,16 @@ import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura
 import { UsuarioComponent } from './Vistas/usuario/usuario.component';
 import { Ventas_TemporalesComponent } from './Vistas/Ventas_Temporales/Ventas_Temporales.component';
 import {InputSwitchModule} from 'primeng/inputswitch';
+import { ReporteInventarioBOPPComponent } from './Vistas/reporteInventarioBOPP/reporteInventarioBOPP.component';
+import { ReporteInventarioMateriaPrimaComponent } from './Vistas/ReporteInventarioMateriaPrima/ReporteInventarioMateriaPrima.component';
 
 export const routes: Routes = [
 
   /******************************************************************** Inicio y Login **********************************************************************/
-  {path: 'inicio', component: InicioComponent},
+  // {path: 'inicio', component: InicioComponent},
   {path: 'Login', component: LoginComponentComponent},
   {path: '', component: LoginComponentComponent},
-  {path: 'home', component: PaginaPrincipalComponent},
+  {path: 'home', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,3,4,5,6,7,8,9,10,11,12,13]}, component: PaginaPrincipalComponent},
   {path: 'Archivos', component: ArchivosComponent},
 
   /******************************************************************* Materia Prima ************************************************************************/
@@ -181,6 +183,8 @@ export const routes: Routes = [
   {path: 'reporte-facturas-remisiones-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ConsultaFac_Rem_MPComponent},
   {path: 'reporte-recuperado-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
   {path: 'reporte-orden-compra', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: Reporte_OrdenCompraComponent},
+  {path: 'reporte-BOPP', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ReporteInventarioBOPPComponent},
+  {path: 'reporte-Inventario-MateriaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ReporteInventarioMateriaPrimaComponent},
 
   /************************************************************************ DESPACHO ************************************************************************/
   // Pre ingresos
@@ -335,7 +339,9 @@ export const routes: Routes = [
     Mantenimiento_CamionesComponent,
     Movimientos_MantenimientoComponent,
     Reporte_MantenimientoComponent,
-    Reporte_DesperdiciosComponent
+    Reporte_DesperdiciosComponent,
+    ReporteInventarioBOPPComponent,
+    ReporteInventarioMateriaPrimaComponent,
   ],
 
 

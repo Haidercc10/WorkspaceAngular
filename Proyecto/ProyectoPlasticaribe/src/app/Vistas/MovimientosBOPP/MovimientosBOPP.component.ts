@@ -13,6 +13,7 @@ import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocume
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
 import { ModalEditarAsignacionesBOPPComponent } from '../modal-editar-asignaciones-bopp/modal-editar-asignaciones-bopp.component';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-MovimientosBOPP',
@@ -55,7 +56,8 @@ export class MovimientosBOPPComponent implements OnInit {
                           private estadoService : EstadosService,
                             private asignacionBOPPService : AsignacionBOPPService,
                               private dtAsgBOPPService : DetalleAsignacion_BOPPService,
-                                private usuarioService : UsuarioService,) {
+                                private usuarioService : UsuarioService,
+                                  private appComponent : AppComponent) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null, Validators.required],
@@ -781,9 +783,19 @@ export class MovimientosBOPPComponent implements OnInit {
                     },
                     content : [
                       {
-                        text: `Plasticaribe S.A.S ---- Asignación de BOPP`,
-                        alignment: 'center',
-                        style: 'titulo',
+                        columns: [
+                          {
+                            image : this.appComponent.logoParaPdf,
+                            width : 100,
+                            height : 80
+                          },
+                          {
+                            text: `Plasticaribe S.A.S ---- Asignación de BOPP`,
+                            alignment: 'center',
+                            style: 'titulo',
+                            margin: 30
+                          }
+                        ]
                       },
                       '\n \n',
                       {

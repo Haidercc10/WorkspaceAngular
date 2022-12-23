@@ -9,6 +9,7 @@ import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisi
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import Swal from 'sweetalert2';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-consultaFac_Rem_MP',
@@ -43,7 +44,8 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
                     private tipoDocuemntoService : TipoDocumentoService,
                       private proveedorService : ProveedorService,
                         private remisionMpService : RemisionesMPService,
-                          private facturaCompraMPService : FacturaMpService,) {
+                          private facturaCompraMPService : FacturaMpService,
+                            private appComponent : AppComponent,) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null],
@@ -407,9 +409,19 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
               },
               content : [
                 {
-                  text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
-                  alignment: 'center',
-                  style: 'titulo',
+                  columns: [
+                    {
+                      image : this.appComponent.logoParaPdf,
+                      width : 100,
+                      height : 80
+                    },
+                    {
+                      text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
+                      alignment: 'center',
+                      style: 'titulo',
+                      margin: 30
+                    }
+                  ]
                 },
                 '\n \n',
                 {
@@ -500,9 +512,19 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
               },
               content : [
                 {
-                  text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
-                  alignment: 'center',
-                  style: 'titulo',
+                  columns: [
+                    {
+                      image : this.appComponent.logoParaPdf,
+                      width : 100,
+                      height : 80
+                    },
+                    {
+                      text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
+                      alignment: 'center',
+                      style: 'titulo',
+                      margin: 30
+                    }
+                  ]
                 },
                 '\n \n',
                 {

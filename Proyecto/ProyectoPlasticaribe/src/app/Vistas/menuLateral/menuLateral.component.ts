@@ -33,6 +33,7 @@ export class MenuLateralComponent implements OnInit {
   subir10: boolean= true;
   subir11: boolean = true;
   subir12 : boolean = true;
+  subir13 : boolean = true;
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService) { }
@@ -138,5 +139,10 @@ export class MenuLateralComponent implements OnInit {
   clickIcon12(){
     if (this.subir12) this.subir12 = false;
     else this.subir12 = true;
+  }
+
+  clickIcon13(){
+    if (this.subir13) this.subir13 = false;
+    else this.subir13 = true;
   }
 }

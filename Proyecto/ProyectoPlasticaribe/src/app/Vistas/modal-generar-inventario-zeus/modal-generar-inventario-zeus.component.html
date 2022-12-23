@@ -1,4 +1,4 @@
-  <!-- Inicio  -->
+<!-- Inicio  -->
 <app-menuLateral></app-menuLateral>
 
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
@@ -76,6 +76,9 @@
     <div class="mb-4">
       <h4 class="tituloRojo">Tabla de Productos</h4>
     </div>
+  </div>
+
+  <div class="contain">
 
     <div class="card" *ngIf="load">
       <p-toolbar styleClass="mb-4 gap-2">
@@ -98,41 +101,72 @@
         [rowsPerPageOptions]="[10,20,30,50,70,100, ArrayProductoZeus.length]"
         [rowHover]="true"
         [globalFilterFields]="['codigoItem','nombreItem']"
-
+        [reorderableColumns]="true"
         currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros" >
         <ng-template pTemplate="caption">
-            <div class="flex">
-                <span class="p-input-icon-left">
-                    <i class="pi pi-search"></i>
-                    <input pInputText type="text" placeholder="Buscar Productos..." (input)="aplicarfiltroGlobal($event, 'contains')" />
-                </span>
-                <span class="p-input-icon-right buscarActualizacion">
-                <label>Buscar última actualización&nbsp;&nbsp;&nbsp;</label>
-                  <p-inputNumber [(ngModel)]="cantidadDias" placeholder="Cantidad"></p-inputNumber>&nbsp;&nbsp;&nbsp;
-                  <p-dropdown [(ngModel)]="filtroFechas" [options]="opcionFiltroFechas" (onChange)="buscarPrecios()"></p-dropdown>
-                </span>
-            </div>
+          <div class="flex">
+            <span class="p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" placeholder="Buscar Productos..." (input)="aplicarfiltroGlobal($event, 'contains')" />
+            </span>
+            <!-- <span class="p-input-icon-right buscarActualizacion">
+            <label>Buscar última actualización&nbsp;&nbsp;&nbsp;</label>
+              <p-inputNumber [(ngModel)]="cantidadDias" placeholder="Cantidad"></p-inputNumber>&nbsp;&nbsp;&nbsp;
+              <p-dropdown [(ngModel)]="filtroFechas" [options]="opcionFiltroFechas" (onChange)="buscarPrecios()"></p-dropdown>
+            </span> -->
+          </div>
         </ng-template>
 
         <!--Headers Tabla-->
         <ng-template pTemplate="header">
           <tr class="tamanoTitulosTabla">
-              <th scope="col" pSortableColumn="codigoItem">Item<p-sortIcon field="codigoItem"></p-sortIcon></th>
-              <th scope="col" pSortableColumn="nombreItem">Nombre <p-sortIcon field="nombreItem"></p-sortIcon></th>
-              <th scope="col" pSortableColumn="PrecioItem">Precio<p-sortIcon field="PrecioItem"></p-sortIcon></th>
-              <th scope="col" pSortableColumn="cantidadItem">Existencias<p-sortIcon field="cantidadItem"></p-sortIcon></th>
-              <th scope="col" pSortableColumn="presentacion">Presentación<p-sortIcon field="presentacion"></p-sortIcon></th>
-              <th scope="col" pSortableColumn="PrecioTotalItem">Subtotal<p-sortIcon field="PrecioTotalItem"></p-sortIcon></th>
-              <th scope="col"  pSortableColumn="cantMinima">Cant. Minima <p-sortIcon field="cantMinima"></p-sortIcon></th>
-              <th scope="col"  pSortableColumn="fechaModificacion">Última actualización <p-sortIcon field="fechaModificacion"></p-sortIcon></th>
+            <th scope="col" pSortableColumn="codigoItem" pReorderableColumn>Item
+              <p-sortIcon field="codigoItem"></p-sortIcon>
+              <p-columnFilter type="numeric" field="codigoItem" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col" pSortableColumn="codigoItem" pReorderableColumn>Cliente
+              <p-sortIcon field="codigoItem"></p-sortIcon>
+              <p-columnFilter type="text" field="Cliente" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col" pSortableColumn="nombreItem" pReorderableColumn>Nombre
+              <p-sortIcon field="nombreItem"></p-sortIcon>
+              <p-columnFilter type="text" field="nombreItem" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col" pSortableColumn="cantidadItem" pReorderableColumn>Existencias
+              <p-sortIcon field="cantidadItem"></p-sortIcon>
+              <p-columnFilter type="numeric" field="cantidadItem" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col" pSortableColumn="PrecioItem" pReorderableColumn>Precio
+              <p-sortIcon field="PrecioItem"></p-sortIcon>
+              <p-columnFilter type="numeric" field="PrecioItem" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col" pSortableColumn="presentacion" pReorderableColumn>Presentación
+              <p-sortIcon field="presentacion"></p-sortIcon>
+              <p-columnFilter type="text" field="presentacion" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col" pSortableColumn="PrecioTotalItem" pReorderableColumn>Subtotal
+              <p-sortIcon field="PrecioTotalItem"></p-sortIcon>
+              <p-columnFilter type="numeric" field="PrecioTotalItem" display="menu"></p-columnFilter>
+            </th>
+            <th scope="col"  pSortableColumn="cantMinima" pReorderableColumn>Cant. Minima
+              <p-sortIcon field="cantMinima"></p-sortIcon>
+              <p-columnFilter type="numeric" field="cantMinima" display="menu"></p-columnFilter>
+            </th>
+            <!-- <th scope="col"  pSortableColumn="fechaModificacion">Última actualización
+              <p-sortIcon field="fechaModificacion"></p-sortIcon>
+            </th> -->
+            <th scope="col"  pSortableColumn="fechaModificacion" pReorderableColumn>Vendedor
+              <p-sortIcon field="fechaModificacion"></p-sortIcon>
+              <p-columnFilter type="text" field="vendedor" display="menu"></p-columnFilter>
+            </th>
           </tr>
         </ng-template>
         <!--Cuerpo Tabla-->
         <ng-template pTemplate="body" let-ArrayProductoZeus>
           <tr class="tamanoTextosTabla">
               <td>{{ArrayProductoZeus.codigoItem}}</td>
+              <td>{{ArrayProductoZeus.Cliente}}</td>
               <td>{{ArrayProductoZeus.nombreItem}}</td>
-              <td>{{ArrayProductoZeus.PrecioItem | currency: 'USD'}}</td>
               <ng-container *ngIf="ArrayProductoZeus.cantidadItem <= ArrayProductoZeus.cantMinima then rojo else azul;"></ng-container>
               <ng-template #rojo>
                 <td style="background-color: rgb(255, 146, 146);">{{ArrayProductoZeus.cantidadItem | number : '1.2-2'}}</td>
@@ -140,6 +174,7 @@
               <ng-template #azul>
                 <td class="TextosInfoTabla2">{{ArrayProductoZeus.cantidadItem | number : '1.2-2'}}</td>
               </ng-template>
+              <td>{{ArrayProductoZeus.PrecioItem | currency: 'USD'}}</td>
               <td>{{ArrayProductoZeus.presentacion}}</td>
               <td>{{ArrayProductoZeus.PrecioTotalItem | currency: 'USD'}}</td>
               <td pEditableColumn (click)="seleccionarProducto(ArrayProductoZeus)">
@@ -152,9 +187,10 @@
                   </ng-template>
                 </p-cellEditor>
               </td>
-              <ng-container *ngIf="ArrayProductoZeus.fechaModificacion != ''; then rojo2; else normal"></ng-container>
-              <ng-template #rojo2><td style="background-color: rgb(255, 146, 146);">{{ArrayProductoZeus.fechaModificacion}}</td></ng-template>
-              <ng-template #normal><td>{{ArrayProductoZeus.fechaModificacion}}</td></ng-template>
+              <td>{{ArrayProductoZeus.vendedor}}</td>
+              <!-- <ng-container *ngIf="ArrayProductoZeus.fechaModificacion != ''; then rojo2; else normal"></ng-container> -->
+              <!-- <ng-template #rojo2><td style="background-color: rgb(255, 146, 146);">{{ArrayProductoZeus.fechaModificacion}}</td></ng-template> -->
+              <!-- <ng-template #normal><td>{{ArrayProductoZeus.fechaModificacion}}</td></ng-template> -->
 
         </ng-template>
         <ng-template pTemplate="summary">
@@ -164,8 +200,6 @@
         </ng-template>
       </p-table>
     </div>
-
-
 
     <!--<div *ngIf="load">
       <div class="mb-4">
