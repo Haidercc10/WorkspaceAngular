@@ -122,12 +122,12 @@ export class PaginaPrincipalComponent implements OnInit {
 
   ngOnInit() {
     setTimeout(() => { this.mostrarVistasFav(); }, 500);
+    this.facturacion();
     this.lecturaStorage();
     this.llenarDatosSeleccionables();
     this.buscarFavoritos();
     this.cantOrdenesUltimoMes();
     this.materiasPrimas();
-    this.facturacion()
   }
 
   // Funcion que leerá la informacion del usuario logeado, infomración que se almacena apenas el usuario incia sesion
@@ -876,12 +876,10 @@ export class PaginaPrincipalComponent implements OnInit {
         x: {
           ticks: { color: '#495057' },
           grid: { color: '#ebedef' },
-          fontSize: 100
         },
         y: {
           ticks: { color: '#495057' },
           grid: { color: '#ebedef' },
-          fontSize: 100
         }
       }
     };

@@ -615,14 +615,14 @@ export class ReporteCostosOTComponent implements OnInit {
                         `Presentación: ${this.presentacionProducto}`
                       ],
                       [
-                        `Cantidad Und: ${this.formatonumeros(this.cantProdSinMargenUnd)}`,
-                        `Cantidad Kg: ${this.formatonumeros(this.cantProdSinMargenKg)}`,
-                        `Cantidad Margen: ${this.formatonumeros(this.CantidadMargen)}%`
+                        `Cantidad Und: ${this.formatonumeros(this.cantProdSinMargenUnd.toFixed(2))}`,
+                        `Cantidad Kg: ${this.formatonumeros(this.cantProdSinMargenKg.toFixed(2))}`,
+                        `Cantidad Margen: ${this.formatonumeros(this.CantidadMargen.toFixed(2))}%`
                       ],
                       [
-                        `Cantidad Kg Con Margen: ${this.formatonumeros(this.cantProdConMargenKg)}`,
-                        `Valor Unitario Und: ${this.formatonumeros(this.valorUnitarioProdUnd)}`,
-                        `Valor Unitario Kg: ${this.formatonumeros(this.valorUnitarioProdKg)}`
+                        `Cantidad Kg Con Margen: ${this.formatonumeros(this.cantProdConMargenKg.toFixed(2))}`,
+                        `Valor Unitario Und: ${this.formatonumeros(this.valorUnitarioProdUnd.toFixed(2))}`,
+                        `Valor Unitario Kg: ${this.formatonumeros(this.valorUnitarioProdKg.toFixed(2))}`
                       ],
                     ]
                   },
@@ -648,15 +648,15 @@ export class ReporteCostosOTComponent implements OnInit {
                       ],
                       [
                         `Producido`,
-                        `$${this.formatonumeros(this.valorFinalOT)}`,
-                        `${this.formatonumeros(this.cantidadSellandoUnidad + this.cantidadWiketiadoUnidad)}`,
-                        `${this.formatonumeros(Math.round(this.cantidadTotalSella + this.cantidadTotalWiketiado))}`
+                        `$${this.formatonumeros(this.valorFinalOT.toFixed(2))}`,
+                        `${this.formatonumeros(this.cantidadSellandoUnidad + this.cantidadWiketiadoUnidad.toFixed(2))}`,
+                        `${this.formatonumeros(Math.round(this.cantidadTotalSella + this.cantidadTotalWiketiado).toFixed(2))}`
                       ],
                       [
                         `Teorico`,
-                        `$${this.formatonumeros(this.valorEstimadoOT)}`,
-                        `${this.formatonumeros(Math.round(this.cantProdSinMargenUnd))}`,
-                        `${this.formatonumeros(this.cantProdSinMargenKg)}`
+                        `$${this.formatonumeros(this.valorEstimadoOT.toFixed(2))}`,
+                        `${this.formatonumeros(Math.round(this.cantProdSinMargenUnd).toFixed(2))}`,
+                        `${this.formatonumeros(this.cantProdSinMargenKg.toFixed(2))}`
                       ],
                     ]
                   },
@@ -673,7 +673,7 @@ export class ReporteCostosOTComponent implements OnInit {
                 this.table(this.ArrayMateriaPrima, ['Id', 'Nombre', 'Cantidad', 'Presentacion', 'PrecioUnd', 'SubTotal', 'Proceso']),
 
                 {
-                  text: `\n\nValor Total Materia Prima Utilizada: $${this.formatonumeros(this.ValorMPEntregada)}`,
+                  text: `\n\nValor Total Materia Prima Utilizada: $${this.formatonumeros(this.ValorMPEntregada.toFixed(2))}`,
                   alignment: 'right',
                   style: 'header',
                 },
@@ -689,19 +689,19 @@ export class ReporteCostosOTComponent implements OnInit {
                     style: 'header',
                     body: [
                       [
-                        `Extrusión: ${this.formatonumeros(Math.round(this.cantidadTotalExt))}`,
-                        `Impresión: ${this.formatonumeros(Math.round(this.cantidadTotalImp))}`,
-                        `Rotograbado: ${this.formatonumeros(Math.round(this.cantidadTotalRot))}`
+                        `Extrusión: ${this.formatonumeros(Math.round(this.cantidadTotalExt).toFixed(2))}`,
+                        `Impresión: ${this.formatonumeros(Math.round(this.cantidadTotalImp).toFixed(2))}`,
+                        `Rotograbado: ${this.formatonumeros(Math.round(this.cantidadTotalRot).toFixed(2))}`
                       ],
                       [
-                        `Doblado: ${this.formatonumeros(Math.round(this.cantidadTotalDbl))}`,
-                        `Laminado: ${this.formatonumeros(Math.round(this.cantidadTotalLaminado))}`,
-                        `Empaque: ${this.formatonumeros(Math.round(this.cantidadTotalEmpaque))}`
+                        `Doblado: ${this.formatonumeros(Math.round(this.cantidadTotalDbl).toFixed(2))}`,
+                        `Laminado: ${this.formatonumeros(Math.round(this.cantidadTotalLaminado).toFixed(2))}`,
+                        `Empaque: ${this.formatonumeros(Math.round(this.cantidadTotalEmpaque).toFixed(2))}`
                       ],
                       [
-                        `Wiketiado: ${this.formatonumeros(Math.round(this.cantidadTotalWiketiado))}`,
-                        `Sellado: ${this.formatonumeros(Math.round(this.cantidadTotalSella))}`,
-                        `Corte: ${this.formatonumeros(Math.round(this.cantidadTotalCorte))}`
+                        `Wiketiado: ${this.formatonumeros(Math.round(this.cantidadTotalWiketiado).toFixed(2))}`,
+                        `Sellado: ${this.formatonumeros(Math.round(this.cantidadTotalSella).toFixed(2))}`,
+                        `Corte: ${this.formatonumeros(Math.round(this.cantidadTotalCorte).toFixed(2))}`
                       ],
                     ]
                   },
@@ -721,15 +721,15 @@ export class ReporteCostosOTComponent implements OnInit {
                     body: [
                       [
                         '',
-                        `Valor Final de La OT: $${this.formatonumeros(this.valorFinalOT)}`,
+                        `Valor Final de La OT: $${this.formatonumeros(this.valorFinalOT.toFixed(2))}`,
                       ],
                       [
                         '',
-                        `Diferencia de Costos La OT: $${this.formatonumeros(this.diferencia)}`,
+                        `Diferencia de Costos La OT: $${this.formatonumeros(this.diferencia.toFixed(2))}`,
                       ],
                       [
                         '',
-                        `Porcentaje de Diferencia de Costos de La OT: ${this.formatonumeros(Math.round(this.diferenciaPorcentaje))}%`,
+                        `Porcentaje de Diferencia de Costos de La OT: ${this.formatonumeros(Math.round(this.diferenciaPorcentaje).toFixed(2))}%`,
                       ],
                     ]
                   },

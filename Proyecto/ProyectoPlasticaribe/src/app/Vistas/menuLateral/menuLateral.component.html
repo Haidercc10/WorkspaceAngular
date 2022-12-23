@@ -241,6 +241,41 @@
           </li>
         </ng-container>
 
+        <!-- DEPERDICIO -->
+        <ng-container *ngIf="ValidarRol == 1">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample13" role="button" aria-expanded="false" (click)="clickIcon13()" aria-controls="collapseExample">
+              <ng-container *ngIf="subir13; then thenTemplate13; else elseTemplate13"></ng-container>
+              <ng-template #thenTemplate13>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate13>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Desperdicio</b>
+            </a>
+            <div class="collapse" id="collapseExample13">
+              <ng-container *ngIf="ValidarRol == 1">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/desperdicio" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-cloud-upload" style="font-size: 15px; margin-right: 2%;"></i>
+                    Ingresar Desperdicio
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-file" style="font-size: 15px; margin-right: 2%;"></i>
+                    Reporte Desperdicio
+                  </a>
+                </div>
+              </ng-container>
+            </div>
+          </li>
+        </ng-container>
+
+
         <!-- GERENCIA -->
         <!-- <ng-container *ngIf="ValidarRol == 1">
           <li>
@@ -774,18 +809,11 @@
 
         <!-- PROCESOS -->
 
-        <!-- DESPERDICIOS -->
-
         <!-- FACTURA DE VENTAS -->
-
 
         <!-- CLIENTES -->
 
-        <!-- ACTIVOS -->
-
         <!-- PROVEEDORES -->
-
-        <!-- MATENIMIENTO -->
 
         <!-- NOTIFICACIONES -->
 
