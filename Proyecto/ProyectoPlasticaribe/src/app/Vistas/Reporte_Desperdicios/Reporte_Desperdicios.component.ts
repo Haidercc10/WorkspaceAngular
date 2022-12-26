@@ -1,12 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import pdfMake from 'pdfmake/build/pdfmake';
+import { MessageService } from 'primeng/api';
+import { AppComponent } from 'src/app/app.component';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -19,33 +24,38 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   public formFiltros !: FormGroup; /** Formulario de filtros */
   public load: boolean = false; /** Variable que realizará la carga al momento de consultar */
   public arrayMateriales = []; /** array que contendrá los materiales de materia prima*/
-  public arrayProductos = []; /** array que cargará los productos */
-  public idProducto: any = 0; /**  */
-  public arrayProcesos : any = [];
-  public arrayMaquinas : any = [];
-  public arrayFallas : any = [];
-  public arrayConsulta : any =[];
+  public arrayProductos = []; /** array que cargará los productos con la consulta de tipo LIKE*/
+  public idProducto: any = 0; /** ID de producto que se cargará en el campo ITEM, pero se mostrará el nombre. */
+  public arrayConsulta : any =[]; /** Array que cargará la consulta inicial */
   public today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  public arrayModal : any = [];
-  public dialog : boolean = false;
+  public arrayModal : any = []; /** Array que se cargará en la tabla del modal con la info de la OT Seleccionada */
+  public dialog : boolean = false; /** Variable que mostrará o no, el modal */
+  public totalDesperdicio : number = 0; /** Variable que contendrá la cantidad total de desperdicio por OT. */
+  public otSeleccionada : number = 0; /** Variable que contendrá la OT Seleccionada en la tabla */
+  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  arrayDatosPdf : any = [];
 
   constructor(private formBuilder : FormBuilder,
     private servicioMateriales : MaterialProductoService,
     private servicioProductos : ProductoService,
-    private servicioActivos : ActivosService,
-    private servicioProcesos : ProcesosService,
-    private servicioFallas : FallasTecnicasService,
-    private servicioDesperdicios : DesperdicioService) {
+    private servicioDesperdicios : DesperdicioService,
+    @Inject(SESSION_STORAGE) private storage: WebStorageService,
+    private rolService : RolesService,
+    private appComponent : AppComponent,
+    private messageService: MessageService) {
     this.inicializarFormulario();
   }
 
+  /** Función que inicializará otras funciones al momento de cargar este componente. */
   ngOnInit() {
     this.cargarMateriales();
-    //this.cargarFallas();
-    //this.cargarProcesos();
-    //this.cargarMaquinas();
+    this.lecturaStorage();
   }
 
+  /** Función que inicializará el formulario de busqueda */
   inicializarFormulario(){
     this.formFiltros = this.formBuilder.group({
       OT : [null],
@@ -54,15 +64,10 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       fechaInicio : [null],
       fechaFinal : [null],
       Material : [null],
-      //Maquina : [null],
-      //MaquinaId : [null],
-      //Proceso : [null],
-      //ProcesoId : [null],
-      //FallaId : [null],
-      //Falla : [null],
     });
   }
 
+  /** Función que cargará los materiales en el combobox.*/
   cargarMateriales(){
     this.servicioMateriales.srvObtenerLista().subscribe(dataMateriales => {
       for (let index = 0; index < dataMateriales.length; index++) {
@@ -71,6 +76,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     });
   }
 
+  /** Función que cargará los productos con una consulta de tipo LIKE */
   likeCargarProductos(){
     this.arrayProductos = [];
     let producto : any = this.formFiltros.value.Producto;
@@ -84,33 +90,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     }
   }
 
-  cargarMaquinas(){
-    this.arrayMaquinas = [];
-    this.servicioActivos.GetTodo().subscribe(dataMaquinas => {
-      for (let index = 0; index < dataMaquinas.length; index++) {
-        if(dataMaquinas[index].tpActv_Id == 4) this.arrayMaquinas.push(dataMaquinas[index]);
-      }
-    })
-  }
-
-  cargarProcesos(){
-    this.arrayProcesos =[];
-    this.servicioProcesos.srvObtenerLista().subscribe(dataProcesos => {
-      for (let index = 0; index < dataProcesos.length; index++) {
-        this.arrayProcesos.push(dataProcesos[index]);
-      }
-    });
-  }
-
-  cargarFallas(){
-    this.arrayFallas = [];
-    this.servicioFallas.srvObtenerLista().subscribe(dataFallas => {
-      for (let index = 0; index < dataFallas.length; index++) {
-        if(dataFallas[index].tipoFalla_Id == 11) this.arrayFallas.push(dataFallas[index]);
-      }
-    });
-  }
-
+  /** Función que cargará el ID del producto en el campo, pero mostrará el nombre */
   seleccionarProducto() {
     let expresion : any = /^[0-9]*(\.?)[ 0-9]+$/;
     this.idProducto = this.formFiltros.value.Producto;
@@ -125,6 +105,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     }
   }
 
+  /** Función que actualizará los filtros de busqueda, agregando el nombre del Item */
   initForm_SeleccionProducto(nombreProducto : any){
     this.formFiltros.setValue({
       OT : this.formFiltros.value.OT,
@@ -142,85 +123,14 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     });
   }
 
-  seleccionarMaquina() {
-    this.servicioActivos.GetId(this.formFiltros.value.Maquina).subscribe(dataMaquina => {
-      console.log(dataMaquina);
-      this.initForm_SeleccionMaquina(dataMaquina);
-    });
-  }
-
-  initForm_SeleccionMaquina(dataMaquina : any){
-    this.formFiltros.setValue({
-      OT : this.formFiltros.value.OT,
-      fechaInicio : this.formFiltros.value.fechaInicio,
-      fechaFinal : this.formFiltros.value.fechaFinal,
-      Producto: this.formFiltros.value.Producto,
-      productoId : this.formFiltros.value.Producto,
-      Material : this.formFiltros.value.Material,
-      ProcesoId : this.formFiltros.value.ProcesoId,
-      Proceso : this.formFiltros.value.Proceso,
-      MaquinaId : dataMaquina.actv_Id,
-      Maquina : dataMaquina.actv_Serial,
-      FallaId : this.formFiltros.value.FallaId,
-      Falla : this.formFiltros.value.Falla,
-    });
-  }
-/*
-  seleccionarProceso() {
-    this.servicioProcesos.srvObtenerListaPorId(this.formFiltros.value.Proceso).subscribe(dataProceso => {
-      console.log(dataProceso);
-      this.initForm_SeleccionProceso(dataProceso);
-    });
-  }
-
-  initForm_SeleccionProceso(dataProceso : any){
-    this.formFiltros.setValue({
-      OT : this.formFiltros.value.OT,
-      fechaInicio : this.formFiltros.value.fechaInicio,
-      fechaFinal : this.formFiltros.value.fechaFinal,
-      Producto: this.formFiltros.value.Producto,
-      productoId : this.formFiltros.value.Producto,
-      Material : this.formFiltros.value.Material,
-      ProcesoId : dataProceso.proceso_Id,
-      Proceso : dataProceso.proceso_Nombre,
-      MaquinaId : this.formFiltros.value.MaquinaId,
-      Maquina : this.formFiltros.value.Maquina,
-      FallaId : this.formFiltros.value.FallaId,
-      Falla : this.formFiltros.value.Falla,
-    });
-  }
-
-  seleccionarFalla(){
-    this.servicioFallas.srvObtenerListaPorId(this.formFiltros.value.Falla).subscribe(dataFalla => {
-      console.log(dataFalla);
-      this.initForm_SeleccionFalla(dataFalla);
-    });
-  }
-
-  initForm_SeleccionFalla(dataFalla : any){
-    this.formFiltros.setValue({
-      OT : this.formFiltros.value.OT,
-      fechaInicio : this.formFiltros.value.fechaInicio,
-      fechaFinal : this.formFiltros.value.fechaFinal,
-      Producto: this.formFiltros.value.Producto,
-      productoId : this.formFiltros.value.Producto,
-      Material : this.formFiltros.value.Material,
-      ProcesoId : this.formFiltros.value.ProcesoId,
-      Proceso : this.formFiltros.value.Proceso,
-      MaquinaId : this.formFiltros.value.MaquinaId,
-      Maquina : this.formFiltros.value.Maquina,
-      FallaId : dataFalla.falla_Id,
-      Falla : dataFalla.falla_Nombre,
-    });
-  }
-*/
+  /** Función que consultará según los campos de busqueda diferentes de vacio. */
   Consultar() {
-    //this.load = false;
-    let OT : number = this.formFiltros.value.OT;
-    let fecha1 : number = this.formFiltros.value.fechaInicio
-    let fecha2 : number = this.formFiltros.value.fechaFinal
-    let material : number = this.formFiltros.value.Material
-    let item : number = this.formFiltros.value.Producto
+    this.load = true;
+    let OT : any = this.formFiltros.value.OT;
+    let fecha1 : any = this.formFiltros.value.fechaInicio
+    let fecha2 : any = this.formFiltros.value.fechaFinal
+    let material : any = this.formFiltros.value.Material
+    let item : any = this.formFiltros.value.Producto
     this.arrayConsulta = [];
     let ruta : string = '';
 
@@ -245,17 +155,16 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     } else {
       ruta = ``;
     }
-
     this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, ruta).subscribe(dataDesperdicios => {
       for (let index = 0; index < dataDesperdicios.length; index++) {
         if(dataDesperdicios.length == 0) this.advertencia('¡No se encontraron resultados de búsqueda con los filtros consultados!');
         else this.llenarTabla(dataDesperdicios[index]);
       }
     });
-
-    //setTimeout(() => {this.load = true; }, 1000);
+    setTimeout(() => {this.load = false; }, 1000);
   }
 
+  /** Llenar la tabla inicial de resultados de busqueda */
   llenarTabla(datos : any) {
     const registro : any = {
     OT : datos.ot,
@@ -269,88 +178,261 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.arrayConsulta.push(registro);
   }
 
+  /** Función para que al momento de seleccionar una OT de la tabla se cargue el modal. */
   consultarOTenTabla(item : any){
+    this.arrayModal = [];
+    this.otSeleccionada = item.OT;
     this.servicioDesperdicios.getDesperdicioxOT(item.OT).subscribe(dataDesperdicios => {
       for (let index = 0; index < dataDesperdicios.length; index++) {
         this.llenarModal(dataDesperdicios[index]);
       }
+      this.pesoTotalDesperdicio();
     });
+
   }
 
+  /** Función para llenar la tabla de modal. */
   llenarModal(datos : any){
     this.dialog = true;
+    this.otSeleccionada = datos.desp_OT;
+
     const dataCompleta : any = {
-      Id : datos.desp_Id,
       OT : datos.desp_OT,
       Item : datos.prod_Id,
       NombreItem : datos.prod_Nombre,
       Peso : datos.desp_PesoKg,
-      IdProceso: datos.proceso_Id,
-      NombreProceso : datos.proceso_Nombre,
-      IdMaterial : datos.material_Id,
-      NombreMaterial : datos.material_Nombre,
-      IdFalla : datos.dalla_Id,
-      NombreFalla : datos.falla_Nombre,
+      Cantidad : this.formatonumeros(datos.desp_PesoKg),
+      Und : 'Kg',
+      Proceso : datos.proceso_Nombre,
+      Material : datos.material_Nombre,
+      No_Conformidad : datos.falla_Nombre,
       Impreso : datos.desp_Impresion,
-      Maquina : datos.actv_Id,
-      NombreMaquina : datos.actv_Nombre,
-      SerialMaquina : datos.actv_Serial,
-      IdOperario : datos.usua_Operario,
-      NombreOperario : datos.operario,
-      IdUsuario : datos.usua_Id,
-      NombreUsuario : datos.usuario,
-      Fecha : datos.desp_Fecha,
-      Observacion : datos.desp_Observacion,
-      FechaIngreso : datos.desp_FechaRegistro,
-      HoraIngreso : datos.desp_HoraRegistro
+      Maquina : datos.actv_Serial,
+      Operario : datos.usua_Nombre,
+      Fecha : datos.desp_Fecha.replace('T00:00:00', ''),
     }
     this.arrayModal.push(dataCompleta);
   }
 
+  /** Función para limpiar filtros de busqueda */
   limpiarCampos(){
     this.formFiltros.reset();
   }
 
+  /** Función para mensaje de tipo advertencia. */
   advertencia(mensaje : string){
     Swal.fire({icon: 'warning',  title: 'Advertencia', text: mensaje, confirmButtonColor: '#ffc107', });
   }
 
+  /** Función que calcula la cantidad total del desperdicio */
+  pesoTotalDesperdicio(){
+    this.totalDesperdicio = 0;
+    for (let index = 0; index < this.arrayModal.length; index++) {
+      this.totalDesperdicio += this.arrayModal[index].Peso;
+    }
+  }
+
+  /** Función que exportará el reporte en PDF */
+  exportarPDF(){
+    this.servicioDesperdicios.getDesperdicioxOT(this.otSeleccionada).subscribe(dataDesp => {
+      for (let index = 0; index < dataDesp.length; index++) {
+        const infoPdf : any = {
+          info: {
+            title: `Reporte de desperdicios ${this.today}`
+          },
+          pageSize: {
+            width: 630,
+            height: 760
+          },
+          footer: {
+            columns: [
+              { text: `Reporte generado por ${this.storage_Nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+              { text: `Fecha Expedición Documento ${this.today} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+            ]
+          },
+          content : [
+            {
+              columns: [
+                {
+                  image : this.appComponent.logoParaPdf,
+                  width : 100,
+                  height : 80
+                },
+                {
+                  text: `Reporte Merma de Material - OT ${this.otSeleccionada}`,
+                  alignment: 'right',
+                  style: 'titulo',
+                  margin: [0, 30, 0, 0],
+                }
+              ]
+            },
+            '\n \n',
+            {
+              style: 'tablaEmpresa',
+              table: {
+                widths: [90, '*', 90, '*'],
+                style: 'header',
+                body: [
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `Nombre Empresa`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${dataDesp[index].empresa_Nombre}`
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `Ciudad`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${dataDesp[index].empresa_Ciudad}`
+                    },
+                  ],
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `NIT`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${dataDesp[index].empresa_Id}`
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `Dirección`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${dataDesp[index].empresa_Direccion}`
+                    },
+                  ],
+                ]
+              },
+              layout: {
+                defaultBorder: false,
+              },
+              fontSize: 9,
+            },
+            '\n \n',
+            {
+              text: `Información detallada de desperdicios\n `,
+              alignment: 'center',
+              style: 'subtitulo'
+            },
+
+            this.table(this.arrayModal, ['OT', 'Maquina', 'Item', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Und', 'Impreso', 'Proceso', 'Fecha', ]),
+          ],
+          styles: {
+            header: {
+              fontSize: 10,
+              bold: true
+            },
+            texto: {
+              fontSize: 9,
+            },
+            titulo: {
+              fontSize: 20,
+              bold: true
+            },
+            subtitulo: {
+              fontSize: 14,
+              bold: true
+            }
+          }
+         }
+         const pdf = pdfMake.createPdf(infoPdf);
+         pdf.open();
+         this.load = false;
+         this.Confirmacion(`¡PDF generado con éxito!`);
+         break;
+      }
+    });
+  }
+
+  // Funcion que se encagará de llenar la tabla del pd
+  buildTableBody(data, columns) {
+    var body = [];
+    body.push(columns);
+    data.forEach(function(row) {
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
+    });
+
+    return body;
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información
+  table(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: [30, 32, 30, 30, 80, 80, 35, 15, 35, 40, 45],
+        body: this.buildTableBody(data, columns)
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+    };
+  }
+
+  getBase64ImageFromURL(url) {
+    return new Promise((resolve, reject) => {
+      var img = new Image();
+      img.setAttribute("crossOrigin", "anonymous");
+
+      img.onload = () => {
+        var canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+
+        var dataURL = canvas.toDataURL("image/jpeg");
+        resolve(dataURL);
+      };
+
+      img.onerror = error => {
+        reject(error);
+      };
+
+      img.src = url;
+    });
+  }
+
+  /**Leer storage para validar su rol y mostrar el usuario. */
+  lecturaStorage(){
+    this.storage_Id = this.storage.get('Id');
+    this.storage_Nombre = this.storage.get('Nombre');
+    let rol = this.storage.get('Rol');
+    this.rolService.srvObtenerLista().subscribe(datos_roles => {
+      for (let index = 0; index < datos_roles.length; index++) {
+        if (datos_roles[index].rolUsu_Id == rol) {
+          this.ValidarRol = rol;
+          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
+        }
+      }
+    });
+  }
+
+    // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => {
+    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
+    const rep = '$1,';
+    return number.toString().replace(exp,rep);
+  }
+
+  Confirmacion(mensaje : string) {
+    this.messageService.add({severity:'success', detail: mensaje});
+  }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//Id : datos.desp_Id,
-/*OT : datos.desp_OT,
-Item : datos.prod_Id,
-NombreItem : datos.prod_Nombre,
-//Peso : datos.desp_PesoKg,
-IdProceso: datos.proceso_Id,
-NombreProceso : datos.proceso_Nombre,
-IdMaterial : datos.material_Id,
-NombreMaterial : datos.material_Nombre,
-//IdFalla : datos.dalla_Id,
-//NombreFalla : datos.falla_Nombre,
-Impreso : datos.desp_Impresion,
-//Maquina : datos.actv_Id,*/
-//NombreMaquina : datos.actv_Nombre,
-//SerialMaquina : datos.actv_Serial,
-//IdOperario : datos.usua_Operario,
-//NombreOperario : datos.operario,
-//IdUsuario : datos.usua_Id,
-//NombreUsuario : datos.usuario,
-//Fecha : datos.desp_Fecha,
-//Observacion : datos.desp_Observacion,
-//FechaIngreso : datos.desp_FechaRegistro,
-//HoraIngreso : datos.desp_HoraRegistro
