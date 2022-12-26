@@ -73,14 +73,8 @@ export class Inventario_ExtrusionComponent implements OnInit {
 
   // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
-    if (this.ArrayRollos.length == 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Advertencia',
-        text: '¡Para poder crear el archivo de Excel primero debe cargar los rollos en la tabla!',
-        showCloseButton: true,
-      });
-    } else {
+    if (this.ArrayRollos.length == 0) this.mensajeAdvertencia('¡Para poder crear el archivo de Excel primero debe cargar los rollos en la tabla!');
+    else {
       const title = `Inventario Extrusión - ${this.today}`;
       const header = ["OT", "Producto", "Nombre Producto", "Peso", "Unidad Medida"]
       let datos : any =[];
@@ -182,7 +176,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
       for (let i = 0; i < datos_rollos.length; i++) {
         this.llenarTabla(datos_rollos[i]);
       }
-    });
+    }, error => { this.mensajeError(`¡No se pudo obtener el inventario de la bodega de extrusión!`, error.message); });
   }
 
   // funcion que va a lenar la tabla con la informacion cosultada
@@ -211,7 +205,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
         for (let i = 0; i < datos_rollos.length; i++) {
           this.llenarTablaModal(datos_rollos[i]);
         }
-      });
+      }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos en bodega de la orden de tranajo N° ${this.numeroOrden}!`, error.message); });
       this.aperturaModal += 1;
     }
   }
@@ -245,5 +239,15 @@ export class Inventario_ExtrusionComponent implements OnInit {
   // Funcion que limpiará los filtros utilizados en la tabla
   clear(table: Table) {
     table.clear();
+  }
+
+  // Mensaje de Advertencia
+  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  }
+
+  // Mensaje de Error
+  mensajeError(text : string, error : any = ''){
+    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
   }
 }

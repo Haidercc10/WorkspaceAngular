@@ -1,15 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
-import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
-import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
-import { RecuperadoService } from 'src/app/Servicios/Recuperado/recuperado.service';
 import { RecuperadoMPService } from 'src/app/Servicios/DetallesRecuperado/recuperadoMP.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { RecuperadoService } from 'src/app/Servicios/Recuperado/recuperado.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
-import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.service';
-import { TipoRecuperadoService } from 'src/app/Servicios/TipoRecuperado/tipoRecuperado.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -50,17 +47,14 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
-                  private tipoBodegaService : TipoBodegaService,
-                    private unidadMedidaService : UnidadMedidaService,
-                      private usuarioService : UsuarioService,
-                        private procesosService : ProcesosService,
-                          private rolService : RolesService,
-                            private frmBuilderMateriaPrima : FormBuilder,
-                              @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                private recuperadoService : RecuperadoService,
-                                  private recuperadoMPService : RecuperadoMPService,
-                                    private tipoRecuperadoService : TipoRecuperadoService,
-                                      private turnosService : TurnosService,) {
+                  private unidadMedidaService : UnidadMedidaService,
+                    private usuarioService : UsuarioService,
+                      private rolService : RolesService,
+                        private frmBuilderMateriaPrima : FormBuilder,
+                          @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                            private recuperadoService : RecuperadoService,
+                              private recuperadoMPService : RecuperadoMPService,
+                                private turnosService : TurnosService,) {
 
     this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
@@ -183,12 +177,12 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         Turno : this.FormMateriaPrimaRecuperada.value.Turno,
         Maquina : this.FormMateriaPrimaRecuperada.value.Maquina,
       });
-    })
+    }, error => { this.mensajeError(`¡No se pudo obtener información del operario con el Id ${usuarioSelccionado}!`, error.message); });
   }
 
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante
   registrarRecuperado(){
-    if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe cargar minimo una materia prima en la tabla")
+    if (this.ArrayMateriaPrima.length == 0) this.mensajeAdvertencia("Debe cargar minimo una materia prima en la tabla")
     else {
       let idUsuario: number = this.FormMateriaPrimaRecuperada.value.usuarioId;
       let observacion : string = this.FormMateriaPrimaRecuperada.value.MpObservacion;
@@ -209,14 +203,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
 
       this.recuperadoService.srvGuardar(datosRecuperado).subscribe(datos_RecuperadoCreada => {
         this.obtenerUltimoIdRecuperado();
-      }, error => {
-        Swal.fire({
-        icon: 'error',
-        title: 'Oops..',
-        html: `<b>¡Error al ingresar el Peletizado!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
-        showCloseButton: true,
-        });
-      });
+      }, error => { this.mensajeError(`¡Error al ingresar el Peletizado!`, error.message); });
     }
   }
 
@@ -243,33 +230,17 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
             TpRecu_Id : tipoRecuperado,
           }
           this.recuperadoMPService.srvGuardar(datosRecuperadoMp).subscribe(datos_recuperadoMpCreada => {
-          }, error => {
-            Swal.fire({
-            icon: 'error',
-            title: 'Oops..',
-            text: "¡Hay campos vacios!",
-            html: `<b>¡Error al registrar la materia prima recuperada!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
-            showCloseButton: true,
-            });
-          });
+          }, error => { this.mensajeError(`¡Error al registrar la materia prima recuperada!`, error.message); });
           this.moverInventarioMpAgregada();
         }
       }
-    }, error => {
-      Swal.fire({
-      icon: 'error',
-      title: 'Oops..',
-      text: "¡Hay campos vacios!",
-      html: `<b>¡Error al consultar el ultimo Id de Recuperado!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
-      showCloseButton: true,
-      });
-    });
+    }, error => { this.mensajeError(`¡¡Error al consultar el ultimo Id de Recuperado!!`, error.message); });
   }
 
   //Funcion que va a validar la informacion que se ingresa a la tabla
   validarCamposVaciosMP(){
     if (this.FormMateriaPrima.valid) this.cargarFormMpEnTablas();
-    else Swal.fire("Hay campos de la Materi Prima vacios");
+    else this.mensajeAdvertencia("Hay campos de la Materi Prima vacios");
   }
 
   //Funcion que envia la informacion de los productos a la tabla.
@@ -311,15 +282,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
             showCloseButton: true,
           });
           this.limpiarTodosCampos();
-        }, error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops..',
-            html: `<b>¡Error al mover el inventario de la materia prima recuperada!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
-            showCloseButton: true,
-          });
-        });
-      });
+        }, error => { this.mensajeError(`¡Error al mover el inventario de la materia prima recuperada!`, error.message); });
+      }, error => { this.mensajeError(`¡No se pudo obtener la información de la materia prima ${this.ArrayMateriaPrima[index].Id}!`, error.message); });
     }
   }
 
@@ -358,7 +322,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         MpCantidad: '',
         MpUnidadMedida : datos_materiaPrima.undMed_Id,
       });
-    });
+    }, error => { this.mensajeError(`¡No se encontró el Id de materia prima bucado!`, error.message); });
   }
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
@@ -371,7 +335,16 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         MpCantidad: '',
         MpUnidadMedida : datos_materiasPrimas.undMed_Id,
       });
-    });
+    }, error => { this.mensajeError(`¡No se pudo obtener la información de la materia prima buscada!`, error.message); });
   }
 
+  // Mensaje de Advertencia
+  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  }
+
+  // Mensaje de Error
+  mensajeError(text : string, error : any = ''){
+    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+  }
 }

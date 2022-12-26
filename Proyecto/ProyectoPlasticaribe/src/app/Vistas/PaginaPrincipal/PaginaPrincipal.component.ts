@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MenuItem, MessageService } from 'primeng/api';
@@ -11,6 +11,7 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
 import Swal from 'sweetalert2';
+import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 
 @Component({
   selector: 'app-PaginaPrincipal',
@@ -19,6 +20,8 @@ import Swal from 'sweetalert2';
 })
 
 export class PaginaPrincipalComponent implements OnInit {
+
+  @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT : Reporte_Procesos_OTComponent;
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -62,6 +65,8 @@ export class PaginaPrincipalComponent implements OnInit {
   productosOrdenesMes : any [] = []; //Variable que va a almacenar los productos a los que se les ha hecho ordenes de trabajo y la cantidad de ordenes hechas de cada uno
   vendedorOrdenesMes : any [] = []; //Variable que almacenará los vendedores que han tenido ordenes de trabajo y la cantidad de cada uno
   procesosOrdenesMes : any [] = []; //Variable que va a almcencar la cantidad de que se ha hecho en cada proceso de produccion
+  modalEstadosOrdenes : boolean = false; //Variable que mostrará el modal de los etsados de las ordenes o no
+  nombreModalEstados : string = ''; //Variable que tendrá el nombre del estado seleccionado
 
   /* INFORMACION GENERAL DE MATERIAS PRIMAS */
   inventarioMateriaPrima : any [] = []; //Variable que almacenará la informacion de los inventarios inciales ya ctuales de las mterias primas
@@ -783,7 +788,7 @@ export class PaginaPrincipalComponent implements OnInit {
     this.mostrarGrafica = true;
     this.nombreGrafica = `Grafica de Estados de Ordenes`;
     this.multiAxisData = {
-      labels: ['Abierta', 'Asignada', 'Terminada', 'En proceso', 'Anulado', 'Cerrada'],
+      labels: ['Abierta', 'Asignada', 'En proceso', 'Terminada', 'Anulado', 'Cerrada'],
       datasets: [{
         label: 'Cantidad de Ordenes de Trabajo',
         backgroundColor: [
@@ -798,8 +803,8 @@ export class PaginaPrincipalComponent implements OnInit {
         data: [
           this.catidadOTAbiertas,
           this.cantidadOTAsignadas,
-          this.cantidadOTTerminada,
           this.cantidadOTIniciada,
+          this.cantidadOTTerminada,
           this.cantidadOtAnulada,
           this.cantidadOTCerrada
         ]
@@ -931,6 +936,127 @@ export class PaginaPrincipalComponent implements OnInit {
         }
       }
     };
+  }
+
+  // Funcion que mostrará el modal de los estados de las ordenes de trabajo, adicional a eso le enviará parametros para que realice la consulta
+  mostrarModalEstados(estado : string){
+    this.modalEstadosOrdenes = true;
+    this.modalEstadosProcesos_OT.modeModal = true;
+    if (estado == 'Abierta') {
+      this.nombreModalEstados = 'Ordenes de Trabajo Abiertas y No Iniciadas';
+      this.modalEstadosProcesos_OT.formularioOT.setValue({
+        idDocumento : null,
+        fecha: this.primerDiaMes,
+        fechaFinal : this.today,
+        estado : 15,
+        fallasOT : null,
+        ObservacionOT : '',
+        Vendedor : '',
+        cliente : null,
+        producto : null,
+      });
+      this.modalEstadosProcesos_OT.consultarOT();
+    } else if (estado == 'Asignada') {
+      this.nombreModalEstados = 'Ordenes de Trabajo Asignadas y No Iniciadas';
+      this.modalEstadosProcesos_OT.formularioOT.setValue({
+        idDocumento : null,
+        fecha: this.primerDiaMes,
+        fechaFinal : this.today,
+        estado : 14,
+        fallasOT : null,
+        ObservacionOT : '',
+        Vendedor : '',
+        cliente : null,
+        producto : null,
+      });
+      this.modalEstadosProcesos_OT.consultarOT();
+    } else if (estado == 'Inciadas') {
+      this.nombreModalEstados = 'Ordenes de Trabajo En Proceso';
+      this.modalEstadosProcesos_OT.formularioOT.setValue({
+        idDocumento : null,
+        fecha: this.primerDiaMes,
+        fechaFinal : this.today,
+        estado : 16,
+        fallasOT : null,
+        ObservacionOT : '',
+        Vendedor : '',
+        cliente : null,
+        producto : null,
+      });
+      this.modalEstadosProcesos_OT.consultarOT();
+    } else if (estado == 'Terminadas') {
+      this.nombreModalEstados = 'Ordenes de Trabajo Terminadas';
+      this.modalEstadosProcesos_OT.formularioOT.setValue({
+        idDocumento : null,
+        fecha: this.primerDiaMes,
+        fechaFinal : this.today,
+        estado : 17,
+        fallasOT : null,
+        ObservacionOT : '',
+        Vendedor : '',
+        cliente : null,
+        producto : null,
+      });
+      this.modalEstadosProcesos_OT.consultarOT();
+    } else if (estado == 'Anuladas') {
+      this.nombreModalEstados = 'Ordenes de Trabajo Anuladas';
+      this.modalEstadosProcesos_OT.formularioOT.setValue({
+        idDocumento : null,
+        fecha: this.primerDiaMes,
+        fechaFinal : this.today,
+        estado : 13,
+        fallasOT : null,
+        ObservacionOT : '',
+        Vendedor : '',
+        cliente : null,
+        producto : null,
+      });
+      this.modalEstadosProcesos_OT.consultarOT();
+    } else if (estado == 'Cerradas') {
+      this.nombreModalEstados = 'Ordenes de Trabajo Cerradas';
+      this.modalEstadosProcesos_OT.formularioOT.setValue({
+        idDocumento : null,
+        fecha: this.primerDiaMes,
+        fechaFinal : this.today,
+        estado : 18,
+        fallasOT : null,
+        ObservacionOT : '',
+        Vendedor : '',
+        cliente : null,
+        producto : null,
+      });
+      this.modalEstadosProcesos_OT.consultarOT();
+    }
+  }
+
+  // Funcion que va a ordenar el ranking de clientes
+  ordenarClientesCostoOrdenes(){
+    this.clientesOrdenesMes.sort((a,b) => Number(b.costo) - Number(a.costo));
+  }
+
+  // Funcion que va a ordenar el ranking de clientes
+  ordenarClientesCantOrdenes(){
+    this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+  }
+
+  // Funcion que va a ordenar el ranking de clientes
+  ordenarClientesPesoOrdenes(){
+    this.clientesOrdenesMes.sort((a,b) => Number(b.peso) - Number(a.peso));
+  }
+
+  // Funcion que va a ordenar el ranking de vendedores
+  ordenarVendedoresCostoOrdenes(){
+    this.vendedorOrdenesMes.sort((a,b) => Number(b.costo) - Number(a.costo));
+  }
+
+  // Funcion que va a ordenar el ranking de clientes
+  ordenarVendedoresCantOrdenes(){
+    this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+  }
+
+  // Funcion que va a ordenar el ranking de clientes
+  ordenarVendedoresPesoOrdenes(){
+    this.vendedorOrdenesMes.sort((a,b) => Number(b.peso) - Number(a.peso));
   }
 
   // Funcion que tomará unos parametros para mostrar un mensaje de error

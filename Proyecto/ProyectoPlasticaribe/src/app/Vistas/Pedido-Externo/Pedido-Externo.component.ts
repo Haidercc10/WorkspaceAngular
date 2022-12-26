@@ -880,7 +880,7 @@ export class PedidoExternoComponent implements OnInit {
         const camposPedido : any = {
           PedExt_FechaCreacion: this.FormPedidoExternoClientes.get('PedFecha')?.value,
           PedExt_FechaEntrega: this.FormPedidoExternoClientes.get('PedFecha')?.value,
-          Empresa_Id: this.EmpresaVendedora,
+          Empresa_Id: 800188732,
           SedeCli_Id: datos_sedeCliente[i].sedeCli_Id,
           Usua_Id: datos_sedeCliente[i].usua_Id,
           Estado_Id: 11,

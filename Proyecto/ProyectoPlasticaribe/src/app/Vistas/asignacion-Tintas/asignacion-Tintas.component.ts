@@ -132,7 +132,7 @@ export class AsignacionTintasComponent implements OnInit {
         Observacion : this.FormAsignacionMP.value.Observacion,
         Fecha : this.FormAsignacionMP.value.Fecha,
       });
-    });
+    }, error => { this.mensajeError(`¡No se ha podido obtener información de la tinta seleccionada!`, error.message); });
   }
 
   // Función que buscará las materias primas que se utilizan para crear tintas
@@ -172,18 +172,13 @@ export class AsignacionTintasComponent implements OnInit {
           undMedMateriaPrima : datos_materiasPrimas[index].unidad,
         });
       }
-    });
+    }, error => { this.mensajeError(`¡No se ha podido obtener información de la materia prima seleccionada!`, error.message); });
   }
 
   //Funcion que validará si alguno de los campos del fomulario de materia prima esta vacio
   validarCamposMateriaPrima(){
     if (this.FormMateriaPrima.valid) this.cargarMateriaPrimaEnTabla();
-    else Swal.fire({
-      icon : 'warning',
-      title: 'Advertencia',
-      text: "Hay campos vacios en el apartado de seleccion de materia prima",
-      showCloseButton: true,
-    });
+    else this.mensajeAdvertencia("Hay campos vacios en el apartado de seleccion de materia prima");
   }
 
   // Funcion que cargará las materias primas en las tabla
@@ -211,14 +206,7 @@ export class AsignacionTintasComponent implements OnInit {
       }
       this.ArrayMateriaPrima.push(productoExt);
       this.FormMateriaPrima.reset();
-    } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Advertencia',
-        text: '¡La cantidad a asignar no debe superar lo que hay en stock!',
-        showCloseButton: true,
-      });
-    }
+    } else this.mensajeAdvertencia('¡La cantidad a asignar no debe superar lo que hay en stock!');
   }
 
   // Funcion que validará la asignación
@@ -240,14 +228,7 @@ export class AsignacionTintasComponent implements OnInit {
           if (result.isConfirmed) this.asignarMPCrearTintas();
         });
       });
-    } else {
-        Swal.fire({
-        icon: 'warning',
-        title: 'Advertencia',
-        text: "¡Hay campos vacios!",
-        showCloseButton: true,
-      });
-    }
+    } else this.mensajeAdvertencia("¡Hay campos vacios!");
   }
 
   //Funcion que almacenará en la base de datos la informacion general sobre la asignacion de materia prima
@@ -276,22 +257,8 @@ export class AsignacionTintasComponent implements OnInit {
       this.asignacionMPxTintas.srvGuardar(datos_asignacionMP).subscribe(datos_asignacionMPxTintas => {
         this.obtenerUltimoIdAsignacion();
         setTimeout(() => {  }, 3000);
-      }, error => {
-        Swal.fire({
-        icon: 'error',
-        title: 'Oops..',
-        html: `<b>¡Error al registrar la creación de tinta!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
-        showCloseButton: true,
-        });
-      });
-    } else {
-      Swal.fire({
-      icon: 'warning',
-      title: 'Advertencia',
-      text: "¡Hay campos vacios!",
-      showCloseButton: true,
-      });
-    }
+      }, error => { this.mensajeError(`¡¡Error al registrar la creación de tinta!!`, error.message); });
+    } else this.mensajeAdvertencia("¡Hay campos vacios!");
   }
 
   // Funcion que servirá para poder obtener el ultimo Id de la asignacion creada y pasarlo a la funcion de creacion de AsignacionMP para que pueda tener el ID de la asignacion
@@ -307,27 +274,13 @@ export class AsignacionTintasComponent implements OnInit {
           proceso_Id : 'TINTAS',
         }
         this.detallesAsignacionMPxTintas.srvGuardar(datosDetallesAsignacion).subscribe(datos_detallesAsignacionMPxTintas => {
-        }, error => {
-          Swal.fire({
-          icon: 'error',
-          title: 'Oops..',
-          html: `<b>¡Error al registrar los detalles de la creación de tinta!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
-          showCloseButton: true,
-          });
-        });
+        }, error => { this.mensajeError(`¡¡Error al registrar los detalles de la creación de tinta!!`, error.message); });
       }
       this.sumarInventarioTintas();
       this.moverInventarioMP();
       this.moverInventarioTintas();
       this.load = false;
-     }, error => {
-      Swal.fire({
-      icon: 'error',
-      title: 'Oops..',
-      html: `<b>¡Error al consultar el último Id de asignación!</b><br>` + `<spam style="color: #f00">${error.messages}</spam>`,
-      showCloseButton: true,
-      });
-    });
+    }, error => { this.mensajeError(`¡¡Error al consultar el último Id de asignación!!`, error.message); });
   }
 
   // Funcion que moverá el inventario de la materia prima que se está asignando para la creacion de la tintas
@@ -349,22 +302,8 @@ export class AsignacionTintasComponent implements OnInit {
           TpBod_Id : datos_materiaPrima.tpBod_Id,
         }
         this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].Materia_Prima, datosMPActualizada).subscribe(datos_mp_creada => {
-        }, error => {
-          Swal.fire({
-          icon: 'error',
-          title: 'Oops..',
-          html: `<b>¡Error al mover el inventario de materia prima!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
-          showCloseButton: true,
-          });
-        });
-      }, error => {
-        Swal.fire({
-        icon: 'error',
-        title: 'Oops..',
-        html: `<b>¡Error al consultar la materia prima!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
-        showCloseButton: true,
-        });
-      });
+        }, error => { this.mensajeError(`¡¡Error al mover el inventario de materia prima!!`, error.message); });
+      }, error => { this.mensajeError(`¡¡Error al consultar la materia prima!!`, error.message); });
     }
   }
 
@@ -390,22 +329,9 @@ export class AsignacionTintasComponent implements OnInit {
           Tinta_Fecha : datos_tinta.tinta_FechaIngreso,
           Tinta_Hora : datos_tinta.tinta_Hora,
         }
-        this.tintasService.srvActualizar(this.ArrayMateriaPrima[index].Tinta, datosTintaActualizada).subscribe(datos_mp_creada => { }, error => {
-          Swal.fire({
-          icon: 'error',
-          title: 'Oops..',
-          html: `<b>¡Error al mover el invantario de tinta!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
-          showCloseButton: true,
-          });
-        });
-      }, error => {
-        Swal.fire({
-        icon: 'error',
-        title: 'Oops..',
-        html: `<b>¡Error al consultar la tinta!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
-        showCloseButton: true,
-        });
-      });
+        this.tintasService.srvActualizar(this.ArrayMateriaPrima[index].Tinta, datosTintaActualizada).subscribe(datos_mp_creada => {
+        }, error => { this.mensajeError(`¡¡Error al mover el invantario de tinta!!`, error.message); });
+      }, error => { this.mensajeError(`¡¡Error al consultar la tinta!!`, error.message); });
     }
   }
 
@@ -428,22 +354,10 @@ export class AsignacionTintasComponent implements OnInit {
         Tinta_Hora : datos_tinta.tinta_Hora,
       }
       this.tintasService.srvActualizar(tinta, datosTintaCreada).subscribe(datos_mp_creada => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Registro Exitoso',
-          html: `<b>¡Registro completado con exito!</b>`,
-          showCloseButton: true,
-        });
+        Swal.fire({ icon: 'success', title: 'Registro Exitoso', html: `<b>¡Registro completado con exito!</b>`, showCloseButton: true, });
         this.limpiarTodosLosCampos();
-      }, error => {
-        Swal.fire({
-        icon: 'error',
-        title: 'Oops..',
-        html: `<b>¡Error al sumar al inventario de la tinta ${datos_tinta.tinta_Nombre}!</b><br>` + `<spam style="color: #f00">${error}</spam>`,
-        showCloseButton: true,
-        });
-      });
-    });
+      }, error => { this.mensajeError(`¡¡Error al sumar al inventario de la tinta ${datos_tinta.tinta_Nombre}!!`, error.message); });
+    }, error => { this.mensajeError(`¡No se pudo obtener información de la tinta con Id ${tinta}!`, error.message); });
     this.load = false;
   }
 
@@ -473,5 +387,15 @@ export class AsignacionTintasComponent implements OnInit {
   //
   llamarModalCrearTintas(){
     this.componenteCrearTintas = true;
+  }
+
+  // Mensaje de Advertencia
+  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  }
+
+  // Mensaje de Error
+  mensajeError(text : string, error : any = ''){
+    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
   }
 }

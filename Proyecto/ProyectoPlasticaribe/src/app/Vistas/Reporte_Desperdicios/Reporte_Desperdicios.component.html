@@ -63,38 +63,6 @@
           </select>
           <label for="floatingSelect">Material</label>
         </div>
-
-         <!--Proceso-->
-         <!--<div class="form-floating col-md-2">
-          <input formControlName="Proceso" class="form-control form-control-sm" list="proceso" id="floatingInput" required (change)="seleccionarProceso()">
-          <datalist id="proceso">
-            <option value={{item.proceso_Id}} *ngFor="let item of arrayProcesos">{{item.proceso_Nombre}}</option>
-          </datalist>
-          <label for="floatingInput">Proceso</label>
-        </div>-->
-      </div>
-    </div>
-
-    <!--Fila 2-->
-    <div class="mb-3">
-      <div class="row g-3">
-         <!--Falla-->
-         <!--<div class="form-floating col-md-3">
-          <input formControlName="Falla" class="form-control form-control-sm" list="falla" id="floatingInput" required (change)="seleccionarFalla()">
-          <datalist id="falla">
-            <option value={{item.falla_Id}} *ngFor="let item of arrayFallas">{{item.falla_Nombre}}</option>
-          </datalist>
-          <label for="floatingInput">No Conformidad</label>
-        </div>-->
-
-        <!-- Maquina -->
-        <!--<div class="form-floating col-md-2">
-          <input formControlName="Maquina" class="form-control form-control-sm" list="maquina" id="floatingInput" required (change)="seleccionarMaquina()" >
-          <datalist id="maquina">
-            <option value={{item.actv_Id}} *ngFor="let item of arrayMaquinas">{{item.actv_Nombre}}</option>
-          </datalist>
-          <label for="floatingInput">Maquina</label>
-        </div>-->
       </div>
     </div>
 
@@ -105,7 +73,6 @@
         <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
       </div>
     </div>
-
   </form>
 
    <!-- TABLA DE RETIRO -->
@@ -142,12 +109,13 @@
             <td>{{arrayConsulta.Impreso}}</td>
             <td>{{arrayConsulta.PesoTotal}}</td>
             <td>{{arrayConsulta.Presentacion}}</td>
-            <td style="text-align: center;"><button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" (click)="llenarModal(1)" style="width: 30px; height: 30px;"></button></td>
+            <td style="text-align: center;"><button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" (click)="llenarModal(arrayConsulta.OT)" style="width: 30px; height: 30px;"></button></td>
           </tr>
         </ng-template>
       </p-table>
     </div>
   </div>
+
   <p-dialog header="OT Nro. {{123456}}" [(visible)]="dialog" [style]="{width: '70%'}" [modal]="true" styleClass="p-fluid">
     <div class="row g-3">
       <div class="table-responsive">
@@ -195,4 +163,3 @@
     </div>
   </p-dialog>
 </div>
-

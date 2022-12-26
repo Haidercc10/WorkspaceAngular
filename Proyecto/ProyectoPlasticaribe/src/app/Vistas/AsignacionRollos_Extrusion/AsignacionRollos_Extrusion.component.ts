@@ -271,14 +271,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
       }
 
       setTimeout(() => {
-        if (consulta <= 0){
-          Swal.fire({
-            icon: 'warning',
-            title: 'Oops...',
-            html:
-            `<b>¡No hay rollos por salir!</b><hr> `,
-          });
-        }
+        if (consulta <= 0) this.mensajeAdvertencia('¡No hay rollos por salir!');
         this.cargando = true;
       }, 2000);
     }, 3000);
@@ -383,7 +376,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que almacenará en la base de datos la información general de la salida de los rollos
   salidaRollos(){
-    if (this.rollosInsertar.length == 0 || this.FormConsultarRollos.value.Proceso == null) Swal.fire(`¡Debe selecionar minimo un rollo para realizar la salida de este mismo y elegir el proceso hacia el que irán los rollos!`);
+    if (this.rollosInsertar.length == 0 || this.FormConsultarRollos.value.Proceso == null) this.mensajeAdvertencia(`¡Debe selecionar minimo un rollo para realizar la salida de este mismo y elegir el proceso hacia el que irán los rollos!`);
     else {
       let Observacion : string = this.FormConsultarRollos.value.Observacion;
       this.cargando = false;
@@ -394,23 +387,10 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         Usua_Id : this.storage_Id,
       }
       this.asgRollos.srvGuardar(info).subscribe(datos_rollos => {
-        this.asgRollos.obtenerUltimoId().subscribe(datos_salida => { this.dtSalidaRollos(datos_salida.asgRollos_Id); }, error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            html:
-            `<b>¡Error al obtener el último Id de asignación!</b><hr>` +
-            `<b style="color: #f00">${error.message}</b>`,
-          });
-        });
+        this.asgRollos.obtenerUltimoId().subscribe(datos_salida => { this.dtSalidaRollos(datos_salida.asgRollos_Id);
+        }, error => { this.mensajeError(`¡¡Error al obtener el último Id de asignación!!`, error.message); });
       }, error => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          html:
-          `<b>¡Error al dar salida a los rollos!</b><hr>` +
-          `<b style="color: #f00">${error.message}</b>`,
-        });
+        this.mensajeError(`¡¡Error al dar salida a los rollos!!`, error.message);
         this.cargando = true;
       });
     }
@@ -430,14 +410,9 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
           Proceso_Id : procesos,
           Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
         }
-        this.dtAsgRollos.srvGuardar(info).subscribe(datos_rollos => {  }, error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            html:
-            `<b>¡Error al dar salida a los rollos!</b><hr>` +
-            `<b style="color: #f00">${error.message}</b>`,
-          });
+        this.dtAsgRollos.srvGuardar(info).subscribe(datos_rollos => {
+        }, error => {
+          this.mensajeError(`¡¡Error al dar salida a los rollos!!`, error.message);
           this.cargando = true;
         });
       }
@@ -461,14 +436,9 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
             Proceso_Id : datos_Rollos[j].proceso_Id,
             Prod_Id : datos_Rollos[j].prod_Id,
           }
-          this.dtIngRollosService.srvActualizar(datos_Rollos[j].dtIngRollo_Id, info).subscribe(datos_actualizados => {  }, error => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              html:
-              `<b>¡No fue posible actualizar el estado de los rollos!</b><hr>` +
-              `<b style="color: #f00">${error.message}</b>`,
-            });
+          this.dtIngRollosService.srvActualizar(datos_Rollos[j].dtIngRollo_Id, info).subscribe(datos_actualizados => {
+          }, error => {
+            this.mensajeError(`¡¡No fue posible actualizar el estado de los rollos!!`, error.message);
             this.cargando = true;
           });
         }
@@ -480,12 +450,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   finalizarInsercion(id : number){
     this.cambioEstado();
     setTimeout(() => {
-      Swal.fire({
-        icon: 'success',
-        title: 'Oops...',
-        html:
-        `<b>¡${this.totalRollos} fueron asignados correctamente!</b><hr>`,
-      });
+      Swal.fire({ icon: 'success', title: 'Registro Exitoso', html: `<b>¡${this.totalRollos} fueron asignados correctamente!</b><hr>`, });
       this.buscarRolloPDF(id);
     }, 2000);
   }
@@ -599,7 +564,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         setTimeout(() => { (this.limpiarCampos()); }, 1200);
         break;
       }
-    });
+    }, error => { this.mensajeError(`¡No se pudo obtener la información necesaria para crear el archivo de tipo PDF!`, error.message); });
   }
 
   // Funcion que traerá los rollos que fueron ingresados
@@ -619,8 +584,8 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         this.rollosPDF.push(info);
         this.rollosPDF.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
-    });
-    setTimeout(() => { this.crearPDF(id); }, 1200);
+      setTimeout(() => { this.crearPDF(id); }, 1200);
+    }, error => { this.mensajeError(`¡No se pudo obtener la información necesaria para crear llenar el archivo de tipo PDF!`, error.message); });
   }
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
@@ -672,4 +637,13 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
     };
   }
 
+  // Mensaje de Advertencia
+  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  }
+
+  // Mensaje de Error
+  mensajeError(text : string, error : any = ''){
+    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+  }
 }

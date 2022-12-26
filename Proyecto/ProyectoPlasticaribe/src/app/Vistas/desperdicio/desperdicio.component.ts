@@ -369,7 +369,7 @@ export class DesperdicioComponent implements OnInit {
       for (let i = 0; i < datos_desperdicios.length; i++) {
         const pdfDefinicion : any = {
           info: {
-            title: `Desperdicio ${this.today}`
+            title: `Reporte Merma de Material - ${this.today}`
           },
           pageSize: {
             width: 630,
@@ -499,7 +499,7 @@ export class DesperdicioComponent implements OnInit {
           Material : datos_desperdicios[i].material_Nombre,
           Operario : datos_desperdicios[i].usua_Nombre,
           No_Conformidad : datos_desperdicios[i].falla_Nombre,
-          Cantidad : this.formatonumeros( datos_desperdicios[i].desp_PesoKg),
+          Cantidad : this.formatonumeros(datos_desperdicios[i].desp_PesoKg.toFixed()),
           Impreso : datos_desperdicios[i].desp_Impresion,
           Observacion : datos_desperdicios[i].desp_Observacion,
           Fecha : datos_desperdicios[i].desp_Fecha.replace('T00:00:00', ''),
@@ -541,32 +541,6 @@ export class DesperdicioComponent implements OnInit {
         }
       }
     };
-  }
-
-  getBase64ImageFromURL(url) {
-    return new Promise((resolve, reject) => {
-      var img = new Image();
-      img.setAttribute("crossOrigin", "anonymous");
-
-      img.onload = () => {
-        var canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-
-        var dataURL = canvas.toDataURL("image/jpeg");
-
-        resolve(dataURL);
-      };
-
-      img.onerror = error => {
-        reject(error);
-      };
-
-      img.src = url;
-    });
   }
 
   // Funcion que va a quitar un desperdicio de la tabla

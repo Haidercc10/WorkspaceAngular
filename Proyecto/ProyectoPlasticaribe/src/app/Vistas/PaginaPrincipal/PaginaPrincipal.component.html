@@ -33,12 +33,84 @@
             <div class="card-body">
               <h5 class="card-title">Estados de Ordenes de Trabajo</h5>
               <p class="card-text">De todas las ordenes de trabajo creadas el último mes, hasta el momento hay:</p>
-              <p class="card-text">Ordenes No Iniciadas: <label class="naranja">{{catidadOTAbiertas | number}}</label></p>
-              <p class="card-text">Ordenes con Materia Prima Asignada: <label class="azul">{{cantidadOTAsignadas | number}}</label></p>
-              <p class="card-text">Ordenes Inciadas: <label class="amarillo">{{cantidadOTIniciada | number}}</label></p>
-              <p class="card-text">Ordenes Terminadas: <label class="verde">{{cantidadOTTerminada | number}}</label></p>
-              <p class="card-text">Ordenes Anuladas: <label class="rojo">{{cantidadOtAnulada | number}}</label></p>
-              <p class="card-text">Ordenes Cerradas: <label class="verde2">{{cantidadOTCerrada | number}}</label></p>
+              <p class="card-text">
+                Ordenes No Iniciadas:
+                <button pButton
+                        type="button"
+                        tooltip="Graficar la información de los clientes"
+                        class="p-button-warning"
+                        data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop"
+                        style="height: 10px;"
+                        (click)="mostrarModalEstados('Abierta')">
+                        {{catidadOTAbiertas | number}}
+                </button>
+              </p>
+              <p class="card-text">
+                Ordenes con Materia Prima Asignada:
+                <button pButton
+                        type="button"
+                        class="azul"
+                        tooltip="Graficar la información de los clientes"
+                        data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop"
+                        style="height: 10px;"
+                        (click)="mostrarModalEstados('Asignada')">
+                        {{cantidadOTAsignadas | number}}
+                </button>
+              </p>
+              <p class="card-text">
+                Ordenes Inciadas:
+                <button pButton
+                        type="button"
+                        class="amarillo p-button-warning"
+                        tooltip="Graficar la información de los clientes"
+                        data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop"
+                        style="height: 10px;"
+                        (click)="mostrarModalEstados('Inciadas')">
+                        {{cantidadOTIniciada | number}}
+                </button>
+              </p>
+              <p class="card-text">
+                Ordenes Terminadas:
+                <button pButton
+                        type="button"
+                        class="verde p-button-success"
+                        tooltip="Graficar la información de los clientes"
+                        data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop"
+                        style="height: 10px;"
+                        (click)="mostrarModalEstados('Terminadas')">
+                        {{cantidadOTTerminada | number}}
+                </button>
+              </p>
+              <p class="card-text">
+                Ordenes Anuladas:
+                <button pButton
+                        type="button"
+                        class="rojo p-button-danger"
+                        tooltip="Graficar la información de los clientes"
+                        data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop"
+                        style="height: 10px;"
+                        (click)="mostrarModalEstados('Anuladas')">
+                        {{cantidadOtAnulada | number}}
+                </button>
+              </p>
+              <p class="card-text">
+                Ordenes Cerradas:
+                <button pButton
+                        type="button"
+                        class="verde2 p-button-success"
+                        tooltip="Graficar la información de los clientes"
+                        data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop"
+                        style="height: 10px;"
+                        (click)="mostrarModalEstados('Cerradas')">
+                        {{cantidadOTCerrada | number}}
+                </button>
+              </p>
               <br>
               <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaEstadosOrdenes()"></button>
             </div>
@@ -87,9 +159,14 @@
             <div class="card-body">
               <h5 class="card-title">Ordenes de Trabajo Por Cliente</h5>
               <p class="card-text">Ranking de clientes a los que se le ha hecho más ordenes de trabajo en el último mes:</p>
+              <div style="height: 10%; text-align: center;">
+                <button pButton pTooltip="Ordenar por Número de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarClientesCantOrdenes()"></button>
+                <button pButton pTooltip="Ordenar por Costo Total de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarClientesCostoOrdenes()"></button>
+                <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button>
+              </div>
               <div class="scrollCard">
                 <p class="card-text" *ngFor="let item of clientesOrdenesMes; let i=index;">
-                  <span>{{i + 1}}) <b>{{item.clienteNom}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas por un valor total de <b>{{item.costo | currency : ' COP $'}}</b>.</span>
+                  <span>{{i + 1}}) <b>{{item.clienteNom}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas por un valor total de <b>{{item.costo | currency : ' COP $'}}</b> y un peso total de <b>{{item.peso | number}} Kg</b>.</span>
                 </p>
               </div>
               <br>
@@ -121,9 +198,14 @@
             <div class="card-body">
               <h5 class="card-title">Ordenes de Trabajo Por Vendedores</h5>
               <p class="card-text">Ranking de vendedores a los que más se les ha hecho ordenes de trabajo en el ultimo mes: </p>
+              <div style="height: 10%; text-align: center;">
+                <button pButton pTooltip="Ordenar por Número de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarVendedoresCantOrdenes()"></button>
+                <button pButton pTooltip="Ordenar por Costo Total de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarVendedoresCostoOrdenes()"></button>
+                <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarVendedoresPesoOrdenes()"></button>
+              </div>
               <div class="scrollCard">
                 <p class="card-text" *ngFor="let item of vendedorOrdenesMes; let i=index">
-                  <span>{{i + 1}}) <b>{{item.nombreCompleto}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas por un valor total de <b>{{item.costo | currency : ' COP $'}}</b>.</span>
+                  <span>{{i + 1}}) <b>{{item.nombreCompleto}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas por un valor total de <b>{{item.costo | currency : ' COP $'}}</b> y un peso de <b>{{item.peso | number}} Kg</b>.</span>
                 </p>
               </div>
               <br>
@@ -340,8 +422,24 @@
       </div>
     </p-tabPanel>
 
-
   </p-tabView>
+
+  <!-- Model que mostrará la información de las ordenes de trabajo con un estado especifico -->
+  <ng-container *ngIf="modalEstadosOrdenes">
+    <div class="modal fade" id="staticBackdrop" aria-labelledby="reporteCostos" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabe">{{nombreModalEstados}}</h5>
+            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
 
   <!-- Modal en el que se va a mostrar la grafica con la información que se le pase -->
   <ng-container *ngIf="mostrarGrafica">

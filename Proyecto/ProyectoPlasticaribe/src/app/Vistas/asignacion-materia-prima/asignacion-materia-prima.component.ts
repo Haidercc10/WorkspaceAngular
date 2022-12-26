@@ -44,6 +44,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   estadoOT : any; //Variable que va a almacenar el estado de la orden de trabajo
 
   otImpresion : any [] = []; //Variable que va a almacenar las diferentes ordenes de trabajo que contiene la orden de trabajo de impresión
+  categoriasSeleccionadas : any [] = [];
+  soloTintas : boolean = false;
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private unidadMedidaService : UnidadMedidaService,
@@ -128,6 +130,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.materiasPrimasSeleccionada_ID = [];
     this.materiasPrimasSeleccionadas = [];
     this.error = false;
+    this.soloTintas = false;
+    this.categoriasSeleccionadas = [];
   }
 
   //Funcion que limpiará los campos de la materia pirma entrante
@@ -202,37 +206,24 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           }, error => {
             this.load = true;
             this.error = true;
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              html:
-              `<b>¡Error al consultar las asignaciones de la OT ${ot}!</b><hr> ` +
-              `<spam style="color : #f00;">${error.message}</spam> `,
-              showCloseButton: true,
-            });
+            this.mensajeError(`¡Error al consultar las asignaciones de la OT ${ot}!`, error.message);
           });
           this.devolucionesService.srvObtenerListaPorOT(ot).subscribe(datos_devoluciones => {
             for (let i = 0; i < datos_devoluciones.length; i++) {
               this.devolucionesMPService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_devolucionesMP => {
                 for (let j = 0; j < datos_devolucionesMP.length; j++) {
-                  if ((datos_devolucionesMP[j].tinta_Id == null || datos_devolucionesMP[j].tinta_Id == 2001) && datos_devolucionesMP[j].matPri_Id != 84 && (datos_devolucionesMP[j].bopp_Id == null || datos_devolucionesMP[j].bopp_Id == 449)) {
-                    devolucionMP += datos_devolucionesMP[j].dtDevMatPri_CantidadDevuelta;
-                    console.log(datos_devolucionesMP[j]);
-                  }
+                  if ((datos_devolucionesMP[j].tinta_Id == null
+                    || datos_devolucionesMP[j].tinta_Id == 2001)
+                    && datos_devolucionesMP[j].matPri_Id != 84
+                    && (datos_devolucionesMP[j].bopp_Id == null
+                    || datos_devolucionesMP[j].bopp_Id == 449)) devolucionMP += datos_devolucionesMP[j].dtDevMatPri_CantidadDevuelta;
                 }
               });
             }
           }, error => {
             this.load = true;
             this.error = true;
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              html:
-              `<b>¡Error al consultar las devoluciones de la OT ${ot}!</b><hr> ` +
-              `<spam style="color : #f00;">${error.message}</spam> `,
-              showCloseButton: true,
-            });
+            this.mensajeError(`¡Error al consultar las devoluciones de la OT ${ot}!`, error.message);
           });
           setTimeout(() => {
             this.cantRestante = (this.kgOT - cantAsig) + devolucionMP;
@@ -247,14 +238,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     }, error => {
       this.error = true;
       this.load = true;
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        html:
-        `<b>¡Error al consultar la OT ${ot}!</b><hr> ` +
-        `<spam style="color : #f00;">${error.message}</spam> `,
-        showCloseButton: true,
-      });
+      this.mensajeError(`¡Error al consultar la OT ${ot}!`, error.message);
     });
   }
 
@@ -300,52 +284,19 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 Cantidad : this.FormMateriaPrimaRetirada.value.MpCantidadRetirada,
                 Und_Medida : this.FormMateriaPrimaRetirada.value.MpUnidadMedidaRetirada,
                 Proceso : this.FormMateriaPrimaRetirada.value.ProcesoRetiro,
+                Categoria : this.FormMateriaPrimaRetirada.value.Categoria,
               }
               if (categoria == 7 || categoria == 8 || categoria == 13) info.Id_Tinta = info.Id;
               else if (categoria == 1 || categoria == 2 || categoria == 3 || categoria == 4 || categoria == 5 || categoria == 9 || categoria == 10) info.Id_Mp = info.Id;
+              this.categoriasSeleccionadas.push(this.FormMateriaPrimaRetirada.value.Categoria);
               this.materiasPrimasSeleccionada_ID.push(this.FormMateriaPrimaRetirada.value.MpIdRetirada);
               this.materiasPrimasSeleccionadas.push(info);
               this.FormMateriaPrimaRetirada.reset();
-            } else {
-              Swal.fire({
-                icon: 'warning',
-                title: 'Oops...',
-                html:
-                `<b>¡La cantidad a asignar supera a la cantidad en stock!</b><hr> `,
-              });
-            }
-          } else {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Oops...',
-              html:
-              `<b>¡Debe seleccionar hacia que proceso va la materia prima!</b><hr> `,
-            });
-          }
-        } else {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Oops...',
-            html:
-            `<b>¡La materia prima ${this.FormMateriaPrimaRetirada.value.MpNombreRetirada} ya ha sido seleccionada!</b><hr> `,
-          });
-        }
-      } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Oops...',
-          html:
-          `<b>¡La cantidad a asignar debe ser mayor a cero (0)!</b><hr> `,
-        });
-      }
-    } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Oops...',
-        html:
-        `<b>¡Hay campos de la materia prima vacios!</b><hr> `,
-      });
-    }
+            } else this.mensajeAdvertencia(`¡La cantidad a asignar supera a la cantidad en stock!`);
+          } else this.mensajeAdvertencia(`¡Debe seleccionar hacia que proceso va la materia prima!`);
+        } else this.mensajeAdvertencia(`¡La materia prima ${this.FormMateriaPrimaRetirada.value.MpNombreRetirada} ya ha sido seleccionada!`);
+      } else this.mensajeAdvertencia(`¡La cantidad a asignar debe ser mayor a cero (0)!`);
+    } else this.mensajeAdvertencia(`¡Hay campos de la materia prima vacios!`);
   }
 
   // Funcion que va a quitar la materia prima
@@ -363,7 +314,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
             this.materiasPrimasSeleccionadas.splice(i, 1);
             for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
-              if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
+              if (data.Id == this.materiasPrimasSeleccionada_ID[j]) {
+                this.materiasPrimasSeleccionada_ID.splice(j, 1);
+                this.categoriasSeleccionadas.splice(j, 1);
+              }
             }
             const Toast = Swal.mixin({
               toast: true,
@@ -393,30 +347,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     if (this.FormMateriaPrimaRetiro.valid) {
       if (this.materiasPrimasSeleccionadas.length != 0){
         if (maquina >= 1 && maquina != 0) this.asignacionMateriaPrima();
-        else {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Oops...',
-            html:
-            `<b>¡El numero de la maquina no es valido!</b><hr> `,
-          });
-        }
-      } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Oops...',
-          html:
-          `<b>¡Debe selccionar minimo una materia prima para crear la asignación!</b><hr> `,
-        });
-      }
-    } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Oops...',
-        html:
-        `<b>¡Hay campos vaios!</b><hr> `,
-      });
-    }
+        else this.mensajeAdvertencia('¡El numero de la maquina no es valido!');
+      } else this.mensajeAdvertencia('¡Debe selccionar minimo una materia prima para crear la asignación!');
+    } else this.mensajeAdvertencia('¡Hay campos vaios!');
   }
 
   //Funcion que asignará la materia prima a una Orden de trabajo y Proceso y lo guardará en la base de datos
@@ -429,41 +362,33 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.load = false;
           if (this.cantidadAsignada <= this.cantRestante) this.crearAsignacion();
           else {
-            this.load = true;
-            if (this.ValidarRol != 1) {
-              Swal.fire({
-                icon: 'warning',
-                title: 'Advertencia',
-                html:
-                `<b>¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}!</b><hr> ` +
-                `<spam>Debe solicitar permisos a un usuario administrador.</spam>`,
-              })
-            } else if (this.ValidarRol == 1) {
-              Swal.fire({
-                icon: 'warning',
-                title: 'Advertencia',
-                html:
-                `<b>¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}!</b><hr> ` +
-                `<spam>¿Desea asignar de todas formas?</spam>`,
-                showCloseButton: true,
-                showCancelButton: true,
-                showConfirmButton: true,
-                showDenyButton: true,
-                confirmButtonText: 'Si',
-                denyButtonText: 'No'
-              }).then((result) => {
-                if (result.isConfirmed) this.crearAsignacion();
-              });
+            if (this.categoriasSeleccionadas.includes(7) || this.categoriasSeleccionadas.includes(8)){
+              this.soloTintas = true;
+              this.crearAsignacion();
+            } else {
+              this.load = true;
+              if (this.ValidarRol != 1) this.mensajeAdvertencia(`¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}!`, `Debe solicitar permisos a un usuario administrador.`);
+              else if (this.ValidarRol == 1) {
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Advertencia',
+                  html:
+                  `<b>¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}!</b><hr> ` +
+                  `<spam>¿Desea asignar de todas formas?</spam>`,
+                  showCloseButton: true,
+                  showCancelButton: true,
+                  showConfirmButton: true,
+                  showDenyButton: true,
+                  confirmButtonText: 'Si',
+                  denyButtonText: 'No'
+                }).then((result) => {
+                  if (result.isConfirmed) this.crearAsignacion();
+                });
+              }
             }
           }
         }, 2000);
-      } else if (this.estadoOT == 4 || this.estadoOT == 1) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Oops...',
-          html:`<b>¡No es podible asignar a esta orden de trabajo, la OT ${idOrdenTrabajo} se encuentra cerrada.!</b><hr> `,
-        });
-      }
+      } else if (this.estadoOT == 4 || this.estadoOT == 1) this.mensajeAdvertencia(`¡No es podible asignar a esta orden de trabajo, la OT ${idOrdenTrabajo} se encuentra cerrada.!`);
     }
   }
 
@@ -483,14 +408,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => { this.obtenerUltimoIdAsignacaion(); }, error => {
       this.error = true;
       this.load = true;
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        html:
-        '<b>¡Error al crear la asignación de materia prima!</b><hr> ' +
-        `<spam style="color : #f00;">${error.message}</spam> `,
-        showCloseButton: true,
-      });
+      this.mensajeError(`¡Error al crear la asignación de materia prima!`, error.message);
     });
   }
 
@@ -500,14 +418,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
       this.asignacionMPService.srvObtenerUltimaAsignacion().subscribe(datos_asignaciones => { this.obtenerProcesoId(datos_asignaciones.asigMp_Id); }, error => {
         this.error = true;
         this.load = true;
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          html:
-          '<b>¡No se pudo extraer el ultimo Id de asignación!</b><hr> ' +
-          `<spam style="color : #f00;">${error.message}</spam> `,
-          showCloseButton: true,
-        });
+        this.mensajeError(`¡No se pudo extraer el ultimo Id de asignación!`, error.message);
       });
     }
   }
@@ -533,17 +444,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(datos_asignacionTintas => {}, error => {
                   this.error = true;
                   this.load = true;
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    html:
-                    `<b>¡Error al insertar la tinta asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!</b><hr> ` +
-                    `<spam style="color : #f00;">${error.message}</spam> `,
-                    showCloseButton: true,
-                  });
+                  this.mensajeError(`¡Error al insertar la tinta asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`, error.message);
                 });
                 this.moverInventarioTintas(idMateriaPrima, cantidadMateriaPrima);
-              } else if (this.materiasPrimasSeleccionadas[index].Id_Mp != 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta == 2001) {
+              } else if (this.materiasPrimasSeleccionadas[index].Id_Mp != 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta == 2001 && !this.soloTintas) {
                 const datosDetallesAsignacion : any = {
                   AsigMp_Id : asigncaion,
                   MatPri_Id : idMateriaPrima,
@@ -554,14 +458,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {}, error => {
                   this.error = true;
                   this.load = true;
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    html:
-                    `<b>¡Error al insertar la materia prima asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!</b><hr> ` +
-                    `<spam style="color : #f00;">${error.message}</spam> `,
-                    showCloseButton: true,
-                  });
+                  this.mensajeError(`¡Error al insertar la materia prima asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`, error.message);
                 });
                 this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
               }
@@ -570,14 +467,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         }, error => {
           this.error = true;
           this.load = true;
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            html:
-            '<b>¡Error al consultar el proceso!</b><hr> ' +
-            `<spam style="color : #f00;">${error.message}</spam> `,
-            showCloseButton: true,
-          });
+          this.mensajeError(`¡Error al consultar el proceso!`, error.message);
         });
       }
       setTimeout(() => { if (!this.error) this.asignacionExitosa(); }, 3500);
@@ -586,12 +476,20 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   // Funcion que va a enviar un mensaje de confirmación indicando que la asignacion se creó bien
   asignacionExitosa() {
-    if (!this.error) {
+    if (!this.error && !this.soloTintas) {
       Swal.fire({
         icon: 'success',
         title: '¡Asignacón Creada Satisfactoriamente!',
         html:
         `<b>¡La asignación ha sido creada de manera satisfactoria!</b><hr> `,
+        showCloseButton: true,
+      });
+      this.LimpiarCampos();
+    } else if (this.soloTintas && this.cantidadAsignada > this.cantRestante) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Asignación de Tintas',
+        html:`<b>¡La asignación se ha registrado satisfactoriamente!</b><hr> ` + `<spam>¡Solo se crearon las asignaciones de tintas!</spam>`,
         showCloseButton: true,
       });
       this.LimpiarCampos();
@@ -617,14 +515,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).subscribe(datos_mp_creada => { }, error => {
           this.error = true;
           this.load = true;
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            html:
-            `<b>¡Error al mover el invenatario de la materia prima ${datos_materiaPrima.matPri_Nombre}!</b><hr> ` +
-            `<spam style="color : #f00;">${error.message}</spam> `,
-            showCloseButton: true,
-          });
+          this.mensajeError(`¡Error al mover el invenatario de la materia prima ${datos_materiaPrima.matPri_Nombre}!`, error.message);
         });
       });
     }
@@ -651,14 +542,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         this.tintasService.srvActualizar(idMateriaPrima, datosTintas).subscribe(datos_tintasActualizada => { }, error => {
           this.error = true;
           this.load = true;
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            html:
-            `<b>¡Error al mover el invenatario de la tinta ${datos_tintas.tinta_Nombre}!</b><hr> ` +
-            `<spam style="color : #f00;">${error.message}</spam> `,
-            showCloseButton: true,
-          });
+          this.mensajeError(`¡Error al mover el invenatario de la tinta ${datos_tintas.tinta_Nombre}!`, error.message);
         });
       });
     }
@@ -672,5 +556,15 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         if (datos_otImp[i].ot.trim() != '') this.otImpresion.push(datos_otImp[i].ot.trim());
       }
     });
+  }
+
+  // Mensaje de Advertencia
+  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  }
+
+  // Mensaje de Error
+  mensajeError(text : string, error : any = ''){
+    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
   }
 }

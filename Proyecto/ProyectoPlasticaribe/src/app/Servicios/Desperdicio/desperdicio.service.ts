@@ -29,6 +29,10 @@ export class DesperdicioService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Desperdicios/getUltimoPedido`);
   }
 
+  GetDesperdicioOt(ot : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Desperdicios/GetDesperdicioOt/${ot}`);
+  }
+
   Put(id:number|String, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Desperdicios/${id}`, data);
   }

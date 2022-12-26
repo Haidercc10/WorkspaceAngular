@@ -120,6 +120,11 @@ export class OcompraComponent implements OnInit {
     this.generarConsecutivo();
   }
 
+  // Funcion que va a limpiar los campos de materia prima
+  limpiarCamposMateriaPrima(){
+    this.FormMateriaPrima.reset();
+  }
+
   //Funcion que va a consultar los proveedores por el nombre que esten escribiendo en el campo de proveedor
   consultarProveedores(){
     this.proveedores = [];
@@ -143,7 +148,7 @@ export class OcompraComponent implements OnInit {
         Id_Proveedor : id,
         Observacion : this.FormOrdenCompra.value.Observacion,
       });
-    });
+    }, error => { this.mensajeError(`¡No se pudo obtener información del proveedor!`, error.message); });
   }
 
   // Generar Consecutivo de Orden de Compra
@@ -156,15 +161,6 @@ export class OcompraComponent implements OnInit {
         Observacion : this.FormOrdenCompra.value.Observacion,
       });
     }, error => {
-      console.log(error);
-      // Swal.fire({
-      //   icon: 'error',
-      //   title: 'Oops...',
-      //   html:
-      //   '<b>¡Error al consultar el ultimo consecutivo de las ordenes de compra!</b><hr> ' +
-      //   `<spam style="color : #f00;">${error.message}</spam> `,
-      //   showCloseButton: true,
-      // });
       this.FormOrdenCompra = this.frmBuilder.group({
         ConsecutivoOrden : 1,
         Proveedor : this.FormOrdenCompra.value.Proveedor,
@@ -209,7 +205,7 @@ export class OcompraComponent implements OnInit {
           Categoria : datos_materiaPrima[i].categoria,
         });
       }
-    });
+    }, error => { this.mensajeError(`¡No se pudo obtener información sobre la materia prima seleccionada!`, error.message); });
   }
 
   // Funcion que va a añadir la materia prima a la tabla
@@ -237,9 +233,9 @@ export class OcompraComponent implements OnInit {
           this.catidadTotalPeso += this.FormMateriaPrima.value.Cantidad;
           this.cantidadTotalPrecio += (this.FormMateriaPrima.value.Cantidad * this.FormMateriaPrima.value.PrecioOculto);
           this.FormMateriaPrima.reset();
-        } else Swal.fire(`¡La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
-      } else Swal.fire(`¡La materia prima '${this.FormMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
-    } else Swal.fire(`¡Hay campos vacios!`);
+        } else this.mensajeAdvertencia(`¡La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
+      } else this.mensajeAdvertencia(`¡La materia prima '${this.FormMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
+    } else this.mensajeAdvertencia(`¡Hay campos vacios!`);
   }
 
   // Funcion que va a quitar la materia prima
@@ -333,13 +329,15 @@ export class OcompraComponent implements OnInit {
   validarDatosOrdenCompra(){
     if (this.FormOrdenCompra.valid) {
       if (this.materiasPrimasSeleccionadas.length > 0) this.crearOrdenCompra();
-      else Swal.fire(`¡Debe escoger minimos 1 Materia Prima!`);
-    } else Swal.fire(`¡Hay Campos Vacios!`);
+      else this.mensajeAdvertencia(`¡Debe escoger minimos 1 Materia Prima!`);
+    } else this.mensajeAdvertencia(`¡Hay Campos Vacios!`);
   }
 
   // Funcion que va a crear la orden de compra
   crearOrdenCompra(){
     this.cargando = false;
+    let observacion : string = this.FormOrdenCompra.value.Observacion;
+    if (observacion == null) observacion = '';
     let info : any = {
       Usua_Id : this.storage_Id,
       Oc_Fecha : moment().format('YYYY-MM-DD'),
@@ -349,16 +347,10 @@ export class OcompraComponent implements OnInit {
       Oc_ValorTotal : this.cantidadTotalPrecio,
       Oc_PesoTotal : this.catidadTotalPeso,
       TpDoc_Id : 'OCMP',
-      Oc_Observacion : (this.FormOrdenCompra.value.Observacion).toUpperCase(),
+      Oc_Observacion : (observacion).toUpperCase(),
     }
     this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => { this.crearDtOrdenCompra(); }, error => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        html:
-        '<b>¡Error al Crear la Orden de Compra!</b><hr> ' +
-        `<spam style="color : #f00;">${error.message}</spam> `,
-      });
+      this.mensajeError(`¡Error al Crear la Orden de Compra!`, error.message);
       this.cargando = false;
     });
   }
@@ -377,14 +369,7 @@ export class OcompraComponent implements OnInit {
           Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[j].Precio,
         }
         this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => { this.GuardadoExitoso(); }, error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            html:
-            '<b>¡Error al insertar la(s) materia(s) prima(s) pedida(s)!</b><hr> ' +
-            `<spam style="color : #f00;">${error.message}</spam> `,
-            showCloseButton: true,
-          });
+          this.mensajeError(`¡Error al insertar la(s) materia(s) prima(s) pedida(s)!`, error.message);
           this.cargando = false;
         });
       }
@@ -439,8 +424,8 @@ export class OcompraComponent implements OnInit {
         this.informacionPDF.push(info);
         this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
-    });
-    setTimeout(() => {this.generarPDF(); }, 2500);
+      setTimeout(() => {this.generarPDF(); }, 2500);
+    }, error => { this.mensajeError(`¡No se pudo obtener información de la última orden de compra creada!`, error.message); });
   }
 
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
@@ -638,7 +623,7 @@ export class OcompraComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    });
+    }, error => { this.mensajeError(`¡No se pudo obtener la información de la última orden de compra creada!`, error.message); });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -670,5 +655,15 @@ export class OcompraComponent implements OnInit {
         }
       }
     };
+  }
+
+  // Mensaje de Advertencia
+  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  }
+
+  // Mensaje de Error
+  mensajeError(text : string, error : any = ''){
+    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
   }
 }

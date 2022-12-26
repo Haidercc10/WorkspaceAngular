@@ -137,7 +137,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         for (let i = 0; i < datos_rollos.length; i++) {
           rollos.push(datos_rollos[i]);
         }
-      });
+      }, error => { this.mensajeError(`¡No se pudo consultar la informacion de los rollos ingresados anteriormente!`, error.message); });
 
       setTimeout(() => {
         if (ot != null && fechaInicial != null && fechaFinal != null) {
@@ -713,7 +713,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   //Funcion que creará el ingreso de los rollos
   ingresaroRollos(){
-    if (this.rollosInsertar.length == 0) Swal.fire(`¡Debe selecionar minimo un rollo para realizar el ingreso!`);
+    if (this.rollosInsertar.length == 0) this.mensajeAdvertencia(`¡Debe selecionar minimo un rollo para realizar el ingreso!`);
     else {
       let Observacion : string = this.FormConsultarRollos.value.Observacion;
       this.cargando = false;
@@ -728,21 +728,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
           this.DtIngresarRollos(datos_ingreso.ingRollo_Id);
         });
       }, error => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'error',
-          title: '¡Error al ingresar los rollos!'
-        });
+        this.mensajeError(`¡¡Error al ingresar los rollos!!`, error.message);
         this.cargando = true;
       });
     }
@@ -763,23 +749,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
           Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
         }
         this.dtIngRollosService.srvGuardar(info).subscribe(datos_rollos => {
-
-        }, error => {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 2500,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          });
-          Toast.fire({
-            icon: 'error',
-            title: '¡Error al ingresar los rollos!'
-          });
+        }, error => { this.mensajeError(`¡¡Error al ingresar los rollos!!`, error.message);
           this.cargando = true;
         });
       }
@@ -789,21 +759,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   //Funcion que se encargará de lenviar el mensaje de confirmación del envio y limpiará los campos
   finalizarInsercion(id : number){
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'center',
-      showConfirmButton: false,
-      timer: 4000,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-      }
-    });
-    Toast.fire({
-      icon: 'success',
-      title: `¡${this.totalRollos} rollos han sido ingresados correctamente!`
-    });
+    Swal.fire({ icon: 'success', title: '', text : '¡${this.totalRollos} rollos han sido ingresados correctamente!', showCloseButton: true, });
     this.buscarRolloPDF(id);
   }
 
@@ -919,7 +875,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         }
         break;
       }
-    });
+    }, error => { this.mensajeError(`¡No se pudo obtener la información del último ingreso de rollos!`, error.message); });
   }
 
   // Funcion que traerá los rollos que fueron ingresados
@@ -938,8 +894,8 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         this.rollosPDF.push(info);
         this.rollosPDF.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
-    });
-    setTimeout(() => { this.crearPDF(id); }, 1200);
+      setTimeout(() => { this.crearPDF(id); }, 1200);
+    }, error => { this.mensajeError(`¡No se pudo obtener información del último ingreso de rollos!`, error.message); });
   }
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
@@ -947,11 +903,11 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
     var body = [];
     body.push(columns);
     data.forEach(function(row) {
-        var dataRow = [];
-        columns.forEach(function(column) {
-            dataRow.push(row[column].toString());
-        });
-        body.push(dataRow);
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
     });
 
     return body;
@@ -960,17 +916,17 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
   // Funcion que genera la tabla donde se mostrará la información de los rollos
   table(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [60, 60, 60, 228, 40, 50],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 7,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [60, 60, 60, 228, 40, 50],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 7,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
   }
 
@@ -989,5 +945,15 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
           }
         }
     };
+  }
+
+  // Mensaje de Advertencia
+  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  }
+
+  // Mensaje de Error
+  mensajeError(text : string, error : any = ''){
+    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
   }
 }

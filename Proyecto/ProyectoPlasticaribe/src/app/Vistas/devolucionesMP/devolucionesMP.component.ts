@@ -128,17 +128,8 @@ export class DevolucionesMPComponent implements OnInit {
           }
         }
       }
-    }, error => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        html:
-        `<b>¡No hay materia prima asignadas a la orden de trabajo ${ot}!</b><hr> ` +
-        `<spam style="color : #f00;">${error.message}</spam> `,
-      });
-    });
+    }, error => { this.mensajeError(`¡¡No hay materia prima asignadas a la orden de trabajo ${ot}!!`, error.message); });
     setTimeout(() => {
-
       this.devolucionMPService.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
         for (let j = 0; j < datos_devolucion.length; j++) {
           for (let i = 0; i < this.materiasPrimas.length; i++) {
@@ -149,15 +140,7 @@ export class DevolucionesMPComponent implements OnInit {
             }
           }
         }
-      }, error => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          html:
-          `<b>¡Error al obtener las devoluciones de la ot ${ot}!</b><hr> ` +
-          `<spam style="color : #f00;">${error.message}</spam> `,
-        });
-      });
+      }, error => { this.mensajeError(`¡¡Error al obtener las devoluciones de la ot ${ot}!!`, error.message); });
       this.load = true;
     }, 2500);
   }
@@ -212,23 +195,9 @@ export class DevolucionesMPComponent implements OnInit {
         Usua_Id : this.storage_Id,
       }
 
-      this.devolucionService.srvGuardar(datosDevolucion).subscribe(datos_DevolucionCreada => { this.creacionDevolucionMateriaPrima(); }, error => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          html:
-          '<b>¡Error al crear la  devolución de materia prima!</b><hr> ' +
-          `<spam style="color : #f00;">${error.message}</spam> `,
-        });
-      });
-    } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Oops...',
-        html:
-        `<b>¡Debe seleccionar minimo 1 materia prima para devolver!</b><hr> `,
-      });
-    }
+      this.devolucionService.srvGuardar(datosDevolucion).subscribe(datos_DevolucionCreada => { this.creacionDevolucionMateriaPrima();
+      }, error => { this.mensajeError(`¡¡Error al crear la  devolución de materia prima!!`, error.message); });
+    } else this.mensajeAdvertencia(`¡Debe seleccionar minimo 1 materia prima para devolver!`);
   }
 
   //Funcion que creará el registro de la materia que viene en un pedido
@@ -245,15 +214,8 @@ export class DevolucionesMPComponent implements OnInit {
             UndMed_Id : this.materiasPrimasRetiradas[i].Unidad_Medida,
             Proceso_Id : this.materiasPrimasRetiradas[i].Proceso,
           }
-          this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(datos_recuperadoMpCreada => {  }, error => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              html:
-              `<b>¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!</b><hr> ` +
-              `<spam style="color : #f00;">${error.message}</spam> `,
-            });
-          });
+          this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(datos_recuperadoMpCreada => {
+          }, error => { this.mensajeError(`¡¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!!`, error.message); });
         }
       }
     });
@@ -261,9 +223,7 @@ export class DevolucionesMPComponent implements OnInit {
       this.moverInventarioMpAgregada();
       this.moverInventarioTintas();
       this.moverInventarioBopp();
-      setTimeout(() => {
-        this.limpiarTodosCampos();
-      }, (1000));
+      setTimeout(() => { this.limpiarTodosCampos(); }, (1000));
     }, (20 * this.materiasPrimasRetiradas.length));
   }
 
@@ -295,13 +255,7 @@ export class DevolucionesMPComponent implements OnInit {
               `<b>¡Registro de Devolución Creado Con Exito!</b><hr> `
             });
           }, error => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              html:
-              `<b>¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!</b><hr> ` +
-              `<spam style="color : #f00;">${error.message}</spam> `,
-            });
+            this.mensajeError(`¡¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!!`, error.message);
             this.load = true;
           });
         });
@@ -339,13 +293,7 @@ export class DevolucionesMPComponent implements OnInit {
               `<b>¡Registro de Devolución Creado Con Exito!</b><hr> `
             });
           }, error => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              html:
-              `<b>¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!</b><hr> ` +
-              `<spam style="color : #f00;">${error.message}</spam> `,
-            });
+            this.mensajeError(`¡¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!!`, error.message);
             this.load = true;
           });
         });
@@ -390,13 +338,7 @@ export class DevolucionesMPComponent implements OnInit {
                 `<b>¡Registro de Devolución Creado Con Exito!</b><hr> `
               });
             }, error => {
-              Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                html:
-                `<b>¡No se ha podido mover el inventario del bopp ${this.materiasPrimasRetiradas[i].Nombre}!</b><hr> ` +
-                `<spam style="color : #f00;">${error.message}</spam> `,
-              });
+              this.mensajeError(`¡¡No se ha podido mover el inventario del bopp ${this.materiasPrimasRetiradas[i].Nombre}!!`, error.message);
               this.load = true;
             });
           }
@@ -417,4 +359,13 @@ export class DevolucionesMPComponent implements OnInit {
     this.materiasPrimasRetiradas = [];
   }
 
+  // Mensaje de Advertencia
+  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  }
+
+  // Mensaje de Error
+  mensajeError(text : string, error : any = ''){
+    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+  }
 }

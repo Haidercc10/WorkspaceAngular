@@ -1,5 +1,7 @@
 <!-- Navegador parte superior -->
-<app-menuLateral></app-menuLateral>
+<ng-container *ngIf="!modeModal">
+  <app-menuLateral></app-menuLateral>
+</ng-container>
 
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">

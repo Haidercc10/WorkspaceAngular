@@ -31,6 +31,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   @ViewChild(DatosOTStatusComponent) MostrarDatosOTxStatus : DatosOTStatusComponent;
   @ViewChild(ReporteCostosOTComponent) reporteCostos : ReporteCostosOTComponent;
 
+  modeModal : boolean = false;
+
   public formularioOT !: FormGroup;
   public page1 : number; //Variable que tendrá el paginado de la tabla en la que se muestran los pedidos consultados
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador

@@ -135,12 +135,7 @@ export class EntradaBOPPComponent implements OnInit {
 
       this.entradaBOPPService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
         if (datos_bopp.length != 0) {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Advertencia',
-            text: "¡Ya existe un bopp con el serial ${serial}, por favor colocar un serial distinto!",
-            showCloseButton: true
-          });
+          this.mensajeAdvertencia(`¡Ya existe un bopp con el serial ${serial}, por favor colocar un serial distinto!`);
           this.load = true;;
         } else {
           this.categoriaService.srvObtenerListaPorId(categoria).subscribe(datos_categorias => {
@@ -175,26 +170,13 @@ export class EntradaBOPPComponent implements OnInit {
           });
         }
       });
-    } else {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Advertencia',
-        text: "¡Hay campos vacios!",
-        showCloseButton: true
-      });
-    }
+    } else this.mensajeAdvertencia(`¡Hay campos vacios!`);
   }
 
   // funcion que crea los rollos en la tabla
   crearEntrada(){
-    if (this.ArrayBOPP.length == 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Advertencia',
-        text: "¡Debe cargar minimo un BOPP en la tabla!",
-        showCloseButton: true
-      });
-    } else {
+    if (this.ArrayBOPP.length == 0) this.mensajeAdvertencia("¡Debe cargar minimo un BOPP en la tabla!");
+    else {
       this.load = false
       for (let i = 0; i < this.ArrayBOPP.length; i++) {
         let bodega : number;
@@ -231,12 +213,7 @@ export class EntradaBOPPComponent implements OnInit {
 
           this.limpiarTodosLosCampos();
         }, error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Opps...',
-            html: `<b>¡Error al ingresar el rollo!</b><hr>` + `<spam style="color: #f00">${error}</spam>`,
-            showCloseButton: true
-          });
+          this.mensajeError(`¡¡Error al ingresar el rollo!!`, error.message);
           this.load = true;
         });
       }
@@ -259,5 +236,15 @@ export class EntradaBOPPComponent implements OnInit {
         }
       }
     });
+  }
+
+  // Mensaje de Advertencia
+  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  }
+
+  // Mensaje de Error
+  mensajeError(text : string, error : any = ''){
+    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
   }
 }
