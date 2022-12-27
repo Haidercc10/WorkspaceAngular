@@ -22,14 +22,6 @@
               <h5 class="card-title">Ordenes de Trabajo Creadas</h5>
               <p class="card-text">El último mes (desde el día <b>{{primerDiaMes}}</b> hasta el día <b>{{today}}</b>) se han creado <b>{{totalOrdenesMes | number}}</b> ordenes de trabajo.</p>
               <p class="card-text">El costo estimado de las ordenes de trabajo creadas el último mes es de <b>{{costoTotalOrdenesMes | currency : ' COP $'}}</b></p>
-              <span class="card-text">
-                Comparativo de la Materia Prima que se ha asignado a las Ordenes de Trabajo creadas en el último mes con la Materia Prima que se ha extruido de las Ordenes de Trabajo creadas en el último mes:
-                <ol>
-                  <b><li>Materia Prima Asignada {{totalMpAsignada | number}} Kg</li></b>
-                  <b><li>Materia Prima Extruida {{totalExtruidoMes | number}} Kg</li></b>
-                </ol>
-              </span>
-              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar el comparativo de materia prima" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#comparativoMP" (click)="llenarGraficaComparativo()"></button>
             </div>
           </div>
         </div>
@@ -147,7 +139,7 @@
               <ng-template #OrdenesMayorCero>
                 <p class="card-text">Estas son las cantidades producidas por cada procesos creadas en el último mes:</p>
                 <p class="card-text" *ngFor="let item of procesosOrdenesMes; let i=index">
-                  <span class="card-text"><b>{{item.nomStatus}}:</b> {{item.peso | number}} Kg <label *ngIf="item.nomStatus == 'SELLADO' || item.nomStatus == 'Wiketiado'"> - {{item.und | number}} Und</label></span><br>
+                  <span class="card-text"><b>{{item.Nombre}}:</b> {{item.cantidad | number}} Kg <label *ngIf="item.Nombre == 'SELLADO' || item.Nombre == 'Wiketiado'"> - {{item.und | number}} Und</label></span><br>
                 </p>
               </ng-template>
             </div>
@@ -418,6 +410,24 @@
                   <span>{{i + 1}}) <b>{{item.tinta_Nombre}}</b> con una cantidad de <b>{{item.cantidad | number}} Kg</b>.</span>
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+        <!--  -->
+        <div class="col">
+          <div class="card h-100">
+            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Comparativo de Materia Prima</h5>
+              <span class="card-text">
+                Comparativo de la Materia Prima que se ha asignado a las Ordenes de Trabajo creadas en el último mes con la Materia Prima que se ha extruido de las Ordenes de Trabajo creadas en el último mes:
+                <ol>
+                  <b><li>Materia Prima Asignada {{totalMpAsignada | number}} Kg</li></b>
+                  <b><li>Materia Prima Extruida {{totalExtruidoMes | number}} Kg</li></b>
+                </ol>
+              </span>
+              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar el comparativo de materia prima" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#comparativoMP" (click)="llenarGraficaComparativo()"></button>
             </div>
           </div>
         </div>

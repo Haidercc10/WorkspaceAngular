@@ -66,4 +66,13 @@ export class OrdenCompra_MateriaPrimaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/OrdenesCompras_FacturasCompras/FacturasComprasAsociadasAOC/${IdOrden}`);
   }
 
+  /** 2 formas de obtener las remisiones que se encuentran asociadas a una OC.  */
+  getRemisionesAsociadasAOC(IdOrden : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_OrdenCompra/RemisionesAsociadasAOC/${IdOrden}`);
+  }
+
+  getRemisionesComprasAsociadasAOC(IdOrden : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Remision_OrdenCompra/RemisionesComprasAsociadasAOC/${IdOrden}`);
+  }
+
 }

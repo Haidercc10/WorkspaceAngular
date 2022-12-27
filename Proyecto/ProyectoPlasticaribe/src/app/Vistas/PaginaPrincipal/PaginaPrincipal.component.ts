@@ -497,8 +497,28 @@ export class PaginaPrincipalComponent implements OnInit {
            || datos_ordenes[i].nomStatus == 'DOBLADO'
            || datos_ordenes[i].nomStatus == 'EMPAQUE'
            || datos_ordenes[i].nomStatus == 'SELLADO'
-           || datos_ordenes[i].nomStatus == 'Wiketiado') this.procesosOrdenesMes.push(datos_ordenes[i]);
-        this.procesosOrdenesMes.sort((a,b) => a.nomStatus.localeCompare(b.nomStatus));
+           || datos_ordenes[i].nomStatus == 'Wiketiado') {
+            let id : number = 0;
+            if (datos_ordenes[i].nomStatus == 'EXTRUSION') id = 1;
+            if (datos_ordenes[i].nomStatus == 'IMPRESION') id = 2;
+            if (datos_ordenes[i].nomStatus == 'ROTOGRABADO') id = 3;
+            if (datos_ordenes[i].nomStatus == 'LAMINADO') id = 4;
+            if (datos_ordenes[i].nomStatus == 'EMPAQUE') {
+              id = 5;
+              datos_ordenes[i].nomStatus = 'CORTE';
+            }
+            if (datos_ordenes[i].nomStatus == 'DOBLADO') id = 6;
+            if (datos_ordenes[i].nomStatus == 'SELLADO') id = 7;
+            if (datos_ordenes[i].nomStatus == 'Wiketiado') id = 8;
+            let info : any  = {
+              id : id,
+              Nombre : datos_ordenes[i].nomStatus,
+              cantidad : datos_ordenes[i].peso,
+              und : datos_ordenes[i].und,
+            }
+            this.procesosOrdenesMes.push(info);
+          this.procesosOrdenesMes.sort((a,b) => Number(a.id) - Number(b.id));
+        }
       }
     }, error => { this.mensajeError(`¡No se ha podido consultar la cantidad producida por cada proceso de las ordenes que se crearon el ultimo mes!`, error.message); });
 

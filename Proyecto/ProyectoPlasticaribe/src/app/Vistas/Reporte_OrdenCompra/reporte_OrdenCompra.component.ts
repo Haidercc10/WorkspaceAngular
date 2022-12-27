@@ -28,6 +28,10 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   registrosConsultados : any [] = []; //Variable que va a almacenar los diferentes registros consultados
   datosPdf : any [] = []; //variable que va a almacenar la informacion de la orden de compra consultada
 
+  // Editar Orden de Compra
+  mostrarModal : boolean = false; //Variable que va a mostrar o no, el modal para editar ordenes de compra
+  numeroOrdenCompra : number = 0; //Variable que va a almcenar el numero de la orden de compra que se desea editar
+
   constructor(private frmBuilder : FormBuilder,
                 private rolService : RolesService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -482,6 +486,12 @@ export class Reporte_OrdenCompraComponent implements OnInit {
         }
       }
     };
+  }
+
+  // Funcion que abrirá y llenará el modal con la informacion de la orden de compra
+  llenarModal(numeroOrden : number){
+    this.mostrarModal = true;
+    this.numeroOrdenCompra = numeroOrden;
   }
 
   // Mensaje de Advertencia

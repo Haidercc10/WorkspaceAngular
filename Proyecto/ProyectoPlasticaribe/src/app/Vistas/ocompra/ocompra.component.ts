@@ -18,7 +18,7 @@ import Swal from 'sweetalert2';
 })
 
 @Component({
-  selector: 'app.ocompra.component',
+  selector: 'app_ocompra_component',
   templateUrl: './ocompra.component.html',
   styleUrls: ['./ocompra.component.css']
 
