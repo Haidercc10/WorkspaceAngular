@@ -22,7 +22,7 @@ import Swal from 'sweetalert2';
 export class Reporte_DesperdiciosComponent implements OnInit {
 
   public formFiltros !: FormGroup; /** Formulario de filtros */
-  public load: boolean = false; /** Variable que realizará la carga al momento de consultar */
+  public load: boolean = true; /** Variable que realizará la carga al momento de consultar */
   public arrayMateriales = []; /** array que contendrá los materiales de materia prima*/
   public arrayProductos = []; /** array que cargará los productos con la consulta de tipo LIKE*/
   public idProducto: any = 0; /** ID de producto que se cargará en el campo ITEM, pero se mostrará el nombre. */
@@ -125,7 +125,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   /** Función que consultará según los campos de busqueda diferentes de vacio. */
   Consultar() {
-    this.load = true;
+    this.load = false;
     let OT : any = this.formFiltros.value.OT;
     let fecha1 : any = this.formFiltros.value.fechaInicio
     let fecha2 : any = this.formFiltros.value.fechaFinal
@@ -155,13 +155,17 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     } else {
       ruta = ``;
     }
-    this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, ruta).subscribe(dataDesperdicios => {
-      for (let index = 0; index < dataDesperdicios.length; index++) {
-        if(dataDesperdicios.length == 0) this.advertencia('¡No se encontraron resultados de búsqueda con los filtros consultados!');
-        else this.llenarTabla(dataDesperdicios[index]);
-      }
-    });
-    setTimeout(() => {this.load = false; }, 1000);
+
+    setTimeout(() => {
+      this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, ruta).subscribe(dataDesperdicios => {
+        if(dataDesperdicios.length == 0) this.advertenciaFechas(fecha1, fecha2);
+        else
+        for (let index = 0; index < dataDesperdicios.length; index++) {
+          this.llenarTabla(dataDesperdicios[index]);
+        }
+      });
+    }, 900);
+    setTimeout(() => {  this.load = true; }, 1000);
   }
 
   /** Llenar la tabla inicial de resultados de busqueda */
@@ -220,8 +224,11 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   }
 
   /** Función para mensaje de tipo advertencia. */
-  advertencia(mensaje : string){
-    Swal.fire({icon: 'warning',  title: 'Advertencia', text: mensaje, confirmButtonColor: '#ffc107', });
+  advertenciaFechas(fecha1 : any, fecha2 : any){
+    if(fecha1 == this.today && fecha2 == this.today) Swal.fire({icon: 'warning',  title: 'Advertencia', text: `No se encontraron resultados de búsqueda de hoy.`, confirmButtonColor: '#ffc107',});
+    else if (fecha1 == this.today && fecha2 != this.today) Swal.fire({icon: 'warning',  title: 'Advertencia', text: `No se encontraron resultados en las fechas consultadas.`, confirmButtonColor: '#ffc107',});
+    else if (fecha1 != this.today && fecha2 != this.today) Swal.fire({icon: 'warning',  title: 'Advertencia', text: `No se encontraron resultados en las fechas consultadas.`, confirmButtonColor: '#ffc107',});
+    else Swal.fire({icon: 'warning',  title: 'Advertencia', text: `No se encontraron resultados de búsqueda con los filtros consultados.`, confirmButtonColor: '#ffc107',});
   }
 
   /** Función que calcula la cantidad total del desperdicio */
@@ -324,6 +331,12 @@ export class Reporte_DesperdiciosComponent implements OnInit {
             },
 
             this.table(this.arrayModal, ['OT', 'Maquina', 'Item', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Und', 'Impreso', 'Proceso', 'Fecha', ]),
+            '\n',
+            {
+              text: `Cantidad total: ${this.formatonumeros(this.totalDesperdicio)} Kg\n `,
+              alignment: 'right',
+              style: 'header'
+            },
           ],
           styles: {
             header: {
@@ -345,7 +358,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
          }
          const pdf = pdfMake.createPdf(infoPdf);
          pdf.open();
-         this.load = false;
+         this.load = true;
          this.Confirmacion(`¡PDF generado con éxito!`);
          break;
       }
@@ -384,6 +397,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     };
   }
 
+  /** Convertir image en base 64 */
   getBase64ImageFromURL(url) {
     return new Promise((resolve, reject) => {
       var img = new Image();
@@ -431,8 +445,14 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     return number.toString().replace(exp,rep);
   }
 
+  /** Mensaje de confirmación que se motrará al generar un Pdf */
   Confirmacion(mensaje : string) {
     this.messageService.add({severity:'success', detail: mensaje});
+  }
+
+  /** Mensaje de alerta que se emitirá al momento de no encontrar datos de una consulta o por alguna inconsistencia */
+  advertencia(mensaje : any){
+    Swal.fire({icon: 'warning',  title: 'Advertencia', text: mensaje, confirmButtonColor: '#ffc107',});
   }
 }
 

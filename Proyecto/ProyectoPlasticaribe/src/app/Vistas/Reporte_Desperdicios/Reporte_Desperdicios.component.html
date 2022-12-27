@@ -1,6 +1,6 @@
 <app-menuLateral></app-menuLateral>
 
-<div class="d-flex justify-content-center overlay" *ngIf="load">
+<div class="d-flex justify-content-center overlay" *ngIf="!load">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
     <span class="visually-hidden">Cargando...</span>
   </div>
@@ -43,7 +43,7 @@
 
         <!-- Fecha final -->
         <div class="form-floating col-md-2">
-          <input formControlName="fechaFinal" type="date" min="0"  class="form-control" id="floatingInput"required > <!--(change)="buscarBOPPSegunFecha()"-->
+          <input formControlName="fechaFinal" type="date" min="0"  class="form-control" id="floatingInput"required >
           <label for="floatingInput">Fecha Final</label>
          </div>
 
@@ -80,7 +80,7 @@
   </div>
 
    <!-- TABLA DE RETIRO -->
-   <div class="mb-3" *ngIf="!load">
+   <div class="mb-3" *ngIf="load">
       <p-table
         #dt
         [value]="arrayConsulta"
