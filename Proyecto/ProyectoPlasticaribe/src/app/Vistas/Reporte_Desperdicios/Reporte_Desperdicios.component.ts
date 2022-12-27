@@ -191,13 +191,14 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   consultarOTenTabla(item : any){
     this.arrayModal = [];
     this.otSeleccionada = item.OT;
+    this.load = false;
     this.servicioDesperdicios.getDesperdicioxOT(item.OT).subscribe(dataDesperdicios => {
       for (let index = 0; index < dataDesperdicios.length; index++) {
         this.llenarModal(dataDesperdicios[index]);
       }
       this.pesoTotalDesperdicio();
     });
-
+    setTimeout(() => { this.load = true }, 500);
   }
 
   /** Función para llenar la tabla de modal. */
@@ -410,9 +411,82 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     Swal.fire({icon: 'warning',  title: 'Advertencia', text: mensaje, confirmButtonColor: '#ffc107',});
   }
 
+
   // Funcion que mostrará un mensaje de error
   mensajeError(text : string, error : any){
     Swal.fire({icon: 'error',  title: 'Opps...', showCloseButton : true, html: `<b>${text}</b>` + `<span style="color: #F00">${error}</span>`});
   }
+
+  /* movimientosDesperdicios() {
+    let OT : any = this.formFiltros.value.OT;
+    let fecha1 : any = this.formFiltros.value.fechaInicio;
+    let fecha2 : any = this.formFiltros.value.fechaFinal;
+    let material : any = this.formFiltros.value.Material;
+    let item : any = this.formFiltros.value.Producto
+    let maquina : any = this.formFiltros.value.Producto
+    let proceso : any = this.formFiltros.value.Producto
+    let falla : any = this.formFiltros.value.Producto
+    let ruta : string = ``;
+
+    if(OT != null && proceso != null && material != null && item != null && maquina != null && falla != null) ruta = `?`;
+    else if(OT != null && proceso != null && material != null && item != null && maquina != null) ruta = `?`;
+    else if(OT != null && proceso != null && falla != null && item != null && maquina != null) ruta = `?`;
+    else if(OT != null && material != null && item != null && maquina != null  && falla != null) ruta = `?`;
+    else if(proceso != null && material != null && item != null && maquina != null  && falla != null) ruta = `?`;
+    else if(OT != null && proceso != null && material != null && item != null) ruta = `?`;
+    else if(OT != null && material != null && item != null && maquina != null) ruta = `?`;
+    else if(OT != null && item != null && maquina != null && falla != null) ruta = `?`;
+    else if(OT != null && material != null && maquina != null && falla != null) ruta = `?`;
+    else if(proceso != null && material != null && item != null && maquina != null) ruta = `?`;
+    else if(proceso != null && item != null && maquina != null && falla != null) ruta = `?`;
+    else if(proceso != null && material != null && falla != null && maquina != null) ruta = `?`;
+    else if(material != null && item != null && maquina != null && falla != null) ruta = `?`;
+    else if(OT != null && proceso != null && maquina != null && item != null) ruta = `?`;
+    else if(OT != null && proceso != null && material != null) ruta = `?`;
+    else if(OT != null && material != null && item != null) ruta = `?`;
+    else if(OT != null && item != null && maquina != null) ruta = `?`;
+    else if(OT != null && maquina != null && falla != null) ruta = `?`;
+    else if(OT != null && maquina != null && item != null) ruta = `?`;
+    else if(OT != null && maquina != null && material != null) ruta = `?`;
+    else if(proceso != null && item != null && material != null) ruta = `?`;
+    else if(proceso != null && maquina != null && falla != null) ruta = `?`;
+    else if(material != null && item != null && maquina != null) ruta = `?`;
+    else if(material != null && maquina != null && falla != null) ruta = `?`;
+    else if(material != null && item != null && falla != null) ruta = `?`;
+    else if(item != null && maquina != null && falla != null) ruta = `?`;
+    else if(proceso != null && maquina != null && material != null) ruta = `?`;
+    else if(proceso != null && falla != null && material != null) ruta = `?`;
+    else if(proceso != null && item != null && material != null) ruta = `?`;
+    else if(OT != null && proceso != null) ruta = `?`;
+    else if(OT != null && material != null) ruta = `?`;
+    else if(OT != null && item != null) ruta = `?`;
+    else if(OT != null && maquina != null) ruta = `?`;
+    else if(OT != null && falla != null) ruta = `?`;
+    else if(proceso != null && material != null) ruta = `?`;
+    else if(proceso != null && item != null) ruta = `?`;
+    else if(proceso != null && maquina != null) ruta = `?`;
+    else if(proceso != null && falla != null) ruta = `?`;
+    else if(material != null && item != null) ruta = `?`;
+    else if(material != null && maquina != null) ruta = `?`;
+    else if(material != null && falla != null) ruta = `?`;
+    else if(item != null && maquina != null) ruta = `?`;
+    else if(item != null && falla != null) ruta = `?`;
+    else if(maquina != null && falla != null) ruta = `?`;
+    else if(OT != null) ruta = `?`;
+    else if(proceso != null) ruta = `?`;
+    else if(material != null) ruta = `?`;
+    else if(maquina != null) ruta = `?`;
+    else if(falla != null) ruta = `?`;
+    else if(item != null) ruta = `?`;
+    else ruta = ``;
+
+    this.servicioDesperdicios.getMovimientosDesperdicios(fecha1, fecha2, ruta).subscribe(dataDesperdicios => {
+      if(dataDesperdicios.length == 0) this.advertenciaFechas(fecha1, fecha2);
+      else
+      for (let index = 0; index < dataDesperdicios.length; index++) {
+
+      }
+    });
+  } */
 }
 
