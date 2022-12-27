@@ -768,6 +768,7 @@ export class MovimientosBOPPComponent implements OnInit {
 
   // Funcion que permitirá ver la informacion del documento en un formato PDF
   verPDF(data : any){
+    let nombre : string = this.storage.get('Nombre');
     if (data.tipoId == 'ASIGBOPP') {
       this.asignacionBOPPService.srvObtenerListaPorId(data.id).subscribe(datos_asignacionBOPP => {
         let boppAsg : any = [];
@@ -780,6 +781,17 @@ export class MovimientosBOPPComponent implements OnInit {
                   const pdfDefinicion : any = {
                     info: {
                       title: `Asignación BOPP N° ${item.asigBOPP_Id}`
+                    },
+                    footer: function(currentPage : any, pageCount : any) {
+                      return [
+                        {
+                          columns: [
+                            { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                            { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                            { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                          ]
+                        }
+                      ]
                     },
                     content : [
                       {

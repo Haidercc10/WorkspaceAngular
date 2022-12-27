@@ -294,6 +294,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
 
   // Funcion que creará el pdf del ingreso
   crearPdfEntrada(id : any){
+    let nombre : string = this.storage.get('Nombre');
     this.ingRollosService.crearPdf(id).subscribe(datos_ingreso => {
       for (let i = 0; i < datos_ingreso.length; i++) {
         for (let j = 0; j < this.rollosPdf.length; j++) {
@@ -304,6 +305,17 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
             pageSize: {
               width: 630,
               height: 760
+            },
+            footer: function(currentPage : any, pageCount : any) {
+              return [
+                {
+                  columns: [
+                    { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                    { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                    { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                  ]
+                }
+              ]
             },
             content : [
               {
@@ -419,6 +431,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
 
   //Funcion que creará el pdf de la asignacion
   crearPDFSalida(id : number){
+    let nombre : string = this.storage.get('Nombre');
     this.salidaRollosService.crearPdf(id).subscribe(datos_ingreso => {
       for (let i = 0; i < datos_ingreso.length; i++) {
         for (let j = 0; j < this.rollosPdf.length; j++) {
@@ -429,6 +442,17 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
             pageSize: {
               width: 630,
               height: 760
+            },
+            footer: function(currentPage : any, pageCount : any) {
+              return [
+                {
+                  columns: [
+                    { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                    { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                    { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                  ]
+                }
+              ]
             },
             content : [
               {

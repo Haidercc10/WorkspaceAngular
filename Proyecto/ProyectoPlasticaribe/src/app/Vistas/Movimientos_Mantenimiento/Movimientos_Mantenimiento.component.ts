@@ -397,6 +397,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
 
   // Funcion que va a crear un PDF con base en la información que le sea suministrada
   crearPdfMantenimiento(data : any){
+    let nombre : string = this.storage.get('Nombre');
     this.dtMantenimientoService.GetPDFMantenimiento(data.Consecutivo).subscribe(datos_mantenimiento => {
       for (let i = 0; i < datos_mantenimiento.length; i++) {
         const pdfDefinicion : any = {
@@ -407,9 +408,15 @@ export class Movimientos_MantenimientoComponent implements OnInit {
             width: 630,
             height: 760
           },
-          footer: {
-            columns: [
-              { text: `Fecha Expedición Documento ${this.today} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8, margin: [0, 0, 20, 0] }
+          footer: function(currentPage : any, pageCount : any) {
+            return [
+              {
+                columns: [
+                  { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                ]
+              }
             ]
           },
           content : [

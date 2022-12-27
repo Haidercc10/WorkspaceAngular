@@ -1,9 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { AsignacionBOPPService } from 'src/app/Servicios/Asignacion_Bopp/asignacionBOPP.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
-import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/DetallesAsgBopp/detallesAsignacionBOPP.service';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
@@ -14,6 +12,7 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import { Table } from 'primeng/table/table';
 import moment from 'moment';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -52,8 +51,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                         private frmBuilderMateriaPrima : FormBuilder,
                           @Inject(SESSION_STORAGE) private storage: WebStorageService,
                             private boppService : EntradaBOPPService,
-                              private asignacionBOPPService : AsignacionBOPPService,
-                                private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,) {
+                              private appComponent : AppComponent,) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : ['', Validators.required],
@@ -82,9 +80,15 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           datos.push(datos1);
         }
         let workbook = new Workbook();
+        const imageId1 = workbook.addImage({
+          base64:  this.appComponent.logoParaPdf,
+          extension: 'png',
+        });
         let worksheet = workbook.addWorksheet(`Inventario Materia_Prima - ${this.today}`);
+        worksheet.addImage(imageId1, 'A1:A3');
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+        worksheet.addRow([]);
         worksheet.addRow([]);
         let headerRow = worksheet.addRow(header);
         headerRow.eachCell((cell, number) => {
@@ -95,7 +99,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:L2');
+        worksheet.mergeCells('A1:L3');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
         datos.forEach(d => {
           let row = worksheet.addRow(d);

@@ -10,6 +10,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
 import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
 import { AppComponent } from 'src/app/app.component';
+import moment from 'moment';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -551,6 +552,7 @@ export class ReporteCostosOTComponent implements OnInit {
 
   // Funcion que cargará el PDF con la infomración de la OT
   CargarPDF(){
+    let nombre : string = this.storage.get('Nombre');
     if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe buscar una OT para crear el reporte");
     else {
       for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
@@ -566,6 +568,17 @@ export class ReporteCostosOTComponent implements OnInit {
             const pdfDefinicion : any = {
               info: {
                 title: `${this.ordenTrabajo}`
+              },
+              footer: function(currentPage : any, pageCount : any) {
+                return [
+                  {
+                    columns: [
+                      { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                      { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                      { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                    ]
+                  }
+                ]
               },
               content : [
                 {

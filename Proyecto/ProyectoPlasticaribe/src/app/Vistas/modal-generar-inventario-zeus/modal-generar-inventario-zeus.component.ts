@@ -12,6 +12,7 @@ import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProduc
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
+import { AppComponent } from 'src/app/app.component';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -56,7 +57,8 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                     private rolService : RolesService,
                       private existencias_ProductosService : ExistenciasProductosService,
                         private frmBuilder : FormBuilder,
-                        private frmBuilder2 : FormBuilder) {
+                          private frmBuilder2 : FormBuilder,
+                            private appComponent : AppComponent,) {
 
     this.FormExistencias = this.frmBuilder.group({
      // cantMinima : [0],
@@ -136,16 +138,22 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
       this.load = false;
       setTimeout(() => {
         const title = `Inventario de Productos Terminados ${this.today}`;
-        const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal", "Cantidad Minima", "Ult. Modificación"]
+        const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal", "Cantidad Minima", "Vendedor"]
         let datos : any =[];
         for (const item of this.ArrayProductoZeus) {
-          const datos1  : any = [item.codigoItem, item.ClienteNombre, item.nombreItem, item.PrecioItem, item.cantidadItem, item.presentacion, item.PrecioTotalItem, item.cantMinima, item.fechaModificacion];
+          const datos1  : any = [item.codigoItem, item.ClienteNombre, item.nombreItem, item.PrecioItem, item.cantidadItem, item.presentacion, item.PrecioTotalItem, item.cantMinima, item.vendedor];
           datos.push(datos1);
         }
         let workbook = new Workbook();
+        const imageId1 = workbook.addImage({
+          base64:  this.appComponent.logoParaPdf,
+          extension: 'png',
+        });
         let worksheet = workbook.addWorksheet(`Inventario de Productos Terminados ${this.today}`);
+        worksheet.addImage(imageId1, 'A1:A3');
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+        worksheet.addRow([]);
         worksheet.addRow([]);
         let headerRow = worksheet.addRow(header);
         headerRow.eachCell((cell, number) => {
@@ -156,21 +164,14 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:I2');
+        worksheet.mergeCells('A1:I3');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
         datos.forEach(d => {
           let row = worksheet.addRow(d);
           let qty = row.getCell(5);
-          let qty9 = row.getCell(9);
           let stock = row.getCell(6);
           let color = 'ADD8E6';
           let color2 = 'FFFFFF'
-          if (+qty.value < +qty9) color = 'FF837B';
-          qty.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: color }
-          }
 
           if (+stock.value < +qty) color2 = 'FF837B';
           stock.fill = {
@@ -182,7 +183,6 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
           row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           row.getCell(7).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
           row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(9).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
         });
         worksheet.getColumn(1).width = 10;
         worksheet.getColumn(2).width = 60;
@@ -192,7 +192,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         worksheet.getColumn(6).width = 20;
         worksheet.getColumn(7).width = 20;
         worksheet.getColumn(8).width = 20;
-        worksheet.getColumn(9).width = 20;
+        worksheet.getColumn(9).width = 60;
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

@@ -399,6 +399,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
 
   // Funcion para llenar el pdf con información de la base de datos dependiendo el pedido
   llenarPDFConBD(formulario : any){
+    let nombre : string = this.storage.get('Nombre');
     if (formulario.tipoDoc == 'Factura') {
       this.facturaCompraMPService.srvObtenerpdfMovimientos(formulario.codigo).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
@@ -406,6 +407,17 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
             const pdfDefinicion : any = {
               info: {
                 title: `${formulario.codigo}`
+              },
+              footer: function(currentPage : any, pageCount : any) {
+                return [
+                  {
+                    columns: [
+                      { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                      { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                      { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                    ]
+                  }
+                ]
               },
               content : [
                 {
@@ -509,6 +521,17 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
             const pdfDefinicion : any = {
               info: {
                 title: `${formulario.codigo}`
+              },
+              footer: function(currentPage : any, pageCount : any) {
+                return [
+                  {
+                    columns: [
+                      { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                      { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                      { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                    ]
+                  }
+                ]
               },
               content : [
                 {

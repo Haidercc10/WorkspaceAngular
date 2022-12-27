@@ -44,6 +44,11 @@ export class PaginaPrincipalComponent implements OnInit {
   multiAxisData: any;
   multiAxisOptions: any;
 
+  /* GRAFICA */
+  mostrarGraficaComparativo : boolean = false; //Variable que mostrará o no la información graficada
+  ComparativoData: any;
+  ComparativoOptions: any;
+
   /* GRAFICA DE FACTURACION */
   facturasData: any; //Variable que almacenará la informacion a graficar de lo facturado cada mes
   facturasOptions: any; //Variable que almacenará los estilos que tendrá la grafica de lo facturado cada mes
@@ -67,6 +72,8 @@ export class PaginaPrincipalComponent implements OnInit {
   procesosOrdenesMes : any [] = []; //Variable que va a almcencar la cantidad de que se ha hecho en cada proceso de produccion
   modalEstadosOrdenes : boolean = false; //Variable que mostrará el modal de los etsados de las ordenes o no
   nombreModalEstados : string = ''; //Variable que tendrá el nombre del estado seleccionado
+  totalMpAsignada : number = 0; //Variable que va a almacenar la cantidad de materia prima asignada en todo el ultimo mes
+  totalExtruidoMes : number = 0; //Variable que almacenará ña cantidad de materia prima que se ha extruido en el mes
 
   /* INFORMACION GENERAL DE MATERIAS PRIMAS */
   inventarioMateriaPrima : any [] = []; //Variable que almacenará la informacion de los inventarios inciales ya ctuales de las mterias primas
@@ -465,6 +472,13 @@ export class PaginaPrincipalComponent implements OnInit {
       }
     }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes y en que estado se encuntran!`, error.message); });
 
+    this.ordenTrabajoService.GetTotalMateriaPrimaAsignadaMes(this.primerDiaMes, this.today).subscribe(datos_ot => {
+      for (let i = 0; i < datos_ot.length; i++) {
+        this.totalMpAsignada += datos_ot[i].cantidad;
+        this.totalExtruidoMes += datos_ot[i].extruido;
+      }
+    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes y en que estado se encuntran!`, error.message); });
+
     this.ordenTrabajoService.GetProductosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
       for (let i = 0; i < datos_ordenes.length; i++) {
         this.productosOrdenesMes.push(datos_ordenes[i]);
@@ -473,9 +487,18 @@ export class PaginaPrincipalComponent implements OnInit {
       }
     }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada producto!`, error.message); });
 
-    this.ordenTrabajoService.GetProcesosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+    this.bagProService.GetPesoProcesosUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
       for (let i = 0; i < datos_ordenes.length; i++) {
-        this.procesosOrdenesMes.push(datos_ordenes[i]);
+        if (datos_ordenes[i].nomStatus == 'IMPRESION'
+           || datos_ordenes[i].nomStatus == 'LAMINADO'
+           || datos_ordenes[i].nomStatus == 'EXTRUSION'
+           || datos_ordenes[i].nomStatus == 'CORTE'
+           || datos_ordenes[i].nomStatus == 'ROTOGRABADO'
+           || datos_ordenes[i].nomStatus == 'DOBLADO'
+           || datos_ordenes[i].nomStatus == 'EMPAQUE'
+           || datos_ordenes[i].nomStatus == 'SELLADO'
+           || datos_ordenes[i].nomStatus == 'Wiketiado') this.procesosOrdenesMes.push(datos_ordenes[i]);
+        this.procesosOrdenesMes.sort((a,b) => a.nomStatus.localeCompare(b.nomStatus));
       }
     }, error => { this.mensajeError(`¡No se ha podido consultar la cantidad producida por cada proceso de las ordenes que se crearon el ultimo mes!`, error.message); });
 
@@ -631,6 +654,55 @@ export class PaginaPrincipalComponent implements OnInit {
       }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las compras de cada uno de los meses del año!`, error.message); });
     }
     setTimeout(() => { this.llenarGraficaIvaCompra(); }, 1800);
+  }
+
+  // Funcion que va a llenar la grafica con la información de la cantidad de materia prima asignada y la cantidad extruida
+  llenarGraficaComparativo(){
+    this.mostrarGraficaComparativo = true;
+    this.ComparativoData = {
+      labels: ['Materia Prima'],
+      datasets: [
+          {
+              label: 'Materia Prima Asignada',
+              backgroundColor: '#42A5F5',
+              data: [this.totalMpAsignada]
+          },
+          {
+              label: 'Materia Prima Extruida',
+              backgroundColor: '#FFA726',
+              data: [this.totalExtruidoMes]
+          }
+      ]
+    };
+
+    this.ComparativoOptions = {
+      indexAxis: 'y',
+      plugins: {
+        legend: {
+          labels: {
+            color: '#495057'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#495057'
+          },
+          grid: {
+            color: '#ebedef'
+          }
+        },
+        y: {
+          ticks: {
+            color: '#495057'
+          },
+          grid: {
+            color: '#ebedef'
+          }
+        }
+      }
+    };
   }
 
   // Funcion que va a llenar la grafica con la información de los vendedores

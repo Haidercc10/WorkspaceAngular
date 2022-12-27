@@ -155,7 +155,7 @@ export const routes: Routes = [
 
   /******************************************************************* Materia Prima ************************************************************************/
   {path: 'ocompra-materiaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: OcompraComponent},
-  {path: 'MateriaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PedidomateriaprimaComponent},
+  {path: 'MateriaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: PedidomateriaprimaComponent},
   {path: 'asignacionMP', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: AsignacionMateriaPrimaComponent},
   {path: 'mp-recuperada', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: MateriaPrimaRecuperadaComponent},
   {path: 'mp-devoluciones', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: DevolucionesMPComponent},

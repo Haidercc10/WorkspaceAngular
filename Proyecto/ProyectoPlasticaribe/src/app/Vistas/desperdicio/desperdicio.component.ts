@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
@@ -365,6 +365,7 @@ export class DesperdicioComponent implements OnInit {
 
   // Funcion que creará un PDF del desperdicio ingresado
   crearPdf(){
+    let nombre : string = this.storage.get('Nombre');
     this.deperdicioService.GetUltimoPedido().subscribe(datos_desperdicios => {
       for (let i = 0; i < datos_desperdicios.length; i++) {
         const pdfDefinicion : any = {
@@ -375,9 +376,15 @@ export class DesperdicioComponent implements OnInit {
             width: 630,
             height: 760
           },
-          footer: {
-            columns: [
-              { text: `Fecha Expedición Documento ${this.today} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8, margin: [0, 0, 20, 0] }
+          footer: function(currentPage : any, pageCount : any) {
+            return [
+              {
+                columns: [
+                  { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                ]
+              }
             ]
           },
           content : [

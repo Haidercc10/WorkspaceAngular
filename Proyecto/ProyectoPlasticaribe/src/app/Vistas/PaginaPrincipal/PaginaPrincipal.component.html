@@ -21,7 +21,15 @@
             <div class="card-body">
               <h5 class="card-title">Ordenes de Trabajo Creadas</h5>
               <p class="card-text">El último mes (desde el día <b>{{primerDiaMes}}</b> hasta el día <b>{{today}}</b>) se han creado <b>{{totalOrdenesMes | number}}</b> ordenes de trabajo.</p>
-              <p class="card-text">EL costo estimado de las ordenes de trabajo creadas el último mes es de <b>{{costoTotalOrdenesMes | currency : ' COP $'}}</b></p>
+              <p class="card-text">El costo estimado de las ordenes de trabajo creadas el último mes es de <b>{{costoTotalOrdenesMes | currency : ' COP $'}}</b></p>
+              <span class="card-text">
+                Comparativo de la Materia Prima que se ha asignado a las Ordenes de Trabajo creadas en el último mes con la Materia Prima que se ha extruido de las Ordenes de Trabajo creadas en el último mes:
+                <ol>
+                  <b><li>Materia Prima Asignada {{totalMpAsignada | number}} Kg</li></b>
+                  <b><li>Materia Prima Extruida {{totalExtruidoMes | number}} Kg</li></b>
+                </ol>
+              </span>
+              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar el comparativo de materia prima" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#comparativoMP" (click)="llenarGraficaComparativo()"></button>
             </div>
           </div>
         </div>
@@ -139,13 +147,7 @@
               <ng-template #OrdenesMayorCero>
                 <p class="card-text">Estas son las cantidades producidas por cada procesos creadas en el último mes:</p>
                 <p class="card-text" *ngFor="let item of procesosOrdenesMes; let i=index">
-                  <span class="card-text"><b>Extrusión:</b> {{item.extrusion | number}} Kg</span><br>
-                  <span class="card-text"><b>Impresión:</b> {{item.impresion | number}} Kg</span><br>
-                  <span class="card-text"><b>Rotograbado</b>: {{item.rotograbado | number}} Kg</span><br>
-                  <span class="card-text"><b>Laminado:</b> {{item.laminado | number}} Kg</span><br>
-                  <span class="card-text"><b>Corte:</b> {{item.corte | number}} Kg</span><br>
-                  <span class="card-text"><b>Doblado:</b> {{item.doblado | number}} Kg</span><br>
-                  <span class="card-text"><b>Sellado:</b> {{item.selladoKg | number}} Kg - {{item.selladoUnd | number}} Und</span>
+                  <span class="card-text"><b>{{item.nomStatus}}:</b> {{item.peso | number}} Kg <label *ngIf="item.nomStatus == 'SELLADO' || item.nomStatus == 'Wiketiado'"> - {{item.und | number}} Und</label></span><br>
                 </p>
               </ng-template>
             </div>
@@ -454,6 +456,26 @@
             <div class="card">
               <h5 class="titulo_grafica">{{nombreGrafica}}</h5>
               <p-chart type="bar" width="100%" height="100%" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Modal en el que se mostrará una grafica de barras comparando la cantidad de materia prima asignada y la cantidad extruida -->
+  <ng-container *ngIf="mostrarGraficaComparativo">
+    <div class="modal fade" id="comparativoMP" aria-labelledby="Comparativo" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel2">Materia Prima Asignada vs Materia Prima Extruida</h5>
+            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="card">
+              <h5 class="titulo_grafica">Materia Prima Asignada vs Materia Prima Extruida</h5>
+              <p-chart type="bar" width="100%" height="100%" [data]="ComparativoData" [options]="ComparativoOptions"></p-chart>
             </div>
           </div>
         </div>

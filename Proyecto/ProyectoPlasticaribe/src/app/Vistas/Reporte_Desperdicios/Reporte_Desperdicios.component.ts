@@ -5,11 +5,8 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
-import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
-import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
-import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
@@ -19,19 +16,20 @@ import Swal from 'sweetalert2';
   templateUrl: './Reporte_Desperdicios.component.html',
   styleUrls: ['./Reporte_Desperdicios.component.css']
 })
+
 export class Reporte_DesperdiciosComponent implements OnInit {
 
-  public formFiltros !: FormGroup; /** Formulario de filtros */
-  public load: boolean = true; /** Variable que realizará la carga al momento de consultar */
-  public arrayMateriales = []; /** array que contendrá los materiales de materia prima*/
-  public arrayProductos = []; /** array que cargará los productos con la consulta de tipo LIKE*/
-  public idProducto: any = 0; /** ID de producto que se cargará en el campo ITEM, pero se mostrará el nombre. */
-  public arrayConsulta : any =[]; /** Array que cargará la consulta inicial */
-  public today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  public arrayModal : any = []; /** Array que se cargará en la tabla del modal con la info de la OT Seleccionada */
-  public dialog : boolean = false; /** Variable que mostrará o no, el modal */
-  public totalDesperdicio : number = 0; /** Variable que contendrá la cantidad total de desperdicio por OT. */
-  public otSeleccionada : number = 0; /** Variable que contendrá la OT Seleccionada en la tabla */
+  formFiltros !: FormGroup; /** Formulario de filtros */
+  load: boolean = true; /** Variable que realizará la carga al momento de consultar */
+  arrayMateriales = []; /** array que contendrá los materiales de materia prima*/
+  arrayProductos = []; /** array que cargará los productos con la consulta de tipo LIKE*/
+  idProducto: any = 0; /** ID de producto que se cargará en el campo ITEM, pero se mostrará el nombre. */
+  arrayConsulta : any =[]; /** Array que cargará la consulta inicial */
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
+  arrayModal : any = []; /** Array que se cargará en la tabla del modal con la info de la OT Seleccionada */
+  dialog : boolean = false; /** Variable que mostrará o no, el modal */
+  totalDesperdicio : number = 0; /** Variable que contendrá la cantidad total de desperdicio por OT. */
+  otSeleccionada : number = 0; /** Variable que contendrá la OT Seleccionada en la tabla */
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -39,24 +37,13 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   arrayDatosPdf : any = [];
 
   constructor(private formBuilder : FormBuilder,
-    private servicioMateriales : MaterialProductoService,
-    private servicioProductos : ProductoService,
-    private servicioDesperdicios : DesperdicioService,
-    @Inject(SESSION_STORAGE) private storage: WebStorageService,
-    private rolService : RolesService,
-    private appComponent : AppComponent,
-    private messageService: MessageService) {
-    this.inicializarFormulario();
-  }
-
-  /** Función que inicializará otras funciones al momento de cargar este componente. */
-  ngOnInit() {
-    this.cargarMateriales();
-    this.lecturaStorage();
-  }
-
-  /** Función que inicializará el formulario de busqueda */
-  inicializarFormulario(){
+                private servicioMateriales : MaterialProductoService,
+                  private servicioProductos : ProductoService,
+                    private servicioDesperdicios : DesperdicioService,
+                      @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                        private rolService : RolesService,
+                          private appComponent : AppComponent,
+                            private messageService: MessageService) {
     this.formFiltros = this.formBuilder.group({
       OT : [null],
       Producto : [null],
@@ -65,6 +52,34 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       fechaFinal : [null],
       Material : [null],
     });
+  }
+
+  /** Función que inicializará otras funciones al momento de cargar este componente. */
+  ngOnInit() {
+    this.cargarMateriales();
+    this.lecturaStorage();
+  }
+
+  /**Leer storage para validar su rol y mostrar el usuario. */
+  lecturaStorage(){
+    this.storage_Id = this.storage.get('Id');
+    this.storage_Nombre = this.storage.get('Nombre');
+    let rol = this.storage.get('Rol');
+    this.rolService.srvObtenerLista().subscribe(datos_roles => {
+      for (let index = 0; index < datos_roles.length; index++) {
+        if (datos_roles[index].rolUsu_Id == rol) {
+          this.ValidarRol = rol;
+          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
+        }
+      }
+    });
+  }
+
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => {
+    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
+    const rep = '$1,';
+    return number.toString().replace(exp,rep);
   }
 
   /** Función que cargará los materiales en el combobox.*/
@@ -96,9 +111,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.idProducto = this.formFiltros.value.Producto;
 
     if(this.idProducto.match(expresion) != null) {
-      this.servicioProductos.obtenerNombreProductos(this.formFiltros.value.Producto).subscribe(dataProducto => {
-        this.initForm_SeleccionProducto(dataProducto);
-      });
+      this.servicioProductos.obtenerNombreProductos(this.formFiltros.value.Producto).subscribe(dataProducto => { this.initForm_SeleccionProducto(dataProducto);
+      }, error => { this.mensajeError(`¡No se encontró información del producto seleccionado!`, error.message); });
     } else {
       this.advertencia('Debe cargar un Item válido.');
       this.idProducto = 0;
@@ -134,34 +148,25 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.arrayConsulta = [];
     let ruta : string = '';
 
+    if (fecha1 == null) fecha1 = this.today;
+    if (fecha2 == null) fecha2 = fecha1;
 
-    if(fecha1 == null) fecha1 = this.today;
-    if(fecha2 == null) fecha2 = fecha1;
-
-    if (OT != null && material != null && item != null) {
-      ruta = `?OT=${OT}&material=${material}&item=${item}`;
-    } else if (OT != null && material != null) {
-      ruta = `?OT=${OT}&material=${material}`;
-    } else if (OT != null && item != null) {
-      ruta = `?OT=${OT}&item=${item}`;
-    } else if (material != null && item != null) {
-      ruta = `?material=${material}&item=${item}`;
-    } else if (OT != null) {
-      ruta = `?OT=${OT}`;
-    } else if (item != null) {
-      ruta = `?item=${item}`;
-    } else if (material != null) {
-      ruta = `?material=${material}`;
-    } else {
-      ruta = ``;
-    }
+    if (OT != null && material != null && item != null) ruta = `?OT=${OT}&material=${material}&item=${item}`;
+    else if (OT != null && material != null) ruta = `?OT=${OT}&material=${material}`;
+    else if (OT != null && item != null) ruta = `?OT=${OT}&item=${item}`;
+    else if (material != null && item != null) ruta = `?material=${material}&item=${item}`;
+    else if (OT != null) ruta = `?OT=${OT}`;
+    else if (item != null) ruta = `?item=${item}`;
+    else if (material != null) ruta = `?material=${material}`;
+    else ruta = ``;
 
     setTimeout(() => {
       this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, ruta).subscribe(dataDesperdicios => {
-        if(dataDesperdicios.length == 0) this.advertenciaFechas(fecha1, fecha2);
-        else
-        for (let index = 0; index < dataDesperdicios.length; index++) {
-          this.llenarTabla(dataDesperdicios[index]);
+        if (dataDesperdicios.length == 0) this.advertencia(`¡No se encontraron resultados de búsqueda con los filtros consultados.!`);
+        else {
+          for (let index = 0; index < dataDesperdicios.length; index++) {
+            this.llenarTabla(dataDesperdicios[index]);
+          }
         }
       });
     }, 900);
@@ -171,13 +176,13 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   /** Llenar la tabla inicial de resultados de busqueda */
   llenarTabla(datos : any) {
     const registro : any = {
-    OT : datos.ot,
-    Item : datos.item,
-    NombreItem : datos.nombreItem,
-    NombreMaterial : datos.material,
-    Impreso : datos.impreso,
-    PesoTotal : datos.pesoTotal,
-    Presentacion : 'Kg'
+      OT : datos.ot,
+      Item : datos.item,
+      NombreItem : datos.nombreItem,
+      NombreMaterial : datos.material,
+      Impreso : datos.impreso,
+      PesoTotal : datos.pesoTotal,
+      Presentacion : 'Kg'
     }
     this.arrayConsulta.push(registro);
   }
@@ -223,14 +228,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.formFiltros.reset();
   }
 
-  /** Función para mensaje de tipo advertencia. */
-  advertenciaFechas(fecha1 : any, fecha2 : any){
-    if(fecha1 == this.today && fecha2 == this.today) Swal.fire({icon: 'warning',  title: 'Advertencia', text: `No se encontraron resultados de búsqueda de hoy.`, confirmButtonColor: '#ffc107',});
-    else if (fecha1 == this.today && fecha2 != this.today) Swal.fire({icon: 'warning',  title: 'Advertencia', text: `No se encontraron resultados en las fechas consultadas.`, confirmButtonColor: '#ffc107',});
-    else if (fecha1 != this.today && fecha2 != this.today) Swal.fire({icon: 'warning',  title: 'Advertencia', text: `No se encontraron resultados en las fechas consultadas.`, confirmButtonColor: '#ffc107',});
-    else Swal.fire({icon: 'warning',  title: 'Advertencia', text: `No se encontraron resultados de búsqueda con los filtros consultados.`, confirmButtonColor: '#ffc107',});
-  }
-
   /** Función que calcula la cantidad total del desperdicio */
   pesoTotalDesperdicio(){
     this.totalDesperdicio = 0;
@@ -241,6 +238,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   /** Función que exportará el reporte en PDF */
   exportarPDF(){
+    let nombre : string = this.storage.get('Nombre');
     this.servicioDesperdicios.getDesperdicioxOT(this.otSeleccionada).subscribe(dataDesp => {
       for (let index = 0; index < dataDesp.length; index++) {
         const infoPdf : any = {
@@ -251,10 +249,15 @@ export class Reporte_DesperdiciosComponent implements OnInit {
             width: 630,
             height: 760
           },
-          footer: {
-            columns: [
-              { text: `Reporte generado por ${this.storage_Nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-              { text: `Fecha Expedición Documento ${this.today} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+          footer: function(currentPage : any, pageCount : any) {
+            return [
+              {
+                columns: [
+                  { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                ]
+              }
             ]
           },
           content : [
@@ -397,54 +400,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     };
   }
 
-  /** Convertir image en base 64 */
-  getBase64ImageFromURL(url) {
-    return new Promise((resolve, reject) => {
-      var img = new Image();
-      img.setAttribute("crossOrigin", "anonymous");
-
-      img.onload = () => {
-        var canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-
-        var dataURL = canvas.toDataURL("image/jpeg");
-        resolve(dataURL);
-      };
-
-      img.onerror = error => {
-        reject(error);
-      };
-
-      img.src = url;
-    });
-  }
-
-  /**Leer storage para validar su rol y mostrar el usuario. */
-  lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    let rol = this.storage.get('Rol');
-    this.rolService.srvObtenerLista().subscribe(datos_roles => {
-      for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
-          this.ValidarRol = rol;
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }
-      }
-    });
-  }
-
-    // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
-
   /** Mensaje de confirmación que se motrará al generar un Pdf */
   Confirmacion(mensaje : string) {
     this.messageService.add({severity:'success', detail: mensaje});
@@ -453,6 +408,11 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   /** Mensaje de alerta que se emitirá al momento de no encontrar datos de una consulta o por alguna inconsistencia */
   advertencia(mensaje : any){
     Swal.fire({icon: 'warning',  title: 'Advertencia', text: mensaje, confirmButtonColor: '#ffc107',});
+  }
+
+  // Funcion que mostrará un mensaje de error
+  mensajeError(text : string, error : any){
+    Swal.fire({icon: 'error',  title: 'Opps...', showCloseButton : true, html: `<b>${text}</b>` + `<span style="color: #F00">${error}</span>`});
   }
 }
 

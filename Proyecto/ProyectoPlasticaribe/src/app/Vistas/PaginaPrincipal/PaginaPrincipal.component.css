@@ -22,30 +22,35 @@ p-pickList span{
   cursor: pointer;
 }
 
+.modal{
+  overflow-x: scroll;
+  min-width: 300px;
+}
+
 .scrollCard{
   overflow-y: scroll;
   max-height: 300px;
 }
 
-.scrollCard::-webkit-scrollbar {
+.scrollCard::-webkit-scrollbar, .modal::-webkit-scrollbar{
   width: 8px;     /* Tamaño del scroll en vertical */
   height: 8px;    /* Tamaño del scroll en horizontal */
 }
 
 /* Ponemos un color de fondo y redondeamos las esquinas del thumb */
-.scrollCard::-webkit-scrollbar-thumb {
+.scrollCard::-webkit-scrollbar-thumb, .modal::-webkit-scrollbar-thumb {
   background: #EBEDEF;
   border-radius: 4px;
 }
 
 /* Cambiamos el fondo y agregamos una sombra cuando esté en hover */
-.scrollCard::-webkit-scrollbar-thumb:hover {
+.scrollCard::-webkit-scrollbar-thumb:hover, .modal::-webkit-scrollbar-thumb:hover {
   background: #D5DBDB;
   box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
 }
 
 /* Cambiamos el fondo cuando esté en active */
-.scrollCard::-webkit-scrollbar-thumb:active {
+.scrollCard::-webkit-scrollbar-thumb:active, .modal::-webkit-scrollbar-thumb:active {
   background-color: #E5E8E8;
 }
 

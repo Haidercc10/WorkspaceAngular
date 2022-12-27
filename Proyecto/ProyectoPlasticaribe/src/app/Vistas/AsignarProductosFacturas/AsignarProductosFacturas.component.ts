@@ -787,6 +787,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
   crearPDF(){
     let factura : string = this.FormConsultarProductos.value.Factura;
+    let nombre : string = this.storage.get('Nombre');
 
     this.dtAsgProdFactura.srvObtenerListaParaPDF(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
@@ -798,6 +799,17 @@ export class AsignarProductosFacturasComponent implements OnInit {
             pageSize: {
               width: 630,
               height: 760
+            },
+            footer: function(currentPage : any, pageCount : any) {
+              return [
+                {
+                  columns: [
+                    { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                    { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                    { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                  ]
+                }
+              ]
             },
             content : [
               {

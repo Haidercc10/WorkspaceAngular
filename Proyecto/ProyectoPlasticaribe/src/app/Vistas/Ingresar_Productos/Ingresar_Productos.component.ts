@@ -866,6 +866,7 @@ export class Ingresar_ProductosComponent implements OnInit {
 
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
   crearPDF(id : number){
+    let nombre : string = this.storage.get('Nombre');
     this.dtEntradaRollosService.srvCrearPDFUltimoId(id).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         for (let j = 0; j < this.rollosAsignados.length; j++) {
@@ -876,6 +877,17 @@ export class Ingresar_ProductosComponent implements OnInit {
             pageSize: {
               width: 630,
               height: 760
+            },
+            footer: function(currentPage : any, pageCount : any) {
+              return [
+                {
+                  columns: [
+                    { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                    { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                    { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                  ]
+                }
+              ]
             },
             content : [
               {
