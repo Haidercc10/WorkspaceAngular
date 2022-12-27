@@ -34,7 +34,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  arrayDatosPdf : any = [];
+  arrayDatosAgrupadosPdf : any = [];
 
   constructor(private formBuilder : FormBuilder,
                 private servicioMateriales : MaterialProductoService,
@@ -198,7 +198,9 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       }
       this.pesoTotalDesperdicio();
     });
+
     setTimeout(() => { this.load = true }, 500);
+    setTimeout(() => { this.grupoDatosPdf(); }, 1000);
   }
 
   /** Función para llenar la tabla de modal. */
@@ -252,6 +254,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
           },
           footer: function(currentPage : any, pageCount : any) {
             return [
+              '\n',
               {
                 columns: [
                   { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
@@ -329,11 +332,22 @@ export class Reporte_DesperdiciosComponent implements OnInit {
             },
             '\n \n',
             {
+              text: `Información consolidada de desperdicios\n `,
+              alignment: 'center',
+              style: 'subtitulo'
+            },
+            this.table2(this.arrayDatosAgrupadosPdf, ['OT', 'Item', 'Nombre', 'Proceso', 'No_Conformidades', 'Cantidad', 'Presentacion']),
+            '\n',
+            {
+              text: `Cantidad total: ${this.formatonumeros(this.totalDesperdicio)} Kg\n `,
+              alignment: 'right',
+              style: 'header'
+            },
+            {
               text: `Información detallada de desperdicios\n `,
               alignment: 'center',
               style: 'subtitulo'
             },
-
             this.table(this.arrayModal, ['OT', 'Maquina', 'Item', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Und', 'Impreso', 'Proceso', 'Fecha', ]),
             '\n',
             {
@@ -358,7 +372,9 @@ export class Reporte_DesperdiciosComponent implements OnInit {
               fontSize: 14,
               bold: true
             }
+
           }
+
          }
          const pdf = pdfMake.createPdf(infoPdf);
          pdf.open();
@@ -401,6 +417,23 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     };
   }
 
+  // Funcion que genera la tabla donde se mostrará la información
+  table2(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: [40, 40, 160, 50, 70, 50, 75],
+        body: this.buildTableBody(data, columns)
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+    };
+  }
+
   /** Mensaje de confirmación que se motrará al generar un Pdf */
   Confirmacion(mensaje : string) {
     this.messageService.add({severity:'success', detail: mensaje});
@@ -415,6 +448,42 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   // Funcion que mostrará un mensaje de error
   mensajeError(text : string, error : any){
     Swal.fire({icon: 'error',  title: 'Opps...', showCloseButton : true, html: `<b>${text}</b>` + `<span style="color: #F00">${error}</span>`});
+  }
+
+  //Agrupar valores en PDF.
+  grupoDatosPdf(){
+    let arrayGrupoProcesos : any = [];
+    this.arrayDatosAgrupadosPdf = [];
+
+    for (let index = 0; index < this.arrayModal.length; index++) {
+      if(!arrayGrupoProcesos.includes(this.arrayModal[index].Proceso)) {
+        let cantidadKg : number = 0;
+        let cantidadDesperdicios : number = 0;
+        for (let grp = 0; grp < this.arrayModal.length; grp++) {
+          if(this.arrayModal[grp].Proceso == this.arrayModal[index].Proceso) {
+            cantidadKg += this.arrayModal[grp].Peso;
+            cantidadDesperdicios += 1;
+          }
+        }
+        arrayGrupoProcesos.push(this.arrayModal[index].Proceso);
+        this.datosAgrupadosPdf(this.arrayModal[index], cantidadKg, cantidadDesperdicios);
+      }
+    }
+  }
+
+  datosAgrupadosPdf(datos : any, cantidadProceso : number, cantDesperdicios : number) {
+    const info : any = {
+      OT : datos.OT,
+      Item : datos.Item,
+      Nombre : datos.NombreItem,
+      Proceso : datos.Proceso,
+      Cantidad : this.formatonumeros(cantidadProceso),
+      Cantidad2 : cantidadProceso,
+      Presentacion : 'Kg',
+      No_Conformidades : cantDesperdicios
+    }
+    this.arrayDatosAgrupadosPdf.push(info);
+    console.log(this.arrayDatosAgrupadosPdf);
   }
 
   /* movimientosDesperdicios() {
