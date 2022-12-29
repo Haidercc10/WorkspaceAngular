@@ -396,7 +396,7 @@ export class OcompraComponent implements OnInit {
     });
     this.actualizarPrecioMatPrimas();
     this.actualizarPrecioTintas();
-    setTimeout(() => { this.limpiarTodo(); }, 1000);
+    setTimeout(() => { this.limpiarTodo(); }, 1500);
   }
 
   //Buscar informacion de la orden de compra creada

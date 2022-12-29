@@ -107,40 +107,49 @@
             <th scope="col">ID
               <p-columnFilter type="text" field="Id" display="menu"></p-columnFilter>
             </th>
-            <th scope="col">Nombre
+            <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre
               <p-columnFilter type="text" field="Nombre" display="menu"></p-columnFilter>
+              <p-sortIcon field="Nombre"></p-sortIcon>
             </th>
-            <th scope="col">Ancho
-              <p-columnFilter type="text" field="Ancho" display="menu"></p-columnFilter>
+            <th pSortableColumn="Ancho" pReorderableColumn scope="col">Ancho
+              <p-columnFilter type="numeric" field="Ancho" display="menu"></p-columnFilter>
+              <p-sortIcon field="Ancho"></p-sortIcon>
             </th>
-            <th scope="col">Inicial
-              <p-columnFilter type="text" field="Inicial" display="menu"></p-columnFilter>
+            <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
+              <p-columnFilter type="numeric" field="Inicial" display="menu"></p-columnFilter>
+              <p-sortIcon field="Inicial"></p-sortIcon>
             </th>
-            <th scope="col">Entrada
-              <p-columnFilter type="text" field="Entrada" display="menu"></p-columnFilter>
+            <th pSortableColumn="Entrada" pReorderableColumn scope="col">Entrada
+              <p-columnFilter type="numeric" field="Entrada" display="menu"></p-columnFilter>
+              <p-sortIcon field="Entrada"></p-sortIcon>
             </th>
-            <th scope="col">Salida
-              <p-columnFilter type="text" field="Salida" display="menu"></p-columnFilter>
+            <th pSortableColumn="Salida" pReorderableColumn scope="col">Salida
+              <p-columnFilter type="numeric" field="Salida" display="menu"></p-columnFilter>
+              <p-sortIcon field="Salida"></p-sortIcon>
             </th>
-            <th scope="col">Existencias
-              <p-columnFilter type="text" field="Cant" display="menu"></p-columnFilter>
+            <th pSortableColumn="Cant" pReorderableColumn scope="col">Existencias
+              <p-columnFilter type="numeric" field="Cant" display="menu"></p-columnFilter>
+              <p-sortIcon field="Cant"></p-sortIcon>
             </th>
-            <th scope="col">Diferencia
-              <p-columnFilter type="text" field="Diferencia" display="menu"></p-columnFilter>
+            <th pSortableColumn="Diferencia" pReorderableColumn scope="col">Diferencia
+              <p-columnFilter type="numeric" field="Diferencia" display="menu"></p-columnFilter>
+              <p-sortIcon field="Diferencia"></p-sortIcon>
             </th>
             <th scope="col">Und. Medida
-              <p-columnFilter type="text" field="UndCant" display="menu"></p-columnFilter>
+              <p-columnFilter type="numeric" field="UndCant" display="menu"></p-columnFilter>
             </th>
             <ng-container *ngIf="ValidarRol == 1">
               <th scope="col">Precio Unitario
                 <p-columnFilter type="numeric" currency="COP" field="PrecioUnd" display="menu"></p-columnFilter>
               </th>
-              <th scope="col">SubTotal
+              <th pSortableColumn="SubTotal" pReorderableColumn scope="col">SubTotal
                 <p-columnFilter type="numeric" currency="COP" field="SubTotal" display="menu"></p-columnFilter>
+                <p-sortIcon field="SubTotal"></p-sortIcon>
               </th>
             </ng-container>
-            <th scope="col">Categoria
+            <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
               <p-columnFilter type="text" field="Categoria" display="menu"></p-columnFilter>
+              <p-sortIcon field="Categoria"></p-sortIcon>
             </th>
             <th>
               <button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button>
