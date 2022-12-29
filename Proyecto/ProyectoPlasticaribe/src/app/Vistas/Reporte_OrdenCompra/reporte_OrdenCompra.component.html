@@ -117,7 +117,7 @@
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-registros>
-              <tr>
+              <tr data-bs-toggle="modal" data-bs-target="#editarOrden" (click)="llenarModal(registros.Oc)">
                 <td>{{registros.Oc}}</td>
                 <td>{{registros.Usuario}}</td>
                 <td>{{registros.Fecha}}</td>
@@ -132,4 +132,35 @@
 
     </div>
   </div>
+
+  <ng-container *ngIf="mostrarModal">
+    <div class="modal fade" id="editarOrden" aria-labelledby="Editar Orden" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel2">Editar Orden de Compra N° {{numeroOrdenCompra}}</h5>
+            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+
+            <div class="contain">
+              <div class="container-fluid">
+                <!-- Titulo principal -->
+                <div class="mb-4 Titulo">
+                  <h2 class="tituloRojo">Editar Orden de Compra</h2>
+                </div>
+
+                <!-- Linea principal -->
+                <div class="mb-4">
+                  <hr class="colorLinea">
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
 </div>

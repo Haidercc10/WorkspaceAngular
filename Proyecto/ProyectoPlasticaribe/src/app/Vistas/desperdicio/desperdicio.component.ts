@@ -69,8 +69,7 @@ export class DesperdicioComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.obtenerOperarios();
-    this.obtenerProcesos();
+    this.obtenerOperarios();;
     this.obtenerFallas();
     this.obtenerMaquinas();
   }
@@ -121,11 +120,16 @@ export class DesperdicioComponent implements OnInit {
 
   //Funcion que va a conultar y obtener todas las areas de la empresa
   obtenerProcesos(){
+    this.procesos = [];
     this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
       for (let i = 0; i < datos_procesos.length; i++) {
-        if (datos_procesos[i].proceso_Codigo != 12
-          && datos_procesos[i].proceso_Codigo != 11
-          && datos_procesos[i].proceso_Codigo != 10) this.procesos.push(datos_procesos[i]);
+        if (datos_procesos[i].proceso_Codigo != 12 && datos_procesos[i].proceso_Codigo != 11 && datos_procesos[i].proceso_Codigo != 10) {
+          if (this.FormDesperdicio.value.Impreso == "SI") {
+            if (datos_procesos[i].proceso_Codigo == 2 || datos_procesos[i].proceso_Codigo == 3) this.procesos.push(datos_procesos[i]);
+          } else if (this.FormDesperdicio.value.Impreso == "NO"){
+            if (datos_procesos[i].proceso_Codigo != 2 && datos_procesos[i].proceso_Codigo != 3) this.procesos.push(datos_procesos[i]);
+          }
+        }
       }
     });
   }
@@ -276,6 +280,7 @@ export class DesperdicioComponent implements OnInit {
           Area : this.FormDesperdicio.value.Area,
           Fecha : this.FormDesperdicio.value.Fecha,
         });
+        this.obtenerProcesos();
         this.cargando = false;
       }
     }, error => { this.mensajesError(`¡No se pudo obtener información de la orden de trabajo N° ${orden}!`, error.message); });
