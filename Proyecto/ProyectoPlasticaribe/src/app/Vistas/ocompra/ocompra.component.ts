@@ -10,6 +10,7 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
 
@@ -59,7 +60,8 @@ export class OcompraComponent implements OnInit {
                         private undMedidaService : UnidadMedidaService,
                           private ordenCompraService : OrdenCompra_MateriaPrimaService,
                             private dtOrdenCompraService : DetallesOrdenesCompraService,
-                              private appComponent : AppComponent,) {
+                              private appComponent : AppComponent,
+                               private servicioTintas : TintasService) {
 
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -392,7 +394,9 @@ export class OcompraComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) this.buscarinfoOrdenCompra();
     });
-    this.limpiarTodo();
+    this.actualizarPrecioMatPrimas();
+    this.actualizarPrecioTintas();
+    setTimeout(() => { this.limpiarTodo(); }, 1000);
   }
 
   //Buscar informacion de la orden de compra creada
@@ -671,6 +675,66 @@ export class OcompraComponent implements OnInit {
 
   // Mensaje de Error
   mensajeError(text : string, error : any = ''){
-    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+    Swal.fire({ icon: 'error', title: 'Error', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+  }
+
+  /** Actualizar Precio de la materia prima al momento de crear la OC*/
+  actualizarPrecioMatPrimas(){
+    for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
+      if(this.materiasPrimasSeleccionadas[index].Id != 84 && this.materiasPrimasSeleccionadas[index].Id < 2000) {
+        this.materiaPrimaService.srvObtenerListaPorId(this.materiasPrimasSeleccionadas[index].Id).subscribe(dataMatPrimas =>{
+         this.cargarDatosMatPrima(this.materiasPrimasSeleccionadas[index], dataMatPrimas);
+        });
+      }
+    }
+  }
+
+  /** Función que cargará los datos de las materias primas para luego actualizarlas. */
+  cargarDatosMatPrima(datosArray : any, data : any){
+    const infoMatPrima : any = {
+      MatPri_Id : data.matPri_Id,
+      MatPri_Nombre : data.matPri_Nombre,
+      MatPri_Descripcion :data.matPri_Descripcion,
+      MatPri_Stock: data.matPri_Stock,
+      UndMed_Id: data.undMed_Id,
+      CatMP_Id: data.catMP_Id,
+      MatPri_Precio: datosArray.Precio,
+      TpBod_Id: data.tpBod_Id,
+      MatPri_Fecha:data.matPri_Fecha,
+      MatPri_Hora: data.matPri_Hora,
+    }
+    this.materiaPrimaService.srvActualizar(infoMatPrima.MatPri_Id, infoMatPrima).subscribe(dataMP => {  }, error => {
+      this.mensajeError('No fue posible actualizar el precio de las Materias Primas');
+    });
+  }
+  /** Actualizar Precio de la materia prima al momento de crear la OC */
+  actualizarPrecioTintas(){
+    for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
+      if(this.materiasPrimasSeleccionadas[index].Id != 2001 && this.materiasPrimasSeleccionadas[index].Id > 2001)
+      this.servicioTintas.srvObtenerListaPorId(this.materiasPrimasSeleccionadas[index].Id).subscribe(dataTintas =>{
+         this.cargarDatosTintas(this.materiasPrimasSeleccionadas[index], dataTintas);
+      });
+    }
+  }
+
+  /** Función que cargará los datos de las materias primas para luego actualizarlas. */
+  cargarDatosTintas(datosArray : any, data : any){
+    const infoTintas : any = {
+      Tinta_Id : data.tinta_Id,
+      Tinta_Nombre : data.tinta_Nombre,
+      Tinta_Descripcion : data.tinta_Descripcion,
+      Tinta_Stock : data.tinta_Stock,
+      Tinta_CodigoHexadecimal : data.tinta_CodigoHexadecimal,
+      UndMed_Id : data.undMed_Id,
+      CatMP_Id : data.catMP_Id,
+      Tinta_Precio : datosArray.Precio,
+      TpBod_Id : data.tpBod_Id,
+      Tinta_InvInicial : data.tinta_InvInicial,
+      Tinta_FechaIngreso : data.tinta_FechaIngreso,
+      Tinta_Hora : data.tinta_Hora,
+    }
+    this.servicioTintas.srvActualizar(infoTintas.Tinta_Id, infoTintas).subscribe(dataMP => {  }, error => {
+      this.mensajeError('No fue posible actualizar el precio de las Tintas');
+    });
   }
 }

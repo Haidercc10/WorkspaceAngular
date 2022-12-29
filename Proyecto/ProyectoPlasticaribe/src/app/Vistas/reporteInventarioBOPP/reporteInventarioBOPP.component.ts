@@ -43,6 +43,11 @@ export class ReporteInventarioBOPPComponent implements OnInit {
   bodegas : any = []; //variable que almacenará las bodegas
   load: boolean = true;
   idMateriasPrimas = [];
+  cantInicial : number = 0;
+  cantEntrante : number = 0;
+  cantSaliente : number = 0;
+  cantExistencias : number = 0;
+  cantDiferencia : number = 0;
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                   private categoriMpService : CategoriaMateriaPrimaService,
@@ -233,6 +238,12 @@ export class ReporteInventarioBOPPComponent implements OnInit {
   cargarTabla(data : any){
     if (!this.idMateriasPrimas.includes(data.id) && data.id != 84 && data.id != 2001 && data.id != 88 && data.id != 89 && data.id != 2072){
       this.valorTotal = this.valorTotal + data.precio * data.stock;
+      this.cantInicial += data.inicial;
+      this.cantEntrante += data.entrada;
+      this.cantSaliente += data.salida;
+      this.cantExistencias += data.stock;
+      this.cantDiferencia += data.diferencia;
+
       let productoExt : any = {
         Id : data.id,
         Nombre : data.nombre,
@@ -264,6 +275,11 @@ export class ReporteInventarioBOPPComponent implements OnInit {
     this.ArrayMateriaPrima = [];
     this.idMateriasPrimas = [];
     this.valorTotal = 0;
+    this.cantInicial  = 0;
+    this.cantEntrante = 0;
+    this.cantSaliente = 0;
+    this.cantExistencias = 0;
+    this.cantDiferencia = 0;
 
     if (fecha != null && fechaFinal != null && idMateriaPrima != null && categoria != null) {
       if (categoria != 0) {
@@ -444,6 +460,31 @@ export class ReporteInventarioBOPPComponent implements OnInit {
         }
       });
     }
+
+    setTimeout(() => { this.load = true; }, 2500);
+  }
+
+  /** Función para mostrar BOPP's que tienen existencias. */
+  mostrarBOPPConStock(){
+    this.load = false;
+    this.idMateriasPrimas = [];
+    this.ArrayMateriaPrima = [];
+    this.valorTotal = 0;
+    this.cantInicial  = 0;
+    this.cantEntrante = 0;
+    this.cantSaliente = 0;
+    this.cantExistencias = 0;
+    this.cantDiferencia = 0;
+
+      this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+      for (let i = 0; i < datos_bopp.length; i++) {
+        this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_bopp[i].bopP_Serial).subscribe(datos_consulta => {
+          for (let j = 0; j < datos_consulta.length; j++) {
+            if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j]);
+          }
+        });
+      }
+    });
 
     setTimeout(() => { this.load = true; }, 2500);
   }

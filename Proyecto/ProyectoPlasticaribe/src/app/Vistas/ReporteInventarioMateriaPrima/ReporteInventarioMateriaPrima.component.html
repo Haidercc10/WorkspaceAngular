@@ -73,8 +73,9 @@
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarConsulta()">Consultar Materia Prima</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarConsulta()"><i class="pi pi-search"></i> Consultar Materia Prima</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()"><i class="pi pi-eraser"></i> Limpiar Campos</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" title="Mostrar Materias Primas con existencias" (click)="mostrarMateriasPrimasConStock()"><i class="pi pi-eye"></i> Con Existencias</button>
         <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-danger mr" pTooltip="Exportar a Excel" tooltipPosition="bottom"></button>
       </div>
     </div>
@@ -106,40 +107,49 @@
             <th scope="col">ID
               <p-columnFilter type="text" field="Id" display="menu"></p-columnFilter>
             </th>
-            <th scope="col">Nombre
+            <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre
               <p-columnFilter type="text" field="Nombre" display="menu"></p-columnFilter>
+              <p-sortIcon field="Nombre"></p-sortIcon>
             </th>
             <th scope="col">Ancho
               <p-columnFilter type="text" field="Ancho" display="menu"></p-columnFilter>
             </th>
-            <th scope="col">Inicial
-              <p-columnFilter type="text" field="Inicial" display="menu"></p-columnFilter>
+            <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
+              <p-columnFilter type="number" field="Inicial" display="menu"></p-columnFilter>
+              <p-sortIcon field="Inicial"></p-sortIcon>
             </th>
-            <th scope="col">Entrada
-              <p-columnFilter type="text" field="Entrada" display="menu"></p-columnFilter>
+            <th pSortableColumn="Entrada" pReorderableColumn scope="col">Entrada
+              <p-columnFilter type="number" field="Entrada" display="menu"></p-columnFilter>
+              <p-sortIcon field="Entrada"></p-sortIcon>
             </th>
-            <th scope="col">Salida
-              <p-columnFilter type="text" field="Salida" display="menu"></p-columnFilter>
+            <th pSortableColumn="Salida" pReorderableColumn scope="col">Salida
+              <p-columnFilter type="number" field="Salida" display="menu"></p-columnFilter>
+              <p-sortIcon field="Salida"></p-sortIcon>
             </th>
-            <th scope="col">Existencias
-              <p-columnFilter type="text" field="Cant" display="menu"></p-columnFilter>
+            <th pSortableColumn="Cant" pReorderableColumn scope="col">Existencias
+              <p-columnFilter type="number" field="Cant" display="menu"></p-columnFilter>
+              <p-sortIcon field="Cant"></p-sortIcon>
             </th>
-            <th scope="col">Diferencia
-              <p-columnFilter type="text" field="Diferencia" display="menu"></p-columnFilter>
+            <th pSortableColumn="Diferencia" pReorderableColumn scope="col">Diferencia
+              <p-columnFilter type="number" field="Diferencia" display="menu"></p-columnFilter>
+              <p-sortIcon field="Diferencia"></p-sortIcon>
             </th>
             <th scope="col">Und. Medida
               <p-columnFilter type="text" field="UndCant" display="menu"></p-columnFilter>
             </th>
             <ng-container *ngIf="ValidarRol == 1">
-              <th scope="col">Precio Unitario
+              <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col">Precio Unitario
                 <p-columnFilter type="numeric" currency="COP" field="PrecioUnd" display="menu"></p-columnFilter>
+                <p-sortIcon field="PrecioUnd"></p-sortIcon>
               </th>
-              <th scope="col">SubTotal
+              <th pSortableColumn="SubTotal" pReorderableColumn scope="col">SubTotal
                 <p-columnFilter type="numeric" currency="COP" field="SubTotal" display="menu"></p-columnFilter>
+                <p-sortIcon field="SubTotal"></p-sortIcon>
               </th>
             </ng-container>
-            <th scope="col">Categoria
+            <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
               <p-columnFilter type="text" field="Categoria" display="menu"></p-columnFilter>
+              <p-sortIcon field="Categoria"></p-sortIcon>
             </th>
             <th>
               <button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button>
@@ -166,7 +176,13 @@
         </ng-template>
         <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
           <tr>
-            <td colspan="10" class="text-right">Totales</td>
+            <td colspan="3" class="text-right">Totales</td>
+            <td>{{cantInicial | number}}</td>
+            <td>{{cantEntrante | number}}</td>
+            <td>{{cantSaliente | number}}</td>
+            <td>{{cantExistencias | number}}</td>
+            <td>{{cantDiferencia | number}}</td>
+            <td colspan="2" class="text-right">{{'Kg'}}</td>
             <td>{{valorTotal | number}}</td>
             <td>COP</td>
             <td><button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button></td>

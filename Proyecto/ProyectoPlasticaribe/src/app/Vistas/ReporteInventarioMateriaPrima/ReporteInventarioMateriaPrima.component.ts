@@ -43,6 +43,11 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
   bodegas : any = []; //variable que almacenará las bodegas
   load: boolean = true;
   idMateriasPrimas = [];
+  cantInicial : number = 0;
+  cantEntrante : number = 0;
+  cantSaliente : number = 0;
+  cantExistencias : number = 0;
+  cantDiferencia : number = 0;
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private tintasService : TintasService,
@@ -157,6 +162,12 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
   LimpiarCampos() {
     this.FormMateriaPrima.reset()
     this.valorTotal = 0;
+    this.cantInicial  = 0;
+    this.cantEntrante = 0;
+    this.cantSaliente = 0;
+    this.cantExistencias = 0;
+    this.cantDiferencia = 0;
+
     this.materiasPrimas = [];
     this.obtenerMateriasPrimas();
   }
@@ -233,7 +244,13 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
   // Funcion que cargará las informacion de las materias primas segun los filtros que se consulten
   cargarTabla(data : any){
     if (!this.idMateriasPrimas.includes(data.id) && data.id != 84 && data.id != 2001 && data.id != 88 && data.id != 89 && data.id != 2072){
+      this.cantInicial += data.inicial;
+      this.cantEntrante += data.entrada;
+      this.cantSaliente += data.salida;
+      this.cantExistencias += data.stock;
+      this.cantDiferencia += data.diferencia;
       this.valorTotal = this.valorTotal + data.precio * data.stock;
+
       let productoExt : any = {
         Id : data.id,
         Nombre : data.nombre,
@@ -265,6 +282,11 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
     this.ArrayMateriaPrima = [];
     this.idMateriasPrimas = [];
     this.valorTotal = 0;
+    this.cantInicial  = 0;
+    this.cantEntrante = 0;
+    this.cantSaliente = 0;
+    this.cantExistencias = 0;
+    this.cantDiferencia = 0;
 
     if (fecha != null && fechaFinal != null && idMateriaPrima != null && categoria != null) {
       if (categoria != 0) {
@@ -572,7 +594,48 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
         }
       });
     }
+    setTimeout(() => { this.load = true; }, 2500);
+  }
 
+  /** Función para mostrar las materias primas que tienen existencias. */
+  mostrarMateriasPrimasConStock(){
+    this.load = false;
+    this.idMateriasPrimas = [];
+    this.ArrayMateriaPrima = [];
+    this.valorTotal = 0;
+    this.cantInicial  = 0;
+    this.cantEntrante = 0;
+    this.cantSaliente = 0;
+    this.cantExistencias = 0;
+    this.cantDiferencia = 0;
+
+    this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
+      for (let i = 0; i < datos_materiaPrima.length; i++) {
+        this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_materiaPrima[i].matPri_Id).subscribe(datos_consulta => {
+          for (let j = 0; j < datos_consulta.length; j++) {
+            if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j]);
+          }
+        });
+      }
+    });
+    /*this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+      for (let i = 0; i < datos_bopp.length; i++) {
+        this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_bopp[i].bopP_Serial).subscribe(datos_consulta => {
+          for (let j = 0; j < datos_consulta.length; j++) {
+            if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j]);
+          }
+        });
+      }
+    });*/
+    this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
+      for (let i = 0; i < datos_tintas.length; i++) {
+        this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_tintas[i].tinta_Id).subscribe(datos_consulta => {
+          for (let j = 0; j < datos_consulta.length; j++) {
+            if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j]);
+          }
+        });
+      }
+    });
     setTimeout(() => { this.load = true; }, 2500);
   }
 

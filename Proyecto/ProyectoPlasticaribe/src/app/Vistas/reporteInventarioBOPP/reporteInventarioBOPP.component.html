@@ -75,6 +75,7 @@
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarConsulta()">Consultar Materia Prima</button>
         <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos</button>
+        <button class="btn btn-danger btn-danger-sm" type="button" title="Mostrar Materias Primas con existencias" (click)="mostrarBOPPConStock()"><i class="pi pi-eye"></i> Con Existencias</button>
         <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-danger mr" pTooltip="Exportar a Excel" tooltipPosition="bottom"></button>
       </div>
     </div>
@@ -166,7 +167,13 @@
         </ng-template>
         <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
           <tr>
-            <td colspan="10" class="text-right">Totales</td>
+            <td colspan="3" class="text-right">Totales</td>
+            <td>{{cantInicial | number}}</td>
+            <td>{{cantEntrante | number}}</td>
+            <td>{{cantSaliente | number}}</td>
+            <td>{{cantExistencias | number}}</td>
+            <td>{{cantDiferencia | number}}</td>
+            <td colspan="2" class="text-right">{{'Kg'}}</td>
             <td>{{valorTotal | number}}</td>
             <td>COP</td>
             <td><button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button></td>
