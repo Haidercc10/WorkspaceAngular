@@ -137,6 +137,10 @@ export class EstadosProcesos_OTService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getTotalMateriaPrimaAsignadaMes/${fecha1}/${fecha2}`);
   }
 
+  GetReporteProcesosOt(fecha1 : any, fecha2 : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/getReporteProcesosOt/${fecha1}/${fecha2}`);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Estados_ProcesosOT/${id}`, data);
   }

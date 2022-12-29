@@ -280,7 +280,7 @@
               currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
               [rowsPerPageOptions]="[10,20,30,50,70,100]"
               [rowHover]="true"
-              dataKey="id">
+              dataKey="ot">
               <!-- Buscador de columnas -->
               <ng-template pTemplate="caption">
                 <p-multiSelect
@@ -294,12 +294,15 @@
               <!-- Titulos -->
               <ng-template pTemplate="header" let-columns>
                 <tr>
-                  <th id="" scope="col" pSortableColumn="ot" style="font-size: 12px;">OT
+                  <th scope="col" pSortableColumn="ot" pResizableColumn style="font-size: 12px;">OT
                     <p-sortIcon field="ot" title="Order por OT"></p-sortIcon>
-                    <p-columnFilter type="text" field="ot" display="menu"></p-columnFilter>
                   </th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Cliente</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Producto</th>
+                  <th id="" scope="col" pSortableColumn="cli" pResizableColumn style="font-size: 12px;">Cliente
+                    <p-sortIcon field="cli"></p-sortIcon>
+                  </th>
+                  <th id="" scope="col" pSortableColumn="prod" pResizableColumn style="font-size: 12px;">Producto
+                    <p-sortIcon field="prod"></p-sortIcon>
+                  </th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Materia Prima</th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Extrusión</th>
                   <th id="" scope="col" pResizableColumn style="font-size: 12px;">Impresión</th>

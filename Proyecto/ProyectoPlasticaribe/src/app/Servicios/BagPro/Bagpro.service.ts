@@ -173,6 +173,10 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOt/getPesoProcesosUltimoMes/${fecha1}/${fecha2}`);
   }
 
+  GetCantOrdenesMateriales(fecha1 : any, fecha2 : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/getCantOrdenesMateriales/${fecha1}/${fecha2}`);
+  }
+
   /* CLIENTESOTITEM */
 
   // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO

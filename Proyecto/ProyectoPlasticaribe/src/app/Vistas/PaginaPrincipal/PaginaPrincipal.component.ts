@@ -73,7 +73,8 @@ export class PaginaPrincipalComponent implements OnInit {
   modalEstadosOrdenes : boolean = false; //Variable que mostrará el modal de los etsados de las ordenes o no
   nombreModalEstados : string = ''; //Variable que tendrá el nombre del estado seleccionado
   totalMpAsignada : number = 0; //Variable que va a almacenar la cantidad de materia prima asignada en todo el ultimo mes
-  totalExtruidoMes : number = 0; //Variable que almacenará ña cantidad de materia prima que se ha extruido en el mes
+  totalExtruidoMes : number = 0; //Variable que almacenará la cantidad de materia prima que se ha extruido en el mes
+  materialesOrdenesMes : any [] = []; //Variable que almacenará la informacion de los materiales en ordenes de trabajo
 
   /* INFORMACION GENERAL DE MATERIAS PRIMAS */
   inventarioMateriaPrima : any [] = []; //Variable que almacenará la informacion de los inventarios inciales ya ctuales de las mterias primas
@@ -472,13 +473,6 @@ export class PaginaPrincipalComponent implements OnInit {
       }
     }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes y en que estado se encuntran!`, error.message); });
 
-    this.ordenTrabajoService.GetTotalMateriaPrimaAsignadaMes(this.primerDiaMes, this.today).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        this.totalMpAsignada += datos_ot[i].cantidad;
-        this.totalExtruidoMes += datos_ot[i].extruido;
-      }
-    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes y en que estado se encuntran!`, error.message); });
-
     this.ordenTrabajoService.GetProductosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
       for (let i = 0; i < datos_ordenes.length; i++) {
         this.productosOrdenesMes.push(datos_ordenes[i]);
@@ -540,6 +534,13 @@ export class PaginaPrincipalComponent implements OnInit {
         this.clientesOrdenesMes.push(datos_ordenes[i]);
         this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
         this.totalOrdenesMes += datos_ordenes[i].cantidad;
+      }
+    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada cliente!`, error.message); });
+
+    this.bagProService.GetCantOrdenesMateriales(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+      for (let i = 0; i < datos_ordenes.length; i++) {
+        this.materialesOrdenesMes.push(datos_ordenes[i]);
+        this.materialesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
       }
     }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada cliente!`, error.message); });
   }
@@ -613,6 +614,13 @@ export class PaginaPrincipalComponent implements OnInit {
         this.materiasPrimasMasUtilizadasCrearTintaMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
       }
     }, error => { this.mensajeError(`¡No se pudo obtener información de las tintas creadas durante las fechas ${this.primerDiaMes} y ${this.today}!`, error.message) });
+
+    this.ordenTrabajoService.GetTotalMateriaPrimaAsignadaMes(this.primerDiaMes, this.today).subscribe(datos_ot => {
+      for (let i = 0; i < datos_ot.length; i++) {
+        this.totalMpAsignada += datos_ot[i].cantidad;
+        this.totalExtruidoMes += datos_ot[i].extruido;
+      }
+    }, error => { this.mensajeError(`¡No se ha podido consultar la cantidad de Materia Prima que se ha asignado y la cantidad de Materia Prima que se ha extruido!`, error.message); });
 
   }
 
@@ -964,19 +972,25 @@ export class PaginaPrincipalComponent implements OnInit {
 
     this.facturasOptions = {
       plugins: {
-        legend: {
-          labels: { color: '#495057' },
-          fontSize: 100
+        datalabels: {
+          align: 'top',
+          color: 'black',
+          font: {
+            size: 14,
+            weight: 600
+          }
         }
       },
       scales: {
         x: {
           ticks: { color: '#495057' },
           grid: { color: '#ebedef' },
+          fontSize: 100
         },
         y: {
           ticks: { color: '#495057' },
           grid: { color: '#ebedef' },
+          fontSize: 100
         }
       }
     };

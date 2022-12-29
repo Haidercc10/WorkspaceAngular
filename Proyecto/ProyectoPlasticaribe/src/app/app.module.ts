@@ -143,6 +143,7 @@ import { Ventas_TemporalesComponent } from './Vistas/Ventas_Temporales/Ventas_Te
 import {InputSwitchModule} from 'primeng/inputswitch';
 import { ReporteInventarioBOPPComponent } from './Vistas/reporteInventarioBOPP/reporteInventarioBOPP.component';
 import { ReporteInventarioMateriaPrimaComponent } from './Vistas/ReporteInventarioMateriaPrima/ReporteInventarioMateriaPrima.component';
+import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 
 export const routes: Routes = [
 
@@ -239,6 +240,8 @@ export const routes: Routes = [
  {path: 'reporte-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_MantenimientoComponent},
  {path: 'mantenimiento-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
 
+/*********************************************************************** REPORTE PEDIDOS ZEUS *****************************************************************/
+ {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: ReportePedidos_ZeusComponent},
 
  /*************************************************************** DESPERDICIO *********************************************************************************/
   {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: DesperdicioComponent},
@@ -342,6 +345,7 @@ export const routes: Routes = [
     Reporte_DesperdiciosComponent,
     ReporteInventarioBOPPComponent,
     ReporteInventarioMateriaPrimaComponent,
+    ReportePedidos_ZeusComponent
   ],
 
 

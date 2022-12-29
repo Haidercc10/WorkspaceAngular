@@ -16,19 +16,22 @@
         <!-- CANTIDAD ORDENES -->
         <div class="col">
           <div class="card h-100">
-            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
             <div class="banner"></div>
             <div class="card-body">
               <h5 class="card-title">Ordenes de Trabajo Creadas</h5>
               <p class="card-text">El último mes (desde el día <b>{{primerDiaMes}}</b> hasta el día <b>{{today}}</b>) se han creado <b>{{totalOrdenesMes | number}}</b> ordenes de trabajo.</p>
               <p class="card-text">El costo estimado de las ordenes de trabajo creadas el último mes es de <b>{{costoTotalOrdenesMes | currency : ' COP $'}}</b></p>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of materialesOrdenesMes; let i=index">
+                  <span class="card-text">{{i+1}}) <b>{{item.extMaterialNom}}:</b> Cantidad de Ordenes: <b>{{item.cantidad | number}}</b>.<br> Peso Total: <b>{{item.peso | number}}</b> Kg.<br> Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
+                </p>
+              </div>
             </div>
           </div>
         </div>
         <!-- ESTADOS ORDENES -->
         <div class="col">
           <div class="card h-100">
-            <!-- <img class="banner" src="assets/Imagenes_Cards/costos.png" class="card-img-top" alt="..." height="127.57px"> -->
             <div class="banner"></div>
             <div class="card-body">
               <h5 class="card-title">Estados de Ordenes de Trabajo</h5>
@@ -119,7 +122,6 @@
         <!-- PRODUCCION TOTAL DEL MES -->
         <div class="col">
           <div class="card h-100">
-            <!-- <img src="..." class="card-img-top" alt="..."> -->
             <div class="banner"></div>
             <div class="card-body">
               <h5 class="card-title">Cantidad Producida Por Procesos</h5>
@@ -148,7 +150,6 @@
         <!-- ORDENES POR CLIENTES -->
         <div class="col">
           <div class="card h-100">
-            <!-- <img src="..." class="card-img-top" alt="..."> -->
             <div class="banner"></div>
             <div class="card-body">
               <h5 class="card-title">Ordenes de Trabajo Por Cliente</h5>
@@ -171,7 +172,6 @@
         <!-- ORDENES POR PRODUCTOS -->
         <div class="col">
           <div class="card h-100">
-            <!-- <img src="..." class="card-img-top" alt="..."> -->
             <div class="banner"></div>
             <div class="card-body">
               <h5 class="card-title">Ordenes de Trabajo Por Producto</h5>
@@ -220,7 +220,6 @@
         <!-- Facturacion Dia  -->
         <div class="col">
           <div class="card h-100">
-            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
             <div class="banner"></div>
             <div class="card-body">
               <h5 class="card-title"></h5>
@@ -233,7 +232,6 @@
         <!--  -->
         <div class="col">
           <div class="card h-100">
-            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
             <div class="banner"></div>
             <div class="card-body">
               <h5 class="card-title"></h5>
@@ -246,7 +244,6 @@
         <!--  -->
         <div class="col">
           <div class="card h-100">
-            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
             <div class="banner"></div>
             <div class="card-body">
               <h5 class="card-title"></h5>
@@ -272,7 +269,6 @@
         <!--  -->
         <div class="col">
           <div class="card h-100">
-            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
             <div class="banner"></div>
             <div class="card-body">
               <h5 class="card-title"></h5>
@@ -285,7 +281,7 @@
       </div>
 
       <!-- Graficas de facturación -->
-      <div class="row row-cols-1 row-cols-md-1 g-3">
+      <div class="row row-cols-1 row-cols-md-1 g-3 graficaFacturacion">
         <p-tabView>
           <!-- VENTAS -->
           <p-tabPanel
