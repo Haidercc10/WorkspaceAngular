@@ -106,7 +106,6 @@
             <!-- <option [ngValue]="estado" *ngFor="let estado of estados">{{estado}}</option> -->
             <option value ="0">Abierto</option>
             <option value="4">Anulado</option>
-            <option value="1">Cerrada</option>
           </select>
           <label for="floatingSelect">Estado Orden de Trabajo</label>
         </div>
@@ -122,10 +121,11 @@
         <button class="btn btn-danger btn-danger-sm" type="button" (click)="CargarPDF()" *ngIf="ValidarRol == 1">Reporte en PDF</button>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button class="btn btn-danger btn-danger-sm" type="button" (click)="cambiarEstado()" *ngIf="ValidarRol == 1">Cambiar Estado</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="cerrarOrden()" *ngIf="ValidarRol == 1">Cerrar OT</button>
       </div>
     </div>
   </form>
-
 
   <div *ngIf="load">
     <div class="mb-4">

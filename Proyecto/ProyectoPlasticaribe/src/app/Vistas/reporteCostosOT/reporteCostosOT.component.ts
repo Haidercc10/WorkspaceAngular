@@ -323,7 +323,7 @@ export class ReporteCostosOTComponent implements OnInit {
         this.cantidadPorcPerdidaProcesoaProceso(ot);
       });
     });
-  }datos_bopp
+  }
 
   //Funcion que calcula y guarda la cantidad de perdida que hubo de un proceso a otro
   cantidadPorcPerdidaProcesoaProceso(ot : any){
@@ -1207,23 +1207,25 @@ export class ReporteCostosOTComponent implements OnInit {
         estado : estado,
       }
       this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(datos_clientesOT => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2200,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer);
-            toast.addEventListener('mouseleave', Swal.resumeTimer);
-          }
-        });
-        Toast.fire({
-          icon: 'success',
-          title: '¡Actualizacion de OT exitosa!'
-        });
-      });
+        Swal.fire({ icon : 'success', title: 'Orden Cerrada', text: `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo}!`, showCloseButton : true });
+      }, error => { Swal.fire({ icon : 'error', title: 'Opps...', html: `<b>No se ha podido cambiar el estado de la OT</b><br><span style="color: #f00">${error.message}</span>`, showCloseButton : true }); });
     }
   }
 
+  // Cerrar Orden
+  cerrarOrden(){
+    if (this.ordenTrabajo == 0) Swal.fire(`¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
+    else {
+      const data : any = {
+        item : this.ordenTrabajo,
+        clienteNom : this.NombreCliente,
+        clienteItemsNom : this.nombreProducto,
+        usrCrea : this.usuarioCreador,
+        estado : '1',
+      }
+      this.bagProServices.srvActualizar(this.ordenTrabajo, data, '1').subscribe(datos_clientesOT => {
+        Swal.fire({ icon : 'success', title: 'Orden Cerrada', text: `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo} a Cerrada!`, showCloseButton : true });
+      }, error => { Swal.fire({ icon : 'error', title: 'Opps...', html: `<b>No se ha podido cambiar el estado de la OT</b><br><span style="color: #f00">${error.message}</span>`, showCloseButton : true }); });
+    }
+  }
 }
