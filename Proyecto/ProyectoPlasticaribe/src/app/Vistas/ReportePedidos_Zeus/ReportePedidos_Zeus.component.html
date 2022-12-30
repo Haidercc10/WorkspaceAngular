@@ -20,14 +20,71 @@
   </div>
 </div>
 
-<div class="contain">
+<div class="contain"></div>
 
-  <div class="container">
+  <div class="container-xxl">
+    <!--<div class="mb-4">
+      <h4 class="tituloRojo">Filtros de búsqueda</h4>
+    </div>-->
+
+    <!--
+    <form [formGroup]="formFiltros">
+      <div class="mb-3">
+        <div class="row g-3">
+
+
+          <div class="form-floating col-md">
+            <input formControlName="Vendedor" class="form-control form-control-sm" (keyup)="cargarVendedores()" list="vendedor" id="floatingInput" title="Nombre de la Materia Prima" required>
+            <datalist id="vendedor">
+              <option *ngFor="let item of arrayVendedores">{{item.nombvende}}</option>
+            </datalist>
+            <label for="floatingInput">Vendedor</label>
+          </div>
+
+
+        <div class="form-floating col-md-3">
+          <input formControlName="Cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" (keyup)="cargarClientes()" title="Nombre de la Materia Prima" required>
+          <datalist id="clientes">
+            <option *ngFor="let item of arrayClientes">{{item.razoncial}}</option>
+          </datalist>
+          <label for="floatingInput">Cliente</label>
+        </div>
+
+
+          <div class="form-floating col-md-3">
+            <input formControlName="Item" class="form-control form-control-sm" list="item" id="floatingInput" (keyup)="cargarItems()" title="Nombre de la Materia Prima" required>
+            <datalist id="item">
+              <option *ngFor="let item of arrayItems">{{item.nombre}}</option>
+            </datalist>
+            <label for="floatingInput">Item</label>
+          </div>
+
+
+          <div class="form-floating col-md">
+            <input formControlName="Fecha1" type="date" min="0" class="form-control" id="floatingInput"required >
+            <label for="floatingInput">Fecha Inicial</label>
+          </div>
+
+
+          <div class="form-floating col-md">
+            <input formControlName="Fecha2" type="date" min="0"  class="form-control" id="floatingInput"required >
+            <label for="floatingInput">Fecha Final</label>
+           </div>
+        </div>
+      </div>
+      <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class="btn btn-danger btn-danger-sm" type="button" ><i class="pi pi-search"></i> Consultar</button>
+          <button class="btn btn-secondary btn-secondary-sm" type="button" ><i class="pi pi-eraser"></i> Limpiar Campos</button>
+        </div>
+      </div>
+    </form>-->
   </div>
-
   <!-- Tabla de Pedidos -->
   <div class="container-fluid tablaDatos">
-    <div>
+    <div class="mb-4">
+      <h3 class="tituloRojo">Información de Pedidos</h3>
+    </div>
       <div *ngIf="!cargando" id="tableProcesos" style="font-size: 14px;">
         <div class="mb-4 ">
           <div class="row g-3">
@@ -54,94 +111,104 @@
                   [(ngModel)]="columnasSeleccionada"
                   optionLabel="header"
                   selectedItemsLabel="{0} columnas seleccionadas"
-                  [style]="{minWidth: '330px'}"
+                  [style]="{minWidth: '300px'}"
                   placeholder="Elige las columnas que quieres ver"></p-multiSelect>
               </ng-template>
-
               <!-- Columnas Principales -->
               <ng-template pTemplate="header" let-columns>
                 <tr>
-                  <th style="text-align: center;" scope="col" pSortableColumn="consecutivo">Consecutivo
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="consecutivo">Pedido
                     <p-sortIcon field="consecutivo"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="consecutivo" display="menu"></p-columnFilter>
                   </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="cliente">Cliente
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cliente">Cliente
                     <p-sortIcon field="cliente"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="cliente" display="menu"></p-columnFilter>
                   </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="producto">Producto
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="producto">Producto
                     <p-sortIcon field="producto"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="producto" display="menu"></p-columnFilter>
                   </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="cant_Pedida">Cant. Pedida
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Pedida">Cant. Pedida
                     <p-sortIcon field="cant_Pedida"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="cant_Pedida" display="menu"></p-columnFilter>
                   </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="cant_Pendiente">Cant. Pendiente
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Pendiente">Cant. Pendiente
                     <p-sortIcon field="cant_Pendiente"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="cant_Pendiente" display="menu"></p-columnFilter>
                   </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="cant_Facturada">Cant. Facturada
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Facturada">Cant. Facturada
                     <p-sortIcon field="cant_Facturada"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="cant_Facturada" display="menu"></p-columnFilter>
                   </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="existencias">Existencias
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="existencias">Stock
                     <p-sortIcon field="existencias"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="existencias" display="menu"></p-columnFilter>
                   </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="presentacion">Presentacion
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="presentacion">Und
                     <p-sortIcon field="presentacion"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="presentacion" display="menu"></p-columnFilter>
                   </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="precioUnidad">Precio Und
-                    <p-sortIcon field="precioUnidad"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="precioUnidad" display="menu"></p-columnFilter>
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="Estado">Estado
+                    <p-sortIcon field="Estado"></p-sortIcon>
                   </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="vendedor">Vendedor
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="vendedor">Vendedor
                     <p-sortIcon field="vendedor"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="vendedor" display="menu"></p-columnFilter>
                   </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="orden_Compra_CLiente">OC CLiente
-                    <p-sortIcon field="orden_Compra_CLiente"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="orden_Compra_CLiente" display="menu"></p-columnFilter>
-                  </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="costo_Cant_Pendiente">Costo Cant Pendiente
-                    <p-sortIcon field="costo_Cant_Pendiente"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="costo_Cant_Pendiente" display="menu"></p-columnFilter>
-                  </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="costo_Cant_Total">Costo Cant Total
-                    <p-sortIcon field="costo_Cant_Total"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="costo_Cant_Total" display="menu"></p-columnFilter>
-                  </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="fecha_Creacion">Fecha Creacion
-                    <p-sortIcon field="fecha_Creacion"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="fecha_Creacion" display="menu"></p-columnFilter>
-                  </th>
-                  <th style="text-align: center;" scope="col" pSortableColumn="fecha_Entrega">Fecha Entrega
-                    <p-sortIcon field="fecha_Entrega"></p-sortIcon>
-                    <p-columnFilter type="numeric" field="fecha_Entrega" display="menu"></p-columnFilter>
+                  <th *ngFor="let col of columns" pResizableColumn style="font-size: 14px;">
+                    {{col.header}}
                   </th>
                 </tr>
+
+                <!-- Campo de Busqueda -->
+                <tr title="Filtros para realizar busquedas de cada campo">
+                  <th>
+                      <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')" class="w-full"> <!--(input)="dt1.filter($event.target.value, 'name', 'contains')" -->
+                  </th>
+                  <th>
+                      <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cliente', 'contains')" class="w-full">
+                  </th>
+                  <th>
+                      <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'producto', 'contains')" class="w-full">
+                  </th>
+                  <th>
+                      <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'cant_Pedida', 'contains')" class="w-full">
+                  </th>
+                   <th>
+                      <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'cant_Pendiente', 'contains')" class="w-full">
+                  </th>
+                  <th>
+                      <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'cant_Facturada', 'contains')" class="w-full">
+                  </th>
+                   <th>
+                      <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'existencias', 'contains')" class="w-full">
+                  </th>
+                  <th>
+                      <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'presentacion', 'contains')" class="w-full">
+                  </th>
+                  <th>
+                    <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'estado', 'contains')" class="w-full">
+                  </th>
+                  <th>
+                      <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'vendedor', 'contains')" class="w-full">
+                  </th>
+                  <th *ngFor="let col of columns">
+                    <input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')" class="w-full">
+                  </th>
+              </tr>
               </ng-template>
 
               <!-- Cuerpo de la tabla -->
               <ng-template pTemplate="body" let-data let-columns="columns">
-                <tr style="cursor: pointer;">
-                  <td scope="col">{{data.consecutivo}}</td>
-                  <td scope="col">{{data.cliente}}</td>
-                  <td scope="col">{{data.producto}}</td>
-                  <td scope="col">{{data.cant_Pedida | number : '1.2-2'}}</td>
-                  <td scope="col">{{data.cant_Pendiente | number : '1.2-2'}}</td>
-                  <td scope="col">{{data.cant_Facturada | number : '1.2-2'}}</td>
-                  <td scope="col">{{data.existencias | number : '1.2-2'}}</td>
-                  <td scope="col">{{data.presentacion}}</td>
-                  <td scope="col">{{data.precioUnidad | number : '1.2-2'}}</td>
-                  <td scope="col">{{data.vendedor}}</td>
-                  <td scope="col">{{data.orden_Compra_CLiente}}</td>
-                  <td scope="col">{{data.costo_Cant_Pendiente | number : '1.2-2'}}</td>
-                  <td scope="col">{{data.costo_Cant_Total | number : '1.2-2'}}</td>
-                  <td scope="col">{{data.fecha_Creacion | date : 'yyyy-MM-dd'}}</td>
-                  <td scope="col">{{data.fecha_Entrega | date : 'yyyy-MM-dd'}}</td>
+                <tr style="cursor: pointer;" title="Con la tecla shift y el scroll del mouse puede moverse hacia los lados de la tabla">
+                  <td style="text-align: center;" scope="col" title="N° Pedido">{{data.consecutivo}}</td>
+                  <td scope="col" title="Cliente">{{data.cliente}}</td>
+                  <td scope="col" title="Item">{{data.producto}}</td>
+                  <td style="text-align: center;" scope="col" title="Cantidad Pedida">{{data.cant_Pedida | number : '1.2-2'}}</td>
+                  <td style="text-align: center;" scope="col" title="Cantidad Pendiente" class="bg-danger2"><b>{{data.cant_Pendiente | number : '1.2-2'}}</b></td>
+                  <td style="text-align: center;" scope="col" title="Cantidad Facturada">{{data.cant_Facturada | number : '1.2-2'}}</td>
+                  <td style="text-align: center;" scope="col" title="Existencias">{{data.existencias | number : '1.2-2'}}</td>
+                  <td style="text-align: center;" scope="col" title="Presentación">{{data.presentacion}}</td>
+                  <ng-container *ngIf="data.estado == 'Pendiente'">
+                      <td style="text-align: center;" scope="col" title="{{titlePendiente}}."><span class="badge bg-danger1">{{data.estado}}</span></td>
+                  </ng-container>
+                  <ng-container *ngIf="data.estado == 'Parcialmente Satisfecho'">
+                      <td style="text-align: center;" scope="col" title="{{titleParcial}}"><span class="badge bg-warning1">{{data.estado}}</span></td>
+                  </ng-container>
+                  <td scope="col" title="Vendedor">{{data.vendedor}}</td>
+                  <td *ngFor="let col of columns">{{data[col.field]}}</td>
                 </tr>
               </ng-template>
 
@@ -163,6 +230,4 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
-</div>

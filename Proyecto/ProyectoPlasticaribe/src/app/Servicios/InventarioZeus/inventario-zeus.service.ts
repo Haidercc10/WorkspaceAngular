@@ -60,4 +60,17 @@ readonly rutaInventarioZeusAPI = rutaZeus;
   GetPedidos(){
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidos`);
   }
+
+  LikeGetClientes(texto : any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientes/${texto}`);
+  }
+
+  LikeGetVendedores(texto: any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getVendedores/${texto}`);
+  }
+
+  LikeGetItems(texto: any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getArticulos/${texto}`);
+  }
+
 }

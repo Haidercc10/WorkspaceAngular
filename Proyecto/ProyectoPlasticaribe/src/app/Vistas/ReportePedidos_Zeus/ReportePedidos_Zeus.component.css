@@ -198,3 +198,36 @@ a:hover {
 .titulos_Paginador{
   display: flex;
 }
+
+.container-fluid {
+  width: 95%;
+}
+
+.bg-danger1 {
+  color: white;
+  background-color: palevioletred;
+  font-size: 14px;
+}
+
+.bg-danger2 {
+  color: palevioletred;
+  font-size: 13px;
+}
+
+.bg-success1 {
+  color: black;
+  background-color: palegreen;
+  font-size: 15px;
+}
+
+.bg-warning1 {
+  color: black;
+  background-color: rgba(255, 228, 78, 0.877);
+  font-size: 14px;
+}
+
+
+
+
+
+
