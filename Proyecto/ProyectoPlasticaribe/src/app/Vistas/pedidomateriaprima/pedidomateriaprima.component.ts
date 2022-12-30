@@ -414,19 +414,19 @@ export class PedidomateriaprimaComponent implements OnInit {
           this.load = false;
         });
       }
+      setTimeout(() => {
+        if (!errorConsulta) {
+          this.relacionOrdenFactura(idFactura);
+          this.cargarRemisionEnFactura(idFactura);
+          setTimeout(() => {
+            this.estadoOrdenCompra();
+            this.moverInventarioMP();
+            this.moverInventarioTintas();
+            this.limpiarTodosCampos();
+          }, 2000);
+        }
+      }, 3500);
     }
-    setTimeout(() => {
-      if (!errorConsulta) {
-        this.relacionOrdenFactura(idFactura);
-        this.cargarRemisionEnFactura(idFactura);
-        setTimeout(() => {
-          this.estadoOrdenCompra();
-          this.moverInventarioMP();
-          this.moverInventarioTintas();
-          this.limpiarTodosCampos();
-        }, 2000);
-      }
-    }, 3500);
   }
 
   // Funcion que va a crear la relacion entre la orden de compra y las posibles facturas que puede tener

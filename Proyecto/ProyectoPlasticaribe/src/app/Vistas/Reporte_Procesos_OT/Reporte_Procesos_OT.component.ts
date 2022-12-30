@@ -539,8 +539,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     let fallas : any = this.formularioOT.value.fallasOT;
     let estado : number = this.formularioOT.value.estado;
     let vendedor : any = this.formularioOT.value.Vendedor;
-    let cliente : any = this.clienteSeleccionado;
-    if (cliente == 0) cliente = null;
+    let cliente : any = this.formularioOT.value.cliente;
     let producto : any = this.formularioOT.value.producto;
     vendedor != '' ? vendedor = vendedor.usua_Id : vendedor = null;
     if (this.ValidarRol == 2) vendedor = this.storage_Id;
@@ -551,704 +550,84 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.cantidadOtAnulada = 0;
     this.cantidadOTFinalizada = 0;
     this.cantidadOTCerrada = 0;
+    let ruta : string = '';
+    let masDeUnFiltros : boolean = true;
 
-    if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && estado != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && estado != null && vendedor != null && cliente != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && estado != null && vendedor != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && estado != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && estado != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fallas != null && estado != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial == datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (fechaincial != null && fechaFinal != null && fallas != null && estado != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorFechasEstadoFalla(fechaincial, fechaFinal, estado, fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fallas != null && estado != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && estado != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fallas != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fallas != null && estado != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fallas != null && estado != null && vendedor != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fallas != null && estado != null && vendedor != null && cliente != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (fechaincial != null && fallas != null && estado != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorFechasEstadoFalla(fechaincial, fechaFinal, estado, fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && estado != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fallas != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fallas == datos_ot[i].falla_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fallas != null && estado != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fallas != null && estado != null && vendedor != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fallas != null && estado != null && vendedor != null && cliente != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && estado != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && estado == datos_ot[i].estado_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && estado != null && vendedor != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && estado != null && vendedor != null && cliente != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fallas != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fallas != null && vendedor != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fallas != null && vendedor != null && cliente != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null&& fallas != null && estado != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fallas != null && estado != null && cliente != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && cliente == datos_ot[i].cli_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fallas != null && estado != null && vendedor != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && vendedor != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && vendedor == datos_ot[i].usua_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && vendedor != null && cliente != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && estado != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && estado == datos_ot[i].estado_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && estado != null && cliente != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && estado == datos_ot[i].estado_Id
-              && cliente == datos_ot[i].cli_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && cliente != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && cliente == datos_ot[i].cli_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && estado != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOtFechasFallas(numOT, fechaincial, fechaFinal, fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (datos_ot[i].estado_Id == estado) {
-              this.llenarArray(datos_ot[i]);
-            }
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && estado != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal, vendedor).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 4800);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-              for (let j = 0; j < datos_bagpro.length; j++) {
-                if (datos_ot[i].estado_Id == estado) {
-                  this.llenarArray(datos_ot[i]);
-                }
-              }
-            });
-          }
-        }
-      });
-    } else if (fallas != null && estado != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorFallas(fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (fechaincial != null && estado != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (fechaincial != null && fallas != null && vendedor != null && cliente != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (fechaincial >= datos_ot[i].estProcOT_FechaCreacion
-              && fechaFinal <= datos_ot[i].estProcOT_FechaCreacion
-              && fallas == datos_ot[i].falla_Id
-              && estado == datos_ot[i].estado_Id
-              && vendedor == datos_ot[i].usua_Id
-              && cliente == datos_ot[i].cli_Id
-              && producto == datos_ot[i].prod_Id) {
-              this.llenarArray(datos_ot[i]);
-            } else Swal.fire('No se encontró la OT consultada.');
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOtFechasFallas(numOT, fechaincial, fechaFinal, fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (fechaincial != null && fechaFinal != null && fallas != null && estado != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorFechasEstadoFalla(fechaincial, fechaFinal, estado, fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (fechaincial != null && fechaFinal != null && estado != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorFechasEstado(fechaincial, fechaFinal, estado, vendedor).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-              if (datos_ot[i].estado_Id == estado){
-                for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i]);
-                }
-              }
-            });
-          }
-        }
-      });
+    if(fechaincial == null) fechaincial = fechaincial = this.today;
+    if(fechaFinal == null) fechaFinal = fechaFinal = fechaincial;
 
-    } else if (numOT   != null && fechaincial != null && fechaFinal != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal, vendedor).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 4800);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-              for (let j = 0; j < datos_bagpro.length; j++) {
-                this.llenarArray(datos_ot[i]);
-              }
-            });
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && estado != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorOtFecha(numOT, fechaincial, vendedor).subscribe(datos_ot => {
-        if(datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
-        else {
-            for (let i = 0; i < datos_ot.length; i++) {
-              this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-                if (datos_ot[i].estado_Id == estado){
-                  for (let j = 0; j < datos_bagpro.length; j++) {
-                    this.llenarArray(datos_ot[i]);
-                  }
-                }
-              });
-            }
-        }
-      });
-
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && estado != null) {
+    //6
+    if (numOT != null && fallas != null && estado != null && vendedor != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
+    //5
+    else if (numOT != null && fallas != null && estado != null && vendedor != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
+    else if (numOT != null && fallas != null && estado != null && vendedor != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
+    else if (numOT != null && fallas != null && estado != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&falla=${fallas}&estado=${estado}`;
+    else if (numOT != null && fallas != null && vendedor != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&falla=${fallas}&vendedor=${vendedor}`;
+    else if (numOT != null && estado != null && vendedor != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&estado=${estado}&vendedor=${vendedor}`;
+    else if (fallas != null && estado != null && vendedor != null && cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}&falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
+    //4
+    else if (numOT != null && vendedor != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&vendedor=${vendedor}`;
+    else if (numOT != null && estado != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&estado=${estado}`;
+    else if (numOT != null && estado != null && vendedor != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&estado=${estado}&vendedor=${vendedor}`;
+    else if (numOT != null && estado != null && vendedor != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&estado=${estado}&vendedor=${vendedor}`;
+    else if (numOT != null && fallas != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&falla=${fallas}`;
+    else if (numOT != null && fallas != null && vendedor != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&falla=${fallas}&vendedor=${vendedor}`;
+    else if (numOT != null && fallas != null && vendedor != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&falla=${fallas}&vendedor=${vendedor}`;
+    else if (numOT != null && fallas != null && estado != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&falla=${fallas}&estado=${estado}`;
+    else if (numOT != null && fallas != null && estado != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&falla=${fallas}&estado=${estado}`;
+    else if (numOT != null && fallas != null && estado != null && vendedor != null) ruta = `?ot=${numOT}&falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
+    else if (estado != null && vendedor != null && cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}&estado=${estado}&vendedor=${vendedor}`;
+    else if (fallas != null && vendedor != null && cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}&falla=${fallas}&vendedor=${vendedor}`;
+    //3
+    else if (numOT != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}`;
+    else if (numOT != null && vendedor != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&vendedor=${vendedor}`;
+    else if (numOT != null && vendedor != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&vendedor=${vendedor}`;
+    else if (numOT != null && estado != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&estado=${estado}`;
+    else if (numOT != null && estado != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&estado=${estado}`;
+    else if (numOT != null && fallas != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}&falla=${fallas}`;
+    else if (numOT != null && fallas != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}&falla=${fallas}`;
+    else if (numOT != null && fallas != null && estado != null) ruta = `?ot=${numOT}&falla=${fallas}&estado=${estado}`;
+    else if (numOT != null && estado != null && vendedor != null) ruta = `?ot=${numOT}&estado=${estado}&vendedor=${vendedor}`;
+    else if (vendedor != null && cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}&vendedor=${vendedor}`;
+    else if (estado != null && cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}&estado=${estado}`;
+    else if (estado != null && vendedor != null && producto != null) ruta = `?prod=${producto}&estado=${estado}&vendedor=${vendedor}`;
+    else if (estado != null && vendedor != null && cliente != null) ruta = `?cli=${cliente}&estado=${estado}&vendedor=${vendedor}`;
+    else if (fallas != null && cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}&falla=${fallas}`;
+    else if (fallas != null && vendedor != null && producto != null) ruta = `?prod=${producto}&falla=${fallas}&vendedor=${vendedor}`;
+    else if (fallas != null && vendedor != null && cliente != null) ruta = `?cli=${cliente}&falla=${fallas}&vendedor=${vendedor}`;
+    else if (fallas != null && estado != null && producto != null) ruta = `?prod=${producto}&falla=${fallas}&estado=${estado}`;
+    else if (fallas != null && estado != null && cliente != null) ruta = `?cli=${cliente}&falla=${fallas}&estado=${estado}`;
+    else if (fallas != null && estado != null && vendedor != null) ruta = `?falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
+    else if (numOT != null && fechaincial != null && fechaFinal != null) {
+      masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
-            if (datos_ot[i].estado_Id == estado){
-              this.llenarArray(datos_ot[i]);
-            }
+            this.llenarArray(datos_ot[i]);
           }
         }
       });
+    } else if (fechaincial != null && fechaFinal != null && vendedor != null) {
+      masDeUnFiltros = false;
+      if (fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') setTimeout(() => {Swal.fire('Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)');}, 4800);
+      else if (fechaFinal < fechaincial) setTimeout(() => {Swal.fire('La fecha final debe ser mayor que la fecha inicial');}, 4800);
+      else {
+        this.srvEstadosOTVendedores.srvObtenerListaPorFechas(fechaincial, fechaFinal, vendedor).subscribe(datos_ot => {
+          if(datos_ot.length == 0) {setTimeout(() => {Swal.fire('No existen OTs creadas en las fechas consultadas.')}, 4800);
+          } else {
+            for (let i = 0; i < datos_ot.length; i++) {
+              this.servicioBagPro.srvObtenerListaClienteOT_Item(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
+                for (let j = 0; j < datos_bagpro.length; j++) {
+                  this.llenarArray(datos_ot[i]);
+                }
+              });
+            }
+          }
+        });
+      }
     } else if (fechaincial != null && fechaFinal != null && fallas != null) {
+      masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorFechasFallas(fechaincial, fechaFinal, fallas).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
@@ -1258,6 +637,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
     } else if (fechaincial != null && fechaFinal != null && estado != null) {
+      masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorFechasEstado(fechaincial, fechaFinal, estado).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
         else {
@@ -1266,303 +646,26 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
         }
       });
-    } else if (fechaincial != null && fallas != null && estado != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorFechaEstadoFalla(fechaincial, estado, fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-            for (let i = 0; i < datos_ot.length; i++) {
-              this.llenarArray(datos_ot[i]);
-            }
-        }
-      });
-    } else if (fechaincial != null && estado != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorFecha(fechaincial, vendedor).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-              if (datos_ot[i].estado_Id == estado){
-                for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i]);
-                }
-              }
-            });
-          }
-        }
-      });
-    } else if (fechaincial != null && fechaFinal != null && vendedor != null) {
-      if (fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') setTimeout(() => {Swal.fire('Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)');}, 4800);
-      else if (fechaFinal < fechaincial) setTimeout(() => {Swal.fire('La fecha final debe ser mayor que la fecha inicial');}, 4800);
-      else {
-        this.srvEstadosOTVendedores.srvObtenerListaPorFechas(fechaincial, fechaFinal, vendedor).subscribe(datos_ot => {
-          if(datos_ot.length == 0) {setTimeout(() => {Swal.fire('No existen OTs creadas en las fechas consultadas.')}, 4800);
-          } else {
-            for (let i = 0; i < datos_ot.length; i++) {
-              this.servicioBagPro.srvObtenerListaClienteOT_Item(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-                  for (let j = 0; j < datos_bagpro.length; j++) {
-                    this.llenarArray(datos_ot[i]);
-                }
-              });
-            }
-          }
-      });
     }
-    } else if (estado != null && numOT != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorOT(numOT, vendedor).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-              if (datos_ot[i].estado_Id == estado){
-                for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i]);
-                }
-              }
-            });
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && fechaFinal != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOtFechas(numOT, fechaincial, fechaFinal).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (numOT != null && fallas != null && estado != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOtFallas(numOT, fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (estado == datos_ot[i].estado_Id) {
-              this.llenarArray(datos_ot[i]);
-            }
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorOtFecha(numOT, fechaincial, vendedor).subscribe(datos_ot => {
-        if(datos_ot.length == 0){setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 4800);
-        } else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-                for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i]);
-                }
-            });
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null && estado != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOtFecha(numOT, fechaincial).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (datos_ot[i].estado_Id == estado) {
-              this.llenarArray(datos_ot[i]);
-            }
-          }
-        }
-      });
-
-    } else if (producto != null && vendedor != null) {
-      this.estadosProcesos_OTService.consultarPorProductoVendedor(producto, vendedor).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (cliente != null && vendedor != null) {
-      this.estadosProcesos_OTService.consultarPorClienteVendedor(cliente, vendedor).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (numOT != null && fechaincial != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOtFecha(numOT, fechaincial).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (numOT != null && fallas != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOtFallas(numOT, fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`);}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (numOT != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (datos_ot[i].prod_Id == producto) {
-              this.llenarArray(datos_ot[i]);
-            }
-          }
-        }
-      });
-    } else if (numOT != null && cliente != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (datos_ot[i].cli_Id == cliente) {
-              this.llenarArray(datos_ot[i]);
-            }
-          }
-        }
-      });
-    } else if (numOT != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorOT(numOT, vendedor).subscribe(datos_ot => {
-        if(datos_ot.length == 0) setTimeout(() => { Swal.fire('No se encontró la OT consultada.'); }, 4800);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo,).subscribe(datos_bagpro => {
-              for (let j = 0; j < datos_bagpro.length; j++) {
-                this.llenarArray(datos_ot[i]);
-              }
-            });
-          }
-        }
-      });
-    } else if (estado != null && numOT != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (datos_ot[i].estado_Id == estado) {
-              this.llenarArray(datos_ot[i]);
-            }
-          }
-        }
-      });
-    } else if (estado != null && fallas != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorOtEstadoFalla(estado, fallas).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (estado != null && cliente != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorClienteEstado(cliente, estado).subscribe(datos_ot => {
-        if(datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 2000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (estado != null && producto != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorProductoEstado(producto, estado).subscribe(datos_ot => {
-        if(datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 2000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        }
-      });
-    } else if (estado != null && vendedor != null) {
-      this.srvEstadosOTVendedores.srvObtenerListaPorOtEstado(estado, vendedor).subscribe(datos_ot => {
-        if(datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con el Estado consultado.`); }, 2000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.servicioBagPro.srvObtenerOTsPorVendedor(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-              for (let j = 0; j < datos_bagpro.length; j++) {
-                if (datos_ot[i].estado_Id == estado){
-                  this.llenarArray(datos_ot[i]);
-                }
-              }
-            });
-          }
-        }
-      });
-    } else if (fechaincial != null && fechaFinal != null) {
-      if (fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') setTimeout(() => { Swal.fire('Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)'); }, 3000);
-      else if(fechaFinal < fechaincial) setTimeout(() => { Swal.fire('La fecha final debe ser mayor que la fecha inicial');}, 3000);
-      else{
-        this.estadosProcesos_OTService.srvObtenerListaPorFechas(fechaincial, fechaFinal).subscribe(datos_ot => {
-          if (datos_ot.length == 0) setTimeout(() => { Swal.fire('No existen OTs creadas en las fechas consultadas.'); }, 3000);
-          else {
-            for (let i = 0; i < datos_ot.length; i++) {
-              this.llenarArray(datos_ot[i]);
-            }
-          }
-        });
-      }
-    } else if (fechaincial != null && fallas != null) {
-      if (fechaincial < '2022-05-01') setTimeout(() => { Swal.fire(`Solo se muestran OT's desde el inicio de las asignaciones de Materia Prima (01/05/2022)`); }, 3000);
-      else {
-        this.estadosProcesos_OTService.srvObtenerListaPorOtFechaFalla(fechaincial, fallas).subscribe(datos_ot => {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
-          }
-        });
-      }
-    } else if (fechaincial != null && vendedor != null) {
-      if (fechaincial < '2022-05-01') setTimeout(() => { Swal.fire(`Solo se muestran OT's desde el inicio de las asignaciones de Materia Prima (2022-05-01)`); }, 4800);
-      else {
-        this.srvEstadosOTVendedores.srvObtenerListaPorFecha(fechaincial, vendedor).subscribe(datos_ot => {
-          if(datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OTs creadas el día ${fechaincial}`); }, 2000);
-          else {
-            for (let i = 0; i < datos_ot.length; i++) {
-              this.servicioBagPro.srvObtenerListaClienteOT_Item(datos_ot[i].estProcOT_OrdenTrabajo).subscribe(datos_bagpro => {
-                for (let j = 0; j < datos_bagpro.length; j++) {
-                  this.llenarArray(datos_ot[i]);
-                }
-              });
-            }
-          }
-        });
-      }
-    } else if (fechaincial != null && estado != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorFecha(fechaincial).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (datos_ot[i].estado_Id == estado) {
-              this.llenarArray(datos_ot[i]);
-            }
-          }
-        }
-      });
-    } else if (fechaincial != null && cliente != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorFecha(fechaincial).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (datos_ot[i].cli_Id == cliente) {
-              this.llenarArray(datos_ot[i]);
-            }
-          }
-        }
-      });
-    } else if (fechaincial != null && producto != null) {
-      this.estadosProcesos_OTService.srvObtenerListaPorFecha(fechaincial).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con la combinación de filtros consultada.`); }, 3000);
-        else{
-          for (let i = 0; i < datos_ot.length; i++) {
-            if (datos_ot[i].prod_Id == producto) {
-              this.llenarArray(datos_ot[i]);
-            }
-          }
-        }
-      });
-    } else if (numOT != null) {
+    //2
+    else if (numOT != null && fallas != null) ruta = `?ot=${numOT}&falla=${fallas}`;
+    else if (numOT != null && estado != null) ruta = `?ot=${numOT}&estado=${estado}`;
+    else if (numOT != null && vendedor != null) ruta = `?ot=${numOT}&vendedor=${vendedor}`;
+    else if (numOT != null && cliente != null) ruta = `?ot=${numOT}&cli=${cliente}`;
+    else if (numOT != null && producto != null) ruta = `?ot=${numOT}&prod=${producto}`;
+    else if (fallas != null && estado != null) ruta = `?falla=${fallas}&estado=${estado}`;
+    else if (fallas != null && vendedor != null) ruta = `?falla=${fallas}&vendedor=${vendedor}`;
+    else if (fallas != null && cliente != null) ruta = `?cli=${cliente}&falla=${fallas}`;
+    else if (fallas != null && producto != null) ruta = `?prod=${producto}&falla=${fallas}`;
+    else if (estado != null && vendedor != null) ruta = `?estado=${estado}&vendedor=${vendedor}`;
+    else if (estado != null && cliente != null) ruta = `?cli=${cliente}&estado=${estado}`;
+    else if (estado != null && producto != null) ruta = `?prod=${producto}&estado=${estado}`;
+    else if (vendedor != null && cliente != null) ruta = `?cli=${cliente}&vendedor=${vendedor}`;
+    else if (vendedor != null && producto != null) ruta = `?prod=${producto}&vendedor=${vendedor}`;
+    else if (cliente != null && producto != null) ruta = `?cli=${cliente}&prod=${producto}`;
+    //1
+    else if (numOT != null) {
+      masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorOT(numOT).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => {Swal.fire('No se encontró la OT consultada.');}, 3000);
         else {
@@ -1571,19 +674,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
         }
       });
-    } else if (fechaincial != null) {
-      if (fechaincial < '2022-05-01') setTimeout(() => { Swal.fire(`Solo se muestran OT's desde el inicio de las asignaciones de Materia Prima (2022-05-01)`); }, 3000);
-      else {
-        this.estadosProcesos_OTService.srvObtenerListaPorFecha(fechaincial).subscribe(datos_ot => {
-          if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OTs creadas el día ${fechaincial}`); }, 3000);
-          else {
-            for (let i = 0; i < datos_ot.length; i++) {
-              this.llenarArray(datos_ot[i]);
-            }
-          };
-        });
-      }
     } else if (fallas != null) {
+      masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorFallas(fallas).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire('No se encontraron OTs con la falla consultada.'); }, 3000);
         else {
@@ -1593,6 +685,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
     } else if (vendedor != null) {
+      masDeUnFiltros = false;
       this.srvEstadosOTVendedores.consultarPorFechasVendedor(this.today, this.today, vendedor).subscribe(datos_ot => {
         if(datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's con el Estado consultado.`); }, 4800);
         else{
@@ -1606,6 +699,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
     } else if (estado != null) {
+      masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorOtEstado(estado).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con el Estado consultado.`);}, 3000);
         else{
@@ -1615,6 +709,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
     } else if (cliente != null) {
+      masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorCliente(cliente).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con el Cliente consultado.`);}, 3000);
         else{
@@ -1624,6 +719,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
     } else if (producto != null) {
+      masDeUnFiltros = false;
       this.estadosProcesos_OTService.srvObtenerListaPorProductos(producto).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => {Swal.fire(`No se encontraron OT's con el producto consultado.`);}, 3000);
         else{
@@ -1632,8 +728,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           }
         }
       });
-    } else {
-      this.estadosProcesos_OTService.srvObtenerListaPorFecha(this.today).subscribe(datos_ot => {
+    }
+    //0
+    else ruta = '';
+    if (masDeUnFiltros == true){
+      this.estadosProcesos_OTService.GetReporteProcesosOt(fechaincial, fechaFinal, ruta).subscribe(datos_ot => {
         if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's creadas del día de hoy.`); }, 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
@@ -1642,28 +741,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         }
       });
     }
-
-
-    if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && estado != null && vendedor != null && cliente != null && producto != null) {
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && estado != null && vendedor != null && cliente != null) {
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && estado != null && vendedor != null && producto != null) {
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && estado != null && cliente != null && producto != null) {
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && vendedor != null && cliente != null && producto != null) {
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && vendedor != null && cliente != null && producto != null) {
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && estado != null && vendedor != null && cliente != null && producto != null) {
-    } else if (numOT != null && fechaincial != null && fallas != null && estado != null && vendedor != null && cliente != null && producto != null) {
-    } else if (fechaincial != null && fechaFinal != null && fallas != null && estado != null && vendedor != null && cliente != null && producto != null) {
-    } else if (numOT != null && fechaincial != null && fechaFinal != null && fallas != null && estado != null && vendedor != null) {
-    }
-
-    this.estadosProcesos_OTService.GetReporteProcesosOt(fechaincial, fechaFinal).subscribe(datos_ot => {
-      if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's creadas del día de hoy.`); }, 3000);
-      else {
-        for (let i = 0; i < datos_ot.length; i++) {
-          this.llenarArray(datos_ot[i]);
-        }
-      }
-    });
 
     setTimeout(() => { this.load = true; }, 2500);
   }

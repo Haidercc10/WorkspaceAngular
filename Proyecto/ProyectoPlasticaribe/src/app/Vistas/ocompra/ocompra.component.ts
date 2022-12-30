@@ -1,4 +1,3 @@
-import { ThisReceiver } from '@angular/compiler';
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import moment from 'moment';
@@ -22,8 +21,8 @@ import Swal from 'sweetalert2';
   selector: 'app_ocompra_component',
   templateUrl: './ocompra.component.html',
   styleUrls: ['./ocompra.component.css']
-
 })
+
 export class OcompraComponent implements OnInit {
 
   FormOrdenCompra : FormGroup; //Formulario principal
@@ -51,6 +50,8 @@ export class OcompraComponent implements OnInit {
   materiasPrimasSeleccionada_ID : any [] = []; //Variable que almacenará los ID de las materias primas que se han seleccionado para que no puedan ser elegidas nuevamente
   consecutivoOrdenCompra : any = 0; //Variable que almacenará el consecutivo de la orden de compra
   informacionPDF : any [] = []; //Variable que tendrá la informacion de la materia prima pedida en la orden de compra
+
+  edicionOrdenCompra : boolean = false;
 
   constructor(private frmBuilder : FormBuilder,
                 private rolService : RolesService,
@@ -287,25 +288,6 @@ export class OcompraComponent implements OnInit {
 
   // Funcion para llamar el modal que pregunta que materia prima se va a crear
   LlamarModalCrearMateriaPrima(){
-    // Swal.fire({
-    //   title: '¿Qué desea crear?',
-    //   text: "¡Presione el botón de la materia prima que quiere crear!",
-    //   icon: 'question',
-    //   allowOutsideClick: false,
-    //   showCancelButton: true,
-    //   showDenyButton: true,
-    //   showCloseButton: true,
-    //   confirmButtonColor: '#3085d6',
-    //   cancelButtonColor: '#3085d6',
-    //   denyButtonColor: '#3085d6',
-    //   confirmButtonText: 'Polietilenos',
-    //   cancelButtonText: 'BOPP / BOPA/ Poliester',
-    //   denyButtonText: 'Tintas / Chips / Solventes',
-    // }).then((result) => {
-    //   if (result.isConfirmed) this.ModalCrearMateriaPrima = true;
-    //   else if (result.dismiss) this.ModalCrearBOPP = true;
-    //   else if (result.isDenied) this.ModalCrearTintas = true;
-    // })
     this.modalCreacionMateriaPrima = true;
   }
 
@@ -380,20 +362,37 @@ export class OcompraComponent implements OnInit {
 
   // Funcion que mostrará el mensaje de que todo el proceso de guardado fue exitoso
   GuardadoExitoso(){
-    Swal.fire({
-      icon: 'success',
-      title: '¡Guardado Exitoso!',
-      html:
-      `<b>¡Orden de compra Creada con exito!</b><hr>`,
-      showCloseButton: true,
-      showConfirmButton: true,
-      showCancelButton : true,
-      confirmButtonColor : '#d44',
-      cancelButtonText : `Cerrar`,
-      confirmButtonText : 'Ver PDF <i class="pi pi-file-pdf"></i>',
-    }).then((result) => {
-      if (result.isConfirmed) this.buscarinfoOrdenCompra();
-    });
+    if (this.edicionOrdenCompra) {
+      Swal.fire({
+        icon: 'success',
+        title: '¡Guardado Exitoso!',
+        html:
+        `<b>¡Orden de compra Editada con exito!</b><hr>`,
+        showCloseButton: true,
+        showConfirmButton: true,
+        showCancelButton : true,
+        confirmButtonColor : '#d44',
+        cancelButtonText : `Cerrar`,
+        confirmButtonText : 'Ver PDF <i class="pi pi-file-pdf"></i>',
+      }).then((result) => {
+        if (result.isConfirmed) this.buscarinfoOrdenCompra();
+      });
+    } else {
+      Swal.fire({
+        icon: 'success',
+        title: '¡Guardado Exitoso!',
+        html:
+        `<b>¡Orden de compra Creada con exito!</b><hr>`,
+        showCloseButton: true,
+        showConfirmButton: true,
+        showCancelButton : true,
+        confirmButtonColor : '#d44',
+        cancelButtonText : `Cerrar`,
+        confirmButtonText : 'Ver PDF <i class="pi pi-file-pdf"></i>',
+      }).then((result) => {
+        if (result.isConfirmed) this.buscarinfoOrdenCompra();
+      });
+    }
     this.actualizarPrecioMatPrimas();
     this.actualizarPrecioTintas();
     setTimeout(() => { this.limpiarTodo(); }, 1500);
@@ -668,16 +667,6 @@ export class OcompraComponent implements OnInit {
     };
   }
 
-  // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
-  }
-
-  // Mensaje de Error
-  mensajeError(text : string, error : any = ''){
-    Swal.fire({ icon: 'error', title: 'Error', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
-  }
-
   /** Actualizar Precio de la materia prima al momento de crear la OC*/
   actualizarPrecioMatPrimas(){
     for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
@@ -707,6 +696,7 @@ export class OcompraComponent implements OnInit {
       this.mensajeError('No fue posible actualizar el precio de las Materias Primas');
     });
   }
+
   /** Actualizar Precio de la materia prima al momento de crear la OC */
   actualizarPrecioTintas(){
     for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
@@ -736,5 +726,118 @@ export class OcompraComponent implements OnInit {
     this.servicioTintas.srvActualizar(infoTintas.Tinta_Id, infoTintas).subscribe(dataMP => {  }, error => {
       this.mensajeError('No fue posible actualizar el precio de las Tintas');
     });
+  }
+
+  // Funcion que va a elminar de la base de datos una de las materias primas, bopp, tintas escogidas al momento de editar la orden de compra
+  eliminarMateriaPrima(data : any){
+    this.dtOrdenCompraService.GetMateriaPrimaOrdenCompa(this.FormOrdenCompra.value.ConsecutivoOrden, data.Id).subscribe(datos_orden => {
+      if (datos_orden.length > 0) {
+        Swal.fire({
+          title: '¿Estás seguro de eliminar la Materia Prima de la Orden de Compra?',
+          text: `Al eliminar la materia prima en este apartado de edición se Eliminará Tambien de la Base de Datos`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Eliminar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            for (let i = 0; i < datos_orden.length; i++) {
+              this.dtOrdenCompraService.deleteID_DtOrdenCompra(datos_orden[i]).subscribe(datos_eliminados => {
+                for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+                  if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
+                    this.materiasPrimasSeleccionadas.splice(i, 1);
+                    this.catidadTotalPeso -= data.Cantidad;
+                    this.cantidadTotalPrecio -= data.SubTotal;
+                    for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
+                      if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
+                    }
+                    const Toast = Swal.mixin({
+                      toast: true,
+                      position: 'center',
+                      showConfirmButton: false,
+                      timer: 1500,
+                      timerProgressBar: true,
+                      didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                      }
+                    });
+                    Toast.fire({
+                      icon: 'success',
+                      title: `¡Se ha quitado la Materia Prima ${data.Nombre} de la Orden de Compra!`
+                    });
+                    break;
+                  }
+                }
+              }, error => { this.mensajeError(`¡No se pudo eliminar la materia de la orden de compra!`, error.message); });
+            }
+          }
+        });
+      } else this.quitarMateriaPrima(data);
+    });
+  }
+
+  // Funcion que editará la informacion general de la orden de compra
+  editarOrdenCompra(){
+    if (this.FormOrdenCompra.valid) {
+      if (this.materiasPrimasSeleccionadas.length > 0) {
+        this.cargando = false;
+        let observacion : string = this.FormOrdenCompra.value.Observacion;
+        if (observacion == null) observacion = '';
+        this.ordenCompraService.getId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden).subscribe(datos_Orden => {
+          let info : any = {
+            Oc_Id : this.FormOrdenCompra.value.ConsecutivoOrden,
+            Usua_Id : this.storage_Id,
+            Oc_Fecha : datos_Orden.oc_Fecha,
+            Oc_Hora : datos_Orden.oc_Hora,
+            Prov_Id : this.FormOrdenCompra.value.Id_Proveedor,
+            Estado_Id : datos_Orden.estado_Id,
+            Oc_ValorTotal : this.cantidadTotalPrecio,
+            Oc_PesoTotal : this.catidadTotalPeso,
+            TpDoc_Id : 'OCMP',
+            Oc_Observacion : (observacion).toUpperCase(),
+          }
+          this.ordenCompraService.putId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden, info).subscribe(datos_ordenCompra => { this.editarDtOrdenCompa(); }, error => {
+            this.mensajeError(`¡Error al Editar la Orden de Compra!`, error.message);
+            this.cargando = false;
+          });
+        }, error => { this.mensajeError(`¡No se pudo obtener información de la Orden de Compra a Editar!`, error.message); });
+      } else this.mensajeAdvertencia(`¡Debe escoger minimos 1 Materia Prima!`);
+    } else this.mensajeAdvertencia(`¡Hay Campos Vacios!`);
+  }
+
+  // Funcion que va a editar los detalles de la orden de compra
+  editarDtOrdenCompa(){
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      this.dtOrdenCompraService.GetMateriaPrimaOrdenCompa(this.FormOrdenCompra.value.ConsecutivoOrden, this.materiasPrimasSeleccionadas[i].Id).subscribe(datos_orden => {
+        if (datos_orden.length == 0) {
+          let info : any = {
+            Oc_Id : this.FormOrdenCompra.value.ConsecutivoOrden,
+            MatPri_Id : this.materiasPrimasSeleccionadas[i].Id_Mp,
+            Tinta_Id : this.materiasPrimasSeleccionadas[i].Id_Tinta,
+            BOPP_Id : this.materiasPrimasSeleccionadas[i].Id_Bopp,
+            Doc_CantidadPedida : this.materiasPrimasSeleccionadas[i].Cantidad,
+            UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
+            Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[i].Precio,
+          }
+          this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => {  }, error => {
+            this.mensajeError(`¡Error al Crear la(s) materia(s) prima(s) pedida(s)!`, error.message);
+            this.cargando = false;
+          });
+        }
+      });
+    }
+    setTimeout(() => { this.GuardadoExitoso(); }, this.materiasPrimasSeleccionadas.length * 10);
+  }
+
+  // Mensaje de Advertencia
+  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  }
+
+  // Mensaje de Error
+  mensajeError(text : string, error : any = ''){
+    Swal.fire({ icon: 'error', title: 'Error', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
   }
 }

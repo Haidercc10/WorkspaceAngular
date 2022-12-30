@@ -166,12 +166,12 @@ p-pickList span{
   padding-bottom: 2%;
 }
 
-/* .graficaFacturacion{
+.graficaFacturacion{
   margin: auto;
-  width: 70%;
+  width: 90%;
   height: 70%;
   font-size: 50px;
-} */
+}
 
 @keyframes card {
   0%   {left:0px;}

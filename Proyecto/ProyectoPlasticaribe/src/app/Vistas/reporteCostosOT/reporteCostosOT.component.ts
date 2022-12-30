@@ -11,6 +11,8 @@ import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/de
 import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
 import { AppComponent } from 'src/app/app.component';
 import moment from 'moment';
+import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -82,7 +84,9 @@ export class ReporteCostosOTComponent implements OnInit {
                         private materiaPrimaService : MateriaPrimaService,
                           private devolucionesService : DevolucionesService,
                             private devolucionesMPService : DevolucionesMPService,
-                              private appComponent : AppComponent,) {
+                              private appComponent : AppComponent,
+                                private boppService : EntradaBOPPService,
+                                  private tintaService : TintasService,) {
 
     this.infoOT = this.frmBuilderMateriaPrima.group({
       ot : ['',Validators.required],
@@ -319,7 +323,7 @@ export class ReporteCostosOTComponent implements OnInit {
         this.cantidadPorcPerdidaProcesoaProceso(ot);
       });
     });
-  }
+  }datos_bopp
 
   //Funcion que calcula y guarda la cantidad de perdida que hubo de un proceso a otro
   cantidadPorcPerdidaProcesoaProceso(ot : any){
@@ -481,22 +485,61 @@ export class ReporteCostosOTComponent implements OnInit {
   // Funcion para llenar la tabla con la materia prima que se ha pedido para la OT consultada
   llenarTablaMP(formulario : any){
     if (this.devolucion != 0) {
-      this.materiaPrimaService.srvObtenerListaPorId(formulario.matPri_Id).subscribe(datos_materiaPrima => {
-        const infoDoc : any = {
-          Id : datos_materiaPrima.matPri_Id,
-          Nombre : datos_materiaPrima.matPri_Nombre,
-          Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
-          Presentacion : datos_materiaPrima.undMed_Id,
-          PrecioUnd : this.formatonumeros(datos_materiaPrima.matPri_Precio),
-          SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio)),
-          Proceso : 'Devolución',
-        }
-        this.totalMPEntregada = this.totalMPEntregada - infoDoc.Cantidad;
-        this.ValorMPEntregada = this.ValorMPEntregada - (formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio);
-        this.ArrayMateriaPrima.push(infoDoc);
-        this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
-        this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
-      });
+      if (formulario.matPri_Id != 84 && formulario.tinta_Id == 2001 && formulario.bopP_Id == 449) {
+        this.materiaPrimaService.srvObtenerListaPorId(formulario.matPri_Id).subscribe(datos_materiaPrima => {
+          const infoDoc : any = {
+            Id : datos_materiaPrima.matPri_Id,
+            Nombre : datos_materiaPrima.matPri_Nombre,
+            Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
+            Presentacion : datos_materiaPrima.undMed_Id,
+            PrecioUnd : this.formatonumeros(datos_materiaPrima.matPri_Precio),
+            SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio)),
+            Proceso : 'Devolución',
+          }
+          this.totalMPEntregada = this.totalMPEntregada - infoDoc.Cantidad;
+          this.ValorMPEntregada = this.ValorMPEntregada - (formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio);
+          this.ArrayMateriaPrima.push(infoDoc);
+          this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+          this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
+        });
+      } else if (formulario.matPri_Id == 84 && formulario.tinta_Id != 2001 && formulario.bopP_Id == 449) {
+        this.tintaService.srvObtenerListaPorId(formulario.tinta_Id).subscribe(datos_tinta => {
+          const infoDoc : any = {
+            Id : datos_tinta.tinta_Id,
+            Nombre : datos_tinta.tinta_Nombre,
+            Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
+            Presentacion : datos_tinta.undMed_Id,
+            PrecioUnd : this.formatonumeros(datos_tinta.tinta_Precio),
+            SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_tinta.tinta_Precio)),
+            Proceso : 'Devolución',
+          }
+          this.totalMPEntregada = this.totalMPEntregada - infoDoc.Cantidad;
+          this.ValorMPEntregada = this.ValorMPEntregada - (formulario.dtDevMatPri_CantidadDevuelta * datos_tinta.tinta_Precio);
+          this.ArrayMateriaPrima.push(infoDoc);
+          this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+          this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
+        });
+      } else if (formulario.matPri_Id == 84 && formulario.tinta_Id == 2001 && formulario.bopP_Id != 449) {
+        this.boppService.srvObtenerListaPorId(formulario.bopP_Id).subscribe(datos => {
+          let datos_bopp : any = [datos];
+          for (let i = 0; i < datos_bopp.length; i++) {
+            const infoDoc : any = {
+              Id : datos_bopp[i].bopP_Id,
+              Nombre : datos_bopp[i].bopP_Nombre,
+              Cantidad : formulario.dtDevMatPri_CantidadDevuelta,
+              Presentacion : datos_bopp[i].undMed_Id,
+              PrecioUnd : this.formatonumeros(datos_bopp[i].bopP_Precio),
+              SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_bopp[i].bopP_Precio)),
+              Proceso : 'Devolución',
+            }
+            this.totalMPEntregada = this.totalMPEntregada - infoDoc.Cantidad;
+            this.ValorMPEntregada = this.ValorMPEntregada - (formulario.dtDevMatPri_CantidadDevuelta * datos_bopp[i].bopP_Precio);
+            this.ArrayMateriaPrima.push(infoDoc);
+            this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+            this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
+          }
+        });
+      }
       this.load = true;
     } else {
       const infoDoc : any = {

@@ -12,6 +12,7 @@ import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
 import Swal from 'sweetalert2';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
+import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 
 @Component({
   selector: 'app-PaginaPrincipal',
@@ -43,15 +44,18 @@ export class PaginaPrincipalComponent implements OnInit {
   nombreGrafica : string = 'Grafica'; //Variable que almacenará el nombre de la grafica
   multiAxisData: any;
   multiAxisOptions: any;
+  multiAxisPlugins = [ DataLabelsPlugin ];
 
   /* GRAFICA */
   mostrarGraficaComparativo : boolean = false; //Variable que mostrará o no la información graficada
   ComparativoData: any;
   ComparativoOptions: any;
+  ComparativoPlugins = [ DataLabelsPlugin ];
 
   /* GRAFICA DE FACTURACION */
   facturasData: any; //Variable que almacenará la informacion a graficar de lo facturado cada mes
   facturasOptions: any; //Variable que almacenará los estilos que tendrá la grafica de lo facturado cada mes
+  facturacionPlugins = [ DataLabelsPlugin ];
 
   /* GRAFICA DE IVA COMPRA */
   ivaCompraData: any; //Variable que almacenará la informacion a graficar del iva de compra de cada mes
@@ -947,7 +951,7 @@ export class PaginaPrincipalComponent implements OnInit {
       labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       datasets: [
         {
-          label: 'Total Vendido en el mes',
+          label: 'Facturación',
           data: [
             this.totalFacturado1,
             this.totalFacturado2,
@@ -960,40 +964,93 @@ export class PaginaPrincipalComponent implements OnInit {
             this.totalFacturado9,
             this.totalFacturado10,
             this.totalFacturado11,
-            this.totalFacturado12
+            this.totalFacturado12,
           ],
-          fill: true,
+          yAxisID: 'y',
           borderColor: '#FFA726',
-          tension: 0,
-          backgroundColor: 'rgba(255,167,38,0.2)'
+          backgroundColor: 'rgba(255,167,38,0.2)',
+          pointStyle: 'rectRot',
+          pointRadius: 10,
+          pointHoverRadius: 15,
+          fill: true,
+          tension: 0.3
         }
       ]
     };
 
     this.facturasOptions = {
-      plugins: {
-        datalabels: {
-          align: 'top',
-          color: 'black',
-          font: {
-            size: 14,
-            weight: 600
+      stacked: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#495057',
+              usePointStyle: true,
+              font: {
+                size: 20
+              }
+            }
+          },
+          tooltip: {
+            titleFont: {
+              size: 50,
+            },
+            usePointStyle: true,
+            bodyFont: {
+              size: 30
+            }
           }
-        }
-      },
-      scales: {
-        x: {
-          ticks: { color: '#495057' },
-          grid: { color: '#ebedef' },
-          fontSize: 100
         },
-        y: {
-          ticks: { color: '#495057' },
-          grid: { color: '#ebedef' },
-          fontSize: 100
+        tooltip: {
+          usePointStyle: true,
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#495057',
+              font: {
+                size: 20
+              }
+            },
+            grid: {
+              color: '#ebedef'
+            }
+          },
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            ticks: {
+              color: '#495057',
+              font: {
+                size: 20
+              }
+            },
+            grid: {
+              color: '#ebedef'
+            }
+          },
+          // y1: {
+          //   type: 'linear',
+          //   display: true,
+          //   position: 'right',
+          //   ticks: {
+          //     color: '#495057',
+          //     font: {
+          //       size: 20
+          //     }
+          //   },
+          //   grid: {
+          //     drawOnChartArea: false,
+          //     color: '#ebedef'
+          //   }
+          // }
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'end'
         }
-      }
     };
+
   }
 
   // Funcion que va a llenar la grafica con la informacion del iva de las compras mensuales
@@ -1003,7 +1060,7 @@ export class PaginaPrincipalComponent implements OnInit {
       datasets: [
         {
           label: 'Total Iva Compra en el mes ',
-          data: [
+          data2: [
             this.totalIvaCompra1,
             this.totalIvaCompra2,
             this.totalIvaCompra3,

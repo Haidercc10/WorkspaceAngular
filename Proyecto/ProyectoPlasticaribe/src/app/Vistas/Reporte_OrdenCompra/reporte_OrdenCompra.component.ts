@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
@@ -7,8 +7,13 @@ import { Table } from 'primeng/table';
 import { AppComponent } from 'src/app/app.component';
 import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCompra/DetallesOrdenesCompra.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
+import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
+import { OcompraComponent } from '../ocompra/ocompra.component';
 
 @Component({
   selector: 'app-reporte_OrdenCompra',
@@ -29,6 +34,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   datosPdf : any [] = []; //variable que va a almacenar la informacion de la orden de compra consultada
 
   // Editar Orden de Compra
+  @ViewChild(OcompraComponent)  EditarOrdenCompra : OcompraComponent;
   mostrarModal : boolean = false; //Variable que va a mostrar o no, el modal para editar ordenes de compra
   numeroOrdenCompra : number = 0; //Variable que va a almcenar el numero de la orden de compra que se desea editar
 
@@ -37,7 +43,11 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private estadosService : EstadosService,
                       private dtOrdenCompraService : DetallesOrdenesCompraService,
-                        private appComponent : AppComponent,) {
+                        private appComponent : AppComponent,
+                          private proveedorService : ProveedorService,
+                            private materiaPrimaService : MateriaPrimaService,
+                              private undMedidaService : UnidadMedidaService,
+                                private ordenCompraService : OrdenCompra_MateriaPrimaService,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -492,6 +502,53 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   llenarModal(numeroOrden : number){
     this.mostrarModal = true;
     this.numeroOrdenCompra = numeroOrden;
+    this.EditarOrdenCompra.edicionOrdenCompra = true;
+    this.EditarOrdenCompra.FormOrdenCompra.reset();
+    this.EditarOrdenCompra.FormMateriaPrima.reset();
+    this.EditarOrdenCompra.materiasPrimasSeleccionadas = [];
+    this.EditarOrdenCompra.catidadTotalPeso = 0;
+    this.EditarOrdenCompra.cantidadTotalPrecio = 0;
+    this.EditarOrdenCompra.materiasPrimasSeleccionada_ID = [];
+    this.EditarOrdenCompra.consecutivoOrdenCompra = 0;
+    this.EditarOrdenCompra.informacionPDF = [];
+    this.dtOrdenCompraService.GetOrdenCompra(numeroOrden).subscribe(datos_orden => {
+      for (let i = 0; i < datos_orden.length; i++) {
+        this.EditarOrdenCompra.FormOrdenCompra.setValue({
+          ConsecutivoOrden : numeroOrden,
+          Proveedor : datos_orden[i].proveedor,
+          Id_Proveedor : datos_orden[i].proveedor_Id,
+          Observacion : datos_orden[i].observacion,
+        });
+        break;
+      }
+      for (let i = 0; i < datos_orden.length; i++) {
+        let info : any = {
+          Id : 0,
+          Id_Mp: datos_orden[i].mP_Id,
+          Id_Tinta: datos_orden[i].tinta_Id,
+          Id_Bopp: datos_orden[i].bopp_Id,
+          Nombre : '',
+          Cantidad : datos_orden[i].cantidad,
+          Und_Medida : datos_orden[i].unidad_Medida,
+          Precio : datos_orden[i].precio_Unitario,
+          SubTotal : (datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
+        };
+        if (info.Id_Mp != 84) {
+          info.Id = info.Id_Mp;
+          info.Nombre = datos_orden[i].mp;
+        } else if (info.Id_Tinta != 2001) {
+          info.Id = info.Id_Tinta;
+          info.Nombre = datos_orden[i].tinta;
+        } else if (info.Id_Bopp != 1) {
+          info.Id = info.Id_Bopp;
+          info.Nombre = datos_orden[i].bopp;
+        }
+        this.EditarOrdenCompra.materiasPrimasSeleccionadas.push(info);
+        this.EditarOrdenCompra.catidadTotalPeso += datos_orden[i].cantidad;
+        this.EditarOrdenCompra.cantidadTotalPrecio += (datos_orden[i].cantidad * datos_orden[i].precio_Unitario);
+      }
+    }, error => { this.mensajeError(`¡No se pudo obtener infroamción de la Orden de Compra N° ${numeroOrden}!`, error.message); });
+
   }
 
   // Mensaje de Advertencia

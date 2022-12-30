@@ -1,4 +1,7 @@
-<app-menuLateral></app-menuLateral>
+<ng-container *ngIf="!edicionOrdenCompra">
+  <app-menuLateral></app-menuLateral>
+</ng-container>
+
 
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
@@ -160,7 +163,10 @@
             <td>{{materiasPrimas.Und_Medida}}</td>
             <td>{{materiasPrimas.Precio | number}}</td>
             <td>{{materiasPrimas.SubTotal | number}}</td>
-            <td><i class="pi pi-trash" style="cursor: pointer;" title="Quitar Materia Prima" (click)="quitarMateriaPrima(materiasPrimas)"></i></td>
+            <td>
+              <i class="pi pi-trash" style="cursor: pointer;" title="Quitar Materia Prima" (click)="quitarMateriaPrima(materiasPrimas)" *ngIf="!edicionOrdenCompra"></i>
+              <i class="pi pi-trash" style="cursor: pointer;" title="Eliminar Materia Prima" (click)="eliminarMateriaPrima(materiasPrimas)" *ngIf="edicionOrdenCompra"></i>
+            </td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
@@ -183,7 +189,8 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarDatosOrdenCompra()">Crear Orden de Compra</button> <!--(click)="validarDatosOrdenCompra()"-->
+      <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarDatosOrdenCompra()" *ngIf="!edicionOrdenCompra">Crear Orden de Compra</button>
+      <button class="btn btn-danger btn-danger-sm" type="button" (click)="editarOrdenCompra()" *ngIf="edicionOrdenCompra">Editar Orden de Compra</button>
       <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()">Limpiar Todos los Campos</button>
     </div>
   </div>
