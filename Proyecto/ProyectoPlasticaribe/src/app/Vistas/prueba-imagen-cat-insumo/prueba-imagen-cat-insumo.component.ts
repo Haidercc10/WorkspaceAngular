@@ -32,10 +32,6 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
       legend: {
         display: true,
       },
-      datalabels: {
-        anchor: 'end',
-        align: 'end'
-      }
     }
   };
   public barChartType: ChartType = 'bar';

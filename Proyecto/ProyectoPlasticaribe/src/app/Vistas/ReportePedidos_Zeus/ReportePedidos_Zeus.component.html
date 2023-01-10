@@ -20,68 +20,11 @@
   </div>
 </div>
 
-<div class="contain"></div>
-
-  <div class="container-xxl">
-    <!--<div class="mb-4">
-      <h4 class="tituloRojo">Filtros de búsqueda</h4>
-    </div>-->
-
-    <!--
-    <form [formGroup]="formFiltros">
-      <div class="mb-3">
-        <div class="row g-3">
-
-
-          <div class="form-floating col-md">
-            <input formControlName="Vendedor" class="form-control form-control-sm" (keyup)="cargarVendedores()" list="vendedor" id="floatingInput" title="Nombre de la Materia Prima" required>
-            <datalist id="vendedor">
-              <option *ngFor="let item of arrayVendedores">{{item.nombvende}}</option>
-            </datalist>
-            <label for="floatingInput">Vendedor</label>
-          </div>
-
-
-        <div class="form-floating col-md-3">
-          <input formControlName="Cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" (keyup)="cargarClientes()" title="Nombre de la Materia Prima" required>
-          <datalist id="clientes">
-            <option *ngFor="let item of arrayClientes">{{item.razoncial}}</option>
-          </datalist>
-          <label for="floatingInput">Cliente</label>
-        </div>
-
-
-          <div class="form-floating col-md-3">
-            <input formControlName="Item" class="form-control form-control-sm" list="item" id="floatingInput" (keyup)="cargarItems()" title="Nombre de la Materia Prima" required>
-            <datalist id="item">
-              <option *ngFor="let item of arrayItems">{{item.nombre}}</option>
-            </datalist>
-            <label for="floatingInput">Item</label>
-          </div>
-
-
-          <div class="form-floating col-md">
-            <input formControlName="Fecha1" type="date" min="0" class="form-control" id="floatingInput"required >
-            <label for="floatingInput">Fecha Inicial</label>
-          </div>
-
-
-          <div class="form-floating col-md">
-            <input formControlName="Fecha2" type="date" min="0"  class="form-control" id="floatingInput"required >
-            <label for="floatingInput">Fecha Final</label>
-           </div>
-        </div>
-      </div>
-      <div class="mb-3">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class="btn btn-danger btn-danger-sm" type="button" ><i class="pi pi-search"></i> Consultar</button>
-          <button class="btn btn-secondary btn-secondary-sm" type="button" ><i class="pi pi-eraser"></i> Limpiar Campos</button>
-        </div>
-      </div>
-    </form>-->
-  </div>
   <!-- Tabla de Pedidos -->
   <div class="container-fluid tablaDatos">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button pButton pRipple label="Exportar Excel" icon="pi pi-file-excel" class="p-button-success r-2" (click)="exportarExcel()"></button>
+    </div>
     <div class="mb-4">
       <h3 class="tituloRojo">Información de Pedidos</h3>
     </div>
@@ -126,13 +69,13 @@
                   <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="producto">Producto
                     <p-sortIcon field="producto"></p-sortIcon>
                   </th>
-                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Pedida">Cant. Pedida
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Pedida" title="Cantidad Pedida">Cant. Pedida
                     <p-sortIcon field="cant_Pedida"></p-sortIcon>
                   </th>
-                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Pendiente">Cant. Pendiente
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Pendiente" title="Cantidad Pendiente">Pendiente
                     <p-sortIcon field="cant_Pendiente"></p-sortIcon>
                   </th>
-                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Facturada">Cant. Facturada
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Facturada" title="Cantidad Facturada">Facturada
                     <p-sortIcon field="cant_Facturada"></p-sortIcon>
                   </th>
                   <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="existencias">Stock
@@ -141,12 +84,13 @@
                   <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="presentacion">Und
                     <p-sortIcon field="presentacion"></p-sortIcon>
                   </th>
-                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="Estado">Estado
-                    <p-sortIcon field="Estado"></p-sortIcon>
+                  <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="estado">Estado
+                    <p-sortIcon field="estado"></p-sortIcon>
                   </th>
                   <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="vendedor">Vendedor
                     <p-sortIcon field="vendedor"></p-sortIcon>
                   </th>
+                  <th style="text-align: center; font-size: 14px;" scope="col">Ver PDF</th>
                   <th *ngFor="let col of columns" pResizableColumn style="font-size: 14px;">
                     {{col.header}}
                   </th>
@@ -184,6 +128,9 @@
                   <th>
                       <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'vendedor', 'contains')" class="w-full">
                   </th>
+                  <th>
+                    <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')" class="w-full" title="Búsqueda por Consecutivo">
+                  </th>
                   <th *ngFor="let col of columns">
                     <input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')" class="w-full">
                   </th>
@@ -208,6 +155,7 @@
                       <td style="text-align: center;" scope="col" title="{{titleParcial}}"><span class="badge bg-warning1">{{data.estado}}</span></td>
                   </ng-container>
                   <td scope="col" title="Vendedor">{{data.vendedor}}</td>
+                  <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
                   <td *ngFor="let col of columns">{{data[col.field]}}</td>
                 </tr>
               </ng-template>
