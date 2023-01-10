@@ -1411,9 +1411,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   // Camvia el estado de una orden de trabajo en la base de datos de bagpro
   cambiarEstadoBagPro(){
     let estado = this.otInfo.est;
-    if (estado == 18) estado = '1'; //Cerrada
-    if (estado != 18 && estado != 3) estado = '0'; //Abierta
-    if (estado == 3) estado = '4'; //Anulada
+    let estadoFinal : any = '';
+    if (estado == 18) estadoFinal = '1'; //Cerrada
+    if (estado != 18 && estado != 3) estadoFinal = '0'; //Abierta
+    if (estado == 3) estadoFinal = '4'; //Anulada
     this.servicioBagPro.srvObtenerListaClienteOT_Item(this.otInfo.ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
         const data : any = {
@@ -1421,9 +1422,9 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           clienteNom : datos_ot[i].clienteNom,
           clienteItemsNom : datos_ot[i].clienteItemsNom,
           usrCrea : datos_ot[i].usrCrea,
-          estado : estado,
+          estado : estadoFinal,
         }
-        this.servicioBagPro.srvActualizar(this.otInfo.ot, data, estado).subscribe(datos_clientesOT => {
+        this.servicioBagPro.srvActualizar(this.otInfo.ot, data, estadoFinal).subscribe(datos_clientesOT => {
           const Toast = Swal.mixin({
             toast: true,
             position: 'center',
