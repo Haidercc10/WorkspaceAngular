@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
@@ -15,6 +15,8 @@ import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisi
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import { AppComponent } from 'src/app/app.component';
+import { PedidomateriaprimaComponent } from '../pedidomateriaprima/pedidomateriaprima.component';
+import { MateriaPrimaRecuperadaComponent } from '../MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
 
 @Component({
   selector: 'app-MovimientoMatPrima',
@@ -22,6 +24,9 @@ import { AppComponent } from 'src/app/app.component';
   styleUrls: ['./MovimientoMatPrima.component.css']
 })
 export class MovimientoMatPrimaComponent implements OnInit {
+
+  @ViewChild(PedidomateriaprimaComponent) EditarFacturaRemisionMp : PedidomateriaprimaComponent //Servirá para hacer la edición de factura y la remisión
+  @ViewChild(MateriaPrimaRecuperadaComponent) EditarRecuperadoMp : MateriaPrimaRecuperadaComponent //Servirá para hacer la edición del recuperado
 
   public FormDocumentos !: FormGroup;
   public page : number; //Variable que tendrá el paginado de la tabla en la que se muestran los pedidos consultados
@@ -49,6 +54,10 @@ export class MovimientoMatPrimaComponent implements OnInit {
   ArrayEstados : any = []; //Variable en la que se almacenaran los estados que puede tener una orden de trabajo
   kgOT : number = 0; //Variable que va a almacenar la cantidad total de kilos que se estipularon para una orden de trabajo
   ArrayMpPDF : any = [] //Variable que almacenará las materias primas del pdf que se esé consultando
+
+  mostrarModal : boolean = false;
+  tituloModal : string = '';
+  componenteModal : any = '';
 
   constructor(private rolService : RolesService,
                 private frmBuilderMateriaPrima : FormBuilder,
@@ -1220,17 +1229,19 @@ export class MovimientoMatPrimaComponent implements OnInit {
       }
       this.ArrayInfoConsulta.push(info);
     } else if (tipoDoc == 'DEVMP') {
-      let info : any = {
-        ot : datos.devMatPri_OrdenTrabajo,
-        tipoId : 'DEVMP',
-        tipo : 'Devolución de Materia Prima',
-        fecha : datos.devMatPri_Fecha,
-        usuario : datos.usua_Nombre,
-        matPrima : datos.matPri_Nombre,
-        cant : datos.dtDevMatPri_CantidadDevuelta,
-        estado : '',
+      if (datos.matPri_Id != 84) {
+        let info : any = {
+          ot : datos.devMatPri_OrdenTrabajo,
+          tipoId : 'DEVMP',
+          tipo : 'Devolución de Materia Prima',
+          fecha : datos.devMatPri_Fecha,
+          usuario : datos.usua_Nombre,
+          matPrima : datos.matPri_Nombre,
+          cant : datos.dtDevMatPri_CantidadDevuelta,
+          estado : '',
+        }
+        this.ArrayInfoConsulta.push(info);
       }
-      this.ArrayInfoConsulta.push(info);
     } else if (tipoDoc == 'FCO') {
       if (datos.matPri_Nombre != 'NO APLICA') {
         let info : any = {
@@ -1274,6 +1285,63 @@ export class MovimientoMatPrimaComponent implements OnInit {
     }
     this.ArrayInfoConsulta.sort((a,b) => Number(a.ot) - Number(b.ot));
     this.ArrayInfoConsulta.sort((a,b) => b.fecha.localeCompare(a.fecha));
+  }
+
+  // Funcion que va a redireccionar a una u otra funcion para editar una documento
+  editarDocumento(data : any){
+    if (data.tipoId == 'FCO') this.editarFacturaMp(data);
+    else if (data.tipoId == 'REM') this.editarRemisionMp(data);
+    else if (data.tipoId == 'RECP') this.editarRecuperadoMp();
+  }
+
+  //Funcion que va a editar una factura de materia prima
+  editarFacturaMp(data : any){
+    this.mostrarModal = true;
+    this.tituloModal = 'Editar Factura de Materia Prima';
+    this.componenteModal = 'FCO';
+    this.EditarFacturaRemisionMp.modalMode = true;
+    this.dtFacturaMP.srvObtenerpdfMovimientos(data.ot).subscribe(datos_factura => {
+      for (let i = 0; i < datos_factura.length; i++) {
+        this.EditarFacturaRemisionMp.FormMateriaPrimaFactura.setValue({
+          ConsecutivoFactura : ['', Validators.required],
+          OrdenCompra : ['', Validators.required],
+          MpFactura: ['', Validators.required],
+          MpRemision : ['', Validators.required],
+          proveedor: ['', Validators.required],
+          proveedorNombre: ['', Validators.required],
+          MpObservacion : ['', Validators.required],
+        });
+      }
+    });
+  }
+
+  // Funcion que va a editar una remision de materia prima
+  editarRemisionMp(data: any){
+    this.mostrarModal = true;
+    this.tituloModal = 'Editar Remisión de Materia Prima';
+    this.componenteModal = 'REM';
+    this.EditarFacturaRemisionMp.modalMode = true;
+    this.dtRemision.srvObtenerpdfMovimientos(data.ot).subscribe(datos_factura => {
+      for (let i = 0; i < datos_factura.length; i++) {
+        this.EditarFacturaRemisionMp.FormMateriaPrimaFactura.setValue({
+          ConsecutivoFactura : '',
+          OrdenCompra : ['', Validators.required],
+          MpFactura: ['', Validators.required],
+          MpRemision : ['', Validators.required],
+          proveedor: ['', Validators.required],
+          proveedorNombre: ['', Validators.required],
+          MpObservacion : ['', Validators.required],
+        });
+      }
+    });
+  }
+
+  // Funcion que va a editar un recuperado de materia prima
+  editarRecuperadoMp(){
+    this.mostrarModal = true;
+    this.tituloModal = 'Editar Recuperado de Materia Prima';
+    this.componenteModal = 'RECP';
+    this.EditarRecuperadoMp.modalMode = true;
   }
 
   // Funcion que almacenará en una variable todas las materia primas del movimiento al que se le hizo la consulta
@@ -1902,7 +1970,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   tableAsignacion(data, columns) {
-  return {
+    return {
       table: {
         headerRows: 1,
         widths: [70, '*', 100, 50],
@@ -1914,6 +1982,6 @@ export class MovimientoMatPrimaComponent implements OnInit {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
-  };
+    };
   }
 }

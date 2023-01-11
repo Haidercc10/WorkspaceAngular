@@ -118,14 +118,14 @@
           </ng-template>
           <ng-template pTemplate="body" let-doc>
             <tr>
-              <td id="CodigoFactura" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.ot}}</td>
-              <td id="Tipo" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.tipo}}</td>
-              <td id="fecha" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
-              <td id="proveedor" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.usuario}}</td>
-              <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.matPrima}}</td>
-              <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.cant | number}}</td>
+              <td id="CodigoFactura" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.ot}}</td>
+              <td id="Tipo" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.tipo}}</td>
+              <td id="fecha" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
+              <td id="proveedor" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.usuario}}</td>
+              <td id="mp" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.matPrima}}</td>
+              <td id="mp" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.cant | number}}</td>
               <ng-container *ngIf="ValidarRol == 1">
-                <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.estado}}</td>
+                <td id="mp" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.estado}}</td>
               </ng-container>
               <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" (click)="articulosPdf(doc)"></a></td>
             </tr>
@@ -148,4 +148,27 @@
       </div>
     </div>
   </div>
+
+
+  <ng-container *ngIf="mostrarModal && storage_Id == 123456789">
+    <div class="modal fade" id="editar" aria-labelledby="Editar Orden" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel2">{{tituloModal}}</h5>
+            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <ng-container *ngIf="componenteModal == 'FCO' || componenteModal == 'REM'">
+              <app_pedidomateriaprima_component></app_pedidomateriaprima_component>
+            </ng-container>
+
+            <ng-container *ngIf="componenteModal == 'RECP'">
+              <app_MateriaPrimaRecuperada></app_MateriaPrimaRecuperada>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
 </div>

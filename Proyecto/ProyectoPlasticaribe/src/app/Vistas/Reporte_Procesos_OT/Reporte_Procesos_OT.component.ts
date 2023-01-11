@@ -78,6 +78,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   producto : any [] = [];
   mostrarModalCostos : boolean = false;
 
+  estadoModal : any;
+
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
                   private rolService : RolesService,
@@ -553,9 +555,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     let ruta : string = '';
     let masDeUnFiltros : boolean = true;
 
-    if(fechaincial == null) fechaincial = fechaincial = this.today;
-    if(fechaFinal == null) fechaFinal = fechaFinal = fechaincial;
-
     //6
     if (numOT != null && fallas != null && estado != null && vendedor != null && cliente != null && producto != null) ruta = `?ot=${numOT}&cli=${cliente}&prod=${producto}&falla=${fallas}&estado=${estado}&vendedor=${vendedor}`;
     //5
@@ -731,16 +730,20 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     }
     //0
     else ruta = '';
-    if (masDeUnFiltros == true){
-      this.estadosProcesos_OTService.GetReporteProcesosOt(fechaincial, fechaFinal, ruta).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's creadas del día de hoy.`); }, 3000);
-        else {
-          for (let i = 0; i < datos_ot.length; i++) {
-            this.llenarArray(datos_ot[i]);
+    setTimeout(() => {
+      if (masDeUnFiltros == true){
+      if(fechaincial == null) fechaincial = fechaincial = this.today;
+      if(fechaFinal == null) fechaFinal = fechaFinal = fechaincial;
+        this.estadosProcesos_OTService.GetReporteProcesosOt(fechaincial, fechaFinal, ruta).subscribe(datos_ot => {
+          if (datos_ot.length == 0) setTimeout(() => { Swal.fire(`No se encontraron OT's creadas del día de hoy.`); }, 3000);
+          else {
+            for (let i = 0; i < datos_ot.length; i++) {
+              this.llenarArray(datos_ot[i]);
+            }
           }
-        }
-      });
-    }
+        });
+      }
+    }, 1500);
 
     setTimeout(() => { this.load = true; }, 2500);
   }
@@ -786,11 +789,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       nombreUsu : data.usua_Nombre,
       cli : data.estProcOT_Cliente,
       prod : data.prod_Nombre,
+      ped : data.estProcOT_Pedido,
     }
     this.columnas = [
       { header: 'Presentación', field: 'und'},
       { header: 'Vendedor', field: 'usu' },
-      // { header: 'Materia Prima', field: 'Mp'},
+      { header: 'Pedido', field: 'Ped'},
       { header: 'Cant Ingresada a Despacho', field: 'entrada'},
       { header: 'Cant Facturada', field: 'salida'},
       { header: 'Fallas', field: 'falla'},
@@ -1358,6 +1362,12 @@ export class Reporte_Procesos_OTComponent implements OnInit {
     this.otInfo = {...dato};
     this.otSeleccionada = dato.ot;
     this.ArrayDocumentoDialog = true;
+    if (dato.est == 'Terminada') this.estadoModal = '17';
+    else if (dato.est == 'En proceso') this.estadoModal = '16';
+    else if (dato.est == 'Asignada') this.estadoModal = '14';
+    else if (dato.est == 'Abierta') this.estadoModal = '15';
+    else if (dato.est == 'Anulado') this.estadoModal = '3';
+    else if (dato.est == 'Cerrada') this.estadoModal = '18';
   }
 
   // Cambia el estado de la orden de trabajo en la nueva base de datos
@@ -1383,7 +1393,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           EstProcOT_CantMatPrimaAsignada : datos_ot[i].estProcOT_CantMatPrimaAsignada,
           EstProcOT_CantidadPedida : datos_ot[i].estProcOT_CantidadPedida,
           UndMed_Id : datos_ot[i].undMed_Id,
-          Estado_Id : estado,
+          Estado_Id : this.estadoModal,
           Falla_Id : datos_ot[i].falla_Id,
           EstProcOT_Observacion : datos_ot[i].estProcOT_Observacion,
           EstProcOT_FechaCreacion : datos_ot[i].estProcOT_FechaCreacion,
@@ -1398,6 +1408,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           Cli_Id : datos_ot[i].cli_Id,
           Prod_Id : datos_ot[i].prod_Id,
           EstProcOT_CLiente : datos_ot[i].estProcOT_Cliente,
+          EstProcOT_Pedido : datos_ot[i].estProcOT_Pedido,
         }
         this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
           this.consultarOT();
@@ -1410,7 +1421,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   // Camvia el estado de una orden de trabajo en la base de datos de bagpro
   cambiarEstadoBagPro(){
-    let estado = this.otInfo.est;
+    let estado = this.estadoModal;
     let estadoFinal : any = '';
     if (estado == 18) estadoFinal = '1'; //Cerrada
     if (estado != 18 && estado != 3) estadoFinal = '0'; //Abierta

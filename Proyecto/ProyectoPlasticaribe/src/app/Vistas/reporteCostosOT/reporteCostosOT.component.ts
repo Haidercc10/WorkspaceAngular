@@ -13,6 +13,7 @@ import { AppComponent } from 'src/app/app.component';
 import moment from 'moment';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
+import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -86,7 +87,8 @@ export class ReporteCostosOTComponent implements OnInit {
                             private devolucionesMPService : DevolucionesMPService,
                               private appComponent : AppComponent,
                                 private boppService : EntradaBOPPService,
-                                  private tintaService : TintasService,) {
+                                  private tintaService : TintasService,
+                                    private estadosProcesos_OTService : EstadosProcesos_OTService) {
 
     this.infoOT = this.frmBuilderMateriaPrima.group({
       ot : ['',Validators.required],
@@ -1194,6 +1196,77 @@ export class ReporteCostosOTComponent implements OnInit {
     }
   }
 
+  // Cambia el estado de la orden de trabajo en la nueva base de datos
+  cambiarEstado2(ot : number, estado : any) {
+    this.estadosProcesos_OTService.srvObtenerListaPorOT(ot).subscribe(datos_ot => {
+      for (let i = 0; i < datos_ot.length; i++) {
+        let info : any = {
+          EstProcOT_OrdenTrabajo : datos_ot[i].estProcOT_OrdenTrabajo,
+          EstProcOT_ExtrusionKg : datos_ot[i].estProcOT_ExtrusionKg,
+          EstProcOT_ImpresionKg : datos_ot[i].estProcOT_ImpresionKg,
+          EstProcOT_RotograbadoKg : datos_ot[i].estProcOT_RotograbadoKg,
+          EstProcOT_LaminadoKg : datos_ot[i].estProcOT_LaminadoKg,
+          EstProcOT_CorteKg : datos_ot[i].estProcOT_CorteKg ,
+          EstProcOT_DobladoKg : datos_ot[i].estProcOT_DobladoKg,
+          EstProcOT_SelladoKg : datos_ot[i].estProcOT_SelladoKg,
+          EstProcOT_SelladoUnd : datos_ot[i].estProcOT_SelladoUnd,
+          EstProcOT_WiketiadoKg : datos_ot[i].estProcOT_WiketiadoKg,
+          EstProcOT_WiketiadoUnd : datos_ot[i].estProcOT_WiketiadoUnd,
+          EstProcOT_CantProdFacturada : datos_ot[i].estProcOT_CantProdFacturada,
+          EstProcOT_CantProdIngresada : datos_ot[i].estProcOT_CantProdIngresada,
+          EstProcOT_CantMatPrimaAsignada : datos_ot[i].estProcOT_CantMatPrimaAsignada,
+          EstProcOT_CantidadPedida : datos_ot[i].estProcOT_CantidadPedida,
+          UndMed_Id : datos_ot[i].undMed_Id,
+          Estado_Id : estado,
+          Falla_Id : datos_ot[i].falla_Id,
+          EstProcOT_Observacion : datos_ot[i].estProcOT_Observacion,
+          EstProcOT_FechaCreacion : datos_ot[i].estProcOT_FechaCreacion,
+          EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
+          Usua_Id : datos_ot[i].usua_Id,
+          EstProcOT_FechaFinal : datos_ot[i].estProcOT_FechaFinal,
+          EstProcOT_FechaInicio: datos_ot[i].estProcOT_FechaInicio,
+          EstProcOT_CantidadPedidaUnd : datos_ot[i].estProcOT_CantidadPedidaUnd,
+          EstProcOT_HoraFinal : datos_ot[i].estProcOT_HoraFinal,
+          EstProcOT_HoraInicio : datos_ot[i].estProcOT_HoraInicio,
+          EstProcOT_DiffDiasInicio_Fin : datos_ot[i].estProcOT_DiffDiasInicio_Fin,
+          Cli_Id : datos_ot[i].cli_Id,
+          Prod_Id : datos_ot[i].prod_Id,
+          EstProcOT_CLiente : datos_ot[i].estProcOT_Cliente,
+          EstProcOT_Pedido : datos_ot[i].estProcOT_Pedido,
+        }
+        if (estado == '0') {
+          let totalPedido : number = info.EstProcOT_CantidadPedida;
+          let kgSellado : number = info.EstProcOT_SelladoKg;
+          let kgEmpaque : number = info.EstProcOT_EmpaqueKg;
+          if (kgSellado >= totalPedido || kgEmpaque >= totalPedido) info.Estado_Id = 17 //TERMINADA
+          else {
+            if ((info.EstProcOT_ExtrusionKg == 0
+                && info.EstProcOT_ImpresionKg == 0
+                && info.EstProcOT_RotograbadoKg == 0
+                && info.EstProcOT_LaminadoKg == 0
+                && info.EstProcOT_CorteKg == 0
+                && info.EstProcOT_DobladoKg == 0
+                && info.EstProcOT_SelladoKg == 0
+                && info.EstProcOT_EmpaqueKg == 0
+                && info.EstProcOT_WiketiadoKg == 0) && info.EstProcOT_CantMatPrimaAsignada > 0) info.Estado_Id = 14; //ASIGNADA
+            else if ((info.EstProcOT_ExtrusionKg > 0
+              || info.EstProcOT_ImpresionKg > 0
+              || info.EstProcOT_RotograbadoKg > 0
+              || info.EstProcOT_LaminadoKg > 0
+              || info.EstProcOT_CorteKg > 0
+              || info.EstProcOT_DobladoKg > 0
+              || info.EstProcOT_SelladoKg > 0
+              || info.EstProcOT_EmpaqueKg > 0
+              || info.EstProcOT_WiketiadoKg > 0) && info.EstProcOT_CantMatPrimaAsignada > 0) info.Estado_Id = 16; //EN PROCESO
+            else info.Estado_Id = 15; //ABIERTA
+          }
+        } else if (estado == '4')estado = 3; //ANULADA
+        this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
+        });
+      }
+    });
+  }
+
   // Funcion que cambiará el estado de una Orden de trabajo consultada
   cambiarEstado(){
     let estado : any = this.infoOT.value.estadoOT;
@@ -1207,6 +1280,7 @@ export class ReporteCostosOTComponent implements OnInit {
         estado : estado,
       }
       this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(datos_clientesOT => {
+        this.cambiarEstado2(this.ordenTrabajo, estado);
         Swal.fire({ icon : 'success', title: 'Orden Cerrada', text: `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo}!`, showCloseButton : true });
       }, error => { Swal.fire({ icon : 'error', title: 'Opps...', html: `<b>No se ha podido cambiar el estado de la OT</b><br><span style="color: #f00">${error.message}</span>`, showCloseButton : true }); });
     }
@@ -1224,6 +1298,7 @@ export class ReporteCostosOTComponent implements OnInit {
         estado : '1',
       }
       this.bagProServices.srvActualizar(this.ordenTrabajo, data, '1').subscribe(datos_clientesOT => {
+        this.cambiarEstado2(this.ordenTrabajo, 18);
         Swal.fire({ icon : 'success', title: 'Orden Cerrada', text: `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo} a Cerrada!`, showCloseButton : true });
       }, error => { Swal.fire({ icon : 'error', title: 'Opps...', html: `<b>No se ha podido cambiar el estado de la OT</b><br><span style="color: #f00">${error.message}</span>`, showCloseButton : true }); });
     }

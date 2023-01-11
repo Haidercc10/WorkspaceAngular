@@ -6,7 +6,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule, Routes } from '@angular/router';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
-
 import { NgChartsModule } from 'ng2-charts';
 import { CookieService } from 'ngx-cookie-service';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
@@ -244,8 +243,8 @@ export const routes: Routes = [
  {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: ReportePedidos_ZeusComponent},
 
  /*************************************************************** DESPERDICIO *********************************************************************************/
-  {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: DesperdicioComponent},
-  {path: 'reporte-desperdicios', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_DesperdiciosComponent },
+  {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1, 12]}, component: DesperdicioComponent},
+  {path: 'reporte-desperdicios', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1, 12]}, component: Reporte_DesperdiciosComponent },
 
 ]
 

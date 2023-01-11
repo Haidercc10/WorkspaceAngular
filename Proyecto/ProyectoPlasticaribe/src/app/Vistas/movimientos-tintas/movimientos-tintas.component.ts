@@ -216,7 +216,7 @@ export class MovimientosTintasComponent implements OnInit {
       } else if (tipoDoc == 'FCO') {
         this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado == 'Factura' && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
+            if (datos_asignacion[i].estado == 'Factura de Compra' && datos_asignacion[i].tinta_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
           }
         });
       } else if (tipoDoc == 'REM') {
@@ -264,7 +264,7 @@ export class MovimientosTintasComponent implements OnInit {
       } else if (tipoDoc == 'FCO') {
         this.dtAsgTinta.srvObtenerConsultaMov8(fechaIncial, fechaFinal, tintaConsulta).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado == 'Factura') this.llenarTabla(datos_asignacion[i]);
+            if (datos_asignacion[i].estado == 'Factura de Compra') this.llenarTabla(datos_asignacion[i]);
           }
         });
       } else if (tipoDoc == 'REM') {
@@ -310,7 +310,7 @@ export class MovimientosTintasComponent implements OnInit {
       } else if (tipoDoc == 'FCO') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado == 'Factura'
+            if (datos_asignacion[i].estado == 'Factura de Compra'
             && datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial
             && datos_asignacion[i].matPri_Id == tintaConsulta) this.llenarTabla(datos_asignacion[i]);
           }
@@ -352,7 +352,7 @@ export class MovimientosTintasComponent implements OnInit {
       } else if (tipoDoc == 'FCO') {
         this.dtAsgTinta.srvObtenerConsultaMov6(ot, fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado == 'Factura') this.llenarTabla(datos_asignacion[i]);
+            if (datos_asignacion[i].estado == 'Factura de Compra') this.llenarTabla(datos_asignacion[i]);
           }
         });
       } else if (tipoDoc == 'REM') {
@@ -424,7 +424,7 @@ export class MovimientosTintasComponent implements OnInit {
       } else if (tipoDoc == 'FCO') {
         this.dtAsgTinta.srvObtenerConsultaMov4(fechaIncial, fechaFinal).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado == 'Factura') this.llenarTabla(datos_asignacion[i]);
+            if (datos_asignacion[i].estado == 'Factura de Compra') this.llenarTabla(datos_asignacion[i]);
           }
         });
       } else if (tipoDoc == 'REM') {
@@ -486,7 +486,7 @@ export class MovimientosTintasComponent implements OnInit {
       } else if (tipoDoc == 'FCO') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado == 'Factura' && tintaConsulta == datos_asignacion[i].tinta) this.llenarTabla(datos_asignacion[i]);
+            if (datos_asignacion[i].estado == 'Factura de Compra' && tintaConsulta == datos_asignacion[i].tinta) this.llenarTabla(datos_asignacion[i]);
           }
         });
       } else if (tipoDoc == 'REM') {
@@ -512,7 +512,7 @@ export class MovimientosTintasComponent implements OnInit {
       } else if (tipoDoc == 'FCO') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado == 'Factura' && datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_asignacion[i]);
+            if (datos_asignacion[i].estado == 'Factura de Compra' && datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '') == fechaIncial) this.llenarTabla(datos_asignacion[i]);
           }
         });
       } else if (tipoDoc == 'REM') {
@@ -550,7 +550,7 @@ export class MovimientosTintasComponent implements OnInit {
       } else if (tipoDoc == 'FCO') {
         this.dtAsgTinta.srvObtenerConsultaMov2(this.today, tintaConsulta).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado == 'Factura') this.llenarTabla(datos_asignacion[i]);
+            if (datos_asignacion[i].estado == 'Factura de Compra') this.llenarTabla(datos_asignacion[i]);
           }
         });
       } else if (tipoDoc == 'REM') {
@@ -576,7 +576,7 @@ export class MovimientosTintasComponent implements OnInit {
       } else if (tipoDoc == 'FCO') {
         this.dtAsgTinta.srvObtenerConsultaMov0(fechaIncial).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado == 'Factura') this.llenarTabla(datos_asignacion[i]);
+            if (datos_asignacion[i].estado == 'Factura de Compra') this.llenarTabla(datos_asignacion[i]);
           }
         });
       } else if (tipoDoc == 'REM') {
@@ -620,7 +620,7 @@ export class MovimientosTintasComponent implements OnInit {
       } else if (tipoDoc == 'FCO') {
         this.dtAsgTinta.srvObtenerConsultaMov3(ot).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado == 'Factura') this.llenarTabla(datos_asignacion[i]);
+            if (datos_asignacion[i].estado == 'Factura de Compra') this.llenarTabla(datos_asignacion[i]);
           }
         });
       } else if (tipoDoc == 'REM') {
@@ -652,7 +652,7 @@ export class MovimientosTintasComponent implements OnInit {
       } else if (tipoDoc == 'FCO') {
         this.dtAsgTinta.srvObtenerConsultaMov0(this.today).subscribe(datos_asignacion => {
           for (let i = 0; i < datos_asignacion.length; i++) {
-            if (datos_asignacion[i].estado == 'Factura') this.llenarTabla(datos_asignacion[i]);
+            if (datos_asignacion[i].estado == 'Factura de Compra') this.llenarTabla(datos_asignacion[i]);
           }
         });
       } else if (tipoDoc == 'REM') {
@@ -695,7 +695,7 @@ export class MovimientosTintasComponent implements OnInit {
 
   // Funcion para llenar la tabla con la informcion consultada
   llenarTabla(datos : any){
-    if (datos.estado != 'Creación Tintas' && datos.estado != 'Remisión' && datos.estado != 'Factura') {
+    if (datos.estado != 'Creación Tintas' && datos.estado != 'Remisión' && datos.estado != 'Factura de Compra') {
       let info : any = {
         ot : datos.ot,
         tipoId : 'ASIGTINTAS',
@@ -749,12 +749,12 @@ export class MovimientosTintasComponent implements OnInit {
         }
         this.ArrayInfoConsulta.push(info);
       }
-    } else if (datos.estado == 'Factura') {
+    } else if (datos.estado == 'Factura de Compra') {
       if (datos.tinta != 2001){
         let info : any = {
           ot : `${datos.ot}`,
           tipoId : 'FCO',
-          tipo : 'Factura de Tintas',
+          tipo : 'Factura de Compra',
           fecha : datos.fecha,
           usuario : datos.usuario_Nombre,
           matPrima : datos.nombre_Tinta2,

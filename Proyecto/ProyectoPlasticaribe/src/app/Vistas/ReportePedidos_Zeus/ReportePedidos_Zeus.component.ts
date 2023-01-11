@@ -10,6 +10,8 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { AppComponent } from 'src/app/app.component';
+import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
+import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -19,6 +21,8 @@ import { AppComponent } from 'src/app/app.component';
 export class ReportePedidos_ZeusComponent implements OnInit {
 
   @ViewChild('dt') dt: Table | undefined;
+  @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT : Reporte_Procesos_OTComponent;
+
   cargando : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -43,12 +47,16 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   public costoCantidadPendiente : number = 0;
   public arrayPedidosIndividuales : any = [];
 
+  modalEstadosOrdenes : boolean = false;
+  consecutivoPedido : any = '';
+
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
                  private inventarioZeusService : InventarioZeusService,
                   private FormBuild : FormBuilder,
-                    private appComponent : AppComponent,) {
+                    private appComponent : AppComponent,
+                      private estadosProcesos_OTService : EstadosProcesos_OTService,) {
 
    this.InicializarFormulario();
   }
@@ -89,6 +97,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   //
   consultarPedidos(){
     this.cargando = true;
+    this.ArrayDocumento = [];
     this.inventarioZeusService.GetPedidos().subscribe(datos_pedidos => {
       for (let i = 0; i < datos_pedidos.length; i++) {
         //this.columnasNoMostradas();
@@ -123,6 +132,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       consecutivo: datos.consecutivo,
       cliente: datos.cliente,
       producto: datos.producto,
+      id_Producto: datos.id_Producto,
       cant_Pedida: datos.cant_Pedida,
       cant_Pendiente: datos.cant_Pendiente,
       cant_Facturada: datos.cant_Facturada,
@@ -136,6 +146,12 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       costo_Cant_Total: this.formatonumeros(datos.costo_Cant_Total.toFixed(2)),
       fecha_Creacion: datos.fecha_Creacion,
       fecha_Entrega: datos.fecha_Entrega,
+      OT : '',
+      Proceso_OT: '',
+      CantPesada : '',
+      Estado_OT: '',
+      CantPedidaKg_OT : '',
+      CantPedidaUnd_OT : '',
     }
 
     this.columnas = [
@@ -145,8 +161,56 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       { header: 'Costo Cant. Total', field: 'costo_Cant_Total', type : 'number' },
       { header: 'Fecha Creación', field: 'fecha_Creacion', type : 'date'},
       { header: 'Fecha Entrega', field: 'fecha_Entrega',  type : 'date'},
+      // { header: 'Estado', field: 'Estado_OT'},
+      // { header: 'Proceso Actual', field: 'Proceso_OT', type : 'number'},
     ];
 
+    this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(datos.consecutivo).subscribe(datos_orden => {
+      for (let i = 0; i < datos_orden.length; i++) {
+        if (parseInt(datos.id_Producto) == datos_orden[i].prod_Id) {
+          dataPedidos.OT = datos_orden[i].estProcOT_OrdenTrabajo;
+          if (datos_orden[i].estProcOT_ExtrusionKg > 0) {
+            dataPedidos.Proceso_OT = `Extrusión ${this.formatonumeros(datos_orden[i].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
+            dataPedidos.CantPesada = datos_orden[i].estProcOT_ExtrusionKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_ImpresionKg > 0) {
+            dataPedidos.Proceso_OT = `Impresión ${this.formatonumeros(datos_orden[i].estProcOT_ImpresionKg.toFixed(2))} Kg`;
+            dataPedidos.CantPesada = datos_orden[i].estProcOT_ImpresionKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_RotograbadoKg > 0) {
+            dataPedidos.Proceso_OT = `Rotograbado ${this.formatonumeros(datos_orden[i].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
+            dataPedidos.CantPesada = datos_orden[i].estProcOT_RotograbadoKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_LaminadoKg > 0) {
+            dataPedidos.Proceso_OT = `Laminado ${this.formatonumeros(datos_orden[i].estProcOT_LaminadoKg.toFixed(2))} Kg`;
+            dataPedidos.CantPesada = datos_orden[i].estProcOT_LaminadoKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_CorteKg > 0) {
+            dataPedidos.Proceso_OT = `Corte - ${this.formatonumeros(datos_orden[i].estProcOT_CorteKg.toFixed(2))} Kg`;
+            dataPedidos.CantPesada = datos_orden[i].estProcOT_CorteKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_DobladoKg > 0) {
+            dataPedidos.Proceso_OT = `Doblado ${this.formatonumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
+            dataPedidos.CantPesada = datos_orden[i].estProcOT_DobladoKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_EmpaqueKg > 0) {
+            dataPedidos.Proceso_OT = `Empaque ${this.formatonumeros(datos_orden[i].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
+            dataPedidos.CantPesada = datos_orden[i].estProcOT_EmpaqueKg.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_SelladoKg > 0) {
+            dataPedidos.Proceso_OT = `Sellado ${this.formatonumeros(datos_orden[i].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[i].estProcOT_SelladoKg.toFixed(2))} Kg`;
+            dataPedidos.CantPesada = datos_orden[i].estProcOT_SelladoUnd.toFixed(2);
+          }
+          if (datos_orden[i].estProcOT_WiketiadoKg > 0) {
+            dataPedidos.Proceso_OT = `Wiketiado ${this.formatonumeros(datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[i].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
+            dataPedidos.CantPesada = datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2);
+          }
+          dataPedidos.Estado_OT = datos_orden[i].estado_Id;
+          dataPedidos.CantPedidaKg_OT = datos_orden[i].estProcOT_CantidadPedida;
+          dataPedidos.CantPedidaUnd_OT = datos_orden[i].estProcOT_CantidadPedidaUnd;
+        }
+      }
+    });
     this.ArrayDocumento.push(dataPedidos);
   }
 
@@ -524,5 +588,119 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         }
       }
     };
+  }
+
+  //Funcion que va a cargar un modal con la informacion de la orden de trabajo que tiene asignada el pedido
+  varOrdenTranajo(data : any){
+    this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(data.consecutivo).subscribe(datos_orden => {
+      if (datos_orden.length > 0) {
+        this.modalEstadosOrdenes = true;
+        this.modalEstadosProcesos_OT.modeModal = true;
+        this.modalEstadosProcesos_OT.ArrayDocumento = [];
+        for (let i = 0; i < datos_orden.length; i++) {
+          this.modalEstadosProcesos_OT.llenarArray(datos_orden[i]);
+        }
+      } else Swal.fire({icon : 'warning', title : 'Advertencia', showCloseButton: true, html : `<b>¡No hay orden asociada al pedido ${data.consecutivo}!</b>`})
+    }, error => {
+      Swal.fire({icon : 'error', title : 'Opps...', showCloseButton: true, html : `<b>¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!</b><br><span style="color: #f00">${error.message}</span>`})
+    });
+  }
+
+  // Funcion que va a actualizar la orden de trabajo de un pedido
+  cambiarOrden_Pedido(data : any){
+    this.cargando = true;
+    this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(data.consecutivo).subscribe(datos_ot => {
+      if (datos_ot.length > 0) {
+        for (let i = 0; i < datos_ot.length; i++) {
+          let info : any = {
+            EstProcOT_OrdenTrabajo : datos_ot[i].estProcOT_OrdenTrabajo,
+            EstProcOT_ExtrusionKg : datos_ot[i].estProcOT_ExtrusionKg,
+            EstProcOT_ImpresionKg : datos_ot[i].estProcOT_ImpresionKg,
+            EstProcOT_RotograbadoKg : datos_ot[i].estProcOT_RotograbadoKg,
+            EstProcOT_LaminadoKg : datos_ot[i].estProcOT_LaminadoKg,
+            EstProcOT_CorteKg : datos_ot[i].estProcOT_CorteKg ,
+            EstProcOT_DobladoKg : datos_ot[i].estProcOT_DobladoKg,
+            EstProcOT_SelladoKg : datos_ot[i].estProcOT_SelladoKg,
+            EstProcOT_SelladoUnd : datos_ot[i].estProcOT_SelladoUnd,
+            EstProcOT_WiketiadoKg : datos_ot[i].estProcOT_WiketiadoKg,
+            EstProcOT_WiketiadoUnd : datos_ot[i].estProcOT_WiketiadoUnd,
+            EstProcOT_CantProdFacturada : datos_ot[i].estProcOT_CantProdFacturada,
+            EstProcOT_CantProdIngresada : datos_ot[i].estProcOT_CantProdIngresada,
+            EstProcOT_CantMatPrimaAsignada : datos_ot[i].estProcOT_CantMatPrimaAsignada,
+            EstProcOT_CantidadPedida : datos_ot[i].estProcOT_CantidadPedida,
+            UndMed_Id : datos_ot[i].undMed_Id,
+            Estado_Id : datos_ot[i].estado_Id,
+            Falla_Id : datos_ot[i].falla_Id,
+            EstProcOT_Observacion : datos_ot[i].estProcOT_Observacion,
+            EstProcOT_FechaCreacion : datos_ot[i].estProcOT_FechaCreacion,
+            EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
+            Usua_Id : datos_ot[i].usua_Id,
+            EstProcOT_FechaFinal : datos_ot[i].estProcOT_FechaFinal,
+            EstProcOT_FechaInicio: datos_ot[i].estProcOT_FechaInicio,
+            EstProcOT_CantidadPedidaUnd : datos_ot[i].estProcOT_CantidadPedidaUnd,
+            EstProcOT_HoraFinal : datos_ot[i].estProcOT_HoraFinal,
+            EstProcOT_HoraInicio : datos_ot[i].estProcOT_HoraInicio,
+            EstProcOT_DiffDiasInicio_Fin : datos_ot[i].estProcOT_DiffDiasInicio_Fin,
+            Cli_Id : datos_ot[i].cli_Id,
+            Prod_Id : datos_ot[i].prod_Id,
+            EstProcOT_CLiente : datos_ot[i].estProcOT_Cliente,
+            EstProcOT_Pedido : null,
+          }
+          this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
+            Swal.fire({icon: 'success', title: 'Cambio Exitoso', text: `¡Se eliminó la relación del pedido ${data.consecutivo} con la OT ${datos_ot[i].estProcOT_OrdenTrabajo}!`, showCloseButton: true})
+          });
+        }
+      }
+    }, error => {
+      Swal.fire({icon : 'error', title : 'Opps...', showCloseButton: true, html : `<b>¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!</b><br><span style="color: #f00">${error.message}</span>`})
+    });
+
+    this.estadosProcesos_OTService.srvObtenerListaPorOT(data.OT).subscribe(datos_ot => {
+      for (let i = 0; i < datos_ot.length; i++) {
+        if(datos_ot[i].EstProcOT_Pedido == null) {
+          if (parseInt(data.id_Producto) == datos_ot[i].prod_Id) {
+            let info : any = {
+              EstProcOT_OrdenTrabajo : datos_ot[i].estProcOT_OrdenTrabajo,
+              EstProcOT_ExtrusionKg : datos_ot[i].estProcOT_ExtrusionKg,
+              EstProcOT_ImpresionKg : datos_ot[i].estProcOT_ImpresionKg,
+              EstProcOT_RotograbadoKg : datos_ot[i].estProcOT_RotograbadoKg,
+              EstProcOT_LaminadoKg : datos_ot[i].estProcOT_LaminadoKg,
+              EstProcOT_CorteKg : datos_ot[i].estProcOT_CorteKg ,
+              EstProcOT_DobladoKg : datos_ot[i].estProcOT_DobladoKg,
+              EstProcOT_SelladoKg : datos_ot[i].estProcOT_SelladoKg,
+              EstProcOT_SelladoUnd : datos_ot[i].estProcOT_SelladoUnd,
+              EstProcOT_WiketiadoKg : datos_ot[i].estProcOT_WiketiadoKg,
+              EstProcOT_WiketiadoUnd : datos_ot[i].estProcOT_WiketiadoUnd,
+              EstProcOT_CantProdFacturada : datos_ot[i].estProcOT_CantProdFacturada,
+              EstProcOT_CantProdIngresada : datos_ot[i].estProcOT_CantProdIngresada,
+              EstProcOT_CantMatPrimaAsignada : datos_ot[i].estProcOT_CantMatPrimaAsignada,
+              EstProcOT_CantidadPedida : datos_ot[i].estProcOT_CantidadPedida,
+              UndMed_Id : datos_ot[i].undMed_Id,
+              Estado_Id : datos_ot[i].estado_Id,
+              Falla_Id : datos_ot[i].falla_Id,
+              EstProcOT_Observacion : datos_ot[i].estProcOT_Observacion,
+              EstProcOT_FechaCreacion : datos_ot[i].estProcOT_FechaCreacion,
+              EstProcOT_EmpaqueKg : datos_ot[i].estProcOT_EmpaqueKg,
+              Usua_Id : datos_ot[i].usua_Id,
+              EstProcOT_FechaFinal : datos_ot[i].estProcOT_FechaFinal,
+              EstProcOT_FechaInicio: datos_ot[i].estProcOT_FechaInicio,
+              EstProcOT_CantidadPedidaUnd : datos_ot[i].estProcOT_CantidadPedidaUnd,
+              EstProcOT_HoraFinal : datos_ot[i].estProcOT_HoraFinal,
+              EstProcOT_HoraInicio : datos_ot[i].estProcOT_HoraInicio,
+              EstProcOT_DiffDiasInicio_Fin : datos_ot[i].estProcOT_DiffDiasInicio_Fin,
+              Cli_Id : datos_ot[i].cli_Id,
+              Prod_Id : datos_ot[i].prod_Id,
+              EstProcOT_CLiente : datos_ot[i].estProcOT_Cliente,
+              EstProcOT_Pedido : data.consecutivo,
+            }
+            this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
+              Swal.fire({icon: 'success', title: 'Cambio Exitoso', text: `¡Se cambió la orden de trabajo asociada al pedido ${data.consecutivo}!`, showCloseButton: true})
+            });
+          } else Swal.fire({ icon: 'warning', title: 'Advertencia', text: `¡El Producto de la OT ${datos_ot[i].estProcOT_OrdenTrabajo} no coincide con el del pedido ${data.consecutivo}!`});
+        } else Swal.fire({ icon: 'warning', title: 'Advertencia', text: `¡La OT ${datos_ot[i].estProcOT_OrdenTrabajo} ya tiene un pedido asignado!`});
+      }
+    });
+
+    setTimeout(() => { this.consultarPedidos(); }, 1000);
   }
 }

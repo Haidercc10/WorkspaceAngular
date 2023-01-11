@@ -205,9 +205,9 @@ p-pickList span{
   }
 
   .modal-xl {
-    width: 80%;
+    width: 85%;
     max-width: none;
-    height: 70%;
+    height: 80%;
     margin: auto;
   }
 }

@@ -81,7 +81,7 @@
           <td pEditableColumn>
             <p-cellEditor>
               <ng-template pTemplate="input">
-                <input class="form-control form-control-sm" type="number" [(ngModel)]="arrayUsuarios.PrecioItem" (keyup.Enter)="actualizarExistenciasProducto(arrayUsuarios)" (change)="actualizarExistenciasProducto(arrayUsuarios)" min="0">
+                <input class="form-control form-control-sm" type="number" [(ngModel)]="arrayUsuarios.PrecioItem" (keyup.enter)="actualizarExistenciasProducto(arrayUsuarios)" (change)="actualizarExistenciasProducto(arrayUsuarios)" min="0">
               </ng-template>
               <ng-template pTemplate="output">
                 {{arrayUsuarios.PrecioItem | number : '1.2-2'}}

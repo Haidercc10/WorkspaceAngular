@@ -1,10 +1,11 @@
-
-
 .TitulosTabla {
   font-size: smaller;
 }
 
-
+.modal{
+  overflow-x: scroll;
+  min-width: 300px;
+}
 
 .Linea {
   color: #777;
@@ -126,30 +127,44 @@ a {
 
 .amarillo {
   background-color: #F3FC20;
+  font-size: 14px;
+  color: black;
 }
 
 .naranja {
   background-color: #F6D45D;
+  font-size: 14px;
+  color: black;
 }
 
 .rojo {
   background-color: #FF7878;
+  font-size: 14px;
+  color: black;
 }
 
 .verde {
   background-color: #8AFC9B;
+  font-size: 14px;
+  color: black;
 }
 
 .azul {
   background-color: #83D3FF;
+  font-size: 14px;
+  color: black;
 }
 
 .gris{
   background-color: #DDDDDD;
+  font-size: 14px;
+  color: black;
 }
 
 .verde2 {
   background-color: #53CC48;
+  font-size: 14px;
+  color: black;
 }
 
 a {
@@ -199,9 +214,9 @@ a:hover {
   display: flex;
 }
 
-.container-fluid {
+/* .container-fluid {
   width: 95%;
-}
+} */
 
 .bg-danger1 {
   color: white;
@@ -227,7 +242,20 @@ a:hover {
 }
 
 
+@media (min-width: 1000px) {
+  .modal-xl {
+    width: 85%;
+    max-width: none;
+    height: 80%;
+    margin: auto;
+  }
+}
 
-
-
-
+@media screen and (max-width: 576px) {
+  .modal-xl {
+    width: 200%;
+    max-width: none;
+    height: 80%;
+    margin: auto;
+  }
+}

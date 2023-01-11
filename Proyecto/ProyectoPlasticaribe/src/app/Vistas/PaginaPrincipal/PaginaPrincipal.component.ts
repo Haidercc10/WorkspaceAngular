@@ -219,11 +219,12 @@ export class PaginaPrincipalComponent implements OnInit {
       // REPORTES
       { id : 34, nombre : 'Inventario Bodega Extrusión', icono : 'assets/Iconos_Menu/bodega.png', categoria: 'Reportes', ruta : './Inventario-Extrusion', roles : [1,5], },
       { id : 35, nombre : 'Inventario de Materia Prima', icono : 'assets/Iconos_Menu/bodega.png', categoria: 'Reportes', ruta : './reporte-Materia-Prima', roles : [1,3], },
-      { id : 36, nombre : 'Reportes de Costos', icono : 'assets/Iconos_Menu/costos.png', categoria: 'Reportes', ruta : './reporte-costos-ot', roles : [1], },
+      { id : 36, nombre : 'Reportes de Costos', icono : ' ', categoria: 'Reportes', ruta : './reporte-costos-ot', roles : [1], },
       { id : 37, nombre : 'Reporte de Pedidos', icono : 'assets/Iconos_Menu/reportePedidos.png', categoria: 'Reportes', ruta : './estados-ot-vendedore', roles : [1,2], },
       { id : 38, nombre : 'Reporte Procesos OT', icono : 'assets/Iconos_Menu/cronologia.png', categoria: 'Reportes', ruta : './reportes-procesos-ot', roles : [1,12], },
       { id : 39, nombre : 'Reporte Rollos Eliminados', icono : 'assets/Iconos_Menu/reporteEliminados.png', categoria: 'Reportes', ruta : './reporte-rollos-eliminados', roles : [1], },
       { id : 43, nombre : 'Reporte de Activos', icono : 'assets/Iconos_Menu/activos.png', categoria: 'Reporte', ruta : './reporte-activos', roles : [1], },
+      { id : 46, nombre : 'Reporte Desperdicio', icono : 'assets/Iconos_Menu/recibos.png', categoria: 'Reporte', ruta : './reporte-desperdicios', roles : [1, 12], },
 
       // USUARIOS
       { id : 40, nombre : 'Usuarios', icono : 'assets/Iconos_Menu/usuarios.png', categoria: 'Usuarios', ruta : './registro-usuario', roles : [1], },
@@ -231,6 +232,11 @@ export class PaginaPrincipalComponent implements OnInit {
       // MANTENIMIENTO Y PEDIDOS DE MANTENIMIENTO
       { id : 41, nombre : 'Pedido de Mantenimiento de Activos', icono : 'assets/Iconos_Menu/pedido_mantenimiento.png', categoria: 'Mantenimiento', ruta : './pedido-mantenimiento', roles : [1], },
       { id : 44, nombre : 'Mantenimiento de Activos', icono : 'assets/Iconos_Menu/Mantenimiento.png', categoria: 'Mantenimiento', ruta : './mantenimiento-camiones', roles : [1], },
+
+      // DEPERDICIO
+      { id : 45, nombre : 'Deperdicio', icono : 'assets/Iconos_Menu/caja.png', categoria: 'Deperdicio', ruta : './desperdicio', roles : [1, 12], },
+
+      //46
     ];
   }
 

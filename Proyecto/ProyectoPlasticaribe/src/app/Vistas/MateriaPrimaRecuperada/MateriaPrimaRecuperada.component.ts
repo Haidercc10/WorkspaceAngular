@@ -13,7 +13,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-MateriaPrimaRecuperada',
+  selector: 'app_MateriaPrimaRecuperada',
   templateUrl: './MateriaPrimaRecuperada.component.html',
   styleUrls: ['./MateriaPrimaRecuperada.component.css']
 })
@@ -45,6 +45,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   AccionBoton = "Agregar"; //Variable que almanará informacio para saber si una materia prima está en edicion o no (Se editará una materia prima cargada en la tabla, no una en la base de datos)
   turnos : any [] = []; //Variable que almacenará los diferentes turnos que se trabajan en la empresa
 
+  modalMode : boolean = false;
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
                   private unidadMedidaService : UnidadMedidaService,

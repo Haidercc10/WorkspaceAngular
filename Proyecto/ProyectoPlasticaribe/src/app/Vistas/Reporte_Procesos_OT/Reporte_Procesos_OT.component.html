@@ -244,7 +244,6 @@
       <div class="mb-4 titulos_Paginador">
         <h4 class="tituloRojo" style="width: 90%;">Ordenes de Trabajo</h4>
       </div>
-      <h4 class="tituloRojo">OT Seleccionada: <b>{{otSeleccionada}}</b></h4>
 
       <!-- Tabla donde se mostrarán las OT Consultadas -->
       <div *ngIf="load" id="tableProcesos" style="font-size: 14px;">
@@ -623,28 +622,28 @@
                   <label class="p-mb-3">Estados de las ordenes de trabajo</label>
                   <div class="p-formgrid p-grid">
                     <div class="p-field-radiobutton p-col-6">
-                      <p-radioButton id="category1" name="category" value="15" [(ngModel)]="otInfo.est"></p-radioButton>
+                      <p-radioButton id="category1" name="category" value="15" [(ngModel)]="estadoModal"></p-radioButton>
                       <label for="category1" style="padding-left: 3%;">Abierta&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     </div>
                     <div class="p-field-radiobutton p-col-6">
-                      <p-radioButton id="category2" name="category" value="3" [(ngModel)]="otInfo.est"></p-radioButton>
+                      <p-radioButton id="category2" name="category" value="3" [(ngModel)]="estadoModal"></p-radioButton>
                       <label for="category1" style="padding-left: 3%;">Anulada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     </div>
                     <div class="p-field-radiobutton p-col-6">
-                      <p-radioButton id="category3" name="category" value="14" [(ngModel)]="otInfo.est"></p-radioButton>
+                      <p-radioButton id="category3" name="category" value="14" [(ngModel)]="estadoModal"></p-radioButton>
                       <label for="category2" style="padding-left: 3%;">Asignada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     </div>
                     <div class="p-field-radiobutton p-col-6">
-                      <p-radioButton id="category5" name="category" value="16" [(ngModel)]="otInfo.est"></p-radioButton>
+                      <p-radioButton id="category5" name="category" value="16" [(ngModel)]="estadoModal"></p-radioButton>
                       <label for="category3" style="padding-left: 3%;">En Proceso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     </div>
                     <div class="p-field-radiobutton p-col-6">
-                      <p-radioButton id="category6" name="category" value="17" [(ngModel)]="otInfo.est"></p-radioButton>
+                      <p-radioButton id="category6" name="category" value="17" [(ngModel)]="estadoModal"></p-radioButton>
                       <label for="category4" style="padding-left: 3%;">Terminada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     </div>
                     <div class="p-field-radiobutton p-col-6" style="margin-left: 30%;">
-                      <p-radioButton id="category4"name="category" value="18" [(ngModel)]="otInfo.est"></p-radioButton>
-                      <label for="category2" style="padding-left: 3%; font-size: 20px; color: #FF7878;">Auditado&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                      <p-radioButton id="category4"name="category" value="18" [(ngModel)]="estadoModal"></p-radioButton>
+                      <label for="category2" style="padding-left: 3%; font-size: 20px; color: #FF7878;">Revisada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     </div>
                   </div>
                 </div>
