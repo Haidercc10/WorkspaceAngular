@@ -161,8 +161,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       { header: 'Costo Cant. Total', field: 'costo_Cant_Total', type : 'number' },
       { header: 'Fecha Creación', field: 'fecha_Creacion', type : 'date'},
       { header: 'Fecha Entrega', field: 'fecha_Entrega',  type : 'date'},
-      // { header: 'Estado', field: 'Estado_OT'},
-      // { header: 'Proceso Actual', field: 'Proceso_OT', type : 'number'},
     ];
 
     this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(datos.consecutivo).subscribe(datos_orden => {
@@ -410,7 +408,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                 columns: [
                   { text: `Reporte generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
                   { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                  { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
                 ]
               }
             ]
