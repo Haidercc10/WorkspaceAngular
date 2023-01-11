@@ -595,11 +595,13 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(data.consecutivo).subscribe(datos_orden => {
       if (datos_orden.length > 0) {
         this.modalEstadosOrdenes = true;
-        this.modalEstadosProcesos_OT.modeModal = true;
-        this.modalEstadosProcesos_OT.ArrayDocumento = [];
-        for (let i = 0; i < datos_orden.length; i++) {
-          this.modalEstadosProcesos_OT.llenarArray(datos_orden[i]);
-        }
+        setTimeout(() => {
+          this.modalEstadosProcesos_OT.modeModal = true;
+          this.modalEstadosProcesos_OT.ArrayDocumento = [];
+          for (let i = 0; i < datos_orden.length; i++) {
+            this.modalEstadosProcesos_OT.llenarArray(datos_orden[i]);
+          }
+        }, 500);
       } else Swal.fire({icon : 'warning', title : 'Advertencia', showCloseButton: true, html : `<b>¡No hay orden asociada al pedido ${data.consecutivo}!</b>`})
     }, error => {
       Swal.fire({icon : 'error', title : 'Opps...', showCloseButton: true, html : `<b>¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!</b><br><span style="color: #f00">${error.message}</span>`})

@@ -209,8 +209,9 @@ export class PaginaPrincipalComponent implements OnInit {
       { id : 29, nombre : 'Crear OT', icono : 'assets/Iconos_Menu/crearOrden.png', categoria: 'Orden de Trabajo', ruta : './ordenes-trabajo', roles : [1], },
 
       // PEDIDOS DE PRODUCTOS
-      { id : 30, nombre : 'Pedidos Externos', icono : 'assets/Iconos_Menu/pedidos.png', categoria: 'Pedidos', ruta : './pedido-externo', roles : [1,2], },
-      { id : 31, nombre : 'Ver Pedidos', icono : 'assets/Iconos_Menu/verDocumento.png', categoria: 'Pedidos', ruta : './opedidoproducto', roles : [1,2], },
+      // { id : 30, nombre : 'Pedidos Externos', icono : 'assets/Iconos_Menu/pedidos.png', categoria: 'Pedidos', ruta : './pedido-externo', roles : [1,2], },
+      // { id : 31, nombre : 'Ver Pedidos', icono : 'assets/Iconos_Menu/verDocumento.png', categoria: 'Pedidos', ruta : './opedidoproducto', roles : [1,2], },
+      { id : 47, nombre : 'Pedidos Zeus', icono : 'assets/Iconos_Menu/pedidos.png', categoria: 'Pedidos', ruta : './Pedidos-Zeus', roles : [1], },
 
       // PRODUCTO TERMINADO
       { id : 32, nombre : 'Producto Terminado (Zeus)', icono : 'assets/Iconos_Menu/bodega.png', categoria: 'Productos', ruta : './inventario-productos-terminados', roles : [1], },
@@ -220,7 +221,7 @@ export class PaginaPrincipalComponent implements OnInit {
       { id : 34, nombre : 'Inventario Bodega Extrusión', icono : 'assets/Iconos_Menu/bodega.png', categoria: 'Reportes', ruta : './Inventario-Extrusion', roles : [1,5], },
       { id : 35, nombre : 'Inventario de Materia Prima', icono : 'assets/Iconos_Menu/bodega.png', categoria: 'Reportes', ruta : './reporte-Materia-Prima', roles : [1,3], },
       { id : 36, nombre : 'Reportes de Costos', icono : ' ', categoria: 'Reportes', ruta : './reporte-costos-ot', roles : [1], },
-      { id : 37, nombre : 'Reporte de Pedidos', icono : 'assets/Iconos_Menu/reportePedidos.png', categoria: 'Reportes', ruta : './estados-ot-vendedore', roles : [1,2], },
+      // { id : 37, nombre : 'Reporte de Pedidos', icono : 'assets/Iconos_Menu/reportePedidos.png', categoria: 'Reportes', ruta : './estados-ot-vendedore', roles : [1,2], },
       { id : 38, nombre : 'Reporte Procesos OT', icono : 'assets/Iconos_Menu/cronologia.png', categoria: 'Reportes', ruta : './reportes-procesos-ot', roles : [1,12], },
       { id : 39, nombre : 'Reporte Rollos Eliminados', icono : 'assets/Iconos_Menu/reporteEliminados.png', categoria: 'Reportes', ruta : './reporte-rollos-eliminados', roles : [1], },
       { id : 43, nombre : 'Reporte de Activos', icono : 'assets/Iconos_Menu/activos.png', categoria: 'Reporte', ruta : './reporte-activos', roles : [1], },
@@ -236,7 +237,7 @@ export class PaginaPrincipalComponent implements OnInit {
       // DEPERDICIO
       { id : 45, nombre : 'Deperdicio', icono : 'assets/Iconos_Menu/caja.png', categoria: 'Deperdicio', ruta : './desperdicio', roles : [1, 12], },
 
-      //46
+      //47
     ];
   }
 
