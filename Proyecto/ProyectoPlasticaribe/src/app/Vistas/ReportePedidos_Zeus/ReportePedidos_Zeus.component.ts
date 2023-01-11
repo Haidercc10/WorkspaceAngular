@@ -161,8 +161,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       { header: 'Costo Cant. Total', field: 'costo_Cant_Total', type : 'number' },
       { header: 'Fecha Creación', field: 'fecha_Creacion', type : 'date'},
       { header: 'Fecha Entrega', field: 'fecha_Entrega',  type : 'date'},
-      // { header: 'Estado', field: 'Estado_OT'},
-      // { header: 'Proceso Actual', field: 'Proceso_OT', type : 'number'},
     ];
 
     this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(datos.consecutivo).subscribe(datos_orden => {
@@ -423,7 +421,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                 columns: [
                   { text: `Reporte generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
                   { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                  { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
                 ]
               }
             ]
@@ -614,11 +612,13 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(data.consecutivo).subscribe(datos_orden => {
       if (datos_orden.length > 0) {
         this.modalEstadosOrdenes = true;
-        this.modalEstadosProcesos_OT.modeModal = true;
-        this.modalEstadosProcesos_OT.ArrayDocumento = [];
-        for (let i = 0; i < datos_orden.length; i++) {
-          this.modalEstadosProcesos_OT.llenarArray(datos_orden[i]);
-        }
+        setTimeout(() => {
+          this.modalEstadosProcesos_OT.modeModal = true;
+          this.modalEstadosProcesos_OT.ArrayDocumento = [];
+          for (let i = 0; i < datos_orden.length; i++) {
+            this.modalEstadosProcesos_OT.llenarArray(datos_orden[i]);
+          }
+        }, 500);
       } else Swal.fire({icon : 'warning', title : 'Advertencia', showCloseButton: true, html : `<b>¡No hay orden asociada al pedido ${data.consecutivo}!</b>`})
     }, error => {
       Swal.fire({icon : 'error', title : 'Opps...', showCloseButton: true, html : `<b>¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!</b><br><span style="color: #f00">${error.message}</span>`})

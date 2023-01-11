@@ -113,7 +113,7 @@ export class DesperdicioComponent implements OnInit {
   obtenerOperarios(){
     this.operariosService.getUsuarios().subscribe(datos_operarios => {
       for (let i = 0; i < datos_operarios.length; i++) {
-        this.operarios.push(datos_operarios[i]);
+        if (datos_operarios[i].rolUsu_Id == 14) this.operarios.push(datos_operarios[i]);
       }
     });
   }
@@ -147,7 +147,7 @@ export class DesperdicioComponent implements OnInit {
   obtenerMaquinas(){
     this.maquinasService.GetTodo().subscribe(datos_maquinas => {
       for (let i = 0; i < datos_maquinas.length; i++) {
-        this.maquinas.push(datos_maquinas[i]);
+        if (datos_maquinas[i].tpActv_Id == 4) this.maquinas.push(datos_maquinas[i]);
       }
     });
   }

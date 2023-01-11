@@ -152,14 +152,14 @@
           <!-- Cuerpo de la tabla -->
           <ng-template pTemplate="body" let-data let-columns="columns">
             <tr style="cursor: pointer;" title="Con la tecla shift y el scroll del mouse puede moverse hacia los lados de la tabla">
-              <td style="text-align: center;" scope="col" title="N° Pedido" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)">{{data.consecutivo}}</td>
-              <td scope="col" title="Cliente" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)">{{data.cliente}}</td>
-              <td scope="col" title="Item" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)">{{data.producto}}</td>
-              <td style="text-align: center;" scope="col" title="Cantidad Pedida" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)">{{data.cant_Pedida | number : '1.2-2'}}</td>
-              <td style="text-align: center;" scope="col" title="Cantidad Pendiente" class="bg-danger2" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><b>{{data.cant_Pendiente | number : '1.2-2'}}</b></td>
-              <td style="text-align: center;" scope="col" title="Cantidad Facturada" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)">{{data.cant_Facturada | number : '1.2-2'}}</td>
-              <td style="text-align: center;" scope="col" title="Existencias" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)">{{data.existencias | number : '1.2-2'}}</td>
-              <td style="text-align: center;" scope="col" title="Presentación" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)">{{data.presentacion}}</td>
+              <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.consecutivo}}</td>
+              <td scope="col" title="Cliente" (dblclick)="varOrdenTranajo(data)">{{data.cliente}}</td>
+              <td scope="col" title="Item" (dblclick)="varOrdenTranajo(data)">{{data.producto}}</td>
+              <td style="text-align: center;" scope="col" title="Cantidad Pedida" (dblclick)="varOrdenTranajo(data)">{{data.cant_Pedida | number : '1.2-2'}}</td>
+              <td style="text-align: center;" scope="col" title="Cantidad Pendiente" class="bg-danger2" (dblclick)="varOrdenTranajo(data)"><b>{{data.cant_Pendiente | number : '1.2-2'}}</b></td>
+              <td style="text-align: center;" scope="col" title="Cantidad Facturada" (dblclick)="varOrdenTranajo(data)">{{data.cant_Facturada | number : '1.2-2'}}</td>
+              <td style="text-align: center;" scope="col" title="Existencias" (dblclick)="varOrdenTranajo(data)">{{data.existencias | number : '1.2-2'}}</td>
+              <td style="text-align: center;" scope="col" title="Presentación" (dblclick)="varOrdenTranajo(data)">{{data.presentacion}}</td>
               <ng-container *ngIf="data.estado == 'Pendiente'">
                   <td style="text-align: center;" scope="col" title="{{titlePendiente}}." data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-danger1">{{data.estado}}</span></td>
               </ng-container>
@@ -182,7 +182,7 @@
                   </ng-template>
                 </p-cellEditor>
               </td>
-              <td style="text-align: center;" scope="col">
+              <td style="text-align: center;" scope="col" (dblclick)="varOrdenTranajo(data)">
                 <span class="badge verde" *ngIf="data.CantPesada >= data.CantPedidaKg_OT || data.Proceso_OT >= data.CantPedidaUnd_OT">{{data.Proceso_OT}}</span> <!-- Terminada -->
                 <span class="badge amarillo" *ngIf="(data.CantPesada < data.CantPedidaKg_OT || data.Proceso_OT < data.CantPedidaUnd_OT) && data.CantPesada > 0">{{data.Proceso_OT}}</span> <!-- En Proceso -->
               </td>
@@ -212,18 +212,8 @@
 </div>
 
 <!-- Model que mostrará la información de las ordenes de trabajo con un estado especifico -->
-<ng-container *ngIf="modalEstadosOrdenes">
-  <div class="modal fade" id="modalEstados" aria-labelledby="reporteCostos" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabe">Estados de la orden de trabajo del pedido {{consecutivoPedido}}</h5>
-          <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
-        </div>
-      </div>
-    </div>
-  </div>
-</ng-container>
+<p-dialog [(visible)]="modalEstadosOrdenes" [style]="{width: '1800px'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" styleClass="p-fluid">
+  <ng-template pTemplate="content">
+    <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
+  </ng-template>
+</p-dialog>
