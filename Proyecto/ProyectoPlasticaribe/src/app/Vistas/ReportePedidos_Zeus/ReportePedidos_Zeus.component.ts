@@ -228,11 +228,11 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     else {
       setTimeout(() => {
         const title = `Reporte de Pedidos Zeus - ${this.today}`;
-      const header = ["N° Pedido", "Cliente", "Item", "Cant. Pedida", "Pendiente", "Facturada", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "OC", "Costo Cant. Pendiente", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega"]
+      const header = ["N° Pedido", "Cliente", "Item", "Cant. Pedida", "Pendiente", "Facturada", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "OC", "Costo Cant. Pendiente", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", "OT", "Proceso Actual", "Estado"]
       let datos : any =[];
 
       for (const item of this.ArrayDocumento) {
-        const datos1  : any = [item.consecutivo, item.cliente, item.producto, item.cant_Pedida, item.cant_Pendiente, item.cant_Facturada, item.existencias, item.presentacion, item.precioUnidad, item.estado, item.vendedor, item.orden_Compra_CLiente, item.costo_Cant_Pendiente, item.costo_Cant_Total, item.fecha_Creacion, item.fecha_Entrega];
+        const datos1  : any = [item.consecutivo, item.cliente, item.producto, item.cant_Pedida, item.cant_Pendiente, item.cant_Facturada, item.existencias, item.presentacion, item.precioUnidad, item.estado, item.vendedor, item.orden_Compra_CLiente, item.costo_Cant_Pendiente, item.costo_Cant_Total, item.fecha_Creacion, item.fecha_Entrega, 123456, 'Sellado 123Kg - 456Und'];
         datos.push(datos1);
       }
       let workbook = new Workbook();
@@ -266,18 +266,38 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           let precioUnd  = row.getCell(9);
           let ccPendiente = row.getCell(13);
           let ccTotal = row.getCell(14);
+          let OT = row.getCell(17);
+          let estadoPedido = row.getCell(10);
+          let colorEstadoPedido;
 
           consecutivo.alignment = { horizontal : 'center' }
           fecha1.alignment = { horizontal : 'center' }
           fecha2.alignment = { horizontal : 'center' }
           medida.alignment = { horizontal : 'center' }
+          OT.alignment = {horizontal : 'center'}
           Pedida.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
-          Pendiente.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
+          /** Pendiente */
+          row.getCell(5).numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
+          Pendiente.font = {color : {'argb' : 'FF7F71'}, 'name': 'Calibri', 'bold' : true, 'size': 11};
           Facturada.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
           stock.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
           precioUnd.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
           ccPendiente.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
           ccTotal.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
+          /** OT con Estado */
+          OT.fill = {
+            type : 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FF7F71' },
+          }
+          /** Estado */
+          if (d[9] == 'Pendiente') colorEstadoPedido = 'FF7F71'
+          else if (d[9] == 'Parcialmente Satisfecho') colorEstadoPedido = 'FFF55D';
+          estadoPedido.fill = {
+            type : 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: colorEstadoPedido },
+          }
 
           worksheet.getColumn(1).width = 12;
           worksheet.getColumn(2).width = 50;
@@ -295,6 +315,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           worksheet.getColumn(14).width = 20;
           worksheet.getColumn(15).width = 15;
           worksheet.getColumn(16).width = 15;
+          worksheet.getColumn(17).width = 15;
+          worksheet.getColumn(18).width = 30;
         });
 
         setTimeout(() => {
@@ -305,6 +327,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           this.cargando = false;
         }, 1000);
       }, 3000);
+      setTimeout(() => {  this.Confirmacion('¡Archivo de Excel generado exitosamente!'); }, 3100);
     }
   }
 
