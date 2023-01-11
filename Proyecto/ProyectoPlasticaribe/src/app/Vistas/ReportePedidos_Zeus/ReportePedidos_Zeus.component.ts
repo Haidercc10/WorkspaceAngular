@@ -227,20 +227,25 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     if(this.ArrayDocumento.length == 0) this.advertencia('Debe haber al menos un pedido en la tabla.');
     else {
       setTimeout(() => {
-        const title = `Reporte de Pedidos Zeus - ${this.today}`;
-      const header = ["N° Pedido", "Cliente", "Item", "Cant. Pedida", "Pendiente", "Facturada", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "OC", "Costo Cant. Pendiente", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", "OT", "Proceso Actual", "Estado"]
+      const title = `Reporte de Pedidos Zeus - ${this.today}`;
+      const header = ["N° Pedido", "Cliente", "Item", "Cant. Pedida", "Pendiente", "Facturada", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "OC", "Costo Cant. Pendiente", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", "OT", "Proceso Actual", "Estado OT"]
       let datos : any =[];
 
       for (const item of this.ArrayDocumento) {
-        const datos1  : any = [item.consecutivo, item.cliente, item.producto, item.cant_Pedida, item.cant_Pendiente, item.cant_Facturada, item.existencias, item.presentacion, item.precioUnidad, item.estado, item.vendedor, item.orden_Compra_CLiente, item.costo_Cant_Pendiente, item.costo_Cant_Total, item.fecha_Creacion, item.fecha_Entrega, 123456, 'Sellado 123Kg - 456Und'];
+        const datos1  : any = [item.consecutivo, item.cliente, item.producto, item.cant_Pedida, item.cant_Pendiente, item.cant_Facturada, item.existencias, item.presentacion, item.precioUnidad, item.estado, item.vendedor, item.orden_Compra_CLiente, item.costo_Cant_Pendiente, item.costo_Cant_Total, item.fecha_Creacion, item.fecha_Entrega, item.OT, item.Proceso_OT, item.Estado_OT];
         datos.push(datos1);
       }
-      let workbook = new Workbook();
+        let workbook = new Workbook();
+        const imageId1 = workbook.addImage({
+          base64:  this.appComponent.logoParaPdf,
+          extension: 'png',
+        });
         let worksheet = workbook.addWorksheet(`Reporte de Pedidos Zeus - ${this.today}`);
+        worksheet.addImage(imageId1, 'A1:A3');
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
         worksheet.addRow([]);
-
+        worksheet.addRow([]);
         let headerRow = worksheet.addRow(header);
         headerRow.eachCell((cell, number) => {
           cell.fill = {
@@ -250,7 +255,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:P2');
+        worksheet.mergeCells('A1:P3');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
 
         datos.forEach(d => {
@@ -268,6 +273,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           let ccTotal = row.getCell(14);
           let OT = row.getCell(17);
           let estadoPedido = row.getCell(10);
+          let estadoOT = row.getCell(19);
+          let colorEstadoOT;
           let colorEstadoPedido;
 
           consecutivo.alignment = { horizontal : 'center' }
@@ -279,18 +286,23 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           /** Pendiente */
           row.getCell(5).numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
           Pendiente.font = {color : {'argb' : 'FF7F71'}, 'name': 'Calibri', 'bold' : true, 'size': 11};
+
           Facturada.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
           stock.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
           precioUnd.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
           ccPendiente.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
           ccTotal.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
+
           /** OT con Estado */
-          OT.fill = {
-            type : 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FF7F71' },
-          }
-          /** Estado */
+          if(d[18] == 17) { colorEstadoOT = '8AFC9B';  estadoOT.fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, }; estadoOT.value = 'Terminada'; }
+          else if(d[18] == 18) {colorEstadoOT = '53CC48'; estadoOT.fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, }; estadoOT.value = 'Cerrada';}
+          else if(d[18] == 3) {colorEstadoOT = 'FF7878'; estadoOT.fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, }; estadoOT.value = 'Anulada';}
+          else if(d[18] == 14) {colorEstadoOT = '83D3FF'; estadoOT.fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, }; estadoOT.value = 'Asignada';}
+          else if(d[18] == 16) {colorEstadoOT = 'F3FC20;'; estadoOT.fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, }; estadoOT.value = 'En Proceso';}
+          else if(d[18] == 15) {colorEstadoOT = 'F6D45D'; estadoOT.fill = { type : 'pattern', pattern: 'solid', fgColor: { argb: colorEstadoOT }, }; estadoOT.value = 'Abierta';}
+          else colorEstadoOT = 'FFFFFF';
+
+          /** Estado Pedido*/
           if (d[9] == 'Pendiente') colorEstadoPedido = 'FF7F71'
           else if (d[9] == 'Parcialmente Satisfecho') colorEstadoPedido = 'FFF55D';
           estadoPedido.fill = {
@@ -317,6 +329,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           worksheet.getColumn(16).width = 15;
           worksheet.getColumn(17).width = 15;
           worksheet.getColumn(18).width = 30;
+          worksheet.getColumn(19).width = 20;
         });
 
         setTimeout(() => {
@@ -338,7 +351,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   /** Mensajes de confirmación */
   Confirmacion(mensaje : string) {
-    Swal.fire({ icon: 'success', title: 'Advertencia', html: mensaje, confirmButtonColor: '#ffc107', confirmButtonText: 'Aceptar', });
+    Swal.fire({ icon: 'success', title: 'Confirmación', html: mensaje, confirmButtonColor: '#53CC48', confirmButtonText: 'Aceptar', });
   }
 
   /** Llenar array al momento de seleccionar VER PDF */
@@ -518,7 +531,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             {
               style: 'texto',
               table: {
-                widths: [120, 45, 40, 40, 40, 20, 65, 50, 50],
+                widths: [110, 45, 40, 40, 40, 20, 65, 60, 50],
                 style: 'texto',
                 body: [
                   [
@@ -584,24 +597,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: [120, 45, 40, 40, 40, 20, 65, 50, 50],
-        body: this.buildTableBody(data, columns)
-      },
-      fontSize: 8,
-      layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
-      }
-    };
-  }
-
-  // Funcion que genera la tabla donde se mostrará la información
-  table2(data, columns) {
-    return {
-      table: {
-        headerRows: 1,
-        widths: [40, 40, 160, 50, 70, 50, 75],
+        widths: [110, 45, 40, 40, 40, 20, 65, 60, 50],
         body: this.buildTableBody(data, columns)
       },
       fontSize: 8,
