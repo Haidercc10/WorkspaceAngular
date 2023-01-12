@@ -72,6 +72,7 @@ export class DesperdicioComponent implements OnInit {
     this.obtenerOperarios();;
     this.obtenerFallas();
     this.obtenerMaquinas();
+    this.obtenerProcesos();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -113,7 +114,7 @@ export class DesperdicioComponent implements OnInit {
   obtenerOperarios(){
     this.operariosService.getUsuarios().subscribe(datos_operarios => {
       for (let i = 0; i < datos_operarios.length; i++) {
-        if (datos_operarios[i].rolUsu_Id == 14) this.operarios.push(datos_operarios[i]);
+        if (datos_operarios[i].rolUsu_Id == 59) this.operarios.push(datos_operarios[i]);
       }
     });
   }
@@ -124,11 +125,7 @@ export class DesperdicioComponent implements OnInit {
     this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
       for (let i = 0; i < datos_procesos.length; i++) {
         if (datos_procesos[i].proceso_Codigo != 12 && datos_procesos[i].proceso_Codigo != 11 && datos_procesos[i].proceso_Codigo != 10) {
-          if (this.FormDesperdicio.value.Impreso == "SI") {
-            if (datos_procesos[i].proceso_Codigo == 2 || datos_procesos[i].proceso_Codigo == 3) this.procesos.push(datos_procesos[i]);
-          } else if (this.FormDesperdicio.value.Impreso == "NO"){
-            if (datos_procesos[i].proceso_Codigo != 2 && datos_procesos[i].proceso_Codigo != 3) this.procesos.push(datos_procesos[i]);
-          }
+          this.procesos.push(datos_procesos[i]);
         }
       }
     });
@@ -280,7 +277,6 @@ export class DesperdicioComponent implements OnInit {
           Area : this.FormDesperdicio.value.Area,
           Fecha : this.FormDesperdicio.value.Fecha,
         });
-        this.obtenerProcesos();
         this.cargando = false;
       }
     }, error => { this.mensajesError(`¡No se pudo obtener información de la orden de trabajo N° ${orden}!`, error.message); });

@@ -233,7 +233,7 @@ export class RegistroComponentComponent implements OnInit {
             Area_Id: this.FormUsuarios.value.usuArea,
             tpUsu_Id: this.FormUsuarios.value.usuTipo,
             RolUsu_Id: this.FormUsuarios.value.usuRol,
-            Empresa_Id: 800188730,
+            Empresa_Id: 800188732,
             Estado_Id: this.FormUsuarios.value.usuEstado,
             Usua_Email: '',
             Usua_Telefono: '',

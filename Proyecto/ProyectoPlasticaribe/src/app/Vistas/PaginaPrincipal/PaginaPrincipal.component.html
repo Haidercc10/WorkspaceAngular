@@ -5,7 +5,7 @@
 
 <!-- INFORMACION GENERAL DE LA EMPRESA Y SUS MOVIMIENTOS -->
 <div class="container-fluid contenedorCards" *ngIf="!displayTerminal" id="card">
-  <p-tabView>
+  <p-tabView (onChange)="handleChange($event)">
     <!-- ORDENES DE TRABAJO -->
     <p-tabPanel
       header="Ordenes de Trabajo"
@@ -290,9 +290,12 @@
             leftIcon="pi pi-wallet"
             tooltip="Información de las Materias Primas"
             *ngIf="ValidarRol == 1">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <p-dropdown [options]="anos" [(ngModel)]="anoSeleccionado" (onChange)="facturacion()"></p-dropdown>
+            </div>
             <div class="row row-cols-1 row-cols-md-1 g-3">
               <div class="card">
-                <p-chart type="line" width="100%" height="100%" [data]="facturasData" [options]="facturasOptions"></p-chart>
+                <p-chart type="line" [data]="facturasData" [options]="facturasOptions"></p-chart>
               </div>
             </div>
           </p-tabPanel>
@@ -431,6 +434,110 @@
       </div>
     </p-tabPanel>
 
+    <!-- PEDIDOS -->
+    <p-tabPanel
+      header="Pedidos Zeus"
+      leftIcon="pi pi-shopping-bag"
+      tooltip="Información de los Pedidos creados en Zeus"
+      *ngIf="ValidarRol == 1">
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <!-- CARD 1 -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Ranking de cantidad de pedidos por clientes. <br> Ranking de costo de pedidos por clientes.</h5>
+              <p class="card-text"></p>
+              <div class="scrollCard">
+                <p class="card-text">
+                  <span>{{1 + 1}}) <b></b>. <br></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Ranking de cantidad de pedidos por productos</h5>
+              <p class="card-text"></p>
+              <div class="scrollCard">
+                <p class="card-text">
+                  <span>{{1 + 1}}) <b></b>. <br></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Ranking de cantidad de pedidos por vendedores. <br> Ranking de costo de pedidos por vendedores.</h5>
+              <p class="card-text"></p>
+              <div class="scrollCard">
+                <p class="card-text">
+                  <span>{{1 + 1}}) <b></b>. <br></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 4 -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Número de pedidos por estados. <br> Número de pedidos creados en el mes.</h5>
+              <p class="card-text"></p>
+              <div class="scrollCard">
+                <p class="card-text">
+                  <span>{{1 + 1}}) <b></b>. <br></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 5 -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Número de pedidos con ordenes de trabajo asociadas.</h5>
+              <p class="card-text"></p>
+              <div class="scrollCard">
+                <p class="card-text">
+                  <span>{{1 + 1}}) <b></b>. <br></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 6 -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Listado de pedidos en los que el stock del producto pedido sea mayor o igual que la cantidad que está pendiente.</h5>
+              <p class="card-text"></p>
+              <div class="scrollCard">
+                <p class="card-text">
+                  <span>{{1 + 1}}) <b></b>. <br></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
   </p-tabView>
 
   <!-- Model que mostrará la información de las ordenes de trabajo con un estado especifico -->

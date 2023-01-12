@@ -59,49 +59,6 @@
           </ng-template>
           <!-- Columnas Principales -->
           <ng-template pTemplate="header" let-columns>
-            <tr>
-              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="consecutivo">Pedido
-                <p-sortIcon field="consecutivo"></p-sortIcon>
-              </th>
-              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cliente">Cliente
-                <p-sortIcon field="cliente"></p-sortIcon>
-              </th>
-              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="producto">Producto
-                <p-sortIcon field="producto"></p-sortIcon>
-              </th>
-              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Pedida" title="Cantidad Pedida">Cant. Pedida
-                <p-sortIcon field="cant_Pedida"></p-sortIcon>
-              </th>
-              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Pendiente" title="Cantidad Pendiente">Pendiente
-                <p-sortIcon field="cant_Pendiente"></p-sortIcon>
-              </th>
-              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Facturada" title="Cantidad Facturada">Facturada
-                <p-sortIcon field="cant_Facturada"></p-sortIcon>
-              </th>
-              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="existencias">Stock
-                <p-sortIcon field="existencias"></p-sortIcon>
-              </th>
-              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="presentacion">Und
-                <p-sortIcon field="presentacion"></p-sortIcon>
-              </th>
-              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="estado">Estado
-                <p-sortIcon field="estado"></p-sortIcon>
-              </th>
-              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="vendedor">Vendedor
-                <p-sortIcon field="vendedor"></p-sortIcon>
-              </th>
-              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="OT">OT
-                <p-sortIcon field="OT"></p-sortIcon>
-              </th>
-              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="Proceso_OT">Proceso Actual
-                <p-sortIcon field="Proceso_OT"></p-sortIcon>
-              </th>
-              <th *ngFor="let col of columns" pResizableColumn style="font-size: 14px;">
-                {{col.header}}
-              </th>
-              <th style="text-align: center; font-size: 14px;" scope="col">Ver PDF</th>
-            </tr>
-
             <!-- Campo de Busqueda -->
             <tr title="Filtros para realizar busquedas de cada campo">
               <th>
@@ -140,13 +97,57 @@
               <th>
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Proceso_OT', 'contains')" class="w-full">
               </th>
-              <th>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')" class="w-full">
-              </th>
               <th *ngFor="let col of columns">
                 <input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')" class="w-full">
               </th>
-          </tr>
+              <th>
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')" class="w-full">
+              </th>
+            </tr>
+
+            <tr>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="consecutivo">Pedido
+                <p-sortIcon field="consecutivo"></p-sortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cliente">Cliente
+                <p-sortIcon field="cliente"></p-sortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="producto">Producto
+                <p-sortIcon field="producto"></p-sortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Pedida" title="Cantidad Pedida">Cant. Pedida
+                <p-sortIcon field="cant_Pedida"></p-sortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Pendiente" title="Cantidad Pendiente">Pendiente
+                <p-sortIcon field="cant_Pendiente"></p-sortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="cant_Facturada" title="Cantidad Facturada">Facturada
+                <p-sortIcon field="cant_Facturada"></p-sortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="existencias">Stock
+                <p-sortIcon field="existencias"></p-sortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="presentacion">Und
+                <p-sortIcon field="presentacion"></p-sortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="estado">Estado
+                <p-sortIcon field="estado"></p-sortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="vendedor">Vendedor
+                <p-sortIcon field="vendedor"></p-sortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="OT">OT
+                <p-sortIcon field="OT"></p-sortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="Proceso_OT">Proceso Actual
+                <p-sortIcon field="Proceso_OT"></p-sortIcon>
+              </th>
+              <th *ngFor="let col of columns" style="font-size: 14px;">
+                {{col.header}}
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col">Ver PDF</th>
+            </tr>
+
           </ng-template>
 
           <!-- Cuerpo de la tabla -->
@@ -212,7 +213,7 @@
 </div>
 
 <!-- Model que mostrará la información de las ordenes de trabajo con un estado especifico -->
-<p-dialog [(visible)]="modalEstadosOrdenes" [style]="{width: '1800px'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" styleClass="p-fluid">
+<p-dialog [(visible)]="modalEstadosOrdenes" [style]="{width: '1800px'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" styleClass="p-fluid">
   <ng-template pTemplate="content">
     <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
   </ng-template>

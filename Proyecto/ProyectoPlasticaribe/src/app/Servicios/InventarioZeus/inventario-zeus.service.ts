@@ -41,8 +41,8 @@ readonly rutaInventarioZeusAPI = rutaZeus;
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/FacturacionMensual/${fecha1}/${fecha2}`);
   }
 
-  GetFacturacionTodosMeses(mes : number){
-    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/FacturacionTodosMeses/${mes}`);
+  GetFacturacionTodosMeses(mes : number, ano : number){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/FacturacionTodosMeses/${mes}/${ano}`);
   }
 
   GetIvaVentaMensual(fecha1 : any, fecha2 : any){

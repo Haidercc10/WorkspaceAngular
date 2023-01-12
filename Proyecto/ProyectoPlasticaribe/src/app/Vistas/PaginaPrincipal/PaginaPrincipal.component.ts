@@ -125,6 +125,18 @@ export class PaginaPrincipalComponent implements OnInit {
   totalIvaCompra10 : number = 0; //Variable que va a almacenar el iva de compra del mes de octubre
   totalIvaCompra11 : number = 0; //Variable que va a almacenar el iva de compra del mes de noviembre
   totalIvaCompra12 : number = 0; //Variable que va a almacenar el iva de compra del mes de diciembre
+  anos : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
+  anoSeleccionado : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
+
+  /* INFORMACIÓN GENERAL DE LOS PEDIDOS */
+  pedidosClientes : any [] = []; //Variable que se llenará con la información de los pedidos agrupados por clientes
+  pedidosProductos : any [] = []; //Variable que se llenará con la información de los pedidos agrupados por productos
+  pedidosVendedores : any [] = []; //Variable que se llenará con la información de los pedidos agrupados por vendedores
+  pedidosParcSatisfechos : number = 0; //Variable que se llenará con la información de los pedidos con estado "Parcialmente Satisfecho"
+  pedidosPendientes : number = 0; //Variable que se llenará con la información de los pedidos con estado "Pendiente"
+  pedidosParcStisfechos_Ot : any [] = []; //Variable que se llenará con la información de los pedidos con estado "Parcialmente Satisfecho" y que tengan OT asociadas
+  pedidosPendientes_Ot : any [] = []; //Variable que se llenará con la información de los pedidos con estado "Pendiente" y con OT asociadas
+  pedidosStock : any [] = []; //Variable que se llenará con los pedidos con un stock (de producto pedido) igual o mayor a la cantidad pediente
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
@@ -135,16 +147,20 @@ export class PaginaPrincipalComponent implements OnInit {
                           private materiaPrimaService : MateriaPrimaService,
                             private boppService : EntradaBOPPService,
                               private tintasCreadasService : DetallesAsignacionMPxTintasService,
-                                private zeusService : InventarioZeusService,) { }
+                                private zeusService : InventarioZeusService,) {
+  }
 
   ngOnInit() {
-    setTimeout(() => { this.mostrarVistasFav(); }, 500);
-    this.facturacion();
     this.lecturaStorage();
+    this.llenarArrayAnos();
     this.llenarDatosSeleccionables();
     this.buscarFavoritos();
-    this.cantOrdenesUltimoMes();
-    this.materiasPrimas();
+    setTimeout(() => {
+      this.mostrarVistasFav();
+      this.facturacion();
+      this.cantOrdenesUltimoMes();
+      this.materiasPrimas();
+    }, 500);
   }
 
   // Funcion que leerá la informacion del usuario logeado, infomración que se almacena apenas el usuario incia sesion
@@ -160,6 +176,15 @@ export class PaginaPrincipalComponent implements OnInit {
         }
       }
     }, error => { this.mensajeError(`¡No se pudo conectar con el API de rubick, por favor recargue la pagina y si el problema persiste concatese con sistemas!`, error.message); });
+  }
+
+  // Funcion que va a llenar el array de años
+  llenarArrayAnos(){
+    for (let i = 0; i < this.anos.length; i++) {
+      let num_Mayor : number = Math.max(...this.anos);
+      if (num_Mayor == moment().year()) break;
+      this.anos.push(num_Mayor + 1);
+    }
   }
 
   // Llenar datos con todas las opciones de vistas que puede seleccionar como favoritas
@@ -470,90 +495,92 @@ export class PaginaPrincipalComponent implements OnInit {
     this.totalOrdenesMes = 0;
     this.costoTotalOrdenesMes = 0;
 
-    this.ordenTrabajoService.srvObtenerListaPorFechas(this.primerDiaMes, this.today).subscribe(datos_ot => {
-      if (datos_ot.length == 0) setTimeout(() => { this.mensajeError('No existen OTs creadas en las el último mes.'); }, 3000);
-      else {
-        for (let i = 0; i < datos_ot.length; i++) {
-          if (datos_ot[i].estado_Nombre == 'Abierta') this.catidadOTAbiertas += 1;
-          if (datos_ot[i].estado_Nombre == 'Asignada') this.cantidadOTAsignadas += 1;
-          if (datos_ot[i].estado_Nombre == 'Terminada') this.cantidadOTTerminada += 1;
-          if (datos_ot[i].estado_Nombre == 'En proceso') this.cantidadOTIniciada += 1;
-          if (datos_ot[i].estado_Nombre == 'Anulado') this.cantidadOtAnulada += 1;
-          if (datos_ot[i].estado_Nombre == 'Cerrada') this.cantidadOTCerrada += 1;
+    if(this.ValidarRol == 1) {
+      this.ordenTrabajoService.srvObtenerListaPorFechas(this.primerDiaMes, this.today).subscribe(datos_ot => {
+        if (datos_ot.length == 0) setTimeout(() => { this.mensajeError('No existen OTs creadas en las el último mes.'); }, 3000);
+        else {
+          for (let i = 0; i < datos_ot.length; i++) {
+            if (datos_ot[i].estado_Nombre == 'Abierta') this.catidadOTAbiertas += 1;
+            if (datos_ot[i].estado_Nombre == 'Asignada') this.cantidadOTAsignadas += 1;
+            if (datos_ot[i].estado_Nombre == 'Terminada') this.cantidadOTTerminada += 1;
+            if (datos_ot[i].estado_Nombre == 'En proceso') this.cantidadOTIniciada += 1;
+            if (datos_ot[i].estado_Nombre == 'Anulado') this.cantidadOtAnulada += 1;
+            if (datos_ot[i].estado_Nombre == 'Cerrada') this.cantidadOTCerrada += 1;
+          }
         }
-      }
-    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes y en que estado se encuntran!`, error.message); });
+      }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes y en que estado se encuntran!`, error.message); });
 
-    this.ordenTrabajoService.GetProductosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        this.productosOrdenesMes.push(datos_ordenes[i]);
-        this.productosOrdenesMes.sort((a,b) => a.prod_Nombre.localeCompare(b.prod_Nombre));
-        this.productosOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-      }
-    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada producto!`, error.message); });
-
-    this.bagProService.GetPesoProcesosUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        if (datos_ordenes[i].nomStatus == 'IMPRESION'
-           || datos_ordenes[i].nomStatus == 'LAMINADO'
-           || datos_ordenes[i].nomStatus == 'EXTRUSION'
-           || datos_ordenes[i].nomStatus == 'CORTE'
-           || datos_ordenes[i].nomStatus == 'ROTOGRABADO'
-           || datos_ordenes[i].nomStatus == 'DOBLADO'
-           || datos_ordenes[i].nomStatus == 'EMPAQUE'
-           || datos_ordenes[i].nomStatus == 'SELLADO'
-           || datos_ordenes[i].nomStatus == 'Wiketiado') {
-            let id : number = 0;
-            if (datos_ordenes[i].nomStatus == 'EXTRUSION') id = 1;
-            if (datos_ordenes[i].nomStatus == 'IMPRESION') id = 2;
-            if (datos_ordenes[i].nomStatus == 'ROTOGRABADO') id = 3;
-            if (datos_ordenes[i].nomStatus == 'LAMINADO') id = 4;
-            if (datos_ordenes[i].nomStatus == 'EMPAQUE') {
-              id = 5;
-              datos_ordenes[i].nomStatus = 'CORTE';
-            }
-            if (datos_ordenes[i].nomStatus == 'DOBLADO') id = 6;
-            if (datos_ordenes[i].nomStatus == 'SELLADO') id = 7;
-            if (datos_ordenes[i].nomStatus == 'Wiketiado') id = 8;
-            let info : any  = {
-              id : id,
-              Nombre : datos_ordenes[i].nomStatus,
-              cantidad : datos_ordenes[i].peso,
-              und : datos_ordenes[i].und,
-            }
-            this.procesosOrdenesMes.push(info);
-          this.procesosOrdenesMes.sort((a,b) => Number(a.id) - Number(b.id));
+      this.ordenTrabajoService.GetProductosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+        for (let i = 0; i < datos_ordenes.length; i++) {
+          this.productosOrdenesMes.push(datos_ordenes[i]);
+          this.productosOrdenesMes.sort((a,b) => a.prod_Nombre.localeCompare(b.prod_Nombre));
+          this.productosOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
         }
-      }
-    }, error => { this.mensajeError(`¡No se ha podido consultar la cantidad producida por cada proceso de las ordenes que se crearon el ultimo mes!`, error.message); });
+      }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada producto!`, error.message); });
 
-    this.bagProService.GetCostoOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        this.costoTotalOrdenesMes += datos_ordenes[i].costo;
-      }
-    }, error => { this.mensajeError(`¡No se ha podido consultar el costo de las ordenes de trabajo que se han hecho en el último mes!`, error.message); });
+      this.bagProService.GetPesoProcesosUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+        for (let i = 0; i < datos_ordenes.length; i++) {
+          if (datos_ordenes[i].nomStatus == 'IMPRESION'
+            || datos_ordenes[i].nomStatus == 'LAMINADO'
+            || datos_ordenes[i].nomStatus == 'EXTRUSION'
+            || datos_ordenes[i].nomStatus == 'CORTE'
+            || datos_ordenes[i].nomStatus == 'ROTOGRABADO'
+            || datos_ordenes[i].nomStatus == 'DOBLADO'
+            || datos_ordenes[i].nomStatus == 'EMPAQUE'
+            || datos_ordenes[i].nomStatus == 'SELLADO'
+            || datos_ordenes[i].nomStatus == 'Wiketiado') {
+              let id : number = 0;
+              if (datos_ordenes[i].nomStatus == 'EXTRUSION') id = 1;
+              if (datos_ordenes[i].nomStatus == 'IMPRESION') id = 2;
+              if (datos_ordenes[i].nomStatus == 'ROTOGRABADO') id = 3;
+              if (datos_ordenes[i].nomStatus == 'LAMINADO') id = 4;
+              if (datos_ordenes[i].nomStatus == 'EMPAQUE') {
+                id = 5;
+                datos_ordenes[i].nomStatus = 'CORTE';
+              }
+              if (datos_ordenes[i].nomStatus == 'DOBLADO') id = 6;
+              if (datos_ordenes[i].nomStatus == 'SELLADO') id = 7;
+              if (datos_ordenes[i].nomStatus == 'Wiketiado') id = 8;
+              let info : any  = {
+                id : id,
+                Nombre : datos_ordenes[i].nomStatus,
+                cantidad : datos_ordenes[i].peso,
+                und : datos_ordenes[i].und,
+              }
+              this.procesosOrdenesMes.push(info);
+            this.procesosOrdenesMes.sort((a,b) => Number(a.id) - Number(b.id));
+          }
+        }
+      }, error => { this.mensajeError(`¡No se ha podido consultar la cantidad producida por cada proceso de las ordenes que se crearon el ultimo mes!`, error.message); });
 
-    this.bagProService.GetCostoOrdenesUltimoMes_Vendedores(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        this.vendedorOrdenesMes.push(datos_ordenes[i]);
-        this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-      }
-    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para vendedor!`, error.message); });
+      this.bagProService.GetCostoOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+        for (let i = 0; i < datos_ordenes.length; i++) {
+          this.costoTotalOrdenesMes += datos_ordenes[i].costo;
+        }
+      }, error => { this.mensajeError(`¡No se ha podido consultar el costo de las ordenes de trabajo que se han hecho en el último mes!`, error.message); });
 
-    this.bagProService.GetCostoOrdenesUltimoMes_Clientes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        this.clientesOrdenesMes.push(datos_ordenes[i]);
-        this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-        this.totalOrdenesMes += datos_ordenes[i].cantidad;
-      }
-    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada cliente!`, error.message); });
+      this.bagProService.GetCostoOrdenesUltimoMes_Vendedores(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+        for (let i = 0; i < datos_ordenes.length; i++) {
+          this.vendedorOrdenesMes.push(datos_ordenes[i]);
+          this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+        }
+      }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para vendedor!`, error.message); });
 
-    this.bagProService.GetCantOrdenesMateriales(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        this.materialesOrdenesMes.push(datos_ordenes[i]);
-        this.materialesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-      }
-    }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada cliente!`, error.message); });
+      this.bagProService.GetCostoOrdenesUltimoMes_Clientes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+        for (let i = 0; i < datos_ordenes.length; i++) {
+          this.clientesOrdenesMes.push(datos_ordenes[i]);
+          this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+          this.totalOrdenesMes += datos_ordenes[i].cantidad;
+        }
+      }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada cliente!`, error.message); });
+
+      this.bagProService.GetCantOrdenesMateriales(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+        for (let i = 0; i < datos_ordenes.length; i++) {
+          this.materialesOrdenesMes.push(datos_ordenes[i]);
+          this.materialesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+        }
+      }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada cliente!`, error.message); });
+    }
   }
 
   // Funcion que va a consultar toda la información general de materia prima
@@ -570,69 +597,70 @@ export class PaginaPrincipalComponent implements OnInit {
     this.cantTintasCreadas = 0;
     this.materiasPrimasMasUtilizadasMes = [];
 
-    this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos_materiaPrima => {
-      for (let i = 0; i < datos_materiaPrima.length; i++) {
-        if (datos_materiaPrima[i].inicial != datos_materiaPrima[i].actual && datos_materiaPrima[i].id_Materia_Prima != 84) this.inventarioMateriaPrima.push(datos_materiaPrima[i]);
-        this.inventarioMateriaPrima.sort((a,b) => a.nombre_Materia_Prima.localeCompare(b.nombre_Materia_Prima));
-      }
-    }, error => { this.mensajeError(`¡No se pudo obtener información de las materias primas!`, error.message); });
+    if(this.ValidarRol == 1) {
+      this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos_materiaPrima => {
+        for (let i = 0; i < datos_materiaPrima.length; i++) {
+          if (datos_materiaPrima[i].inicial != datos_materiaPrima[i].actual && datos_materiaPrima[i].id_Materia_Prima != 84) this.inventarioMateriaPrima.push(datos_materiaPrima[i]);
+          this.inventarioMateriaPrima.sort((a,b) => a.nombre_Materia_Prima.localeCompare(b.nombre_Materia_Prima));
+        }
+      }, error => { this.mensajeError(`¡No se pudo obtener información de las materias primas!`, error.message); });
 
-    this.boppService.GetBoppStockInventario().subscribe(datos_bopp => {
-      for (let i = 0; i < datos_bopp.length; i++) {
-        if (datos_bopp[i].catMP_Id == 6) this.cantRollosBopp = datos_bopp[i].conteoDescripcion;
-        else if (datos_bopp[i].catMP_Id == 14) this.cantRollosBopa = datos_bopp[i].conteoDescripcion;
-        else if (datos_bopp[i].catMP_Id == 15) this.cantRollosPoliester = datos_bopp[i].conteoDescripcion;
-      }
-    }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos biorientados!`, error.message) });
+      this.boppService.GetBoppStockInventario().subscribe(datos_bopp => {
+        for (let i = 0; i < datos_bopp.length; i++) {
+          if (datos_bopp[i].catMP_Id == 6) this.cantRollosBopp = datos_bopp[i].conteoDescripcion;
+          else if (datos_bopp[i].catMP_Id == 14) this.cantRollosBopa = datos_bopp[i].conteoDescripcion;
+          else if (datos_bopp[i].catMP_Id == 15) this.cantRollosPoliester = datos_bopp[i].conteoDescripcion;
+        }
+      }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos biorientados!`, error.message) });
 
-    this.boppService.GetCantRollosUtilizados_Mes(this.primerDiaMes, this.today).subscribe(datos_bopp => {
-      for (let i = 0; i < datos_bopp.length; i++) {
-        this.cantRollosUtilizados += datos_bopp[i].cantidad;
-      }
-    }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos biorientados!`, error.message) });
+      this.boppService.GetCantRollosUtilizados_Mes(this.primerDiaMes, this.today).subscribe(datos_bopp => {
+        for (let i = 0; i < datos_bopp.length; i++) {
+          this.cantRollosUtilizados += datos_bopp[i].cantidad;
+        }
+      }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos biorientados!`, error.message) });
 
-    this.boppService.GetCantRollosIngresados_Mes(this.primerDiaMes, this.today).subscribe(datos_bopp => {
-      for (let i = 0; i < datos_bopp.length; i++) {
-        this.cantRollosEntrantes += datos_bopp[i].cantidad;
-      }
-    }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos biorientados!`, error.message) });
+      this.boppService.GetCantRollosIngresados_Mes(this.primerDiaMes, this.today).subscribe(datos_bopp => {
+        for (let i = 0; i < datos_bopp.length; i++) {
+          this.cantRollosEntrantes += datos_bopp[i].cantidad;
+        }
+      }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos biorientados!`, error.message) });
 
-    this.materiaPrimaService.GetMateriasPrimasUtilizadasHoy(this.today).subscribe(datos_materiasPrimas => {
-      for (let i = 0; i < datos_materiasPrimas.length; i++) {
-        this.materiasPrimasMovidasHoy.push(datos_materiasPrimas[i]);
-        this.materiasPrimasMovidasHoy.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-      }
-    }, error => { this.mensajeError(`¡No se pudo obtener información de las materias primas que tuvieron asignaciones hoy!`, error.message) });
+      this.materiaPrimaService.GetMateriasPrimasUtilizadasHoy(this.today).subscribe(datos_materiasPrimas => {
+        for (let i = 0; i < datos_materiasPrimas.length; i++) {
+          this.materiasPrimasMovidasHoy.push(datos_materiasPrimas[i]);
+          this.materiasPrimasMovidasHoy.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+        }
+      }, error => { this.mensajeError(`¡No se pudo obtener información de las materias primas que tuvieron asignaciones hoy!`, error.message) });
 
-    this.tintasCreadasService.GetTintasCreadasMes(this.primerDiaMes, this.today).subscribe(datos_tintas => {
-      for (let i = 0; i < datos_tintas.length; i++) {
-        this.tintasCreadas.push(datos_tintas[i]);
-        this.tintasCreadas.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-        this.cantTintasCreadas += 1;
-      }
-    }, error => { this.mensajeError(`¡No se pudo obtener información de las tintas creadas durante las fechas ${this.primerDiaMes} y ${this.today}!`, error.message) });
+      this.tintasCreadasService.GetTintasCreadasMes(this.primerDiaMes, this.today).subscribe(datos_tintas => {
+        for (let i = 0; i < datos_tintas.length; i++) {
+          this.tintasCreadas.push(datos_tintas[i]);
+          this.tintasCreadas.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+          this.cantTintasCreadas += 1;
+        }
+      }, error => { this.mensajeError(`¡No se pudo obtener información de las tintas creadas durante las fechas ${this.primerDiaMes} y ${this.today}!`, error.message) });
 
-    this.materiaPrimaService.GetMateriasPrimasUltilizadasMes(this.primerDiaMes, this.today).subscribe(datos_materiasPrimas => {
-      for (let i = 0; i < datos_materiasPrimas.length; i++) {
-        this.materiasPrimasMasUtilizadasMes.push(datos_materiasPrimas[i]);
-        this.materiasPrimasMasUtilizadasMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-      }
-    }, error => { this.mensajeError(`¡No se pudo obtener información de las materias primas más utilizadas durante el mes!`, error.message); });
+      this.materiaPrimaService.GetMateriasPrimasUltilizadasMes(this.primerDiaMes, this.today).subscribe(datos_materiasPrimas => {
+        for (let i = 0; i < datos_materiasPrimas.length; i++) {
+          this.materiasPrimasMasUtilizadasMes.push(datos_materiasPrimas[i]);
+          this.materiasPrimasMasUtilizadasMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+        }
+      }, error => { this.mensajeError(`¡No se pudo obtener información de las materias primas más utilizadas durante el mes!`, error.message); });
 
-    this.tintasCreadasService.GetMateriasPrimasCrearTintasMes(this.primerDiaMes, this.today).subscribe(datos_tintas => {
-      for (let i = 0; i < datos_tintas.length; i++) {
-        this.materiasPrimasMasUtilizadasCrearTintaMes.push(datos_tintas[i]);
-        this.materiasPrimasMasUtilizadasCrearTintaMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-      }
-    }, error => { this.mensajeError(`¡No se pudo obtener información de las tintas creadas durante las fechas ${this.primerDiaMes} y ${this.today}!`, error.message) });
+      this.tintasCreadasService.GetMateriasPrimasCrearTintasMes(this.primerDiaMes, this.today).subscribe(datos_tintas => {
+        for (let i = 0; i < datos_tintas.length; i++) {
+          this.materiasPrimasMasUtilizadasCrearTintaMes.push(datos_tintas[i]);
+          this.materiasPrimasMasUtilizadasCrearTintaMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+        }
+      }, error => { this.mensajeError(`¡No se pudo obtener información de las tintas creadas durante las fechas ${this.primerDiaMes} y ${this.today}!`, error.message) });
 
-    this.ordenTrabajoService.GetTotalMateriaPrimaAsignadaMes(this.primerDiaMes, this.today).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        this.totalMpAsignada += datos_ot[i].cantidad;
-        this.totalExtruidoMes += datos_ot[i].extruido;
-      }
-    }, error => { this.mensajeError(`¡No se ha podido consultar la cantidad de Materia Prima que se ha asignado y la cantidad de Materia Prima que se ha extruido!`, error.message); });
-
+      this.ordenTrabajoService.GetTotalMateriaPrimaAsignadaMes(this.primerDiaMes, this.today).subscribe(datos_ot => {
+        for (let i = 0; i < datos_ot.length; i++) {
+          this.totalMpAsignada += datos_ot[i].cantidad;
+          this.totalExtruidoMes += datos_ot[i].extruido;
+        }
+      }, error => { this.mensajeError(`¡No se ha podido consultar la cantidad de Materia Prima que se ha asignado y la cantidad de Materia Prima que se ha extruido!`, error.message); });
+    }
   }
 
   // Funcion que va a consultar la información de la facturación
@@ -641,58 +669,64 @@ export class PaginaPrincipalComponent implements OnInit {
     this.totalFacuturadoMes = 0;
     this.totalIvaVentaMes = 0;
     this.totalIvaCompraMes = 0;
+    if(this.ValidarRol == 1) {
+      this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => {
+        this.totalFacturadoDia = datos_facturacion;
+      }, error => { this.mensajeError(`¡No se pudo obtener información sobre el valor de lo facturado hoy!`, error.message); });
 
-    this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => {
-      this.totalFacturadoDia = datos_facturacion;
-    }, error => { this.mensajeError(`¡No se pudo obtener información sobre el valor de lo facturado hoy!`, error.message); });
+      this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
+        this.totalFacuturadoMes = datos_facturacion;
+      }, error => { this.mensajeError(`¡No se pudo aobtener información sobre lo facturado del mes actual!`, error.message); });
 
-    this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
-      this.totalFacuturadoMes = datos_facturacion;
-    }, error => { this.mensajeError(`¡No se pudo aobtener información sobre lo facturado del mes actual!`, error.message); });
+      this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
+        this.totalIvaVentaMes = datos_facturacion;
+      }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las ventas del mes actual!`, error.message); });
 
-    this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
-      this.totalIvaVentaMes = datos_facturacion;
-    }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las ventas del mes actual!`, error.message); });
+      // this.zeusService.GetIvaCompraMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
+      //   this.totalIvaCompraMes = datos_facturacion;
+      // }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las compras de mes actual!`, error.message); });
 
-    // this.zeusService.GetIvaCompraMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
-    //   this.totalIvaCompraMes = datos_facturacion;
-    // }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las compras de mes actual!`, error.message); });
+      for (let i = 0; i < 12; i++) {
+        this.zeusService.GetFacturacionTodosMeses(i+ 1, this.anoSeleccionado).subscribe(datos_facturacion => {
+          if (i == 0) this.totalFacturado1 = datos_facturacion;
+          if (i == 1) this.totalFacturado2 = datos_facturacion;
+          if (i == 2) this.totalFacturado3 = datos_facturacion;
+          if (i == 3) this.totalFacturado4 = datos_facturacion;
+          if (i == 4) this.totalFacturado5 = datos_facturacion;
+          if (i == 5) this.totalFacturado6 = datos_facturacion;
+          if (i == 6) this.totalFacturado7 = datos_facturacion;
+          if (i == 7) this.totalFacturado8 = datos_facturacion;
+          if (i == 8) this.totalFacturado9 = datos_facturacion;
+          if (i == 9) this.totalFacturado10 = datos_facturacion;
+          if (i == 10) this.totalFacturado11 = datos_facturacion;
+          if (i == 11) this.totalFacturado12 = datos_facturacion;
+        }, error => { this.mensajeError(`¡No se pudo obtener información sobre la cantidad facturada en cada uno de los meses del año!`, error.message); });
+      }
+      setTimeout(() => { this.llenarGraficaFacturacion(); }, 1500);
 
-    for (let i = 0; i < 12; i++) {
-      this.zeusService.GetFacturacionTodosMeses(i+ 1).subscribe(datos_facturacion => {
-        if (i == 0) this.totalFacturado1 = datos_facturacion;
-        if (i == 1) this.totalFacturado2 = datos_facturacion;
-        if (i == 2) this.totalFacturado3 = datos_facturacion;
-        if (i == 3) this.totalFacturado4 = datos_facturacion;
-        if (i == 4) this.totalFacturado5 = datos_facturacion;
-        if (i == 5) this.totalFacturado6 = datos_facturacion;
-        if (i == 6) this.totalFacturado7 = datos_facturacion;
-        if (i == 7) this.totalFacturado8 = datos_facturacion;
-        if (i == 8) this.totalFacturado9 = datos_facturacion;
-        if (i == 9) this.totalFacturado10 = datos_facturacion;
-        if (i == 10) this.totalFacturado11 = datos_facturacion;
-        if (i == 11) this.totalFacturado12 = datos_facturacion;
-      }, error => { this.mensajeError(`¡No se pudo obtener información sobre la cantidad facturada en cada uno de los meses del año!`, error.message); });
+      for (let i = 0; i < 12; i++) {
+        this.zeusService.GetIvaCompraTodosMeses(i+ 1).subscribe(datos_facturacion => {
+          if (i == 0) this.totalIvaCompra1 = datos_facturacion;
+          if (i == 1) this.totalIvaCompra2 = datos_facturacion;
+          if (i == 2) this.totalIvaCompra3 = datos_facturacion;
+          if (i == 3) this.totalIvaCompra4 = datos_facturacion;
+          if (i == 4) this.totalIvaCompra5 = datos_facturacion;
+          if (i == 5) this.totalIvaCompra6 = datos_facturacion;
+          if (i == 6) this.totalIvaCompra7 = datos_facturacion;
+          if (i == 7) this.totalIvaCompra8 = datos_facturacion;
+          if (i == 8) this.totalIvaCompra9 = datos_facturacion;
+          if (i == 9) this.totalIvaCompra10 = datos_facturacion;
+          if (i == 10) this.totalIvaCompra11 = datos_facturacion;
+          if (i == 11) this.totalIvaCompra12 = datos_facturacion;
+        }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las compras de cada uno de los meses del año!`, error.message); });
+      }
+      setTimeout(() => { this.llenarGraficaIvaCompra(); }, 1800);
     }
-    setTimeout(() => { this.llenarGraficaFacturacion(); }, 1500);
+  }
 
-    for (let i = 0; i < 12; i++) {
-      this.zeusService.GetIvaCompraTodosMeses(i+ 1).subscribe(datos_facturacion => {
-        if (i == 0) this.totalIvaCompra1 = datos_facturacion;
-        if (i == 1) this.totalIvaCompra2 = datos_facturacion;
-        if (i == 2) this.totalIvaCompra3 = datos_facturacion;
-        if (i == 3) this.totalIvaCompra4 = datos_facturacion;
-        if (i == 4) this.totalIvaCompra5 = datos_facturacion;
-        if (i == 5) this.totalIvaCompra6 = datos_facturacion;
-        if (i == 6) this.totalIvaCompra7 = datos_facturacion;
-        if (i == 7) this.totalIvaCompra8 = datos_facturacion;
-        if (i == 8) this.totalIvaCompra9 = datos_facturacion;
-        if (i == 9) this.totalIvaCompra10 = datos_facturacion;
-        if (i == 10) this.totalIvaCompra11 = datos_facturacion;
-        if (i == 11) this.totalIvaCompra12 = datos_facturacion;
-      }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las compras de cada uno de los meses del año!`, error.message); });
-    }
-    setTimeout(() => { this.llenarGraficaIvaCompra(); }, 1800);
+  // Funcion que va a consultar la información general de los pedidos creados en Zeus
+  pedidosZeus(){
+
   }
 
   // Funcion que va a llenar la grafica con la información de la cantidad de materia prima asignada y la cantidad extruida
@@ -949,7 +983,6 @@ export class PaginaPrincipalComponent implements OnInit {
         }
       }
     };
-
   }
 
   // Funcion que va a llenar la grafica de las cantidades facturadas en cada mes
@@ -1057,7 +1090,6 @@ export class PaginaPrincipalComponent implements OnInit {
           align: 'end'
         }
     };
-
   }
 
   // Funcion que va a llenar la grafica con la informacion del iva de las compras mensuales
@@ -1232,5 +1264,11 @@ export class PaginaPrincipalComponent implements OnInit {
   // Funcion que tomará unos parametros para mostrar un mensaje de error
   mensajeError(texto : string, error : any = ''){
     Swal.fire({ icon: 'error', title: 'Opps...', showCloseButton : true, html: `<b>${texto}</b><br>` + `<spam style="color: #f00">${error}</spam>`, });
+  }
+
+  // Funcion que va a detectar sorbe que panel está siendo seleccionado
+  handleChange(e) {
+    var index = e.index;
+    if (index == 3) this.pedidosZeus();
   }
 }
