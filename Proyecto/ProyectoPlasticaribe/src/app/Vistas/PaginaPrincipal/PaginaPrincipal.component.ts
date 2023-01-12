@@ -726,7 +726,15 @@ export class PaginaPrincipalComponent implements OnInit {
 
   // Funcion que va a consultar la información general de los pedidos creados en Zeus
   pedidosZeus(){
+    // Pedidos CLientes
+    this.zeusService.getPedidosCliente().subscribe(datos_pedidos => { this.pedidosClientes = datos_pedidos; });
+    // Pedidos Productos
+    this.zeusService.getPedidosProductos().subscribe(datos_pedidos => { this.pedidosProductos = datos_pedidos; });
 
+    setTimeout(() => {
+      this.pedidosClientes.sort((a,b) => b.cantidad - a.cantidad);
+      this.pedidosProductos.sort((a,b) => b.cantidad - a.cantidad);
+    }, 500);
   }
 
   // Funcion que va a llenar la grafica con la información de la cantidad de materia prima asignada y la cantidad extruida
@@ -1140,6 +1148,164 @@ export class PaginaPrincipalComponent implements OnInit {
     };
   }
 
+  // Funcion que va a llenar la grafica con informacion de los clientes
+  llenarGraficaClientes_Pedidos(){
+    this.mostrarGrafica = true;
+    this.nombreGrafica = `Grafica de Clientes`;
+    let clientes : any = [];
+    let costo : any = [];
+    let cantOt : any = [];
+    for (let i = 0; i < 5; i++) {
+      clientes.push(this.pedidosClientes[i].cliente);
+      costo.push(this.pedidosClientes[i].costo);
+      cantOt.push(this.pedidosClientes[i].cantidad);
+    }
+    this.multiAxisData = {
+      labels: clientes,
+      datasets: [{
+        label: 'Cantidad de Pedidos hechos ',
+        backgroundColor: [
+          '#AB47BC',
+          '#42A5F5',
+          '#66BB6A',
+          '#FFCA28',
+          '#26A69A'
+        ],
+        yAxisID: 'y',
+        data: cantOt
+      },
+      {
+        label: 'Valor Total de Pedidos ',
+        backgroundColor: [ '#F5B041', ],
+        yAxisID: 'y1',
+        data: costo
+      }]
+    };
+    this.multiAxisOptions = {
+      plugins: {
+        legend: {
+          labels: { color: '#495057' }
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: true
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#495057'
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: {
+            min: 0,
+            max: 100,
+            color: '#495057'
+          },
+          grid: { color: '#ebedef' }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          grid: {
+            drawOnChartArea: false,
+            color: '#ebedef'
+          },
+          ticks: {
+            min: 0,
+            max: 100,
+            color: '#495057'
+          }
+        }
+      }
+    };
+  }
+
+  // Funcion que va a llenar la grafica con informacion de los clientes
+  llenarGraficaProductos_Pedidos(){
+    this.mostrarGrafica = true;
+    this.nombreGrafica = `Grafica de Productos`;
+    let clientes : any = [];
+    let costo : any = [];
+    let cantOt : any = [];
+    for (let i = 0; i < 5; i++) {
+      clientes.push(this.pedidosProductos[i].producto);
+      costo.push(this.pedidosProductos[i].costo);
+      cantOt.push(this.pedidosProductos[i].cantidad);
+    }
+    this.multiAxisData = {
+      labels: clientes,
+      datasets: [{
+        label: 'Cantidad de Pedidos hechos ',
+        backgroundColor: [
+          '#AB47BC',
+          '#42A5F5',
+          '#66BB6A',
+          '#FFCA28',
+          '#26A69A'
+        ],
+        yAxisID: 'y',
+        data: cantOt
+      },
+      {
+        label: 'Valor Total de Pedidos ',
+        backgroundColor: [ '#F5B041', ],
+        yAxisID: 'y1',
+        data: costo
+      }]
+    };
+    this.multiAxisOptions = {
+      plugins: {
+        legend: {
+          labels: { color: '#495057' }
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: true
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#495057'
+          },
+          grid: { color: '#ebedef' }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: {
+            min: 0,
+            max: 100,
+            color: '#495057'
+          },
+          grid: { color: '#ebedef' }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          grid: {
+            drawOnChartArea: false,
+            color: '#ebedef'
+          },
+          ticks: {
+            min: 0,
+            max: 100,
+            color: '#495057'
+          }
+        }
+      }
+    };
+  }
+
   // Funcion que mostrará el modal de los estados de las ordenes de trabajo, adicional a eso le enviará parametros para que realice la consulta
   mostrarModalEstados(estado : string){
     this.modalEstadosOrdenes = true;
@@ -1259,6 +1425,26 @@ export class PaginaPrincipalComponent implements OnInit {
   // Funcion que va a ordenar el ranking de clientes
   ordenarVendedoresPesoOrdenes(){
     this.vendedorOrdenesMes.sort((a,b) => Number(b.peso) - Number(a.peso));
+  }
+
+  // Funcion que va a ordenar el ranking de clientes en pedidos
+  ordenarClienteCantidad_Pedidos(){
+    this.pedidosClientes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+  }
+
+  // Funcion que va a ordenar el ranking de clientes en pedidos
+  ordenarClienteCosto_Pedidos(){
+    this.pedidosClientes.sort((a,b) => Number(b.costo) - Number(a.costo));
+  }
+
+  // Funcion que va a ordenar el ranking de productos en pedidos
+  ordenarProductoCantidad_Pedidos(){
+    this.pedidosProductos.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+  }
+
+  // Funcion que va a ordenar el ranking de productos en pedidos
+  ordenarProductoCosto_Pedidos(){
+    this.pedidosProductos.sort((a,b) => Number(b.costo) - Number(a.costo));
   }
 
   // Funcion que tomará unos parametros para mostrar un mensaje de error

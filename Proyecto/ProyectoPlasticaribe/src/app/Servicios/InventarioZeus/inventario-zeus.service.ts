@@ -76,4 +76,24 @@ readonly rutaInventarioZeusAPI = rutaZeus;
   getPedidosXConsecutivo(id : any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosPorConsecutivo/${id}`);
   }
+
+  getPedidosCliente() {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosCliente`);
+  }
+
+  getPedidosProductos() {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosProductos`);
+  }
+
+  getPedidosVendedores() {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosVendedores`);
+  }
+
+  getPedidosEstados() {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosEstados`);
+  }
+
+  getPedidosStock() {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosStock`);
+  }
 }

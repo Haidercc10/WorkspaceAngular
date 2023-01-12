@@ -448,11 +448,19 @@
             <div class="card-body">
               <h5 class="card-title">Ranking de cantidad de pedidos por clientes. <br> Ranking de costo de pedidos por clientes.</h5>
               <p class="card-text"></p>
+              <div style="height: 10%; text-align: center;">
+                <button pButton pTooltip="Ordenar por Número de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarClienteCantidad_Pedidos()"></button>
+                <button pButton pTooltip="Ordenar por Costo Total de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarClienteCosto_Pedidos()"></button>
+                <!-- <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button> -->
+              </div>
+              <br>
               <div class="scrollCard">
-                <p class="card-text">
-                  <span>{{1 + 1}}) <b></b>. <br></span>
+                <p class="card-text" *ngFor="let item of pedidosClientes; let i=index">
+                  <span class="card-text">{{i+1}}) <b>{{item.cliente}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
                 </p>
               </div>
+              <br>
+              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaClientes_Pedidos()"></button>
             </div>
           </div>
         </div>
@@ -464,11 +472,19 @@
             <div class="card-body">
               <h5 class="card-title">Ranking de cantidad de pedidos por productos</h5>
               <p class="card-text"></p>
+              <div style="height: 10%; text-align: center;">
+                <button pButton pTooltip="Ordenar por Número de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarProductoCantidad_Pedidos()"></button>
+                <button pButton pTooltip="Ordenar por Costo Total de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarProductoCosto_Pedidos()"></button>
+                <!-- <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button> -->
+              </div>
+              <br>
               <div class="scrollCard">
-                <p class="card-text">
-                  <span>{{1 + 1}}) <b></b>. <br></span>
+                <p class="card-text" *ngFor="let item of pedidosProductos; let i=index">
+                  <span class="card-text">{{i+1}}) <b>{{item.producto}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
                 </p>
               </div>
+              <br>
+              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaProductos_Pedidos()"></button>
             </div>
           </div>
         </div>
@@ -478,7 +494,7 @@
           <div class="card h-100">
             <div class="banner"></div>
             <div class="card-body">
-              <h5 class="card-title">Ranking de cantidad de pedidos por vendedores. <br> Ranking de costo de pedidos por vendedores.</h5>
+              <h5 class="card-title">Número de pedidos por estados. <br> Número de pedidos creados en el mes.</h5>
               <p class="card-text"></p>
               <div class="scrollCard">
                 <p class="card-text">
