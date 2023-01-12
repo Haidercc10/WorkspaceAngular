@@ -138,6 +138,8 @@ export class PaginaPrincipalComponent implements OnInit {
   pedidosPendientes_Ot : any [] = []; //Variable que se llenará con la información de los pedidos con estado "Pendiente" y con OT asociadas
   pedidosStock : any [] = []; //Variable que se llenará con los pedidos con un stock (de producto pedido) igual o mayor a la cantidad pediente
 
+  estadosPedidos : any [] = [];
+
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
                   private vistasFavService : VistasFavoritasService,
@@ -161,6 +163,7 @@ export class PaginaPrincipalComponent implements OnInit {
       this.cantOrdenesUltimoMes();
       this.materiasPrimas();
     }, 500);
+    this.pedidosPorEstados();
   }
 
   // Funcion que leerá la informacion del usuario logeado, infomración que se almacena apenas el usuario incia sesion
@@ -727,6 +730,17 @@ export class PaginaPrincipalComponent implements OnInit {
   // Funcion que va a consultar la información general de los pedidos creados en Zeus
   pedidosZeus(){
 
+  }
+
+  /** Función para mostrar la card con el numero de pedidos por estados */
+  pedidosPorEstados(){
+    this.estadosPedidos = [];
+    this.zeusService.getPedidosXEstados().subscribe(dataPedidos => {
+      for (let index = 0; index < dataPedidos.length; index++) {
+        this.estadosPedidos.push(dataPedidos[index]);
+        console.log(this.estadosPedidos);
+      }
+    });
   }
 
   // Funcion que va a llenar la grafica con la información de la cantidad de materia prima asignada y la cantidad extruida

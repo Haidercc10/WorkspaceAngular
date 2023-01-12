@@ -451,6 +451,7 @@
               <div class="scrollCard">
                 <p class="card-text">
                   <span>{{1 + 1}}) <b></b>. <br></span>
+
                 </p>
               </div>
             </div>
@@ -497,8 +498,8 @@
               <h5 class="card-title">Número de pedidos por estados. <br> Número de pedidos creados en el mes.</h5>
               <p class="card-text"></p>
               <div class="scrollCard">
-                <p class="card-text">
-                  <span>{{1 + 1}}) <b></b>. <br></span>
+                <p class="card-text" *ngFor="let data of estadosPedidos; let i=index">
+                  <span>{{i + 1}}) <b> Estado </b>. <br></span>
                 </p>
               </div>
             </div>

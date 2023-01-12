@@ -61,9 +61,9 @@ export let rutaBagPro = "http://192.168.0.85:9095/api"; //Ruta al servidor de la
 
 
 /* RUTA PRINCIPAL DE API ZEUS */
- export let rutaZeus = "http://192.168.0.85:9055/api"; //Ruta al servidor de la base de datos de Zeus --- SERVIDOR
+//export let rutaZeus = "http://192.168.0.85:9055/api"; //Ruta al servidor de la base de datos de Zeus --- SERVIDOR
 //export let rutaZeus = "https://localhost:7283/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
-// export let rutaZeus = "http://192.168.0.140:9055/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
+export let rutaZeus = "http://192.168.0.140:9055/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
 // export let rutaZeus = "http://192.168.0.153:9075/api" //Ruta al servidor de la base de datos de Zeus --- LOCAL
 
 /***************************************************************************************************
