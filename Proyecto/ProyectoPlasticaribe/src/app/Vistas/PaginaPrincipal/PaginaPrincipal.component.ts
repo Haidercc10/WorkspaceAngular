@@ -163,7 +163,6 @@ export class PaginaPrincipalComponent implements OnInit {
       this.cantOrdenesUltimoMes();
       this.materiasPrimas();
     }, 500);
-    this.pedidosPorEstados();
   }
 
   // Funcion que leerá la informacion del usuario logeado, infomración que se almacena apenas el usuario incia sesion
@@ -733,22 +732,14 @@ export class PaginaPrincipalComponent implements OnInit {
     this.zeusService.getPedidosCliente().subscribe(datos_pedidos => { this.pedidosClientes = datos_pedidos; });
     // Pedidos Productos
     this.zeusService.getPedidosProductos().subscribe(datos_pedidos => { this.pedidosProductos = datos_pedidos; });
+    //Pedidos Vendedores
+    this.zeusService.getPedidosVendedores().subscribe(datos_pedidos => { this.pedidosVendedores = datos_pedidos });
 
     setTimeout(() => {
       this.pedidosClientes.sort((a,b) => b.cantidad - a.cantidad);
       this.pedidosProductos.sort((a,b) => b.cantidad - a.cantidad);
+      this.pedidosVendedores.sort((a,b) => b.cantidad - a.cantidad);
     }, 500);
-  }
-
-  /** Función para mostrar la card con el numero de pedidos por estados */
-  pedidosPorEstados(){
-    this.estadosPedidos = [];
-    this.zeusService.getPedidosXEstados().subscribe(dataPedidos => {
-      for (let index = 0; index < dataPedidos.length; index++) {
-        this.estadosPedidos.push(dataPedidos[index]);
-        console.log(this.estadosPedidos);
-      }
-    });
   }
 
   // Funcion que va a llenar la grafica con la información de la cantidad de materia prima asignada y la cantidad extruida
@@ -1210,15 +1201,13 @@ export class PaginaPrincipalComponent implements OnInit {
           ticks: {
             color: '#495057'
           },
-          grid: { color: '#ebedef' }
+          grid: { color: '#ebedef' },
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
           ticks: {
-            min: 0,
-            max: 100,
             color: '#495057'
           },
           grid: { color: '#ebedef' }
@@ -1232,13 +1221,85 @@ export class PaginaPrincipalComponent implements OnInit {
             color: '#ebedef'
           },
           ticks: {
-            min: 0,
-            max: 100,
             color: '#495057'
           }
         }
       }
     };
+  }
+
+  llenarGraficaVendedores_Pedidos(){
+    this.mostrarGrafica = true;
+    this.nombreGrafica = `Grafica de Vendedores`;
+    let vendedores : any = [];
+    let costo : any = [];
+    let cantidad_Pedidos : any = [];
+    for(let i = 0; i < 5; i++) {
+      vendedores.push(this.pedidosVendedores[i].vendedor);
+      costo.push(this.pedidosVendedores[i].costo);
+      cantidad_Pedidos.push(this.pedidosVendedores[i].cantidad);
+    }
+    this.multiAxisData = {
+      labels: vendedores,
+      datasets : [{
+        label: `Cantidad de pedidos`,
+        backgroundColor : [
+          '#AB47BC',
+          '#42A5F5',
+          '#66BB6A',
+          '#FFCA28',
+          '#26A69A'
+        ],
+        yAxisID: 'y',
+        data : cantidad_Pedidos
+      },
+      {
+        label: `Valor total de Pedidos`,
+        backgroundColor: ['#F5B041', ],
+        yAxisID: 'y1',
+        data: costo
+      }]
+    };
+    this.multiAxisOptions = {
+      plugins : {
+        legend: {
+          labels: {color: '#495057'}
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: true
+        },
+      },
+        scales: {
+          x : {
+            ticks : {
+              color: '#495057'
+            },
+            grid : {color : '#ebedef'}
+          },
+          y : {
+            type: 'linear',
+            display : true,
+            position : 'left',
+            ticks: {
+              color: '#495057'
+            },
+            grid : { color: '#ebedef' }
+          },
+          y1 : {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            ticks : {
+              color: '#495057'
+            },
+            grid: {
+              drawOnChartArea: false,
+              color: '#ebedef',
+            }
+          }
+        }
+    }
   }
 
   // Funcion que va a llenar la grafica con informacion de los clientes
@@ -1459,6 +1520,16 @@ export class PaginaPrincipalComponent implements OnInit {
   // Funcion que va a ordenar el ranking de productos en pedidos
   ordenarProductoCosto_Pedidos(){
     this.pedidosProductos.sort((a,b) => Number(b.costo) - Number(a.costo));
+  }
+
+   // Funcion que va a ordenar el ranking de vendedores en pedidos
+   ordenarVendedorCantidad_Pedidos(){
+    this.pedidosVendedores.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+  }
+
+  // Funcion que va a ordenar el ranking de vendedores en pedidos
+  ordenarVendedorCosto_Pedidos(){
+    this.pedidosVendedores.sort((a,b) => Number(b.costo) - Number(a.costo));
   }
 
   // Funcion que tomará unos parametros para mostrar un mensaje de error
