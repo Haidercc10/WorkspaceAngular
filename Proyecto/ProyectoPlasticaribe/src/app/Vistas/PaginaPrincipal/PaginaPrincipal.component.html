@@ -518,11 +518,17 @@
           <div class="card h-100">
             <div class="banner"></div>
             <div class="card-body">
-              <h5 class="card-title">Número de pedidos por estados. <br> Número de pedidos creados en el mes.</h5>
-              <p class="card-text"></p>
+              <h5 class="card-title">Cantidad Total de pedidos.</h5>
               <div class="scrollCard">
-                <p class="card-text" *ngFor="let data of estadosPedidos; let i=index">
-                  <span>{{i + 1}}) <b> Estado </b>. <br></span>
+                <p class="card-text" *ngFor="let item of pedidosTotales; let i=index">
+                  <span class="card-text">Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
+                </p>
+              </div>
+              <br>
+              <h5 class="card-title">Número de pedidos por estados.</h5>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of pedidosEstados; let i=index">
+                  <span class="card-text">{{i+1}}) <b>{{item.estado}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
                 </p>
               </div>
             </div>
@@ -537,8 +543,8 @@
               <h5 class="card-title">Número de pedidos con ordenes de trabajo asociadas.</h5>
               <p class="card-text"></p>
               <div class="scrollCard">
-                <p class="card-text">
-                  <span>{{1 + 1}}) <b></b>. <br></span>
+                <p class="card-text" *ngFor="let item of pedidos_Ot; let i=index">
+                  <span class="card-text">{{i+1}}) Pedido: <b>{{item.pedido}}</b> <br> Orden de Trabajo: <b>{{item.orden}}</b> <br> Producto: <b>{{item.producto}}</b><br> Cliente: <b>{{item.cliente}}</b>. <br> Proceso de La OT: <b>{{item.proceso}}</b></span><br>
                 </p>
               </div>
             </div>
@@ -553,8 +559,8 @@
               <h5 class="card-title">Listado de pedidos en los que el stock del producto pedido sea mayor o igual que la cantidad que está pendiente.</h5>
               <p class="card-text"></p>
               <div class="scrollCard">
-                <p class="card-text">
-                  <span>{{1 + 1}}) <b></b>. <br></span>
+                <p class="card-text" *ngFor="let item of pedidosStock; let i=index">
+                  <span class="card-text">{{i+1}}) Pedido: <b>{{item.consecutivo}}</b> <br> Producto: <b>{{item.producto}}</b><br> Existencias: <label class="verdeClientes"><b>{{item.existencias | number}}</b></label>.<br> Cantidad Pendiente: <b>{{item.cant_Pendiente | number}}</b></span><br>
                 </p>
               </div>
             </div>

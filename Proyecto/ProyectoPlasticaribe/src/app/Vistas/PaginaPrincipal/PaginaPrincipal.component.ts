@@ -132,10 +132,9 @@ export class PaginaPrincipalComponent implements OnInit {
   pedidosClientes : any [] = []; //Variable que se llenará con la información de los pedidos agrupados por clientes
   pedidosProductos : any [] = []; //Variable que se llenará con la información de los pedidos agrupados por productos
   pedidosVendedores : any [] = []; //Variable que se llenará con la información de los pedidos agrupados por vendedores
-  pedidosParcSatisfechos : number = 0; //Variable que se llenará con la información de los pedidos con estado "Parcialmente Satisfecho"
-  pedidosPendientes : number = 0; //Variable que se llenará con la información de los pedidos con estado "Pendiente"
-  pedidosParcStisfechos_Ot : any [] = []; //Variable que se llenará con la información de los pedidos con estado "Parcialmente Satisfecho" y que tengan OT asociadas
-  pedidosPendientes_Ot : any [] = []; //Variable que se llenará con la información de los pedidos con estado "Pendiente" y con OT asociadas
+  pedidosEstados : any [] = []; //Variable que se llenará con la información de los pedidos con estado "Parcialmente Satisfecho" y con estado "Pendiente"
+  pedidosTotales : any [] = []; //VAriable que se llenará con la infromación de los totales de los pedidos
+  pedidos_Ot : any [] = []; //Variable que se llenará con la información de los pedidos que tengan OT asociadas
   pedidosStock : any [] = []; //Variable que se llenará con los pedidos con un stock (de producto pedido) igual o mayor a la cantidad pediente
 
   estadosPedidos : any [] = [];
@@ -163,6 +162,13 @@ export class PaginaPrincipalComponent implements OnInit {
       this.cantOrdenesUltimoMes();
       this.materiasPrimas();
     }, 500);
+  }
+
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => {
+    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
+    const rep = '$1,';
+    return number.toString().replace(exp,rep);
   }
 
   // Funcion que leerá la informacion del usuario logeado, infomración que se almacena apenas el usuario incia sesion
@@ -735,10 +741,71 @@ export class PaginaPrincipalComponent implements OnInit {
     //Pedidos Vendedores
     this.zeusService.getPedidosVendedores().subscribe(datos_pedidos => { this.pedidosVendedores = datos_pedidos });
 
+    // Pedidos Estados
+    this.zeusService.getPedidosEstados().subscribe(datos_pedidos => {
+      this.pedidosTotales = [];
+      this.pedidosEstados = datos_pedidos;
+      let info = { cantidad : 0, costo: 0 };
+      for (let i = 0; i < datos_pedidos.length; i++) {
+        info.cantidad += datos_pedidos[i].cantidad;
+        info.costo += datos_pedidos[i].costo;
+      }
+      this.pedidosTotales.push(info);
+    });
+
+    // Pedidos con ordenes de trabajo asociadas
+    this.zeusService.GetPedidos().subscribe(datos_pedidos => {
+      for (let i = 0; i < datos_pedidos.length; i++) {
+        this.ordenTrabajoService.GetOrdenesTrabajo_Pedido(datos_pedidos[i].consecutivo).subscribe(datos_orden => {
+          for (let j = 0; j < datos_orden.length; j++) {
+            let info : any = {
+              pedido : datos_pedidos[i].consecutivo,
+              orden : datos_orden[j].estProcOT_OrdenTrabajo,
+              cliente : datos_pedidos[i].cliente,
+              producto : datos_pedidos[i].producto,
+              proceso : ''
+            }
+            if (datos_orden[j].estProcOT_ExtrusionKg > 0) {
+              info.proceso = `Extrusión ${this.formatonumeros(datos_orden[j].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
+            }
+            if (datos_orden[j].estProcOT_ImpresionKg > 0) {
+              info.proceso = `Impresión ${this.formatonumeros(datos_orden[j].estProcOT_ImpresionKg.toFixed(2))} Kg`;
+            }
+            if (datos_orden[j].estProcOT_RotograbadoKg > 0) {
+              info.proceso = `Rotograbado ${this.formatonumeros(datos_orden[j].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
+            }
+            if (datos_orden[j].estProcOT_LaminadoKg > 0) {
+              info.proceso = `Laminado ${this.formatonumeros(datos_orden[j].estProcOT_LaminadoKg.toFixed(2))} Kg`;
+            }
+            if (datos_orden[j].estProcOT_CorteKg > 0) {
+              info.proceso = `Corte - ${this.formatonumeros(datos_orden[j].estProcOT_CorteKg.toFixed(2))} Kg`;
+            }
+            if (datos_orden[j].estProcOT_DobladoKg > 0) {
+              info.proceso = `Doblado ${this.formatonumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
+            }
+            if (datos_orden[j].estProcOT_EmpaqueKg > 0) {
+              info.proceso = `Empaque ${this.formatonumeros(datos_orden[j].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
+            }
+            if (datos_orden[j].estProcOT_SelladoKg > 0) {
+              info.proceso = `Sellado ${this.formatonumeros(datos_orden[j].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[j].estProcOT_SelladoKg.toFixed(2))} Kg`;
+            }
+            if (datos_orden[j].estProcOT_WiketiadoKg > 0) {
+              info.proceso = `Wiketiado ${this.formatonumeros(datos_orden[j].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[j].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
+            }
+            this.pedidos_Ot.push(info);
+          }
+        });
+      }
+    });
+
+    //Pedidos Stock
+    this.zeusService.getPedidosStock().subscribe(datos_pedidos => { this.pedidosStock = datos_pedidos; });
+
     setTimeout(() => {
       this.pedidosClientes.sort((a,b) => b.cantidad - a.cantidad);
       this.pedidosProductos.sort((a,b) => b.cantidad - a.cantidad);
       this.pedidosVendedores.sort((a,b) => b.cantidad - a.cantidad);
+      this.pedidosStock.sort((a,b) => a.consecutivo - b.consecutivo);
     }, 500);
   }
 

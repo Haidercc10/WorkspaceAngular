@@ -295,30 +295,27 @@ export class DesperdicioComponent implements OnInit {
         }
       }
       setTimeout(() => {
-        if (exits) this.mensajesAdvertencia(`¡Ya hay una orden de trabajo con el número ${this.FormDesperdicio.value.OTDesperdicio} y la "No Conformidad" ${this.FormDesperdicio.value.TipoNoConformidad} del área de ${this.FormDesperdicio.value.Area} en la tabla!`);
-        else {
-          let info : any = {
-            Ot : this.FormDesperdicio.value.OTDesperdicio,
-            IdMaquina : this.FormDesperdicio.value.IdMaquina,
-            Maquina : this.FormDesperdicio.value.Maquina,
-            IdItem : this.FormDesperdicio.value.IdProducto,
-            Item : `${this.FormDesperdicio.value.IdProducto} - ${this.FormDesperdicio.value.Producto}`,
-            IdMateria : parseInt(this.FormDesperdicio.value.IdTipoMaterial.trim()),
-            Material : this.FormDesperdicio.value.TipoMaterial,
-            IdOperario : this.FormDesperdicio.value.IdOperario,
-            Operario : this.FormDesperdicio.value.Operario,
-            IdNoConformidad : this.FormDesperdicio.value.IdTipoNoConformidad,
-            NoConformidad : this.FormDesperdicio.value.TipoNoConformidad,
-            Cantidad : this.FormDesperdicio.value.CantidadKg,
-            Impreso : this.FormDesperdicio.value.Impreso,
-            Observacion : this.FormDesperdicio.value.Observacion,
-            Fecha : this.FormDesperdicio.value.Fecha,
-            IdArea : this.FormDesperdicio.value.IdArea,
-            Area : this.FormDesperdicio.value.Area,
-          }
-          this.grupoDespercios.push(info);
-          this.limpiarCampos();
+        let info : any = {
+          Ot : this.FormDesperdicio.value.OTDesperdicio,
+          IdMaquina : this.FormDesperdicio.value.IdMaquina,
+          Maquina : this.FormDesperdicio.value.Maquina,
+          IdItem : this.FormDesperdicio.value.IdProducto,
+          Item : `${this.FormDesperdicio.value.IdProducto} - ${this.FormDesperdicio.value.Producto}`,
+          IdMateria : parseInt(this.FormDesperdicio.value.IdTipoMaterial.trim()),
+          Material : this.FormDesperdicio.value.TipoMaterial,
+          IdOperario : this.FormDesperdicio.value.IdOperario,
+          Operario : this.FormDesperdicio.value.Operario,
+          IdNoConformidad : this.FormDesperdicio.value.IdTipoNoConformidad,
+          NoConformidad : this.FormDesperdicio.value.TipoNoConformidad,
+          Cantidad : this.FormDesperdicio.value.CantidadKg,
+          Impreso : this.FormDesperdicio.value.Impreso,
+          Observacion : this.FormDesperdicio.value.Observacion,
+          Fecha : this.FormDesperdicio.value.Fecha,
+          IdArea : this.FormDesperdicio.value.IdArea,
+          Area : this.FormDesperdicio.value.Area,
         }
+        this.grupoDespercios.push(info);
+        this.limpiarCampos();
       }, 1000);
     } else this.mensajesAdvertencia(`¡Hay Campos Vacios!`);
   }
@@ -361,7 +358,7 @@ export class DesperdicioComponent implements OnInit {
         this.llenarDatosPdf();
         this.limpiarTodo();
       }
-    }, 10 * this.grupoDespercios.length);
+    }, 2000);
   }
 
   // Funcion que creará un PDF del desperdicio ingresado

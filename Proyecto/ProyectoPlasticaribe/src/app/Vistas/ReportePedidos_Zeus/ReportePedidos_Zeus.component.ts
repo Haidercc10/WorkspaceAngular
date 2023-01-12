@@ -50,6 +50,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   modalEstadosOrdenes : boolean = false;
   consecutivoPedido : any = '';
 
+  pedido : any = null
+
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
@@ -106,6 +108,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       }
     });
     setTimeout(() => { this.cargando = false; }, 2000);
+    setTimeout(() => {
+      this.pedido = 16614
+    }, 3000);
   }
 
   @Input() get columnasSeleccionada(): any[] {
