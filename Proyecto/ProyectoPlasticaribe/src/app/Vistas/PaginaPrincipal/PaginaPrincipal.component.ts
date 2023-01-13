@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MenuItem, MessageService } from 'primeng/api';
@@ -13,6 +13,10 @@ import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/Vistas
 import Swal from 'sweetalert2';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import DataLabelsPlugin from 'chartjs-plugin-datalabels';
+
+@Injectable({
+  providedIn: 'root'
+})
 
 @Component({
   selector: 'app-PaginaPrincipal',

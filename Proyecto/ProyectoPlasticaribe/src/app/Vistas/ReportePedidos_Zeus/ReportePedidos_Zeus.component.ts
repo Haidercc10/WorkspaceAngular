@@ -52,6 +52,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   pedido : any = null
 
+  sumaCostoPendiente : number = 0;
+  sumaCostoTotal : number = 0;
+
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
@@ -158,12 +161,14 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       CantPedidaKg_OT : '',
       CantPedidaUnd_OT : '',
     }
+    this.sumaCostoPendiente += datos.costo_Cant_Pendiente;
+    this.sumaCostoTotal += datos.costo_Cant_Total;
 
     this.columnas = [
       { header: 'Precio U.', field: 'precioUnidad', type : 'number' },
       { header: 'OC Cliente', field: 'orden_Compra_CLiente'},
-      { header: 'Costo Cant. Pendiente', field: 'costo_Cant_Pendiente', type : 'number'},
-      { header: 'Costo Cant. Total', field: 'costo_Cant_Total', type : 'number' },
+      // { header: 'Costo Cant. Pendiente', field: 'costo_Cant_Pendiente', type : 'number'},
+      // { header: 'Costo Cant. Total', field: 'costo_Cant_Total', type : 'number' },
       { header: 'Fecha Creación', field: 'fecha_Creacion', type : 'date'},
       { header: 'Fecha Entrega', field: 'fecha_Entrega',  type : 'date'},
     ];

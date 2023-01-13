@@ -40,7 +40,7 @@
           styleClass="p-datatable-gridlines p-datatable-sm"
           responsiveLayout="scroll"
           [paginator]="true"
-          [rows]="20"
+          [rows]="ArrayDocumento.length"
           [showCurrentPageReport]="true"
           [(first)]="first"
           currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
@@ -97,6 +97,12 @@
               <th>
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Proceso_OT', 'contains')" class="w-full">
               </th>
+              <th>
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costo_Cant_Pendiente', 'contains')" class="w-full">
+              </th>
+              <th>
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costo_Cant_Total', 'contains')" class="w-full">
+              </th>
               <th *ngFor="let col of columns">
                 <input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')" class="w-full">
               </th>
@@ -142,6 +148,12 @@
               <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="Proceso_OT">Proceso Actual
                 <p-sortIcon field="Proceso_OT"></p-sortIcon>
               </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="costo_Cant_Pendiente">Total Pendiente
+                <p-sortIcon field="costo_Cant_Pendiente"></p-sortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" scope="col" pSortableColumn="costo_Cant_Total">Total
+                <p-sortIcon field="costo_Cant_Total"></p-sortIcon>
+              </th>
               <th *ngFor="let col of columns" style="font-size: 14px;">
                 {{col.header}}
               </th>
@@ -161,10 +173,10 @@
               <td style="text-align: center;" scope="col" title="Existencias" (dblclick)="varOrdenTranajo(data)">{{data.existencias | number : '1.2-2'}}</td>
               <td style="text-align: center;" scope="col" title="Presentación" (dblclick)="varOrdenTranajo(data)">{{data.presentacion}}</td>
               <ng-container *ngIf="data.estado == 'Pendiente'">
-                  <td style="text-align: center;" scope="col" title="{{titlePendiente}}." data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-danger1">{{data.estado}}</span></td>
+                <td style="text-align: center;" scope="col" title="{{titlePendiente}}." data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-danger1">{{data.estado}}</span></td>
               </ng-container>
               <ng-container *ngIf="data.estado == 'Parcialmente Satisfecho'">
-                  <td style="text-align: center;" scope="col" title="{{titleParcial}}" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-warning1">{{data.estado}}</span></td>
+                <td style="text-align: center;" scope="col" title="{{titleParcial}}" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-warning1">{{data.estado}}</span></td>
               </ng-container>
               <td scope="col" title="Vendedor">{{data.vendedor}}</td>
               <td style="text-align: center;" scope="col" pEditableColumn>
@@ -186,18 +198,22 @@
                 <span class="badge verde" *ngIf="data.CantPesada >= data.CantPedidaKg_OT || data.Proceso_OT >= data.CantPedidaUnd_OT">{{data.Proceso_OT}}</span> <!-- Terminada -->
                 <span class="badge amarillo" *ngIf="(data.CantPesada < data.CantPedidaKg_OT || data.Proceso_OT < data.CantPedidaUnd_OT) && data.CantPesada > 0">{{data.Proceso_OT}}</span> <!-- En Proceso -->
               </td>
+              <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.costo_Cant_Pendiente}}</td>
+              <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.costo_Cant_Total}}</td>
               <td *ngFor="let col of columns">{{data[col.field]}}</td>
               <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
             </tr>
           </ng-template>
 
           <!-- Footer de la Tabla -->
-          <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
-            <tr>
-              <td colspan="15" class="text-right">
-              </td>
-            </tr>
-          </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="12" class="text-right">Totales</td>
+            <td>{{sumaCostoPendiente | number : '1.2-2'}}</td>
+            <td>{{sumaCostoTotal | number : '1.2-2'}}</td>
+            <td>COP</td>
+          </tr>
+        </ng-template>
 
           <ng-template pTemplate="summary">
             <div class="p-d-flex p-ai-center p-jc-between">
