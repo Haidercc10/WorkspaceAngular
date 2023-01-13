@@ -16,6 +16,7 @@ import { EstadosProcesosOTxVendedoresService } from 'src/app/Servicios/EstadosPr
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { FilterService } from 'primeng/api';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -90,7 +91,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
                             private servicioBagPro : BagproService,
                               private usuarioService : UsuarioService,
                                 private clientesService : ClientesService,
-                                  private productosService : ProductoService,) {
+                                  private productosService : ProductoService,
+                                    private paginaPrincipal : PaginaPrincipalComponent) {
 
     this.formularioOT = this.frmBuilder.group({
       idDocumento : [null],
@@ -1414,6 +1416,8 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           this.consultarOT();
           this.cambiarEstadoBagPro();
           this.ArrayDocumentoDialog = false;
+          setTimeout(() => { if (this.modeModal) this.paginaPrincipal.cantOrdenesUltimoMes(); }, 1500);
+
         });
       }
     });

@@ -14,6 +14,7 @@ import moment from 'moment';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -88,7 +89,8 @@ export class ReporteCostosOTComponent implements OnInit {
                               private appComponent : AppComponent,
                                 private boppService : EntradaBOPPService,
                                   private tintaService : TintasService,
-                                    private estadosProcesos_OTService : EstadosProcesos_OTService) {
+                                    private estadosProcesos_OTService : EstadosProcesos_OTService,
+                                      private paginaPrincipal : PaginaPrincipalComponent) {
 
     this.infoOT = this.frmBuilderMateriaPrima.group({
       ot : ['',Validators.required],
@@ -1262,6 +1264,7 @@ export class ReporteCostosOTComponent implements OnInit {
           }
         } else if (estado == '4')estado = 3; //ANULADA
         this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
+          setTimeout(() => { if (this.modeModal) this.paginaPrincipal.cantOrdenesUltimoMes(); }, 1500);
         });
       }
     });

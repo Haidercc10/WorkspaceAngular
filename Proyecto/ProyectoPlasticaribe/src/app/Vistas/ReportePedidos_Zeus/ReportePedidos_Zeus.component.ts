@@ -258,7 +258,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:P3');
+        worksheet.mergeCells('A1:S3');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
 
         datos.forEach(d => {

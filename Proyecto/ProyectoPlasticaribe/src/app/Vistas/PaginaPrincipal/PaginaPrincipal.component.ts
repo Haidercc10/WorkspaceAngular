@@ -158,9 +158,7 @@ export class PaginaPrincipalComponent implements OnInit {
     this.buscarFavoritos();
     setTimeout(() => {
       this.mostrarVistasFav();
-      this.facturacion();
-      this.cantOrdenesUltimoMes();
-      this.materiasPrimas();
+      this.tiempoExcedido();
     }, 500);
   }
 
@@ -169,6 +167,19 @@ export class PaginaPrincipalComponent implements OnInit {
     const exp = /(\d)(?=(\d{3})+(?!\d))/g;
     const rep = '$1,';
     return number.toString().replace(exp,rep);
+  }
+
+  //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
+  recargar(){
+    setTimeout(() => { this.tiempoExcedido(); }, 60000);
+  }
+
+  //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
+  tiempoExcedido() {
+    this.facturacion();
+    this.cantOrdenesUltimoMes();
+    this.materiasPrimas();
+    this.recargar();
   }
 
   // Funcion que leerá la informacion del usuario logeado, infomración que se almacena apenas el usuario incia sesion
@@ -270,7 +281,7 @@ export class PaginaPrincipalComponent implements OnInit {
       // DEPERDICIO
       { id : 45, nombre : 'Deperdicio', icono : 'assets/Iconos_Menu/caja.png', categoria: 'Deperdicio', ruta : './desperdicio', roles : [1, 12], },
 
-      //47
+      // SIGUIENTE 48
     ];
   }
 
@@ -502,6 +513,13 @@ export class PaginaPrincipalComponent implements OnInit {
     this.procesosOrdenesMes = [];
     this.totalOrdenesMes = 0;
     this.costoTotalOrdenesMes = 0;
+    this.materialesOrdenesMes = [];
+    this.catidadOTAbiertas = 0;
+    this.cantidadOTAsignadas = 0;
+    this.cantidadOTTerminada = 0;
+    this.cantidadOTIniciada = 0;
+    this.cantidadOtAnulada = 0;
+    this.cantidadOTCerrada = 0;
 
     if(this.ValidarRol == 1) {
       this.ordenTrabajoService.srvObtenerListaPorFechas(this.primerDiaMes, this.today).subscribe(datos_ot => {
@@ -604,6 +622,9 @@ export class PaginaPrincipalComponent implements OnInit {
     this.tintasCreadas = [];
     this.cantTintasCreadas = 0;
     this.materiasPrimasMasUtilizadasMes = [];
+    this.totalMpAsignada = 0;
+    this.totalExtruidoMes = 0;
+    this.materiasPrimasMasUtilizadasCrearTintaMes = [];
 
     if(this.ValidarRol == 1) {
       this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos_materiaPrima => {
@@ -740,7 +761,6 @@ export class PaginaPrincipalComponent implements OnInit {
     this.zeusService.getPedidosProductos().subscribe(datos_pedidos => { this.pedidosProductos = datos_pedidos; });
     //Pedidos Vendedores
     this.zeusService.getPedidosVendedores().subscribe(datos_pedidos => { this.pedidosVendedores = datos_pedidos });
-
     // Pedidos Estados
     this.zeusService.getPedidosEstados().subscribe(datos_pedidos => {
       this.pedidosTotales = [];
@@ -752,9 +772,9 @@ export class PaginaPrincipalComponent implements OnInit {
       }
       this.pedidosTotales.push(info);
     });
-
     // Pedidos con ordenes de trabajo asociadas
     this.zeusService.GetPedidos().subscribe(datos_pedidos => {
+      this.pedidos_Ot = [];
       for (let i = 0; i < datos_pedidos.length; i++) {
         this.ordenTrabajoService.GetOrdenesTrabajo_Pedido(datos_pedidos[i].consecutivo).subscribe(datos_orden => {
           for (let j = 0; j < datos_orden.length; j++) {
@@ -797,7 +817,6 @@ export class PaginaPrincipalComponent implements OnInit {
         });
       }
     });
-
     //Pedidos Stock
     this.zeusService.getPedidosStock().subscribe(datos_pedidos => { this.pedidosStock = datos_pedidos; });
 
@@ -1295,6 +1314,7 @@ export class PaginaPrincipalComponent implements OnInit {
     };
   }
 
+  //
   llenarGraficaVendedores_Pedidos(){
     this.mostrarGrafica = true;
     this.nombreGrafica = `Grafica de Vendedores`;

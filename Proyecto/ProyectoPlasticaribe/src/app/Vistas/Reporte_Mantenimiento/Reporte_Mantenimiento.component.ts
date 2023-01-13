@@ -5,6 +5,7 @@ import * as fs from 'file-saver';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Table } from 'primeng/table';
+import { AppComponent } from 'src/app/app.component';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { Tipo_ActivoService } from 'src/app/Servicios/TiposActivos/Tipo_Activo.service';
@@ -41,7 +42,8 @@ export class Reporte_MantenimientoComponent implements OnInit {
                 private rolService : RolesService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private activosService : ActivosService,
-                      private tipoActivoService : Tipo_ActivoService,) {
+                      private tipoActivoService : Tipo_ActivoService,
+                        private appComponent : AppComponent,) {
 
     this.FormActivos = this.frmBuilderMateriaPrima.group({
       ActivoId : [null, Validators.required],
@@ -80,16 +82,22 @@ export class Reporte_MantenimientoComponent implements OnInit {
       this.cargando = true;
       setTimeout(() => {
         const title = `Inventario Activos - ${this.today}`;
-        const header = ["Id", "Nombre", "Tipo Activo", "Fecha de Compra", "Precio Compra", "Fecha Último Mtto", "Precio Último Mtto", "Precio Total Mttos", "Depreciacion"]
+        const header = ["Id", "Nombre", "Tipo Activo", "Fecha de Compra", "Precio Compra", "Fecha Último Mtto", "Precio Último Mtto", "Precio Total Mttos", "Depreciación"]
         let datos : any =[];
         for (const item of this.InformacionActivos) {
           const datos1  : any = [item.Id, item.Nombre, item.TipoActivo, item.Fecha, item.FechaUltMtto, item.PrecioCompra, item.PrecioUltMtto, item.PrecioTotalMtto, item.Depreciacion];
           datos.push(datos1);
         }
         let workbook = new Workbook();
+        const imageId1 = workbook.addImage({
+          base64:  this.appComponent.logoParaPdf,
+          extension: 'png',
+        });
         let worksheet = workbook.addWorksheet(`Inventario Activos - ${this.today}`);
+        worksheet.addImage(imageId1, 'A1:A3');
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+        worksheet.addRow([]);
         worksheet.addRow([]);
         let headerRow = worksheet.addRow(header);
         headerRow.eachCell((cell, number) => {
@@ -100,7 +108,7 @@ export class Reporte_MantenimientoComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:I2');
+        worksheet.mergeCells('A1:I3');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
         datos.forEach(d => {
           let row = worksheet.addRow(d);
@@ -147,7 +155,7 @@ export class Reporte_MantenimientoComponent implements OnInit {
     this.activosService.GetTodo().subscribe(datos_activos => {
       for (let i = 0; i < datos_activos.length; i++) {
         this.activosService.GetInfoActivos(datos_activos[i].actv_Id).subscribe(datos_infoActivos => {
-          if (datos_infoActivos.length == 0) this.llenarTablaSinMantenimientos(datos_infoActivos);
+          if (datos_infoActivos == null) this.llenarTablaSinMantenimientos(datos_activos[i]);
           else this.llenarTabla(datos_infoActivos);
         }, error => { this.mensajesError(`¡No se ha podido buscar la información del activo ${datos_activos[i].actv_Nombre}!`, error.message); });
       }
@@ -177,7 +185,7 @@ export class Reporte_MantenimientoComponent implements OnInit {
       let info : any = {
         Id : datos.actv_Serial,
         Nombre : datos.actv_Nombre,
-        TipoActivo : datos_tiposActivos.TpActv_Nombre,
+        TipoActivo : datos_tiposActivos.tpActv_Nombre,
         Fecha : datos.actv_FechaCompra.replace('T00:00:00', ''),
         FechaUltMtto : '',
         PrecioCompra : datos.actv_PrecioCompra,
