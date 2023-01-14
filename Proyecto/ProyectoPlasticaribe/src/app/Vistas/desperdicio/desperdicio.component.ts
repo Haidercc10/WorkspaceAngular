@@ -8,6 +8,7 @@ import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
+import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -34,6 +35,7 @@ export class DesperdicioComponent implements OnInit {
   maquinas : any [] = []; //Variable que almacenará las diferentes maquinas
   grupoDespercios : any [] = []; //Variable que almacenará los desperdicios que se vayan ingresando para mstrarlos en la tabla
   datosPdf : any [] = []; //Variable que va a almacenar los datos ingresados a la base de datos
+  materiales : any [] = []; //Variable que va a tener la información de los materiales
 
   constructor(private frmBuilder : FormBuilder,
                 private rolService : RolesService,
@@ -44,16 +46,17 @@ export class DesperdicioComponent implements OnInit {
                           private fallasService : FallasTecnicasService,
                             private maquinasService : ActivosService,
                               private deperdicioService : DesperdicioService,
-                                private appComponent : AppComponent,) {
+                                private appComponent : AppComponent,
+                                  private materiaService : MaterialProductoService,) {
 
     this.FormDesperdicio = this.frmBuilder.group({
-      OTDesperdicio : [null, Validators.required],
+      OTDesperdicio : [null],
       IdMaquina : [null, Validators.required],
       Maquina : [null, Validators.required],
       IdOperario : [null, Validators.required],
       Operario : [null, Validators.required],
-      IdProducto : [null, Validators.required],
-      Producto : [null, Validators.required],
+      IdProducto : [null],
+      Producto : [null],
       IdTipoMaterial : [null, Validators.required],
       TipoMaterial : [null, Validators.required],
       Impreso : [null, Validators.required],
@@ -73,6 +76,7 @@ export class DesperdicioComponent implements OnInit {
     this.obtenerFallas();
     this.obtenerMaquinas();
     this.obtenerProcesos();
+    this.obtenerMateriales();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -147,6 +151,11 @@ export class DesperdicioComponent implements OnInit {
         if (datos_maquinas[i].tpActv_Id == 4) this.maquinas.push(datos_maquinas[i]);
       }
     });
+  }
+
+  // Funcion que va a consultar y obtener la inforamcion de los materiales
+  obtenerMateriales(){
+    this.materiaService.srvObtenerLista().subscribe(datos_materiales => { this.materiales = datos_materiales });
   }
 
   // Funcion que va a consultar el id de la falla y en su lugar colocará el nombre en el formulario
@@ -249,11 +258,40 @@ export class DesperdicioComponent implements OnInit {
     }, error => { this.mensajesError(`¡No se pudo obtener información del área seleccionada!`, error.message); });
   }
 
+  // Funcion que va a consultar el id del material y en su lugar colocará el nombre de este
+  buscarMaterial(){
+    this.materiaService.srvObtenerListaPorId(this.FormDesperdicio.value.TipoMaterial).subscribe(datos_material => {
+      this.FormDesperdicio.setValue({
+        OTDesperdicio : this.FormDesperdicio.value.OTDesperdicio,
+        IdMaquina : this.FormDesperdicio.value.IdMaquina,
+        Maquina : this.FormDesperdicio.value.Maquina,
+        IdOperario : this.FormDesperdicio.value.IdOperario,
+        Operario : this.FormDesperdicio.value.Operario,
+        IdProducto : this.FormDesperdicio.value.IdProducto,
+        Producto : this.FormDesperdicio.value.Producto,
+        IdTipoMaterial : datos_material.material_Id,
+        TipoMaterial : datos_material.material_Nombre,
+        Impreso : this.FormDesperdicio.value.Impreso,
+        IdTipoNoConformidad : this.FormDesperdicio.value.IdTipoNoConformidad,
+        TipoNoConformidad : this.FormDesperdicio.value.TipoNoConformidad,
+        CantidadKg : this.FormDesperdicio.value.CantidadKg,
+        Observacion : this.FormDesperdicio.value.Observacion,
+        IdArea : this.FormDesperdicio.value.IdArea,
+        Area : this.FormDesperdicio.value.Area,
+        Fecha : this.FormDesperdicio.value.Fecha,
+      });
+    }, error => { this.mensajesError(`¡No se pudo obtener información del material seleccionado!`, error.message); });
+  }
+
   // Funcion que consultará la informacion de la orden de trabajo
   consultarOrdenTrabajo(){
     this.cargando = true;
     let orden : number = this.FormDesperdicio.value.OTDesperdicio;
     this.bagProService.srvObtenerListaClienteOT_Item(orden).subscribe(datos_orden => {
+      if (datos_orden.length == 0) {
+        this.cargando = false;
+        this.mensajesError(`¡No se pudo obtener información de la orden de trabajo N° ${orden}!`);
+      }
       for (let i = 0; i < datos_orden.length; i++) {
         let imp : any = datos_orden[i].impresion.trim();
         if (imp == "1") imp = "SI";
@@ -287,36 +325,30 @@ export class DesperdicioComponent implements OnInit {
     this.cargando = true;
     let exits : boolean = false;
     if (this.FormDesperdicio.valid) {
-      for (let i = 0; i < this.grupoDespercios.length; i++) {
-        if (this.grupoDespercios[i].Ot == this.FormDesperdicio.value.OTDesperdicio
-          && this.grupoDespercios[i].NoConformidad == this.FormDesperdicio.value.TipoNoConformidad
-          && this.grupoDespercios[i].Area == this.FormDesperdicio.value.Area) {
-          exits = true;
-        }
+      if (this.FormDesperdicio.value.OTDesperdicio == null) this.FormDesperdicio.value.OTDesperdicio = 0;
+      if (this.FormDesperdicio.value.Producto == null) this.FormDesperdicio.value.Producto = `No aplica`;
+      if (this.FormDesperdicio.value.IdProducto == null) this.FormDesperdicio.value.IdProducto = 100163;
+      let info : any = {
+        Ot : this.FormDesperdicio.value.OTDesperdicio,
+        IdMaquina : this.FormDesperdicio.value.IdMaquina,
+        Maquina : this.FormDesperdicio.value.Maquina,
+        IdItem : this.FormDesperdicio.value.IdProducto,
+        Item : `${this.FormDesperdicio.value.IdProducto} - ${this.FormDesperdicio.value.Producto}`,
+        IdMateria : parseInt(this.FormDesperdicio.value.IdTipoMaterial),
+        Material : this.FormDesperdicio.value.TipoMaterial,
+        IdOperario : this.FormDesperdicio.value.IdOperario,
+        Operario : this.FormDesperdicio.value.Operario,
+        IdNoConformidad : this.FormDesperdicio.value.IdTipoNoConformidad,
+        NoConformidad : this.FormDesperdicio.value.TipoNoConformidad,
+        Cantidad : this.FormDesperdicio.value.CantidadKg,
+        Impreso : this.FormDesperdicio.value.Impreso,
+        Observacion : this.FormDesperdicio.value.Observacion,
+        Fecha : this.FormDesperdicio.value.Fecha,
+        IdArea : this.FormDesperdicio.value.IdArea,
+        Area : this.FormDesperdicio.value.Area,
       }
-      setTimeout(() => {
-        let info : any = {
-          Ot : this.FormDesperdicio.value.OTDesperdicio,
-          IdMaquina : this.FormDesperdicio.value.IdMaquina,
-          Maquina : this.FormDesperdicio.value.Maquina,
-          IdItem : this.FormDesperdicio.value.IdProducto,
-          Item : `${this.FormDesperdicio.value.IdProducto} - ${this.FormDesperdicio.value.Producto}`,
-          IdMateria : parseInt(this.FormDesperdicio.value.IdTipoMaterial.trim()),
-          Material : this.FormDesperdicio.value.TipoMaterial,
-          IdOperario : this.FormDesperdicio.value.IdOperario,
-          Operario : this.FormDesperdicio.value.Operario,
-          IdNoConformidad : this.FormDesperdicio.value.IdTipoNoConformidad,
-          NoConformidad : this.FormDesperdicio.value.TipoNoConformidad,
-          Cantidad : this.FormDesperdicio.value.CantidadKg,
-          Impreso : this.FormDesperdicio.value.Impreso,
-          Observacion : this.FormDesperdicio.value.Observacion,
-          Fecha : this.FormDesperdicio.value.Fecha,
-          IdArea : this.FormDesperdicio.value.IdArea,
-          Area : this.FormDesperdicio.value.Area,
-        }
-        this.grupoDespercios.push(info);
-        this.limpiarCampos();
-      }, 1000);
+      this.grupoDespercios.push(info);
+      this.limpiarCampos();
     } else this.mensajesAdvertencia(`¡Hay Campos Vacios!`);
   }
 

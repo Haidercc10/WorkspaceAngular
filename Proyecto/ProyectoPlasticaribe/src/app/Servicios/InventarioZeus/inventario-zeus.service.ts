@@ -57,6 +57,10 @@ readonly rutaInventarioZeusAPI = rutaZeus;
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/GetIvaCompraTodosMeses/${mes}`);
   }
 
+  GetPedidosAgrupados(){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosAgrupados`);
+  }
+
   GetPedidos(){
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidos`);
   }

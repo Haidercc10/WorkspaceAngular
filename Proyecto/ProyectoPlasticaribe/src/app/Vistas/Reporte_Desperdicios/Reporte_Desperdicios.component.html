@@ -93,6 +93,30 @@
       [rowsPerPageOptions]="[5, 10, 15, 20]"
       currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros">
       <ng-template pTemplate="header">
+        <tr title="Filtros para realizar busquedas de cada campo">
+          <th>
+            <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'OT', 'contains')" class="w-full">
+          </th>
+          <th>
+            <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains')" class="w-full">
+          </th>
+          <th>
+            <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'NombreItem', 'contains')" class="w-full">
+          </th>
+          <th>
+            <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'NombreMaterial', 'contains')" class="w-full">
+          </th>
+          <th>
+            <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Impreso', 'contains')" class="w-full">
+          </th>
+          <th>
+            <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'PesoTotal', 'contains')" class="w-full">
+          </th>
+          <th>
+            <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')" class="w-full">
+          </th>
+          <th></th>
+        </tr>
         <tr>
           <th scope="col">OT</th>
           <th scope="col">Item</th>
@@ -136,6 +160,44 @@
           [rowsPerPageOptions]="[5, 10, 15, 20]"
         currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros">
           <ng-template pTemplate="header">
+            <tr title="Filtros para realizar busquedas de cada campo">
+              <th>
+                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro2($event, 'OT', 'contains')" class="w-full">
+              </th>
+              <th>
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Item', 'contains')" class="w-full">
+              </th>
+              <th>
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'NombreItem', 'contains')" class="w-full">
+              </th>
+              <th>
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'NombreMaterial', 'contains')" class="w-full">
+              </th>
+              <th>
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Impreso', 'contains')" class="w-full">
+              </th>
+              <th>
+                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro2($event, 'Peso', 'contains')" class="w-full">
+              </th>
+              <th>
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Und', 'contains')" class="w-full">
+              </th>
+              <th>
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'No_Conformidad', 'contains')" class="w-full">
+              </th>
+              <th>
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Fecha', 'contains')" class="w-full">
+              </th>
+              <th>
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Operario', 'contains')" class="w-full">
+              </th>
+              <th>
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Proceso', 'contains')" class="w-full">
+              </th>
+              <th>
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro2($event, 'Maquina', 'contains')" class="w-full">
+              </th>
+            </tr>
             <tr>
               <th scope="col">OT</th>
               <th scope="col">Item</th>

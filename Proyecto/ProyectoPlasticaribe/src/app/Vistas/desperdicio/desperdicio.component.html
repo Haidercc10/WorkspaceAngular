@@ -29,25 +29,28 @@
       <div class="row g-3">
         <!-- OT -->
         <div class="form-floating col-md-2">
-          <input formControlName="OTDesperdicio" class="form-control form-control-sm" id="floatingInput" type="number" min="100000" (keyup.enter)="consultarOrdenTrabajo()" required>
+          <input formControlName="OTDesperdicio" class="form-control form-control-sm" id="floatingInput" type="number" min="100000" (keyup.enter)="consultarOrdenTrabajo()">
           <label for="floatingInput">OT</label>
         </div>
 
         <!-- ID PRODUCTO -->
         <div class="form-floating col-md-2">
-          <input formControlName="IdProducto" class="form-control form-control-sm" id="floatingInput" type="number" required readonly onmousedown="return false;">
+          <input formControlName="IdProducto" class="form-control form-control-sm" id="floatingInput" type="number" readonly onmousedown="return false;">
           <label for="floatingInput">Id Producto</label>
         </div>
 
         <!-- NOMBRE PRODUCTO -->
         <div class="form-floating col-md-4">
-          <input formControlName="Producto" class="form-control form-control-sm" id="floatingInput" type="text" required readonly onmousedown="return false;">
+          <input formControlName="Producto" class="form-control form-control-sm" id="floatingInput" type="text" readonly onmousedown="return false;">
           <label for="floatingInput">Nombre Producto</label>
         </div>
 
-        <!-- TIPO DE MATEIRAL -->
+        <!-- TIPO DE MATERIAL -->
         <div class="form-floating col-md-4">
-          <input formControlName="TipoMaterial" class="form-control form-control-sm" id="floatingInput" type="text" required readonly onmousedown="return false;">
+          <input formControlName="TipoMaterial" class="form-control form-control-sm" list="material" id="floatingInput" type="text" (change)="buscarMaterial()" required>
+          <datalist id="material">
+            <option value={{item.material_Id}} *ngFor="let item of materiales">{{item.material_Nombre}}</option>
+          </datalist>
           <label for="floatingInput">Tipo de Material</label>
         </div>
 

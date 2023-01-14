@@ -143,6 +143,7 @@ import {InputSwitchModule} from 'primeng/inputswitch';
 import { ReporteInventarioBOPPComponent } from './Vistas/reporteInventarioBOPP/reporteInventarioBOPP.component';
 import { ReporteInventarioMateriaPrimaComponent } from './Vistas/ReporteInventarioMateriaPrima/ReporteInventarioMateriaPrima.component';
 import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
+import { TreeTableModule } from 'primeng/treetable';
 
 export const routes: Routes = [
 
@@ -411,6 +412,7 @@ export const routes: Routes = [
     ChartModule,
     SkeletonModule,
     InputSwitchModule,
+    TreeTableModule,
   ],
 
   providers: [

@@ -789,33 +789,15 @@ export class PaginaPrincipalComponent implements OnInit {
               producto : datos_pedidos[i].producto,
               proceso : ''
             }
-            if (datos_orden[j].estProcOT_ExtrusionKg > 0) {
-              info.proceso = `Extrusión ${this.formatonumeros(datos_orden[j].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
-            }
-            if (datos_orden[j].estProcOT_ImpresionKg > 0) {
-              info.proceso = `Impresión ${this.formatonumeros(datos_orden[j].estProcOT_ImpresionKg.toFixed(2))} Kg`;
-            }
-            if (datos_orden[j].estProcOT_RotograbadoKg > 0) {
-              info.proceso = `Rotograbado ${this.formatonumeros(datos_orden[j].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
-            }
-            if (datos_orden[j].estProcOT_LaminadoKg > 0) {
-              info.proceso = `Laminado ${this.formatonumeros(datos_orden[j].estProcOT_LaminadoKg.toFixed(2))} Kg`;
-            }
-            if (datos_orden[j].estProcOT_CorteKg > 0) {
-              info.proceso = `Corte - ${this.formatonumeros(datos_orden[j].estProcOT_CorteKg.toFixed(2))} Kg`;
-            }
-            if (datos_orden[j].estProcOT_DobladoKg > 0) {
-              info.proceso = `Doblado ${this.formatonumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
-            }
-            if (datos_orden[j].estProcOT_EmpaqueKg > 0) {
-              info.proceso = `Empaque ${this.formatonumeros(datos_orden[j].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
-            }
-            if (datos_orden[j].estProcOT_SelladoKg > 0) {
-              info.proceso = `Sellado ${this.formatonumeros(datos_orden[j].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[j].estProcOT_SelladoKg.toFixed(2))} Kg`;
-            }
-            if (datos_orden[j].estProcOT_WiketiadoKg > 0) {
-              info.proceso = `Wiketiado ${this.formatonumeros(datos_orden[j].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[j].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
-            }
+            if (datos_orden[j].estProcOT_ExtrusionKg > 0) info.proceso = `Extrusión ${this.formatonumeros(datos_orden[j].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_ImpresionKg > 0) info.proceso = `Impresión ${this.formatonumeros(datos_orden[j].estProcOT_ImpresionKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_RotograbadoKg > 0) info.proceso = `Rotograbado ${this.formatonumeros(datos_orden[j].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_LaminadoKg > 0) info.proceso = `Laminado ${this.formatonumeros(datos_orden[j].estProcOT_LaminadoKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_CorteKg > 0) info.proceso = `Corte - ${this.formatonumeros(datos_orden[j].estProcOT_CorteKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_DobladoKg > 0) info.proceso = `Doblado ${this.formatonumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_EmpaqueKg > 0) info.proceso = `Empaque ${this.formatonumeros(datos_orden[j].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_SelladoKg > 0) info.proceso = `Sellado ${this.formatonumeros(datos_orden[j].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[j].estProcOT_SelladoKg.toFixed(2))} Kg`;
+            if (datos_orden[j].estProcOT_WiketiadoKg > 0) info.proceso = `Wiketiado ${this.formatonumeros(datos_orden[j].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[j].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
             this.pedidos_Ot.push(info);
           }
         });
@@ -838,16 +820,16 @@ export class PaginaPrincipalComponent implements OnInit {
     this.ComparativoData = {
       labels: ['Materia Prima'],
       datasets: [
-          {
-              label: 'Materia Prima Asignada',
-              backgroundColor: '#42A5F5',
-              data: [this.totalMpAsignada]
-          },
-          {
-              label: 'Materia Prima Extruida',
-              backgroundColor: '#FFA726',
-              data: [this.totalExtruidoMes]
-          }
+        {
+          label: 'Materia Prima Asignada',
+          backgroundColor: '#42A5F5',
+          data: [this.totalMpAsignada]
+        },
+        {
+          label: 'Materia Prima Extruida',
+          backgroundColor: '#FFA726',
+          data: [this.totalExtruidoMes]
+        }
       ]
     };
 
@@ -1318,7 +1300,7 @@ export class PaginaPrincipalComponent implements OnInit {
     };
   }
 
-  //
+  // Funcion que va a llenar la grafica de los pedidos
   llenarGraficaVendedores_Pedidos(){
     this.mostrarGrafica = true;
     this.nombreGrafica = `Grafica de Vendedores`;
@@ -1613,8 +1595,8 @@ export class PaginaPrincipalComponent implements OnInit {
     this.pedidosProductos.sort((a,b) => Number(b.costo) - Number(a.costo));
   }
 
-   // Funcion que va a ordenar el ranking de vendedores en pedidos
-   ordenarVendedorCantidad_Pedidos(){
+  // Funcion que va a ordenar el ranking de vendedores en pedidos
+  ordenarVendedorCantidad_Pedidos(){
     this.pedidosVendedores.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
   }
 

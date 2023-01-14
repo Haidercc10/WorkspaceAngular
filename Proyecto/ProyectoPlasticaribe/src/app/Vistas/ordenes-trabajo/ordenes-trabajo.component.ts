@@ -31,6 +31,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import { table } from 'console';
 import { faListSquares } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
+import { AppComponent } from 'src/app/app.component';
 
 @Injectable({
   providedIn: 'root'
@@ -128,7 +129,8 @@ export class OrdenesTrabajoComponent implements OnInit {
                                                           private usuarioService : UsuarioService,
                                                             private mezclaMaterialService : Mezclas_MaterialesService,
                                                               private mezclaPigmentosService : Mezclas_PigmentosService,
-                                                                private mezclasService : MezclasService,) {
+                                                                private mezclasService : MezclasService,
+                                                                  private appComponent : AppComponent,) {
 
     this.FormOrdenTrabajo = this.frmBuilderPedExterno.group({
       OT_Id: [''],
@@ -1479,6 +1481,7 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que creará el PDF de la Orden de trabajo
   pdfOrdenTrabajo(ot : number){
+    let usuario : string = this.storage.get('Nombre');
     this.ordenTrabajoService.srvObtenerListaPdfOTInsertada(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
         let FechaDatetime = datos_ot[i].ot_FechaCreacion;
@@ -1496,16 +1499,38 @@ export class OrdenesTrabajoComponent implements OnInit {
             width: 630,
             height: 760
           },
+          footer: function(currentPage : any, pageCount : any) {
+            return [
+              '\n',
+              {
+                columns: [
+                  { text: `Reporte generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                  { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                ]
+              }
+            ]
+          },
           content : [
             {
-              text: `OT ${ot}`,
-              alignment: 'right',
-              style: 'ot',
-            },
-            {
-              text: `PLASTICARIBE S.A.S 800188732-2.\n\nORDEN DE TRABAJO EXTRUSIÓN. ${fechaCreacionFinal}`,
-              alignment: 'center',
-              style: 'titulo',
+              columns: [
+                {
+                  image : this.appComponent.logoParaPdf,
+                  width : 90,
+                  height : 50
+                },
+                {
+                  text: `PLASTICARIBE S.A.S 800188732-2.\n\nORDEN DE TRABAJO EXTRUSIÓN. ${fechaCreacionFinal}`,
+                  alignment: 'right',
+                  style: 'titulo',
+                  margin: [0, 30, 0, 0],
+                },
+                {
+                  text: `OT ${ot}`,
+                  alignment: 'right',
+                  style: 'ot',
+                }
+              ]
             },
             '\n',
             {
@@ -2239,9 +2264,19 @@ export class OrdenesTrabajoComponent implements OnInit {
               pageBreak: 'before',
             },
             {
-              text: `PLASTICARIBE S.A.S 800188732-2.\n\nORDEN DE TRABAJO. ${fechaCreacionFinal}`,
-              alignment: 'center',
-              style: 'titulo',
+              columns: [
+                {
+                  image : this.appComponent.logoParaPdf,
+                  width : 100,
+                  height : 80
+                },
+                {
+                  text: `PLASTICARIBE S.A.S 800188732-2.\n\nORDEN DE TRABAJO EXTRUSIÓN. ${fechaCreacionFinal}`,
+                  alignment: 'center',
+                  style: 'titulo',
+                  margin: [0, 30, 0, 0],
+                }
+              ]
             },
             '\n',
             {
@@ -2983,13 +3018,6 @@ export class OrdenesTrabajoComponent implements OnInit {
     let ot : number = this.FormOrdenTrabajo.value.OT_Id;
     this.ordenTrabajoService.srvObtenerListaPdfOTInsertada(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
-        let FechaDatetime = datos_ot[i].ot_FechaCreacion;
-        let FechaCreacionNueva = FechaDatetime.indexOf("T");
-        let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
-
-        let FechaEntregaDatetime = datos_ot[i].pedExt_FechaEntrega;
-        let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-        let fechaEntregaFinal = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
         const pdfDefinicion : any = {
           info: {
             title: `${ot}`
@@ -3005,7 +3033,7 @@ export class OrdenesTrabajoComponent implements OnInit {
               style: 'ot',
             },
             {
-              text: `Plasticaribe S.A.S 800188732-2\n\nORDEN DE TRABAJO. ${fechaCreacionFinal}`,
+              text: `Plasticaribe S.A.S 800188732-2\n\nORDEN DE TRABAJO. ${datos_ot[i].ot_FechaCreacion.replace('T00:00:00','')}`,
               alignment: 'center',
               style: 'titulo',
             },
@@ -3129,7 +3157,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                     },
                     {
                       border: [false, false, false, false],
-                      text: `${fechaEntregaFinal}`,
+                      text: `${datos_ot[i].pedExt_FechaEntrega.replace('T00:00:00','')}`,
                       alignment: 'center',
                     },
                   ]
@@ -3597,7 +3625,7 @@ export class OrdenesTrabajoComponent implements OnInit {
               pageBreak: 'before',
             },
             {
-              text: `Plasticaribe S.A.S 800188732-2\nORDEN DE TRABAJO. ${fechaCreacionFinal}`,
+              text: `Plasticaribe S.A.S 800188732-2\nORDEN DE TRABAJO. ${datos_ot[i].ot_FechaCreacion.replace('T00:00:00','')}`,
               alignment: 'center',
               style: 'titulo',
             },
@@ -3721,7 +3749,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                     },
                     {
                       border: [false, false, false, false],
-                      text: `${fechaEntregaFinal}`,
+                      text: `${datos_ot[i].pedExt_FechaEntrega.replace('T00:00:00','')}`,
                       alignment: 'center',
                     },
                   ]

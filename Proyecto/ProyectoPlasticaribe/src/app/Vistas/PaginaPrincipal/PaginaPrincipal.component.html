@@ -446,6 +446,59 @@
           <div class="card h-100">
             <div class="banner"></div>
             <div class="card-body">
+              <h5 class="card-title">Cantidad Total de pedidos.</h5>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of pedidosTotales; let i=index">
+                  <span class="card-text">Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
+                </p>
+              </div>
+              <br>
+              <h5 class="card-title">Número de pedidos por estados.</h5>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of pedidosEstados; let i=index">
+                  <span class="card-text">{{i+1}}) <b>{{item.estado}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Número de pedidos con ordenes de trabajo asociadas.</h5>
+              <p class="card-text"></p>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of pedidos_Ot; let i=index">
+                  <span class="card-text">{{i+1}}) Pedido: <b>{{item.pedido}}</b> <br> Orden de Trabajo: <b>{{item.orden}}</b> <br> Producto: <b>{{item.producto}}</b><br> Cliente: <b>{{item.cliente}}</b>. <br> Proceso de La OT: <b>{{item.proceso}}</b></span><br>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
+              <h5 class="card-title">Listado de pedidos en los que el stock del producto pedido sea mayor o igual que la cantidad que está pendiente.</h5>
+              <p class="card-text"></p>
+              <div class="scrollCard">
+                <p class="card-text" *ngFor="let item of pedidosStock; let i=index">
+                  <span class="card-text">{{i+1}}) Pedido: <b>{{item.consecutivo}}</b> <br> Producto: <b>{{item.producto}}</b><br> Existencias: <label class="verdePedidos"><b>{{item.existencias | number}}</b></label>.<br> Cantidad Pendiente: <b>{{item.cant_Pendiente | number}}</b></span><br>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- CARD 4 -->
+        <div class="col">
+          <div class="card h-100">
+            <div class="banner"></div>
+            <div class="card-body">
               <h5 class="card-title">Ranking de cantidad de pedidos por clientes. <br> Ranking de costo de pedidos por clientes.</h5>
               <p class="card-text"></p>
               <div style="height: 10%; text-align: center;">
@@ -465,7 +518,7 @@
           </div>
         </div>
 
-        <!-- CARD 2 -->
+        <!-- CARD 5 -->
         <div class="col">
           <div class="card h-100">
             <div class="banner"></div>
@@ -489,7 +542,7 @@
           </div>
         </div>
 
-        <!-- CARD 3 -->
+        <!-- CARD 6 -->
         <div class="col">
           <div class="card h-100">
             <div class="banner"></div>
@@ -509,60 +562,6 @@
               </div>
               <br>
               <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los vendedores" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaVendedores_Pedidos()"></button>
-            </div>
-          </div>
-        </div>
-
-        <!-- CARD 4 -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="card-title">Cantidad Total de pedidos.</h5>
-              <div class="scrollCard">
-                <p class="card-text" *ngFor="let item of pedidosTotales; let i=index">
-                  <span class="card-text">Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
-                </p>
-              </div>
-              <br>
-              <h5 class="card-title">Número de pedidos por estados.</h5>
-              <div class="scrollCard">
-                <p class="card-text" *ngFor="let item of pedidosEstados; let i=index">
-                  <span class="card-text">{{i+1}}) <b>{{item.estado}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- CARD 5 -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="card-title">Número de pedidos con ordenes de trabajo asociadas.</h5>
-              <p class="card-text"></p>
-              <div class="scrollCard">
-                <p class="card-text" *ngFor="let item of pedidos_Ot; let i=index">
-                  <span class="card-text">{{i+1}}) Pedido: <b>{{item.pedido}}</b> <br> Orden de Trabajo: <b>{{item.orden}}</b> <br> Producto: <b>{{item.producto}}</b><br> Cliente: <b>{{item.cliente}}</b>. <br> Proceso de La OT: <b>{{item.proceso}}</b></span><br>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- CARD 6 -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="card-title">Listado de pedidos en los que el stock del producto pedido sea mayor o igual que la cantidad que está pendiente.</h5>
-              <p class="card-text"></p>
-              <div class="scrollCard">
-                <p class="card-text" *ngFor="let item of pedidosStock; let i=index">
-                  <span class="card-text">{{i+1}}) Pedido: <b>{{item.consecutivo}}</b> <br> Producto: <b>{{item.producto}}</b><br> Existencias: <label class="verdePedidos"><b>{{item.existencias | number}}</b></label>.<br> Cantidad Pendiente: <b>{{item.cant_Pendiente | number}}</b></span><br>
-                </p>
-              </div>
             </div>
           </div>
         </div>
