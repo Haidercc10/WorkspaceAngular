@@ -435,10 +435,10 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       const header = ["N° Pedido", "Cliente", "Item", "Cant. Pedida", "Pendiente", "Facturada", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "OC", "Costo Cant. Pendiente", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", "OT", "Proceso Actual", "Estado OT"]
       let datos : any =[];
 
-      for (const item of this.ArrayDocumento) {
-        const datos1  : any = [item.consecutivo, item.cliente, item.producto, item.cant_Pedida, item.cant_Pendiente, item.cant_Facturada, item.existencias, item.presentacion, item.precioUnidad, item.estado, item.vendedor, item.orden_Compra_CLiente, item.costo_Cant_Pendiente, item.costo_Cant_Total, item.fecha_Creacion, item.fecha_Entrega, item.OT, item.Proceso_OT, item.Estado_OT];
-        datos.push(datos1);
+      for (let index = 0; index < this.ArrayDocumento.length; index++) {
+        this.llenarArrayExcel(this.ArrayDocumento[index].children, datos);
       }
+
         let workbook = new Workbook();
         const imageId1 = workbook.addImage({
           base64:  this.appComponent.logoParaPdf,
@@ -547,6 +547,35 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       setTimeout(() => {  this.Confirmacion('¡Archivo de Excel generado exitosamente!'); }, 3100);
     }
   }
+
+  /** Función que llenará los datos del formato excel exportado */
+  llenarArrayExcel(datos : any, arrayDatos : any){
+    for (let i = 0; i < datos.length; i++) {
+      const datos1 : any = [
+        datos[i].data.consecutivo,
+        datos[i].data.cliente,
+        datos[i].data.producto,
+        datos[i].data.cant_Pedida,
+        datos[i].data.cant_Pendiente,
+        datos[i].data.cant_Facturada,
+        datos[i].data.existencias,
+        datos[i].data.presentacion,
+        datos[i].data.precioUnidad,
+        datos[i].data.estado,
+        datos[i].data.vendedor,
+        datos[i].data.orden_Compra_CLiente,
+        datos[i].data.costo_Cant_Pendiente,
+        datos[i].data.costo_Cant_Total,
+        datos[i].data.fecha_Creacion.replace('T00:00:00', ''),
+        datos[i].data.fecha_Entrega.replace('T00:00:00', ''),
+        datos[i].data.OT,
+        datos[i].data.Proceso_OT,
+        datos[i].data.Estado_OT,
+      ];
+      arrayDatos.push(datos1);
+    }
+  }
+
 
   /** Mensajes de advertencia */
   advertencia(mensaje : string) {
