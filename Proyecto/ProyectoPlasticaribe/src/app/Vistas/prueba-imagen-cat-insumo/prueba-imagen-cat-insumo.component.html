@@ -1,4 +1,4 @@
-<p-treeTable #tt [value]="files" [columns]="cols">
+<p-treeTable #tt [value]="files" [columns]="cols" [resizableColumns]="true" columnResizeMode="expand">
   <ng-template pTemplate="caption">
       <div style="text-align: right">
           <i class="pi pi-search" style="margin:4px 4px 0 0"></i>
@@ -7,15 +7,17 @@
   </ng-template>
   <ng-template pTemplate="header" let-columns>
       <tr>
-          <th *ngFor="let col of cols">
-              {{col.header}}
-          </th>
+        <th ttResizableColumn>
+          aaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        </th>
+        <th ttResizableColumn>
+          aaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        </th>
+        <th ttResizableColumn>
+          aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbb
+        </th>
       </tr>
-      <tr>
-          <th *ngFor="let col of cols">
-              <input pInputText type="text" >
-          </th>
-      </tr>
+
   </ng-template>
   <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
       <tr>

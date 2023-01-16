@@ -1,6 +1,5 @@
 import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Table } from 'primeng/table';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
@@ -12,6 +11,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import { AppComponent } from 'src/app/app.component';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+import { TreeTable } from 'primeng/treetable';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -20,7 +20,7 @@ import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/E
 })
 export class ReportePedidos_ZeusComponent implements OnInit {
 
-  @ViewChild('dt') dt: Table | undefined;
+  @ViewChild('tt') tt: TreeTable | undefined;
   @ViewChild(Reporte_Procesos_OTComponent) modalEstadosProcesos_OT : Reporte_Procesos_OTComponent;
 
   cargando : boolean = false;
@@ -135,7 +135,25 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   // Funcion que permitirá filtrar la información de la tabla
   aplicarfiltro($event, campo : any, valorCampo : string){
-    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    this.tt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    console.log(this.tt)
+    setTimeout(() => {
+      if (this.tt.filteredNodes != null) {
+        this.sumaCostoPendiente = 0;
+        this.sumaCostoTotal = 0;
+        for (let i = 0; i < this.tt.filteredNodes.length; i++) {
+          this.sumaCostoPendiente += this.tt.filteredNodes[i].data.costo_Cant_Pendiente;
+          this.sumaCostoTotal += this.tt.filteredNodes[i].data.costo_Cant_Total;
+        }
+      } else {
+        this.sumaCostoPendiente = 0;
+        this.sumaCostoTotal = 0;
+        for (let i = 0; i < this.tt._value.length; i++) {
+          this.sumaCostoPendiente += this.tt._value[i].data.costo_Cant_Pendiente;
+          this.sumaCostoTotal += this.tt._value[i].data.costo_Cant_Total;
+        }
+      }
+    }, 1000);
   }
 
   //
@@ -161,8 +179,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         "vendedor": datos.vendedor,
         "precioUnidad" : '',
         "orden_Compra_CLiente": datos.orden_Compra_CLiente,
-        "costo_Cant_Pendiente": '',
-        "costo_Cant_Total": '',
+        "costo_Cant_Pendiente": 0,
+        "costo_Cant_Total": 0,
         "fecha_Creacion": datos.fecha_Creacion,
         "fecha_Entrega": datos.fecha_Entrega,
         "OT" : '',
@@ -171,6 +189,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         "Estado_OT": '',
         "CantPedidaKg_OT" : '',
         "CantPedidaUnd_OT" : '',
+        "ExistenciaMayor" : false,
       },
       "children":[]
     }
@@ -196,8 +215,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             "vendedor": datos.vendedor,
             "precioUnidad" : this.formatonumeros(datos.precioUnidad.toFixed(2)),
             "orden_Compra_CLiente": datos.orden_Compra_CLiente,
-            "costo_Cant_Pendiente": this.formatonumeros(datos.costo_Cant_Pendiente.toFixed(2)),
-            "costo_Cant_Total": this.formatonumeros(datos.costo_Cant_Total.toFixed(2)),
+            "costo_Cant_Pendiente": datos.costo_Cant_Pendiente.toFixed(2),
+            "costo_Cant_Total": datos.costo_Cant_Total.toFixed(2),
             "fecha_Creacion": datos.fecha_Creacion,
             "fecha_Entrega": datos.fecha_Entrega,
             "OT" : '',
@@ -206,8 +225,17 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             "Estado_OT": '',
             "CantPedidaKg_OT" : '',
             "CantPedidaUnd_OT" : '',
+            "ExistenciaMayor" : false,
           },
         }
+
+        if (datos.existencias >= datos.cant_Pendiente) {
+          dataPedidos.data.ExistenciaMayor = true;
+          this.ArrayDocumento[i].data.ExistenciaMayor = true;
+        }
+
+        this.ArrayDocumento[i].data.costo_Cant_Pendiente += datos.costo_Cant_Pendiente;
+        this.ArrayDocumento[i].data.costo_Cant_Total += datos.costo_Cant_Total;
 
         this.sumaCostoPendiente += datos.costo_Cant_Pendiente;
         this.sumaCostoTotal += datos.costo_Cant_Total;
@@ -218,7 +246,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
               dataPedidos.data.OT = datos_orden[i].estProcOT_OrdenTrabajo;
               if (datos_orden[i].estProcOT_ExtrusionKg > 0) {
                 dataPedidos.data.Proceso_OT = `Extrusión ${this.formatonumeros(datos_orden[i].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
-                dataPedidos.CantPesada = datos_orden[i].estProcOT_ExtrusionKg.toFixed(2);
+                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_ExtrusionKg.toFixed(2);
               }
               if (datos_orden[i].estProcOT_ImpresionKg > 0) {
                 dataPedidos.data.Proceso_OT = `Impresión ${this.formatonumeros(datos_orden[i].estProcOT_ImpresionKg.toFixed(2))} Kg`;
@@ -260,24 +288,12 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         });
 
         this.columnas = [
-          // { header: 'Pedido', field: 'consecutivo'},
-          // { header: 'Cliente', field: 'cliente'},
-          // { header: 'Producto', field: 'producto'},
-          // { header: 'Cant Pedida', field: 'cant_Pedida'},
-          // { header: 'Pendiente', field: 'cant_Pendiente'},
-          // { header: 'Facturada', field: 'cant_Facturada'},
-          // { header: 'Existencias', field: 'existencias'},
-          // { header: 'Und', field: 'presentacion'},
-          // { header: 'Estado', field: 'estado'},
-          // { header: 'Vendedor', field: 'vendedor'},
-          { header: 'Precio Und', field: 'precioUnidad'},
+          { header: 'Precio U.', field: 'precioUnidad', type : 'number' },
           { header: 'OC Cliente', field: 'orden_Compra_CLiente'},
-          { header: 'Valor Pendiente', field: 'costo_Cant_Pendiente'},
-          { header: 'Valor Total', field: 'costo_Cant_Total'},
-          { header: 'Fecha Creación', field: 'fecha_Creacion'},
-          { header: 'Fecha Entrega', field: 'fecha_Entrega'},
-          // { header: 'OT', field: 'OT'},
-          { header: 'Proceso OT', field: 'Proceso_OT'},
+          // { header: 'Costo Cant. Pendiente', field: 'costo_Cant_Pendiente', type : 'number'},
+          // { header: 'Costo Cant. Total', field: 'costo_Cant_Total', type : 'number' },
+          { header: 'Fecha Creación', field: 'fecha_Creacion', type : 'date'},
+          { header: 'Fecha Entrega', field: 'fecha_Entrega',  type : 'date'},
         ];
         this.ArrayDocumento[i].children.push(dataPedidos);
       }
@@ -359,39 +375,39 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           dataPedidos.OT = datos_orden[i].estProcOT_OrdenTrabajo;
           if (datos_orden[i].estProcOT_ExtrusionKg > 0) {
             dataPedidos.Proceso_OT = `Extrusión ${this.formatonumeros(datos_orden[i].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
-            dataPedidos.CantPesada = datos_orden[i].estProcOT_ExtrusionKg.toFixed(2);
+            dataPedidos.data.CantPesada = datos_orden[i].estProcOT_ExtrusionKg.toFixed(2);
           }
           if (datos_orden[i].estProcOT_ImpresionKg > 0) {
             dataPedidos.Proceso_OT = `Impresión ${this.formatonumeros(datos_orden[i].estProcOT_ImpresionKg.toFixed(2))} Kg`;
-            dataPedidos.CantPesada = datos_orden[i].estProcOT_ImpresionKg.toFixed(2);
+            dataPedidos.data.CantPesada = datos_orden[i].estProcOT_ImpresionKg.toFixed(2);
           }
           if (datos_orden[i].estProcOT_RotograbadoKg > 0) {
             dataPedidos.Proceso_OT = `Rotograbado ${this.formatonumeros(datos_orden[i].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
-            dataPedidos.CantPesada = datos_orden[i].estProcOT_RotograbadoKg.toFixed(2);
+            dataPedidos.data.CantPesada = datos_orden[i].estProcOT_RotograbadoKg.toFixed(2);
           }
           if (datos_orden[i].estProcOT_LaminadoKg > 0) {
             dataPedidos.Proceso_OT = `Laminado ${this.formatonumeros(datos_orden[i].estProcOT_LaminadoKg.toFixed(2))} Kg`;
-            dataPedidos.CantPesada = datos_orden[i].estProcOT_LaminadoKg.toFixed(2);
+            dataPedidos.data.CantPesada = datos_orden[i].estProcOT_LaminadoKg.toFixed(2);
           }
           if (datos_orden[i].estProcOT_CorteKg > 0) {
             dataPedidos.Proceso_OT = `Corte - ${this.formatonumeros(datos_orden[i].estProcOT_CorteKg.toFixed(2))} Kg`;
-            dataPedidos.CantPesada = datos_orden[i].estProcOT_CorteKg.toFixed(2);
+            dataPedidos.data.CantPesada = datos_orden[i].estProcOT_CorteKg.toFixed(2);
           }
           if (datos_orden[i].estProcOT_DobladoKg > 0) {
             dataPedidos.Proceso_OT = `Doblado ${this.formatonumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
-            dataPedidos.CantPesada = datos_orden[i].estProcOT_DobladoKg.toFixed(2);
+            dataPedidos.data.CantPesada = datos_orden[i].estProcOT_DobladoKg.toFixed(2);
           }
           if (datos_orden[i].estProcOT_EmpaqueKg > 0) {
             dataPedidos.Proceso_OT = `Empaque ${this.formatonumeros(datos_orden[i].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
-            dataPedidos.CantPesada = datos_orden[i].estProcOT_EmpaqueKg.toFixed(2);
+            dataPedidos.data.CantPesada = datos_orden[i].estProcOT_EmpaqueKg.toFixed(2);
           }
           if (datos_orden[i].estProcOT_SelladoKg > 0) {
             dataPedidos.Proceso_OT = `Sellado ${this.formatonumeros(datos_orden[i].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[i].estProcOT_SelladoKg.toFixed(2))} Kg`;
-            dataPedidos.CantPesada = datos_orden[i].estProcOT_SelladoUnd.toFixed(2);
+            dataPedidos.data.CantPesada = datos_orden[i].estProcOT_SelladoUnd.toFixed(2);
           }
           if (datos_orden[i].estProcOT_WiketiadoKg > 0) {
             dataPedidos.Proceso_OT = `Wiketiado ${this.formatonumeros(datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[i].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
-            dataPedidos.CantPesada = datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2);
+            dataPedidos.data.CantPesada = datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2);
           }
           dataPedidos.Estado_OT = datos_orden[i].estado_Id;
           dataPedidos.CantPedidaKg_OT = datos_orden[i].estProcOT_CantidadPedida;

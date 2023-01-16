@@ -36,8 +36,7 @@
          [columns]="columnasSeleccionada"
          [resizableColumns]="true"
          columnResizeMode="expand"
-         styleClass="p-datatable-gridlines p-datatable-sm"
-         responsiveLayout="scroll"
+         styleClass="p-treetable-sm p-treetable-gridlines"
          [paginator]="true"
          [rows]="ArrayDocumento.length"
          [showCurrentPageReport]="true"
@@ -45,70 +44,219 @@
          [rowsPerPageOptions]="[10,20,30,50,70,100, ArrayDocumento.length]"
          [rowHover]="true">
          <ng-template pTemplate="caption">
-             <div style="text-align:left">
-                 <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header"
-                    selectedItemsLabel="{0} columns selected" [style]="{'width': '20em'}" defaultLabel="Choose Columns"></p-multiSelect>
-             </div>
+            <div style="text-align:left">
+              <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header" selectedItemsLabel="{0} columnas seleccionadas" [style]="{'width': '20em'}" defaultLabel="Elige las columnas que quieres ver"></p-multiSelect>
+            </div>
          </ng-template>
           <ng-template pTemplate="header" let-columns>
             <tr>
-              <th style="text-align: center; font-size: 14px;" scope="col">Pedido</th>
-              <th style="text-align: center; font-size: 14px;" scope="col">Cliente</th>
-              <th style="text-align: center; font-size: 14px;" scope="col">Producto</th>
-              <th style="text-align: center; font-size: 14px;" scope="col">Cant. Pedida</th>
-              <th style="text-align: center; font-size: 14px;" scope="col">Pendiente</th>
-              <th style="text-align: center; font-size: 14px;" scope="col">Facturada</th>
-              <th style="text-align: center; font-size: 14px;" scope="col">Stock</th>
-              <th style="text-align: center; font-size: 14px;" scope="col">Und</th>
-              <th style="text-align: center; font-size: 14px;" scope="col">Estado</th>
-              <th style="text-align: center; font-size: 14px;" scope="col">Vendedor</th>
-              <th style="text-align: center; font-size: 14px;" scope="col">OT</th>
-              <th *ngFor="let col of columnasSeleccionada"> {{col.header}} </th>
-            </tr>
-            <!-- <tr>
-              <th *ngFor="let col of columnas">
-                <input pInputText type="text" >
+              <th ttResizableColumn style="width: 150px">
+                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
               </th>
-            </tr> -->
+              <th ttResizableColumn style="width: 200px">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cliente', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 200px">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'producto', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 150px">
+                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'cant_Pedida', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 150px">
+                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'cant_Pendiente', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 150px">
+                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'cant_Facturada', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 100px">
+                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'existencias', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 100px">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'presentacion', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 200px">
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'estado', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 200px">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'vendedor', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 100px">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'OT', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 300px">
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Proceso_OT', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 200px">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costo_Cant_Pendiente', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 150px">
+              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costo_Cant_Total', 'contains')">
+              </th>
+              <th *ngFor="let col of columns" ttResizableColumn style="width: 200px">
+                <input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 100px">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
+              </th>
+            </tr>
+            <tr>
+              <th style="text-align: center; width: max-content; font-size: 14px;" ttSortableColumn="consecutivo">Pedido
+                <p-treeTableSortIcon field="consecutivo"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" ttSortableColumn="cliente">Cliente
+                <p-treeTableSortIcon field="cliente"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" ttSortableColumn="producto">Producto
+                <p-treeTableSortIcon field="producto"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" ttSortableColumn="cant_Pedida">Cant. Pedida
+                <p-treeTableSortIcon field="cant_Pedida"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" ttSortableColumn="cant_Pendiente">Pendiente
+                <p-treeTableSortIcon field="cant_Pendiente"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" ttSortableColumn="cant_Facturada">Facturada
+                <p-treeTableSortIcon field="cant_Facturada"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" ttSortableColumn="existencias">Stock
+                <p-treeTableSortIcon field="existencias"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" ttSortableColumn="presentacion">Und
+                <p-treeTableSortIcon field="presentacion"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" ttSortableColumn="estado">Estado
+                <p-treeTableSortIcon field="estado"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" ttSortableColumn="vendedor">Vendedor
+                <p-treeTableSortIcon field="vendedor"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" ttSortableColumn="OT">OT
+                <p-treeTableSortIcon field="OT"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" ttSortableColumn="Proceso_OT">Proceso Actual
+                <p-treeTableSortIcon field="Proceso_OT"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; width: 100px; font-size: 14px;" ttSortableColumn="costo_Cant_Pendiente">Total Pendiente
+                <p-treeTableSortIcon field="costo_Cant_Pendiente"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;" ttSortableColumn="costo_Cant_Total">Total
+                <p-treeTableSortIcon field="costo_Cant_Total"></p-treeTableSortIcon>
+              </th>
+              <th *ngFor="let col of columnasSeleccionada" [ttSortableColumn]="col.field">{{col.header}}
+                <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center; font-size: 14px;">Ver PDF</th>
+            </tr>
           </ng-template>
           <ng-template pTemplate="body" let-rowNode let-data="rowData">
+            <ng-container *ngIf="data.ExistenciaMayor; then thenTemplate; else elseTemplate"></ng-container>
+            <!-- Existencias mayores o iguales a la cantidad pendiente -->
+            <ng-template #thenTemplate>
+              <tr style="background-color: #ABEBC6 ;">
+                <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">
+                  <p-treeTableToggler [rowNode]="rowNode" ></p-treeTableToggler>
+                  {{data.consecutivo}}
+                </td>
+                <td scope="col" title="Cliente" (dblclick)="varOrdenTranajo(data)">{{data.cliente}}</td>
+                <td scope="col" title="Item" (dblclick)="varOrdenTranajo(data)">{{data.producto}}</td>
+                <td style="text-align: center;" scope="col" title="Cantidad Pedida" (dblclick)="varOrdenTranajo(data)">{{data.cant_Pedida | number : '1.2-2'}}</td>
+                <td style="text-align: center;" scope="col" title="Cantidad Pendiente" class="bg-danger2" (dblclick)="varOrdenTranajo(data)"><b>{{data.cant_Pendiente | number : '1.2-2'}}</b></td>
+                <td style="text-align: center;" scope="col" title="Cantidad Facturada" (dblclick)="varOrdenTranajo(data)">{{data.cant_Facturada | number : '1.2-2'}}</td>
+                <td style="text-align: center;" scope="col" title="Existencias" (dblclick)="varOrdenTranajo(data)">{{data.existencias | number : '1.2-2'}}</td>
+                <td style="text-align: center;" scope="col" title="Presentación" (dblclick)="varOrdenTranajo(data)">{{data.presentacion}}</td>
+                <ng-container *ngIf="data.estado == 'Pendiente'">
+                  <td style="text-align: center;" scope="col" title="{{titlePendiente}}." data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-danger1">{{data.estado}}</span></td>
+                </ng-container>
+                <ng-container *ngIf="data.estado == 'Parcialmente Satisfecho'">
+                  <td style="text-align: center;" scope="col" title="{{titleParcial}}" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-warning1">{{data.estado}}</span></td>
+                </ng-container>
+                <td scope="col" title="Vendedor">{{data.vendedor}}</td>
+                <td ttEditableColumn>
+                  <p-treeTableCellEditor>
+                    <ng-template pTemplate="input">
+                      <input class="form-control form-control-sm" style="width: 100px;" type="number" [(ngModel)]="data.OT" (keyup.space)="cambiarOrden_Pedido(data)">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                      <span class="badge verde" *ngIf="data.Estado_OT == 17">{{data.OT}}</span> <!-- Terminada -->
+                      <span class="badge verde2" *ngIf="data.Estado_OT == 18">{{data.OT}}</span> <!-- Cerrada -->
+                      <span class="badge rojo" *ngIf="data.Estado_OT == 3">{{data.OT}}</span> <!-- Anulada -->
+                      <span class="badge azul" *ngIf="data.Estado_OT == 14">{{data.OT}}</span> <!-- Asignada -->
+                      <span class="badge amarillo" *ngIf="data.Estado_OT == 16">{{data.OT}}</span> <!-- En Proceso -->
+                      <span class="badge naranja" *ngIf="data.Estado_OT == 15">{{data.OT}}</span> <!-- Abierta -->
+                    </ng-template>
+                  </p-treeTableCellEditor>
+                </td>
+                <td style="text-align: center;" scope="col" (dblclick)="varOrdenTranajo(data)">
+                  <span class="badge verde" *ngIf="data.Estado_OT == 17">{{data.Proceso_OT}}</span> <!-- Terminada -->
+                  <span class="badge amarillo" *ngIf="data.Estado_OT == 16">{{data.Proceso_OT}}</span> <!-- En Proceso -->
+                </td>
+                <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.costo_Cant_Pendiente | number}}</td>
+                <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.costo_Cant_Total | number}}</td>
+                <td *ngFor="let col of columnasSeleccionada; let i = index"> {{data[col.field]}} </td>
+                <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+              </tr>
+            </ng-template>
+            <!-- Existencias menores a la cantidad pendiente -->
+            <ng-template #elseTemplate>
+              <tr>
+                <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">
+                  <p-treeTableToggler [rowNode]="rowNode" ></p-treeTableToggler>
+                  {{data.consecutivo}}
+                </td>
+                <td scope="col" title="Cliente" (dblclick)="varOrdenTranajo(data)">{{data.cliente}}</td>
+                <td scope="col" title="Item" (dblclick)="varOrdenTranajo(data)">{{data.producto}}</td>
+                <td style="text-align: center;" scope="col" title="Cantidad Pedida" (dblclick)="varOrdenTranajo(data)">{{data.cant_Pedida | number : '1.2-2'}}</td>
+                <td style="text-align: center;" scope="col" title="Cantidad Pendiente" class="bg-danger2" (dblclick)="varOrdenTranajo(data)"><b>{{data.cant_Pendiente | number : '1.2-2'}}</b></td>
+                <td style="text-align: center;" scope="col" title="Cantidad Facturada" (dblclick)="varOrdenTranajo(data)">{{data.cant_Facturada | number : '1.2-2'}}</td>
+                <td style="text-align: center;" scope="col" title="Existencias" (dblclick)="varOrdenTranajo(data)">{{data.existencias | number : '1.2-2'}}</td>
+                <td style="text-align: center;" scope="col" title="Presentación" (dblclick)="varOrdenTranajo(data)">{{data.presentacion}}</td>
+                <ng-container *ngIf="data.estado == 'Pendiente'">
+                  <td style="text-align: center;" scope="col" title="{{titlePendiente}}." data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-danger1">{{data.estado}}</span></td>
+                </ng-container>
+                <ng-container *ngIf="data.estado == 'Parcialmente Satisfecho'">
+                  <td style="text-align: center;" scope="col" title="{{titleParcial}}" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-warning1">{{data.estado}}</span></td>
+                </ng-container>
+                <td scope="col" title="Vendedor">{{data.vendedor}}</td>
+                <td ttEditableColumn>
+                  <p-treeTableCellEditor>
+                    <ng-template pTemplate="input">
+                      <input class="form-control form-control-sm" style="width: 100px;" type="number" [(ngModel)]="data.OT" (keyup.space)="cambiarOrden_Pedido(data)">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                      <span class="badge verde" *ngIf="data.Estado_OT == 17">{{data.OT}}</span> <!-- Terminada -->
+                      <span class="badge verde2" *ngIf="data.Estado_OT == 18">{{data.OT}}</span> <!-- Cerrada -->
+                      <span class="badge rojo" *ngIf="data.Estado_OT == 3">{{data.OT}}</span> <!-- Anulada -->
+                      <span class="badge azul" *ngIf="data.Estado_OT == 14">{{data.OT}}</span> <!-- Asignada -->
+                      <span class="badge amarillo" *ngIf="data.Estado_OT == 16">{{data.OT}}</span> <!-- En Proceso -->
+                      <span class="badge naranja" *ngIf="data.Estado_OT == 15">{{data.OT}}</span> <!-- Abierta -->
+                    </ng-template>
+                  </p-treeTableCellEditor>
+                </td>
+                <td style="text-align: center;" scope="col" (dblclick)="varOrdenTranajo(data)">
+                  <span class="badge verde" *ngIf="data.Estado_OT == 17">{{data.Proceso_OT}}</span> <!-- Terminada -->
+                  <span class="badge amarillo" *ngIf="data.Estado_OT == 16">{{data.Proceso_OT}}</span> <!-- En Proceso -->
+                </td>
+                <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.costo_Cant_Pendiente | number}}</td>
+                <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.costo_Cant_Total | number}}</td>
+                <td *ngFor="let col of columnasSeleccionada; let i = index"> {{data[col.field]}} </td>
+                <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+              </tr>
+            </ng-template>
+          </ng-template>
+          <!-- Footer de la Tabla -->
+          <ng-template pTemplate="footer">
             <tr>
-              <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">
-                <p-treeTableToggler [rowNode]="rowNode" ></p-treeTableToggler>
-                {{data.consecutivo}}
-              </td>
-              <td scope="col" title="Cliente" (dblclick)="varOrdenTranajo(data)">{{data.cliente}}</td>
-              <td scope="col" title="Item" (dblclick)="varOrdenTranajo(data)">{{data.producto}}</td>
-              <td style="text-align: center;" scope="col" title="Cantidad Pedida" (dblclick)="varOrdenTranajo(data)">{{data.cant_Pedida | number : '1.2-2'}}</td>
-              <td style="text-align: center;" scope="col" title="Cantidad Pendiente" class="bg-danger2" (dblclick)="varOrdenTranajo(data)"><b>{{data.cant_Pendiente | number : '1.2-2'}}</b></td>
-              <td style="text-align: center;" scope="col" title="Cantidad Facturada" (dblclick)="varOrdenTranajo(data)">{{data.cant_Facturada | number : '1.2-2'}}</td>
-              <td style="text-align: center;" scope="col" title="Existencias" (dblclick)="varOrdenTranajo(data)">{{data.existencias | number : '1.2-2'}}</td>
-              <td style="text-align: center;" scope="col" title="Presentación" (dblclick)="varOrdenTranajo(data)">{{data.presentacion}}</td>
-              <ng-container *ngIf="data.estado == 'Pendiente'">
-                <td style="text-align: center;" scope="col" title="{{titlePendiente}}." data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-danger1">{{data.estado}}</span></td>
-              </ng-container>
-              <ng-container *ngIf="data.estado == 'Parcialmente Satisfecho'">
-                <td style="text-align: center;" scope="col" title="{{titleParcial}}" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-warning1">{{data.estado}}</span></td>
-              </ng-container>
-              <td scope="col" title="Vendedor">{{data.vendedor}}</td>
-              <td ttEditableColumn>
-                <p-treeTableCellEditor>
-                  <ng-template pTemplate="input">
-                      <input pInputText type="text" [(ngModel)]="data.OT">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    <span class="badge verde" *ngIf="data.Estado_OT == 17">{{data.OT}}</span> <!-- Terminada -->
-                    <span class="badge verde2" *ngIf="data.Estado_OT == 18">{{data.OT}}</span> <!-- Cerrada -->
-                    <span class="badge rojo" *ngIf="data.Estado_OT == 3">{{data.OT}}</span> <!-- Anulada -->
-                    <span class="badge azul" *ngIf="data.Estado_OT == 14">{{data.OT}}</span> <!-- Asignada -->
-                    <span class="badge amarillo" *ngIf="data.Estado_OT == 16">{{data.OT}}</span> <!-- En Proceso -->
-                    <span class="badge naranja" *ngIf="data.Estado_OT == 15">{{data.OT}}</span> <!-- Abierta -->
-                  </ng-template>
-                </p-treeTableCellEditor>
-              </td>
-
-              <td *ngFor="let col of columnasSeleccionada; let i = index"> {{data[col.field]}} </td>
+              <td colspan="12" class="text-right">Totales</td>
+              <td>{{sumaCostoPendiente | number : '1.2-2'}}</td>
+              <td>{{sumaCostoTotal | number : '1.2-2'}}</td>
+              <td>COP</td>
             </tr>
+          </ng-template>
+
+          <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+              En total hay {{ArrayDocumento ? ArrayDocumento.length : 0 | number : '1.2-2'}} Pedido(s).
+            </div>
           </ng-template>
         </p-treeTable>
 

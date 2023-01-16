@@ -241,6 +241,32 @@ a:hover {
   font-size: 14px;
 }
 
+p-treeTable{
+  overflow-x: scroll;
+  min-width: 300px;
+}
+
+p-treeTable::-webkit-scrollbar{
+  width: 8px;     /* Tamaño del scroll en vertical */
+  height: 8px;    /* Tamaño del scroll en horizontal */
+}
+
+/* Ponemos un color de fondo y redondeamos las esquinas del thumb */
+p-treeTable::-webkit-scrollbar-thumb{
+  background: #EBEDEF;
+  border-radius: 4px;
+}
+
+/* Cambiamos el fondo y agregamos una sombra cuando esté en hover */
+p-treeTable::-webkit-scrollbar-thumb:hover{
+  background: #D5DBDB;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Cambiamos el fondo cuando esté en active */
+p-treeTable::-webkit-scrollbar-thumb:active{
+  background-color: #E5E8E8;
+}
 
 @media (min-width: 1000px) {
   .modal-xl {
