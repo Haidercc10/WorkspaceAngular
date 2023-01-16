@@ -427,17 +427,27 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   /** Función para exportar todos los pedidos a Excel */
   exportarExcel(){
-    this.cargando = true;
     if(this.ArrayDocumento.length == 0) this.advertencia('Debe haber al menos un pedido en la tabla.');
     else {
-      setTimeout(() => {
-      const title = `Reporte de Pedidos Zeus - ${this.today}`;
-      const header = ["N° Pedido", "Cliente", "Item", "Cant. Pedida", "Pendiente", "Facturada", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "OC", "Costo Cant. Pendiente", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", "OT", "Proceso Actual", "Estado OT"]
       let datos : any =[];
 
-      for (let index = 0; index < this.ArrayDocumento.length; index++) {
-        this.llenarArrayExcel(this.ArrayDocumento[index].children, datos);
-      }
+      setTimeout(() => {
+        if(this.tt.filteredNodes != null) {
+          for (let index = 0; index < this.tt.filteredNodes.length; index++) {
+            this.llenarArrayExcel(this.tt.filteredNodes[index].children, datos);
+            console.log(22)
+          }
+        } else {
+          for (let index = 0; index < this.tt._value.length; index++) {
+            this.llenarArrayExcel(this.tt._value[index].children, datos);
+            console.log(11)
+          }
+        }
+      }, 300);
+
+      setTimeout(() => {
+        const title = `Reporte de Pedidos Zeus - ${this.today}`;
+        const header = ["N° Pedido", "Cliente", "Item", "Cant. Pedida", "Pendiente", "Facturada", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "OC", "Costo Cant. Pendiente", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", "OT", "Proceso Actual", "Estado OT"]
 
         let workbook = new Workbook();
         const imageId1 = workbook.addImage({
@@ -543,13 +553,14 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           });
           this.cargando = false;
         }, 1000);
-      }, 3000);
+      }, 1500);
       setTimeout(() => {  this.Confirmacion('¡Archivo de Excel generado exitosamente!'); }, 3100);
     }
   }
 
   /** Función que llenará los datos del formato excel exportado */
   llenarArrayExcel(datos : any, arrayDatos : any){
+    this.cargando = true;
     for (let i = 0; i < datos.length; i++) {
       const datos1 : any = [
         datos[i].data.consecutivo,
