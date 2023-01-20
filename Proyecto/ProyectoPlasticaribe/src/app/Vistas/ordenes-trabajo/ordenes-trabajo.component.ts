@@ -32,6 +32,8 @@ import moment from 'moment';
 import { AppComponent } from 'src/app/app.component';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
 import { MessageService } from 'primeng/api';
+import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
+import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
 
 @Injectable({
   providedIn: 'root'
@@ -530,6 +532,7 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que cargará las mezclas de materiales
   cargarMezclaMateria(){
+    this.mezclasMateriales = [];
     this.mezclaMaterialService.srvObtenerLista().subscribe(datos_mezclasMateriales => {
       for (let i = 0; i < datos_mezclasMateriales.length; i++) {
         this.mezclasMateriales.push(datos_mezclasMateriales[i].mezMaterial_Nombre);
@@ -549,9 +552,10 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que cargará las mezclas de pigmentos
   cargarMezclaPigmento(){
+    this.mezclasPigmentos = [];
     this.mezclaPigmentosService.srvObtenerLista().subscribe(datos_mezclaPigmentos => {
       for (let i = 0; i < datos_mezclaPigmentos.length; i++) {
-        this.mezclasPigmentos.push(datos_mezclaPigmentos[i])
+        this.mezclasPigmentos.push(datos_mezclaPigmentos[i].mezPigmto_Nombre)
       }
     });
   }
@@ -568,6 +572,7 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que cargará el nombre de las mezclas
   cargarMezclas(){
+    this.mezclas = [];
     this.mezclasService.srvObtenerLista().subscribe(datos_mezclas => {
       for (let i = 0; i < datos_mezclas.length; i++) {
         this.mezclas.push(datos_mezclas[i]);
@@ -4601,7 +4606,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.cargarMezclaMateria2();
     this.cargarMezclaPigmento2();
     this.cargarMateriales_MatPrima();
-    setTimeout(() => { this.initFormCrearMezclas(); }, 700);
+    setTimeout(() => { this.initFormCrearMezclas(); }, 1000);
   }
 
   initFormCrearMezclas(){
@@ -5042,9 +5047,9 @@ export class OrdenesTrabajoComponent implements OnInit {
       MezclaPigmento2_Capa3 : pigmento2C3,
       PorcentajeMezclaPigmentoP2_Capa3 : porcPigmento2C3,
     });
-
   }
 
+  /** Función que creará la mezcla predefinida  */
   crearMezclaPredefinida() {
     let mezcla : any = this.formCrearMezclas.value.Nombre_Mezclas;
     let material : any = this.formCrearMezclas.value.Material_MatPrima;
@@ -5178,8 +5183,10 @@ export class OrdenesTrabajoComponent implements OnInit {
                       Mezcla_FechaIngreso: this.today
                     }
                     this.mezclasService.srvGuardar(modelo).subscribe(dataMezclas2 => {
-                      this.mostrarConfirmacion();
-                      setTimeout(() => { this.initFormCrearMezclas(); this.cargarMezclas();}, 1000);
+                      this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
+                      setTimeout(() => {
+                        this.initFormCrearMezclas();
+                        this.cargarMezclas();}, 1000);
                     });
                   } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
 
@@ -5192,7 +5199,7 @@ export class OrdenesTrabajoComponent implements OnInit {
 
       } else if(this.checkedCapa2 == true) {
         let porcentajeTotalCapas : any = (porc_Capa1 + porc_Capa2 + porc_Capa3);
-        if(porcentajeTotalCapas == 100) {
+        if(porcentajeTotalCapas == 100 && porc_Capa1 != 0 && porc_Capa2 != 0) {
           if((material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1)
             && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)) {
 
@@ -5250,7 +5257,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                         Mezcla_FechaIngreso: this.today
                       }
                       this.mezclasService.srvGuardar(modelo).subscribe(dataMezclas2 => {
-                        this.mostrarConfirmacion();
+                        this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
                         setTimeout(() => { this.initFormCrearMezclas(); this.cargarMezclas(); }, 1000);
                       });
                     } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
@@ -5259,14 +5266,15 @@ export class OrdenesTrabajoComponent implements OnInit {
               });
               } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
           } else this.mostrarAdvertencia('No puede usar estos porcentajes de mezcla para los materiales seleccionados');
-        } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de las capas debe ser 100');
+        } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de las capas 1 y 2 debe ser 100');
         /** Fin Condición 2 */
 
       } else if (this.checkedCapa3 == true) {
         let porcentajeTotalCapas : number = (porc_Capa1 + porc_Capa2 + porc_Capa3);
-        if(porcentajeTotalCapas == 100) {
+        if(porcentajeTotalCapas == 100 && porc_Capa1 != 0 && porc_Capa2 != 0 && porc_Capa3 != 0) {
           if((material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1)
-            && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)) {
+            && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)
+            && (material1C3 != 1 || material2C3 != 1 || material3C3 != 1 || material4C3 != 1)) {
               let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
               let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
               let porcMaterialesCapa3: number = (porcMaterial1C3 + porcMaterial2C3 + porcMaterial3C3 + porcMaterial4C3);
@@ -5322,7 +5330,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                         Mezcla_FechaIngreso: this.today
                       }
                       this.mezclasService.srvGuardar(modelo).subscribe(dataMezclas2 => {
-                        this.mostrarConfirmacion();
+                        this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
                         setTimeout(() => { this.initFormCrearMezclas(); this.cargarMezclas(); }, 1000);
                       });
                     } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
@@ -5341,6 +5349,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     }
   }
 
+  /** Función que validará si las caracteristicas de la mezcla ya existen. Si no existen crea la mezcla.  */
   compararRegistroEntrante() {
     if(this.objetoDatos.Material_MatPrima == this.formCrearMezclas.value.Material_MatPrima &&
       this.objetoDatos.mezclaNroCapas == this.nroCapas &&
@@ -5394,11 +5403,56 @@ export class OrdenesTrabajoComponent implements OnInit {
   this.modalMateriales = true;
  }
 
+  /** Función para crear mater desde el modal de crear mezclas */
  crearMaterial(){
   let nombreMaterial : string = this.formCrearMateriales.value.matNombre;
   let descripcionMaterial : string = this.formCrearMateriales.value.matDescripcion;
 
-  if(descripcionMaterial == null) descripcionMaterial = `Material de tipo`
+  if(descripcionMaterial == null) descripcionMaterial = `Mezcla de Material ${nombreMaterial.toUpperCase()}`;
+
+  this.mezclaMaterialService.getMezclasMateriales(nombreMaterial.toUpperCase()).subscribe(dataMzMaterial => {
+    if(dataMzMaterial.length == 0) {
+      const material : modelMezMaterial = {
+        MezMaterial_Nombre: nombreMaterial.toUpperCase(),
+        MezMaterial_Descripcion: descripcionMaterial,
+      }
+      console.table(material);
+      this.mezclaMaterialService.srvGuardar(material).subscribe(dataMzMaterial2 => {
+        this.mostrarConfirmacion('Registro creado con éxito!');
+        setTimeout(() => {
+          this.formCrearMateriales.reset();
+          this.cargarMezclaMateria();
+          this.cargarMezclaMateria2();
+        }, 300);
+      });
+    } else this.mostrarAdvertencia(`Ya existe una material de mezclas llamado ${nombreMaterial.toUpperCase()}`);
+  });
+ }
+
+ /** Función para crear pigmentos desde el modal de crear mezclas */
+ crearPigmento(){
+  let nombrePigmento : string = this.formCrearPigmentos.value.pigNombre;
+  let descripcionPigmento : string = this.formCrearPigmentos.value.pigDescripcion;
+
+  if(descripcionPigmento == null) descripcionPigmento = `Mezcla de Pigmento ${nombrePigmento.toUpperCase()}`;
+
+  this.mezclaPigmentosService.getMezclasPigmentos(nombrePigmento.toUpperCase()).subscribe(dataMzPigmento => {
+    if(dataMzPigmento.length == 0) {
+      const pigmento : modelMezPigmento = {
+        MezPigmto_Nombre: nombrePigmento.toUpperCase(),
+        MezPigmto_Descripcion: descripcionPigmento,
+      }
+      console.table(pigmento);
+      this.mezclaPigmentosService.srvGuardar(pigmento).subscribe(dataMzPigmento => {
+        this.mostrarConfirmacion('Registro creado con éxito!');
+        setTimeout(() => {
+         this.formCrearPigmentos.reset();
+         this.mezclasPigmentos();
+         this.mezclasPigmentos2();
+        }, 300);
+      });
+    } else this.mostrarAdvertencia(`Ya existe un pigmento de mezclas llamado ${nombrePigmento.toUpperCase()}`)
+  });
  }
 
  cargarModalPigmentos(){
@@ -5411,7 +5465,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   }
 
   /** Mostrar mensaje de confirmación */
-  mostrarConfirmacion() {
-    this.messageService.add({severity:'success', detail:`Registro de Mezcla Predefinida creado con éxito!`});
+  mostrarConfirmacion(texto : string) {
+    this.messageService.add({severity:'success', detail: texto } );
   }
 }

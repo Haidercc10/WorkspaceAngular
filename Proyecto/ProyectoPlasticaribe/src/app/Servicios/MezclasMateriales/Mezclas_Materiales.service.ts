@@ -31,6 +31,10 @@ export class Mezclas_MaterialesService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezcla_Material/${id}`);
   }
 
+  getMezclasMateriales(nombre : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezcla_Material/Nombres_Materiales/${nombre}`);
+  }
+
   //
   srvActualizar(id:number|String, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Mezcla_Material/${id}`, data);

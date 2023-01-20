@@ -595,8 +595,10 @@
         <div class="tab-pane fade" id="Mezclas" role="tabpanel" aria-labelledby="Mezclas-tab">
 
             <!--Boton para llamar el modal de crear mezclas-->
-            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button pButton pRipple label="Crear Mezclas" icon="pi pi-plus" class="p-button-danger r-2" (click)="cargarModalMezclas()"></button>
+            <div class="container">
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button pButton pRipple label="Crear Mezclas" icon="pi pi-plus" class="p-button-danger r-2" (click)="cargarModalMezclas()"></button>
+              </div>
             </div>
 
             <!-- Modal para crear mezclas -->
@@ -608,13 +610,14 @@
                 </div>
 
                 <!--Modal Materiales -->
-                <p-dialog header="Creación de Materiales" [(visible)]="modalMateriales" [style]="{width: '40%'}" [modal]="true" [resizable]="true" styleClass="p-fluid">
+                <p-dialog header="Creación de Materiales" [(visible)]="modalMateriales" [style]="{width: '30%'}" [modal]="true" [resizable]="true" styleClass="p-fluid">
                   <form [formGroup]="formCrearMateriales">
+                    <p-toast position="center"></p-toast>
                     <!-- Nombre -->
                     <div class="form-floating col-md mb-3">
-                      <input formControlName="matNombre" class="form-control form-control-sm" list="materiales" id="floatingInput" required (keyup)="cargarMezclaMateria2()">
+                      <input formControlName="matNombre" class="form-control form-control-sm" list="materiales" id="floatingInput" required (change)="cargarMezclaMateria()">
                       <datalist id="materiales">
-                        <option value={{item.mezMaterial_Nombre}} *ngFor="let item of arrayMateriales2">{{item.mezMaterial_Nombre}}</option>
+                        <option value={{item.mezMaterial_Nombre}} *ngFor="let item of mezclasMateriales2">{{item.mezMaterial_Nombre}}</option>
                       </datalist>
                       <label for="floatingInput">Nombre</label>
                     </div>
@@ -627,18 +630,19 @@
                   </form>
 
                   <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                    <button pButton pRipple label="Crear Material" icon="pi pi-plus" class="p-button-danger r-2"></button>
+                    <button pButton pRipple label="Crear Material" icon="pi pi-plus" class="p-button-danger r-2" (click)="crearMaterial()"></button>
                   </div>
                 </p-dialog>
 
                 <!-- Modal Pigmentos -->
-                <p-dialog header="Creación de Pigmentos" [(visible)]="modalPigmentos" [style]="{width: '40%'}" [modal]="true" [resizable]="true" styleClass="p-fluid">
+                <p-dialog header="Creación de Pigmentos" [(visible)]="modalPigmentos" [style]="{width: '30%'}" [modal]="true" [resizable]="true" styleClass="p-fluid">
                   <form [formGroup]="formCrearPigmentos">
+                    <p-toast position="center"></p-toast>
                     <!-- Nombre -->
                     <div class="form-floating col-md mb-3">
-                      <input formControlName="pigNombre" class="form-control form-control-sm" list="materiales" id="floatingInput" required (keyup)="cargarMezclaPigmento()">
-                      <datalist id="materiales">
-                        <option value={{item.mezPigmto_Nombre}} *ngFor="let item of arrayPigmentos">{{item.mezPigmto_Nombre}}</option>
+                      <input formControlName="pigNombre" class="form-control form-control-sm" list="pigmentos" id="floatingInput" required (change)="cargarMezclaPigmento()">
+                      <datalist id="pigmentos">
+                        <option value={{item.mezPigmto_Nombre}} *ngFor="let item of mezclasPigmentos2">{{item.mezPigmto_Nombre}}</option>
                       </datalist>
                       <label for="floatingInput">Nombre</label>
                     </div>
@@ -651,7 +655,7 @@
                   </form>
 
                   <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                    <button pButton pRipple label="Crear Materiales" icon="pi pi-plus" class="p-button-danger r-2"></button>
+                    <button pButton pRipple label="Crear Pigmento" icon="pi pi-plus" class="p-button-danger r-2" (click)="crearPigmento()"></button>
                   </div>
                 </p-dialog>
 
@@ -688,8 +692,6 @@
                     <div class="mb-3">
                       <h6 class="tituloRojo">N° de capas</h6>
                     </div>
-
-
 
                     <div class="form-check form-check-inline">
                       <input class="form-check-input" formControlName="Chechbox_Capa1" type="checkbox" id="capa1" [(ngModel)]="checkedCapa1" value="option1" (click)="cambiarNroCapas1()">
@@ -736,7 +738,7 @@
                     <ng-template #Capa2>
                       <div class="form-floating col-md-2" #Capa2>
                         <input formControlName="Proc_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required readonly onmousedown="return false;">
-                        <label for="floatingInput">% Capa 1</label>
+                        <label for="floatingInput">% Capa 2</label>
                       </div>
                     </ng-template>
 
@@ -1310,7 +1312,6 @@
               </div>
 
             </p-dialog>
-
             <!--Fin modal de mezclas -->
 
 
@@ -1626,7 +1627,7 @@
                 <!--Pigmento 1 Capa 1-->
                 <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmentoP1_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezPigt.mezPigmto_Id" *ngFor="let mezPigt of mezclasPigmentos2">{{mezPigt.mezPigmto_Nombre}}</option>
+                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 1</label>
                 </div>
@@ -1640,7 +1641,7 @@
                  <!-- Pigmento 1 Capa 2-->
                  <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmentoP1_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezPigt.mezPigmto_Id" *ngFor="let mezPigt of mezclasPigmentos2">{{mezPigt.mezPigmto_Nombre}}</option>
+                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 1</label>
                 </div>
@@ -1654,7 +1655,7 @@
                  <!-- Pigmento 1 Capa 3 -->
                  <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmento1_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezPigt.mezPigmto_Id" *ngFor="let mezPigt of mezclasPigmentos2">{{mezPigt.mezPigmto_Nombre}}</option>
+                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 1</label>
                 </div>
@@ -1675,7 +1676,7 @@
                 <!--Pigmento 2 Capa 1-->
                 <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmentoP2_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezPigt.mezPigmto_Id" *ngFor="let mezPigt of mezclasPigmentos2">{{mezPigt.mezPigmto_Nombre}}</option>
+                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 2</label>
                 </div>
@@ -1689,7 +1690,7 @@
                  <!--Pigmento 2 Capa 2-->
                  <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmentoP2_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezPigt.mezPigmto_Id" *ngFor="let mezPigt of mezclasPigmentos2">{{mezPigt.mezPigmto_Nombre}}</option>
+                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 2</label>
                 </div>
@@ -1703,7 +1704,7 @@
                  <!--Pigmento 2 Capa 3-->
                  <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmento2_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezPigt.mezPigmto_Id" *ngFor="let mezPigt of mezclasPigmentos2">{{mezPigt.mezPigmto_Nombre}}</option>
+                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 2</label>
                 </div>

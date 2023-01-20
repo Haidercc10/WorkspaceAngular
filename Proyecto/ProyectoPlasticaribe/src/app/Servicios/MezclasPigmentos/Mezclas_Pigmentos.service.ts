@@ -30,6 +30,10 @@ export class Mezclas_PigmentosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezcla_Pigmento/${id}`);
   }
 
+  getMezclasPigmentos(nombre : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezcla_Pigmento/Nombres_Pigmentos/${nombre}`);
+  }
+
   //
   srvActualizar(id:number|String, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Mezcla_Pigmento/${id}`, data);
