@@ -22,6 +22,44 @@
 
 <!-- Tabla de Pedidos -->
 <div class="container-fluid">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-center" >
+    <!--Inicio Tabla OT-->
+    <div class="mb-4">
+      <div class="row g-3">
+        <div class="table-responsive">
+          <table class="table table-borderless table-hover mt-2 tableColores" style="font-size: 14px;">
+            <thead class="TitulosTabla">
+              <td class="verde">
+                <a class="btn verde" data-bs-toggle="collapse" href="#multiCollapseExample4" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>Se puede facturar todo el pedido</b></a>
+                <div class="row">
+                  <div class="col">
+                    <div class="collapse multi-collapse" id="multiCollapseExample4">
+                      <div class="card card-body">
+                        Este color indica que todos los item del pedido puede n fecturados y enviados dado que la cantidad que hay en existencias es igual o superior a la cantidad pendiente del respectivo item.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="azul">
+                <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample5" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>Se puede facturar minimo un item del pedido</b></a>
+                <div class="row">
+                  <div class="col">
+                    <div class="collapse multi-collapse" id="multiCollapseExample5">
+                      <div class="card card-body">
+                        Este color indica que minimo uno de los items del pedido puede ser facturado, ese siempre estará para pedidos con más de un item.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </thead>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
     <button pButton pRipple label="Exportar Excel" icon="pi pi-file-excel" class="p-button-success r-2" (click)="exportarExcel()"></button>
   </div>
@@ -42,7 +80,28 @@
          [showCurrentPageReport]="true"
          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
          [rowsPerPageOptions]="[10,20,30,50,70,100, ArrayDocumento.length]"
-         [rowHover]="true">
+         [rowHover]="true"
+         [scrollable]="true" scrollHeight="1000px">
+         <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col style="width:150px">
+              <col style="width:200px">
+              <col style="width:200px">
+              <col style="width:150px">
+              <col style="width:150px">
+              <col style="width:150px">
+              <col style="width:100px">
+              <col style="width:100px">
+              <col style="width:200px">
+              <col style="width:200px">
+              <col style="width:100px">
+              <col style="width:300px">
+              <col style="width:200px;">
+              <col style="width:150px">
+              <col style="width:200px">
+              <col *ngFor="let col of columnasSeleccionada" style="width:100px">
+            </colgroup>
+         </ng-template>
          <ng-template pTemplate="caption">
             <div style="text-align:left">
               <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header" selectedItemsLabel="{0} columnas seleccionadas" [style]="{'width': '20em'}" defaultLabel="Elige las columnas que quieres ver"></p-multiSelect>
@@ -75,7 +134,7 @@
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'presentacion', 'contains')">
               </th>
               <th ttResizableColumn style="width: 200px">
-              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'estado', 'contains')">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'estado', 'contains')">
               </th>
               <th ttResizableColumn style="width: 200px">
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'vendedor', 'contains')">
@@ -84,13 +143,13 @@
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'OT', 'contains')">
               </th>
               <th ttResizableColumn style="width: 300px">
-              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Proceso_OT', 'contains')">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Proceso_OT', 'contains')">
               </th>
               <th ttResizableColumn style="width: 200px">
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costo_Cant_Pendiente', 'contains')">
               </th>
               <th ttResizableColumn style="width: 150px">
-              <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costo_Cant_Total', 'contains')">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costo_Cant_Total', 'contains')">
               </th>
               <th *ngFor="let col of columns" ttResizableColumn style="width: 200px">
                 <input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')">
@@ -152,49 +211,99 @@
             <ng-container *ngIf="data.ExistenciaMayor; then thenTemplate; else elseTemplate"></ng-container>
             <!-- Existencias mayores o iguales a la cantidad pendiente -->
             <ng-template #thenTemplate>
-              <tr style="background-color: #ABEBC6 ;">
-                <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">
-                  <p-treeTableToggler [rowNode]="rowNode" ></p-treeTableToggler>
-                  {{data.consecutivo}}
-                </td>
-                <td scope="col" title="Cliente" (dblclick)="varOrdenTranajo(data)">{{data.cliente}}</td>
-                <td scope="col" title="Item" (dblclick)="varOrdenTranajo(data)">{{data.producto}}</td>
-                <td style="text-align: center;" scope="col" title="Cantidad Pedida" (dblclick)="varOrdenTranajo(data)">{{data.cant_Pedida | number : '1.2-2'}}</td>
-                <td style="text-align: center;" scope="col" title="Cantidad Pendiente" class="bg-danger2" (dblclick)="varOrdenTranajo(data)"><b>{{data.cant_Pendiente | number : '1.2-2'}}</b></td>
-                <td style="text-align: center;" scope="col" title="Cantidad Facturada" (dblclick)="varOrdenTranajo(data)">{{data.cant_Facturada | number : '1.2-2'}}</td>
-                <td style="text-align: center;" scope="col" title="Existencias" (dblclick)="varOrdenTranajo(data)">{{data.existencias | number : '1.2-2'}}</td>
-                <td style="text-align: center;" scope="col" title="Presentación" (dblclick)="varOrdenTranajo(data)">{{data.presentacion}}</td>
-                <ng-container *ngIf="data.estado == 'Pendiente'">
-                  <td style="text-align: center;" scope="col" title="{{titlePendiente}}." data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-danger1">{{data.estado}}</span></td>
-                </ng-container>
-                <ng-container *ngIf="data.estado == 'Parcialmente Satisfecho'">
-                  <td style="text-align: center;" scope="col" title="{{titleParcial}}" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-warning1">{{data.estado}}</span></td>
-                </ng-container>
-                <td scope="col" title="Vendedor">{{data.vendedor}}</td>
-                <td ttEditableColumn>
-                  <p-treeTableCellEditor>
-                    <ng-template pTemplate="input">
-                      <input class="form-control form-control-sm" style="width: 100px;" type="number" [(ngModel)]="data.OT" (keyup.space)="cambiarOrden_Pedido(data)">
-                    </ng-template>
-                    <ng-template pTemplate="output">
-                      <span class="badge verde" *ngIf="data.Estado_OT == 17">{{data.OT}}</span> <!-- Terminada -->
-                      <span class="badge verde2" *ngIf="data.Estado_OT == 18">{{data.OT}}</span> <!-- Cerrada -->
-                      <span class="badge rojo" *ngIf="data.Estado_OT == 3">{{data.OT}}</span> <!-- Anulada -->
-                      <span class="badge azul" *ngIf="data.Estado_OT == 14">{{data.OT}}</span> <!-- Asignada -->
-                      <span class="badge amarillo" *ngIf="data.Estado_OT == 16">{{data.OT}}</span> <!-- En Proceso -->
-                      <span class="badge naranja" *ngIf="data.Estado_OT == 15">{{data.OT}}</span> <!-- Abierta -->
-                    </ng-template>
-                  </p-treeTableCellEditor>
-                </td>
-                <td style="text-align: center;" scope="col" (dblclick)="varOrdenTranajo(data)">
-                  <span class="badge verde" *ngIf="data.Estado_OT == 17">{{data.Proceso_OT}}</span> <!-- Terminada -->
-                  <span class="badge amarillo" *ngIf="data.Estado_OT == 16">{{data.Proceso_OT}}</span> <!-- En Proceso -->
-                </td>
-                <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.costo_Cant_Pendiente | number}}</td>
-                <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.costo_Cant_Total | number}}</td>
-                <td *ngFor="let col of columnasSeleccionada; let i = index"> {{data[col.field]}} </td>
-                <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
-              </tr>
+              <ng-container *ngIf="data.Cant_Items_ExistenciaMayor < data.Cant_Items; then azul; else verde"></ng-container>
+              <!--  -->
+              <ng-template #azul>
+                <tr style="background-color: #aad0f3 ;">
+                  <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">
+                    <p-treeTableToggler [rowNode]="rowNode" ></p-treeTableToggler>
+                    {{data.consecutivo}}
+                  </td>
+                  <td scope="col" title="Cliente" (dblclick)="varOrdenTranajo(data)">{{data.cliente}}</td>
+                  <td scope="col" title="Item" (dblclick)="varOrdenTranajo(data)">{{data.producto}}</td>
+                  <td style="text-align: center;" scope="col" title="Cantidad Pedida" (dblclick)="varOrdenTranajo(data)">{{data.cant_Pedida | number : '1.2-2'}}</td>
+                  <td style="text-align: center;" scope="col" title="Cantidad Pendiente" class="bg-danger2" (dblclick)="varOrdenTranajo(data)"><b>{{data.cant_Pendiente | number : '1.2-2'}}</b></td>
+                  <td style="text-align: center;" scope="col" title="Cantidad Facturada" (dblclick)="varOrdenTranajo(data)">{{data.cant_Facturada | number : '1.2-2'}}</td>
+                  <td style="text-align: center;" scope="col" title="Existencias" (dblclick)="varOrdenTranajo(data)">{{data.existencias | number : '1.2-2'}}</td>
+                  <td style="text-align: center;" scope="col" title="Presentación" (dblclick)="varOrdenTranajo(data)">{{data.presentacion}}</td>
+                  <ng-container *ngIf="data.estado == 'Pendiente'">
+                    <td style="text-align: center;" scope="col" title="{{titlePendiente}}." data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-danger1">{{data.estado}}</span></td>
+                  </ng-container>
+                  <ng-container *ngIf="data.estado == 'Parcialmente Satisfecho'">
+                    <td style="text-align: center;" scope="col" title="{{titleParcial}}" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-warning1">{{data.estado}}</span></td>
+                  </ng-container>
+                  <td scope="col" title="Vendedor">{{data.vendedor}}</td>
+                  <td ttEditableColumn>
+                    <p-treeTableCellEditor>
+                      <ng-template pTemplate="input" *ngIf="ValidarRol == 1">
+                        <input class="form-control form-control-sm" style="width: 100px;" type="number" [(ngModel)]="data.OT" (keyup.space)="cambiarOrden_Pedido(data)">
+                      </ng-template>
+                      <ng-template pTemplate="output">
+                        <span class="badge verde" *ngIf="data.Estado_OT == 17">{{data.OT}}</span> <!-- Terminada -->
+                        <span class="badge verde2" *ngIf="data.Estado_OT == 18">{{data.OT}}</span> <!-- Cerrada -->
+                        <span class="badge rojo" *ngIf="data.Estado_OT == 3">{{data.OT}}</span> <!-- Anulada -->
+                        <span class="badge azul" *ngIf="data.Estado_OT == 14">{{data.OT}}</span> <!-- Asignada -->
+                        <span class="badge amarillo" *ngIf="data.Estado_OT == 16">{{data.OT}}</span> <!-- En Proceso -->
+                        <span class="badge naranja" *ngIf="data.Estado_OT == 15">{{data.OT}}</span> <!-- Abierta -->
+                      </ng-template>
+                    </p-treeTableCellEditor>
+                  </td>
+                  <td style="text-align: center;" scope="col" (dblclick)="varOrdenTranajo(data)">
+                    <span class="badge verde" *ngIf="data.Estado_OT == 17">{{data.Proceso_OT}}</span> <!-- Terminada -->
+                    <span class="badge amarillo" *ngIf="data.Estado_OT == 16">{{data.Proceso_OT}}</span> <!-- En Proceso -->
+                  </td>
+                  <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.costo_Cant_Pendiente | number}}</td>
+                  <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.costo_Cant_Total | number}}</td>
+                  <td *ngFor="let col of columnasSeleccionada; let i = index"> {{data[col.field]}} </td>
+                  <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                </tr>
+              </ng-template>
+              <!--  -->
+              <ng-template #verde>
+                <tr style="background-color: #ABEBC6 ;">
+                  <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">
+                    <p-treeTableToggler [rowNode]="rowNode" ></p-treeTableToggler>
+                    {{data.consecutivo}}
+                  </td>
+                  <td scope="col" title="Cliente" (dblclick)="varOrdenTranajo(data)">{{data.cliente}}</td>
+                  <td scope="col" title="Item" (dblclick)="varOrdenTranajo(data)">{{data.producto}}</td>
+                  <td style="text-align: center;" scope="col" title="Cantidad Pedida" (dblclick)="varOrdenTranajo(data)">{{data.cant_Pedida | number : '1.2-2'}}</td>
+                  <td style="text-align: center;" scope="col" title="Cantidad Pendiente" class="bg-danger2" (dblclick)="varOrdenTranajo(data)"><b>{{data.cant_Pendiente | number : '1.2-2'}}</b></td>
+                  <td style="text-align: center;" scope="col" title="Cantidad Facturada" (dblclick)="varOrdenTranajo(data)">{{data.cant_Facturada | number : '1.2-2'}}</td>
+                  <td style="text-align: center;" scope="col" title="Existencias" (dblclick)="varOrdenTranajo(data)">{{data.existencias | number : '1.2-2'}}</td>
+                  <td style="text-align: center;" scope="col" title="Presentación" (dblclick)="varOrdenTranajo(data)">{{data.presentacion}}</td>
+                  <ng-container *ngIf="data.estado == 'Pendiente'">
+                    <td style="text-align: center;" scope="col" title="{{titlePendiente}}." data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-danger1">{{data.estado}}</span></td>
+                  </ng-container>
+                  <ng-container *ngIf="data.estado == 'Parcialmente Satisfecho'">
+                    <td style="text-align: center;" scope="col" title="{{titleParcial}}" data-bs-toggle="modal" data-bs-target="#modalEstados" (click)="varOrdenTranajo(data)"><span class="badge bg-warning1">{{data.estado}}</span></td>
+                  </ng-container>
+                  <td scope="col" title="Vendedor">{{data.vendedor}}</td>
+                  <td ttEditableColumn>
+                    <p-treeTableCellEditor>
+                      <ng-template pTemplate="input" *ngIf="ValidarRol == 1">
+                        <input class="form-control form-control-sm" style="width: 100px;" type="number" [(ngModel)]="data.OT" (keyup.space)="cambiarOrden_Pedido(data)">
+                      </ng-template>
+                      <ng-template pTemplate="output">
+                        <span class="badge verde" *ngIf="data.Estado_OT == 17">{{data.OT}}</span> <!-- Terminada -->
+                        <span class="badge verde2" *ngIf="data.Estado_OT == 18">{{data.OT}}</span> <!-- Cerrada -->
+                        <span class="badge rojo" *ngIf="data.Estado_OT == 3">{{data.OT}}</span> <!-- Anulada -->
+                        <span class="badge azul" *ngIf="data.Estado_OT == 14">{{data.OT}}</span> <!-- Asignada -->
+                        <span class="badge amarillo" *ngIf="data.Estado_OT == 16">{{data.OT}}</span> <!-- En Proceso -->
+                        <span class="badge naranja" *ngIf="data.Estado_OT == 15">{{data.OT}}</span> <!-- Abierta -->
+                      </ng-template>
+                    </p-treeTableCellEditor>
+                  </td>
+                  <td style="text-align: center;" scope="col" (dblclick)="varOrdenTranajo(data)">
+                    <span class="badge verde" *ngIf="data.Estado_OT == 17">{{data.Proceso_OT}}</span> <!-- Terminada -->
+                    <span class="badge amarillo" *ngIf="data.Estado_OT == 16">{{data.Proceso_OT}}</span> <!-- En Proceso -->
+                  </td>
+                  <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.costo_Cant_Pendiente | number}}</td>
+                  <td style="text-align: center;" scope="col" title="N° Pedido" (dblclick)="varOrdenTranajo(data)">{{data.costo_Cant_Total | number}}</td>
+                  <td *ngFor="let col of columnasSeleccionada; let i = index"> {{data[col.field]}} </td>
+                  <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                </tr>
+              </ng-template>
             </ng-template>
             <!-- Existencias menores a la cantidad pendiente -->
             <ng-template #elseTemplate>
@@ -219,7 +328,7 @@
                 <td scope="col" title="Vendedor">{{data.vendedor}}</td>
                 <td ttEditableColumn>
                   <p-treeTableCellEditor>
-                    <ng-template pTemplate="input">
+                    <ng-template pTemplate="input" *ngIf="ValidarRol == 1">
                       <input class="form-control form-control-sm" style="width: 100px;" type="number" [(ngModel)]="data.OT" (keyup.space)="cambiarOrden_Pedido(data)">
                     </ng-template>
                     <ng-template pTemplate="output">

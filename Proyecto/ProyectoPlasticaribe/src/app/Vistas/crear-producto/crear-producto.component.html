@@ -1,6 +1,4 @@
-<!--Inicio formulario crear productos -->
 <form [formGroup]="FormCrearProducto" (ngSubmit)="validarCamposVacios()">
-  <!-- Inicio Fila 1 Crear producto -->
   <div class="mb-4">
     <div class="row g-3">
       <!-- ID Producto -->
@@ -8,101 +6,103 @@
         <input formControlName="ProduId" type="search" min="0" class="form-control" id="floatingInput" required >
         <label for="floatingInput">Id Producto</label>
       </div>
+
       <!-- ID/Nombre Producto -->
-      <div class="form-floating col-md">
+      <div class="form-floating col-md-4">
         <input formControlName="ProduNombre" type="text" class="form-control form-control-sm" id="floatingInput" required>
         <label for="floatingInput">Nombre Producto</label>
       </div>
+
       <!-- Ancho Producto -->
       <div class="form-floating col-md-2">
         <input formControlName="ProduAncho" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
         <label for="floatingInput">Ancho Producto</label>
       </div>
+
       <!-- Fuelle Producto -->
       <div class="form-floating col-md-2">
         <input formControlName="ProduFuelle" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
         <label for="floatingInput">Fuelle Producto</label>
       </div>
+
       <!-- Calibre Producto -->
       <div class="form-floating col-md-2">
         <input formControlName="ProduCalibre" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
         <label for="floatingInput">Calibre Producto</label>
       </div>
+
       <!-- Largo Producto -->
       <div class="form-floating col-md-2">
         <input formControlName="ProduLargo" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
         <label for="floatingInput">Largo Producto</label>
       </div>
-    </div>
-  </div>
-  <!-- Fin Fila 1 Crear Producto -->
 
-  <!-- Inicio Fila 2 Crear Producto -->
-  <div class="mb-4">
-    <div class="row g-3">
       <!-- Unidad medida Calibre/Ancho/Fuelle Producto -->
       <div class="form-floating col-md-2">
         <select formControlName="ProduUnidadMedidaACF" type="text" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-          <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
+          <option [ngValue]="undMed.undMed_Id" *ngFor="let undMed of unidadMedida">{{undMed.undMed_Id}}</option>
         </select>
         <label for="floatingSelect">Und. Medida</label>
       </div>
+
       <!-- Tipo Producto -->
       <div class="form-floating col-md-2">
         <select formControlName="ProduTipo" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-          <option [ngValue]="tipo_Producto" *ngFor="let tipo_Producto of tipoProducto">{{tipo_Producto}}</option>
+          <option [ngValue]="tipo_Producto.tpProd_Id" *ngFor="let tipo_Producto of tipoProducto">{{tipo_Producto.tpProd_Nombre}}</option>
         </select>
         <label for="floatingSelect">Tipo Producto</label>
       </div>
+
+      <!-- Tipo Sellado -->
+      <div class="form-floating col-md-2">
+        <select formControlName="ProduSellado" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
+          <option [ngValue]="item.tpSellado_Id" *ngFor="let item of tiposSellado">{{item.tpSellados_Nombre}}</option>
+        </select>
+        <label for="floatingSelect">Tipo Sellado</label>
+      </div>
+
+      <!-- Bolsas Por Bulto -->
+      <div class="form-floating col-md-2">
+        <input formControlName="ProduBolsasBulto" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
+        <label for="floatingInput">Bolsas Por Bulto</label>
+      </div>
+
+      <!-- Bolsas Por Paquete -->
+      <div class="form-floating col-md-2">
+        <input formControlName="ProduBolsasPaquete" type="number" class="form-control form-control-sm" id="floatingInput" required maxlength="14">
+        <label for="floatingInput">Bolsas Por Paquete</label>
+      </div>
+
       <!-- Material -->
       <div class="form-floating col-md-2">
         <select formControlName="ProduMaterial" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-          <option [ngValue]="material" *ngFor="let material of materialProducto">{{material}}</option>
+          <option [ngValue]="material.material_Id" *ngFor="let material of materialProducto">{{material.material_Nombre}}</option>
         </select>
         <label for="floatingSelect">Material del Producto</label>
       </div>
+
       <!-- Pigmento -->
       <div class="form-floating col-md-2">
         <select formControlName="ProduPigmento" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-          <option [ngValue]="pigmento" *ngFor="let pigmento of pigmentoProducto">{{pigmento}}</option>
+          <option [ngValue]="pigmento.pigmt_Id" *ngFor="let pigmento of pigmentoProducto">{{pigmento.pigmt_Nombre}}</option>
         </select>
         <label for="floatingSelect">Pigmento del Producto</label>
       </div>
+
       <!-- Campo Descripción producto -->
-      <div class="form-floating  col-md-4">
+      <div class="form-floating col-md">
         <textarea formControlName="ProdDescripcion" id="floatingTextarea" type="text" class="form-control form-control-sm campoObservacion"></textarea>
         <label for="floatingTextarea">Descripción del Producto</label>
       </div>
-    </div>
-  </div>
 
-  <!-- Inicio fila 3 -->
-  <div class="mb-4">
-    <div class="row g-3">
       <!-- Cliente -->
-      <ng-container>
-        <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm autoCompleteCLientes">
-          <ng-autocomplete
-            class=""
-            [data]="cliente"
-            (selected)='selectEventNombreCliente($event)'
-            (inputChanged)='onChangeSearchNombreCliente($event)'
-            (inputFocused)='onFocusedNombreCliente($event)'
-            [searchKeyword]="keywordClientes"
-            [itemTemplate]="itemTemplate"
-            [notFoundTemplate]="notFoundTemplate"
-            id="floatingInput"
-            formControlName="ClienteNombre">
-          </ng-autocomplete>
-          <ng-template #itemTemplate let-item>
-            <a [innerHTML]="item.cli_Nombre"></a>
-          </ng-template>
-          <ng-template #notFoundTemplate let-notFound>
-            <div [innerHTML]="notFound"></div>
-          </ng-template>
-          <label for="floatingInput" *ngIf="validarInputClientes">Cliente</label>
-        </div>
-      </ng-container>
+      <div class="form-floating col-md">
+        <input formControlName="ClienteNombre" class="form-control form-control-sm" list="cliente" id="floatingInput" required>
+        <datalist id="cliente">
+          <option value={{item.cli_Id}} *ngFor="let item of cliente">{{item.cli_Nombre}}</option>
+        </datalist>
+        <label for="floatingInput">Cliente</label>
+      </div>
     </div>
   </div>
 
@@ -126,36 +126,36 @@
   <div class="mb-4">
     <div class="row g-3">
 
-      <div class="form-floating col-md-2">
+      <div class="form-floating col-md">
         <input formControlName="ProdId" type="search" min="0" class="form-control" id="floatingInput" required >
         <label for="floatingInput">Id Producto</label>
       </div>
 
       <!-- Cantidad Producto -->
-      <div class="form-floating col-md-2">
+      <div class="form-floating col-md">
         <input formControlName="ProduCantidad" type="search" min="0" class="form-control" id="floatingInput" required >
         <label for="floatingInput">Cantidad Producto</label>
       </div>
 
       <!-- UM Cantidad Producto -->
-      <div class="form-floating col-md-2">
+      <div class="form-floating col-md">
         <select formControlName="ProduUnidadMedidaCant" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdUnidadMedidaACF">
           <!-- <option [ngValue]="null" disabled selected>Seleccione Und. Medida</option> -->
-          <option [ngValue]="und" *ngFor="let und of unidadMedida">{{und}}</option>
+          <option [ngValue]="und.undMed_Id" *ngFor="let und of unidadMedida">{{und.undMed_Id}}</option>
         </select>
         <label for="floatingSelect">Und. Medida</label>
       </div>
 
       <!-- Precio Producto -->
-      <div class="form-floating col-md-2">
+      <div class="form-floating col-md">
         <input formControlName="ProduPrecioUnd" type="search" min="0" class="form-control" id="floatingInput" required >
         <label for="floatingInput">Precio Producto</label>
       </div>
 
       <!-- Tipo Moneda -->
-      <div class="form-floating col-md-3">
+      <div class="form-floating col-md">
         <select formControlName="ProduTipoMoneda" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdTipoMoneda">
-          <option [ngValue]="tiposMonedas" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas}}</option>
+          <option [ngValue]="tiposMonedas.tpMoneda_Id" *ngFor="let tiposMonedas of tipoMoneda">{{tiposMonedas.tpMoneda_Id}}</option>
         </select>
         <label for="floatingSelect">Tipo de Moneda</label>
       </div>
@@ -171,4 +171,3 @@
   </div>
   <!-- Fin botones -->
 </form>
-<!--Fin Formulario crear productos -->

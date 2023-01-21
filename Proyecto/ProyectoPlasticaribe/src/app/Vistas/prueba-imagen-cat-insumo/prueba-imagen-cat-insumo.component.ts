@@ -17,6 +17,8 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
 
   cols: any[];
 
+  numbers = [45, 4, 9, 16, 25];
+
   constructor() { }
 
   ngOnInit() {
@@ -52,7 +54,12 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
           { field: 'size', header: 'Size' },
           { field: 'type', header: 'Type' }
       ];
+
+    console.log(this.numbers.find(this.myFunction))
   }
 
+  myFunction(value, index, array) {
+    return value > 18;
+  }
 
 }

@@ -115,6 +115,9 @@ export class OpedidoproductoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/PedidosSinOT`);
   }
 
+  GetCrearPdfUltPedido():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/getCrearPdfUltPedido`);
+  }
 
 //Metodo agregar Pedidos de Productos
   srvAgregarPedidosProductos(data:any) {

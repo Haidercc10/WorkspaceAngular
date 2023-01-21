@@ -1,11 +1,10 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { TipoMonedaService } from 'src/app/Servicios/TipoMoneda/tipo-moneda.service';
 import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
-import {OpedidoproductoComponent} from 'src/app/Vistas/opedidoproducto/opedidoproducto.component'
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -14,6 +13,9 @@ import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
 import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
+import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado.service';
+import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
+import moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -28,21 +30,18 @@ export class CrearProductoComponent implements OnInit {
 
   public FormCrearProducto : FormGroup;
   public FormCrearPresentacionProducto : FormGroup;
-
-  unidadMedida = [];
-  tipoProducto = [];
-  materialProducto = [];
-  pigmentoProducto =[];
-  tipoMoneda = [];
-  producto = [];
-  pedidosID = [];
-  cliente = [];
-  clienteDatos = [];
-  storage_Id : number;
-  storage_Nombre : any;
-  storage_Rol : any;
-  validarInputClientes : any = true;
-  keywordClientes = 'cli_Nombre';
+  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
+  unidadMedida : any [] = []; //Variable que almacemará las unidades de medida
+  tipoProducto : any [] = []; //Variable que almacenará los tipos de productos
+  materialProducto : any [] = []; //Variable que almacenará los materiales
+  pigmentoProducto : any [] = []; //Variable que almancenará los pigmentos
+  tipoMoneda : any [] = []; //Variable que almacenará los tipos de monedas
+  tiposSellado : any [] = [];  //Variable que almacenará los tipos de sellados
+  cliente : any [] = []; //Variable que almacenará los clientes
 
   constructor(private frmBuilderCrearProducto : FormBuilder,
                 private unidadMedidaService : UnidadMedidaService,
@@ -50,193 +49,264 @@ export class CrearProductoComponent implements OnInit {
                     private tipoMonedaService : TipoMonedaService,
                       private productoService : ProductoService,
                         private pedidosProducto : PedidoExternoComponent,
-                         private existenciasService : ExistenciasProductosService,
-                          private clientesService : ClientesService,
-                            private usuarioService : UsuarioService,
-                              @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                private rolService : RolesService,
-                                  private materialService : MaterialProductoService,
-                                    private pigmentoServices : PigmentoProductoService) {
+                          private existenciasService : ExistenciasProductosService,
+                            private clientesService : ClientesService,
+                              private usuarioService : UsuarioService,
+                                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                                  private rolService : RolesService,
+                                    private materialService : MaterialProductoService,
+                                      private pigmentoServices : PigmentoProductoService,
+                                        private tipoSelladoService : TiposSelladoService,
+                                          private ClientesProductosService : ClientesProductosService,) {
 
-  this.FormCrearProducto = this.frmBuilderCrearProducto.group({
-    //Datos para la tabla de productos. (Iguala el valor del campo en la vista)
-      ProduId:['', Validators.required],
-      ProduNombre: ['', Validators.required],
-      ProduAncho: ['', Validators.required],
-      ProduFuelle: ['', Validators.required],
-      ProduCalibre: ['', Validators.required],
-      ProduLargo : ['', Validators.required],
-      ProduUnidadMedidaACF: ['', Validators.required],
-      ProduTipo: ['', Validators.required],
-      ProduMaterial: ['', Validators.required],
-      ProduPigmento: ['', Validators.required],
-      ProdDescripcion: ['',],
+    this.FormCrearProducto = this.frmBuilderCrearProducto.group({
+      ProduId:[null, Validators.required],
+      ProduNombre: [null, Validators.required],
+      ProduAncho: [null, Validators.required],
+      ProduFuelle: [null, Validators.required],
+      ProduCalibre: [null, Validators.required],
+      ProduLargo : [null, Validators.required],
+      ProduUnidadMedidaACF: [null, Validators.required],
+      ProduTipo: [null, Validators.required],
+      ProduSellado: [null, Validators.required],
+      ProduMaterial: [null, Validators.required],
+      ProduPigmento: [null, Validators.required],
+      ProdDescripcion: '',
       ClienteNombre: [null, Validators.required],
+      ProduBolsasBulto : 0,
+      ProduBolsasPaquete : 0,
     });
 
     this.FormCrearPresentacionProducto = this.frmBuilderCrearProducto.group({
-    //Datos para la tabla de productos. (Iguala el valor del campo en la vista)
-      ProdId:['', Validators.required],
+      ProdId:[null, Validators.required],
       ProduCantidad: [0, Validators.required],
-      ProduUnidadMedidaCant: ['', Validators.required],
-      ProduPrecioUnd: ['', Validators.required],
-      ProduTipoMoneda: ['', Validators.required],
+      ProduUnidadMedidaCant: ['Kg', Validators.required],
+      ProduPrecioUnd: [0, Validators.required],
+      ProduTipoMoneda: ['COP', Validators.required],
     });
   }
 
-  onChangeSearchNombreCliente(val: string) {
-    if (val != '') this.validarInputClientes = false;
-    else this.validarInputClientes = true;
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
-  }
-
-  onFocusedNombreCliente(e){
-    if (!e.isTrusted) this.validarInputClientes = false;
-    else this.validarInputClientes = true;
-    if (this.FormCrearProducto.value.ClienteNombre != null) this.validarInputClientes = false;
-    else this.validarInputClientes = true;
-    // do something when input is focused
-  }
-
-  selectEventNombreCliente(item) {
-    if (this.FormCrearProducto.value.ClienteNombre != null) this.validarInputClientes = false;
-    else this.validarInputClientes = true;
-    // do something with selected item
-  }
-
   ngOnInit(): void {
+    this.lecturaStorage();
+    this.LimpiarCampos();
     this.undMedidaComboBox();
     this.tipoProductoComboBox();
     this.matrialProductoComboBox();
     this.pigmentoProductocomboBox();
     this.tipoMondedaComboBox();
-    this.lecturaStorage();
     this.clientesComboBox();
+    this.tiposSelladoComboBox();
   }
 
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
     let rol = this.storage.get('Rol');
     this.rolService.srvObtenerLista().subscribe(datos_roles => {
       for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) this.storage_Rol = datos_roles[index].rolUsu_Nombre;
+        if (datos_roles[index].rolUsu_Id == rol) {
+          this.ValidarRol = rol;
+          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
+        }
       }
     });
   }
 
-  validarCamposVacios() : any{
-    if(this.FormCrearProducto.valid) this.llenarTabla();
-    else Swal.fire("Hay campos vacios");
-  }
-
-  validarCamposVaciosPresentacion() : any{
-    if(this.FormCrearPresentacionProducto.valid) this.llenarTablaPresentacion();
-    else Swal.fire("Hay campos vacios");
-  }
-
+  // Funcion que va a limpiar los campos del formulario de producto
   LimpiarCampos() {
-    this.FormCrearProducto.reset();
+    this.productoService.GetIdUltimoProducto().subscribe(datos => {
+      this.FormCrearProducto.setValue({
+        ProduId:datos + 1,
+        ProduNombre: null,
+        ProduAncho: null,
+        ProduFuelle: null,
+        ProduCalibre: null,
+        ProduLargo : null,
+        ProduUnidadMedidaACF: null,
+        ProduTipo: null,
+        ProduSellado: null,
+        ProduMaterial: null,
+        ProduPigmento: null,
+        ProdDescripcion: '',
+        ClienteNombre: null,
+        ProduBolsasBulto : 0,
+        ProduBolsasPaquete : 0,
+      });
+    });
   }
 
+  // Funcion que va a limpiar los campos del formulario de existencias
   LimpiarCamposPresentacion() {
-    this.FormCrearPresentacionProducto.reset();
+    this.FormCrearPresentacionProducto.setValue({
+      ProdId:null,
+      ProduCantidad: 0,
+      ProduUnidadMedidaCant: 'Kg',
+      ProduPrecioUnd: 0,
+      ProduTipoMoneda: 'COP',
+    });
   }
 
+  // Funcion que consultará y almacenará los tipos de sellado
+  tiposSelladoComboBox(){
+    this.tipoSelladoService.srvObtenerLista().subscribe(datos_tpSelado => { this.tiposSellado = datos_tpSelado; });
+  }
+
+  // Funcion que consultará y almacenará los clientes
   clientesComboBox() {
     this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
       this.clientesService.srvObtenerListaPorEstado(1).subscribe(datos_clientes => {
         for (let index = 0; index < datos_clientes.length; index++) {
-          if (datos_usuarios.rolUsu_Id == 2) {
-            this.cliente.push(datos_clientes[index]);
-            this.clienteDatos.push(datos_clientes[index]);
-            continue;
-          }else {
-            this.cliente.push(datos_clientes[index]);
-            this.clienteDatos.push(datos_clientes[index]);
-          }
+          if (datos_usuarios.rolUsu_Id == 2) this.cliente.push(datos_clientes[index]);
+          else this.cliente.push(datos_clientes[index]);
           this.cliente.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
         }
       });
     });
   }
 
+  // Funcion que consultará y almacenará las unidades de medida
   undMedidaComboBox() {
-    this.unidadMedidaService.srvObtenerLista().subscribe(datos_undMed => {
-      for (let index = 0; index < datos_undMed.length; index++) {
-        this.unidadMedida.push(datos_undMed[index].undMed_Id);
-      }
-    });
+    this.unidadMedidaService.srvObtenerLista().subscribe(datos_undMed => { this.unidadMedida = datos_undMed; });
   }
 
+  // Funcion que consultará y almacenará los tipos de productos
   tipoProductoComboBox(){
-    this.tipoProductoService.srvObtenerLista().subscribe(datos_tiposProductos => {
-      for (let index = 0; index < datos_tiposProductos.length; index++) {
-        this.tipoProducto.push(datos_tiposProductos[index].tpProd_Nombre);
-      }
-    })
+    this.tipoProductoService.srvObtenerLista().subscribe(datos_tiposProductos => { this.tipoProducto = datos_tiposProductos; });
   }
 
   // Funcion para llenar el comboBox de material del producto
   matrialProductoComboBox(){
-    this.materialService.srvObtenerLista().subscribe(datos_material => {
-      for (let index = 0; index < datos_material.length; index++) {
-        this.materialProducto.push(datos_material[index].material_Nombre);
-      }
-    });
+    this.materialService.srvObtenerLista().subscribe(datos_material => { this.materialProducto = datos_material; });
   }
 
   // Funcion para llenar el comboBox de pigmentos del producto
   pigmentoProductocomboBox(){
-    this.pigmentoServices.srvObtenerLista().subscribe(datos_pigmentos => {
-      for (let index = 0; index < datos_pigmentos.length; index++) {
-        this.pigmentoProducto.push(datos_pigmentos[index].pigmt_Nombre);
-      }
-    });
+    this.pigmentoServices.srvObtenerLista().subscribe(datos_pigmentos => { this.pigmentoProducto = datos_pigmentos; });
   }
 
+  // Funcion que consultará y almacenará los tipos de monedas
   tipoMondedaComboBox(){
-    this.tipoMonedaService.srvObtenerLista().subscribe(datos_tiposMoneda => {
-      for (let index = 0; index < datos_tiposMoneda.length; index++) {
-        this.tipoMoneda.push(datos_tiposMoneda[index].tpMoneda_Id);
-      }
-    })
+    this.tipoMonedaService.srvObtenerLista().subscribe(datos_tiposMoneda => { this.tipoMoneda = datos_tiposMoneda; })
   }
 
+  // Funcion que va a validar los campos del formulario de productos
+  validarCamposVacios() : any{
+    if(this.FormCrearProducto.valid) this.llenarTabla();
+    else this.mensajeAdvertencia("Hay campos vacios");
+  }
+
+  // Funcion que va a validar los campos del formulario de existencias
+  validarCamposVaciosPresentacion() : any{
+    if(this.FormCrearPresentacionProducto.valid) this.llenarTablaPresentacion();
+    else this.mensajeAdvertencia("Hay campos vacios");
+  }
+
+  // Funcion que va a crear un producto y lo va a asociar a un cliente
   llenarTabla(){
-    let id : any = this.FormCrearProducto.value.ProduId;
-    let nombre : any = this.FormCrearProducto.value.ProduNombre;
-    let ancho : any = this.FormCrearProducto.value.ProduAncho;
-    let fuelle : any = this.FormCrearProducto.value.ProduFuelle;
-    let calibre : any = this.FormCrearProducto.value.ProduCalibre;
-    let largo : any = this.FormCrearProducto.value.ProduLargo;
-    let undMed : any = this.FormCrearProducto.value.ProduUnidadMedidaACF;
-    let tpProducto : any = this.FormCrearProducto.value.ProduTipo;
-    let material : any = this.FormCrearProducto.value.ProduMaterial;
-    let pigmento : any = this.FormCrearProducto.value.ProduPigmento;
-    let cantidad : any = this.FormCrearProducto.value.ProduCantidad;
-    let undMed2 : any = this.FormCrearProducto.value.ProduUnidadMedidaCant;
-    let precio : any = this.FormCrearProducto.value.ProduPrecioUnd;
-    let precioFinal : string = this.FormCrearProducto.value.ProduPrecioUnd;
-    let moneda : any = this.FormCrearProducto.value.ProduTipoMoneda;
-    let descripcion : any = this.FormCrearProducto.value.ProdDescripcion;
-    let cliente : any = this.FormCrearProducto.value.ClienteNombre.cli_Nombre;
-
-    this.pedidosProducto.llenarTablaProductosCreador(id, nombre, ancho, fuelle, calibre, largo, undMed, tpProducto, material, pigmento, cantidad, undMed2, precio, moneda, descripcion);
-    this.pedidosProducto.registrarProducto(id, nombre, ancho, fuelle, calibre, largo, undMed, tpProducto, material, pigmento, descripcion, cliente);
-    this.LimpiarCampos();
+    if (this.ValidarRol == 2) {
+      const datosProductos : any = {
+        Prod_Id: this.FormCrearProducto.value.ProduId,
+        Prod_Nombre: this.FormCrearProducto.value.ProduNombre,
+        Prod_Descripcion: this.FormCrearProducto.value.ProdDescripcion,
+        TpProd_Id: this.FormCrearProducto.value.ProduTipo,
+        Prod_Peso: 0,
+        Prod_Peso_Millar: 0,
+        UndMedPeso: 'Kg',
+        Prod_Fuelle: this.FormCrearProducto.value.ProduFuelle,
+        Prod_Ancho: this.FormCrearProducto.value.ProduAncho,
+        Prod_Calibre: this.FormCrearProducto.value.ProduCalibre,
+        UndMedACF: this.FormCrearProducto.value.ProduUnidadMedidaACF,
+        Estado_Id: 9,
+        Prod_Largo: this.FormCrearProducto.value.ProduLargo,
+        Pigmt_Id: this.FormCrearProducto.value.ProduPigmento,
+        Material_Id: this.FormCrearProducto.value.ProduMaterial,
+        Prod_Fecha : this.today,
+        Prod_Hora : moment().format('H:mm:ss'),
+        TpSellado_Id : this.FormCrearProducto.value.ProduSellado,
+        Prod_CantBolsasBulto: this.FormCrearProducto.value.ProduBolsasBulto,
+        Prod_CantBolsasPaquete: this.FormCrearProducto.value.ProduBolsasPaquete,
+      };
+      const clienteproducto : any = {
+        Cli_Id: this.FormCrearProducto.value.ClienteNombre,
+        Prod_Id: this.FormCrearProducto.value.ProduId
+      }
+      this.productoService.srvGuardar(datosProductos).subscribe(datos => {
+        this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
+          this.mensajeSatisfactorio('Se creó el producto de manera satisfactoria y se asoció al cliente');
+          this.LimpiarCampos();
+        }, error => { this.mensajeError('¡Ocurrió un error al crear la relación del producto con el cliente producto!', error.message); });
+      }, error => { this.mensajeError('¡Ocurrió un error al crear el producto!', error.message); });
+    }else if (this.ValidarRol == 1){
+      const datosProductos : any = {
+        Prod_Id: this.FormCrearProducto.value.ProduId,
+        Prod_Nombre: this.FormCrearProducto.value.ProduNombre,
+        Prod_Descripcion: this.FormCrearProducto.value.ProdDescripcion,
+        TpProd_Id: this.FormCrearProducto.value.ProduTipo,
+        Prod_Peso: 0,
+        Prod_Peso_Millar: 0,
+        UndMedPeso: 'Kg',
+        Prod_Fuelle: this.FormCrearProducto.value.ProduFuelle,
+        Prod_Ancho: this.FormCrearProducto.value.ProduAncho,
+        Prod_Calibre: this.FormCrearProducto.value.ProduCalibre,
+        UndMedACF: this.FormCrearProducto.value.ProduUnidadMedidaACF,
+        Estado_Id: 10,
+        Prod_Largo: this.FormCrearProducto.value.ProduLargo,
+        Pigmt_Id: this.FormCrearProducto.value.ProduPigmento,
+        Material_Id: this.FormCrearProducto.value.ProduMaterial,
+        Prod_Fecha : this.today,
+        Prod_Hora : moment().format('H:mm:ss'),
+        TpSellado_Id : this.FormCrearProducto.value.ProduSellado,
+        Prod_CantBolsasBulto: this.FormCrearProducto.value.ProduBolsasBulto,
+        Prod_CantBolsasPaquete: this.FormCrearProducto.value.ProduBolsasPaquete,
+      };
+      const clienteproducto : any = {
+        Cli_Id: this.FormCrearProducto.value.ClienteNombre,
+        Prod_Id: this.FormCrearProducto.value.ProduId
+      }
+      this.productoService.srvGuardar(datosProductos).subscribe(datos => {
+        this.ClientesProductosService.srvGuardar(clienteproducto).subscribe(datos =>{
+          this.mensajeSatisfactorio('Se creó el producto de manera satisfactoria y se asoció al cliente');
+          this.LimpiarCampos();
+        }, error => { this.mensajeError('¡Ocurrió un error al crear la relación del producto con el cliente producto!', error.message); });
+      }, error => { this.mensajeError('¡Ocurrió un error al crear el producto!', error.message); });
+    }
   }
 
+  //Funcion que va a crear una existencia para un producto
   llenarTablaPresentacion(){
-    let id : any = this.FormCrearPresentacionProducto.value.ProdId;
-    let cantidad : any = this.FormCrearPresentacionProducto.value.ProduCantidad;
-    let undMed2 : any = this.FormCrearPresentacionProducto.value.ProduUnidadMedidaCant;
-    let precio : any = this.FormCrearPresentacionProducto.value.ProduPrecioUnd;
-    let precioFinal : string = this.FormCrearPresentacionProducto.value.ProduPrecioUnd;
-    let moneda : any = this.FormCrearPresentacionProducto.value.ProduTipoMoneda;
-    this.pedidosProducto.registrarExistenciaProducto(id, cantidad, undMed2, precio, precioFinal, moneda);
-    this.LimpiarCamposPresentacion();
+    const datosExistencias : any = {
+      Prod_Id: this.FormCrearPresentacionProducto.value.ProdId,
+      ExProd_Cantidad: this.FormCrearPresentacionProducto.value.ProduCantidad,
+      TpBod_Id: 2,
+      UndMed_Id: this.FormCrearPresentacionProducto.value.ProduUnidadMedidaCant,
+      ExProd_Precio: this.FormCrearPresentacionProducto.value.ProduPrecioUnd,
+      ExProd_PrecioExistencia: this.FormCrearPresentacionProducto.value.ProduPrecioUnd * this.FormCrearPresentacionProducto.value.ProduCantidad,
+      ExProd_PrecioSinInflacion: 0,
+      TpMoneda_Id: this.FormCrearPresentacionProducto.value.ProduTipoMoneda,
+      ExProd_PrecioVenta: this.FormCrearPresentacionProducto.value.ProduPrecioUnd,
+      Exprod_CantMinima : 0,
+      ExProd_Fecha : moment().format('YYYY-MM-DD'),
+      ExProd_Hora : moment().format('H:mm:ss'),
+    };
+    this.existenciasService.srvGuardar(datosExistencias).subscribe(datos_existencias => {
+      this.mensajeSatisfactorio(`La existencia del producto con el ID ${this.FormCrearPresentacionProducto.value.ProdId} ha sido creada correctamente`);
+      this.LimpiarCamposPresentacion();
+    }, error => { this.mensajeError('¡Ocurrió un error, no fue posible guardar la presentación!', error.message); });
   }
 
+  // Mensaje Satisfactorio
+  mensajeSatisfactorio(mensaje : string){
+    Swal.fire({ icon: 'success', title: 'Guardado Exitoso', html:`<b>${mensaje}</b><hr> `, showCloseButton: true, });
+  }
+
+  // Mensaje de Advertencia
+  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  }
+
+  // Mensaje de Error
+  mensajeError(text : string, error : any = ''){
+    Swal.fire({ icon: 'error', title: 'Error', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+  }
 }

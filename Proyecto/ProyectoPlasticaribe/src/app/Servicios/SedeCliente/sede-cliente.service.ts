@@ -42,6 +42,10 @@ export class SedeClienteService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/clienteSede/${cliente}/${ciudad}/${direccion}`);
   }
 
+  GetSedesCliente(cliente : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/SedesClientes/getSedesCliente/${cliente}`);
+  }
+
   //Metodo agregar Productos
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/SedesClientes', data)

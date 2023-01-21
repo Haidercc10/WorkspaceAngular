@@ -161,7 +161,6 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   // Funcion que limpiará todos los campos
   limpiarTodosCampos(){
-    this.load = true;
     this.FormMateriaPrimaFactura.setValue({
       ConsecutivoFactura : this.ultimoIdFactura,
       OrdenCompra : '',
@@ -174,6 +173,8 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.FormRemisiones.reset();
     this.ArrayRemisiones = [];
     this.valorTotal = 0;
+    this.load = true;
+    this.ArrayMateriaPrima = [];
   }
 
   //Funcion que colocará el nombre a las columnas de la tabla en la cual se muestran los productos pedidos por los clientes
@@ -425,7 +426,7 @@ export class PedidomateriaprimaComponent implements OnInit {
             this.estadoOrdenCompra();
             this.moverInventarioMP();
             this.moverInventarioTintas();
-            this.limpiarTodosCampos();
+            setTimeout(() => { this.limpiarTodosCampos(); }, 1500);
           }, 2000);
         }
       }, 3500);
@@ -550,7 +551,7 @@ export class PedidomateriaprimaComponent implements OnInit {
           setTimeout(() => {
             this.moverInventarioMP();
             this.moverInventarioTintas();
-            this.limpiarTodosCampos();
+            setTimeout(() => { this.limpiarTodosCampos(); }, 1500);
           }, 2000);
         }
       }, 3500);

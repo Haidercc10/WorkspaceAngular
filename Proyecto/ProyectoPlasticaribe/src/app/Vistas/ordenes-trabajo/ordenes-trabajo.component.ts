@@ -771,17 +771,13 @@ export class OrdenesTrabajoComponent implements OnInit {
               for (let j = 0; j < datos_productosPedidos.length; j++) {
                 this.existenciasProductosServices.srvObtenerListaPorIdProducto(datos_productosPedidos[j].prod_Id).subscribe(datos_productos => {
                   for (let k = 0; k < datos_productos.length; k++) {
-                    let FechaEntregaDatetime = datos_pedido[i].pedExt_FechaEntrega;
-                    let FechaEntregaNueva = FechaEntregaDatetime.indexOf("T");
-                    let fechaEntrega = FechaEntregaDatetime.substring(0, FechaEntregaNueva);
-
                     this.clienteId = datos_pedido[i].sedeCli_Id;
                     this.FormOrdenTrabajo.patchValue({
                       OT_Id: ['', Validators.required],
                       Pedido_Id: idPedido.nombre,
                       Nombre_Vendedor: datos_pedido[i].usua_Nombre,
                       OT_FechaCreacion: this.today,
-                      OT_FechaEntrega: fechaEntrega,
+                      OT_FechaEntrega: datos_pedido[i].pedExt_FechaEntrega.replace('T00:00:00', ''),
                       ID_Cliente: datos_pedido[i].cli_Id,
                       Nombre_Cliente: datos_pedido[i].cli_Nombre,
                       Ciudad_SedeCliente: datos_pedido[i].sedeCliente_Ciudad,
@@ -4666,11 +4662,8 @@ export class OrdenesTrabajoComponent implements OnInit {
   cargarCombinacionMezclas2(){
     let nombreMezcla : any =  this.formCrearMezclas.value.Nombre_Mezclas;
     if (nombreMezcla != null) {
-
       this.mezclasService.srvObtenerListaPorNombre(nombreMezcla.replace('%', '%25')).subscribe(datos_mezcla => {
         for (let i = 0; i < datos_mezcla.length; i++) {
-          console.log(datos_mezcla[i].mezcla_NroCapas);
-
           this.idMezclaSeleccionada = datos_mezcla[i].mezcla_Id;
           if (datos_mezcla[i].mezcla_NroCapas == 1) {
             this.checkedCapa1 = true;
@@ -4739,7 +4732,6 @@ export class OrdenesTrabajoComponent implements OnInit {
             MezclaPigmento2_Capa3 : datos_mezcla[i].mezPigmto_Id2xCapa3,
             PorcentajeMezclaPigmentoP2_Capa3 : datos_mezcla[i].mezcla_PorcentajePigmto2_Capa3,
           }
-          console.table(this.objetoDatos);
 
           this.formCrearMezclas = this.frmBuilderPedExterno.group({
             mezclaId : this.idMezclaSeleccionada,
@@ -4790,9 +4782,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           });
         }
       });
-    } else {
-      this.mensajeAdvertencia('Debe llenar el campo nombre de mezclas');
-    }
+    } else this.mensajeAdvertencia('Debe llenar el campo nombre de mezclas');
   }
 
   // Funcion que enviará un mensaje de advertencia
@@ -5132,7 +5122,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           if(material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1){
             let porcentajeTotalCapa1 : number = porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1;
             if (porcentajeTotalCapa1 == 100) {
-             this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
+              this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
                 if(dataMezcla.length == 0) {
                   if(!this.compararRegistroEntrante()) {
                     let modelo : modelMezclas = {
@@ -5186,13 +5176,13 @@ export class OrdenesTrabajoComponent implements OnInit {
                       this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
                       setTimeout(() => {
                         this.initFormCrearMezclas();
-                        this.cargarMezclas();}, 1000);
+                        this.cargarMezclas();
+                      }, 1000);
                     });
                   } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
-
-                } else this.mostrarAdvertencia(`Ya existe una mezcla llamada ${mezcla}`)
-             });
-            } else  this.mostrarAdvertencia('La suma del porcentaje de mezcla de materiales de la capa 1 debe ser 100, por favor verifique!');
+                } else this.mostrarAdvertencia(`Ya existe una mezcla llamada ${mezcla}`);
+              });
+            } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de materiales de la capa 1 debe ser 100, por favor verifique!');
           } else this.mostrarAdvertencia('No puede usar este porcentaje para el/los material(es) seleccionado(s)');
         } else this.mostrarAdvertencia('El porcentaje de mezcla de la capa 1 debe ser 100, por favor verifique!.');
         /** Fin Condición 1 */
@@ -5203,68 +5193,67 @@ export class OrdenesTrabajoComponent implements OnInit {
           if((material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1)
             && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)) {
 
-              let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
-              let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
-              if(porcMaterialesCapa1 == 100 && porcMaterialesCapa2 == 100) {
-                this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
-                  if(dataMezcla.length == 0) {
-                    if(!this.compararRegistroEntrante()) {
-                      let modelo : modelMezclas = {
-                        mezclaId : 0,
-                        Mezcla_Nombre: mezcla.replace('%25', '%'),
-                        Mezcla_NroCapas: 2,
-                        Material_Id: material,
-                        Mezcla_PorcentajeCapa1: porc_Capa1,
-                        MezMaterial_Id1xCapa1: material1C1,
-                        Mezcla_PorcentajeMaterial1_Capa1: porcMaterial1C1,
-                        MezMaterial_Id2xCapa1: material2C1,
-                        Mezcla_PorcentajeMaterial2_Capa1: porcMaterial2C1,
-                        MezMaterial_Id3xCapa1: material3C1,
-                        Mezcla_PorcentajeMaterial3_Capa1: porcMaterial3C1,
-                        MezMaterial_Id4xCapa1: material4C1,
-                        Mezcla_PorcentajeMaterial4_Capa1: porcMaterial4C1,
-                        MezPigmto_Id1xCapa1: pigmento1C1,
-                        Mezcla_PorcentajePigmto1_Capa1: porcPigmento1C1,
-                        MezPigmto_Id2xCapa1: pigmento2C1,
-                        Mezcla_PorcentajePigmto2_Capa1: porcPigmento2C1,
-                        Mezcla_PorcentajeCapa2: porc_Capa2,
-                        MezMaterial_Id1xCapa2: material1C2,
-                        Mezcla_PorcentajeMaterial1_Capa2: porcMaterial1C2,
-                        MezMaterial_Id2xCapa2: material2C2,
-                        Mezcla_PorcentajeMaterial2_Capa2: porcMaterial2C2,
-                        MezMaterial_Id3xCapa2: material3C2,
-                        Mezcla_PorcentajeMaterial3_Capa2: porcMaterial3C2,
-                        MezMaterial_Id4xCapa2: material4C2,
-                        Mezcla_PorcentajeMaterial4_Capa2: porcMaterial4C2,
-                        MezPigmto_Id1xCapa2: pigmento1C2,
-                        Mezcla_PorcentajePigmto1_Capa2: porcPigmento1C2,
-                        MezPigmto_Id2xCapa2: pigmento2C2,
-                        Mezcla_PorcentajePigmto2_Capa2: porcPigmento2C2,
-                        Mezcla_PorcentajeCapa3: porc_Capa3,
-                        MezMaterial_Id1xCapa3: material1C3,
-                        Mezcla_PorcentajeMaterial1_Capa3: porcMaterial1C3,
-                        MezMaterial_Id2xCapa3: material2C3,
-                        Mezcla_PorcentajeMaterial2_Capa3: porcMaterial2C3,
-                        MezMaterial_Id3xCapa3: material3C3,
-                        Mezcla_PorcentajeMaterial3_Capa3: porcMaterial3C3,
-                        MezMaterial_Id4xCapa3: material4C3,
-                        Mezcla_PorcentajeMaterial4_Capa3: porcMaterial4C3,
-                        MezPigmto_Id1xCapa3: pigmento1C3,
-                        Mezcla_PorcentajePigmto1_Capa3: porcPigmento1C3,
-                        MezPigmto_Id2xCapa3: pigmento2C3,
-                        Mezcla_PorcentajePigmto2_Capa3: porcPigmento2C3,
-                        Usua_Id: this.storage_Id,
-                        Mezcla_FechaIngreso: this.today
-                      }
-                      this.mezclasService.srvGuardar(modelo).subscribe(dataMezclas2 => {
-                        this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
-                        setTimeout(() => { this.initFormCrearMezclas(); this.cargarMezclas(); }, 1000);
-                      });
-                    } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
-
-                  } else this.mostrarAdvertencia(`Ya existe una mezcla llamada ${mezcla}`)
+            let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
+            let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
+            if(porcMaterialesCapa1 == 100 && porcMaterialesCapa2 == 100) {
+              this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
+                if(dataMezcla.length == 0) {
+                  if(!this.compararRegistroEntrante()) {
+                    let modelo : modelMezclas = {
+                      mezclaId : 0,
+                      Mezcla_Nombre: mezcla.replace('%25', '%'),
+                      Mezcla_NroCapas: 2,
+                      Material_Id: material,
+                      Mezcla_PorcentajeCapa1: porc_Capa1,
+                      MezMaterial_Id1xCapa1: material1C1,
+                      Mezcla_PorcentajeMaterial1_Capa1: porcMaterial1C1,
+                      MezMaterial_Id2xCapa1: material2C1,
+                      Mezcla_PorcentajeMaterial2_Capa1: porcMaterial2C1,
+                      MezMaterial_Id3xCapa1: material3C1,
+                      Mezcla_PorcentajeMaterial3_Capa1: porcMaterial3C1,
+                      MezMaterial_Id4xCapa1: material4C1,
+                      Mezcla_PorcentajeMaterial4_Capa1: porcMaterial4C1,
+                      MezPigmto_Id1xCapa1: pigmento1C1,
+                      Mezcla_PorcentajePigmto1_Capa1: porcPigmento1C1,
+                      MezPigmto_Id2xCapa1: pigmento2C1,
+                      Mezcla_PorcentajePigmto2_Capa1: porcPigmento2C1,
+                      Mezcla_PorcentajeCapa2: porc_Capa2,
+                      MezMaterial_Id1xCapa2: material1C2,
+                      Mezcla_PorcentajeMaterial1_Capa2: porcMaterial1C2,
+                      MezMaterial_Id2xCapa2: material2C2,
+                      Mezcla_PorcentajeMaterial2_Capa2: porcMaterial2C2,
+                      MezMaterial_Id3xCapa2: material3C2,
+                      Mezcla_PorcentajeMaterial3_Capa2: porcMaterial3C2,
+                      MezMaterial_Id4xCapa2: material4C2,
+                      Mezcla_PorcentajeMaterial4_Capa2: porcMaterial4C2,
+                      MezPigmto_Id1xCapa2: pigmento1C2,
+                      Mezcla_PorcentajePigmto1_Capa2: porcPigmento1C2,
+                      MezPigmto_Id2xCapa2: pigmento2C2,
+                      Mezcla_PorcentajePigmto2_Capa2: porcPigmento2C2,
+                      Mezcla_PorcentajeCapa3: porc_Capa3,
+                      MezMaterial_Id1xCapa3: material1C3,
+                      Mezcla_PorcentajeMaterial1_Capa3: porcMaterial1C3,
+                      MezMaterial_Id2xCapa3: material2C3,
+                      Mezcla_PorcentajeMaterial2_Capa3: porcMaterial2C3,
+                      MezMaterial_Id3xCapa3: material3C3,
+                      Mezcla_PorcentajeMaterial3_Capa3: porcMaterial3C3,
+                      MezMaterial_Id4xCapa3: material4C3,
+                      Mezcla_PorcentajeMaterial4_Capa3: porcMaterial4C3,
+                      MezPigmto_Id1xCapa3: pigmento1C3,
+                      Mezcla_PorcentajePigmto1_Capa3: porcPigmento1C3,
+                      MezPigmto_Id2xCapa3: pigmento2C3,
+                      Mezcla_PorcentajePigmto2_Capa3: porcPigmento2C3,
+                      Usua_Id: this.storage_Id,
+                      Mezcla_FechaIngreso: this.today
+                    }
+                    this.mezclasService.srvGuardar(modelo).subscribe(dataMezclas2 => {
+                      this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
+                      setTimeout(() => { this.initFormCrearMezclas(); this.cargarMezclas(); }, 1000);
+                    });
+                  } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
+                } else this.mostrarAdvertencia(`Ya existe una mezcla llamada ${mezcla}`);
               });
-              } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
+            } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
           } else this.mostrarAdvertencia('No puede usar estos porcentajes de mezcla para los materiales seleccionados');
         } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de las capas 1 y 2 debe ser 100');
         /** Fin Condición 2 */
@@ -5275,78 +5264,73 @@ export class OrdenesTrabajoComponent implements OnInit {
           if((material1C1 != 1 || material2C1 != 1 || material3C1 != 1 || material4C1 != 1)
             && (material1C2 != 1 || material2C2 != 1 || material3C2 != 1 || material4C2 != 1)
             && (material1C3 != 1 || material2C3 != 1 || material3C3 != 1 || material4C3 != 1)) {
-              let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
-              let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
-              let porcMaterialesCapa3: number = (porcMaterial1C3 + porcMaterial2C3 + porcMaterial3C3 + porcMaterial4C3);
-              if(porcMaterialesCapa1 == 100 && porcMaterialesCapa2 == 100 && porcMaterialesCapa3 == 100) {
-                this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
-                  if(dataMezcla.length == 0) {
-                    if(!this.compararRegistroEntrante()) {
-                      let modelo : modelMezclas = {
-                        mezclaId : 0,
-                        Mezcla_Nombre: mezcla.replace('%25', '%'),
-                        Mezcla_NroCapas: 2,
-                        Material_Id: material,
-                        Mezcla_PorcentajeCapa1: porc_Capa1,
-                        MezMaterial_Id1xCapa1: material1C1,
-                        Mezcla_PorcentajeMaterial1_Capa1: porcMaterial1C1,
-                        MezMaterial_Id2xCapa1: material2C1,
-                        Mezcla_PorcentajeMaterial2_Capa1: porcMaterial2C1,
-                        MezMaterial_Id3xCapa1: material3C1,
-                        Mezcla_PorcentajeMaterial3_Capa1: porcMaterial3C1,
-                        MezMaterial_Id4xCapa1: material4C1,
-                        Mezcla_PorcentajeMaterial4_Capa1: porcMaterial4C1,
-                        MezPigmto_Id1xCapa1: pigmento1C1,
-                        Mezcla_PorcentajePigmto1_Capa1: porcPigmento1C1,
-                        MezPigmto_Id2xCapa1: pigmento2C1,
-                        Mezcla_PorcentajePigmto2_Capa1: porcPigmento2C1,
-                        Mezcla_PorcentajeCapa2: porc_Capa2,
-                        MezMaterial_Id1xCapa2: material1C2,
-                        Mezcla_PorcentajeMaterial1_Capa2: porcMaterial1C2,
-                        MezMaterial_Id2xCapa2: material2C2,
-                        Mezcla_PorcentajeMaterial2_Capa2: porcMaterial2C2,
-                        MezMaterial_Id3xCapa2: material3C2,
-                        Mezcla_PorcentajeMaterial3_Capa2: porcMaterial3C2,
-                        MezMaterial_Id4xCapa2: material4C2,
-                        Mezcla_PorcentajeMaterial4_Capa2: porcMaterial4C2,
-                        MezPigmto_Id1xCapa2: pigmento1C2,
-                        Mezcla_PorcentajePigmto1_Capa2: porcPigmento1C2,
-                        MezPigmto_Id2xCapa2: pigmento2C2,
-                        Mezcla_PorcentajePigmto2_Capa2: porcPigmento2C2,
-                        Mezcla_PorcentajeCapa3: porc_Capa3,
-                        MezMaterial_Id1xCapa3: material1C3,
-                        Mezcla_PorcentajeMaterial1_Capa3: porcMaterial1C3,
-                        MezMaterial_Id2xCapa3: material2C3,
-                        Mezcla_PorcentajeMaterial2_Capa3: porcMaterial2C3,
-                        MezMaterial_Id3xCapa3: material3C3,
-                        Mezcla_PorcentajeMaterial3_Capa3: porcMaterial3C3,
-                        MezMaterial_Id4xCapa3: material4C3,
-                        Mezcla_PorcentajeMaterial4_Capa3: porcMaterial4C3,
-                        MezPigmto_Id1xCapa3: pigmento1C3,
-                        Mezcla_PorcentajePigmto1_Capa3: porcPigmento1C3,
-                        MezPigmto_Id2xCapa3: pigmento2C3,
-                        Mezcla_PorcentajePigmto2_Capa3: porcPigmento2C3,
-                        Usua_Id: this.storage_Id,
-                        Mezcla_FechaIngreso: this.today
-                      }
-                      this.mezclasService.srvGuardar(modelo).subscribe(dataMezclas2 => {
-                        this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
-                        setTimeout(() => { this.initFormCrearMezclas(); this.cargarMezclas(); }, 1000);
-                      });
-                    } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
-
-                  } else this.mostrarAdvertencia(`Ya existe una mezcla llamada ${mezcla}`)
+            let porcMaterialesCapa1 : number = (porcMaterial1C1 + porcMaterial2C1 + porcMaterial3C1 + porcMaterial4C1);
+            let porcMaterialesCapa2: number = (porcMaterial1C2 + porcMaterial2C2 + porcMaterial3C2 + porcMaterial4C2);
+            let porcMaterialesCapa3: number = (porcMaterial1C3 + porcMaterial2C3 + porcMaterial3C3 + porcMaterial4C3);
+            if(porcMaterialesCapa1 == 100 && porcMaterialesCapa2 == 100 && porcMaterialesCapa3 == 100) {
+              this.mezclasService.srvObtenerListaPorNombre(mezcla.replace('%', '%25')).subscribe(dataMezcla => {
+                if(dataMezcla.length == 0) {
+                  if(!this.compararRegistroEntrante()) {
+                    let modelo : modelMezclas = {
+                      mezclaId : 0,
+                      Mezcla_Nombre: mezcla.replace('%25', '%'),
+                      Mezcla_NroCapas: 2,
+                      Material_Id: material,
+                      Mezcla_PorcentajeCapa1: porc_Capa1,
+                      MezMaterial_Id1xCapa1: material1C1,
+                      Mezcla_PorcentajeMaterial1_Capa1: porcMaterial1C1,
+                      MezMaterial_Id2xCapa1: material2C1,
+                      Mezcla_PorcentajeMaterial2_Capa1: porcMaterial2C1,
+                      MezMaterial_Id3xCapa1: material3C1,
+                      Mezcla_PorcentajeMaterial3_Capa1: porcMaterial3C1,
+                      MezMaterial_Id4xCapa1: material4C1,
+                      Mezcla_PorcentajeMaterial4_Capa1: porcMaterial4C1,
+                      MezPigmto_Id1xCapa1: pigmento1C1,
+                      Mezcla_PorcentajePigmto1_Capa1: porcPigmento1C1,
+                      MezPigmto_Id2xCapa1: pigmento2C1,
+                      Mezcla_PorcentajePigmto2_Capa1: porcPigmento2C1,
+                      Mezcla_PorcentajeCapa2: porc_Capa2,
+                      MezMaterial_Id1xCapa2: material1C2,
+                      Mezcla_PorcentajeMaterial1_Capa2: porcMaterial1C2,
+                      MezMaterial_Id2xCapa2: material2C2,
+                      Mezcla_PorcentajeMaterial2_Capa2: porcMaterial2C2,
+                      MezMaterial_Id3xCapa2: material3C2,
+                      Mezcla_PorcentajeMaterial3_Capa2: porcMaterial3C2,
+                      MezMaterial_Id4xCapa2: material4C2,
+                      Mezcla_PorcentajeMaterial4_Capa2: porcMaterial4C2,
+                      MezPigmto_Id1xCapa2: pigmento1C2,
+                      Mezcla_PorcentajePigmto1_Capa2: porcPigmento1C2,
+                      MezPigmto_Id2xCapa2: pigmento2C2,
+                      Mezcla_PorcentajePigmto2_Capa2: porcPigmento2C2,
+                      Mezcla_PorcentajeCapa3: porc_Capa3,
+                      MezMaterial_Id1xCapa3: material1C3,
+                      Mezcla_PorcentajeMaterial1_Capa3: porcMaterial1C3,
+                      MezMaterial_Id2xCapa3: material2C3,
+                      Mezcla_PorcentajeMaterial2_Capa3: porcMaterial2C3,
+                      MezMaterial_Id3xCapa3: material3C3,
+                      Mezcla_PorcentajeMaterial3_Capa3: porcMaterial3C3,
+                      MezMaterial_Id4xCapa3: material4C3,
+                      Mezcla_PorcentajeMaterial4_Capa3: porcMaterial4C3,
+                      MezPigmto_Id1xCapa3: pigmento1C3,
+                      Mezcla_PorcentajePigmto1_Capa3: porcPigmento1C3,
+                      MezPigmto_Id2xCapa3: pigmento2C3,
+                      Mezcla_PorcentajePigmto2_Capa3: porcPigmento2C3,
+                      Usua_Id: this.storage_Id,
+                      Mezcla_FechaIngreso: this.today
+                    }
+                    this.mezclasService.srvGuardar(modelo).subscribe(dataMezclas2 => {
+                      this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
+                      setTimeout(() => { this.initFormCrearMezclas(); this.cargarMezclas(); }, 1000);
+                    });
+                  } else this.mostrarAdvertencia(`No es posible crear una mezcla con las mismas caracteristicas de una mezcla existente.`);
+                } else this.mostrarAdvertencia(`Ya existe una mezcla llamada ${mezcla}`)
               });
-              } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
+            } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de los materiales en cada capa debe ser 100');
           } else this.mostrarAdvertencia('No puede usar este porcentaje para los materiales seleccionados');
         } else this.mostrarAdvertencia('La suma del porcentaje de mezcla de las capas debe ser 100');
         /** Fin condición 3 */
-      } else {
-        this.mostrarAdvertencia('Debe elegir el número de capas de la mezcla.')
-      }
-    } else {
-      this.mostrarAdvertencia('Debe diligenciar el campo Nombre de Mezcla')
-    }
+      } else this.mostrarAdvertencia('Debe elegir el número de capas de la mezcla.');
+    } else this.mostrarAdvertencia('Debe diligenciar el campo Nombre de Mezcla');
   }
 
   /** Función que validará si las caracteristicas de la mezcla ya existen. Si no existen crea la mezcla.  */
@@ -5392,72 +5376,66 @@ export class OrdenesTrabajoComponent implements OnInit {
       this.objetoDatos.PorcentajeMezclaPigmentoP2_Capa2 == this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa2 &&
       this.objetoDatos.MezclaPigmento2_Capa3 == this.formCrearMezclas.value.MezclaPigmento2_Capa3 &&
       this.objetoDatos.PorcentajeMezclaPigmentoP2_Capa3 == this.formCrearMezclas.value.PorcentajeMezclaPigmentoP2_Capa3) {
-        console.table(this.formCrearMezclas.value)
-        return true;
-      } else {
-       return false;
-      }
+      return true;
+    } else return false;
   }
 
- cargarModalMateriales(){
-  this.modalMateriales = true;
- }
+  cargarModalMateriales(){
+    this.modalMateriales = true;
+  }
 
   /** Función para crear mater desde el modal de crear mezclas */
- crearMaterial(){
-  let nombreMaterial : string = this.formCrearMateriales.value.matNombre;
-  let descripcionMaterial : string = this.formCrearMateriales.value.matDescripcion;
+  crearMaterial(){
+    let nombreMaterial : string = this.formCrearMateriales.value.matNombre;
+    let descripcionMaterial : string = this.formCrearMateriales.value.matDescripcion;
+    if(descripcionMaterial == null) descripcionMaterial = `Mezcla de Material ${nombreMaterial.toUpperCase()}`;
+    this.mezclaMaterialService.getMezclasMateriales(nombreMaterial.toUpperCase()).subscribe(dataMzMaterial => {
+      if(dataMzMaterial.length == 0) {
+        const material : modelMezMaterial = {
+          MezMaterial_Nombre: nombreMaterial.toUpperCase(),
+          MezMaterial_Descripcion: descripcionMaterial,
+        }
+        this.mezclaMaterialService.srvGuardar(material).subscribe(dataMzMaterial2 => {
+          this.mostrarConfirmacion('Registro creado con éxito!');
+          setTimeout(() => {
+            this.formCrearMateriales.reset();
+            this.cargarMezclaMateria();
+            this.cargarMezclaMateria2();
+          }, 300);
+        });
+      } else this.mostrarAdvertencia(`Ya existe una material de mezclas llamado ${nombreMaterial.toUpperCase()}`);
+    });
+  }
 
-  if(descripcionMaterial == null) descripcionMaterial = `Mezcla de Material ${nombreMaterial.toUpperCase()}`;
+  /** Función para crear pigmentos desde el modal de crear mezclas */
+  crearPigmento(){
+    let nombrePigmento : string = this.formCrearPigmentos.value.pigNombre;
+    let descripcionPigmento : string = this.formCrearPigmentos.value.pigDescripcion;
 
-  this.mezclaMaterialService.getMezclasMateriales(nombreMaterial.toUpperCase()).subscribe(dataMzMaterial => {
-    if(dataMzMaterial.length == 0) {
-      const material : modelMezMaterial = {
-        MezMaterial_Nombre: nombreMaterial.toUpperCase(),
-        MezMaterial_Descripcion: descripcionMaterial,
-      }
-      console.table(material);
-      this.mezclaMaterialService.srvGuardar(material).subscribe(dataMzMaterial2 => {
-        this.mostrarConfirmacion('Registro creado con éxito!');
-        setTimeout(() => {
-          this.formCrearMateriales.reset();
-          this.cargarMezclaMateria();
-          this.cargarMezclaMateria2();
-        }, 300);
-      });
-    } else this.mostrarAdvertencia(`Ya existe una material de mezclas llamado ${nombreMaterial.toUpperCase()}`);
-  });
- }
+    if(descripcionPigmento == null) descripcionPigmento = `Mezcla de Pigmento ${nombrePigmento.toUpperCase()}`;
 
- /** Función para crear pigmentos desde el modal de crear mezclas */
- crearPigmento(){
-  let nombrePigmento : string = this.formCrearPigmentos.value.pigNombre;
-  let descripcionPigmento : string = this.formCrearPigmentos.value.pigDescripcion;
+    this.mezclaPigmentosService.getMezclasPigmentos(nombrePigmento.toUpperCase()).subscribe(dataMzPigmento => {
+      if(dataMzPigmento.length == 0) {
+        const pigmento : modelMezPigmento = {
+          MezPigmto_Nombre: nombrePigmento.toUpperCase(),
+          MezPigmto_Descripcion: descripcionPigmento,
+        }
+        console.table(pigmento);
+        this.mezclaPigmentosService.srvGuardar(pigmento).subscribe(dataMzPigmento => {
+          this.mostrarConfirmacion('Registro creado con éxito!');
+          setTimeout(() => {
+          this.formCrearPigmentos.reset();
+          this.mezclasPigmentos();
+          this.mezclasPigmentos2();
+          }, 300);
+        });
+      } else this.mostrarAdvertencia(`Ya existe un pigmento de mezclas llamado ${nombrePigmento.toUpperCase()}`)
+    });
+  }
 
-  if(descripcionPigmento == null) descripcionPigmento = `Mezcla de Pigmento ${nombrePigmento.toUpperCase()}`;
-
-  this.mezclaPigmentosService.getMezclasPigmentos(nombrePigmento.toUpperCase()).subscribe(dataMzPigmento => {
-    if(dataMzPigmento.length == 0) {
-      const pigmento : modelMezPigmento = {
-        MezPigmto_Nombre: nombrePigmento.toUpperCase(),
-        MezPigmto_Descripcion: descripcionPigmento,
-      }
-      console.table(pigmento);
-      this.mezclaPigmentosService.srvGuardar(pigmento).subscribe(dataMzPigmento => {
-        this.mostrarConfirmacion('Registro creado con éxito!');
-        setTimeout(() => {
-         this.formCrearPigmentos.reset();
-         this.mezclasPigmentos();
-         this.mezclasPigmentos2();
-        }, 300);
-      });
-    } else this.mostrarAdvertencia(`Ya existe un pigmento de mezclas llamado ${nombrePigmento.toUpperCase()}`)
-  });
- }
-
- cargarModalPigmentos(){
-  this.modalPigmentos = true;
- }
+  cargarModalPigmentos(){
+    this.modalPigmentos = true;
+  }
 
   /** Mostrar mensaje de error */
   mostrarAdvertencia(dato : any) {

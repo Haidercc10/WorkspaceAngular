@@ -144,6 +144,7 @@ import { ReporteInventarioBOPPComponent } from './Vistas/reporteInventarioBOPP/r
 import { ReporteInventarioMateriaPrimaComponent } from './Vistas/ReporteInventarioMateriaPrima/ReporteInventarioMateriaPrima.component';
 import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 import { TreeTableModule } from 'primeng/treetable';
+import { CheckboxModule } from 'primeng/checkbox';
 
 export const routes: Routes = [
 
@@ -151,7 +152,7 @@ export const routes: Routes = [
   // {path: 'inicio', component: InicioComponent},
   {path: 'Login', component: LoginComponentComponent},
   {path: '', component: LoginComponentComponent},
-  {path: 'home', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,3,4,5,6,7,8,9,10,11,12,13]}, component: PaginaPrincipalComponent},
+  {path: 'home', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,3,4,5,6,7,8,9,10,11,12,13,60]}, component: PaginaPrincipalComponent},
   {path: 'Archivos', component: ArchivosComponent},
 
   /******************************************************************* Materia Prima ************************************************************************/
@@ -218,7 +219,7 @@ export const routes: Routes = [
 
   /****************************************************************** INVENTARIO DE PRODUCTOS ****************************************************************/
   {path: 'inventario-productos', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component : InventarioProductosPBDDComponent},
-  {path: 'inventario-productos-terminados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ModalGenerarInventarioZeusComponent},
+  {path: 'inventario-productos-terminados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,60]}, component: ModalGenerarInventarioZeusComponent},
 
   /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
   {path: 'opedidoproducto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component: OpedidoproductoComponent},
@@ -241,7 +242,7 @@ export const routes: Routes = [
  {path: 'mantenimiento-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
 
 /*********************************************************************** REPORTE PEDIDOS ZEUS *****************************************************************/
- {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: ReportePedidos_ZeusComponent},
+ {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,60]}, component: ReportePedidos_ZeusComponent},
 
  /*************************************************************** DESPERDICIO *********************************************************************************/
   {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1, 12]}, component: DesperdicioComponent},
@@ -413,6 +414,7 @@ export const routes: Routes = [
     SkeletonModule,
     InputSwitchModule,
     TreeTableModule,
+    CheckboxModule,
   ],
 
   providers: [

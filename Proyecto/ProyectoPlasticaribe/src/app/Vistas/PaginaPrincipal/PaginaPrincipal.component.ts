@@ -183,6 +183,7 @@ export class PaginaPrincipalComponent implements OnInit {
     this.facturacion();
     this.cantOrdenesUltimoMes();
     this.materiasPrimas();
+    this.pedidosZeus();
     this.recargar();
   }
 
@@ -630,7 +631,7 @@ export class PaginaPrincipalComponent implements OnInit {
     this.totalExtruidoMes = 0;
     this.materiasPrimasMasUtilizadasCrearTintaMes = [];
 
-    if(this.ValidarRol == 1) {
+    if(this.ValidarRol == 1 || this.ValidarRol == 60) {
       this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos_materiaPrima => {
         for (let i = 0; i < datos_materiaPrima.length; i++) {
           if (datos_materiaPrima[i].inicial != datos_materiaPrima[i].actual && datos_materiaPrima[i].id_Materia_Prima != 84) this.inventarioMateriaPrima.push(datos_materiaPrima[i]);
@@ -702,7 +703,7 @@ export class PaginaPrincipalComponent implements OnInit {
     this.totalFacuturadoMes = 0;
     this.totalIvaVentaMes = 0;
     this.totalIvaCompraMes = 0;
-    if(this.ValidarRol == 1) {
+    if(this.ValidarRol == 1 || this.ValidarRol == 60) {
       this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => {
         this.totalFacturadoDia = datos_facturacion;
       }, error => { this.mensajeError(`¡No se pudo obtener información sobre el valor de lo facturado hoy!`, error.message); });
@@ -782,23 +783,26 @@ export class PaginaPrincipalComponent implements OnInit {
       for (let i = 0; i < datos_pedidos.length; i++) {
         this.ordenTrabajoService.GetOrdenesTrabajo_Pedido(datos_pedidos[i].consecutivo).subscribe(datos_orden => {
           for (let j = 0; j < datos_orden.length; j++) {
-            let info : any = {
-              pedido : datos_pedidos[i].consecutivo,
-              orden : datos_orden[j].estProcOT_OrdenTrabajo,
-              cliente : datos_pedidos[i].cliente,
-              producto : datos_pedidos[i].producto,
-              proceso : ''
+            if (parseInt(datos_pedidos[i].id_Producto) == datos_orden[j].prod_Id) {
+              let info : any = {
+                pedido : datos_pedidos[i].consecutivo,
+                orden : datos_orden[j].estProcOT_OrdenTrabajo,
+                cliente : datos_pedidos[i].cliente,
+                producto : datos_pedidos[i].producto,
+                proceso : ''
+              }
+              if (datos_orden[j].estProcOT_ExtrusionKg > 0) info.proceso = `Extrusión ${this.formatonumeros(datos_orden[j].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
+              if (datos_orden[j].estProcOT_ImpresionKg > 0) info.proceso = `Impresión ${this.formatonumeros(datos_orden[j].estProcOT_ImpresionKg.toFixed(2))} Kg`;
+              if (datos_orden[j].estProcOT_RotograbadoKg > 0) info.proceso = `Rotograbado ${this.formatonumeros(datos_orden[j].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
+              if (datos_orden[j].estProcOT_LaminadoKg > 0) info.proceso = `Laminado ${this.formatonumeros(datos_orden[j].estProcOT_LaminadoKg.toFixed(2))} Kg`;
+              if (datos_orden[j].estProcOT_CorteKg > 0) info.proceso = `Corte - ${this.formatonumeros(datos_orden[j].estProcOT_CorteKg.toFixed(2))} Kg`;
+              if (datos_orden[j].estProcOT_DobladoKg > 0) info.proceso = `Doblado ${this.formatonumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
+              if (datos_orden[j].estProcOT_EmpaqueKg > 0) info.proceso = `Empaque ${this.formatonumeros(datos_orden[j].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
+              if (datos_orden[j].estProcOT_SelladoKg > 0) info.proceso = `Sellado ${this.formatonumeros(datos_orden[j].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[j].estProcOT_SelladoKg.toFixed(2))} Kg`;
+              if (datos_orden[j].estProcOT_WiketiadoKg > 0) info.proceso = `Wiketiado ${this.formatonumeros(datos_orden[j].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[j].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
+              this.pedidos_Ot.push(info);
+              this.pedidos_Ot.sort((a,b) => Number(a.pedido) - Number(b.pedido));
             }
-            if (datos_orden[j].estProcOT_ExtrusionKg > 0) info.proceso = `Extrusión ${this.formatonumeros(datos_orden[j].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_ImpresionKg > 0) info.proceso = `Impresión ${this.formatonumeros(datos_orden[j].estProcOT_ImpresionKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_RotograbadoKg > 0) info.proceso = `Rotograbado ${this.formatonumeros(datos_orden[j].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_LaminadoKg > 0) info.proceso = `Laminado ${this.formatonumeros(datos_orden[j].estProcOT_LaminadoKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_CorteKg > 0) info.proceso = `Corte - ${this.formatonumeros(datos_orden[j].estProcOT_CorteKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_DobladoKg > 0) info.proceso = `Doblado ${this.formatonumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_EmpaqueKg > 0) info.proceso = `Empaque ${this.formatonumeros(datos_orden[j].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_SelladoKg > 0) info.proceso = `Sellado ${this.formatonumeros(datos_orden[j].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[j].estProcOT_SelladoKg.toFixed(2))} Kg`;
-            if (datos_orden[j].estProcOT_WiketiadoKg > 0) info.proceso = `Wiketiado ${this.formatonumeros(datos_orden[j].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[j].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
-            this.pedidos_Ot.push(info);
           }
         });
       }

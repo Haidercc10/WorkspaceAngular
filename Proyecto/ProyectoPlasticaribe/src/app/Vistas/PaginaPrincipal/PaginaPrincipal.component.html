@@ -215,7 +215,7 @@
       header="Facturación"
       leftIcon="pi pi-wallet"
       tooltip="Información de las Materias Primas"
-      *ngIf="ValidarRol == 1">
+      *ngIf="ValidarRol == 1 || ValidarRol == 60">
       <div class="row row-cols-1 row-cols-md-4 g-3">
         <!-- Facturacion Dia  -->
         <div class="col">
@@ -289,7 +289,7 @@
             header="Ventas"
             leftIcon="pi pi-wallet"
             tooltip="Información de las Materias Primas"
-            *ngIf="ValidarRol == 1">
+            *ngIf="ValidarRol == 1 || ValidarRol == 60">
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
               <p-dropdown [options]="anos" [(ngModel)]="anoSeleccionado" (onChange)="facturacion()"></p-dropdown>
             </div>
@@ -321,7 +321,7 @@
       header="Materia Prima"
       leftIcon="pi pi-box"
       tooltip="Información de las Materias Primas"
-      *ngIf="ValidarRol == 1">
+      *ngIf="ValidarRol == 1 || ValidarRol == 60">
       <div class="row row-cols-1 row-cols-md-3 g-4">
         <!--  -->
         <div class="col">
@@ -439,7 +439,7 @@
       header="Pedidos Zeus"
       leftIcon="pi pi-shopping-bag"
       tooltip="Información de los Pedidos creados en Zeus"
-      *ngIf="ValidarRol == 1">
+      *ngIf="ValidarRol == 1 || ValidarRol == 60">
       <div class="row row-cols-1 row-cols-md-3 g-4">
         <!-- CARD 1 -->
         <div class="col">

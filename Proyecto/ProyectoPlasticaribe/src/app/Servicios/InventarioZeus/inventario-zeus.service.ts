@@ -26,6 +26,9 @@ readonly rutaInventarioZeusAPI = rutaZeus;
     return this.http.get<any>(this.rutaInventarioZeusAPI + '/existencias/BusquedaCodigoArticulo');
   }
 
+  GetExistenciasArticulo(id : string):Observable<any[]> {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/existencias/getExistenciasArticulo/${id}`);
+  }
 
   /************************************************************ DOCUMENTOS ITEMS **************************************************************/
   GetProductosFacturados(fecha1 : any, fecha2 : any){

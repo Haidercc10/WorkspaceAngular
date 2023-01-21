@@ -11,7 +11,6 @@
     <!-- Tipo ID Cliente-->
     <div class="form-floating col-md-1">
       <select formControlName="TipoIdCliente" type="text" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-        <!-- <option [ngValue]="null" disabled selected>Tipo ID</option> -->
         <option [ngValue]="tipo_identificacion" *ngFor="let tipo_identificacion of tipoIdentificacion">{{tipo_identificacion}}</option>
       </select>
       <label for="floatingSelect">Tipo ID</label>
@@ -19,69 +18,53 @@
 
     <!-- Nombre Cliente-->
     <div class="form-floating col-md">
-      <input formControlName="CliNombre" type="text" class="form-control form-control-sm" id="floatingInput" required>
-      <label for="floatingInput">Nombre Cliente</label>
+      <input formControlName="CliNombre" class="form-control form-control-sm" list="cliente" id="floatingInput" title="Nombre del Cliente">
+      <datalist id="cliente">
+        <option value={{item.cli_Nombre}} *ngFor="let item of cliente">{{item.cli_Nombre}}</option>
+      </datalist>
+      <label for="floatingInput">Cliente</label>
     </div>
   </div>
-  <!-- Fin Fila 1 Crear Cliente -->
 
-  <!-- Inicio Fila 2 Crear Cliente -->
   <div class="row g-3">
-
     <!-- Telefono Cliente -->
     <div class="form-floating col-md-2">
-      <input formControlName="CliTelefono" type="text" class="form-control form-control-sm" id="floatingInput" required>
+      <input formControlName="CliTelefono" type="text" class="form-control form-control-sm" id="floatingInput">
       <label for="floatingInput">Telefono Cliente</label>
     </div>
 
       <!-- Email cliente -->
     <div class="form-floating col-md">
-      <input formControlName="CliEmail" type="text" class="form-control form-control-sm" id="floatingInput" required>
+      <input formControlName="CliEmail" type="text" class="form-control form-control-sm" id="floatingInput">
       <label for="floatingInput">E-mail Cliente</label>
     </div>
 
     <!-- Tipo cliente -->
     <div class="form-floating col-md-2">
       <select formControlName="TipoClienteId" type="text" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-        <!-- <option [ngValue]="null" disabled selected>Tipo Cliente</option> -->
-        <option [ngValue]="tipo_Cliente" *ngFor="let tipo_Cliente of tiposClientes">{{tipo_Cliente}}</option>
+        <option [ngValue]="tipo_Cliente.tpCli_Id" *ngFor="let tipo_Cliente of tiposClientes">{{tipo_Cliente.tpCli_Nombre}}</option>
       </select>
       <label for="floatingSelect">Tipo Cliente</label>
     </div>
 
     <!-- ID/Nombre Usuario -->
-    <ng-container>
-      <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm vendedorAutoComplete">
-        <ng-autocomplete
-          class=""
-          [data]="usuario"
-          (selected)='selectEventVendedor($event)'
-          (inputChanged)='onChangeSearchVendedor($event)'
-          (inputFocused)='onFocusedVendedor($event)'
-          [searchKeyword]="keywordVendedor"
-          [itemTemplate]="itemTemplateVendedorConsulta"
-          [notFoundTemplate]="notFoundTemplate"
-          id="floatingInput"
-          formControlName="UsuIdNombre">
-        </ng-autocomplete>
-        <ng-template #itemTemplateVendedorConsulta let-item>
-          <a [innerHTML]="item.usua_Nombre"></a>
-        </ng-template>
-        <ng-template #notFoundTemplate let-notFound>
-          <div [innerHTML]="notFound"></div>
-        </ng-template>
-        <label for="floatingInput" *ngIf="validarInputVendedor">Nombre Vendedor</label>
-      </div>
-    </ng-container>
+    <div class="form-floating col-md">
+      <input formControlName="UsuIdNombre" class="form-control form-control-sm" list="vendedor" id="floatingInput" (change)="vendedoreSeleccionado()" required>
+      <datalist id="vendedor">
+        <option value={{item.usua_Id}} *ngFor="let item of usuario">{{item.usua_Nombre}}</option>
+      </datalist>
+      <label for="floatingInput">Vededor</label>
+    </div>
   </div>
 
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="submit">Crear cliente</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
+      <button class="btn btn-danger btn-danger-sm" type="submit">Crear cliente</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
     </div>
   </div>
 </form>
+
 <div class="mb-4">
   <hr>
 </div>
@@ -89,27 +72,27 @@
 <div class="mb-4">
   <h5 class="tituloRojo">Crear sedes a clientes</h5>
 </div>
-<!--Inicio formulario crear sede cliente -->
 
 <form [formGroup]="FormCrearSedeClientes" (ngSubmit)="validarCamposVaciosSedes()">
-  <!-- Inicio Fila 1 Crear sede cliente -->
   <div class="mb-4">
     <div class="row g-3">
-
       <!-- Nombre del cliente -->
       <div class="form-floating col-md">
-        <input formControlName="CliId2" type="number" class="form-control form-control-sm" id="floatingInput">
-        <label for="floatingInput">Id cliente</label>
+        <input formControlName="CliId2" class="form-control form-control-sm" list="cliente" id="floatingInput" required>
+        <datalist id="cliente">
+          <option value={{item.cli_Id}} *ngFor="let item of cliente">{{item.cli_Nombre}}</option>
+        </datalist>
+        <label for="floatingInput">Cliente</label>
       </div>
 
       <!-- Ciudad sede cliente -->
       <div class="form-floating col-md">
-        <input formControlName="SedeCli_Ciudad" type="text" class="form-control form-control-sm" id="floatingInput">
+        <input formControlName="SedeCli_Ciudad" type="text" class="form-control form-control-sm" id="floatingInput" required>
         <label for="floatingInput">Ciudad Sede</label>
       </div>
 
       <div class="form-floating col-md">
-        <input formControlName="SedeCli_Direccion" type="text" class="form-control form-control-sm" id="floatingInput">
+        <input formControlName="SedeCli_Direccion" type="text" class="form-control form-control-sm" id="floatingInput" required>
         <label for="floatingInput">Direccion Sede</label>
       </div>
 
@@ -121,14 +104,10 @@
     </div>
   </div>
 
-  <!-- Fin Fila 1 Crear sedes clientes -->
-
-  <!-- Inicio botones -->
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="submit">Crear Sede de Cliente</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCamposSede()">Limpiar campos</button>
+      <button class="btn btn-danger btn-danger-sm" type="submit">Crear Sede de Cliente</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCamposSede()">Limpiar campos</button>
     </div>
   </div>
 </form>
-<!--Fin Formulario crear Cliente -->

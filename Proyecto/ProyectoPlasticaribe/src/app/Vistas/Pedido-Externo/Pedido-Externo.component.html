@@ -1,25 +1,22 @@
 <!--Navegador parte superior -->
 <app-menuLateral></app-menuLateral>
 
-<div class="d-flex justify-content-center overlay" *ngIf="!load">
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
     <span class="visually-hidden">Cargando...</span>
   </div>
 </div>
 
 <div class="contain">
-  <!--fin Navegador parte superior -->
   <div class="container-fluid">
-    <!-- Debajo del Navegador -->
     <div class="mb-4 Titulo">
       <h2 class="tituloRojo">Ordenes de Pedidos</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
     </div>
-  <!-- Fin Debajo del Navegador -->
+
     <div class="container">
-      <!-- Inicio Botones que llama el modal de crear Cliente y producto-->
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
         (click)= "LlamarModalCrearCliente()" title="Si no encuentras el cliente consultado, ¡Crealo aquí!">
@@ -32,49 +29,25 @@
           Crear productos
         </button>
       </div>
-      <!-- Fin Botones que llama el modal de crear cliente y producto-->
-
-      <!-- <div class="overlay" *ngIf="!load">
-        <div class="spinner ">
-          <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
-        </div>
-      </div> -->
 
       <!-- Inicio titulo -->
       <div class="mb-4">
-        <h4 class="tituloRojo">Crear Pedido N° {{contadorPedidosExternos}}</h4>
+        <h4 class="tituloRojo">Crear Pedido</h4>
       </div>
       <!-- Fin titulo -->
+
       <!--Inicio Crear Pedidos-->
       <form [formGroup]="FormPedidoExternoClientes">
-        <!-- Inicio fila 1 de campos -->
         <div class="mb-3">
           <div class="row g-3">
             <!-- Cliente -->
-            <ng-container>
-              <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm autoCompleteCLientes">
-                <ng-autocomplete
-                  class=""
-                  [data]="cliente"
-                  (selected)='ciudadClienteComboBox($event)'
-                  (selected)='productoCliente()'
-                  (inputChanged)='onChangeSearchNombreCliente($event)'
-                  (inputFocused)='onFocusedNombreCliente($event)'
-                  [searchKeyword]="keywordClientes"
-                  [itemTemplate]="itemTemplate"
-                  [notFoundTemplate]="notFoundTemplate"
-                  id="floatingInput"
-                  formControlName="PedClienteNombre">
-                </ng-autocomplete>
-                <ng-template #itemTemplate let-item>
-                  <a [innerHTML]="item.cli_Nombre"></a>
-                </ng-template>
-                <ng-template #notFoundTemplate let-notFound>
-                  <div [innerHTML]="notFound"></div>
-                </ng-template>
-                <label for="floatingInput" *ngIf="validarInputClientes">Cliente</label>
-              </div>
-            </ng-container>
+            <div class="form-floating col-md">
+              <input formControlName="PedClienteNombre" class="form-control form-control-sm" list="cliente" id="floatingInput" title="Nombre del Cliente" (change)="clienteSeleccionado()">
+              <datalist id="cliente">
+                <option value={{item.cli_Id}} *ngFor="let item of cliente">{{item.cli_Nombre}}</option>
+              </datalist>
+              <label for="floatingInput">Cliente</label>
+            </div>
 
             <!-- Ciudad -->
             <div class="form-floating col-md-2">
@@ -101,14 +74,13 @@
             </div>
           </div>
         </div>
-        <!-- Fin fila 1 de campos -->
-        <!-- Inicio Observacion -->
+
         <div class="mb-5">
           <div class="row g-3">
             <!-- Fecha pedido -->
             <div class="form-floating col-md-2">
-              <input formControlName="PedFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido" readonly onmousedown="return false;">
-              <label for="floatingInput">Fecha Pedido</label>
+              <input formControlName="PedFechaEnt" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido">
+              <label for="floatingInput">Fecha Entrega</label>
             </div>
 
             <!-- Campo Observacion -->
@@ -125,26 +97,22 @@
 
             <!-- Iva -->
             <div class="form-floating col-md">
-              <mat-checkbox
-                formControlName="PedIva"
-                style="margin-top: 15px; margin-left: 30px; height: 12px;"
-                (click)="checkboxIva()"
-                [(ngModel)]="checked">
-                (%) Iva
-              </mat-checkbox>
+              <div class="field-checkbox" style="padding: 10%;">
+                <p-checkbox formControlName="PedIva" [(ngModel)]="checked" (click)="checkboxIva()" [binary]="true" inputId="binary"></p-checkbox>
+                <label for="binary">&nbsp;&nbsp;IVA(%)</label>
+              </div>
             </div>
           </div>
         </div>
-        <!-- Fin Observacion -->
-        <!--Fin Crear Pedidos-->
-        <!-- Linea -->
-        <div class="mb-4">
-          <hr class="Linea">
-        </div>
-        <!-- Fin Linea -->
-        <!--Inicio tabla productos agregados-->
       </form>
-        <!-- Inicio Titulo Agregar Productos al pedido -->
+
+      <!-- Linea -->
+      <div class="mb-4">
+        <hr class="Linea">
+      </div>
+      <!-- Fin Linea -->
+
+      <!-- Inicio Titulo Agregar Productos al pedido -->
       <div class="mb-4">
         <h4 class="tituloRojo">Agregar Productos</h4>
       </div>
@@ -156,37 +124,21 @@
           <div class="row g-3">
             <!-- ID Producto -->
             <div class="form-floating col-md-2">
-              <input formControlName="ProdId" type="search" min="0" (search)="buscarProducto()" class="form-control" id="floatingInput" name="PrdId" required >
+              <input formControlName="ProdId" type="search" min="0" class="form-control" id="floatingInput" name="PrdId" (keyup.enter)="buscarProductoId()" required >
               <label for="floatingInput">Id Producto</label>
             </div>
-            <!-- ID/Nombre Producto -->
-            <ng-container>
-              <div class="ng-autocomplete form-floating col-md-2 form-control form-control-sm autoCompleteProductos">
-                <ng-autocomplete
-                  class=""
-                  [data]="producto"
-                  (selected)='llenadoProducto($event)'
-                  (inputChanged)='onChangeSearchNombreProductos($event)'
-                  (inputFocused)='onFocusedNombreProductos($event)'
-                  [searchKeyword]="keywordNombresProductos"
-                  [itemTemplate]="itemTemplate1"
-                  [notFoundTemplate]="notFoundTemplate"
-                  id="floatingInput"
-                  formControlName="ProdNombre">
-                </ng-autocomplete>
-                <ng-template #itemTemplate1 let-item>
-                  <a [innerHTML]="item.prod_Nombre"></a>
-                </ng-template>
-                <ng-template #notFoundTemplate let-notFound>
-                  <div [innerHTML]="notFound"></div>
-                </ng-template>
-                <label for="floatingInput" *ngIf="validarInputNombresProductos">Producto</label>
-              </div>
-            </ng-container>
 
-            <ng-container *ngIf="ValidarRol == 2; else fila2">
-              <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
-              <div class="form-floating col-md">
+            <!-- ID/Nombre Producto -->
+            <div class="form-floating col-md-4">
+              <input formControlName="ProdNombre" (change)="buscarProducto()" class="form-control form-control-sm" list="producto" id="floatingInput" title="Nombre del Cliente">
+              <datalist id="producto">
+                <option value={{item.prod_Id}} *ngFor="let item of producto">{{item.prod_Nombre}}</option>
+              </datalist>
+              <label for="floatingInput">Producto</label>
+            </div>
+
+            <ng-container *ngIf="ValidarRol != 1; else fila2">
+              <div class="form-floating col-md-2">
                 <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm" id="floatingInput" required>
                 <label for="floatingSelect">Cantidad Pedida</label>
               </div>
@@ -206,8 +158,8 @@
                 <label for="floatingInput">Precio unitario</label>
               </div>
             </ng-container>
+
             <ng-template #fila2>
-              <!-- Cantidad Producto --> <!-- onkeypress= "return (event.charCode >= 48 && event.charCode <= 57)""-->
               <div class="form-floating col-md">
                 <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm" id="floatingInput" required>
                 <label for="floatingSelect">Cantidad Pedida</label>
@@ -230,12 +182,10 @@
             </ng-template>
           </div>
         </div>
-        <!-- Fin Fila 1 Agregar Producto -->
-        <!-- Fin Fila 2 Agregar Producto -->
-        <!--Fila 3 Inicio-->
+
          <!-- Inicio Descripción producto -->
         <div class="mb-4">
-          <ng-container *ngIf="ValidarRol == 2; else fila3">
+          <ng-container *ngIf="ValidarRol != 1; else fila3">
             <div class="row g-3">
               <!-- Ultima venta -->
               <div class="form-floating col-md-2">
@@ -250,6 +200,7 @@
               </div>
             </div>
           </ng-container>
+
           <ng-template #fila3>
             <div class="row g-3">
               <!-- Ultima venta -->
@@ -266,112 +217,118 @@
             </div>
           </ng-template>
         </div>
-        <!-- Fin Descripción producto -->
-        <!--Fila 3 Fin -->
-        <!-- Inicio botones -->
-        <div class="mb-3">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVacios()"> {{AccionBoton}} Producto </button>
-              <ng-container *ngIf="ValidarRol == 1">
-                <button class="btn btn-danger btn-danger-sm" type="button" (click)="actualizarProducto()">Actualizar Producto</button>
-              </ng-container>
-              <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCamposProductos()">Limpiar campos</button>
+      </form>
+
+      <!-- Inicio botones -->
+      <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVacios()"> {{AccionBoton}} Producto </button>
+          <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCamposProductos()">Limpiar campos</button>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <hr class="Linea">
+      </div>
+
+      <div class="mb-4">
+        <h4 class="tituloRojo">Tabla de Productos</h4>
+      </div>
+
+      <div class="mb-3" *ngIf="!cargando">
+        <div class="row g-3">
+          <div class="table-responsive">
+            <p-table
+              #dt
+              [value]="ArrayProducto"
+              [resizableColumns]="true"
+              columnResizeMode="expand"
+              styleClass="p-datatable-gridlines p-datatable-sm"
+              responsiveLayout="scroll"
+              [paginator]="true"
+              [rows]="20"
+              [showCurrentPageReport]="true"
+              responsiveLayout="scroll"
+              currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+              [rowsPerPageOptions]="[10,20,30,50,70,100]"
+              [rowHover]="true"
+              dataKey="id">
+              <ng-template pTemplate="header" let-columns>
+                <tr>
+                  <th scope="col" class="idProducto">ID</th>
+                  <th id="nombre" scope="col">Nombre</th>
+                  <th id="cantidad" scope="col">Cantidad</th>
+                  <th id="undMedidaCantidad" scope="col">UndMedCant</th>
+                  <th id="precioUnitario" scope="col">PrecioU</th>
+                  <th id="Subtotal" scope="col">Subtotal</th>
+                  <th id="acciones" scope="col"></th>
+                  <th id="acciones" scope="col"></th>
+              </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-rowData let-listaProductos let-columns="columns">
+                <tr style="font-size: 13px;">
+                  <td>{{listaProductos.Id}}</td>
+                  <td>{{listaProductos.Nombre}}</td>
+                  <td>{{listaProductos.Cant | number}}</td>
+                  <td>{{listaProductos.UndCant}}</td>
+                  <td>{{listaProductos.PrecioUnd | number}}</td>
+                  <td>{{listaProductos.SubTotal}}</td>
+                  <td><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true" title="Editar Producto"></i></a></td>
+                  <td><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
+                </tr>
+              </ng-template>
+            </p-table>
           </div>
         </div>
-        <!-- Fin botones -->
-        <!--Fin agregar productos -->
-        <div class="mb-4">
-          <hr class="Linea">
-        </div>
-        <!--Inicio tabla productos -->
-        <!-- Inicio titulo tabla producto -->
-        <div class="mb-4">
-          <h4 class="tituloRojo">Tabla de Productos</h4>
-        </div>
-        <!-- Fin titulo producto -->
-        <!-- Inicio tabla producto -->
+      </div>
+
+      <br>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <div class="mb-3">
           <div class="row g-3">
-            <div class="table-responsive">
-              <table class="table table-bordered table-hover mt-2" >
-                <thead class="TitulosTabla">
-                  <tr *ngFor="let columnas of titulosTabla let i = index">
-                    <th scope="col" class="idProducto">{{columnas.pID}}</th>
-                    <th id="nombre" scope="col">{{columnas.pNombre}}</th>
-                    <th id="cantidad" scope="col">{{columnas.pCantidad}}</th>
-                    <th id="undMedidaCantidad" scope="col">{{columnas.pUndMedCant}}</th>
-                    <th id="precioUnitario" scope="col">{{columnas.pPrecioU}}</th>
-                    <th id="Subtotal" scope="col">{{columnas.pSubtotal}}</th>
-                    <th id="acciones" scope="col"></th>
-                    <th id="acciones" scope="col"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let listaProductos of ArrayProducto; let j = index">
-                    <th id="id" class="TextosInfoTabla">{{listaProductos.Id}}</th>
-                    <td id="nombreCampo" class="TextosInfoTabla">{{listaProductos.Nombre}}</td>
-                    <td id="cantidadDisponible" class="TextosInfoTabla">{{listaProductos.Cant | number}}</td>
-                    <td id="undMedidaCantidad" class="TextosInfoTabla">{{listaProductos.UndCant}}</td>
-                    <td id="precioUnitario" class="TextosInfoTabla">{{listaProductos.PrecioUnd | number}}</td>
-                    <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.SubTotal}}</td>
-                    <td id="Editar" ><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true" title="Editar Producto"></i></a></td>
-                    <td id="Eliminar" ><a><i class="fa fa-trash" (click)="QuitarProductoTabla(j, listaProductos)" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <label for=""><b>Valor total</b></label>
+            <label for="">${{valorTotal | number}}</label>
           </div>
         </div>
-        <!-- Fin tabla producto -->
-        <!--Inicio valor total-->
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <div class="mb-3">
-            <div class="row g-3">
-              <label for=""><b>Valor total</b></label>
-              <label for="">${{valorTotal | number}}</label>
-            </div>
-          </div>
-          <div class="mb-3">
-            <div class="row g-3">
-              <label for=""><b>Descuento (%)</b></label>
-              <label for="">{{descuento | number}}%</label>
-            </div>
-          </div>
-          <div class="mb-3">
-            <div class="row g-3">
-              <label for=""><b>Subtotal menos Descuento</b></label>
-              <label for="">${{valorMenosDescuento | number}}</label>
-            </div>
-          </div>
-          <div class="mb-3">
-            <div class="row g-3">
-              <label for=""><b>IVA (%)</b></label>
-              <label for="">{{iva | number}}%</label>
-            </div>
-          </div>
-          <div class="mb-3">
-            <div class="row g-3">
-              <label for=""><b>Subtotal Iva</b></label>
-              <label for="">${{valorMenosIva | number}}</label>
-            </div>
-          </div>
-          <div class="mb-3">
-            <div class="row g-3">
-              <label for=""><b>Total</b></label>
-              <label for="">${{valorfinal | number}}</label>
-            </div>
+        <div class="mb-3">
+          <div class="row g-3">
+            <label for=""><b>Descuento (%)</b></label>
+            <label for="">{{descuento | number}}%</label>
           </div>
         </div>
-        <!--Fin valor total-->
-        <!-- Inicio Botones -->
-        <div class="bajarPagina">
-            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="confirmarPedido()">Crear Pedido</button>
-              <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosCampos()">Limpiar Todo</button>
-            </div>
+        <div class="mb-3">
+          <div class="row g-3">
+            <label for=""><b>Subtotal menos Descuento</b></label>
+            <label for="">${{valorMenosDescuento | number}}</label>
+          </div>
         </div>
-      </form>
-      <!-- Fin Botones -->
+        <div class="mb-3">
+          <div class="row g-3">
+            <label for=""><b>IVA (%)</b></label>
+            <label for="">{{iva | number}}%</label>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="row g-3">
+            <label for=""><b>Subtotal Iva</b></label>
+            <label for="">${{valorMenosIva | number}}</label>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="row g-3">
+            <label for=""><b>Total</b></label>
+            <label for="">${{valorfinal | number}}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="bajarPagina">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="confirmarPedido()">Crear Pedido</button>
+          <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosCampos()">Limpiar Todo</button>
+        </div>
+      </div>
+
       <!-- Modal de crear producto -->
       <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -381,13 +338,11 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <!--Carga componente crear producto-->
               <app-crear-producto></app-crear-producto>
             </div>
           </div>
         </div>
       </div>
-      <!-- Fin Modal de crear producto -->
 
       <!-- Modal de crear cliente -->
       <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
@@ -398,13 +353,11 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <!--Carga componente crear cliente-->
               <app-crear-clientes></app-crear-clientes>
             </div>
           </div>
         </div>
       </div>
-      <!-- Fin Modal de crear cliente -->
     </div>
   </div>
 </div>
