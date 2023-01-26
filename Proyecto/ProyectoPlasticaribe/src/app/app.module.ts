@@ -145,6 +145,8 @@ import { ReporteInventarioMateriaPrimaComponent } from './Vistas/ReporteInventar
 import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 import { TreeTableModule } from 'primeng/treetable';
 import { CheckboxModule } from 'primeng/checkbox';
+import { Reporte_PedidosVendedoresComponent } from './Vistas/Reporte_PedidosVendedores/Reporte_PedidosVendedores.component';
+
 
 export const routes: Routes = [
 
@@ -207,6 +209,7 @@ export const routes: Routes = [
   {path: 'ordenes-trabajo', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: OrdenesTrabajoComponent},
   {path: 'reportes-procesos-ot', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,12]}, component: Reporte_Procesos_OTComponent},
   {path: 'estados-ot-vendedores', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component : EstadosOT_VendedoresComponent}, // Estados OT Vendedores
+  {path: 'reporte-pedidos-vendedores', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,60]}, component : Reporte_PedidosVendedoresComponent}, // Pedidos Vendedores
 
   /************************************** Ingreso de Rollos a Extrusion y Asignacion de Rollos a otros Procesos **********************************************/
   {path: 'IngresoRollos-Extrusion', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,5]}, component : IngresoRollos_ExtrusionComponent}, // Ingreso de Rollos a Extrusion.
@@ -346,7 +349,8 @@ export const routes: Routes = [
     Reporte_DesperdiciosComponent,
     ReporteInventarioBOPPComponent,
     ReporteInventarioMateriaPrimaComponent,
-    ReportePedidos_ZeusComponent
+    ReportePedidos_ZeusComponent,
+    Reporte_PedidosVendedoresComponent
   ],
 
 

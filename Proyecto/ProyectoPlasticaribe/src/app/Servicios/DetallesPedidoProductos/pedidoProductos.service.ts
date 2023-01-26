@@ -64,4 +64,13 @@ export class PedidoProductosService {
     return this.http.post(this.rutaPlasticaribeAPI + '/PedidoProducto', data)
   }
 
+  /**  */
+  getPedidoPendiente(){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoProducto/PedidosPendientes');
+  }
+
+  /**  */
+  getPedidoPendientexId(pedido : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoProducto/PedidosPendientesxId/${pedido}`);
+  }
 }

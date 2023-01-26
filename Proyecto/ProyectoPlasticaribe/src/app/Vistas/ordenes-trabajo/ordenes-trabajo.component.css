@@ -190,3 +190,7 @@ a {
 .container-fluid{
   width: 80%;
 }
+
+.container-sm {
+  width: 60%;
+}
