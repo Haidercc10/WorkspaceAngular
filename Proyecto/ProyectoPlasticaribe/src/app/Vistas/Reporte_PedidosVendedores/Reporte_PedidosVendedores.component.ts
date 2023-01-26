@@ -95,7 +95,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         "idVendedor": datos.usua_Id,
         "vendedor": datos.usua_Nombre,
         "idEstado": datos.estado_Id,
-        "nombreEstado": datos.estado_Nombre,
+        "estado": datos.estado_Nombre,
         "costo_Cant_Total": (datos.pedExtProd_Cantidad * datos.exProd_PrecioVenta),
       },
       "children" : []
