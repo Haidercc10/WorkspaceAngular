@@ -276,9 +276,9 @@ export class AsignacionTintasComponent implements OnInit {
         this.detallesAsignacionMPxTintas.srvGuardar(datosDetallesAsignacion).subscribe(datos_detallesAsignacionMPxTintas => {
         }, error => { this.mensajeError(`¡¡Error al registrar los detalles de la creación de tinta!!`, error.message); });
       }
-      this.sumarInventarioTintas();
       this.moverInventarioMP();
       this.moverInventarioTintas();
+      setTimeout(() => { this.sumarInventarioTintas(); }, 1000);
       this.load = false;
     }, error => { this.mensajeError(`¡¡Error al consultar el último Id de asignación!!`, error.message); });
   }

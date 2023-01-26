@@ -2,7 +2,7 @@
   <app-menuLateral></app-menuLateral>
 </ng-container>
 
-<div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
     <span class="visually-hidden">Cargando...</span>
   </div>
@@ -23,7 +23,7 @@
 <div class="contain">
   <!--Inicio info OT-->
   <div class="container-fluid bajarPagina">
-    <div class="container">
+    <!-- <div class="container"> -->
 
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <h4 class="tituloRojo" title="Consecutivo sobre el cual se crea una nueva OT">OT N° {{ultimaOrdenTrabajo}}</h4>
@@ -38,37 +38,23 @@
         <div class="mb-3">
           <div class="row g-3">
             <!-- OT -->
-            <div class="form-floating col-md-2">
-              <input formControlName="OT_Id" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarOT()" required >
+            <div class="form-floating col-md-3">
+              <input formControlName="OT_Id" type="search" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="ConsultarOrdenTrabajo()">
               <label for="floatingInput">Nro. OT</label>
             </div>
 
             <!-- Nro. Pedido -->
-            <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm" style="width: 50%;">
-              <ng-autocomplete
-                class=""
-                [data]="pedidosSinOT"
-                (selected)='consultarPedido($event)'
-                (inputChanged)='onChangeSearchPedido($event)'
-                (inputFocused)='onFocusedNombrePedido($event)'
-                [searchKeyword]="keywordPedidos"
-                [itemTemplate]="itemTemplate"
-                [notFoundTemplate]="notFoundTemplate"
-                id="floatingInput"
-                formControlName="Pedido_Id">
-              </ng-autocomplete>
-              <ng-template #itemTemplate let-item>
-                <a [innerHTML]="item.nombre"></a>
-              </ng-template>
-              <ng-template #notFoundTemplate let-notFound>
-                <div [innerHTML]="notFound"></div>
-              </ng-template>
-              <label for="floatingInput" *ngIf="validarInputPedidos">Pedidos</label>
+            <div class="form-floating col-md">
+              <input formControlName="Pedido_Id" class="form-control" list="Pedidos" id="floatingInput" title="Pedidos" (change)="informacionPedido()" required>
+              <datalist id="Pedidos">
+                <option value={{item.id_Pedido}} *ngFor="let item of pedidosSinOT">{{item.nombre_Cliente}} - {{item.fecha_Entrega | date : 'yyyy-MM-dd'}}</option>
+              </datalist>
+              <label for="floatingInput">Pedidos</label>
             </div>
 
             <!--Vendedor-->
-            <div class="form-floating col-md-4">
-              <input formControlName="Nombre_Vendedor" type="text" class="form-control form-control-sm" id="floatingInput" required >
+            <div class="form-floating col-md">
+              <input formControlName="Nombre_Vendedor" type="text" class="form-control form-control-sm" id="floatingInput" required readonly onmousedown="return false;">
               <label for="floatingInput">Vendedor</label>
             </div>
           </div>
@@ -85,25 +71,25 @@
 
             <!-- Fecha Estimada Entrega -->
             <div class="form-floating col-md-2">
-              <input formControlName="OT_FechaEntrega" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha estimada de entrega">
+              <input formControlName="OT_FechaEntrega" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha estimada de entrega" readonly onmousedown="return false;">
               <label for="floatingInput">Fecha Entrega</label>
             </div>
 
             <!-- ID Sede Cliente -->
             <div class="form-floating col-md-2">
-              <input formControlName="ID_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <input formControlName="ID_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required readonly onmousedown="return false;">
               <label for="floatingInput">ID Cliente</label>
             </div>
 
             <!-- Cliente -->
             <div class="form-floating col-md-4">
-              <input formControlName="Nombre_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <input formControlName="Nombre_Cliente" type="text" class="form-control form-control-sm" id="floatingInput" required readonly onmousedown="return false;">
               <label for="floatingInput">Nombre Cliente</label>
             </div>
 
             <!-- Ciudad Cliente -->
             <div class="form-floating col-md-2">
-              <input formControlName="Ciudad_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <input formControlName="Ciudad_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required readonly onmousedown="return false;">
               <label for="floatingInput">Ciudad Cliente</label>
             </div>
           </div>
@@ -114,16 +100,16 @@
           <div class="row g-3">
             <!-- Sede -->
             <div class="form-floating col-md-3">
-              <input formControlName="Direccion_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required >
+              <input formControlName="Direccion_SedeCliente" type="text" class="form-control form-control-sm" id="floatingInput" required readonly onmousedown="return false;">
               <label for="floatingInput">Direccion Sede</label>
             </div>
 
             <!-- Estado -->
             <div class="form-floating col-md-2">
               <select formControlName="OT_Estado" id="floatingSelect" type="text" name="PextEstadoId" class="form-select form-select-sm" aria-label=".form-select-sm example" required readonly onmousedown="return false;">
-                <option [ngValue]="estados" *ngFor="let estados of estados">{{estados}}</option>
+                <option [ngValue]="estados.estado_Id" *ngFor="let estados of estados">{{estados.estado_Nombre}}</option>
               </select>
-              <label for="floatingSelect">Estado de la OT</label>
+              <label for="floatingSelect">Estado del Pedido</label>
             </div>
 
             <!-- Campo Observacion -->
@@ -132,49 +118,68 @@
               <label for="floatingTextArea">Observación</label>
             </div>
 
-            <!-- Margen -->
-            <div class="form-floating col-md-2">
-              <input formControlName="Margen" type="number" class="form-control form-control-sm" min="0" max="100" id="floatingInput" required>
-              <label for="floatingInput">Margen (%)</label>
-              <div>
-                <label><b>Cant Kg total: </b>{{cantidadKgMasMargen | number}}</label>
-              </div>
-              <div>
-                <label><b>Cant Und total: </b>{{cantidadUndMasMargen | number}}</label>
+            <!-- Cyrel -->
+            <div class="form-floating col-md">
+              <div class="field-checkbox checkedCyrel_Corte">
+                <p-checkbox formControlName="OT_Cyrel" [(ngModel)]="checkedCyrel" [binary]="true" inputId="Cyrel"></p-checkbox>
+                <label for="Cyrel">Cyrel</label>
               </div>
             </div>
 
-            <!-- <div class="form-floating col-md-1">
-              <mat-checkbox
-                formControlName="OT_Cyrel"
-                style="margin-top: 15px; margin-left: 30px; height: 12px;"
-                id="extrusion"
-                (change)="CheckExtrusion($event)"
-                [(ngModel)]="checkedExtrusion">
-                Extrusion
-              </mat-checkbox>
-            </div> -->
+            <!-- Extrsión -->
+            <div class="form-floating col-md">
+              <div class="field-checkbox checkedCyrel_Corte">
+                <p-checkbox formControlName="OT_Extrusion" [(ngModel)]="extrusion" [binary]="true" inputId="OT_Extrusion" (click)="habilitarProcesoExtrusion()"></p-checkbox>
+                <label for="OT_Extrusion">Extrusón</label>
+              </div>
+            </div>
 
-            <!-- Cyrel -->
-            <div class="form-floating col-md-1">
-              <mat-checkbox
-                formControlName="OT_Cyrel"
-                id="cyrel"
-                style="margin-top: 15px; margin-left: 30px; height: 12px;"
-                [(ngModel)]="checkedCyrel">
-                Cyrel
-              </mat-checkbox>
+            <!-- Impresion -->
+            <div class="form-floating col-md">
+              <div class="field-checkbox checkedCyrel_Corte">
+                <p-checkbox formControlName="OT_Impresion" [(ngModel)]="impresion" [binary]="true" inputId="OT_Impresion" (click)="habilitarProcesoImpresion()"></p-checkbox>
+                <label for="OT_Impresion">Impresión</label>
+              </div>
+            </div>
+
+            <!-- Rotograbado -->
+            <div class="form-floating col-md">
+              <div class="field-checkbox checkedCyrel_Corte">
+                <p-checkbox formControlName="OT_Rotograbado" [(ngModel)]="rotograbado" [binary]="true" inputId="OT_Rotograbado" (click)="habilitarProcesoRotograbado()"></p-checkbox>
+                <label for="OT_Rotograbado">Rotograbado</label>
+              </div>
+            </div>
+
+            <!-- Laminado -->
+            <div class="form-floating col-md">
+              <div class="field-checkbox checkedCyrel_Corte">
+                <p-checkbox formControlName="OT_Laminado" [(ngModel)]="laminado" [binary]="true" inputId="OT_Laminado" (click)="habilitarProcesoLaminado()"></p-checkbox>
+                <label for="OT_Laminado">Laminado</label>
+              </div>
             </div>
 
             <!-- Corte -->
-            <div class="form-floating col-md-1">
-              <mat-checkbox
-                formControlName="OT_Corte"
-                id="corte"
-                style="margin-top: 15px; margin-left: 30px; height: 12px;"
-                [(ngModel)]="checkedCorte">
-                Corte
-              </mat-checkbox>
+            <div class="form-floating col-md">
+              <div class="field-checkbox checkedCyrel_Corte">
+                <p-checkbox formControlName="OT_Corte" [(ngModel)]="checkedCorte" [binary]="true" inputId="OT_Corte" (click)="habilitarProcesoCorte()"></p-checkbox>
+                <label for="OT_Corte">Corte</label>
+              </div>
+            </div>
+
+            <!-- Doblado -->
+            <div class="form-floating col-md">
+              <div class="field-checkbox checkedCyrel_Corte">
+                <p-checkbox formControlName="OT_Doblado" [(ngModel)]="doblado" [binary]="true" inputId="OT_Doblado"></p-checkbox>
+                <label for="OT_Doblado">Doblado</label>
+              </div>
+            </div>
+
+            <!-- Sellado -->
+            <div class="form-floating col-md">
+              <div class="field-checkbox checkedCyrel_Corte">
+                <p-checkbox formControlName="OT_Sellado" [(ngModel)]="sellado" [binary]="true" inputId="OT_Sellado" (click)="habilitarProcesoSellado()"></p-checkbox>
+                <label for="OT_Sellado">Sellado</label>
+              </div>
             </div>
           </div>
         </div>
@@ -184,66 +189,65 @@
         <hr class="colorLinea">
       </div>
 
-       <!--Titulo tabla-->
+      <!--Titulo tabla-->
       <div class="mb-3">
         <h4 class="tituloRojo">Tabla de Productos Pedidos</h4>
       </div>
 
       <!-- Inicio tabla producto -->
-      <div class="mb-3">
-        <div class="row g-3">
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover mt-2" title="Al seleccionar un registro, se cargará la información de la última OT que incluía dicho producto en las secciones de producción">
-              <thead class="TitulosTabla">
-                <tr *ngFor="let columnas of titulosTabla let i = index">
-                  <th scope="col" class="idProducto">{{columnas.pID}}</th>
-                  <th id="nombre" scope="col">{{columnas.pNombre}}</th>
-                  <th id="ancho" scope="col" class="">{{columnas.pAncho}}</th>
-                  <th id="fuelle" scope="col">{{columnas.pFuelle}}</th>
-                  <!-- <th id="calibre" scope="col">{{columnas.pCalibre}}</th> -->
-                  <th id="largo" scope="col">{{columnas.pLargo}}</th>
-                  <th id="undMedidaPeso" scope="col">{{columnas.pUndMedACF}}</th>
-                  <th id="largo" scope="col">{{columnas.pPesoMillar}}</th>
-                  <th id="tipoProducto" scope="col">{{columnas.pTipoProd}}</th>
-                  <!-- <th id="material" scope="col">{{columnas.pMaterial}}</th>
-                  <th id="pigmento" scope="col">{{columnas.pPigmento}}</th> -->
-                  <th id="cantidad" scope="col">{{columnas.pCantPaquete}}</th>
-                  <th id="cantidad" scope="col">{{columnas.pCantBulto}}</th>
-                  <th id="cantidad" scope="col">{{columnas.pCantidad}}</th>
-                  <th id="undMedidaCantidad" scope="col">{{columnas.pUndMedCant}}</th>
-                  <th id="undMedidaCantidad" scope="col">{{columnas.pTipoSellado}}</th>
-                  <th id="precioUnitario" scope="col">{{columnas.pPrecioU}}</th>
-                  <th id="Subtotal" scope="col">{{columnas.pSubtotal}}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let listaProductos of ArrayProducto; let j = index">
-                  <th id="id" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Id}}</th>
-                  <td id="nombreCampo" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Nombre}}</td>
-                  <td id="ancho" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Ancho}}</td>
-                  <td id="fuelle" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Fuelle}}</td>
-                  <!-- <td id="calibre" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Cal}}</td> -->
-                  <td id="largo" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Largo}}</td>
-                  <td id="undMedidaPeso" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Und}}</td>
-                  <td id="largo" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.PesoMillar}}</td>
-                  <td id="tipoProducto" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Tipo}}</td>
-                  <!-- <td id="material" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Material}}</td>
-                  <td id="pigmento" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Pigmento}}</td> -->
-                  <td id="cantidadDisponible" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.CantPaquete}}</td>
-                  <td id="cantidadDisponible" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.CantBulto}}</td>
-                  <td id="cantidadDisponible" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.Cant}}</td>
-                  <td id="undMedidaCantidad" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.UndCant}}</td>
-                  <td id="undMedidaCantidad" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.TipoSellado}}</td>
-                  <td id="precioUnitario" class="TextosInfoTabla" (click)="consultar_Prod_Cli_Presentacion(listaProductos)">{{listaProductos.PrecioUnd | currency }}</td>
-                  <td id="Subtotal" class="TextosInfoTabla">{{listaProductos.SubTotal | currency }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <p-table
+        #dt
+        [value]="ArrayProducto"
+        [resizableColumns]="true"
+        columnResizeMode="expand"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="ArrayProducto.length"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} productos"
+        [rowsPerPageOptions]="[20]"
+        dataKey="Nombre"
+        selectionMode="single"
+        (onRowSelect)="consultarInfoProducto($event.data)"
+        (onRowUnselect)="onRowUnselect()">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col" style="font-size: 12px;">Id</th>
+            <th scope="col" style="font-size: 12px;">Producto</th>
+            <th scope="col" style="font-size: 12px;">Cantidad Pedida</th>
+            <th scope="col" style="font-size: 12px;">Und</th>
+            <th scope="col" style="font-size: 12px;">Precio</th>
+            <th scope="col" style="font-size: 12px;">SubTotal</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr [pSelectableRow]="item">
+            <td>{{item.Id}}</td>
+            <td>{{item.Nombre}}</td>
+            <td [pEditableColumn]="item.Cant" pEditableColumnField="price">
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input pInputText type="text" [(ngModel)]="item.Cant" [min]="1">
+                </ng-template>
+                <ng-template pTemplate="output">{{item.Cant | number}}</ng-template>
+              </p-cellEditor>
+            </td>
+            <td>{{item.UndCant}}</td>
+            <td>{{item.PrecioUnd | currency : 'COP $'}}</td>
+            <td>{{item.SubTotal | currency : 'COP $' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="5" class="text-right">Totales</td>
+            <td>{{cantidadCostoProductos | currency : 'COP $'}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <br>
 
-        <!--Linea-->
+      <!--Linea-->
       <div class="mb-4">
         <hr class="colorLinea">
       </div>
@@ -253,40 +257,80 @@
         <h4 class="tituloRojo">Procesos de Producción</h4>
       </div>
 
-        <!-- TABS de Procesos -->
+      <!-- TABS de Procesos -->
       <ul class="nav nav-tabs justify-content-md-center" >
         <li class="nav-item">
-          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#Extrusión" type="button" role="tab">Extrusión</button>
+          <button class="nav-link active" id="tabDatosOT" data-bs-toggle="tab" data-bs-target="#DatosOT" type="button" role="tab">Datos OT</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#Impresión" type="button" role="tab">Impresión</button>
+          <button class="nav-link" id="tabExtrusion" data-bs-toggle="tab" data-bs-target="#Extrusión" type="button" role="tab" disabled>Extrusión</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#Laminado" type="button" role="tab">Laminado</button>
+          <button class="nav-link" id="tabImpresion" data-bs-toggle="tab" data-bs-target="#Impresión" type="button" role="tab" disabled>Impresión</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#Mezclas" type="button" role="tab">Mezclas</button>
+          <button class="nav-link" id="tabLaminadosion" data-bs-toggle="tab" data-bs-target="#Laminado" type="button" role="tab" disabled>Laminado</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="tabCorte" data-bs-toggle="tab" data-bs-target="#Corte" type="button" role="tab" disabled>Corte</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="tabSellado" data-bs-toggle="tab" data-bs-target="#Sellado" type="button" role="tab" disabled>Sellado</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="tabMezclas" data-bs-toggle="tab" data-bs-target="#Mezclas" type="button" role="tab">Mezclas</button>
         </li>
       </ul>
 
       <!-- TABS de Informacion de los Procesos -->
       <div class="tab-content" id="myTabContent">
+        <!-- Datos de la OT -->
+        <div class="tab-pane fade show active" id="DatosOT" role="tabpanel" aria-labelledby="DatosOT-tab">
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <div class="mb-3">
+              <div class="row g-3">
+                <label><b>Cantidad {{presentacionProducto}}</b></label>
+                <label>{{cantidadProducto | number}}</label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="row g-3">
+                <label><b>Valor {{presentacionProducto}}</b></label>
+                <label>{{valorProducto | number}}</label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="row g-3">
+                <label><b>Neto Kg</b></label>
+                <label>{{netoKg | number}}</label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="row g-3">
+                <label><b>Valor Kg</b></label>
+                <label>{{valorKg | number}}</label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="row g-3">
+                <label><b>Valor OT</b></label>
+                <label>{{valorOt | number}}</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Extrusion -->
-        <div class="tab-pane fade show active" id="Extrusión" role="tabpanel" aria-labelledby="Extrusión-tab">
+        <div class="tab-pane fade show" id="Extrusión" role="tabpanel" aria-labelledby="Extrusión-tab">
           <form [formGroup]="FormOrdenTrabajoExtrusion">
             <div class="mb-3" >
               <div class="row g-3 justify-content-md-center">
 
-                <!-- Cantidad a extruir -->
-                <div class="form-floating col-md-2">
-                  <input formControlName="cantidad_Extrusion" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
-                  <label for="floatingInput">Cantidad</label>
-                </div>
-
                 <!-- Material -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Material_Extrusion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="MaterialPrd" *ngFor="let MaterialPrd of arrayMateriales">{{MaterialPrd}}</option>
+                    <option [ngValue]="MaterialPrd.material_Id" *ngFor="let MaterialPrd of arrayMateriales">{{MaterialPrd.material_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material</label>
                 </div>
@@ -294,17 +338,25 @@
                 <!-- Formato -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Formato_Extrusion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="formato" *ngFor="let formato of formatos">{{formato}}</option>
+                    <option [ngValue]="formato.formato_Id" *ngFor="let formato of formatos">{{formato.formato_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Formato</label>
                 </div>
 
-                 <!-- Pigmento -->
+                  <!-- Pigmento -->
                 <div class="form-floating col-md-2">
                   <select formControlName="Pigmento_Extrusion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="Pigmentos" *ngFor="let Pigmentos of arrayPigmentos">{{Pigmentos}}</option>
+                    <option [ngValue]="Pigmentos.pigmt_Id" *ngFor="let Pigmentos of arrayPigmentos">{{Pigmentos.pigmt_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento</label>
+                </div>
+
+                <!-- Tratado -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Tratado_Extrusion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="tratados.tratado_Id" *ngFor="let tratados of tratado">{{tratados.tratado_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Tratado</label>
                 </div>
               </div>
             </div>
@@ -331,9 +383,9 @@
                   <label for="floatingInput">Ancho 3</label>
                 </div>
 
-                 <!-- Formato -->
-                 <div class="form-floating col-md-1">
-                  <input formControlName="Calibre_Extrusion" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
+                <!-- Formato -->
+                <div class="form-floating col-md-1">
+                  <input formControlName="Calibre_Extrusion" type="number" class="form-control form-control-sm" id="floatingInput" required (keyup)="calcularDatosOt(informacionSeleccionada)">
                   <label for="floatingInput">Calibre</label>
                 </div>
 
@@ -345,13 +397,12 @@
                   <label for="floatingSelect">Und. Medida</label>
                 </div>
 
-                 <!-- Formato -->
+                <!-- Peso Extrusion -->
                 <div class="form-floating col-md-2">
-                  <select formControlName="Tratado_Extrusion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="tratados" *ngFor="let tratados of tratado">{{tratados}}</option>
-                  </select>
-                  <label for="floatingSelect">Tratado</label>
+                  <input formControlName="Peso_Extrusion" type="number" class="form-control form-control-sm" id="floatingInput" required readonly>
+                  <label for="floatingInput">Peso Extrusión</label>
                 </div>
+
               </div>
             </div>
           </form>
@@ -360,45 +411,26 @@
         <!-- Impresion -->
         <div class="tab-pane fade" id="Impresión" role="tabpanel" aria-labelledby="Impresión-tab">
           <form [formGroup]="FormOrdenTrabajoImpresion">
-
             <!--Fila 1-->
             <div class="mb-3" >
               <div class="row g-3 justify-content-md-center">
-                <!-- Cantidad a extruir -->
-                <div class="form-floating col-md-2">
-                  <input formControlName="cantidad_Impresion" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a imprimir">
-                  <label for="floatingInput">Cantidad</label>
-                </div>
-
                 <!-- Material -->
                 <div class="form-floating col-md-2">
-                  <select formControlName="Tipo_Impresion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="tipoImpresion" *ngFor="let tipoImpresion of tiposImpresion">{{tipoImpresion}}</option>
+                  <select formControlName="Tipo_Impresion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                    <option [ngValue]="tipoImpresion.tpImpresion_Id" *ngFor="let tipoImpresion of tiposImpresion">{{tipoImpresion.tpImpresion_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Tipo Impresión</label>
                 </div>
 
                 <!-- Rodillo -->
                 <div class="form-floating col-md-2">
-                  <!-- <select formControlName="Rodillo_Impresion" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option [ngValue]="rodillo" *ngFor="let rodillo of rodillos">{{rodillo}}</option>
-                  </select>
-                  <label for="floatingSelect">Rodillo</label> -->
-
-                  <input formControlName="Rodillo_Impresion" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a imprimir">
+                  <input formControlName="Rodillo_Impresion" type="number" class="form-control form-control-sm" id="floatingInput">
                   <label for="floatingInput">Rodillo</label>
                 </div>
 
-                 <!-- Psita -->
+                  <!-- Psita -->
                 <div class="form-floating col-md-2">
-                  <!-- <select formControlName="Pista_Impresion" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option value="1" disabled selected></option>
-                    <option [ngValue]="pista" *ngFor="let pista of pistas">{{pista}}</option>
-                  </select>
-                  <label for="floatingSelect">Pista</label> -->
-
-                  <input formControlName="Pista_Impresion" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a imprimir">
+                  <input formControlName="Pista_Impresion" type="number" class="form-control form-control-sm" id="floatingInput">
                   <label for="floatingInput">Pista</label>
                 </div>
 
@@ -407,81 +439,81 @@
 
             <!--Fila 2-->
             <div class="mb-3" style="text-align: center;">
-                <h6 class="tituloRojo">Tintas</h6>
+              <h6 class="tituloRojo">Tintas</h6>
             </div>
 
-             <!--Fila 3-->
+              <!--Fila 3-->
             <div class="mb-3" >
               <div class="row g-3 justify-content-md-center">
 
                 <!-- Tinta 1 -->
                 <div class="form-floating col-md-2">
-                  <select formControlName="Tinta_Impresion1" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
+                  <select formControlName="Tinta_Impresion1" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example">
+                    <option [ngValue]="NombreTintas.tinta_Nombre" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Tinta 1 (Opcional)</label>
                 </div>
 
                 <!-- Tinta 2 -->
                 <div class="form-floating col-md-2">
-                  <select formControlName="Tinta_Impresion2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
+                  <select formControlName="Tinta_Impresion2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                    <option [ngValue]="NombreTintas.tinta_Nombre" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Tinta 2 (Opcional)</label>
                 </div>
 
                 <!-- Tinta 3 -->
                 <div class="form-floating col-md-2">
-                  <select formControlName="Tinta_Impresion3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
+                  <select formControlName="Tinta_Impresion3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                    <option [ngValue]="NombreTintas.tinta_Nombre" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Tinta 3 (Opcional)</label>
                 </div>
 
-                 <!-- Tinta 4 -->
+                  <!-- Tinta 4 -->
                 <div class="form-floating col-md-2">
-                  <select formControlName="Tinta_Impresion4" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
+                  <select formControlName="Tinta_Impresion4" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example">
+                    <option [ngValue]="NombreTintas.tinta_Nombre" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
                   </select>
-                  <label for="floatingSelect">Tinta 4</label>
+                  <label for="floatingSelect">Tinta 4 (Opcional)</label>
                 </div>
 
               </div>
             </div>
 
-             <!--Fila 4 -->
-             <div class="mb-3" >
+            <!--Fila 4 -->
+            <div class="mb-3" >
               <div class="row g-3 justify-content-md-center">
                 <!-- Cantidad a extruir -->
                 <div class="form-floating col-md-2">
-                  <select formControlName="Tinta_Impresion5" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
+                  <select formControlName="Tinta_Impresion5" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example">
+                    <option [ngValue]="NombreTintas.tinta_Nombre" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
                   </select>
-                  <label for="floatingSelect">Tinta 5</label>
+                  <label for="floatingSelect">Tinta 5 (Opcional)</label>
                 </div>
 
                 <!-- Material -->
                 <div class="form-floating col-md-2">
-                  <select formControlName="Tinta_Impresion6" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
+                  <select formControlName="Tinta_Impresion6" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                    <option [ngValue]="NombreTintas.tinta_Nombre" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
                   </select>
-                  <label for="floatingSelect">Tinta 6</label>
+                  <label for="floatingSelect">Tinta 6 (Opcional)</label>
                 </div>
 
                 <!-- Formato -->
                 <div class="form-floating col-md-2">
-                  <select formControlName="Tinta_Impresion7" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
+                  <select formControlName="Tinta_Impresion7" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                    <option [ngValue]="NombreTintas.tinta_Nombre" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
                   </select>
-                  <label for="floatingSelect">Tinta 7</label>
+                  <label for="floatingSelect">Tinta 7 (Opcional)</label>
                 </div>
 
-                 <!-- Formato -->
+                  <!-- Formato -->
                 <div class="form-floating col-md-2">
-                  <select formControlName="Tinta_Impresion8" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="NombreTintas" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas}}</option>
+                  <select formControlName="Tinta_Impresion8" id="floatingSelect" type="text" n class="form-select form-select-sm" aria-label=".form-select-sm example">
+                    <option [ngValue]="NombreTintas.tinta_Nombre" *ngFor="let NombreTintas of arrayTintas">{{NombreTintas.tinta_Nombre}}</option>
                   </select>
-                  <label for="floatingSelect">Tinta 8</label>
+                  <label for="floatingSelect">Tinta 8 (Opcional)</label>
                 </div>
 
               </div>
@@ -493,26 +525,14 @@
         <!-- Laminado -->
         <div class="tab-pane fade" id="Laminado" role="tabpanel" aria-labelledby="Laminado-tab">
           <form [formGroup]="FormOrdenTrabajoLaminado">
-                <!--Fila 1-->
-            <div class="mb-3" >
-              <div class="row g-3 justify-content-md-center">
-
-                <!-- Cantidad a laminar -->
-                <div class="form-floating col-md-2">
-                  <input formControlName="cantidad_Laminado" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a Laminar">
-                  <label for="floatingInput">Cantidad</label>
-                </div>
-              </div>
-            </div>
-
-            <!--Fila 2-->
+            <!--Fila 1-->
             <div class="mb-3" >
               <div class="row g-3 justify-content-md-center">
 
                 <!--Capa 1-->
                 <div class="form-floating col-md-2">
                   <select formControlName="Capa_Laminado1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="lamCapas" *ngFor="let lamCapas of laminado_capas">{{lamCapas}}</option>
+                    <option [ngValue]="lamCapas.lamCapa_Id" *ngFor="let lamCapas of laminado_capas">{{lamCapas.lamCapa_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Capa 1</label>
                 </div>
@@ -530,14 +550,14 @@
               </div>
             </div>
 
-            <!--Fila 3-->
+            <!--Fila 2-->
             <div class="mb-3" >
               <div class="row g-3 justify-content-md-center">
 
                 <!--Capa 2-->
                 <div class="form-floating col-md-2">
                   <select formControlName="Capa_Laminado2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="lamCapas" *ngFor="let lamCapas of laminado_capas">{{lamCapas}}</option>
+                    <option [ngValue]="lamCapas.lamCapa_Id" *ngFor="let lamCapas of laminado_capas">{{lamCapas.lamCapa_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Capa 2</label>
                 </div>
@@ -556,14 +576,14 @@
               </div>
             </div>
 
-             <!--Fila 4-->
-             <div class="mb-3" >
+            <!--Fila 3-->
+            <div class="mb-3" >
               <div class="row g-3 justify-content-md-center">
 
                 <!--Capa 3-->
                 <div class="form-floating col-md-2">
                   <select formControlName="Capa_Laminado3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="lamCapas" *ngFor="let lamCapas of laminado_capas">{{lamCapas}}</option>
+                    <option [ngValue]="lamCapas.lamCapa_Id" *ngFor="let lamCapas of laminado_capas">{{lamCapas.lamCapa_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Capa 3</label>
                 </div>
@@ -582,6 +602,150 @@
               </div>
             </div>
 
+          </form>
+        </div>
+
+        <!-- Corte -->
+        <div class="tab-pane fade" id="Corte" role="tabpanel" aria-labelledby="Corte-tab">
+          <form [formGroup]="FormOrdenTrabajoCorte">
+            <!-- Fila 1 -->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+                <!-- Formato -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Formato_Corte" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="lamCapas.tpProd_Nombre" *ngFor="let lamCapas of tipoProductos">{{lamCapas.tpProd_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Formato</label>
+                </div>
+
+                <!-- Ancho -->
+                <div class="form-floating col-md-1">
+                  <input formControlName="Ancho_Corte" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
+                  <label for="floatingInput">Ancho</label>
+                </div>
+
+                <!-- Largo-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="Largo_Corte" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
+                  <label for="floatingInput">Largo</label>
+                </div>
+
+                <!-- Fuelle-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="Fuelle_Corte" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
+                  <label for="floatingInput">Fuelle</label>
+                </div>
+
+                <!-- Margen -->
+                <div class="form-floating col-md-2">
+                  <input formControlName="Margen_Corte" type="number" class="form-control form-control-sm" min="0" max="100" id="floatingInput" required>
+                  <label for="floatingInput">Margen (%)</label>
+                  <div>
+                    <label><b>Margen Kg: </b>{{margenKg | number}}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Sellado -->
+        <div class="tab-pane fade" id="Sellado" role="tabpanel" aria-labelledby="Sellado-tab">
+          <form [formGroup]="FormOrdenTrabajoSellado">
+            <!-- Fila 1 -->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+                <!-- Formato -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="Formato_Sellado" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="lamCapas.tpProd_Nombre" *ngFor="let lamCapas of tipoProductos">{{lamCapas.tpProd_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Formato</label>
+                </div>
+
+                <!-- Ancho -->
+                <div class="form-floating col-md-1">
+                  <input formControlName="Ancho_Sellado" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
+                  <label for="floatingInput">Ancho</label>
+                </div>
+
+                <!-- Largo-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="Largo_Sellado" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
+                  <label for="floatingInput">Largo</label>
+                </div>
+
+                <!-- Fuelle-->
+                <div class="form-floating col-md-1">
+                  <input formControlName="Fuelle_Sellado" type="number" class="form-control form-control-sm" id="floatingInput" required title="Cantidad a extruir">
+                  <label for="floatingInput">Fuelle</label>
+                </div>
+
+                <!-- Margen -->
+                <div class="form-floating col-md-2">
+                  <input formControlName="Margen_Sellado" type="number" class="form-control form-control-sm" min="0" max="100" id="floatingInput" required>
+                  <label for="floatingInput">Margen (%)</label>
+                  <div>
+                    <label><b>Margen Kg: </b>{{margenKg | number}}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fila 2 -->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+                <!-- Peso Millar -->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PesoMillar" type="number" class="form-control form-control-sm" id="floatingInput" required readonly>
+                  <label for="floatingInput">PesoMillar</label>
+                </div>
+                <!-- Tipo Sellado -->
+                <div class="form-floating col-md-2">
+                  <select formControlName="TipoSellado" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                    <option [ngValue]="lamCapas.tpSellados_Nombre" *ngFor="let lamCapas of tipoSellado">{{lamCapas.tpSellados_Nombre}}</option>
+                  </select>
+                  <label for="floatingSelect">Tipo Sellado</label>
+                </div>
+                <!-- Precio Día -->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PrecioDia" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">Precio Día</label>
+                </div>
+                <!-- Precio Noche -->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PrecioNoche" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">Precio Noche</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fila 3 -->
+            <div class="mb-3" >
+              <div class="row g-3 justify-content-md-center">
+                <!-- Peso Millar -->
+                <div class="form-floating col-md-3">
+                  <input formControlName="CantidadPaquete" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">Cantidad x Paquete</label>
+                </div>
+                <!-- Peso Paquete -->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PesoPaquete" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">Peso Paquete</label>
+                </div>
+                <!-- Precio Noche -->
+                <div class="form-floating col-md-3">
+                  <input formControlName="CantidadBulto" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">Cantidad x Bulto</label>
+                </div>
+                <!-- Peso Bulto -->
+                <div class="form-floating col-md-1">
+                  <input formControlName="PesoBulto" type="number" class="form-control form-control-sm" id="floatingInput" required>
+                  <label for="floatingInput">Peso Bulto</label>
+                </div>
+              </div>
+            </div>
           </form>
         </div>
 
@@ -1310,26 +1474,12 @@
             <!--Fila 1-->
             <div class="mb-3" >
               <div class="row g-3 justify-content-md-center">
-                <div class="ng-autocomplete form-floating col-md-3 form-control form-control-sm" style="width: 50%;">
-                  <ng-autocomplete
-                    class=""
-                    [data]="mezclas"
-                    (selected)='cargarCombinacionMezclas($event)'
-                    (inputChanged)='onChangeSearchMezcla($event)'
-                    (inputFocused)='onFocusedNombreMezcla($event)'
-                    [searchKeyword]="keywordMezclas"
-                    [itemTemplate]="itemTemplate2"
-                    [notFoundTemplate]="notFoundTemplate"
-                    id="floatingInput"
-                    formControlName="Nombre_Mezclas">
-                  </ng-autocomplete>
-                  <ng-template #itemTemplate2 let-item>
-                    <a [innerHTML]="item.mezcla_Nombre"></a>
-                  </ng-template>
-                  <ng-template #notFoundTemplate let-notFound>
-                    <div [innerHTML]="notFound"></div>
-                  </ng-template>
-                  <label for="floatingInput" *ngIf="validarInputMezclas">Mezclas</label>
+                <div class="form-floating col-md-5">
+                  <input formControlName="Nombre_Mezclas" class="form-control" list="Mezlas" id="floatingInput" (change)="cargarCombinacionMezclas()" required>
+                  <datalist id="Mezlas">
+                    <option value={{item.mezcla_Id}} *ngFor="let item of mezclas">{{item.mezcla_Nombre}}</option>
+                  </datalist>
+                  <label for="floatingInput">Mezclas</label>
                 </div>
               </div>
             </div>
@@ -1374,7 +1524,7 @@
                 </div>
 
                 <!--Capa 2 interna-->
-               <div class="form-floating col-md-2">
+                <div class="form-floating col-md-2">
                   <input formControlName="Proc_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required >
                   <label for="floatingInput">% Capa 2</label>
                 </div>
@@ -1398,7 +1548,7 @@
                 <!--Material 1 Capa 1 -->
                 <div class="form-floating col-md-2">
                   <select formControlName="materialP1_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                    <option [ngValue]="mezMat.mezMaterial_Id" *ngFor="let mezMat of mezclasMateriales">{{mezMat.mezMaterial_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material 1</label>
                 </div>
@@ -1409,10 +1559,10 @@
                   <label for="floatingInput">%</label>
                 </div>
 
-                 <!--Material 1 Capa 2-->
-                 <div class="form-floating col-md-2">
+                  <!--Material 1 Capa 2-->
+                  <div class="form-floating col-md-2">
                   <select formControlName="materialP1_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                    <option [ngValue]="mezMat.mezMaterial_Id" *ngFor="let mezMat of mezclasMateriales">{{mezMat.mezMaterial_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material 1</label>
                 </div>
@@ -1423,10 +1573,10 @@
                   <label for="floatingInput">%</label>
                 </div>
 
-                 <!--Material 1 Capa 3-->
-                 <div class="form-floating col-md-2">
+                  <!--Material 1 Capa 3-->
+                  <div class="form-floating col-md-2">
                   <select formControlName="materialP1_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                    <option [ngValue]="mezMat.mezMaterial_Id" *ngFor="let mezMat of mezclasMateriales">{{mezMat.mezMaterial_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material 1</label>
                 </div>
@@ -1447,7 +1597,7 @@
                 <!--Material 2 Capa 1-->
                 <div class="form-floating col-md-2">
                   <select formControlName="materialP2_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                    <option [ngValue]="mezMat.mezMaterial_Id" *ngFor="let mezMat of mezclasMateriales">{{mezMat.mezMaterial_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material 2</label>
                 </div>
@@ -1461,7 +1611,7 @@
                   <!--Material 2 Capa 2-->
                 <div class="form-floating col-md-2">
                   <select formControlName="materialP2_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                    <option [ngValue]="mezMat.mezMaterial_Id" *ngFor="let mezMat of mezclasMateriales">{{mezMat.mezMaterial_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material 2</label>
                 </div>
@@ -1475,7 +1625,7 @@
                   <!--Material 2 Capa 3-->
                 <div class="form-floating col-md-2">
                   <select formControlName="materialP2_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                    <option [ngValue]="mezMat.mezMaterial_Id" *ngFor="let mezMat of mezclasMateriales">{{mezMat.mezMaterial_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material 2</label>
                 </div>
@@ -1495,7 +1645,7 @@
                 <!--Material 3 Capa 1 -->
                 <div class="form-floating col-md-2">
                   <select formControlName="materialP3_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                    <option [ngValue]="mezMat.mezMaterial_Id" *ngFor="let mezMat of mezclasMateriales">{{mezMat.mezMaterial_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material 3</label>
                 </div>
@@ -1506,10 +1656,10 @@
                   <label for="floatingInput">%</label>
                 </div>
 
-                 <!--Material 3 Capa 2-->
-                 <div class="form-floating col-md-2">
+                  <!--Material 3 Capa 2-->
+                  <div class="form-floating col-md-2">
                   <select formControlName="materialP3_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                    <option [ngValue]="mezMat.mezMaterial_Id" *ngFor="let mezMat of mezclasMateriales">{{mezMat.mezMaterial_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material 3</label>
                 </div>
@@ -1520,10 +1670,10 @@
                   <label for="floatingInput">%</label>
                 </div>
 
-                 <!--Material 3 Capa 3-->
-                 <div class="form-floating col-md-2">
+                  <!--Material 3 Capa 3-->
+                  <div class="form-floating col-md-2">
                   <select formControlName="materialP3_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                    <option [ngValue]="mezMat.mezMaterial_Id" *ngFor="let mezMat of mezclasMateriales">{{mezMat.mezMaterial_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material 3</label>
                 </div>
@@ -1543,7 +1693,7 @@
                 <!-- Material 4 Capa 1-->
                 <div class="form-floating col-md-2">
                   <select formControlName="materialP4_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                    <option [ngValue]="mezMat.mezMaterial_Id" *ngFor="let mezMat of mezclasMateriales">{{mezMat.mezMaterial_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material 4</label>
                 </div>
@@ -1554,10 +1704,10 @@
                   <label for="floatingInput">%</label>
                 </div>
 
-                 <!--Material 4 Capa 2-->
-                 <div class="form-floating col-md-2">
+                  <!--Material 4 Capa 2-->
+                  <div class="form-floating col-md-2">
                   <select formControlName="materialP4_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                    <option [ngValue]="mezMat.mezMaterial_Id" *ngFor="let mezMat of mezclasMateriales">{{mezMat.mezMaterial_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material 4</label>
                 </div>
@@ -1568,10 +1718,10 @@
                   <label for="floatingInput">%</label>
                 </div>
 
-                 <!--Material 4 Capa 3-->
-                 <div class="form-floating col-md-2">
+                  <!--Material 4 Capa 3-->
+                  <div class="form-floating col-md-2">
                   <select formControlName="materialP_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezMat" *ngFor="let mezMat of mezclasMateriales">{{mezMat}}</option>
+                    <option [ngValue]="mezMat.mezMaterial_Id" *ngFor="let mezMat of mezclasMateriales">{{mezMat.mezMaterial_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Material 4</label>
                 </div>
@@ -1592,7 +1742,7 @@
                 <!--Pigmento 1 Capa 1-->
                 <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmentoP1_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
+                    <option [ngValue]="mezPigt.mezPigmto_Id" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt.mezPigmto_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 1</label>
                 </div>
@@ -1603,10 +1753,10 @@
                   <label for="floatingInput">%</label>
                 </div>
 
-                 <!-- Pigmento 1 Capa 2-->
-                 <div class="form-floating col-md-2">
+                  <!-- Pigmento 1 Capa 2-->
+                  <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmentoP1_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
+                    <option [ngValue]="mezPigt.mezPigmto_Id" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt.mezPigmto_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 1</label>
                 </div>
@@ -1617,10 +1767,10 @@
                   <label for="floatingInput">%</label>
                 </div>
 
-                 <!-- Pigmento 1 Capa 3 -->
-                 <div class="form-floating col-md-2">
+                  <!-- Pigmento 1 Capa 3 -->
+                  <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmento1_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
+                    <option [ngValue]="mezPigt.mezPigmto_Id" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt.mezPigmto_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 1</label>
                 </div>
@@ -1641,7 +1791,7 @@
                 <!--Pigmento 2 Capa 1-->
                 <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmentoP2_Capa1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
+                    <option [ngValue]="mezPigt.mezPigmto_Id" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt.mezPigmto_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 2</label>
                 </div>
@@ -1652,10 +1802,10 @@
                   <label for="floatingInput">%</label>
                 </div>
 
-                 <!--Pigmento 2 Capa 2-->
-                 <div class="form-floating col-md-2">
+                  <!--Pigmento 2 Capa 2-->
+                  <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmentoP2_Capa2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
+                    <option [ngValue]="mezPigt.mezPigmto_Id" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt.mezPigmto_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 2</label>
                 </div>
@@ -1666,10 +1816,10 @@
                   <label for="floatingInput">%</label>
                 </div>
 
-                 <!--Pigmento 2 Capa 3-->
-                 <div class="form-floating col-md-2">
+                  <!--Pigmento 2 Capa 3-->
+                  <div class="form-floating col-md-2">
                   <select formControlName="MezclaPigmento2_Capa3" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                    <option [ngValue]="mezPigt" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt}}</option>
+                    <option [ngValue]="mezPigt.mezPigmto_Id" *ngFor="let mezPigt of mezclasPigmentos">{{mezPigt.mezPigmto_Nombre}}</option>
                   </select>
                   <label for="floatingSelect">Pigmento 2</label>
                 </div>
@@ -1688,11 +1838,11 @@
       <!-- Inicio Botones -->
       <div class="bajarPagina">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="guardarOT()">Crear Orden de Trabajo</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="guardarOt()">Crear Orden de Trabajo</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTCreada()">Consultar Orden de Trabajo</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="pdfOrdenTrabajo()">Ver PDF <i class="pi pi-file-pdf"></i></button>
         </div>
       </div>
-    </div>
+    <!-- </div> -->
   </div>
 </div>

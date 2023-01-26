@@ -2630,7 +2630,7 @@ export class OpedidoproductoComponent implements OnInit {
           nombre : `${item.pedExt_Id} - ${item.cli_Nombre} - ${fechaEntrega}`,
           fecha : fechaEntrega,
         }
-        this.CrearOrdenTrabajo.consultarPedido(itemOt);
+        // this.CrearOrdenTrabajo.consultarPedido(itemOt);
       } else if (datos_ot.length >= 1){
         let productosOT : any = [];
 
@@ -2653,7 +2653,7 @@ export class OpedidoproductoComponent implements OnInit {
                 nombre : `${item.pedExt_Id} - ${item.cli_Nombre} - ${fechaEntrega}`,
                 fecha : fechaEntrega,
               }
-              this.CrearOrdenTrabajo.consultarPedido(itemOt);
+              // this.CrearOrdenTrabajo.consultarPedido(itemOt);
             } else continue;
           }
           if (productos.length == 0) Swal.fire(`El pedido ${item.pedExt_Id} ya tiene ordenes de trabajo`);

@@ -628,20 +628,20 @@
               <b>Pedidos</b>
             </a>
             <div class="collapse" id="collapseExample5">
-               <!-- <div class="mb-2 sangria">
-                <a class="fst-normal" data-bs-toggle="" href="pedido-externo" role="button" aria-expanded="false">
+               <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
+                <a class="fst-normal" data-bs-toggle="" href="/pedido-externo" role="button" aria-expanded="false">
                   <i class="pi pi-shopping-bag" style="font-size: 15px; margin-right: 2%;"></i>
                   Pedidos Externos
                 </a>
               </div>
-               <div class="mb-2 sangria">
-                <a class="fst-normal" data-bs-toggle="" href="opedidoproducto" role="button" aria-expanded="false">
+               <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
+                <a class="fst-normal" data-bs-toggle="" href="/home" role="button" aria-expanded="false">
                   <i class="pi pi-eye" style="font-size: 15px; margin-right: 2%;"></i>
                   Ver Pedidos
                 </a>
-              </div> -->
+              </div>
 
-              <div class="mb-2 sangria">
+              <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 60">
                 <a class="fst-normal" data-bs-toggle="" href="/Pedidos-Zeus" role="button" aria-expanded="false">
                   <i class="pi pi-shopping-bag" style="font-size: 15px; margin-right: 2%;"></i>
                   Pedidos Zeus

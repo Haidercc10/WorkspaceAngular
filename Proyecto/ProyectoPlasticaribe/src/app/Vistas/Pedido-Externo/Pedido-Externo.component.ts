@@ -62,6 +62,8 @@ export class PedidoExternoComponent implements OnInit {
   ultimoPrecio : number = 0; //Variable que almacenará el ultimo precio por el que se facturó un producto
   checked = false; //Variable que va a almancenar la información de si el pedido lleva iva o no
   productosPedidos : any [] = []; //Variable que se llenará con la información de los productos que se enviaron a la base de datos, los productos serán del ultimo pedido creado
+  modalMode : boolean = false; //Variable que será true cuando el componente esté apareciendo en un modal
+  pedidoEditar : number = 0; //Variable que alamcenará el numero el pedido que se está editando
 
   constructor(private pedidoproductoService : OpedidoproductoService,
                 private productosServices : ProductoService,
@@ -134,9 +136,8 @@ export class PedidoExternoComponent implements OnInit {
 
   // Funcion que va a dar un valor a la variable iva dependiendo de si fue seleccionada o no la casilla del iva
   checkboxIva(){
-    if (!this.checked) {
-      this.iva = 19;
-    } else {
+    if (!this.checked) this.iva = 19;
+    else {
       this.iva = 0;
       this.valorMenosIva = 0;
       this.valorfinal -= this.valorfinal;
@@ -146,10 +147,17 @@ export class PedidoExternoComponent implements OnInit {
 
   //Funcion que validar si cambia uno de los input se muestre la misma informacion en la parde abajo de la tabla
   ivaDescuento(){
-    this.descuento = this.FormPedidoExternoClientes.value.PedDescuento;
-    this.valorMenosDescuento += (this.valorTotal * this.descuento) / 100;
-    this.valorMenosIva += (this.valorTotal * this.iva) / 100;
-    this.valorfinal = (this.valorTotal - this.valorMenosDescuento) + this.valorMenosIva;
+    if (this.valorTotal == 0) {
+      this.descuento = 0;
+      this.valorMenosDescuento = 0;
+      this.valorMenosIva = 0;
+      this.valorfinal = 0;
+    } else {
+      this.descuento = this.FormPedidoExternoClientes.value.PedDescuento;
+      this.valorMenosDescuento = (this.valorTotal * this.descuento) / 100;
+      this.valorMenosIva = (this.valorTotal * this.iva) / 100;
+      this.valorfinal = this.valorTotal - this.valorMenosDescuento + this.valorMenosIva;
+    }
   }
 
   //Cargar modal de crear producto
@@ -200,8 +208,9 @@ export class PedidoExternoComponent implements OnInit {
     this.usuarioService.srvObtenerListaPorId(this.storage.get('Id')).subscribe(datos_usuarios => {
       this.clientesService.srvObtenerListaPorEstado(1).subscribe(datos_clientes => {
         for (let index = 0; index < datos_clientes.length; index++) {
-          if (datos_usuarios.rolUsu_Id == 2) this.cliente.push(datos_clientes[index]);
-          else this.cliente.push(datos_clientes[index]);
+          if (datos_usuarios.rolUsu_Id == 2) {
+            if (datos_clientes[index].usua_Id == this.storage.get('Id')) this.cliente.push(datos_clientes[index]);
+          } else this.cliente.push(datos_clientes[index]);
           this.cliente.sort((a,b) => a.cli_Nombre.localeCompare(b.cli_Nombre));
         }
       });
@@ -306,6 +315,7 @@ export class PedidoExternoComponent implements OnInit {
   buscarProducto(){
     this.producto = [];
     this.presentacion = [];
+    this.ultimoPrecio = 0;
     let idProducto : number = this.FormPedidoExternoProductos.value.ProdNombre;
 
     this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(datos_existencis => {
@@ -313,12 +323,8 @@ export class PedidoExternoComponent implements OnInit {
         for (let i = 0; i < datos_existencis.length; i++) {
           this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
             for (let j = 0; j < datos_producto.length; j++) {
-              this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto, datos_producto[j].undMed_Id).subscribe(datos_productoPedido => {
-                let datos : any = [];
-                datos.push(datos_productoPedido);
-                for (const item of datos) {
-                  this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
-                }
+              this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), datos_producto[j].undMed_Id).subscribe(datos_productoPedido => {
+                this.ultimoPrecio = datos_productoPedido;
               });
 
               setTimeout(() => {
@@ -326,21 +332,11 @@ export class PedidoExternoComponent implements OnInit {
                 this.FormPedidoExternoProductos.setValue({
                   ProdId: datos_producto[j].prod_Id,
                   ProdNombre: datos_producto[j].prod_Nombre,
-                  ProdAncho: datos_producto[j].prod_Ancho,
-                  ProdFuelle: datos_producto[j].prod_Fuelle,
-                  ProdCalibre: datos_producto[j].prod_Calibre,
-                  ProdLargo: datos_producto[j].prod_Largo,
-                  ProdUnidadMedidaACF: datos_producto[j].undMedACF,
-                  ProdTipo: datos_producto[j].tpProd_Nombre,
-                  ProdMaterial: datos_producto[j].material_Nombre,
-                  ProdPigmento: datos_producto[j].pigmt_Nombre,
                   ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
                   ProdUnidadMedidaCant: datos_producto[j].undMed_Id,
-                  ProdPrecioUnd: datos_producto[j].exProd_PrecioVenta,
-                  ProdUltFacturacion: this.ultimoPrecio,
-                  ProdTipoMoneda: datos_producto[j].tpMoneda_Id,
-                  ProdStock: datos_existencis[i].existencias,
-                  ProdDescripcion: datos_producto[j].prod_Descripcion,
+                  ProdPrecioUnd: datos_producto[j].exProd_PrecioVenta.toFixed(2),
+                  ProdUltFacturacion: this.formatonumeros(this.ultimoPrecio.toFixed(2)),
+                  ProdStock: this.formatonumeros(datos_existencis[i].existencias.toFixed(2)),
                 });
               }, 100);
             }
@@ -380,28 +376,24 @@ export class PedidoExternoComponent implements OnInit {
       if (datos_existencis .length != 0) {
         for (let i = 0; i < datos_existencis.length; i++) {
           this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
-              for (let j = 0; j < datos_producto.length; j++) {
-                this.PedidoProductosService.srvObtenerListaPorIdProducto(idProducto, datos_producto[j].undMed_Id).subscribe(datos_productoPedido => {
-                  let datos : any = [];
-                  datos.push(datos_productoPedido);
-                  for (const item of datos) {
-                    this.ultimoPrecio = item.pedExtProd_PrecioUnitario;
-                  }
-                });
+            for (let j = 0; j < datos_producto.length; j++) {
+              this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), datos_producto[j].undMed_Id).subscribe(datos_productoPedido => {
+                this.ultimoPrecio = datos_productoPedido;
+              });
 
-                setTimeout(() => {
-                  this.presentacion.push(datos_producto[j].undMed_Id);
-                  this.FormPedidoExternoProductos.setValue({
-                    ProdId: datos_producto[j].prod_Id,
-                    ProdNombre: datos_producto[j].prod_Nombre,
-                    ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
-                    ProdUnidadMedidaCant: datos_producto[j].undMed_Id,
-                    ProdPrecioUnd: datos_producto[j].exProd_PrecioVenta,
-                    ProdUltFacturacion: this.ultimoPrecio,
-                    ProdStock: datos_existencis[i].existencias,
-                  });
-                }, 100);
-              }
+              setTimeout(() => {
+                this.presentacion.push(datos_producto[j].undMed_Id);
+                this.FormPedidoExternoProductos.setValue({
+                  ProdId: datos_producto[j].prod_Id,
+                  ProdNombre: datos_producto[j].prod_Nombre,
+                  ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
+                  ProdUnidadMedidaCant: datos_producto[j].undMed_Id,
+                  ProdPrecioUnd: datos_producto[j].exProd_PrecioVenta.toFixed(2),
+                  ProdUltFacturacion: this.formatonumeros(this.ultimoPrecio.toFixed(2)),
+                  ProdStock: this.formatonumeros(datos_existencis[i].existencias.toFixed(2)),
+                });
+              }, 100);
+            }
           });
         }
       } else if (datos_existencis.length == 0) {
@@ -455,7 +447,7 @@ export class PedidoExternoComponent implements OnInit {
             UndCant : this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
             PrecioUnd : precioProducto,
             Stock : this.formatonumeros(this.FormPedidoExternoProductos.get('ProdStock').value),
-            SubTotal : this.formatonumeros(this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad),
+            SubTotal : this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad,
           }
 
           if (this.AccionBoton == "Agregar" && this.ArrayProducto.length == 0) this.ArrayProducto.push(productoExt);
@@ -472,10 +464,10 @@ export class PedidoExternoComponent implements OnInit {
           }
           this.LimpiarCamposProductos();
           this.productoCliente();
-        } else this.mensajeAdvertencia(`El precio digitado no puede ser menor a 0`);
+        } else this.mensajeAdvertencia(`El precio digitado debe ser mayor a 0`);
       } else if (datos_existencias.length != 0) {
         for (let index = 0; index < datos_existencias.length; index++) {
-          if (precioProducto >= datos_existencias[index].exProd_PrecioVenta) {
+          if (precioProducto >= this.FormPedidoExternoProductos.value.ProdUltFacturacion) {
             let productoExt : any = {
               Id : this.FormPedidoExternoProductos.get('ProdId')?.value,
               Nombre : this.FormPedidoExternoProductos.value.ProdNombre,
@@ -483,7 +475,7 @@ export class PedidoExternoComponent implements OnInit {
               UndCant : this.FormPedidoExternoProductos.get('ProdUnidadMedidaCant')?.value,
               PrecioUnd : precioProducto,
               Stock : this.formatonumeros(this.FormPedidoExternoProductos.get('ProdStock').value),
-              SubTotal : this.formatonumeros((this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad).toFixed(2)),
+              SubTotal : (this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad),
             }
 
             if (this.AccionBoton == "Agregar" && this.ArrayProducto.length == 0) this.ArrayProducto.push(productoExt);
@@ -500,7 +492,7 @@ export class PedidoExternoComponent implements OnInit {
             }
             this.LimpiarCamposProductos();
             this.productoCliente();
-          } else this.mensajeAdvertencia(`El precio digitado no puede ser menor al que tiene el producto estipulado $${datos_existencias[index].exProd_PrecioVenta}`);
+          } else this.mensajeAdvertencia(`El precio digitado no puede ser menor al que tiene el producto estipulado $${this.FormPedidoExternoProductos.value.ProdUltFacturacion}`);
         }
       }
       this.ArrayProducto.sort((a,b)=> Number(a.PrecioUnd) - Number(b.PrecioUnd));
@@ -523,18 +515,20 @@ export class PedidoExternoComponent implements OnInit {
           width: 800,
           heightAuto : true,
           html:
-          `<b>Cliente:</b> ${clienteNombre.cli_Nombre} <br> ` +
+          `<b>Cliente:</b> ${clienteNombre} <br> ` +
           `<b>Ciudad:</b> ${ciudad} <br>` +
           `<b>Direccion:</b> ${direccionSede} <br>` +
-          `<b>Iva:</b> ${this.iva}% <b>Descuento:</b> ${this.descuento}% <br>` +
-          `<b>Valor del Pedido</b> ${this.valorfinal}<br>`,
+          `<b>Iva:</b> ${this.iva}% <b>Descuento:</b> ${this.formatonumeros(this.descuento.toFixed(2))}% <br>` +
+          `<b>Valor del Pedido</b> ${this.formatonumeros(this.valorfinal.toFixed(2))}<br>`,
           showDenyButton: true,
           showCancelButton: true,
           confirmButtonText: 'Crear Pedido',
           denyButtonText: `Seguir Editando`,
           cancelButtonText : `Cancelar Pedido`,
         }).then((result) => {
-          if (result.isConfirmed) this.CrearPedidoExterno();
+          if (result.isConfirmed)
+            if (!this.modalMode) this.CrearPedidoExterno();
+            else this.editarPedido();
           else if (result.isDenied) {
             const Toast = Swal.mixin({
               toast: true,
@@ -583,7 +577,13 @@ export class PedidoExternoComponent implements OnInit {
           PedExt_PrecioTotalFinal : this.valorfinal,
           PedExt_HoraCreacion : moment().format('H:mm:ss'),
         }
-        this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data=> { this.crearDetallesPedido(); }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!', error.message); });
+        this.pedidoproductoService.srvGuardarPedidosProductos(camposPedido).subscribe(data=> {
+          this.crearDetallesPedido();
+          setTimeout(() => {
+            this.productosPedido(data.pedExt_Id);
+            this.limpiarTodosCampos();
+          }, 2000);
+        }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!', error.message); });
       }
     }, error => { this.mensajeError('¡La dirección y la ciudad escogidas no coninciden!', error.message) });
   }
@@ -603,20 +603,69 @@ export class PedidoExternoComponent implements OnInit {
             PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd
           }
           this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(registro_pedido_productos => {
-            setTimeout(() => {
-              Swal.fire({icon: 'success', title: 'Pedido Creado Exitosamente', text: 'El pedido fue creado de manera satisfactoria'});
-              this.productosPedido();
-              this.limpiarTodosCampos();
-            }, 2000);
+            Swal.fire({icon: 'success', title: 'Pedido Creado Exitosamente', text: 'El pedido fue creado de manera satisfactoria'});
           }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!', error.message); });
         }
       }
     });
   }
 
+  // Funcion que va a editar la información principal del pedido
+  editarPedido(){
+    this.cargando = true;
+    let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
+    let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
+    let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    this.pedidoproductoService.srvObtenerListaPorId(this.pedidoEditar).subscribe(datos => {
+      this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
+        for (let i = 0; i < datos_sedeCliente.length; i++) {
+          const camposPedido : any = {
+            PedExt_FechaCreacion: datos.pedExt_FechaCreacion,
+            PedExt_FechaEntrega: this.FormPedidoExternoClientes.get('PedFechaEnt')?.value,
+            Empresa_Id: 800188732,
+            PedExt_Codigo: 0,
+            SedeCli_Id: datos_sedeCliente[i].sedeCli_Id,
+            Usua_Id: datos_sedeCliente[i].usua_Id,
+            Estado_Id: 11,
+            PedExt_Observacion: this.FormPedidoExternoClientes.get('PedObservacion')?.value,
+            PedExt_PrecioTotal: this.valorTotal,
+            Creador_Id: datos.creador_Id,
+            PedExt_Descuento: this.FormPedidoExternoClientes.value.PedDescuento,
+            PedExt_Iva: this.iva,
+            PedExt_PrecioTotalFinal : this.valorfinal,
+            PedExt_HoraCreacion : datos.pedExt_Hora,
+          }
+          this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(data=> {
+            this.editarDetallesPedido();
+            setTimeout(() => {
+              this.productosPedido(this.pedidoEditar);
+              this.limpiarTodosCampos();
+            }, 2000);
+          }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!', error.message); });
+        }
+      }, error => { this.mensajeError('¡La dirección y la ciudad escogidas no coninciden!', error.message) });
+    });
+  }
+
+  //Funcion que va a editar la información de los productos del pedido
+  editarDetallesPedido(){
+    for (let index = 0; index < this.ArrayProducto.length; index++) {
+      const productosPedidos : any = {
+        Prod_Id: this.ArrayProducto[index].Id,
+        PedExt_Id: this.pedidoEditar,
+        PedExtProd_Cantidad : this.ArrayProducto[index].Cant,
+        UndMed_Id : this.ArrayProducto[index].UndCant,
+        PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd,
+      }
+      this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(registro_pedido_productos => {
+        Swal.fire({icon: 'success', title: 'Pedido Editado Exitosamente', text: 'El pedido fue Editado de manera satisfactoria'});
+      }, error => { this.mensajeError('¡No se pudo Editar el pedido, por favor intente de nuevo!', error.message); });
+    }
+  }
+
   // Funcion que consultará los productos del ultimo pedido creado
-  productosPedido(){
-    this.pedidoproductoService.GetCrearPdfUltPedido().subscribe(datos_pedido => {
+  productosPedido(pedido : number){
+    this.pedidoproductoService.GetCrearPdfUltPedido(pedido).subscribe(datos_pedido => {
       for (let i = 0; i < datos_pedido.length; i++) {
         let info : any = {
           Id : datos_pedido[i].producto_Id,
@@ -629,18 +678,18 @@ export class PedidoExternoComponent implements OnInit {
         this.productosPedidos.push(info);
         this.productosPedidos.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
-      setTimeout(() => { this.crearpdf(); }, 2000);
+      setTimeout(() => { this.crearpdf(pedido); }, 2000);
     });
   }
 
   // Fucnion para que crear ub pdf apenas se realiza el pedido de productos
-  crearpdf(){
+  crearpdf(pedido : number){
     let usuario = this.storage_Nombre;
-    this.pedidoproductoService.GetCrearPdfUltPedido().subscribe(datos_pedido => {
+    this.pedidoproductoService.GetCrearPdfUltPedido(pedido).subscribe(datos_pedido => {
       for (let i = 0; i < datos_pedido.length; i++) {
         const pdfDefinicion : any = {
           info: {
-            title: `Pedido N° ${datos_pedido[i].consecutivo}`
+            title: `Pedido N° ${datos_pedido[i].id_Pedido}`
           },
           pageSize: {
             width: 630,
@@ -667,7 +716,7 @@ export class PedidoExternoComponent implements OnInit {
                   height : 80
                 },
                 {
-                  text: `Pedido Nro. ${datos_pedido[i].consecutivo}`,
+                  text: `Pedido Nro. ${datos_pedido[i].id_Pedido}`,
                   alignment: 'right',
                   style: 'titulo',
                   margin: [0, 30, 0, 0],
@@ -770,7 +819,7 @@ export class PedidoExternoComponent implements OnInit {
             {
               style: 'tablaCliente',
               table: {
-                widths: ['*', '*', '*'],
+                widths: [170, 170, 170],
                 style: 'header',
                 body: [
                   [
@@ -835,7 +884,7 @@ export class PedidoExternoComponent implements OnInit {
                     },
                     {
                       border: [false, false, true, true],
-                      text: `${this.formatonumeros(datos_pedido[i].precio_Total - ((datos_pedido[i].precio_Total * datos_pedido[i].descuento) / 100))}`
+                      text: `${this.formatonumeros((datos_pedido[i].precio_Total * datos_pedido[i].descuento) / 100)}`
                     },
                   ],
                   [
@@ -853,11 +902,11 @@ export class PedidoExternoComponent implements OnInit {
                     '',
                     {
                       border: [true, false, true, true],
-                      text: `SUBTOTAL MAS IVA`
+                      text: `SUBTOTAL IVA`
                     },
                     {
                       border: [false, false, true, true],
-                      text: `${this.formatonumeros(datos_pedido[i].precio_Total - ((datos_pedido[i].precio_Total * datos_pedido[i].iva) / 100))}`
+                      text: `${this.formatonumeros(((datos_pedido[i].precio_Total * datos_pedido[i].iva) / 100))}`
                     },
                   ],
                   [
@@ -938,8 +987,8 @@ export class PedidoExternoComponent implements OnInit {
   }
 
   // Función para quitar un producto de la tabla
-  QuitarProductoTabla(index : number, formulario : any) {
-    this.productoEliminado = formulario.Id
+  QuitarProductoTabla(data : any) {
+    this.productoEliminado = data.Id
     Swal.fire({
       title: '¿Estás seguro de eliminar el producto del pedido?',
       icon: 'warning',
@@ -949,10 +998,47 @@ export class PedidoExternoComponent implements OnInit {
       confirmButtonText: 'Eliminar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.ArrayProducto.splice(index, 1);
-        this.formatonumeros(this.valorTotal = this.valorTotal - formulario.SubTotal);
-        this.mensajeAdvertencia('Producto eliminado');
+        for (let i = 0; i < this.ArrayProducto.length; i++) {
+          if (this.ArrayProducto[i].Id == data.Id) {
+            this.ArrayProducto.splice(i, 1);
+            this.valorTotal -= data.SubTotal;
+            setTimeout(() => { this.ivaDescuento(); }, 200);
+            this.mensajeAdvertencia('Producto eliminado');
+            break;
+          }
+        }
       }
+    });
+  }
+
+  //Funcion que va a eliminar de la base de datos un producto del pedido
+  eliminarProducto(data : any){
+    this.PedidoProductosService.srvObtenerListaPorIdProducto_Pedido(data.Id, this.pedidoEditar).subscribe(datos => {
+      if (datos.length > 0) {
+        Swal.fire({
+          title: '¿Estás seguro de eliminar el producto del pedido?',
+          text: `Al eliminar el producto en este apartado de edición se Eliminará Tambien de la Base de Datos`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Eliminar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.PedidoProductosService.srvEliminar(data.Id, this.pedidoEditar).subscribe(datos_Eliminados => {
+              for (let i = 0; i < this.ArrayProducto.length; i++) {
+                if (this.ArrayProducto[i].Id == data.Id) {
+                  this.ArrayProducto.splice(i, 1);
+                  this.valorTotal = this.valorTotal - data.SubTotal;
+                  this.ivaDescuento();
+                  this.mensajeAdvertencia('Producto eliminado');
+                  break;
+                }
+              }
+            });
+          }
+        });
+      } else this.QuitarProductoTabla(data);
     });
   }
 

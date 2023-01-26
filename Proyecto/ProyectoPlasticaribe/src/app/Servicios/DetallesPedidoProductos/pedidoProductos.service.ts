@@ -56,7 +56,7 @@ export class PedidoProductosService {
 
   //Metodo eliminar Pedidos
   srvEliminar(id_producto:number, id_pedido:number,) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/PedidoProducto/ ?prod_Id=${id_producto}&pedExt_Id=${id_pedido}`);
+    return this.http.delete(this.rutaPlasticaribeAPI + `/PedidoProducto/0?prod_Id=${id_producto}&pedExt_Id=${id_pedido}`);
   }
 
   //

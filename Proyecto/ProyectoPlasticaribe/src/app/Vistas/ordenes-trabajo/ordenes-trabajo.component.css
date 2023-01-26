@@ -175,3 +175,18 @@ a {
 .centrarComboMezclas {
   text-align: center;
 }
+
+.checkedCyrel_Corte {
+  margin-left: 20%;
+  margin-top: 20%;
+}
+
+@media (max-width: 700px){
+  .checkedCyrel_Corte {
+    margin: auto;
+  }
+}
+
+.container-fluid{
+  width: 80%;
+}

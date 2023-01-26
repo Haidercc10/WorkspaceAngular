@@ -48,6 +48,11 @@ export class ClientesService {
     return this.http.put(this.rutaPlasticaribeAPI + `/Clientes/${id}`, data);
   }
 
+  //Metodo actualzar Productos
+  PutEstadoCliente(id:number|String, data:any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/Clientes/putEstadoCliente/${id}`, data);
+  }
+
   //Metodo eliminar Productos
   srvEliminar(id:number|String) {
     return this.http.delete(this.rutaPlasticaribeAPI + `/Clientes/${id}`);

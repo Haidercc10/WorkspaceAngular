@@ -1,5 +1,6 @@
-<!--Navegador parte superior -->
-<app-menuLateral></app-menuLateral>
+<ng-container *ngIf="!modalMode">
+  <app-menuLateral></app-menuLateral>
+</ng-container>
 
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
@@ -17,24 +18,25 @@
     </div>
 
     <div class="container">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
-        (click)= "LlamarModalCrearCliente()" title="Si no encuentras el cliente consultado, ¡Crealo aquí!">
-          Crear clientes
-        </button>
+      <ng-container *ngIf="ValidarRol == 1">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
+          (click)= "LlamarModalCrearCliente()" title="Si no encuentras el cliente consultado, ¡Crealo aquí!">
+            Crear clientes
+          </button>
 
 
-        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-        (click)="LlamarModalCrearProducto()" title="Si no encuentras el producto solicitado, ¡Crealo aquí!">
-          Crear productos
-        </button>
-      </div>
+          <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+          (click)="LlamarModalCrearProducto()" title="Si no encuentras el producto solicitado, ¡Crealo aquí!">
+            Crear productos
+          </button>
+        </div>
+      </ng-container>
 
       <!-- Inicio titulo -->
       <div class="mb-4">
         <h4 class="tituloRojo">Crear Pedido</h4>
       </div>
-      <!-- Fin titulo -->
 
       <!--Inicio Crear Pedidos-->
       <form [formGroup]="FormPedidoExternoClientes">
@@ -110,13 +112,11 @@
       <div class="mb-4">
         <hr class="Linea">
       </div>
-      <!-- Fin Linea -->
 
       <!-- Inicio Titulo Agregar Productos al pedido -->
       <div class="mb-4">
         <h4 class="tituloRojo">Agregar Productos</h4>
       </div>
-        <!-- Fin Titulo Agregar Productos al pedido -->
 
       <form [formGroup]="FormPedidoExternoProductos">
         <!-- Inicio Fila 1 Agregar producto -->
@@ -185,37 +185,19 @@
 
          <!-- Inicio Descripción producto -->
         <div class="mb-4">
-          <ng-container *ngIf="ValidarRol != 1; else fila3">
-            <div class="row g-3">
-              <!-- Ultima venta -->
-              <div class="form-floating col-md-2">
-                <input formControlName="ProdUltFacturacion" type="number" class="form-control form-control-sm" id="floatingInput" name="ProdUltFacturacion" readonly onmousedown="return false;">
-                <label for="floatingInput">Ultimo Precio Facturado</label>
-              </div>
-
-              <!-- Stock Producto -->
-              <div class="form-floating col-md-2">
-                <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdStock" readonly onmousedown="return false;">
-                <label for="floatingSelect">En Stock</label>
-              </div>
+          <div class="row g-3">
+            <!-- Ultima venta -->
+            <div class="form-floating col-md-2">
+              <input formControlName="ProdUltFacturacion" type="text" class="form-control form-control-sm" id="floatingInput" name="ProdUltFacturacion" readonly onmousedown="return false;">
+              <label for="floatingInput">Ultimo Precio Facturado</label>
             </div>
-          </ng-container>
 
-          <ng-template #fila3>
-            <div class="row g-3">
-              <!-- Ultima venta -->
-              <div class="form-floating col-md-2">
-                <input formControlName="ProdUltFacturacion" type="number" class="form-control form-control-sm" id="floatingInput" name="ProdUltFacturacion" readonly onmousedown="return false;">
-                <label for="floatingInput">Ultimo Precio Facturado</label>
-              </div>
-
-              <!-- Stock Producto -->
-              <div class="form-floating col-md-2">
-                <input formControlName="ProdStock" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdStock" readonly onmousedown="return false;">
-                <label for="floatingSelect">En Stock</label>
-              </div>
+            <!-- Stock Producto -->
+            <div class="form-floating col-md-2">
+              <input formControlName="ProdStock" type="text" class="form-control form-control-sm" id="floatingInput" name="PrdStock" readonly onmousedown="return false;">
+              <label for="floatingSelect">En Stock</label>
             </div>
-          </ng-template>
+          </div>
         </div>
       </form>
 
@@ -262,8 +244,7 @@
                   <th id="precioUnitario" scope="col">PrecioU</th>
                   <th id="Subtotal" scope="col">Subtotal</th>
                   <th id="acciones" scope="col"></th>
-                  <th id="acciones" scope="col"></th>
-              </tr>
+                </tr>
               </ng-template>
               <ng-template pTemplate="body" let-rowData let-listaProductos let-columns="columns">
                 <tr style="font-size: 13px;">
@@ -272,9 +253,9 @@
                   <td>{{listaProductos.Cant | number}}</td>
                   <td>{{listaProductos.UndCant}}</td>
                   <td>{{listaProductos.PrecioUnd | number}}</td>
-                  <td>{{listaProductos.SubTotal}}</td>
-                  <td><a><i class="fa fa-pencil" (click)="EditarProductoTabla(listaProductos)" aria-hidden="true" title="Editar Producto"></i></a></td>
-                  <td><a><i class="fa fa-trash" aria-hidden="true" title="Quitar Producto de la tabla"></i></a></td>
+                  <td>{{listaProductos.SubTotal | number}}</td>
+                  <td *ngIf="!modalMode"><a><i class="fa fa-trash" style="cursor: pointer;" title="Quitar Producto de la tabla" (click)="QuitarProductoTabla(listaProductos)"></i></a></td>
+                  <td *ngIf="modalMode"><a><i class="fa fa-trash" style="cursor: pointer;" title="Quitar Producto de la tabla" (click)="eliminarProducto(listaProductos)"></i></a></td>
                 </tr>
               </ng-template>
             </p-table>
@@ -324,7 +305,8 @@
 
       <div class="bajarPagina">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" value="" (click)="confirmarPedido()">Crear Pedido</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" *ngIf="!modalMode" (click)="confirmarPedido()">Crear Pedido</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" *ngIf="modalMode" (click)="confirmarPedido()">Editar Pedido</button>
           <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosCampos()">Limpiar Todo</button>
         </div>
       </div>

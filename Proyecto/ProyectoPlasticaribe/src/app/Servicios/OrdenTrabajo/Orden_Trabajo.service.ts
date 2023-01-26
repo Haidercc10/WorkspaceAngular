@@ -41,6 +41,10 @@ export class Orden_TrabajoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/PdfOTInsertada/${dato}`);
   }
 
+  GetInfoUltOT(producto : number, presentacion : string){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getInfoUltOT/${producto}/${presentacion}`);
+  }
+
   //Metodo actualzar Pedidos de Productos
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Orden_Trabajo/${id}`, data);

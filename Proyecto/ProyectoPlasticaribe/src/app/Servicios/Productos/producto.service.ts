@@ -52,6 +52,11 @@ export class ProductoService {
     return this.http.put(this.rutaPlasticaribeAPI + `/Producto/${id}`, datos_Productos);
   }
 
+  //Metodo actualzar Productos
+  PutEstadoProducto(id: number, datos_Productos:any) {
+    return this.http.put(this.rutaPlasticaribeAPI + `/Producto/putEstadoProducto/${id}`, datos_Productos);
+  }
+
   //Metodo eliminar Productos
   srvEliminar(id:number|String) {
     return this.http.delete(this.rutaPlasticaribeAPI + `/Producto/${id}`);

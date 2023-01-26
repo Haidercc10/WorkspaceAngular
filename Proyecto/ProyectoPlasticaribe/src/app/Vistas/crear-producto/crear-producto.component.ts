@@ -226,6 +226,10 @@ export class CrearProductoComponent implements OnInit {
         TpSellado_Id : this.FormCrearProducto.value.ProduSellado,
         Prod_CantBolsasBulto: this.FormCrearProducto.value.ProduBolsasBulto,
         Prod_CantBolsasPaquete: this.FormCrearProducto.value.ProduBolsasPaquete,
+        Prod_PrecioDia_Sellado : 0,
+        Prod_PrecioNoche_Sellado : 0,
+        Prod_Peso_Paquete : 0,
+        Prod_Peso_Bulto : 0,
       };
       const clienteproducto : any = {
         Cli_Id: this.FormCrearProducto.value.ClienteNombre,
@@ -259,6 +263,10 @@ export class CrearProductoComponent implements OnInit {
         TpSellado_Id : this.FormCrearProducto.value.ProduSellado,
         Prod_CantBolsasBulto: this.FormCrearProducto.value.ProduBolsasBulto,
         Prod_CantBolsasPaquete: this.FormCrearProducto.value.ProduBolsasPaquete,
+        Prod_PrecioDia_Sellado : 0,
+        Prod_PrecioNoche_Sellado : 0,
+        Prod_Peso_Paquete : 0,
+        Prod_Peso_Bulto : 0,
       };
       const clienteproducto : any = {
         Cli_Id: this.FormCrearProducto.value.ClienteNombre,

@@ -258,9 +258,9 @@ export class PaginaPrincipalComponent implements OnInit {
       { id : 29, nombre : 'Crear OT', icono : 'assets/Iconos_Menu/crearOrden.png', categoria: 'Orden de Trabajo', ruta : './ordenes-trabajo', roles : [1], },
 
       // PEDIDOS DE PRODUCTOS
-      // { id : 30, nombre : 'Pedidos Externos', icono : 'assets/Iconos_Menu/pedidos.png', categoria: 'Pedidos', ruta : './pedido-externo', roles : [1,2], },
-      // { id : 31, nombre : 'Ver Pedidos', icono : 'assets/Iconos_Menu/verDocumento.png', categoria: 'Pedidos', ruta : './opedidoproducto', roles : [1,2], },
-      { id : 47, nombre : 'Pedidos Zeus', icono : 'assets/Iconos_Menu/pedidos.png', categoria: 'Pedidos', ruta : './Pedidos-Zeus', roles : [1], },
+      { id : 30, nombre : 'Pedidos Externos', icono : 'assets/Iconos_Menu/pedidos.png', categoria: 'Pedidos', ruta : './pedido-externo', roles : [1,2,60], },
+      { id : 31, nombre : 'Ver Pedidos', icono : 'assets/Iconos_Menu/verDocumento.png', categoria: 'Pedidos', ruta : './', roles : [1,2,60], },
+      { id : 47, nombre : 'Pedidos Zeus', icono : 'assets/Iconos_Menu/Pedidos_Zeus.png', categoria: 'Pedidos', ruta : './Pedidos-Zeus', roles : [1,60], },
 
       // PRODUCTO TERMINADO
       { id : 32, nombre : 'Producto Terminado (Zeus)', icono : 'assets/Iconos_Menu/bodega.png', categoria: 'Productos', ruta : './inventario-productos-terminados', roles : [1], },

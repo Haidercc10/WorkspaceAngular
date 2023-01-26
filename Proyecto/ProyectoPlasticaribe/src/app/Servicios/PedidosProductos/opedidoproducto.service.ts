@@ -111,12 +111,16 @@ export class OpedidoproductoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/fechasEstado/${fecha}/${fechaEntrega}/${estado}`);
   }
 
-  srvObtenerListaPedidosSinOT(){
+  GetPedidosSinOT():Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/PedidosSinOT`);
   }
 
-  GetCrearPdfUltPedido():Observable<any[]> {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/getCrearPdfUltPedido`);
+  GetInfoPedido(pedido : number):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/getInfoPedido/${pedido}`);
+  }
+
+  GetCrearPdfUltPedido(pedido : number):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/getCrearPdfUltPedido/${pedido}`);
   }
 
 //Metodo agregar Pedidos de Productos

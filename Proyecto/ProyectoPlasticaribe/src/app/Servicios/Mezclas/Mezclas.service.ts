@@ -31,6 +31,10 @@ export class MezclasService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezclas/${id}`);
   }
 
+  getMezclaNombre(nombre : any){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezclas/getMezclaNombre/${nombre}`);
+  }
+
   srvObtenerListaPorNombre(nombre : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Mezclas/combinacionMezclas/${nombre}`);
   }

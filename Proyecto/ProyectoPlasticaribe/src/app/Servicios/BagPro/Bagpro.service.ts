@@ -133,8 +133,8 @@ export class BagproService {
   }
 
    // CONSULTA A LA TABLA CLIENTES_OT_ITEM DE BAGPRO
-   srvObtenerListaClienteOT_Cliente_Item_Presentacion(clienteNom : string, producto : number, presentacion : string):Observable<any[]> {
-    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/OT_Cliente_Item_Presentacion/${clienteNom}/${producto}/${presentacion}`);
+   srvObtenerListaClienteOT_Item_Presentacion(producto : number, presentacion : string):Observable<any[]> {
+    return this.http.get<any>(this.rutaBagPro + `/ClientesOt/OT_Cliente_Item_Presentacion/${producto}/${presentacion}`);
   }
 
   srvObtenerListaClienteOT_Fecha(fecha : any):Observable<any[]> {
