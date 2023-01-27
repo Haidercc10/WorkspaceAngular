@@ -107,4 +107,8 @@ readonly rutaInventarioZeusAPI = rutaZeus;
   getPedidosStock() {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosStock`);
   }
+
+  getExistenciasProductos(item : number, presentacion: any) {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Existencias/getExistenciasProductos/${item}/${presentacion}`);
+  }
 }

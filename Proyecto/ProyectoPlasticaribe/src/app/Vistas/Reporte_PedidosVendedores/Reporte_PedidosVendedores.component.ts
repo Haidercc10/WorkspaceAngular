@@ -9,6 +9,7 @@ import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 
 @Component({
   selector: 'app-Reporte_PedidosVendedores',
@@ -39,7 +40,8 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
                 private rolService : RolesService,
                   private appComponent : AppComponent,
                     private servicioDtlPedidos : PedidoProductosService,
-                      private servicioPedidos : OpedidoproductoService,) { }
+                      private servicioPedidos : OpedidoproductoService,
+                        private servicioZeus : InventarioZeusService) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -104,39 +106,45 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
 
   // Funcion que va a llenar los datos de los productos de cada pedido
   pedidosDetallados(){
+
     this.servicioDtlPedidos.getPedidoPendiente().subscribe(datos_pedidos => {
       for (let i = 0; i < datos_pedidos.length; i++) {
-        for (let j = 0; j < this.ArrayDocumento.length; j++) {
-          if (datos_pedidos[i].pedExt_Id == this.ArrayDocumento[j].data.consecutivo) {
-            let info : any = {
-              "data" : {
-                "consecutivo": datos_pedidos[i].pedExt_Id,
-                "fechaCreacion" : datos_pedidos[i].pedExt_FechaCreacion.replace('T00:00:00', ''),
-                "fechaEntrega" : datos_pedidos[i].pedExt_FechaEntrega.replace('T00:00:00', ''),
-                "idCliente": datos_pedidos[i].cli_Id,
-                "cliente": datos_pedidos[i].cli_Nombre,
-                "idProducto ": datos_pedidos[i].prod_Id,
-                "producto":  datos_pedidos[i].prod_Nombre,
-                "cant_Pedida": datos_pedidos[i].pedExtProd_Cantidad,
-                "existencias": datos_pedidos[i].exProd_Cantidad,
-                "precio": datos_pedidos[i].pedExtProd_PrecioUnitario,
-                "presentacion": datos_pedidos[i].undMed_Id,
-                "idVendedor": datos_pedidos[i].usua_Id,
-                "vendedor": datos_pedidos[i].usua_Nombre,
-                "idEstado": datos_pedidos[i].estado_Id,
-                "estado": datos_pedidos[i].estado_Nombre,
-                "costo_Cant_Total": (datos_pedidos[i].pedExtProd_Cantidad * datos_pedidos[i].exProd_PrecioVenta),
+            for (let j = 0; j < this.ArrayDocumento.length; j++) {
+              if (datos_pedidos[i].pedExt_Id == this.ArrayDocumento[j].data.consecutivo) {
+                let info : any = {
+                  "data" : {
+                    "consecutivo": datos_pedidos[i].pedExt_Id,
+                    "fechaCreacion" : datos_pedidos[i].pedExt_FechaCreacion.replace('T00:00:00', ''),
+                    "fechaEntrega" : datos_pedidos[i].pedExt_FechaEntrega.replace('T00:00:00', ''),
+                    "idCliente": datos_pedidos[i].cli_Id,
+                    "cliente": datos_pedidos[i].cli_Nombre,
+                    "idProducto ": datos_pedidos[i].prod_Id,
+                    "producto":  datos_pedidos[i].prod_Nombre,
+                    "cant_Pedida": datos_pedidos[i].pedExtProd_Cantidad,
+                    "existencias": 0,
+                    "precio": datos_pedidos[i].pedExtProd_PrecioUnitario,
+                    "presentacion": datos_pedidos[i].undMed_Id,
+                    "idVendedor": datos_pedidos[i].usua_Id,
+                    "vendedor": datos_pedidos[i].usua_Nombre,
+                    "idEstado": datos_pedidos[i].estado_Id,
+                    "estado": datos_pedidos[i].estado_Nombre,
+                    "costo_Cant_Total": (datos_pedidos[i].pedExtProd_Cantidad * datos_pedidos[i].exProd_PrecioVenta),
+                  }
+                }
+                if(datos_pedidos[i].undMed_Id == 'Und') datos_pedidos[i].undMed_Id = 'UND';
+                if(datos_pedidos[i].undMed_Id == 'Kg') datos_pedidos[i].undMed_Id = 'KLS';
+                if(datos_pedidos[i].undMed_Id == 'Paquete') datos_pedidos[i].undMed_Id = 'PAQ';
+
+                this.servicioZeus.getExistenciasProductos(datos_pedidos[i].prod_Id.toString(), datos_pedidos[i].undMed_Id).subscribe(dataZeus => {
+                  for (let index = 0; index < dataZeus.length; index++) {
+                    info.data.existencias = dataZeus[index].existencias;
+                  }
+                });
+
+                this.ArrayDocumento[j].children.push(info);
+                this.ArrayDocumento.sort((a,b) => Number(a.data.consecutivo) - Number(b.data.consecutivo));
               }
             }
-            this.columnas = [
-              { header: 'Precio U.', field: 'precio', type : 'number' },
-              { header: 'Fecha Creación', field: 'fechaCreacion', type : 'date'},
-              { header: 'Fecha Entrega', field: 'fechaEntrega',  type : 'date'},
-            ];
-            this.ArrayDocumento[j].children.push(info);
-            this.ArrayDocumento.sort((a,b) => Number(a.data.consecutivo) - Number(b.data.consecutivo));
-          }
-        }
       }
     });
   }
@@ -343,10 +351,10 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
       text: 'Está seguro que desea aceptar el pedido?',
       showCancelButton: true,
       confirmButtonText: 'Confirmar',
-      confirmButtonColor: '#d83542',
+      confirmButtonColor: '#53CC48',
     }).then((result) => {
       if (result.isConfirmed) this.aceptarPedido(item);
-    })
+    });
   }
 
   /** Aceptar Pedido para luego crearlo en Zeus */

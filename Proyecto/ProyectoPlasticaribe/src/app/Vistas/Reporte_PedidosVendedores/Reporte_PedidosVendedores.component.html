@@ -47,7 +47,7 @@
                  <col style="width:120px">
                  <col style="width:200px">
                  <col style="width:200px">
-                 <col style="width:120px">
+                 <col style="width:140px">
                  <col style="width:100px">
                  <col style="width:80px">
                  <col style="width:100px">
@@ -150,7 +150,9 @@
                 <td scope="col" title="Cliente">{{data.cliente}}</td>
                 <td scope="col" title="Item">{{data.producto}}</td>
                 <td style="text-align: center;" scope="col" title="Cantidad Pedida">{{data.cant_Pedida | number : '1.2-2'}}</td>
-                <td style="text-align: center;" scope="col" title="Existencias">{{data.existencias | number : '1.2-2'}}</td>
+                <ng-container *ngIf="data.existencias > data.cant_Pedida; then verde else blanco"></ng-container>
+                <ng-template #verde><td style="text-align: center; background-color: #ABEBC6;" scope="col" title="Existencias">{{data.existencias | number : '1.2-2'}}</td></ng-template>
+                <ng-template #blanco><td style="text-align: center;" scope="col" title="Existencias">{{data.existencias | number : '1.2-2'}}</td></ng-template>
                 <td style="text-align: center;" scope="col" title="Presentación">{{data.presentacion}}</td>
                 <td style="text-align: center;" scope="col" title="Presentación">{{data.precio}}</td>
                 <td style="text-align: center;" scope="col" title="Estado del Pedido">{{data.estado}}</td>
