@@ -1,10 +1,13 @@
 import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Workbook } from 'exceljs';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { TreeTable } from 'primeng/treetable';
 import { AppComponent } from 'src/app/app.component';
 import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import Swal from 'sweetalert2';
+import * as fs from 'file-saver';
 
 @Component({
   selector: 'app-Reporte_PedidosVendedores',
@@ -184,17 +187,143 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
   cambiarOrden_Pedido(item : any){
 
   }
-  /** */
-  aceptarPedido(item : any){
 
-  }
-
-  /** */
   mostrarPedidoPdf(item : any){
 
   }
-  /** */
+  /** Función que exportará a excel lo que esté cargado en la tabla.*/
   exportarExcel(){
+    if(this.ArrayDocumento.length == 0) this.advertencia('Debe haber al menos un pedido en la tabla.')
+    else {
+      let datos : any = [];
 
+      setTimeout(() => {
+        if(this.tt.filteredNodes != null) {
+          for (let index = 0; index < this.tt.filteredNodes.length; index++) {
+            this.llenarArrayExcel(this.tt.filteredNodes[index].children, datos);
+          }
+        } else {
+          for (let index = 0; index < this.tt._value.length; index++) {
+            this.llenarArrayExcel(this.tt._value[index].children, datos);
+          }
+        }
+      }, 500);
+
+      setTimeout(() => {
+        const title = `Pedidos de Vendedores - ${this.today}`;
+        const header = ["N° Pedido", "Cliente", "Item", "Cant. Pedida", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", ]
+        let workbook = new Workbook();
+        const imageId1 = workbook.addImage({
+          base64:  this.appComponent.logoParaPdf,
+          extension: 'png',
+        });
+        let worksheet = workbook.addWorksheet(`Reporte de de Vendedores - ${this.today}`);
+        worksheet.addImage(imageId1, 'A1:A3');
+        let titleRow = worksheet.addRow([title]);
+        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+        worksheet.addRow([]);
+        worksheet.addRow([]);
+        let headerRow = worksheet.addRow(header);
+        headerRow.eachCell((cell, number) => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'eeeeee' }
+          }
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+        });
+        worksheet.mergeCells('A1:L3');
+        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+        datos.forEach(d => {
+          let row = worksheet.addRow(d);
+          let cantPedida = row.getCell(4);
+          let stock = row.getCell(5);
+          let precioUnd = row.getCell(7);
+          let costoTotal = row.getCell(10);
+          let consecutivo = row.getCell(1);
+          let fecha1 = row.getCell(11);
+          let fecha2 = row.getCell(12);
+          let und = row.getCell(6);
+          let color;
+
+          cantPedida.numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          stock.numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          precioUnd.numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+          costoTotal.numFmt = '""#,##0.00;[Red]\-""#,##0.00';
+
+          consecutivo.alignment = {horizontal : 'center'};
+          fecha1.alignment = {horizontal : 'center'};
+          fecha2.alignment = {horizontal : 'center'};
+          und.alignment = {horizontal : 'center'};
+
+          if(d[4] >= d[3]) {
+            color = '8AFC9B';
+            stock.fill = {type : 'pattern', pattern: 'solid', fgColor: { argb: color }, };
+          } else color = 'FFFFFF';
+
+          worksheet.getColumn(1).width = 12;
+          worksheet.getColumn(2).width = 50;
+          worksheet.getColumn(3).width = 50;
+          worksheet.getColumn(4).width = 15;
+          worksheet.getColumn(5).width = 15;
+          worksheet.getColumn(6).width = 10;
+          worksheet.getColumn(7).width = 15;
+          worksheet.getColumn(8).width = 15;
+          worksheet.getColumn(9).width = 40;
+          worksheet.getColumn(10).width = 25;
+          worksheet.getColumn(11).width = 40;
+          worksheet.getColumn(12).width = 20;
+        });
+        setTimeout(() => {
+          workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            fs.saveAs(blob, `Reporte de Vendedores - ${this.today}.xlsx`);
+          });
+          this.load = false;
+        }, 1000);
+      }, 1500);
+      setTimeout(() => {  this.Confirmacion('¡Archivo de Excel generado exitosamente!'); }, 3000);
+    }
   }
+
+  /** Función para llenar el array de datos que se mostrará en el excel. */
+  llenarArrayExcel(datos : any, arrayDatos : any){
+    this.load = true;
+    for (let i = 0; i < datos.length; i++) {
+      const datos1 : any = [
+        datos[i].data.consecutivo,
+        datos[i].data.cliente,
+        datos[i].data.producto,
+        datos[i].data.cant_Pedida,
+        datos[i].data.existencias,
+        datos[i].data.presentacion,
+        datos[i].data.precioUnidad,
+        datos[i].data.estado,
+        datos[i].data.vendedor,
+        datos[i].data.costo_Cant_Total,
+        datos[i].data.fechaCreacion.replace('T00:00:00', ''),
+        datos[i].data.fechaEntrega.replace('T00:00:00', ''),
+      ];
+      arrayDatos.push(datos1);
+    }
+  }
+
+  /** Mensajes de advertencia */
+  advertencia(mensaje : string) {
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html: mensaje, confirmButtonColor: '#ffc107', confirmButtonText: 'Aceptar', });
+  }
+
+  /** Mensajes de confirmación */
+  Confirmacion(mensaje : string) {
+    Swal.fire({ icon: 'success', title: 'Confirmación', html: mensaje, confirmButtonColor: '#53CC48', confirmButtonText: 'Aceptar', });
+  }
+
+  /** Aceptar Pedido para luego crearlo en Zeus */
+  aceptarPedido(item : any){
+    this.servicioDtlPedidos.getPedidoPendientexId(item.consecutivo).subscribe(dataPedidos => {
+
+    });
+  }
+
+
 }
