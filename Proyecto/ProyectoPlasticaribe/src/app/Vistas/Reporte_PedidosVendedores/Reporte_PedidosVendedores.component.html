@@ -57,6 +57,7 @@
                  <col style="width:140px">
                  <col style="width:60px">
                  <col style="width:80px">
+                 <col style="width:80px">
                </colgroup>
             </ng-template>
             <ng-template pTemplate="header">
@@ -93,6 +94,9 @@
                 </th>
                 <th ttResizableColumn style="width: 150px">
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'fechaCreacion', 'contains')">
+                </th>
+                <th ttResizableColumn style="width: 100px">
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
                 </th>
                 <th ttResizableColumn style="width: 100px">
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
@@ -137,6 +141,8 @@
                 </th>
                 <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo">Editar
                 </th>
+                <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo">Ver PDF
+                </th>
                 <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo">Confirmar
                 </th>
               </tr>
@@ -160,6 +166,7 @@
                 <td style="text-align: center;" scope="col" title="Subtotal">{{data.costo_Cant_Total | number}}</td>
                 <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaCreacion}}</td>
                 <td style="text-align: center;" scope="col" title="Editar Pedido"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                <td style="text-align: center;" scope="col" title="Confirmar Pedido"><button (click)="mostrarPedidoPdf(data)" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
                 <td style="text-align: center;" scope="col" title="Confirmar Pedido"><button (click)="confirmarActualizacion(data.consecutivo)" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
               </tr>
             </ng-template>

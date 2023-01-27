@@ -378,7 +378,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
       }
       this.servicioPedidos.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
         this.Confirmacion(`Pedido Nro. ${item} aceptado con exito!`);
-        setTimeout(() => { this.cargarPedidosPendientes(); }, 1000);
+        setTimeout(() => { this.cargarPedidosPendientes(); }, 100);
       }, error => { this.mostrarError(`No fue posible aceptar el pedido ${item}, por favor, verifique!`); });
     });
   }
