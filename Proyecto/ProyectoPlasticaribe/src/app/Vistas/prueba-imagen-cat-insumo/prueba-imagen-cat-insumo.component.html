@@ -1,33 +1,844 @@
-<p-treeTable #tt [value]="files" [columns]="cols" [reorderableColumns]="true">
-  <ng-template pTemplate="caption">
-      <div style="text-align: right">
-          <i class="pi pi-search" style="margin:4px 4px 0 0"></i>
-          <input type="text" pInputText size="50" placeholder="Global Filter"style="width:auto">
+<mat-sidenav-container class="example-container menu">
+  <mat-sidenav #sidenav [mode]="mode.value || 'over'">
+    <nav id="sidebar" *ngIf="ValidarRol != undefined">
+      <div class="container-fluid">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <label class="btnclose pi pi-times-circle" mat-button (click)="sidenav.toggle()"></label>
+        </div>
       </div>
-  </ng-template>
-  <ng-template pTemplate="header" let-columns>
-      <tr>
-          <th *ngFor="let col of cols" ttReorderableColumn>
-              {{col.header}}
-          </th>
-      </tr>
-      <tr>
-          <th *ngFor="let col of cols">
-              <input pInputText type="text" >
-          </th>
-      </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
-      <tr>
-          <td *ngFor="let col of cols; let i = index">
-            <p-treeTableToggler [rowNode]="rowNode" *ngIf="i == 0"></p-treeTableToggler>
-            {{rowData[col.field]}}
-          </td>
-      </tr>
-  </ng-template>
-  <ng-template pTemplate="emptymessage">
-      <tr>
-          <td [attr.colspan]="cols.length">No data found.</td>
-      </tr>
-  </ng-template>
-</p-treeTable>
+      <div class="imagen">
+        <img src=".\assets\plasticaribe.jpg" alt="" style="width: 70px;">
+        <p>Plasticaribe S.A.S</p>
+      </div>
+      <div class="sidebar-header">
+        <h4 class="nombreUsuario">
+          <i class="pi pi-user" style="font-size: 2rem;"></i>
+          {{storage_Nombre}}
+        </h4>
+        <h6 class="tipoUsuario">
+          <i class="pi pi-verified" style="font-size: 1rem;"></i>
+          {{storage_Rol}}</h6>
+      </div>
+
+      <ul>
+        <!-- INICIO -->
+        <li>
+          <a class="fw-normal" href="home" role="button">
+            <i class="pi pi-home" style="margin-right: 3%;"></i>
+            <b>Inicio</b>
+          </a>
+        </li>
+
+        <!-- Bodega de Extrusión -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample9" role="button" aria-expanded="false" (click)="clickIcon9()" aria-controls="collapseExample">
+              <ng-container *ngIf="subir9; then thenTemplate9; else elseTemplate9"></ng-container>
+              <ng-template #thenTemplate9>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate9>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Bodega de Extrusión</b>
+            </a>
+            <div class="collapse" id="collapseExample9">
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2 sangria">
+                 <a class="fst-normal" data-bs-toggle="" href="/Eliminar-rollos" role="button" aria-expanded="false" aria-controls="">
+                   <i class="pi pi-delete-left" style="font-size: 15px; margin-right: 2%;"></i>
+                   Eliminar Rollos
+                 </a>
+               </div>
+             </ng-container>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/IngresoRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-cloud-upload" style="font-size: 15px; margin-right: 2%;"></i>
+                    Ingreso de Rollos
+                  </a>
+                </div>
+              </ng-container>
+              <!-- Inventario Boddega Extrusion -->
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
+                <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/Inventario-Extrusion" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-box" style="font-size: 15px; margin-right: 2%;"></i>
+                    Inventario Bodega Extrusión
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
+                <div class="mb-2 sangria">
+                 <a class="fst-normal" data-bs-toggle="" href="/ReporteRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
+                   <i class="pi pi-th-large" style="font-size: 15px; margin-right: 2%;"></i>
+                   Bodega de Extrusión
+                 </a>
+               </div>
+             </ng-container>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/AsignacionRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-cloud-download" style="font-size: 15px; margin-right: 2%;"></i>
+                    Salida de Rollos
+                  </a>
+                </div>
+              </ng-container>
+               <div class="mb-2 sangria">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- BOPP / BOPA / POLIESTER -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" (click)="clickIcon1()" aria-controls="collapseExample">
+              <ng-container *ngIf="subir1; then thenTemplate1; else elseTemplate1"></ng-container>
+              <ng-template #thenTemplate1>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate1>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>BOPP / BOPA / POLIESTER</b>
+            </a>
+            <div class="collapse" id="collapseExample1">
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/AsignacionBOPPTemporal" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-cloud-download" style="font-size: 15px; margin-right: 2%;"></i>
+                    Asignación
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/entrada-BOPP" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-cloud-upload" style="font-size: 15px; margin-right: 2%;"></i>
+                    Entrada
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
+                <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/reporte-BOPP" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-box" style="font-size: 15px; margin-right: 2%;"></i>
+                    Inventario de BOPP / BOPA / POLIESTER
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/movimientos-bopp" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-sitemap" style="font-size: 15px; margin-right: 2%;"></i>
+                    Movimientos BOPP
+                  </a>
+                </div>
+              </ng-container>
+               <div class="mb-2 sangria">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- Despacho -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample8" role="button" aria-expanded="false" (click)="clickIcon8()" aria-controls="collapseExample">
+              <ng-container *ngIf="subir8; then thenTemplate8; else elseTemplate8"></ng-container>
+              <ng-template #thenTemplate8>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate8>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Despacho</b>
+            </a>
+            <div class="collapse" id="collapseExample8">
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 10">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/ingresar-productos" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-cloud-upload" style="font-size: 15px; margin-right: 2%;"></i>
+                    Ingresar Rollos
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 ">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/asignacion-productos-facturas" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-wallet" style="font-size: 15px; margin-right: 2%;"></i>
+                    Facturar Rollos
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 10">
+                <div class="mb-2 sangria">
+                 <a class="fst-normal" data-bs-toggle="" href="/factura-rollos-productos" role="button" aria-expanded="false" aria-controls="">
+                   <i class="pi pi-truck" style="font-size: 15px; margin-right: 2%;"></i>
+                   Despachar Mercancia
+                 </a>
+               </div>
+             </ng-container>
+             <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 10">
+                <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/devolucion-rollos-productos" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-window-minimize" style="font-size: 15px; margin-right: 2%;"></i>
+                    Devolución de Rollos
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12">
+                <div class="mb-2 sangria">
+                 <a class="fst-normal" data-bs-toggle="" href="/reporte-despacho" role="button" aria-expanded="false" aria-controls="">
+                   <i class="pi pi-truck" style="font-size: 15px; margin-right: 2%;"></i>
+                   Movimientos Despacho
+                 </a>
+               </div>
+             </ng-container>
+
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9 || ValidarRol == 12">
+                <div class="mb-2 sangria">
+                  <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample8_1" role="button" (click)="clickIcon8_1()" aria-expanded="false" aria-controls="collapseExample">
+                    <ng-container *ngIf="subir8_1; then thenTemplate8_1; else elseTemplate8_1"></ng-container>
+                    <ng-template #thenTemplate8_1>
+                      <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+                    </ng-template>
+                    <ng-template #elseTemplate8_1>
+                      <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+                    </ng-template>
+                    Pre Ingreso
+                  </a>
+                  <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 7">
+                    <div class="collapse" id="collapseExample8_1">
+                      <div class="mb-2 subSangria">
+                        <a class="fst-normal" data-bs-toggle="" href="/preingreso-extrusion" role="button" aria-expanded="false" aria-controls="">
+                          <i class="pi pi-cloud-upload" style="font-size: 15px; margin-right: 2%;"></i>
+                          Extrusion
+                        </a>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 8 || ValidarRol == 9 || ValidarRol == 12">
+                    <div class="collapse" id="collapseExample8_1">
+                      <div class="mb-2 subSangria">
+                        <a class="fst-normal" data-bs-toggle="" href="/preingreso-sellado" role="button" aria-expanded="false" aria-controls="">
+                          <i class="pi pi-cloud-upload" style="font-size: 15px; margin-right: 2%;"></i>
+                          Sellado / Empaque
+                        </a>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </ng-container>
+
+              <div class="mb-2 sangria">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- DEPERDICIO -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 12">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample13" role="button" aria-expanded="false" (click)="clickIcon13()" aria-controls="collapseExample">
+              <ng-container *ngIf="subir13; then thenTemplate13; else elseTemplate13"></ng-container>
+              <ng-template #thenTemplate13>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate13>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Desperdicio</b>
+            </a>
+            <div class="collapse" id="collapseExample13">
+              <div class="mb-2 sangria">
+                <a class="fst-normal" data-bs-toggle="" href="/desperdicio" role="button" aria-expanded="false" aria-controls="">
+                  <i class="pi pi-cloud-upload" style="font-size: 15px; margin-right: 2%;"></i>
+                  Ingresar Desperdicio
+                </a>
+              </div>
+              <div class="mb-2 sangria">
+                <a class="fst-normal" data-bs-toggle="" href="/reporte-desperdicios" role="button" aria-expanded="false" aria-controls="">
+                  <i class="pi pi-file" style="font-size: 15px; margin-right: 2%;"></i>
+                  Reporte Desperdicio
+                </a>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+
+        <!-- GERENCIA -->
+        <!-- <ng-container *ngIf="ValidarRol == 1">
+          <li>
+            <a class="fw-normal" href="reporte-ventas" role="button">
+              <i class="pi pi-chart-line" style="margin-right: 2%;"></i>
+              <b>Gerencia</b>
+            </a>
+          </li>
+        </ng-container> -->
+
+        <!-- GESTOR DE ARCHIVOS -->
+        <li>
+          <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" (click)="clickIcon2()" aria-controls="collapseExample">
+            <ng-container *ngIf="subir2; then thenTemplate; else elseTemplate"></ng-container>
+              <ng-template #thenTemplate>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Gestor de Archivos</b>
+          </a>
+          <div class="collapse" id="collapseExample2">
+             <div class="mb-2 sangria">
+              <a class="fst-normal" data-bs-toggle="" href="/Archivos" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-folder" style="font-size: 15px; margin-right: 2%;"></i>
+                Archivos
+              </a>
+            </div>
+          </div>
+        </li>
+
+        <!-- MATERIAS PRIMAS -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 13">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample3" role="button" (click)="clickIcon3()"  aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir3; then thenTemplate; else elseTemplate"></ng-container>
+              <ng-template #thenTemplate>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Materia Prima</b>
+            </a>
+            <div class="collapse" id="collapseExample3">
+               <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                <a class="fst-normal" data-bs-toggle="" href="/asignacionMP" role="button" aria-expanded="false" aria-controls="">
+                  <i class="pi pi-cloud-download" style="font-size: 15px; margin-right: 2%;"></i>
+                  Asignación Materia Prima
+                </a>
+              </div>
+               <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                <a class="fst-normal" data-bs-toggle="" href="/asignacion-tintas" role="button" aria-expanded="false" aria-controls="">
+                  <i class="pi pi-plus-circle" style="font-size: 15px; margin-right: 2%;"></i>
+                  Creación Tintas
+                </a>
+              </div>
+               <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                <a class="fst-normal" data-bs-toggle="" href="/mp-devoluciones" role="button" aria-expanded="false" aria-controls="">
+                  <i class="pi pi-window-minimize" style="font-size: 15px; margin-right: 2%;"></i>
+                  Devoluciones
+                </a>
+              </div>
+               <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                <a class="fst-normal" data-bs-toggle="" href="/MateriaPrima" role="button" aria-expanded="false" aria-controls="">
+                  <i class="pi pi-cloud-upload" style="font-size: 15px; margin-right: 2%;"></i>
+                  Entradas
+                </a>
+              </div>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/reporte-Inventario-MateriaPrima" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-box" style="font-size: 15px; margin-right: 2%;"></i>
+                    Inventario de Materia Prima
+                  </a>
+                </div>
+              </ng-container>
+              <!-- <ng-container *ngIf="ValidarRol == 1">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/materias_primas" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-box" style="font-size: 15px; margin-right: 2%;"></i>
+                    Materias Primas
+                  </a>
+                </div>
+              </ng-container> -->
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                <div class="mb-2 sangria">
+                  <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7_1" role="button" (click)="clickIcon7_1()" aria-expanded="false" aria-controls="collapseExample">
+                    <ng-container *ngIf="subir7_1; then thenTemplate7_1; else elseTemplate7_1"></ng-container>
+                    <ng-template #thenTemplate7_1>
+                      <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+                    </ng-template>
+                    <ng-template #elseTemplate7_1>
+                      <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+                    </ng-template>
+                    Movimientos Materia Prima
+                  </a>
+                  <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                    <div class="mb-2 subSangria">
+                      <a class="fst-normal" data-bs-toggle="" href="/movimientos-matprima" role="button" aria-expanded="false" aria-controls="">
+                        <i class="pi pi-sitemap" style="font-size: 15px; margin-right: 2%;"></i>
+                        Movimientos MP
+                      </a>
+                    </div>
+                  </div>
+                  <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                    <div class="mb-2 subSangria">
+                      <a class="fst-normal" data-bs-toggle="" href="/movimientos-tintas" role="button" aria-expanded="false" aria-controls="">
+                        <i class="pi pi-sitemap" style="font-size: 15px; margin-right: 2%;"></i>
+                        Movimientos Tintas
+                      </a>
+                    </div>
+                  </div>
+                  <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                    <div class="mb-2 subSangria">
+                      <a class="fst-normal" data-bs-toggle="" href="/reporte-recuperado-mp" role="button" aria-expanded="false" aria-controls="">
+                        <i class="pi pi-sitemap" style="font-size: 15px; margin-right: 2%;"></i>
+                        Movimientos Recuperado
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 13">
+                <div class="mb-2 sangria">
+                 <a class="fst-normal" data-bs-toggle="" href="/reporte-orden-compra" role="button" aria-expanded="false" aria-controls="">
+                   <i class="pi pi-shopping-cart" style="font-size: 15px; margin-right: 2%;"></i>
+                   Movimientos Ordenes de Compra
+                 </a>
+               </div>
+             </ng-container>
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 13">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/ocompra-materiaPrima" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-cart-plus" style="font-size: 15px; margin-right: 2%;"></i>
+                    Orden de Compra
+                  </a>
+                </div>
+              </ng-container>
+               <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                <a class="fst-normal" data-bs-toggle="" href="/mp-recuperada" role="button" aria-expanded="false" aria-controls="">
+                  <i class="pi pi-window-minimize" style="font-size: 15px; margin-right: 2%;"></i>
+                  Recuperado
+                </a>
+              </div>
+               <div class="mb-2 sangria">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- MANTENIMIENTOS Y PEDIDOS DE MANTENIMIENTOS -->
+        <ng-container *ngIf="ValidarRol == 1">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample12" role="button" (click)="clickIcon12()" aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir12; then thenTemplate12; else elseTemplate12"></ng-container>
+              <ng-template #thenTemplate12>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate12>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Mantenimiento de Activos</b>
+            </a>
+            <div class="collapse" id="collapseExample12">
+              <!-- Pedido de Mantenimiento -->
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2 sangria">
+                 <a class="fst-normal" data-bs-toggle="" href="/pedido-mantenimiento" role="button" aria-expanded="false" aria-controls="">
+                   <i class="pi pi-ticket" style="font-size: 15px; margin-right: 2%;"></i>
+                   Pedido de Mantenimiento
+                 </a>
+               </div>
+               <div class="mb-2 sangria">
+                <a class="fst-normal" data-bs-toggle="" href="/mantenimiento-activos" role="button" aria-expanded="false" aria-controls="">
+                  <i class="pi pi-wrench" style="font-size: 15px; margin-right: 2%;"></i>
+                  Mantenimiento
+                </a>
+              </div>
+              <!-- Inventario Activos -->
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/reporte-activos" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-box" style="font-size: 15px; margin-right: 2%;"></i>
+                    Inventario Activos
+                  </a>
+                </div>
+              </ng-container>
+             </ng-container>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- MOVIMIENTOS -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5 || ValidarRol == 13">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample10" role="button" (click)="clickIcon10()" aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir10; then thenTemplate10; else elseTemplate10"></ng-container>
+              <ng-template #thenTemplate10>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate10>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Movimientos</b>
+            </a>
+            <div class="collapse" id="collapseExample10">
+              <!-- Bodega de Extrusión -->
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
+                <div class="mb-2 sangria">
+                 <a class="fst-normal" data-bs-toggle="" href="/ReporteRollos-Extrusion" role="button" aria-expanded="false" aria-controls="">
+                   <i class="pi pi-th-large" style="font-size: 15px; margin-right: 2%;"></i>
+                   Bodega de Extrusión
+                 </a>
+               </div>
+             </ng-container>
+
+              <!-- Entrada Materia Prima -->
+              <ng-container *ngIf="ValidarRol == 1">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/reporte-facturas-remisiones-mp" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-window-minimize" style="font-size: 15px; margin-right: 2%;"></i>
+                    Entradas de Materia Prima
+                  </a>
+                </div>
+              </ng-container>
+
+              <!-- Movimientos de Mantenimientos -->
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2 sangria">
+                 <a class="fst-normal" data-bs-toggle="" href="/movimientos-mantenimientos" role="button" aria-expanded="false" aria-controls="">
+                   <i class="pi pi-wrench" style="font-size: 15px; margin-right: 2%;"></i>
+                   Movimientos Mantenimientos
+                 </a>
+               </div>
+             </ng-container>
+
+              <!-- Reporte de Despacho -->
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12">
+                <div class="mb-2 sangria">
+                 <a class="fst-normal" data-bs-toggle="" href="/reporte-despacho" role="button" aria-expanded="false" aria-controls="">
+                   <i class="pi pi-truck" style="font-size: 15px; margin-right: 2%;"></i>
+                   Movimientos Despacho
+                 </a>
+               </div>
+             </ng-container>
+
+              <!-- Movimientos -->
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
+                <div class="mb-2 sangria">
+                  <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7_1" role="button" (click)="clickIcon7_1()" aria-expanded="false" aria-controls="collapseExample">
+                    <ng-container *ngIf="subir7_1; then thenTemplate7_1; else elseTemplate7_1"></ng-container>
+                    <ng-template #thenTemplate7_1>
+                      <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+                    </ng-template>
+                    <ng-template #elseTemplate7_1>
+                      <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+                    </ng-template>
+                    Movimientos Materia Prima
+                  </a>
+                  <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                    <div class="mb-2 subSangria">
+                      <a class="fst-normal" data-bs-toggle="" href="/movimientos-bopp" role="button" aria-expanded="false" aria-controls="">
+                        <i class="pi pi-sitemap" style="font-size: 15px; margin-right: 2%;"></i>
+                        Movimientos BOPP
+                      </a>
+                    </div>
+                  </div>
+                  <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                    <div class="mb-2 subSangria">
+                      <a class="fst-normal" data-bs-toggle="" href="/movimientos-matprima" role="button" aria-expanded="false" aria-controls="">
+                        <i class="pi pi-sitemap" style="font-size: 15px; margin-right: 2%;"></i>
+                        Movimientos MP
+                      </a>
+                    </div>
+                  </div>
+                  <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                    <div class="mb-2 subSangria">
+                      <a class="fst-normal" data-bs-toggle="" href="/movimientos-tintas" role="button" aria-expanded="false" aria-controls="">
+                        <i class="pi pi-sitemap" style="font-size: 15px; margin-right: 2%;"></i>
+                        Movimientos Tintas
+                      </a>
+                    </div>
+                  </div>
+                  <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
+                    <div class="mb-2 subSangria">
+                      <a class="fst-normal" data-bs-toggle="" href="/reporte-recuperado-mp" role="button" aria-expanded="false" aria-controls="">
+                        <i class="pi pi-sitemap" style="font-size: 15px; margin-right: 2%;"></i>
+                        Movimientos Recuperado
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+
+              <!-- MOVIMIENTOS ORDENES DE COMPRA -->
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 13">
+                <div class="mb-2 sangria">
+                 <a class="fst-normal" data-bs-toggle="" href="/reporte-orden-compra" role="button" aria-expanded="false" aria-controls="">
+                   <i class="pi pi-shopping-cart" style="font-size: 15px; margin-right: 2%;"></i>
+                   Movimientos Ordenes de Compra
+                 </a>
+               </div>
+             </ng-container>
+              <div class="mb-2 sangria">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- ORDEN DE TRABAJO -->
+        <ng-container *ngIf="ValidarRol == 1">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample4" role="button" (click)="clickIcon4()" aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir4; then thenTemplate; else elseTemplate"></ng-container>
+              <ng-template #thenTemplate>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Orden de Trabajo</b>
+            </a>
+            <div class="collapse" id="collapseExample4">
+              <ng-container *ngIf="ValidarRol == 1">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/ordenes-trabajo" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-file" style="font-size: 15px; margin-right: 2%;"></i>
+                    Crear OT
+                  </a>
+                </div>
+              </ng-container>
+               <div class="mb-2 sangria">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- PEDIDOS -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample5" role="button" (click)="clickIcon5()" aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir5; then thenTemplate; else elseTemplate"></ng-container>
+              <ng-template #thenTemplate>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Pedidos</b>
+            </a>
+            <div class="collapse" id="collapseExample5">
+               <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
+                <a class="fst-normal" href="/pedido-externo" role="button" aria-expanded="false">
+                  <i class="pi pi-shopping-bag" style="font-size: 15px; margin-right: 2%;"></i>
+                  Pedidos Externos
+                </a>
+              </div>
+               <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
+                <a class="fst-normal" href="/home" role="button" aria-expanded="false">
+                  <i class="pi pi-eye" style="font-size: 15px; margin-right: 2%;"></i>
+                  Ver Pedidos
+                </a>
+              </div>
+
+              <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 60">
+                <a class="fst-normal" data-bs-toggle="" href="/Pedidos-Zeus" role="button" aria-expanded="false">
+                  <i class="pi pi-shopping-bag" style="font-size: 15px; margin-right: 2%;"></i>
+                  Pedidos Zeus
+                </a>
+              </div>
+               <div class="mb-2 sangria">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- PRODUCTOS -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 60">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample6" role="button" (click)="clickIcon6()" aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir6; then thenTemplate; else elseTemplate"></ng-container>
+              <ng-template #thenTemplate>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Productos</b>
+            </a>
+            <div class="collapse" id="collapseExample6">
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 60">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/inventario-productos-terminados" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-box" style="font-size: 15px; margin-right: 2%;"></i>
+                    Producto Terminado (Zeus)
+                  </a>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="ValidarRol == 1">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/inventario-productos" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-box" style="font-size: 15px; margin-right: 2%;"></i>
+                    Producto Terminado
+                  </a>
+                </div>
+              </ng-container>
+               <div class="mb-2 sangria">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- REPORTES -->
+        <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7" role="button" (click)="clickIcon7()" aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir7; then thenTemplate7; else elseTemplate7"></ng-container>
+              <ng-template #thenTemplate7>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate7>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Reportes</b>
+            </a>
+            <div class="collapse" id="collapseExample7">
+              <!-- Inventario Activos -->
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/reporte-activos" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-box" style="font-size: 15px; margin-right: 2%;"></i>
+                    Inventario Activos
+                  </a>
+                </div>
+              </ng-container>
+
+              <!-- Inventario Boddega Extrusion -->
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 5">
+                <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/Inventario-Extrusion" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-box" style="font-size: 15px; margin-right: 2%;"></i>
+                    Inventario Bodega Extrusión
+                  </a>
+                </div>
+              </ng-container>
+
+              <!-- Inventario Materia Prima -->
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
+                <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-box" style="font-size: 15px; margin-right: 2%;"></i>
+                    Inventario de Materia Prima
+                  </a>
+                </div>
+              </ng-container>
+
+              <!-- Reporte de Costos -->
+              <ng-container *ngIf="ValidarRol == 1">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/reporte-costos-ot" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-calculator" style="font-size: 15px; margin-right: 2%;"></i>
+                    Reportes de Costos
+                  </a>
+                </div>
+              </ng-container>
+
+              <!-- Reporte de Procesos de Ordenes de trabajo Para Vendedores-->
+              <!-- <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2">
+                <div class="mb-2 sangria">
+                 <a class="fst-normal" data-bs-toggle="" href="/estados-ot-vendedores" role="button" aria-expanded="false" aria-controls="">
+                   <i class="pi pi-shopping-bag" style="font-size: 15px; margin-right: 2%;"></i>
+                   Reporte de Pedidos
+                 </a>
+               </div>
+              </ng-container> -->
+
+              <!-- Reporte de Procesos de Ordenes de trabajo -->
+              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 12">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/reportes-procesos-ot" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-sliders-h" style="font-size: 15px; margin-right: 2%"></i>
+                    Reporte Procesos OT
+                  </a>
+                </div>
+              </ng-container>
+
+              <!-- Reporte de rollos eliminados -->
+              <ng-container *ngIf="ValidarRol == 1">
+                <div class="mb-2 sangria">
+                 <a class="fst-normal" data-bs-toggle="" href="/reporte-rollos-eliminados" role="button" aria-expanded="false" aria-controls="">
+                   <i class="pi pi-trash" style="font-size: 15px; margin-right: 2%;"></i>
+                   Reporte Rollos Eliminados
+                 </a>
+               </div>
+              </ng-container>
+              <div class="mb-2 sangria">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- USUARIOS -->
+        <ng-container *ngIf="ValidarRol == 1">
+          <li>
+            <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample11" role="button" (click)="clickIcon11()" aria-expanded="false" aria-controls="collapseExample">
+              <ng-container *ngIf="subir11; then thenTemplate; else elseTemplate"></ng-container>
+              <ng-template #thenTemplate>
+                <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+              </ng-template>
+              <ng-template #elseTemplate>
+                <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+              </ng-template>
+              <b>Usuarios</b>
+            </a>
+            <div class="collapse" id="collapseExample11">
+              <ng-container *ngIf="ValidarRol == 1">
+                 <div class="mb-2 sangria">
+                  <a class="fst-normal" data-bs-toggle="" href="/registro-usuario" role="button" aria-expanded="false" aria-controls="">
+                    <i class="pi pi-users" style="font-size: 15px; margin-right: 2%;"></i>
+                    Usuarios
+                  </a>
+                </div>
+              </ng-container>
+               <div class="mb-2 sangria">
+                <hr>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+
+        <!-- PROCESOS -->
+
+        <!-- FACTURA DE VENTAS -->
+
+        <!-- CLIENTES -->
+
+        <!-- PROVEEDORES -->
+
+        <!-- NOTIFICACIONES -->
+
+      </ul>
+      <button class="btn btn-danger btn-danger-sm boton" id="boton_CerrarSesion" type="button" (click)="confimacionSalida()">
+        <li aria-hidden="true">
+          <i class="pi pi-sign-out"></i>
+          <br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Salir&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
+        </li>
+      </button>
+    </nav>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <p><button class="botonMenu d-grid gap-2 d-md-flex justify-content-md-start" mat-button (click)="sidenav.toggle()"><svg xmlns="http://www.w3.org/2000/svg" style="width: 20px;" viewBox="0 0 512 512"><path d="M88 48C101.3 48 112 58.75 112 72V120C112 133.3 101.3 144 88 144H40C26.75 144 16 133.3 16 120V72C16 58.75 26.75 48 40 48H88zM480 64C497.7 64 512 78.33 512 96C512 113.7 497.7 128 480 128H192C174.3 128 160 113.7 160 96C160 78.33 174.3 64 192 64H480zM480 224C497.7 224 512 238.3 512 256C512 273.7 497.7 288 480 288H192C174.3 288 160 273.7 160 256C160 238.3 174.3 224 192 224H480zM480 384C497.7 384 512 398.3 512 416C512 433.7 497.7 448 480 448H192C174.3 448 160 433.7 160 416C160 398.3 174.3 384 192 384H480zM16 232C16 218.7 26.75 208 40 208H88C101.3 208 112 218.7 112 232V280C112 293.3 101.3 304 88 304H40C26.75 304 16 293.3 16 280V232zM88 368C101.3 368 112 378.7 112 392V440C112 453.3 101.3 464 88 464H40C26.75 464 16 453.3 16 440V392C16 378.7 26.75 368 40 368H88z"/></svg>&nbsp;&nbsp;&nbsp;<b><span class="user">Plasti<span>caribe S.A.S</span></span></b></button></p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <span class="user"><i class="pi pi-user"></i> {{storage_Nombre}}</span>
+          <span class="tipoUser"><i class="pi pi-verified"></i> {{storage_Rol}} </span>
+        </div>
+      </div>
+    </nav>
+  </mat-sidenav-content>
+</mat-sidenav-container>
