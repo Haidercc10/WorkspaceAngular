@@ -8,6 +8,7 @@ import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProducto
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
+import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 
 @Component({
   selector: 'app-Reporte_PedidosVendedores',
@@ -37,7 +38,8 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
                   private appComponent : AppComponent,
-                    private servicioDtlPedidos : PedidoProductosService) { }
+                    private servicioDtlPedidos : PedidoProductosService,
+                      private servicioPedidos : OpedidoproductoService,) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -126,19 +128,28 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
                 "costo_Cant_Total": (datos_pedidos[i].pedExtProd_Cantidad * datos_pedidos[i].exProd_PrecioVenta),
               }
             }
+            this.columnas = [
+              { header: 'Precio U.', field: 'precio', type : 'number' },
+              { header: 'Fecha Creación', field: 'fechaCreacion', type : 'date'},
+              { header: 'Fecha Entrega', field: 'fechaEntrega',  type : 'date'},
+            ];
             this.ArrayDocumento[j].children.push(info);
+            this.ArrayDocumento.sort((a,b) => Number(a.data.consecutivo) - Number(b.data.consecutivo));
           }
         }
       }
     });
   }
 
-  /**  */
+  /** Función que va a cargar el pedido y su detalles */
   cargarPedidosPendientes(){
     this.load = true;
     this.ArrayDocumento = [];
     this.pedidoAgrupado();
-    setTimeout(() => { this.pedidosDetallados(); }, 1500);
+    setTimeout(() => {
+      this.pedidosDetallados();
+      this.ArrayDocumento.sort((a,b) => Number(a.consecutivo) - Number(b.consecutivo));
+    }, 1500);
     setTimeout(() => { this.load = false; }, 2000);
   }
 
@@ -168,7 +179,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
     this.ArrayDocumento.push(infoPedido);
   }
 
-  /** */
+  /** Función que buscara por filtros en la tabla. */
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.tt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
   }
@@ -188,9 +199,11 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
 
   }
 
+  /** */
   mostrarPedidoPdf(item : any){
 
   }
+
   /** Función que exportará a excel lo que esté cargado en la tabla.*/
   exportarExcel(){
     if(this.ArrayDocumento.length == 0) this.advertencia('Debe haber al menos un pedido en la tabla.')
@@ -262,17 +275,17 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
           } else color = 'FFFFFF';
 
           worksheet.getColumn(1).width = 12;
-          worksheet.getColumn(2).width = 50;
-          worksheet.getColumn(3).width = 50;
+          worksheet.getColumn(2).width = 45;
+          worksheet.getColumn(3).width = 45;
           worksheet.getColumn(4).width = 15;
           worksheet.getColumn(5).width = 15;
           worksheet.getColumn(6).width = 10;
           worksheet.getColumn(7).width = 15;
-          worksheet.getColumn(8).width = 15;
+          worksheet.getColumn(8).width = 12;
           worksheet.getColumn(9).width = 40;
-          worksheet.getColumn(10).width = 25;
-          worksheet.getColumn(11).width = 40;
-          worksheet.getColumn(12).width = 20;
+          worksheet.getColumn(10).width = 18;
+          worksheet.getColumn(11).width = 18;
+          worksheet.getColumn(12).width = 18;
         });
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
@@ -297,7 +310,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         datos[i].data.cant_Pedida,
         datos[i].data.existencias,
         datos[i].data.presentacion,
-        datos[i].data.precioUnidad,
+        datos[i].data.precio,
         datos[i].data.estado,
         datos[i].data.vendedor,
         datos[i].data.costo_Cant_Total,
@@ -318,12 +331,47 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
     Swal.fire({ icon: 'success', title: 'Confirmación', html: mensaje, confirmButtonColor: '#53CC48', confirmButtonText: 'Aceptar', });
   }
 
-  /** Aceptar Pedido para luego crearlo en Zeus */
-  aceptarPedido(item : any){
-    this.servicioDtlPedidos.getPedidoPendientexId(item.consecutivo).subscribe(dataPedidos => {
-
-    });
+   /** Mensajes de error */
+   mostrarError(mensaje : string) {
+    Swal.fire({ icon: 'error', title: 'Confirmación', html: mensaje, confirmButtonColor: '#d83542', confirmButtonText: 'Aceptar', });
   }
 
+  confirmarActualizacion(item : any){
+    Swal.fire({
+      icon: 'warning',
+      title: 'Advertencia',
+      text: 'Está seguro que desea aceptar el pedido?',
+      showCancelButton: true,
+      confirmButtonText: 'Confirmar',
+      confirmButtonColor: '#d83542',
+    }).then((result) => {
+      if (result.isConfirmed) this.aceptarPedido(item);
+    })
+  }
 
+  /** Aceptar Pedido para luego crearlo en Zeus */
+  aceptarPedido(item : any){
+    this.servicioPedidos.srvObtenerListaPorId(item).subscribe(dataPedidos => {
+      const info : any = {
+        PedExt_Id : dataPedidos.pedExt_Id,
+        PedExt_Codigo : dataPedidos.pedExt_Codigo,
+        PedExt_FechaCreacion : dataPedidos.pedExt_FechaCreacion,
+        PedExt_FechaEntrega : dataPedidos.pedExt_FechaEntrega,
+        Empresa_Id : dataPedidos.empresa_Id,
+        SedeCli_Id : dataPedidos.sedeCli_Id,
+        Estado_Id : 26,
+        PedExt_Observacion : dataPedidos.pedExt_Observacion,
+        Usua_Id : dataPedidos.usua_Id,
+        PedExt_Descuento : dataPedidos.pedExt_Descuento,
+        PedExt_Iva : dataPedidos.pedExt_Iva,
+        PedExt_PrecioTotalFinal : dataPedidos.pedExt_PrecioTotalFinal,
+        PedExt_HoraCreacion: dataPedidos.pedExt_HoraCreacion,
+        Creador_Id : dataPedidos.creador_Id,
+      }
+      this.servicioPedidos.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
+        this.Confirmacion(`Pedido Nro. ${item} aceptado con exito!`);
+        setTimeout(() => { this.cargarPedidosPendientes(); }, 1000);
+      }, error => { this.mostrarError(`No fue posible aceptar el pedido ${item}, por favor, verifique!`); });
+    });
+  }
 }

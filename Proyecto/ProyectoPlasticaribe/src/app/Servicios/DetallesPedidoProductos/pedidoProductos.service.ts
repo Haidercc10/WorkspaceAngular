@@ -66,12 +66,12 @@ export class PedidoProductosService {
 
   /**  */
   getPedidoPendiente(){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoProducto/PedidosPendientes');
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/PedidoProducto/PedidosPendientesCompletos');
   }
 
   /**  */
   getPedidoPendientexId(pedido : number){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoProducto/PedidosPendientesxId/${pedido}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoProducto/getPedidosPendientesAgrupadosxId/${pedido}`);
   }
 
   GetPedidosPendientesAgrupados(){

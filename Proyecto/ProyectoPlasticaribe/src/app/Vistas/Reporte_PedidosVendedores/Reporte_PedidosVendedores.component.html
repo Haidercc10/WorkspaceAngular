@@ -44,17 +44,19 @@
             scrollHeight="1000px">
             <ng-template pTemplate="colgroup">
                <colgroup>
-                 <col style="width:150px">
+                 <col style="width:120px">
                  <col style="width:200px">
                  <col style="width:200px">
-                 <col style="width:150px">
-                 <col style="width:150px">
-                 <col style="width:150px">
+                 <col style="width:120px">
+                 <col style="width:100px">
+                 <col style="width:80px">
                  <col style="width:100px">
                  <col style="width:100px">
-                 <col style="width:200px">
-                 <col style="width:100px">
-                 <col style="width:100px">
+                 <col style="width:180px">
+                 <col style="width:120px">
+                 <col style="width:140px">
+                 <col style="width:60px">
+                 <col style="width:80px">
                </colgroup>
             </ng-template>
             <ng-template pTemplate="header">
@@ -77,6 +79,9 @@
                 <th ttResizableColumn style="width: 100px">
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'presentacion', 'contains')">
                 </th>
+                <th ttResizableColumn style="width: 100px">
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'precio', 'contains')">
+                </th>
                 <th ttResizableColumn style="width: 200px">
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'estado', 'contains')">
                 </th>
@@ -85,6 +90,9 @@
                 </th>
                 <th ttResizableColumn style="width: 150px">
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costo_Cant_Total', 'contains')">
+                </th>
+                <th ttResizableColumn style="width: 150px">
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'fechaCreacion', 'contains')">
                 </th>
                 <th ttResizableColumn style="width: 100px">
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
@@ -112,6 +120,9 @@
                 <th style="text-align: center; font-size: 14px;" ttSortableColumn="presentacion">Und
                   <p-treeTableSortIcon field="presentacion"></p-treeTableSortIcon>
                 </th>
+                <th style="text-align: center; font-size: 14px;" ttSortableColumn="precio">Precio
+                  <p-treeTableSortIcon field="precio"></p-treeTableSortIcon>
+                </th>
                 <th style="text-align: center; font-size: 14px;" ttSortableColumn="estado">Estado
                   <p-treeTableSortIcon field="estado"></p-treeTableSortIcon>
                 </th>
@@ -120,6 +131,9 @@
                 </th>
                 <th style="text-align: center; font-size: 14px;" ttSortableColumn="costo_Cant_Total">Total
                   <p-treeTableSortIcon field="costo_Cant_Total"></p-treeTableSortIcon>
+                </th>
+                <th style="text-align: center; font-size: 14px;" ttSortableColumn="fechaCreacion">Fecha Creación
+                  <p-treeTableSortIcon field="fechaCreacion"></p-treeTableSortIcon>
                 </th>
                 <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo">Editar
                 </th>
@@ -138,11 +152,13 @@
                 <td style="text-align: center;" scope="col" title="Cantidad Pedida">{{data.cant_Pedida | number : '1.2-2'}}</td>
                 <td style="text-align: center;" scope="col" title="Existencias">{{data.existencias | number : '1.2-2'}}</td>
                 <td style="text-align: center;" scope="col" title="Presentación">{{data.presentacion}}</td>
-                <td style="text-align: center;" scope="col" title="{{titlePendiente}}.">{{data.estado}}</td>
+                <td style="text-align: center;" scope="col" title="Presentación">{{data.precio}}</td>
+                <td style="text-align: center;" scope="col" title="Estado del Pedido">{{data.estado}}</td>
                 <td scope="col" title="Vendedor">{{data.vendedor}}</td>
-                <td style="text-align: center;" scope="col" title="N° Pedido">{{data.costo_Cant_Total | number}}</td>
-                <td></td>
-                <td></td>
+                <td style="text-align: center;" scope="col" title="Subtotal">{{data.costo_Cant_Total | number}}</td>
+                <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaCreacion}}</td>
+                <td style="text-align: center;" scope="col" title="Editar Pedido"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                <td style="text-align: center;" scope="col" title="Confirmar Pedido"><button (click)="confirmarActualizacion(data.consecutivo)" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
               </tr>
             </ng-template>
           </p-treeTable>
