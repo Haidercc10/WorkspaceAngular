@@ -137,49 +137,24 @@
               <label for="floatingInput">Producto</label>
             </div>
 
-            <ng-container *ngIf="ValidarRol != 1; else fila2">
-              <div class="form-floating col-md-2">
-                <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm" id="floatingInput" required>
-                <label for="floatingSelect">Cantidad Pedida</label>
-              </div>
+            <div class="form-floating col-md-2">
+              <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm" id="floatingInput" required>
+              <label for="floatingSelect">Cantidad Pedida</label>
+            </div>
 
-              <!-- UM Cantidad Producto -->
-              <div class="form-floating col-md">
-                <select formControlName="ProdUnidadMedidaCant" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdUnidadMedidaCant" required >
-                  <option [ngValue]="null" disabled selected>Seleccione Presentación</option>
-                  <option [ngValue]="presentaciones" *ngFor="let presentaciones of presentacion">{{presentaciones}}</option>
-                </select>
-                <label for="floatingSelect">Presentación</label>
-              </div>
+            <!-- UM Cantidad Producto -->
+            <div class="form-floating col-md">
+              <select formControlName="ProdUnidadMedidaCant" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdUnidadMedidaCant" required >
+                <option [ngValue]="presentaciones" *ngFor="let presentaciones of presentacion">{{presentaciones}}</option>
+              </select>
+              <label for="floatingSelect">Presentación</label>
+            </div>
 
-              <!-- Precio Producto -->
-              <div class="form-floating col-md-2">
-                <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdPrecioUnd">
-                <label for="floatingInput">Precio unitario</label>
-              </div>
-            </ng-container>
-
-            <ng-template #fila2>
-              <div class="form-floating col-md">
-                <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm" id="floatingInput" required>
-                <label for="floatingSelect">Cantidad Pedida</label>
-              </div>
-
-              <!-- UM Cantidad Producto -->
-              <div class="form-floating col-md">
-                <select formControlName="ProdUnidadMedidaCant" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdUnidadMedidaCant" required >
-                  <option [ngValue]="null" disabled selected>Seleccione Presentación</option>
-                  <option [ngValue]="presentaciones" *ngFor="let presentaciones of presentacion">{{presentaciones}}</option>
-                </select>
-                <label for="floatingSelect">Presentación</label>
-              </div>
-
-              <!-- Precio Producto -->
-              <div class="form-floating col-md-2">
-                <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdPrecioUnd">
-                <label for="floatingInput">Precio unitario</label>
-              </div>
-            </ng-template>
+            <!-- Precio Producto -->
+            <div class="form-floating col-md-2">
+              <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdPrecioUnd">
+              <label for="floatingInput">Precio unitario</label>
+            </div>
           </div>
         </div>
 

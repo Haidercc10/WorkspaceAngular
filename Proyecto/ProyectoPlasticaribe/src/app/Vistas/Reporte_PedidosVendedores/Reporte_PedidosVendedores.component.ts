@@ -1,15 +1,17 @@
 import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
-import { Workbook } from 'exceljs';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { TreeTable } from 'primeng/treetable';
 import { AppComponent } from 'src/app/app.component';
 import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
+import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
-import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { Workbook } from 'exceljs';
+import pdfMake from 'pdfmake/build/pdfmake';
 
 @Component({
   selector: 'app-Reporte_PedidosVendedores',
@@ -35,12 +37,15 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
   public ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
 
+  @ViewChild(PedidoExternoComponent) modalPedidoExterno : PedidoExternoComponent;
+  pedidoSelecccionado : number = 0; //Variable que almacenará la informacion del pedido que se desee editar
+  productosPedidos : any [] = []; //Variable que se llenará con la información de los productos que se enviaron a la base de datos, los productos serán del ultimo pedido creado
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
                   private appComponent : AppComponent,
                     private servicioDtlPedidos : PedidoProductosService,
-                      private servicioPedidos : OpedidoproductoService,
+                      private pedidoExternoService : OpedidoproductoService,
                         private servicioZeus : InventarioZeusService) { }
 
   ngOnInit() {
@@ -63,6 +68,13 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
     });
   }
 
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => {
+    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
+    const rep = '$1,';
+    return number.toString().replace(exp,rep);
+  }
+
   @Input() get columnasSeleccionada(): any[] {
     return this._columnasSeleccionada;
   }
@@ -77,74 +89,79 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
     this.ArrayDocumento = [];
     this.servicioDtlPedidos.GetPedidosPendientesAgrupados().subscribe(datos_pedidos => {
       for (let i = 0; i < datos_pedidos.length; i++) {
-        let info : any = {
-          "data" : {
-            "consecutivo": datos_pedidos[i].pedExt_Id,
-            "fechaCreacion" : datos_pedidos[i].pedExt_FechaCreacion.replace('T00:00:00', ''),
-            "fechaEntrega" : datos_pedidos[i].pedExt_FechaEntrega.replace('T00:00:00', ''),
-            "idCliente": datos_pedidos[i].cli_Id,
-            "cliente": datos_pedidos[i].cli_Nombre,
-            "idProducto ": '',
-            "producto":  '',
-            "cant_Pedida": '',
-            "existencias": '',
-            "precio": '',
-            "presentacion": '',
-            "idVendedor": datos_pedidos[i].usua_Id,
-            "vendedor": datos_pedidos[i].usua_Nombre,
-            "idEstado": datos_pedidos[i].estado_Id,
-            "estado": datos_pedidos[i].estado_Nombre,
-            "costo_Cant_Total": (datos_pedidos[i].pedExt_PrecioTotalFinal),
-          },
-          expanded: true,
-          "children" : []
-        }
-        this.ArrayDocumento.push(info);
+        if (this.ValidarRol == 2){
+          if (datos_pedidos[i].usua_Id == this.storage_Id) this.llenarPedidosAgrupado(datos_pedidos[i]);
+        } else if (this.ValidarRol == 1 || this.ValidarRol == 60) this.llenarPedidosAgrupado(datos_pedidos[i]);
       }
     });
   }
 
+  // Funcion que va a llenar la informacion de los pedidos
+  llenarPedidosAgrupado(data){
+    let info : any = {
+      "data" : {
+        "consecutivo": data.pedExt_Id,
+        "fechaCreacion" : data.pedExt_FechaCreacion.replace('T00:00:00', ''),
+        "fechaEntrega" : data.pedExt_FechaEntrega.replace('T00:00:00', ''),
+        "idCliente": data.cli_Id,
+        "cliente": data.cli_Nombre,
+        "idProducto ": '',
+        "producto":  '',
+        "cant_Pedida": '',
+        "existencias": '',
+        "precio": '',
+        "presentacion": '',
+        "idVendedor": data.usua_Id,
+        "vendedor": data.usua_Nombre,
+        "idEstado": data.estado_Id,
+        "estado": data.estado_Nombre,
+        "costo_Cant_Total": (data.pedExt_PrecioTotalFinal),
+      },
+      expanded: true,
+      "children" : []
+    }
+    this.ArrayDocumento.push(info);
+  }
+
   // Funcion que va a llenar los datos de los productos de cada pedido
   pedidosDetallados(){
-
     this.servicioDtlPedidos.getPedidoPendiente().subscribe(datos_pedidos => {
       for (let i = 0; i < datos_pedidos.length; i++) {
-            for (let j = 0; j < this.ArrayDocumento.length; j++) {
-              if (datos_pedidos[i].pedExt_Id == this.ArrayDocumento[j].data.consecutivo) {
-                let info : any = {
-                  "data" : {
-                    "consecutivo": datos_pedidos[i].pedExt_Id,
-                    "fechaCreacion" : datos_pedidos[i].pedExt_FechaCreacion.replace('T00:00:00', ''),
-                    "fechaEntrega" : datos_pedidos[i].pedExt_FechaEntrega.replace('T00:00:00', ''),
-                    "idCliente": datos_pedidos[i].cli_Id,
-                    "cliente": datos_pedidos[i].cli_Nombre,
-                    "idProducto ": datos_pedidos[i].prod_Id,
-                    "producto":  datos_pedidos[i].prod_Nombre,
-                    "cant_Pedida": datos_pedidos[i].pedExtProd_Cantidad,
-                    "existencias": 0,
-                    "precio": datos_pedidos[i].pedExtProd_PrecioUnitario,
-                    "presentacion": datos_pedidos[i].undMed_Id,
-                    "idVendedor": datos_pedidos[i].usua_Id,
-                    "vendedor": datos_pedidos[i].usua_Nombre,
-                    "idEstado": datos_pedidos[i].estado_Id,
-                    "estado": datos_pedidos[i].estado_Nombre,
-                    "costo_Cant_Total": (datos_pedidos[i].pedExtProd_Cantidad * datos_pedidos[i].exProd_PrecioVenta),
-                  }
-                }
-                if(datos_pedidos[i].undMed_Id == 'Und') datos_pedidos[i].undMed_Id = 'UND';
-                if(datos_pedidos[i].undMed_Id == 'Kg') datos_pedidos[i].undMed_Id = 'KLS';
-                if(datos_pedidos[i].undMed_Id == 'Paquete') datos_pedidos[i].undMed_Id = 'PAQ';
-
-                this.servicioZeus.getExistenciasProductos(datos_pedidos[i].prod_Id.toString(), datos_pedidos[i].undMed_Id).subscribe(dataZeus => {
-                  for (let index = 0; index < dataZeus.length; index++) {
-                    info.data.existencias = dataZeus[index].existencias;
-                  }
-                });
-
-                this.ArrayDocumento[j].children.push(info);
-                this.ArrayDocumento.sort((a,b) => Number(a.data.consecutivo) - Number(b.data.consecutivo));
+        for (let j = 0; j < this.ArrayDocumento.length; j++) {
+          if (datos_pedidos[i].pedExt_Id == this.ArrayDocumento[j].data.consecutivo) {
+            let info : any = {
+              "data" : {
+                "consecutivo": datos_pedidos[i].pedExt_Id,
+                "fechaCreacion" : datos_pedidos[i].pedExt_FechaCreacion.replace('T00:00:00', ''),
+                "fechaEntrega" : datos_pedidos[i].pedExt_FechaEntrega.replace('T00:00:00', ''),
+                "idCliente": datos_pedidos[i].cli_Id,
+                "cliente": datos_pedidos[i].cli_Nombre,
+                "idProducto ": datos_pedidos[i].prod_Id,
+                "producto":  datos_pedidos[i].prod_Nombre,
+                "cant_Pedida": datos_pedidos[i].pedExtProd_Cantidad,
+                "existencias": 0,
+                "precio": datos_pedidos[i].pedExtProd_PrecioUnitario,
+                "presentacion": datos_pedidos[i].undMed_Id,
+                "idVendedor": datos_pedidos[i].usua_Id,
+                "vendedor": datos_pedidos[i].usua_Nombre,
+                "idEstado": datos_pedidos[i].estado_Id,
+                "estado": datos_pedidos[i].estado_Nombre,
+                "costo_Cant_Total": (datos_pedidos[i].pedExtProd_Cantidad * datos_pedidos[i].exProd_PrecioVenta),
               }
             }
+            if(datos_pedidos[i].undMed_Id == 'Und') datos_pedidos[i].undMed_Id = 'UND';
+            if(datos_pedidos[i].undMed_Id == 'Kg') datos_pedidos[i].undMed_Id = 'KLS';
+            if(datos_pedidos[i].undMed_Id == 'Paquete') datos_pedidos[i].undMed_Id = 'PAQ';
+
+            this.servicioZeus.getExistenciasProductos(datos_pedidos[i].prod_Id.toString(), datos_pedidos[i].undMed_Id).subscribe(dataZeus => {
+              for (let index = 0; index < dataZeus.length; index++) {
+                info.data.existencias = dataZeus[index].existencias;
+              }
+            });
+            this.ArrayDocumento[j].children.push(info);
+            this.ArrayDocumento.sort((a,b) => Number(a.data.consecutivo) - Number(b.data.consecutivo));
+          }
+        }
       }
     });
   }
@@ -157,34 +174,8 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
     setTimeout(() => {
       this.pedidosDetallados();
       this.ArrayDocumento.sort((a,b) => Number(a.consecutivo) - Number(b.consecutivo));
-    }, 1500);
+    }, 1000);
     setTimeout(() => { this.load = false; }, 2000);
-  }
-
-  /** */
-  infoPedidos(datos : any){
-    const infoPedido : any = {
-      "data" : {
-        "consecutivo ": datos.pedExt_Id,
-        "fechaCreacion" : datos.pedExt_FechaCreacion.replace('T00:00:00', ''),
-        "fechaEntrega" : datos.pedExt_FechaEntrega.replace('T00:00:00', ''),
-        "idCliente": datos.cli_Id,
-        "cliente": datos.cli_Nombre,
-        "idProducto ": datos.prod_Id,
-        "producto":  datos.prod_Nombre,
-        "cant_Pedida": datos.pedExtProd_Cantidad,
-        "existencias": datos.exProd_Cantidad,
-        "precio": datos.pedExtProd_PrecioUnitario,
-        "presentacion": datos.undMed_Id,
-        "idVendedor": datos.usua_Id,
-        "vendedor": datos.usua_Nombre,
-        "idEstado": datos.estado_Id,
-        "estado": datos.estado_Nombre,
-        "costo_Cant_Total": (datos.pedExtProd_Cantidad * datos.exProd_PrecioVenta),
-      },
-      "children" : []
-    }
-    this.ArrayDocumento.push(infoPedido);
   }
 
   /** Función que buscara por filtros en la tabla. */
@@ -192,27 +183,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
     this.tt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
   }
 
-  /** */
-  editarPedido(item: any){
-    this.modalEditar = true;
-    this.servicioDtlPedidos.getPedidoPendientexId(item.consecutivo).subscribe(dataPedido => {
-      for (let index = 0; index < dataPedido.length; index++) {
-
-      }
-    });
-  }
-
-  /** */
-  cambiarOrden_Pedido(item : any){
-
-  }
-
-  /** */
-  mostrarPedidoPdf(item : any){
-
-  }
-
-  /** Función que exportará a excel lo que esté cargado en la tabla.*/
+  // Funcion que va a exportar a excel la informacion de los pedidos
   exportarExcel(){
     if(this.ArrayDocumento.length == 0) this.advertencia('Debe haber al menos un pedido en la tabla.')
     else {
@@ -283,17 +254,17 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
           } else color = 'FFFFFF';
 
           worksheet.getColumn(1).width = 12;
-          worksheet.getColumn(2).width = 45;
-          worksheet.getColumn(3).width = 45;
+          worksheet.getColumn(2).width = 50;
+          worksheet.getColumn(3).width = 50;
           worksheet.getColumn(4).width = 15;
           worksheet.getColumn(5).width = 15;
           worksheet.getColumn(6).width = 10;
           worksheet.getColumn(7).width = 15;
-          worksheet.getColumn(8).width = 12;
+          worksheet.getColumn(8).width = 15;
           worksheet.getColumn(9).width = 40;
-          worksheet.getColumn(10).width = 18;
-          worksheet.getColumn(11).width = 18;
-          worksheet.getColumn(12).width = 18;
+          worksheet.getColumn(10).width = 25;
+          worksheet.getColumn(11).width = 40;
+          worksheet.getColumn(12).width = 20;
         });
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
@@ -318,7 +289,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         datos[i].data.cant_Pedida,
         datos[i].data.existencias,
         datos[i].data.presentacion,
-        datos[i].data.precio,
+        datos[i].data.precioUnidad,
         datos[i].data.estado,
         datos[i].data.vendedor,
         datos[i].data.costo_Cant_Total,
@@ -339,8 +310,8 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
     Swal.fire({ icon: 'success', title: 'Confirmación', html: mensaje, confirmButtonColor: '#53CC48', confirmButtonText: 'Aceptar', });
   }
 
-   /** Mensajes de error */
-   mostrarError(mensaje : string) {
+  /** Mensajes de error */
+  mostrarError(mensaje : string) {
     Swal.fire({ icon: 'error', title: 'Confirmación', html: mensaje, confirmButtonColor: '#d83542', confirmButtonText: 'Aceptar', });
   }
 
@@ -359,7 +330,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
 
   /** Aceptar Pedido para luego crearlo en Zeus */
   aceptarPedido(item : any){
-    this.servicioPedidos.srvObtenerListaPorId(item).subscribe(dataPedidos => {
+    this.pedidoExternoService.srvObtenerListaPorId(item).subscribe(dataPedidos => {
       const info : any = {
         PedExt_Id : dataPedidos.pedExt_Id,
         PedExt_Codigo : dataPedidos.pedExt_Codigo,
@@ -376,10 +347,243 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         PedExt_HoraCreacion: dataPedidos.pedExt_HoraCreacion,
         Creador_Id : dataPedidos.creador_Id,
       }
-      this.servicioPedidos.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
+      this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
         this.Confirmacion(`Pedido Nro. ${item} aceptado con exito!`);
+        setTimeout(() => { this.cargarPedidosPendientes(); }, 1000);
         setTimeout(() => { this.cargarPedidosPendientes(); }, 100);
       }, error => { this.mostrarError(`No fue posible aceptar el pedido ${item}, por favor, verifique!`); });
     });
+  }
+
+  // Funcion que mostrará un modal con la informacion del pedido seleccionado y en el que se podrá editar el pedido selecionado
+  editarPedido(data: any){
+    this.modalEditar = true;
+    setTimeout(() => {
+      this.modalPedidoExterno.limpiarTodosCampos();
+      this.modalPedidoExterno.modalMode = true;
+      this.pedidoExternoService.GetInfoEditarPedido(data.consecutivo).subscribe(datos_pedido => {
+        for (let i = 0; i < datos_pedido.length; i++) {
+          this.modalPedidoExterno.FormPedidoExternoClientes.setValue({
+            PedClienteNombre: datos_pedido[i].id_Cliente,
+            PedClienteId : datos_pedido[i].id_Cliente,
+            PedSedeCli_Id: datos_pedido[i].id_SedeCliente,
+            ciudad_sede: datos_pedido[i].ciudad,
+            PedUsuarioNombre: datos_pedido[i].vendedor,
+            PedUsuarioId: datos_pedido[i].id_Vendedor,
+            PedFechaEnt: datos_pedido[i].fecha_Entrega.replace('T00:00:00', ''),
+            PedEstadoId: 11,
+            PedObservacion: datos_pedido[i].observacion,
+            PedDescuento : datos_pedido[i].descuento,
+            PedIva : datos_pedido[i].iva,
+          });
+          this.modalPedidoExterno.pedidoEditar = data.consecutivo;
+          this.modalPedidoExterno.clienteSeleccionado();
+          this.modalPedidoExterno.valorTotal = datos_pedido[i].valor_Total;
+          this.modalPedidoExterno.iva = datos_pedido[i].iva;
+          if (datos_pedido[i].iva > 0) this.modalPedidoExterno.checked = true;
+          this.modalPedidoExterno.descuento = datos_pedido[i].descuento;
+          this.modalPedidoExterno.ivaDescuento();
+          let productoExt : any = {
+            Id : datos_pedido[i].id_Producto,
+            Nombre : datos_pedido[i].producto,
+            Cant : datos_pedido[i].cantidad_Pedida,
+            UndCant : datos_pedido[i].presentacion,
+            PrecioUnd : datos_pedido[i].precio_Unitario,
+            Stock : 0,
+            SubTotal : (datos_pedido[i].cantidad_Pedida * datos_pedido[i].precio_Unitario),
+          }
+          this.modalPedidoExterno.ArrayProducto.push(productoExt);
+        }
+      });
+    }, 500);
+  }
+
+  // Funcion que consultará los productos del ultimo pedido creado
+  productosPedido(pedido : number){
+    this.productosPedidos = [];
+    this.pedidoExternoService.GetCrearPdfUltPedido(pedido).subscribe(datos_pedido => {
+      for (let i = 0; i < datos_pedido.length; i++) {
+        let info : any = {
+          Id : datos_pedido[i].producto_Id,
+          Nombre : datos_pedido[i].producto,
+          Cantidad : this.formatonumeros(datos_pedido[i].cantidad),
+          Und : datos_pedido[i].presentacion,
+          Precio : this.formatonumeros(datos_pedido[i].precio_Unitario),
+          SubTotal : this.formatonumeros(datos_pedido[i].subTotal_Producto),
+        }
+        this.productosPedidos.push(info);
+        this.productosPedidos.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+      }
+      setTimeout(() => { this.crearpdf(pedido); }, 1000);
+    });
+  }
+
+  // Fucnion para que crear ub pdf apenas se realiza el pedido de productos
+  crearpdf(pedido : number){
+    let usuario = this.storage_Nombre;
+    this.pedidoExternoService.GetCrearPdfUltPedido(pedido).subscribe(datos_pedido => {
+      for (let i = 0; i < datos_pedido.length; i++) {
+        const pdfDefinicion : any = {
+          info: { title: `Pedido N° ${datos_pedido[i].id_Pedido}` },
+          pageSize: { width: 630, height: 760 },
+          footer: function(currentPage : any, pageCount : any) {
+            return [
+              '\n',
+              {
+                columns: [
+                  { text: `Reporte generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                  { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                ]
+              }
+            ]
+          },
+          content : [
+            {
+              columns: [
+                { image : this.appComponent.logoParaPdf, width : 100, height : 80 },
+                { text: `Pedido Nro. ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
+              ]
+            },
+            '\n \n',
+            {
+              style: 'tablaEmpresa',
+              table: {
+                widths: [90, '*', 90, '*'],
+                style: 'header',
+                body: [
+                  [
+                    { border: [false, false, false, false], text: `NIT` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Id}` },
+                    { border: [false, false, false, false], text: `Nombre Empresa` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa}` },
+                  ],
+                  [
+                    { border: [false, false, false, false], text: `Dirección` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Direccion}` },
+                    { border: [false, false, false, false], text: `Ciudad` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Ciudad}` },
+                  ],
+                  [
+                    { border: [false, false, false, false], text: `Fecha de pedido` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].fechaCreacion.replace('T00:00:00', '')}` },
+                    { border: [false, false, false, false], text: `Fecha de entrega` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].fechaEntrega.replace('T00:00:00', '')}` },
+                  ],
+                  [
+                    { border: [false, false, false, false], text: `Vendedor` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`, fontSize: 8 },
+                    { border: [false, false, false, false], text: `Estado del pedido` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].estado}` },
+                  ],
+                ]
+              },
+              layout: { defaultBorder: false, },
+              fontSize: 9,
+            },
+            '\n \n',
+            { text: `\n Información detallada del cliente \n \n`, alignment: 'center', style: 'header' },
+            {
+              style: 'tablaCliente',
+              table: {
+                widths: [170, 170, 170],
+                style: 'header',
+                body: [
+                  [ `ID: ${datos_pedido[i].cliente_Id}`,  `Tipo de ID: ${datos_pedido[i].tipo_Id}`, `Tipo de Cliente: ${datos_pedido[i].tipo_Cliente}` ],
+                  [ `Nombre: ${datos_pedido[i].cliente}`, `Telefono: ${datos_pedido[i].telefono_Cliente}`, `Ciudad: ${datos_pedido[i].ciudad_Cliente}` ],
+                  [ `Dirección: ${datos_pedido[i].direccion_Cliente}`, `Codigo Postal: ${datos_pedido[i].codPostal_Cliente}`, `E-mail: ${datos_pedido[i].correo_Cliente}` ]
+                ]
+              },
+              layout: 'lightHorizontalLines',
+              fontSize: 9,
+            },
+            { text: `\n\n Información detallada de producto(s) pedido(s) \n `, alignment: 'center', style: 'header' },
+            this.table(this.productosPedidos, ['Id', 'Nombre', 'Cantidad', 'Und', 'Precio', 'SubTotal']),
+            {
+              style: 'tablaTotales',
+              table: {
+                widths: [256, '*', 98],
+                style: 'header',
+                body: [
+                  [
+                    '',
+                    { border: [true, false, true, true], text: `SUBTOTAL` },
+                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].precio_Total.toFixed(2))}` },
+                  ],
+                  [
+                    '',
+                    { border: [true, false, true, true], text: `DESCUENTO (%)` },
+                    { border: [false, false, true, true], text: `${datos_pedido[i].descuento.toFixed(2)}%` },
+                  ],
+                  [
+                    '',
+                    { border: [true, false, true, true], text: `SUBTOTAL DESCUENTO` },
+                    { border: [false, false, true, true], text: `${this.formatonumeros(((datos_pedido[i].precio_Total * datos_pedido[i].descuento) / 100).toFixed(2))}` },
+                  ],
+                  [
+                    '',
+                    { border: [true, false, true, true], text: `IVA (%)` },
+                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].iva.toFixed(2))}%` },
+                  ],
+                  [
+                    '',
+                    { border: [true, false, true, true], text: `SUBTOTAL IVA` },
+                    { border: [false, false, true, true], text: `${this.formatonumeros(((datos_pedido[i].precio_Total * datos_pedido[i].iva) / 100).toFixed(2))}` },
+                  ],
+                  [
+                    '',
+                    { border: [true, false, true, true], text: `TOTAL` },
+                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].precio_Final.toFixed(2))}` },
+                  ]
+                ]
+              },
+              layout: { defaultBorder: false, },
+              fontSize: 8,
+            },
+            { text: `\n \nObservación sobre el pedido: \n ${datos_pedido[i].observacion}\n`, style: 'header', }
+          ],
+          styles: {
+            header: { fontSize: 10, bold: true },
+            general: { fontSize: 8, bold: true },
+            titulo: { fontSize: 20, bold: true }
+          }
+        }
+        const pdf = pdfMake.createPdf(pdfDefinicion);
+        pdf.open();
+        break;
+      }
+    });
+
+  }
+
+  // funcion que se encagará de llenar la tabla de los productos en el pdf
+  buildTableBody(data, columns) {
+    var body = [];
+    body.push(columns);
+    data.forEach(function(row) {
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: [50, 197, 50, 50, 50, 98],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+    };
   }
 }

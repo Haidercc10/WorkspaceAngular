@@ -165,12 +165,26 @@
                 <td scope="col" title="Vendedor">{{data.vendedor}}</td>
                 <td style="text-align: center;" scope="col" title="Subtotal">{{data.costo_Cant_Total | number}}</td>
                 <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaCreacion}}</td>
-                <td style="text-align: center;" scope="col" title="Editar Pedido"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
-                <td style="text-align: center;" scope="col" title="Confirmar Pedido"><button (click)="mostrarPedidoPdf(data)" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                <td style="text-align: center;" scope="col" title="Editar Pedido"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="editarPedido(data)" style="width: 30px; height: 30px;"></button></td>
+                <td style="text-align: center;" scope="col" title="Confirmar Pedido"><button (click)="productosPedido(data.consecutivo)" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" style="width: 30px; height: 30px;"></button></td>
                 <td style="text-align: center;" scope="col" title="Confirmar Pedido"><button (click)="confirmarActualizacion(data.consecutivo)" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
               </tr>
             </ng-template>
           </p-treeTable>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="staticBackdrop2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel2">Editar Pedido</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="cargarPedidosPendientes()"></button>
+          </div>
+          <div class="modal-body">
+            <app-Pedido-Externo></app-Pedido-Externo>
+          </div>
         </div>
       </div>
     </div>

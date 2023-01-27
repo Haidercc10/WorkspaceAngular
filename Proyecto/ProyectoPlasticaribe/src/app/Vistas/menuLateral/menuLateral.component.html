@@ -465,7 +465,7 @@
     </ng-container>
 
     <!-- MOVIMIENTOS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5 || ValidarRol == 13">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5 || ValidarRol == 13">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample10" role="button" (click)="clickIcon10()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir10; then thenTemplate10; else elseTemplate10"></ng-container>
@@ -632,7 +632,7 @@
             </a>
           </div>
             <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
-            <a class="fst-normal" href="/home" role="button" aria-expanded="false">
+            <a class="fst-normal" href="/reporte-pedidos-vendedores" role="button" aria-expanded="false">
               <i class="pi pi-eye" style="font-size: 15px; margin-right: 2%;"></i>
               Ver Pedidos
             </a>
@@ -689,7 +689,7 @@
     </ng-container>
 
     <!-- REPORTES -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7" role="button" (click)="clickIcon7()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir7; then thenTemplate7; else elseTemplate7"></ng-container>
@@ -818,7 +818,7 @@
     <!-- NOTIFICACIONES -->
 
   </ul>
-  <button class="btn boton" id="boton_CerrarSesion" type="button" (click)="confimacionSalida()">
+  <button class="btn boton" id="boton_CerrarSesion" type="button" (click)="confirm1()">
     <li aria-hidden="true">
       <i class="pi pi-fw pi-power-off"></i>
       <br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Salir&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
@@ -842,3 +842,25 @@
     </div>
   </div>
 </nav>
+<br>
+
+<p-toast position="center" key="c" (onClose)="onReject()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle" style="font-size: 3rem"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="onConfirm()" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject()" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+

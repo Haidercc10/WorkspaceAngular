@@ -123,6 +123,10 @@ export class OpedidoproductoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/getCrearPdfUltPedido/${pedido}`);
   }
 
+  GetInfoEditarPedido(pedido : number):Observable<any[]>{
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/getInfoEditarPedido/${pedido}` );
+  }
+
 //Metodo agregar Pedidos de Productos
   srvAgregarPedidosProductos(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/PedidoExterno', data)

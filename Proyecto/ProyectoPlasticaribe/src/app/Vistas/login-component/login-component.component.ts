@@ -38,8 +38,8 @@ export class LoginComponentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.storage.clear();
     this.ruta = this.storage.get('Ruta');
-    // this.storage.clear();
     // this.saveInLocal('Ruta', this.ruta);
     this.cargaDatosComboBox();
   }
@@ -74,8 +74,6 @@ export class LoginComponentComponent implements OnInit {
   Consulta(){
     try {
       let empresa : string = this.formularioUsuario.value.Empresa;
-      this.saveInLocal('BD', 1);
-
       this.usuarioServices.srvObtenerListaPorId(this.formularioUsuario.value.Identificacion).subscribe(datos_usuarios=>{
         this.empresaServices.srvObtenerLista().subscribe(datos_empresa => {
           for (let index = 0; index < datos_empresa.length; index++) {
@@ -108,7 +106,7 @@ export class LoginComponentComponent implements OnInit {
                       || this.ruta == 'http://192.168.0.153:4700/Login'
                       || this.ruta == 'http://192.168.0.153:4700'
                       || this.ruta == 'http://192.168.0.153:4700/') window.location.href = "./home";
-                  else window.location.href = this.ruta;
+                  else  window.location.href = "./home";
                   break;
                 } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena){
                   Swal.fire({

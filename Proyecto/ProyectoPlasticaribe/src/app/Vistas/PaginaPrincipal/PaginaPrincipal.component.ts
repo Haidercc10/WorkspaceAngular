@@ -259,7 +259,7 @@ export class PaginaPrincipalComponent implements OnInit {
 
       // PEDIDOS DE PRODUCTOS
       { id : 30, nombre : 'Pedidos Externos', icono : 'assets/Iconos_Menu/pedidos.png', categoria: 'Pedidos', ruta : './pedido-externo', roles : [1,2,60], },
-      { id : 31, nombre : 'Ver Pedidos', icono : 'assets/Iconos_Menu/verDocumento.png', categoria: 'Pedidos', ruta : './', roles : [1,2,60], },
+      { id : 31, nombre : 'Ver Pedidos', icono : 'assets/Iconos_Menu/verDocumento.png', categoria: 'Pedidos', ruta : './reporte-pedidos-vendedores', roles : [1,2,60], },
       { id : 47, nombre : 'Pedidos Zeus', icono : 'assets/Iconos_Menu/Pedidos_Zeus.png', categoria: 'Pedidos', ruta : './Pedidos-Zeus', roles : [1,60], },
 
       // PRODUCTO TERMINADO

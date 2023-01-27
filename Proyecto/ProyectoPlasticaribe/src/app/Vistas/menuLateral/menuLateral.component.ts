@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/api';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
@@ -20,6 +21,7 @@ export class MenuLateralComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   mostrarMenu : boolean = false; //Variable que se utilizará para mostrar el menú
+  position: string = '';
   subir : boolean = true;
   subir1 : boolean = true;
   subir2 : boolean = true;
@@ -38,7 +40,9 @@ export class MenuLateralComponent implements OnInit {
   subir13 : boolean = true;
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
-                private rolService : RolesService) { }
+                private rolService : RolesService,
+                  private confirmationService: ConfirmationService,
+                    private messageService: MessageService) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -58,18 +62,31 @@ export class MenuLateralComponent implements OnInit {
     });
   }
 
-  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
-  confimacionSalida(){
-    Swal.fire({
-      title: '¿Seguro que desea salir?',
-      showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: 'Salir',
-      denyButtonText: `No Salir`,
-    }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
-      if (result.isConfirmed) window.location.href = "./";
-    })
+  showConfirm() {
+    this.confirmationService.confirm({
+      message: '¿Seguro que desea salir?',
+      header: 'Cerrar Sesión',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Si',
+      rejectLabel: 'No',
+      accept: () => {
+        window.location.href = "./";
+        this.messageService.add({severity:'info', summary:'Confirmed', detail:'You have accepted'});
+      },
+    });
+  }
+
+  confirm1() {
+    this.messageService.clear();
+    this.messageService.add({key: 'c', sticky: true, severity:'warn', summary:'¿Seguro que desea salir?'});
+  }
+
+  onConfirm() {
+    window.location.href = "./";
+  }
+
+  onReject() {
+    this.messageService.clear('c');
   }
 
   // Funcion que hacer que aparezca un icono u otro
