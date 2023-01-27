@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./menuLateral.component.css']
 })
 export class MenuLateralComponent implements OnInit {
+  display : boolean = false;
 
   mode = new FormControl('over' as MatDrawerMode);
 
@@ -18,6 +19,7 @@ export class MenuLateralComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  mostrarMenu : boolean = false; //Variable que se utilizará para mostrar el menú
   subir : boolean = true;
   subir1 : boolean = true;
   subir2 : boolean = true;

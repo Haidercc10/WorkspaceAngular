@@ -1,5 +1,9 @@
-import { Component, OnInit, Injectable, ViewChild } from '@angular/core';
-import { TreeNode } from 'primeng/api';
+import { Component, OnInit, Injectable, Inject } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { MatDrawerMode } from '@angular/material/sidenav';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -13,53 +17,140 @@ import { TreeNode } from 'primeng/api';
 
 export class PruebaImagenCatInsumoComponent implements OnInit {
 
-  files: TreeNode[];
+  display : boolean = false;
 
-  cols: any[];
+  mode = new FormControl('over' as MatDrawerMode);
 
-  numbers = [45, 4, 9, 16, 25];
+  storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  mostrarMenu : boolean = false; //Variable que se utilizará para mostrar el menú
+  subir : boolean = true;
+  subir1 : boolean = true;
+  subir2 : boolean = true;
+  subir3 : boolean = true;
+  subir4 : boolean = true;
+  subir5 : boolean = true;
+  subir6 : boolean = true;
+  subir7 : boolean = true;
+  subir7_1 : boolean = true;
+  subir8 : boolean = true;
+  subir8_1 : boolean = true;
+  subir9 : boolean = true;
+  subir10: boolean= true;
+  subir11: boolean = true;
+  subir12 : boolean = true;
+  subir13 : boolean = true;
 
-  constructor() { }
+  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private rolService : RolesService) { }
 
   ngOnInit() {
-      // this.nodeService.getFilesystem().then(files => this.files = files);
-      this.files = [
-        {
-          "data":{
-              "name":"Applications",
-              "size":"200mb",
-              "type":"Folder"
-          },
-          "children":[
-              {
-                  "data":{
-                      "name":"editor.app",
-                      "size":"25mb",
-                      "type":"Application"
-                  }
-              },
-              {
-                  "data":{
-                      "name":"settings.app",
-                      "size":"50mb",
-                      "type":"Application"
-                  }
-              }
-          ]
-        },
-      ]
-
-      this.cols = [
-          { field: 'name', header: 'Name' },
-          { field: 'size', header: 'Size' },
-          { field: 'type', header: 'Type' }
-      ];
-
-    console.log(this.numbers.find(this.myFunction))
+    this.lecturaStorage();
   }
 
-  myFunction(value, index, array) {
-    return value > 18;
+  lecturaStorage(){
+    this.storage_Id = this.storage.get('Id');
+    this.storage_Nombre = this.storage.get('Nombre');
+    let rol = this.storage.get('Rol');
+    this.rolService.srvObtenerLista().subscribe(datos_roles => {
+      for (let index = 0; index < datos_roles.length; index++) {
+        if (datos_roles[index].rolUsu_Id == rol) {
+          this.ValidarRol = rol;
+          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
+        }
+      }
+    });
   }
 
+  /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */
+  confimacionSalida(){
+    Swal.fire({
+      title: '¿Seguro que desea salir?',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Salir',
+      denyButtonText: `No Salir`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) window.location.href = "./";
+    })
+  }
+
+  // Funcion que hacer que aparezca un icono u otro
+  clickIcon1(){
+    if (this.subir1) this.subir1 = false;
+    else this.subir1 = true;
+  }
+
+  clickIcon2(){
+    if (this.subir2) this.subir2 = false;
+    else this.subir2 = true;
+  }
+
+  clickIcon3(){
+    if (this.subir3) this.subir3 = false;
+    else this.subir3 = true;
+  }
+
+  clickIcon4(){
+    if (this.subir4) this.subir4 = false;
+    else this.subir4 = true;
+  }
+
+  clickIcon5(){
+    if (this.subir5) this.subir5 = false;
+    else this.subir5 = true;
+  }
+
+  clickIcon6(){
+    if (this.subir6) this.subir6 = false;
+    else this.subir6 = true;
+  }
+
+  clickIcon7(){
+    if (this.subir7) this.subir7 = false;
+    else this.subir7 = true;
+  }
+
+  clickIcon7_1(){
+    if (this.subir7_1) this.subir7_1 = false;
+    else this.subir7_1 = true;
+  }
+
+  clickIcon8(){
+    if (this.subir8) this.subir8 = false;
+    else this.subir8 = true;
+  }
+
+  clickIcon8_1(){
+    if (this.subir8_1) this.subir8_1 = false;
+    else this.subir8_1 = true;
+  }
+
+  clickIcon9(){
+    if (this.subir9) this.subir9 = false;
+    else this.subir9 = true;
+  }
+
+  clickIcon10(){
+    if (this.subir10) this.subir10 = false;
+    else this.subir10 = true;
+  }
+
+  clickIcon11(){
+    if (this.subir11) this.subir11 = false;
+    else this.subir11 = true;
+  }
+
+  clickIcon12(){
+    if (this.subir12) this.subir12 = false;
+    else this.subir12 = true;
+  }
+
+  clickIcon13(){
+    if (this.subir13) this.subir13 = false;
+    else this.subir13 = true;
+  }
 }

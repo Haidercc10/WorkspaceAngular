@@ -145,6 +145,7 @@ import { ReporteInventarioMateriaPrimaComponent } from './Vistas/ReporteInventar
 import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 import { TreeTableModule } from 'primeng/treetable';
 import { CheckboxModule } from 'primeng/checkbox';
+import { SidebarModule } from 'primeng/sidebar';
 
 export const routes: Routes = [
 
@@ -349,7 +350,6 @@ export const routes: Routes = [
     ReportePedidos_ZeusComponent
   ],
 
-
   imports: [
     BrowserModule,
     ReactiveFormsModule,
@@ -415,6 +415,7 @@ export const routes: Routes = [
     InputSwitchModule,
     TreeTableModule,
     CheckboxModule,
+    SidebarModule,
   ],
 
   providers: [

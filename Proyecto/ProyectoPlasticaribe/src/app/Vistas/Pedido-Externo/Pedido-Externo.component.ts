@@ -271,7 +271,6 @@ export class PedidoExternoComponent implements OnInit {
             PedDescuento : this.FormPedidoExternoClientes.value.PedDescuento,
             PedIva : this.FormPedidoExternoClientes.value.PedIva,
           });
-
         }
       } else {
         for (const item of this.sedeCliente) {
@@ -301,12 +300,9 @@ export class PedidoExternoComponent implements OnInit {
 
   // Funcion para cargar los productos de un solo cliente
   productoCliente(){
-    this.producto = [];
     this.ClientesProductosService.srvObtenerListaPorNombreCliente(this.FormPedidoExternoClientes.value.PedClienteId).subscribe(datos_clientesProductos => {
       for (let index = 0; index < datos_clientesProductos.length; index++) {
-        this.productosServices.srvObtenerListaPorId(datos_clientesProductos[index].prod_Id).subscribe(datos_productos => {
-          this.producto.push(datos_productos);
-        });
+        this.productosServices.srvObtenerListaPorId(datos_clientesProductos[index].prod_Id).subscribe(datos_productos => { this.producto = datos_productos; });
       }
     });
   }
@@ -377,9 +373,7 @@ export class PedidoExternoComponent implements OnInit {
         for (let i = 0; i < datos_existencis.length; i++) {
           this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
             for (let j = 0; j < datos_producto.length; j++) {
-              this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), datos_producto[j].undMed_Id).subscribe(datos_productoPedido => {
-                this.ultimoPrecio = datos_productoPedido;
-              });
+              this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), datos_producto[j].undMed_Id).subscribe(datos_productoPedido => { this.ultimoPrecio = datos_productoPedido; });
 
               setTimeout(() => {
                 this.presentacion.push(datos_producto[j].undMed_Id);
@@ -423,7 +417,7 @@ export class PedidoExternoComponent implements OnInit {
   // VALIDACION PARA CAMPOS VACIOS
   validarCamposVacios(){
     if(this.FormPedidoExternoProductos.valid) this.cargarFormProductoEnTablas(this.ArrayProducto);
-    else this.mensajeAdvertencia( "Hay campos vacios en el formulario de producto");
+    else this.mensajeAdvertencia("Hay campos vacios en el formulario de producto");
   }
 
   // Funcion que envia la informacion de los productos a la tabla.
@@ -526,10 +520,10 @@ export class PedidoExternoComponent implements OnInit {
           denyButtonText: `Seguir Editando`,
           cancelButtonText : `Cancelar Pedido`,
         }).then((result) => {
-          if (result.isConfirmed)
+          if (result.isConfirmed) {
             if (!this.modalMode) this.CrearPedidoExterno();
             else this.editarPedido();
-          else if (result.isDenied) {
+          } else if (result.isDenied) {
             const Toast = Swal.mixin({
               toast: true,
               position: 'center',
@@ -545,8 +539,7 @@ export class PedidoExternoComponent implements OnInit {
               icon: 'info',
               title: 'Puede seguir editando el pedido'
             });
-          }
-          else if (result.isDismissed) this.limpiarTodosCampos();
+          } else if (result.isDismissed) this.limpiarTodosCampos();
         });
       }
     } else this.mensajeAdvertencia('¡Hay Campos Vacios!');
@@ -617,33 +610,35 @@ export class PedidoExternoComponent implements OnInit {
     let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
     this.pedidoproductoService.srvObtenerListaPorId(this.pedidoEditar).subscribe(datos => {
-      this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
-        for (let i = 0; i < datos_sedeCliente.length; i++) {
-          const camposPedido : any = {
-            PedExt_FechaCreacion: datos.pedExt_FechaCreacion,
-            PedExt_FechaEntrega: this.FormPedidoExternoClientes.get('PedFechaEnt')?.value,
-            Empresa_Id: 800188732,
-            PedExt_Codigo: 0,
-            SedeCli_Id: datos_sedeCliente[i].sedeCli_Id,
-            Usua_Id: datos_sedeCliente[i].usua_Id,
-            Estado_Id: 11,
-            PedExt_Observacion: this.FormPedidoExternoClientes.get('PedObservacion')?.value,
-            PedExt_PrecioTotal: this.valorTotal,
-            Creador_Id: datos.creador_Id,
-            PedExt_Descuento: this.FormPedidoExternoClientes.value.PedDescuento,
-            PedExt_Iva: this.iva,
-            PedExt_PrecioTotalFinal : this.valorfinal,
-            PedExt_HoraCreacion : datos.pedExt_Hora,
+      if (datos.estado_Id != 11) {
+        this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
+          for (let i = 0; i < datos_sedeCliente.length; i++) {
+            const camposPedido : any = {
+              PedExt_FechaCreacion: datos.pedExt_FechaCreacion,
+              PedExt_FechaEntrega: this.FormPedidoExternoClientes.get('PedFechaEnt')?.value,
+              Empresa_Id: 800188732,
+              PedExt_Codigo: 0,
+              SedeCli_Id: datos_sedeCliente[i].sedeCli_Id,
+              Usua_Id: datos_sedeCliente[i].usua_Id,
+              Estado_Id: 11,
+              PedExt_Observacion: this.FormPedidoExternoClientes.get('PedObservacion')?.value,
+              PedExt_PrecioTotal: this.valorTotal,
+              Creador_Id: datos.creador_Id,
+              PedExt_Descuento: this.FormPedidoExternoClientes.value.PedDescuento,
+              PedExt_Iva: this.iva,
+              PedExt_PrecioTotalFinal : this.valorfinal,
+              PedExt_HoraCreacion : datos.pedExt_Hora,
+            }
+            this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(data=> {
+              this.editarDetallesPedido();
+              setTimeout(() => {
+                this.productosPedido(this.pedidoEditar);
+                this.limpiarTodosCampos();
+              }, 2000);
+            }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!', error.message); });
           }
-          this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(data=> {
-            this.editarDetallesPedido();
-            setTimeout(() => {
-              this.productosPedido(this.pedidoEditar);
-              this.limpiarTodosCampos();
-            }, 2000);
-          }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!', error.message); });
-        }
-      }, error => { this.mensajeError('¡La dirección y la ciudad escogidas no coninciden!', error.message) });
+        }, error => { this.mensajeError('¡La dirección y la ciudad escogidas no coninciden!', error.message) });
+      }
     });
   }
 
@@ -688,13 +683,8 @@ export class PedidoExternoComponent implements OnInit {
     this.pedidoproductoService.GetCrearPdfUltPedido(pedido).subscribe(datos_pedido => {
       for (let i = 0; i < datos_pedido.length; i++) {
         const pdfDefinicion : any = {
-          info: {
-            title: `Pedido N° ${datos_pedido[i].id_Pedido}`
-          },
-          pageSize: {
-            width: 630,
-            height: 760
-          },
+          info: { title: `Pedido N° ${datos_pedido[i].id_Pedido}` },
+          pageSize: { width: 630, height: 760 },
           footer: function(currentPage : any, pageCount : any) {
             return [
               '\n',
@@ -710,17 +700,8 @@ export class PedidoExternoComponent implements OnInit {
           content : [
             {
               columns: [
-                {
-                  image : this.appComponent.logoParaPdf,
-                  width : 100,
-                  height : 80
-                },
-                {
-                  text: `Pedido Nro. ${datos_pedido[i].id_Pedido}`,
-                  alignment: 'right',
-                  style: 'titulo',
-                  margin: [0, 30, 0, 0],
-                }
+                { image : this.appComponent.logoParaPdf, width : 100, height : 80 },
+                { text: `Pedido Nro. ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },
             '\n \n',
@@ -731,122 +712,51 @@ export class PedidoExternoComponent implements OnInit {
                 style: 'header',
                 body: [
                   [
-                    {
-                      border: [false, false, false, false],
-                      text: `NIT`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_pedido[i].empresa_Id}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Nombre Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_pedido[i].empresa}`
-                    },
+                    { border: [false, false, false, false], text: `NIT` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Id}` },
+                    { border: [false, false, false, false], text: `Nombre Empresa` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa}` },
                   ],
                   [
-                    {
-                      border: [false, false, false, false],
-                      text: `Dirección`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_pedido[i].empresa_Direccion}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Ciudad`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_pedido[i].empresa_Ciudad}`
-                    },
+                    { border: [false, false, false, false], text: `Dirección` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Direccion}` },
+                    { border: [false, false, false, false], text: `Ciudad` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Ciudad}` },
                   ],
                   [
-                    {
-                      border: [false, false, false, false],
-                      text: `Fecha de pedido`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_pedido[i].fechaCreacion.replace('T00:00:00', '')}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Fecha de entrega`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_pedido[i].fechaEntrega.replace('T00:00:00', '')}`
-                    },
+                    { border: [false, false, false, false], text: `Fecha de pedido` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].fechaCreacion.replace('T00:00:00', '')}` },
+                    { border: [false, false, false, false], text: `Fecha de entrega` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].fechaEntrega.replace('T00:00:00', '')}` },
                   ],
                   [
-                    {
-                      border: [false, false, false, false],
-                      text: `Vendedor`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`,
-                      fontSize: 8
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Estado del pedido`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_pedido[i].estado}`
-                    },
+                    { border: [false, false, false, false], text: `Vendedor` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`, fontSize: 8 },
+                    { border: [false, false, false, false], text: `Estado del pedido` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].estado}` },
                   ],
                 ]
               },
-              layout: {
-                defaultBorder: false,
-              },
+              layout: { defaultBorder: false, },
               fontSize: 9,
             },
             '\n \n',
-            {
-              text: `\n Información detallada del cliente \n \n`,
-              alignment: 'center',
-              style: 'header'
-            },
+            { text: `\n Información detallada del cliente \n \n`, alignment: 'center', style: 'header' },
             {
               style: 'tablaCliente',
               table: {
                 widths: [170, 170, 170],
                 style: 'header',
                 body: [
-                  [
-                    `ID: ${datos_pedido[i].cliente_Id}`,
-                    `Tipo de ID: ${datos_pedido[i].tipo_Id}`,
-                    `Tipo de Cliente: ${datos_pedido[i].tipo_Cliente}`
-                  ],
-                  [
-                    `Nombre: ${datos_pedido[i].cliente}`,
-                    `Telefono: ${datos_pedido[i].telefono_Cliente}`,
-                    `Ciudad: ${datos_pedido[i].ciudad_Cliente}`
-                  ],
-                  [
-                    `Dirección: ${datos_pedido[i].direccion_Cliente}`,
-                    `Codigo Postal: ${datos_pedido[i].codPostal_Cliente}`,
-                    `E-mail: ${datos_pedido[i].correo_Cliente}`
-                  ]
+                  [ `ID: ${datos_pedido[i].cliente_Id}`,  `Tipo de ID: ${datos_pedido[i].tipo_Id}`, `Tipo de Cliente: ${datos_pedido[i].tipo_Cliente}` ],
+                  [ `Nombre: ${datos_pedido[i].cliente}`, `Telefono: ${datos_pedido[i].telefono_Cliente}`, `Ciudad: ${datos_pedido[i].ciudad_Cliente}` ],
+                  [ `Dirección: ${datos_pedido[i].direccion_Cliente}`, `Codigo Postal: ${datos_pedido[i].codPostal_Cliente}`, `E-mail: ${datos_pedido[i].correo_Cliente}` ]
                 ]
               },
               layout: 'lightHorizontalLines',
               fontSize: 9,
             },
-            {
-              text: `\n\n Información detallada de producto(s) pedido(s) \n `,
-              alignment: 'center',
-              style: 'header'
-            },
+            { text: `\n\n Información detallada de producto(s) pedido(s) \n `, alignment: 'center', style: 'header' },
             this.table(this.productosPedidos, ['Id', 'Nombre', 'Cantidad', 'Und', 'Precio', 'SubTotal']),
             {
               style: 'tablaTotales',
@@ -856,95 +766,45 @@ export class PedidoExternoComponent implements OnInit {
                 body: [
                   [
                     '',
-                    {
-                      border: [true, false, true, true],
-                      text: `SUBTOTAL`
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `${this.formatonumeros(datos_pedido[i].precio_Total)}`
-                    },
+                    { border: [true, false, true, true], text: `SUBTOTAL` },
+                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].precio_Total)}` },
                   ],
                   [
                     '',
-                    {
-                      border: [true, false, true, true],
-                      text: `DESCUENTO (%)`
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `${datos_pedido[i].descuento}%`
-                    },
+                    { border: [true, false, true, true], text: `DESCUENTO (%)` },
+                    { border: [false, false, true, true], text: `${datos_pedido[i].descuento}%` },
                   ],
                   [
                     '',
-                    {
-                      border: [true, false, true, true],
-                      text: `SUBTOTAL MENOS DESCUENTO`
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `${this.formatonumeros((datos_pedido[i].precio_Total * datos_pedido[i].descuento) / 100)}`
-                    },
+                    { border: [true, false, true, true], text: `SUBTOTAL MENOS DESCUENTO` },
+                    { border: [false, false, true, true], text: `${this.formatonumeros((datos_pedido[i].precio_Total * datos_pedido[i].descuento) / 100)}` },
                   ],
                   [
                     '',
-                    {
-                      border: [true, false, true, true],
-                      text: `IVA (%)`
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `${this.formatonumeros(datos_pedido[i].iva)}%`
-                    },
+                    { border: [true, false, true, true], text: `IVA (%)` },
+                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].iva)}%` },
                   ],
                   [
                     '',
-                    {
-                      border: [true, false, true, true],
-                      text: `SUBTOTAL IVA`
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `${this.formatonumeros(((datos_pedido[i].precio_Total * datos_pedido[i].iva) / 100))}`
-                    },
+                    { border: [true, false, true, true], text: `SUBTOTAL IVA` },
+                    { border: [false, false, true, true], text: `${this.formatonumeros(((datos_pedido[i].precio_Total * datos_pedido[i].iva) / 100))}` },
                   ],
                   [
                     '',
-                    {
-                      border: [true, false, true, true],
-                      text: `TOTAL`
-                    },
-                    {
-                      border: [false, false, true, true],
-                      text: `${this.formatonumeros(datos_pedido[i].precio_Final)}`
-                    },
+                    { border: [true, false, true, true], text: `TOTAL` },
+                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].precio_Final)}` },
                   ]
                 ]
               },
-              layout: {
-                defaultBorder: false,
-              },
+              layout: { defaultBorder: false, },
               fontSize: 8,
             },
-            {
-              text: `\n \nObservación sobre el pedido: \n ${datos_pedido[i].observacion}\n`,
-              style: 'header',
-            }
+            { text: `\n \nObservación sobre el pedido: \n ${datos_pedido[i].observacion}\n`, style: 'header', }
           ],
           styles: {
-            header: {
-              fontSize: 10,
-              bold: true
-            },
-            general: {
-              fontSize: 8,
-              bold: true
-            },
-            titulo: {
-              fontSize: 20,
-              bold: true
-            }
+            header: { fontSize: 10, bold: true },
+            general: { fontSize: 8, bold: true },
+            titulo: { fontSize: 20, bold: true }
           }
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
