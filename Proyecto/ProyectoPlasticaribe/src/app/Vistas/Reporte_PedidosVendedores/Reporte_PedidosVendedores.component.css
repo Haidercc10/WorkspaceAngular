@@ -214,9 +214,9 @@ a:hover {
   display: flex;
 }
 
-.container-fluid {
+/* .container-fluid {
   width: 95%;
-}
+} */
 
 .bg-danger1 {
   color: white;
@@ -283,5 +283,35 @@ p-treeTable::-webkit-scrollbar-thumb:active{
     max-width: none;
     height: 80%;
     margin: auto;
+  }
+}
+
+@media (min-width: 1370px){
+  .tablaDatos{
+    min-width: 1500px;
+  }
+
+  .tableColores {
+    text-align: center;
+    width: 1250px;
+  }
+
+  .tableColores td .collapse{
+    margin-top: 1%;
+    text-align: start;
+    font-size: 11px;
+
+  }
+}
+
+@media (max-width: 1369px){
+  .tableColores {
+    text-align: center;
+  }
+
+  .tableColores td .collapse{
+    margin-top: 1%;
+    font-size: 11px;
+    text-align: center;
   }
 }

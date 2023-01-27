@@ -81,7 +81,8 @@
          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
          [rowsPerPageOptions]="[10,20,30,50,70,100, ArrayDocumento.length]"
          [rowHover]="true"
-         [scrollable]="true" scrollHeight="1000px">
+         [scrollable]="true"
+         scrollHeight="1000px">
          <ng-template pTemplate="colgroup" let-columns>
             <colgroup>
               <col style="width:150px">

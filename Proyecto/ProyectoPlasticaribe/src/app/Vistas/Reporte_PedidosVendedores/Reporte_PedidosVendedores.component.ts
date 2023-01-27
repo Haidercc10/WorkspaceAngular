@@ -31,11 +31,10 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
 
 
-  constructor(
-  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-  private rolService : RolesService,
-  private appComponent : AppComponent,
-  private servicioDtlPedidos : PedidoProductosService) { }
+  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private rolService : RolesService,
+                  private appComponent : AppComponent,
+                    private servicioDtlPedidos : PedidoProductosService) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -65,15 +64,78 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
     this._columnasSeleccionada = this.columnas.filter(col => val.includes(col));
   }
 
+  // Funcion que va a cargar el encabezado de los pedidos
+  pedidoAgrupado(){
+    this.load = true;
+    this.ArrayDocumento = [];
+    this.servicioDtlPedidos.GetPedidosPendientesAgrupados().subscribe(datos_pedidos => {
+      for (let i = 0; i < datos_pedidos.length; i++) {
+        let info : any = {
+          "data" : {
+            "consecutivo": datos_pedidos[i].pedExt_Id,
+            "fechaCreacion" : datos_pedidos[i].pedExt_FechaCreacion.replace('T00:00:00', ''),
+            "fechaEntrega" : datos_pedidos[i].pedExt_FechaEntrega.replace('T00:00:00', ''),
+            "idCliente": datos_pedidos[i].cli_Id,
+            "cliente": datos_pedidos[i].cli_Nombre,
+            "idProducto ": '',
+            "producto":  '',
+            "cant_Pedida": '',
+            "existencias": '',
+            "precio": '',
+            "presentacion": '',
+            "idVendedor": datos_pedidos[i].usua_Id,
+            "vendedor": datos_pedidos[i].usua_Nombre,
+            "idEstado": datos_pedidos[i].estado_Id,
+            "estado": datos_pedidos[i].estado_Nombre,
+            "costo_Cant_Total": (datos_pedidos[i].pedExt_PrecioTotalFinal),
+          },
+          expanded: true,
+          "children" : []
+        }
+        this.ArrayDocumento.push(info);
+      }
+    });
+  }
+
+  // Funcion que va a llenar los datos de los productos de cada pedido
+  pedidosDetallados(){
+    this.servicioDtlPedidos.getPedidoPendiente().subscribe(datos_pedidos => {
+      for (let i = 0; i < datos_pedidos.length; i++) {
+        for (let j = 0; j < this.ArrayDocumento.length; j++) {
+          if (datos_pedidos[i].pedExt_Id == this.ArrayDocumento[j].data.consecutivo) {
+            let info : any = {
+              "data" : {
+                "consecutivo": datos_pedidos[i].pedExt_Id,
+                "fechaCreacion" : datos_pedidos[i].pedExt_FechaCreacion.replace('T00:00:00', ''),
+                "fechaEntrega" : datos_pedidos[i].pedExt_FechaEntrega.replace('T00:00:00', ''),
+                "idCliente": datos_pedidos[i].cli_Id,
+                "cliente": datos_pedidos[i].cli_Nombre,
+                "idProducto ": datos_pedidos[i].prod_Id,
+                "producto":  datos_pedidos[i].prod_Nombre,
+                "cant_Pedida": datos_pedidos[i].pedExtProd_Cantidad,
+                "existencias": datos_pedidos[i].exProd_Cantidad,
+                "precio": datos_pedidos[i].pedExtProd_PrecioUnitario,
+                "presentacion": datos_pedidos[i].undMed_Id,
+                "idVendedor": datos_pedidos[i].usua_Id,
+                "vendedor": datos_pedidos[i].usua_Nombre,
+                "idEstado": datos_pedidos[i].estado_Id,
+                "estado": datos_pedidos[i].estado_Nombre,
+                "costo_Cant_Total": (datos_pedidos[i].pedExtProd_Cantidad * datos_pedidos[i].exProd_PrecioVenta),
+              }
+            }
+            this.ArrayDocumento[j].children.push(info);
+          }
+        }
+      }
+    });
+  }
+
   /**  */
   cargarPedidosPendientes(){
     this.load = true;
     this.ArrayDocumento = [];
-    this.servicioDtlPedidos.getPedidoPendiente().subscribe(dataPedidos => {
-      for (let index = 0; index < dataPedidos.length; index++) {
-        this.infoPedidos(dataPedidos[index]);
-      }
-    });
+    this.pedidoAgrupado();
+    setTimeout(() => { this.pedidosDetallados(); }, 1500);
     setTimeout(() => { this.load = false; }, 2000);
   }
 
@@ -82,8 +144,8 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
     const infoPedido : any = {
       "data" : {
         "consecutivo ": datos.pedExt_Id,
-        "fechaCreacion" :  datos.pedExt_FechaCreacion.replace('T00:00:00', ''),
-        "fechaEntrega" :  datos.pedExt_FechaEntrega.replace('T00:00:00', ''),
+        "fechaCreacion" : datos.pedExt_FechaCreacion.replace('T00:00:00', ''),
+        "fechaEntrega" : datos.pedExt_FechaEntrega.replace('T00:00:00', ''),
         "idCliente": datos.cli_Id,
         "cliente": datos.cli_Nombre,
         "idProducto ": datos.prod_Id,
@@ -101,7 +163,6 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
       "children" : []
     }
     this.ArrayDocumento.push(infoPedido);
-    console.log(infoPedido);
   }
 
   /** */
