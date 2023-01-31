@@ -217,6 +217,7 @@
             <th scope="col" style="font-size: 12px;">Producto</th>
             <th scope="col" style="font-size: 12px;">Cantidad Pedida</th>
             <th scope="col" style="font-size: 12px;">Und</th>
+            <th scope="col" style="font-size: 12px;">Fecha Entrega</th>
             <th scope="col" style="font-size: 12px;">Precio</th>
             <th scope="col" style="font-size: 12px;">SubTotal</th>
           </tr>
@@ -234,13 +235,14 @@
               </p-cellEditor>
             </td>
             <td>{{item.UndCant}}</td>
+            <td>{{item.FechaEntrega}}</td>
             <td>{{item.PrecioUnd | currency : 'COP $'}}</td>
             <td>{{item.SubTotal | currency : 'COP $' }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
           <tr>
-            <td colspan="5" class="text-right">Totales</td>
+            <td colspan="6" class="text-right">Totales</td>
             <td>{{cantidadCostoProductos | currency : 'COP $'}}</td>
           </tr>
         </ng-template>

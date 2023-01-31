@@ -53,7 +53,7 @@
 
             <!-- Ciudad -->
             <div class="form-floating col-md-2">
-              <select formControlName="ciudad_sede" type="text" id="floatingSelect" name="ciudad_sede" (change)="verificarCartera()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <select formControlName="ciudad_sede" type="text" id="floatingSelect" name="ciudad_sede" (change)="llenarDireccionCliente()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="ciudades" *ngFor="let ciudades of ciudad">{{ciudades}}</option>
               </select>
               <label for="floatingSelect">Ciudad(es)</label>
@@ -87,7 +87,7 @@
 
             <!-- Campo Observacion -->
             <div class="form-floating col-md">
-              <input formControlName="PedDescuento" type="number" (change)="ivaDescuento()" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido">
+              <input formControlName="PedDescuento" type="number" (keyup)="ivaDescuento()" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido">
               <label for="floatingInput">(%) Descuento</label>
             </div>
 
@@ -112,13 +112,13 @@
         <h4 class="tituloRojo">Agregar Productos</h4>
       </div>
 
-      <form [formGroup]="FormPedidoExternoProductos">
+      <form [formGroup]="FormPedidoExternoProductos" autocomplete="off">
         <!-- Inicio Fila 1 Agregar producto -->
         <div class="mb-3">
           <div class="row g-3">
             <!-- ID Producto -->
             <div class="form-floating col-md">
-              <input formControlName="ProdId" type="search" min="0" class="form-control" id="floatingInput" name="PrdId" (keyup.enter)="buscarProductoId()" required >
+              <input formControlName="ProdId" type="search" min="0" class="form-control" id="floatingInput" name="PrdId" (keyup)="buscarProductoId()" required>
               <label for="floatingInput">Id Producto</label>
             </div>
 

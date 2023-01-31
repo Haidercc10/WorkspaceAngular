@@ -133,11 +133,7 @@ export class OcompraComponent implements OnInit {
     this.proveedores = [];
     let nombre : string = this.FormOrdenCompra.value.Proveedor.trim();
     if (nombre != '') {
-      this.proveedorService.getProveedorLike(nombre).subscribe(datos_Proveedores => {
-        for (let i = 0; i < datos_Proveedores.length; i++) {
-          this.proveedores.push(datos_Proveedores[i]);
-        }
-      });
+      this.proveedorService.getProveedorLike(nombre).subscribe(datos_Proveedores => { this.proveedores = datos_Proveedores; });
     }
   }
 
@@ -145,11 +141,9 @@ export class OcompraComponent implements OnInit {
   cambiarNombreProveedor(){
     let id : number = this.FormOrdenCompra.value.Proveedor;
     this.proveedorService.srvObtenerListaPorId(id).subscribe(datos_proveedor => {
-      this.FormOrdenCompra = this.frmBuilder.group({
-        ConsecutivoOrden : this.FormOrdenCompra.value.ConsecutivoOrden,
+      this.FormOrdenCompra.patchValue({
         Proveedor : datos_proveedor.prov_Nombre,
         Id_Proveedor : id,
-        Observacion : this.FormOrdenCompra.value.Observacion,
       });
     }, error => { this.mensajeError(`¡No se pudo obtener información del proveedor!`, error.message); });
   }
@@ -157,18 +151,12 @@ export class OcompraComponent implements OnInit {
   // Generar Consecutivo de Orden de Compra
   generarConsecutivo(){
     this.ordenCompraService.getUltimoId_OrdenCompra().subscribe(datos_ordenCompra => {
-      this.FormOrdenCompra = this.frmBuilder.group({
+      this.FormOrdenCompra.patchValue({
         ConsecutivoOrden : datos_ordenCompra + 1,
-        Proveedor : this.FormOrdenCompra.value.Proveedor,
-        Id_Proveedor : this.FormOrdenCompra.value.Id_Proveedor,
-        Observacion : this.FormOrdenCompra.value.Observacion,
       });
     }, error => {
       this.FormOrdenCompra = this.frmBuilder.group({
         ConsecutivoOrden : 1,
-        Proveedor : this.FormOrdenCompra.value.Proveedor,
-        Id_Proveedor : this.FormOrdenCompra.value.Id_Proveedor,
-        Observacion : this.FormOrdenCompra.value.Observacion,
       });
       this.cargando = false;
     });
@@ -177,20 +165,14 @@ export class OcompraComponent implements OnInit {
   // Funcion que va a consultar la materia prima
   obtenerMateriaPrima(){
     this.materiaPrimaService.getMpTintaBopp().subscribe(datos_materiaPrimas => {
-      for (let i = 0; i < datos_materiaPrimas.length; i++) {
-        this.materiaPrima.push(datos_materiaPrimas[i]);
-        this.materiaPrima.sort((a,b) => a.nombre.localeCompare(b.nombre));
-      }
+      (datos_materiaPrimas == this.materiaPrima)
+      this.materiaPrima.sort((a,b) => a.nombre.localeCompare(b.nombre));
     });
   }
 
   // Funcion que va a consultar las unidades de medida
   obtenerUnidadesMedida(){
-    this.undMedidaService.srvObtenerLista().subscribe(datos_undMedida => {
-      for (let i = 0; i < datos_undMedida.length; i++) {
-        this.unidadesMedida.push(datos_undMedida[i]);
-      }
-    });
+    this.undMedidaService.srvObtenerLista().subscribe(datos_undMedida => { this.unidadesMedida = datos_undMedida; });
   }
 
   //Funcion que va a mostrar el nombre de la materia prima

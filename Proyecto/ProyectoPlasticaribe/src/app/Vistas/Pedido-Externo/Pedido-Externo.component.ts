@@ -155,7 +155,7 @@ export class PedidoExternoComponent implements OnInit {
   //Funcion que validar si cambia uno de los input se muestre la misma informacion en la parde abajo de la tabla
   ivaDescuento(){
     if (this.valorTotal == 0) {
-      this.descuento = 0;
+      this.descuento = this.FormPedidoExternoClientes.value.PedDescuento;
       this.valorMenosDescuento = 0;
       this.valorMenosIva = 0;
       this.valorfinal = 0;
@@ -192,7 +192,7 @@ export class PedidoExternoComponent implements OnInit {
     this.valorMenosIva = 0;
     this.valorfinal = 0;
     this.pedidosProductos = [];
-    this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
+    this.FormPedidoExternoClientes.patchValue({
       PedClienteNombre: null,
       PedClienteId : null,
       PedSedeCli_Id: null,
@@ -229,18 +229,9 @@ export class PedidoExternoComponent implements OnInit {
   // Funcion que va a buscar el cliente seleccionado
   clienteSeleccionado(){
     this.clientesService.srvObtenerListaPorId(this.FormPedidoExternoClientes.value.PedClienteNombre).subscribe(datos => {
-      this.FormPedidoExternoClientes.setValue({
+      this.FormPedidoExternoClientes.patchValue({
         PedClienteNombre: datos.cli_Nombre,
         PedClienteId : datos.cli_Id,
-        PedSedeCli_Id: this.FormPedidoExternoClientes.value.PedSedeCli_Id,
-        ciudad_sede: this.FormPedidoExternoClientes.value.ciudad_sede,
-        PedUsuarioNombre: this.FormPedidoExternoClientes.value.PedUsuarioNombre,
-        PedUsuarioId: this.FormPedidoExternoClientes.value.PedUsuarioId,
-        PedFechaEnt: this.FormPedidoExternoClientes.value.PedFechaEnt,
-        PedEstadoId: this.FormPedidoExternoClientes.value.PedEstadoId,
-        PedObservacion: this.FormPedidoExternoClientes.value.PedObservacion,
-        PedDescuento : this.FormPedidoExternoClientes.value.PedDescuento,
-        PedIva : this.FormPedidoExternoClientes.value.PedIva,
       });
       setTimeout(() => {
         this.ciudadClienteComboBox();
@@ -267,44 +258,47 @@ export class PedidoExternoComponent implements OnInit {
           this.sedeCliente = [];
           this.usuarioVende.push(item.usua_Nombre);
           this.sedeCliente.push(item.sedeCliente_Direccion);
-          this.FormPedidoExternoClientes.setValue({
-            PedClienteNombre: this.FormPedidoExternoClientes.value.PedClienteNombre,
-            PedClienteId : this.FormPedidoExternoClientes.value.PedClienteId,
+          this.FormPedidoExternoClientes.patchValue({
             PedSedeCli_Id: item.sedeCliente_Direccion,
             ciudad_sede: item.sedeCliente_Ciudad,
             PedUsuarioNombre: item.usua_Nombre,
             PedUsuarioId: item.usua_Id,
-            PedFechaEnt: this.FormPedidoExternoClientes.value.PedFechaEnt,
-            PedEstadoId: this.FormPedidoExternoClientes.value.PedEstadoId,
-            PedObservacion: this.FormPedidoExternoClientes.value.PedObservacion,
-            PedDescuento : this.FormPedidoExternoClientes.value.PedDescuento,
-            PedIva : this.FormPedidoExternoClientes.value.PedIva,
           });
         }
         this.verificarCartera();
       } else {
         for (const item of this.sedeCliente) {
           this.usuarioVende.push(item.usua_Nombre);
-          this.FormPedidoExternoClientes.setValue({
-            PedClienteNombre: this.FormPedidoExternoClientes.value.PedClienteNombre,
-            PedClienteId : this.FormPedidoExternoClientes.value.PedClienteId,
-            PedSedeCli_Id: this.FormPedidoExternoClientes.value.PedSedeCli_Id,
-            ciudad_sede: this.FormPedidoExternoClientes.value.ciudad_sede,
+          this.FormPedidoExternoClientes.patchValue({
             PedUsuarioNombre: item.usua_Nombre,
             PedUsuarioId: item.usua_Id,
-            PedFechaEnt: this.FormPedidoExternoClientes.value.PedFechaEnt,
-            PedEstadoId: this.FormPedidoExternoClientes.value.PedEstadoId,
-            PedObservacion: this.FormPedidoExternoClientes.value.PedObservacion,
-            PedDescuento : this.FormPedidoExternoClientes.value.PedDescuento,
-            PedIva : this.FormPedidoExternoClientes.value.PedIva,
           });
           break;
         }
         this.sedeCliente = [];
-        for (let i = 0; i < datos_sedesClientes.length; i++) {
-          this.sedeCliente.push(datos_sedesClientes[i].sedeCliente_Direccion);
-        }
       }
+    });
+  }
+
+  // Funcion que va a llenar el campo de direccion una vez se haya llenado el campo ciudad
+  llenarDireccionCliente(){
+    let cliente : number = this.FormPedidoExternoClientes.value.PedClienteId;
+    let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
+    this.sedeCliente = [];
+    this.sedesClientesService.GetDireccionesCliente(cliente, ciudad).subscribe(datos_sedesClientes => {
+      for (let i = 0; i < datos_sedesClientes.length; i++) {
+        this.sedeCliente.push(datos_sedesClientes[i].sedeCliente_Direccion);
+      }
+      setTimeout(() => {
+        if (this.sedeCliente.length <= 1) {
+          for (let i = 0; i < this.sedeCliente.length; i++) {
+            this.FormPedidoExternoClientes.patchValue({
+              PedSedeCli_Id: datos_sedesClientes[i].sedeCliente_Direccion,
+            });
+            this.verificarCartera();
+          }
+        }
+      }, 500);
     });
   }
 
@@ -320,20 +314,17 @@ export class PedidoExternoComponent implements OnInit {
         for (let j = 0; j < datos_sedeCliente.length; j++) {
           this.zeusCobtabilidadService.getVistasFavUsuario(datos_sedeCliente[j].sedeCli_CodBagPro).subscribe(datos => {
             if (datos.length == 0) this.cargando = false;
-            let diasCartera : number = 0;
             for (let i = 0; i < datos.length; i++) {
               let fechaRadicado : any = datos[i].fecha_Radicado;
               if (datos[i].fecha_Radicado == null) fechaRadicado = datos[i].lapsO_DOC;
               let hoy = moment([moment().year(), moment().month(), moment().date()]);
               let fechaDocumento = moment([moment(fechaRadicado).year(), moment(fechaRadicado).month(), moment(fechaRadicado).date()]);
-              diasCartera += hoy.diff(fechaDocumento, 'days');
-            }
-            setTimeout(() => {
-              if (diasCartera >= 70) {
-                this.mensajeAdvertencia(`¡El cliente seleccionado tiene un reporte de ${diasCartera} días en cartera, por lo que no será posible crearle un pedido!`);
+              if (hoy.diff(fechaDocumento, 'days') >= 70) {
+                this.mensajeAdvertencia(`¡El cliente seleccionado tiene un reporte de ${this.formatonumeros(hoy.diff(fechaDocumento, 'days'))} días en cartera, por lo que no será posible crearle un pedido!`);
                 this.limpiarTodosCampos();
+                break;
               } else this.cargando = false;
-            }, 1000);
+            }
           }, error => {
             this.mensajeError(`¡Error al consultar la cartera del cliente selecionado!`, error.message);
             this.limpiarTodosCampos();
@@ -351,6 +342,7 @@ export class PedidoExternoComponent implements OnInit {
 
   // Funcion para cargar los productos de un solo cliente
   productoCliente(){
+    this.producto = [];
     this.ClientesProductosService.srvObtenerListaPorNombreCliente(this.FormPedidoExternoClientes.value.PedClienteId).subscribe(datos_clientesProductos => {
       for (let index = 0; index < datos_clientesProductos.length; index++) {
         this.productosServices.srvObtenerListaPorId(datos_clientesProductos[index].prod_Id).subscribe(datos_productos => {
@@ -421,16 +413,17 @@ export class PedidoExternoComponent implements OnInit {
 
   //Funcion encargada de buscar un producto por el id del producto
   buscarProductoId(){
-    this.producto = [];
-    this.presentacion = [];
     let idProducto : number = this.FormPedidoExternoProductos.value.ProdId;
-
+    if (idProducto == null || idProducto == undefined || idProducto == 0) this.productoCliente();
     this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(datos_existencis => {
-      if (datos_existencis .length != 0) {
+      if (datos_existencis.length != 0) {
         for (let i = 0; i < datos_existencis.length; i++) {
           this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
             for (let j = 0; j < datos_producto.length; j++) {
-              this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), datos_producto[j].undMed_Id).subscribe(datos_productoPedido => { this.ultimoPrecio = datos_productoPedido; });
+              this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), datos_producto[j].undMed_Id).subscribe(datos_productoPedido => {
+                this.ultimoPrecio = datos_productoPedido.precioUnidad;
+                this.fechaUltFacuracion = datos_productoPedido.fechaDocumento.replace('T00:00:00', '');
+              });
 
               setTimeout(() => {
                 this.presentacion.push(datos_producto[j].undMed_Id);
@@ -463,7 +456,7 @@ export class PedidoExternoComponent implements OnInit {
               ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
               ProdUnidadMedidaCant: '',
               ProdPrecioUnd: 0,
-              ProdUltFacturacion: this.ultimoPrecio,
+              ProdUltFacturacion: 0,
               ProdStock: 0,
               ProdFechaEnt : this.FormPedidoExternoProductos.value.ProdFechaEnt,
             });

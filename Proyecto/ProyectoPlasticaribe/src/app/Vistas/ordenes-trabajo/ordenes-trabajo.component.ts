@@ -8,12 +8,9 @@ import { AppComponent } from 'src/app/app.component';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
-import { modelOrdenTrabajo_SelladoCorte } from 'src/app/Modelo/modelOrdenTrabajo_Sellado_Corte';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
-import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { FormatosService } from 'src/app/Servicios/Formato/Formatos.service';
 import { Laminado_CapaService } from 'src/app/Servicios/LaminadoCapa/Laminado_Capa.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
@@ -35,7 +32,6 @@ import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-product
 import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado.service';
 import { TratadoService } from 'src/app/Servicios/Tratado/Tratado.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
 
 @Injectable({
@@ -62,7 +58,6 @@ export class OrdenesTrabajoComponent implements OnInit {
   public arrayPigmentos = []; /** Array que colocará las pigmentos en los combobox al momento de crear la OT */
   public arrayMateriales = []; /** Array que colocará las materiales en los combobox al momento de crear la OT*/
   public arrayUnidadesMedidas = []; /** Array que colocará las unidades de medida en los combobox al momento de crear la OT*/
-
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
   vistaPedidos : boolean = false; //Funcion que validará si se muestra el navbar de ordenes de trabajo o no
   checkedCyrel : boolean = false; //Variable para saber si el checkbox del Cyrel está seleccionado o no
@@ -102,6 +97,23 @@ export class OrdenesTrabajoComponent implements OnInit {
   modalMezclas : boolean = false; //Variable que mostrará o no el modal para crear mezclas.
   tipoProductos : any [] = []; //Vairbla que almacenará la informacion de ls tipos de productos
   tipoSellado : any [] = []; //Variable que almacenará la informacion de los tipos de sellados
+  extrusion : boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
+  impresion : boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
+  rotograbado : boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
+  laminado : boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
+  doblado : boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
+  corte : boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
+  sellado : boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
+  cantidadProducto : number = 0; //Variable que almacenará la cantidad de producto que se va a pedir
+  valorProducto : number = 0; //Variable que almacenrá ek valor total el producto
+  netoKg : number = 0; //Variable que almacenará el peso neto en kilogramos que se debe producir
+  valorKg : number = 0; //Variable que almacenará el valor del kilogramo
+  valorOt : number = 0; //Variable que almacenará el valor total de la orden de trabajo
+  margenKg : number = 0; //Variable que almcanerá la cantidad adicional de kg que se harán para manejar un margen de error
+  pesoPaquete : number = 0; //Variable que almacenará cuantos kg pesa un paquete
+  pesoBulto : number = 0; //Variable que almacenará cuantos kg pesa un bulto
+  informacionSeleccionada : any; //Variable que almacenará la información del producto seleccionado
+
   formCrearMezclas !: FormGroup;
   arrayMateriales2 : any = [];
   objetoDatos : any;
@@ -111,24 +123,6 @@ export class OrdenesTrabajoComponent implements OnInit {
   modalPigmentos : boolean = false;
   formCrearPigmentos !: FormGroup;
   formCrearMateriales !: FormGroup;
-
-  extrusion : boolean = false;
-  impresion : boolean = false;
-  rotograbado : boolean = false;
-  laminado : boolean = false;
-  doblado : boolean = false;
-  corte : boolean = false;
-  sellado : boolean = false;
-
-  cantidadProducto : number = 0;
-  valorProducto : number = 0;
-  netoKg : number = 0;
-  valorKg : number = 0;
-  valorOt : number = 0;
-  margenKg : number = 0;
-  pesoPaquete : number = 0;
-  pesoBulto : number = 0;
-  informacionSeleccionada : any;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
@@ -826,7 +820,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Pedido_Id: pedido,
           Nombre_Vendedor: datos[i].vendedor,
           OT_FechaCreacion: this.today,
-          OT_FechaEntrega: datos[i].fecha_Entrega.replace('T00:00:00', ''),
+          OT_FechaEntrega: null,
           Id_Sede_Cliente : datos[i].id_Sede_Cliente,
           ID_Cliente: datos[i].id_Cliente,
           Nombre_Cliente: datos[i].cliente,
@@ -866,6 +860,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           TipoSellado : datos[i].tipo_Sellado,
           PrecioUnd : datos[i].precio_Producto,
           SubTotal : datos[i].subTotal_Producto,
+          FechaEntrega : datos[i].fecha_Entrega.replace('T00:00:00', ''),
         }
         this.ArrayProducto.push(productoExt);
         this.cantidadCostoProductos += datos[i].subTotal_Producto;
@@ -890,26 +885,8 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.presentacionProducto = data.UndCant;
     this.ordenTrabajoService.GetInfoUltOT(data.Id, data.UndCant).subscribe(datos_Ot => {
       this.FormOrdenTrabajo.patchValue({
-        OT_Id: this.FormOrdenTrabajo.value.OT_Id,
-        Pedido_Id: this.FormOrdenTrabajo.value.Pedido_Id,
-        Nombre_Vendedor:  this.FormOrdenTrabajo.value.Nombre_Vendedor,
-        OT_FechaCreacion: this.today,
-        OT_FechaEntrega: this.FormOrdenTrabajo.value.OT_FechaEntrega,
-        ID_Cliente: this.FormOrdenTrabajo.value.ID_Cliente,
-        Nombre_Cliente: this.FormOrdenTrabajo.value.Nombre_Cliente,
-        Ciudad_SedeCliente: this.FormOrdenTrabajo.value.Ciudad_SedeCliente,
-        Direccion_SedeCliente : this.FormOrdenTrabajo.value.Direccion_SedeCliente,
-        OT_Estado : 11,
         OT_Observacion : datos_Ot.observacion,
         Margen : datos_Ot.margen_Adicional,
-        OT_Cyrel : this.FormOrdenTrabajo.value.OT_Cyrel,
-        OT_Extrusion : this.extrusion,
-        OT_Impresion : this.impresion,
-        OT_Rotograbado : this.rotograbado,
-        OT_Laminado : this.laminado,
-        OT_Corte : this.checkedCorte,
-        OT_Doblado : this.doblado,
-        OT_Sellado : this.sellado,
       });
       this.FormOrdenTrabajoExtrusion.patchValue({
         Material_Extrusion : datos_Ot.material_Extrusion_Id,
@@ -947,14 +924,14 @@ export class OrdenesTrabajoComponent implements OnInit {
         Calibre_Laminado3 : datos_Ot.calibre3_Laminado,
         cantidad_Laminado3 : datos_Ot.cantidad3_Laminado,
       });
-      this.FormOrdenTrabajoCorte = this.frmBuilderPedExterno.group({
+      this.FormOrdenTrabajoCorte.patchValue({
         Formato_Corte : data.Tipo,
         Ancho_Corte : data.Ancho,
         Largo_Corte : data.Largo,
         Fuelle_Corte : data.Fuelle,
         Margen_Corte : datos_Ot.margen_Adicional,
       });
-      this.FormOrdenTrabajoSellado = this.frmBuilderPedExterno.group({
+      this.FormOrdenTrabajoSellado.patchValue({
         Formato_Sellado : data.Tipo,
         Ancho_Sellado : data.Ancho,
         Largo_Sellado : data.Largo,
@@ -962,12 +939,8 @@ export class OrdenesTrabajoComponent implements OnInit {
         Margen_Sellado : datos_Ot.margen_Adicional,
         PesoMillar : data.PesoMillar,
         TipoSellado : data.TipoSellado,
-        PrecioDia : 0,
-        PrecioNoche : 0,
         CantidadPaquete : data.CantPaquete,
-        PesoPaquete : 0,
         CantidadBulto : data.CantBulto,
-        PesoBulto : 0,
       });
       setTimeout(() => { this.calcularDatosOt(data) }, 500);
       if (datos_Ot.cant_Capas_Mezclas == 1) {
@@ -1046,26 +1019,9 @@ export class OrdenesTrabajoComponent implements OnInit {
         ot.push(datos_Ot);
         for (const itemOt of ot) {
           this.FormOrdenTrabajo.patchValue({
-            OT_Id: this.FormOrdenTrabajo.value.OT_Id,
-            Pedido_Id: this.FormOrdenTrabajo.value.Pedido_Id,
-            Nombre_Vendedor: this.FormOrdenTrabajo.value.Nombre_Vendedor,
-            OT_FechaCreacion: this.today,
-            OT_FechaEntrega: this.FormOrdenTrabajo.value.OT_FechaEntrega,
-            ID_Cliente: this.FormOrdenTrabajo.value.ID_Cliente,
-            Nombre_Cliente: this.FormOrdenTrabajo.value.Nombre_Cliente,
-            Ciudad_SedeCliente: this.FormOrdenTrabajo.value.Ciudad_SedeCliente,
-            Direccion_SedeCliente : this.FormOrdenTrabajo.value.Direccion_SedeCliente,
-            OT_Estado : this.FormOrdenTrabajo.value.OT_Estado,
+            OT_FechaEntrega: data.FechaEntrega,
             OT_Observacion : itemOt.observacion,
             Margen : itemOt.ptMargen,
-            OT_Cyrel : this.checkedCyrel,
-            OT_Extrusion : this.extrusion,
-            OT_Impresion : this.impresion,
-            OT_Rotograbado : this.rotograbado,
-            OT_Laminado : this.laminado,
-            OT_Corte : this.checkedCorte,
-            OT_Doblado : this.doblado,
-            OT_Sellado : this.sellado,
           });
 
           if (itemOt.cyrel == 1) this.checkedCyrel = true;
@@ -1074,7 +1030,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           if (itemOt.corte == 1) this.checkedCorte = true;
           else if (itemOt.corte == 0) this.checkedCorte = false;
 
-          this.FormOrdenTrabajoExtrusion.setValue({
+          this.FormOrdenTrabajoExtrusion.patchValue({
             Material_Extrusion : parseInt(itemOt.extMaterial.trim()),
             Formato_Extrusion : parseInt(itemOt.ptFormatopt.trim()),
             Pigmento_Extrusion : parseInt(itemOt.extPigmento.trim()),
@@ -1168,7 +1124,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             CantidadBulto : data.CantBulto,
             PesoBulto : 0,
           });
-          setTimeout(() => { this.calcularDatosOt(data) }, 500);
+          setTimeout(() => { this.calcularDatosOt(data); }, 1000);
           this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas = itemOt.mezModoNom;
           this.cargarCombinacionMezclas();
         }
@@ -1193,32 +1149,14 @@ export class OrdenesTrabajoComponent implements OnInit {
         if (material == 3) fact = 0.0048;
         else fact = 0.00468;
         this.FormOrdenTrabajoExtrusion.patchValue({
-          Material_Extrusion : this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
-          Formato_Extrusion : this.FormOrdenTrabajoExtrusion.value.Formato_Extrusion,
-          Pigmento_Extrusion : this.FormOrdenTrabajoExtrusion.value.Pigmento_Extrusion,
-          Ancho_Extrusion1 : this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1,
-          Ancho_Extrusion2 : this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2,
-          Ancho_Extrusion3 : this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3,
-          Calibre_Extrusion : this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
-          UnidadMedida_Extrusion : this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
-          Tratado_Extrusion : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
-          Peso_Extrusion : ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd).toFixed(3),
+          Peso_Extrusion : ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd),
         });
       } else {
         largoUnd = 39.3701;
         if (material == 3) fact = 0.0317;
         else fact = 0.0302;
         this.FormOrdenTrabajoExtrusion.patchValue({
-          Material_Extrusion : this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
-          Formato_Extrusion : this.FormOrdenTrabajoExtrusion.value.Formato_Extrusion,
-          Pigmento_Extrusion : this.FormOrdenTrabajoExtrusion.value.Pigmento_Extrusion,
-          Ancho_Extrusion1 : this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1,
-          Ancho_Extrusion2 : this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2,
-          Ancho_Extrusion3 : this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3,
-          Calibre_Extrusion : this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
-          UnidadMedida_Extrusion : this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
-          Tratado_Extrusion : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
-          Peso_Extrusion : ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd).toFixed(3),
+          Peso_Extrusion : ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd),
         });
       }
       //Calcular Peso Producto y Peso Millar
@@ -1438,7 +1376,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       Tratado_Id : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
       Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
     }
-    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(datos_otExtrusion => { });
+    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(datos_otExtrusion => { }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.message); });
   }
 
   //Funcion que va a guardar la informacion de impresion de la orden de trabajo
@@ -1469,7 +1407,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Tinta7_Id : datos_impresion[j].tinta_Id7,
           Tinta8_Id : datos_impresion[j].tinta_Id8,
         }
-        this.otImpresionService.srvGuardar(infoOTImp).subscribe(datos_otImpresion => { });
+        this.otImpresionService.srvGuardar(infoOTImp).subscribe(datos_otImpresion => { }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.message); });
       }
     });
   }
@@ -1488,7 +1426,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       LamCapa_Cantidad2 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
       LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
     }
-    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(datos_laminado => { });
+    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(datos_laminado => { }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.message); });
   }
 
   // Funcion que va a guardar la informacion de la orden de trabajo para sellado y/o corte
@@ -1510,6 +1448,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.CantidadBulto,
       SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
     }
+    this.otSelladoCorteService.post(info).subscribe(datos => { }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado'!`, error.message); });
   }
 
   //Funcion que va a cambiar el estado de un producto a "Activo"
@@ -2596,6 +2535,11 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Funcion que enviará un mensaje de advertencia
   mensajeAdvertencia(text : string){
     Swal.fire({ icon: 'warning', title: 'Advertencia', showCloseButton: true, html: `<b>${text}</b><br>` });
+  }
+
+  // Funcion que devolverá un mensaje de error con la informacion que se le envie
+  mensajeError(text : string, error : string = ''){
+    Swal.fire({icon : 'error', title: 'Opps...', html: `<b>${text}</b>` + `<span style="#f00">${error}</span>`});
   }
 
   //
