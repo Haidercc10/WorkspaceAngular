@@ -426,7 +426,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
           Und : datos_pedido[i].presentacion,
           Precio : this.formatonumeros(datos_pedido[i].precio_Unitario),
           SubTotal : this.formatonumeros(datos_pedido[i].subTotal_Producto),
-          "Fecha Entrega" : datos_pedido[i].fechaEntrega.replace('T00:00:00', ''),
+          "Fecha Entrega" : datos_pedido[i].fecha_Entrega.replace('T00:00:00', ''),
         }
         this.productosPedidos.push(info);
         this.productosPedidos.sort((a,b) => a.Nombre.localeCompare(b.Nombre));

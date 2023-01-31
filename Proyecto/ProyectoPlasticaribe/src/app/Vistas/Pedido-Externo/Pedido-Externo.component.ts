@@ -316,6 +316,7 @@ export class PedidoExternoComponent implements OnInit {
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
     if (direccionSede != null && ciudad != null && clienteNombre != null) {
       this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
+        if (datos_sedeCliente.lengrh == 0) !this.cargando;
         for (let j = 0; j < datos_sedeCliente.length; j++) {
           this.zeusCobtabilidadService.getVistasFavUsuario(datos_sedeCliente[j].sedeCli_CodBagPro).subscribe(datos => {
             if (datos.length == 0) this.cargando = false;
@@ -331,7 +332,7 @@ export class PedidoExternoComponent implements OnInit {
               if (diasCartera >= 70) {
                 this.mensajeAdvertencia(`¡El cliente seleccionado tiene un reporte de ${diasCartera} días en cartera, por lo que no será posible crearle un pedido!`);
                 this.limpiarTodosCampos();
-              }
+              } else this.cargando = false;
             }, 1000);
           }, error => {
             this.mensajeError(`¡Error al consultar la cartera del cliente selecionado!`, error.message);
@@ -340,7 +341,7 @@ export class PedidoExternoComponent implements OnInit {
         }
       }, error => {
         this.mensajeError(`¡Ocurrió un error al consultar el código del cliente seleccionado!`, error.message);
-        !this.cargando;
+        this.cargando = false;
       });
     } else {
       this.mensajeAdvertencia(`¡Llene los campos "Cliente", "Ciudad" y "Dirección" para consultar la cartera del cliente!`);
@@ -602,7 +603,7 @@ export class PedidoExternoComponent implements OnInit {
           SedeCli_Id: datos_sedeCliente[i].sedeCli_Id,
           Usua_Id: datos_sedeCliente[i].usua_Id,
           Estado_Id: 11,
-          PedExt_Observacion: observacion,
+          PedExt_Observacion: observacion.toUpperCase(),
           PedExt_PrecioTotal: this.valorTotal,
           Creador_Id: this.storage_Id,
           PedExt_Descuento: this.FormPedidoExternoClientes.value.PedDescuento,
@@ -650,6 +651,8 @@ export class PedidoExternoComponent implements OnInit {
     let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
     let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    let observacion = this.FormPedidoExternoClientes.get('PedObservacion')?.value;
+    if (observacion == null) observacion = '';
     this.pedidoproductoService.srvObtenerListaPorId(this.pedidoEditar).subscribe(datos => {
       this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
         for (let i = 0; i < datos_sedeCliente.length; i++) {
@@ -662,7 +665,7 @@ export class PedidoExternoComponent implements OnInit {
             SedeCli_Id: datos_sedeCliente[i].sedeCli_Id,
             Usua_Id: datos_sedeCliente[i].usua_Id,
             Estado_Id: 11,
-            PedExt_Observacion: this.FormPedidoExternoClientes.get('PedObservacion')?.value,
+            PedExt_Observacion: observacion.toUpperCase(),
             PedExt_PrecioTotal: this.valorTotal,
             Creador_Id: datos.creador_Id,
             PedExt_Descuento: this.FormPedidoExternoClientes.value.PedDescuento,
@@ -716,7 +719,7 @@ export class PedidoExternoComponent implements OnInit {
           Und : datos_pedido[i].presentacion,
           Precio : this.formatonumeros(datos_pedido[i].precio_Unitario),
           SubTotal : this.formatonumeros(datos_pedido[i].subTotal_Producto),
-          "Fecha Entrega" : datos_pedido[i].fechaEntrega.replace('T00:00:00', ''),
+          "Fecha Entrega" : datos_pedido[i].fecha_Entrega.replace('T00:00:00', ''),
         }
         this.productosPedidos.push(info);
         this.productosPedidos.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
