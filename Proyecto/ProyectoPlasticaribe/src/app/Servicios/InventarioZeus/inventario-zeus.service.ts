@@ -30,7 +30,7 @@ readonly rutaInventarioZeusAPI = rutaZeus;
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/existencias/getExistenciasArticulo/${id}`);
   }
 
-  GetPrecioUltimoPrecioFacturado(producto : string, presentacion : string):Observable<number> {
+  GetPrecioUltimoPrecioFacturado(producto : string, presentacion : string):Observable<any> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/existencias/getPrecioUltimoPrecioFacturado/${producto}/${presentacion}`);
   }
 

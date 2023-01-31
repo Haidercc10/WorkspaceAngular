@@ -15,6 +15,7 @@ import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import Swal from 'sweetalert2';
 import { Reporte_PedidosVendedoresComponent } from '../Reporte_PedidosVendedores/Reporte_PedidosVendedores.component';
 
@@ -67,6 +68,7 @@ export class PedidoExternoComponent implements OnInit {
   productosPedidos : any [] = []; //Variable que se llenará con la información de los productos que se enviaron a la base de datos, los productos serán del ultimo pedido creado
   modalMode : boolean = false; //Variable que será true cuando el componente esté apareciendo en un modal
   pedidoEditar : number = 0; //Variable que alamcenará el numero el pedido que se está editando
+  fechaUltFacuracion : any; //Variable que mostrará la fecha de la ultima facturacion de un producto seleccionado
 
   constructor(private pedidoproductoService : OpedidoproductoService,
                 private productosServices : ProductoService,
@@ -81,7 +83,8 @@ export class PedidoExternoComponent implements OnInit {
                                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                                     private ClientesProductosService : ClientesProductosService,
                                       private zeusService : InventarioZeusService,
-                                        private appComponent : AppComponent,) {
+                                        private appComponent : AppComponent,
+                                          private zeusCobtabilidadService : ZeusContabilidadService,) {
 
     //Campos que vienen del formulario
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
@@ -91,7 +94,7 @@ export class PedidoExternoComponent implements OnInit {
       ciudad_sede: [null, Validators.required],
       PedUsuarioId: [null, Validators.required],
       PedUsuarioNombre: [null, Validators.required],
-      PedFechaEnt: [null, Validators.required],
+      PedFechaEnt: this.today,
       PedEstadoId: 11,
       PedObservacion: '',
       PedDescuento : 0,
@@ -107,6 +110,7 @@ export class PedidoExternoComponent implements OnInit {
        ProdPrecioUnd: [null, Validators.required],
        ProdUltFacturacion : [null, Validators.required],
        ProdStock: [null, Validators.required],
+       ProdFechaEnt: [null, Validators.required],
     });
   }
 
@@ -195,7 +199,7 @@ export class PedidoExternoComponent implements OnInit {
       ciudad_sede: null,
       PedUsuarioNombre: null,
       PedUsuarioId : null,
-      PedFechaEnt: null,
+      PedFechaEnt: this.today,
       PedEstadoId: 11,
       PedObservacion: null,
       PedDescuento : 0,
@@ -277,6 +281,7 @@ export class PedidoExternoComponent implements OnInit {
             PedIva : this.FormPedidoExternoClientes.value.PedIva,
           });
         }
+        this.verificarCartera();
       } else {
         for (const item of this.sedeCliente) {
           this.usuarioVende.push(item.usua_Nombre);
@@ -303,6 +308,46 @@ export class PedidoExternoComponent implements OnInit {
     });
   }
 
+  //Funcion que validará que la sede de cliente escogida no se encuentre reportada en cartera
+  verificarCartera(){
+    this.cargando = true;
+    let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
+    let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
+    let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    if (direccionSede != null && ciudad != null && clienteNombre != null) {
+      this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
+        for (let j = 0; j < datos_sedeCliente.length; j++) {
+          this.zeusCobtabilidadService.getVistasFavUsuario(datos_sedeCliente[j].sedeCli_CodBagPro).subscribe(datos => {
+            if (datos.length == 0) this.cargando = false;
+            let diasCartera : number = 0;
+            for (let i = 0; i < datos.length; i++) {
+              let fechaRadicado : any = datos[i].fecha_Radicado;
+              if (datos[i].fecha_Radicado == null) fechaRadicado = datos[i].lapsO_DOC;
+              let hoy = moment([moment().year(), moment().month(), moment().date()]);
+              let fechaDocumento = moment([moment(fechaRadicado).year(), moment(fechaRadicado).month(), moment(fechaRadicado).date()]);
+              diasCartera += hoy.diff(fechaDocumento, 'days');
+            }
+            setTimeout(() => {
+              if (diasCartera >= 70) {
+                this.mensajeAdvertencia(`¡El cliente seleccionado tiene un reporte de ${diasCartera} días en cartera, por lo que no será posible crearle un pedido!`);
+                this.limpiarTodosCampos();
+              }
+            }, 1000);
+          }, error => {
+            this.mensajeError(`¡Error al consultar la cartera del cliente selecionado!`, error.message);
+            this.limpiarTodosCampos();
+          });
+        }
+      }, error => {
+        this.mensajeError(`¡Ocurrió un error al consultar el código del cliente seleccionado!`, error.message);
+        !this.cargando;
+      });
+    } else {
+      this.mensajeAdvertencia(`¡Llene los campos "Cliente", "Ciudad" y "Dirección" para consultar la cartera del cliente!`);
+      this.cargando = false;
+    }
+  }
+
   // Funcion para cargar los productos de un solo cliente
   productoCliente(){
     this.ClientesProductosService.srvObtenerListaPorNombreCliente(this.FormPedidoExternoClientes.value.PedClienteId).subscribe(datos_clientesProductos => {
@@ -319,7 +364,8 @@ export class PedidoExternoComponent implements OnInit {
     this.producto = [];
     this.presentacion = [];
     this.ultimoPrecio = 0;
-    let idProducto : number = this.FormPedidoExternoProductos.value.ProdNombre;
+    let idProducto : any = this.FormPedidoExternoProductos.value.ProdNombre;
+    if (idProducto == null || idProducto == undefined || idProducto == '') this.productoCliente();
 
     this.zeusService.GetExistenciasArticulo(idProducto.toString()).subscribe(datos_existencis => {
       if (datos_existencis.length != 0) {
@@ -327,7 +373,8 @@ export class PedidoExternoComponent implements OnInit {
           this.existenciasProductosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
             for (let j = 0; j < datos_producto.length; j++) {
               this.zeusService.GetPrecioUltimoPrecioFacturado(idProducto.toString(), datos_producto[j].undMed_Id).subscribe(datos_productoPedido => {
-                this.ultimoPrecio = datos_productoPedido;
+                this.ultimoPrecio = datos_productoPedido.precioUnidad;
+                this.fechaUltFacuracion = datos_productoPedido.fechaDocumento.replace('T00:00:00', '');
               });
 
               setTimeout(() => {
@@ -340,6 +387,7 @@ export class PedidoExternoComponent implements OnInit {
                   ProdPrecioUnd: datos_producto[j].exProd_PrecioVenta.toFixed(2),
                   ProdUltFacturacion: this.formatonumeros(this.ultimoPrecio.toFixed(2)),
                   ProdStock: this.formatonumeros(datos_existencis[i].existencias.toFixed(2)),
+                  ProdFechaEnt : this.FormPedidoExternoProductos.value.ProdFechaEnt,
                 });
               }, 100);
             }
@@ -362,6 +410,7 @@ export class PedidoExternoComponent implements OnInit {
               ProdPrecioUnd: 0,
               ProdUltFacturacion: this.ultimoPrecio,
               ProdStock: 0,
+              ProdFechaEnt : this.FormPedidoExternoProductos.value.ProdFechaEnt,
             });
           }
         });
@@ -392,6 +441,7 @@ export class PedidoExternoComponent implements OnInit {
                   ProdPrecioUnd: datos_producto[j].exProd_PrecioVenta.toFixed(2),
                   ProdUltFacturacion: this.formatonumeros(this.ultimoPrecio.toFixed(2)),
                   ProdStock: this.formatonumeros(datos_existencis[i].existencias.toFixed(2)),
+                  ProdFechaEnt : this.FormPedidoExternoProductos.value.ProdFechaEnt,
                 });
               }, 100);
             }
@@ -414,6 +464,7 @@ export class PedidoExternoComponent implements OnInit {
               ProdPrecioUnd: 0,
               ProdUltFacturacion: this.ultimoPrecio,
               ProdStock: 0,
+              ProdFechaEnt : this.FormPedidoExternoProductos.value.ProdFechaEnt,
             });
           }
         });
@@ -449,6 +500,7 @@ export class PedidoExternoComponent implements OnInit {
             PrecioUnd : precioProducto,
             Stock : this.formatonumeros(this.FormPedidoExternoProductos.get('ProdStock').value),
             SubTotal : this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad,
+            FechaEntrega : this.FormPedidoExternoProductos.value.ProdFechaEnt,
           }
           this.ArrayProducto.push(productoExt);
           this.LimpiarCamposProductos();
@@ -465,6 +517,7 @@ export class PedidoExternoComponent implements OnInit {
               PrecioUnd : precioProducto,
               Stock : this.formatonumeros(this.FormPedidoExternoProductos.get('ProdStock').value),
               SubTotal : (this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad),
+              FechaEntrega : this.FormPedidoExternoProductos.value.ProdFechaEnt,
             }
             this.ArrayProducto.push(productoExt);
             this.LimpiarCamposProductos();
@@ -536,6 +589,8 @@ export class PedidoExternoComponent implements OnInit {
     let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
     let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
+    let observacion = this.FormPedidoExternoClientes.get('PedObservacion')?.value;
+    if (observacion == null) observacion = '';
 
     this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
       for (let i = 0; i < datos_sedeCliente.length; i++) {
@@ -547,7 +602,7 @@ export class PedidoExternoComponent implements OnInit {
           SedeCli_Id: datos_sedeCliente[i].sedeCli_Id,
           Usua_Id: datos_sedeCliente[i].usua_Id,
           Estado_Id: 11,
-          PedExt_Observacion: this.FormPedidoExternoClientes.get('PedObservacion')?.value,
+          PedExt_Observacion: observacion,
           PedExt_PrecioTotal: this.valorTotal,
           Creador_Id: this.storage_Id,
           PedExt_Descuento: this.FormPedidoExternoClientes.value.PedDescuento,
@@ -578,7 +633,8 @@ export class PedidoExternoComponent implements OnInit {
             PedExt_Id: item.pedExt_Id,
             PedExtProd_Cantidad : this.ArrayProducto[index].Cant,
             UndMed_Id : this.ArrayProducto[index].UndCant,
-            PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd
+            PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd,
+            PedExtProd_FechaEntrega : this.ArrayProducto[index].FechaEntrega,
           }
           this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(registro_pedido_productos => {
             Swal.fire({icon: 'success', title: 'Pedido Creado Exitosamente', text: 'El pedido fue creado de manera satisfactoria'});
@@ -600,7 +656,7 @@ export class PedidoExternoComponent implements OnInit {
           const camposPedido : any = {
             PedExt_Id : this.pedidoEditar,
             PedExt_FechaCreacion: datos.pedExt_FechaCreacion,
-            PedExt_FechaEntrega: this.FormPedidoExternoClientes.get('PedFechaEnt')?.value,
+            PedExt_FechaEntrega: datos_sedeCliente[i].pedExt_FechaEntrega,
             Empresa_Id: 800188732,
             PedExt_Codigo: 0,
             SedeCli_Id: datos_sedeCliente[i].sedeCli_Id,
@@ -639,6 +695,7 @@ export class PedidoExternoComponent implements OnInit {
             PedExtProd_Cantidad : this.ArrayProducto[index].Cant,
             UndMed_Id : this.ArrayProducto[index].UndCant,
             PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd,
+            PedExtProd_FechaEntrega : this.ArrayProducto[index].FechaEntrega,
           }
           this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(registro_pedido_productos => { }, error => {
             this.mensajeError('¡No se pudo Editar el pedido, por favor intente de nuevo!', error.message);
@@ -659,6 +716,7 @@ export class PedidoExternoComponent implements OnInit {
           Und : datos_pedido[i].presentacion,
           Precio : this.formatonumeros(datos_pedido[i].precio_Unitario),
           SubTotal : this.formatonumeros(datos_pedido[i].subTotal_Producto),
+          "Fecha Entrega" : datos_pedido[i].fechaEntrega.replace('T00:00:00', ''),
         }
         this.productosPedidos.push(info);
         this.productosPedidos.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
@@ -716,14 +774,14 @@ export class PedidoExternoComponent implements OnInit {
                   [
                     { border: [false, false, false, false], text: `Fecha de pedido` },
                     { border: [false, false, false, true], text: `${datos_pedido[i].fechaCreacion.replace('T00:00:00', '')}` },
-                    { border: [false, false, false, false], text: `Fecha de entrega` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].fechaEntrega.replace('T00:00:00', '')}` },
+                    { border: [false, false, false, false], text: `Estado del pedido` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].estado}` },
                   ],
                   [
                     { border: [false, false, false, false], text: `Vendedor` },
                     { border: [false, false, false, true], text: `${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`, fontSize: 8 },
-                    { border: [false, false, false, false], text: `Estado del pedido` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].estado}` },
+                    {},
+                    {},
                   ],
                 ]
               },
@@ -747,17 +805,17 @@ export class PedidoExternoComponent implements OnInit {
               fontSize: 9,
             },
             { text: `\n\n Información detallada de producto(s) pedido(s) \n `, alignment: 'center', style: 'header' },
-            this.table(this.productosPedidos, ['Id', 'Nombre', 'Cantidad', 'Und', 'Precio', 'SubTotal']),
+            this.table(this.productosPedidos, ['Id', 'Nombre', 'Cantidad', 'Und', 'Fecha Entrega', 'Precio', 'SubTotal']),
             {
               style: 'tablaTotales',
               table: {
-                widths: [256, '*', 98],
+                widths: [275, '*', 98],
                 style: 'header',
                 body: [
                   [
                     '',
                     { border: [true, false, true, true], text: `SUBTOTAL` },
-                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].precio_Total)}` },
+                    { border: [false, false, true, true], text: `$${this.formatonumeros(datos_pedido[i].precio_Total)}` },
                   ],
                   [
                     '',
@@ -767,7 +825,7 @@ export class PedidoExternoComponent implements OnInit {
                   [
                     '',
                     { border: [true, false, true, true], text: `SUBTOTAL DESCUENTO` },
-                    { border: [false, false, true, true], text: `${this.formatonumeros((datos_pedido[i].precio_Total * datos_pedido[i].descuento) / 100)}` },
+                    { border: [false, false, true, true], text: `$${this.formatonumeros((datos_pedido[i].precio_Total * datos_pedido[i].descuento) / 100)}` },
                   ],
                   [
                     '',
@@ -777,12 +835,12 @@ export class PedidoExternoComponent implements OnInit {
                   [
                     '',
                     { border: [true, false, true, true], text: `SUBTOTAL IVA` },
-                    { border: [false, false, true, true], text: `${this.formatonumeros(((datos_pedido[i].precio_Total * datos_pedido[i].iva) / 100))}` },
+                    { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_pedido[i].precio_Total * datos_pedido[i].iva) / 100))}` },
                   ],
                   [
                     '',
                     { border: [true, false, true, true], text: `TOTAL` },
-                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].precio_Final)}` },
+                    { border: [false, false, true, true], text: `$${this.formatonumeros(datos_pedido[i].precio_Final)}` },
                   ]
                 ]
               },
@@ -824,7 +882,7 @@ export class PedidoExternoComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: [50, 197, 50, 50, 50, 98],
+        widths: [40, 177, 40, 30, 51, 50, 98],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 8,

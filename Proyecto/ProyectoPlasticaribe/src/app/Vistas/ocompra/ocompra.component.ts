@@ -317,6 +317,65 @@ export class OcompraComponent implements OnInit {
     } else this.mensajeAdvertencia(`¡Hay Campos Vacios!`);
   }
 
+  // Funcion que va a consultar la información de una orden de compra existente y prepará los campos para que sea editable
+  consultarOrdenCompra(){
+    let ordenCompra : number = this.FormOrdenCompra.value.ConsecutivoOrden;
+    this.dtOrdenCompraService.GetOrdenCompra(ordenCompra).subscribe(datos_orden => {
+      if (datos_orden.length > 0) {
+        this.edicionOrdenCompra = true;
+        this.FormOrdenCompra.reset();
+        this.FormMateriaPrima.reset();
+        this.materiasPrimasSeleccionadas = [];
+        this.catidadTotalPeso = 0;
+        this.cantidadTotalPrecio = 0;
+        this.materiasPrimasSeleccionada_ID = [];
+        this.consecutivoOrdenCompra = 0;
+        this.informacionPDF = [];
+        for (let i = 0; i < datos_orden.length; i++) {
+          this.FormOrdenCompra.setValue({
+            ConsecutivoOrden : ordenCompra,
+            Proveedor : datos_orden[i].proveedor,
+            Id_Proveedor : datos_orden[i].proveedor_Id,
+            Observacion : datos_orden[i].observacion,
+          });
+          break;
+        }
+        for (let i = 0; i < datos_orden.length; i++) {
+          let info : any = {
+            Id : 0,
+            Id_Mp: datos_orden[i].mP_Id,
+            Id_Tinta: datos_orden[i].tinta_Id,
+            Id_Bopp: datos_orden[i].bopp_Id,
+            Nombre : '',
+            Cantidad : datos_orden[i].cantidad,
+            Und_Medida : datos_orden[i].unidad_Medida,
+            Precio : datos_orden[i].precio_Unitario,
+            SubTotal : (datos_orden[i].cantidad * datos_orden[i].precio_Unitario),
+          };
+          if (info.Id_Mp != 84) {
+            info.Id = info.Id_Mp;
+            info.Nombre = datos_orden[i].mp;
+          } else if (info.Id_Tinta != 2001) {
+            info.Id = info.Id_Tinta;
+            info.Nombre = datos_orden[i].tinta;
+          } else if (info.Id_Bopp != 1) {
+            info.Id = info.Id_Bopp;
+            info.Nombre = datos_orden[i].bopp;
+          }
+          this.materiasPrimasSeleccionadas.push(info);
+          this.catidadTotalPeso += datos_orden[i].cantidad;
+          this.cantidadTotalPrecio += (datos_orden[i].cantidad * datos_orden[i].precio_Unitario);
+        }
+      } else {
+        this.mensajeAdvertencia(`¡No se encontraon registros para orden de compra N° ${ordenCompra}!`);
+        this.limpiarTodo();
+      }
+    }, error => {
+      this.mensajeError(`¡No se pudo obtener infroamción de la Orden de Compra N° ${ordenCompra}!`, error.message);
+      this.limpiarTodo();
+    });
+  }
+
   // Funcion que va a crear la orden de compra
   crearOrdenCompra(){
     this.cargando = false;

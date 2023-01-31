@@ -54,10 +54,11 @@
                  <col style="width:100px">
                  <col style="width:180px">
                  <col style="width:120px">
-                 <col style="width:140px">
+                 <col style="width:160px">
+                 <col style="width:150px">
                  <col style="width:60px">
                  <col style="width:80px">
-                 <col style="width:80px">
+                 <col style="width:80px" *ngIf="ValidarRol == 1">
                </colgroup>
             </ng-template>
             <ng-template pTemplate="header">
@@ -95,14 +96,17 @@
                 <th ttResizableColumn style="width: 150px">
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'fechaCreacion', 'contains')">
                 </th>
-                <th ttResizableColumn style="width: 100px">
-                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
+                <th ttResizableColumn style="width: 150px">
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'fechaEntrega', 'contains')">
                 </th>
                 <th ttResizableColumn style="width: 100px">
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
                 </th>
                 <th ttResizableColumn style="width: 100px">
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
+                </th>
+                <th ttResizableColumn style="width: 100px">
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')" *ngIf="ValidarRol == 1">
                 </th>
               </tr>
               <tr>
@@ -139,11 +143,14 @@
                 <th style="text-align: center; font-size: 14px;" ttSortableColumn="fechaCreacion">Fecha Creación
                   <p-treeTableSortIcon field="fechaCreacion"></p-treeTableSortIcon>
                 </th>
+                <th style="text-align: center; font-size: 14px;" ttSortableColumn="fechaCreacion">Fecha Entrega
+                  <p-treeTableSortIcon field="fechaCreacion"></p-treeTableSortIcon>
+                </th>
                 <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo">Editar
                 </th>
                 <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo">Ver PDF
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo">Confirmar
+                <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo" *ngIf="ValidarRol == 1">Confirmar
                 </th>
               </tr>
             </ng-template>
@@ -165,9 +172,16 @@
                 <td scope="col" title="Vendedor">{{data.vendedor}}</td>
                 <td style="text-align: center;" scope="col" title="Subtotal">{{data.costo_Cant_Total | number}}</td>
                 <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaCreacion}}</td>
+                <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaEntrega}}</td>
                 <td style="text-align: center;" scope="col" title="Editar Pedido"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="editarPedido(data)" style="width: 30px; height: 30px;"></button></td>
                 <td style="text-align: center;" scope="col" title="Confirmar Pedido"><button (click)="productosPedido(data.consecutivo)" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" style="width: 30px; height: 30px;"></button></td>
-                <td style="text-align: center;" scope="col" title="Confirmar Pedido"><button (click)="confirmarActualizacion(data.consecutivo)" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button (click)="confirmarActualizacion(data.consecutivo)" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="9" class="text-right">Totales</td>
+                <td colspan="6">{{precioTotalPedidos | currency : 'COP $'}}</td>
               </tr>
             </ng-template>
           </p-treeTable>

@@ -8,6 +8,7 @@ import { AppComponent } from 'src/app/app.component';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
+import { modelOrdenTrabajo_SelladoCorte } from 'src/app/Modelo/modelOrdenTrabajo_Sellado_Corte';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
@@ -23,6 +24,7 @@ import { Orden_TrabajoService } from 'src/app/Servicios/OrdenTrabajo/Orden_Traba
 import { OT_ExtrusionService } from 'src/app/Servicios/OrdenTrabajo_Extrusion/OT_Extrusion.service';
 import { OT_ImpresionService } from 'src/app/Servicios/OrdenTrabajo_Impresion/OT_Impresion.service';
 import { OT_LaminadoService } from 'src/app/Servicios/OrdenTrabajo_Laminado/OT_Laminado.service';
+import { OrdenTrabajo_Sellado_CorteService } from 'src/app/Servicios/OrdenTrabajo_Sellado_Corte/OrdenTrabajo_Sellado_Corte.service';
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
@@ -146,15 +148,16 @@ export class OrdenesTrabajoComponent implements OnInit {
                                             private otExtrusionServie : OT_ExtrusionService,
                                               private otImpresionService : OT_ImpresionService,
                                                 private otLaminadoService : OT_LaminadoService,
-                                                  private mezclaMaterialService : Mezclas_MaterialesService,
-                                                    private mezclaPigmentosService : Mezclas_PigmentosService,
-                                                      private mezclasService : MezclasService,
-                                                        private appComponent : AppComponent,
-                                                          private messageService: MessageService,
-                                                            private productoService : ProductoService,
-                                                              private clienteServise : ClientesService,
-                                                                private tiposProductosService : TipoProductoService,
-                                                                  private tipoSelladoService : TiposSelladoService,) {
+                                                  private otSelladoCorteService : OrdenTrabajo_Sellado_CorteService,
+                                                    private mezclaMaterialService : Mezclas_MaterialesService,
+                                                      private mezclaPigmentosService : Mezclas_PigmentosService,
+                                                        private mezclasService : MezclasService,
+                                                          private appComponent : AppComponent,
+                                                            private messageService: MessageService,
+                                                              private productoService : ProductoService,
+                                                                private clienteServise : ClientesService,
+                                                                  private tiposProductosService : TipoProductoService,
+                                                                    private tipoSelladoService : TiposSelladoService,) {
 
     this.FormOrdenTrabajo = this.frmBuilderPedExterno.group({
       OT_Id: [''],
@@ -1388,11 +1391,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       let infoOT : any = {
         SedeCli_Id : this.FormOrdenTrabajo.value.Id_Sede_Cliente,
         Prod_Id : this.producto,
-        Ot_CantidadKilos : this.cantidadKilos,
-        Ot_CantidadUnidades : this.cantidadKilos + ((this.cantidadKilos * this.FormOrdenTrabajo.value.Margen) / 100),
         Ot_MargenAdicional : this.FormOrdenTrabajo.value.Margen,
-        Ot_CantidadKilos_Margen : cantidadKilosMargen,
-        Ot_CantidadUnidades_Margen : cantidadUnidadesMargen,
         Ot_FechaCreacion : this.today,
         Estado_Id : 4,
         Usua_Id : this.storage_Id,
@@ -1403,6 +1402,11 @@ export class OrdenesTrabajoComponent implements OnInit {
         Mezcla_Id : this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
         UndMed_Id : this.presentacionProducto,
         Ot_Hora : moment().format('H:mm:ss'),
+        Extrusion : this.extrusion,
+        Impresion : this.impresion,
+        Rotograbado : this.rotograbado,
+        Laminado : this.laminado,
+        Sellado : this.sellado,
       }
       this.ordenTrabajoService.srvGuardar(infoOT).subscribe(datos_ot => {
         this.guardarOt_Extrusion(datos_ot.ot_Id);
@@ -1485,6 +1489,27 @@ export class OrdenesTrabajoComponent implements OnInit {
       LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
     }
     this.otLaminadoService.srvGuardar(infoOTLam).subscribe(datos_laminado => { });
+  }
+
+  // Funcion que va a guardar la informacion de la orden de trabajo para sellado y/o corte
+  guardarOt_Sellado_Corte(ordenTrabajo : number){
+    let info : any = {
+      Ot_Id : ordenTrabajo,
+      Corte :  this.checkedCorte,
+      Sellado :  this.sellado,
+      Formato_Id : this.FormOrdenTrabajoSellado.value.Formato_Sellado,
+      SelladoCorte_Ancho : this.FormOrdenTrabajoSellado.value.Ancho_Sellado,
+      SelladoCorte_Largo : this.FormOrdenTrabajoSellado.value.Largo_Sellado,
+      SelladoCorte_Fuelle : this.FormOrdenTrabajoSellado.value.Fuelle_Sellado,
+      SelladoCorte_PesoMillar : this.FormOrdenTrabajoSellado.value.PesoMillar,
+      TpSellado_Id : this.FormOrdenTrabajoSellado.value.TipoSellado,
+      SelladoCorte_PrecioSelladoDia : this.FormOrdenTrabajoSellado.value.PrecioDia,
+      SelladoCorte_PrecioSelladoNoche : this.FormOrdenTrabajoSellado.value.PrecioNoche,
+      SelladoCorte_CantBolsasPaquete : this.FormOrdenTrabajoSellado.value.CantidadPaquete,
+      SelladoCorte_CantBolsasBulto : this.FormOrdenTrabajoSellado.value.PesoPaquete,
+      SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.CantidadBulto,
+      SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
+    }
   }
 
   //Funcion que va a cambiar el estado de un producto a "Activo"

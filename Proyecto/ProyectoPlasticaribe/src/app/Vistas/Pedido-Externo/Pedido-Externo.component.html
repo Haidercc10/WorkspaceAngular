@@ -4,7 +4,7 @@
 
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
-    <span class="visually-hidden">Cargando...</span>
+    <!-- <span>Cargando...</span> -->
   </div>
 </div>
 
@@ -44,7 +44,7 @@
           <div class="row g-3">
             <!-- Cliente -->
             <div class="form-floating col-md">
-              <input formControlName="PedClienteNombre" class="form-control form-control-sm" list="cliente" id="floatingInput" title="Nombre del Cliente" (change)="clienteSeleccionado()">
+              <input formControlName="PedClienteNombre" type="search" class="form-control form-control-sm" list="cliente" id="floatingInput" title="Nombre del Cliente" (change)="clienteSeleccionado()">
               <datalist id="cliente">
                 <option value={{item.cli_Id}} *ngFor="let item of cliente">{{item.cli_Nombre}}</option>
               </datalist>
@@ -53,7 +53,7 @@
 
             <!-- Ciudad -->
             <div class="form-floating col-md-2">
-              <select formControlName="ciudad_sede" type="text" id="floatingSelect" name="ciudad_sede"class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <select formControlName="ciudad_sede" type="text" id="floatingSelect" name="ciudad_sede" (change)="verificarCartera()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="ciudades" *ngFor="let ciudades of ciudad">{{ciudades}}</option>
               </select>
               <label for="floatingSelect">Ciudad(es)</label>
@@ -61,7 +61,7 @@
 
             <!-- Sede Cliente -->
             <div class="form-floating col-md-2">
-              <select formControlName="PedSedeCli_Id" type="text" id="floatingSelect" name="PSedeCli_Id" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+              <select formControlName="PedSedeCli_Id" type="text" id="floatingSelect" name="PSedeCli_Id" (change)="verificarCartera()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
                 <option [ngValue]="sedesclientes" *ngFor="let sedesclientes of sedeCliente">{{sedesclientes}}</option>
               </select>
               <label for="floatingSelect">Dirección Sede</label>
@@ -79,12 +79,6 @@
 
         <div class="mb-5">
           <div class="row g-3">
-            <!-- Fecha pedido -->
-            <div class="form-floating col-md-2">
-              <input formControlName="PedFechaEnt" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido">
-              <label for="floatingInput">Fecha Entrega</label>
-            </div>
-
             <!-- Campo Observacion -->
             <div class="form-floating col-md-6">
               <textarea formControlName="PedObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
@@ -123,21 +117,21 @@
         <div class="mb-3">
           <div class="row g-3">
             <!-- ID Producto -->
-            <div class="form-floating col-md-2">
+            <div class="form-floating col-md">
               <input formControlName="ProdId" type="search" min="0" class="form-control" id="floatingInput" name="PrdId" (keyup.enter)="buscarProductoId()" required >
               <label for="floatingInput">Id Producto</label>
             </div>
 
             <!-- ID/Nombre Producto -->
             <div class="form-floating col-md-4">
-              <input formControlName="ProdNombre" (change)="buscarProducto()" class="form-control form-control-sm" list="producto" id="floatingInput" title="Nombre del Cliente">
+              <input formControlName="ProdNombre" type="search" (change)="buscarProducto()" class="form-control form-control-sm" list="producto" id="floatingInput" title="Nombre del Cliente">
               <datalist id="producto">
                 <option value={{item.prod_Id}} *ngFor="let item of producto">{{item.prod_Nombre}}</option>
               </datalist>
               <label for="floatingInput">Producto</label>
             </div>
 
-            <div class="form-floating col-md-2">
+            <div class="form-floating col-md">
               <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm" id="floatingInput" required>
               <label for="floatingSelect">Cantidad Pedida</label>
             </div>
@@ -151,9 +145,15 @@
             </div>
 
             <!-- Precio Producto -->
-            <div class="form-floating col-md-2">
+            <div class="form-floating col-md">
               <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdPrecioUnd">
               <label for="floatingInput">Precio unitario</label>
+            </div>
+
+            <!-- Fecha Entrega Producto -->
+            <div class="form-floating col-md">
+              <input formControlName="ProdFechaEnt" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido">
+              <label for="floatingInput">Fecha Entrega</label>
             </div>
           </div>
         </div>
@@ -165,6 +165,9 @@
             <div class="form-floating col-md-2">
               <input formControlName="ProdUltFacturacion" type="text" class="form-control form-control-sm" id="floatingInput" name="ProdUltFacturacion" readonly onmousedown="return false;">
               <label for="floatingInput">Ultimo Precio Facturado</label>
+              <div>
+                <label><b>Ult. Facturación: </b>{{fechaUltFacuracion}}</label>
+              </div>
             </div>
 
             <!-- Stock Producto -->
@@ -218,6 +221,7 @@
                   <th id="undMedidaCantidad" scope="col">UndMedCant</th>
                   <th id="precioUnitario" scope="col">PrecioU</th>
                   <th id="Subtotal" scope="col">Subtotal</th>
+                  <th scope="col">Fecha Entrega</th>
                   <th id="acciones" scope="col"></th>
                 </tr>
               </ng-template>
@@ -229,6 +233,7 @@
                   <td>{{listaProductos.UndCant}}</td>
                   <td>{{listaProductos.PrecioUnd | number}}</td>
                   <td>{{listaProductos.SubTotal | number}}</td>
+                  <td>{{listaProductos.FechaEntrega}}</td>
                   <td *ngIf="!modalMode"><a><i class="fa fa-trash" style="cursor: pointer;" title="Quitar Producto de la tabla" (click)="QuitarProductoTabla(listaProductos)"></i></a></td>
                   <td *ngIf="modalMode"><a><i class="fa fa-trash" style="cursor: pointer;" title="Quitar Producto de la tabla" (click)="eliminarProducto(listaProductos)"></i></a></td>
                 </tr>
@@ -280,8 +285,8 @@
 
       <div class="bajarPagina">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" *ngIf="!modalMode" (click)="confirmarPedido()">Crear Pedido</button>
-          <button class=" btn btn-danger btn-danger-sm" type="button" *ngIf="modalMode" (click)="confirmarPedido()">Editar Pedido</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" *ngIf="!modalMode && !cargando" (click)="confirmarPedido()">Crear Pedido</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" *ngIf="modalMode && !cargando" (click)="confirmarPedido()">Editar Pedido</button>
           <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosCampos()">Limpiar Todo</button>
         </div>
       </div>

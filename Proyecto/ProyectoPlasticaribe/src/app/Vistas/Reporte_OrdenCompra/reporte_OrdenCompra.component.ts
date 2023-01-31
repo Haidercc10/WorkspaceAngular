@@ -7,11 +7,7 @@ import { Table } from 'primeng/table';
 import { AppComponent } from 'src/app/app.component';
 import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCompra/DetallesOrdenesCompra.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
-import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
-import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
-import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
 import { OcompraComponent } from '../ocompra/ocompra.component';
 
@@ -43,11 +39,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private estadosService : EstadosService,
                       private dtOrdenCompraService : DetallesOrdenesCompraService,
-                        private appComponent : AppComponent,
-                          private proveedorService : ProveedorService,
-                            private materiaPrimaService : MateriaPrimaService,
-                              private undMedidaService : UnidadMedidaService,
-                                private ordenCompraService : OrdenCompra_MateriaPrimaService,) {
+                        private appComponent : AppComponent,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -208,7 +200,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
         }
       }, error => { this.mensajeError(`¡No se pudo encontrar información con los filtros consultados!`, error.message); });
     }
-    setTimeout(() => { this.cargando = false; }, 10 * size_query);
+    setTimeout(() => { this.cargando = false; }, 2000);
   }
 
   // Funcion que servirá para llenar la tabla que se verá que está en la vista con la informacion que devuelve la consulta

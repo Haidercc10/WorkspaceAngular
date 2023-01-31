@@ -40,6 +40,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
   @ViewChild(PedidoExternoComponent) modalPedidoExterno : PedidoExternoComponent;
   pedidoSelecccionado : number = 0; //Variable que almacenará la informacion del pedido que se desee editar
   productosPedidos : any [] = []; //Variable que se llenará con la información de los productos que se enviaron a la base de datos, los productos serán del ultimo pedido creado
+  precioTotalPedidos : number = 0; //Variable que almacenará el costo total de los pedidos
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
@@ -87,6 +88,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
   pedidoAgrupado(){
     this.load = true;
     this.ArrayDocumento = [];
+    this.precioTotalPedidos = 0;
     this.servicioDtlPedidos.GetPedidosPendientesAgrupados().subscribe(datos_pedidos => {
       for (let i = 0; i < datos_pedidos.length; i++) {
         if (this.ValidarRol == 2){
@@ -120,6 +122,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
       expanded: true,
       "children" : []
     }
+    this.precioTotalPedidos += data.pedExt_PrecioTotalFinal;
     this.ArrayDocumento.push(info);
   }
 
@@ -181,6 +184,19 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
   /** Función que buscara por filtros en la tabla. */
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.tt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    setTimeout(() => {
+      if (this.tt.filteredNodes != null) {
+        this.precioTotalPedidos = 0;
+        for (let i = 0; i < this.tt.filteredNodes.length; i++) {
+          this.precioTotalPedidos += this.tt.filteredNodes[i].data.costo_Cant_Total;
+        }
+      } else {
+        this.precioTotalPedidos = 0;
+        for (let i = 0; i < this.tt._value.length; i++) {
+          this.precioTotalPedidos += this.tt._value[i].data.costo_Cant_Total;
+        }
+      }
+    }, 400);
   }
 
   // Funcion que va a exportar a excel la informacion de los pedidos
@@ -289,7 +305,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         datos[i].data.cant_Pedida,
         datos[i].data.existencias,
         datos[i].data.presentacion,
-        datos[i].data.precioUnidad,
+        datos[i].data.precio,
         datos[i].data.estado,
         datos[i].data.vendedor,
         datos[i].data.costo_Cant_Total,
@@ -410,6 +426,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
           Und : datos_pedido[i].presentacion,
           Precio : this.formatonumeros(datos_pedido[i].precio_Unitario),
           SubTotal : this.formatonumeros(datos_pedido[i].subTotal_Producto),
+          "Fecha Entrega" : datos_pedido[i].fechaEntrega.replace('T00:00:00', ''),
         }
         this.productosPedidos.push(info);
         this.productosPedidos.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
@@ -467,14 +484,14 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
                   [
                     { border: [false, false, false, false], text: `Fecha de pedido` },
                     { border: [false, false, false, true], text: `${datos_pedido[i].fechaCreacion.replace('T00:00:00', '')}` },
-                    { border: [false, false, false, false], text: `Fecha de entrega` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].fechaEntrega.replace('T00:00:00', '')}` },
+                    { border: [false, false, false, false], text: `Estado del pedido` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].estado}` },
                   ],
                   [
                     { border: [false, false, false, false], text: `Vendedor` },
                     { border: [false, false, false, true], text: `${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`, fontSize: 8 },
-                    { border: [false, false, false, false], text: `Estado del pedido` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].estado}` },
+                    {},
+                    {},
                   ],
                 ]
               },
@@ -498,42 +515,42 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
               fontSize: 9,
             },
             { text: `\n\n Información detallada de producto(s) pedido(s) \n `, alignment: 'center', style: 'header' },
-            this.table(this.productosPedidos, ['Id', 'Nombre', 'Cantidad', 'Und', 'Precio', 'SubTotal']),
+            this.table(this.productosPedidos, ['Id', 'Nombre', 'Cantidad', 'Und', 'Fecha Entrega', 'Precio', 'SubTotal']),
             {
               style: 'tablaTotales',
               table: {
-                widths: [256, '*', 98],
+                widths: [275, '*', 98],
                 style: 'header',
                 body: [
                   [
                     '',
                     { border: [true, false, true, true], text: `SUBTOTAL` },
-                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].precio_Total.toFixed(2))}` },
+                    { border: [false, false, true, true], text: `$${this.formatonumeros(datos_pedido[i].precio_Total)}` },
                   ],
                   [
                     '',
                     { border: [true, false, true, true], text: `DESCUENTO (%)` },
-                    { border: [false, false, true, true], text: `${datos_pedido[i].descuento.toFixed(2)}%` },
+                    { border: [false, false, true, true], text: `${datos_pedido[i].descuento}%` },
                   ],
                   [
                     '',
                     { border: [true, false, true, true], text: `SUBTOTAL DESCUENTO` },
-                    { border: [false, false, true, true], text: `${this.formatonumeros(((datos_pedido[i].precio_Total * datos_pedido[i].descuento) / 100).toFixed(2))}` },
+                    { border: [false, false, true, true], text: `$${this.formatonumeros((datos_pedido[i].precio_Total * datos_pedido[i].descuento) / 100)}` },
                   ],
                   [
                     '',
                     { border: [true, false, true, true], text: `IVA (%)` },
-                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].iva.toFixed(2))}%` },
+                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].iva)}%` },
                   ],
                   [
                     '',
                     { border: [true, false, true, true], text: `SUBTOTAL IVA` },
-                    { border: [false, false, true, true], text: `${this.formatonumeros(((datos_pedido[i].precio_Total * datos_pedido[i].iva) / 100).toFixed(2))}` },
+                    { border: [false, false, true, true], text: `$${this.formatonumeros(((datos_pedido[i].precio_Total * datos_pedido[i].iva) / 100))}` },
                   ],
                   [
                     '',
                     { border: [true, false, true, true], text: `TOTAL` },
-                    { border: [false, false, true, true], text: `${this.formatonumeros(datos_pedido[i].precio_Final.toFixed(2))}` },
+                    { border: [false, false, true, true], text: `$${this.formatonumeros(datos_pedido[i].precio_Final)}` },
                   ]
                 ]
               },
@@ -575,7 +592,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: [50, 197, 50, 50, 50, 98],
+        widths: [40, 177, 40, 30, 51, 50, 98],
         body: this.buildTableBody(data, columns),
       },
       fontSize: 8,
