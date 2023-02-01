@@ -17,7 +17,7 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { ZeusContabilidadService } from 'src/app/Servicios/Zeus_Contabilidad/zeusContabilidad.service';
 import Swal from 'sweetalert2';
-import { Reporte_PedidosVendedoresComponent } from '../Reporte_PedidosVendedores/Reporte_PedidosVendedores.component';
+import { ReportePedidos_ZeusComponent } from '../ReportePedidos_Zeus/ReportePedidos_Zeus.component';
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +31,7 @@ import { Reporte_PedidosVendedoresComponent } from '../Reporte_PedidosVendedores
 
 export class PedidoExternoComponent implements OnInit {
 
-  @ViewChild(Reporte_PedidosVendedoresComponent) modalReporte_PedidosVendedoresComponent : Reporte_PedidosVendedoresComponent;
+  @ViewChild(ReportePedidos_ZeusComponent) modalReporte_PedidosVendedoresComponent : ReportePedidos_ZeusComponent;
 
   public FormPedidoExternoClientes !: FormGroup; //Formulario de pedidos cliente
   public FormPedidoExternoProductos!: FormGroup; //Formuladio de pedidos productos
@@ -64,7 +64,7 @@ export class PedidoExternoComponent implements OnInit {
   valorfinal : number = 0; //VAlor final menos em iva y el descuento
   productoEliminado : number; //Variable que tendrá el id de un producto que se va a eliminar de la base de datos o de un pedido nuevo
   ultimoPrecio : number = 0; //Variable que almacenará el ultimo precio por el que se facturó un producto
-  checked = false; //Variable que va a almancenar la información de si el pedido lleva iva o no
+  checked = true; //Variable que va a almancenar la información de si el pedido lleva iva o no
   productosPedidos : any [] = []; //Variable que se llenará con la información de los productos que se enviaron a la base de datos, los productos serán del ultimo pedido creado
   modalMode : boolean = false; //Variable que será true cuando el componente esté apareciendo en un modal
   pedidoEditar : number = 0; //Variable que alamcenará el numero el pedido que se está editando
@@ -117,6 +117,7 @@ export class PedidoExternoComponent implements OnInit {
   ngOnInit(): void {
     this.clientesComboBox();
     this.lecturaStorage();
+    this.checkboxIva();
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -143,7 +144,7 @@ export class PedidoExternoComponent implements OnInit {
 
   // Funcion que va a dar un valor a la variable iva dependiendo de si fue seleccionada o no la casilla del iva
   checkboxIva(){
-    if (!this.checked) this.iva = 19;
+    if (this.checked) this.iva = 19;
     else {
       this.iva = 0;
       this.valorMenosIva = 0;
@@ -188,7 +189,7 @@ export class PedidoExternoComponent implements OnInit {
     this.valorTotal = 0;
     this.descuento = 0;
     this.valorMenosDescuento = 0;
-    this.iva = 0;
+    this.iva = 19;
     this.valorMenosIva = 0;
     this.valorfinal = 0;
     this.pedidosProductos = [];
@@ -228,15 +229,17 @@ export class PedidoExternoComponent implements OnInit {
 
   // Funcion que va a buscar el cliente seleccionado
   clienteSeleccionado(){
-    this.clientesService.srvObtenerListaPorId(this.FormPedidoExternoClientes.value.PedClienteNombre).subscribe(datos => {
-      this.FormPedidoExternoClientes.patchValue({
-        PedClienteNombre: datos.cli_Nombre,
-        PedClienteId : datos.cli_Id,
-      });
-      setTimeout(() => {
-        this.ciudadClienteComboBox();
-        this.productoCliente();
-      }, 100);
+    this.clientesService.srvObtenerListaPorNombreCliente(this.FormPedidoExternoClientes.value.PedClienteNombre).subscribe(datos => {
+      for (let i = 0; i < datos.length; i++) {
+        this.FormPedidoExternoClientes.patchValue({
+          PedClienteNombre: datos[i].cli_Nombre,
+          PedClienteId : datos[i].cli_Id,
+        });
+        setTimeout(() => {
+          this.ciudadClienteComboBox();
+          this.productoCliente();
+        }, 100);
+      }
     });
   }
 
@@ -669,10 +672,9 @@ export class PedidoExternoComponent implements OnInit {
           this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(data=> {
             this.editarDetallesPedido();
             setTimeout(() => {
-              this.limpiarTodosCampos();
               Swal.fire({icon: 'success', title: 'Pedido Editado Exitosamente', text: 'El pedido fue Editado de manera satisfactoria'});
-              this.modalReporte_PedidosVendedoresComponent.cargarPedidosPendientes();
               this.productosPedido(this.pedidoEditar);
+              this.limpiarTodosCampos();
             }, 2000);
           }, error => { this.mensajeError('¡No se pudo editar el pedido, por favor intente de nuevo!', error.message); });
         }

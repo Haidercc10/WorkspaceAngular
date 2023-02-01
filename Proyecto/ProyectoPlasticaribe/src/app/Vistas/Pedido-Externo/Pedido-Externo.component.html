@@ -46,7 +46,7 @@
             <div class="form-floating col-md">
               <input formControlName="PedClienteNombre" type="search" class="form-control form-control-sm" list="cliente" id="floatingInput" title="Nombre del Cliente" (change)="clienteSeleccionado()">
               <datalist id="cliente">
-                <option value={{item.cli_Id}} *ngFor="let item of cliente">{{item.cli_Nombre}}</option>
+                <option value={{item.cli_Nombre}} *ngFor="let item of cliente">{{item.cli_Id}}</option>
               </datalist>
               <label for="floatingInput">Cliente</label>
             </div>
@@ -94,8 +94,8 @@
             <!-- Iva -->
             <div class="form-floating col-md">
               <div class="field-checkbox" style="padding: 10%;">
-                <p-checkbox formControlName="PedIva" [(ngModel)]="checked" (click)="checkboxIva()" [binary]="true" inputId="binary"></p-checkbox>
-                <label for="binary">&nbsp;&nbsp;IVA(%)</label>
+                <p-checkbox formControlName="PedIva" [(ngModel)]="checked" (click)="checkboxIva()" [binary]="true"></p-checkbox>
+                <label>&nbsp;&nbsp;IVA(%)</label>
               </div>
             </div>
           </div>

@@ -245,7 +245,7 @@ export const routes: Routes = [
  {path: 'mantenimiento-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
 
 /*********************************************************************** REPORTE PEDIDOS ZEUS *****************************************************************/
- {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,60]}, component: ReportePedidos_ZeusComponent},
+ {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: ReportePedidos_ZeusComponent},
 
  /*************************************************************** DESPERDICIO *********************************************************************************/
   {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1, 12]}, component: DesperdicioComponent},

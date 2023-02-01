@@ -12,6 +12,7 @@ import * as fs from 'file-saver';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { Workbook } from 'exceljs';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 
 @Component({
   selector: 'app-Reporte_PedidosVendedores',
@@ -41,13 +42,18 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
   pedidoSelecccionado : number = 0; //Variable que almacenará la informacion del pedido que se desee editar
   productosPedidos : any [] = []; //Variable que se llenará con la información de los productos que se enviaron a la base de datos, los productos serán del ultimo pedido creado
   precioTotalPedidos : number = 0; //Variable que almacenará el costo total de los pedidos
+  arrayPedidosIndividuales : any = [];
+  costoCantidadTotal : number = 0;
+  costoCantidadPendiente : number = 0;
+
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
                   private appComponent : AppComponent,
                     private servicioDtlPedidos : PedidoProductosService,
                       private pedidoExternoService : OpedidoproductoService,
-                        private servicioZeus : InventarioZeusService) { }
+                        private servicioZeus : InventarioZeusService,
+                          private estadosProcesos_OTService : EstadosProcesos_OTService,) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -96,6 +102,181 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         } else if (this.ValidarRol == 1 || this.ValidarRol == 60) this.llenarPedidosAgrupado(datos_pedidos[i]);
       }
     });
+    this.consultarPedidos();
+  }
+
+  // Funcion que va a consultar los pedidos de zeus
+  consultarPedidos(){
+    this.load = true;
+    this.ArrayDocumento = [];
+
+    this.servicioZeus.GetPedidosAgrupados().subscribe(datos_pedidos => {
+      for (let i = 0; i < datos_pedidos.length; i++) {
+        this.llenarTablaAgrupada(datos_pedidos[i]);
+      }
+    });
+
+    setTimeout(() => {
+      this.servicioZeus.GetPedidos().subscribe(datos_pedidos => {
+        for (let i = 0; i < datos_pedidos.length; i++) {
+          this.llenarDatosTabla(datos_pedidos[i]);
+          this.ArrayDocumento.sort((a,b) => Number(a.consecutivo) - Number(b.consecutivo));
+        }
+      });
+    }, 1500);
+    setTimeout(() => { this.load = false; }, 2500);
+  }
+
+  // Funcion que va llenar el encabezado de los pedidos, este encabezado tendrá la información general de cada uno de los pedidos
+  llenarTablaAgrupada(datos : any){
+    if(datos.fecha_Creacion == null) datos.fecha_Creacion = datos.fecha_Creacion
+    else datos.fecha_Creacion = datos.fecha_Creacion.replace('T00:00:00', '');
+
+    if(datos.fecha_Entrega == null) datos.fecha_Entrega = datos.fecha_Entrega
+    else datos.fecha_Entrega = datos.fecha_Entrega.replace('T00:00:00', '');
+
+    const info : any = {
+      "data":{
+        "consecutivo": datos.consecutivo,
+        "cliente": datos.cliente,
+        "producto": '',
+        "id_Producto": '',
+        "cant_Pedida": '',
+        "cant_Pendiente": '',
+        "cant_Facturada": '',
+        "existencias": '',
+        "presentacion": '',
+        "estado": datos.estado,
+        "vendedor": datos.vendedor,
+        "precioUnidad" : '',
+        "orden_Compra_CLiente": datos.orden_Compra_CLiente,
+        "costo_Cant_Pendiente": 0,
+        "costo_Cant_Total": 0,
+        "fechaCreacion": datos.fecha_Creacion,
+        "fechaEntrega": datos.fecha_Entrega,
+        "OT" : '',
+        "Proceso_OT": '',
+        "CantPesada" : '',
+        "Estado_OT": '',
+        "CantPedidaKg_OT" : '',
+        "CantPedidaUnd_OT" : '',
+        "ExistenciaMayor" : false,
+        "Cant_Items_ExistenciaMayor" : 0,
+        "Cant_Items" : 0,
+        "Zeus" : 1,
+      },
+      expanded: true,
+      "children":[]
+    }
+    this.ArrayDocumento.push(info);
+  }
+
+  // Funcion que va a llenar de forma detallada cada uno de los productos de cada pedido
+  llenarDatosTabla(datos : any){
+    for (let i = 0; i < this.ArrayDocumento.length; i++) {
+      if (this.ArrayDocumento[i].data.consecutivo == datos.consecutivo) {
+        const dataPedidos : any = {
+          "data":{
+            "consecutivo": datos.consecutivo,
+            "cliente": datos.cliente,
+            "producto": datos.producto,
+            "id_Producto": datos.id_Producto,
+            "cant_Pedida": datos.cant_Pedida,
+            "cant_Pendiente": datos.cant_Pendiente,
+            "cant_Facturada": datos.cant_Facturada,
+            "existencias": datos.existencias,
+            "presentacion": datos.presentacion,
+            "estado": datos.estado,
+            "vendedor": datos.vendedor,
+            "precioUnidad" : this.formatonumeros(datos.precioUnidad.toFixed(2)),
+            "orden_Compra_CLiente": datos.orden_Compra_CLiente,
+            "costo_Cant_Pendiente": datos.costo_Cant_Pendiente.toFixed(2),
+            "costo_Cant_Total": datos.costo_Cant_Total.toFixed(2),
+            "fechaCreacion": datos.fecha_Creacion,
+            "fechaEntrega": datos.fecha_Entrega,
+            "OT" : '',
+            "Proceso_OT": '',
+            "CantPesada" : '',
+            "Estado_OT": '',
+            "CantPedidaKg_OT" : '',
+            "CantPedidaUnd_OT" : '',
+            "ExistenciaMayor" : false,
+            "Zeus" : 1,
+          },
+        }
+        this.precioTotalPedidos += datos.costo_Cant_Total;
+        this.ArrayDocumento[i].data.Cant_Items += 1;
+
+        if (datos.existencias >= datos.cant_Pendiente) {
+          dataPedidos.data.ExistenciaMayor = true;
+          this.ArrayDocumento[i].data.ExistenciaMayor = true;
+          this.ArrayDocumento[i].data.Cant_Items_ExistenciaMayor += 1;
+        }
+
+        this.ArrayDocumento[i].data.costo_Cant_Pendiente += datos.costo_Cant_Pendiente;
+        this.ArrayDocumento[i].data.costo_Cant_Total += datos.costo_Cant_Total;
+
+        this.sumaCostoPendiente += datos.costo_Cant_Pendiente;
+        this.sumaCostoTotal += datos.costo_Cant_Total;
+
+        this.estadosProcesos_OTService.GetOrdenesTrabajo_Pedido(datos.consecutivo).subscribe(datos_orden => {
+          for (let i = 0; i < datos_orden.length; i++) {
+            if (parseInt(datos.id_Producto) == datos_orden[i].prod_Id) {
+              dataPedidos.data.OT = datos_orden[i].estProcOT_OrdenTrabajo;
+              if (datos_orden[i].estProcOT_ExtrusionKg > 0) {
+                dataPedidos.data.Proceso_OT = `Extrusión ${this.formatonumeros(datos_orden[i].estProcOT_ExtrusionKg.toFixed(2))} Kg`;
+                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_ExtrusionKg.toFixed(2);
+              }
+              if (datos_orden[i].estProcOT_ImpresionKg > 0) {
+                dataPedidos.data.Proceso_OT = `Impresión ${this.formatonumeros(datos_orden[i].estProcOT_ImpresionKg.toFixed(2))} Kg`;
+                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_ImpresionKg.toFixed(2);
+              }
+              if (datos_orden[i].estProcOT_RotograbadoKg > 0) {
+                dataPedidos.data.Proceso_OT = `Rotograbado ${this.formatonumeros(datos_orden[i].estProcOT_RotograbadoKg.toFixed(2))} Kg`;
+                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_RotograbadoKg.toFixed(2);
+              }
+              if (datos_orden[i].estProcOT_LaminadoKg > 0) {
+                dataPedidos.data.Proceso_OT = `Laminado ${this.formatonumeros(datos_orden[i].estProcOT_LaminadoKg.toFixed(2))} Kg`;
+                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_LaminadoKg.toFixed(2);
+              }
+              if (datos_orden[i].estProcOT_CorteKg > 0) {
+                dataPedidos.data.Proceso_OT = `Corte - ${this.formatonumeros(datos_orden[i].estProcOT_CorteKg.toFixed(2))} Kg`;
+                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_CorteKg.toFixed(2);
+              }
+              if (datos_orden[i].estProcOT_DobladoKg > 0) {
+                dataPedidos.data.Proceso_OT = `Doblado ${this.formatonumeros(datos_orden[i].estProcOT_DobladoKg.toFixed(2))} Kg`;
+                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_DobladoKg.toFixed(2);
+              }
+              if (datos_orden[i].estProcOT_EmpaqueKg > 0) {
+                dataPedidos.data.Proceso_OT = `Empaque ${this.formatonumeros(datos_orden[i].estProcOT_EmpaqueKg.toFixed(2))} Kg`;
+                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_EmpaqueKg.toFixed(2);
+              }
+              if (datos_orden[i].estProcOT_SelladoKg > 0) {
+                dataPedidos.data.Proceso_OT = `Sellado ${this.formatonumeros(datos_orden[i].estProcOT_SelladoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[i].estProcOT_SelladoKg.toFixed(2))} Kg`;
+                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_SelladoUnd.toFixed(2);
+              }
+              if (datos_orden[i].estProcOT_WiketiadoKg > 0) {
+                dataPedidos.data.Proceso_OT = `Wiketiado ${this.formatonumeros(datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2))} Und - ${this.formatonumeros(datos_orden[i].estProcOT_WiketiadoKg.toFixed(2))} Kg`;
+                dataPedidos.data.CantPesada = datos_orden[i].estProcOT_WiketiadoUnd.toFixed(2);
+              }
+              dataPedidos.data.Estado_OT = datos_orden[i].estado_Id;
+              dataPedidos.data.CantPedidaKg_OT = datos_orden[i].estProcOT_CantidadPedida;
+              dataPedidos.data.CantPedidaUnd_OT = datos_orden[i].estProcOT_CantidadPedidaUnd;
+            }
+          }
+        });
+
+        this.columnas = [
+          { header: 'Precio U.', field: 'precioUnidad', type : 'number' },
+          { header: 'OC Cliente', field: 'orden_Compra_CLiente'},
+          { header: 'Fecha Creación', field: 'fecha_Creacion', type : 'date'},
+          { header: 'Fecha Entrega', field: 'fecha_Entrega',  type : 'date'},
+        ];
+        this.ArrayDocumento[i].children.push(dataPedidos);
+        this.ArrayDocumento.sort((a,b) => Number(a.data.consecutivo) - Number(b.data.consecutivo));
+        this.ArrayDocumento.sort((a,b) => Number(b.data.ExistenciaMayor) - Number(a.data.ExistenciaMayor));
+      }
+    }
   }
 
   // Funcion que va a llenar la informacion de los pedidos
@@ -104,7 +285,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
       "data" : {
         "consecutivo": data.pedExt_Id,
         "fechaCreacion" : data.pedExt_FechaCreacion.replace('T00:00:00', ''),
-        "fechaEntrega" : data.pedExt_FechaEntrega.replace('T00:00:00', ''),
+        "fechaEntrega" : '',
         "idCliente": data.cli_Id,
         "cliente": data.cli_Nombre,
         "idProducto ": '',
@@ -118,6 +299,21 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         "idEstado": data.estado_Id,
         "estado": data.estado_Nombre,
         "costo_Cant_Total": (data.pedExt_PrecioTotalFinal),
+        "id_Producto": '',
+        "cant_Pendiente": '',
+        "cant_Facturada": '',
+        "precioUnidad" : '',
+        "orden_Compra_CLiente": '',
+        "OT" : '',
+        "Proceso_OT": '',
+        "CantPesada" : '',
+        "Estado_OT": '',
+        "CantPedidaKg_OT" : '',
+        "CantPedidaUnd_OT" : '',
+        "ExistenciaMayor" : false,
+        "Cant_Items_ExistenciaMayor" : 0,
+        "Cant_Items" : 0,
+        "Zeus" : 0,
       },
       expanded: true,
       "children" : []
@@ -136,7 +332,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
               "data" : {
                 "consecutivo": datos_pedidos[i].pedExt_Id,
                 "fechaCreacion" : datos_pedidos[i].pedExt_FechaCreacion.replace('T00:00:00', ''),
-                "fechaEntrega" : datos_pedidos[i].pedExt_FechaEntrega.replace('T00:00:00', ''),
+                "fechaEntrega" : datos_pedidos[i].pedExtProd_FechaEntrega.replace('T00:00:00', ''),
                 "idCliente": datos_pedidos[i].cli_Id,
                 "cliente": datos_pedidos[i].cli_Nombre,
                 "idProducto ": datos_pedidos[i].prod_Id,
@@ -150,6 +346,21 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
                 "idEstado": datos_pedidos[i].estado_Id,
                 "estado": datos_pedidos[i].estado_Nombre,
                 "costo_Cant_Total": (datos_pedidos[i].pedExtProd_Cantidad * datos_pedidos[i].exProd_PrecioVenta),
+                "id_Producto": '',
+                "cant_Pendiente": '',
+                "cant_Facturada": '',
+                "precioUnidad" : '',
+                "orden_Compra_CLiente": '',
+                "OT" : '',
+                "Proceso_OT": '',
+                "CantPesada" : '',
+                "Estado_OT": '',
+                "CantPedidaKg_OT" : '',
+                "CantPedidaUnd_OT" : '',
+                "ExistenciaMayor" : false,
+                "Cant_Items_ExistenciaMayor" : 0,
+                "Cant_Items" : 0,
+                "Zeus" : 0,
               }
             }
             if(datos_pedidos[i].undMed_Id == 'Und') datos_pedidos[i].undMed_Id = 'UND';
@@ -331,6 +542,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
     Swal.fire({ icon: 'error', title: 'Confirmación', html: mensaje, confirmButtonColor: '#d83542', confirmButtonText: 'Aceptar', });
   }
 
+  //
   confirmarActualizacion(item : any){
     Swal.fire({
       icon: 'warning',
@@ -368,6 +580,47 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         setTimeout(() => { this.cargarPedidosPendientes(); }, 1000);
         setTimeout(() => { this.cargarPedidosPendientes(); }, 100);
       }, error => { this.mostrarError(`No fue posible aceptar el pedido ${item}, por favor, verifique!`); });
+    });
+  }
+
+  //
+  confirmarCancelacion(item : any){
+    Swal.fire({
+      icon: 'warning',
+      title: 'Advertencia',
+      text: 'Está seguro que desea cancelar el pedido?',
+      showCancelButton: true,
+      confirmButtonText: 'Confirmar',
+      confirmButtonColor: '#53CC48',
+    }).then((result) => {
+      if (result.isConfirmed) this.cancelarPedido(item);
+    });
+  }
+
+  /** Aceptar Pedido para luego crearlo en Zeus */
+  cancelarPedido(item : any){
+    this.pedidoExternoService.srvObtenerListaPorId(item).subscribe(dataPedidos => {
+      const info : any = {
+        PedExt_Id : dataPedidos.pedExt_Id,
+        PedExt_Codigo : dataPedidos.pedExt_Codigo,
+        PedExt_FechaCreacion : dataPedidos.pedExt_FechaCreacion,
+        PedExt_FechaEntrega : dataPedidos.pedExt_FechaEntrega,
+        Empresa_Id : dataPedidos.empresa_Id,
+        SedeCli_Id : dataPedidos.sedeCli_Id,
+        Estado_Id : 4,
+        PedExt_Observacion : dataPedidos.pedExt_Observacion,
+        Usua_Id : dataPedidos.usua_Id,
+        PedExt_Descuento : dataPedidos.pedExt_Descuento,
+        PedExt_Iva : dataPedidos.pedExt_Iva,
+        PedExt_PrecioTotalFinal : dataPedidos.pedExt_PrecioTotalFinal,
+        PedExt_HoraCreacion: dataPedidos.pedExt_HoraCreacion,
+        Creador_Id : dataPedidos.creador_Id,
+      }
+      this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
+        this.Confirmacion(`Pedido Nro. ${item} cancelado con exito!`);
+        setTimeout(() => { this.cargarPedidosPendientes(); }, 1000);
+        setTimeout(() => { this.cargarPedidosPendientes(); }, 100);
+      }, error => { this.mostrarError(`No fue posible cancelar el pedido ${item}, por favor, verifique!`); });
     });
   }
 
@@ -567,6 +820,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
         pdf.open();
+        this.Confirmacion(`¡PDF generado con éxito!`);
         break;
       }
     });
@@ -594,6 +848,185 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         headerRows: 1,
         widths: [40, 177, 40, 30, 51, 50, 98],
         body: this.buildTableBody(data, columns),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+    };
+  }
+
+  /** Llenar array al momento de seleccionar VER PDF */
+  llenarArrayPdf(item : any){
+    this.arrayPedidosIndividuales = [];
+    this.servicioZeus.getPedidosXConsecutivo(item.consecutivo).subscribe(dataPedidos => {
+      for (let index = 0; index < dataPedidos.length; index++) {
+        this.tablaPedidos(dataPedidos[index]);
+      }
+    });
+  }
+
+  /** LLenar array para mostrar info en PDF */
+  tablaPedidos(datos : any){
+    const dataPedidos : any = {
+      consecutivo: datos.consecutivo,
+      cliente: datos.cliente,
+      Producto: datos.producto,
+      Cant_Pedida: this.formatonumeros(datos.cant_Pedida),
+      Pendiente: this.formatonumeros(datos.cant_Pendiente),
+      Facturada: this.formatonumeros(datos.cant_Facturada),
+      Stock: this.formatonumeros(datos.existencias),
+      Und: datos.presentacion,
+      Estado: datos.estado,
+      Vendedor: datos.vendedor,
+      precioUnidad : this.formatonumeros(datos.precioUnidad),
+      orden_Compra_CLiente: datos.orden_Compra_CLiente,
+      Costo_Pendiente: this.formatonumeros(datos.costo_Cant_Pendiente),
+      Costo_Total: this.formatonumeros(datos.costo_Cant_Total),
+      Costo_Pendiente1 : datos.costo_Cant_Pendiente,
+      Costo_Total1 : datos.costo_Cant_Total,
+      fecha_Creacion: datos.fecha_Creacion,
+      fecha_Entrega: datos.fecha_Entrega,
+    }
+    this.arrayPedidosIndividuales.push(dataPedidos);
+    this.calcularTotales();
+    //this.mostrarPedidoPdf(dataPedidos);
+  }
+
+  /** Calcular valores de costos en cantidad total/pendiente. */
+  calcularTotales(){
+    this.costoCantidadPendiente = 0;
+    this.costoCantidadTotal = 0;
+
+    for (let index = 0; index < this.arrayPedidosIndividuales.length; index++) {
+      this.costoCantidadTotal += this.arrayPedidosIndividuales[index].Costo_Total1;
+      this.costoCantidadPendiente +=this.arrayPedidosIndividuales[index].Costo_Pendiente1;
+    }
+  }
+
+  /** Mostrar el PDF que contiene la información detallada del pedido. */
+  mostrarPedidoPdf(item : any){
+    this.llenarArrayPdf(item);
+    let usuario : string = this.storage.get('Nombre');
+    this.servicioZeus.getPedidosXConsecutivo(item.consecutivo).subscribe(dataPedidos => {
+      for (let index = 0; index < dataPedidos.length; index++) {
+        const infoPdf : any = {
+          info: { title: `Pedido Nro.  ${item.consecutivo}` },
+          pageSize: { width: 630, height: 760 },
+          footer: function(currentPage : any, pageCount : any) {
+            return [
+              '\n',
+              {
+                columns: [
+                  { text: `Reporte generado por ${usuario}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                  { text: `${currentPage.toString()} de ${pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                ]
+              }
+            ]
+          },
+          content : [
+            {
+              columns: [
+                { image : this.appComponent.logoParaPdf, width : 100, height : 80 },
+                { text: `Pedido Zeus Nro. ${item.consecutivo}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
+              ]
+            },
+            '\n \n',
+            {
+              style: 'tablaEmpresa',
+              table: {
+                widths: [90, '*', 90, '*'],
+                style: 'header',
+                body: [
+                  [
+                    { border: [false, false, false, false], text: `Nombre Empresa` },
+                    { border: [false, false, false, true], text: `${dataPedidos[index].empresa}` },
+                    { border: [false, false, false, false], text: `Ciudad` },
+                    { border: [false, false, false, true], text: `${dataPedidos[index].ciudad_Empresa}` },
+                  ],
+                  [
+                    { border: [false, false, false, false], text: `NIT` },
+                    { border: [false, false, false, true], text: `${dataPedidos[index].nit}` },
+                    { border: [false, false, false, false], text: `Dirección` },
+                    { border: [false, false, false, true], text: `${dataPedidos[index].direccion}` },
+                  ],
+                ]
+              },
+              layout: { defaultBorder: false, },
+              fontSize: 9,
+            },
+            '\n',
+            {
+              text: `\n Información general del Pedido \n \n`,
+              alignment: 'center',
+              style: 'subtitulo'
+            },
+            {
+              style: 'tablaCliente',
+              table: {
+                widths: ['*', '*', '*'],
+                style: 'subtitulo',
+                body: [
+                  [ `NIT Cliente: ${dataPedidos[index].id_Cliente}`, `Nombre: ${dataPedidos[index].cliente}`, `Ciudad: ${dataPedidos[index].ciudad}`, ],
+                  [ `Fecha Creación: ${dataPedidos[index].fecha_Creacion.replace('T00:00:00', '')}`, `Vendedor : ${dataPedidos[index].vendedor}`, `OC: ${dataPedidos[index].orden_Compra_CLiente}` ],
+                ]
+              },
+              layout: 'lightHorizontalLines',
+              fontSize: 11,
+            },'\n \n',
+            {
+              text: `Información detallada del Pedido\n `,
+              alignment: 'center',
+              style: 'subtitulo'
+            },
+            this.table2(this.arrayPedidosIndividuales, ['Producto', 'Cant_Pedida', 'Pendiente', 'Facturada', 'Stock', 'Und', 'Costo_Pendiente', 'Costo_Total', 'Estado' ]),
+            {
+              style: 'texto',
+              table: {
+                widths: [110, 45, 40, 40, 40, 20, 65, 60, 50],
+                style: 'texto',
+                body: [
+                  [
+                    {text: '', colSpan : 4 , border : [false, false, false, false]},
+                    {},
+                    {},
+                    {},
+                    {text : 'Totales', colSpan : 2,  alignment : 'right',  border : [true, false, true, true] },
+                    {},
+                    {text: this.formatonumeros(this.costoCantidadPendiente.toFixed(2)), border: [true, false, true, true]},
+                    {text: this.formatonumeros(this.costoCantidadTotal.toFixed(2)), border: [true, false, true, true]},
+                    {text: '', border : [false, false, false, false] },
+                  ],
+                ]
+              },
+            }
+          ],
+          styles: {
+            header: { fontSize: 10, bold: true },
+            texto: { fontSize: 8, },
+            titulo: { fontSize: 20, bold: true },
+            subtitulo: { fontSize: 14, bold: true }
+          }
+         }
+         const pdf = pdfMake.createPdf(infoPdf);
+         pdf.open();
+         this.load = false;
+         this.Confirmacion(`¡PDF generado con éxito!`);
+         break;
+      }
+    });
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información
+  table2(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: [110, 45, 40, 40, 40, 20, 65, 60, 50],
+        body: this.buildTableBody(data, columns)
       },
       fontSize: 8,
       layout: {

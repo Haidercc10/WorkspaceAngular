@@ -59,6 +59,7 @@
                  <col style="width:60px">
                  <col style="width:80px">
                  <col style="width:80px" *ngIf="ValidarRol == 1">
+                 <col style="width:80px" *ngIf="ValidarRol == 1">
                </colgroup>
             </ng-template>
             <ng-template pTemplate="header">
@@ -108,6 +109,9 @@
                 <th ttResizableColumn style="width: 100px">
                   <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')" *ngIf="ValidarRol == 1">
                 </th>
+                <th ttResizableColumn style="width: 100px">
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')" *ngIf="ValidarRol == 1">
+                </th>
               </tr>
               <tr>
                 <th style="text-align: center; width: max-content; font-size: 14px;" ttSortableColumn="consecutivo">Pedido
@@ -146,37 +150,116 @@
                 <th style="text-align: center; font-size: 14px;" ttSortableColumn="fechaCreacion">Fecha Entrega
                   <p-treeTableSortIcon field="fechaCreacion"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo">Editar
-                </th>
                 <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo">Ver PDF
                 </th>
+                <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo">Editar
+                </th>
                 <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo" *ngIf="ValidarRol == 1">Confirmar
+                </th>
+                <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo" *ngIf="ValidarRol == 1">Cancelar
                 </th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-rowNode let-data="rowData">
-              <tr>
-                <td style="text-align: center;" scope="col" title="N° Pedido">
-                  <p-treeTableToggler [rowNode]="rowNode" ></p-treeTableToggler>
-                  {{data.consecutivo}}
-                </td>
-                <td scope="col" title="Cliente">{{data.cliente}}</td>
-                <td scope="col" title="Item">{{data.producto}}</td>
-                <td style="text-align: center;" scope="col" title="Cantidad Pedida">{{data.cant_Pedida | number : '1.2-2'}}</td>
-                <ng-container *ngIf="data.existencias > data.cant_Pedida; then verde else blanco"></ng-container>
-                <ng-template #verde><td style="text-align: center; background-color: #ABEBC6;" scope="col" title="Existencias">{{data.existencias | number : '1.2-2'}}</td></ng-template>
-                <ng-template #blanco><td style="text-align: center;" scope="col" title="Existencias">{{data.existencias | number : '1.2-2'}}</td></ng-template>
-                <td style="text-align: center;" scope="col" title="Presentación">{{data.presentacion}}</td>
-                <td style="text-align: center;" scope="col" title="Presentación">{{data.precio}}</td>
-                <td style="text-align: center;" scope="col" title="Estado del Pedido">{{data.estado}}</td>
-                <td scope="col" title="Vendedor">{{data.vendedor}}</td>
-                <td style="text-align: center;" scope="col" title="Subtotal">{{data.costo_Cant_Total | number}}</td>
-                <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaCreacion}}</td>
-                <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaEntrega}}</td>
-                <td style="text-align: center;" scope="col" title="Editar Pedido"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="editarPedido(data)" style="width: 30px; height: 30px;"></button></td>
-                <td style="text-align: center;" scope="col" title="Confirmar Pedido"><button (click)="productosPedido(data.consecutivo)" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" style="width: 30px; height: 30px;"></button></td>
-                <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button (click)="confirmarActualizacion(data.consecutivo)" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
-              </tr>
+              <ng-container *ngIf="data.Zeus == 1; then EnZeus; else NoZeus"></ng-container>
+              <ng-template #EnZeus>
+                <ng-container *ngIf="data.ExistenciaMayor; then thenTemplate; else elseTemplate">></ng-container>
+                <ng-template #thenTemplate>
+                  <ng-container *ngIf="data.Cant_Items_ExistenciaMayor < data.Cant_Items; then azul; else verde"></ng-container>
+                  <ng-template #azul>
+                    <tr style="text-align: center; background-color: #ABEBC6;">
+                      <td style="text-align: center;" scope="col" title="N° Pedido">
+                        <p-treeTableToggler [rowNode]="rowNode" ></p-treeTableToggler>
+                        {{data.consecutivo}}
+                      </td>
+                      <td scope="col" title="Cliente">{{data.cliente}}</td>
+                      <td scope="col" title="Item">{{data.producto}}</td>
+                      <td style="text-align: center;" scope="col" title="Cantidad Pedida">{{data.cant_Pedida | number : '1.2-2'}}</td>
+                      <td style="text-align: center;" scope="col" title="Existencias">{{data.existencias | number : '1.2-2'}}</td>
+                      <td style="text-align: center;" scope="col" title="Presentación">{{data.presentacion}}</td>
+                      <td style="text-align: center;" scope="col" title="Presentación">{{data.precio}}</td>
+                      <td style="text-align: center;" scope="col" title="Estado del Pedido">{{data.estado}}</td>
+                      <td scope="col" title="Vendedor">{{data.vendedor}}</td>
+                      <td style="text-align: center;" scope="col" title="Subtotal">{{data.costo_Cant_Total | number}}</td>
+                      <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaCreacion}}</td>
+                      <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaEntrega}}</td>
+                      <td style="text-align: center;" scope="col"><button (click)="mostrarPedidoPdf(data)" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" style="width: 30px; height: 30px;"></button></td>
+                      <td style="text-align: center;" scope="col"></td>
+                      <td style="text-align: center;" scope="col" *ngIf="ValidarRol == 1"></td>
+                      <td style="text-align: center;" scope="col" *ngIf="ValidarRol == 1"></td>
+                    </tr>
+                  </ng-template>
+                  <ng-template #verde>
+                    <tr style="text-align: center; background-color: #ABEBC6;">
+                      <td style="text-align: center;" scope="col" title="N° Pedido">
+                        <p-treeTableToggler [rowNode]="rowNode" ></p-treeTableToggler>
+                        {{data.consecutivo}}
+                      </td>
+                      <td scope="col" title="Cliente">{{data.cliente}}</td>
+                      <td scope="col" title="Item">{{data.producto}}</td>
+                      <td style="text-align: center;" scope="col" title="Cantidad Pedida">{{data.cant_Pedida | number : '1.2-2'}}</td>
+                      <td style="text-align: center;" scope="col" title="Existencias">{{data.existencias | number : '1.2-2'}}</td>
+                      <td style="text-align: center;" scope="col" title="Presentación">{{data.presentacion}}</td>
+                      <td style="text-align: center;" scope="col" title="Presentación">{{data.precio}}</td>
+                      <td style="text-align: center;" scope="col" title="Estado del Pedido">{{data.estado}}</td>
+                      <td scope="col" title="Vendedor">{{data.vendedor}}</td>
+                      <td style="text-align: center;" scope="col" title="Subtotal">{{data.costo_Cant_Total | number}}</td>
+                      <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaCreacion}}</td>
+                      <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaEntrega}}</td>
+                      <td style="text-align: center;" scope="col" title="Confirmar Pedido"><button (click)="mostrarPedidoPdf(data)" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" style="width: 30px; height: 30px;"></button></td>
+                      <td style="text-align: center;" scope="col" title="Editar Pedido"></td>
+                      <td style="text-align: center;" scope="col" *ngIf="ValidarRol == 1"></td>
+                      <td style="text-align: center;" scope="col" *ngIf="ValidarRol == 1"></td>
+                    </tr>
+                  </ng-template>
+                </ng-template>
+                <ng-template #elseTemplate>
+                  <tr>
+                    <td style="text-align: center;" scope="col" title="N° Pedido">
+                      <p-treeTableToggler [rowNode]="rowNode" ></p-treeTableToggler>
+                      {{data.consecutivo}}
+                    </td>
+                    <td scope="col" title="Cliente">{{data.cliente}}</td>
+                    <td scope="col" title="Item">{{data.producto}}</td>
+                    <td style="text-align: center;" scope="col" title="Cantidad Pedida">{{data.cant_Pedida | number : '1.2-2'}}</td>
+                    <td style="text-align: center;" scope="col" title="Existencias">{{data.existencias | number : '1.2-2'}}</td>
+                    <td style="text-align: center;" scope="col" title="Presentación">{{data.presentacion}}</td>
+                    <td style="text-align: center;" scope="col" title="Presentación">{{data.precio}}</td>
+                    <td style="text-align: center;" scope="col" title="Estado del Pedido">{{data.estado}}</td>
+                    <td scope="col" title="Vendedor">{{data.vendedor}}</td>
+                    <td style="text-align: center;" scope="col" title="Subtotal">{{data.costo_Cant_Total | number}}</td>
+                    <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaCreacion}}</td>
+                    <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaEntrega}}</td>
+                    <td style="text-align: center;" scope="col"><button (click)="mostrarPedidoPdf(data)" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" style="width: 30px; height: 30px;"></button></td>
+                    <td style="text-align: center;" scope="col" title="Editar Pedido"></td>
+                    <td style="text-align: center;" scope="col" *ngIf="ValidarRol == 1"></td>
+                    <td style="text-align: center;" scope="col" *ngIf="ValidarRol == 1"></td>
+                  </tr>
+                </ng-template>
+              </ng-template>
+              <ng-template #NoZeus>
+                <tr style="text-align: center; background-color: #FAACAC;">
+                  <td style="text-align: center;" scope="col" title="N° Pedido">
+                    <p-treeTableToggler [rowNode]="rowNode" ></p-treeTableToggler>
+                    {{data.consecutivo}}
+                  </td>
+                  <td scope="col" title="Cliente">{{data.cliente}}</td>
+                  <td scope="col" title="Item">{{data.producto}}</td>
+                  <td style="text-align: center;" scope="col" title="Cantidad Pedida">{{data.cant_Pedida | number : '1.2-2'}}</td>
+                  <td style="text-align: center;" scope="col" title="Existencias">{{data.existencias | number : '1.2-2'}}</td>
+                  <td style="text-align: center;" scope="col" title="Presentación">{{data.presentacion}}</td>
+                  <td style="text-align: center;" scope="col" title="Presentación">{{data.precio}}</td>
+                  <td style="text-align: center;" scope="col" title="Estado del Pedido">{{data.estado}}</td>
+                  <td scope="col" title="Vendedor">{{data.vendedor}}</td>
+                  <td style="text-align: center;" scope="col" title="Subtotal">{{data.costo_Cant_Total | number}}</td>
+                  <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaCreacion}}</td>
+                  <td style="text-align: center;" scope="col" title="Fecha Creación">{{data.fechaEntrega}}</td>
+                  <td style="text-align: center;" scope="col" title="Confirmar Pedido"><button (click)="productosPedido(data.consecutivo)" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" style="width: 30px; height: 30px;"></button></td>
+                  <td style="text-align: center;" scope="col" title="Editar Pedido"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="editarPedido(data)" style="width: 30px; height: 30px;"></button></td>
+                  <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button (click)="confirmarActualizacion(data.consecutivo)" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                  <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button (click)="confirmarCancelacion(data.consecutivo)" pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger mr-2" style="width: 30px; height: 30px;"></button></td>
+                </tr>
+              </ng-template>
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>

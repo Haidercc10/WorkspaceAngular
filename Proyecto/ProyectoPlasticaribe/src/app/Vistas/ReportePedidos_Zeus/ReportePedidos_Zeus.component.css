@@ -268,24 +268,6 @@ p-treeTable::-webkit-scrollbar-thumb:active{
   background-color: #E5E8E8;
 }
 
-@media (min-width: 1000px) {
-  .modal-xl {
-    width: 85%;
-    max-width: none;
-    height: 80%;
-    margin: auto;
-  }
-}
-
-@media screen and (max-width: 576px) {
-  .modal-xl {
-    width: 200%;
-    max-width: none;
-    height: 80%;
-    margin: auto;
-  }
-}
-
 @media (min-width: 1370px){
   .tablaDatos{
     min-width: 1500px;
