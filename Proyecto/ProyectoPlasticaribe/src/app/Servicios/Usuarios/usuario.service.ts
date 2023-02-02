@@ -27,6 +27,11 @@ export class UsuarioService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/Usuarios')
   }
 
+  // Enviará los datos al API para que está valide la existencia del usuario
+  GetLoginUsuario(usuario : number, contrasena : string, empresa : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getLoginUsuario/${usuario}/${contrasena}/${empresa}`);
+  }
+
   srvObtenerListaPorId(id : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/${id}`);
   }

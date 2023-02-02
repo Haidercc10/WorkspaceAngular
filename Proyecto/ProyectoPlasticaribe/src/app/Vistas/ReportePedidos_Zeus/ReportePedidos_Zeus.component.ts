@@ -873,7 +873,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             {
               columns: [
                 { image : this.appComponent.logoParaPdf, width : 100, height : 80 },
-                { text: `Pedido Zeus Nro. ${item.consecutivo}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
+                { text: `Pedido Zeus ${item.consecutivo}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },
             '\n \n',
@@ -999,7 +999,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             {
               columns: [
                 { image : this.appComponent.logoParaPdf, width : 100, height : 80 },
-                { text: `Pedido Nro. ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
+                { text: `Pedido ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },
             '\n \n',
@@ -1010,28 +1010,16 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                 style: 'header',
                 body: [
                   [
-                    { border: [false, false, false, false], text: `NIT` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Id}` },
-                    { border: [false, false, false, false], text: `Nombre Empresa` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa}` },
-                  ],
-                  [
-                    { border: [false, false, false, false], text: `Dirección` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Direccion}` },
-                    { border: [false, false, false, false], text: `Ciudad` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Ciudad}` },
-                  ],
-                  [
+                    { border: [false, false, false, false], text: `Comercial`  },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`, fontSize: 8 },
                     { border: [false, false, false, false], text: `Fecha de pedido` },
                     { border: [false, false, false, true], text: `${datos_pedido[i].fechaCreacion.replace('T00:00:00', '')}` },
-                    { border: [false, false, false, false], text: `Estado del pedido` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].estado}` },
                   ],
                   [
-                    { border: [false, false, false, false], text: `Vendedor` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`, fontSize: 8 },
-                    {},
-                    {},
+                    { border: [false, false, false, false], text: `Estado del pedido` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].estado}` },
+                    { border: [false, false, false, false], text: `Código` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].consecutivo}` },
                   ],
                 ]
               },

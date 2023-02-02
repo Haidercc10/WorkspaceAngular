@@ -476,7 +476,7 @@ export class PedidoExternoComponent implements OnInit {
   }
 
   // Funcion que envia la informacion de los productos a la tabla.
-  cargarFormProductoEnTablas(formulario : any){
+  cargarFormProductoEnTablas(_formulario : any){
     this.cargando = true;
     this.ultimoPrecio = 0;
     let idProducto : number = this.FormPedidoExternoProductos.value.ProdId;
@@ -632,8 +632,9 @@ export class PedidoExternoComponent implements OnInit {
             UndMed_Id : this.ArrayProducto[index].UndCant,
             PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd,
             PedExtProd_FechaEntrega : this.ArrayProducto[index].FechaEntrega,
+            PedExtProd_CantidadFaltante : 0,
           }
-          this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(registro_pedido_productos => {
+          this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(_registro_pedido_productos => {
             Swal.fire({icon: 'success', title: 'Pedido Creado Exitosamente', text: 'El pedido fue creado de manera satisfactoria'});
           }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!', error.message); });
         }
@@ -669,7 +670,7 @@ export class PedidoExternoComponent implements OnInit {
             PedExt_PrecioTotalFinal : this.valorfinal,
             PedExt_HoraCreacion : datos.pedExt_Hora,
           }
-          this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(data=> {
+          this.pedidoproductoService.srvActualizarPedidosProductos(this.pedidoEditar,camposPedido).subscribe(_data=> {
             this.editarDetallesPedido();
             setTimeout(() => {
               Swal.fire({icon: 'success', title: 'Pedido Editado Exitosamente', text: 'El pedido fue Editado de manera satisfactoria'});
@@ -694,8 +695,9 @@ export class PedidoExternoComponent implements OnInit {
             UndMed_Id : this.ArrayProducto[index].UndCant,
             PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd,
             PedExtProd_FechaEntrega : this.ArrayProducto[index].FechaEntrega,
+            PedExtProd_CantidadFaltante : 0,
           }
-          this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(registro_pedido_productos => { }, error => {
+          this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(_registro_pedido_productos => { }, error => {
             this.mensajeError('¡No se pudo Editar el pedido, por favor intente de nuevo!', error.message);
           });
         }
@@ -747,7 +749,7 @@ export class PedidoExternoComponent implements OnInit {
             {
               columns: [
                 { image : this.appComponent.logoParaPdf, width : 100, height : 80 },
-                { text: `Pedido Nro. ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
+                { text: `Pedido ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },
             '\n \n',
@@ -758,28 +760,16 @@ export class PedidoExternoComponent implements OnInit {
                 style: 'header',
                 body: [
                   [
-                    { border: [false, false, false, false], text: `NIT` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Id}` },
-                    { border: [false, false, false, false], text: `Nombre Empresa` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa}` },
-                  ],
-                  [
-                    { border: [false, false, false, false], text: `Dirección` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Direccion}` },
-                    { border: [false, false, false, false], text: `Ciudad` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Ciudad}` },
-                  ],
-                  [
+                    { border: [false, false, false, false], text: `Comercial`  },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`, fontSize: 8 },
                     { border: [false, false, false, false], text: `Fecha de pedido` },
                     { border: [false, false, false, true], text: `${datos_pedido[i].fechaCreacion.replace('T00:00:00', '')}` },
-                    { border: [false, false, false, false], text: `Estado del pedido` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].estado}` },
                   ],
                   [
-                    { border: [false, false, false, false], text: `Vendedor` },
-                    { border: [false, false, false, true], text: `${datos_pedido[i].vendedor_Id} - ${datos_pedido[i].vendedor}`, fontSize: 8 },
-                    {},
-                    {},
+                    { border: [false, false, false, false], text: `Estado del pedido` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].estado}` },
+                    { border: [false, false, false, false], text: `Código` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].consecutivo}` },
                   ],
                 ]
               },
@@ -885,7 +875,7 @@ export class PedidoExternoComponent implements OnInit {
       },
       fontSize: 8,
       layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex, _node, _columnIndex) {
           return (rowIndex == 0) ? '#CCCCCC' : null;
         }
       }
@@ -931,7 +921,7 @@ export class PedidoExternoComponent implements OnInit {
           confirmButtonText: 'Eliminar'
         }).then((result) => {
           if (result.isConfirmed) {
-            this.PedidoProductosService.srvEliminar(data.Id, this.pedidoEditar).subscribe(datos_Eliminados => {
+            this.PedidoProductosService.srvEliminar(data.Id, this.pedidoEditar).subscribe(_datos_Eliminados => {
               for (let i = 0; i < this.ArrayProducto.length; i++) {
                 if (this.ArrayProducto[i].Id == data.Id) {
                   this.ArrayProducto.splice(i, 1);

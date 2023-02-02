@@ -140,6 +140,16 @@ export class LoginComponentComponent implements OnInit {
     } catch (error) { console.log(error); }
   }
 
+  // Funcion que se encargará de enviar al API la información del usuario que desea iniciar sesion y dependiendo de la respuesta de esta se actuará
+  consultaLogin(){
+    let empresa : number = this.formularioUsuario.value.Empresa;
+    let idUsuario : number = this.formularioUsuario.value.Identificacion;
+    let contrasena : string = this.formularioUsuario.value.Contrasena;
+    this.usuarioServices.GetLoginUsuario(123456789, "123456", 800188732).subscribe(data => {
+      console.log(data);
+    }, error => { this.mensajeError(`Las credenciales brindadas son incorrectas o no coninciden, por favor intentelo de nuvo`); });
+  }
+
   consulta_insercionAsistencia(){
     if (!true) Swal.fire({ icon: 'error', title: 'Asistencia Registrada!', text: 'La asistencia de la persona X el día Y ha sido registrado con éxito!' });
     else Swal.fire({ icon: 'error', title: 'Oops...', text: 'No se ha podido registrar su asistencia!' });
@@ -161,6 +171,11 @@ export class LoginComponentComponent implements OnInit {
       password.type = 'password';
       this.mostrarPass = false;
     }
+  }
+
+  // Funcion que mostrará un mensaje de error
+  mensajeError(text : string){
+    Swal.fire({ icon: 'warning', title: 'Oops...', html: `<b>¡${text}!</b><hr> `, });
   }
 
 }
