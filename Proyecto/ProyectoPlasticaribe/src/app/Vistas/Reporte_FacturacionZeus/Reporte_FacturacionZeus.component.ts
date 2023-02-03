@@ -2,7 +2,11 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 
 @Component({
   selector: 'app-Reporte_FacturacionZeus',
@@ -22,13 +26,33 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   arrayClientes : any = []; /** Array que contendrá la información de los clientes */
   arrayItems : any = []; /** Array que contendrá la información de los items */
   arrayVendedores : any = []; /** Array que contendrá la información de los vendedores */
+  anos : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
+  anioActual : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
+  arrayAnios : any = [];
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                  private rolService : RolesService,) { }
+                  private rolService : RolesService,
+                    private servicioUsuarios : UsuarioService,
+                      private servicioClientes : ClientesService,
+                        private servicioProductos : ProductoService,
+                          private servicioZeus : InventarioZeusService) { }
 
   ngOnInit() {
     this.lecturaStorage();
+    this.inicializarFormulario();
+    this.cargarAnios();
+    this.cargarClientes();
+  }
+
+  inicializarFormulario(){
+    this.formFiltros = this.frmBuilder.group({
+      vendedor: [null],
+      cliente: [null],
+      item: [null],
+      anio1: [null],
+      anio2: [null],
+    });
   }
 
   /**Leer storage para validar su rol y mostrar el usuario. */
@@ -51,6 +75,55 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     const exp = /(\d)(?=(\d{3})+(?!\d))/g;
     const rep = '$1,';
     return number.toString().replace(exp,rep);
+  }
+
+  /** Funció para limpiar los campos del formulario */
+  limpiarTodo(){
+    this.formFiltros.reset();
+  }
+
+  /** cargar vendedores al datalist que se encuentra en los filtros de busqueda*/
+  cargarVendedores(){
+    this.arrayVendedores = [];
+    let vendedor : any = this.formFiltros.value.vendedor;
+
+    this.servicioZeus.LikeGetVendedores(vendedor).subscribe(dataUsuarios => {
+      for (let index = 0; index < dataUsuarios.length; index++) {
+        this.arrayVendedores.push(dataUsuarios[index]);
+      }
+    });
+  }
+
+  /** cargar clientes al datalist que se encuentra en los filtros de busqueda*/
+  cargarClientes(){
+    this.arrayClientes = [];
+    let cliente : any = this.formFiltros.value.cliente;
+
+    this.servicioZeus.LikeGetClientes(cliente).subscribe(dataClientes => {
+      for (let index = 0; index < dataClientes.length; index++) {
+        this.arrayClientes.push(dataClientes[index]);
+      }
+    });
+  }
+
+   /** cargar items al datalist que se encuentra en los filtros de busqueda*/
+  cargarProductos(){
+    this.arrayItems = [];
+    let item : any = this.formFiltros.value.item;
+
+    this.servicioZeus.LikeGetItems(item).subscribe(dataItems => {
+      for (let index = 0; index < dataItems.length; index++) {
+        this.arrayItems.push(dataItems[index]);
+      }
+    });
+  }
+
+  /** Función para cargar los años en el combobox de años. */
+  cargarAnios(){
+    this.arrayAnios = [];
+    for (let index = 2019; index < this.anioActual + 1; index++) {
+      this.arrayAnios.push(index);
+    }
   }
 
 }

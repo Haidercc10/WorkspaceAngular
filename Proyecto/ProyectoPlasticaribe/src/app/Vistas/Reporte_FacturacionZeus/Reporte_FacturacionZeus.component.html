@@ -23,7 +23,9 @@
 <div class="container-fluid">
   <div class="container">
 
-
+    <div class="mb-4">
+      <h3 class="tituloRojo">Filtros de búsqueda</h3>
+    </div>
       <!-- Formulario para consultar filtros -->
       <form [formGroup]="formFiltros">
 
@@ -32,16 +34,16 @@
           <div class="row g-3">
 
              <!-- Vendedores -->
-             <div class="form-floating col-md-4">
-              <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" required>
-              <datalist id="clientes">
+             <div class="form-floating col-md">
+              <input formControlName="vendedor" class="form-control form-control-sm" list="vendedores" id="floatingInput" required>
+              <datalist id="vendedores">
                 <option value={{item.vendedor}} *ngFor="let item of arrayVendedores">{{item.nombreVendedor}}</option>
               </datalist>
               <label for="floatingInput">Vendedor</label>
             </div>
 
             <!-- Clientes -->
-            <div class="form-floating col-md-3">
+            <div class="form-floating col-md">
               <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" required> <!--(keyup)="likeCargarProductos()" (change)="seleccionarProducto()"-->
               <datalist id="clientes">
                 <option value={{item.cliente}} *ngFor="let item of arrayClientes">{{item.nombreCliente}}</option>
@@ -50,20 +52,45 @@
             </div>
 
             <!-- Items -->
-            <div class="form-floating col-md-4">
-              <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" required> <!--(keyup)="likeCargarProductos()" (change)="seleccionarProducto()"-->
-              <datalist id="clientes">
+            <div class="form-floating col-md">
+              <input formControlName="item" class="form-control form-control-sm" list="items" id="floatingInput" required> <!--(keyup)="likeCargarProductos()" (change)="seleccionarProducto()"-->
+              <datalist id="items">
                 <option value={{item.Item}} *ngFor="let item of arrayClientes">{{item.nombreItem}}</option>
               </datalist>
               <label for="floatingInput">Item</label>
             </div>
 
             <!--Año 1-->
-
+            <div class="form-floating col-md-1">
+              <select formControlName="anio1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
+              </select>
+              <label for="floatingSelect">Año 1</label>
+            </div>
 
             <!--Año 1-->
+            <div class="form-floating col-md-1">
+              <select formControlName="anio2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
+              </select>
+              <label for="floatingSelect">Año 2</label>
+            </div>
 
           </div>
+        </div>
+        <!--Fin Formulario -->
+
+        <!--Botones-->
+        <div class="mb-3">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button class="btn btn-danger btn-danger-sm" type="button"><i class="pi pi-search"></i> Consultar</button>
+            <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()"><i class="pi pi-eraser"></i> Limpiar campos</button>
+          </div>
+        </div>
+
+        <!--Linea-->
+        <div class="mb-4">
+          <hr class="colorLinea">
         </div>
       </form>
   </div>
