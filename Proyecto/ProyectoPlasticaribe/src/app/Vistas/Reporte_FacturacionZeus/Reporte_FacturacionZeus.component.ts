@@ -38,7 +38,9 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
     this.formFiltros = this.frmBuilder.group({
       vendedor: [null],
+      idvendedor : [null],
       cliente: [null],
+      idcliente : [null],
       item: [null],
       anio1: [null],
       anio2: [null],
@@ -105,6 +107,18 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     for (let index = 2019; index < this.anioActual + 1; index++) {
       this.arrayAnios.push(index);
     }
+  }
+
+  seleccionarVendedores(){
+
+  }
+
+  seleccionarClientes() {
+
+  }
+
+  seleccionarProductos() {
+
   }
 
   // Funcion que va a consultar el consolidado de los clientes, productos y vendedores

@@ -26,53 +26,55 @@
     <div class="mb-4">
       <h3 class="tituloRojo">Filtros de búsqueda</h3>
     </div>
-    <!-- Formulario para consultar filtros -->
-    <form [formGroup]="formFiltros">
-      <!-- Primera Fila -->
-      <div class="mb-3">
-        <div class="row g-3">
-          <!-- Vendedores -->
-          <div class="form-floating col-md">
-            <input formControlName="vendedor" class="form-control form-control-sm" list="vendedores" id="floatingInput">
-            <datalist id="vendedores">
-              <option value={{item.vendedor}} *ngFor="let item of arrayVendedores">{{item.nombreVendedor}}</option>
-            </datalist>
-            <label for="floatingInput">Vendedor</label>
-          </div>
+      <!-- Formulario para consultar filtros -->
+      <form [formGroup]="formFiltros">
 
-          <!-- Clientes -->
-          <div class="form-floating col-md">
-            <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput">
-            <datalist id="clientes">
-              <option value={{item.cliente}} *ngFor="let item of arrayClientes">{{item.nombreCliente}}</option>
-            </datalist>
-            <label for="floatingInput">Cliente</label>
-          </div>
+        <!-- Primera Fila -->
+        <div class="mb-3">
+          <div class="row g-3">
 
-          <!-- Items -->
-          <div class="form-floating col-md">
-            <input formControlName="item" class="form-control form-control-sm" list="items" id="floatingInput">
-            <datalist id="items">
-              <option value={{item.Item}} *ngFor="let item of arrayClientes">{{item.nombreItem}}</option>
-            </datalist>
-            <label for="floatingInput">Item</label>
-          </div>
+             <!-- Vendedores -->
+             <div class="form-floating col-md">
+                <input formControlName="vendedor" class="form-control form-control-sm" list="vendedores" id="floatingInput" (keyup)="cargarVendedores()" autocomplete="off" (change)="seleccionarVendedores()" required>
+                <datalist id="vendedores">
+                    <option value={{item.idvende}} *ngFor="let item of arrayVendedores">{{item.nombvende}}</option>
+                </datalist>
+                <label for="floatingInput">Vendedor</label>
+              </div>
 
-          <!--Año 1-->
-          <div class="form-floating col-md-1">
-            <select formControlName="anio1" id="floatingSelect" type="text" class="form-select form-select-sm">
-              <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
-            </select>
-            <label for="floatingSelect">Año 1</label>
-          </div>
+            <!-- Clientes -->
+            <div class="form-floating col-md">
+              <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" (keyup)="cargarClientes()" (change)="seleccionarClientes()" required>
+              <datalist id="clientes">
+                <option value={{item.idcliente}} *ngFor="let item of arrayClientes">{{item.razoncial}}</option>
+              </datalist>
+              <label for="floatingInput">Cliente</label>
+            </div>
 
-          <!--Año 1-->
-          <div class="form-floating col-md-1">
-            <select formControlName="anio2" id="floatingSelect" type="text" class="form-select form-select-sm">
-              <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
-            </select>
-            <label for="floatingSelect">Año 2</label>
-          </div>
+            <!-- Items -->
+            <div class="form-floating col-md">
+              <input formControlName="item" class="form-control form-control-sm" list="items" id="floatingInput" (keyup)="cargarProductos()" (change)="seleccionarProductos()" required >
+              <datalist id="items">
+                <option value={{item.idarticulo}} *ngFor="let item of arrayItems">{{item.nombre}}</option>
+              </datalist>
+              <label for="floatingInput">Item</label>
+            </div>
+
+            <!--Año 1-->
+            <div class="form-floating col-md-1">
+              <select formControlName="anio1" id="floatingSelect" type="text" class="form-select form-select-sm">
+                <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
+              </select>
+              <label for="floatingSelect">Año 1</label>
+            </div>
+
+            <!--Año 2-->
+            <div class="form-floating col-md-1">
+              <select formControlName="anio2" id="floatingSelect" type="text" class="form-select form-select-sm">
+                <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
+              </select>
+              <label for="floatingSelect">Año 2</label>
+            </div>
         </div>
       </div>
       <!--Fin Formulario -->

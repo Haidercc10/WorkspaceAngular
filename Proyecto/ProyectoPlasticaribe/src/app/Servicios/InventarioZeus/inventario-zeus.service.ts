@@ -90,6 +90,14 @@ export class InventarioZeusService {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidos`);
   }
 
+  getClientesxVendedor(vendedor : any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientesxVendedor/${vendedor}`);
+  }
+
+  getVendedoresxNombre(nombre: any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getVendedoresxNombre/${nombre}`);
+  }
+
   getPedidosXConsecutivo(id : any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosPorConsecutivo/${id}`);
   }
