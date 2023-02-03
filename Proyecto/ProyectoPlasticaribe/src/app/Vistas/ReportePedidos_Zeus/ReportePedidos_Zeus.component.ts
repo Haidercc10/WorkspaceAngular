@@ -822,24 +822,12 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.inventarioZeusService.getPedidosXConsecutivo(item.consecutivo).subscribe(dataPedidos => {
       for (let i = 0; i < dataPedidos.length; i++) {
         const info : any = {
-          consecutivo: dataPedidos[i].consecutivo,
-          cliente: dataPedidos[i].cliente,
-          Producto: dataPedidos[i].producto,
-          "Cant. Pedida": this.formatonumeros(dataPedidos[i].cant_Pedida),
-          Pendiente: this.formatonumeros(dataPedidos[i].cant_Pendiente),
-          Facturada: this.formatonumeros(dataPedidos[i].cant_Facturada),
-          Stock: this.formatonumeros(dataPedidos[i].existencias),
-          Und: dataPedidos[i].presentacion,
-          Estado: dataPedidos[i].estado,
-          Vendedor: dataPedidos[i].vendedor,
-          precioUnidad : this.formatonumeros(dataPedidos[i].precioUnidad),
-          "Orden Compra CLiente": dataPedidos[i].orden_Compra_CLiente,
-          Costo_Pendiente: this.formatonumeros(dataPedidos[i].costo_Cant_Pendiente),
-          Costo_Total: this.formatonumeros(dataPedidos[i].costo_Cant_Total),
-          Costo_Pendiente1 : dataPedidos[i].costo_Cant_Pendiente,
-          Costo_Total1 : dataPedidos[i].costo_Cant_Total,
-          fecha_Creacion: dataPedidos[i].fecha_Creacion,
-          fecha_Entrega: dataPedidos[i].fecha_Entrega,
+          Nombre : dataPedidos[i].producto,
+          Cantidad : this.formatonumeros(dataPedidos[i].cant_Pedida),
+          Und : dataPedidos[i].presentacion,
+          Precio : this.formatonumeros(dataPedidos[i].precioUnidad),
+          SubTotal : this.formatonumeros(dataPedidos[i].costo_Cant_Total),
+          "Fecha Entrega" : dataPedidos[i].fecha_Entrega.replace('T00:00:00', ''),
         }
         this.arrayPedidosIndividuales.push(info);
         this.costoCantidadTotal += dataPedidos[i].costo_Cant_Total;
@@ -884,16 +872,16 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                 style: 'header',
                 body: [
                   [
-                    { border: [false, false, false, false], text: `Nombre Empresa` },
-                    { border: [false, false, false, true], text: `${dataPedidos[index].empresa}` },
-                    { border: [false, false, false, false], text: `Ciudad` },
-                    { border: [false, false, false, true], text: `${dataPedidos[index].ciudad_Empresa}` },
+                    { border: [false, false, false, false], text: `Comercial`  },
+                    { border: [false, false, false, true], text: `${dataPedidos[index].vendedor}`, fontSize: 8 },
+                    { border: [false, false, false, false], text: `Fecha de pedido` },
+                    { border: [false, false, false, true], text: `${dataPedidos[index].fecha_Creacion.replace('T00:00:00', '')}` },
                   ],
                   [
-                    { border: [false, false, false, false], text: `NIT` },
-                    { border: [false, false, false, true], text: `${dataPedidos[index].nit}` },
-                    { border: [false, false, false, false], text: `Dirección` },
-                    { border: [false, false, false, true], text: `${dataPedidos[index].direccion}` },
+                    { border: [false, false, false, false], text: `Código` },
+                    { border: [false, false, false, true], text: `` },
+                    {},
+                    {}
                   ],
                 ]
               },
@@ -901,42 +889,39 @@ export class ReportePedidos_ZeusComponent implements OnInit {
               fontSize: 9,
             },
             '\n',
-            { text: `\n Información general del Pedido \n \n`, alignment: 'center', style: 'subtitulo'  },
+            { text: `\n Información detallada del cliente \n \n`, alignment: 'center', style: 'header' },
             {
               style: 'tablaCliente',
               table: {
-                widths: ['*', '*', '*'],
-                style: 'subtitulo',
+                widths: [170, 170, 170],
+                style: 'header',
                 body: [
                   [ `NIT Cliente: ${dataPedidos[index].id_Cliente}`,  `Nombre: ${dataPedidos[index].cliente}`, `Ciudad: ${dataPedidos[index].ciudad}`, ],
-                  [ `Fecha Creación: ${dataPedidos[index].fecha_Creacion.replace('T00:00:00', '')}`, `Vendedor : ${dataPedidos[index].vendedor}`, `OC: ${dataPedidos[index].orden_Compra_CLiente}` ],
+                  [ `OC: ${dataPedidos[index].orden_Compra_CLiente}`, ``, `` ]
                 ]
               },
               layout: 'lightHorizontalLines',
-              fontSize: 11,
-            },'\n \n',
-            { text: `Información detallada del Pedido\n `, alignment: 'center', style: 'subtitulo' },
-            this.table(this.arrayPedidosIndividuales, ['Producto', 'Cant. Pedida', 'Pendiente', 'Facturada', 'Stock', 'Und', 'Costo_Pendiente', 'Costo_Total', 'Estado' ]),
+              fontSize: 9,
+            },
+            '\n \n',
+            { text: `\n\n Información detallada de producto(s) pedido(s) \n `, alignment: 'center', style: 'header' },
+            this.table(this.arrayPedidosIndividuales, ['Nombre', 'Cantidad', 'Und', 'Fecha Entrega', 'Precio', 'SubTotal']),
             {
-              style: 'texto',
+              style: 'tablaTotales',
               table: {
-                widths: [110, 45, 40, 40, 40, 20, 65, 60, 50],
-                style: 'texto',
+                widths: [270, 145, 98],
+                style: 'header',
                 body: [
                   [
-                    { text: '', colSpan : 4 , border : [false, false, false, false]},
-                    {},
-                    {},
-                    {},
-                    { text : 'Totales', colSpan : 2,  alignment : 'right',  border : [true, false, true, true] },
-                    {},
-                    { text: this.formatonumeros(this.costoCantidadPendiente.toFixed(2)), border: [true, false, true, true]},
-                    { text: this.formatonumeros(this.costoCantidadTotal.toFixed(2)), border: [true, false, true, true]},
-                    { text: '', border : [false, false, false, false] },
+                    '',
+                    { border: [true, false, true, true], text: `Total Pedido` },
+                    { border: [false, false, true, true], text: `$${this.formatonumeros(this.costoCantidadTotal.toFixed(2))}` },
                   ],
                 ]
               },
-            }
+              layout: { defaultBorder: false, },
+              fontSize: 8,
+            },
           ],
           styles: {
             header: { fontSize: 10, bold: true },
@@ -1139,7 +1124,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     return {
       table: {
         headerRows: 1,
-        widths: [110, 45, 40, 40, 40, 20, 65, 60, 50],
+        widths: [177, 50, 40, 61, 60, 98],
         body: this.buildTableBody(data, columns)
       },
       fontSize: 8,

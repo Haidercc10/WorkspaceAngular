@@ -1,6 +1,6 @@
 <app-menuLateral></app-menuLateral>
 
-<div class="d-flex justify-content-center overlay" *ngIf="load">
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div class="spinner-border text-danger" role="status" style="margin: auto;">
     <span class="visually-hidden">Cargando...</span>
   </div>
@@ -26,72 +26,139 @@
     <div class="mb-4">
       <h3 class="tituloRojo">Filtros de búsqueda</h3>
     </div>
-      <!-- Formulario para consultar filtros -->
-      <form [formGroup]="formFiltros">
+    <!-- Formulario para consultar filtros -->
+    <form [formGroup]="formFiltros">
+      <!-- Primera Fila -->
+      <div class="mb-3">
+        <div class="row g-3">
+          <!-- Vendedores -->
+          <div class="form-floating col-md">
+            <input formControlName="vendedor" class="form-control form-control-sm" list="vendedores" id="floatingInput">
+            <datalist id="vendedores">
+              <option value={{item.vendedor}} *ngFor="let item of arrayVendedores">{{item.nombreVendedor}}</option>
+            </datalist>
+            <label for="floatingInput">Vendedor</label>
+          </div>
 
-        <!-- Primera Fila -->
-        <div class="mb-3">
-          <div class="row g-3">
+          <!-- Clientes -->
+          <div class="form-floating col-md">
+            <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput">
+            <datalist id="clientes">
+              <option value={{item.cliente}} *ngFor="let item of arrayClientes">{{item.nombreCliente}}</option>
+            </datalist>
+            <label for="floatingInput">Cliente</label>
+          </div>
 
-             <!-- Vendedores -->
-             <div class="form-floating col-md">
-              <input formControlName="vendedor" class="form-control form-control-sm" list="vendedores" id="floatingInput" required>
-              <datalist id="vendedores">
-                <option value={{item.vendedor}} *ngFor="let item of arrayVendedores">{{item.nombreVendedor}}</option>
-              </datalist>
-              <label for="floatingInput">Vendedor</label>
-            </div>
+          <!-- Items -->
+          <div class="form-floating col-md">
+            <input formControlName="item" class="form-control form-control-sm" list="items" id="floatingInput">
+            <datalist id="items">
+              <option value={{item.Item}} *ngFor="let item of arrayClientes">{{item.nombreItem}}</option>
+            </datalist>
+            <label for="floatingInput">Item</label>
+          </div>
 
-            <!-- Clientes -->
-            <div class="form-floating col-md">
-              <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" required> <!--(keyup)="likeCargarProductos()" (change)="seleccionarProducto()"-->
-              <datalist id="clientes">
-                <option value={{item.cliente}} *ngFor="let item of arrayClientes">{{item.nombreCliente}}</option>
-              </datalist>
-              <label for="floatingInput">Cliente</label>
-            </div>
+          <!--Año 1-->
+          <div class="form-floating col-md-1">
+            <select formControlName="anio1" id="floatingSelect" type="text" class="form-select form-select-sm">
+              <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
+            </select>
+            <label for="floatingSelect">Año 1</label>
+          </div>
 
-            <!-- Items -->
-            <div class="form-floating col-md">
-              <input formControlName="item" class="form-control form-control-sm" list="items" id="floatingInput" required> <!--(keyup)="likeCargarProductos()" (change)="seleccionarProducto()"-->
-              <datalist id="items">
-                <option value={{item.Item}} *ngFor="let item of arrayClientes">{{item.nombreItem}}</option>
-              </datalist>
-              <label for="floatingInput">Item</label>
-            </div>
-
-            <!--Año 1-->
-            <div class="form-floating col-md-1">
-              <select formControlName="anio1" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
-              </select>
-              <label for="floatingSelect">Año 1</label>
-            </div>
-
-            <!--Año 1-->
-            <div class="form-floating col-md-1">
-              <select formControlName="anio2" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
-              </select>
-              <label for="floatingSelect">Año 2</label>
-            </div>
-
+          <!--Año 1-->
+          <div class="form-floating col-md-1">
+            <select formControlName="anio2" id="floatingSelect" type="text" class="form-select form-select-sm">
+              <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
+            </select>
+            <label for="floatingSelect">Año 2</label>
           </div>
         </div>
-        <!--Fin Formulario -->
+      </div>
+      <!--Fin Formulario -->
 
-        <!--Botones-->
-        <div class="mb-3">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="btn btn-danger btn-danger-sm" type="button"><i class="pi pi-search"></i> Consultar</button>
-            <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()"><i class="pi pi-eraser"></i> Limpiar campos</button>
-          </div>
+      <!--Botones-->
+      <div class="mb-3">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class="btn btn-danger btn-danger-sm" type="button"><i class="pi pi-search"></i> Consultar</button>
+          <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()"><i class="pi pi-eraser"></i> Limpiar campos</button>
         </div>
+      </div>
 
-        <!--Linea-->
-        <div class="mb-4">
-          <hr class="colorLinea">
-        </div>
-      </form>
+      <!--Linea-->
+      <div class="mb-4">
+        <hr class="colorLinea">
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="card" *ngIf="!cargando">
+    <p-table [value]="arrayConsolidado"
+             sortField="Ano"
+             sortMode="single"
+             [scrollable]="true"
+             scrollHeight="900px"
+             rowGroupMode="subheader"
+             groupRowsBy="Ano"
+             [rowHover]="true"
+             styleClass="p-datatable-sm"
+             columnResizeMode="expand"
+             responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th><p-columnFilter type="text" field="Mes"></p-columnFilter></th>
+          <th><p-columnFilter type="text" field="Vendedor"></p-columnFilter></th>
+          <th><p-columnFilter type="text" field="Cliente"></p-columnFilter></th>
+          <th><p-columnFilter type="text" field="Id_Producto"></p-columnFilter></th>
+          <th><p-columnFilter type="text" field="Producto"></p-columnFilter></th>
+          <th><p-columnFilter type="text" field="Cantidad"></p-columnFilter></th>
+          <th><p-columnFilter type="text" field="Presentacion"></p-columnFilter></th>
+          <th><p-columnFilter type="text" field="Precio"></p-columnFilter></th>
+          <th><p-columnFilter type="text" field="SubTotal"></p-columnFilter></th>
+        </tr>
+        <tr>
+          <th>Mes</th>
+          <th>Vendedor</th>
+          <th>Cliente</th>
+          <th>Id Producto</th>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Presentación</th>
+          <th>Precio</th>
+          <th>SubTotal</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="groupheader" let-consolidado>
+        <tr pRowGroupHeader>
+          <td colspan="9">
+            <span class="font-bold">{{consolidado.Ano}}</span>
+          </td>
+        </tr>
+      </ng-template>
+      <!-- <ng-template pTemplate="groupfooter" let-consolidado>
+        <tr>
+          <td  style="width: 90%;">
+            <div style="text-align: right; width: 100%;">Total Año</div>
+          </td>
+          <td  style="width: 10%;">{{calcularTotalVendidoAno(consolidado.Ano) | number}}</td>
+        </tr>
+      </ng-template> -->
+      <ng-template pTemplate="body" let-consolidado let-rowIndex="rowIndex">
+        <tr>
+          <td>{{consolidado.Mes}}</td>
+          <td>{{consolidado.Vendedor}}</td>
+          <td>{{consolidado.Cliente}}</td>
+          <td>{{consolidado.Id_Producto}}</td>
+          <td>{{consolidado.Producto}}</td>
+          <td>{{consolidado.Cantidad | number}}</td>
+          <td>{{consolidado.Presentacion}}</td>
+          <td>{{consolidado.Precio | number}}</td>
+          <td>{{consolidado.SubTotal | number}}</td>
+        </tr>
+      </ng-template>
+    </p-table>
   </div>
 </div>

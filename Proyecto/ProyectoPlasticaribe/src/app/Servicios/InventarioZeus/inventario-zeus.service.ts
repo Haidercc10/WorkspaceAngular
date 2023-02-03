@@ -11,11 +11,29 @@ export class InventarioZeusService {
  //Encapsular httpClient en Constructor.
   constructor(private http : HttpClient) { }
 
-//Crear ruta del api
-readonly rutaInventarioZeusAPI = rutaZeus;
+  //Crear ruta del api
+  readonly rutaInventarioZeusAPI = rutaZeus;
 
+  /************************************************************ ARTICULOS **************************************************************/
+  LikeGetClientes(texto : any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientes/${texto}`);
+  }
+
+  LikeGetVendedores(texto: any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getVendedores/${texto}`);
+  }
+
+  LikeGetItems(texto: any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getArticulos/${texto}`);
+  }
+
+  /************************************************************ EXISTENCIAS **************************************************************/
   srvObtenerExistenciasZeus():Observable<any[]> {
     return this.http.get<any>(this.rutaInventarioZeusAPI + '/existencias');
+  }
+
+  getExistenciasProductos(item : number, presentacion: any) {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Existencias/getExistenciasProductos/${item}/${presentacion}`);
   }
 
   srvObtenerExistenciasZeusXId(Articulo : number):Observable<any[]> {
@@ -72,18 +90,6 @@ readonly rutaInventarioZeusAPI = rutaZeus;
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidos`);
   }
 
-  LikeGetClientes(texto : any){
-    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientes/${texto}`);
-  }
-
-  LikeGetVendedores(texto: any){
-    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getVendedores/${texto}`);
-  }
-
-  LikeGetItems(texto: any){
-    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getArticulos/${texto}`);
-  }
-
   getPedidosXConsecutivo(id : any) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosPorConsecutivo/${id}`);
   }
@@ -108,7 +114,7 @@ readonly rutaInventarioZeusAPI = rutaZeus;
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getPedidosStock`);
   }
 
-  getExistenciasProductos(item : number, presentacion: any) {
-    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Existencias/getExistenciasProductos/${item}/${presentacion}`);
+  GetConsolidadClientesArticulo(ano1 : number, ano2 : number, ruta : string) {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getConsolidadoClientesArticulo/${ano1}/${ano2}/${ruta}`);
   }
 }
