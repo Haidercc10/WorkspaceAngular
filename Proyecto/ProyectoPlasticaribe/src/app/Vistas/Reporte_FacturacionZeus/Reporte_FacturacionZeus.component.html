@@ -1,0 +1,70 @@
+<app-menuLateral></app-menuLateral>
+
+<div class="d-flex justify-content-center overlay" *ngIf="load">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
+<div class="contain">
+  <!-- Navegador fin de parte superior -->
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Reporte de Facturación Zeus</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="container">
+
+
+      <!-- Formulario para consultar filtros -->
+      <form [formGroup]="formFiltros">
+
+        <!-- Primera Fila -->
+        <div class="mb-3">
+          <div class="row g-3">
+
+             <!-- Vendedores -->
+             <div class="form-floating col-md-4">
+              <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" required>
+              <datalist id="clientes">
+                <option value={{item.vendedor}} *ngFor="let item of arrayVendedores">{{item.nombreVendedor}}</option>
+              </datalist>
+              <label for="floatingInput">Vendedor</label>
+            </div>
+
+            <!-- Clientes -->
+            <div class="form-floating col-md-3">
+              <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" required> <!--(keyup)="likeCargarProductos()" (change)="seleccionarProducto()"-->
+              <datalist id="clientes">
+                <option value={{item.cliente}} *ngFor="let item of arrayClientes">{{item.nombreCliente}}</option>
+              </datalist>
+              <label for="floatingInput">Cliente</label>
+            </div>
+
+            <!-- Items -->
+            <div class="form-floating col-md-4">
+              <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" required> <!--(keyup)="likeCargarProductos()" (change)="seleccionarProducto()"-->
+              <datalist id="clientes">
+                <option value={{item.Item}} *ngFor="let item of arrayClientes">{{item.nombreItem}}</option>
+              </datalist>
+              <label for="floatingInput">Item</label>
+            </div>
+
+            <!--Año 1-->
+
+
+            <!--Año 1-->
+
+          </div>
+        </div>
+      </form>
+  </div>
+</div>

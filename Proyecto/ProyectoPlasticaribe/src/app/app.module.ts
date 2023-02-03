@@ -147,6 +147,7 @@ import { TreeTableModule } from 'primeng/treetable';
 import { CheckboxModule } from 'primeng/checkbox';
 import { Reporte_PedidosVendedoresComponent } from './Vistas/Reporte_PedidosVendedores/Reporte_PedidosVendedores.component';
 import { SidebarModule } from 'primeng/sidebar';
+import { Reporte_FacturacionZeusComponent } from './Vistas/Reporte_FacturacionZeus/Reporte_FacturacionZeus.component';
 
 export const routes: Routes = [
 
@@ -246,6 +247,7 @@ export const routes: Routes = [
 
 /*********************************************************************** REPORTE PEDIDOS ZEUS *****************************************************************/
  {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: ReportePedidos_ZeusComponent},
+ {path: 'rpt-facturacion-zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: Reporte_FacturacionZeusComponent},
 
  /*************************************************************** DESPERDICIO *********************************************************************************/
   {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1, 12]}, component: DesperdicioComponent},
@@ -350,7 +352,8 @@ export const routes: Routes = [
     ReporteInventarioBOPPComponent,
     ReporteInventarioMateriaPrimaComponent,
     ReportePedidos_ZeusComponent,
-    Reporte_PedidosVendedoresComponent
+    Reporte_PedidosVendedoresComponent,
+    Reporte_FacturacionZeusComponent,
   ],
 
   imports: [
