@@ -43,11 +43,8 @@
                 <label for="floatingInput">Vendedor</label>
               </div>
               <ng-template #Vendedor>
-                <div class="form-floating col-md">
-                  <input formControlName="vendedor" class="form-control form-control-sm" list="vendedores" id="floatingInput" autocomplete="off" required readonly onmousedown="return false">
-                  <datalist id="vendedores">
-                      <option value={{storage_Id}}>{{storage_Nombre}}</option>
-                  </datalist>
+                <div class="form-floating col-md mb-3">
+                  <input formControlName="vendedor" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off" value="{{storage_Nombre}}" readonly onmousedown="return false">
                   <label for="floatingInput">Vendedor</label>
                 </div>
               </ng-template>
