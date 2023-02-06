@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -48,7 +48,6 @@ import { MaterialExampleModule } from '../material.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { RoleGuardServiceGuard } from './Guards/role-guard-service.guard';
-import { ValidacionLoginGuard } from './Guards/validacion-login.guard';
 import { BuscarInventarioXProductoPipe } from './Pipes/BuscarInventarioXProducto.pipe';
 import { FiltroNombreClientePTPipe } from './Pipes/filtro-nombre-cliente-pt.pipe';
 import { FiltrosProductosTerminadosZeusPipe } from './Pipes/filtros-productos-terminados-zeus.pipe';
@@ -148,6 +147,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { Reporte_PedidosVendedoresComponent } from './Vistas/Reporte_PedidosVendedores/Reporte_PedidosVendedores.component';
 import { SidebarModule } from 'primeng/sidebar';
 import { Reporte_FacturacionZeusComponent } from './Vistas/Reporte_FacturacionZeus/Reporte_FacturacionZeus.component';
+import { JwtInterceptor } from './_helpers/jwt.interceptor';
+import { ErrorInterceptor } from './_helpers/error.interceptor';
 
 export const routes: Routes = [
 
@@ -165,7 +166,7 @@ export const routes: Routes = [
   {path: 'mp-recuperada', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: MateriaPrimaRecuperadaComponent},
   {path: 'mp-devoluciones', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: DevolucionesMPComponent},
   // Tintas
-  {path: 'Entrada-Tintas', canActivate : [ValidacionLoginGuard], component : Entrada_TintasComponent},
+  {path: 'Entrada-Tintas', canActivate : [RoleGuardServiceGuard], component : Entrada_TintasComponent},
   {path: 'asignacion-tintas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: AsignacionTintasComponent},
   // BOPP
   {path: 'asignacion-bopp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: AsignacionBOPPComponent},
@@ -427,7 +428,9 @@ export const routes: Routes = [
   providers: [
     CookieService,
     MessageService,
-    ConfirmationService
+    ConfirmationService,
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],
 
   bootstrap: [AppComponent]

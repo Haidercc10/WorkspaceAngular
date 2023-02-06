@@ -1,10 +1,12 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import { EmpresaService } from 'src/app/Servicios/Empresa/empresa.service';
 import Swal from 'sweetalert2';
-import { CookieService } from 'ngx-cookie-service';
 import {SESSION_STORAGE, WebStorageService} from 'ngx-webstorage-service';
+import { AuthenticationService } from 'src/app/_Services/authentication.service';
+import { Router } from '@angular/router';
+import { MovimientosAplicacionService } from 'src/app/Servicios/Movimientos_Aplicacion/MovimientosAplicacion.service';
+import moment from 'moment';
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -14,22 +16,20 @@ import {SESSION_STORAGE, WebStorageService} from 'ngx-webstorage-service';
 
 export class LoginComponentComponent implements OnInit {
 
-  public formularioUsuario !: FormGroup;
-  public data:any=[];
+  formularioUsuario !: FormGroup;
+  data:any=[];
   ruta : any;
-  public mostrarPass : boolean = false;
+  mostrarPass : boolean = false;
+  empresas: any [] = [];
 
-  /* SE INSTANCIA LA VARIABLE "empresas" QUE VA A SER DE TIPO "EmpresaService" Y TAMBIEN SERÁ UN ARRAY
-  AQUÍ SE GUARDARÁN LOS NOMBRES DE LAS EMPRESAS QUE HAY EN LA BASE DE DATOS */
-  empresas:EmpresaService[]=[];
-  empresa=[];
+  constructor(private empresaServices : EmpresaService,
+                private frmBuilderUsuario : FormBuilder,
+                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                    private authenticationService: AuthenticationService,
+                      private router: Router,
+                        private movAplicacionService : MovimientosAplicacionService,) {
 
-  constructor(private usuarioServices : UsuarioService,
-                private empresaServices : EmpresaService,
-                  private frmBuilderUsuario : FormBuilder,
-                    private cookieServices : CookieService,
-                      @Inject(SESSION_STORAGE) private storage: WebStorageService) {
-
+    if (this.authenticationService.userValue) this.router.navigate(['/home']);
     this.formularioUsuario = this.frmBuilderUsuario.group({
       Identificacion: [, Validators.required],
       Contrasena: [, Validators.required],
@@ -38,12 +38,12 @@ export class LoginComponentComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.storage.clear();
     this.ruta = this.storage.get('Ruta');
-    // this.saveInLocal('Ruta', this.ruta);
+    this.storage.clear();
     this.cargaDatosComboBox();
   }
 
+  // Funcion que guardará informacion a en la sesion
   saveInLocal(key, val): void {
     this.storage.set(key, val);
     this.data[key]= this.storage.get(key);
@@ -51,93 +51,13 @@ export class LoginComponentComponent implements OnInit {
 
   // FUNCION PARA CARGAR LOS DATOS DE LAS EMPRESAS EN EL COMBOBOX DEL HTML
   cargaDatosComboBox(){
-    this.empresaServices.srvObtenerLista().subscribe(datos_empresa=>{
-      for (let index = 0; index < datos_empresa.length; index++) {
-        this.empresas.push(datos_empresa[index].empresa_Nombre);
-      }
-    }, error =>{ Swal.fire('Ocurrió un error, intentelo de nuevo'); });
+    this.empresaServices.srvObtenerLista().subscribe(datos =>{ this.empresas = datos; }, error =>{ Swal.fire('Ocurrió un error, intentelo de nuevo'); });
   }
 
-  // FUNCION PARA HACER VALIDACIONES DE CAMPOS VACIOS, QUE DADO ESTE CASO (EN EL QUE HAYAN CAMPOS VACIOS) SE MOSTRARÁ UN MENSAJE INFOMANDO DE ESTO.
-  // SI NO HAY CAMPOS VACIOS ENTRARÍA A EL METODO Consulta()
+  //Funcion que va a validar si hay campos vacios
   validarCamposVacios() : any{
-    if (this.formularioUsuario.valid) this.Consulta();
+    if (this.formularioUsuario.valid) this.consultaLogin();
     else this.advertenciaCamposVacios();
-  }
-
-  // FUNCION PARA LIMPIAR LOS CAMPOS DEL FORMULARIO.
-  clear(){
-    this.formularioUsuario.reset();
-  }
-
-  // FUNCION PARA HACER LA VALIDACION DE LA ENTRADA DE USUARIOS, SE VERIFICAN LOS CAMPOS DIGITADOS CON LA BASE DE DATOS.
-  Consulta(){
-    try {
-      let empresa : string = this.formularioUsuario.value.Empresa;
-      this.usuarioServices.srvObtenerListaPorId(this.formularioUsuario.value.Identificacion).subscribe(datos_usuarios=>{
-        this.empresaServices.srvObtenerLista().subscribe(datos_empresa => {
-          for (let index = 0; index < datos_empresa.length; index++) {
-            if (datos_empresa[index].empresa_Nombre == empresa) {
-              if (datos_usuarios.estado_Id == 1) {
-                if (this.formularioUsuario.value.Contrasena == datos_usuarios.usua_Contrasena && datos_usuarios.empresa_Id == datos_empresa[index].empresa_Id) {
-                  let idUsuario : number = datos_usuarios.usua_Id;
-                  let nombre: string = datos_usuarios.usua_Nombre;
-                  let rol: number = datos_usuarios.rolUsu_Id;
-                  // var medianoche = new Date();
-                  // medianoche.setHours(23,59,59,0);
-                  // console.log(medianoche);
-                  // this.cookieServices.set('Id', `${idUsuario}`, {expires: medianoche} );
-                  // this.cookieServices.set('Nombre', `${nombre}`, {expires: medianoche} );
-                  // this.cookieServices.set('Rol', `${rol}`, {expires: medianoche});
-
-                  this.saveInLocal('Id', idUsuario);
-                  this.saveInLocal('Nombre', nombre);
-                  this.saveInLocal('Rol', rol);
-                  this.clear();
-                  if (this.ruta == 'http://192.168.0.153:4600/Login'
-                      || this.ruta == 'http://192.168.0.153:4600'
-                      || this.ruta == 'http://192.168.0.153:4600/'
-                      || this.ruta == 'http://192.168.0.85:4700/Login'
-                      || this.ruta == 'http://192.168.0.85:4700'
-                      || this.ruta == 'http://192.168.0.85:4700/'
-                      || this.ruta == 'http://localhost:4200/Login'
-                      || this.ruta == 'http://localhost:4200'
-                      || this.ruta == 'http://localhost:4200/'
-                      || this.ruta == 'http://192.168.0.153:4700/Login'
-                      || this.ruta == 'http://192.168.0.153:4700'
-                      || this.ruta == 'http://192.168.0.153:4700/') window.location.href = "./home";
-                  else  window.location.href = "./home";
-                  break;
-                } else if (this.formularioUsuario.value.Identificacion == datos_usuarios.usua_Id && this.formularioUsuario.value.Contrasena != datos_usuarios.usua_Contrasena){
-                  Swal.fire({
-                    icon: 'warning',
-                    title: 'Oops...',
-                    html:
-                    `<b>¡EL número de identificacion no coincide con la contraseña!</b><hr> `,
-                  });
-                  break;
-                } else{
-                  Swal.fire({
-                    icon: 'warning',
-                    title: 'Oops...',
-                    html:
-                    `<b>¡El número de identificación ${this.formularioUsuario.value.Identificacion} no se encuentra asociado a la empresa ${empresa}!</b><hr> `,
-                  });
-                  break;
-                }
-              } else if (datos_usuarios.estado_Id != 1){
-                Swal.fire({
-                  icon: 'warning',
-                  title: 'Oops...',
-                  html:
-                  `<b>¡El número de identificación ${this.formularioUsuario.value.Identificacion} no se encuentra asociado a la empresa ${empresa}!</b><hr> `,
-                });
-              }
-            }
-          }
-        });
-      }, error =>{ Swal.fire({ icon: 'warning', title: 'Oops...', html: `<b>¡El número de identificación no se encuentra registrado!</b><hr> `, }); });
-    } catch (error) { console.log(error); }
   }
 
   // Funcion que se encargará de enviar al API la información del usuario que desea iniciar sesion y dependiendo de la respuesta de esta se actuará
@@ -145,25 +65,33 @@ export class LoginComponentComponent implements OnInit {
     let empresa : number = this.formularioUsuario.value.Empresa;
     let idUsuario : number = this.formularioUsuario.value.Identificacion;
     let contrasena : string = this.formularioUsuario.value.Contrasena;
-    this.usuarioServices.GetLoginUsuario(123456789, "123456", 800188732).subscribe(data => {
-      console.log(data);
-    }, error => { this.mensajeError(`Las credenciales brindadas son incorrectas o no coninciden, por favor intentelo de nuvo`); });
-  }
-
-  consulta_insercionAsistencia(){
-    if (!true) Swal.fire({ icon: 'error', title: 'Asistencia Registrada!', text: 'La asistencia de la persona X el día Y ha sido registrado con éxito!' });
-    else Swal.fire({ icon: 'error', title: 'Oops...', text: 'No se ha podido registrar su asistencia!' });
+    let data : any = { "id_Usuario": idUsuario, "contrasena": contrasena, "empresa": empresa }
+    this.authenticationService.login(data).subscribe(datos => {
+      let idUsuario : number = datos.usua_Id;
+      let nombre: string = datos.usuario;
+      let rol: number = datos.rolUsu_Id;
+      let infoMovimientoAplicacion : any = {
+        "Usua_Id" : idUsuario,
+        "MovApp_Nombre" : `Inicio de sesión del usuario "${nombre}"`,
+        "MovApp_Descripcion" : `El usuario "${nombre}" con el ID ${idUsuario} inició sesión en el programa el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
+        "MovApp_Fecha" : moment().format('YYYY-MM-DD'),
+        "MovApp_Hora" : moment().format('H:mm:ss'),
+      }
+      this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(datos => { });
+      this.saveInLocal('Id', idUsuario);
+      this.saveInLocal('Nombre', nombre);
+      this.saveInLocal('Rol', rol);
+      this.formularioUsuario.reset();
+      this.router.navigate(['/home']);
+    }, error => { this.mensajeError(`¡No fue posible iniciar sesión!`, error) });
   }
 
     // Funcion que mostrará una advertencia para cuando haya campos vacios en la edicion o creacion de un usuario
-  advertenciaCamposVacios() {
-    Swal.fire({icon: 'warning',  title: 'Advertencia', text: `¡Por favor, debe llenar los campos vacios!`, confirmButtonColor: '#ffc107', });
-  }
+  advertenciaCamposVacios() { Swal.fire({icon: 'warning',  title: 'Advertencia', text: `¡Por favor, debe llenar los campos vacios!`, confirmButtonColor: '#ffc107', }); }
 
   // Funcin que va a mostrar o no la contraseña del usuario
   mostrarPassword(){
     let password : any = document.getElementById('pass');
-
     if(password.type == 'password') {
       password.type = 'text';
       this.mostrarPass = true;
@@ -174,8 +102,5 @@ export class LoginComponentComponent implements OnInit {
   }
 
   // Funcion que mostrará un mensaje de error
-  mensajeError(text : string){
-    Swal.fire({ icon: 'warning', title: 'Oops...', html: `<b>¡${text}!</b><hr> `, });
-  }
-
+  mensajeError(text : string, error : any = ""){ Swal.fire({ icon: 'warning', title: 'Oops...', html: `<b>¡${text}!</b><hr>`, }); }
 }

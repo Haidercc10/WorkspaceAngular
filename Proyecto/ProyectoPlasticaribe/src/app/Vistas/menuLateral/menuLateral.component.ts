@@ -4,6 +4,7 @@ import { MatDrawerMode } from '@angular/material/sidenav';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/api';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { AuthenticationService } from 'src/app/_Services/authentication.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -42,7 +43,8 @@ export class MenuLateralComponent implements OnInit {
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
                   private confirmationService: ConfirmationService,
-                    private messageService: MessageService) { }
+                    private messageService: MessageService,
+                      private authenticationService: AuthenticationService,) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -70,7 +72,7 @@ export class MenuLateralComponent implements OnInit {
       acceptLabel: 'Si',
       rejectLabel: 'No',
       accept: () => {
-        window.location.href = "./";
+        this.authenticationService.logout();
         this.messageService.add({severity:'info', summary:'Confirmed', detail:'You have accepted'});
       },
     });
@@ -82,7 +84,7 @@ export class MenuLateralComponent implements OnInit {
   }
 
   onConfirm() {
-    window.location.href = "./";
+    this.authenticationService.logout();
   }
 
   onReject() {

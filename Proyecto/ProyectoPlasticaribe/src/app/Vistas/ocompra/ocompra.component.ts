@@ -165,7 +165,7 @@ export class OcompraComponent implements OnInit {
   // Funcion que va a consultar la materia prima
   obtenerMateriaPrima(){
     this.materiaPrimaService.getMpTintaBopp().subscribe(datos_materiaPrimas => {
-      (datos_materiaPrimas == this.materiaPrima)
+      this.materiaPrima = datos_materiaPrimas;
       this.materiaPrima.sort((a,b) => a.nombre.localeCompare(b.nombre));
     });
   }

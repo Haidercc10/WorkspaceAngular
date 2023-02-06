@@ -30,7 +30,7 @@
       <div class="form-floating col-md mb-3">
         <select formControlName="Empresa" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
           <option [ngValue]="null" disabled selected>Seleccione la Empresa</option>
-          <option [ngValue]="empresa" *ngFor="let empresa of empresas">{{empresa}}</option>
+          <option [ngValue]="empresa.empresa_Id" *ngFor="let empresa of empresas">{{empresa.empresa_Nombre}}</option>
         </select>
         <label for="floatingSelect">Empresa</label>
       </div>
