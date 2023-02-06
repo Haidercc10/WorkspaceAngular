@@ -54,7 +54,7 @@
 
             <!-- Clientes -->
             <div class="form-floating col-md">
-              <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" (keyup)="cargarClientes()" (change)="seleccionarClientes()" required>
+              <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" (keyup)="cargarClientes()" (change)="seleccionarClientes()" autocomplete="off" required>
               <datalist id="clientes">
                 <option value={{item.idcliente}} *ngFor="let item of arrayClientes">{{item.razoncial}}</option>
               </datalist>
@@ -108,7 +108,7 @@
 
 <div class="container-fluid">
   <div class="card" *ngIf="!cargando">
-    <p-table #tt
+    <p-table #dt
              [value]="arrayConsolidado"
              sortField="Ano"
              sortMode="single"
@@ -145,9 +145,9 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="groupheader" let-consolidado>
-        <tr pRowGroupHeader>
+        <tr pRowGroupHeader style="background-color: #83D3FF;">
           <td colspan="9">
-            <span class="font-bold">{{consolidado.Ano}}</span>
+            <span class="font-bold" style="color: black;"><b>{{consolidado.Ano}}</b></span>
           </td>
         </tr>
       </ng-template>
@@ -161,23 +161,33 @@
       </ng-template> -->
       <ng-template pTemplate="body" let-consolidado let-rowIndex="rowIndex">
         <tr>
-          <td>{{consolidado.Mes}}</td>
+          <td><b>{{consolidado.Mes}}</b></td>
           <td>{{consolidado.Vendedor}}</td>
           <td>{{consolidado.Cliente}}</td>
           <td>{{consolidado.Id_Producto}}</td>
           <td>{{consolidado.Producto}}</td>
-          <td>{{consolidado.Cantidad | number}}</td>
+          <td><b>{{consolidado.Cantidad | number}}</b></td>
           <td>{{consolidado.Presentacion}}</td>
           <td>{{consolidado.Precio | number}}</td>
-          <td>{{consolidado.SubTotal | number}}</td>
+          <td><b>{{consolidado.SubTotal | number}}</b></td>
         </tr>
       </ng-template>
-      <ng-template pTemplate="footer">
-        <tr>
-          <td colspan="9" class="text-right">Totales</td>
-
-        </tr>
-      </ng-template>
+      <ng-template pTemplate="groupfooter" let-consolidado>
+        <tr style="background-color: palegreen;">
+            <td colspan="8" class="text-left font-bold pr-6"><b>{{'Total Año: ' + consolidado.Ano}}</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td *ngIf="totalAnio; else Filtro" class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Ano) | number : '1.2-2'}}</b></td>
+            <ng-template #Filtro>
+              <td class="text-left font-bold pr-6"><b>{{totalConsulta | number : '1.2-2'}}</b></td>
+            </ng-template>
+          </tr>
+    </ng-template>
     </p-table>
   </div>
 </div>

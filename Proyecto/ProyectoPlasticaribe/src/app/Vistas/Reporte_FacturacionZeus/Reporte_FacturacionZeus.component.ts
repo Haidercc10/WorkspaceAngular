@@ -2,8 +2,7 @@ import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { TreeTable } from 'primeng/treetable';
-import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
+import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
@@ -14,7 +13,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./Reporte_FacturacionZeus.component.css']
 })
 export class Reporte_FacturacionZeusComponent implements OnInit {
-  @ViewChild('tt') tt: TreeTable | undefined;
+  @ViewChild('dt') dt: Table | undefined;
   formFiltros !: FormGroup; /** Formulario de filtros de busqueda */
   arrayDocumento : any = []; /** Array para cargar la información que se verá en la vista. */
   cargando : boolean = false; /** Variable para indicar la espera en la carga de un proceso. */
@@ -28,14 +27,15 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   arrayVendedores : any = []; /** Array que contendrá la información de los vendedores */
   anos : any [] = [2019]; //Variable que almacenará los años desde el 2019 hasta el año actual
   anioActual : number = moment().year(); //Variable que almacenará la información del año actual en princio y luego podrá cambiar a un año seleccionado
-  arrayAnios : any = [];
+  arrayAnios : any = []; /** Array que cargará los años desde 2019 hasta el actual  */
   arrayConsolidado : any [] = []; //Variable que tendrá la información del consolidado consultado
+  totalConsulta : number = 0; /** Variable que cargará el valor total de la consulta si se filtra por uno de los campos de la tabla. */
+  totalAnio : boolean = true; /** Variable que mostrará el total por año o el valor total segun el filtro seleccionado en la tabla. */
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
                   private rolService : RolesService,
-                    private invetarioZeusService : InventarioZeusService,
-                      private servicioCliProd : ClientesProductosService) {
+                    private invetarioZeusService : InventarioZeusService,) {
 
     this.formFiltros = this.frmBuilder.group({
       vendedor: [null],
@@ -134,7 +134,10 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
           this.cargarClientesxVendedor(dataClientes[index].idvende);
         }
        });
-    } else this.advertencia('Debe elegir un asesor comercial válido!');
+    } else {
+      if(this.formFiltros.value.idvende != null) this.cargarClientesxVendedor(this.formFiltros.value.idvende);
+      else this.arrayClientes = [];
+    }
   }
 
   /** Se cargarán los clientes del vendedor seleccionado. */
@@ -164,9 +167,12 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
           this.cargarItemsxClientes(dataClientes3[index].idcliente);
         }
        });
-    } else this.advertencia('Debe elegir un cliente válido!');
+    } else
+      if(this.formFiltros.value.vendedor) this.cargarClientesxVendedor(this.formFiltros.value.idvendedor);
+      else this.arrayClientes = []; this.arrayItems = [];
   }
 
+  /** Cargar los items del cliente seleccionado */
   cargarItemsxClientes(cliente : any) {
     this.arrayItems = [];
     this.invetarioZeusService.getArticulosxCliente(cliente).subscribe(dataArticulo => {
@@ -176,6 +182,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     });
   }
 
+  /** Funcion que se ejecutará al seleccionar un producto. */
   seleccionarProductos() {
     let expresion : any = /^[0-9]*(\.?)[ 0-9]+$/;
     let itemSeleccionado : any = this.formFiltros.value.item;
@@ -195,11 +202,31 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
           });
         }
       });
-    } else this.advertencia('Debe elegir un item válido!');
+    } else {
+      if(this.formFiltros.value.idcliente != null) this.cargarItemsxClientes(this.formFiltros.value.idcliente);
+      else this.arrayItems = [];
+    }
   }
 
+  /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
   aplicarfiltro($event, campo : any, valorCampo : string){
-    this.tt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    setTimeout(() => {
+      if(this.dt.filteredValue != null) {
+        this.totalAnio = false;
+        this.totalConsulta = 0;
+        for (let i = 0; i < this.dt.filteredValue.length; i++) {
+          this.totalConsulta += this.dt.filteredValue[i].SubTotal;
+          console.log(this.totalConsulta);
+        }
+      } else {
+        this.totalAnio = true;
+        console.log(this.totalAnio)
+        for (let index = 0; index < this.arrayConsolidado.length; index++) {
+          this.calcularTotalVendidoAno(this.arrayConsolidado[index].Ano);
+        }
+      }
+    }, 500);
   }
 
   // Funcion que va a consultar el consolidado de los clientes, productos y vendedores
