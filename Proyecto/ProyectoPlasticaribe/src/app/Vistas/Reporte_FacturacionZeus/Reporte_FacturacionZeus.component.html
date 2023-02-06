@@ -34,13 +34,23 @@
           <div class="row g-3">
 
              <!-- Vendedores -->
-             <div class="form-floating col-md">
+
+             <div class="form-floating col-md" *ngIf="ValidarRol == 1; else Vendedor">
                 <input formControlName="vendedor" class="form-control form-control-sm" list="vendedores" id="floatingInput" (keyup)="cargarVendedores()" autocomplete="off" (change)="seleccionarVendedores()" required>
                 <datalist id="vendedores">
                     <option value={{item.idvende}} *ngFor="let item of arrayVendedores">{{item.nombvende}}</option>
                 </datalist>
                 <label for="floatingInput">Vendedor</label>
               </div>
+              <ng-template #Vendedor>
+                <div class="form-floating col-md">
+                  <input formControlName="vendedor" class="form-control form-control-sm" list="vendedores" id="floatingInput" autocomplete="off" required readonly onmousedown="return false">
+                  <datalist id="vendedores">
+                      <option value={{storage_Id}}>{{storage_Nombre}}</option>
+                  </datalist>
+                  <label for="floatingInput">Vendedor</label>
+                </div>
+              </ng-template>
 
             <!-- Clientes -->
             <div class="form-floating col-md">
@@ -53,9 +63,9 @@
 
             <!-- Items -->
             <div class="form-floating col-md">
-              <input formControlName="item" class="form-control form-control-sm" list="items" id="floatingInput" (keyup)="cargarProductos()" (change)="seleccionarProductos()" required >
+              <input formControlName="item" class="form-control form-control-sm" list="items" id="floatingInput" (keyup)="cargarProductos()" (change)="seleccionarProductos()" required autocomplete="off">
               <datalist id="items">
-                <option value={{item.idarticulo}} *ngFor="let item of arrayItems">{{item.nombre}}</option>
+                <option value={{valor.codigo}} *ngFor="let valor of arrayItems">{{valor.nombre}}</option>
               </datalist>
               <label for="floatingInput">Item</label>
             </div>
@@ -82,7 +92,7 @@
       <!--Botones-->
       <div class="mb-3">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class="btn btn-danger btn-danger-sm" type="button"><i class="pi pi-search"></i> Consultar</button>
+          <button class="btn btn-danger btn-danger-sm" type="submit" (click)="consultarConsolidado()"><i class="pi pi-search"></i> Consultar</button>
           <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()"><i class="pi pi-eraser"></i> Limpiar campos</button>
         </div>
       </div>
@@ -98,7 +108,8 @@
 
 <div class="container-fluid">
   <div class="card" *ngIf="!cargando">
-    <p-table [value]="arrayConsolidado"
+    <p-table #tt
+             [value]="arrayConsolidado"
              sortField="Ano"
              sortMode="single"
              [scrollable]="true"
@@ -111,15 +122,15 @@
              responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
-          <th><p-columnFilter type="text" field="Mes"></p-columnFilter></th>
-          <th><p-columnFilter type="text" field="Vendedor"></p-columnFilter></th>
-          <th><p-columnFilter type="text" field="Cliente"></p-columnFilter></th>
-          <th><p-columnFilter type="text" field="Id_Producto"></p-columnFilter></th>
-          <th><p-columnFilter type="text" field="Producto"></p-columnFilter></th>
-          <th><p-columnFilter type="text" field="Cantidad"></p-columnFilter></th>
-          <th><p-columnFilter type="text" field="Presentacion"></p-columnFilter></th>
-          <th><p-columnFilter type="text" field="Precio"></p-columnFilter></th>
-          <th><p-columnFilter type="text" field="SubTotal"></p-columnFilter></th>
+          <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')"></th>
+          <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id_Producto', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Producto', 'contains')"></th>
+          <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')"></th>
+          <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')"></th>
+          <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')"></th>
+          <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
         </tr>
         <tr>
           <th>Mes</th>
@@ -159,6 +170,12 @@
           <td>{{consolidado.Presentacion}}</td>
           <td>{{consolidado.Precio | number}}</td>
           <td>{{consolidado.SubTotal | number}}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <tr>
+          <td colspan="9" class="text-right">Totales</td>
+
         </tr>
       </ng-template>
     </p-table>

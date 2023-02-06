@@ -1,12 +1,12 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { TreeTable } from 'primeng/treetable';
+import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
-import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-Reporte_FacturacionZeus',
@@ -14,7 +14,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
   styleUrls: ['./Reporte_FacturacionZeus.component.css']
 })
 export class Reporte_FacturacionZeusComponent implements OnInit {
-
+  @ViewChild('tt') tt: TreeTable | undefined;
   formFiltros !: FormGroup; /** Formulario de filtros de busqueda */
   arrayDocumento : any = []; /** Array para cargar la información que se verá en la vista. */
   cargando : boolean = false; /** Variable para indicar la espera en la carga de un proceso. */
@@ -34,7 +34,8 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
                   private rolService : RolesService,
-                    private invetarioZeusService : InventarioZeusService) {
+                    private invetarioZeusService : InventarioZeusService,
+                      private servicioCliProd : ClientesProductosService) {
 
     this.formFiltros = this.frmBuilder.group({
       vendedor: [null],
@@ -42,6 +43,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       cliente: [null],
       idcliente : [null],
       item: [null],
+      idItem : [null],
       anio1: [null],
       anio2: [null],
     });
@@ -50,7 +52,6 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   ngOnInit() {
     this.lecturaStorage();
     this.cargarAnios();
-    this.cargarClientes();
   }
 
   /**Leer storage para validar su rol y mostrar el usuario. */
@@ -78,27 +79,30 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   /** Funció para limpiar los campos del formulario */
   limpiarTodo(){
     this.formFiltros.reset();
+    this.arrayClientes = [];
+    this.arrayItems = [];
+    this.arrayVendedores = [];
   }
 
   /** cargar vendedores al datalist que se encuentra en los filtros de busqueda*/
   cargarVendedores(){
     this.arrayVendedores = [];
     let vendedor : any = this.formFiltros.value.vendedor;
-    this.invetarioZeusService.LikeGetVendedores(vendedor).subscribe(dataUsuarios => { this.arrayVendedores = dataUsuarios; });
+    if(vendedor != null && vendedor.length > 2) this.invetarioZeusService.LikeGetVendedores(vendedor).subscribe(dataUsuarios => { this.arrayVendedores = dataUsuarios; });
   }
 
   /** cargar clientes al datalist que se encuentra en los filtros de busqueda*/
   cargarClientes(){
     this.arrayClientes = [];
     let cliente : any = this.formFiltros.value.cliente;
-    this.invetarioZeusService.LikeGetClientes(cliente).subscribe(dataClientes => { this.arrayClientes = dataClientes; });
+    if(cliente != null && cliente.length > 2) this.invetarioZeusService.LikeGetClientes(cliente).subscribe(dataClientes => { this.arrayClientes = dataClientes; });
   }
 
    /** cargar items al datalist que se encuentra en los filtros de busqueda*/
   cargarProductos(){
     this.arrayItems = [];
     let item : any = this.formFiltros.value.item;
-    this.invetarioZeusService.LikeGetItems(item).subscribe(dataItems => { this.arrayItems = dataItems; });
+    if(item != null && item.length > 2) this.invetarioZeusService.LikeGetItems(item).subscribe(dataItems => { this.arrayItems = dataItems; });
   }
 
   /** Función para cargar los años en el combobox de años. */
@@ -109,16 +113,93 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     }
   }
 
+  /** Al momento de seleccionar un vendedor, se cargaran sus clientes en el combobox*/
   seleccionarVendedores(){
+    let expresion : any = /^[0-9]*(\.?)[ 0-9]+$/;
+    let vendedorSeleccionado : any = this.formFiltros.value.vendedor;
 
+    if(vendedorSeleccionado.match(expresion) != null) {
+      this.invetarioZeusService.getVendedoresxId(vendedorSeleccionado).subscribe(dataClientes => {
+        for (let index = 0; index < dataClientes.length; index++) {
+          this.formFiltros = this.frmBuilder.group({
+            vendedor: dataClientes[index].nombvende,
+            idvendedor : dataClientes[index].idvende,
+            cliente: this.formFiltros.value.cliente,
+            idcliente : this.formFiltros.value.idcliente,
+            item: this.formFiltros.value.item,
+            idItem : this.formFiltros.value.idItem,
+            anio1: this.formFiltros.value.anio1,
+            anio2: this.formFiltros.value.anio2,
+          });
+          this.cargarClientesxVendedor(dataClientes[index].idvende);
+        }
+       });
+    } else this.advertencia('Debe elegir un asesor comercial válido!');
   }
 
-  seleccionarClientes() {
+  /** Se cargarán los clientes del vendedor seleccionado. */
+  cargarClientesxVendedor(vendedor : any){
+    this.arrayClientes = [];
+    this.invetarioZeusService.getClientesxVendedor(vendedor).subscribe(dataClientes2 => { this.arrayClientes = dataClientes2; });
+  }
 
+  /** Al momento de seleccionar un cliente, se cargaran sus items */
+  seleccionarClientes() {
+    let expresion : any = /^[0-9]*(\.?)[ 0-9]+$/;
+    let clienteSeleccionado : any = this.formFiltros.value.cliente;
+
+    if(clienteSeleccionado.match(expresion) != null) {
+      this.invetarioZeusService.getClientesxId(clienteSeleccionado).subscribe(dataClientes3 => {
+        for (let index = 0; index < dataClientes3.length; index++) {
+          this.formFiltros.setValue({
+            vendedor: this.formFiltros.value.vendedor,
+            idvendedor : this.formFiltros.value.idvendedor,
+            cliente: dataClientes3[index].razoncial,
+            idcliente : dataClientes3[index].idcliente,
+            item: this.formFiltros.value.item,
+            idItem : this.formFiltros.value.idItem,
+            anio1: this.formFiltros.value.anio1,
+            anio2: this.formFiltros.value.anio2,
+          });
+          this.cargarItemsxClientes(dataClientes3[index].idcliente);
+        }
+       });
+    } else this.advertencia('Debe elegir un cliente válido!');
+  }
+
+  cargarItemsxClientes(cliente : any) {
+    this.arrayItems = [];
+    this.invetarioZeusService.getArticulosxCliente(cliente).subscribe(dataArticulo => {
+      for (let index = 0; index < dataArticulo.length; index++) {
+        this.arrayItems.push(dataArticulo[index]);
+      }
+    });
   }
 
   seleccionarProductos() {
+    let expresion : any = /^[0-9]*(\.?)[ 0-9]+$/;
+    let itemSeleccionado : any = this.formFiltros.value.item;
 
+    if(itemSeleccionado.match(expresion) != null) {
+      this.invetarioZeusService.getArticulosxId(itemSeleccionado).subscribe(dataItems => {
+        for (let index = 0; index < dataItems.length; index++) {
+          this.formFiltros.setValue({
+            vendedor: this.formFiltros.value.vendedor,
+            idvendedor : this.formFiltros.value.idvendedor,
+            cliente: this.formFiltros.value.cliente,
+            idcliente : this.formFiltros.value.idcliente,
+            item: dataItems[index].nombre,
+            idItem : dataItems[index].codigo,
+            anio1: this.formFiltros.value.anio1,
+            anio2: this.formFiltros.value.anio2,
+          });
+        }
+      });
+    } else this.advertencia('Debe elegir un item válido!');
+  }
+
+  aplicarfiltro($event, campo : any, valorCampo : string){
+    this.tt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
   }
 
   // Funcion que va a consultar el consolidado de los clientes, productos y vendedores
@@ -128,12 +209,12 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     let ruta : string = '';
     let anoInicial : number = this.formFiltros.value.anio1;
     let anoFinal : number = this.formFiltros.value.anio2;
-    let cliente : string = this.formFiltros.value.cliente;
-    let producto : any = this.formFiltros.value.item;
-    let vendedor : any = `${this.formFiltros.value.vendedor}`;
-    producto.toString();
-    if (vendedor.length == 2) vendedor = `0${vendedor}`;
-    else if (vendedor.length == 1) vendedor = `00${vendedor}`;
+    let cliente : string = this.formFiltros.value.idcliente;
+    let producto : any = this.formFiltros.value.idItem;
+    let vendedor : any = this.formFiltros.value.idvendedor;
+    // producto.toString();
+    //if (vendedor.length == 2) vendedor = `0${vendedor}`;
+    //else if (vendedor.length == 1) vendedor = `00${vendedor}`;
     if (anoInicial == null) anoInicial = moment().year();
     if (anoFinal == null) anoFinal = anoInicial;
 
@@ -146,8 +227,12 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     else if (vendedor != null) ruta = `?vendedor=${vendedor}`;
 
     this.invetarioZeusService.GetConsolidadClientesArticulo(anoInicial, anoFinal, ruta).subscribe(datos_consolidado => {
-      for (let i = 0; i < datos_consolidado.length; i++) {
-        this.llenarConsolidado(datos_consolidado[i]);
+      if(datos_consolidado.length == 0) {
+        this.advertencia('No se encontraron resultados de búsqueda con la combinación de filtros seleccionada!')
+      } else {
+        for (let i = 0; i < datos_consolidado.length; i++) {
+          this.llenarConsolidado(datos_consolidado[i]);
+        }
       }
       setTimeout(() => { this.cargando = false; }, 10 * datos_consolidado.length);
     });
@@ -175,7 +260,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       Id_Producto : data.id_Producto,
       Producto : data.producto,
       Cantidad : data.cantidad,
-      Presentacion : data.presentacion,
+      Presentacion : data.presentación,
       Precio : data.precio,
       SubTotal : data.subTotal,
       Id_Vendedor : data.id_Vendedor,
@@ -193,6 +278,11 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       }
     }
     return total;
+  }
+
+  // Funcion que mostrará una advertencia si no se encuentran registros de búsqueda
+  advertencia(mensaje : string) {
+    Swal.fire({  icon: 'warning', title: 'Advertencia', text: mensaje, confirmButtonColor: '#ffc107', })
   }
 
 }

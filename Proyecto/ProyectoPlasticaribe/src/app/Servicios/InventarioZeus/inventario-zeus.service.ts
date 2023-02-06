@@ -94,8 +94,20 @@ export class InventarioZeusService {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientesxVendedor/${vendedor}`);
   }
 
-  getVendedoresxNombre(nombre: any){
-    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getVendedoresxNombre/${nombre}`);
+  getClientesxId(idcliente : any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getClientesxId/${idcliente}`);
+  }
+
+  getVendedoresxId(id: any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getVendedoresxId/${id}`);
+  }
+
+  getArticulosxId(id: any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/Articulos/getArticulosxId/${id}`);
+  }
+
+  getArticulosxCliente(id: any){
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getArticulosxCliente/${id}`);
   }
 
   getPedidosXConsecutivo(id : any) {
