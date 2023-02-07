@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Reporte de Facturación Zeus</h2>
+      <h2 class="tituloRojo">Consolidado de Facturación</h2>
     </div>
 
     <div class="mb-4">
@@ -81,6 +81,7 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
           <button class="btn btn-danger btn-danger-sm" type="submit" (click)="consultarConsolidado()"><i class="pi pi-search"></i> Consultar</button>
           <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()"><i class="pi pi-eraser"></i> Limpiar campos</button>
+          <button class="btn btn-success btn-success-sm" type="button" (click)="exportarExcel()"><i class="pi pi-file-excel"></i> Exportar a Excel</button>
         </div>
       </div>
     </form>
@@ -108,6 +109,7 @@
              responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
+          <th></th>
           <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')"></th>
@@ -119,6 +121,7 @@
           <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
         </tr>
         <tr>
+          <th>#</th>
           <th>Mes</th>
           <th>Vendedor</th>
           <th>Cliente</th>
@@ -139,6 +142,7 @@
       </ng-template>
       <ng-template pTemplate="body" let-consolidado let-rowIndex="rowIndex">
         <tr>
+          <td>{{rowIndex + 1}}</td>
           <td><b>{{consolidado.Mes}}</b></td>
           <td>{{consolidado.Vendedor}}</td>
           <td>{{consolidado.Cliente}}</td>
@@ -160,9 +164,9 @@
           <td></td>
           <td></td>
           <td></td>
-          <td *ngIf="totalAnio; else Filtro" class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Ano) | number : '1.2-2'}}</b></td>
+          <td *ngIf="totalAnio; else Filtro" class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Ano) | currency : 'COP $'}}</b></td>
           <ng-template #Filtro>
-            <td class="text-left font-bold pr-6"><b>{{totalConsulta | number : '1.2-2'}}</b></td>
+            <td class="text-left font-bold pr-6"><b>{{totalConsulta | currency : 'COP $'}}</b></td>
           </ng-template>
         </tr>
       </ng-template>

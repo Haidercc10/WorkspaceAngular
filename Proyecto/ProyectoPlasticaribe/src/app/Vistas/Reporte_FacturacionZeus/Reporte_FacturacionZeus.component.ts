@@ -6,6 +6,8 @@ import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 
 @Component({
   selector: 'app-Reporte_FacturacionZeus',
@@ -263,21 +265,26 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     let anoInicial : number = this.formFiltros.value.anio1;
     let anoFinal : number = this.formFiltros.value.anio2;
     let cliente : string = this.formFiltros.value.idcliente;
-    let producto : any = this.formFiltros.value.iditem;
-    let vendedor : any = `${this.formFiltros.value.idvendedor}`;
-    if (producto) producto.toString();
-    if (vendedor.length == 2) vendedor = `0${vendedor}`;
-    else if (vendedor.length == 1) vendedor = `00${vendedor}`;
+    let nombreCliente : any = this.formFiltros.value.cliente;
+    let producto : any = this.formFiltros.value.idItem;
+    let nombreItem : any = this.formFiltros.value.item;
+    let vendedor : any = this.formFiltros.value.idvendedor;
+    let nombreVendedor : any = this.formFiltros.value.vendedor;
+    if (vendedor != null) {
+      if (vendedor.length == 2) vendedor = `0${vendedor}`;
+      else if (vendedor.length == 1) vendedor = `00${vendedor}`;
+    }
+    if (producto != null) producto.toString();
     if (anoInicial == null) anoInicial = moment().year();
     if (anoFinal == null) anoFinal = anoInicial;
 
-    if (cliente != null && producto != null && vendedor != null) ruta = `?vendedor=${vendedor}&producto=${producto}&cliente=${cliente}`;
-    else if (cliente != null && producto != null) ruta = `?producto=${producto}&cliente=${cliente}`;
-    else if (cliente != null && vendedor != null) ruta = `?vendedor=${vendedor}&cliente=${cliente}`;
-    else if (producto != null && vendedor != null) ruta = `?vendedor=${vendedor}&producto=${producto}`;
-    else if (cliente != null) ruta = `?cliente=${cliente}`;
-    else if (producto != null) ruta = `?producto=${producto}`;
-    else if (vendedor != null) ruta = `?vendedor=${vendedor}`;
+    if (cliente != null && producto != null && vendedor != null) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}&producto=${producto}&nombreProducto=${nombreItem}&cliente=${cliente}&nombreCliente=${nombreCliente}`;
+    else if (cliente != null && producto != null) ruta = `?producto=${producto}&nombreProducto=${nombreItem}&cliente=${cliente}&nombreCliente=${nombreCliente}`;
+    else if (cliente != null && vendedor != null) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}&cliente=${cliente}&nombreCliente=${nombreCliente}`;
+    else if (producto != null && vendedor != null) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}&producto=${producto}&nombreProducto=${nombreItem}`;
+    else if (cliente != null) ruta = `?cliente=${cliente}&nombreCliente=${nombreCliente}`;
+    else if (producto != null) ruta = `?producto=${producto}&nombreProducto=${nombreItem}`;
+    else if (vendedor != null) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}`;
 
     this.invetarioZeusService.GetConsolidadClientesArticulo(anoInicial, anoFinal, ruta).subscribe(datos_consolidado => {
       if(datos_consolidado.length == 0) {
@@ -313,7 +320,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       Id_Producto : data.id_Producto,
       Producto : data.producto,
       Cantidad : data.cantidad,
-      Presentacion : data.presentación,
+      Presentacion : data.presentacion,
       Precio : data.precio,
       SubTotal : data.subTotal,
       Id_Vendedor : data.id_Vendedor,
@@ -329,6 +336,89 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       if (this.arrayConsolidado[i].Ano == ano) total += this.arrayConsolidado[i].SubTotal;
     }
     return total;
+  }
+
+  // Funcion que va a exportar a excel la informacion que este cargada en la tabla
+  exportarExcel(){
+    if (this.arrayConsolidado.length == 0) this.advertencia('Debe haber al menos un pedido en la tabla.');
+    else {
+      this.cargando = true;
+      setTimeout(() => {
+        const title = `Consolidado Facturación - ${this.today}`;
+        const header = ["Mes", "Año", "Id Cliente", "Cliente", "Id Producto", "Producto", "Cantidad", "Presentación", "Precio Unidad", "SubTotal", "Id vendedor", "Vendedor"];
+        let datos : any =[];
+        for (const item of this.arrayConsolidado) {
+          const datos1  : any = [item.Mes, item.Ano, item.Id_Cliente, item.Cliente, item.Id_Producto, item.Producto, item.Cantidad, item.Presentacion, item.Precio, item.SubTotal, item.Id_Vendedor, item.Vendedor];
+          datos.push(datos1);
+        }
+        let workbook = new Workbook();
+        let worksheet = workbook.addWorksheet(`Reporte de OT por Procesos - ${this.today}`);
+        let titleRow = worksheet.addRow([title]);
+        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+        worksheet.addRow([]);
+        worksheet.addRow([]);
+        let headerRow = worksheet.addRow(header);
+        headerRow.eachCell((cell, number) => {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'eeeeee' } }
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+        });
+        worksheet.mergeCells('A1:L3');
+        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+
+        datos.forEach(d => {
+          let row = worksheet.addRow(d);
+          let mes = row.getCell(1);
+          let anio = row.getCell(2);
+          let idCliente = row.getCell(3);
+          let cliente = row.getCell(4);
+          let idProducto = row.getCell(5);
+          let producto = row.getCell(6);
+          let cantidad = row.getCell(7);
+          let presentacion = row.getCell(8);
+          let precio = row.getCell(9);
+          let subTotal = row.getCell(10);
+          let idvendedor = row.getCell(11);
+          let vendedor = row.getCell(12);
+
+          mes.alignment = { horizontal : 'center' };
+          anio.alignment = { horizontal : 'center' };
+          idCliente.alignment = { horizontal : 'center' };
+          cliente.alignment = { horizontal : 'center' };
+          idProducto.alignment = { horizontal : 'center' };
+          producto.alignment = { horizontal : 'center' };
+          cantidad.alignment = { horizontal : 'center' };
+          presentacion.alignment = { horizontal : 'center' };
+          precio.alignment = { horizontal : 'center' };
+          subTotal.alignment = { horizontal : 'center' };
+          idvendedor.alignment = { horizontal : 'center' };
+          vendedor.alignment = { horizontal : 'center' };
+
+          cantidad.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
+          precio.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
+          subTotal.numFmt  = '""#,##0.00;[Red]\-""#,##0.00';
+
+          worksheet.getColumn(1).width = 12;
+          worksheet.getColumn(2).width = 12;
+          worksheet.getColumn(3).width = 15;
+          worksheet.getColumn(4).width = 60;
+          worksheet.getColumn(5).width = 12;
+          worksheet.getColumn(6).width = 50;
+          worksheet.getColumn(7).width = 15;
+          worksheet.getColumn(8).width = 15;
+          worksheet.getColumn(9).width = 15;
+          worksheet.getColumn(10).width = 15;
+          worksheet.getColumn(11).width = 12;
+          worksheet.getColumn(12).width = 50;
+        });
+        setTimeout(() => {
+          workbook.xlsx.writeBuffer().then((data) => {
+            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            fs.saveAs(blob, `Consolidado Facturacion - ${this.today}.xlsx`);
+          });
+          this.cargando = false;
+        }, 1000);
+      }, 1500);
+    }
   }
 
   // Funcion que mostrará una advertencia si no se encuentran registros de búsqueda

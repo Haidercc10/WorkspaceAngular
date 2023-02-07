@@ -60,6 +60,7 @@ export let vistasDisponibles : any = [
   { id : 39, nombre : 'Reporte Rollos Eliminados', icono : 'assets/Iconos_Menu/reporteEliminados.png', categoria: 'Reportes', ruta : './reporte-rollos-eliminados', roles : [1], },
   { id : 43, nombre : 'Reporte de Activos', icono : 'assets/Iconos_Menu/activos.png', categoria: 'Reporte', ruta : './reporte-activos', roles : [1], },
   { id : 46, nombre : 'Reporte Desperdicio', icono : 'assets/Iconos_Menu/recibos.png', categoria: 'Reporte', ruta : './reporte-desperdicios', roles : [1, 12], },
+  { id : 48, nombre : 'Consolidado Facturación', icono : 'assets/Iconos_Menu/factura.png', categoria: 'Reporte', ruta : './rpt-facturacion-zeus', roles : [1, 2, 60], },
 
   // USUARIOS
   { id : 40, nombre : 'Usuarios', icono : 'assets/Iconos_Menu/usuarios.png', categoria: 'Usuarios', ruta : './registro-usuario', roles : [1], },
@@ -71,5 +72,5 @@ export let vistasDisponibles : any = [
   // DEPERDICIO
   { id : 45, nombre : 'Deperdicio', icono : 'assets/Iconos_Menu/caja.png', categoria: 'Deperdicio', ruta : './desperdicio', roles : [1, 12], },
 
-  // SIGUIENTE 48
+  // SIGUIENTE 49
 ];

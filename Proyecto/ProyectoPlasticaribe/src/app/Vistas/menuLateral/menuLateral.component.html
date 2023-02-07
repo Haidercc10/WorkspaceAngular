@@ -691,7 +691,7 @@
     </ng-container>
 
     <!-- REPORTES -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7" role="button" (click)="clickIcon7()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir7; then thenTemplate7; else elseTemplate7"></ng-container>
@@ -745,14 +745,14 @@
           </ng-container>
 
           <!-- Reporte de Procesos de Ordenes de trabajo Para Vendedores-->
-          <!-- <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2">
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/estados-ot-vendedores" role="button" aria-expanded="false" aria-controls="">
-                <i class="pi pi-shopping-bag" style="font-size: 15px; margin-right: 2%;"></i>
-                Reporte de Pedidos
+              <a class="fst-normal" data-bs-toggle="" href="/rpt-facturacion-zeus" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-dollar" style="font-size: 15px; margin-right: 2%;"></i>
+                Consolidado Facturación
               </a>
             </div>
-          </ng-container> -->
+          </ng-container>
 
           <!-- Reporte de Procesos de Ordenes de trabajo -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 12">

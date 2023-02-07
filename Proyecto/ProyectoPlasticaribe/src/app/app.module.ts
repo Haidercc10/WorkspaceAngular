@@ -149,6 +149,12 @@ import { SidebarModule } from 'primeng/sidebar';
 import { Reporte_FacturacionZeusComponent } from './Vistas/Reporte_FacturacionZeus/Reporte_FacturacionZeus.component';
 import { JwtInterceptor } from './_helpers/jwt.interceptor';
 import { ErrorInterceptor } from './_helpers/error.interceptor';
+import { ErrorInterceptor_InvZeus } from './_helpers/error.interceptor_InvZeus';
+import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
+import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
+import { ErrorInterceptor_ContaZeus } from './_helpers/error.interceptor_ContaZeus';
+import { jwtInterceptor_BagPro } from './_helpers/jwt.interceptor_BagPro';
+import { errorInterceptor_BagPro } from './_helpers/error.interceptor_BagPro';
 
 export const routes: Routes = [
 
@@ -431,6 +437,15 @@ export const routes: Routes = [
     ConfirmationService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor_InvZeus, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor_InvZeus, multi: true },
+
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor_ContaZeus, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor_ContaZeus, multi: true },
+
+    { provide: HTTP_INTERCEPTORS, useClass: jwtInterceptor_BagPro, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: errorInterceptor_BagPro, multi: true },
   ],
 
   bootstrap: [AppComponent]

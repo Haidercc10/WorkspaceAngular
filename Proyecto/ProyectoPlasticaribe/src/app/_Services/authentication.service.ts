@@ -53,7 +53,7 @@ export class AuthenticationService {
       "MovApp_Hora" : moment().format('H:mm:ss'),
     }
     this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(datos => { });
-    localStorage.removeItem('user');
+    localStorage.clear();
     this.storage.clear();
     this.userSubject.next(null);
     this.router.navigate(['/']);

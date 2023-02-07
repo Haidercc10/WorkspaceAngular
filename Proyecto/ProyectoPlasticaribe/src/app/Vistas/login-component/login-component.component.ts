@@ -7,6 +7,9 @@ import { AuthenticationService } from 'src/app/_Services/authentication.service'
 import { Router } from '@angular/router';
 import { MovimientosAplicacionService } from 'src/app/Servicios/Movimientos_Aplicacion/MovimientosAplicacion.service';
 import moment from 'moment';
+import { AuthenticationService_InvZeus } from 'src/app/_Services/authentication_InvZeus.service';
+import { authentication_ContaZeus } from 'src/app/_Services/authentication_ContaZeus.service';
+import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.service';
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -27,9 +30,11 @@ export class LoginComponentComponent implements OnInit {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private authenticationService: AuthenticationService,
                       private router: Router,
-                        private movAplicacionService : MovimientosAplicacionService,) {
+                        private movAplicacionService : MovimientosAplicacionService,
+                          private authenticationInvZeusService : AuthenticationService_InvZeus,
+                            private authenticationContaZeusService : authentication_ContaZeus,
+                              private authenticationBagPro : authentication_BagPro,) {
 
-    if (this.authenticationService.userValue) this.router.navigate(['/home']);
     this.formularioUsuario = this.frmBuilderUsuario.group({
       Identificacion: [, Validators.required],
       Contrasena: [, Validators.required],
@@ -38,8 +43,8 @@ export class LoginComponentComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.ruta = this.storage.get('Ruta');
     this.storage.clear();
+    localStorage.clear();
     this.cargaDatosComboBox();
   }
 
@@ -65,7 +70,7 @@ export class LoginComponentComponent implements OnInit {
     let empresa : number = this.formularioUsuario.value.Empresa;
     let idUsuario : number = this.formularioUsuario.value.Identificacion;
     let contrasena : string = this.formularioUsuario.value.Contrasena;
-    let data : any = { "id_Usuario": idUsuario, "contrasena": contrasena, "empresa": empresa }
+    let data : any = { "id_Usuario": idUsuario, "contrasena": contrasena, "empresa": empresa };
     this.authenticationService.login(data).subscribe(datos => {
       let idUsuario : number = datos.usua_Id;
       let nombre: string = datos.usuario;
@@ -78,15 +83,17 @@ export class LoginComponentComponent implements OnInit {
         "MovApp_Hora" : moment().format('H:mm:ss'),
       }
       this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(datos => { });
+      this.authenticationInvZeusService.login().subscribe(datos => {});
+      this.authenticationContaZeusService.login().subscribe(datos => {});
+      this.authenticationBagPro.login().subscribe(datos => {});
       this.saveInLocal('Id', idUsuario);
       this.saveInLocal('Nombre', nombre);
       this.saveInLocal('Rol', rol);
-      this.formularioUsuario.reset();
-      this.router.navigate(['/home']);
+      setTimeout(() => { this.router.navigate(['/home']); }, 500);
     }, error => { this.mensajeError(`¡No fue posible iniciar sesión!`, error) });
   }
 
-    // Funcion que mostrará una advertencia para cuando haya campos vacios en la edicion o creacion de un usuario
+  // Funcion que mostrará una advertencia para cuando haya campos vacios en la edicion o creacion de un usuario
   advertenciaCamposVacios() { Swal.fire({icon: 'warning',  title: 'Advertencia', text: `¡Por favor, debe llenar los campos vacios!`, confirmButtonColor: '#ffc107', }); }
 
   // Funcin que va a mostrar o no la contraseña del usuario

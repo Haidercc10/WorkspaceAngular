@@ -5,6 +5,9 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/api';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
+import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.service';
+import { authentication_ContaZeus } from 'src/app/_Services/authentication_ContaZeus.service';
+import { AuthenticationService_InvZeus } from 'src/app/_Services/authentication_InvZeus.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -44,7 +47,10 @@ export class MenuLateralComponent implements OnInit {
                 private rolService : RolesService,
                   private confirmationService: ConfirmationService,
                     private messageService: MessageService,
-                      private authenticationService: AuthenticationService,) { }
+                      private authenticationService: AuthenticationService,
+                        private authenticationInvZeusService : AuthenticationService_InvZeus,
+                          private authentication_ContaZeus : authentication_ContaZeus,
+                            private authentication_Bagpro : authentication_BagPro,) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -73,6 +79,9 @@ export class MenuLateralComponent implements OnInit {
       rejectLabel: 'No',
       accept: () => {
         this.authenticationService.logout();
+        this.authenticationInvZeusService.logout();
+        this.authentication_ContaZeus.logout();
+        this.authentication_Bagpro.logout();
         this.messageService.add({severity:'info', summary:'Confirmed', detail:'You have accepted'});
       },
     });
@@ -85,6 +94,9 @@ export class MenuLateralComponent implements OnInit {
 
   onConfirm() {
     this.authenticationService.logout();
+    this.authenticationInvZeusService.logout();
+    this.authentication_ContaZeus.logout();
+    this.authentication_Bagpro.logout();
   }
 
   onReject() {
