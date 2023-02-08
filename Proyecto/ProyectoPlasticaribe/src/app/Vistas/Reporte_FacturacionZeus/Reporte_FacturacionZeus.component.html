@@ -63,7 +63,7 @@
             <select formControlName="anio1" id="floatingSelect" type="text" class="form-select form-select-sm">
               <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
             </select>
-            <label for="floatingSelect">Año 1</label>
+            <label for="floatingSelect">Año Inicial</label>
           </div>
 
           <!--Año 2-->
@@ -71,7 +71,7 @@
             <select formControlName="anio2" id="floatingSelect" type="text" class="form-select form-select-sm">
               <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
             </select>
-            <label for="floatingSelect">Año 2</label>
+            <label for="floatingSelect">Año Final</label>
           </div>
       </div>
       </div>
@@ -168,6 +168,20 @@
           <ng-template #Filtro>
             <td class="text-left font-bold pr-6"><b>{{totalConsulta | currency : 'COP $'}}</b></td>
           </ng-template>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <tr>
+          <td>Totales</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>{{valorTotalConsulta | currency : 'COP $'}}</td>
         </tr>
       </ng-template>
     </p-table>

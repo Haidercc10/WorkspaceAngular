@@ -33,6 +33,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   arrayConsolidado : any [] = []; //Variable que tendrá la información del consolidado consultado
   totalConsulta : number = 0; /** Variable que cargará el valor total de la consulta si se filtra por uno de los campos de la tabla. */
   totalAnio : boolean = true; /** Variable que mostrará el total por año o el valor total segun el filtro seleccionado en la tabla. */
+  valorTotalConsulta : number = 0; //Variable que almacenará el costo total de los productos facturdos que trae la consulta
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -261,6 +262,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   consultarConsolidado(){
     this.cargando = true;
     this.arrayConsolidado = [];
+    this.valorTotalConsulta = 0;
     let ruta : string = '';
     let anoInicial : number = this.formFiltros.value.anio1;
     let anoFinal : number = this.formFiltros.value.anio2;
@@ -294,7 +296,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
           this.llenarConsolidado(datos_consolidado[i]);
         }
       }
-      setTimeout(() => { this.cargando = false; }, 10 * datos_consolidado.length);
+      setTimeout(() => { this.cargando = false; }, datos_consolidado.length);
     });
   }
 
@@ -326,6 +328,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
       Id_Vendedor : data.id_Vendedor,
       Vendedor : data.vendedor,
     }
+    this.valorTotalConsulta += data.subTotal;
     this.arrayConsolidado.push(info);
   }
 

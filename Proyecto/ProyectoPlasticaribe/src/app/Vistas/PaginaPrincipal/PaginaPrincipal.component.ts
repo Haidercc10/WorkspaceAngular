@@ -466,7 +466,7 @@ export class PaginaPrincipalComponent implements OnInit {
             if (datos_ot[i].estado_Nombre == 'Cerrada') this.cantidadOTCerrada += 1;
           }
         }
-      }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes y en que estado se encuntran!`, error.message); });
+      });
 
       this.ordenTrabajoService.GetProductosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
         for (let i = 0; i < datos_ordenes.length; i++) {
@@ -474,7 +474,7 @@ export class PaginaPrincipalComponent implements OnInit {
           this.productosOrdenesMes.sort((a,b) => a.prod_Nombre.localeCompare(b.prod_Nombre));
           this.productosOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
         }
-      }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada producto!`, error.message); });
+      });
 
       this.bagProService.GetPesoProcesosUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
         for (let i = 0; i < datos_ordenes.length; i++) {
@@ -509,20 +509,20 @@ export class PaginaPrincipalComponent implements OnInit {
             this.procesosOrdenesMes.sort((a,b) => Number(a.id) - Number(b.id));
           }
         }
-      }, error => { this.mensajeError(`¡No se ha podido consultar la cantidad producida por cada proceso de las ordenes que se crearon el ultimo mes!`, error.message); });
+      });
 
       this.bagProService.GetCostoOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
         for (let i = 0; i < datos_ordenes.length; i++) {
           this.costoTotalOrdenesMes += datos_ordenes[i].costo;
         }
-      }, error => { this.mensajeError(`¡No se ha podido consultar el costo de las ordenes de trabajo que se han hecho en el último mes!`, error.message); });
+      });
 
       this.bagProService.GetCostoOrdenesUltimoMes_Vendedores(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
         for (let i = 0; i < datos_ordenes.length; i++) {
           this.vendedorOrdenesMes.push(datos_ordenes[i]);
           this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
         }
-      }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para vendedor!`, error.message); });
+      });
 
       this.bagProService.GetCostoOrdenesUltimoMes_Clientes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
         for (let i = 0; i < datos_ordenes.length; i++) {
@@ -530,14 +530,14 @@ export class PaginaPrincipalComponent implements OnInit {
           this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
           this.totalOrdenesMes += datos_ordenes[i].cantidad;
         }
-      }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada cliente!`, error.message); });
+      });
 
       this.bagProService.GetCantOrdenesMateriales(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
         for (let i = 0; i < datos_ordenes.length; i++) {
           this.materialesOrdenesMes.push(datos_ordenes[i]);
           this.materialesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
         }
-      }, error => { this.mensajeError(`¡No se ha podido consultar cuantas ordenes de trabajo se han hecho en el último mes para cada cliente!`, error.message); });
+      });
     }
   }
 
@@ -564,7 +564,7 @@ export class PaginaPrincipalComponent implements OnInit {
           if (datos_materiaPrima[i].inicial != datos_materiaPrima[i].actual && datos_materiaPrima[i].id_Materia_Prima != 84) this.inventarioMateriaPrima.push(datos_materiaPrima[i]);
           this.inventarioMateriaPrima.sort((a,b) => a.nombre_Materia_Prima.localeCompare(b.nombre_Materia_Prima));
         }
-      }, error => { this.mensajeError(`¡No se pudo obtener información de las materias primas!`, error.message); });
+      });
 
       this.boppService.GetBoppStockInventario().subscribe(datos_bopp => {
         for (let i = 0; i < datos_bopp.length; i++) {
@@ -572,26 +572,26 @@ export class PaginaPrincipalComponent implements OnInit {
           else if (datos_bopp[i].catMP_Id == 14) this.cantRollosBopa = datos_bopp[i].conteoDescripcion;
           else if (datos_bopp[i].catMP_Id == 15) this.cantRollosPoliester = datos_bopp[i].conteoDescripcion;
         }
-      }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos biorientados!`, error.message) });
+      });
 
       this.boppService.GetCantRollosUtilizados_Mes(this.primerDiaMes, this.today).subscribe(datos_bopp => {
         for (let i = 0; i < datos_bopp.length; i++) {
           this.cantRollosUtilizados += datos_bopp[i].cantidad;
         }
-      }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos biorientados!`, error.message) });
+      });
 
       this.boppService.GetCantRollosIngresados_Mes(this.primerDiaMes, this.today).subscribe(datos_bopp => {
         for (let i = 0; i < datos_bopp.length; i++) {
           this.cantRollosEntrantes += datos_bopp[i].cantidad;
         }
-      }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos biorientados!`, error.message) });
+      });
 
       this.materiaPrimaService.GetMateriasPrimasUtilizadasHoy(this.today).subscribe(datos_materiasPrimas => {
         for (let i = 0; i < datos_materiasPrimas.length; i++) {
           this.materiasPrimasMovidasHoy.push(datos_materiasPrimas[i]);
           this.materiasPrimasMovidasHoy.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
         }
-      }, error => { this.mensajeError(`¡No se pudo obtener información de las materias primas que tuvieron asignaciones hoy!`, error.message) });
+      });
 
       this.tintasCreadasService.GetTintasCreadasMes(this.primerDiaMes, this.today).subscribe(datos_tintas => {
         for (let i = 0; i < datos_tintas.length; i++) {
@@ -599,28 +599,28 @@ export class PaginaPrincipalComponent implements OnInit {
           this.tintasCreadas.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
           this.cantTintasCreadas += 1;
         }
-      }, error => { this.mensajeError(`¡No se pudo obtener información de las tintas creadas durante las fechas ${this.primerDiaMes} y ${this.today}!`, error.message) });
+      });
 
       this.materiaPrimaService.GetMateriasPrimasUltilizadasMes(this.primerDiaMes, this.today).subscribe(datos_materiasPrimas => {
         for (let i = 0; i < datos_materiasPrimas.length; i++) {
           this.materiasPrimasMasUtilizadasMes.push(datos_materiasPrimas[i]);
           this.materiasPrimasMasUtilizadasMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
         }
-      }, error => { this.mensajeError(`¡No se pudo obtener información de las materias primas más utilizadas durante el mes!`, error.message); });
+      });
 
       this.tintasCreadasService.GetMateriasPrimasCrearTintasMes(this.primerDiaMes, this.today).subscribe(datos_tintas => {
         for (let i = 0; i < datos_tintas.length; i++) {
           this.materiasPrimasMasUtilizadasCrearTintaMes.push(datos_tintas[i]);
           this.materiasPrimasMasUtilizadasCrearTintaMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
         }
-      }, error => { this.mensajeError(`¡No se pudo obtener información de las tintas creadas durante las fechas ${this.primerDiaMes} y ${this.today}!`, error.message) });
+      });
 
       this.ordenTrabajoService.GetTotalMateriaPrimaAsignadaMes(this.primerDiaMes, this.today).subscribe(datos_ot => {
         for (let i = 0; i < datos_ot.length; i++) {
           this.totalMpAsignada += datos_ot[i].cantidad;
           this.totalExtruidoMes += datos_ot[i].extruido;
         }
-      }, error => { this.mensajeError(`¡No se ha podido consultar la cantidad de Materia Prima que se ha asignado y la cantidad de Materia Prima que se ha extruido!`, error.message); });
+      });
     }
   }
 
@@ -633,15 +633,15 @@ export class PaginaPrincipalComponent implements OnInit {
     if(this.ValidarRol == 1 || this.ValidarRol == 60) {
       this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => {
         this.totalFacturadoDia = datos_facturacion;
-      }, error => { this.mensajeError(`¡No se pudo obtener información sobre el valor de lo facturado hoy!`, error.message); });
+      });
 
       this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
         this.totalFacuturadoMes = datos_facturacion;
-      }, error => { this.mensajeError(`¡No se pudo aobtener información sobre lo facturado del mes actual!`, error.message); });
+      });
 
       this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
         this.totalIvaVentaMes = datos_facturacion;
-      }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las ventas del mes actual!`, error.message); });
+      });
 
       // this.zeusService.GetIvaCompraMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
       //   this.totalIvaCompraMes = datos_facturacion;
@@ -661,7 +661,7 @@ export class PaginaPrincipalComponent implements OnInit {
           if (i == 9) this.totalFacturado10 = datos_facturacion;
           if (i == 10) this.totalFacturado11 = datos_facturacion;
           if (i == 11) this.totalFacturado12 = datos_facturacion;
-        }, error => { this.mensajeError(`¡No se pudo obtener información sobre la cantidad facturada en cada uno de los meses del año!`, error.message); });
+        });
       }
       setTimeout(() => { this.llenarGraficaFacturacion(); }, 1500);
 
@@ -679,7 +679,7 @@ export class PaginaPrincipalComponent implements OnInit {
           if (i == 9) this.totalIvaCompra10 = datos_facturacion;
           if (i == 10) this.totalIvaCompra11 = datos_facturacion;
           if (i == 11) this.totalIvaCompra12 = datos_facturacion;
-        }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las compras de cada uno de los meses del año!`, error.message); });
+        });
       }
       setTimeout(() => { this.llenarGraficaIvaCompra(); }, 1800);
     }
