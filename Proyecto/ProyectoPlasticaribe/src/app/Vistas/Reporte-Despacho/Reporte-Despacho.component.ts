@@ -11,7 +11,7 @@ import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-Reporte-Despacho',
@@ -55,8 +55,7 @@ export class ReporteDespachoComponent implements OnInit {
                             private dtAsigFactService : DetallesAsignacionProductosFacturaService,
                               private dtDevolucion : DetallesDevolucionesProductosService,
                                 private dtEntradaService : DetallesEntradaRollosService,
-                                  private preCargueService : DtPreEntregaRollosService,
-                                    private appComponent : AppComponent,) {
+                                  private preCargueService : DtPreEntregaRollosService,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -117,21 +116,12 @@ export class ReporteDespachoComponent implements OnInit {
 
   /** Cargar Productos en Select Input */
   llenadoProducto(){
-    this.servicioProducto.srvObtenerLista().subscribe(registrosProductos => {
-      for (let index = 0; index < registrosProductos.length; index++) {
-         this.arrayProducto.push(registrosProductos[index]);
-         //console.log(this.arrayProducto);
-      }
-    });
+    this.servicioProducto.srvObtenerLista().subscribe(registrosProductos => { this.arrayProducto = registrosProductos; });
   }
 
   /** Cargar combo estados rollos */
   llenadoEstadoRollos() {
-    this.servicioEstados.srvObtenerEstadosRollos().subscribe(registroEstadosRollos => {
-      for (let index = 0; index < registroEstadosRollos.length; index++) {
-        this.arrayEstadoRollo.push(registroEstadosRollos[index])
-      }
-    })
+    this.servicioEstados.srvObtenerEstadosRollos().subscribe(registroEstadosRollos => { this.arrayEstadoRollo = registroEstadosRollos; })
   }
 
   /** Cargar tipos de documentos a los combos. */
@@ -152,9 +142,7 @@ export class ReporteDespachoComponent implements OnInit {
   llenadoRollosIngresados() {
     this.servicioDtlEntradaRollos.srvObtenerLista().subscribe(registrosRollos => {
       for (let index = 0; index < registrosRollos.length; index++) {
-        let info : any = {
-          rollo_Id : `${registrosRollos[index].rollo_Id}`
-        }
+        let info : any = { rollo_Id : `${registrosRollos[index].rollo_Id}` };
         this.arrayRollo.push(info);
       }
     });
@@ -299,7 +287,7 @@ export class ReporteDespachoComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : this.appComponent.logoParaPdf,
+                    image : logoParaPdf,
                     width : 100,
                     height : 80
                   },
@@ -498,7 +486,7 @@ export class ReporteDespachoComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : this.appComponent.logoParaPdf,
+                    image : logoParaPdf,
                     width : 100,
                     height : 80
                   },
@@ -674,7 +662,7 @@ export class ReporteDespachoComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : this.appComponent.logoParaPdf,
+                    image : logoParaPdf,
                     width : 100,
                     height : 80
                   },
@@ -840,7 +828,7 @@ export class ReporteDespachoComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : this.appComponent.logoParaPdf,
+                    image : logoParaPdf,
                     width : 100,
                     height : 80
                   },

@@ -5,7 +5,7 @@ import * as fs from 'file-saver';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Table } from 'primeng/table';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { Tipo_ActivoService } from 'src/app/Servicios/TiposActivos/Tipo_Activo.service';
@@ -42,8 +42,7 @@ export class Reporte_MantenimientoComponent implements OnInit {
                 private rolService : RolesService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private activosService : ActivosService,
-                      private tipoActivoService : Tipo_ActivoService,
-                        private appComponent : AppComponent,) {
+                      private tipoActivoService : Tipo_ActivoService,) {
 
     this.FormActivos = this.frmBuilderMateriaPrima.group({
       ActivoId : [null, Validators.required],
@@ -90,7 +89,7 @@ export class Reporte_MantenimientoComponent implements OnInit {
         }
         let workbook = new Workbook();
         const imageId1 = workbook.addImage({
-          base64:  this.appComponent.logoParaPdf,
+          base64:  logoParaPdf,
           extension: 'png',
         });
         let worksheet = workbook.addWorksheet(`Inventario Activos - ${this.today}`);

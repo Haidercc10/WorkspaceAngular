@@ -5,7 +5,7 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
@@ -45,8 +45,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
                     private servicioDesperdicios : DesperdicioService,
                       @Inject(SESSION_STORAGE) private storage: WebStorageService,
                         private rolService : RolesService,
-                          private appComponent : AppComponent,
-                            private messageService: MessageService) {
+                          private messageService: MessageService) {
     this.formFiltros = this.formBuilder.group({
       OT : [null],
       Producto : [null],
@@ -99,13 +98,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.arrayProductos = [];
     let producto : any = this.formFiltros.value.Producto;
 
-    if(producto != null) {
-      this.servicioProductos.obtenerItemsLike(producto).subscribe(dataProducto => {
-        for (let index = 0; index < dataProducto.length; index++) {
-          this.arrayProductos.push(dataProducto[index]);
-        }
-      });
-    }
+    if(producto != null) this.servicioProductos.obtenerItemsLike(producto).subscribe(dataProducto => { this.arrayProductos = dataProducto; });
   }
 
   /** Función que cargará el ID del producto en el campo, pero mostrará el nombre */
@@ -124,19 +117,9 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   /** Función que actualizará los filtros de busqueda, agregando el nombre del Item */
   initForm_SeleccionProducto(nombreProducto : any){
-    this.formFiltros.setValue({
-      OT : this.formFiltros.value.OT,
-      fechaInicio : this.formFiltros.value.fechaInicio,
-      fechaFinal : this.formFiltros.value.fechaFinal,
+    this.formFiltros.patchValue({
       productoId : this.idProducto,
       Producto: nombreProducto,
-      Material : this.formFiltros.value.Material,
-      ProcesoId : this.formFiltros.value.ProcesoId,
-      Proceso : this.formFiltros.value.Proceso,
-      MaquinaId : this.formFiltros.value.MaquinaId,
-      Maquina : this.formFiltros.value.Maquina,
-      FallaId : this.formFiltros.value.FallaId,
-      Falla : this.formFiltros.value.Falla,
     });
   }
 
@@ -271,7 +254,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
             {
               columns: [
                 {
-                  image : this.appComponent.logoParaPdf,
+                  image : logoParaPdf,
                   width : 100,
                   height : 80
                 },

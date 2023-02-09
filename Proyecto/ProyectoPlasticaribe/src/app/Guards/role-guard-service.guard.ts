@@ -20,10 +20,10 @@ export class RoleGuardServiceGuard implements CanActivate {
       const expectedRole = route.data['expectedRole'];
       let rol = this.storage.get('Rol');
       if (!rol) rol = user.rolUsu_Id;
-      if (!expectedRole.includes(rol)) this.router.navigate(['/home']);
+      if (!expectedRole.includes(rol)) window.location.pathname = '/home';
       return expectedRole;
     }
-    this.router.navigate(['/'], { queryParams: { returnUrl: state.url } });
+    window.location.pathname = '/'
     return false;
   }
 }

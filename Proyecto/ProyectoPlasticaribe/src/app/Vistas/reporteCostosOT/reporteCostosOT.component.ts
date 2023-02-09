@@ -9,12 +9,12 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import pdfMake from 'pdfmake/build/pdfmake';
 import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
 import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
-import { AppComponent } from 'src/app/app.component';
 import moment from 'moment';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -86,11 +86,10 @@ export class ReporteCostosOTComponent implements OnInit {
                         private materiaPrimaService : MateriaPrimaService,
                           private devolucionesService : DevolucionesService,
                             private devolucionesMPService : DevolucionesMPService,
-                              private appComponent : AppComponent,
-                                private boppService : EntradaBOPPService,
-                                  private tintaService : TintasService,
-                                    private estadosProcesos_OTService : EstadosProcesos_OTService,
-                                      private paginaPrincipal : PaginaPrincipalComponent) {
+                              private boppService : EntradaBOPPService,
+                                private tintaService : TintasService,
+                                  private estadosProcesos_OTService : EstadosProcesos_OTService,
+                                    private paginaPrincipal : PaginaPrincipalComponent) {
 
     this.infoOT = this.frmBuilderMateriaPrima.group({
       ot : ['',Validators.required],
@@ -365,22 +364,9 @@ export class ReporteCostosOTComponent implements OnInit {
             let FechaCreacionNueva = FechaDatetime.indexOf("T");
             let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
             this.fechaFinalOT = fechaCreacionFinal;
-            this.infoOT.setValue({
+            this.infoOT.patchValue({
               ot : ot,
-              cliente : this.infoOT.value.cliente,
-              IdProducto : this.infoOT.value.IdProducto,
-              NombreProducto : this.infoOT.value.NombreProducto,
-              cantProductoSinMargenUnd : this.infoOT.value.cantProductoSinMargenUnd,
-              cantProductoSinMargenKg : this.infoOT.value.cantProductoSinMargenKg,
-              margenAdicional : this.infoOT.value.margenAdicional,
-              cantProductoConMargen : this.infoOT.value.cantProductoConMargen,
-              PresentacionProducto : this.infoOT.value.PresentacionProducto,
-              ValorUnidadProductoUnd : this.infoOT.value.ValorUnidadProductoUnd,
-              ValorUnidadProductoKg : this.infoOT.value.ValorUnidadProductoKg,
-              ValorEstimadoOt : this.infoOT.value.ValorEstimadoOt,
-              fechaInicioOT : this.infoOT.value.fechaInicioOT,
               fechaFinOT : this.fechaFinalOT,
-              estadoOT : this.infoOT.value.estadoOT,
             });
           }
         });
@@ -395,22 +381,9 @@ export class ReporteCostosOTComponent implements OnInit {
             let FechaCreacionNueva = FechaDatetime.indexOf("T");
             let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
             this.fechaFinalOT = fechaCreacionFinal;
-            this.infoOT.setValue({
+            this.infoOT.patchValue({
               ot : ot,
-              cliente : this.infoOT.value.cliente,
-              IdProducto : this.infoOT.value.IdProducto,
-              NombreProducto : this.infoOT.value.NombreProducto,
-              cantProductoSinMargenUnd : this.infoOT.value.cantProductoSinMargenUnd,
-              cantProductoSinMargenKg : this.infoOT.value.cantProductoSinMargenKg,
-              margenAdicional : this.infoOT.value.margenAdicional,
-              cantProductoConMargen : this.infoOT.value.cantProductoConMargen,
-              PresentacionProducto : this.infoOT.value.PresentacionProducto,
-              ValorUnidadProductoUnd : this.infoOT.value.ValorUnidadProductoUnd,
-              ValorUnidadProductoKg : this.infoOT.value.ValorUnidadProductoKg,
-              ValorEstimadoOt : this.infoOT.value.ValorEstimadoOt,
-              fechaInicioOT : this.infoOT.value.fechaInicioOT,
               fechaFinOT : this.fechaFinalOT,
-              estadoOT : this.infoOT.value.estadoOT,
             });
             break;
           }
@@ -426,22 +399,9 @@ export class ReporteCostosOTComponent implements OnInit {
             let FechaCreacionNueva = FechaDatetime.indexOf("T");
             let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
             this.fechaFinalOT = fechaCreacionFinal;
-            this.infoOT.setValue({
+            this.infoOT.patchValue({
               ot : ot,
-              cliente : this.infoOT.value.cliente,
-              IdProducto : this.infoOT.value.IdProducto,
-              NombreProducto : this.infoOT.value.NombreProducto,
-              cantProductoSinMargenUnd : this.infoOT.value.cantProductoSinMargenUnd,
-              cantProductoSinMargenKg : this.infoOT.value.cantProductoSinMargenKg,
-              margenAdicional : this.infoOT.value.margenAdicional,
-              cantProductoConMargen : this.infoOT.value.cantProductoConMargen,
-              PresentacionProducto : this.infoOT.value.PresentacionProducto,
-              ValorUnidadProductoUnd : this.infoOT.value.ValorUnidadProductoUnd,
-              ValorUnidadProductoKg : this.infoOT.value.ValorUnidadProductoKg,
-              ValorEstimadoOt : this.infoOT.value.ValorEstimadoOt,
-              fechaInicioOT : this.infoOT.value.fechaInicioOT,
               fechaFinOT : this.fechaFinalOT,
-              estadoOT : this.infoOT.value.estadoOT,
             });
             break;
           }
@@ -457,22 +417,9 @@ export class ReporteCostosOTComponent implements OnInit {
             let FechaCreacionNueva = FechaDatetime.indexOf("T");
             let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
             this.fechaFinalOT = fechaCreacionFinal;
-            this.infoOT.setValue({
+            this.infoOT.patchValue({
               ot : ot,
-              cliente : this.infoOT.value.cliente,
-              IdProducto : this.infoOT.value.IdProducto,
-              NombreProducto : this.infoOT.value.NombreProducto,
-              cantProductoSinMargenUnd : this.infoOT.value.cantProductoSinMargenUnd,
-              cantProductoSinMargenKg : this.infoOT.value.cantProductoSinMargenKg,
-              margenAdicional : this.infoOT.value.margenAdicional,
-              cantProductoConMargen : this.infoOT.value.cantProductoConMargen,
-              PresentacionProducto : this.infoOT.value.PresentacionProducto,
-              ValorUnidadProductoUnd : this.infoOT.value.ValorUnidadProductoUnd,
-              ValorUnidadProductoKg : this.infoOT.value.ValorUnidadProductoKg,
-              ValorEstimadoOt : this.infoOT.value.ValorEstimadoOt,
-              fechaInicioOT : this.infoOT.value.fechaInicioOT,
               fechaFinOT :fechaCreacionFinal,
-              estadoOT : this.infoOT.value.estadoOT,
             });
             break;
           }
@@ -570,30 +517,29 @@ export class ReporteCostosOTComponent implements OnInit {
     var body = [];
     body.push(columns);
     data.forEach(function(row) {
-        var dataRow = [];
-        columns.forEach(function(column) {
-            dataRow.push(row[column].toString());
-        });
-        body.push(dataRow);
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
     });
-
     return body;
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [20, 185, 40, 60, 50, 60, 40],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 8,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [20, 185, 40, 60, 50, 60, 40],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
   }
 
@@ -631,7 +577,7 @@ export class ReporteCostosOTComponent implements OnInit {
                 {
                   columns: [
                     {
-                      image : this.appComponent.logoParaPdf,
+                      image : logoParaPdf,
                       width : 100,
                       height : 80
                     },
@@ -820,7 +766,7 @@ export class ReporteCostosOTComponent implements OnInit {
                 {
                   columns: [
                     {
-                      image : this.appComponent.logoParaPdf,
+                      image : logoParaPdf,
                       width : 100,
                       height : 80
                     },
@@ -1010,7 +956,7 @@ export class ReporteCostosOTComponent implements OnInit {
                 {
                   columns: [
                     {
-                      image : this.appComponent.logoParaPdf,
+                      image : logoParaPdf,
                       width : 100,
                       height : 80
                     },

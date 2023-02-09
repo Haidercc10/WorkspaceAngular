@@ -280,13 +280,13 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     if (anoInicial == null) anoInicial = moment().year();
     if (anoFinal == null) anoFinal = anoInicial;
 
-    if (cliente != null && producto != null && vendedor != null) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}&producto=${producto}&nombreProducto=${nombreItem}&cliente=${cliente}&nombreCliente=${nombreCliente}`;
-    else if (cliente != null && producto != null) ruta = `?producto=${producto}&nombreProducto=${nombreItem}&cliente=${cliente}&nombreCliente=${nombreCliente}`;
-    else if (cliente != null && vendedor != null) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}&cliente=${cliente}&nombreCliente=${nombreCliente}`;
-    else if (producto != null && vendedor != null) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}&producto=${producto}&nombreProducto=${nombreItem}`;
-    else if (cliente != null) ruta = `?cliente=${cliente}&nombreCliente=${nombreCliente}`;
-    else if (producto != null) ruta = `?producto=${producto}&nombreProducto=${nombreItem}`;
-    else if (vendedor != null) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}`;
+    if (cliente && nombreCliente && producto && nombreItem && vendedor && nombreVendedor) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}&producto=${producto}&nombreProducto=${nombreItem}&cliente=${cliente}&nombreCliente=${nombreCliente}`;
+    else if (cliente && nombreCliente && producto && nombreItem) ruta = `?producto=${producto}&nombreProducto=${nombreItem}&cliente=${cliente}&nombreCliente=${nombreCliente}`;
+    else if (cliente && nombreCliente && vendedor && nombreVendedor) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}&cliente=${cliente}&nombreCliente=${nombreCliente}`;
+    else if (vendedor && nombreVendedor && producto && nombreItem) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}&producto=${producto}&nombreProducto=${nombreItem}`;
+    else if (cliente && nombreCliente) ruta = `?cliente=${cliente}&nombreCliente=${nombreCliente}`;
+    else if (producto && nombreItem) ruta = `?producto=${producto}&nombreProducto=${nombreItem}`;
+    else if (vendedor && nombreVendedor) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}`;
 
     this.invetarioZeusService.GetConsolidadClientesArticulo(anoInicial, anoFinal, ruta).subscribe(datos_consolidado => {
       if(datos_consolidado.length == 0) {

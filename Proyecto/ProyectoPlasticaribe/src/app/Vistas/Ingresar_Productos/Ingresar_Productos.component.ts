@@ -10,7 +10,7 @@ import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProduc
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-Ingresar_Productos',
@@ -56,8 +56,7 @@ export class Ingresar_ProductosComponent implements OnInit {
                         private entradaRolloService : EntradaRollosService,
                           private dtEntradaRollosService : DetallesEntradaRollosService,
                               private productosService : ProductoService,
-                                  private dtPreEntregaService : DtPreEntregaRollosService,
-                                    private appComponent : AppComponent) {
+                                  private dtPreEntregaService : DtPreEntregaRollosService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -893,7 +892,7 @@ export class Ingresar_ProductosComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : this.appComponent.logoParaPdf,
+                    image : logoParaPdf,
                     width : 100,
                     height : 80
                   },

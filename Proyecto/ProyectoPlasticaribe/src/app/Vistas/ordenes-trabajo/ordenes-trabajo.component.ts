@@ -4,7 +4,7 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { modelMezclas } from 'src/app/Modelo/modelMezclas';
 import { modelMezMaterial } from 'src/app/Modelo/modelMezMaterial';
 import { modelMezPigmento } from 'src/app/Modelo/modelMezPigmento';
@@ -146,12 +146,11 @@ export class OrdenesTrabajoComponent implements OnInit {
                                                     private mezclaMaterialService : Mezclas_MaterialesService,
                                                       private mezclaPigmentosService : Mezclas_PigmentosService,
                                                         private mezclasService : MezclasService,
-                                                          private appComponent : AppComponent,
-                                                            private messageService: MessageService,
-                                                              private productoService : ProductoService,
-                                                                private clienteServise : ClientesService,
-                                                                  private tiposProductosService : TipoProductoService,
-                                                                    private tipoSelladoService : TiposSelladoService,) {
+                                                          private messageService: MessageService,
+                                                            private productoService : ProductoService,
+                                                              private clienteServise : ClientesService,
+                                                                private tiposProductosService : TipoProductoService,
+                                                                  private tipoSelladoService : TiposSelladoService,) {
 
     this.FormOrdenTrabajo = this.frmBuilderPedExterno.group({
       OT_Id: [''],
@@ -1532,7 +1531,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : this.appComponent.logoParaPdf, width : 70, height :40 },
+                { image : logoParaPdf, width : 70, height :40 },
                 {
                   width: 390,
                   text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${datos_ot[i].ot_FechaCreacion.replace('T00:00:00', '')}`,
@@ -1809,7 +1808,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             // Hoja 2
             {
               columns: [
-                { image : this.appComponent.logoParaPdf, width : 70, height :40 },
+                { image : logoParaPdf, width : 70, height :40 },
                 {
                   width: 390,
                   text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${datos_ot[i].ot_FechaCreacion.replace('T00:00:00', '')}`,

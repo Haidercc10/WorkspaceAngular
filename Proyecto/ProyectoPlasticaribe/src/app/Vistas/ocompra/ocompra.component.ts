@@ -3,7 +3,7 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCompra/DetallesOrdenesCompra.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
@@ -61,8 +61,7 @@ export class OcompraComponent implements OnInit {
                         private undMedidaService : UnidadMedidaService,
                           private ordenCompraService : OrdenCompra_MateriaPrimaService,
                             private dtOrdenCompraService : DetallesOrdenesCompraService,
-                              private appComponent : AppComponent,
-                               private servicioTintas : TintasService) {
+                              private servicioTintas : TintasService) {
 
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -151,13 +150,9 @@ export class OcompraComponent implements OnInit {
   // Generar Consecutivo de Orden de Compra
   generarConsecutivo(){
     this.ordenCompraService.getUltimoId_OrdenCompra().subscribe(datos_ordenCompra => {
-      this.FormOrdenCompra.patchValue({
-        ConsecutivoOrden : datos_ordenCompra + 1,
-      });
+      this.FormOrdenCompra.patchValue({ ConsecutivoOrden : datos_ordenCompra + 1, });
     }, error => {
-      this.FormOrdenCompra = this.frmBuilder.group({
-        ConsecutivoOrden : 1,
-      });
+      this.FormOrdenCompra = this.frmBuilder.group({ ConsecutivoOrden : 1, });
       this.cargando = false;
     });
   }
@@ -500,7 +495,7 @@ export class OcompraComponent implements OnInit {
             {
               columns: [
                 {
-                  image : this.appComponent.logoParaPdf,
+                  image : logoParaPdf,
                   width : 100,
                   height : 80
                 },

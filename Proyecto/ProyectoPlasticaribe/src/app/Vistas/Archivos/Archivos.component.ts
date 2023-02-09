@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { AppComponent } from 'src/app/app.component';
 import { ArchivosService } from 'src/app/Servicios/Archivos/Archivos.service';
@@ -19,7 +20,7 @@ export class ArchivosComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number = null; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  today : any = moment().format('YYYY-MM-DD') //Variable que se usará para llenar la fecha actual
   ArrayArchivos : any [] = []; //Variable que almacenará los archivos que vienen de la base de datos
   categoriasArchivos : any [] = []; //Variable para almacenar las categorias de archivos que hay
   selectedFile: File = null;
@@ -46,22 +47,10 @@ export class ArchivosComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.fecha();
     this.lecturaStorage();
     this.mostrarCarpetas();
     this.obtenerCategorias();
     this.cargarArchivos();
-  }
-
-  //Funcion que colocará la fecha actual
-  fecha(){
-    this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -82,11 +71,7 @@ export class ArchivosComponent implements OnInit {
   //Funcion que traerá las categorias existentes
   obtenerCategorias(){
     this.categoriasArchivos = [];
-    this.categoriaArchivosService.srvObtenerLista().subscribe(datos_categorias => {
-      for (let i = 0; i < datos_categorias.length; i++) {
-        this.categoriasArchivos.push(datos_categorias[i]);
-      }
-    });
+    this.categoriaArchivosService.srvObtenerLista().subscribe(datos_categorias => { this.categoriasArchivos = datos_categorias; });
   }
 
   //Funcion que limpiará todos los campos

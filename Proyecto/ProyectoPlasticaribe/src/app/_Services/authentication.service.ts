@@ -3,15 +3,19 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
 import { User } from '../_Models/user';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MovimientosAplicacionService } from '../Servicios/Movimientos_Aplicacion/MovimientosAplicacion.service';
 import moment from 'moment';
+import { AuthenticationService_InvZeus } from './authentication_InvZeus.service';
+import { authentication_ContaZeus } from './authentication_ContaZeus.service';
+import { authentication_BagPro } from './authentication_BagPro.service';
 
 @Injectable({ providedIn: 'root' })
+
 export class AuthenticationService {
+
   readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
   private userSubject: BehaviorSubject<User | null>;
   public user: Observable<User | null>;
@@ -20,7 +24,10 @@ export class AuthenticationService {
   constructor(private router: Router,
                 private http: HttpClient,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private movAplicacionService : MovimientosAplicacionService,) {
+                    private movAplicacionService : MovimientosAplicacionService,
+                      private authenticationInvZeusService : AuthenticationService_InvZeus,
+                        private authenticationContaZeusService : authentication_ContaZeus,
+                          private authenticationBagPro : authentication_BagPro,) {
 
     this.userSubject = new BehaviorSubject(JSON.parse(localStorage.getItem('user')!));
     this.user = this.userSubject.asObservable();
@@ -56,6 +63,9 @@ export class AuthenticationService {
     localStorage.clear();
     this.storage.clear();
     this.userSubject.next(null);
-    this.router.navigate(['/']);
+    this.authenticationInvZeusService.logout();
+    this.authenticationContaZeusService.logout();
+    this.authenticationBagPro.logout();
+    window.location.pathname = '/';
   }
 }

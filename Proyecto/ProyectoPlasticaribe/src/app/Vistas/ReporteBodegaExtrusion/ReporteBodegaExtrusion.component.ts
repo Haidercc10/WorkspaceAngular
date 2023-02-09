@@ -1,17 +1,14 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { timeStamp } from 'console';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollosExtrusion/DetallesAsgRollos_Extrusion.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
-import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 
 @Injectable({
   providedIn: 'root'
@@ -43,8 +40,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private estadosService : EstadosService,
                       private ingRollosService : DtIngRollos_ExtrusionService,
-                        private salidaRollosService : DetallesAsgRollos_ExtrusionService,
-                          private appComponent : AppComponent,) {
+                        private salidaRollosService : DetallesAsgRollos_ExtrusionService,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -113,7 +109,6 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
     let fechaFin : any = this.FormConsultarFiltros.value.fechaFinalDoc;
 
     if (fechaIni != null && fechaFin != null) {
-      console.log(1)
       this.ingRollosService.getconsultaRollosFechas(fechaIni, fechaFin).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
           this.llenarTabla(datos_factura[i]);
@@ -125,7 +120,6 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
         }
       });
     } else if (ot != null) {
-      console.log(2)
       this.ingRollosService.getconsultaRollosOT(ot).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
           this.llenarTabla(datos_factura[i]);
@@ -137,7 +131,6 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
         }
       });
     } else if (fechaIni != null) {
-      console.log(3)
       this.ingRollosService.getconsultaRollosFechas(fechaIni, fechaIni).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
           this.llenarTabla(datos_factura[i]);
@@ -149,7 +142,6 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
         }
       });
     } else {
-      console.log(4)
       this.ingRollosService.getconsultaRollosFechas(this.today, this.today).subscribe(datos_factura => {
         for (let i = 0; i < datos_factura.length; i++) {
           this.llenarTabla(datos_factura[i]);
@@ -276,9 +268,8 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   // Funcion que calculará el total de rollos
   calcularTotalRollos() {
     let total = 0;
-    console.log(this.rollosAgrupados)
     for(let sale of this.rollosAgrupados) {
-        total += sale.Rollos2;
+      total += sale.Rollos2;
     }
     this.totalRollos = total;
   }
@@ -321,7 +312,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : this.appComponent.logoParaPdf,
+                    image : logoParaPdf,
                     width : 100,
                     height : 80
                   },
@@ -458,7 +449,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : this.appComponent.logoParaPdf,
+                    image : logoParaPdf,
                     width : 100,
                     height : 80
                   },

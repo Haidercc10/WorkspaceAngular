@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.service';
@@ -46,8 +46,7 @@ export class DesperdicioComponent implements OnInit {
                           private fallasService : FallasTecnicasService,
                             private maquinasService : ActivosService,
                               private deperdicioService : DesperdicioService,
-                                private appComponent : AppComponent,
-                                  private materiaService : MaterialProductoService,) {
+                                private materiaService : MaterialProductoService,) {
 
     this.FormDesperdicio = this.frmBuilder.group({
       OTDesperdicio : [null],
@@ -161,24 +160,9 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar el id de la falla y en su lugar colocará el nombre en el formulario
   buscarFalla(){
     this.fallasService.srvObtenerListaPorId(this.FormDesperdicio.value.TipoNoConformidad).subscribe(datos_falla => {
-      this.FormDesperdicio.setValue({
-        OTDesperdicio : this.FormDesperdicio.value.OTDesperdicio,
-        IdMaquina : this.FormDesperdicio.value.IdMaquina,
-        Maquina : this.FormDesperdicio.value.Maquina,
-        IdOperario : this.FormDesperdicio.value.IdOperario,
-        Operario : this.FormDesperdicio.value.Operario,
-        IdProducto : this.FormDesperdicio.value.IdProducto,
-        Producto : this.FormDesperdicio.value.Producto,
-        IdTipoMaterial : this.FormDesperdicio.value.IdTipoMaterial,
-        TipoMaterial : this.FormDesperdicio.value.TipoMaterial,
-        Impreso : this.FormDesperdicio.value.Impreso,
+      this.FormDesperdicio.patchValue({
         IdTipoNoConformidad : datos_falla.falla_Id,
         TipoNoConformidad : datos_falla.falla_Nombre,
-        CantidadKg : this.FormDesperdicio.value.CantidadKg,
-        Observacion : this.FormDesperdicio.value.Observacion,
-        IdArea : this.FormDesperdicio.value.IdArea,
-        Area : this.FormDesperdicio.value.Area,
-        Fecha : this.FormDesperdicio.value.Fecha,
       });
     }, error => { this.mensajesError(`¡No se pudo obtener información de la "No Conformidad" seleccionada!`, error.message); });
   }
@@ -186,24 +170,9 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar el id del operario y en su lugar colocará el nombre en el formulario
   buscarOperario(){
     this.operariosService.srvObtenerListaPorId(this.FormDesperdicio.value.Operario).subscribe(datos_operario => {
-      this.FormDesperdicio.setValue({
-        OTDesperdicio : this.FormDesperdicio.value.OTDesperdicio,
-        IdMaquina : this.FormDesperdicio.value.IdMaquina,
-        Maquina : this.FormDesperdicio.value.Maquina,
+      this.FormDesperdicio.patchValue({
         IdOperario : datos_operario.usua_Id,
         Operario : datos_operario.usua_Nombre,
-        IdProducto : this.FormDesperdicio.value.IdProducto,
-        Producto : this.FormDesperdicio.value.Producto,
-        IdTipoMaterial : this.FormDesperdicio.value.IdTipoMaterial,
-        TipoMaterial : this.FormDesperdicio.value.TipoMaterial,
-        Impreso : this.FormDesperdicio.value.Impreso,
-        IdTipoNoConformidad : this.FormDesperdicio.value.IdTipoNoConformidad,
-        TipoNoConformidad : this.FormDesperdicio.value.TipoNoConformidad,
-        CantidadKg : this.FormDesperdicio.value.CantidadKg,
-        Observacion : this.FormDesperdicio.value.Observacion,
-        IdArea : this.FormDesperdicio.value.IdArea,
-        Area : this.FormDesperdicio.value.Area,
-        Fecha : this.FormDesperdicio.value.Fecha,
       });
     }, error => { this.mensajesError(`¡No se pudo obtener información del operario seleccionada!`, error.message); });
   }
@@ -211,24 +180,9 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar el id de la maquina y en su lugar colocará el serial de la maquina
   buscarMaquina(){
     this.maquinasService.GetId(this.FormDesperdicio.value.Maquina).subscribe(datos_maquinas => {
-      this.FormDesperdicio.setValue({
-        OTDesperdicio : this.FormDesperdicio.value.OTDesperdicio,
+      this.FormDesperdicio.patchValue({
         IdMaquina : datos_maquinas.actv_Id,
         Maquina : datos_maquinas.actv_Serial,
-        IdOperario : this.FormDesperdicio.value.IdOperario,
-        Operario : this.FormDesperdicio.value.Operario,
-        IdProducto : this.FormDesperdicio.value.IdProducto,
-        Producto : this.FormDesperdicio.value.Producto,
-        IdTipoMaterial : this.FormDesperdicio.value.IdTipoMaterial,
-        TipoMaterial : this.FormDesperdicio.value.TipoMaterial,
-        Impreso : this.FormDesperdicio.value.Impreso,
-        IdTipoNoConformidad : this.FormDesperdicio.value.IdTipoNoConformidad,
-        TipoNoConformidad : this.FormDesperdicio.value.TipoNoConformidad,
-        CantidadKg : this.FormDesperdicio.value.CantidadKg,
-        Observacion : this.FormDesperdicio.value.Observacion,
-        IdArea : this.FormDesperdicio.value.IdArea,
-        Area : this.FormDesperdicio.value.Area,
-        Fecha : this.FormDesperdicio.value.Fecha,
       });
     }, error => { this.mensajesError(`¡No se pudo obtener información de la maquina seleccionada!`, error.message); });
   }
@@ -236,24 +190,9 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar el id del area y en su lugar colocará el nombre del area o proceso
   buscarProceso(){
     this.procesosService.srvObtenerListaPorId(this.FormDesperdicio.value.Area).subscribe(datos_procesos => {
-      this.FormDesperdicio.setValue({
-        OTDesperdicio : this.FormDesperdicio.value.OTDesperdicio,
-        IdMaquina : this.FormDesperdicio.value.IdMaquina,
-        Maquina : this.FormDesperdicio.value.Maquina,
-        IdOperario : this.FormDesperdicio.value.IdOperario,
-        Operario : this.FormDesperdicio.value.Operario,
-        IdProducto : this.FormDesperdicio.value.IdProducto,
-        Producto : this.FormDesperdicio.value.Producto,
-        IdTipoMaterial : this.FormDesperdicio.value.IdTipoMaterial,
-        TipoMaterial : this.FormDesperdicio.value.TipoMaterial,
-        Impreso : this.FormDesperdicio.value.Impreso,
-        IdTipoNoConformidad : this.FormDesperdicio.value.IdTipoNoConformidad,
-        TipoNoConformidad : this.FormDesperdicio.value.TipoNoConformidad,
-        CantidadKg : this.FormDesperdicio.value.CantidadKg,
-        Observacion : this.FormDesperdicio.value.Observacion,
+      this.FormDesperdicio.patchValue({
         IdArea : datos_procesos.proceso_Id,
         Area : datos_procesos.proceso_Nombre,
-        Fecha : this.FormDesperdicio.value.Fecha,
       });
     }, error => { this.mensajesError(`¡No se pudo obtener información del área seleccionada!`, error.message); });
   }
@@ -261,24 +200,9 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar el id del material y en su lugar colocará el nombre de este
   buscarMaterial(){
     this.materiaService.srvObtenerListaPorId(this.FormDesperdicio.value.TipoMaterial).subscribe(datos_material => {
-      this.FormDesperdicio.setValue({
-        OTDesperdicio : this.FormDesperdicio.value.OTDesperdicio,
-        IdMaquina : this.FormDesperdicio.value.IdMaquina,
-        Maquina : this.FormDesperdicio.value.Maquina,
-        IdOperario : this.FormDesperdicio.value.IdOperario,
-        Operario : this.FormDesperdicio.value.Operario,
-        IdProducto : this.FormDesperdicio.value.IdProducto,
-        Producto : this.FormDesperdicio.value.Producto,
+      this.FormDesperdicio.patchValue({
         IdTipoMaterial : datos_material.material_Id,
         TipoMaterial : datos_material.material_Nombre,
-        Impreso : this.FormDesperdicio.value.Impreso,
-        IdTipoNoConformidad : this.FormDesperdicio.value.IdTipoNoConformidad,
-        TipoNoConformidad : this.FormDesperdicio.value.TipoNoConformidad,
-        CantidadKg : this.FormDesperdicio.value.CantidadKg,
-        Observacion : this.FormDesperdicio.value.Observacion,
-        IdArea : this.FormDesperdicio.value.IdArea,
-        Area : this.FormDesperdicio.value.Area,
-        Fecha : this.FormDesperdicio.value.Fecha,
       });
     }, error => { this.mensajesError(`¡No se pudo obtener información del material seleccionado!`, error.message); });
   }
@@ -296,24 +220,13 @@ export class DesperdicioComponent implements OnInit {
         let imp : any = datos_orden[i].impresion.trim();
         if (imp == "1") imp = "SI";
         else if (imp == "0") imp = "NO";
-        this.FormDesperdicio.setValue({
+        this.FormDesperdicio.patchValue({
           OTDesperdicio : orden,
-          IdMaquina : this.FormDesperdicio.value.IdMaquina,
-          Maquina : this.FormDesperdicio.value.Maquina,
-          IdOperario : this.FormDesperdicio.value.IdOperario,
-          Operario : this.FormDesperdicio.value.Operario,
           IdProducto : datos_orden[i].clienteItems,
           Producto : datos_orden[i].clienteItemsNom,
           IdTipoMaterial : datos_orden[i].extMaterial,
           TipoMaterial : datos_orden[i].extMaterialNom,
           Impreso : imp,
-          IdTipoNoConformidad : this.FormDesperdicio.value.IdTipoNoConformidad,
-          TipoNoConformidad : this.FormDesperdicio.value.TipoNoConformidad,
-          CantidadKg : this.FormDesperdicio.value.CantidadKg,
-          Observacion : this.FormDesperdicio.value.Observacion,
-          IdArea : this.FormDesperdicio.value.IdArea,
-          Area : this.FormDesperdicio.value.Area,
-          Fecha : this.FormDesperdicio.value.Fecha,
         });
         this.cargando = false;
       }
@@ -399,13 +312,8 @@ export class DesperdicioComponent implements OnInit {
     this.deperdicioService.GetUltimoPedido().subscribe(datos_desperdicios => {
       for (let i = 0; i < datos_desperdicios.length; i++) {
         const pdfDefinicion : any = {
-          info: {
-            title: `Reporte Merma de Material - ${this.today}`
-          },
-          pageSize: {
-            width: 630,
-            height: 760
-          },
+          info: { title: `Reporte Merma de Material - ${this.today}` },
+          pageSize: { width: 630, height: 760 },
           footer: function(currentPage : any, pageCount : any) {
             return [
               {
@@ -420,17 +328,8 @@ export class DesperdicioComponent implements OnInit {
           content : [
             {
               columns: [
-                {
-                  image : this.appComponent.logoParaPdf,
-                  width : 100,
-                  height : 80
-                },
-                {
-                  text: `Reporte Merma de Material`,
-                  alignment: 'right',
-                  style: 'titulo',
-                  margin: 30
-                }
+                { image : logoParaPdf, width : 100, height : 80 },
+                { text: `Reporte Merma de Material`, alignment: 'right',  style: 'titulo', margin: 30 }
               ]
             },
             '\n \n',
@@ -441,79 +340,33 @@ export class DesperdicioComponent implements OnInit {
                 style: 'header',
                 body: [
                   [
-                    {
-                      border: [false, false, false, false],
-                      text: `Nombre Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `Plasticaribe S.A.S`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Dirección`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_desperdicios[i].empresa_Direccion}`
-                    },
+                    { border: [false, false, false, false], text: `Nombre Empresa` },
+                    { border: [false, false, false, true], text: `Plasticaribe S.A.S` },
+                    { border: [false, false, false, false], text: `Dirección` },
+                    { border: [false, false, false, true], text: `${datos_desperdicios[i].empresa_Direccion}` },
                   ],
                   [
-                    {
-                      border: [false, false, false, false],
-                      text: `Ciudad`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_desperdicios[i].empresa_Ciudad}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Fecha registro`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_desperdicios[i].desp_FechaRegistro.replace('T00:00:00', '')}`
-                    },
+                    { border: [false, false, false, false], text: `Ciudad` },
+                    { border: [false, false, false, true], text: `${datos_desperdicios[i].empresa_Ciudad}` },
+                    { border: [false, false, false, false], text: `Fecha registro` },
+                    { border: [false, false, false, true], text: `${datos_desperdicios[i].desp_FechaRegistro.replace('T00:00:00', '')}` },
                   ],
                 ]
               },
-              layout: {
-                defaultBorder: false,
-              },
+              layout: { defaultBorder: false, },
               fontSize: 9,
             },
             '\n \n',
-            {
-              text: `Ingresados Por:\n`,
-              alignment: 'left',
-              style: 'header',
-            },
-            {
-              text: `${datos_desperdicios[i].nombreCreador}\n`,
-              alignment: 'left',
-              style: 'texto',
-            },
-            {
-              text: `\n\n Información detallada de los Desperdicios \n `,
-              alignment: 'center',
-              style: 'header'
-            },
+            { text: `Ingresados Por:\n`, alignment: 'left', style: 'header', },
+            { text: `${datos_desperdicios[i].nombreCreador}\n`, alignment: 'left', style: 'texto', },
+            { text: `\n\n Información detallada de los Desperdicios \n `, alignment: 'center', style: 'header' },
 
             this.table(this.datosPdf, ['OT', 'Maquina', 'Item', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Impreso', 'Area', 'Fecha', 'Observacion']),
           ],
           styles: {
-            header: {
-              fontSize: 10,
-              bold: true
-            },
-            texto: {
-              fontSize: 9,
-            },
-            titulo: {
-              fontSize: 20,
-              bold: true
-            }
+            header: { fontSize: 10, bold: true },
+            texto: { fontSize: 9, },
+            titulo: { fontSize: 20, bold: true }
           }
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);

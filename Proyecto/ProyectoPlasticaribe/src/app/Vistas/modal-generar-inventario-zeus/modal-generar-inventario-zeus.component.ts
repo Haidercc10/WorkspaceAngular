@@ -1,18 +1,16 @@
-import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { FiltrosProductosTerminadosZeusPipe } from 'src/app/Pipes/filtros-productos-terminados-zeus.pipe';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import Swal from 'sweetalert2';
-import * as XLSX from 'xlsx';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { Table } from 'primeng/table';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -56,21 +54,14 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private rolService : RolesService,
                       private existencias_ProductosService : ExistenciasProductosService,
-                        private frmBuilder : FormBuilder,
-                          private frmBuilder2 : FormBuilder,
-                            private appComponent : AppComponent,) {
+                        private frmBuilder : FormBuilder,) {
 
     this.FormExistencias = this.frmBuilder.group({
-     // cantMinima : [0],
       cantidad : [0],
       filtroFechas : [''],
     });
 
-    this.FormEditarCantMinima = this.frmBuilder.group({
-      //CantMinimaEditada : [],
-      cantMinima : [],
-    });
-
+    this.FormEditarCantMinima = this.frmBuilder.group({ cantMinima : [], });
 
     this.load = true;
   }
@@ -78,7 +69,6 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   ngOnInit(): void {
     this.ColumnasTabla();
     this.InventarioExistenciaZeus();
-    //this.FormEditarCantMinima.disable();
   }
 
   // Funcion que calculará cual es la fecha segun los parametros especificados
@@ -108,14 +98,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     for (let i = 0; i < this.ArrayProductoZeus.length; i++) {
       this.ArrayProductoZeus[i].fechaModificacion = '';
       this.clienteOtItems.srvObtenerListaConsultarItem(this.fechaBusqueda, this.today, this.ArrayProductoZeus[i].codigoItem, this.ArrayProductoZeus[i].PrecioItem).subscribe(datos_item => {
-        //if (datos_item.length != 0){
-          //for (let j = 0; j < datos_item.length; j++) {
-            if(datos_item != null) {
-              this.ArrayProductoZeus[i].fechaModificacion = `${datos_item}`.replace('T00:00:00', '');
-            }
-            //break;
-          //}
-        //}
+        if(datos_item != null) this.ArrayProductoZeus[i].fechaModificacion = `${datos_item}`.replace('T00:00:00', '');
       });
     }
     setTimeout(() => { this.ordenarItems(); }, 7000);
@@ -146,7 +129,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         }
         let workbook = new Workbook();
         const imageId1 = workbook.addImage({
-          base64:  this.appComponent.logoParaPdf,
+          base64:  logoParaPdf,
           extension: 'png',
         });
         let worksheet = workbook.addWorksheet(`Inventario de Productos Terminados ${this.today}`);
@@ -199,8 +182,8 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             fs.saveAs(blob, `Inventario de Productos Terminados ${this.today}.xlsx`);
           });
           this.load = true;
-        }, 1000);
-      }, 3500);
+        }, 500);
+      }, 2000);
     }
   }
 
@@ -255,55 +238,38 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   //
   seleccionarProducto(item){
     this.numeroIdProd = item.codigoItem;
-    console.log(this.numeroIdProd);
-    //this.FormEditarCantMinima.enable();
-    // const a : any = document.createElement("a");
-    // document.body.appendChild(a);
-    // a.href = "#FormExistencias";
-    // a.click();
-    // document.body.removeChild(a);
   }
 
   //
   actualizarCantMinima(fila){
-    console.log(fila.codigoItem)
-    //this.numeroIdProd = fila.codigoItem;
-    //let cantidad : number = this.FormEditarCantMinima.value.cantMinima;
-      for (let index = 0; index < this.ArrayProductoZeus.length; index++) {
-        if(fila.codigoItem == this.ArrayProductoZeus[index].codigoItem)
-          this.existencias_ProductosService.srvObtenerListaPorIdProducto2(this.numeroIdProd).subscribe(datos_existencias => {
-            for (let i = 0; i < datos_existencias.length; i++) {
-              const datosExistencias = {
-                Prod_Id: this.numeroIdProd,
-                exProd_Id: datos_existencias[i].exProd_Id,
-                ExProd_Cantidad: datos_existencias[i].exProd_Cantidad,
-                UndMed_Id: datos_existencias[i].undMed_Id,
-                TpBod_Id: datos_existencias[i].tpBod_Id,
-                ExProd_Precio: datos_existencias[i].exProd_Precio,
-                ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
-                ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
-                ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
-                TpMoneda_Id: datos_existencias[i].tpMoneda_Id,
-                exProd_PrecioVenta : datos_existencias[i].exProd_PrecioVenta,
-                ExProd_CantMinima : this.ArrayProductoZeus[index].cantMinima,
-                ExProd_Fecha : this.ArrayProductoZeus[i].exProd_Fecha,
-                ExProd_Hora : this.ArrayProductoZeus[i].exProd_Hora,
-              }
-
-              console.log(datosExistencias);
-              this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
-                this.InventarioExistenciaZeus();
-                this.confirmUsuarioCreado(fila.nombreItem);
-              //cantidad = datos_existencias[i].exProd_CantidadMinima
-              //this.numeroIdProd = 0;
+    for (let index = 0; index < this.ArrayProductoZeus.length; index++) {
+      if(fila.codigoItem == this.ArrayProductoZeus[index].codigoItem) {
+        this.existencias_ProductosService.srvObtenerListaPorIdProducto2(this.numeroIdProd).subscribe(datos_existencias => {
+          for (let i = 0; i < datos_existencias.length; i++) {
+            const datosExistencias = {
+              Prod_Id: this.numeroIdProd,
+              exProd_Id: datos_existencias[i].exProd_Id,
+              ExProd_Cantidad: datos_existencias[i].exProd_Cantidad,
+              UndMed_Id: datos_existencias[i].undMed_Id,
+              TpBod_Id: datos_existencias[i].tpBod_Id,
+              ExProd_Precio: datos_existencias[i].exProd_Precio,
+              ExProd_PrecioExistencia: datos_existencias[i].exProd_PrecioExistencia,
+              ExProd_PrecioSinInflacion: datos_existencias[i].exProd_PrecioSinInflacion,
+              ExProd_PrecioTotalFinal: datos_existencias[i].exProd_PrecioTotalFinal,
+              TpMoneda_Id: datos_existencias[i].tpMoneda_Id,
+              exProd_PrecioVenta : datos_existencias[i].exProd_PrecioVenta,
+              ExProd_CantMinima : this.ArrayProductoZeus[index].cantMinima,
+              ExProd_Fecha : this.ArrayProductoZeus[i].exProd_Fecha,
+              ExProd_Hora : this.ArrayProductoZeus[i].exProd_Hora,
+            }
+            this.existencias_ProductosService.srvActualizarExistenciaCantidadMinima(this.numeroIdProd, datosExistencias).subscribe(datos_existencias => {
+              this.InventarioExistenciaZeus();
+              this.confirmUsuarioCreado(fila.nombreItem);
             });
           }
-          //this.FormEditarCantMinima.reset();
-          //this.FormEditarCantMinima.disable();
         });
       }
-
-
+    }
   }
 
   //

@@ -124,13 +124,10 @@ export class AsignacionTintasComponent implements OnInit {
   buscarTintaSeleccionada(){
     let tinta : any = this.FormAsignacionMP.value.Tinta;
     this.tintasService.srvObtenerListaPorId(tinta).subscribe(datos_tinta => {
-      this.FormAsignacionMP .setValue({
+      this.FormAsignacionMP .patchValue({
         Id_Tinta: datos_tinta.tinta_Id,
         Tinta : datos_tinta.tinta_Nombre,
-        cantidadTinta : this.FormAsignacionMP.value.cantidadTinta,
         undMedTinta : datos_tinta.undMed_Id,
-        Observacion : this.FormAsignacionMP.value.Observacion,
-        Fecha : this.FormAsignacionMP.value.Fecha,
       });
     }, error => { this.mensajeError(`¡No se ha podido obtener información de la tinta seleccionada!`, error.message); });
   }

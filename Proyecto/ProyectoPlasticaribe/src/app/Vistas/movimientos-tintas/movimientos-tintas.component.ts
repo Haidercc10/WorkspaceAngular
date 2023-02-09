@@ -13,7 +13,7 @@ import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisi
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-movimientos-tintas',
@@ -47,8 +47,7 @@ export class MovimientosTintasComponent implements OnInit {
                               private dtRemision : RemisionesMPService,
                                 private servicioTintas : TintasService,
                                   private dtAsgTinta : DetallesAsignacionTintasService,
-                                    private dtCreacionTinta : DetallesAsignacionMPxTintasService,
-                                      private appComponent : AppComponent,) {
+                                    private dtCreacionTinta : DetallesAsignacionMPxTintasService,) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null, Validators.required],
@@ -73,14 +72,9 @@ export class MovimientosTintasComponent implements OnInit {
     let id : number = this.FormDocumentos.value.tintas;
     this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
       for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.FormDocumentos.setValue({
-          idDocumento : this.FormDocumentos.value.idDocumento,
-          TipoDocumento: this.FormDocumentos.value.TipoDocumento,
+        this.FormDocumentos.patchValue({
           TintaId : datos_materiaPrima[i].id,
           tintas: datos_materiaPrima[i].nombre,
-          fecha: this.FormDocumentos.value.fecha,
-          fechaFinal : this.FormDocumentos.value.fechaFinal,
-          estado : this.FormDocumentos.value.estado,
         });
       }
     });
@@ -870,7 +864,7 @@ export class MovimientosTintasComponent implements OnInit {
                 {
                   columns: [
                     {
-                      image : this.appComponent.logoParaPdf,
+                      image : logoParaPdf,
                       width : 100,
                       height : 80
                     },
@@ -969,7 +963,7 @@ export class MovimientosTintasComponent implements OnInit {
                 {
                   columns: [
                     {
-                      image : this.appComponent.logoParaPdf,
+                      image : logoParaPdf,
                       width : 100,
                       height : 80
                     },
@@ -1082,7 +1076,7 @@ export class MovimientosTintasComponent implements OnInit {
                 {
                   columns: [
                     {
-                      image : this.appComponent.logoParaPdf,
+                      image : logoParaPdf,
                       width : 100,
                       height : 80
                     },
@@ -1188,7 +1182,7 @@ export class MovimientosTintasComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : this.appComponent.logoParaPdf,
+                    image : logoParaPdf,
                     width : 100,
                     height : 80
                   },

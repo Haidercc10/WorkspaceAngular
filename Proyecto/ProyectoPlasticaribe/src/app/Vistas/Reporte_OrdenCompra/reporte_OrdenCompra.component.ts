@@ -4,7 +4,7 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCompra/DetallesOrdenesCompra.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
@@ -38,8 +38,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
                 private rolService : RolesService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private estadosService : EstadosService,
-                      private dtOrdenCompraService : DetallesOrdenesCompraService,
-                        private appComponent : AppComponent,) {
+                      private dtOrdenCompraService : DetallesOrdenesCompraService,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -282,7 +281,7 @@ export class Reporte_OrdenCompraComponent implements OnInit {
             {
               columns: [
                 {
-                  image : this.appComponent.logoParaPdf,
+                  image : logoParaPdf,
                   width : 100,
                   height : 80
                 },

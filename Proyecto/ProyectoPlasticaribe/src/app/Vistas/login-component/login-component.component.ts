@@ -19,6 +19,7 @@ import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.s
 
 export class LoginComponentComponent implements OnInit {
 
+  cargando : boolean = false;
   formularioUsuario !: FormGroup;
   data:any=[];
   ruta : any;
@@ -35,6 +36,11 @@ export class LoginComponentComponent implements OnInit {
                             private authenticationContaZeusService : authentication_ContaZeus,
                               private authenticationBagPro : authentication_BagPro,) {
 
+    if (!this.storage.get('Token')) localStorage.clear();
+    if ((this.storage.get('Token')
+       && this.storage.get('Token_BagPro')
+       && this.storage.get('Token_Inv_Zeus')
+       && this.storage.get('Token_Conta_Zeus')) || localStorage.getItem('user')) this.router.navigate(['/home']);
     this.formularioUsuario = this.frmBuilderUsuario.group({
       Identificacion: [, Validators.required],
       Contrasena: [, Validators.required],
@@ -67,30 +73,34 @@ export class LoginComponentComponent implements OnInit {
 
   // Funcion que se encargará de enviar al API la información del usuario que desea iniciar sesion y dependiendo de la respuesta de esta se actuará
   consultaLogin(){
+    this.cargando = true;
     let empresa : number = this.formularioUsuario.value.Empresa;
     let idUsuario : number = this.formularioUsuario.value.Identificacion;
     let contrasena : string = this.formularioUsuario.value.Contrasena;
     let data : any = { "id_Usuario": idUsuario, "contrasena": contrasena, "empresa": empresa };
     this.authenticationService.login(data).subscribe(datos => {
-      let idUsuario : number = datos.usua_Id;
-      let nombre: string = datos.usuario;
-      let rol: number = datos.rolUsu_Id;
-      let infoMovimientoAplicacion : any = {
-        "Usua_Id" : idUsuario,
-        "MovApp_Nombre" : `Inicio de sesión del usuario "${nombre}"`,
-        "MovApp_Descripcion" : `El usuario "${nombre}" con el ID ${idUsuario} inició sesión en el programa el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
-        "MovApp_Fecha" : moment().format('YYYY-MM-DD'),
-        "MovApp_Hora" : moment().format('H:mm:ss'),
-      }
-      this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(datos => { });
-      this.authenticationInvZeusService.login().subscribe(datos => {});
-      this.authenticationContaZeusService.login().subscribe(datos => {});
-      this.authenticationBagPro.login().subscribe(datos => {});
-      this.saveInLocal('Id', idUsuario);
-      this.saveInLocal('Nombre', nombre);
-      this.saveInLocal('Rol', rol);
-      setTimeout(() => { this.router.navigate(['/home']); }, 500);
-    }, error => { this.mensajeError(`¡No fue posible iniciar sesión!`, error) });
+      this.authenticationInvZeusService.login().subscribe(datos_InvZeus => {
+        this.authenticationContaZeusService.login().subscribe(datos_ContZeus => {
+          this.authenticationBagPro.login().subscribe(datos_BagPro => {
+            let idUsuario : number = datos.usua_Id;
+            let nombre: string = datos.usuario;
+            let rol: number = datos.rolUsu_Id;
+            let infoMovimientoAplicacion : any = {
+              "Usua_Id" : idUsuario,
+              "MovApp_Nombre" : `Inicio de sesión del usuario "${nombre}"`,
+              "MovApp_Descripcion" : `El usuario "${nombre}" con el ID ${idUsuario} inició sesión en el programa el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
+              "MovApp_Fecha" : moment().format('YYYY-MM-DD'),
+              "MovApp_Hora" : moment().format('H:mm:ss'),
+            }
+            this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(datos_Mov => { }, err => { this.mensajeError(`¡Error Insertanco el inició de sesión!`); });
+            this.saveInLocal('Id', idUsuario);
+            this.saveInLocal('Nombre', nombre);
+            this.saveInLocal('Rol', rol);
+            window.location.pathname = '/home';
+          }, err => { this.mensajeError(`¡Error al conectarse con BagPro!`); });
+        }, err => { this.mensajeError(`¡Error al conectarse con Contabilidad de Zeus!`); });
+      }, err => { this.mensajeError(`¡Error al conectarse con Inventario de Zeus!`); });
+    }, err => { this.mensajeError(`¡No fue posible iniciar sesión!`) });
   }
 
   // Funcion que mostrará una advertencia para cuando haya campos vacios en la edicion o creacion de un usuario
@@ -109,5 +119,8 @@ export class LoginComponentComponent implements OnInit {
   }
 
   // Funcion que mostrará un mensaje de error
-  mensajeError(text : string, error : any = ""){ Swal.fire({ icon: 'warning', title: 'Oops...', html: `<b>¡${text}!</b><hr>`, }); }
+  mensajeError(text : string){
+    this.cargando = false;
+    Swal.fire({ icon: 'warning', title: 'Oops...', html: `<b>¡${text}!</b><hr>`, });
+  }
 }

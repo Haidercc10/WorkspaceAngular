@@ -6,7 +6,7 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { TreeTable } from 'primeng/treetable';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
@@ -53,10 +53,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
                 private rolService : RolesService,
                   private inventarioZeusService : InventarioZeusService,
                     private FormBuild : FormBuilder,
-                      private appComponent : AppComponent,
-                        private estadosProcesos_OTService : EstadosProcesos_OTService,
-                          private pedidoProductosService : PedidoProductosService,
-                            private pedidoExternoService : OpedidoproductoService,) {
+                      private estadosProcesos_OTService : EstadosProcesos_OTService,
+                        private pedidoProductosService : PedidoProductosService,
+                          private pedidoExternoService : OpedidoproductoService,) {
 
     this.formFiltros = this.FormBuild.group({
       IdVendedor : [null],
@@ -681,7 +680,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
         let workbook = new Workbook();
         const imageId1 = workbook.addImage({
-          base64:  this.appComponent.logoParaPdf,
+          base64:  logoParaPdf,
           extension: 'png',
         });
         let worksheet = workbook.addWorksheet(`Reporte de Pedidos Zeus - ${this.today}`);
@@ -860,7 +859,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : this.appComponent.logoParaPdf, width : 100, height : 80 },
+                { image : logoParaPdf, width : 100, height : 80 },
                 { text: `Pedido Zeus ${item.consecutivo}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },
@@ -983,7 +982,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : this.appComponent.logoParaPdf, width : 100, height : 80 },
+                { image : logoParaPdf, width : 100, height : 80 },
                 { text: `Pedido ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },

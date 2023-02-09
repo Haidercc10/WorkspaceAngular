@@ -47,10 +47,7 @@ export class MenuLateralComponent implements OnInit {
                 private rolService : RolesService,
                   private confirmationService: ConfirmationService,
                     private messageService: MessageService,
-                      private authenticationService: AuthenticationService,
-                        private authenticationInvZeusService : AuthenticationService_InvZeus,
-                          private authentication_ContaZeus : authentication_ContaZeus,
-                            private authentication_Bagpro : authentication_BagPro,) { }
+                      private authenticationService: AuthenticationService,) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -79,9 +76,6 @@ export class MenuLateralComponent implements OnInit {
       rejectLabel: 'No',
       accept: () => {
         this.authenticationService.logout();
-        this.authenticationInvZeusService.logout();
-        this.authentication_ContaZeus.logout();
-        this.authentication_Bagpro.logout();
         this.messageService.add({severity:'info', summary:'Confirmed', detail:'You have accepted'});
       },
     });
@@ -94,9 +88,6 @@ export class MenuLateralComponent implements OnInit {
 
   onConfirm() {
     this.authenticationService.logout();
-    this.authenticationInvZeusService.logout();
-    this.authentication_ContaZeus.logout();
-    this.authentication_Bagpro.logout();
   }
 
   onReject() {

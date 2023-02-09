@@ -2,7 +2,6 @@ import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { TreeTable } from 'primeng/treetable';
-import { AppComponent } from 'src/app/app.component';
 import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
@@ -13,6 +12,7 @@ import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventar
 import { Workbook } from 'exceljs';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-Reporte_PedidosVendedores',
@@ -49,11 +49,10 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
-                  private appComponent : AppComponent,
-                    private servicioDtlPedidos : PedidoProductosService,
-                      private pedidoExternoService : OpedidoproductoService,
-                        private servicioZeus : InventarioZeusService,
-                          private estadosProcesos_OTService : EstadosProcesos_OTService,) { }
+                  private servicioDtlPedidos : PedidoProductosService,
+                    private pedidoExternoService : OpedidoproductoService,
+                      private servicioZeus : InventarioZeusService,
+                        private estadosProcesos_OTService : EstadosProcesos_OTService,) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -433,7 +432,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
         const header = ["N° Pedido", "Cliente", "Item", "Cant. Pedida", "Stock", "Und", "Precio Und", "Estado", "Vendedor", "Costo Cant. Total", "Fecha Creación ", "Fecha Entrega", ]
         let workbook = new Workbook();
         const imageId1 = workbook.addImage({
-          base64:  this.appComponent.logoParaPdf,
+          base64:  logoParaPdf,
           extension: 'png',
         });
         let worksheet = workbook.addWorksheet(`Reporte de de Vendedores - ${this.today}`);
@@ -711,7 +710,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : this.appComponent.logoParaPdf, width : 100, height : 80 },
+                { image : logoParaPdf, width : 100, height : 80 },
                 { text: `Pedido Nro. ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },
@@ -930,7 +929,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : this.appComponent.logoParaPdf, width : 100, height : 80 },
+                { image : logoParaPdf, width : 100, height : 80 },
                 { text: `Pedido Zeus Nro. ${item.consecutivo}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },

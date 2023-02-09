@@ -13,6 +13,7 @@ import * as fs from 'file-saver';
 import { Table } from 'primeng/table/table';
 import moment from 'moment';
 import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -55,8 +56,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                       private rolService : RolesService,
                         private frmBuilderMateriaPrima : FormBuilder,
                           @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                            private boppService : EntradaBOPPService,
-                              private appComponent : AppComponent,) {
+                            private boppService : EntradaBOPPService,) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : ['', Validators.required],
@@ -86,7 +86,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         }
         let workbook = new Workbook();
         const imageId1 = workbook.addImage({
-          base64:  this.appComponent.logoParaPdf,
+          base64: logoParaPdf,
           extension: 'png',
         });
         let worksheet = workbook.addWorksheet(`Inventario Materia_Prima - ${this.today}`);
@@ -201,10 +201,8 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   // Funcion para obtener las diferentes categorias de materia prima existentes
   obtenerCategorias(){
     this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => {
-      for (let i = 0; i < datos_categorias.length; i++) {
-        this.categorias.push(datos_categorias[i]);
-        this.categorias.sort((a,b) => a.catMP_Nombre.localeCompare(b.catMP_Nombre));
-      }
+      this.categorias = datos_categorias;
+      this.categorias.sort((a,b) => a.catMP_Nombre.localeCompare(b.catMP_Nombre));
     });
   }
 
@@ -212,11 +210,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   obtenerMateriasPrimas(){
     this.materiasPrimas = [];
     let nombre : string = this.FormMateriaPrima.value.MpNombre;
-    this.materiaPrimaService.GetMateriaPrima_LikeNombre(nombre).subscribe(datos_materiaPrima => {
-      for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.materiasPrimas.push(datos_materiaPrima[i]);
-      }
-    });
+    this.materiaPrimaService.GetMateriaPrima_LikeNombre(nombre).subscribe(datos_materiaPrima => { this.materiasPrimas = datos_materiaPrima; });
   }
 
   //Funcion que va a mostrar el nombre de la materia prima
@@ -224,16 +218,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     let id : number = this.FormMateriaPrima.value.MpNombre;
     this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
       for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
+        this.FormMateriaPrima.patchValue({
           MpId : datos_materiaPrima[i].id,
           MpNombre: datos_materiaPrima[i].nombre,
-          MpCantidad : this.FormMateriaPrima.value.MpCantidad,
-          MpPrecio: this.FormMateriaPrima.value.MpPrecio,
-          MpUnidadMedida: this.FormMateriaPrima.value.MpUnidadMedida,
-          fecha: this.FormMateriaPrima.value.fecha,
-          fechaFinal: this.FormMateriaPrima.value.fechaFinal,
-          MpCategoria : this.FormMateriaPrima.value.MpCategoria,
-          MpBodega : this.FormMateriaPrima.value.MpBodega,
         });
       }
     });

@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
 import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
@@ -83,8 +83,7 @@ export class PedidoExternoComponent implements OnInit {
                                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                                     private ClientesProductosService : ClientesProductosService,
                                       private zeusService : InventarioZeusService,
-                                        private appComponent : AppComponent,
-                                          private zeusCobtabilidadService : ZeusContabilidadService,) {
+                                        private zeusCobtabilidadService : ZeusContabilidadService,) {
 
     //Campos que vienen del formulario
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
@@ -748,7 +747,7 @@ export class PedidoExternoComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : this.appComponent.logoParaPdf, width : 100, height : 80 },
+                { image : logoParaPdf, width : 100, height : 80 },
                 { text: `Pedido ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },

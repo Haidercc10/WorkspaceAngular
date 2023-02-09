@@ -6,11 +6,10 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
 import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
-import { EntradaRollosService } from 'src/app/Servicios/IngresoRollosDespacho/EntradaRollos.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-RollosAsignadasFactura',
@@ -43,8 +42,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                     private dtAsgProdFactura : DetallesAsignacionProductosFacturaService,
                       private rollosService : DetallesEntradaRollosService,
                         private servicioUsuarios : UsuarioService,
-                          private facturaService : AsignacionProductosFacturaService,
-                            private appComponent : AppComponent,) {
+                          private facturaService : AsignacionProductosFacturaService,) {
 
     this.FormConsultarFactura = this.frmBuilderPedExterno.group({
       Fact_Id: ['', Validators.required],
@@ -114,12 +112,8 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   //Funcion que a mostrar los usuarios de tipo conductor
   ObtenerUsuariosConductores() {
     this.servicioUsuarios.srvObtenerListaUsuario().subscribe(registrosUsuarios => {
-      for (let index = 0; index < registrosUsuarios.length; index++) {
-        this.servicioUsuarios.srvObtenerListaPorIdConductor(registrosUsuarios[index].usua_Id).subscribe(registrosConductores => {
-          for (let ind = 0; ind < registrosConductores.length; ind++) {
-            this.arrayConductor.push(registrosConductores[ind]);
-          }
-        });
+      for (let i = 0; i < registrosUsuarios.length; i++) {
+        this.servicioUsuarios.srvObtenerListaPorIdConductor(registrosUsuarios[i].usua_Id).subscribe(registrosConductores => { this.arrayConductor = registrosConductores; });
       }
     });
   }
@@ -140,11 +134,9 @@ export class RollosAsignadasFacturaComponent implements OnInit {
             Presentacion : datos_factura[i].undMed_Id,
           }
           this.rollos.push(info);
-          this.FormConsultarFactura.setValue({
+          this.FormConsultarFactura.patchValue({
             Fact_Id: factura.toUpperCase(),
             Cliente : datos_factura[i].cli_Nombre,
-            Conductor : this.FormConsultarFactura.value.Conductor,
-            PlacaCamion : this.FormConsultarFactura.value.PlacaCamion,
           });
         }
       }
@@ -453,32 +445,11 @@ export class RollosAsignadasFacturaComponent implements OnInit {
           }
         });
       }
-      if (this.rollosInsertar.length > 100) {
-        setTimeout(() => {
-          //this.cambiarEstadoRollosNoVerificados();
-          this.buscarRolloPDF();
-        }, 7000);
-      } else if (this.rollosInsertar.length > 70) {
-        setTimeout(() => {
-          //this.cambiarEstadoRollosNoVerificados();
-          this.buscarRolloPDF();
-        }, 6000);
-      } else if (this.rollosInsertar.length > 50) {
-        setTimeout(() => {
-          //this.cambiarEstadoRollosNoVerificados();
-          this.buscarRolloPDF();
-        }, 5000);
-      } else if (this.rollosInsertar.length > 20) {
-        setTimeout(() => {
-          //this.cambiarEstadoRollosNoVerificados();
-          this.buscarRolloPDF();
-        }, 4000);
-      } else {
-        setTimeout(() => {
-          //this.cambiarEstadoRollosNoVerificados();
-          this.buscarRolloPDF();
-        }, 3000);
-      }
+      if (this.rollosInsertar.length > 100) setTimeout(() => { this.buscarRolloPDF(); }, 7000);
+      else if (this.rollosInsertar.length > 70) setTimeout(() => { this.buscarRolloPDF(); }, 6000);
+      else if (this.rollosInsertar.length > 50) setTimeout(() => { this.buscarRolloPDF(); }, 5000);
+      else if (this.rollosInsertar.length > 20) setTimeout(() => { this.buscarRolloPDF(); }, 4000);
+      else setTimeout(() => { this.buscarRolloPDF(); }, 3000);
     } else Swal.fire("¡Debe cargar minimo un rollo en la tabla!");
   }
 
@@ -544,7 +515,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
               {
                 columns: [
                   {
-                    image : this.appComponent.logoParaPdf,
+                    image : logoParaPdf,
                     width : 100,
                     height : 80
                   },

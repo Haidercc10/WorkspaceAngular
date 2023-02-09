@@ -4,7 +4,7 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { Table } from 'primeng/table';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { DetallePedido_MantenimientoService } from 'src/app/Servicios/DetallePedido_Mantenimiento/DetallePedido_Mantenimiento.service';
 import { Detalle_MantenimientoService } from 'src/app/Servicios/Detalle_Mantenimiento/Detalle_Mantenimiento.service';
@@ -46,8 +46,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
                       private tipoMantenimientoService : Tipo_MantenimientoService,
                         private estadosService : EstadosService,
                           private dtMantenimientoService : Detalle_MantenimientoService,
-                            private dtPedidoMttoService : DetallePedido_MantenimientoService,
-                              private appComponent : AppComponent,) {
+                            private dtPedidoMttoService : DetallePedido_MantenimientoService,) {
 
     this.FormMovimientosMantenimiento = this.frmBuilder.group({
       ConsecutivoMovimiento : [null],
@@ -126,17 +125,9 @@ export class Movimientos_MantenimientoComponent implements OnInit {
   // Funcion que tomará el id del activo seleccionado, lo almacenará y cambiará el id por el nombre en el campo de activo
   buscarActivoSeleccionado(){
     this.activosService.GetId(this.FormMovimientosMantenimiento.value.Activo).subscribe(datos_activo => {
-      this.FormMovimientosMantenimiento.setValue({
-        ConsecutivoMovimiento : this.FormMovimientosMantenimiento.value.ConsecutivoMovimiento,
+      this.FormMovimientosMantenimiento.patchValue({
         IdActivo : datos_activo.actv_Id,
         Activo : datos_activo.actv_Nombre,
-        IdTipoMantenimiento : this.FormMovimientosMantenimiento.value.IdTipoMantenimiento,
-        TipoMantenimiento : this.FormMovimientosMantenimiento.value.TipoMantenimiento,
-        FechaDaño : this.FormMovimientosMantenimiento.value.FechaDaño,
-        Estado : this.FormMovimientosMantenimiento.value.Estado,
-        FechaInicial : this.FormMovimientosMantenimiento.value.FechaInicial,
-        FechaFinal : this.FormMovimientosMantenimiento.value.FechaFinal,
-        TipoMovimiento: this.FormMovimientosMantenimiento.value.TipoMovimiento,
       });
     }, error => { this.mensajesError(`¡No se puede encontrar la información del activo ${this.FormMovimientosMantenimiento.value.Activo}!`, error.message) });
   }
@@ -144,17 +135,9 @@ export class Movimientos_MantenimientoComponent implements OnInit {
   // Funcion que va a tomar el id de l tipo de mantenimiento seleccionado, lo almacenará y cambiará el id por el nombre en el campo de tipo de mantenimiento
   buscarTipoMantenimientoSeleccionado(){
     this.tipoMantenimientoService.GetId(this.FormMovimientosMantenimiento.value.TipoMantenimiento).subscribe(datos_tipoMtto => {
-      this.FormMovimientosMantenimiento.setValue({
-        ConsecutivoMovimiento : this.FormMovimientosMantenimiento.value.ConsecutivoMovimiento,
-        IdActivo : this.FormMovimientosMantenimiento.value.IdActivo,
-        Activo : this.FormMovimientosMantenimiento.value.Activo,
+      this.FormMovimientosMantenimiento.patchValue({
         IdTipoMantenimiento : datos_tipoMtto.tpMtto_Id,
         TipoMantenimiento : datos_tipoMtto.tpMtto_Nombre,
-        FechaDaño : this.FormMovimientosMantenimiento.value.FechaDaño,
-        Estado : this.FormMovimientosMantenimiento.value.Estado,
-        FechaInicial : this.FormMovimientosMantenimiento.value.FechaInicial,
-        FechaFinal : this.FormMovimientosMantenimiento.value.FechaFinal,
-        TipoMovimiento: this.FormMovimientosMantenimiento.value.TipoMovimiento,
       });
     }, error => { this.mensajesError(`¡No se puedo obtner información acerca del tipo de mantenimiento ${this.FormMovimientosMantenimiento.value.TipoMantenimiento}!`, error.message) });
   }
@@ -276,24 +259,15 @@ export class Movimientos_MantenimientoComponent implements OnInit {
     this.dtPedidoMttoService.GetPDFPedido(data.Consecutivo).subscribe(datos_pedido => {
       for (let i = 0; i < datos_pedido.length; i++) {
         const pdfDefinicion : any = {
-          info: {
-            title: `Pedido de Mantenimiento N° ${datos_pedido[i].pedMtto_Id}`
-          },
-          pageSize: {
-            width: 630,
-            height: 760
-          },
+          info: { title: `Pedido de Mantenimiento N° ${datos_pedido[i].pedMtto_Id}` },
+          pageSize: { width: 630, height: 760 },
           footer: {
             columns: [
               { text: `Fecha Expedición Documento ${this.today} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8, margin: [0, 0, 20, 0] }
             ]
           },
           content : [
-            {
-              text: `Pedido de Mantenimiento N° ${datos_pedido[i].pedMtto_Id}`,
-              alignment: 'right',
-              style: 'titulo',
-            },
+            { text: `Pedido de Mantenimiento N° ${datos_pedido[i].pedMtto_Id}`, alignment: 'right', style: 'titulo', },
             '\n \n',
             {
               style: 'tablaEmpresa',
@@ -302,89 +276,35 @@ export class Movimientos_MantenimientoComponent implements OnInit {
                 style: 'header',
                 body: [
                   [
-                    {
-                      border: [false, false, false, false],
-                      text: `Nombre Empresa`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `Plasticaribe S.A.S`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Fecha`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_pedido[i].pedMtto_Fecha.replace('T00:00:00', '')}`
-                    },
+                    { border: [false, false, false, false], text: `Nombre Empresa` },
+                    { border: [false, false, false, true], text: `Plasticaribe S.A.S` },
+                    { border: [false, false, false, false], text: `Fecha` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].pedMtto_Fecha.replace('T00:00:00', '')}` },
                   ],
                   [
-                    {
-                      border: [false, false, false, false],
-                      text: `Dirección`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_pedido[i].empresa_Direccion}`
-                    },
-                    {
-                      border: [false, false, false, false],
-                      text: `Ciudad`
-                    },
-                    {
-                      border: [false, false, false, true],
-                      text: `${datos_pedido[i].empresa_Ciudad}`
-                    },
+                    { border: [false, false, false, false], text: `Dirección` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Direccion}` },
+                    { border: [false, false, false, false], text: `Ciudad` },
+                    { border: [false, false, false, true], text: `${datos_pedido[i].empresa_Ciudad}` },
                   ],
                 ]
               },
-              layout: {
-                defaultBorder: false,
-              },
+              layout: { defaultBorder: false, },
               fontSize: 9,
             },
             '\n \n',
-            {
-              text: `Ingresados Por:\n`,
-              alignment: 'left',
-              style: 'header',
-            },
-            {
-              text: `${datos_pedido[i].nombreCreador}\n`,
-              alignment: 'left',
-              style: 'texto',
-            },
-            {
-              text: `\nObservación:`,
-              alignment: 'left',
-              style: 'header'
-            },
-            {
-              text: `${datos_pedido[i].pedMtto_Observacion} `,
-              alignment: 'left',
-              style: 'texto'
-            },
-            {
-              text: `\n\n Información detallada de los Activos \n `,
-              alignment: 'center',
-              style: 'header'
-            },
+            { text: `Ingresados Por:\n`, alignment: 'left', style: 'header', },
+            { text: `${datos_pedido[i].nombreCreador}\n`, alignment: 'left', style: 'texto', },
+            { text: `\nObservación:`, alignment: 'left', style: 'header' },
+            { text: `${datos_pedido[i].pedMtto_Observacion} `, alignment: 'left', style: 'texto' },
+            { text: `\n\n Información detallada de los Activos \n `, alignment: 'center', style: 'header' },
 
             this.table(this.infoPdf, ['Id', 'Serial', 'Nombre', 'Fecha_Falla', 'Tipo_Mtto']),
           ],
           styles: {
-            header: {
-              fontSize: 10,
-              bold: true
-            },
-            texto: {
-              fontSize: 9,
-            },
-            titulo: {
-              fontSize: 20,
-              bold: true
-            }
+            header: { fontSize: 10, bold: true },
+            texto: { fontSize: 9, },
+            titulo: { fontSize: 20, bold: true }
           }
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
@@ -401,13 +321,8 @@ export class Movimientos_MantenimientoComponent implements OnInit {
     this.dtMantenimientoService.GetPDFMantenimiento(data.Consecutivo).subscribe(datos_mantenimiento => {
       for (let i = 0; i < datos_mantenimiento.length; i++) {
         const pdfDefinicion : any = {
-          info: {
-            title: `Mantenimiento de Activos N° ${datos_mantenimiento[i].mtto_Id}`
-          },
-          pageSize: {
-            width: 630,
-            height: 760
-          },
+          info: { title: `Mantenimiento de Activos N° ${datos_mantenimiento[i].mtto_Id}` },
+          pageSize: { width: 630, height: 760 },
           footer: function(currentPage : any, pageCount : any) {
             return [
               {
@@ -422,11 +337,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
           content : [
             {
               columns: [
-                {
-                  image : this.appComponent.logoParaPdf,
-                  width : 100,
-                  height : 80
-                },
+                { image : logoParaPdf, width : 100, height : 80 },
                 {
                   text: `Mantenimiento de Activos N° ${datos_mantenimiento[i].mtto_Id}`,
                   alignment: 'right',

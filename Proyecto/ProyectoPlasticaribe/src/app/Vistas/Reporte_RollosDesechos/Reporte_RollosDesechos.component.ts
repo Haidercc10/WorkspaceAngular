@@ -13,7 +13,7 @@ import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import Swal from 'sweetalert2';
 import * as fs from 'file-saver';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
-import { AppComponent } from 'src/app/app.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-Reporte_RollosDesechos',
@@ -60,8 +60,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
                         private servicioRollos : SrvRollosEliminadosService,
                           @Inject(SESSION_STORAGE) private storage: WebStorageService,
                             private rolService : RolesService,
-                              private servicioProcesos : ProcesosService,
-                                private appComponent : AppComponent,) {
+                              private servicioProcesos : ProcesosService,) {
 
     this.formConsultaRollos = this.formbuilder.group({
       OT : [null],
@@ -102,14 +101,9 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
     if(this.idProducto.match(expresion) != null) {
       this.servicioProducto.obtenerNombreProductos(this.formConsultaRollos.value.producto).subscribe(dataProducto => {
-        this.formConsultaRollos = this.formbuilder.group({
-          OT : this.formConsultaRollos.value.OT,
-          fecha : this.formConsultaRollos.value.fecha,
-          fechaFinal : this.formConsultaRollos.value.fechaFinal,
+        this.formConsultaRollos.patchValue({
           producto: dataProducto,
           id_producto : this.idProducto,
-          rollo : this.formConsultaRollos.value.rollo,
-          Proceso : this.formConsultaRollos.value.Proceso,
         });
       });
     } else {
@@ -128,11 +122,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
   /** Cargar los procesos de donde puede venir el rollo. */
   obtenerProcesos(){
-    this.servicioProcesos.srvObtenerLista().subscribe(dataProcesos => {
-      for (let index = 0; index < dataProcesos.length; index++) {
-        this.arrayProcesos.push(dataProcesos[index]);
-      }
-    });
+    this.servicioProcesos.srvObtenerLista().subscribe(dataProcesos => { this.arrayProcesos = dataProcesos; });
   }
 
   /** Filtros de consulta que cargarán información en la tabla. */
@@ -586,33 +576,19 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
   /** NO USADA: Función para cargar los turnos en el combobox de la vista */
   obtenerTurno(){
-    this.servicioTurno.srvObtenerLista().subscribe(dataTurnos => {
-      for (let index = 0; index < dataTurnos.length; index++) {
-        this.arrayTurnos.push(dataTurnos[index]);
-      }
-    });
+    this.servicioTurno.srvObtenerLista().subscribe(dataTurnos => { this.arrayTurnos = dataTurnos; });
   }
 
   /** NO USADA: Función para cargar los materiales de mat. prima en el combobox de la vista */
   obtenerMaterial(){
-    this.servicioMaterial.srvObtenerLista().subscribe(dataMaterial => {
-      for (let index = 0; index < dataMaterial.length; index++) {
-        this.arrayMaterial.push(dataMaterial[index]);
-      }
-    });
+    this.servicioMaterial.srvObtenerLista().subscribe(dataMaterial => { this.arrayMaterial = dataMaterial; });
   }
 
    /** Función para cargar los productos en el datalist de la vista */
   obtenerProductos() {
     this.arrayProductos = [];
     let campoItem : string = this.formConsultaRollos.value.producto;
-    if (campoItem.length > 2 && campoItem != null) {
-      this.servicioProducto.obtenerItemsLike(this.Item.trim()).subscribe(dataProducto => {
-        for(let index = 0; index < dataProducto.length; index++) {
-          this.arrayProductos.push(dataProducto[index]);
-        }
-      });
-    }
+    if (campoItem.length > 2 && campoItem != null) this.servicioProducto.obtenerItemsLike(this.Item.trim()).subscribe(dataProducto => { this.arrayProductos = dataProducto; });
   }
 
   /** Campos que saldrán en la tabla al momento de consultar los filtros. */
@@ -685,11 +661,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
   /** NO USADA: Obtener nombres de Ultimos Clientes con OT*/
   obtenerUltimosClientes() {
-    this.servicioBagPro.srvObtenerListaUltimosClientes(this.fechaAnterior).subscribe(dataClientes => {
-      for (let index = 0; index < dataClientes.length; index++) {
-        this.arrayClientes.push(dataClientes[index]);
-      }
-    });
+    this.servicioBagPro.srvObtenerListaUltimosClientes(this.fechaAnterior).subscribe(dataClientes => { this.arrayClientes = dataClientes; });
   }
 
   /** Mostrar en la tabla las columnas elegidas en el Input-Select que se encuentra en la parte superior de la tabla. */
@@ -772,7 +744,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
           {
             columns: [
               {
-                image : this.appComponent.logoParaPdf,
+                image : logoParaPdf,
                 width : 100,
                 height : 80
               },
@@ -915,11 +887,10 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         confirmButtonText: 'Formato PDF',
         denyButtonText: `Formato Excel`,
       }).then((result) => {
-        /* Read more about isConfirmed, isDenied below */
         if (result.isDenied) this.exportarExcel();
         else if (result.isConfirmed) this.exportarPdf();
       });
-    } else Swal.fire('Debe cargar al menos un registro en la tabla.')
+    } else Swal.fire('Debe cargar al menos un registro en la tabla.');
   }
 
   /** Prime NG */
@@ -955,6 +926,4 @@ export class Reporte_RollosDesechosComponent implements OnInit {
   isFirstPage(): boolean {
     return this.ArrayDocumento ? this.first === 0 : true;
   }
-
-
 }

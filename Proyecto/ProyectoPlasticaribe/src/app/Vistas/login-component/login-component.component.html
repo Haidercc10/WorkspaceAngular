@@ -48,3 +48,9 @@
   </div>
   <!--Fin Contenedor Principal-->
 </form>
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>

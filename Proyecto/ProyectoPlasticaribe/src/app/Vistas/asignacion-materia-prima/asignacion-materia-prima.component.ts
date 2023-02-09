@@ -183,14 +183,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           let adicional : number = datos_procesos[index].datosotKg * 0.02;
           this.kgOT = datos_procesos[index].datosotKg + adicional;
           this.estadoOT = datos_procesos[index].estado;
-          this.FormMateriaPrimaRetiro.setValue({
-            OTRetiro : this.FormMateriaPrimaRetiro.value.OTRetiro,
-            OTImp : this.FormMateriaPrimaRetiro.value.OTImp,
-            FechaRetiro : this.FormMateriaPrimaRetiro.value.FechaRetiro,
-            Maquina : this.FormMateriaPrimaRetiro.value.Maquina,
-            kgOt : parseFloat(datos_procesos[index].datosotKg + adicional),
-            ObservacionRetiro : this.FormMateriaPrimaRetiro.value.ObservacionRetiro,
-          });
+          this.FormMateriaPrimaRetiro.patchValue({ kgOt : parseFloat(datos_procesos[index].datosotKg + adicional), });
           this.asignacionMPService.srvObtenerListaPorOt(ot).subscribe(datos_asignaciones => {
             if (datos_asignaciones.length != 0) {
               for (let index = 0; index < datos_asignaciones.length; index++) {
@@ -232,7 +225,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           break;
         }
       } else {
-        Swal.fire(`La orden de trabajo N° ${ot} no se encuentra registrada en BagPro`);
+        this.mensajeAdvertencia(`La orden de trabajo N° ${ot} no se encuentra registrada en BagPro`);
         this.load = true;
       }
     }, error => {
@@ -342,7 +335,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   // Funcion que hará validaciones antes de realizar la asignación
   validarCamposVaciosRetirada(){
-    let ot : any = this.FormMateriaPrimaRetiro.value.OTRetiro;
     let maquina : number = this.FormMateriaPrimaRetiro.value.Maquina
     if (this.FormMateriaPrimaRetiro.valid) {
       if (this.materiasPrimasSeleccionadas.length != 0){

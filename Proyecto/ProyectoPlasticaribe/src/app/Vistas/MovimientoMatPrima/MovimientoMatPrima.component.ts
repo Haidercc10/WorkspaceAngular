@@ -14,9 +14,9 @@ import { RecuperadoMPService } from 'src/app/Servicios/DetallesRecuperado/recupe
 import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
-import { AppComponent } from 'src/app/app.component';
 import { PedidomateriaprimaComponent } from '../pedidomateriaprima/pedidomateriaprima.component';
 import { MateriaPrimaRecuperadaComponent } from '../MateriaPrimaRecuperada/MateriaPrimaRecuperada.component';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-MovimientoMatPrima',
@@ -71,8 +71,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                                 private dtFacturaMP : FacturaMpService,
                                   private dtRemision : RemisionesMPService,
                                     private dtRecuperado : RecuperadoMPService,
-                                      private dtTintas : DetallesAsignacionTintasService,
-                                        private appComponent : AppComponent,) {
+                                      private dtTintas : DetallesAsignacionTintasService,) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null, Validators.required],
@@ -109,9 +108,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
           estado : this.FormDocumentos.value.estado,
         });
       }
-    }, error => {
-      this.load = true;
-    });
+    }, error => { this.load = true; });
   }
 
   // Funcion que va a limpiar los campos
@@ -1446,7 +1443,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                 {
                   columns: [
                     {
-                      image : this.appComponent.logoParaPdf,
+                      image : logoParaPdf,
                       width : 100,
                       height : 80
                     },
@@ -1543,7 +1540,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                 {
                   columns: [
                     {
-                      image : this.appComponent.logoParaPdf,
+                      image : logoParaPdf,
                       width : 100,
                       height : 80
                     },
@@ -1639,7 +1636,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                 {
                   columns: [
                     {
-                      image : this.appComponent.logoParaPdf,
+                      image : logoParaPdf,
                       width : 100,
                       height : 80
                     },
@@ -1752,7 +1749,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                 {
                   columns: [
                     {
-                      image : this.appComponent.logoParaPdf,
+                      image : logoParaPdf,
                       width : 100,
                       height : 80
                     },
@@ -1859,7 +1856,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                 {
                   columns: [
                     {
-                      image : this.appComponent.logoParaPdf,
+                      image : logoParaPdf,
                       width : 100,
                       height : 80
                     },
