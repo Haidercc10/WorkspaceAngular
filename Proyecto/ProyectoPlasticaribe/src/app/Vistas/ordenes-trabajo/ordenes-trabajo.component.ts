@@ -123,6 +123,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   modalPigmentos : boolean = false;
   formCrearPigmentos !: FormGroup;
   formCrearMateriales !: FormGroup;
+  nroCapasOT : number = 0;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 private rolService : RolesService,
@@ -531,6 +532,8 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.ultimaOT();
     this.pedidos();
     this.cargando = false;
+    this.nroCapas = 0;
+    this.nroCapasOT = 0;
   }
 
   /** Función que cargará las tintas en los combobox al momento de crear la OT. */
@@ -626,7 +629,8 @@ export class OrdenesTrabajoComponent implements OnInit {
   //Funcion que va cargar cada uno de los componentes de la mezcla
   cargarCombinacionMezclas(){
     this.mezclasService.srvObtenerListaPorId(this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas).subscribe(datos_mezcla => {
-      if (datos_mezcla.mezcla_NroCapas == 1) {
+      this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
+      /*if (datos_mezcla.mezcla_NroCapas == 1) {
         this.checkedCapa1 = true;
         this.checkedCapa2 = false;
         this.checkedCapa3 = false;
@@ -644,13 +648,13 @@ export class OrdenesTrabajoComponent implements OnInit {
         this.checkedCapa3 = true;
         const capa3 : any = document.getElementById("capa3");
         capa3.click();
-      }
+      }*/
       this.FormOrdenTrabajoMezclas = this.frmBuilderPedExterno.group({
         Id_Mezcla : datos_mezcla.mezcla_Id,
         Nombre_Mezclas : datos_mezcla.mezcla_Nombre,
-        Chechbox_Capa1 : this.checkedCapa1,
-        Chechbox_Capa2 : this.checkedCapa2,
-        Chechbox_Capa3 : this.checkedCapa3,
+        Chechbox_Capa1 : this.nroCapasOT,
+        Chechbox_Capa2 : '',
+        Chechbox_Capa3 : '',
         Proc_Capa1 : datos_mezcla.mezcla_PorcentajeCapa1,
         Proc_Capa2 : datos_mezcla.mezcla_PorcentajeCapa2,
         Proc_Capa3 : datos_mezcla.mezcla_PorcentajeCapa3,
@@ -691,9 +695,18 @@ export class OrdenesTrabajoComponent implements OnInit {
         MezclaPigmento2_Capa3 : datos_mezcla.mezPigmto_Id2xCapa3,
         PorcentajeMezclaPigmentoP2_Capa3 : datos_mezcla.mezcla_PorcentajePigmto2_Capa3,
       });
+      setTimeout(() => {
+        this.FormOrdenTrabajoMezclas.disable();
+        this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
+        this.FormOrdenTrabajoMezclas.get('Id_Mezclas').enable();
+      }, 1000);
+
+
+
     }, error => {
       this.mezclasService.getMezclaNombre(this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas).subscribe(datos_mezcla => {
-        if (datos_mezcla.mezcla_NroCapas == 1) {
+        this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
+        /*if (datos_mezcla.mezcla_NroCapas == 1) {
           this.checkedCapa1 = true;
           this.checkedCapa2 = false;
           this.checkedCapa3 = false;
@@ -711,13 +724,13 @@ export class OrdenesTrabajoComponent implements OnInit {
           this.checkedCapa3 = true;
           const capa3 : any = document.getElementById("capa3");
           capa3.click();
-        }
+        }*/
         this.FormOrdenTrabajoMezclas = this.frmBuilderPedExterno.group({
           Id_Mezcla : datos_mezcla.mezcla_Id,
           Nombre_Mezclas : datos_mezcla.mezcla_Nombre,
-          Chechbox_Capa1 : this.checkedCapa1,
-          Chechbox_Capa2 : this.checkedCapa2,
-          Chechbox_Capa3 : this.checkedCapa3,
+          Chechbox_Capa1 : this.nroCapasOT,
+          Chechbox_Capa2 : '',
+          Chechbox_Capa3 : '',
           Proc_Capa1 : datos_mezcla.mezcla_PorcentajeCapa1,
           Proc_Capa2 : datos_mezcla.mezcla_PorcentajeCapa2,
           Proc_Capa3 : datos_mezcla.mezcla_PorcentajeCapa3,
@@ -920,15 +933,15 @@ export class OrdenesTrabajoComponent implements OnInit {
         CantidadPaquete : data.CantPaquete,
         CantidadBulto : data.CantBulto,
       });
-      datos_Ot.cyrel == "1" ? this.checkedCyrel = true : this.checkedCyrel = false;
+      this.checkedCyrel = datos_Ot.cyrel
       this.extrusion = datos_Ot.extrusion;
       this.impresion = datos_Ot.impresion;
       this.rotograbado = datos_Ot.rotograbado;
       this.laminado = datos_Ot.laminado;
-      datos_Ot.corte == "1" ? this.checkedCorte = true : this.checkedCorte = false;
+      this.checkedCorte = datos_Ot.corte;
       this.sellado = datos_Ot.sellado;
       setTimeout(() => { this.calcularDatosOt(data) }, 500);
-      if (datos_Ot.cant_Capas_Mezclas == 1) {
+      /*if (datos_Ot.cant_Capas_Mezclas == 1) {
         this.checkedCapa1 = true;
         this.checkedCapa2 = false;
         this.checkedCapa3 = false;
@@ -946,13 +959,14 @@ export class OrdenesTrabajoComponent implements OnInit {
         this.checkedCapa3 = true;
         const capa3 : any = document.getElementById("capa3");
         capa3.click();
-      }
+      }*/
+
       this.FormOrdenTrabajoMezclas.patchValue({
         Id_Mezcla : datos_Ot.mezcla_Id,
         Nombre_Mezclas : datos_Ot.mezcla,
-        Chechbox_Capa1 : this.checkedCapa1,
-        Chechbox_Capa2 : this.checkedCapa2,
-        Chechbox_Capa3 : this.checkedCapa3,
+        Chechbox_Capa1 : datos_Ot.cant_Capas_Mezclas,
+        Chechbox_Capa2 : '',
+        Chechbox_Capa3 : '',
         Proc_Capa1 : datos_Ot.capa1_Mezcla,
         Proc_Capa2 : datos_Ot.capa2_Mezcla,
         Proc_Capa3 : datos_Ot.capa3_Mezcla,
@@ -993,6 +1007,13 @@ export class OrdenesTrabajoComponent implements OnInit {
         MezclaPigmento2_Capa3 : datos_Ot.pigmento2_Capa3_Mezcla_Id,
         PorcentajeMezclaPigmentoP2_Capa3 : datos_Ot.porcentaje_Pigmento2_Capa3_Mezcla,
       });
+
+      setTimeout(() => {
+        this.FormOrdenTrabajoMezclas.disable();
+        this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
+        this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
+      }, 1000);
+
     }, error => {
       let presentacion : string = data.UndCant;
       if (presentacion == 'Kg') presentacion = 'Kilo';
@@ -1303,7 +1324,16 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   //Funcion que va a guardar la información de la orden de trabajo
   guardarOt(){
+    let fechaEntrega : any = this.FormOrdenTrabajo.value.OT_FechaEntrega;
+    let ordenTrabajo : any = this.FormOrdenTrabajo.value.OT_Id;
+    if(fechaEntrega == null) this.FormOrdenTrabajo.value.OT_FechaEntrega = this.today;
+    if(ordenTrabajo == null) this.FormOrdenTrabajo.value.OT_Id = 309;
+
     if (!this.FormOrdenTrabajoLaminado.valid || !this.FormOrdenTrabajoImpresion.valid || !this.FormOrdenTrabajoExtrusion.valid || !this.FormOrdenTrabajo.valid){
+      console.log(this.FormOrdenTrabajoLaminado)
+      console.log(this.FormOrdenTrabajoImpresion)
+      console.log(this.FormOrdenTrabajoExtrusion)
+      console.log(this.FormOrdenTrabajo)
       this.mensajeAdvertencia("!Hay campos vacíos¡");
     } else if (this.FormOrdenTrabajoLaminado.valid && this.FormOrdenTrabajoImpresion.valid && this.FormOrdenTrabajoExtrusion.valid && this.FormOrdenTrabajo.valid){
       this.cargando = true;
@@ -1338,11 +1368,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         Ot_CantidadPedida : this.cantidadProducto,
       }
       this.ordenTrabajoService.srvGuardar(infoOT).subscribe(datos_ot => {
-        errorExt = this.guardarOt_Extrusion(datos_ot.ot_Id);
         errorImp = this.guardarOt_Impresion(datos_ot.ot_Id);
-        errorLam = this.guardarOt_Laminado(datos_ot.ot_Id);
-        errorSelCor = this.guardarOt_Sellado_Corte(datos_ot.ot_Id);
-        this.cambiarEstadoProducto(this.producto);
         this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.ID_Cliente);
         setTimeout(() => { this.pdfOrdenTrabajo(datos_ot.ot_Id); }, 1500);
         setTimeout(() => {
@@ -2995,8 +3021,10 @@ export class OrdenesTrabajoComponent implements OnInit {
       this.mezclasService.srvObtenerListaPorNombre(nombreMezcla.replace('%', '%25')).subscribe(datos_mezcla => {
         for (let i = 0; i < datos_mezcla.length; i++) {
           this.idMezclaSeleccionada = datos_mezcla[i].mezcla_Id;
-          if (datos_mezcla[i].mezcla_NroCapas == 1) {
-            this.checkedCapa1 = true;
+          this.nroCapas = datos_mezcla[i].mezcla_NroCapas;
+
+          /*if (datos_mezcla[i].mezcla_NroCapas == 1) {
+           this.checkedCapa1 = true;
             this.checkedCapa2 = false;
             this.checkedCapa3 = false;
             const capa1 : any = document.getElementById("capa1");
@@ -3013,11 +3041,11 @@ export class OrdenesTrabajoComponent implements OnInit {
             this.checkedCapa3 = true;
             const capa3 : any = document.getElementById("capa3");
             capa3.click();
-          }
-
-          if(this.checkedCapa1 == true) this.nroCapas = 1;
-          if(this.checkedCapa2 == true) this.nroCapas = 2;
-          if(this.checkedCapa3 == true) this.nroCapas = 3;
+          }*/
+          console.log(this.nroCapas);
+          if(this.nroCapas == 1) this.checkedCapa1 == true; this.checkedCapa2 == false; this.checkedCapa3 == false;
+          if(this.nroCapas == 2) this.checkedCapa1 == false; this.checkedCapa2 == true; this.checkedCapa3 == false;
+          if(this.nroCapas == 3) this.checkedCapa1 == false; this.checkedCapa2 == false; this.checkedCapa3 == true;
 
           this.objetoDatos = {
             Material_MatPrima : datos_mezcla[i].material_Id,
@@ -3067,9 +3095,9 @@ export class OrdenesTrabajoComponent implements OnInit {
             mezclaId : this.idMezclaSeleccionada,
             Nombre_Mezclas : nombreMezcla.replace('%25', '%'),
             Material_MatPrima : datos_mezcla[i].material_Id,
-            Chechbox_Capa1 : this.checkedCapa1,
-            Chechbox_Capa2 : this.checkedCapa2,
-            Chechbox_Capa3 : this.checkedCapa3,
+            Chechbox_Capa1 : this.nroCapas,
+            Chechbox_Capa2 : '',
+            Chechbox_Capa3 : '',
             Proc_Capa1 : datos_mezcla[i].mezcla_PorcentajeCapa1,
             Proc_Capa2 : datos_mezcla[i].mezcla_PorcentajeCapa2,
             Proc_Capa3 : datos_mezcla[i].mezcla_PorcentajeCapa3,
@@ -3145,14 +3173,13 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.checkedCapa1 = true;
     this.checkedCapa2 = false;
     this.checkedCapa3 = false;
+    this.nroCapas = 1;
 
     this.formCrearMezclas = this.frmBuilderPedExterno.group ({
       mezclaId : 0,
       Nombre_Mezclas : mezcla,
       Material_MatPrima : material,
-      Chechbox_Capa1 : this.checkedCapa1,
-      Chechbox_Capa2 : this.checkedCapa2,
-      Chechbox_Capa3 : this.checkedCapa3,
+      Chechbox_Capa1 : this.nroCapas,
       Proc_Capa1 : 100,
       Proc_Capa2 : 0,
       Proc_Capa3 : 0,
@@ -3229,14 +3256,13 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.checkedCapa1 = false;
     this.checkedCapa2 = true;
     this.checkedCapa3 = false;
+    this.nroCapas = 2;
 
     this.formCrearMezclas = this.frmBuilderPedExterno.group ({
       mezclaId : 0,
       Nombre_Mezclas : mezcla,
       Material_MatPrima : material,
-      Chechbox_Capa1 : this.checkedCapa1,
-      Chechbox_Capa2 : this.checkedCapa2,
-      Chechbox_Capa3 : this.checkedCapa3,
+      Chechbox_Capa1 : this.nroCapas,
       Proc_Capa1 : 50,
       Proc_Capa2 : 50,
       Proc_Capa3 : 0,
@@ -3327,14 +3353,13 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.checkedCapa1 = false;
     this.checkedCapa2 = false;
     this.checkedCapa3 = true;
+    this.nroCapas = 3;
 
     this.formCrearMezclas = this.frmBuilderPedExterno.group({
       mezclaId : 0,
       Nombre_Mezclas : mezcla,
       Material_MatPrima : material,
-      Chechbox_Capa1 : this.checkedCapa1,
-      Chechbox_Capa2 : this.checkedCapa2,
-      Chechbox_Capa3 : this.checkedCapa3,
+      Chechbox_Capa1 : this.nroCapas,
       Proc_Capa1 : 30,
       Proc_Capa2 : 40,
       Proc_Capa3 : 30,
