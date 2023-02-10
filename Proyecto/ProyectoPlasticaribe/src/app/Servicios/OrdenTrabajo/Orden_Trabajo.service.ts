@@ -38,7 +38,7 @@ export class Orden_TrabajoService {
   }
 
   srvObtenerListaPdfOTInsertada(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/PdfOTInsertada/${dato}`);
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Trabajo/getPdfOTInsertada/${dato}`);
   }
 
   GetInfoUltOT(producto : number, presentacion : string){

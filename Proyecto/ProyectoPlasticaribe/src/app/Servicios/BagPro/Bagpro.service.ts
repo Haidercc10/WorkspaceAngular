@@ -149,7 +149,7 @@ export class BagproService {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOt/CostosOT/${ot}`);
   }
 
-  srvObtenerListaClienteOT_UltimaOT():Observable<any[]> {
+  srvObtenerListaClienteOT_UltimaOT():Observable<any> {
     return this.http.get<any>(this.rutaBagPro + `/ClientesOt/UltimaOT/`);
   }
 
