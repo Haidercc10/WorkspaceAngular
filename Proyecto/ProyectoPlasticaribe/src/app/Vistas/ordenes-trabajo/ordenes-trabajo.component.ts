@@ -25,7 +25,6 @@ import { OrdenTrabajo_Sellado_CorteService } from 'src/app/Servicios/OrdenTrabaj
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { Tipos_ImpresionService } from 'src/app/Servicios/TipoImpresion/Tipos_Impresion.service';
 import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service';
@@ -54,10 +53,10 @@ export class OrdenesTrabajoComponent implements OnInit {
   public FormOrdenTrabajoSellado !: FormGroup;
   public FormOrdenTrabajoMezclas !: FormGroup;
 
-  public arrayTintas = []; /** Array que colocará las tintas en los combobox al momento de crear la OT */
-  public arrayPigmentos = []; /** Array que colocará las pigmentos en los combobox al momento de crear la OT */
-  public arrayMateriales = []; /** Array que colocará las materiales en los combobox al momento de crear la OT*/
-  public arrayUnidadesMedidas = []; /** Array que colocará las unidades de medida en los combobox al momento de crear la OT*/
+  arrayTintas = []; /** Array que colocará las tintas en los combobox al momento de crear la OT */
+  arrayPigmentos = []; /** Array que colocará las pigmentos en los combobox al momento de crear la OT */
+  arrayMateriales = []; /** Array que colocará las materiales en los combobox al momento de crear la OT*/
+  arrayUnidadesMedidas = []; /** Array que colocará las unidades de medida en los combobox al momento de crear la OT*/
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
   vistaPedidos : boolean = false; //Funcion que validará si se muestra el navbar de ordenes de trabajo o no
   checkedCyrel : boolean = false; //Variable para saber si el checkbox del Cyrel está seleccionado o no
@@ -76,14 +75,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   formatos : any = []; //Variable que servirá para almacenar los formatos que se harán en extrusion
   tiposImpresion : any = []; //Variable que guardará los diferentes tipos de impresion que hay en la empresa
   laminado_capas : any = []; //Vaiable qie almacenará los diferentes laminados
-  cantidadKgMasMargen : number = 0; //Variable que almacenará el total que se va a producir en la orden de trabajo, sumandole el margen que le proporcionen
-  cantidadUndMasMargen : number = 0; //Variable que almacenará el total que se va a producir en la orden de trabajo, sumandole el margen que le proporcionen
   producto : number = 0; //Variable que almacenará el producto al que se espera que se le cree la orden de trabajo
-  pedidoId : number = 0; //VAriable que almacenará el pedido del cual se estará creando la orden de trabajo
-  clienteId : number = 0; //Variable que almacenará el ID de la sede del cliente al cual se le creará la orden de trabajo
-  cantidadKilos : number = 0; //Variable que va a almacenar la cantidad de kilos pedidos en el pedido y que se harán en la orden de trabajo
-  cantidadUnidades : number = 0; //Variable que va a almacenar la cantidad de unidades pedidas en el pedido y que se harán en la orden de trabajo
-  pesoProducto : number = 0; //Variable que va a almacenar el peso del producto al que se le hará la orden de trabajo
   mezclasMateriales : any = [] //Vaiable que almacenará las mezclas de materiales
   mezclasMateriales2 : any = [] //Vaiable que almacenará los ID de las mezclas de materiales
   mezclasPigmentos : any = []; //Variable que almacenará las mezclas de pigmentos
@@ -102,7 +94,6 @@ export class OrdenesTrabajoComponent implements OnInit {
   rotograbado : boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   laminado : boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   doblado : boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
-  corte : boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   sellado : boolean = false; //Variable que servirá para saber si se pasará por el proceso o no
   cantidadProducto : number = 0; //Variable que almacenará la cantidad de producto que se va a pedir
   valorProducto : number = 0; //Variable que almacenrá ek valor total el producto
@@ -126,55 +117,54 @@ export class OrdenesTrabajoComponent implements OnInit {
   nroCapasOT : number = 0;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private bagProService : BagproService,
-                      private pedidoExternoService : OpedidoproductoService,
-                        private servicioTintas : TintasService,
-                          private servicioMateriales : MaterialProductoService,
-                            private servicioPigmentos : PigmentoProductoService,
-                              private servicioUnidadMedida : UnidadMedidaService,
-                                private estadosService : EstadosService,
-                                  private tratadoServise : TratadoService,
-                                    private formatoService : FormatosService,
-                                      private tiposImpresionService : Tipos_ImpresionService,
-                                        private laminadoCapasService : Laminado_CapaService,
-                                          private ordenTrabajoService : Orden_TrabajoService,
-                                            private otExtrusionServie : OT_ExtrusionService,
-                                              private otImpresionService : OT_ImpresionService,
-                                                private otLaminadoService : OT_LaminadoService,
-                                                  private otSelladoCorteService : OrdenTrabajo_Sellado_CorteService,
-                                                    private mezclaMaterialService : Mezclas_MaterialesService,
-                                                      private mezclaPigmentosService : Mezclas_PigmentosService,
-                                                        private mezclasService : MezclasService,
-                                                          private messageService: MessageService,
-                                                            private productoService : ProductoService,
-                                                              private clienteServise : ClientesService,
-                                                                private tiposProductosService : TipoProductoService,
-                                                                  private tipoSelladoService : TiposSelladoService,) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private bagProService : BagproService,
+                    private pedidoExternoService : OpedidoproductoService,
+                      private servicioTintas : TintasService,
+                        private servicioMateriales : MaterialProductoService,
+                          private servicioPigmentos : PigmentoProductoService,
+                            private servicioUnidadMedida : UnidadMedidaService,
+                              private estadosService : EstadosService,
+                                private tratadoServise : TratadoService,
+                                  private formatoService : FormatosService,
+                                    private tiposImpresionService : Tipos_ImpresionService,
+                                      private laminadoCapasService : Laminado_CapaService,
+                                        private ordenTrabajoService : Orden_TrabajoService,
+                                          private otExtrusionServie : OT_ExtrusionService,
+                                            private otImpresionService : OT_ImpresionService,
+                                              private otLaminadoService : OT_LaminadoService,
+                                                private otSelladoCorteService : OrdenTrabajo_Sellado_CorteService,
+                                                  private mezclaMaterialService : Mezclas_MaterialesService,
+                                                    private mezclaPigmentosService : Mezclas_PigmentosService,
+                                                      private mezclasService : MezclasService,
+                                                        private messageService: MessageService,
+                                                          private productoService : ProductoService,
+                                                            private clienteServise : ClientesService,
+                                                              private tiposProductosService : TipoProductoService,
+                                                                private tipoSelladoService : TiposSelladoService,) {
 
     this.FormOrdenTrabajo = this.frmBuilderPedExterno.group({
-      OT_Id: [''],
-      Pedido_Id: ['', Validators.required],
-      Nombre_Vendedor: ['', Validators.required],
+      OT_Id: [null],
+      Pedido_Id: [null, Validators.required],
+      Nombre_Vendedor: [null, Validators.required],
       OT_FechaCreacion: this.today,
-      OT_FechaEntrega: ['', Validators.required],
-      Id_Sede_Cliente : ['', Validators.required],
-      ID_Cliente: ['', Validators.required],
-      Nombre_Cliente: ['', Validators.required],
-      Ciudad_SedeCliente: ['', Validators.required],
-      Direccion_SedeCliente : ['', Validators.required],
-      OT_Estado : ['', Validators.required],
-      OT_Observacion : [''],
+      OT_FechaEntrega: [null, Validators.required],
+      Id_Sede_Cliente : [null, Validators.required],
+      ID_Cliente: [null, Validators.required],
+      Nombre_Cliente: [null, Validators.required],
+      Ciudad_SedeCliente: [null, Validators.required],
+      Direccion_SedeCliente : [null, Validators.required],
+      OT_Estado : [null, Validators.required],
+      OT_Observacion : [null],
       Margen : [0, Validators.required],
-      OT_Cyrel : [''],
-      OT_Extrusion : [''],
-      OT_Impresion : [''],
-      OT_Rotograbado : [''],
-      OT_Laminado : [''],
-      OT_Corte : [''],
-      OT_Doblado : [''],
-      OT_Sellado : [''],
+      OT_Cyrel : [false],
+      OT_Extrusion : [false],
+      OT_Impresion : [false],
+      OT_Rotograbado : [false],
+      OT_Laminado : [false],
+      OT_Corte : [false],
+      OT_Doblado : [false],
+      OT_Sellado : [false],
     });
 
     this.FormOrdenTrabajoExtrusion = this.frmBuilderPedExterno.group({
@@ -186,7 +176,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       Ancho_Extrusion2 : [0, Validators.required],
       Ancho_Extrusion3 : [0, Validators.required],
       Calibre_Extrusion : [0, Validators.required],
-      UnidadMedida_Extrusion : ['', Validators.required],
+      UnidadMedida_Extrusion : [null, Validators.required],
       Tratado_Extrusion : [1, Validators.required],
       Peso_Extrusion : [0, Validators.required],
     });
@@ -220,19 +210,19 @@ export class OrdenesTrabajoComponent implements OnInit {
     });
 
     this.FormOrdenTrabajoCorte = this.frmBuilderPedExterno.group({
-      Formato_Corte : ['', Validators.required],
-      Ancho_Corte : ['', Validators.required],
-      Largo_Corte : ['', Validators.required],
-      Fuelle_Corte : ['', Validators.required],
-      Margen_Corte : ['', Validators.required],
+      Formato_Corte : [null, Validators.required],
+      Ancho_Corte : [null, Validators.required],
+      Largo_Corte : [null, Validators.required],
+      Fuelle_Corte : [null, Validators.required],
+      Margen_Corte : [null, Validators.required],
     });
 
     this.FormOrdenTrabajoSellado = this.frmBuilderPedExterno.group({
-      Formato_Sellado : ['', Validators.required],
-      Ancho_Sellado : ['', Validators.required],
-      Largo_Sellado : ['', Validators.required],
-      Fuelle_Sellado : ['', Validators.required],
-      Margen_Sellado : ['', Validators.required],
+      Formato_Sellado : [null, Validators.required],
+      Ancho_Sellado : [null, Validators.required],
+      Largo_Sellado : [null, Validators.required],
+      Fuelle_Sellado : [null, Validators.required],
+      Margen_Sellado : [null, Validators.required],
       PesoMillar : [0, Validators.required],
       TipoSellado : [0, Validators.required],
       PrecioDia : [0, Validators.required],
@@ -241,6 +231,53 @@ export class OrdenesTrabajoComponent implements OnInit {
       PesoPaquete : [0, Validators.required],
       CantidadBulto : [0, Validators.required],
       PesoBulto : [0, Validators.required],
+    });
+
+    this.FormOrdenTrabajoMezclas = this.frmBuilderPedExterno.group({
+      Id_Mezcla : [null, Validators.required],
+      Nombre_Mezclas : [null, Validators.required],
+      Chechbox_Capa1 : [null, Validators.required],
+      Chechbox_Capa2 : [null, Validators.required],
+      Chechbox_Capa3 : [null, Validators.required],
+      Proc_Capa1 : [0, Validators.required],
+      Proc_Capa2 : [0, Validators.required],
+      Proc_Capa3 : [0, Validators.required],
+      materialP1_Capa1 : [1, Validators.required],
+      PorcentajeMaterialP1_Capa1 : [0, Validators.required],
+      materialP1_Capa2 : [1, Validators.required],
+      PorcentajeMaterialP1_Capa2 : [0, Validators.required],
+      materialP1_Capa3 : [1, Validators.required],
+      PorcentajeMaterialP1_Capa3 : [0, Validators.required],
+      materialP2_Capa1 : [1, Validators.required],
+      PorcentajeMaterialP2_Capa1 : [0, Validators.required],
+      materialP2_Capa2 : [1, Validators.required],
+      PorcentajeMaterialP2_Capa2 : [0, Validators.required],
+      materialP2_Capa3 : [1, Validators.required],
+      PorcentajeMaterialP2_Capa3 : [0, Validators.required],
+      materialP3_Capa1 : [1, Validators.required],
+      PorcentajeMaterialP3_Capa1 : [0, Validators.required],
+      materialP3_Capa2 : [1, Validators.required],
+      PorcentajeMaterialP3_Capa2 : [0, Validators.required],
+      materialP3_Capa3 : [1, Validators.required],
+      PorcentajeMaterialP3_Capa3 : [0, Validators.required],
+      materialP4_Capa1 : [1, Validators.required],
+      PorcentajeMaterialP4_Capa1 : [0, Validators.required],
+      materialP4_Capa2 : [1, Validators.required],
+      PorcentajeMaterialP4_Capa2 : [0, Validators.required],
+      materialP_Capa3 : [1, Validators.required],
+      PorcentajeMaterialP_Capa3 : [0, Validators.required],
+      MezclaPigmentoP1_Capa1 : [1, Validators.required],
+      PorcentajeMezclaPigmentoP1_Capa1 : [0, Validators.required],
+      MezclaPigmentoP1_Capa2 : [1, Validators.required],
+      PorcentajeMezclaPigmentoP1_Capa2 : [0, Validators.required],
+      MezclaPigmento1_Capa3 : [1, Validators.required],
+      PorcentajeMezclaPigmentoP1_Capa3 :[0, Validators.required],
+      MezclaPigmentoP2_Capa1 : [1, Validators.required],
+      PorcentajeMezclaPigmentoP2_Capa1 : [0, Validators.required],
+      MezclaPigmentoP2_Capa2 : [1, Validators.required],
+      PorcentajeMezclaPigmentoP2_Capa2 : [0, Validators.required],
+      MezclaPigmento2_Capa3 : [1, Validators.required],
+      PorcentajeMezclaPigmentoP2_Capa3 : [0, Validators.required],
     });
 
     /** Formulario para creación de mezclas */
@@ -293,53 +330,6 @@ export class OrdenesTrabajoComponent implements OnInit {
     });
 
 
-    this.FormOrdenTrabajoMezclas = this.frmBuilderPedExterno.group({
-      Id_Mezcla : ['', Validators.required],
-      Nombre_Mezclas : ['', Validators.required],
-      Chechbox_Capa1 : ['', Validators.required],
-      Chechbox_Capa2 : ['', Validators.required],
-      Chechbox_Capa3 : ['', Validators.required],
-      Proc_Capa1 : [0, Validators.required],
-      Proc_Capa2 : [0, Validators.required],
-      Proc_Capa3 : [0, Validators.required],
-      materialP1_Capa1 : [1, Validators.required],
-      PorcentajeMaterialP1_Capa1 : [0, Validators.required],
-      materialP1_Capa2 : [1, Validators.required],
-      PorcentajeMaterialP1_Capa2 : [0, Validators.required],
-      materialP1_Capa3 : [1, Validators.required],
-      PorcentajeMaterialP1_Capa3 : [0, Validators.required],
-      materialP2_Capa1 : [1, Validators.required],
-      PorcentajeMaterialP2_Capa1 : [0, Validators.required],
-      materialP2_Capa2 : [1, Validators.required],
-      PorcentajeMaterialP2_Capa2 : [0, Validators.required],
-      materialP2_Capa3 : [1, Validators.required],
-      PorcentajeMaterialP2_Capa3 : [0, Validators.required],
-      materialP3_Capa1 : [1, Validators.required],
-      PorcentajeMaterialP3_Capa1 : [0, Validators.required],
-      materialP3_Capa2 : [1, Validators.required],
-      PorcentajeMaterialP3_Capa2 : [0, Validators.required],
-      materialP3_Capa3 : [1, Validators.required],
-      PorcentajeMaterialP3_Capa3 : [0, Validators.required],
-      materialP4_Capa1 : [1, Validators.required],
-      PorcentajeMaterialP4_Capa1 : [0, Validators.required],
-      materialP4_Capa2 : [1, Validators.required],
-      PorcentajeMaterialP4_Capa2 : [0, Validators.required],
-      materialP_Capa3 : [1, Validators.required],
-      PorcentajeMaterialP_Capa3 : [0, Validators.required],
-      MezclaPigmentoP1_Capa1 : [1, Validators.required],
-      PorcentajeMezclaPigmentoP1_Capa1 : [0, Validators.required],
-      MezclaPigmentoP1_Capa2 : [1, Validators.required],
-      PorcentajeMezclaPigmentoP1_Capa2 : [0, Validators.required],
-      MezclaPigmento1_Capa3 : [1, Validators.required],
-      PorcentajeMezclaPigmentoP1_Capa3 :[0, Validators.required],
-      MezclaPigmentoP2_Capa1 : [1, Validators.required],
-      PorcentajeMezclaPigmentoP2_Capa1 : [0, Validators.required],
-      MezclaPigmentoP2_Capa2 : [1, Validators.required],
-      PorcentajeMezclaPigmentoP2_Capa2 : [0, Validators.required],
-      MezclaPigmento2_Capa3 : [1, Validators.required],
-      PorcentajeMezclaPigmentoP2_Capa3 : [0, Validators.required],
-    });
-
     this.formCrearMateriales = this.frmBuilderPedExterno.group({
       matNombre : [null, Validators.required],
       matDescripcion :  [null, Validators.required],
@@ -385,23 +375,23 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.ValidarRol = this.storage.get('Rol');
   }
 
-  // Funcion que limpiará todos los campos
-  limpiarCampos(){
+  // Funcion que colocará los campos del formulario principal con datos predeterminados
+  limpiarFormOrdenTrabajo(){
     this.FormOrdenTrabajo.patchValue({
-      OT_Id: '',
-      Pedido_Id: '',
-      Nombre_Vendedor: '',
+      OT_Id: null,
+      Pedido_Id: null,
+      Nombre_Vendedor: null,
       OT_FechaCreacion: this.today,
-      OT_FechaEntrega: '',
-      Id_Sede_Cliente : '',
-      ID_Cliente: '',
-      Nombre_Cliente: '',
-      Ciudad_SedeCliente: '',
-      Direccion_SedeCliente : '',
-      OT_Estado : 11,
-      OT_Observacion : '',
+      OT_FechaEntrega: null,
+      Id_Sede_Cliente : null,
+      ID_Cliente: null,
+      Nombre_Cliente: null,
+      Ciudad_SedeCliente: null,
+      Direccion_SedeCliente : null,
+      OT_Estado : null,
+      OT_Observacion : null,
       Margen : 0,
-      OT_Cyrel : '',
+      OT_Cyrel : false,
       OT_Extrusion : false,
       OT_Impresion : false,
       OT_Rotograbado : false,
@@ -410,6 +400,716 @@ export class OrdenesTrabajoComponent implements OnInit {
       OT_Doblado : false,
       OT_Sellado : false,
     });
+  }
+
+  // Funcion que va a limpiar los campos del formulario de extrusión
+  limpiarFormExtrusion(){
+    this.FormOrdenTrabajoExtrusion.patchValue({
+      Material_Extrusion : 1,
+      Formato_Extrusion : 1,
+      Pigmento_Extrusion : 1,
+      Ancho_Extrusion1 : 0,
+      Ancho_Extrusion2 : 0,
+      Ancho_Extrusion3 : 0,
+      Calibre_Extrusion : 0,
+      UnidadMedida_Extrusion : 'Cms',
+      Tratado_Extrusion : 1,
+      Peso_Extrusion : 0,
+    });
+  }
+
+  // Funcion que va a limpiar los campos del formulario de impresion y rotograbado
+  limpiarFormImpresion(){
+    this.FormOrdenTrabajoImpresion.patchValue({
+      Tipo_Impresion : 1,
+      Rodillo_Impresion : 0,
+      Pista_Impresion : 0,
+      Tinta_Impresion1 : 'NO APLICA',
+      Tinta_Impresion2 : 'NO APLICA',
+      Tinta_Impresion3 : 'NO APLICA',
+      Tinta_Impresion4 : 'NO APLICA',
+      Tinta_Impresion5 : 'NO APLICA',
+      Tinta_Impresion6 : 'NO APLICA',
+      Tinta_Impresion7 : 'NO APLICA',
+      Tinta_Impresion8 : 'NO APLICA',
+    });
+  }
+
+  // Funcion que va a limpiar los campos del formulario de laminado
+  limpiarFormLaminado(){
+    this.FormOrdenTrabajoLaminado.patchValue({
+      Capa_Laminado1 : 1,
+      Calibre_Laminado1 : 0,
+      cantidad_Laminado1 : 0,
+      Capa_Laminado2 : 1,
+      Calibre_Laminado2 : 0,
+      cantidad_Laminado2 : 0,
+      Capa_Laminado3 : 1,
+      Calibre_Laminado3 : 0,
+      cantidad_Laminado3 : 0,
+    });
+  }
+
+  // Funcion que va a limpiar los campos del formulario de orte
+  limpiarFormCorte(){
+    this.FormOrdenTrabajoCorte.patchValue({
+      Formato_Corte : 7,
+      Ancho_Corte : 0,
+      Largo_Corte : 0,
+      Fuelle_Corte : 0,
+      Margen_Corte : 0,
+    });
+  }
+
+  // Funcion que va a limpíar los campos del formulario de sellado
+  limpiarFormSellado(){
+    this.FormOrdenTrabajoSellado.patchValue({
+      Formato_Sellado : 7,
+      Ancho_Sellado : 0,
+      Largo_Sellado : 0,
+      Fuelle_Sellado : 0,
+      Margen_Sellado : 0,
+      PesoMillar : 0,
+      TipoSellado : 1,
+      PrecioDia : 0,
+      PrecioNoche : 0,
+      CantidadPaquete : 0,
+      PesoPaquete : 0,
+      CantidadBulto : 0,
+      PesoBulto : 0,
+    });
+  }
+
+  // Funcion que va a limpiar los campos del formulario de mezclas
+  limpiarFormMezclas(){
+    this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas : 109, });
+    this.cargarCombinacionMezclas();
+  }
+
+  // Funcion que limpiará todos los campos
+  limpiarCampos(){
+    this.ultimaOT();
+    this.pedidos();
+    this.limpiarFormOrdenTrabajo();
+    this.limpiarFormExtrusion();
+    this.limpiarFormImpresion();
+    this.limpiarFormLaminado();
+    this.limpiarFormCorte();
+    this.limpiarFormSellado();
+    this.limpiarFormMezclas();
+    this.checkedCyrel = false;
+    this.checkedCorte = false;
+    this.cantidadCostoProductos = 0;
+    this.ArrayProducto = [];
+    this.checkedCapa1 = false;
+    this.checkedCapa2 = false;
+    this.checkedCapa3 = false;
+    this.presentacionProducto = '';
+    this.producto = 0;
+    this.idMezclaSeleccionada = 0;
+    this.nroCapas = 0;
+    this.nroCapasOT = 0;
+    this.cantidadCostoProductos = 0;
+    this.extrusion = false;
+    this.impresion = false;
+    this.rotograbado = false;
+    this.laminado = false;
+    this.sellado = false;
+    this.cargando = false;
+    this.cantidadProducto = 0;
+    this.valorProducto = 0;
+    this.netoKg = 0;
+    this.valorKg = 0;
+    this.valorOt = 0;
+    this.margenKg = 0;
+    this.pesoPaquete = 0;
+    this.pesoBulto = 0;
+    this.informacionSeleccionada = 0;
+  }
+
+  /** Función que cargará las tintas en los combobox al momento de crear la OT. */
+  cargarTintasEnProcesoImpresion(){
+    this.servicioTintas.srvObtenerLista().subscribe(registrosTintas => { this.arrayTintas = registrosTintas; });
+  }
+
+  /** Función que cargará los pigmentos en el combobox al momento de crear la OT. */
+  cargarPigmentosEnProcesoExtrusion(){
+    this.servicioPigmentos.srvObtenerLista().subscribe(registrosPigmentos => { this.arrayPigmentos = registrosPigmentos; });
+  }
+
+  //Funcion que cargará los estados que puede tener una orden de trabajo
+  cargarEstados(){
+    this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => { this.estados = datos_estados; });
+  }
+
+  /** Función que cargará los materiales en el combobox al momento de crear la OT. */
+  cargarMaterialEnProcesoExtrusion(){
+    this.servicioMateriales.srvObtenerLista().subscribe(registrosMateriasProd => { this.arrayMateriales = registrosMateriasProd; });
+  }
+
+   /** Función que cargará los materiales en el combobox al momento de llamar el modal de Crear Mezclas. */
+  cargarMateriales_MatPrima(){
+    this.servicioMateriales.srvObtenerLista().subscribe(registrosMateriasProd => { this.arrayMateriales2 = registrosMateriasProd; });
+  }
+
+  /** Función que cargará las unidades de medida en el combobox al momento de crear la OT. */
+  cargarUnidadMedidaEnProcesoExtrusion(){
+    this.servicioUnidadMedida.srvObtenerLista().subscribe(datos_und => {
+      for (let i = 0; i < datos_und.length; i++) {
+        if (datos_und[i].undMed_Id == 'Cms' || datos_und[i].undMed_Id == 'Plgs') this.arrayUnidadesMedidas.push(datos_und[i].undMed_Id);
+      }
+    });
+  }
+
+  //Funcion que se encargará de cargar los diferentes tratados para el proceso de extrusion
+  cargarTratadoEnProcesoExtrusion(){
+    this.tratadoServise.srvObtenerLista().subscribe(datos_tratado => { this.tratado = datos_tratado; });
+  }
+
+  //Funcion que cargará los formatos para el proceso de extrusion
+  cargarFormatosEnProcesoExtrusion(){
+    this.formatoService.srvObtenerLista().subscribe(datos_formatos => { this.formatos = datos_formatos; });
+  }
+
+  //Funcion que cargará los diferentes tipos de impresion que maneja la empresa
+  cargarTiposImpresion(){
+    this.tiposImpresionService.srvObtenerLista().subscribe(datos_tiposImpresion => { this.tiposImpresion = datos_tiposImpresion; });
+  }
+
+  //Funcion que cargará los diferentes laminados
+  cargarLaminados(){
+    this.laminadoCapasService.srvObtenerLista().subscribe(datos_laminado => { this.laminado_capas = datos_laminado; });
+  }
+
+  // Funcion que cargará las mezclas de materiales
+  cargarMezclaMateria(){
+    this.mezclasMateriales = [];
+    this.mezclaMaterialService.srvObtenerLista().subscribe(datos_mezclasMateriales => { this.mezclasMateriales = datos_mezclasMateriales; });
+  }
+
+  // Funcion que cargará las mezclas de materiales
+  cargarMezclaMateria2(){
+    this.mezclasMateriales2 = [];
+    this.mezclaMaterialService.srvObtenerLista().subscribe(datos_mezclasMateriales => {
+      for (let i = 0; i < datos_mezclasMateriales.length; i++) {
+        this.mezclasMateriales2.push(datos_mezclasMateriales[i]);
+      }
+    });
+  }
+
+  // Funcion que cargará las mezclas de pigmentos
+  cargarMezclaPigmento(){
+    this.mezclaPigmentosService.srvObtenerLista().subscribe(datos_mezclaPigmentos => { this.mezclasPigmentos = datos_mezclaPigmentos; });
+  }
+
+    // Funcion que cargará las mezclas de pigmentos
+  cargarMezclaPigmento2(){
+    this.mezclasPigmentos2 = [];
+    this.mezclaPigmentosService.srvObtenerLista().subscribe(datos_mezclaPigmentos => {
+      for (let i = 0; i < datos_mezclaPigmentos.length; i++) {
+        this.mezclasPigmentos2.push(datos_mezclaPigmentos[i])
+      }
+    });
+  }
+
+  // Funcion que cargará el nombre de las mezclas
+  cargarMezclas(){
+    this.mezclasService.srvObtenerLista().subscribe(datos_mezclas => { this.mezclas = datos_mezclas; });
+  }
+
+  //Funcion que va cargar cada uno de los componentes de la mezcla
+  cargarCombinacionMezclas(){
+    this.mezclasService.srvObtenerListaPorId(this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas).subscribe(datos_mezcla => {
+      this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
+      this.FormOrdenTrabajoMezclas.patchValue({
+        Id_Mezcla : datos_mezcla.mezcla_Id,
+        Nombre_Mezclas : datos_mezcla.mezcla_Nombre,
+        Chechbox_Capa1 : this.nroCapasOT,
+        Chechbox_Capa2 : '',
+        Chechbox_Capa3 : '',
+        Proc_Capa1 : datos_mezcla.mezcla_PorcentajeCapa1,
+        Proc_Capa2 : datos_mezcla.mezcla_PorcentajeCapa2,
+        Proc_Capa3 : datos_mezcla.mezcla_PorcentajeCapa3,
+        materialP1_Capa1 : datos_mezcla.mezMaterial_Id1xCapa1,
+        PorcentajeMaterialP1_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa1,
+        materialP1_Capa2 : datos_mezcla.mezMaterial_Id1xCapa2,
+        PorcentajeMaterialP1_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa2,
+        materialP1_Capa3 : datos_mezcla.mezMaterial_Id1xCapa3,
+        PorcentajeMaterialP1_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa3,
+        materialP2_Capa1 : datos_mezcla.mezMaterial_Id2xCapa1,
+        PorcentajeMaterialP2_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa1,
+        materialP2_Capa2 : datos_mezcla.mezMaterial_Id2xCapa2,
+        PorcentajeMaterialP2_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa2,
+        materialP2_Capa3 : datos_mezcla.mezMaterial_Id2xCapa3,
+        PorcentajeMaterialP2_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa3,
+        materialP3_Capa1 : datos_mezcla.mezMaterial_Id3xCapa1,
+        PorcentajeMaterialP3_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa1,
+        materialP3_Capa2 : datos_mezcla.mezMaterial_Id3xCapa2,
+        PorcentajeMaterialP3_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa2,
+        materialP3_Capa3 : datos_mezcla.mezMaterial_Id3xCapa3,
+        PorcentajeMaterialP3_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa3,
+        materialP4_Capa1 : datos_mezcla.mezMaterial_Id4xCapa1,
+        PorcentajeMaterialP4_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa1,
+        materialP4_Capa2 : datos_mezcla.mezMaterial_Id4xCapa2,
+        PorcentajeMaterialP4_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa2,
+        materialP_Capa3 : datos_mezcla.mezMaterial_Id4xCapa3,
+        PorcentajeMaterialP_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa3,
+        MezclaPigmentoP1_Capa1 : datos_mezcla.mezPigmto_Id1xCapa1,
+        PorcentajeMezclaPigmentoP1_Capa1 : datos_mezcla.mezcla_PorcentajePigmto1_Capa1,
+        MezclaPigmentoP1_Capa2 : datos_mezcla.mezPigmto_Id1xCapa2,
+        PorcentajeMezclaPigmentoP1_Capa2 : datos_mezcla.mezcla_PorcentajePigmto1_Capa2,
+        MezclaPigmento1_Capa3 : datos_mezcla.mezPigmto_Id1xCapa3,
+        PorcentajeMezclaPigmentoP1_Capa3 :datos_mezcla.mezcla_PorcentajePigmto1_Capa3,
+        MezclaPigmentoP2_Capa1 : datos_mezcla.mezPigmto_Id1xCapa1,
+        PorcentajeMezclaPigmentoP2_Capa1 : datos_mezcla.mezcla_PorcentajePigmto2_Capa1,
+        MezclaPigmentoP2_Capa2 : datos_mezcla.mezPigmto_Id2xCapa2,
+        PorcentajeMezclaPigmentoP2_Capa2 : datos_mezcla.mezcla_PorcentajePigmto2_Capa2,
+        MezclaPigmento2_Capa3 : datos_mezcla.mezPigmto_Id2xCapa3,
+        PorcentajeMezclaPigmentoP2_Capa3 : datos_mezcla.mezcla_PorcentajePigmto2_Capa3,
+      });
+      setTimeout(() => {
+        this.FormOrdenTrabajoMezclas.disable();
+        this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
+        this.FormOrdenTrabajoMezclas.get('Id_Mezclas').enable();
+      }, 1000);
+    }, error => {
+      this.mezclasService.getMezclaNombre(this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas).subscribe(datos_mezcla => {
+        this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
+        this.FormOrdenTrabajoMezclas.patchValue({
+          Id_Mezcla : datos_mezcla.mezcla_Id,
+          Nombre_Mezclas : datos_mezcla.mezcla_Nombre,
+          Chechbox_Capa1 : this.nroCapasOT,
+          Chechbox_Capa2 : '',
+          Chechbox_Capa3 : '',
+          Proc_Capa1 : datos_mezcla.mezcla_PorcentajeCapa1,
+          Proc_Capa2 : datos_mezcla.mezcla_PorcentajeCapa2,
+          Proc_Capa3 : datos_mezcla.mezcla_PorcentajeCapa3,
+          materialP1_Capa1 : datos_mezcla.mezMaterial_Id1xCapa1,
+          PorcentajeMaterialP1_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa1,
+          materialP1_Capa2 : datos_mezcla.mezMaterial_Id1xCapa2,
+          PorcentajeMaterialP1_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa2,
+          materialP1_Capa3 : datos_mezcla.mezMaterial_Id1xCapa3,
+          PorcentajeMaterialP1_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa3,
+          materialP2_Capa1 : datos_mezcla.mezMaterial_Id2xCapa1,
+          PorcentajeMaterialP2_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa1,
+          materialP2_Capa2 : datos_mezcla.mezMaterial_Id2xCapa2,
+          PorcentajeMaterialP2_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa2,
+          materialP2_Capa3 : datos_mezcla.mezMaterial_Id2xCapa3,
+          PorcentajeMaterialP2_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa3,
+          materialP3_Capa1 : datos_mezcla.mezMaterial_Id3xCapa1,
+          PorcentajeMaterialP3_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa1,
+          materialP3_Capa2 : datos_mezcla.mezMaterial_Id3xCapa2,
+          PorcentajeMaterialP3_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa2,
+          materialP3_Capa3 : datos_mezcla.mezMaterial_Id3xCapa3,
+          PorcentajeMaterialP3_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa3,
+          materialP4_Capa1 : datos_mezcla.mezMaterial_Id4xCapa1,
+          PorcentajeMaterialP4_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa1,
+          materialP4_Capa2 : datos_mezcla.mezMaterial_Id4xCapa2,
+          PorcentajeMaterialP4_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa2,
+          materialP_Capa3 : datos_mezcla.mezMaterial_Id4xCapa3,
+          PorcentajeMaterialP_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa3,
+          MezclaPigmentoP1_Capa1 : datos_mezcla.mezPigmto_Id1xCapa1,
+          PorcentajeMezclaPigmentoP1_Capa1 : datos_mezcla.mezcla_PorcentajePigmto1_Capa1,
+          MezclaPigmentoP1_Capa2 : datos_mezcla.mezPigmto_Id1xCapa2,
+          PorcentajeMezclaPigmentoP1_Capa2 : datos_mezcla.mezcla_PorcentajePigmto1_Capa2,
+          MezclaPigmento1_Capa3 : datos_mezcla.mezPigmto_Id1xCapa3,
+          PorcentajeMezclaPigmentoP1_Capa3 :datos_mezcla.mezcla_PorcentajePigmto1_Capa3,
+          MezclaPigmentoP2_Capa1 : datos_mezcla.mezPigmto_Id1xCapa1,
+          PorcentajeMezclaPigmentoP2_Capa1 : datos_mezcla.mezcla_PorcentajePigmto2_Capa1,
+          MezclaPigmentoP2_Capa2 : datos_mezcla.mezPigmto_Id2xCapa2,
+          PorcentajeMezclaPigmentoP2_Capa2 : datos_mezcla.mezcla_PorcentajePigmto2_Capa2,
+          MezclaPigmento2_Capa3 : datos_mezcla.mezPigmto_Id2xCapa3,
+          PorcentajeMezclaPigmentoP2_Capa3 : datos_mezcla.mezcla_PorcentajePigmto2_Capa3,
+        });
+      });
+    });
+  }
+
+  // Funcion que va cargará la informacion de los tipos de productos
+  cargarTiposProductos(){
+    this.tiposProductosService.srvObtenerLista().subscribe(datos => { this.tipoProductos = datos });
+  }
+
+  // Funcion que va a cargar la informacion de los tipos de sellado
+  cargarTiposSellado(){
+    this.tipoSelladoService.srvObtenerLista().subscribe(datos => { this.tipoSellado = datos });
+  }
+
+  // Funcion que traerá la ultima orden de trabajo para poder tomar el ID de la OT
+  ultimaOT(){
+    this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(datos_ot => { this.ultimaOrdenTrabajo = datos_ot.item + 1;  });
+  }
+
+  //Funcion que servirá para mostrar la informacion de los pedidos que no tienen orden de trabajo
+  pedidos(){
+    this.pedidoExternoService.GetPedidosSinOT().subscribe(datos => { this.pedidosSinOT = datos });
+  }
+
+  // funcion que consultará la informacion del pedido apra crear la orden de trabajo
+  informacionPedido(){
+    let pedido : number = this.FormOrdenTrabajo.value.Pedido_Id;
+    this.cantidadCostoProductos = 0;
+    this.ArrayProducto = [];
+    this.limpiarCampos();
+    this.pedidoExternoService.GetInfoPedido(pedido).subscribe(datos => {
+      for (let i = 0; i < datos.length; i++) {
+        this.FormOrdenTrabajo.patchValue({
+          OT_Id: null,
+          Pedido_Id: pedido,
+          Nombre_Vendedor: datos[i].vendedor,
+          OT_FechaCreacion: this.today,
+          OT_FechaEntrega: null,
+          Id_Sede_Cliente : datos[i].id_Sede_Cliente,
+          ID_Cliente: datos[i].id_Cliente,
+          Nombre_Cliente: datos[i].cliente,
+          Ciudad_SedeCliente: datos[i].ciudad,
+          Direccion_SedeCliente : datos[i].direccion,
+          OT_Estado : datos[i].estado,
+          OT_Observacion : datos[i].observacion,
+          Margen : 0,
+          OT_Cyrel : this.checkedCyrel,
+          OT_Extrusion : this.extrusion,
+          OT_Impresion : this.impresion,
+          OT_Rotograbado : this.rotograbado,
+          OT_Laminado : this.laminado,
+          OT_Corte : this.checkedCorte,
+          OT_Doblado : this.doblado,
+          OT_Sellado : this.sellado,
+        });
+
+        let productoExt : any = {
+          Id : datos[i].id_Producto,
+          Nombre : datos[i].producto,
+          Ancho : datos[i].ancho_Producto,
+          Fuelle : datos[i].fuelle_Producto,
+          Largo : datos[i].largo_Producto,
+          Cal : datos[i].calibre_Producto,
+          Und : datos[i].und_ACFL,
+          Peso_Producto : datos[i].peso_Producto,
+          PesoMillar : datos[i].peso_Millar,
+          Tipo : datos[i].tipo_Producto,
+          Material : datos[i].material_Producto,
+          Pigmento : datos[i].pigmento_Producto,
+          CantPaquete : datos[i].cant_Paquete,
+          CantBulto : datos[i].cant_Bulto,
+          Cant : datos[i].cantidad_Restante,
+          Cant_Inicial : datos[i].cantidad_Pedida,
+          UndCant : datos[i].und_Pedido,
+          TipoSellado : datos[i].tipo_Sellado,
+          PrecioUnd : datos[i].precio_Producto,
+          SubTotal : datos[i].subTotal_Producto,
+          FechaEntrega : datos[i].fecha_Entrega.replace('T00:00:00', ''),
+        }
+        this.ArrayProducto.push(productoExt);
+        this.cantidadCostoProductos += datos[i].subTotal_Producto;
+      }
+    });
+  }
+
+  // Funcion que va buscar, almacenar y mostrar la información de la ultima orden de trabajo para un producto con una presentacion especifica
+  consultarInfoProducto(data : any){
+    this.informacionSeleccionada = data;
+    this.cantidadProducto = 0;
+    this.valorProducto = 0;
+    this.netoKg = 0;
+    this.valorKg = 0;
+    this.valorOt = 0;
+    this.margenKg = 0;
+    this.pesoPaquete = 0;
+    this.pesoBulto = 0;
+    this.producto = data.Id;
+    this.presentacionProducto = data.UndCant;
+    this.ordenTrabajoService.GetInfoUltOT(data.Id, data.UndCant).subscribe(datos_Ot => {
+      this.FormOrdenTrabajo.patchValue({
+        OT_FechaEntrega: data.FechaEntrega,
+        OT_Observacion : datos_Ot.observacion,
+        Margen : datos_Ot.margen,
+      });
+      this.FormOrdenTrabajoExtrusion.patchValue({
+        Material_Extrusion : datos_Ot.id_Material,
+        Formato_Extrusion : datos_Ot.id_Formato_Extrusion,
+        Pigmento_Extrusion : datos_Ot.id_Pigmento_Extrusion,
+        Ancho_Extrusion1 : datos_Ot.ancho1_Extrusion,
+        Ancho_Extrusion2 : datos_Ot.ancho2_Extrusion,
+        Ancho_Extrusion3 : datos_Ot.ancho3_Extrusion,
+        Calibre_Extrusion : datos_Ot.calibre_Extrusion,
+        UnidadMedida_Extrusion : datos_Ot.und_Extrusion,
+        Tratado_Extrusion : datos_Ot.id_Tratado,
+        Peso_Extrusion : datos_Ot.peso_Extrusion,
+      });
+      this.FormOrdenTrabajoImpresion.patchValue({
+        Tipo_Impresion : datos_Ot.id_Tipo_Imptesion,
+        Rodillo_Impresion : datos_Ot.rodillo,
+        Pista_Impresion : datos_Ot.pista,
+        Tinta_Impresion1 : datos_Ot.tinta1,
+        Tinta_Impresion2 : datos_Ot.tinta2,
+        Tinta_Impresion3 : datos_Ot.tinta3,
+        Tinta_Impresion4 : datos_Ot.tinta4,
+        Tinta_Impresion5 : datos_Ot.tinta5,
+        Tinta_Impresion6 : datos_Ot.tinta6,
+        Tinta_Impresion7 : datos_Ot.tinta7,
+        Tinta_Impresion8 : datos_Ot.tinta8,
+      });
+      this.FormOrdenTrabajoLaminado.patchValue({
+        Capa_Laminado1 : datos_Ot.id_Capa1,
+        Calibre_Laminado1 : datos_Ot.calibre_Laminado_Capa1,
+        cantidad_Laminado1 : datos_Ot.cantidad_Laminado_Capa1,
+        Capa_Laminado2 : datos_Ot.id_Capa2,
+        Calibre_Laminado2 : datos_Ot.calibre_Laminado_Capa2,
+        cantidad_Laminado2 : datos_Ot.cantidad_Laminado_Capa2,
+        Capa_Laminado3 : datos_Ot.id_Capa3,
+        Calibre_Laminado3 : datos_Ot.calibre_Laminado_Capa3,
+        cantidad_Laminado3 : datos_Ot.cantidad_Laminado_Capa3,
+      });
+      this.FormOrdenTrabajoCorte.patchValue({
+        Formato_Corte : datos_Ot.formato_Producto,
+        Ancho_Corte : datos_Ot.selladoCorte_Ancho,
+        Largo_Corte : datos_Ot.selladoCorte_Largo,
+        Fuelle_Corte : datos_Ot.selladoCorte_Fuelle,
+        Margen_Corte : datos_Ot.margen,
+      });
+      this.FormOrdenTrabajoSellado.patchValue({
+        Formato_Sellado : datos_Ot.formato_Producto,
+        Ancho_Sellado : datos_Ot.selladoCorte_Ancho,
+        Largo_Sellado : datos_Ot.selladoCorte_Largo,
+        Fuelle_Sellado : datos_Ot.selladoCorte_Fuelle,
+        Margen_Sellado : datos_Ot.margen,
+        PesoMillar : datos_Ot.prod_Peso_Millar,
+        TipoSellado : datos_Ot.tpSellados_Nombre,
+        CantidadPaquete : datos_Ot.selladoCorte_CantBolsasPaquete,
+        CantidadBulto : datos_Ot.selladoCorte_CantBolsasBulto,
+        PrecioDia : datos_Ot.selladoCorte_PrecioSelladoDia,
+        PrecioNoche : datos_Ot.selladoCorte_PrecioSelladoNoche,
+      });
+      this.checkedCyrel = datos_Ot.cyrel;
+      this.extrusion = datos_Ot.extrusion;
+      this.impresion = datos_Ot.impresion;
+      this.rotograbado = datos_Ot.rotograbado;
+      this.laminado = datos_Ot.laminado;
+      this.checkedCorte = datos_Ot.corte;
+      this.sellado = datos_Ot.sellado;
+      setTimeout(() => { this.calcularDatosOt(data) }, 500);
+
+      this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas : datos_Ot.mezcla_Id, });
+      this.cargarCombinacionMezclas();
+      setTimeout(() => {
+        this.FormOrdenTrabajoMezclas.disable();
+        this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
+        this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
+      }, 1000);
+    }, error => {
+      let presentacion : string = data.UndCant;
+      if (presentacion == 'Kg') presentacion = 'Kilo';
+      else if (presentacion == 'Und') presentacion = 'Unidad';
+      let impresion : any;
+      let laminadoCapa1 : any, laminadoCapa2 : any, laminadoCapa3 : any;
+      this.bagProService.srvObtenerListaClienteOT_Item_Presentacion(data.Id, presentacion).subscribe(datos_Ot => {
+        for (const itemOt of datos_Ot) {
+          this.FormOrdenTrabajo.patchValue({
+            OT_FechaEntrega: data.FechaEntrega,
+            OT_Observacion : itemOt.observacion,
+            Margen : itemOt.ptMargen,
+          });
+
+          itemOt.extrusion == '1' ? this.extrusion = true : this.extrusion = false;
+          itemOt.impresion == '1' ? this.impresion = true : this.impresion = false;
+          itemOt.lamiando == '1' ? this.rotograbado = true : this.rotograbado = false;
+          itemOt.laminado2 == '1' ? this.laminado = true : this.laminado = false;
+          itemOt.pterminado == '1' ? this.sellado = true : this.sellado = false;
+          itemOt.corte == '1' ? this.checkedCorte = true : this.checkedCorte = false;
+          itemOt.cyrel == '1' ? this.checkedCyrel = true : this.checkedCyrel = false;
+
+          this.FormOrdenTrabajoExtrusion.patchValue({
+            Material_Extrusion : parseInt(itemOt.extMaterial.trim()),
+            Formato_Extrusion : parseInt(itemOt.ptFormatopt.trim()),
+            Pigmento_Extrusion : parseInt(itemOt.extPigmento.trim()),
+            Ancho_Extrusion1 : itemOt.extAcho1,
+            Ancho_Extrusion2 : itemOt.extAcho2,
+            Ancho_Extrusion3 : itemOt.extAcho3,
+            Calibre_Extrusion : itemOt.extCalibre,
+            UnidadMedida_Extrusion : itemOt.extUnidadesNom.trim(),
+            Tratado_Extrusion : parseInt(itemOt.extTratado.trim()),
+            Peso_Extrusion : itemOt.extPeso,
+          });
+
+          if (itemOt.impFlexoNom.trim() != 'FLEXOGRAFIA' && itemOt.impFlexoNom.trim() != 'ROTOGRABADO') impresion = 1;
+          else if (itemOt.impFlexoNom.trim() == 'FLEXOGRAFIA') impresion = 2;
+          else if (itemOt.impFlexoNom.trim() == 'ROTOGRABADO') impresion = 3;
+
+          let tinta1 : any = itemOt.impTinta1Nom.trim();
+          let tinta2 : any = itemOt.impTinta2Nom.trim();
+          let tinta3 : any = itemOt.impTinta3Nom.trim();
+          let tinta4 : any = itemOt.impTinta4Nom.trim();
+          let tinta5 : any = itemOt.impTinta5Nom.trim();
+          let tinta6 : any = itemOt.impTinta6Nom.trim();
+          let tinta7 : any = itemOt.impTinta7Nom.trim();
+          let tinta8 : any = itemOt.impTinta8Nom.trim();
+
+          if (tinta1 == '') tinta1 = 'NO APLICA';
+          if (tinta2 == '') tinta2 = 'NO APLICA';
+          if (tinta3 == '') tinta3 = 'NO APLICA';
+          if (tinta4 == '') tinta4 = 'NO APLICA';
+          if (tinta5 == '') tinta5 = 'NO APLICA';
+          if (tinta6 == '') tinta6 = 'NO APLICA';
+          if (tinta7 == '') tinta7 = 'NO APLICA';
+          if (tinta8 == '') tinta8 = 'NO APLICA';
+
+          this.servicioTintas.srvObtenerListaConsultaImpresion(tinta1, tinta2, tinta3, tinta4, tinta5, tinta6, tinta7, tinta8).subscribe(datos_impresion => {
+            for (let j = 0; j < datos_impresion.length; j++) {
+              this.FormOrdenTrabajoImpresion.setValue({
+                Tipo_Impresion : impresion,
+                Rodillo_Impresion : itemOt.impRodillo,
+                Pista_Impresion : itemOt.impPista,
+                Tinta_Impresion1 : datos_impresion[j].tinta_Id1,
+                Tinta_Impresion2 : datos_impresion[j].tinta_Id2,
+                Tinta_Impresion3 : datos_impresion[j].tinta_Id3,
+                Tinta_Impresion4 : datos_impresion[j].tinta_Id4,
+                Tinta_Impresion5 : datos_impresion[j].tinta_Id5,
+                Tinta_Impresion6 : datos_impresion[j].tinta_Id6,
+                Tinta_Impresion7 : datos_impresion[j].tinta_Id7,
+                Tinta_Impresion8 : datos_impresion[j].tinta_Id8,
+              });
+            }
+          });
+
+          laminadoCapa1 = itemOt.lamCapa1.trim();
+          laminadoCapa2 = itemOt.lamCapa2.trim();
+          laminadoCapa3 = itemOt.lamCapa3.trim();
+
+          if (laminadoCapa1 == '1') laminadoCapa1 = 1;
+          if (laminadoCapa2 == '1') laminadoCapa2 = 1;
+          if (laminadoCapa3 == '1') laminadoCapa3 = 1;
+
+          this.FormOrdenTrabajoLaminado.patchValue({
+            Capa_Laminado1 : parseInt(laminadoCapa1),
+            Calibre_Laminado1 : itemOt.lamCalibre1,
+            cantidad_Laminado1 : itemOt.cant1,
+            Capa_Laminado2 : parseInt(laminadoCapa2),
+            Calibre_Laminado2 : itemOt.lamCalibre2,
+            cantidad_Laminado2 : itemOt.cant2,
+            Capa_Laminado3 : parseInt(laminadoCapa3),
+            Calibre_Laminado3 : itemOt.lamCalibre3,
+            cantidad_Laminado3 : itemOt.cant3,
+          });
+          this.FormOrdenTrabajoCorte.patchValue({
+            Formato_Corte : data.Tipo,
+            Ancho_Corte : data.Ancho,
+            Largo_Corte : data.Largo,
+            Fuelle_Corte : data.Fuelle,
+            Margen_Corte : itemOt.ptMargen,
+          });
+          this.FormOrdenTrabajoSellado.patchValue({
+            Formato_Sellado : data.Tipo,
+            Ancho_Sellado : data.Ancho,
+            Largo_Sellado : data.Largo,
+            Fuelle_Sellado : data.Fuelle,
+            Margen_Sellado : itemOt.ptMargen,
+            PesoMillar : data.PesoMillar,
+            TipoSellado : data.TipoSellado,
+            PrecioDia : itemOt.dia,
+            PrecioNoche : itemOt.noche,
+            CantidadPaquete : data.CantPaquete,
+            PesoPaquete : itemOt.pesopaquete == '' ? itemOt.pesopaquete = 0 : itemOt.pesopaquete = parseFloat(itemOt.pesopaquete),
+            CantidadBulto : data.CantBulto,
+            PesoBulto : itemOt.pesoBulto == '' ? itemOt.pesoBulto = 0 : itemOt.pesoBulto = parseFloat(itemOt.pesoBulto),
+          });
+          setTimeout(() => { this.calcularDatosOt(data); }, 1000);
+          this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas = itemOt.mezModoNom;
+          this.cargarCombinacionMezclas();
+          setTimeout(() => {
+            this.FormOrdenTrabajoMezclas.disable();
+            this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
+            this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
+          }, 1000);
+        }
+      }, error => { this.mensajeAdvertencia(`No se encuentra una Orden de Trabajo anterior para el producto ${data.Id} y presentación ${presentacion}`); });
+    });
+  }
+
+  // Funcion que va a calcular los datos de la ot
+  calcularDatosOt(data : any){
+    let margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado | this.FormOrdenTrabajoCorte.value.Margen_Corte;
+    if (this.checkedCorte) margen_Adicional = this.FormOrdenTrabajoCorte.value.Margen_Corte;
+    if (this.sellado) margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado;
+    this.FormOrdenTrabajo.patchValue({Margen : margen_Adicional});
+    if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Plgs') {
+      let ancho1 : number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1;
+      let ancho2 : number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2;
+      let ancho3 : number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3;
+      let calibre : number = this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion;
+      let material : number = this.FormOrdenTrabajoExtrusion.value.Material_Extrusion;
+      let fact : number = 0;
+      let largoUnd : number = 0;
+      //Calcular Peso de Extrusion
+      if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
+        largoUnd = 100;
+        if (material == 3) fact = 0.0048;
+        else fact = 0.00468;
+        this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion : ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
+      } else {
+        largoUnd = 39.3701;
+        if (material == 3) fact = 0.0317;
+        else fact = 0.0302;
+        this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion : ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
+      }
+      //Calcular Peso Producto y Peso Millar
+      for (let i = 0; i < this.ArrayProducto.length; i++) {
+        if (this.ArrayProducto[i].Id == data.Id && this.ArrayProducto[i].UndCant == data.UndCant) {
+          //Peso Producto
+          if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms'){
+            if (material == 3) fact = 0.0048;
+            else fact = 0.00468;
+            this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
+          } else {
+            if (material == 3) fact = 0.0317;
+            else fact = 0.0302;
+            this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
+          }
+          //Peso Millar
+          this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].Peso_Producto * 1000;
+          if (this.ArrayProducto[i].Tipo == 'Laminado' || this.ArrayProducto[i].Tipo == 'Hoja') this.ArrayProducto[i].PesoMillar / 2;
+
+          //Calcular datos de la ot
+          if (data.UndCant == 'Kg') {
+            this.cantidadProducto = data.Cant;
+            this.margenKg = margen_Adicional * (data.Cant / 100);
+            this.netoKg = data.Cant + ((data.Cant * margen_Adicional) / 100);
+            this.valorKg = data.PrecioUnd;
+            this.valorProducto = data.PrecioUnd;
+            this.valorOt = data.Cant * this.valorProducto;
+          } else if (data.UndCant == 'Paquete') {
+            this.cantidadProducto = data.Cant;
+            this.valorProducto = data.PrecioUnd;
+            this.margenKg = margen_Adicional * (((data.Cant * data.CantPaquete * this.ArrayProducto[i].PesoMillar) / 1000) / 100);
+            this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * (data.Cant * data.CantPaquete)));
+            this.valorOt = data.Cant * data.PrecioUnd;
+            if (data.PesoMillar > 0 && data.CantPaquete > 0) this.pesoPaquete = this.ArrayProducto[i].PesoMillar * (data.CantPaquete / 1000);
+            if (data.CantPaquete > 0) this.pesoBulto = this.pesoPaquete * data.CantBulto;
+            if (data.CantPaquete == 0) this.valorKg = 0;
+            else {
+              if (data.CantPaquete > 0) this.valorKg = data.PrecioUnd / this.pesoPaquete;
+              else this.valorKg = 0;
+            }
+          } else if (data.UndCant == 'Und') {
+            this.cantidadProducto = data.Cant;
+            this.valorProducto = data.PrecioUnd;
+            this.valorOt = this.cantidadProducto * this.valorProducto;
+            this.margenKg = (margen_Adicional * ((data.Cant * this.ArrayProducto[i].PesoMillar) / 1000)) / 100;
+            this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * data.Cant));
+            if (this.ArrayProducto[i].Peso_Producto > 0){
+              if (this.valorOt == 0) this.valorOt = 1;
+              if ((data.Cant * this.ArrayProducto[i].PesoMillar) / 1000 == 0) this.valorKg = 0;
+              else this.valorKg = this.valorOt / ((data.Cant * this.ArrayProducto[i].PesoMillar) / 1000);
+            } else this.valorOt = 0;
+          } else if (data.UndCant == 'Rollo') {
+          }
+        }
+      }
+    } else this.mensajeAdvertencia(`¡Debe elegir una unidad de medida para extrusión!`);
+  }
+
+  // Funcion que se se ejecurá cuando hayan deseleccionado un producto
+  onRowUnselect(){
     this.FormOrdenTrabajoExtrusion.patchValue({
       Material_Extrusion : 1,
       Formato_Extrusion : 1,
@@ -514,355 +1214,17 @@ export class OrdenesTrabajoComponent implements OnInit {
       CantidadBulto : 0,
       PesoBulto : 0,
     });
-    this.checkedCyrel = false;
-    this.checkedCorte = false;
-    this.checkedCapa1 = false;
-    this.checkedCapa2 = false;
-    this.checkedCapa3 = false;
-    this.ArrayProducto = [];
-    this.cantidadKgMasMargen = 0;
-    this.cantidadUndMasMargen = 0;
     this.producto = 0;
-    this.pedidoId = 0;
-    this.clienteId = 0;
-    this.cantidadKilos = 0;
-    this.cantidadUnidades = 0;
-    this.pesoProducto = 0;
     this.idMezclaSeleccionada = 0;
-    this.ultimaOT();
-    this.pedidos();
-    this.cargando = false;
     this.nroCapas = 0;
     this.nroCapasOT = 0;
-  }
-
-  /** Función que cargará las tintas en los combobox al momento de crear la OT. */
-  cargarTintasEnProcesoImpresion(){
-    this.servicioTintas.srvObtenerLista().subscribe(registrosTintas => { this.arrayTintas = registrosTintas; });
-  }
-
-  /** Función que cargará los pigmentos en el combobox al momento de crear la OT. */
-  cargarPigmentosEnProcesoExtrusion(){
-    this.servicioPigmentos.srvObtenerLista().subscribe(registrosPigmentos => { this.arrayPigmentos = registrosPigmentos; });
-  }
-
-  //Funcion que cargará los estados que puede tener una orden de trabajo
-  cargarEstados(){
-    this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => { this.estados = datos_estados; });
-  }
-
-  /** Función que cargará los materiales en el combobox al momento de crear la OT. */
-  cargarMaterialEnProcesoExtrusion(){
-    this.servicioMateriales.srvObtenerLista().subscribe(registrosMateriasProd => { this.arrayMateriales = registrosMateriasProd; });
-  }
-
-   /** Función que cargará los materiales en el combobox al momento de llamar el modal de Crear Mezclas. */
-  cargarMateriales_MatPrima(){
-    this.servicioMateriales.srvObtenerLista().subscribe(registrosMateriasProd => { this.arrayMateriales2 = registrosMateriasProd; });
-  }
-
-  /** Función que cargará las unidades de medida en el combobox al momento de crear la OT. */
-  cargarUnidadMedidaEnProcesoExtrusion(){
-    this.servicioUnidadMedida.srvObtenerLista().subscribe(datos_und => {
-      for (let i = 0; i < datos_und.length; i++) {
-        if (datos_und[i].undMed_Id == 'Cms' || datos_und[i].undMed_Id == 'Plgs') this.arrayUnidadesMedidas.push(datos_und[i].undMed_Id);
-      }
-    });
-  }
-
-  //Funcion que se encargará de cargar los diferentes tratados para el proceso de extrusion
-  cargarTratadoEnProcesoExtrusion(){
-    this.tratadoServise.srvObtenerLista().subscribe(datos_tratado => { this.tratado = datos_tratado; });
-  }
-
-  //Funcion que cargará los formatos para el proceso de extrusion
-  cargarFormatosEnProcesoExtrusion(){
-    this.formatoService.srvObtenerLista().subscribe(datos_formatos => { this.formatos = datos_formatos; });
-  }
-
-  //Funcion que cargará los diferentes tipos de impresion que maneja la empresa
-  cargarTiposImpresion(){
-    this.tiposImpresionService.srvObtenerLista().subscribe(datos_tiposImpresion => { this.tiposImpresion = datos_tiposImpresion; });
-  }
-
-  //Funcion que cargará los diferentes laminados
-  cargarLaminados(){
-    this.laminadoCapasService.srvObtenerLista().subscribe(datos_laminado => { this.laminado_capas = datos_laminado; });
-  }
-
-  // Funcion que cargará las mezclas de materiales
-  cargarMezclaMateria(){
-    this.mezclasMateriales = [];
-    this.mezclaMaterialService.srvObtenerLista().subscribe(datos_mezclasMateriales => { this.mezclasMateriales = datos_mezclasMateriales; });
-  }
-
-  // Funcion que cargará las mezclas de materiales
-  cargarMezclaMateria2(){
-    this.mezclasMateriales2 = [];
-    this.mezclaMaterialService.srvObtenerLista().subscribe(datos_mezclasMateriales => {
-      for (let i = 0; i < datos_mezclasMateriales.length; i++) {
-        this.mezclasMateriales2.push(datos_mezclasMateriales[i]);
-      }
-    });
-  }
-
-  // Funcion que cargará las mezclas de pigmentos
-  cargarMezclaPigmento(){
-    this.mezclaPigmentosService.srvObtenerLista().subscribe(datos_mezclaPigmentos => { this.mezclasPigmentos = datos_mezclaPigmentos; });
-  }
-
-    // Funcion que cargará las mezclas de pigmentos
-  cargarMezclaPigmento2(){
-    this.mezclasPigmentos2 = [];
-    this.mezclaPigmentosService.srvObtenerLista().subscribe(datos_mezclaPigmentos => {
-      for (let i = 0; i < datos_mezclaPigmentos.length; i++) {
-        this.mezclasPigmentos2.push(datos_mezclaPigmentos[i])
-      }
-    });
-  }
-
-  // Funcion que cargará el nombre de las mezclas
-  cargarMezclas(){
-    this.mezclasService.srvObtenerLista().subscribe(datos_mezclas => { this.mezclas = datos_mezclas; });
-  }
-
-  //Funcion que va cargar cada uno de los componentes de la mezcla
-  cargarCombinacionMezclas(){
-    this.mezclasService.srvObtenerListaPorId(this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas).subscribe(datos_mezcla => {
-      this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
-      /*if (datos_mezcla.mezcla_NroCapas == 1) {
-        this.checkedCapa1 = true;
-        this.checkedCapa2 = false;
-        this.checkedCapa3 = false;
-        const capa1 : any = document.getElementById("capa1");
-        capa1.click();
-      } else if (datos_mezcla.mezcla_NroCapas == 2) {
-        this.checkedCapa1 = false;
-        this.checkedCapa2 = true;
-        this.checkedCapa3 = false;
-        const capa2 : any = document.getElementById("capa2");
-        capa2.click();
-      } else if (datos_mezcla.mezcla_NroCapas == 3) {
-        this.checkedCapa1 = false;
-        this.checkedCapa2 = false;
-        this.checkedCapa3 = true;
-        const capa3 : any = document.getElementById("capa3");
-        capa3.click();
-      }*/
-      this.FormOrdenTrabajoMezclas = this.frmBuilderPedExterno.group({
-        Id_Mezcla : datos_mezcla.mezcla_Id,
-        Nombre_Mezclas : datos_mezcla.mezcla_Nombre,
-        Chechbox_Capa1 : this.nroCapasOT,
-        Chechbox_Capa2 : '',
-        Chechbox_Capa3 : '',
-        Proc_Capa1 : datos_mezcla.mezcla_PorcentajeCapa1,
-        Proc_Capa2 : datos_mezcla.mezcla_PorcentajeCapa2,
-        Proc_Capa3 : datos_mezcla.mezcla_PorcentajeCapa3,
-        materialP1_Capa1 : datos_mezcla.mezMaterial_Id1xCapa1,
-        PorcentajeMaterialP1_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa1,
-        materialP1_Capa2 : datos_mezcla.mezMaterial_Id1xCapa2,
-        PorcentajeMaterialP1_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa2,
-        materialP1_Capa3 : datos_mezcla.mezMaterial_Id1xCapa3,
-        PorcentajeMaterialP1_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa3,
-        materialP2_Capa1 : datos_mezcla.mezMaterial_Id2xCapa1,
-        PorcentajeMaterialP2_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa1,
-        materialP2_Capa2 : datos_mezcla.mezMaterial_Id2xCapa2,
-        PorcentajeMaterialP2_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa2,
-        materialP2_Capa3 : datos_mezcla.mezMaterial_Id2xCapa3,
-        PorcentajeMaterialP2_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa3,
-        materialP3_Capa1 : datos_mezcla.mezMaterial_Id3xCapa1,
-        PorcentajeMaterialP3_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa1,
-        materialP3_Capa2 : datos_mezcla.mezMaterial_Id3xCapa2,
-        PorcentajeMaterialP3_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa2,
-        materialP3_Capa3 : datos_mezcla.mezMaterial_Id3xCapa3,
-        PorcentajeMaterialP3_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa3,
-        materialP4_Capa1 : datos_mezcla.mezMaterial_Id4xCapa1,
-        PorcentajeMaterialP4_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa1,
-        materialP4_Capa2 : datos_mezcla.mezMaterial_Id4xCapa2,
-        PorcentajeMaterialP4_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa2,
-        materialP_Capa3 : datos_mezcla.mezMaterial_Id4xCapa3,
-        PorcentajeMaterialP_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa3,
-        MezclaPigmentoP1_Capa1 : datos_mezcla.mezPigmto_Id1xCapa1,
-        PorcentajeMezclaPigmentoP1_Capa1 : datos_mezcla.mezcla_PorcentajePigmto1_Capa1,
-        MezclaPigmentoP1_Capa2 : datos_mezcla.mezPigmto_Id1xCapa2,
-        PorcentajeMezclaPigmentoP1_Capa2 : datos_mezcla.mezcla_PorcentajePigmto1_Capa2,
-        MezclaPigmento1_Capa3 : datos_mezcla.mezPigmto_Id1xCapa3,
-        PorcentajeMezclaPigmentoP1_Capa3 :datos_mezcla.mezcla_PorcentajePigmto1_Capa3,
-        MezclaPigmentoP2_Capa1 : datos_mezcla.mezPigmto_Id1xCapa1,
-        PorcentajeMezclaPigmentoP2_Capa1 : datos_mezcla.mezcla_PorcentajePigmto2_Capa1,
-        MezclaPigmentoP2_Capa2 : datos_mezcla.mezPigmto_Id2xCapa2,
-        PorcentajeMezclaPigmentoP2_Capa2 : datos_mezcla.mezcla_PorcentajePigmto2_Capa2,
-        MezclaPigmento2_Capa3 : datos_mezcla.mezPigmto_Id2xCapa3,
-        PorcentajeMezclaPigmentoP2_Capa3 : datos_mezcla.mezcla_PorcentajePigmto2_Capa3,
-      });
-      setTimeout(() => {
-        this.FormOrdenTrabajoMezclas.disable();
-        this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
-        this.FormOrdenTrabajoMezclas.get('Id_Mezclas').enable();
-      }, 1000);
-
-
-
-    }, error => {
-      this.mezclasService.getMezclaNombre(this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas).subscribe(datos_mezcla => {
-        this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
-        /*if (datos_mezcla.mezcla_NroCapas == 1) {
-          this.checkedCapa1 = true;
-          this.checkedCapa2 = false;
-          this.checkedCapa3 = false;
-          const capa1 : any = document.getElementById("capa1");
-          capa1.click();
-        } else if (datos_mezcla.mezcla_NroCapas == 2) {
-          this.checkedCapa1 = false;
-          this.checkedCapa2 = true;
-          this.checkedCapa3 = false;
-          const capa2 : any = document.getElementById("capa2");
-          capa2.click();
-        } else if (datos_mezcla.mezcla_NroCapas == 3) {
-          this.checkedCapa1 = false;
-          this.checkedCapa2 = false;
-          this.checkedCapa3 = true;
-          const capa3 : any = document.getElementById("capa3");
-          capa3.click();
-        }*/
-        this.FormOrdenTrabajoMezclas = this.frmBuilderPedExterno.group({
-          Id_Mezcla : datos_mezcla.mezcla_Id,
-          Nombre_Mezclas : datos_mezcla.mezcla_Nombre,
-          Chechbox_Capa1 : this.nroCapasOT,
-          Chechbox_Capa2 : '',
-          Chechbox_Capa3 : '',
-          Proc_Capa1 : datos_mezcla.mezcla_PorcentajeCapa1,
-          Proc_Capa2 : datos_mezcla.mezcla_PorcentajeCapa2,
-          Proc_Capa3 : datos_mezcla.mezcla_PorcentajeCapa3,
-          materialP1_Capa1 : datos_mezcla.mezMaterial_Id1xCapa1,
-          PorcentajeMaterialP1_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa1,
-          materialP1_Capa2 : datos_mezcla.mezMaterial_Id1xCapa2,
-          PorcentajeMaterialP1_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa2,
-          materialP1_Capa3 : datos_mezcla.mezMaterial_Id1xCapa3,
-          PorcentajeMaterialP1_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial1_Capa3,
-          materialP2_Capa1 : datos_mezcla.mezMaterial_Id2xCapa1,
-          PorcentajeMaterialP2_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa1,
-          materialP2_Capa2 : datos_mezcla.mezMaterial_Id2xCapa2,
-          PorcentajeMaterialP2_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa2,
-          materialP2_Capa3 : datos_mezcla.mezMaterial_Id2xCapa3,
-          PorcentajeMaterialP2_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial2_Capa3,
-          materialP3_Capa1 : datos_mezcla.mezMaterial_Id3xCapa1,
-          PorcentajeMaterialP3_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa1,
-          materialP3_Capa2 : datos_mezcla.mezMaterial_Id3xCapa2,
-          PorcentajeMaterialP3_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa2,
-          materialP3_Capa3 : datos_mezcla.mezMaterial_Id3xCapa3,
-          PorcentajeMaterialP3_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial3_Capa3,
-          materialP4_Capa1 : datos_mezcla.mezMaterial_Id4xCapa1,
-          PorcentajeMaterialP4_Capa1 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa1,
-          materialP4_Capa2 : datos_mezcla.mezMaterial_Id4xCapa2,
-          PorcentajeMaterialP4_Capa2 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa2,
-          materialP_Capa3 : datos_mezcla.mezMaterial_Id4xCapa3,
-          PorcentajeMaterialP_Capa3 : datos_mezcla.mezcla_PorcentajeMaterial4_Capa3,
-          MezclaPigmentoP1_Capa1 : datos_mezcla.mezPigmto_Id1xCapa1,
-          PorcentajeMezclaPigmentoP1_Capa1 : datos_mezcla.mezcla_PorcentajePigmto1_Capa1,
-          MezclaPigmentoP1_Capa2 : datos_mezcla.mezPigmto_Id1xCapa2,
-          PorcentajeMezclaPigmentoP1_Capa2 : datos_mezcla.mezcla_PorcentajePigmto1_Capa2,
-          MezclaPigmento1_Capa3 : datos_mezcla.mezPigmto_Id1xCapa3,
-          PorcentajeMezclaPigmentoP1_Capa3 :datos_mezcla.mezcla_PorcentajePigmto1_Capa3,
-          MezclaPigmentoP2_Capa1 : datos_mezcla.mezPigmto_Id1xCapa1,
-          PorcentajeMezclaPigmentoP2_Capa1 : datos_mezcla.mezcla_PorcentajePigmto2_Capa1,
-          MezclaPigmentoP2_Capa2 : datos_mezcla.mezPigmto_Id2xCapa2,
-          PorcentajeMezclaPigmentoP2_Capa2 : datos_mezcla.mezcla_PorcentajePigmto2_Capa2,
-          MezclaPigmento2_Capa3 : datos_mezcla.mezPigmto_Id2xCapa3,
-          PorcentajeMezclaPigmentoP2_Capa3 : datos_mezcla.mezcla_PorcentajePigmto2_Capa3,
-        });
-      });
-    });
-  }
-
-  // Funcion que va cargará la informacion de los tipos de productos
-  cargarTiposProductos(){
-    this.tiposProductosService.srvObtenerLista().subscribe(datos => { this.tipoProductos = datos });
-  }
-
-  // Funcion que va a cargar la informacion de los tipos de sellado
-  cargarTiposSellado(){
-    this.tipoSelladoService.srvObtenerLista().subscribe(datos => { this.tipoSellado = datos });
-  }
-
-  // Funcion que traerá la ultima orden de trabajo para poder tomar el ID de la OT
-  ultimaOT(){
-    this.bagProService.srvObtenerListaClienteOT_UltimaOT().subscribe(datos_ot => { this.ultimaOrdenTrabajo = datos_ot.item + 1;  });
-  }
-
-  //Funcion que servirá para mostrar la informacion de los pedidos que no tienen orden de trabajo
-  pedidos(){
-    this.pedidoExternoService.GetPedidosSinOT().subscribe(datos => { this.pedidosSinOT = datos });
-  }
-
-  // funcion que consultará la informacion del pedido apra crear la orden de trabajo
-  informacionPedido(){
-    let pedido : number = this.FormOrdenTrabajo.value.Pedido_Id;
-    this.cantidadKgMasMargen = 0;
-    this.cantidadUndMasMargen = 0;
     this.cantidadCostoProductos = 0;
-    this.ArrayProducto = [];
-    this.limpiarCampos();
-    this.pedidoExternoService.GetInfoPedido(pedido).subscribe(datos => {
-      for (let i = 0; i < datos.length; i++) {
-        this.FormOrdenTrabajo.patchValue({
-          OT_Id: null,
-          Pedido_Id: pedido,
-          Nombre_Vendedor: datos[i].vendedor,
-          OT_FechaCreacion: this.today,
-          OT_FechaEntrega: null,
-          Id_Sede_Cliente : datos[i].id_Sede_Cliente,
-          ID_Cliente: datos[i].id_Cliente,
-          Nombre_Cliente: datos[i].cliente,
-          Ciudad_SedeCliente: datos[i].ciudad,
-          Direccion_SedeCliente : datos[i].direccion,
-          OT_Estado : datos[i].estado,
-          OT_Observacion : datos[i].observacion,
-          Margen : 0,
-          OT_Cyrel : this.checkedCyrel,
-          OT_Extrusion : this.extrusion,
-          OT_Impresion : this.impresion,
-          OT_Rotograbado : this.rotograbado,
-          OT_Laminado : this.laminado,
-          OT_Corte : this.checkedCorte,
-          OT_Doblado : this.doblado,
-          OT_Sellado : this.sellado,
-        });
-
-        let productoExt : any = {
-          Id : datos[i].id_Producto,
-          Nombre : datos[i].producto,
-          Ancho : datos[i].ancho_Producto,
-          Fuelle : datos[i].fuelle_Producto,
-          Largo : datos[i].largo_Producto,
-          Cal : datos[i].calibre_Producto,
-          Und : datos[i].und_ACFL,
-          Peso_Producto : datos[i].peso_Producto,
-          PesoMillar : datos[i].peso_Millar,
-          Tipo : datos[i].tipo_Producto,
-          Material : datos[i].material_Producto,
-          Pigmento : datos[i].pigmento_Producto,
-          CantPaquete : datos[i].cant_Paquete,
-          CantBulto : datos[i].cant_Bulto,
-          Cant : datos[i].cantidad_Pedida,
-          Cant_Inicial : datos[i].cantidad_Pedida,
-          UndCant : datos[i].und_Pedido,
-          TipoSellado : datos[i].tipo_Sellado,
-          PrecioUnd : datos[i].precio_Producto,
-          SubTotal : datos[i].subTotal_Producto,
-          FechaEntrega : datos[i].fecha_Entrega.replace('T00:00:00', ''),
-        }
-        this.ArrayProducto.push(productoExt);
-        this.cantidadCostoProductos += datos[i].subTotal_Producto;
-      }
-    });
-  }
-
-  // Funcion que va buscar, almacenar y mostrar la información de la ultima orden de trabajo para un producto con una presentacion especifica
-  consultarInfoProducto(data : any){
-    this.informacionSeleccionada = data;
-    this.cantidadKgMasMargen = 0;
-    this.cantidadUndMasMargen = 0;
+    this.extrusion = false;
+    this.impresion = false;
+    this.rotograbado = false;
+    this.laminado = false;
+    this.sellado = false;
+    this.cargando = false;
     this.cantidadProducto = 0;
     this.valorProducto = 0;
     this.netoKg = 0;
@@ -871,515 +1233,90 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.margenKg = 0;
     this.pesoPaquete = 0;
     this.pesoBulto = 0;
-    this.producto = data.Id;
-    this.presentacionProducto = data.UndCant;
-    this.ordenTrabajoService.GetInfoUltOT(data.Id, data.UndCant).subscribe(datos_Ot => {
-      this.FormOrdenTrabajo.patchValue({
-        OT_FechaEntrega: data.FechaEntrega,
-        OT_Observacion : datos_Ot.observacion,
-        Margen : datos_Ot.margen_Adicional,
-      });
-      this.FormOrdenTrabajoExtrusion.patchValue({
-        Material_Extrusion : datos_Ot.material_Extrusion_Id,
-        Formato_Extrusion : datos_Ot.formato_Extrusion_Id,
-        Pigmento_Extrusion : datos_Ot.pigmento_Extrusion_Id,
-        Ancho_Extrusion1 : datos_Ot.ancho1_Extrusion,
-        Ancho_Extrusion2 : datos_Ot.ancho2_Extrusion,
-        Ancho_Extrusion3 : datos_Ot.ancho3_Extrusion,
-        Calibre_Extrusion : datos_Ot.calibre_Extrusion,
-        UnidadMedida_Extrusion : datos_Ot.undMed_Extrusion,
-        Tratado_Extrusion : datos_Ot.tratado_Extrusion_Id,
-        Peso_Extrusion : datos_Ot.peso_Extrusion,
-      });
-      this.FormOrdenTrabajoImpresion.patchValue({
-        Tipo_Impresion : datos_Ot.tipo_Impresion_Id,
-        Rodillo_Impresion : datos_Ot.rodillo_Impresion,
-        Pista_Impresion : datos_Ot.pista_Impresion,
-        Tinta_Impresion1 : datos_Ot.tinta1_Impresion,
-        Tinta_Impresion2 : datos_Ot.tinta2_Impresion,
-        Tinta_Impresion3 : datos_Ot.tinta3_Impresion,
-        Tinta_Impresion4 : datos_Ot.tinta4_Impresion,
-        Tinta_Impresion5 : datos_Ot.tinta5_Impresion,
-        Tinta_Impresion6 : datos_Ot.tinta6_Impresion,
-        Tinta_Impresion7 : datos_Ot.tinta7_Impresion,
-        Tinta_Impresion8 : datos_Ot.tinta8_Impresion,
-      });
-      this.FormOrdenTrabajoLaminado.patchValue({
-        Capa_Laminado1 : datos_Ot.capa1_Laminado_Id,
-        Calibre_Laminado1 : datos_Ot.calibre1_Laminado,
-        cantidad_Laminado1 : datos_Ot.cantidad2_Laminado,
-        Capa_Laminado2 : datos_Ot.capa2_Laminado_Id,
-        Calibre_Laminado2 : datos_Ot.calibre2_Laminado,
-        cantidad_Laminado2 : datos_Ot.cantidad2_Laminado,
-        Capa_Laminado3 : datos_Ot.capa3_Laminado_Id,
-        Calibre_Laminado3 : datos_Ot.calibre3_Laminado,
-        cantidad_Laminado3 : datos_Ot.cantidad3_Laminado,
-      });
-      this.FormOrdenTrabajoCorte.patchValue({
-        Formato_Corte : data.Tipo,
-        Ancho_Corte : data.Ancho,
-        Largo_Corte : data.Largo,
-        Fuelle_Corte : data.Fuelle,
-        Margen_Corte : datos_Ot.margen_Adicional,
-      });
-      this.FormOrdenTrabajoSellado.patchValue({
-        Formato_Sellado : data.Tipo,
-        Ancho_Sellado : data.Ancho,
-        Largo_Sellado : data.Largo,
-        Fuelle_Sellado : data.Fuelle,
-        Margen_Sellado : datos_Ot.margen_Adicional,
-        PesoMillar : data.PesoMillar,
-        TipoSellado : data.TipoSellado,
-        CantidadPaquete : data.CantPaquete,
-        CantidadBulto : data.CantBulto,
-      });
-      this.checkedCyrel = datos_Ot.cyrel
-      this.extrusion = datos_Ot.extrusion;
-      this.impresion = datos_Ot.impresion;
-      this.rotograbado = datos_Ot.rotograbado;
-      this.laminado = datos_Ot.laminado;
-      this.checkedCorte = datos_Ot.corte;
-      this.sellado = datos_Ot.sellado;
-      setTimeout(() => { this.calcularDatosOt(data) }, 500);
-      /*if (datos_Ot.cant_Capas_Mezclas == 1) {
-        this.checkedCapa1 = true;
-        this.checkedCapa2 = false;
-        this.checkedCapa3 = false;
-        const capa1 : any = document.getElementById("capa1");
-        capa1.click();
-      } else if (datos_Ot.cant_Capas_Mezclas == 2) {
-        this.checkedCapa1 = false;
-        this.checkedCapa2 = true;
-        this.checkedCapa3 = false;
-        const capa2 : any = document.getElementById("capa2");
-        capa2.click();
-      } else if (datos_Ot.cant_Capas_Mezclas == 3) {
-        this.checkedCapa1 = false;
-        this.checkedCapa2 = false;
-        this.checkedCapa3 = true;
-        const capa3 : any = document.getElementById("capa3");
-        capa3.click();
-      }*/
-
-      this.FormOrdenTrabajoMezclas.patchValue({
-        Id_Mezcla : datos_Ot.mezcla_Id,
-        Nombre_Mezclas : datos_Ot.mezcla,
-        Chechbox_Capa1 : datos_Ot.cant_Capas_Mezclas,
-        Chechbox_Capa2 : '',
-        Chechbox_Capa3 : '',
-        Proc_Capa1 : datos_Ot.capa1_Mezcla,
-        Proc_Capa2 : datos_Ot.capa2_Mezcla,
-        Proc_Capa3 : datos_Ot.capa3_Mezcla,
-        materialP1_Capa1 : datos_Ot.material1_Capa1_Mezcla_Id,
-        PorcentajeMaterialP1_Capa1 : datos_Ot.porcentaje_Material1_Capa1_Mezcla,
-        materialP1_Capa2 : datos_Ot.material1_Capa2_Mezcla_Id,
-        PorcentajeMaterialP1_Capa2 : datos_Ot.porcentaje_Material1_Capa2_Mezcla,
-        materialP1_Capa3 : datos_Ot.material1_Capa3_Mezcla_Id,
-        PorcentajeMaterialP1_Capa3 : datos_Ot.porcentaje_Material1_Capa3_Mezcla,
-        materialP2_Capa1 : datos_Ot.material2_Capa1_Mezcla_Id,
-        PorcentajeMaterialP2_Capa1 : datos_Ot.porcentaje_Material2_Capa1_Mezcla,
-        materialP2_Capa2 : datos_Ot.material2_Capa2_Mezcla_Id,
-        PorcentajeMaterialP2_Capa2 : datos_Ot.porcentaje_Material2_Capa2_Mezcla,
-        materialP2_Capa3 : datos_Ot.material2_Capa3_Mezcla_Id,
-        PorcentajeMaterialP2_Capa3 : datos_Ot.porcentaje_Material2_Capa3_Mezcla,
-        materialP3_Capa1 : datos_Ot.material3_Capa1_Mezcla_Id,
-        PorcentajeMaterialP3_Capa1 : datos_Ot.porcentaje_Material3_Capa1_Mezcla,
-        materialP3_Capa2 : datos_Ot.material3_Capa2_Mezcla_Id,
-        PorcentajeMaterialP3_Capa2 : datos_Ot.porcentaje_Material3_Capa2_Mezcla,
-        materialP3_Capa3 : datos_Ot.material3_Capa3_Mezcla_Id,
-        PorcentajeMaterialP3_Capa3 : datos_Ot.porcentaje_Material3_Capa3_Mezcla,
-        materialP4_Capa1 : datos_Ot.material4_Capa1_Mezcla_Id,
-        PorcentajeMaterialP4_Capa1 : datos_Ot.porcentaje_Material4_Capa1_Mezcla,
-        materialP4_Capa2 : datos_Ot.material4_Capa2_Mezcla_Id,
-        PorcentajeMaterialP4_Capa2 : datos_Ot.porcentaje_Material4_Capa2_Mezcla,
-        materialP_Capa3 : datos_Ot.material4_Capa3_Mezcla_Id,
-        PorcentajeMaterialP_Capa3 : datos_Ot.porcentaje_Material4_Capa3_Mezcla,
-        MezclaPigmentoP1_Capa1 : datos_Ot.pigmento1_Capa1_Mezcla_Id,
-        PorcentajeMezclaPigmentoP1_Capa1 : datos_Ot.porcentaje_Pigmento1_Capa1_Mezcla,
-        MezclaPigmentoP1_Capa2 : datos_Ot.pigmento1_Capa2_Mezcla_Id,
-        PorcentajeMezclaPigmentoP1_Capa2 : datos_Ot.porcentaje_Pigmento1_Capa2_Mezcla,
-        MezclaPigmento1_Capa3 : datos_Ot.pigmento1_Capa3_Mezcla_Id,
-        PorcentajeMezclaPigmentoP1_Capa3 :datos_Ot.porcentaje_Pigmento1_Capa3_Mezcla,
-        MezclaPigmentoP2_Capa1 : datos_Ot.pigmento2_Capa1_Mezcla_Id,
-        PorcentajeMezclaPigmentoP2_Capa1 : datos_Ot.porcentaje_Pigmento2_Capa1_Mezcla,
-        MezclaPigmentoP2_Capa2 : datos_Ot.pigmento2_Capa2_Mezcla_Id,
-        PorcentajeMezclaPigmentoP2_Capa2 : datos_Ot.porcentaje_Pigmento2_Capa2_Mezcla,
-        MezclaPigmento2_Capa3 : datos_Ot.pigmento2_Capa3_Mezcla_Id,
-        PorcentajeMezclaPigmentoP2_Capa3 : datos_Ot.porcentaje_Pigmento2_Capa3_Mezcla,
-      });
-
-      setTimeout(() => {
-        this.FormOrdenTrabajoMezclas.disable();
-        this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
-        this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
-      }, 1000);
-
-    }, error => {
-      let presentacion : string = data.UndCant;
-      if (presentacion == 'Kg') presentacion = 'Kilo';
-      else if (presentacion == 'Und') presentacion = 'Unidad';
-      let impresion : any;
-      let laminadoCapa1 : any, laminadoCapa2 : any, laminadoCapa3 : any;
-      this.bagProService.srvObtenerListaClienteOT_Item_Presentacion(data.Id, presentacion).subscribe(datos_Ot => {
-        let ot : any = [];
-        ot.push(datos_Ot);
-        for (const itemOt of ot) {
-          this.FormOrdenTrabajo.patchValue({
-            OT_FechaEntrega: data.FechaEntrega,
-            OT_Observacion : itemOt.observacion,
-            Margen : itemOt.ptMargen,
-          });
-
-          if (itemOt.cyrel == 1) this.checkedCyrel = true;
-          else if (itemOt.cyrel == 0) this.checkedCyrel = false;
-
-          if (itemOt.corte == 1) this.checkedCorte = true;
-          else if (itemOt.corte == 0) this.checkedCorte = false;
-
-          this.FormOrdenTrabajoExtrusion.patchValue({
-            Material_Extrusion : parseInt(itemOt.extMaterial.trim()),
-            Formato_Extrusion : parseInt(itemOt.ptFormatopt.trim()),
-            Pigmento_Extrusion : parseInt(itemOt.extPigmento.trim()),
-            Ancho_Extrusion1 : itemOt.extAcho1,
-            Ancho_Extrusion2 : itemOt.extAcho2,
-            Ancho_Extrusion3 : itemOt.extAcho3,
-            Calibre_Extrusion : itemOt.extCalibre,
-            UnidadMedida_Extrusion : itemOt.extUnidadesNom.trim(),
-            Tratado_Extrusion : parseInt(itemOt.extTratado.trim()),
-            Peso_Extrusion : itemOt.extPeso,
-          });
-
-          if (itemOt.impFlexoNom.trim() != 'FLEXOGRAFIA' && itemOt.impFlexoNom.trim() != 'ROTOGRABADO') impresion = 1;
-          else if (itemOt.impFlexoNom.trim() == 'FLEXOGRAFIA') impresion = 2;
-          else if (itemOt.impFlexoNom.trim() == 'ROTOGRABADO') impresion = 3;
-
-          let tinta1 : any = itemOt.impTinta1Nom.trim();
-          let tinta2 : any = itemOt.impTinta2Nom.trim();
-          let tinta3 : any = itemOt.impTinta3Nom.trim();
-          let tinta4 : any = itemOt.impTinta4Nom.trim();
-          let tinta5 : any = itemOt.impTinta5Nom.trim();
-          let tinta6 : any = itemOt.impTinta6Nom.trim();
-          let tinta7 : any = itemOt.impTinta7Nom.trim();
-          let tinta8 : any = itemOt.impTinta8Nom.trim();
-
-          if (tinta1 == '') tinta1 = 'NO APLICA';
-          if (tinta2 == '') tinta2 = 'NO APLICA';
-          if (tinta3 == '') tinta3 = 'NO APLICA';
-          if (tinta4 == '') tinta4 = 'NO APLICA';
-          if (tinta5 == '') tinta5 = 'NO APLICA';
-          if (tinta6 == '') tinta6 = 'NO APLICA';
-          if (tinta7 == '') tinta7 = 'NO APLICA';
-          if (tinta8 == '') tinta8 = 'NO APLICA';
-
-          this.servicioTintas.srvObtenerListaConsultaImpresion(tinta1, tinta2, tinta3, tinta4, tinta5, tinta6, tinta7, tinta8).subscribe(datos_impresion => {
-            for (let j = 0; j < datos_impresion.length; j++) {
-              this.FormOrdenTrabajoImpresion.setValue({
-                Tipo_Impresion : impresion,
-                Rodillo_Impresion : itemOt.impRodillo,
-                Pista_Impresion : itemOt.impPista,
-                Tinta_Impresion1 : datos_impresion[j].tinta_Id1,
-                Tinta_Impresion2 : datos_impresion[j].tinta_Id2,
-                Tinta_Impresion3 : datos_impresion[j].tinta_Id3,
-                Tinta_Impresion4 : datos_impresion[j].tinta_Id4,
-                Tinta_Impresion5 : datos_impresion[j].tinta_Id5,
-                Tinta_Impresion6 : datos_impresion[j].tinta_Id6,
-                Tinta_Impresion7 : datos_impresion[j].tinta_Id7,
-                Tinta_Impresion8 : datos_impresion[j].tinta_Id8,
-              });
-            }
-          });
-
-          laminadoCapa1 = itemOt.lamCapa1.trim();
-          laminadoCapa2 = itemOt.lamCapa2.trim();
-          laminadoCapa3 = itemOt.lamCapa3.trim();
-
-          if (laminadoCapa1 == '1') laminadoCapa1 = 1;
-          if (laminadoCapa2 == '1') laminadoCapa2 = 1;
-          if (laminadoCapa3 == '1') laminadoCapa3 = 1;
-
-          this.FormOrdenTrabajoLaminado.patchValue({
-            Capa_Laminado1 : parseInt(laminadoCapa1),
-            Calibre_Laminado1 : itemOt.lamCalibre1,
-            cantidad_Laminado1 : itemOt.cant1,
-            Capa_Laminado2 : parseInt(laminadoCapa2),
-            Calibre_Laminado2 : itemOt.lamCalibre2,
-            cantidad_Laminado2 : itemOt.cant2,
-            Capa_Laminado3 : parseInt(laminadoCapa3),
-            Calibre_Laminado3 : itemOt.lamCalibre3,
-            cantidad_Laminado3 : itemOt.cant3,
-          });
-          this.FormOrdenTrabajoCorte.patchValue({
-            Formato_Corte : data.Tipo,
-            Ancho_Corte : data.Ancho,
-            Largo_Corte : data.Largo,
-            Fuelle_Corte : data.Fuelle,
-            Margen_Corte : itemOt.ptMargen,
-          });
-          this.FormOrdenTrabajoSellado.patchValue({
-            Formato_Sellado : data.Tipo,
-            Ancho_Sellado : data.Ancho,
-            Largo_Sellado : data.Largo,
-            Fuelle_Sellado : data.Fuelle,
-            Margen_Sellado : itemOt.ptMargen,
-            PesoMillar : data.PesoMillar,
-            TipoSellado : data.TipoSellado,
-            PrecioDia : 0,
-            PrecioNoche : 0,
-            CantidadPaquete : data.CantPaquete,
-            PesoPaquete : 0,
-            CantidadBulto : data.CantBulto,
-            PesoBulto : 0,
-          });
-          setTimeout(() => { this.calcularDatosOt(data); }, 1000);
-          this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas = itemOt.mezModoNom;
-          this.cargarCombinacionMezclas();
-        }
-      }, error => { this.mensajeAdvertencia(`No se encuentra una Orden de Trabajo anterior para el producto ${data.Id} y presentación ${presentacion}`); });
-    });
-  }
-
-  // Funcion que va a calcular los datos de la ot
-  calcularDatosOt(data : any){
-    let margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado | this.FormOrdenTrabajoCorte.value.Margen_Corte;
-    if (this.checkedCorte) margen_Adicional = this.FormOrdenTrabajoCorte.value.Margen_Corte;
-    if (this.sellado) margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado;
-    this.FormOrdenTrabajo.patchValue({Margen : margen_Adicional});
-    if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Plgs') {
-      let ancho1 : number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1;
-      let ancho2 : number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2;
-      let ancho3 : number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3;
-      let calibre : number = this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion;
-      let material : number = this.FormOrdenTrabajoExtrusion.value.Material_Extrusion;
-      let fact : number = 0;
-      let largoUnd : number = 0;
-      //Calcular Peso de Extrusion
-      if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms') {
-        largoUnd = 100;
-        if (material == 3) fact = 0.0048;
-        else fact = 0.00468;
-        this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion : ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
-      } else {
-        largoUnd = 39.3701;
-        if (material == 3) fact = 0.0317;
-        else fact = 0.0302;
-        this.FormOrdenTrabajoExtrusion.patchValue({ Peso_Extrusion : ((ancho1 + ancho2 + ancho3) * calibre * fact * largoUnd), });
-      }
-      //Calcular Peso Producto y Peso Millar
-      for (let i = 0; i < this.ArrayProducto.length; i++) {
-        if (this.ArrayProducto[i].Id == data.Id && this.ArrayProducto[i].UndCant == data.UndCant) {
-          //Peso Producto
-          if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms'){
-            if (material == 3) fact = 0.0048;
-            else fact = 0.00468;
-            this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
-          } else {
-            if (material == 3) fact = 0.0317;
-            else fact = 0.0302;
-            this.ArrayProducto[i].Peso_Producto = (this.ArrayProducto[i].Ancho) * (this.ArrayProducto[i].Largo + this.ArrayProducto[i].Fuelle) * (this.ArrayProducto[i].Cal) * fact / 1000;
-          }
-          //Peso Millar
-          this.ArrayProducto[i].PesoMillar = this.ArrayProducto[i].Peso_Producto * 1000;
-          if (this.ArrayProducto[i].Tipo == 'Laminado' || this.ArrayProducto[i].Tipo == 'Hoja') this.ArrayProducto[i].PesoMillar / 2;
-
-          //Calcular datos de la ot
-          if (data.UndCant == 'Kg') {
-            this.cantidadProducto = data.Cant;
-            this.margenKg = margen_Adicional * (data.Cant / 100);
-            this.netoKg = data.Cant + ((data.Cant * margen_Adicional) / 100);
-            this.valorKg = data.PrecioUnd;
-            this.valorProducto = data.PrecioUnd;
-            this.valorOt = data.Cant * this.valorProducto;
-          } else if (data.UndCant == 'Paquete') {
-            this.cantidadProducto = data.Cant;
-            this.valorProducto = data.PrecioUnd;
-            this.margenKg = margen_Adicional * (((data.Cant * data.CantPaquete * this.ArrayProducto[i].PesoMillar) / 1000) / 100);
-            this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * (data.Cant * data.CantPaquete)));
-            this.valorOt = data.Cant * data.PrecioUnd;
-            if (data.PesoMillar > 0 && data.CantPaquete > 0) this.pesoPaquete = this.ArrayProducto[i].PesoMillar * (data.CantPaquete / 1000);
-            if (data.CantPaquete > 0) this.pesoBulto = this.pesoPaquete * data.CantBulto;
-            if (data.CantPaquete == 0) this.valorKg = 0;
-            else {
-              if (data.CantPaquete > 0) this.valorKg = data.PrecioUnd / this.pesoPaquete;
-              else this.valorKg = 0;
-            }
-          } else if (data.UndCant == 'Und') {
-            this.cantidadProducto = data.Cant;
-            this.valorProducto = data.PrecioUnd;
-            this.valorOt = this.cantidadProducto * this.valorProducto;
-            this.margenKg = (margen_Adicional * ((data.Cant * this.ArrayProducto[i].PesoMillar) / 1000)) / 100;
-            this.netoKg = ((1 + (margen_Adicional / 100)) * ((this.ArrayProducto[i].PesoMillar / 1000) * data.Cant));
-            if (this.ArrayProducto[i].Peso_Producto > 0){
-              if (this.valorOt == 0) this.valorOt = 1;
-              if ((data.Cant * this.ArrayProducto[i].PesoMillar) / 1000 == 0) this.valorKg = 0;
-              else this.valorKg = this.valorOt / ((data.Cant * this.ArrayProducto[i].PesoMillar) / 1000);
-            } else this.valorOt = 0;
-          } else if (data.UndCant == 'Rollo') {
-          }
-        }
-      }
-    } else this.mensajeAdvertencia(`¡Debe elegir una unidad de medida para extrusión!`);
-  }
-
-  // Funcion que se se ejecurá cuando hayan deseleccionado un producto
-  onRowUnselect(){
-    this.FormOrdenTrabajoExtrusion.patchValue({
-      Material_Extrusion : 1,
-      Formato_Extrusion : 1,
-      Pigmento_Extrusion : 1,
-      Ancho_Extrusion1 : 0,
-      Ancho_Extrusion2 : 0,
-      Ancho_Extrusion3 : 0,
-      Calibre_Extrusion : 0,
-      UnidadMedida_Extrusion : '',
-      Tratado_Extrusion : 1,
-    });
-    this.FormOrdenTrabajoImpresion.patchValue({
-      Tipo_Impresion : 1,
-      Rodillo_Impresion : 0,
-      Pista_Impresion : 0,
-      Tinta_Impresion1 : 'NO APLICA',
-      Tinta_Impresion2 : 'NO APLICA',
-      Tinta_Impresion3 : 'NO APLICA',
-      Tinta_Impresion4 : 'NO APLICA',
-      Tinta_Impresion5 : 'NO APLICA',
-      Tinta_Impresion6 : 'NO APLICA',
-      Tinta_Impresion7 : 'NO APLICA',
-      Tinta_Impresion8 : 'NO APLICA',
-    });
-    this.FormOrdenTrabajoLaminado.patchValue({
-      Capa_Laminado1 : 1,
-      Calibre_Laminado1 : 0,
-      cantidad_Laminado1 : 0,
-      Capa_Laminado2 : 1,
-      Calibre_Laminado2 : 0,
-      cantidad_Laminado2 : 0,
-      Capa_Laminado3 : 1,
-      Calibre_Laminado3 : 0,
-      cantidad_Laminado3 : 0,
-    });
-    this.FormOrdenTrabajoMezclas.patchValue({
-      Id_Mezcla: '',
-      Nombre_Mezclas : '',
-      Chechbox_Capa1 : '',
-      Chechbox_Capa2 : '',
-      Chechbox_Capa3 : '',
-      Proc_Capa1 : 0,
-      Proc_Capa2 : 0,
-      Proc_Capa3 : 0,
-      materialP1_Capa1 : 1,
-      PorcentajeMaterialP1_Capa1 : 0,
-      materialP1_Capa2 : 1,
-      PorcentajeMaterialP1_Capa2 : 0,
-      materialP1_Capa3 : 1,
-      PorcentajeMaterialP1_Capa3 : 0,
-      materialP2_Capa1 : 1,
-      PorcentajeMaterialP2_Capa1 : 0,
-      materialP2_Capa2 : 1,
-      PorcentajeMaterialP2_Capa2 : 0,
-      materialP2_Capa3 : 1,
-      PorcentajeMaterialP2_Capa3 : 0,
-      materialP3_Capa1 : 1,
-      PorcentajeMaterialP3_Capa1 : 0,
-      materialP3_Capa2 : 1,
-      PorcentajeMaterialP3_Capa2 : 0,
-      materialP3_Capa3 : 1,
-      PorcentajeMaterialP3_Capa3 : 0,
-      materialP4_Capa1 : 1,
-      PorcentajeMaterialP4_Capa1 : 0,
-      materialP4_Capa2 : 1,
-      PorcentajeMaterialP4_Capa2 : 0,
-      materialP_Capa3 : 1,
-      PorcentajeMaterialP_Capa3 : 0,
-      MezclaPigmentoP1_Capa1 : 1,
-      PorcentajeMezclaPigmentoP1_Capa1 : 0,
-      MezclaPigmentoP1_Capa2 : 1,
-      PorcentajeMezclaPigmentoP1_Capa2 : 0,
-      MezclaPigmento1_Capa3 : 1,
-      PorcentajeMezclaPigmentoP1_Capa3 :0,
-      MezclaPigmentoP2_Capa1 : 1,
-      PorcentajeMezclaPigmentoP2_Capa1 : 0,
-      MezclaPigmentoP2_Capa2 : 1,
-      PorcentajeMezclaPigmentoP2_Capa2 : 0,
-      MezclaPigmento2_Capa3 : 1,
-      PorcentajeMezclaPigmentoP2_Capa3 : 0,
-    });
-    this.informacionSeleccionada = '';
+    this.informacionSeleccionada = 0;
+    this.checkedCyrel = false;
+    this.checkedCorte = false;
+    this.cantidadCostoProductos = 0;
     this.checkedCapa1 = false;
     this.checkedCapa2 = false;
     this.checkedCapa3 = false;
-    this.cantidadKgMasMargen = 0;
-    this.cantidadUndMasMargen = 0;
-    this.producto = 0;
-    this.cantidadKilos = 0;
-    this.cantidadUnidades = 0;
-    this.pesoProducto = 0;
-    this.idMezclaSeleccionada = 0;
-    this.extrusion = false;
-    this.impresion = false;
-    this.rotograbado = false;
-    this.laminado = false;
-    this.checkedCorte = false;
-    this.sellado = false;
+    this.presentacionProducto = '';
+  }
+
+  // Funcion que va a validar que la información este correcta
+  validarDatos(){
+    if (this.FormOrdenTrabajo.valid) {
+      if (!this.extrusion) this.limpiarFormExtrusion();
+      if (!this.impresion && !this.rotograbado) this.limpiarFormImpresion();
+      if (!this.laminado) this.limpiarFormLaminado();
+      if (!this.checkedCorte) this.limpiarFormCorte();
+      if (!this.sellado) this.limpiarFormSellado();
+      if (!this.FormOrdenTrabajoMezclas.valid) this.limpiarFormMezclas();
+
+      if (this.FormOrdenTrabajoExtrusion.valid) {
+        if (this.FormOrdenTrabajoImpresion.valid) {
+          if (this.FormOrdenTrabajoLaminado.valid) {
+            if (this.FormOrdenTrabajoCorte.valid) {
+              if (this.FormOrdenTrabajoSellado.valid) {
+                if (this.FormOrdenTrabajoMezclas.valid) this.guardarOt();
+                else this.mensajeAdvertencia(`¡El formulario de Mezclas tiene campos vaios!`);
+              } else this.mensajeAdvertencia(`¡El formulario de Sellado tiene campos vacios!`);
+            } else this.mensajeAdvertencia(`¡El formulario de Corte tiene campos vacios!`);
+          } else this.mensajeAdvertencia(`¡EL formulario de Laminado tiene campos vacios!`);
+        } else this.mensajeAdvertencia(`¡El formulario de Impresion tiene campos vacios!`);
+      } else this.mensajeAdvertencia(`¡EL formulario de Extrusion tiene campos vacios!`);
+    } else this.mensajeAdvertencia(`¡Hay campos del formulario vacios!`);
   }
 
   //Funcion que va a guardar la información de la orden de trabajo
   guardarOt(){
     let fechaEntrega : any = this.FormOrdenTrabajo.value.OT_FechaEntrega;
     let ordenTrabajo : any = this.FormOrdenTrabajo.value.OT_Id;
-    if(fechaEntrega == null) this.FormOrdenTrabajo.value.OT_FechaEntrega = this.today;
-    if(ordenTrabajo == null) this.FormOrdenTrabajo.value.OT_Id = 309;
+    if (fechaEntrega == null) this.FormOrdenTrabajo.value.OT_FechaEntrega = this.today;
+    if (ordenTrabajo == null) this.FormOrdenTrabajo.value.OT_Id = 309;
 
-    if (!this.FormOrdenTrabajoLaminado.valid || !this.FormOrdenTrabajoImpresion.valid || !this.FormOrdenTrabajoExtrusion.valid || !this.FormOrdenTrabajo.valid){
-      console.log(this.FormOrdenTrabajoLaminado)
-      console.log(this.FormOrdenTrabajoImpresion)
-      console.log(this.FormOrdenTrabajoExtrusion)
-      console.log(this.FormOrdenTrabajo)
-      this.mensajeAdvertencia("!Hay campos vacíos¡");
-    } else if (this.FormOrdenTrabajoLaminado.valid && this.FormOrdenTrabajoImpresion.valid && this.FormOrdenTrabajoExtrusion.valid && this.FormOrdenTrabajo.valid){
-      this.cargando = true;
-      let errorExt : boolean = false, errorImp : boolean = false, errorLam : boolean = false, errorSelCor : boolean = false, cyrelOT : any, corteOT : any;
-      if (this.checkedCyrel) cyrelOT = '1';
-      else cyrelOT = '0';
-      if (this.checkedCorte) corteOT = '1'
-      else corteOT = '0';
-      let infoOT : any = {
-        SedeCli_Id : this.FormOrdenTrabajo.value.Id_Sede_Cliente,
-        Prod_Id : this.producto,
-        Ot_PesoNetoKg : this.netoKg,
-        Ot_ValorOT : this.valorOt,
-        Ot_MargenAdicional : this.FormOrdenTrabajo.value.Margen,
-        Ot_ValorKg : this.valorKg,
-        Ot_ValorUnidad : this.valorProducto,
-        Ot_FechaCreacion : this.today,
-        Estado_Id : 4,
-        Usua_Id : this.storage_Id,
-        PedExt_Id : parseInt(this.FormOrdenTrabajo.value.Pedido_Id),
-        Ot_Observacion : this.FormOrdenTrabajo.value.OT_Observacion,
-        Ot_Cyrel : cyrelOT,
-        Ot_Corte : corteOT,
-        Mezcla_Id : this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
-        UndMed_Id : this.presentacionProducto,
-        Ot_Hora : moment().format('H:mm:ss'),
-        Extrusion : this.extrusion,
-        Impresion : this.impresion,
-        Laminado : this.laminado,
-        Rotograbado : this.rotograbado,
-        Sellado : this.sellado,
-        Ot_CantidadPedida : this.cantidadProducto,
-      }
-      this.ordenTrabajoService.srvGuardar(infoOT).subscribe(datos_ot => {
-        errorImp = this.guardarOt_Impresion(datos_ot.ot_Id);
-        this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.ID_Cliente);
-        setTimeout(() => { this.pdfOrdenTrabajo(datos_ot.ot_Id); }, 1500);
-        setTimeout(() => {
-          if (!errorExt && !errorImp && !errorLam && !errorSelCor) Swal.fire({icon: 'success', title: '¡Orden de Trabajo Creada!', text: `Se ha creado la de trabajo N°${datos_ot.ot_Id}`});
-          this.limpiarCampos();
-        }, 2000);
-      }, err => {
-        this.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, err.message);
-        this.cargando = false;
-      });
+    this.cargando = true;
+    let errorExt : boolean = false, errorImp : boolean = false, errorLam : boolean = false, errorSelCor : boolean = false;
+    let infoOT : any = {
+      SedeCli_Id : this.FormOrdenTrabajo.value.Id_Sede_Cliente,
+      Prod_Id : this.producto,
+      Ot_PesoNetoKg : this.netoKg,
+      Ot_ValorOT : this.valorOt,
+      Ot_MargenAdicional : this.FormOrdenTrabajo.value.Margen,
+      Ot_ValorKg : this.valorKg,
+      Ot_ValorUnidad : this.valorProducto,
+      Ot_FechaCreacion : this.today,
+      Estado_Id : 15,
+      Usua_Id : this.storage_Id,
+      PedExt_Id : parseInt(this.FormOrdenTrabajo.value.Pedido_Id),
+      Ot_Observacion : this.FormOrdenTrabajo.value.OT_Observacion,
+      Ot_Cyrel : this.checkedCyrel,
+      Ot_Corte : this.checkedCorte,
+      Mezcla_Id : this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
+      UndMed_Id : this.presentacionProducto,
+      Ot_Hora : moment().format('H:mm:ss'),
+      Extrusion : this.extrusion,
+      Impresion : this.impresion,
+      Laminado : this.laminado,
+      Rotograbado : this.rotograbado,
+      Sellado : this.sellado,
+      Ot_CantidadPedida : this.cantidadProducto,
     }
+    this.ordenTrabajoService.srvGuardar(infoOT).subscribe(datos_ot => {
+      errorExt = this.guardarOt_Extrusion(datos_ot.ot_Id);
+      errorImp = this.guardarOt_Impresion(datos_ot.ot_Id);
+      errorLam = this.guardarOt_Laminado(datos_ot.ot_Id);
+      errorSelCor = this.guardarOt_Sellado_Corte(datos_ot.ot_Id);
+      this.cambiarEstadoCliente(this.FormOrdenTrabajo.value.ID_Cliente);
+      setTimeout(() => { this.pdfOrdenTrabajo(datos_ot.ot_Id); }, 1500);
+      setTimeout(() => {
+        if (!errorExt && !errorImp && !errorLam && !errorSelCor) Swal.fire({icon: 'success', title: '¡Orden de Trabajo Creada!', text: `Se ha creado la de trabajo N°${datos_ot.ot_Id}`});
+        this.limpiarCampos();
+      }, 2000);
+    }, err => {
+      this.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, err.message);
+      this.cargando = false;
+    });
   }
 
   //Funcion que va a guardar la informacion de extrusion de la orden de trabajo
@@ -1455,24 +1392,27 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que va a guardar la informacion de la orden de trabajo para sellado y/o corte
   guardarOt_Sellado_Corte(ordenTrabajo : number){
-    let info : any = {
-      Ot_Id : ordenTrabajo,
-      Corte :  this.checkedCorte,
-      Sellado :  this.sellado,
-      Formato_Id : this.FormOrdenTrabajoSellado.value.Formato_Sellado,
-      SelladoCorte_Ancho : this.FormOrdenTrabajoSellado.value.Ancho_Sellado,
-      SelladoCorte_Largo : this.FormOrdenTrabajoSellado.value.Largo_Sellado,
-      SelladoCorte_Fuelle : this.FormOrdenTrabajoSellado.value.Fuelle_Sellado,
-      SelladoCorte_PesoMillar : this.FormOrdenTrabajoSellado.value.PesoMillar,
-      TpSellado_Id : this.FormOrdenTrabajoSellado.value.TipoSellado,
-      SelladoCorte_PrecioSelladoDia : this.FormOrdenTrabajoSellado.value.PrecioDia,
-      SelladoCorte_PrecioSelladoNoche : this.FormOrdenTrabajoSellado.value.PrecioNoche,
-      SelladoCorte_CantBolsasPaquete : this.FormOrdenTrabajoSellado.value.CantidadPaquete,
-      SelladoCorte_CantBolsasBulto : this.FormOrdenTrabajoSellado.value.PesoPaquete,
-      SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.CantidadBulto,
-      SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
-    }
-    this.otSelladoCorteService.post(info).subscribe(datos => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.message); });
+    let tipoSellado : string = this.FormOrdenTrabajoSellado.value.TipoSellado, formato : string = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
+    this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
+      let info : any = {
+        Ot_Id : ordenTrabajo,
+        Corte :  this.checkedCorte,
+        Sellado :  this.sellado,
+        Formato_Id : datos.tpProd_Id,
+        SelladoCorte_Ancho : this.FormOrdenTrabajoSellado.value.Ancho_Sellado,
+        SelladoCorte_Largo : this.FormOrdenTrabajoSellado.value.Largo_Sellado,
+        SelladoCorte_Fuelle : this.FormOrdenTrabajoSellado.value.Fuelle_Sellado,
+        SelladoCorte_PesoMillar : this.FormOrdenTrabajoSellado.value.PesoMillar,
+        TpSellado_Id : datos.tpSellado_Id,
+        SelladoCorte_PrecioSelladoDia : this.FormOrdenTrabajoSellado.value.PrecioDia,
+        SelladoCorte_PrecioSelladoNoche : this.FormOrdenTrabajoSellado.value.PrecioNoche,
+        SelladoCorte_CantBolsasPaquete : this.FormOrdenTrabajoSellado.value.CantidadPaquete,
+        SelladoCorte_CantBolsasBulto : this.FormOrdenTrabajoSellado.value.CantidadBulto,
+        SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
+        SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
+      }
+      this.otSelladoCorteService.post(info).subscribe(datos => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.message); });
+    }, error => { this.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.message); });
     return false;
   }
 
@@ -1528,10 +1468,8 @@ export class OrdenesTrabajoComponent implements OnInit {
         Cli_Fecha : datos_cliente.cli_Fecha,
         Cli_Hora : datos_cliente.cli_Hora,
       }
-      this.clienteServise.PutEstadoCliente(cliente, info).subscribe(datos => {  }, error => {
-        Swal.fire({icon: 'error', title: 'Opps...', html: `<b>¡No fue posible actualizar el estado del cliente con el Id ${cliente}!</b><br><span style="color: #F00">${error.message}</span>`})
-      });
-    }, error => { Swal.fire({icon: 'error', title: 'Opps...', html: `<b>¡El cliente con el Id ${cliente} no se ha encontrado!</b><br><span style="color: #F00">${error.message}</span>`}) });
+      this.clienteServise.PutEstadoCliente(cliente, info).subscribe(datos => { }, error => { this.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.message); });
+    }, error => { this.mensajeError(`El cliente con el Id ${cliente} no se ha encontrado!`, error.message) });
   }
 
   // Funcion que creará el PDF de la Orden de trabajo
@@ -1539,7 +1477,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     let usuario : string = this.storage.get('Nombre');
     this.ordenTrabajoService.srvObtenerListaPdfOTInsertada(ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
-        if (datos_ot[i].cyrel == "1") {
+        if (datos_ot[i].cyrel) {
           const pdfDefinicion : any = {
             info: { title: `${datos_ot[i].numero_Orden}` },
             pageSize: { width: 630, height: 760 },
@@ -1935,7 +1873,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                             ],
                             [
                               { border : [], text : `ANCHO`, },
-                              { border : [], text : `${this.formatonumeros(datos_ot[i].ancho1_Extrusion)}       +       ${this.formatonumeros(datos_ot[i].ancho2_Extrusion)}       +       `, },
+                              { border : [], text : `${this.formatonumeros(datos_ot[i].ancho1_Extrusion)}       +       ${this.formatonumeros(datos_ot[i].ancho2_Extrusion)}   +   `, },
                               { border : [], text : `       ${this.formatonumeros(datos_ot[i].ancho3_Extrusion)}`, }
                             ],
                             [
@@ -2163,7 +2101,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           }
           const pdf = pdfMake.createPdf(pdfDefinicion);
           pdf.open();
-        } else if (datos_ot[i].cyrel == "0") {
+        } else if (!datos_ot[i].cyrel) {
           const pdfDefinicion : any = {
             info: { title: `${datos_ot[i].numero_Orden}` },
             pageSize: { width: 630, height: 760 },
@@ -2196,7 +2134,7 @@ export class OrdenesTrabajoComponent implements OnInit {
               {
                 style: 'tablaEmpresa',
                 table: {
-                  widths: [90, '*', 90, '*'],
+                  widths: [60, '*', 60, '*'],
                   style: 'header',
                   body: [
                     [
@@ -2473,7 +2411,7 @@ export class OrdenesTrabajoComponent implements OnInit {
               {
                 style: 'tablaEmpresa',
                 table: {
-                  widths: [90, '*', 90, '*'],
+                  widths: [60, '*', 60, '*'],
                   style: 'header',
                   body: [
                     [
@@ -2559,7 +2497,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                             ],
                             [
                               { border : [], text : `ANCHO`, },
-                              { border : [], text : `${this.formatonumeros(datos_ot[i].ancho1_Extrusion)}       +       ${this.formatonumeros(datos_ot[i].ancho2_Extrusion)}       +       `, },
+                              { border : [], text : `${this.formatonumeros(datos_ot[i].ancho1_Extrusion)}       +       ${this.formatonumeros(datos_ot[i].ancho2_Extrusion)}   +   `, },
                               { border : [], text : `       ${this.formatonumeros(datos_ot[i].ancho3_Extrusion)}`, }
                             ],
                             [
@@ -2781,172 +2719,130 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Funcion que va a consultar la informacion de la una orden de trabajo
   ConsultarOrdenTrabajo(){
     let numeroOT : number = this.FormOrdenTrabajo.value.OT_Id;
-    this.ArrayProducto = [];
+    this.limpiarCampos();
 
     this.ordenTrabajoService.srvObtenerListaPdfOTInsertada(numeroOT).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
+
+        this.checkedCyrel = datos_orden[i].cyrel;
+        this.extrusion = datos_orden[i].extrusion;
+        this.impresion = datos_orden[i].impresion;
+        this.rotograbado = datos_orden[i].rotograbado;
+        this.laminado = datos_orden[i].laminado;
+        this.checkedCorte = datos_orden[i].corte;
+        this.sellado = datos_orden[i].sellado;
+
         this.FormOrdenTrabajo.patchValue({
-          OT_Id: numeroOT,
-          Pedido_Id: datos_orden[i].pedExt_Id,
+          OT_Id: datos_orden[i].numero_Orden,
+          Pedido_Id: datos_orden[i].id_Pedido,
           Nombre_Vendedor: datos_orden[i].vendedor,
-          OT_FechaCreacion: datos_orden[i].ot_FechaCreacion.replace('T00:00:00', ''),
-          OT_FechaEntrega: datos_orden[i].pedExt_FechaEntrega.replace('T00:00:00', ''),
-          Id_Sede_Cliente : datos_orden[i].sedeCli_Id,
-          ID_Cliente: datos_orden[i].cli_Id,
-          Nombre_Cliente: datos_orden[i].cli_Nombre,
-          Ciudad_SedeCliente: datos_orden[i].sedeCliente_Ciudad,
-          Direccion_SedeCliente : datos_orden[i].sedeCliente_Direccion,
-          OT_Estado : datos_orden[i].estado_Id,
-          OT_Observacion : datos_orden[i].ot_Observacion,
+          OT_FechaCreacion: datos_orden[i].fecha_Creacion.replace('T00:00:00', ''),
+          OT_FechaEntrega: datos_orden[i].fecha_Entrega.replace('T00:00:00', ''),
+          Id_Sede_Cliente : datos_orden[i].i_SedeCliente,
+          ID_Cliente: datos_orden[i].id_Cliente,
+          Nombre_Cliente: datos_orden[i].cliente,
+          Ciudad_SedeCliente: datos_orden[i].ciudad,
+          Direccion_SedeCliente : datos_orden[i].direccion,
+          OT_Estado : datos_orden[i].estado_Orden,
+          OT_Observacion : datos_orden[i].observacion,
           Margen : datos_orden[i].ot_MargenAdicional,
-          OT_Cyrel : datos_orden[i].ot_Cyrel,
-          OT_Corte : datos_orden[i].ot_Corte,
+          OT_Cyrel : this.checkedCyrel,
+          OT_Extrusion : this.extrusion,
+          OT_Impresion : this.impresion,
+          OT_Rotograbado : this.rotograbado,
+          OT_Laminado : this.laminado,
+          OT_Corte : this.checkedCorte,
+          OT_Doblado : this.doblado,
+          OT_Sellado : this.sellado,
         });
-        if (datos_orden[i].ot_Cyrel == 1) this.checkedCyrel = true;
-        if (datos_orden[i].ot_Corte == 1) this.checkedCorte = true;
 
         let productoExt : any = {
-          Id : datos_orden[i].prod_Id,
-          Nombre : datos_orden[i].prod_Nombre,
-          Ancho : datos_orden[i].prod_Ancho,
-          Fuelle : datos_orden[i].prod_Fuelle,
-          Largo : datos_orden[i].prod_Largo,
-          Cal : datos_orden[i].prod_Calibre,
-          Und : datos_orden[i].undMedACF,
-          PesoMillar : datos_orden[i].prod_Peso_Millar,
-          Tipo : datos_orden[i].tpProd_Nombre,
-          Material : datos_orden[i].materialProducto,
-          Pigmento : datos_orden[i].pigmentoProducto,
-          CantPaquete : datos_orden[i].prod_CantBolsasPaquete,
-          CantBulto : datos_orden[i].prod_CantBolsasBulto,
-          Cant : datos_orden[i].ot_CantidadKilos,
-          Cant_Inicial : datos_orden[i].ot_CantidadKilos,
-          UndCant : datos_orden[i].presentacion_Id,
+          Id : datos_orden[i].id_Producto,
+          Nombre : datos_orden[i].producto,
+          Ancho : datos_orden[i].selladoCorte_Ancho,
+          Fuelle : datos_orden[i].selladoCorte_Fuelle,
+          Largo : datos_orden[i].selladoCorte_Largo,
+          Cal : datos_orden[i].calibre_Extrusion,
+          Und : datos_orden[i].und_Extrusion,
+          PesoMillar : datos_orden[i].selladoCorte_PesoMillar,
+          Tipo : datos_orden[i].formato_Producto,
+          Material : datos_orden[i].material,
+          Pigmento : datos_orden[i].pigmento_Extrusion,
+          CantPaquete : datos_orden[i].selladoCorte_CantBolsasPaquete,
+          CantBulto : datos_orden[i].selladoCorte_CantBolsasBulto,
+          Cant : datos_orden[i].cantidad_Pedida,
+          Cant_Inicial : datos_orden[i].cantidad_Pedida,
+          UndCant : datos_orden[i].id_Presentacion,
           TipoSellado : datos_orden[i].tpSellados_Nombre,
-          PrecioUnd : datos_orden[i].pedExtProd_PrecioUnitario,
-          SubTotal : datos_orden[i].pedExtProd_PrecioUnitario * datos_orden[i].ot_CantidadKilos,
+          PrecioUnd : datos_orden[i].precio_Producto,
+          SubTotal : datos_orden[i].precio_Producto * datos_orden[i].cantidad_Pedida,
+          FechaEntrega : datos_orden[i].fecha_Entrega.replace('T00:00:00', ''),
         }
         this.ArrayProducto.push(productoExt);
-        this.cantidadCostoProductos = datos_orden[i].pedExtProd_PrecioUnitario * datos_orden[i].ot_CantidadKilos;
+        this.cantidadCostoProductos = productoExt.SubTotal;
 
         this.FormOrdenTrabajoExtrusion.patchValue({
-          Material_Extrusion : datos_orden[i].material_Id,
-          Formato_Extrusion : datos_orden[i].formato_Id,
-          Pigmento_Extrusion : datos_orden[i].pigmt_Id,
-          Ancho_Extrusion1 : datos_orden[i].extrusion_Ancho1,
-          Ancho_Extrusion2 : datos_orden[i].extrusion_Ancho2,
-          Ancho_Extrusion3 : datos_orden[i].extrusion_Ancho3,
+          Material_Extrusion : datos_orden[i].id_Material,
+          Formato_Extrusion : datos_orden[i].id_Formato_Extrusion,
+          Pigmento_Extrusion : datos_orden[i].id_Pigmento_Extrusion,
+          Ancho_Extrusion1 : datos_orden[i].ancho1_Extrusion,
+          Ancho_Extrusion2 : datos_orden[i].ancho2_Extrusion,
+          Ancho_Extrusion3 : datos_orden[i].ancho3_Extrusion,
           Calibre_Extrusion : datos_orden[i].calibre_Extrusion,
-          UnidadMedida_Extrusion : datos_orden[i].undMed_Id,
-          Tratado_Extrusion : datos_orden[i].tratado_Id,
+          UnidadMedida_Extrusion : datos_orden[i].und_Extrusion,
+          Tratado_Extrusion : datos_orden[i].id_Tratado,
         });
         this.FormOrdenTrabajoImpresion.patchValue({
-          Tipo_Impresion : datos_orden[i].tpImpresion_Id,
-          Rodillo_Impresion : datos_orden[i].rodillo_Id,
-          Pista_Impresion : datos_orden[i].pista_Id,
-          Tinta_Impresion1 : datos_orden[i].tinta1_Nombre,
-          Tinta_Impresion2 : datos_orden[i].tinta2_Nombre,
-          Tinta_Impresion3 : datos_orden[i].tinta3_Nombre,
-          Tinta_Impresion4 : datos_orden[i].tinta4_Nombre,
-          Tinta_Impresion5 : datos_orden[i].tinta5_Nombre,
-          Tinta_Impresion6 : datos_orden[i].tinta6_Nombre,
-          Tinta_Impresion7 : datos_orden[i].tinta7_Nombre,
-          Tinta_Impresion8 : datos_orden[i].tinta8_Nombre,
+          Tipo_Impresion : datos_orden[i].id_Tipo_Imptesion,
+          Rodillo_Impresion : datos_orden[i].rodillo,
+          Pista_Impresion : datos_orden[i].pista,
+          Tinta_Impresion1 : datos_orden[i].tinta1,
+          Tinta_Impresion2 : datos_orden[i].tinta2,
+          Tinta_Impresion3 : datos_orden[i].tinta3,
+          Tinta_Impresion4 : datos_orden[i].tinta4,
+          Tinta_Impresion5 : datos_orden[i].tinta5,
+          Tinta_Impresion6 : datos_orden[i].tinta6,
+          Tinta_Impresion7 : datos_orden[i].tinta7,
+          Tinta_Impresion8 : datos_orden[i].tinta8,
         });
         this.FormOrdenTrabajoLaminado.patchValue({
-          Capa_Laminado1 : datos_orden[i].capa_Id1,
-          Calibre_Laminado1 : datos_orden[i].lamCapa_Calibre1,
-          cantidad_Laminado1 : datos_orden[i].lamCapa_Cantidad1,
-          Capa_Laminado2 : datos_orden[i].capa_Id2,
-          Calibre_Laminado2 : datos_orden[i].lamCapa_Calibre2,
-          cantidad_Laminado2 : datos_orden[i].lamCapa_Cantidad2,
-          Capa_Laminado3 : datos_orden[i].capa_Id3,
-          Calibre_Laminado3 : datos_orden[i].lamCapa_Calibre13,
-          cantidad_Laminado3 : datos_orden[i].lamCapa_Cantidad3,
+          Capa_Laminado1 : datos_orden[i].id_Capa1,
+          Calibre_Laminado1 : datos_orden[i].calibre_Laminado_Capa1,
+          cantidad_Laminado1 : datos_orden[i].cantidad_Laminado_Capa1,
+          Capa_Laminado2 : datos_orden[i].id_Capa2,
+          Calibre_Laminado2 : datos_orden[i].calibre_Laminado_Capa2,
+          cantidad_Laminado2 : datos_orden[i].cantidad_Laminado_Capa2,
+          Capa_Laminado3 : datos_orden[i].id_Capa3,
+          Calibre_Laminado3 : datos_orden[i].calibre_Laminado_Capa3,
+          cantidad_Laminado3 : datos_orden[i].cantidad_Laminado_Capa3,
         });
-        setTimeout(() => {
-          if (this.pesoProducto != 0) {
-            if (datos_orden.UndCant == 'Kg') {
-              this.cantidadKilos = datos_orden.Cant;
-              this.cantidadUnidades = datos_orden.Cant / this.pesoProducto;
-            } else {
-              this.cantidadUnidades = datos_orden.Cant;
-              this.cantidadKilos = (datos_orden.Cant * this.pesoProducto) / 1000;
-            }
-          } else if (this.pesoProducto == 0) {
-            this.cantidadKilos = datos_orden.Cant;
-            this.cantidadUnidades = datos_orden.Cant;
-          }
-          this.cantidadKgMasMargen = this.cantidadKilos + ((this.cantidadKilos * this.FormOrdenTrabajo.value.Margen) / 100);
-          this.cantidadUndMasMargen = this.cantidadUnidades + ((this.cantidadUnidades * this.FormOrdenTrabajo.value.Margen) / 100);
-        }, 500);
-        if (datos_orden[i].mezcla_NroCapas == 1) {
-          this.checkedCapa1 = true;
-          this.checkedCapa2 = false;
-          this.checkedCapa3 = false;
-          const capa1 : any = document.getElementById("capa1");
-          capa1.click();
-        } else if (datos_orden[i].mezcla_NroCapas == 2) {
-          this.checkedCapa1 = false;
-          this.checkedCapa2 = true;
-          this.checkedCapa3 = false;
-          const capa2 : any = document.getElementById("capa2");
-          capa2.click();
-        } else if (datos_orden[i].mezcla_NroCapas == 3) {
-          this.checkedCapa1 = false;
-          this.checkedCapa2 = false;
-          this.checkedCapa3 = true;
-          const capa3 : any = document.getElementById("capa3");
-          capa3.click();
-        }
-        this.FormOrdenTrabajoMezclas.patchValue({
-          Id_Mezcla : datos_orden[i].mezcla_Id,
-          Nombre_Mezclas : datos_orden[i].mezcla_Nombre,
-          Chechbox_Capa1 : this.checkedCapa1,
-          Chechbox_Capa2 : this.checkedCapa2,
-          Chechbox_Capa3 : this.checkedCapa3,
-          Proc_Capa1 : datos_orden[i].mezcla_PorcentajeCapa1,
-          Proc_Capa2 : datos_orden[i].mezcla_PorcentajeCapa2,
-          Proc_Capa3 : datos_orden[i].mezcla_PorcentajeCapa3,
-          materialP1_Capa1 : datos_orden[i].mezMaterial_Id1xCapa1,
-          PorcentajeMaterialP1_Capa1 : datos_orden[i].mezcla_PorcentajeMaterial1_Capa1,
-          materialP1_Capa2 : datos_orden[i].mezMaterial_Id1xCapa2,
-          PorcentajeMaterialP1_Capa2 : datos_orden[i].mezcla_PorcentajeMaterial1_Capa2,
-          materialP1_Capa3 : datos_orden[i].mezMaterial_Id1xCapa3,
-          PorcentajeMaterialP1_Capa3 : datos_orden[i].mezcla_PorcentajeMaterial1_Capa3,
-          materialP2_Capa1 : datos_orden[i].mezMaterial_Id2xCapa1,
-          PorcentajeMaterialP2_Capa1 : datos_orden[i].mezcla_PorcentajeMaterial2_Capa1,
-          materialP2_Capa2 : datos_orden[i].mezMaterial_Id2xCapa2,
-          PorcentajeMaterialP2_Capa2 : datos_orden[i].mezcla_PorcentajeMaterial2_Capa2,
-          materialP2_Capa3 : datos_orden[i].mezMaterial_Id2xCapa3,
-          PorcentajeMaterialP2_Capa3 : datos_orden[i].mezcla_PorcentajeMaterial2_Capa3,
-          materialP3_Capa1 : datos_orden[i].mezMaterial_Id3xCapa1,
-          PorcentajeMaterialP3_Capa1 : datos_orden[i].mezcla_PorcentajeMaterial3_Capa1,
-          materialP3_Capa2 : datos_orden[i].mezMaterial_Id3xCapa2,
-          PorcentajeMaterialP3_Capa2 : datos_orden[i].mezcla_PorcentajeMaterial3_Capa2,
-          materialP3_Capa3 : datos_orden[i].mezMaterial_Id3xCapa3,
-          PorcentajeMaterialP3_Capa3 : datos_orden[i].mezcla_PorcentajeMaterial3_Capa3,
-          materialP4_Capa1 : datos_orden[i].mezMaterial_Id4xCapa1,
-          PorcentajeMaterialP4_Capa1 : datos_orden[i].mezcla_PorcentajeMaterial4_Capa1,
-          materialP4_Capa2 : datos_orden[i].mezMaterial_Id4xCapa2,
-          PorcentajeMaterialP4_Capa2 : datos_orden[i].mezcla_PorcentajeMaterial4_Capa2,
-          materialP_Capa3 : datos_orden[i].mezMaterial_Id4xCapa3,
-          PorcentajeMaterialP_Capa3 : datos_orden[i].mezcla_PorcentajeMaterial4_Capa3,
-          MezclaPigmentoP1_Capa1 : datos_orden[i].mezPigmto_Id1xCapa1,
-          PorcentajeMezclaPigmentoP1_Capa1 : datos_orden[i].mezcla_PorcentajePigmto1_Capa1,
-          MezclaPigmentoP1_Capa2 : datos_orden[i].mezPigmto_Id1xCapa2,
-          PorcentajeMezclaPigmentoP1_Capa2 : datos_orden[i].mezcla_PorcentajePigmto1_Capa2,
-          MezclaPigmento1_Capa3 : datos_orden[i].mezPigmto_Id1xCapa3,
-          PorcentajeMezclaPigmentoP1_Capa3 :datos_orden[i].mezcla_PorcentajePigmto1_Capa3,
-          MezclaPigmentoP2_Capa1 : datos_orden[i].mezPigmto_Id2xCapa1,
-          PorcentajeMezclaPigmentoP2_Capa1 : datos_orden[i].mezcla_PorcentajePigmto2_Capa1,
-          MezclaPigmentoP2_Capa2 : datos_orden[i].mezPigmto_Id2xCapa2,
-          PorcentajeMezclaPigmentoP2_Capa2 : datos_orden[i].mezcla_PorcentajePigmto2_Capa2,
-          MezclaPigmento2_Capa3 : datos_orden[i].mezPigmto_Id2xCapa3,
-          PorcentajeMezclaPigmentoP2_Capa3 : datos_orden[i].mezcla_PorcentajePigmto2_Capa3,
+        this.FormOrdenTrabajoCorte.patchValue({
+          Formato_Corte : datos_orden[i].id_Formato_Producto,
+          Ancho_Corte : datos_orden[i].selladoCorte_Ancho,
+          Largo_Corte : datos_orden[i].selladoCorte_Largo,
+          Fuelle_Corte : datos_orden[i].selladoCorte_Fuelle,
+          Margen_Corte : datos_orden[i].margen_Adicional,
         });
+        this.FormOrdenTrabajoSellado.patchValue({
+          Formato_Sellado : datos_orden[i].id_Formato_Producto,
+          Ancho_Sellado : datos_orden[i].selladoCorte_Ancho,
+          Largo_Sellado : datos_orden[i].selladoCorte_Largo,
+          Fuelle_Sellado : datos_orden[i].selladoCorte_Fuelle,
+          Margen_Sellado : datos_orden[i].margen,
+          PesoMillar : datos_orden[i].selladoCorte_PesoMillar,
+          TipoSellado : datos_orden[i].tpSellado_Id,
+          CantidadPaquete : datos_orden[i].selladoCorte_CantBolsasPaquete,
+          CantidadBulto : datos_orden[i].selladoCorte_CantBolsasBulto,
+          PrecioDia : datos_orden[i].selladoCorte_PrecioSelladoDia,
+          PrecioNoche : datos_orden[i].selladoCorte_PrecioSelladoNoche,
+          PesoPaquete : datos_orden[i].selladoCorte_PesoBulto,
+          PesoBulto : datos_orden[i].selladoCorte_PesoPaquete,
+        });
+        this.FormOrdenTrabajoMezclas.patchValue({ Nombre_Mezclas : datos_orden[i].mezcla_Id, });
+        this.cargarCombinacionMezclas();
+        this.calcularDatosOt(productoExt);
       }
-    }, error => { Swal.fire({icon:'error', title: 'OT no encontrada', text: `¡No se ha encontrado una orden de trabajo con el consecutivo ${numeroOT}!`}) });
+    }, error => { this.mensajeError(`¡No se ha encontrado una orden de trabajo con el consecutivo ${numeroOT}!`, error.message); });
   }
 
   //
@@ -3023,26 +2919,6 @@ export class OrdenesTrabajoComponent implements OnInit {
           this.idMezclaSeleccionada = datos_mezcla[i].mezcla_Id;
           this.nroCapas = datos_mezcla[i].mezcla_NroCapas;
 
-          /*if (datos_mezcla[i].mezcla_NroCapas == 1) {
-           this.checkedCapa1 = true;
-            this.checkedCapa2 = false;
-            this.checkedCapa3 = false;
-            const capa1 : any = document.getElementById("capa1");
-            capa1.click();
-          } else if (datos_mezcla[i].mezcla_NroCapas == 2) {
-            this.checkedCapa1 = false;
-            this.checkedCapa2 = true;
-            this.checkedCapa3 = false;
-            const capa2 : any = document.getElementById("capa2");
-            capa2.click();
-          } else if (datos_mezcla[i].mezcla_NroCapas == 3) {
-            this.checkedCapa1 = false;
-            this.checkedCapa2 = false;
-            this.checkedCapa3 = true;
-            const capa3 : any = document.getElementById("capa3");
-            capa3.click();
-          }*/
-          console.log(this.nroCapas);
           if(this.nroCapas == 1) this.checkedCapa1 == true; this.checkedCapa2 == false; this.checkedCapa3 == false;
           if(this.nroCapas == 2) this.checkedCapa1 == false; this.checkedCapa2 == true; this.checkedCapa3 == false;
           if(this.nroCapas == 3) this.checkedCapa1 == false; this.checkedCapa2 == false; this.checkedCapa3 == true;

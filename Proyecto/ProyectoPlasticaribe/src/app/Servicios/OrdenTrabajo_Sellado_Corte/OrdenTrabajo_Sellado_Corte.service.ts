@@ -12,8 +12,6 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 export class OrdenTrabajo_Sellado_CorteService {
 
 
-  readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-
   //Encapsular httpclient en el constructor
   constructor(private http : HttpClient,
     @Inject(SESSION_STORAGE) private storage: WebStorageService) {
@@ -23,24 +21,28 @@ export class OrdenTrabajo_Sellado_CorteService {
   }
 
   getTodo() {
-    return this.http.get<any>(this.rutaPlasticaribeAPI + '/OT_SelladoCorte');
+    return this.http.get<any>(rutaPlasticaribeAPI + '/OT_SelladoCorte');
   }
 
   getInfoPorId(dato : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/OT_SelladoCorte/${dato}`);
+    return this.http.get<any>(rutaPlasticaribeAPI + `/OT_SelladoCorte/${dato}`);
+  }
+
+  getTipoSellado_Formato(tipoSellado : string, formato : string){
+    return this.http.get<any>(rutaPlasticaribeAPI + `/OT_SelladoCorte/getTipoSellado_Formato/${tipoSellado}/${formato}`);
   }
 
   //Metodo actualzar
   put(id:number|string, data:any) {
-    return this.http.put(this.rutaPlasticaribeAPI + `/OT_SelladoCorte/${id}`, data);
+    return this.http.put(rutaPlasticaribeAPI + `/OT_SelladoCorte/${id}`, data);
   }
   //Metodo eliminar
   delete(id:number|string) {
-    return this.http.delete(this.rutaPlasticaribeAPI + `/OT_SelladoCorte/${id}`);
+    return this.http.delete(rutaPlasticaribeAPI + `/OT_SelladoCorte/${id}`);
   }
 
   post(data : modelOrdenTrabajo_SelladoCorte): Observable<any> {
-   return this.http.post(this.rutaPlasticaribeAPI + '/OT_SelladoCorte', data);
+   return this.http.post(rutaPlasticaribeAPI + '/OT_SelladoCorte', data);
   }
 
 }
