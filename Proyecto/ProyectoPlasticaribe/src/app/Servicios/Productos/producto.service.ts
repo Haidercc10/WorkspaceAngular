@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { AppComponent} from 'src/app/app.component';
 import { modelProducto } from '../../Modelo/modelProducto';
 import { rutaPlasticaribeAPI,  } from 'src/polyfills';
+import { relativeTimeRounding } from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -78,5 +79,9 @@ export class ProductoService {
 
   obtenerItemsLike(letras : any): Observable<any> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Producto/consultaNombreItem/${letras}`);
+  }
+
+  GetInfoProducto_Prod_Presentacion(id : number, presentacion : string) : Observable<any[]> {
+    return this.http.get<any>(rutaPlasticaribeAPI + `/Producto/getInfoProducto_Prod_Presentacion/${id}/${presentacion}`);
   }
 }

@@ -137,4 +137,8 @@ export class InventarioZeusService {
   GetConsolidadClientesArticulo(ano1 : number, ano2 : number, ruta : string) {
     return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getConsolidadoClientesArticulo/${ano1}/${ano2}/${ruta}`);
   }
+
+  GetInfoPedido_Consecutivo(id : number) : Observable<any[]> {
+    return this.http.get<any>(this.rutaInventarioZeusAPI + `/MovimientoItems/getInfoPedido_Consecutivo/${id}`);
+  }
 }

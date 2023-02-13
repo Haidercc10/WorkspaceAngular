@@ -12,6 +12,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { FormatosService } from 'src/app/Servicios/Formato/Formatos.service';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { Laminado_CapaService } from 'src/app/Servicios/LaminadoCapa/Laminado_Capa.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { MezclasService } from 'src/app/Servicios/Mezclas/Mezclas.service';
@@ -25,6 +26,7 @@ import { OrdenTrabajo_Sellado_CorteService } from 'src/app/Servicios/OrdenTrabaj
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { Tipos_ImpresionService } from 'src/app/Servicios/TipoImpresion/Tipos_Impresion.service';
 import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service';
@@ -58,6 +60,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   arrayMateriales = []; /** Array que colocará las materiales en los combobox al momento de crear la OT*/
   arrayUnidadesMedidas = []; /** Array que colocará las unidades de medida en los combobox al momento de crear la OT*/
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
+  edicionOrdenTrabajo : boolean = false; //Variable para validar que se está editando o no una orden de trabajo
   vistaPedidos : boolean = false; //Funcion que validará si se muestra el navbar de ordenes de trabajo o no
   checkedCyrel : boolean = false; //Variable para saber si el checkbox del Cyrel está seleccionado o no
   checkedCorte : boolean = false; //Variable para saber si el checkbox del Corte está seleccionado o no
@@ -141,7 +144,9 @@ export class OrdenesTrabajoComponent implements OnInit {
                                                           private productoService : ProductoService,
                                                             private clienteServise : ClientesService,
                                                               private tiposProductosService : TipoProductoService,
-                                                                private tipoSelladoService : TiposSelladoService,) {
+                                                                private tipoSelladoService : TiposSelladoService,
+                                                                  private pedidosZeusService : InventarioZeusService,
+                                                                    private sedeClienteService : SedeClienteService,) {
 
     this.FormOrdenTrabajo = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -346,6 +351,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.lecturaStorage();
     this.ultimaOT();
     this.pedidos();
+    this.pedidosZues();
     this.cargarTintasEnProcesoImpresion();
     this.cargarPigmentosEnProcesoExtrusion();
     this.cargarMaterialEnProcesoExtrusion();
@@ -490,6 +496,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   limpiarCampos(){
     this.ultimaOT();
     this.pedidos();
+    this.pedidosZues();
     this.limpiarFormOrdenTrabajo();
     this.limpiarFormExtrusion();
     this.limpiarFormImpresion();
@@ -497,6 +504,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.limpiarFormCorte();
     this.limpiarFormSellado();
     this.limpiarFormMezclas();
+    this.edicionOrdenTrabajo = false;
     this.checkedCyrel = false;
     this.checkedCorte = false;
     this.cantidadCostoProductos = 0;
@@ -673,7 +681,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         });
       }, 300);
     }, error => {
-      this.mezclasService.getMezclaNombre(this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas).subscribe(datos_mezcla => {
+      this.mezclasService.getMezclaNombre(this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas.replace('%', '%25')).subscribe(datos_mezcla => {
         this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
         setTimeout(() => {
           this.FormOrdenTrabajoMezclas.disable();
@@ -750,6 +758,106 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.pedidoExternoService.GetPedidosSinOT().subscribe(datos => { this.pedidosSinOT = datos });
   }
 
+  // Funcion que va a obtener los pedidos provenientes de zeus
+  pedidosZues(){
+    this.pedidosZeusService.GetPedidosAgrupados().subscribe(datos_Pedidos => {
+      for (let i = 0; i < datos_Pedidos.length; i++) {
+        let data : any =  {
+          "id_Pedido": parseInt(datos_Pedidos[i].consecutivo),
+          "id_Cliente": datos_Pedidos[i],
+          "nombre_Cliente": datos_Pedidos[i].cliente,
+          "cantidad_Productos": 1,
+          "zeus" : true,
+        }
+        this.pedidosSinOT.push(data);
+      }
+    });
+  }
+
+  // Funcion que va a validar si el pedido viene de zeus
+  validarPedido(){
+    let pedido : number = this.FormOrdenTrabajo.value.Pedido_Id;
+    for (const item of this.pedidosSinOT){
+      if (item.id_Pedido == pedido){
+        if (!item.zeus) this.informacionPedido();
+        else if (item.zeus) this.informacionPedidoZeus();
+      }
+    }
+  }
+
+  // funcion que consultará la informacion de un pedido de Zeus
+  informacionPedidoZeus(){
+    let pedido : number = this.FormOrdenTrabajo.value.Pedido_Id;
+    this.cantidadCostoProductos = 0;
+    this.ArrayProducto = [];
+    this.limpiarCampos();
+    let presentacion : string;
+    this.pedidosZeusService.GetInfoPedido_Consecutivo(pedido).subscribe(datos => {
+      for (let i = 0; i < datos.length; i++) {
+        this.sedeClienteService.GetSedeCliente(datos[i].id_Cliente, datos[i].ciudad, datos[i].direccion_Cliente).subscribe(datosSede => {
+          for (let j = 0; j < datosSede.length; j++) {
+            this.FormOrdenTrabajo.patchValue({
+              OT_Id: null,
+              Pedido_Id: pedido,
+              Nombre_Vendedor: datos[i].vendedor,
+              OT_FechaCreacion: this.today,
+              OT_FechaEntrega: null,
+              Id_Sede_Cliente : datosSede[j].sedeCli_Id,
+              ID_Cliente: datosSede[j].cli_Id,
+              Nombre_Cliente: datos[i].cliente,
+              Ciudad_SedeCliente: datos[i].ciudad,
+              Direccion_SedeCliente : datos[i].direccion_Cliente,
+              OT_Estado : datos[i].estado == 'Parcialmente Satisfecho' ? datos[i].estado = 12 : datos[i].estado = 11,
+              OT_Observacion : datos[i].observacion,
+              Margen : 0,
+              OT_Cyrel : this.checkedCyrel,
+              OT_Extrusion : this.extrusion,
+              OT_Impresion : this.impresion,
+              OT_Rotograbado : this.rotograbado,
+              OT_Laminado : this.laminado,
+              OT_Corte : this.checkedCorte,
+              OT_Doblado : this.doblado,
+              OT_Sellado : this.sellado,
+            });
+            break;
+          }
+        });
+        if (datos[i].presentacion == "UND") presentacion = 'Und';
+        else if (datos[i].presentacion == 'KLS') presentacion = 'Kg';
+        else if (datos[i].presentacion == 'PAQ') presentacion = 'Paquete';
+        this.productoService.GetInfoProducto_Prod_Presentacion(datos[i].id_Producto, presentacion).subscribe(datos_producto => {
+          for (let j = 0; j < datos_producto.length; j++) {
+            let productoExt : any = {
+              Id : datos_producto[j].produ.prod_Id,
+              Nombre : datos_producto[j].produ.prod_Nombre,
+              Ancho : datos_producto[j].produ.prod_Ancho,
+              Fuelle : datos_producto[j].produ.prod_Fuelle,
+              Largo : datos_producto[j].produ.prod_Largo,
+              Cal : datos_producto[j].produ.prod_Calibre,
+              Und : presentacion,
+              Peso_Producto : datos_producto[j].produ.prod_Peso,
+              PesoMillar : datos_producto[j].produ.prod_Peso_Millar,
+              Tipo : datos_producto[j].tipo_Producto,
+              Material : datos_producto[j].material,
+              Pigmento : datos_producto[j].pigmento,
+              CantPaquete : datos_producto[j].produ.prod_CantBolsasPaquete,
+              CantBulto : datos_producto[j].produ.prod_CantBolsasBulto,
+              Cant : parseFloat(datos[i].cant_Pendiente),
+              Cant_Pedida : parseFloat(datos[i].cant_Pendiente),
+              UndCant : presentacion,
+              TipoSellado : datos_producto[j].tipo_Sellado,
+              PrecioUnd : datos[i].precioUnidad,
+              SubTotal : datos[i].costo_Cant_Pendiente,
+              FechaEntrega : datos[i].fecha_Entrega.replace('T00:00:00', ''),
+            }
+            this.ArrayProducto.push(productoExt);
+            this.cantidadCostoProductos += datos[i].costo_Cant_Pendiente;
+          }
+        });
+      }
+    });
+  }
+
   // funcion que consultará la informacion del pedido apra crear la orden de trabajo
   informacionPedido(){
     let pedido : number = this.FormOrdenTrabajo.value.Pedido_Id;
@@ -814,6 +922,19 @@ export class OrdenesTrabajoComponent implements OnInit {
   // Funcion que va buscar, almacenar y mostrar la información de la ultima orden de trabajo para un producto con una presentacion especifica
   consultarInfoProducto(data : any){
     this.informacionSeleccionada = data;
+    this.limpiarFormExtrusion();
+    this.limpiarFormImpresion();
+    this.limpiarFormLaminado();
+    this.limpiarFormCorte();
+    this.limpiarFormSellado();
+    this.limpiarFormMezclas();
+    this.extrusion = false;
+    this.impresion = false;
+    this.rotograbado = false;
+    this.laminado = false;
+    this.sellado = false;
+    this.checkedCorte = false;
+    this.checkedCyrel = false;
     this.cantidadProducto = 0;
     this.valorProducto = 0;
     this.netoKg = 0;
@@ -916,13 +1037,13 @@ export class OrdenesTrabajoComponent implements OnInit {
             Margen : itemOt.ptMargen,
           });
 
-          itemOt.extrusion == '1' ? this.extrusion = true : this.extrusion = false;
-          itemOt.impresion == '1' ? this.impresion = true : this.impresion = false;
-          itemOt.lamiando == '1' ? this.rotograbado = true : this.rotograbado = false;
-          itemOt.laminado2 == '1' ? this.laminado = true : this.laminado = false;
-          itemOt.pterminado == '1' ? this.sellado = true : this.sellado = false;
-          itemOt.corte == '1' ? this.checkedCorte = true : this.checkedCorte = false;
-          itemOt.cyrel == '1' ? this.checkedCyrel = true : this.checkedCyrel = false;
+          itemOt.extrusion.trim() == '1' ? this.extrusion = true : this.extrusion = false;
+          itemOt.impresion.trim() == '1' ? this.impresion = true : this.impresion = false;
+          itemOt.lamiando.trim() == '1' ? this.rotograbado = true : this.rotograbado = false;
+          itemOt.laminado2.trim() == '1' ? this.laminado = true : this.laminado = false;
+          itemOt.pterminado.trim() == '1' ? this.sellado = true : this.sellado = false;
+          itemOt.corte.trim() == '1' ? this.checkedCorte = true : this.checkedCorte = false;
+          itemOt.cyrel.trim() == '1' ? this.checkedCyrel = true : this.checkedCyrel = false;
 
           this.FormOrdenTrabajoExtrusion.patchValue({
             Material_Extrusion : parseInt(itemOt.extMaterial.trim()),
@@ -1036,7 +1157,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     let margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado | this.FormOrdenTrabajoCorte.value.Margen_Corte;
     if (this.checkedCorte) margen_Adicional = this.FormOrdenTrabajoCorte.value.Margen_Corte;
     if (this.sellado) margen_Adicional = this.FormOrdenTrabajoSellado.value.Margen_Sellado;
-    this.FormOrdenTrabajo.patchValue({Margen : margen_Adicional});
+    this.FormOrdenTrabajo.patchValue({ Margen : margen_Adicional });
     if (this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Cms' || this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion == 'Plgs') {
       let ancho1 : number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1;
       let ancho2 : number = this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2;
@@ -1115,114 +1236,41 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que se se ejecurá cuando hayan deseleccionado un producto
   onRowUnselect(){
-    this.FormOrdenTrabajoExtrusion.patchValue({
-      Material_Extrusion : 1,
-      Formato_Extrusion : 1,
-      Pigmento_Extrusion : 1,
-      Ancho_Extrusion1 : 0,
-      Ancho_Extrusion2 : 0,
-      Ancho_Extrusion3 : 0,
-      Calibre_Extrusion : 0,
-      UnidadMedida_Extrusion : '',
-      Tratado_Extrusion : 1,
-      Peso_Extrusion : 0,
-    });
-    this.FormOrdenTrabajoImpresion.patchValue({
-      Tipo_Impresion : 1,
-      Rodillo_Impresion : 0,
-      Pista_Impresion : 0,
-      Tinta_Impresion1 : 'NO APLICA',
-      Tinta_Impresion2 : 'NO APLICA',
-      Tinta_Impresion3 : 'NO APLICA',
-      Tinta_Impresion4 : 'NO APLICA',
-      Tinta_Impresion5 : 'NO APLICA',
-      Tinta_Impresion6 : 'NO APLICA',
-      Tinta_Impresion7 : 'NO APLICA',
-      Tinta_Impresion8 : 'NO APLICA',
-    });
-    this.FormOrdenTrabajoLaminado.patchValue({
-      Capa_Laminado1 : 1,
-      Calibre_Laminado1 : 0,
-      cantidad_Laminado1 : 0,
-      Capa_Laminado2 : 1,
-      Calibre_Laminado2 : 0,
-      cantidad_Laminado2 : 0,
-      Capa_Laminado3 : 1,
-      Calibre_Laminado3 : 0,
-      cantidad_Laminado3 : 0,
-    });
-    this.FormOrdenTrabajoMezclas.patchValue({
-      Id_Mezcla: '',
-      Nombre_Mezclas : '',
-      Chechbox_Capa1 : '',
-      Chechbox_Capa2 : '',
-      Chechbox_Capa3 : '',
-      Proc_Capa1 : 0,
-      Proc_Capa2 : 0,
-      Proc_Capa3 : 0,
-      materialP1_Capa1 : 1,
-      PorcentajeMaterialP1_Capa1 : 0,
-      materialP1_Capa2 : 1,
-      PorcentajeMaterialP1_Capa2 : 0,
-      materialP1_Capa3 : 1,
-      PorcentajeMaterialP1_Capa3 : 0,
-      materialP2_Capa1 : 1,
-      PorcentajeMaterialP2_Capa1 : 0,
-      materialP2_Capa2 : 1,
-      PorcentajeMaterialP2_Capa2 : 0,
-      materialP2_Capa3 : 1,
-      PorcentajeMaterialP2_Capa3 : 0,
-      materialP3_Capa1 : 1,
-      PorcentajeMaterialP3_Capa1 : 0,
-      materialP3_Capa2 : 1,
-      PorcentajeMaterialP3_Capa2 : 0,
-      materialP3_Capa3 : 1,
-      PorcentajeMaterialP3_Capa3 : 0,
-      materialP4_Capa1 : 1,
-      PorcentajeMaterialP4_Capa1 : 0,
-      materialP4_Capa2 : 1,
-      PorcentajeMaterialP4_Capa2 : 0,
-      materialP_Capa3 : 1,
-      PorcentajeMaterialP_Capa3 : 0,
-      MezclaPigmentoP1_Capa1 : 1,
-      PorcentajeMezclaPigmentoP1_Capa1 : 0,
-      MezclaPigmentoP1_Capa2 : 1,
-      PorcentajeMezclaPigmentoP1_Capa2 : 0,
-      MezclaPigmento1_Capa3 : 1,
-      PorcentajeMezclaPigmentoP1_Capa3 :0,
-      MezclaPigmentoP2_Capa1 : 1,
-      PorcentajeMezclaPigmentoP2_Capa1 : 0,
-      MezclaPigmentoP2_Capa2 : 1,
-      PorcentajeMezclaPigmentoP2_Capa2 : 0,
-      MezclaPigmento2_Capa3 : 1,
-      PorcentajeMezclaPigmentoP2_Capa3 : 0,
-    });
-    this.FormOrdenTrabajoCorte.patchValue({
-      Formato_Corte : '',
-      Ancho_Corte : '',
-      Largo_Corte : '',
-      Fuelle_Corte : '',
-      Margen_Corte : '',
-    });
-    this.FormOrdenTrabajoSellado.patchValue({
-      Formato_Sellado : '',
-      Ancho_Sellado : '',
-      Largo_Sellado : '',
-      Fuelle_Sellado : '',
-      Margen_Sellado : '',
-      PesoMillar : 0,
-      TipoSellado : 0,
-      PrecioDia : 0,
-      PrecioNoche : 0,
-      CantidadPaquete : 0,
-      PesoPaquete : 0,
-      CantidadBulto : 0,
-      PesoBulto : 0,
-    });
+    this.limpiarFormExtrusion();
+    this.limpiarFormImpresion();
+    this.limpiarFormLaminado();
+    this.limpiarFormMezclas();
+    this.limpiarFormCorte();
+    this.limpiarFormSellado();
     this.producto = 0;
     this.idMezclaSeleccionada = 0;
     this.nroCapas = 0;
     this.nroCapasOT = 0;
+    this.checkedCyrel = false;
+    this.checkedCorte = false;
+    this.checkedCapa1 = false;
+    this.checkedCapa2 = false;
+    this.checkedCapa3 = false;
+    this.presentacionProducto = '';
+    this.producto = 0;
+    this.idMezclaSeleccionada = 0;
+    this.nroCapas = 0;
+    this.nroCapasOT = 0;
+    this.extrusion = false;
+    this.impresion = false;
+    this.rotograbado = false;
+    this.laminado = false;
+    this.sellado = false;
+    this.cargando = false;
+    this.cantidadProducto = 0;
+    this.valorProducto = 0;
+    this.netoKg = 0;
+    this.valorKg = 0;
+    this.valorOt = 0;
+    this.margenKg = 0;
+    this.pesoPaquete = 0;
+    this.pesoBulto = 0;
+    this.informacionSeleccionada = 0;
   }
 
   // Funcion que va a validar que la información este correcta
@@ -1255,9 +1303,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   //Funcion que va a guardar la información de la orden de trabajo
   guardarOt(){
     let fechaEntrega : any = this.FormOrdenTrabajo.value.OT_FechaEntrega;
-    let ordenTrabajo : any = this.FormOrdenTrabajo.value.OT_Id;
     if (fechaEntrega == null) this.FormOrdenTrabajo.value.OT_FechaEntrega = this.today;
-    if (ordenTrabajo == null) this.FormOrdenTrabajo.value.OT_Id = 309;
 
     this.cargando = true;
     let errorExt : boolean = false, errorImp : boolean = false, errorLam : boolean = false, errorSelCor : boolean = false;
@@ -1298,7 +1344,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         this.limpiarCampos();
       }, 2000);
     }, err => {
-      this.mensajeError(`¡No fue posible crear la Orden de Trabajo!`, err.message);
+      this.mensajeError(`¡No fue posible crear la Orden de Trabajo!`);
       this.cargando = false;
     });
   }
@@ -2704,6 +2750,7 @@ export class OrdenesTrabajoComponent implements OnInit {
   ConsultarOrdenTrabajo(){
     let numeroOT : number = this.FormOrdenTrabajo.value.OT_Id;
     this.limpiarCampos();
+    this.edicionOrdenTrabajo = true;
 
     this.ordenTrabajoService.srvObtenerListaPdfOTInsertada(numeroOT).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
@@ -2722,7 +2769,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Nombre_Vendedor: datos_orden[i].vendedor,
           OT_FechaCreacion: datos_orden[i].fecha_Creacion.replace('T00:00:00', ''),
           OT_FechaEntrega: datos_orden[i].fecha_Entrega.replace('T00:00:00', ''),
-          Id_Sede_Cliente : datos_orden[i].i_SedeCliente,
+          Id_Sede_Cliente : datos_orden[i].id_SedeCliente,
           ID_Cliente: datos_orden[i].id_Cliente,
           Nombre_Cliente: datos_orden[i].cliente,
           Ciudad_SedeCliente: datos_orden[i].ciudad,
@@ -2801,20 +2848,20 @@ export class OrdenesTrabajoComponent implements OnInit {
           cantidad_Laminado3 : datos_orden[i].cantidad_Laminado_Capa3,
         });
         this.FormOrdenTrabajoCorte.patchValue({
-          Formato_Corte : datos_orden[i].id_Formato_Producto,
+          Formato_Corte : datos_orden[i].formato_Producto,
           Ancho_Corte : datos_orden[i].selladoCorte_Ancho,
           Largo_Corte : datos_orden[i].selladoCorte_Largo,
           Fuelle_Corte : datos_orden[i].selladoCorte_Fuelle,
           Margen_Corte : datos_orden[i].margen_Adicional,
         });
         this.FormOrdenTrabajoSellado.patchValue({
-          Formato_Sellado : datos_orden[i].id_Formato_Producto,
+          Formato_Sellado : datos_orden[i].formato_Producto,
           Ancho_Sellado : datos_orden[i].selladoCorte_Ancho,
           Largo_Sellado : datos_orden[i].selladoCorte_Largo,
           Fuelle_Sellado : datos_orden[i].selladoCorte_Fuelle,
           Margen_Sellado : datos_orden[i].margen,
           PesoMillar : datos_orden[i].selladoCorte_PesoMillar,
-          TipoSellado : datos_orden[i].tpSellado_Id,
+          TipoSellado : datos_orden[i].tpSellados_Nombre,
           CantidadPaquete : datos_orden[i].selladoCorte_CantBolsasPaquete,
           CantidadBulto : datos_orden[i].selladoCorte_CantBolsasBulto,
           PrecioDia : datos_orden[i].selladoCorte_PrecioSelladoDia,
@@ -2827,6 +2874,72 @@ export class OrdenesTrabajoComponent implements OnInit {
         this.calcularDatosOt(productoExt);
       }
     }, error => { this.mensajeError(`¡No se ha encontrado una orden de trabajo con el consecutivo ${numeroOT}!`, error.message); });
+  }
+
+  // Funcion que va actualizar con nueva información la orden de trabajo
+  editarOrdenTrabajo(){
+    if (this.edicionOrdenTrabajo) {
+      console.log(this.FormOrdenTrabajo)
+      this.cargando = true;
+      let ot : number = this.FormOrdenTrabajo.value.OT_Id;
+      let info : any = {
+        Ot_Id : ot,
+        SedeCli_Id : this.FormOrdenTrabajo.value.Id_Sede_Cliente,
+        Prod_Id : this.producto,
+        Ot_PesoNetoKg : this.netoKg,
+        Ot_ValorOT : this.valorOt,
+        Ot_MargenAdicional : this.FormOrdenTrabajo.value.Margen,
+        Ot_ValorKg : this.valorKg,
+        Ot_ValorUnidad : this.valorProducto,
+        Ot_FechaCreacion : this.today,
+        Estado_Id : 15,
+        Usua_Id : this.storage_Id,
+        PedExt_Id : parseInt(this.FormOrdenTrabajo.value.Pedido_Id),
+        Ot_Observacion : this.FormOrdenTrabajo.value.OT_Observacion,
+        Ot_Cyrel : this.checkedCyrel,
+        Ot_Corte : this.checkedCorte,
+        Mezcla_Id : this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
+        UndMed_Id : this.presentacionProducto,
+        Ot_Hora : moment().format('H:mm:ss'),
+        Extrusion : this.extrusion,
+        Impresion : this.impresion,
+        Laminado : this.laminado,
+        Rotograbado : this.rotograbado,
+        Sellado : this.sellado,
+        Ot_CantidadPedida : this.cantidadProducto,
+      }
+      this.ordenTrabajoService.srvActualizar(ot, info).subscribe(datos_actualizados => {
+        let errorExt : boolean = false, errorImp : boolean = false, errorLam : boolean = false, errorSelCor : boolean = false;
+        errorExt = this.actualizarOt_Extrusion();
+        errorImp = this.actualizarOT_Impresion();
+        errorLam = this. actualizarOT_Laminado();
+        errorSelCor = this.actualizarOT_Sellado_Corte();
+        setTimeout(() => {
+          if (!errorExt && !errorImp && !errorLam && !errorSelCor) Swal.fire({icon : 'success', title: '¡Actualizado Correctamente!', text: `Se ha realizado la actualización de la Orden de Trabajo N° ${ot}`});
+        }, 1500);
+      }, error => { this.mensajeError(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`); });
+      this.cargando = false;
+    }
+  }
+
+  // Funcion que va a actualizar la tabla "OT_Extrusion"
+  actualizarOt_Extrusion(){
+    return false;
+  }
+
+  // Funcion que va a actualizar la tabla "OT_Impresion"
+  actualizarOT_Impresion(){
+    return false;
+  }
+
+  // Funcion que va a a ctualizar la tabla #OT_Laminado
+  actualizarOT_Laminado(){
+    return false;
+  }
+
+  // Funcion que va a a ctualizar la tabla "OT_Sellado_Corte"
+  actualizarOT_Sellado_Corte(){
+    return false;
   }
 
   //
@@ -3686,6 +3799,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     this.messageService.add({severity:'success', detail: texto } );
   }
 
+  // Funcion que va a deshabilitar los campos del formulario de mezclas, luego habilitará solo los campos de la capa 1
   habilitarCapa1(){
     setTimeout(() => {
       this.formCrearMezclas.disable();
@@ -3708,9 +3822,9 @@ export class OrdenesTrabajoComponent implements OnInit {
       this.formCrearMezclas.get('PorcentajeMezclaPigmentoP2_Capa1').enable();
       this.cambiarNroCapas1();
     }, 300);
-
   }
 
+  // Funcion que va a deshabilitar los campos del formulario de mezclas, luego habilitará solo los campos de la capa 1 y 2
   habilitarCapa2(){
     setTimeout(() => {
       this.formCrearMezclas.disable();
@@ -3748,6 +3862,7 @@ export class OrdenesTrabajoComponent implements OnInit {
     }, 300);
   }
 
+  // Funcion que va a deshabilitar los campos del formulario de mezclas, luego habilitará solo los campos de la capa 1, 2 y 3
   habilitarCapa3(){
     setTimeout(() => {
       this.formCrearMezclas.disable();
@@ -3797,6 +3912,4 @@ export class OrdenesTrabajoComponent implements OnInit {
       this.cambiarNroCapas3();
     }, 300);
   }
-
-
 }

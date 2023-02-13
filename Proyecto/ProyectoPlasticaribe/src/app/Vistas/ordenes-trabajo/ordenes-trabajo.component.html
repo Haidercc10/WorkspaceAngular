@@ -44,9 +44,9 @@
 
           <!-- Nro. Pedido -->
           <div class="form-floating col-md">
-            <input formControlName="Pedido_Id" class="form-control" list="Pedidos" id="floatingInput" title="Pedidos" (change)="informacionPedido()" required autocomplete="off">
+            <input formControlName="Pedido_Id" class="form-control" list="Pedidos" id="floatingInput" title="Pedidos" (change)="validarPedido()" required autocomplete="off">
             <datalist id="Pedidos">
-              <option value={{item.id_Pedido}} *ngFor="let item of pedidosSinOT">{{item.nombre_Cliente}} - {{item.fecha_Entrega | date : 'yyyy-MM-dd'}}</option>
+              <option value={{item.id_Pedido}} *ngFor="let item of pedidosSinOT">{{item.nombre_Cliente}} - N° de Productos {{item.cantidad_Productos | number}}</option>
             </datalist>
             <label for="floatingInput">Pedidos</label>
           </div>
@@ -759,7 +759,6 @@
               </form>
             </div>
 
-            <!-- Mezclas -->
             <div class="tab-pane fade" id="Mezclas" role="tabpanel" aria-labelledby="Mezclas-tab">
 
               <!--Boton para llamar el modal de crear mezclas-->
@@ -1717,7 +1716,8 @@
           <!-- Fila 5, Inicio Botones -->
           <div class="bajarPagina">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="validarDatos()">Crear Orden de Trabajo</button>
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="validarDatos()" *ngIf="!edicionOrdenTrabajo">Crear Orden de Trabajo</button>
+              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="editarOrdenTrabajo()" *ngIf="edicionOrdenTrabajo">Editar Orden de Trabajo</button>
               <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
               <button class=" btn btn-danger btn-danger-sm" type="button" (click)="pdfOrdenTrabajo()">Ver PDF <i class="pi pi-file-pdf"></i></button>
             </div>
