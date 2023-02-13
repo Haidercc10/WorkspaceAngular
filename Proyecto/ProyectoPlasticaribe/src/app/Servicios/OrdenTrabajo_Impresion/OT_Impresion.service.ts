@@ -29,6 +29,10 @@ export class OT_ImpresionService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/OT_Impresion/${dato}`);
   }
 
+  GetOT_Impresion(ot : number) {
+    return this.http.get<any>(rutaPlasticaribeAPI + `/OT_Impresion/getOT_Impresion/${ot}`);
+  }
+
   //Metodo actualzar
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/OT_Impresion/${id}`, data);

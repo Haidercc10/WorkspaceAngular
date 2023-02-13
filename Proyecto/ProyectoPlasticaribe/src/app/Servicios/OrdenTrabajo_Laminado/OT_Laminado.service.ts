@@ -29,6 +29,10 @@ export class OT_LaminadoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/OT_Laminado/${dato}`);
   }
 
+  GetOT_Laminado(ot : number) {
+    return this.http.get<any>(rutaPlasticaribeAPI + `/OT_Laminado/getOT_Laminado/${ot}`);
+  }
+
   //Metodo actualzar
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/OT_Laminado/${id}`, data);

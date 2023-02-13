@@ -32,6 +32,10 @@ export class OrdenTrabajo_Sellado_CorteService {
     return this.http.get<any>(rutaPlasticaribeAPI + `/OT_SelladoCorte/getTipoSellado_Formato/${tipoSellado}/${formato}`);
   }
 
+  GetOT_SelladoCorte(ot : number) {
+    return this.http.get<any>(rutaPlasticaribeAPI + `/OT_SelladoCorte/getOT_Sellado_Corte/${ot}`);
+  }
+
   //Metodo actualzar
   put(id:number|string, data:any) {
     return this.http.put(rutaPlasticaribeAPI + `/OT_SelladoCorte/${id}`, data);

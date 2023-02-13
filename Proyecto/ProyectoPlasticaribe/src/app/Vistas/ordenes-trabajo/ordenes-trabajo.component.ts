@@ -2809,6 +2809,8 @@ export class OrdenesTrabajoComponent implements OnInit {
           SubTotal : datos_orden[i].precio_Producto * datos_orden[i].cantidad_Pedida,
           FechaEntrega : datos_orden[i].fecha_Entrega.replace('T00:00:00', ''),
         }
+        this.producto = datos_orden[i].id_Producto;
+        this.presentacionProducto = datos_orden[i].id_Presentacion;
         this.ArrayProducto.push(productoExt);
         this.cantidadCostoProductos = productoExt.SubTotal;
 
@@ -2876,69 +2878,248 @@ export class OrdenesTrabajoComponent implements OnInit {
     }, error => { this.mensajeError(`¡No se ha encontrado una orden de trabajo con el consecutivo ${numeroOT}!`, error.message); });
   }
 
+  // Funcion que va a validar que si se desee actualizar la orden de trabajo
+  validarActualizacionOT(){
+    if (this.FormOrdenTrabajo.valid) {
+      let ot : number = this.FormOrdenTrabajo.value.OT_Id;
+      if (!this.extrusion) this.limpiarFormExtrusion();
+      if (!this.impresion && !this.rotograbado) this.limpiarFormImpresion();
+      if (!this.laminado) this.limpiarFormLaminado();
+      if (!this.checkedCorte) this.limpiarFormCorte();
+      if (!this.sellado) this.limpiarFormSellado();
+      if (!this.FormOrdenTrabajoMezclas.valid) this.limpiarFormMezclas();
+
+      setTimeout(() => {
+        if (this.FormOrdenTrabajoExtrusion.valid) {
+          if (this.FormOrdenTrabajoImpresion.valid) {
+            if (this.FormOrdenTrabajoLaminado.valid) {
+              if (this.FormOrdenTrabajoCorte.valid) {
+                if (this.FormOrdenTrabajoSellado.valid) {
+                  if (this.FormOrdenTrabajoMezclas.valid) {
+                    Swal.fire({
+                      icon: 'info',
+                      title: 'Confirmación de Edición de OT',
+                      html:`<spam>¿Esta seguro de editar la información de la Orden de Trabajo N° ${ot}?</spam>
+                      <br> <b>¡Al hacer esto no se recuperarán los datos iniciales!</b>`,
+                      showDenyButton: true,
+                      confirmButtonText: `Editar Orden de Trabajo`,
+                      denyButtonText: `Seguir Editando`,
+                    }).then((result) => {
+                      if (result.isConfirmed) this.editarOrdenTrabajo();
+                      else if (result.isDenied) {
+                        const Toast = Swal.mixin({
+                          toast: true, position: 'center', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+                          didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer);
+                            toast.addEventListener('mouseleave', Swal.resumeTimer);
+                          }
+                        });
+                        Toast.fire({ icon: 'info', title: 'Puede seguir editando la Orden de Trabajo' });
+                      }
+                    });
+                  } else this.mensajeAdvertencia(`¡El formulario de Mezclas tiene campos vacios!`);
+                } else this.mensajeAdvertencia(`¡El formulario de Sellado tiene campos vacios!`);
+              } else this.mensajeAdvertencia(`¡El formulario de Corte tiene campos vacios!`);
+            } else this.mensajeAdvertencia(`¡EL formulario de Laminado tiene campos vacios!`);
+          } else this.mensajeAdvertencia(`¡El formulario de Impresion tiene campos vacios!`);
+        } else this.mensajeAdvertencia(`¡EL formulario de Extrusion tiene campos vacios!`);
+      }, 700);
+    } else this.mensajeAdvertencia(`¡Hay campos del formulario vacios!`);
+  }
+
   // Funcion que va actualizar con nueva información la orden de trabajo
   editarOrdenTrabajo(){
     if (this.edicionOrdenTrabajo) {
-      console.log(this.FormOrdenTrabajo)
       this.cargando = true;
       let ot : number = this.FormOrdenTrabajo.value.OT_Id;
-      let info : any = {
-        Ot_Id : ot,
-        SedeCli_Id : this.FormOrdenTrabajo.value.Id_Sede_Cliente,
-        Prod_Id : this.producto,
-        Ot_PesoNetoKg : this.netoKg,
-        Ot_ValorOT : this.valorOt,
-        Ot_MargenAdicional : this.FormOrdenTrabajo.value.Margen,
-        Ot_ValorKg : this.valorKg,
-        Ot_ValorUnidad : this.valorProducto,
-        Ot_FechaCreacion : this.today,
-        Estado_Id : 15,
-        Usua_Id : this.storage_Id,
-        PedExt_Id : parseInt(this.FormOrdenTrabajo.value.Pedido_Id),
-        Ot_Observacion : this.FormOrdenTrabajo.value.OT_Observacion,
-        Ot_Cyrel : this.checkedCyrel,
-        Ot_Corte : this.checkedCorte,
-        Mezcla_Id : this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
-        UndMed_Id : this.presentacionProducto,
-        Ot_Hora : moment().format('H:mm:ss'),
-        Extrusion : this.extrusion,
-        Impresion : this.impresion,
-        Laminado : this.laminado,
-        Rotograbado : this.rotograbado,
-        Sellado : this.sellado,
-        Ot_CantidadPedida : this.cantidadProducto,
-      }
-      this.ordenTrabajoService.srvActualizar(ot, info).subscribe(datos_actualizados => {
-        let errorExt : boolean = false, errorImp : boolean = false, errorLam : boolean = false, errorSelCor : boolean = false;
-        errorExt = this.actualizarOt_Extrusion();
-        errorImp = this.actualizarOT_Impresion();
-        errorLam = this. actualizarOT_Laminado();
-        errorSelCor = this.actualizarOT_Sellado_Corte();
-        setTimeout(() => {
-          if (!errorExt && !errorImp && !errorLam && !errorSelCor) Swal.fire({icon : 'success', title: '¡Actualizado Correctamente!', text: `Se ha realizado la actualización de la Orden de Trabajo N° ${ot}`});
-        }, 1500);
-      }, error => { this.mensajeError(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`); });
-      this.cargando = false;
+      this.ordenTrabajoService.srvObtenerListaPorId(ot).subscribe(datos_Orden => {
+        let info : any = {
+          Ot_Id : ot,
+          SedeCli_Id : this.FormOrdenTrabajo.value.Id_Sede_Cliente,
+          Prod_Id : this.producto,
+          Ot_PesoNetoKg : this.netoKg,
+          Ot_ValorOT : this.valorOt,
+          Ot_MargenAdicional : this.FormOrdenTrabajo.value.Margen,
+          Ot_ValorKg : this.valorKg,
+          Ot_ValorUnidad : this.valorProducto,
+          Ot_FechaCreacion : datos_Orden.ot_FechaCreacion,
+          Estado_Id : 15,
+          Usua_Id : this.storage_Id,
+          PedExt_Id : parseInt(this.FormOrdenTrabajo.value.Pedido_Id),
+          Ot_Observacion : this.FormOrdenTrabajo.value.OT_Observacion,
+          Ot_Cyrel : this.checkedCyrel,
+          Ot_Corte : this.checkedCorte,
+          Mezcla_Id : this.FormOrdenTrabajoMezclas.value.Id_Mezcla,
+          UndMed_Id : this.presentacionProducto,
+          Ot_Hora : datos_Orden.ot_Hora,
+          Extrusion : this.extrusion,
+          Impresion : this.impresion,
+          Laminado : this.laminado,
+          Rotograbado : this.rotograbado,
+          Sellado : this.sellado,
+          Ot_CantidadPedida : this.cantidadProducto,
+        }
+        this.ordenTrabajoService.srvActualizar(ot, info).subscribe(datos_actualizados => {
+          let errorExt : boolean, errorImp : boolean, errorLam : boolean, errorSelCor : boolean;
+          errorExt = this.actualizarOt_Extrusion(ot);
+          errorImp = this.actualizarOT_Impresion(ot);
+          errorLam = this. actualizarOT_Laminado(ot);
+          errorSelCor = this.actualizarOT_Sellado_Corte(ot);
+          setTimeout(() => {
+            if (!errorExt && !errorImp && !errorLam && !errorSelCor) {
+              Swal.fire({icon : 'success', title: '¡Actualizado Correctamente!', text: `Se ha realizado la actualización de la Orden de Trabajo N° ${ot}`});
+              this.limpiarCampos();
+            }
+          }, 1500);
+        }, error => { this.mensajeError(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`); });
+      }, error => { this.mensajeError(`No se pudo obtener información de la Orden de Trabajo N° ${ot}`); });
     }
   }
 
   // Funcion que va a actualizar la tabla "OT_Extrusion"
-  actualizarOt_Extrusion(){
+  actualizarOt_Extrusion(ot : number) : any {
+    this.otExtrusionServie.GetOT_Extrusion(ot).subscribe(datos_extrusion => {
+      for (let i = 0; i < datos_extrusion.length; i++) {
+        let infoOTExt : any = {
+          Extrusion_Id : datos_extrusion[i].extrusion_Id,
+          Ot_Id : ot,
+          Material_Id : this.FormOrdenTrabajoExtrusion.value.Material_Extrusion,
+          Formato_Id : this.FormOrdenTrabajoExtrusion.value.Formato_Extrusion,
+          Pigmt_Id : this.FormOrdenTrabajoExtrusion.value.Pigmento_Extrusion,
+          Extrusion_Calibre : this.FormOrdenTrabajoExtrusion.value.Calibre_Extrusion,
+          Extrusion_Ancho1 : this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion1,
+          Extrusion_Ancho2 : this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion2,
+          Extrusion_Ancho3 : this.FormOrdenTrabajoExtrusion.value.Ancho_Extrusion3,
+          UndMed_Id : this.FormOrdenTrabajoExtrusion.value.UnidadMedida_Extrusion,
+          Tratado_Id : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
+          Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
+        }
+        this.otExtrusionServie.srvActualizar(datos_extrusion[i].extrusion_Id, infoOTExt).subscribe(datos_otExtrusion => { }, error => {
+          this.mensajeError(`¡No se actualizó la información de la OT en el área de 'Extrusión'!`, error.message);
+          return true;
+        });
+      }
+    }, error => {
+      this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`);
+      return true;
+    });
     return false;
   }
 
   // Funcion que va a actualizar la tabla "OT_Impresion"
-  actualizarOT_Impresion(){
+  actualizarOT_Impresion(ot : number) : any {
+    this.otImpresionService.GetOT_Impresion(ot).subscribe(datos_Impresion => {
+      for (let i = 0; i < datos_Impresion.length; i++) {
+        let rodilloImpresion : any = this.FormOrdenTrabajoImpresion.value.Rodillo_Impresion;
+        let pistaImpresion : any = this.FormOrdenTrabajoImpresion.value.Pista_Impresion;
+        let tinta1Impresion : any = this.FormOrdenTrabajoImpresion.value.Tinta_Impresion1;
+        let tinta2Impresion : any = this.FormOrdenTrabajoImpresion.value.Tinta_Impresion2;
+        let tinta3Impresion : any = this.FormOrdenTrabajoImpresion.value.Tinta_Impresion3;
+        let tinta4Impresion : any = this.FormOrdenTrabajoImpresion.value.Tinta_Impresion4;
+        let tinta5Impresion : any = this.FormOrdenTrabajoImpresion.value.Tinta_Impresion5;
+        let tinta6Impresion : any = this.FormOrdenTrabajoImpresion.value.Tinta_Impresion6;
+        let tinta7Impresion : any = this.FormOrdenTrabajoImpresion.value.Tinta_Impresion7;
+        let tinta8Impresion : any = this.FormOrdenTrabajoImpresion.value.Tinta_Impresion8;
+        this.servicioTintas.srvObtenerListaConsultaImpresion(tinta1Impresion, tinta2Impresion, tinta3Impresion, tinta4Impresion, tinta5Impresion, tinta6Impresion, tinta7Impresion, tinta8Impresion).subscribe(datos_impresion => {
+          for (let j = 0; j < datos_impresion.length; j++) {
+            let infoOTImp : any = {
+              Impresion_Id : datos_Impresion[i].impresion_Id,
+              Ot_Id : ot,
+              TpImpresion_Id : this.FormOrdenTrabajoImpresion.value.Tipo_Impresion,
+              Rodillo_Id : rodilloImpresion,
+              Pista_Id : pistaImpresion,
+              Tinta1_Id : datos_impresion[j].tinta_Id1,
+              Tinta2_Id : datos_impresion[j].tinta_Id2,
+              Tinta3_Id : datos_impresion[j].tinta_Id3,
+              Tinta4_Id : datos_impresion[j].tinta_Id4,
+              Tinta5_Id : datos_impresion[j].tinta_Id5,
+              Tinta6_Id : datos_impresion[j].tinta_Id6,
+              Tinta7_Id : datos_impresion[j].tinta_Id7,
+              Tinta8_Id : datos_impresion[j].tinta_Id8,
+            }
+            this.otImpresionService.srvActualizar(datos_Impresion[i].impresion_Id, infoOTImp).subscribe(datos_otImpresion => { }, error => {
+              this.mensajeError(`¡No se actualizó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.message);
+              return true;
+            });
+          }
+        }, error => {
+          this.mensajeError(`¡No se encontrarón las tintas seleccionadas en el proceso de impresión!`);
+          return true;
+        });
+      }
+    }, error => {
+      this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`);
+      return true;
+    });
     return false;
   }
 
   // Funcion que va a a ctualizar la tabla #OT_Laminado
-  actualizarOT_Laminado(){
+  actualizarOT_Laminado(ot : number){
+    this.otLaminadoService.GetOT_Laminado(ot).subscribe(datos_laminado => {
+      for (let i = 0; i < datos_laminado.length; i++) {
+        let infoOTLam : any = {
+          LamCapa_Id : datos_laminado[i].lamCapa_Id,
+          OT_Id : ot,
+          Capa_Id1 : this.FormOrdenTrabajoLaminado.value.Capa_Laminado1,
+          Capa_Id2 : this.FormOrdenTrabajoLaminado.value.Capa_Laminado2,
+          Capa_Id3 : this.FormOrdenTrabajoLaminado.value.Capa_Laminado3,
+          LamCapa_Calibre1 : this.FormOrdenTrabajoLaminado.value.Calibre_Laminado1,
+          LamCapa_Calibre2 : this.FormOrdenTrabajoLaminado.value.Calibre_Laminado2,
+          LamCapa_Calibre3 : this.FormOrdenTrabajoLaminado.value.Calibre_Laminado3,
+          LamCapa_Cantidad1 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado1,
+          LamCapa_Cantidad2 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
+          LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
+        }
+        this.otLaminadoService.srvActualizar(datos_laminado[i].lamCapa_Id, infoOTLam).subscribe(datos_laminado => { }, error => {
+          this.mensajeError(`¡No se actualizó la información de la OT en el área de 'Laminado'!`, error.message);
+          return true;
+        });
+      }
+    }, error => {
+      this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`);
+      return true;
+    });
     return false;
   }
 
   // Funcion que va a a ctualizar la tabla "OT_Sellado_Corte"
-  actualizarOT_Sellado_Corte(){
+  actualizarOT_Sellado_Corte(ot : number){
+    this.otSelladoCorteService.GetOT_SelladoCorte(ot).subscribe(datos_ot => {
+      for (let i = 0; i < datos_ot.length; i++) {
+        let tipoSellado : string = this.FormOrdenTrabajoSellado.value.TipoSellado, formato : string = this.FormOrdenTrabajoSellado.value.Formato_Sellado;
+        this.otSelladoCorteService.getTipoSellado_Formato(tipoSellado, formato).subscribe(datos => {
+          let info : any = {
+            SelladoCorte_Id : datos_ot[i].selladoCorte_Id,
+            Ot_Id : ot,
+            Corte :  this.checkedCorte,
+            Sellado :  this.sellado,
+            Formato_Id : datos.tpProd_Id,
+            SelladoCorte_Ancho : this.FormOrdenTrabajoSellado.value.Ancho_Sellado,
+            SelladoCorte_Largo : this.FormOrdenTrabajoSellado.value.Largo_Sellado,
+            SelladoCorte_Fuelle : this.FormOrdenTrabajoSellado.value.Fuelle_Sellado,
+            SelladoCorte_PesoMillar : this.FormOrdenTrabajoSellado.value.PesoMillar,
+            TpSellado_Id : datos.tpSellado_Id,
+            SelladoCorte_PrecioSelladoDia : this.FormOrdenTrabajoSellado.value.PrecioDia,
+            SelladoCorte_PrecioSelladoNoche : this.FormOrdenTrabajoSellado.value.PrecioNoche,
+            SelladoCorte_CantBolsasPaquete : this.FormOrdenTrabajoSellado.value.CantidadPaquete,
+            SelladoCorte_CantBolsasBulto : this.FormOrdenTrabajoSellado.value.CantidadBulto,
+            SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
+            SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
+          }
+          this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(datos => { }, error => {
+            this.mensajeError(`¡No se actualizó la información de la OT en el área de 'Sellado' o 'Corte'!`, error.message);
+            return true;
+          });
+        }, error => {
+          this.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.message);
+          return true;
+        });
+      }
+    }, error => {
+      this.mensajeError(`¡No se ha encontrado información de la OT N° ${ot}!`);
+      return true;
+    });
     return false;
   }
 
@@ -3131,6 +3312,7 @@ export class OrdenesTrabajoComponent implements OnInit {
 
   // Funcion que devolverá un mensaje de error con la informacion que se le envie
   mensajeError(text : string, error : string = ''){
+    this.cargando = false;
     Swal.fire({icon : 'error', title: 'Opps...', html: `<b>${text}</b>` + `<span style="#f00">${error}</span>`});
   }
 

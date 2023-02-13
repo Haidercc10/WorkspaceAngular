@@ -25,6 +25,10 @@ export class OT_ExtrusionService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/OT_Extrusion');
   }
 
+  GetOT_Extrusion(ot : number) {
+    return this.http.get<any>(rutaPlasticaribeAPI + `/OT_Extrusion/getOT_Extrusion/${ot}`);
+  }
+
   srvObtenerListaPorId(dato : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/OT_Extrusion/${dato}`);
   }
