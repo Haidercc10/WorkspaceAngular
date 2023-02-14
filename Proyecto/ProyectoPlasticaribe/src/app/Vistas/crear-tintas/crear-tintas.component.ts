@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
@@ -22,8 +21,7 @@ export class CrearTintasComponent implements OnInit {
   informacion : string = '';
 
   /** Inyeccion httpClient y servicios */
-  constructor(private http : HttpClient,
-              private frmBuilderCT : FormBuilder,
+  constructor(private frmBuilderCT : FormBuilder,
                 private servicioUnidadMedida : UnidadMedidaService,
                   private servicioTintas : TintasService,
                     private categoriasService : CategoriaMateriaPrimaService,) {
@@ -68,7 +66,6 @@ export class CrearTintasComponent implements OnInit {
   agregarTintas(){
     let bodegaId : number = 5; /** Variable del tipo de bodega de tintas */
     let cantidadTinta : number = 0; /** cantidad de tinta inicializada en 0*/
-    let CodigoHexa : string = '';
 
     if(this.formularioTintas.valid){
       const datosTintas : modelTintas = {
@@ -105,7 +102,7 @@ export class CrearTintasComponent implements OnInit {
   /** Limpia todos los campos */
   limpiarCampos(){
     this.tintaCreada = false;
-    this.formularioTintas = this.frmBuilderCT.group({
+    this.formularioTintas.patchValue({
       TintaNombre : null,
       TintaDescripcion : null,
       TintaCodigoHexa: '',

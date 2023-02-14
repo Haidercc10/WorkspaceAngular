@@ -1,25 +1,11 @@
-import { Component, Inject, Injectable, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, Injectable, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { AreaService } from 'src/app/Servicios/Areas/area.service';
-import { AsignacionMPService } from 'src/app/Servicios/Asignacion_MateriaPrima/asignacionMP.service';
-import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
-import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
-import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
-import { FactuaMpCompradaService } from 'src/app/Servicios/FacturaMateriaPrima/facturaMpComprada.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { MpProveedorService } from 'src/app/Servicios/MateriaPrima_Proveedor/MpProveedor.service';
-import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
-import { TipoEstadosService } from 'src/app/Servicios/TipoEstado/tipo-estados.service';
-import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
-import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -44,24 +30,11 @@ export class CrearMateriaprimaComponent implements OnInit {
   informacion : string = '';
 
   constructor(private materiaPrimaService : MateriaPrimaService,
-    private categoriMpService : CategoriaMateriaPrimaService,
-      private tipoBodegaService : TipoBodegaService,
-        private unidadMedidaService : UnidadMedidaService,
-          private estadoService : EstadosService,
-            private tipoEstadoService : TipoEstadosService,
-              private usuarioService : UsuarioService,
-                private procesosService : ProcesosService,
-                  private areasService : AreaService,
-                    private rolService : RolesService,
-                      private frmBuilderMateriaPrima : FormBuilder,
-                        @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                          private proveedorservices : ProveedorService,
-                            private proveedorMPService : MpProveedorService,
-                              private facturaMpComService : FactuaMpCompradaService,
-                                private facturaMpService : FacturaMpService,
-                                    private asignacionMPService : AsignacionMPService,
-                                      private detallesAsignacionService : DetallesAsignacionService,
-                                        private bagProServices : BagproService,) {
+                private categoriMpService : CategoriaMateriaPrimaService,
+                  private unidadMedidaService : UnidadMedidaService,
+                    private frmBuilderMateriaPrima : FormBuilder,
+                      private proveedorservices : ProveedorService,
+                        private proveedorMPService : MpProveedorService,) {
 
     this.materiPrima = this.frmBuilderMateriaPrima.group({
       mpNombre: ['', Validators.required],
@@ -117,25 +90,15 @@ export class CrearMateriaprimaComponent implements OnInit {
     let nombreMateriaPrima : string = this.materiPrima.value.mpNombre;
     let descripcionMateriaPrima : string = this.materiPrima.value.mpDescripcion;
     let stockMateriaPrima : number = 0;
-    let undMed : string = 'Kg';
     let categoriaMateriaPrima : number = this.materiPrima.value.mpCategoria;
     let precioMateriaPrima : number = this.materiPrima.value.mpValor;
-    let bodega : number = 4;
-    let proveedor : number = this.materiPrima.value.mpProveedor;
 
-    this.CreacionMateriaPrima(nombreMateriaPrima, descripcionMateriaPrima, stockMateriaPrima, undMed, categoriaMateriaPrima, precioMateriaPrima, bodega, proveedor);
+    this.CreacionMateriaPrima(nombreMateriaPrima, descripcionMateriaPrima, stockMateriaPrima, categoriaMateriaPrima, precioMateriaPrima);
     this.materiPrima.reset();
   }
 
   //Funacion que crea una materia prima y la guarda en la base de datos
-  CreacionMateriaPrima(nombreMateriaPrima : string,
-    descripcionMateriaPrima : string,
-    stockMateriaPrima : number,
-    undMed : any,
-    categoriaMateriaPrima : number,
-    precioMateriaPrima : number,
-    proveedor : number,
-    bodega : any){
+  CreacionMateriaPrima(nombreMateriaPrima : string, descripcionMateriaPrima : string, stockMateriaPrima : number, categoriaMateriaPrima : number, precioMateriaPrima : number){
 
     const datosMP : any = {
       MatPri_Nombre : nombreMateriaPrima,
@@ -157,7 +120,6 @@ export class CrearMateriaprimaComponent implements OnInit {
       this.informacion = `¡Fallo al crear la materia prima! \n\n ${error.message}`;
     });
   }
-
 
   //Funcion qu creará la relacion de materia prima y proveedores
   creacionMpProveedor(idMateriaPrima : number, proveedor : number){

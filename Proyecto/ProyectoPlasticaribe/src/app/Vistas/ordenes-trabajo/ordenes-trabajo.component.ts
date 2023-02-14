@@ -680,7 +680,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           PorcentajeMezclaPigmentoP2_Capa3 : datos_mezcla.mezcla_PorcentajePigmto2_Capa3,
         });
       }, 300);
-    }, error => {
+    }, () => {
       this.mezclasService.getMezclaNombre(this.FormOrdenTrabajoMezclas.value.Nombre_Mezclas.replace('%', '%25')).subscribe(datos_mezcla => {
         this.nroCapasOT = datos_mezcla.mezcla_NroCapas;
         setTimeout(() => {
@@ -1023,7 +1023,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         this.FormOrdenTrabajoMezclas.get('Nombre_Mezclas').enable();
         this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
       }, 1000);
-    }, error => {
+    }, () => {
       let presentacion : string = data.UndCant;
       if (presentacion == 'Kg') presentacion = 'Kilo';
       else if (presentacion == 'Und') presentacion = 'Unidad';
@@ -1148,7 +1148,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             this.FormOrdenTrabajoMezclas.get('Id_Mezcla').enable();
           }, 1000);
         }
-      }, error => { this.mensajeAdvertencia(`No se encuentra una Orden de Trabajo anterior para el producto ${data.Id} y presentación ${presentacion}`); });
+      }, () => { this.mensajeAdvertencia(`No se encuentra una Orden de Trabajo anterior para el producto ${data.Id} y presentación ${presentacion}`); });
     });
   }
 
@@ -1343,7 +1343,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         if (!errorExt && !errorImp && !errorLam && !errorSelCor) Swal.fire({icon: 'success', title: '¡Orden de Trabajo Creada!', text: `Se ha creado la de trabajo N°${datos_ot.ot_Id}`});
         this.limpiarCampos();
       }, 2000);
-    }, err => {
+    }, () => {
       this.mensajeError(`¡No fue posible crear la Orden de Trabajo!`);
       this.cargando = false;
     });
@@ -1364,7 +1364,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       Tratado_Id : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
       Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
     }
-    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(datos_otExtrusion => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.message); });
+    this.otExtrusionServie.srvGuardar(infoOTExt).subscribe(() => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Extrusión'!`, error.message); });
     return false;
   }
 
@@ -1396,7 +1396,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Tinta7_Id : datos_impresion[j].tinta_Id7,
           Tinta8_Id : datos_impresion[j].tinta_Id8,
         }
-        this.otImpresionService.srvGuardar(infoOTImp).subscribe(datos_otImpresion => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.message); });
+        this.otImpresionService.srvGuardar(infoOTImp).subscribe(() => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.message); });
       }
     });
     return false;
@@ -1416,7 +1416,7 @@ export class OrdenesTrabajoComponent implements OnInit {
       LamCapa_Cantidad2 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
       LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
     }
-    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(datos_laminado => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.message); });
+    this.otLaminadoService.srvGuardar(infoOTLam).subscribe(() => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Laminado'!`, error.message); });
     return false;
   }
 
@@ -1441,7 +1441,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
         SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
       }
-      this.otSelladoCorteService.post(info).subscribe(datos => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.message); });
+      this.otSelladoCorteService.post(info).subscribe(() => { return true; }, error => { this.mensajeError(`¡No se guardó información de la OT en el área de 'Sellado' o 'Corte'!`, error.message); });
     }, error => { this.mensajeError(`¡No se pudo obtener informacón del Formato y Tipo de Sellado Selecionados para el área de Sellado!`, error.message); });
     return false;
   }
@@ -1476,7 +1476,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Prod_Peso_Paquete : 0,
           Prod_Peso_Bulto : 0,
         }
-        this.productoService.PutEstadoProducto(producto, info).subscribe(datos_Producto => { }, error => {
+        this.productoService.PutEstadoProducto(producto, info).subscribe(() => { }, error => {
           Swal.fire({icon: 'error', title: 'Opps...', html: `<b>¡No fue posible actualizar el estado del producto ${producto}!</b><br><span style="color: #F00">${error.message}</span>`})
         });
       }
@@ -1498,7 +1498,7 @@ export class OrdenesTrabajoComponent implements OnInit {
         Cli_Fecha : datos_cliente.cli_Fecha,
         Cli_Hora : datos_cliente.cli_Hora,
       }
-      this.clienteServise.PutEstadoCliente(cliente, info).subscribe(datos => { }, error => { this.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.message); });
+      this.clienteServise.PutEstadoCliente(cliente, info).subscribe(() => { }, error => { this.mensajeError(`No fue posible actualizar el estado del cliente con el Id ${cliente}`, error.message); });
     }, error => { this.mensajeError(`El cliente con el Id ${cliente} no se ha encontrado!`, error.message) });
   }
 
@@ -2959,7 +2959,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           Sellado : this.sellado,
           Ot_CantidadPedida : this.cantidadProducto,
         }
-        this.ordenTrabajoService.srvActualizar(ot, info).subscribe(datos_actualizados => {
+        this.ordenTrabajoService.srvActualizar(ot, info).subscribe(() => {
           let errorExt : boolean, errorImp : boolean, errorLam : boolean, errorSelCor : boolean;
           errorExt = this.actualizarOt_Extrusion(ot);
           errorImp = this.actualizarOT_Impresion(ot);
@@ -2971,8 +2971,8 @@ export class OrdenesTrabajoComponent implements OnInit {
               this.limpiarCampos();
             }
           }, 1500);
-        }, error => { this.mensajeError(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`); });
-      }, error => { this.mensajeError(`No se pudo obtener información de la Orden de Trabajo N° ${ot}`); });
+        }, () => { this.mensajeError(`¡No fue posible actualizar la Orden de Trabajo N° ${ot}!`); });
+      }, () => { this.mensajeError(`No se pudo obtener información de la Orden de Trabajo N° ${ot}`); });
     }
   }
 
@@ -2994,12 +2994,12 @@ export class OrdenesTrabajoComponent implements OnInit {
           Tratado_Id : this.FormOrdenTrabajoExtrusion.value.Tratado_Extrusion,
           Extrusion_Peso : this.FormOrdenTrabajoExtrusion.value.Peso_Extrusion,
         }
-        this.otExtrusionServie.srvActualizar(datos_extrusion[i].extrusion_Id, infoOTExt).subscribe(datos_otExtrusion => { }, error => {
+        this.otExtrusionServie.srvActualizar(datos_extrusion[i].extrusion_Id, infoOTExt).subscribe(() => { }, error => {
           this.mensajeError(`¡No se actualizó la información de la OT en el área de 'Extrusión'!`, error.message);
           return true;
         });
       }
-    }, error => {
+    }, () => {
       this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`);
       return true;
     });
@@ -3037,17 +3037,17 @@ export class OrdenesTrabajoComponent implements OnInit {
               Tinta7_Id : datos_impresion[j].tinta_Id7,
               Tinta8_Id : datos_impresion[j].tinta_Id8,
             }
-            this.otImpresionService.srvActualizar(datos_Impresion[i].impresion_Id, infoOTImp).subscribe(datos_otImpresion => { }, error => {
+            this.otImpresionService.srvActualizar(datos_Impresion[i].impresion_Id, infoOTImp).subscribe(() => { }, error => {
               this.mensajeError(`¡No se actualizó información de la OT en el área de 'Impresión' y 'Rotograbado'!`, error.message);
               return true;
             });
           }
-        }, error => {
+        }, () => {
           this.mensajeError(`¡No se encontrarón las tintas seleccionadas en el proceso de impresión!`);
           return true;
         });
       }
-    }, error => {
+    }, () => {
       this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`);
       return true;
     });
@@ -3071,12 +3071,12 @@ export class OrdenesTrabajoComponent implements OnInit {
           LamCapa_Cantidad2 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado2,
           LamCapa_Cantidad3 : this.FormOrdenTrabajoLaminado.value.cantidad_Laminado3,
         }
-        this.otLaminadoService.srvActualizar(datos_laminado[i].lamCapa_Id, infoOTLam).subscribe(datos_laminado => { }, error => {
+        this.otLaminadoService.srvActualizar(datos_laminado[i].lamCapa_Id, infoOTLam).subscribe(() => { }, error => {
           this.mensajeError(`¡No se actualizó la información de la OT en el área de 'Laminado'!`, error.message);
           return true;
         });
       }
-    }, error => {
+    }, () => {
       this.mensajeError(`¡No se encontró información de la OT N° ${ot}!`);
       return true;
     });
@@ -3107,7 +3107,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             SelladoCorte_PesoPaquete : this.FormOrdenTrabajoSellado.value.PesoPaquete,
             SelladoCorte_PesoBulto : this.FormOrdenTrabajoSellado.value.PesoBulto,
           }
-          this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(datos => { }, error => {
+          this.otSelladoCorteService.put(datos_ot[i].selladoCorte_Id, info).subscribe(() => { }, error => {
             this.mensajeError(`¡No se actualizó la información de la OT en el área de 'Sellado' o 'Corte'!`, error.message);
             return true;
           });
@@ -3116,7 +3116,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           return true;
         });
       }
-    }, error => {
+    }, () => {
       this.mensajeError(`¡No se ha encontrado información de la OT N° ${ot}!`);
       return true;
     });
@@ -3704,7 +3704,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                       Usua_Id: this.storage_Id,
                       Mezcla_FechaIngreso: this.today
                     }
-                    this.mezclasService.srvGuardar(modelo).subscribe(dataMezclas2 => {
+                    this.mezclasService.srvGuardar(modelo).subscribe(() => {
                       this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
                       setTimeout(() => {
                         this.initFormCrearMezclas();
@@ -3778,7 +3778,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                       Usua_Id: this.storage_Id,
                       Mezcla_FechaIngreso: this.today
                     }
-                    this.mezclasService.srvGuardar(modelo).subscribe(dataMezclas2 => {
+                    this.mezclasService.srvGuardar(modelo).subscribe(() => {
                       this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
                       setTimeout(() => { this.initFormCrearMezclas(); this.cargarMezclas(); }, 1000);
                     });
@@ -3850,7 +3850,7 @@ export class OrdenesTrabajoComponent implements OnInit {
                       Usua_Id: this.storage_Id,
                       Mezcla_FechaIngreso: this.today
                     }
-                    this.mezclasService.srvGuardar(modelo).subscribe(dataMezclas2 => {
+                    this.mezclasService.srvGuardar(modelo).subscribe(() => {
                       this.mostrarConfirmacion(`Registro de Mezcla Predefinida creado con éxito!`);
                       setTimeout(() => { this.initFormCrearMezclas(); this.cargarMezclas(); }, 1000);
                     });
@@ -3928,7 +3928,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           MezMaterial_Nombre: nombreMaterial.toUpperCase(),
           MezMaterial_Descripcion: descripcionMaterial,
         }
-        this.mezclaMaterialService.srvGuardar(material).subscribe(dataMzMaterial2 => {
+        this.mezclaMaterialService.srvGuardar(material).subscribe(() => {
           this.mostrarConfirmacion('Registro creado con éxito!');
           setTimeout(() => {
             this.formCrearMateriales.reset();
@@ -3953,8 +3953,7 @@ export class OrdenesTrabajoComponent implements OnInit {
           MezPigmto_Nombre: nombrePigmento.toUpperCase(),
           MezPigmto_Descripcion: descripcionPigmento,
         }
-        console.table(pigmento);
-        this.mezclaPigmentosService.srvGuardar(pigmento).subscribe(dataMzPigmento => {
+        this.mezclaPigmentosService.srvGuardar(pigmento).subscribe(() => {
           this.mostrarConfirmacion('Registro creado con éxito!');
           setTimeout(() => {
           this.formCrearPigmentos.reset();

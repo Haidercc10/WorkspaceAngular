@@ -159,7 +159,7 @@
         <tr [pSelectableRow]="item">
           <td>{{item.Id}}</td>
           <td>{{item.Nombre}}</td>
-          <td>{{item.Cant_Inicial}}</td>
+          <td>{{item.Cant_Inicial | number}}</td>
           <td [pEditableColumn]="item.Cant" pEditableColumnField="price">
             <p-cellEditor>
               <ng-template pTemplate="input">
