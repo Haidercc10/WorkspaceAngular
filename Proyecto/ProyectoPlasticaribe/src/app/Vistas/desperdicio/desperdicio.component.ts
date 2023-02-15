@@ -261,7 +261,7 @@ export class DesperdicioComponent implements OnInit {
         Area : this.FormDesperdicio.value.Area,
       }
       this.grupoDespercios.push(info);
-      this.limpiarCampos();
+      this.cargando = false;
     } else this.mensajesAdvertencia(`¡Hay Campos Vacios!`);
   }
 

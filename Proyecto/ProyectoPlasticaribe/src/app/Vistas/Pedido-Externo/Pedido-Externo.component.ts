@@ -625,7 +625,8 @@ export class PedidoExternoComponent implements OnInit {
             UndMed_Id : this.ArrayProducto[index].UndCant,
             PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd,
             PedExtProd_FechaEntrega : this.ArrayProducto[index].FechaEntrega,
-            PedExtProd_CantidadFaltante : 0,
+            PedExtProd_CantidadFaltante : this.ArrayProducto[index].Cant,
+            PedExtProd_CantidadFacturada : 0,
           }
           this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(_registro_pedido_productos => {
             Swal.fire({icon: 'success', title: 'Pedido Creado Exitosamente', text: 'El pedido fue creado de manera satisfactoria'});
@@ -688,7 +689,8 @@ export class PedidoExternoComponent implements OnInit {
             UndMed_Id : this.ArrayProducto[index].UndCant,
             PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd,
             PedExtProd_FechaEntrega : this.ArrayProducto[index].FechaEntrega,
-            PedExtProd_CantidadFaltante : 0,
+            PedExtProd_CantidadFaltante : this.ArrayProducto[index].Cant,
+            PedExtProd_CantidadFacturada : 0,
           }
           this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(_registro_pedido_productos => { }, error => {
             this.mensajeError('¡No se pudo Editar el pedido, por favor intente de nuevo!', error.message);
