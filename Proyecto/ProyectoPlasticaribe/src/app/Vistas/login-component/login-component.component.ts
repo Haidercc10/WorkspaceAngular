@@ -10,6 +10,7 @@ import moment from 'moment';
 import { AuthenticationService_InvZeus } from 'src/app/_Services/authentication_InvZeus.service';
 import { authentication_ContaZeus } from 'src/app/_Services/authentication_ContaZeus.service';
 import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -25,6 +26,7 @@ export class LoginComponentComponent implements OnInit {
   ruta : any;
   mostrarPass : boolean = false;
   empresas: any [] = [];
+  ipAddress : any;
 
   constructor(private empresaServices : EmpresaService,
                 private frmBuilderUsuario : FormBuilder,
@@ -34,7 +36,8 @@ export class LoginComponentComponent implements OnInit {
                         private movAplicacionService : MovimientosAplicacionService,
                           private authenticationInvZeusService : AuthenticationService_InvZeus,
                             private authenticationContaZeusService : authentication_ContaZeus,
-                              private authenticationBagPro : authentication_BagPro,) {
+                              private authenticationBagPro : authentication_BagPro,
+                                private http : HttpClient) {
 
     if (!this.storage.get('Token')) localStorage.clear();
     if ((this.storage.get('Token')
@@ -52,6 +55,9 @@ export class LoginComponentComponent implements OnInit {
     this.storage.clear();
     localStorage.clear();
     this.cargaDatosComboBox();
+    this.http.get("http://api.ipify.org/?format=json").subscribe((res:any)=>{
+      this.ipAddress = res.ip;
+    });
   }
 
   // Funcion que guardará informacion a en la sesion

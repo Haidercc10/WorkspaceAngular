@@ -164,7 +164,7 @@ export class PaginaPrincipalComponent implements OnInit {
     setTimeout(() => {
       this.mostrarVistasFav();
       this.tiempoExcedido();
-    }, 500);
+    }, 1500);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion

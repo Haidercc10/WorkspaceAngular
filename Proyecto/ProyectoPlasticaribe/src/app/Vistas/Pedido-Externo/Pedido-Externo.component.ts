@@ -332,14 +332,8 @@ export class PedidoExternoComponent implements OnInit {
             this.limpiarTodosCampos();
           });
         }
-      }, error => {
-        this.mensajeError(`¡Ocurrió un error al consultar el código del cliente seleccionado!`, error.message);
-        this.cargando = false;
-      });
-    } else {
-      this.mensajeAdvertencia(`¡Llene los campos "Cliente", "Ciudad" y "Dirección" para consultar la cartera del cliente!`);
-      this.cargando = false;
-    }
+      }, error => { this.mensajeError(`¡Ocurrió un error al consultar el código del cliente seleccionado!`, error.message); });
+    } else this.mensajeAdvertencia(`¡Llene los campos "Cliente", "Ciudad" y "Dirección" para consultar la cartera del cliente!`);
   }
 
   // Funcion para cargar los productos de un solo cliente
@@ -939,11 +933,13 @@ export class PedidoExternoComponent implements OnInit {
 
   // Mensaje de Advertencia
   mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    this.cargando = false;
     Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
   }
 
   // Mensaje de Error
   mensajeError(text : string, error : any = ''){
+    this.cargando = false;
     Swal.fire({ icon: 'error', title: 'Error', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
   }
 }

@@ -24,7 +24,7 @@ export class ArchivosComponent implements OnInit {
   ArrayArchivos : any [] = []; //Variable que almacenará los archivos que vienen de la base de datos
   categoriasArchivos : any [] = []; //Variable para almacenar las categorias de archivos que hay
   selectedFile: File = null;
-  nombreCarpeta : string = 'C:\\Calidad\\'; //Variable que almacenará el nombre de las carpetas a las cuales se entra
+  nombreCarpeta : string = 'D:\\Calidad\\'; //Variable que almacenará el nombre de las carpetas a las cuales se entra
   ruta : string; //Variable que almacenará el nombre de las carpetas que se estan vistando
   mover : boolean = false; //Variable que va a validar si se está moviendo un archivo o no
   copiar : boolean = false; //Variable que va a validar si se esta copiando un archivo
@@ -105,7 +105,7 @@ export class ArchivosComponent implements OnInit {
   mostrarCarpetas(ruta : string = this.rutaArchivos.rutaCarpetaArchivos){
     this.ArrayArchivos = [];
     this.nombreCarpeta = ruta;
-    this.ruta = ruta.replace(`C:\\Calidad\\`, 'Calidad\\');
+    this.ruta = ruta.replace(`D:\\Calidad\\`, 'Calidad\\');
     this.archivosService.mostrarCarpetas(ruta).subscribe(datos_archivos => {
       for (let i = 0; i < datos_archivos.length; i++) {
         let nombreArchivos : string = datos_archivos[i].replace(`${ruta}`,'');
@@ -134,7 +134,7 @@ export class ArchivosComponent implements OnInit {
       else {
         this.nombreCarpeta = `${this.nombreCarpeta}\\${nombreCarpeta}`
         let ruta : string = this.nombreCarpeta;
-        this.ruta = ruta.replace(`C:\\Calidad\\`, '');
+        this.ruta = ruta.replace(`D:\\Calidad\\`, '');
         this.archivosService.crearCarpetas(ruta).subscribe(datos_archivo => {
           this.cargarArchivos(this.nombreCarpeta);
           this.mostrarCarpetas(this.nombreCarpeta);
@@ -194,10 +194,10 @@ export class ArchivosComponent implements OnInit {
   regresarCarpetaAnterior(){
     let ultimaRuta : any = `${this.nombreCarpeta.lastIndexOf("\\")}`;
     this.nombreCarpeta = this.nombreCarpeta.substring(0, ultimaRuta);
-    if (this.nombreCarpeta != "C:\\Calidad\\" && this.nombreCarpeta != "" && this.nombreCarpeta != "C:\\" && this.nombreCarpeta != "C:" && this.nombreCarpeta != "C") {
+    if (this.nombreCarpeta != "D:\\Calidad\\" && this.nombreCarpeta != "" && this.nombreCarpeta != "D:\\" && this.nombreCarpeta != "D:" && this.nombreCarpeta != "D") {
       this.cargarArchivos(this.nombreCarpeta);
       this.mostrarCarpetas(this.nombreCarpeta);
-    } else this.nombreCarpeta = "C:\\Calidad\\";
+    } else this.nombreCarpeta = "D:\\Calidad\\";
   }
 
   // Funcion que servirá para abrir carpetas
