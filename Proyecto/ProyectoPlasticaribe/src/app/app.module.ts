@@ -117,9 +117,7 @@ import { PedidoMantenimientoComponent } from './Vistas/Pedido-Mantenimiento/Pedi
 import { PedidomateriaprimaComponent } from './Vistas/pedidomateriaprima/pedidomateriaprima.component';
 import { PreIngresoRolloSelladoComponent } from './Vistas/PreIngresoRolloSellado/PreIngresoRolloSellado.component';
 import { PreIngresoRollosExtrusionComponent } from './Vistas/PreIngresoRollosExtrusion/PreIngresoRollosExtrusion.component';
-import { ProductoComponent } from './Vistas/producto/producto.component';
 import { PruebaImagenCatInsumoComponent } from './Vistas/prueba-imagen-cat-insumo/prueba-imagen-cat-insumo.component';
-import { PruebasComponent } from './Vistas/pruebas/pruebas.component';
 import { RegistroComponentComponent } from './Vistas/registro-component/registro-component.component';
 import { ReporteDespachoComponent } from './Vistas/Reporte-Despacho/Reporte-Despacho.component';
 import { ReporteEstadosOTComponent } from './Vistas/reporte-estados-ot/reporte-estados-ot.component';
@@ -127,16 +125,13 @@ import { ReporteBodegaExtrusionComponent } from './Vistas/ReporteBodegaExtrusion
 import { ReporteCostosOTComponent } from './Vistas/reporteCostosOT/reporteCostosOT.component';
 import { ReporteMateriaPrimaComponent } from './Vistas/reporteMateriaPrima/reporteMateriaPrima.component';
 import { ReporteMpOtComponent } from './Vistas/reporteMpOt/reporteMpOt.component';
-import { ReportesComponent } from './Vistas/reportes/reportes.component';
 import { Reporte_DesperdiciosComponent } from './Vistas/Reporte_Desperdicios/Reporte_Desperdicios.component';
 import { Reporte_MantenimientoComponent } from './Vistas/Reporte_Mantenimiento/Reporte_Mantenimiento.component';
 import { Reporte_OrdenCompraComponent } from './Vistas/Reporte_OrdenCompra/reporte_OrdenCompra.component';
 import { Reporte_Procesos_OTComponent } from './Vistas/Reporte_Procesos_OT/Reporte_Procesos_OT.component';
 import { Reporte_RecuperadoMPComponent } from './Vistas/Reporte_RecuperadoMP/Reporte_RecuperadoMP.component';
 import { Reporte_RollosDesechosComponent } from './Vistas/Reporte_RollosDesechos/Reporte_RollosDesechos.component';
-import { RolesComponentComponent } from './Vistas/roles-component/roles-component.component';
 import { RollosAsignadasFacturaComponent } from './Vistas/RollosAsignadasFactura/RollosAsignadasFactura.component';
-import { UsuarioComponent } from './Vistas/usuario/usuario.component';
 import { Ventas_TemporalesComponent } from './Vistas/Ventas_Temporales/Ventas_Temporales.component';
 import {InputSwitchModule} from 'primeng/inputswitch';
 import { ReporteInventarioBOPPComponent } from './Vistas/reporteInventarioBOPP/reporteInventarioBOPP.component';
@@ -191,7 +186,7 @@ export const routes: Routes = [
   {path: 'materias_primas', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: MateriasPrimasComponent},
   // Reportes de materia prima
   {path: 'reporte-Materia-Prima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ReporteMateriaPrimaComponent},
-  {path: 'reporte-Materia-Prima-OT', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReporteMpOtComponent},
+  // {path: 'reporte-Materia-Prima-OT', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: ReporteMpOtComponent},
   {path: 'reporte-facturas-remisiones-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ConsultaFac_Rem_MPComponent},
   {path: 'reporte-recuperado-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
   {path: 'reporte-orden-compra', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: Reporte_OrdenCompraComponent},
@@ -269,20 +264,16 @@ export const routes: Routes = [
     LoginComponentComponent,
     InicioComponent,
     InicioComponent,
-    RolesComponentComponent,
     FpensionComponent,
     EpsComponent,
     CajacompensacionComponent,
     OpedidoproductoComponent,
     PedidoExternoComponent,
     OcompraComponent,
-    UsuarioComponent,
     PedidomateriaprimaComponent,
     CrearProductoComponent,
     ClientesComponent,
     CrearSedesClientesComponent,
-    ProductoComponent,
-    ReportesComponent,
     EstadosComponent,
     PaginaPrincipalComponent,
     DesperdicioComponent,
@@ -308,7 +299,6 @@ export const routes: Routes = [
     AsignacionBOPP_TEMPORALComponent,
     ModalEditarAsignacionesBOPPComponent,
     ModalGenerarInventarioZeusComponent,
-    PruebasComponent,
     FiltrosProductosTerminadosZeusPipe,
     FiltroNombreClientePTPipe,
     ReporteEstadosOTComponent,

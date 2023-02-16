@@ -7,6 +7,7 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { TreeTable } from 'primeng/treetable';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { modelOpedido } from 'src/app/Modelo/modelOpedido';
 import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
@@ -35,9 +36,9 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   ArrayDocumento = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   productosPedidos : any [] = []; //Variable que se llenará con la información de los productos que se enviaron a la base de datos, los productos serán del ultimo pedido creado
-  modalEditar : boolean = false;
-  _columnasSeleccionada : any [] = [];
-  columnas : any [] = [];
+  modalEditar : boolean = false; //Variable que validará si el pedido está en edición o no
+  _columnasSeleccionada : any [] = []; //Variable que almacenará las columnas que se han elegido para ver adicionalmente a las que ya se cargan incialmente
+  columnas : any [] = []; //Variable que almacenará las columnas que podrán ser selecciondas para ver adicionales a las iniciales
   formFiltros !: FormGroup;
   titlePendiente : string = 'Estado que indica que no se ha realizado entrega de ninguno de los items del pedido.';
   titleParcial : string = 'Estado que indica que se ha realizado entrega de al menos uno de los items del pedido.';
@@ -75,19 +76,11 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     this.consultarPedidos();
   }
 
-  /**Leer storage para validar su rol y mostrar el usuario. */
+  // Funcion que va a consultar la información que está almcenada en el almacenamiento del navegador
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
-    let rol = this.storage.get('Rol');
-    this.rolService.srvObtenerLista().subscribe(datos_roles => {
-      for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
-          this.ValidarRol = rol;
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }
-      }
-    });
+    this.ValidarRol = this.storage.get('Rol');
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -592,7 +585,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   /** Aceptar Pedido para luego crearlo en Zeus */
   aceptarPedido(item : any){
     this.pedidoExternoService.srvObtenerListaPorId(item).subscribe(dataPedidos => {
-      const info : any = {
+      const info : modelOpedido = {
         PedExt_Id : dataPedidos.pedExt_Id,
         PedExt_Codigo : dataPedidos.pedExt_Codigo,
         PedExt_FechaCreacion : dataPedidos.pedExt_FechaCreacion,
@@ -601,6 +594,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         SedeCli_Id : dataPedidos.sedeCli_Id,
         Estado_Id : 26,
         PedExt_Observacion : dataPedidos.pedExt_Observacion,
+        PedExt_PrecioTotal: dataPedidos.pedExt_PrecioTotal,
         Usua_Id : dataPedidos.usua_Id,
         PedExt_Descuento : dataPedidos.pedExt_Descuento,
         PedExt_Iva : dataPedidos.pedExt_Iva,
@@ -642,6 +636,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         SedeCli_Id : dataPedidos.sedeCli_Id,
         Estado_Id : 4,
         PedExt_Observacion : dataPedidos.pedExt_Observacion,
+        PedExt_PrecioTotal: dataPedidos.pedExt_PrecioTotal,
         Usua_Id : dataPedidos.usua_Id,
         PedExt_Descuento : dataPedidos.pedExt_Descuento,
         PedExt_Iva : dataPedidos.pedExt_Iva,

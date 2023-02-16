@@ -56,9 +56,7 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
                       private rolService : RolesService,
                         private frmBuilderMateriaPrima : FormBuilder,
                           @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                            private boppService : EntradaBOPPService,
-                              private asignacionBOPPService : AsignacionBOPPService,
-                                private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,) {
+                            private boppService : EntradaBOPPService,) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : ['', Validators.required],
@@ -189,15 +187,7 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
-    let rol = this.storage.get('Rol');
-    this.rolService.srvObtenerLista().subscribe(datos_roles => {
-      for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
-          this.ValidarRol = rol;
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }
-      }
-    });
+    this.ValidarRol = this.storage.get('Rol');
   }
 
   // Funcion para obtener las diferentes categorias de materia prima existentes
@@ -618,15 +608,6 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
         });
       }
     });
-    /*this.boppService.srvObtenerLista().subscribe(datos_bopp => {
-      for (let i = 0; i < datos_bopp.length; i++) {
-        this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_bopp[i].bopP_Serial).subscribe(datos_consulta => {
-          for (let j = 0; j < datos_consulta.length; j++) {
-            if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j]);
-          }
-        });
-      }
-    });*/
     this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
       for (let i = 0; i < datos_tintas.length; i++) {
         this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_tintas[i].tinta_Id).subscribe(datos_consulta => {

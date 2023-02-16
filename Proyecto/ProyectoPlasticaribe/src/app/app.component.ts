@@ -53,6 +53,7 @@ export class AppComponent implements OnInit{
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
+    this.ValidarRol = this.storage.get('Rol');
   }
 
   //Funcio para verificar la inactividad de un usuario, cuando pasa mas de 30 minutos sin actividad se cierra la sesion

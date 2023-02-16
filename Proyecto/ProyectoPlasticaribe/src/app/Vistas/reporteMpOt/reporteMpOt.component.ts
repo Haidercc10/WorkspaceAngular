@@ -2,22 +2,13 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { AreaService } from 'src/app/Servicios/Areas/area.service';
 import { AsignacionMPService } from 'src/app/Servicios/Asignacion_MateriaPrima/asignacionMP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
-import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
-import { FactuaMpCompradaService } from 'src/app/Servicios/FacturaMateriaPrima/facturaMpComprada.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
-import { MpProveedorService } from 'src/app/Servicios/MateriaPrima_Proveedor/MpProveedor.service';
-import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
-import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
-import { TipoEstadosService } from 'src/app/Servicios/TipoEstado/tipo-estados.service';
 import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.service';
-import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
@@ -171,15 +162,7 @@ export class ReporteMpOtComponent implements OnInit {
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
-    let rol = this.storage.get('Rol');
-    this.rolService.srvObtenerLista().subscribe(datos_roles => {
-      for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
-          this.ValidarRol = rol;
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }
-      }
-    });
+    this.ValidarRol = this.storage.get('Rol');
   }
 
   /* FUNCION PARA RELIZAR CONFIMACIÓN DE SALIDA */

@@ -65,19 +65,11 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
     return number.toString().replace(exp,rep);
   }
 
-  //Funcion que leerá la informacion que se almacenará en el storage del navegador y leerá la información de las cookies
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
-    let rol = this.storage.get('Rol');
-    this.rolService.srvObtenerLista().subscribe(datos_roles => {
-      for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
-          this.ValidarRol = rol;
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }
-      }
-    });
+    this.ValidarRol = this.storage.get('Rol');
   }
 
   // funcion que va a limpiar los campos del formulario
