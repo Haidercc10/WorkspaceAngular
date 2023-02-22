@@ -58,17 +58,13 @@ export class AppComponent implements OnInit{
 
   //Funcio para verificar la inactividad de un usuario, cuando pasa mas de 30 minutos sin actividad se cierra la sesion
   inactividad(){
-    window.onload = this.reiniciarTiempo();;
-    // Eventos del DOM
-    document.onmousemove = this.reiniciarTiempo();
     document.onkeypress = this.reiniciarTiempo();
     document.onload = this.reiniciarTiempo();
     document.onmousemove = this.reiniciarTiempo();
     document.onmousedown = this.reiniciarTiempo(); // aplica para una pantalla touch
     document.ontouchstart = this.reiniciarTiempo();
-    document.onclick = this.reiniciarTiempo();     // aplica para un clic del touchpad
-    document.onscroll = this.reiniciarTiempo();    // navegando con flechas del teclado
-    document.onkeypress = this.reiniciarTiempo();
+    document.onclick = this.reiniciarTiempo(); // aplica para un clic del touchpad
+    document.onscroll = this.reiniciarTiempo(); // navegando con flechas del teclado
   }
 
   // Funcion uqe va a reiniciar el tiempo de espera de la aplicacion
@@ -80,9 +76,7 @@ export class AppComponent implements OnInit{
       window.location.pathname = '/';
     }
     clearTimeout(t);
-    t = setTimeout(this.tiempoExcedido, 1800000);
-    // 1 minuto son 60000 millisegundos
-    // 30 minutos son 1800000 milisegundos
+    t = setTimeout(this.tiempoExcedido, 1800000); // 1 minuto son 60000 millisegundos, 30 minutos son 1800000 milisegundos
   }
 
   // Funcion que se va a ejecutar cuando se exceda el tiempo de espera

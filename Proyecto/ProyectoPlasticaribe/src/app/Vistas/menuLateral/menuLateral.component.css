@@ -137,6 +137,10 @@ p {
   border: none;
   border-radius: 0;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  position: fixed;
+  z-index: 100;
+  margin-top: -25px;
 }
 
 .user {

@@ -255,8 +255,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         this.columnas = [
           { header: 'Precio U.', field: 'precioUnidad', type : 'number' },
           { header: 'OC Cliente', field: 'orden_Compra_CLiente'},
-          // { header: 'Costo Cant. Pendiente', field: 'costo_Cant_Pendiente', type : 'number'},
-          // { header: 'Costo Cant. Total', field: 'costo_Cant_Total', type : 'number' },
           { header: 'Fecha Creación', field: 'fecha_Creacion', type : 'date'},
           { header: 'Fecha Entrega', field: 'fecha_Entrega',  type : 'date'},
         ];
@@ -276,7 +274,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         } else if (this.ValidarRol == 1 || this.ValidarRol == 60) this.llenarEncabezadoPedidos(datos_pedidos[i]);
       }
     });
-    setTimeout(() => { this.llenarDetallesPedidos(); }, 1000);
+    setTimeout(() => { this.llenarDetallesPedidos(); }, 1500);
   }
 
   // Funcion que va a llena el encabezado de los pedidos que no han sido enviados a zeus

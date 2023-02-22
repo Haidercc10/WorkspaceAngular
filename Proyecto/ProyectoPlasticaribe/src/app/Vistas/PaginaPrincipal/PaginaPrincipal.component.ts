@@ -164,7 +164,7 @@ export class PaginaPrincipalComponent implements OnInit {
     setTimeout(() => {
       this.mostrarVistasFav();
       this.tiempoExcedido();
-    }, 1500);
+    }, 2500);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -1309,8 +1309,5 @@ export class PaginaPrincipalComponent implements OnInit {
   mensajeError(texto : string, error : any = ''){ Swal.fire({ icon: 'error', title: 'Opps...', showCloseButton : true, html: `<b>${texto}</b><br>` + `<spam style="color: #f00">${error}</spam>`, }); }
 
   // Funcion que va a detectar sorbe que panel está siendo seleccionado
-  handleChange(e) {
-    var index = e.index;
-    if (index == 3) this.pedidosZeus();
-  }
+  handleChange(e) { if (e.index == 3) this.pedidosZeus(); }
 }
