@@ -154,7 +154,7 @@ import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 export const routes: Routes = [
 
   /******************************************************************** Inicio y Login **********************************************************************/
-  // {path: 'inicio', component: InicioComponent},
+  {path: 'inicio', component: InicioComponent},
   {path: 'Login', component: LoginComponentComponent},
   {path: '', component: LoginComponentComponent},
   {path: 'home', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,3,4,5,6,7,8,9,10,11,12,13,60]}, component: PaginaPrincipalComponent},

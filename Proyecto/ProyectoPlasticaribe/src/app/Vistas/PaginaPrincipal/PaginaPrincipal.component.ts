@@ -663,25 +663,25 @@ export class PaginaPrincipalComponent implements OnInit {
           if (i == 11) this.totalFacturado12 = datos_facturacion;
         });
       }
-      setTimeout(() => { this.llenarGraficaFacturacion(); }, 1500);
+      setTimeout(() => { this.llenarGraficaFacturacion(); }, 2500);
 
-      for (let i = 0; i < 12; i++) {
-        this.zeusService.GetIvaCompraTodosMeses(i+ 1).subscribe(datos_facturacion => {
-          if (i == 0) this.totalIvaCompra1 = datos_facturacion;
-          if (i == 1) this.totalIvaCompra2 = datos_facturacion;
-          if (i == 2) this.totalIvaCompra3 = datos_facturacion;
-          if (i == 3) this.totalIvaCompra4 = datos_facturacion;
-          if (i == 4) this.totalIvaCompra5 = datos_facturacion;
-          if (i == 5) this.totalIvaCompra6 = datos_facturacion;
-          if (i == 6) this.totalIvaCompra7 = datos_facturacion;
-          if (i == 7) this.totalIvaCompra8 = datos_facturacion;
-          if (i == 8) this.totalIvaCompra9 = datos_facturacion;
-          if (i == 9) this.totalIvaCompra10 = datos_facturacion;
-          if (i == 10) this.totalIvaCompra11 = datos_facturacion;
-          if (i == 11) this.totalIvaCompra12 = datos_facturacion;
-        });
-      }
-      setTimeout(() => { this.llenarGraficaIvaCompra(); }, 1800);
+      // for (let i = 0; i < 12; i++) {
+      //   this.zeusService.GetIvaCompraTodosMeses(i+ 1).subscribe(datos_facturacion => {
+      //     if (i == 0) this.totalIvaCompra1 = datos_facturacion;
+      //     if (i == 1) this.totalIvaCompra2 = datos_facturacion;
+      //     if (i == 2) this.totalIvaCompra3 = datos_facturacion;
+      //     if (i == 3) this.totalIvaCompra4 = datos_facturacion;
+      //     if (i == 4) this.totalIvaCompra5 = datos_facturacion;
+      //     if (i == 5) this.totalIvaCompra6 = datos_facturacion;
+      //     if (i == 6) this.totalIvaCompra7 = datos_facturacion;
+      //     if (i == 7) this.totalIvaCompra8 = datos_facturacion;
+      //     if (i == 8) this.totalIvaCompra9 = datos_facturacion;
+      //     if (i == 9) this.totalIvaCompra10 = datos_facturacion;
+      //     if (i == 10) this.totalIvaCompra11 = datos_facturacion;
+      //     if (i == 11) this.totalIvaCompra12 = datos_facturacion;
+      //   });
+      // }
+      // setTimeout(() => { this.llenarGraficaIvaCompra(); }, 1800);
     }
   }
 
@@ -1306,7 +1306,7 @@ export class PaginaPrincipalComponent implements OnInit {
   ordenarVendedorCosto_Pedidos(){ this.pedidosVendedores.sort((a,b) => Number(b.costo) - Number(a.costo)); }
 
   // Funcion que tomará unos parametros para mostrar un mensaje de error
-  mensajeError(texto : string, error : any = ''){ Swal.fire({ icon: 'error', title: 'Opps...', showCloseButton : true, html: `<b>${texto}</b><br>` + `<spam style="color: #f00">${error}</spam>`, }); }
+  mensajeError(texto : string, error : string = ''){ Swal.fire({ icon: 'error', title: 'Opps...', showCloseButton : true, html: `<b>${texto}</b><br>` + `<spam style="color: #f00">${error}</spam>`, }); }
 
   // Funcion que va a detectar sorbe que panel está siendo seleccionado
   handleChange(e) { if (e.index == 3) this.pedidosZeus(); }
