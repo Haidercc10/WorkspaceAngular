@@ -11,6 +11,7 @@ import moment from 'moment';
 import { AuthenticationService_InvZeus } from './authentication_InvZeus.service';
 import { authentication_ContaZeus } from './authentication_ContaZeus.service';
 import { authentication_BagPro } from './authentication_BagPro.service';
+import Swal from 'sweetalert2';
 
 @Injectable({ providedIn: 'root' })
 
@@ -54,18 +55,19 @@ export class AuthenticationService {
   logout() {
     let infoMovimientoAplicacion : any = {
       "Usua_Id" : this.storage.get('Id'),
-      "MovApp_Nombre" : `Se cerró la sesión del usuario "${this.storage.get('Nombre')}"`,
-      "MovApp_Descripcion" : `El usuario "${this.storage.get('Nombre')}" con el ID ${this.storage.get('Id')} cerró sesión en el programa el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
+      "MovApp_Nombre" : `Cierre de sesión`,
+      "MovApp_Descripcion" : `El usuario "${this.storage.get('Nombre')}" con el ID ${this.storage.get('Id')} cerró sesión el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
       "MovApp_Fecha" : moment().format('YYYY-MM-DD'),
       "MovApp_Hora" : moment().format('H:mm:ss'),
     }
-    this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(datos => { });
-    localStorage.clear();
-    this.storage.clear();
-    this.userSubject.next(null);
-    this.authenticationInvZeusService.logout();
-    this.authenticationContaZeusService.logout();
-    this.authenticationBagPro.logout();
-    window.location.pathname = '/';
+    this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(datos => {
+      localStorage.clear();
+      this.storage.clear();
+      this.userSubject.next(null);
+      this.authenticationInvZeusService.logout();
+      this.authenticationContaZeusService.logout();
+      this.authenticationBagPro.logout();
+      window.location.pathname = '/';
+    }, error => { Swal.fire({ icon: 'error', title: 'Error de Cierre de Sesión', text: '¡No se registró el cierre de sesión del usuario!' }); });
   }
 }

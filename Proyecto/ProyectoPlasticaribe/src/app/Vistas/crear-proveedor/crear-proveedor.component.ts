@@ -34,7 +34,7 @@ export class CrearProveedorComponent implements OnInit {
       ProvNombre: ['', Validators.required],
       provTipoId: ['', Validators.required],
       TipoProv: ['', Validators.required],
-      ProvCiudad: ['', Validators.required],
+      ProvCiudad: [''],
       ProvTelefono: [''],
       ProvEmail: [''],
     });

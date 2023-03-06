@@ -93,16 +93,17 @@ export class LoginComponentComponent implements OnInit {
             let rol: number = datos.rolUsu_Id;
             let infoMovimientoAplicacion : any = {
               "Usua_Id" : idUsuario,
-              "MovApp_Nombre" : `Inicio de sesión del usuario "${nombre}"`,
-              "MovApp_Descripcion" : `El usuario "${nombre}" con el ID ${idUsuario} inició sesión en el programa el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
+              "MovApp_Nombre" : `Inicio de sesión`,
+              "MovApp_Descripcion" : `El usuario "${nombre}" con el ID ${idUsuario} inició sesión el día ${moment().format('YYYY-MM-DD')} a las ${moment().format('H:mm:ss')} horas.`,
               "MovApp_Fecha" : moment().format('YYYY-MM-DD'),
               "MovApp_Hora" : moment().format('H:mm:ss'),
             }
-            this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(datos_Mov => { }, err => { this.mensajeError(`¡Error Insertanco el inició de sesión!`); });
-            this.saveInLocal('Id', idUsuario);
-            this.saveInLocal('Nombre', nombre);
-            this.saveInLocal('Rol', rol);
-            window.location.pathname = '/home';
+            this.movAplicacionService.insert(infoMovimientoAplicacion).subscribe(datos_Mov => {
+              this.saveInLocal('Id', idUsuario);
+              this.saveInLocal('Nombre', nombre);
+              this.saveInLocal('Rol', rol);
+              window.location.pathname = '/home';
+            }, err => { this.mensajeError(`¡Error al registrar el inicio de sesión!`); });
           }, err => { this.mensajeError(`¡Error al conectarse con BagPro!`); });
         }, err => { this.mensajeError(`¡Error al conectarse con Contabilidad de Zeus!`); });
       }, err => { this.mensajeError(`¡Error al conectarse con Inventario de Zeus!`); });
