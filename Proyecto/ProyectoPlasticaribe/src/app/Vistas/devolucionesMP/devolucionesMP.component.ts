@@ -30,6 +30,7 @@ export class DevolucionesMPComponent implements OnInit {
   materiasPrimasRetiradas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   load : boolean;
+  maximoIdMp : number = 0; /** Variable que almacenará el ultimo id de la matprima para la validación que se realiza al cargar las MP/Tintas/BOPP a la tabla.  */
 
 
   constructor(private materiaPrimaService : MateriaPrimaService,
@@ -53,6 +54,11 @@ export class DevolucionesMPComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
+  }
+
+  /** Función que obtendrá el ultimo ID de la tabla de matprimas. */
+  ultimoIdMatPrima(){
+    this.materiaPrimaService.getMaximoIdMatPrima().subscribe(data => { this.maximoIdMp = data; });
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -80,6 +86,7 @@ export class DevolucionesMPComponent implements OnInit {
 
   // Funcion que va a consultar por OT todas las materia primas asignadas a una orden de trabajo
   consultarOt(){
+    this.ultimoIdMatPrima();
     this.load = false;
     this.materiasPrimas = [];
     let ot : number = this.FormDevolucion.value.ot;
@@ -100,8 +107,7 @@ export class DevolucionesMPComponent implements OnInit {
             Proceso : datos_asignacionMP[i].proceso,
             Proceso_Nombre : datos_asignacionMP[i].nombreProceso,
           }
-
-          if (info.Id != 84 && info.Id < 100) {
+          if (info.Id != 84 && info.Id <= this.maximoIdMp) {
             info.Id_MateriaPrima = info.Id;
             info.Id_Tinta = 2001;
             info.Id_Bopp = 449;
@@ -109,7 +115,7 @@ export class DevolucionesMPComponent implements OnInit {
             info.Id_Tinta = info.Id;
             info.Id_MateriaPrima = 84;
             info.Id_Bopp = 449;
-          } else if (info.Id != 449 && info.Id > 100) {
+          } else if (info.Id != 449 && info.Id > this.maximoIdMp) {
             info.Id_Bopp = info.Id;
             info.Id_MateriaPrima = 84;
             info.Id_Tinta = 2001;

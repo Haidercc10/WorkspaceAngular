@@ -106,4 +106,8 @@ export class MateriaPrimaService {
     return this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data)
   }
 
+  getMaximoIdMatPrima() {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMaximoIdMatPrima`);
+  }
+
 }
