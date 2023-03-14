@@ -863,7 +863,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
       consecutivo: datos.consecutivo,
       cliente: datos.cliente,
       Producto: datos.producto,
-      Cant_Pedida: this.formatonumeros(datos.cant_Pedida),
+      "Cant Pedida": this.formatonumeros(datos.cant_Pedida),
       Pendiente: this.formatonumeros(datos.cant_Pendiente),
       Facturada: this.formatonumeros(datos.cant_Facturada),
       Stock: this.formatonumeros(datos.existencias),
@@ -872,8 +872,8 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
       Vendedor: datos.vendedor,
       precioUnidad : this.formatonumeros(datos.precioUnidad),
       orden_Compra_CLiente: datos.orden_Compra_CLiente,
-      Costo_Pendiente: this.formatonumeros(datos.costo_Cant_Pendiente),
-      Costo_Total: this.formatonumeros(datos.costo_Cant_Total),
+      "Costo Pendiente": this.formatonumeros(datos.costo_Cant_Pendiente),
+      "Costo Total": this.formatonumeros(datos.costo_Cant_Total),
       Costo_Pendiente1 : datos.costo_Cant_Pendiente,
       Costo_Total1 : datos.costo_Cant_Total,
       fecha_Creacion: datos.fecha_Creacion,
@@ -971,7 +971,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
               alignment: 'center',
               style: 'subtitulo'
             },
-            this.table2(this.arrayPedidosIndividuales, ['Producto', 'Cant_Pedida', 'Pendiente', 'Facturada', 'Stock', 'Und', 'Costo_Pendiente', 'Costo_Total', 'Estado' ]),
+            this.table2(this.arrayPedidosIndividuales, ['Producto', 'Cant Pedida', 'Pendiente', 'Facturada', 'Stock', 'Und', 'Costo Pendiente', 'Costo Total', 'Estado' ]),
             {
               style: 'texto',
               table: {

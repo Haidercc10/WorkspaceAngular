@@ -41,12 +41,11 @@ export class Movimientos_MantenimientoComponent implements OnInit {
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                  private rolService : RolesService,
-                    private activosService : ActivosService,
-                      private tipoMantenimientoService : Tipo_MantenimientoService,
-                        private estadosService : EstadosService,
-                          private dtMantenimientoService : Detalle_MantenimientoService,
-                            private dtPedidoMttoService : DetallePedido_MantenimientoService,) {
+                  private activosService : ActivosService,
+                    private tipoMantenimientoService : Tipo_MantenimientoService,
+                      private estadosService : EstadosService,
+                        private dtMantenimientoService : Detalle_MantenimientoService,
+                          private dtPedidoMttoService : DetallePedido_MantenimientoService,) {
 
     this.FormMovimientosMantenimiento = this.frmBuilder.group({
       ConsecutivoMovimiento : [null],
@@ -219,8 +218,8 @@ export class Movimientos_MantenimientoComponent implements OnInit {
           Id : datos_pedido[i].actv_Id,
           Serial: datos_pedido[i].actv_Serial,
           Nombre: datos_pedido[i].actv_Nombre,
-          Fecha_Falla : datos_pedido[i].dtPedMtto_FechaFalla.replace('T00:00:00', ''),
-          Tipo_Mtto : datos_pedido[i].tpMtto_Nombre,
+          "Fecha Falla" : datos_pedido[i].dtPedMtto_FechaFalla.replace('T00:00:00', ''),
+          "Tipo Mtto" : datos_pedido[i].tpMtto_Nombre,
         }
         this.infoPdf.push(info);
       }
@@ -237,7 +236,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
           Id : datos_mantenimiento[i].actv_Id,
           Serial: datos_mantenimiento[i].actv_Serial,
           Nombre: datos_mantenimiento[i].actv_Nombre,
-          Tipo_Mtto : datos_mantenimiento[i].tpMtto_Nombre,
+          "Tipo Mtto" : datos_mantenimiento[i].tpMtto_Nombre,
           Estado : datos_mantenimiento[i].estado_Nombre,
         }
         this.infoPdf.push(info);
@@ -291,7 +290,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
             { text: `${datos_pedido[i].pedMtto_Observacion} `, alignment: 'left', style: 'texto' },
             { text: `\n\n Información detallada de los Activos \n `, alignment: 'center', style: 'header' },
 
-            this.table(this.infoPdf, ['Id', 'Serial', 'Nombre', 'Fecha_Falla', 'Tipo_Mtto']),
+            this.table(this.infoPdf, ['Id', 'Serial', 'Nombre', 'Fecha Falla', 'Tipo Mtto']),
           ],
           styles: {
             header: { fontSize: 10, bold: true },
@@ -458,7 +457,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
               style: 'header'
             },
 
-            this.table(this.infoPdf, ['Id', 'Serial', 'Nombre', 'Estado', 'Tipo_Mtto']),
+            this.table(this.infoPdf, ['Id', 'Serial', 'Nombre', 'Estado', 'Tipo Mtto']),
           ],
           styles: {
             header: {

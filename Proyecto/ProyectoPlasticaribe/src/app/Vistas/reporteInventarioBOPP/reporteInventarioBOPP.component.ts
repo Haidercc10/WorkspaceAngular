@@ -1,17 +1,13 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Table } from 'primeng/table';
-import { AsignacionBOPPService } from 'src/app/Servicios/Asignacion_Bopp/asignacionBOPP.service';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
-import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/DetallesAsgBopp/detallesAsignacionBOPP.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
-import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.service';
 import Swal from 'sweetalert2';
 
@@ -50,14 +46,11 @@ export class ReporteInventarioBOPPComponent implements OnInit {
   cantDiferencia : number = 0;
 
   constructor(private materiaPrimaService : MateriaPrimaService,
-                  private categoriMpService : CategoriaMateriaPrimaService,
-                    private tipoBodegaService : TipoBodegaService,
-                      private rolService : RolesService,
-                        private frmBuilderMateriaPrima : FormBuilder,
-                          @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                            private boppService : EntradaBOPPService,
-                              private asignacionBOPPService : AsignacionBOPPService,
-                                private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,) {
+                private categoriMpService : CategoriaMateriaPrimaService,
+                  private tipoBodegaService : TipoBodegaService,
+                    private frmBuilderMateriaPrima : FormBuilder,
+                      @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                        private boppService : EntradaBOPPService,) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : ['', Validators.required],
@@ -74,7 +67,7 @@ export class ReporteInventarioBOPPComponent implements OnInit {
 
   // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
-    if (this.ArrayMateriaPrima.length == 0) Swal.fire("¡Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla!");
+    if (this.ArrayMateriaPrima.length == 0) this.mensajeAdvertencia("¡Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla!");
     else {
       this.load = false;
       setTimeout(() => {
@@ -91,7 +84,7 @@ export class ReporteInventarioBOPPComponent implements OnInit {
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
         worksheet.addRow([]);
         let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell, number) => {
+        headerRow.eachCell((cell) => {
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
@@ -188,10 +181,8 @@ export class ReporteInventarioBOPPComponent implements OnInit {
   // Funcion para obtener las diferentes categorias de materia prima existentes
   obtenerCategorias(){
     this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => {
-      for (let i = 0; i < datos_categorias.length; i++) {
-        this.categorias.push(datos_categorias[i]);
-        this.categorias.sort((a,b) => a.catMP_Nombre.localeCompare(b.catMP_Nombre));
-      }
+      this.categorias = datos_categorias;
+      this.categorias.sort((a,b) => a.catMP_Nombre.localeCompare(b.catMP_Nombre));
     });
   }
 
@@ -200,9 +191,7 @@ export class ReporteInventarioBOPPComponent implements OnInit {
     this.materiasPrimas = [];
     let nombre : string = this.FormMateriaPrima.value.MpNombre;
     this.materiaPrimaService.GetMateriaPrima_LikeNombre(nombre).subscribe(datos_materiaPrima => {
-      for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.materiasPrimas.push(datos_materiaPrima[i]);
-      }
+      this.materiasPrimas = datos_materiaPrima;
     });
   }
 
@@ -211,16 +200,9 @@ export class ReporteInventarioBOPPComponent implements OnInit {
     let id : number = this.FormMateriaPrima.value.MpNombre;
     this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
       for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
+        this.FormMateriaPrima.patchValue({
           MpId : datos_materiaPrima[i].id,
           MpNombre: datos_materiaPrima[i].nombre,
-          MpCantidad : this.FormMateriaPrima.value.MpCantidad,
-          MpPrecio: this.FormMateriaPrima.value.MpPrecio,
-          MpUnidadMedida: this.FormMateriaPrima.value.MpUnidadMedida,
-          fecha: this.FormMateriaPrima.value.fecha,
-          fechaFinal: this.FormMateriaPrima.value.fechaFinal,
-          MpCategoria : this.FormMateriaPrima.value.MpCategoria,
-          MpBodega : this.FormMateriaPrima.value.MpBodega,
         });
       }
     });
@@ -468,7 +450,7 @@ export class ReporteInventarioBOPPComponent implements OnInit {
     this.cantExistencias = 0;
     this.cantDiferencia = 0;
 
-      this.boppService.srvObtenerLista().subscribe(datos_bopp => {
+    this.boppService.srvObtenerLista().subscribe(datos_bopp => {
       for (let i = 0; i < datos_bopp.length; i++) {
         this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_bopp[i].bopP_Serial).subscribe(datos_consulta => {
           for (let j = 0; j < datos_consulta.length; j++) {
@@ -484,5 +466,15 @@ export class ReporteInventarioBOPPComponent implements OnInit {
   // Funcion que limpiará los filtros utilizados en la tabla
   clear(table: Table) {
     table.clear();
+  }
+
+  // Funcion que va a devolver un mensaje de error
+  mensajeError(mensaje : string){
+    Swal.fire({ icon: 'error', title: '¡Ha ocurrido un error!', text: mensaje });
+  }
+
+  // Funcion que va a devover un mensaje de advertencia
+  mensajeAdvertencia(mensaje : string){
+    Swal.fire({ icon: 'warning', title: '¡Advertencia!', text: mensaje });
   }
 }

@@ -1,13 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
+import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
 import { DevolucionesProductosService } from 'src/app/Servicios/DevolucionesRollosFacturados/DevolucionesProductos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -29,13 +27,12 @@ export class Devoluciones_Productos_RollosComponent implements OnInit {
   rollosInsertar : any [] = []; //Variable que va a amacenar los diferentes rollos que se van a insertar
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
 
-  constructor(private rolService : RolesService,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                  private dtAsgProdFactura : DetallesAsignacionProductosFacturaService,
-                    private rollosService : DetallesEntradaRollosService,
-                      private dtDevolucionService : DetallesDevolucionesProductosService,
-                        private devolcuionesService : DevolucionesProductosService,
-                          private ExistenciasProdService : ExistenciasProductosService,) {
+  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private dtAsgProdFactura : DetallesAsignacionProductosFacturaService,
+                  private rollosService : DetallesEntradaRollosService,
+                    private dtDevolucionService : DetallesDevolucionesProductosService,
+                      private devolcuionesService : DevolucionesProductosService,
+                        private ExistenciasProdService : ExistenciasProductosService,) {
   }
 
   ngOnInit() {

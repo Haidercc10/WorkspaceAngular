@@ -38,13 +38,12 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
   remConFac : any = [];
   load: boolean = true;;
 
-  constructor(private rolService : RolesService,
-                private frmBuilderMateriaPrima : FormBuilder,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private tipoDocuemntoService : TipoDocumentoService,
-                      private proveedorService : ProveedorService,
-                        private remisionMpService : RemisionesMPService,
-                          private facturaCompraMPService : FacturaMpService,) {
+  constructor(private frmBuilderMateriaPrima : FormBuilder,
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private tipoDocuemntoService : TipoDocumentoService,
+                    private proveedorService : ProveedorService,
+                      private remisionMpService : RemisionesMPService,
+                        private facturaCompraMPService : FacturaMpService,) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null],
@@ -331,8 +330,8 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
             Id : datos_factura[i].matPri_Id,
             Nombre : datos_factura[i].matPri_Nombre,
             Cant : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad),
-            UndCant : datos_factura[i].undMed_Id,
-            PrecioUnd : this.formatonumeros(datos_factura[i].faccoMatPri_ValorUnitario),
+            "Und Cant" : datos_factura[i].undMed_Id,
+            "Precio Und" : this.formatonumeros(datos_factura[i].faccoMatPri_ValorUnitario),
             SubTotal : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad * datos_factura[i].faccoMatPri_ValorUnitario),
           }
           this.documentoInfo.push(items);
@@ -346,8 +345,8 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
             Id : datos_remision[i].matPri_Id,
             Nombre : datos_remision[i].matPri_Nombre,
             Cant : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad),
-            UndCant : datos_remision[i].undMed_Id,
-            PrecioUnd : this.formatonumeros(datos_remision[i].remiMatPri_ValorUnitario),
+            "Und Cant" : datos_remision[i].undMed_Id,
+            "Precio Und" : this.formatonumeros(datos_remision[i].remiMatPri_ValorUnitario),
             SubTotal : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad * datos_remision[i].remiMatPri_ValorUnitario),
           }
           this.documentoInfo.push(items);
@@ -467,7 +466,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
                   style: 'header'
                 },
 
-                this.table(this.documentoInfo, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                this.table(this.documentoInfo, ['Id', 'Nombre', 'Cant', 'Und Cant', 'Precio Und', 'SubTotal']),
 
                 {
                   text: `\n\nValor Total Factura: $${this.formatonumeros(datos_factura[i].facco_ValorTotal)}`,
@@ -575,7 +574,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
                   style: 'header'
                 },
 
-                this.table(this.documentoInfo, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                this.table(this.documentoInfo, ['Id', 'Nombre', 'Cant', 'Und Cant', 'Precio Und', 'SubTotal']),
               ],
               styles: {
                 header: {

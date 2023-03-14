@@ -1,12 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { AsignacionBOPPService } from 'src/app/Servicios/Asignacion_Bopp/asignacionBOPP.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
-import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/DetallesAsgBopp/detallesAsignacionBOPP.service';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.service';
 import Swal from 'sweetalert2';
@@ -53,10 +50,9 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
                 private tintasService : TintasService,
                   private categoriMpService : CategoriaMateriaPrimaService,
                     private tipoBodegaService : TipoBodegaService,
-                      private rolService : RolesService,
-                        private frmBuilderMateriaPrima : FormBuilder,
-                          @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                            private boppService : EntradaBOPPService,) {
+                      private frmBuilderMateriaPrima : FormBuilder,
+                        @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                          private boppService : EntradaBOPPService,) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : ['', Validators.required],
@@ -73,7 +69,7 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
 
   // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
-    if (this.ArrayMateriaPrima.length == 0) Swal.fire("¡Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla!");
+    if (this.ArrayMateriaPrima.length == 0) this.mensajeAdvertencia("¡Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla!");
     else {
       this.load = false;
       setTimeout(() => {
@@ -170,7 +166,7 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
     this.obtenerMateriasPrimas();
   }
 
-  //  Funcion que tomará y almacenará las bdoegas
+  // Funcion que tomará y almacenará las bdoegas
   obtenerBodegas(){
     this.bodegas = [];
     this.tipoBodegaService.srvObtenerLista().subscribe(datos_bodegas => {
@@ -193,10 +189,8 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
   // Funcion para obtener las diferentes categorias de materia prima existentes
   obtenerCategorias(){
     this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => {
-      for (let i = 0; i < datos_categorias.length; i++) {
-        this.categorias.push(datos_categorias[i]);
-        this.categorias.sort((a,b) => a.catMP_Nombre.localeCompare(b.catMP_Nombre));
-      }
+      this.categorias = datos_categorias;
+      this.categorias.sort((a,b) => a.catMP_Nombre.localeCompare(b.catMP_Nombre));
     });
   }
 
@@ -204,11 +198,7 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
   obtenerMateriasPrimas(){
     this.materiasPrimas = [];
     let nombre : string = this.FormMateriaPrima.value.MpNombre;
-    this.materiaPrimaService.GetMateriaPrima_LikeNombre(nombre).subscribe(datos_materiaPrima => {
-      for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.materiasPrimas.push(datos_materiaPrima[i]);
-      }
-    });
+    this.materiaPrimaService.GetMateriaPrima_LikeNombre(nombre).subscribe(datos_materiaPrima => { this.materiasPrimas = datos_materiaPrima; });
   }
 
   //Funcion que va a mostrar el nombre de la materia prima
@@ -216,16 +206,9 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
     let id : number = this.FormMateriaPrima.value.MpNombre;
     this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
       for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
+        this.FormMateriaPrima.patchValue({
           MpId : datos_materiaPrima[i].id,
           MpNombre: datos_materiaPrima[i].nombre,
-          MpCantidad : this.FormMateriaPrima.value.MpCantidad,
-          MpPrecio: this.FormMateriaPrima.value.MpPrecio,
-          MpUnidadMedida: this.FormMateriaPrima.value.MpUnidadMedida,
-          fecha: this.FormMateriaPrima.value.fecha,
-          fechaFinal: this.FormMateriaPrima.value.fechaFinal,
-          MpCategoria : this.FormMateriaPrima.value.MpCategoria,
-          MpBodega : this.FormMateriaPrima.value.MpBodega,
         });
       }
     });
@@ -624,4 +607,15 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
   clear(table: Table) {
     table.clear();
   }
+
+  // Funcion que va a devolver un mensahje de error
+  mensajeError(mensaje : string) {
+    Swal.fire({ icon: 'error', title: '¡Ha ocurrido un error!', text: mensaje });
+  }
+
+  // Funcion que va a devolver un mensaje de advertencia
+  mensajeAdvertencia(mensaje : string){
+    Swal.fire({ icon: 'warning', title: '¡Advertencia!', text: mensaje });
+  }
+
 }

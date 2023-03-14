@@ -696,7 +696,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
   }
 
    /** Mensaje de advertencia si no hay rollos para ingresar */
-   advertenciaRollos() {
+  advertenciaRollos() {
     Swal.fire({icon: 'warning',  title: 'Advertencia', text: `No hay rollos por ingresar`, confirmButtonColor: '#ffc107', });
   }
 

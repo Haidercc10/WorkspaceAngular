@@ -47,16 +47,15 @@ export class MovimientosBOPPComponent implements OnInit {
   acumuladorOTPDF = [];
   boppAsignada : any = [];
 
-  constructor(private rolService : RolesService,
-                private frmBuilderMateriaPrima : FormBuilder,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private tipoDocuemntoService : TipoDocumentoService,
-                      private boppService : EntradaBOPPService,
-                        private bagProServices : BagproService,
-                          private estadoService : EstadosService,
-                            private asignacionBOPPService : AsignacionBOPPService,
-                              private dtAsgBOPPService : DetalleAsignacion_BOPPService,
-                                private usuarioService : UsuarioService,) {
+  constructor(private frmBuilderMateriaPrima : FormBuilder,
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private tipoDocuemntoService : TipoDocumentoService,
+                    private boppService : EntradaBOPPService,
+                      private bagProServices : BagproService,
+                        private estadoService : EstadosService,
+                          private asignacionBOPPService : AsignacionBOPPService,
+                            private dtAsgBOPPService : DetalleAsignacion_BOPPService,
+                              private usuarioService : UsuarioService,) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null, Validators.required],
@@ -140,10 +139,8 @@ export class MovimientosBOPPComponent implements OnInit {
     this.ArrayBopp = [];
     let data : string = this.FormDocumentos.value.bopp;
     this.boppService.GetRollosLike(data).subscribe(datos_bopp => {
-      for (let i = 0; i < datos_bopp.length; i++) {
-        this.ArrayBopp.push(datos_bopp[i]);
-        this.ArrayBopp.sort((a,b) => a.bopP_Nombre.localeCompare(b.bopP_Nombre));
-      }
+      this.ArrayBopp = datos_bopp;
+      this.ArrayBopp.sort((a,b) => a.bopP_Nombre.localeCompare(b.bopP_Nombre));
     });
   }
 

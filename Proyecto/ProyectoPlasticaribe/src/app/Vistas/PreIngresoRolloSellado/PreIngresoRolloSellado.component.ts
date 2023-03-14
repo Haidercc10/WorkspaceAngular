@@ -736,7 +736,7 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
         let info : any = {
           OT : datos_factura[i].dtlPreEntRollo_OT,
           Rollo : datos_factura[i].rollo_Id,
-          IdCliente : datos_factura[i].cli_Id,
+          "Id Cliente" : datos_factura[i].cli_Id,
           Cliente : datos_factura[i].cli_Nombre,
           Producto : datos_factura[i].prod_Id,
           Nombre : datos_factura[i].prod_Nombre,

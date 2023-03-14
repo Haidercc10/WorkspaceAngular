@@ -903,14 +903,14 @@ export class AsignarProductosFacturasComponent implements OnInit {
                 alignment: 'center',
                 style: 'header'
               },
-              this.table2(this.grupoProductos, ['Id', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion', 'Cant_Unidades']),
+              this.table2(this.grupoProductos, ['Id', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion', 'Cant. Unidades']),
               {
                 text: `\n\n Información detallada de producto(s)\n `,
                 alignment: 'center',
                 style: 'header'
               },
 
-              this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion', 'Cant_Unidades']),
+              this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion', 'Cant. Unidades']),
               {
                 text: `\nCant. Total: ${this.formatonumeros(this.Total.toFixed(2))}\n\n`,
                 alignment: 'right',
@@ -954,7 +954,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
           Nombre : datos_factura[i].prod_Nombre,
           Cantidad : this.formatonumeros(datos_factura[i].dtAsigProdFV_Cantidad),
           Presentacion : datos_factura[i].undMed_Id,
-          Cant_Unidades : `${this.formatonumeros(datos_factura[i].prod_CantidadUnidades)} Und`
+          "Cant. Unidades" : `${this.formatonumeros(datos_factura[i].prod_CantidadUnidades)} Und`
         }
         console.log(info);
         this.rollosAsignados.push(info);
@@ -969,7 +969,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
           Nombre : datos_factura[i].prod_Nombre,
           Cantidad : this.formatonumeros(datos_factura[i].suma),
           Presentacion : datos_factura[i].undMed_Id,
-          Cant_Unidades : `${datos_factura[i].SumaUnd} Und`
+          "Cant. Unidades" : `${datos_factura[i].SumaUnd} Und`
         }
         this.Productos.push(info);
       }

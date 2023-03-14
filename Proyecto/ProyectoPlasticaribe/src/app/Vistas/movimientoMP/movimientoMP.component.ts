@@ -13,7 +13,6 @@ import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMater
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
 import { FactuaMpCompradaService } from 'src/app/Servicios/FacturaMateriaPrima/facturaMpComprada.service';
-import { InventInicialDiaService } from 'src/app/Servicios/InvenatiorInicialMateriaPrima/inventInicialDia.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { RecuperadoService } from 'src/app/Servicios/Recuperado/recuperado.service';
@@ -128,29 +127,25 @@ export class MovimientoMPComponent implements OnInit {
   public historyHeading: string = 'Seleccionado Recientemente';
 
   constructor(private materiaPrimaService : MateriaPrimaService,
-                private categoriMpService : CategoriaMateriaPrimaService,
-                  private tipoBodegaService : TipoBodegaService,
-                    private rolService : RolesService,
-                      private frmBuilderMateriaPrima : FormBuilder,
-                        @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                          private tipoDocuemntoService : TipoDocumentoService,
-                            private proveedorService : ProveedorService,
-                              private remisionService : RemisionService,
-                                private remisionMpService : RemisionesMPService,
-                                  private facturaCompraMPService : FactuaMpCompradaService,
-                                    private facturaCompraService : FacturaMpService,
-                                      private usuarioService : UsuarioService,
-                                        private remisionFacturaService : RemisionFacturaService,
-                                          private asignacionService : AsignacionMPService,
-                                            private asignacionMpService : DetallesAsignacionService,
-                                              private recuperadoService : RecuperadoService,
-                                                private recuperadoMPService : RecuperadoMPService,
-                                                  private bagProServices : BagproService,
-                                                  private devolucionService : DevolucionesService,
-                                                    private devolucionMPService : DevolucionesMPService,
-                                                      private boppService : EntradaBOPPService,
-                                                        private asignacionBOPPService : AsignacionBOPPService,
-                                                          private detallesAsgBOPPService : DetalleAsignacion_BOPPService) {
+                private frmBuilderMateriaPrima : FormBuilder,
+                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                    private tipoDocuemntoService : TipoDocumentoService,
+                      private proveedorService : ProveedorService,
+                        private remisionService : RemisionService,
+                          private remisionMpService : RemisionesMPService,
+                            private facturaCompraMPService : FactuaMpCompradaService,
+                              private facturaCompraService : FacturaMpService,
+                                private usuarioService : UsuarioService,
+                                  private asignacionService : AsignacionMPService,
+                                    private asignacionMpService : DetallesAsignacionService,
+                                      private recuperadoService : RecuperadoService,
+                                        private recuperadoMPService : RecuperadoMPService,
+                                          private bagProServices : BagproService,
+                                          private devolucionService : DevolucionesService,
+                                            private devolucionMPService : DevolucionesMPService,
+                                              private boppService : EntradaBOPPService,
+                                                private asignacionBOPPService : AsignacionBOPPService,
+                                                  private detallesAsgBOPPService : DetalleAsignacion_BOPPService) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : new FormControl(),

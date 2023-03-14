@@ -59,19 +59,18 @@ export class MovimientoMatPrimaComponent implements OnInit {
   tituloModal : string = '';
   componenteModal : any = '';
 
-  constructor(private rolService : RolesService,
-                private frmBuilderMateriaPrima : FormBuilder,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private materiaPrimaService : MateriaPrimaService,
-                      private tipoDocuemntoService : TipoDocumentoService,
-                        private bagProServices : BagproService,
-                          private estadoService : EstadosService,
-                            private dtAsgMP : DetallesAsignacionService,
-                              private dtDevMP : DevolucionesMPService,
-                                private dtFacturaMP : FacturaMpService,
-                                  private dtRemision : RemisionesMPService,
-                                    private dtRecuperado : RecuperadoMPService,
-                                      private dtTintas : DetallesAsignacionTintasService,) {
+  constructor(private frmBuilderMateriaPrima : FormBuilder,
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private materiaPrimaService : MateriaPrimaService,
+                    private tipoDocuemntoService : TipoDocumentoService,
+                      private bagProServices : BagproService,
+                        private estadoService : EstadosService,
+                          private dtAsgMP : DetallesAsignacionService,
+                            private dtDevMP : DevolucionesMPService,
+                              private dtFacturaMP : FacturaMpService,
+                                private dtRemision : RemisionesMPService,
+                                  private dtRecuperado : RecuperadoMPService,
+                                    private dtTintas : DetallesAsignacionTintasService,) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null, Validators.required],
@@ -153,10 +152,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
   // Funcion que va a cargar las materias primas
   obtenerMateriasPrimas(){
     this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiasPrimas => {
-      for (let i = 0; i < datos_materiasPrimas.length; i++) {
-        this.ArrayMateriaPrima.push(datos_materiasPrimas[i]);
-        this.ArrayMateriaPrima.sort((a,b) => a.matPri_Nombre.localeCompare(b.matPri_Nombre));
-      }
+      this.ArrayMateriaPrima = datos_materiasPrimas;
+      this.ArrayMateriaPrima.sort((a,b) => a.matPri_Nombre.localeCompare(b.matPri_Nombre));
     });
   }
 
@@ -1344,7 +1341,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
             Id : datos_asignacion[i].matPri_Id,
             Nombre : datos_asignacion[i].matPri_Nombre,
             Cant : this.formatonumeros(datos_asignacion[i].sum),
-            UndCant : datos_asignacion[i].undMed_Id,
+            "Und Cant" : datos_asignacion[i].undMed_Id,
           }
           this.ArrayMpPDF.push(items);
         }
@@ -1357,7 +1354,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
             Id : datos_devolucion[i].matPri_Id,
             Nombre : datos_devolucion[i].matPri_Nombre,
             Cant : this.formatonumeros(datos_devolucion[i].dtDevMatPri_CantidadDevuelta),
-            UndCant : datos_devolucion[i].undMed_Id,
+            "Und Cant" : datos_devolucion[i].undMed_Id,
           }
           this.ArrayMpPDF.push(items);
         }
@@ -1370,8 +1367,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
             Id : datos_factura[i].matPri_Id,
             Nombre : datos_factura[i].matPri_Nombre,
             Cant : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad),
-            UndCant : datos_factura[i].undMed_Id,
-            PrecioUnd : this.formatonumeros(datos_factura[i].faccoMatPri_ValorUnitario),
+            "Und Cant" : datos_factura[i].undMed_Id,
+            "Precio Und" : this.formatonumeros(datos_factura[i].faccoMatPri_ValorUnitario),
             SubTotal : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad * datos_factura[i].faccoMatPri_ValorUnitario),
           }
           this.ArrayMpPDF.push(items);
@@ -1385,8 +1382,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
             Id : datos_remision[i].matPri_Id,
             Nombre : datos_remision[i].matPri_Nombre,
             Cant : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad),
-            UndCant : datos_remision[i].undMed_Id,
-            PrecioUnd : this.formatonumeros(datos_remision[i].remiMatPri_ValorUnitario),
+            "Und Cant" : datos_remision[i].undMed_Id,
+            "Precio Und" : this.formatonumeros(datos_remision[i].remiMatPri_ValorUnitario),
             SubTotal : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad * datos_remision[i].remiMatPri_ValorUnitario),
           }
           this.ArrayMpPDF.push(items);
@@ -1400,7 +1397,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
             Id : datos_recuperado[i].matPri_Id,
             Nombre : datos_recuperado[i].matPri_Nombre,
             Cant : this.formatonumeros(datos_recuperado[i].recMatPri_Cantidad),
-            UndCant : datos_recuperado[i].undMed_Id,
+            "Und Cant" : datos_recuperado[i].undMed_Id,
           }
           this.ArrayMpPDF.push(items);
         }
@@ -1489,7 +1486,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   style: 'header'
                 },
 
-                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant']),
+                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant']),
               ],
               styles: {
                 header: {
@@ -1586,7 +1583,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   style: 'header'
                 },
 
-                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant']),
+                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant']),
               ],
               styles: {
                 header: {
@@ -1692,7 +1689,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   style: 'header'
                 },
 
-                this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant', 'Precio Und', 'Sub Total']),
 
                 {
                   text: `\n\nValor Total Factura: $${this.formatonumeros(datos_factura[i].facco_ValorTotal)}`,
@@ -1805,7 +1802,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   style: 'header'
                 },
 
-                this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant', 'Precio Und', 'Sub Total']),
               ],
               styles: {
                 header: {
@@ -1902,7 +1899,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   style: 'header'
                 },
 
-                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant']),
+                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant']),
               ],
               styles: {
                 header: {

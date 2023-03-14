@@ -531,18 +531,14 @@ export class ReporteCostosOTComponent implements OnInit {
   // Funcion que cargará el PDF con la infomración de la OT
   CargarPDF(){
     let nombre : string = this.storage.get('Nombre');
-    if (this.ArrayMateriaPrima.length == 0) Swal.fire("Debe buscar una OT para crear el reporte");
+    if (this.ArrayMateriaPrima.length == 0) this.mensajeAdvertencia("Debe buscar una OT para crear el reporte");
     else {
       for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
         for (const item of this.ArrayProcesos) {
-          let Sellado = item.Sel;
-          let SelladoNuevo = Sellado.indexOf(" KG");
-          let SelladoFinal = Sellado.substring(0, SelladoNuevo);
-          let wiketiado = item.Wik;
-          let wiketiadoNuevo = wiketiado.indexOf(" KG");
-          let wiketiadoFinal = wiketiado.substring(0, wiketiadoNuevo);
+          let Sellado = item.Sel.replace(' KG', '');
+          let wiketiado = item.Wik.replace(' KG', '');
 
-          if (SelladoFinal != 0 && wiketiadoFinal != 0 && item.Emp == 0) {
+          if (Sellado != 0 && wiketiado != 0 && item.Emp == 0) {
             const pdfDefinicion : any = {
               info: {
                 title: `${this.ordenTrabajo}`
@@ -742,7 +738,7 @@ export class ReporteCostosOTComponent implements OnInit {
             const pdf = pdfMake.createPdf(pdfDefinicion);
             pdf.open();
             break;
-          } else if (SelladoFinal == 0 && item.Emp != 0) {
+          } else if (Sellado == 0 && item.Emp != 0) {
             const pdfDefinicion : any = {
               info: {
                 title: `${this.ordenTrabajo}`
@@ -932,7 +928,7 @@ export class ReporteCostosOTComponent implements OnInit {
             pdf.open();
             break;
 
-          } else if (SelladoFinal != 0 && item.Emp == 0) {
+          } else if (Sellado != 0 && item.Emp == 0) {
             const pdfDefinicion : any = {
               info: {
                 title: `${this.ordenTrabajo}`
@@ -1216,7 +1212,7 @@ export class ReporteCostosOTComponent implements OnInit {
       this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(datos_clientesOT => {
         this.cambiarEstado2(this.ordenTrabajo, estado);
         Swal.fire({ icon : 'success', title: 'Orden Cerrada', text: `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo}!`, showCloseButton : true });
-      }, error => { Swal.fire({ icon : 'error', title: 'Opps...', html: `<b>No se ha podido cambiar el estado de la OT</b><br><span style="color: #f00">${error.message}</span>`, showCloseButton : true }); });
+      }, error => { this.mensajeError('No se ha podido cambiar el estado de la OT'); });
     }
   }
 
@@ -1234,7 +1230,7 @@ export class ReporteCostosOTComponent implements OnInit {
       this.bagProServices.srvActualizar(this.ordenTrabajo, data, '1').subscribe(datos_clientesOT => {
         this.cambiarEstado2(this.ordenTrabajo, 18);
         Swal.fire({ icon : 'success', title: 'Orden Cerrada', text: `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo} a Cerrada!`, showCloseButton : true });
-      }, error => { Swal.fire({ icon : 'error', title: 'Opps...', html: `<b>No se ha podido cambiar el estado de la OT</b><br><span style="color: #f00">${error.message}</span>`, showCloseButton : true }); });
+      }, error => { this.mensajeError(`No se ha podido cambiar el estado de la OT`); });
     }
   }
 

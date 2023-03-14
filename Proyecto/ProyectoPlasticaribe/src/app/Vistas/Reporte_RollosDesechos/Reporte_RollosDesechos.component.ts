@@ -568,7 +568,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       Orden : datos.rollo_OT,
       Rollo : datos.rollo_Id,
       Cliente : datos.rollo_Cliente,
-      ItemId : datos.prod_Id,
+      "Item Id" : datos.prod_Id,
       Item : datos.prod_Nombre,
       Ancho : datos.rollo_Ancho,
       Largo : datos.rollo_Largo,
@@ -612,7 +612,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
           Item : this.ArrayDocumento[index].ItemId,
           Nombre : this.ArrayDocumento[index].Item,
           Peso : cantidadPesos,
-          NoRollos : cantRollos,
+          "No Rollos" : cantRollos,
         }
         this.arrayDataConsolidada.push(infoConsolidada);
         this.PesoTotalKg += infoConsolidada.Peso;
@@ -744,7 +744,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             style: 'header'
           },
 
-          this.table2(this.arrayDataConsolidada, ['OT', 'Cliente', 'Item', 'Nombre', 'Peso', 'NoRollos']),
+          this.table2(this.arrayDataConsolidada, ['OT', 'Cliente', 'Item', 'Nombre', 'Peso', 'No Rollos']),
 
           {
             text: `\n\n Información detallada de los rollos eliminados \n `,
@@ -752,7 +752,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             style: 'header'
           },
 
-          this.table(this.ArrayDocumento, ['Orden', 'Rollo', 'Cliente', 'ItemId', 'Item', 'Peso', 'Fecha', 'Operario']),
+          this.table(this.ArrayDocumento, ['Orden', 'Rollo', 'Cliente', 'Item Id', 'Item', 'Peso', 'Fecha', 'Operario']),
 
           {
             text: `\n\nCantidad de rollos: ${this.cantidadOTs}`,

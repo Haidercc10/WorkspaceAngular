@@ -51,12 +51,11 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   sumaCostoTotal : number = 0;
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
-                private rolService : RolesService,
-                  private inventarioZeusService : InventarioZeusService,
-                    private FormBuild : FormBuilder,
-                      private estadosProcesos_OTService : EstadosProcesos_OTService,
-                        private pedidoProductosService : PedidoProductosService,
-                          private pedidoExternoService : OpedidoproductoService,) {
+                private inventarioZeusService : InventarioZeusService,
+                  private FormBuild : FormBuilder,
+                    private estadosProcesos_OTService : EstadosProcesos_OTService,
+                      private pedidoProductosService : PedidoProductosService,
+                        private pedidoExternoService : OpedidoproductoService,) {
 
     this.formFiltros = this.FormBuild.group({
       IdVendedor : [null],
@@ -462,9 +461,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             }
           }, 500);
         } else this.mensajeAdvertencia(`¡No hay orden asociada al pedido ${data.consecutivo}!`);
-      }, error => {
-        Swal.fire({icon : 'error', title : 'Opps...', showCloseButton: true, html : `<b>¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!</b><br><span style="color: #f00">${error.message}</span>`});
-      });
+      }, error => { this.mensajeError(`¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`); });
     }
   }
 
@@ -514,9 +511,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           }
         }
       }
-    }, error => {
-      Swal.fire({icon : 'error', title : 'Opps...', showCloseButton: true, html : `<b>¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!</b><br><span style="color: #f00">${error.message}</span>`})
-    });
+    }, error => { this.mensajeError(`¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`); });
 
     this.estadosProcesos_OTService.srvObtenerListaPorOT(data.OT).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
@@ -559,8 +554,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
               Swal.fire({icon: 'success', title: 'Cambio Exitoso', text: `¡Se cambió la orden de trabajo asociada al pedido ${data.consecutivo}!`, showCloseButton: true})
             });
-          } else Swal.fire({ icon: 'warning', title: 'Advertencia', text: `¡El Producto de la OT ${datos_ot[i].estProcOT_OrdenTrabajo} no coincide con el del pedido ${data.consecutivo}!`});
-        } else Swal.fire({ icon: 'warning', title: 'Advertencia', text: `¡La OT ${datos_ot[i].estProcOT_OrdenTrabajo} ya tiene un pedido asignado!`});
+          } else this.mensajeAdvertencia(`¡El Producto de la OT ${datos_ot[i].estProcOT_OrdenTrabajo} no coincide con el del pedido ${data.consecutivo}!`);
+        } else this.mensajeAdvertencia(`¡La OT ${datos_ot[i].estProcOT_OrdenTrabajo} ya tiene un pedido asignado!`);
       }
     });
     setTimeout(() => { this.consultarPedidos(); }, 1000);
@@ -575,9 +570,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Confirmar',
       confirmButtonColor: '#53CC48',
-    }).then((result) => {
-      if (result.isConfirmed) this.aceptarPedido(item);
-    });
+    }).then((result) => { if (result.isConfirmed) this.aceptarPedido(item); });
   }
 
   /** Aceptar Pedido para luego crearlo en Zeus */
@@ -602,8 +595,10 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       }
       this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
         this.Confirmacion(`Pedido Nro. ${item} aceptado con exito!`);
-        setTimeout(() => { this.consultarPedidosZeus(); }, 100);
-        setTimeout(() => { this.consultarPedidos(); }, 100);
+        setTimeout(() => {
+          this.consultarPedidosZeus();
+          this.consultarPedidos();
+        }, 100);
       }, error => { this.mensajeError(`No fue posible aceptar el pedido ${item}, por favor, verifique!`); });
     });
   }
@@ -617,9 +612,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Confirmar',
       confirmButtonColor: '#53CC48',
-    }).then((result) => {
-      if (result.isConfirmed) this.cancelarPedido(item);
-    });
+    }).then((result) => { if (result.isConfirmed) this.cancelarPedido(item); });
   }
 
   /** Aceptar Pedido para luego crearlo en Zeus */
@@ -644,8 +637,10 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       }
       this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
         this.Confirmacion(`Pedido Nro. ${item} cancelado con exito!`);
-        setTimeout(() => { this.consultarPedidosZeus(); }, 100);
-        setTimeout(() => { this.consultarPedidos(); }, 100);
+        setTimeout(() => {
+          this.consultarPedidosZeus();
+          this.consultarPedidos();
+        }, 100);
       }, error => { this.mensajeError(`No fue posible cancelar el pedido ${item}, por favor, verifique!`); });
     });
   }

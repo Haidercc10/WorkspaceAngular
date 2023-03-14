@@ -36,18 +36,16 @@ export class MovimientosTintasComponent implements OnInit {
   ArrayEstados : any = []; //Variable en la que se almacenaran los estados que puede tener una orden de trabajo
   ArrayMpPDF : any = [] //Variable que almacenará las materias primas del pdf que se esé consultando
 
-  constructor(private rolService : RolesService,
-                private frmBuilderMateriaPrima : FormBuilder,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private materiaPrimaService : MateriaPrimaService,
-                      private tipoDocuemntoService : TipoDocumentoService,
-                        private bagProServices : BagproService,
-                          private estadoService : EstadosService,
-                            private dtFacturaMP : FacturaMpService,
-                              private dtRemision : RemisionesMPService,
-                                private servicioTintas : TintasService,
-                                  private dtAsgTinta : DetallesAsignacionTintasService,
-                                    private dtCreacionTinta : DetallesAsignacionMPxTintasService,) {
+  constructor(private frmBuilderMateriaPrima : FormBuilder,
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private materiaPrimaService : MateriaPrimaService,
+                    private tipoDocuemntoService : TipoDocumentoService,
+                      private estadoService : EstadosService,
+                        private dtFacturaMP : FacturaMpService,
+                          private dtRemision : RemisionesMPService,
+                            private servicioTintas : TintasService,
+                              private dtAsgTinta : DetallesAsignacionTintasService,
+                                private dtCreacionTinta : DetallesAsignacionMPxTintasService,) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null, Validators.required],
@@ -765,7 +763,7 @@ export class MovimientosTintasComponent implements OnInit {
             Id : datos_asignacion[i].tinta_Id,
             Nombre : datos_asignacion[i].tinta_Nombre,
             Cant : this.formatonumeros(datos_asignacion[i].sum),
-            UndCant : datos_asignacion[i].undMed_Id,
+            "Und Cant" : datos_asignacion[i].undMed_Id,
           }
           this.ArrayMpPDF.push(items);
         }
@@ -778,8 +776,8 @@ export class MovimientosTintasComponent implements OnInit {
             Id : datos_factura[i].matPri_Id,
             Nombre : datos_factura[i].matPri_Nombre,
             Cant : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad),
-            UndCant : datos_factura[i].undMed_Id,
-            PrecioUnd : this.formatonumeros(datos_factura[i].faccoMatPri_ValorUnitario),
+            "Und Cant" : datos_factura[i].undMed_Id,
+            "Precio Und" : this.formatonumeros(datos_factura[i].faccoMatPri_ValorUnitario),
             SubTotal : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad * datos_factura[i].faccoMatPri_ValorUnitario),
           }
           this.ArrayMpPDF.push(items);
@@ -793,8 +791,8 @@ export class MovimientosTintasComponent implements OnInit {
             Id : datos_remision[i].matPri_Id,
             Nombre : datos_remision[i].matPri_Nombre,
             Cant : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad),
-            UndCant : datos_remision[i].undMed_Id,
-            PrecioUnd : this.formatonumeros(datos_remision[i].remiMatPri_ValorUnitario),
+            "Und Cant" : datos_remision[i].undMed_Id,
+            "Precio Und" : this.formatonumeros(datos_remision[i].remiMatPri_ValorUnitario),
             SubTotal : this.formatonumeros((datos_remision[i].remiMatPri_Cantidad * datos_remision[i].remiMatPri_ValorUnitario).toFixed(2)),
           }
           this.ArrayMpPDF.push(items);
@@ -912,7 +910,7 @@ export class MovimientosTintasComponent implements OnInit {
                   fontSize: 12,
                 },
 
-                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant']),
+                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant']),
               ],
               styles: {
                 header: {
@@ -1019,7 +1017,7 @@ export class MovimientosTintasComponent implements OnInit {
                   style: 'header'
                 },
 
-                this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant', 'Precio Und', 'SubTotal']),
 
                 {
                   text: `\n\nValor Total Factura: $${this.formatonumeros(datos_factura[i].facco_ValorTotal)}`,
@@ -1132,7 +1130,7 @@ export class MovimientosTintasComponent implements OnInit {
                   style: 'header'
                 },
 
-                this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant', 'PrecioUnd', 'SubTotal']),
+                this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant', 'Precio Und', 'SubTotal']),
               ],
               styles: {
                 header: {

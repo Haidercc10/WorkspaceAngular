@@ -1,19 +1,17 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
+import { Table } from 'primeng/table/table';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.service';
 import Swal from 'sweetalert2';
-import { Workbook } from 'exceljs';
-import * as fs from 'file-saver';
-import { Table } from 'primeng/table/table';
-import moment from 'moment';
-import { AppComponent } from 'src/app/app.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -53,10 +51,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                 private tintasService : TintasService,
                   private categoriMpService : CategoriaMateriaPrimaService,
                     private tipoBodegaService : TipoBodegaService,
-                      private rolService : RolesService,
-                        private frmBuilderMateriaPrima : FormBuilder,
-                          @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                            private boppService : EntradaBOPPService,) {
+                      private frmBuilderMateriaPrima : FormBuilder,
+                        @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                          private boppService : EntradaBOPPService,) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : ['', Validators.required],
@@ -73,7 +70,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
 
   // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
-    if (this.ArrayMateriaPrima.length == 0) Swal.fire("¡Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla!");
+    if (this.ArrayMateriaPrima.length == 0) this.mensajeAdvertencia("¡Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla!");
     else {
       this.load = false;
       setTimeout(() => {
@@ -711,5 +708,15 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   // Funcion que limpiará los filtros utilizados en la tabla
   clear(table: Table) {
     table.clear();
+  }
+
+  // Funcion que va a devolver un mensahje de error
+  mensajeError(mensaje : string) {
+    Swal.fire({ icon: 'error', title: '¡Ha ocurrido un error!', text: mensaje });
+  }
+
+  // Funcion que va a devolver un mensaje de advertencia
+  mensajeAdvertencia(mensaje : string){
+    Swal.fire({ icon: 'warning', title: '¡Advertencia!', text: mensaje });
   }
 }

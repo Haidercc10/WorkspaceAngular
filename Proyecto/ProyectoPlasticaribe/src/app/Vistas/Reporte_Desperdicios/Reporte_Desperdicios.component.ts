@@ -195,7 +195,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       Und : 'Kg',
       Proceso : datos.proceso_Nombre,
       Material : datos.material_Nombre,
-      No_Conformidad : datos.falla_Nombre,
+      "No Conformidad" : datos.falla_Nombre,
       Impreso : datos.desp_Impresion,
       Maquina : datos.actv_Serial,
       Operario : datos.usua_Nombre,
@@ -314,7 +314,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
               alignment: 'center',
               style: 'subtitulo'
             },
-            this.table2(this.arrayDatosAgrupadosPdf, ['OT', 'Item', 'Nombre', 'Proceso', 'No_Conformidades', 'Cantidad', 'Presentacion']),
+            this.table2(this.arrayDatosAgrupadosPdf, ['OT', 'Item', 'Nombre', 'Proceso', 'No Conformidades', 'Cantidad', 'Presentacion']),
             '\n',
             {
               text: `Cantidad total: ${this.formatonumeros(this.totalDesperdicio)} Kg\n `,
@@ -326,7 +326,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
               alignment: 'center',
               style: 'subtitulo'
             },
-            this.table(this.arrayModal, ['OT', 'Maquina', 'Item', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Und', 'Impreso', 'Proceso', 'Fecha', ]),
+            this.table(this.arrayModal, ['OT', 'Maquina', 'Item', 'Material', 'Operario', 'No Conformidad', 'Cantidad', 'Und', 'Impreso', 'Proceso', 'Fecha', ]),
             '\n',
             {
               text: `Cantidad total: ${this.formatonumeros(this.totalDesperdicio)} Kg\n `,
@@ -467,7 +467,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       Cantidad : this.formatonumeros(cantidadProceso),
       Cantidad2 : cantidadProceso,
       Presentacion : 'Kg',
-      No_Conformidades : cantDesperdicios
+      "No Conformidades" : cantDesperdicios
     }
     this.arrayDatosAgrupadosPdf.push(info);
   }
