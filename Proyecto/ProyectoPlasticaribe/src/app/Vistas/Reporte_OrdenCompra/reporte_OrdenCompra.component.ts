@@ -274,8 +274,8 @@ export class Reporte_OrdenCompraComponent implements OnInit {
               columns: [
                 {
                   image : logoParaPdf,
-                  width : 100,
-                  height : 80
+                  width : 220,
+                  height : 50
                 },
                 {
                   text: `Orden de Compra de Materia Prima N° ${datos_orden[i].consecutivo}`,
