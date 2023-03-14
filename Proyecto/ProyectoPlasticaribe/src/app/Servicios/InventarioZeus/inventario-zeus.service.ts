@@ -6,6 +6,7 @@ import { rutaZeus } from 'src/polyfills';
 @Injectable({
   providedIn: 'root'
 })
+
 export class InventarioZeusService {
 
  //Encapsular httpClient en Constructor.
