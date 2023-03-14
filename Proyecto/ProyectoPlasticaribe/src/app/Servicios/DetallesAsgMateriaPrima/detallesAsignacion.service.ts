@@ -106,6 +106,10 @@ export class DetallesAsignacionService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/pdfMovimientos/${ot}`);
   }
 
+  getMateriasPrimasAsignadas(ot : number){
+    return this.http.get<any>(rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/getMateriaPrimaAsignada/${ot}`);
+  }
+
 //Metodo agregar
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/DetalleAsignacion_MateriaPrima', data)

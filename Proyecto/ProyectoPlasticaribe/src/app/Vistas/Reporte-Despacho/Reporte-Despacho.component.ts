@@ -44,18 +44,16 @@ export class ReporteDespachoComponent implements OnInit {
   public TipoDocumento = '';
   public Estado = '';
 
-
   constructor(private servicioProducto : ProductoService,
                 private frmBuilder : FormBuilder,
-                  private rolService : RolesService,
-                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                      private servicioEstados : EstadosService,
-                        private servicioTipoDoc : TipoDocumentoService,
-                          private servicioDtlEntradaRollos: DetallesEntradaRollosService,
-                            private dtAsigFactService : DetallesAsignacionProductosFacturaService,
-                              private dtDevolucion : DetallesDevolucionesProductosService,
-                                private dtEntradaService : DetallesEntradaRollosService,
-                                  private preCargueService : DtPreEntregaRollosService,) {
+                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                    private servicioEstados : EstadosService,
+                      private servicioTipoDoc : TipoDocumentoService,
+                        private servicioDtlEntradaRollos: DetallesEntradaRollosService,
+                          private dtAsigFactService : DetallesAsignacionProductosFacturaService,
+                            private dtDevolucion : DetallesDevolucionesProductosService,
+                              private dtEntradaService : DetallesEntradaRollosService,
+                                private preCargueService : DtPreEntregaRollosService,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -93,15 +91,15 @@ export class ReporteDespachoComponent implements OnInit {
 
   //
   limpiarCampos(){
-    this.FormConsultarFiltros = this.frmBuilder.group({
-      Documento : [null, Validators.required],
-      ProdNombre : ['', Validators.required],
-      Rollo : ['', Validators.required ],
-      Cliente : ['', Validators.required ],
-      tipoDoc : ['', Validators.required ],
-      fechaDoc: [null, Validators.required],
-      fechaFinalDoc: [null, Validators.required],
-      estadoRollo: ['', Validators.required],
+    this.FormConsultarFiltros.patchValue({
+      Documento : null,
+      ProdNombre : '',
+      Rollo : '',
+      Cliente : '',
+      tipoDoc : '',
+      fechaDoc: null,
+      fechaFinalDoc: null,
+      estadoRollo: '',
     });
     this.infoDoc = [];
   }
@@ -280,8 +278,8 @@ export class ReporteDespachoComponent implements OnInit {
                 columns: [
                   {
                     image : logoParaPdf,
-                    width : 100,
-                    height : 80
+                    width : 220,
+                    height : 50
                   },
                   {
                     text: `Rollos de la Factura ${factura.toUpperCase()}`,
@@ -479,8 +477,8 @@ export class ReporteDespachoComponent implements OnInit {
                 columns: [
                   {
                     image : logoParaPdf,
-                    width : 100,
-                    height : 80
+                    width : 220,
+                    height : 50
                   },
                   {
                     text: `Rollos devueltos de la factura ${factura.toUpperCase()}`,
@@ -655,8 +653,8 @@ export class ReporteDespachoComponent implements OnInit {
                 columns: [
                   {
                     image : logoParaPdf,
-                    width : 100,
-                    height : 80
+                    width : 220,
+                    height : 50
                   },
                   {
                     text: `Rollos Ingresados N° ${ot}`,
@@ -821,8 +819,8 @@ export class ReporteDespachoComponent implements OnInit {
                 columns: [
                   {
                     image : logoParaPdf,
-                    width : 100,
-                    height : 80
+                    width : 220,
+                    height : 50
                   },
                   {
                     text: `Rollos Pre Ingresados N° ${ot}`,

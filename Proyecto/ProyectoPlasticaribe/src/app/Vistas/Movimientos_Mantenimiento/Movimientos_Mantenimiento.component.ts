@@ -329,7 +329,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : logoParaPdf, width : 100, height : 80 },
+                { image : logoParaPdf, width : 220, height : 50 },
                 {
                   text: `Mantenimiento de Activos N° ${datos_mantenimiento[i].mtto_Id}`,
                   alignment: 'right',

@@ -6,7 +6,6 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Table } from 'primeng/table';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -31,10 +30,9 @@ export class Inventario_ExtrusionComponent implements OnInit {
   pesoTotalOrden : number = 0; //Variable que va a tener el peso total de la orden consultada
   aperturaModal : number = 0;
 
-  constructor(private rolService : RolesService,
-                private frmBuilder : FormBuilder,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private ingRollosService : DtIngRollos_ExtrusionService) {
+  constructor(private frmBuilder : FormBuilder,
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private ingRollosService : DtIngRollos_ExtrusionService) {
 
     this.FormInventario = this.frmBuilder.group({
       OrdenTrabajo : [null],

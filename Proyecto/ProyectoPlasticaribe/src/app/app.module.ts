@@ -190,7 +190,7 @@ export const routes: Routes = [
   {path: 'reporte-facturas-remisiones-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ConsultaFac_Rem_MPComponent},
   {path: 'reporte-recuperado-mp', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component : Reporte_RecuperadoMPComponent}, // Reporte recuperado MP.
   {path: 'reporte-orden-compra', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,13]}, component: Reporte_OrdenCompraComponent},
-  {path: 'reporte-BOPP', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ReporteInventarioBOPPComponent},
+  {path: 'reporte-BOPP', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3,4]}, component: ReporteInventarioBOPPComponent},
   {path: 'reporte-Inventario-MateriaPrima', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,3]}, component: ReporteInventarioMateriaPrimaComponent},
 
   /************************************************************************ DESPACHO ************************************************************************/

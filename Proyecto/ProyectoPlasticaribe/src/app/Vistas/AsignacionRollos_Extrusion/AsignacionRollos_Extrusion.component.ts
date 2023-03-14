@@ -7,7 +7,6 @@ import { AsignacionRollos_ExtrusionService } from 'src/app/Servicios/AsignaciinR
 import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollosExtrusion/DetallesAsgRollos_Extrusion.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -15,6 +14,7 @@ import Swal from 'sweetalert2';
   templateUrl: './AsignacionRollos_Extrusion.component.html',
   styleUrls: ['./AsignacionRollos_Extrusion.component.css']
 })
+
 export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   public FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
@@ -36,12 +36,11 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   rollosPDF : any [] = []; //Variable que almacenará la informacion de los rollos salientes
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private dtIngRollosService : DtIngRollos_ExtrusionService,
-                      private procesosService : ProcesosService,
-                        private asgRollos : AsignacionRollos_ExtrusionService,
-                          private dtAsgRollos : DetallesAsgRollos_ExtrusionService,) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private dtIngRollosService : DtIngRollos_ExtrusionService,
+                    private procesosService : ProcesosService,
+                      private asgRollos : AsignacionRollos_ExtrusionService,
+                        private dtAsgRollos : DetallesAsgRollos_ExtrusionService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -107,8 +106,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   obtenerProcesos(){
     this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
       for (let i = 0; i < datos_procesos.length; i++) {
-        if (datos_procesos[i].proceso_Id != 'RECUP'
-            && datos_procesos[i].proceso_Id != 'TINTAS') this.procesos.push(datos_procesos[i]);
+        if (datos_procesos[i].proceso_Id != 'RECUP' && datos_procesos[i].proceso_Id != 'TINTAS') this.procesos.push(datos_procesos[i]);
       }
     });
   }
@@ -261,11 +259,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
           }
         });
       }
-
-      setTimeout(() => {
-        if (consulta <= 0) this.mensajeAdvertencia('¡No hay rollos por salir!');
-        this.cargando = true;
-      }, 2000);
+      setTimeout(() => { if (consulta <= 0) this.mensajeAdvertencia('¡No hay rollos por salir!'); }, 2000);
     }, 3000);
   }
 
@@ -403,10 +397,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
           Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
         }
         this.dtAsgRollos.srvGuardar(info).subscribe(datos_rollos => {
-        }, error => {
-          this.mensajeError(`¡¡Error al dar salida a los rollos!!`, error.message);
-          this.cargando = true;
-        });
+        }, error => { this.mensajeError(`¡¡Error al dar salida a los rollos!!`, error.message); });
       }
     }
     setTimeout(() => { this.finalizarInsercion(id); }, 3000);
@@ -429,10 +420,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
             Prod_Id : datos_Rollos[j].prod_Id,
           }
           this.dtIngRollosService.srvActualizar(datos_Rollos[j].dtIngRollo_Id, info).subscribe(datos_actualizados => {
-          }, error => {
-            this.mensajeError(`¡¡No fue posible actualizar el estado de los rollos!!`, error.message);
-            this.cargando = true;
-          });
+          }, error => { this.mensajeError(`¡¡No fue posible actualizar el estado de los rollos!!`, error.message); });
         }
       });
     }
@@ -644,10 +632,12 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   // Mensaje de Advertencia
   mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
     Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+    this.cargando = true;
   }
 
   // Mensaje de Error
   mensajeError(text : string, error : any = ''){
     Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+    this.cargando = true;
   }
 }

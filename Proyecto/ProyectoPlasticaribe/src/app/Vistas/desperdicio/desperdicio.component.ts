@@ -320,7 +320,7 @@ export class DesperdicioComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : logoParaPdf, width : 100, height : 80 },
+                { image : logoParaPdf, width : 220, height : 50 },
                 { text: `Reporte Merma de Material`, alignment: 'right',  style: 'titulo', margin: 30 }
               ]
             },

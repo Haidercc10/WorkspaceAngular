@@ -13,13 +13,13 @@ import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
-import { AsignacionMateriaPrimaComponent } from '../asignacion-materia-prima/asignacion-materia-prima.component';
 
 @Component({
   selector: 'app-reporte-estados-ot',
   templateUrl: './reporte-estados-ot.component.html',
   styleUrls: ['./reporte-estados-ot.component.css']
 })
+
 export class ReporteEstadosOTComponent implements OnInit {
 
   public formularioOT !: FormGroup;
@@ -43,15 +43,14 @@ export class ReporteEstadosOTComponent implements OnInit {
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
                   private rolService : RolesService,
-                    private tipoDocumentoService : TipoDocumentoService,
-                      private bagProServices : BagproService,
-                        private asignacionService : AsignacionMPService,
-                          private asignacionMpService : DetallesAsignacionService,
-                            private usuariosService : UsuarioService,
-                              private estadosService : EstadosService,
-                                private boppService : EntradaBOPPService,
-                                  private asignacionBOPPService : AsignacionBOPPService,
-                                    private detallesAsgBOPPService : DetalleAsignacion_BOPPService) {
+                    private bagProServices : BagproService,
+                      private asignacionService : AsignacionMPService,
+                        private asignacionMpService : DetallesAsignacionService,
+                          private usuariosService : UsuarioService,
+                            private estadosService : EstadosService,
+                              private boppService : EntradaBOPPService,
+                                private asignacionBOPPService : AsignacionBOPPService,
+                                  private detallesAsgBOPPService : DetalleAsignacion_BOPPService) {
 
       this.formularioOT = this.frmBuilder.group({
         idDocumento : new FormControl(),
@@ -884,13 +883,12 @@ export class ReporteEstadosOTComponent implements OnInit {
     var body = [];
     body.push(columns);
     data.forEach(function(row) {
-        var dataRow = [];
-        columns.forEach(function(column) {
-            dataRow.push(row[column].toString());
-        });
-        body.push(dataRow);
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
     });
-
     return body;
   }
 

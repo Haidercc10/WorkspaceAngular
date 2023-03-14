@@ -34,13 +34,12 @@ export class AsignacionTintasComponent implements OnInit {
   componenteCrearMateriasPrimas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
-                private rolService : RolesService,
-                  private frmBuilder : FormBuilder,
-                    private unidadMedidaService : UnidadMedidaService,
-                      private materiaPrimaService : MateriaPrimaService,
-                        private tintasService : TintasService,
-                          private asignacionMPxTintas : AsignacionMPxTintasService,
-                            private detallesAsignacionMPxTintas : DetallesAsignacionMPxTintasService,)  {
+                private frmBuilder : FormBuilder,
+                  private unidadMedidaService : UnidadMedidaService,
+                    private materiaPrimaService : MateriaPrimaService,
+                      private tintasService : TintasService,
+                        private asignacionMPxTintas : AsignacionMPxTintasService,
+                          private detallesAsignacionMPxTintas : DetallesAsignacionMPxTintasService,)  {
 
     this.FormAsignacionMP = this.frmBuilder.group({
       Id_Tinta : [null, Validators.required],

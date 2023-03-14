@@ -852,7 +852,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : logoParaPdf, width : 100, height : 80 },
+                { image : logoParaPdf, width : 220, height : 50 },
                 { text: `Pedido Zeus ${item.consecutivo}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },
@@ -975,7 +975,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : logoParaPdf, width : 100, height : 80 },
+                { image : logoParaPdf, width : 220, height : 50 },
                 { text: `Pedido ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },

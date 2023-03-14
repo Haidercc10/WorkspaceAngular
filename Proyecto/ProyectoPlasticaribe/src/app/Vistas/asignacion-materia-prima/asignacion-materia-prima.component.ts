@@ -6,11 +6,8 @@ import { AsignacionMPService } from 'src/app/Servicios/Asignacion_MateriaPrima/a
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { DetallesAsignacionTintasService } from 'src/app/Servicios/DetallesAsgTintas/detallesAsignacionTintas.service';
-import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
-import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
@@ -50,16 +47,13 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private unidadMedidaService : UnidadMedidaService,
                   private procesosService : ProcesosService,
-                    private rolService : RolesService,
-                      private frmBuilderMateriaPrima : FormBuilder,
-                        @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                          private asignacionMPService : AsignacionMPService,
-                            private detallesAsignacionService : DetallesAsignacionService,
-                              private bagProServices : BagproService,
-                                private tintasService : TintasService,
-                                  private detallesAsignacionTintas : DetallesAsignacionTintasService,
-                                    private devolucionesService : DevolucionesService,
-                                      private devolucionesMPService : DevolucionesMPService, ) {
+                    private frmBuilderMateriaPrima : FormBuilder,
+                      @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                        private asignacionMPService : AsignacionMPService,
+                          private detallesAsignacionService : DetallesAsignacionService,
+                            private bagProServices : BagproService,
+                              private tintasService : TintasService,
+                                private detallesAsignacionTintas : DetallesAsignacionTintasService,) {
 
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : [null, Validators.required],
@@ -165,8 +159,6 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     let ot : string = this.FormMateriaPrimaRetiro.value.OTRetiro;
     this.cantRestante = 0;
     this.kgOT = 0;
-    let cantAsig : number = 0; //Variable que almacena la cantidad de materia prima que se ha asignado hasta el momento
-    let devolucionMP : number = 0; // Varibale que almacenará la cantidad de materia prima devuelta por la ot
 
     this.load = false;
     this.bagProServices.srvObtenerListaClienteOT_Item(ot).subscribe(datos_procesos => {
@@ -176,53 +168,16 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.kgOT = datos_procesos[index].datosotKg + adicional;
           this.estadoOT = datos_procesos[index].estado;
           this.FormMateriaPrimaRetiro.patchValue({ kgOt : parseFloat(datos_procesos[index].datosotKg + adicional), });
-          this.asignacionMPService.srvObtenerListaPorOt(ot).subscribe(datos_asignaciones => {
-            if (datos_asignaciones.length != 0) {
-              for (let index = 0; index < datos_asignaciones.length; index++) {
-                if (datos_asignaciones[index].asigMP_OrdenTrabajo == ot) {
-                  this.detallesAsignacionService.srvObtenerListaPorAsigId(datos_asignaciones[index].asigMp_Id).subscribe(datos_asignacionMp => {
-                    for (let i = 0; i < datos_asignacionMp.length; i++) {
-                      cantAsig += datos_asignacionMp[i].dtAsigMp_Cantidad;
-                    }
-                  });
-                }
-              }
-            }
-          }, error => {
+          this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(ot)).subscribe(datos_asignacion => {
+            this.cantRestante = this.kgOT - (datos_asignacion[0] - datos_asignacion[1]);
+            if (this.cantRestante <= 0) this.mensajeAdvertencia(`¡No se pueden hacer más asignaciones a la OT ${ot}!`);
             this.load = true;
-            this.error = true;
-            this.mensajeError(`¡Error al consultar las asignaciones de la OT ${ot}!`, error.message);
           });
-          this.devolucionesService.srvObtenerListaPorOT(ot).subscribe(datos_devoluciones => {
-            for (let i = 0; i < datos_devoluciones.length; i++) {
-              this.devolucionesMPService.srvObtenerListaPorDevId(datos_devoluciones[i].devMatPri_Id).subscribe(datos_devolucionesMP => {
-                for (let j = 0; j < datos_devolucionesMP.length; j++) {
-                  if ((datos_devolucionesMP[j].tinta_Id == null
-                    || datos_devolucionesMP[j].tinta_Id == 2001)
-                    && datos_devolucionesMP[j].matPri_Id != 84
-                    && (datos_devolucionesMP[j].bopp_Id == null
-                    || datos_devolucionesMP[j].bopp_Id == 449)) devolucionMP += datos_devolucionesMP[j].dtDevMatPri_CantidadDevuelta;
-                }
-              });
-            }
-          }, error => {
-            this.load = true;
-            this.error = true;
-            this.mensajeError(`¡Error al consultar las devoluciones de la OT ${ot}!`, error.message);
-          });
-          setTimeout(() => {
-            this.cantRestante = (this.kgOT - cantAsig) + devolucionMP;
-            this.load = true;
-          }, 1500);
           break;
         }
-      } else {
-        this.mensajeAdvertencia(`La orden de trabajo N° ${ot} no se encuentra registrada en BagPro`);
-        this.load = true;
-      }
+      } else this.mensajeAdvertencia(`La orden de trabajo N° ${ot} no se encuentra registrada en BagPro`);
     }, error => {
       this.error = true;
-      this.load = true;
       this.mensajeError(`¡Error al consultar la OT ${ot}!`, error.message);
     });
   }
@@ -545,10 +500,12 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   // Mensaje de Advertencia
   mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
     Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+    this.load = true;
   }
 
   // Mensaje de Error
   mensajeError(text : string, error : any = ''){
     Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+    this.load = true;
   }
 }

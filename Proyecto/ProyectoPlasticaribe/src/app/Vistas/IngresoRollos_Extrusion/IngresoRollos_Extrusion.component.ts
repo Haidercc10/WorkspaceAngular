@@ -1,13 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { IngRollos_ExtrusuionService } from 'src/app/Servicios/IngresoRollosBodegaExtrusion/IngRollos_Extrusuion.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -37,12 +35,10 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
   rollosPDF : any [] = [];
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                private rolService : RolesService,
-                  private cookieServices : CookieService,
-                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                      private bagProService : BagproService,
-                        private IngRollosService : IngRollos_ExtrusuionService,
-                          private dtIngRollosService : DtIngRollos_ExtrusionService,) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private bagProService : BagproService,
+                    private IngRollosService : IngRollos_ExtrusuionService,
+                      private dtIngRollosService : DtIngRollos_ExtrusionService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -74,7 +70,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   // funcion que va a limpiar los campos del formulario
   limpiarForm(){
-    this.FormConsultarRollos.setValue({
+    this.FormConsultarRollos.patchValue({
       OT_Id: null,
       IdRollo: null,
       fechaDoc : null,
@@ -86,7 +82,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que va a limpiar todos los campos
   limpiarCampos(){
-    this.FormConsultarRollos.setValue({
+    this.FormConsultarRollos.patchValue({
       OT_Id: null,
       IdRollo: null,
       fechaDoc : null,
@@ -689,7 +685,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
   calcularTotalRollos() {
     let total = 0;
     for(let sale of this.grupoProductos) {
-        total += sale.Rollos2;
+      total += sale.Rollos2;
     }
     this.totalRollos = total;
   }
@@ -719,10 +715,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         this.IngRollosService.obtenerUltimoId().subscribe(datos_ingreso => {
           this.DtIngresarRollos(datos_ingreso.ingRollo_Id);
         });
-      }, error => {
-        this.mensajeError(`¡¡Error al ingresar los rollos!!`, error.message);
-        this.cargando = true;
-      });
+      }, error => { this.mensajeError(`¡¡Error al ingresar los rollos!!`, error.message); });
     }
   }
 
@@ -741,9 +734,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
           Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
         }
         this.dtIngRollosService.srvGuardar(info).subscribe(datos_rollos => {
-        }, error => { this.mensajeError(`¡¡Error al ingresar los rollos!!`, error.message);
-          this.cargando = true;
-        });
+        }, error => { this.mensajeError(`¡¡Error al ingresar los rollos!!`, error.message); });
       }
     }
     setTimeout(() => { this.finalizarInsercion(id); }, 5000);
@@ -954,10 +945,12 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
   // Mensaje de Advertencia
   mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
     Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+    this.cargando = true;
   }
 
   // Mensaje de Error
   mensajeError(text : string, error : any = ''){
     Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+    this.cargando = true;
   }
 }

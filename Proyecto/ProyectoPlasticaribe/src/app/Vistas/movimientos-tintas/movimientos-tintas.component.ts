@@ -857,8 +857,8 @@ export class MovimientosTintasComponent implements OnInit {
                   columns: [
                     {
                       image : logoParaPdf,
-                      width : 100,
-                      height : 80
+                      width : 220,
+                      height : 50
                     },
                     {
                       text: `Plasticaribe S.A.S ---- Asignación de Tintas`,
@@ -956,8 +956,8 @@ export class MovimientosTintasComponent implements OnInit {
                   columns: [
                     {
                       image : logoParaPdf,
-                      width : 100,
-                      height : 80
+                      width : 220,
+                      height : 50
                     },
                     {
                       text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
@@ -1069,8 +1069,8 @@ export class MovimientosTintasComponent implements OnInit {
                   columns: [
                     {
                       image : logoParaPdf,
-                      width : 100,
-                      height : 80
+                      width : 220,
+                      height : 50
                     },
                     {
                       text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
@@ -1175,8 +1175,8 @@ export class MovimientosTintasComponent implements OnInit {
                 columns: [
                   {
                     image : logoParaPdf,
-                    width : 100,
-                    height : 80
+                    width : 220,
+                    height : 50
                   },
                   {
                     text: `Plasticaribe S.A.S ---- Creación de Tinta`,

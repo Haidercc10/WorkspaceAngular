@@ -1,18 +1,17 @@
 import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { TreeTable } from 'primeng/treetable';
-import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
-import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
-import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
-import Swal from 'sweetalert2';
-import * as fs from 'file-saver';
-import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
-import { Workbook } from 'exceljs';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+import { TreeTable } from 'primeng/treetable';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
+import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
+import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
+import Swal from 'sweetalert2';
+import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 
 @Component({
   selector: 'app-Reporte_PedidosVendedores',
@@ -48,11 +47,10 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
 
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
-                private rolService : RolesService,
-                  private servicioDtlPedidos : PedidoProductosService,
-                    private pedidoExternoService : OpedidoproductoService,
-                      private servicioZeus : InventarioZeusService,
-                        private estadosProcesos_OTService : EstadosProcesos_OTService,) { }
+                private servicioDtlPedidos : PedidoProductosService,
+                  private pedidoExternoService : OpedidoproductoService,
+                    private servicioZeus : InventarioZeusService,
+                      private estadosProcesos_OTService : EstadosProcesos_OTService,) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -702,7 +700,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : logoParaPdf, width : 100, height : 80 },
+                { image : logoParaPdf, width : 220, height : 50 },
                 { text: `Pedido Nro. ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },
@@ -921,7 +919,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : logoParaPdf, width : 100, height : 80 },
+                { image : logoParaPdf, width : 220, height : 50 },
                 { text: `Pedido Zeus Nro. ${item.consecutivo}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },

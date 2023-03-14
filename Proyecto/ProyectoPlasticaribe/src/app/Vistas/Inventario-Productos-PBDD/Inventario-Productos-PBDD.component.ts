@@ -195,23 +195,9 @@ export class InventarioProductosPBDDComponent implements OnInit {
                 html: `<b>¡Se actualizó la información del producto ${data.NombreItem}!</b>`,
               });
               this.InventarioExistenciaBDNueva();
-            }, error => {
-              Swal.fire({
-                icon: 'error',
-                title: 'Opps...',
-                showCloseButton: true,
-                html: `<b>¡Error al actualizar la información del producto ${data.NombreItem}!</b>` + `<spam style="color: #f00">${error.message}</spam>`,
-              });
-            });
+            }, error => { this.mensajeError(`¡Error al actualizar la información del producto ${data.NombreItem}!`); });
           }
-        }, error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Opps...',
-            showCloseButton: true,
-            html: `<b>¡Error al buscar la información del producto ${data.NombreItem}!</b>` + `<spam style="color: #f00">${error.message}</spam>`,
-          });
-        });
+        }, error => { this.mensajeError(`¡Error al buscar la información del producto ${data.NombreItem}!`); });
         break;
       }
     }
@@ -254,22 +240,18 @@ export class InventarioProductosPBDDComponent implements OnInit {
             html: `<b>¡Se actualizó la información del producto ${data.NombreItem}!</b>`,
           });
           this.InventarioExistenciaBDNueva();
-        }, error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Opps...',
-            showCloseButton: true,
-            html: `<b>¡Error al actualizar la información del producto ${data.NombreItem}!</b>` + `<spam style="color: #f00">${error.message}</spam>`,
-          });
-        });
+        }, error => { this.mensajeError(`¡Error al actualizar la información del producto ${data.NombreItem}!`); });
       }
-    }, error => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Opps...',
-        showCloseButton: true,
-        html: `<b>¡Error al buscar la información del producto ${data.NombreItem}!</b>` + `<spam style="color: #f00">${error.message}</spam>`,
-      });
-    });
+    }, error => { this.mensajeError(`¡Error al buscar la información del producto ${data.NombreItem}!`); });
+  }
+
+  // Funcion que va a devolver un mensaje de error
+  mensajeError(mensaje : string){
+    Swal.fire({ icon: 'error', title: 'Opps...', text: mensaje, showCloseButton: true });
+  }
+
+  // Funcion que va a devolver un mensaje de advertencia
+  mensajeAdvertencia(mensaje : string) {
+    Swal.fire({ icon: 'warning', title: 'Advertencia', text: mensaje, showCloseButton: true, });
   }
 }

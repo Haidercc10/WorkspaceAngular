@@ -2,7 +2,6 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
@@ -81,15 +80,14 @@ export class ReporteCostosOTComponent implements OnInit {
   constructor(private frmBuilderMateriaPrima : FormBuilder,
                 private bagProServices : BagproService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private rolService : RolesService,
-                      private detallesAsignacionService : DetallesAsignacionService,
-                        private materiaPrimaService : MateriaPrimaService,
-                          private devolucionesService : DevolucionesService,
-                            private devolucionesMPService : DevolucionesMPService,
-                              private boppService : EntradaBOPPService,
-                                private tintaService : TintasService,
-                                  private estadosProcesos_OTService : EstadosProcesos_OTService,
-                                    private paginaPrincipal : PaginaPrincipalComponent) {
+                    private detallesAsignacionService : DetallesAsignacionService,
+                      private materiaPrimaService : MateriaPrimaService,
+                        private devolucionesService : DevolucionesService,
+                          private devolucionesMPService : DevolucionesMPService,
+                            private boppService : EntradaBOPPService,
+                              private tintaService : TintasService,
+                                private estadosProcesos_OTService : EstadosProcesos_OTService,
+                                  private paginaPrincipal : PaginaPrincipalComponent) {
 
     this.infoOT = this.frmBuilderMateriaPrima.group({
       ot : ['',Validators.required],
@@ -208,10 +206,8 @@ export class ReporteCostosOTComponent implements OnInit {
     let ot : number = this.infoOT.value.ot;
     let porcentajeMargen : number = 0;
     this.bagProServices.srvObtenerListaClienteOT_ItemCostos(ot).subscribe(datos_OT => {
-      if (datos_OT.length == 0) {
-        Swal.fire(`No se encuentran registros de la OT ${ot}`);
-        this.load = true;
-      } else {
+      if (datos_OT.length == 0) this.mensajeAdvertencia(`No se encuentran registros de la OT ${ot}`);
+      else {
         for (const item of datos_OT) {
           porcentajeMargen = (item.datosmargenKg / item.datosotKg) * 100;
 
@@ -227,16 +223,13 @@ export class ReporteCostosOTComponent implements OnInit {
           this.valorUnitarioProdUnd = item.datosvalorBolsa;
           this.valorUnitarioProdKg = item.datosValorKg;
           this.valorEstimadoOT = Math.round(item.datosvalorOt);
-          let FechaDatetime = item.fechaCrea;
-          let FechaCreacionNueva = FechaDatetime.indexOf("T");
-          let fechaCreacionFinal = FechaDatetime.substring(0, FechaCreacionNueva);
-          this.fechaOT = fechaCreacionFinal;
+          this.fechaOT = item.fechaCrea.replace('T00:00:00', '');
           this.usuarioCreador = item.usrCrea;
           if (item.estado == null || item.estado == '' || item.estado == '0') this.estado = '0';
           else if (item.estado == 4) this.estado = '4';
           else if (item.estado == 1) this.estado = '1';
 
-          this.infoOT.setValue({
+          this.infoOT.patchValue({
             ot : ot,
             cliente : item.clienteNom,
             IdProducto : item.clienteItems,
@@ -570,8 +563,8 @@ export class ReporteCostosOTComponent implements OnInit {
                   columns: [
                     {
                       image : logoParaPdf,
-                      width : 100,
-                      height : 80
+                      width : 220,
+                      height : 50
                     },
                     {
                       text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
@@ -759,8 +752,8 @@ export class ReporteCostosOTComponent implements OnInit {
                   columns: [
                     {
                       image : logoParaPdf,
-                      width : 100,
-                      height : 80
+                      width : 220,
+                      height : 50
                     },
                     {
                       text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
@@ -949,8 +942,8 @@ export class ReporteCostosOTComponent implements OnInit {
                   columns: [
                     {
                       image : logoParaPdf,
-                      width : 100,
-                      height : 80
+                      width : 220,
+                      height : 50
                     },
                     {
                       text: `Plasticaribe S.A.S ---- Reporte de Orden de Trabajo`,
@@ -1243,5 +1236,17 @@ export class ReporteCostosOTComponent implements OnInit {
         Swal.fire({ icon : 'success', title: 'Orden Cerrada', text: `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo} a Cerrada!`, showCloseButton : true });
       }, error => { Swal.fire({ icon : 'error', title: 'Opps...', html: `<b>No se ha podido cambiar el estado de la OT</b><br><span style="color: #f00">${error.message}</span>`, showCloseButton : true }); });
     }
+  }
+
+  // Funcion que mostrará un mensaje de error
+  mensajeError(mensaje : string){
+    Swal.fire({icon: 'error', title: '¡Algo salió mal!', text: mensaje });
+    this.load = true;
+  }
+
+  // funcion que mostrará un mensaje de advertencia
+  mensajeAdvertencia(mensaje : string) {
+    Swal.fire({icon: 'warning', title: '¡Advertencia!', text: mensaje });
+    this.load = true;
   }
 }

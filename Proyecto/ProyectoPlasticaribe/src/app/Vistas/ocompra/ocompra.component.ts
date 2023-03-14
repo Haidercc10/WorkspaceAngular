@@ -488,8 +488,8 @@ export class OcompraComponent implements OnInit {
               columns: [
                 {
                   image : logoParaPdf,
-                  width : 100,
-                  height : 80
+                  width : 220,
+                  height : 50
                 },
                 {
                   text: `Orden de Compra de Materia Prima N° ${datos_orden[i].consecutivo}`,
@@ -698,7 +698,7 @@ export class OcompraComponent implements OnInit {
   /** Actualizar Precio de la materia prima al momento de crear la OC*/
   actualizarPrecioMatPrimas(){
     for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
-      if(this.materiasPrimasSeleccionadas[index].Id != 84 && this.materiasPrimasSeleccionadas[index].Id < 2000) {
+      if(this.materiasPrimasSeleccionadas[index].Id_Mp != 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta < 2000) {
         this.materiaPrimaService.srvObtenerListaPorId(this.materiasPrimasSeleccionadas[index].Id).subscribe(dataMatPrimas =>{
          this.cargarDatosMatPrima(this.materiasPrimasSeleccionadas[index], dataMatPrimas);
         });
@@ -728,7 +728,7 @@ export class OcompraComponent implements OnInit {
   /** Actualizar Precio de la materia prima al momento de crear la OC */
   actualizarPrecioTintas(){
     for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
-      if(this.materiasPrimasSeleccionadas[index].Id != 2001 && this.materiasPrimasSeleccionadas[index].Id > 2001)
+      if(this.materiasPrimasSeleccionadas[index].Id_Tinta != 2001 && this.materiasPrimasSeleccionadas[index].Id_Tinta > 2001)
       this.servicioTintas.srvObtenerListaPorId(this.materiasPrimasSeleccionadas[index].Id).subscribe(dataTintas =>{
          this.cargarDatosTintas(this.materiasPrimasSeleccionadas[index], dataTintas);
       });

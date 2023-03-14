@@ -7,7 +7,6 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Table } from 'primeng/table';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { Tipo_ActivoService } from 'src/app/Servicios/TiposActivos/Tipo_Activo.service';
 import Swal from 'sweetalert2';
 import { Movimientos_MantenimientoComponent } from '../Movimientos_Mantenimiento/Movimientos_Mantenimiento.component';
@@ -39,10 +38,9 @@ export class Reporte_MantenimientoComponent implements OnInit {
   @ViewChild(Movimientos_MantenimientoComponent) movimientosActivos : Movimientos_MantenimientoComponent;
 
   constructor(private frmBuilderMateriaPrima : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private activosService : ActivosService,
-                      private tipoActivoService : Tipo_ActivoService,) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private activosService : ActivosService,
+                    private tipoActivoService : Tipo_ActivoService,) {
 
     this.FormActivos = this.frmBuilderMateriaPrima.group({
       ActivoId : [null, Validators.required],

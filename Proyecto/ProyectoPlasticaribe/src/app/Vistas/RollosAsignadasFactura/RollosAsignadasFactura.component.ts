@@ -508,8 +508,8 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                 columns: [
                   {
                     image : logoParaPdf,
-                    width : 100,
-                    height : 80
+                    width : 220,
+                    height : 50
                   },
                   {
                     text: `Rollos de la Factura ${factura.toUpperCase()}`,

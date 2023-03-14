@@ -17,6 +17,7 @@ import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { FilterService } from 'primeng/api';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
+import moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +41,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   month : any = new Date(); //Variable que se usará para llenar la fecha de hace un mes
   ArrayDocumento = []; //Varibale que almacenará la información que se mostrará en la tabla de vista
   load : boolean = true; //Variable que permitirá validar si debe salir o no la imagen de carga
@@ -136,14 +137,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   //Funcion que colocará la fecha actual
   fecha(){
-    this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
-
     this.month = new Date();
     var dd : any = this.month.getDate();
     var mm : any = this.month.getMonth();
@@ -445,7 +438,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   // Funcion que limpiará todos los campos de la vista
   limpiarCampos(){
     this.ArrayDocumento = [];
-    this.formularioOT = this.frmBuilder.group({
+    this.formularioOT.patchValue({
       idDocumento : [null],
       fecha: [null],
       fechaFinal : [null],
@@ -500,11 +493,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   // Funcion que mostrará las posibles fallas que puede tener una orden de trabajo en produccion
   ObternerFallas(){
-    this.fallasTecnicasService.srvObtenerLista().subscribe(datos_fallas => {
-      for (let i = 0; i < datos_fallas.length; i++) {
-        this.fallas.push(datos_fallas[i]);
-      }
-    });
+    this.fallasTecnicasService.srvObtenerLista().subscribe(datos_fallas => { this.fallas = datos_fallas; });
   }
 
   //Funcion que consultará los estados para ordenes de trabajo
@@ -792,14 +781,11 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       { header: 'Cant Ingresada a Despacho', field: 'entrada'},
       { header: 'Cant Facturada', field: 'salida'},
       { header: 'Fallas', field: 'falla'},
-      // { header: 'Cliente', field: 'cli'},
-      // { header: 'Producto', field: 'prod'},
       { header: 'Fecha Inicio OT', field: 'fechaInicio'},
       { header: 'Fecha Fin OT', field: 'fechaFinal'}
     ];
 
     this.ArrayDocumento.push(info);
-    //this.ArrayDocumento.sort((a,b) => a.fecha.localeCompare(b.fecha));
     this.ArrayDocumento.sort((a,b) => Number(b.ot) - Number(a.ot));
     this.load = true;
 
@@ -1221,10 +1207,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   // Funcion que va a cerrar el modal cuando no haya información
   cerrarModal(message : string){
-    Swal.fire({
-      title: message,
-      confirmButtonText: 'OK'
-    }).then((result) => {
+    Swal.fire({ title: message, confirmButtonText: 'OK' }).then((result) => {
       let btn : any = document.getElementById("btn-close");
       btn.click();
     });
@@ -1312,9 +1295,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
         fechaFinOT : '',
         estadoOT : '',
       });
-      setTimeout(() => {
-        this.reporteCostos.consultaOTBagPro();
-      }, 500);
+      setTimeout(() => { this.reporteCostos.consultaOTBagPro(); }, 500);
     }, 500);
   }
 
@@ -1367,7 +1348,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   // Cambia el estado de la orden de trabajo en la nueva base de datos
   cambiarEstado() {
     this.submitted = true;
-    let estado = this.otInfo.est;
     this.estadosProcesos_OTService.srvObtenerListaPorOT(this.otInfo.ot).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
         let info : any = {

@@ -7,7 +7,6 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
 import { PreEntregaRollosService } from 'src/app/Servicios/PreIngresoRollosDespacho/PreEntregaRollos.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -15,6 +14,7 @@ import Swal from 'sweetalert2';
   templateUrl: './PreIngresoRollosExtrusion.component.html',
   styleUrls: ['./PreIngresoRollosExtrusion.component.css']
 })
+
 export class PreIngresoRollosExtrusionComponent implements OnInit {
 
   public FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
@@ -40,11 +40,10 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
   cantPage : number = 25;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private bagProService : BagproService,
-                      private dtPreEntRollosService : DtPreEntregaRollosService,
-                        private preEntRollosService : PreEntregaRollosService,) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private bagProService : BagproService,
+                    private dtPreEntRollosService : DtPreEntregaRollosService,
+                      private preEntRollosService : PreEntregaRollosService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -466,8 +465,8 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
                 columns: [
                   {
                     image : logoParaPdf,
-                    width : 100,
-                    height : 80
+                    width : 220,
+                    height : 50
                   },
                   {
                     text: `Pre Cargue de Rollos`,
@@ -706,7 +705,7 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     Swal.fire({icon: 'warning',  title: 'Advertencia', text: `La fecha seleccionada no es válida`, confirmButtonColor: '#ffc107', });
   }
 
-    /** Función para seleccionar los rollos a insertar (Uno a uno)*/
+  /** Función para seleccionar los rollos a insertar (Uno a uno)*/
   cargarRollosInsertar(item) {
     let scrollable : number = window.scrollY;
     this.cargando = false;
@@ -717,7 +716,6 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     this.rollosInsertar.sort((a,b) => Number(a.Id) - Number(b.Id) );
     setTimeout(() => { window.scroll(0, scrollable) }, 10);
   }
-
 
   /** Función para seleccionar todos los rollos a insertar */
   cargarTodosRollosInsertar(item){
@@ -741,7 +739,6 @@ export class PreIngresoRollosExtrusionComponent implements OnInit {
     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
     setTimeout(() => { window.scroll(0, scrollable) }, 10);
   }
-
 
   /** Funcion para quitar todos los rollos seleccionados para insertar previamente. */
   quitarTodosRollosInsertar(){

@@ -27,7 +27,7 @@ export class Ingresar_ProductosComponent implements OnInit {
   public FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
 
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   hora : any = moment().format("H:mm:ss"); //Variable que almacenará la hora
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
@@ -47,16 +47,15 @@ export class Ingresar_ProductosComponent implements OnInit {
   rollosSinIngresar : number = 0; // variable para calcular la cantidad de rollos que no se han ingresado
   rollosIngresados : number = 0; //variable para calcular la cantidad de rollos que se han ingresado
   public page : number;
-  fechaBusqueda : any = new Date(); // Variable que va a ayudar al momento de saber hasta que fecha se va a buscar
+  fechaBusqueda : any = moment().subtract(4, 'day').format('YYYY-MM-DD'); // Variable que va a ayudar al momento de saber hasta que fecha se va a buscar
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                      private ExistenciasProdService : ExistenciasProductosService,
-                        private entradaRolloService : EntradaRollosService,
-                          private dtEntradaRollosService : DetallesEntradaRollosService,
-                              private productosService : ProductoService,
-                                  private dtPreEntregaService : DtPreEntregaRollosService,) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private ExistenciasProdService : ExistenciasProductosService,
+                    private entradaRolloService : EntradaRollosService,
+                      private dtEntradaRollosService : DetallesEntradaRollosService,
+                          private productosService : ProductoService,
+                              private dtPreEntregaService : DtPreEntregaRollosService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -69,7 +68,6 @@ export class Ingresar_ProductosComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.fecha();
     this.lecturaStorage();
   }
 
@@ -87,30 +85,9 @@ export class Ingresar_ProductosComponent implements OnInit {
     this.ValidarRol = this.storage.get('Rol');
   }
 
-  //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
-  fecha(){
-    this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
-
-    this.FormConsultarRollos.setValue({
-      OT_Id: null,
-      IdRollo : null,
-      fechaDoc : null,
-      fechaFinalDoc: null,
-      Observacion : null,
-      Proceso : null,
-    });
-    this.fechaBusqueda = moment().subtract(4, 'day').format('YYYY-MM-DD');
-  }
-
   // Funcion para limpiar los campos de la vista
   limpiarCampos(){
-    this.FormConsultarRollos.setValue({
+    this.FormConsultarRollos.patchValue({
       OT_Id: null,
       IdRollo: null,
       fechaDoc : null,
@@ -125,12 +102,11 @@ export class Ingresar_ProductosComponent implements OnInit {
     this.cargando = true;
     this.Total = 0;
     this.rollosAsignados = [];
-    // window.location.href = "./ingresar-productos";
   }
 
   // funcion que va a limpiar los campos del formulario
   limpiarForm(){
-    this.FormConsultarRollos.setValue({
+    this.FormConsultarRollos.patchValue({
       OT_Id: null,
       IdRollo: null,
       fechaDoc : null,
@@ -885,8 +861,8 @@ export class Ingresar_ProductosComponent implements OnInit {
                 columns: [
                   {
                     image : logoParaPdf,
-                    width : 100,
-                    height : 80
+                    width : 220,
+                    height : 50
                   },
                   {
                     text: `Cargue de Rollos`,

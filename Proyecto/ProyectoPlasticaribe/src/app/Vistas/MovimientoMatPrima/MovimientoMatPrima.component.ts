@@ -1436,8 +1436,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   columns: [
                     {
                       image : logoParaPdf,
-                      width : 100,
-                      height : 80
+                      width : 220,
+                      height : 50
                     },
                     {
                       text: `Plasticaribe S.A.S ---- Asignación de Materia Prima`,
@@ -1533,8 +1533,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   columns: [
                     {
                       image : logoParaPdf,
-                      width : 100,
-                      height : 80
+                      width : 220,
+                      height : 50
                     },
                     {
                       text: `Plasticaribe S.A.S ---- Devolución de Materia Prima`,
@@ -1629,8 +1629,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   columns: [
                     {
                       image : logoParaPdf,
-                      width : 100,
-                      height : 80
+                      width : 220,
+                      height : 50
                     },
                     {
                       text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
@@ -1742,8 +1742,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   columns: [
                     {
                       image : logoParaPdf,
-                      width : 100,
-                      height : 80
+                      width : 220,
+                      height : 50
                     },
                     {
                       text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
@@ -1849,8 +1849,8 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   columns: [
                     {
                       image : logoParaPdf,
-                      width : 100,
-                      height : 80
+                      width : 220,
+                      height : 50
                     },
                     {
                       text: `Plasticaribe S.A.S ---- Recuperado de Materia Prima`,

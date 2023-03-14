@@ -11,7 +11,6 @@ import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProduc
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -79,11 +78,10 @@ export class PedidoExternoComponent implements OnInit {
                           private frmBuilderPedExterno : FormBuilder,
                             private existenciasProductosServices : ExistenciasProductosService,
                               private PedidoProductosService : PedidoProductosService,
-                                private rolService : RolesService,
-                                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                    private ClientesProductosService : ClientesProductosService,
-                                      private zeusService : InventarioZeusService,
-                                        private zeusCobtabilidadService : ZeusContabilidadService,) {
+                                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                                  private ClientesProductosService : ClientesProductosService,
+                                    private zeusService : InventarioZeusService,
+                                      private zeusCobtabilidadService : ZeusContabilidadService,) {
 
     //Campos que vienen del formulario
     this.FormPedidoExternoClientes = this.frmBuilderPedExterno.group({
@@ -735,7 +733,7 @@ export class PedidoExternoComponent implements OnInit {
           content : [
             {
               columns: [
-                { image : logoParaPdf, width : 100, height : 80 },
+                { image : logoParaPdf, width : 220, height : 50 },
                 { text: `Pedido ${datos_pedido[i].id_Pedido}`, alignment: 'right', style: 'titulo', margin: [0, 30, 0, 0], }
               ]
             },

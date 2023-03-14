@@ -6,7 +6,6 @@ import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateri
 import { RecuperadoMPService } from 'src/app/Servicios/DetallesRecuperado/recuperadoMP.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { RecuperadoService } from 'src/app/Servicios/Recuperado/recuperado.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
@@ -50,12 +49,11 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
                 private categoriMpService : CategoriaMateriaPrimaService,
                   private unidadMedidaService : UnidadMedidaService,
                     private usuarioService : UsuarioService,
-                      private rolService : RolesService,
-                        private frmBuilderMateriaPrima : FormBuilder,
-                          @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                            private recuperadoService : RecuperadoService,
-                              private recuperadoMPService : RecuperadoMPService,
-                                private turnosService : TurnosService,) {
+                      private frmBuilderMateriaPrima : FormBuilder,
+                        @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                          private recuperadoService : RecuperadoService,
+                            private recuperadoMPService : RecuperadoMPService,
+                              private turnosService : TurnosService,) {
 
     this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
@@ -161,15 +159,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   llenarUsuarioSeleccionado(){
     let usuarioSelccionado : string = this.FormMateriaPrimaRecuperada.value.usuarioNombre;
     this.usuarioService.srvObtenerListaPorId(usuarioSelccionado).subscribe(datos_usuario => {
-      this.FormMateriaPrimaRecuperada.setValue({
-        ConsecutivoFactura : this.FormMateriaPrimaRecuperada.value.ConsecutivoFactura,
-        MpingresoFecha: this.FormMateriaPrimaRecuperada.value.MpingresoFecha,
-        usuarioNombre : this.FormMateriaPrimaRecuperada.value.usuarioNombre,
-        usuarioId: datos_usuario.usua_Id,
-        MpObservacion: this.FormMateriaPrimaRecuperada.value.MpObservacion,
-        Turno : this.FormMateriaPrimaRecuperada.value.Turno,
-        Maquina : this.FormMateriaPrimaRecuperada.value.Maquina,
-      });
+      this.FormMateriaPrimaRecuperada.patchValue({ usuarioId: datos_usuario.usua_Id, });
     }, error => { this.mensajeError(`¡No se pudo obtener información del operario con el Id ${usuarioSelccionado}!`, error.message); });
   }
 

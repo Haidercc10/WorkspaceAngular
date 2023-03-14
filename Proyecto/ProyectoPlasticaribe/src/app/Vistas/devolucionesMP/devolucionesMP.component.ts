@@ -107,19 +107,8 @@ export class DevolucionesMPComponent implements OnInit {
             Proceso : datos_asignacionMP[i].proceso,
             Proceso_Nombre : datos_asignacionMP[i].nombreProceso,
           }
-          if (info.Id != 84 && info.Id <= this.maximoIdMp) {
-            info.Id_MateriaPrima = info.Id;
-            info.Id_Tinta = 2001;
-            info.Id_Bopp = 449;
-          } else if (info.Id > 2001) {
-            info.Id_Tinta = info.Id;
-            info.Id_MateriaPrima = 84;
-            info.Id_Bopp = 449;
-          } else if (info.Id != 449 && info.Id > this.maximoIdMp) {
-            info.Id_Bopp = info.Id;
-            info.Id_MateriaPrima = 84;
-            info.Id_Tinta = 2001;
-          }
+          if (info.Id_Bopp == 0) info.Id_Bopp = 449;
+
           this.materiasPrimas.push(info);
           for (let index = 0; index < this.materiasPrimas.length; index++) {
             this.materiasPrimas[index].Cantidad_Devuelta = this.materiasPrimas[index].Cantidad_Oculta;

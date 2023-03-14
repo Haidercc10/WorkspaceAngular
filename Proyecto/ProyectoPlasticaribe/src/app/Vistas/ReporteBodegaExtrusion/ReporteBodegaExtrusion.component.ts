@@ -8,7 +8,6 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollosExtrusion/DetallesAsgRollos_Extrusion.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,11 +35,10 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   totalCantidad : number = 0; //Variable que almacenará la cantidad de total de kg de los rollos
 
   constructor(private frmBuilder : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private estadosService : EstadosService,
-                      private ingRollosService : DtIngRollos_ExtrusionService,
-                        private salidaRollosService : DetallesAsgRollos_ExtrusionService,) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private estadosService : EstadosService,
+                    private ingRollosService : DtIngRollos_ExtrusionService,
+                      private salidaRollosService : DetallesAsgRollos_ExtrusionService,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -225,8 +223,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
     let producto : any = [];
     for (let i = 0; i < this.rollosPdf.length; i++) {
       if (!producto.includes(this.rollosPdf[i].OT)) {
-        let cantidad : number = 0;
-        let cantRollo : number = 0;
+        let cantidad : number = 0, cantRollo : number = 0;
         for (let j = 0; j < this.rollosPdf.length; j++) {
           if (this.rollosPdf[i].Producto == this.rollosPdf[j].Producto) {
             cantidad += this.rollosPdf[j].Cantidad2;
@@ -305,8 +302,8 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
                 columns: [
                   {
                     image : logoParaPdf,
-                    width : 100,
-                    height : 80
+                    width : 220,
+                    height : 50
                   },
                   {
                     text: `Ingreso de Rollos a Bodega de Extrusión`,
@@ -442,8 +439,8 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
                 columns: [
                   {
                     image : logoParaPdf,
-                    width : 100,
-                    height : 80
+                    width : 220,
+                    height : 50
                   },
                   {
                     text: `Salida de Rollos a Bodega de Extrusión`,
@@ -554,11 +551,11 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
     var body = [];
     body.push(columns);
     data.forEach(function(row) {
-        var dataRow = [];
-        columns.forEach(function(column) {
-            dataRow.push(row[column].toString());
-        });
-        body.push(dataRow);
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
     });
 
     return body;
@@ -584,17 +581,17 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   // Funcion que genera la tabla donde se mostrará la información de los rollos
   table2(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [60, 50, 240, 60, 40, 50],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 7,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [60, 50, 240, 60, 40, 50],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 7,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
   }
 }

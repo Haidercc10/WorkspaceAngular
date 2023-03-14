@@ -4,7 +4,6 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Table } from 'primeng/table';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
@@ -14,6 +13,7 @@ import * as fs from 'file-saver';
   templateUrl: './Reporte_FacturacionZeus.component.html',
   styleUrls: ['./Reporte_FacturacionZeus.component.css']
 })
+
 export class Reporte_FacturacionZeusComponent implements OnInit {
   @ViewChild('dt') dt: Table | undefined;
   formFiltros !: FormGroup; /** Formulario de filtros de busqueda */
@@ -37,8 +37,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                  private rolService : RolesService,
-                    private invetarioZeusService : InventarioZeusService,) {
+                  private invetarioZeusService : InventarioZeusService,) {
 
     this.formFiltros = this.frmBuilder.group({
       vendedor: [null],
@@ -128,7 +127,6 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
   /** Al momento de seleccionar un vendedor, se cargaran sus clientes en el combobox*/
   seleccionarVendedores(){
-    let expresion : any = /^[0-9]*(\.?)[0-9]+$/;
     let vendedorSeleccionado : any = this.formFiltros.value.vendedor;
     this.invetarioZeusService.getVendedoresxId(vendedorSeleccionado).subscribe(dataClientes => {
       for (let index = 0; index < dataClientes.length; index++) {
@@ -211,7 +209,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
         }
       });
     } else {
-      if(this.formFiltros.value.idcliente != null) this.cargarItemsxClientes(this.formFiltros.value.idcliente);
+      if (this.formFiltros.value.idcliente != null) this.cargarItemsxClientes(this.formFiltros.value.idcliente);
       else this.arrayItems = [];
     }
   }

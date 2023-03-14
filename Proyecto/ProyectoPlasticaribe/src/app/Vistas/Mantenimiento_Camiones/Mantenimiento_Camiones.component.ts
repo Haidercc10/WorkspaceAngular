@@ -9,9 +9,7 @@ import { DetallePedido_MantenimientoService } from 'src/app/Servicios/DetallePed
 import { Detalle_MantenimientoService } from 'src/app/Servicios/Detalle_Mantenimiento/Detalle_Mantenimiento.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { MantenimientoService } from 'src/app/Servicios/Mantenimiento/Mantenimiento.service';
-import { SrvPedido_MttoService } from 'src/app/Servicios/Pedido_Mtto/srvPedido_Mtto.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -19,6 +17,7 @@ import Swal from 'sweetalert2';
   templateUrl: './Mantenimiento_Camiones.component.html',
   styleUrls: ['./Mantenimiento_Camiones.component.css']
 })
+
 export class Mantenimiento_CamionesComponent implements OnInit {
 
   public formConsultarPedidoMtto !: FormGroup; /** Formulario de consulta inic */
@@ -48,12 +47,12 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
                   private servicioDetPedMtto : DetallePedido_MantenimientoService,
-                    private rolService : RolesService,
-                      private servicioMtto : MantenimientoService,
-                        private servicioDetMtto : Detalle_MantenimientoService,
-                          private servicioProveedores : ProveedorService,
-                            private servicioEstados : EstadosService,
-                              private messageService: MessageService,) {
+                    private servicioMtto : MantenimientoService,
+                      private servicioDetMtto : Detalle_MantenimientoService,
+                        private servicioProveedores : ProveedorService,
+                          private servicioEstados : EstadosService,
+                            private messageService: MessageService,) {
+
     this.inicializarFormulario();
     this.inicializarFormulario2();
     this.inicializarFormularioMtto();
@@ -178,7 +177,7 @@ export class Mantenimiento_CamionesComponent implements OnInit {
         }
       }
     }, error => { this.mensajeError('¡No se pudo obtener información de los pedidos y/o mantenimientos consultados!', error.message) });
-    setTimeout(() => {this.cargando = true}, 1000);
+    setTimeout(() => { this.cargando = true }, 1000);
   }
 
   /** Información que se cargará en la tabla inicial luego de realizar la consulta.  */

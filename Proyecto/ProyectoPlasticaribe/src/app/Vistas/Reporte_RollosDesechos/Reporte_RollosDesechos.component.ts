@@ -36,7 +36,6 @@ export class Reporte_RollosDesechosComponent implements OnInit {
   public ArrayDocumento : any [] = []; /** Array que contendrá la info cargada en la tabla de consultar un filtro */
   public arrayOperarios = []; /** Array que contendrá la info cargada en la tabla de operarios */
   public load : boolean = true; /** Carga la imagen de carga al momento de realizar una busqueda */
-  //public Operario : string;
   _columnasSeleccionada : any [] = []; /**  */
   first = 0; /** Cantidad de Items mostrados en la tabla. */
   rows = 10;
@@ -59,8 +58,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
                       private servicioBagPro : BagproService,
                         private servicioRollos : SrvRollosEliminadosService,
                           @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                            private rolService : RolesService,
-                              private servicioProcesos : ProcesosService,) {
+                            private servicioProcesos : ProcesosService,) {
 
     this.formConsultaRollos = this.formbuilder.group({
       OT : [null],
@@ -133,10 +131,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     if(fecha1 != null && fecha2 != null && rolloEliminado != null && productoConsulta != null && ordenTrabajo != null && proceso != null) {
       this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha2, ordenTrabajo).subscribe(dataRollos => {
         for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_Id == rolloEliminado
-            && dataRollos[index].prod_Id == productoConsulta
-            && dataRollos[index].proceso_Id == proceso) {
-              this.parametrosTablaRollos(dataRollos[index]);;
+          if (dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].prod_Id == productoConsulta && dataRollos[index].proceso_Id == proceso) {
+            this.parametrosTablaRollos(dataRollos[index]);
             this.cantidadOTs += 1;
           }
         }
@@ -158,9 +154,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     } else if(fecha1 != null && fecha2 != null && rolloEliminado != null && ordenTrabajo != null && proceso != null) {
       this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha2, ordenTrabajo).subscribe(dataRollos => {
         for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_Id == rolloEliminado
-            && dataRollos[index].proceso_Id == proceso) {
-              this.parametrosTablaRollos(dataRollos[index]);;
+          if (dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].proceso_Id == proceso) {
+            this.parametrosTablaRollos(dataRollos[index]);;
             this.cantidadOTs += 1;
           }
         }
@@ -168,21 +163,17 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     } else if(fecha1 != null && fecha2 != null && productoConsulta != null && ordenTrabajo != null && proceso != null) {
       this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha2, ordenTrabajo).subscribe(dataRollos => {
         for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].prod_Id == productoConsulta
-            && dataRollos[index].proceso_Id == proceso) {
-              this.parametrosTablaRollos(dataRollos[index]);
-              this.cantidadOTs += 1;
+          if (dataRollos[index].prod_Id == productoConsulta && dataRollos[index].proceso_Id == proceso) {
+            this.parametrosTablaRollos(dataRollos[index]);
+            this.cantidadOTs += 1;
           }
         }
       });
     } else if(fecha1 != null && rolloEliminado != null && productoConsulta != null && ordenTrabajo != null && proceso != null) {
       this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
         for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1
-            && dataRollos[index].rollo_Id == rolloEliminado
-            && dataRollos[index].prod_Id == productoConsulta
-            && dataRollos[index].proceso_Id == proceso) {
-              this.parametrosTablaRollos(dataRollos[index]);;
+          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].prod_Id == productoConsulta && dataRollos[index].proceso_Id == proceso) {
+            this.parametrosTablaRollos(dataRollos[index]);;
             this.cantidadOTs += 1;
           }
         }
@@ -190,10 +181,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     } else if(rolloEliminado != null && productoConsulta != null && ordenTrabajo != null && proceso != null) {
       this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
         for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_Id == rolloEliminado
-            && dataRollos[index].prod_Id == productoConsulta
-            && dataRollos[index].proceso_Id == proceso) {
-              this.parametrosTablaRollos(dataRollos[index]);;
+          if (dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].prod_Id == productoConsulta && dataRollos[index].proceso_Id == proceso) {
+            this.parametrosTablaRollos(dataRollos[index]);;
             this.cantidadOTs += 1;
           }
         }
@@ -201,10 +190,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     } else if(fecha1 != null && productoConsulta != null && ordenTrabajo != null && proceso != null) {
       this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
         for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1
-            && dataRollos[index].prod_Id == productoConsulta
-            && dataRollos[index].proceso_Id == proceso) {
-              this.parametrosTablaRollos(dataRollos[index]);;
+          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].prod_Id == productoConsulta && dataRollos[index].proceso_Id == proceso) {
+            this.parametrosTablaRollos(dataRollos[index]);;
             this.cantidadOTs += 1;
           }
         }
@@ -235,10 +222,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     } else if(fecha1 != null && rolloEliminado != null && ordenTrabajo != null && proceso != null) {
       this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
         for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1
-            && dataRollos[index].rollo_Id == rolloEliminado
-            && dataRollos[index].proceso_Id == proceso) {
-              this.parametrosTablaRollos(dataRollos[index]);;
+          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].proceso_Id == proceso) {
+            this.parametrosTablaRollos(dataRollos[index]);;
             this.cantidadOTs += 1;
           }
         }
@@ -246,10 +231,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     } else if(fecha1 != null && rolloEliminado != null && productoConsulta != null && proceso != null) {
       this.servicioRollos.srvObtenerListaRollosxRollo(rolloEliminado).subscribe(dataRollos => {
         for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1
-            && dataRollos[index].prod_Id == productoConsulta
-            && dataRollos[index].proceso_Id == proceso) {
-              this.parametrosTablaRollos(dataRollos[index]);;
+          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].prod_Id == productoConsulta && dataRollos[index].proceso_Id == proceso) {
+            this.parametrosTablaRollos(dataRollos[index]);;
             this.cantidadOTs += 1;;
           }
         }
@@ -257,10 +240,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     } else if(fecha1 != null && rolloEliminado != null && ordenTrabajo != null && proceso != null) {
       this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
         for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1
-            && dataRollos[index].rollo_Id == rolloEliminado
-            && dataRollos[index].proceso_Id == proceso) {
-              this.parametrosTablaRollos(dataRollos[index]);;
+          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].proceso_Id == proceso) {
+            this.parametrosTablaRollos(dataRollos[index]);;
             this.cantidadOTs += 1;
           }
         }
@@ -268,19 +249,18 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     } else if(fecha1 != null && rolloEliminado != null && productoConsulta != null && proceso != null) {
       this.servicioRollos.getRollosxFechasxRolloxItemxProceso(fecha1, fecha1, rolloEliminado, this.idProducto, proceso).subscribe(dataRollos => {
         if(dataRollos.length == 0) setTimeout(() => { this.rollosNoEncontrados(); }, 3000);
-        else
-        for (let index = 0; index < dataRollos.length; index++) {
-          this.parametrosTablaRollos(dataRollos[index]);
-          this.cantidadOTs += 1
+        else {
+          for (let index = 0; index < dataRollos.length; index++) {
+            this.parametrosTablaRollos(dataRollos[index]);
+            this.cantidadOTs += 1
+          }
         }
       });
     } else if(fecha1 != null && rolloEliminado != null && productoConsulta != null && ordenTrabajo != null) {
       this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
         for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1
-            && dataRollos[index].rollo_Id == rolloEliminado
-            && dataRollos[index].prod_Id == productoConsulta) {
-              this.parametrosTablaRollos(dataRollos[index]);;
+          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].rollo_Id == rolloEliminado && dataRollos[index].prod_Id == productoConsulta) {
+            this.parametrosTablaRollos(dataRollos[index]);;
             this.cantidadOTs += 1;
           }
         }
@@ -339,9 +319,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     } else if(fecha1 != null && rolloEliminado != null && productoConsulta != null) {
       this.servicioRollos.srvObtenerListaRollosxRollo(rolloEliminado).subscribe(dataRollos => {
         for (let index = 0; index < dataRollos.length; index++) {
-          if (dataRollos[index].rollo_FechaIngreso == fecha1
-            && dataRollos[index].prod_Id == productoConsulta) {
-            this.parametrosTablaRollos(dataRollos[index]);;
+          if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].prod_Id == productoConsulta) {
+            this.parametrosTablaRollos(dataRollos[index]);
             this.cantidadOTs += 1;
             }
         }
@@ -350,8 +329,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       this.servicioRollos.srvObtenerListaRollosxOT(ordenTrabajo).subscribe(dataRollos => {
         for (let index = 0; index < dataRollos.length; index++) {
           if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].rollo_Id == rolloEliminado) {
-            this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1
+            this.parametrosTablaRollos(dataRollos[index]);
+            this.cantidadOTs += 1;
           }
         }
       });
@@ -370,7 +349,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         for (let index = 0; index < dataRollos.length; index++) {
           if (dataRollos[index].rollo_FechaIngreso == fecha1 && dataRollos[index].prod_Id == productoConsulta) {
             this.parametrosTablaRollos(dataRollos[index]);;
-            this.cantidadOTs += 1
+            this.cantidadOTs += 1;
           }
         }
       });
@@ -737,8 +716,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             columns: [
               {
                 image : logoParaPdf,
-                width : 100,
-                height : 80
+                width : 220,
+                height : 50
               },
               {
                 text: `Plasticaribe S.A.S ---- Reporte rollos eliminados (Extrusión)`,
@@ -804,68 +783,68 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
   /** Exportar reporte de rollos en excel */
   exportarExcel(){
-      this.load = false;
-      setTimeout(() => {
-        const title = `Reporte de rollos eliminados (Extrusión)`;
-        const header = ["OT", "Rollo", "Cliente", "Nro. Item", "Nombre Item", "Peso", "Presentación", "Ancho", "Largo", "Fuelle", "Medida", "Material", "Calibre", "Operario", "Fecha", "Turno"]
-        let datos : any =[];
-        for (const item of this.ArrayDocumento) {
-          const datos1  : any = [item.Orden, item.Rollo, item.Cliente, item.ItemId, item.Item, item.Peso, item.Kg, item.Ancho, item.Largo, item.Fuelle, item.Medida, item.Material, item.Calibre, item.Operario, item.Fecha, item.Turno];
-          datos.push(datos1);
+    this.load = false;
+    setTimeout(() => {
+      const title = `Reporte de rollos eliminados (Extrusión)`;
+      const header = ["OT", "Rollo", "Cliente", "Nro. Item", "Nombre Item", "Peso", "Presentación", "Ancho", "Largo", "Fuelle", "Medida", "Material", "Calibre", "Operario", "Fecha", "Turno"]
+      let datos : any =[];
+      for (const item of this.ArrayDocumento) {
+        const datos1  : any = [item.Orden, item.Rollo, item.Cliente, item.ItemId, item.Item, item.Peso, item.Kg, item.Ancho, item.Largo, item.Fuelle, item.Medida, item.Material, item.Calibre, item.Operario, item.Fecha, item.Turno];
+        datos.push(datos1);
+      }
+      let workbook = new Workbook();
+      let worksheet = workbook.addWorksheet(`Reporte de rollos eliminados`);
+      let titleRow = worksheet.addRow([title]);
+      titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+      worksheet.addRow([]);
+      let headerRow = worksheet.addRow(header);
+      headerRow.eachCell((cell, number) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'eeeeee' }
         }
-        let workbook = new Workbook();
-        let worksheet = workbook.addWorksheet(`Reporte de rollos eliminados`);
-        let titleRow = worksheet.addRow([title]);
-        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-        worksheet.addRow([]);
-        let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell, number) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'eeeeee' }
-          }
-          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-        });
-        worksheet.mergeCells('A1:P2');
-        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-        datos.forEach(d => {
-          let row = worksheet.addRow(d);
-          let peso = row.getCell(6);
-          let color = 'F1948A';
+        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      });
+      worksheet.mergeCells('A1:P2');
+      worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+      datos.forEach(d => {
+        let row = worksheet.addRow(d);
+        let peso = row.getCell(6);
+        let color = 'F1948A';
 
-          peso.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: color }
-          }
+        peso.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: color }
+        }
 
+      });
+      worksheet.getColumn(1).width = 10;
+      worksheet.getColumn(2).width = 10;
+      worksheet.getColumn(3).width = 50;
+      worksheet.getColumn(4).width = 10;
+      worksheet.getColumn(5).width = 50;
+      worksheet.getColumn(6).width = 10;
+      worksheet.getColumn(7).width = 15;
+      worksheet.getColumn(8).width = 10;
+      worksheet.getColumn(9).width = 10;
+      worksheet.getColumn(10).width = 10;
+      worksheet.getColumn(11).width = 10;
+      worksheet.getColumn(12).width = 10;
+      worksheet.getColumn(13).width = 10;
+      worksheet.getColumn(14).width = 30;
+      worksheet.getColumn(15).width = 12;
+      worksheet.getColumn(16).width = 20;
+      setTimeout(() => {
+        workbook.xlsx.writeBuffer().then((data) => {
+          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          fs.saveAs(blob, `Reporte de rollos eliminados ${this.today}.xlsx`);
         });
-        worksheet.getColumn(1).width = 10;
-        worksheet.getColumn(2).width = 10;
-        worksheet.getColumn(3).width = 50;
-        worksheet.getColumn(4).width = 10;
-        worksheet.getColumn(5).width = 50;
-        worksheet.getColumn(6).width = 10;
-        worksheet.getColumn(7).width = 15;
-        worksheet.getColumn(8).width = 10;
-        worksheet.getColumn(9).width = 10;
-        worksheet.getColumn(10).width = 10;
-        worksheet.getColumn(11).width = 10;
-        worksheet.getColumn(12).width = 10;
-        worksheet.getColumn(13).width = 10;
-        worksheet.getColumn(14).width = 30;
-        worksheet.getColumn(15).width = 12;
-        worksheet.getColumn(16).width = 20;
-        setTimeout(() => {
-          workbook.xlsx.writeBuffer().then((data) => {
-            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            fs.saveAs(blob, `Reporte de rollos eliminados ${this.today}.xlsx`);
-          });
-          this.load = true;
-        }, 1000);
-       }, 3500);
-      setTimeout(() => {Swal.fire('Archivo generado con éxito!') }, 4000);
+        this.load = true;
+      }, 1000);
+    }, 3500);
+    setTimeout(() => {Swal.fire('Archivo generado con éxito!') }, 4000);
   }
 
   /** Elegir formato en el que desea exportar el documento. */

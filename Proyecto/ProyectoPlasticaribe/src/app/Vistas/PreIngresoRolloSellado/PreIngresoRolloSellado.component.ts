@@ -6,7 +6,6 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
 import { PreEntregaRollosService } from 'src/app/Servicios/PreIngresoRollosDespacho/PreEntregaRollos.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
@@ -41,11 +40,10 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
   public first : number = 0;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private bagProService : BagproService,
-                      private dtPreEntRollosService : DtPreEntregaRollosService,
-                        private preEntRollosService : PreEntregaRollosService,) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private bagProService : BagproService,
+                    private dtPreEntRollosService : DtPreEntregaRollosService,
+                      private preEntRollosService : PreEntregaRollosService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -79,31 +77,9 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
   //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
   fecha(){
     setTimeout(() => {
-      if (this.ValidarRol == 8){
-        this.FormConsultarRollos.setValue({
-          OT_Id: this.FormConsultarRollos.value.OT_Id,
-          fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-          fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-          Observacion : this.FormConsultarRollos.value.Observacion,
-          Proceso : '2',
-        });
-      } else if (this.ValidarRol == 9){
-        this.FormConsultarRollos.setValue({
-          OT_Id: this.FormConsultarRollos.value.OT_Id,
-          fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-          fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-          Observacion : this.FormConsultarRollos.value.Observacion,
-          Proceso : '1',
-        });
-      } else {
-        this.FormConsultarRollos.setValue({
-          OT_Id: this.FormConsultarRollos.value.OT_Id,
-          fechaDoc : this.FormConsultarRollos.value.fechaDoc,
-          fechaFinalDoc: this.FormConsultarRollos.value.fechaFinalDoc,
-          Observacion : this.FormConsultarRollos.value.Observacion,
-          Proceso : '1',
-        });
-      }
+      if (this.ValidarRol == 8) this.FormConsultarRollos.patchValue({ Proceso : '2', });
+      else if (this.ValidarRol == 9) this.FormConsultarRollos.patchValue({ Proceso : '1', });
+      else this.FormConsultarRollos.patchValue({ Proceso : '1', });
     }, 1500);
   }
 
@@ -626,8 +602,8 @@ export class PreIngresoRolloSelladoComponent implements OnInit {
                 columns: [
                   {
                     image : logoParaPdf,
-                    width : 100,
-                    height : 80
+                    width : 220,
+                    height : 50
                   },
                   {
                     text: `Pre Cargue de Rollos`,

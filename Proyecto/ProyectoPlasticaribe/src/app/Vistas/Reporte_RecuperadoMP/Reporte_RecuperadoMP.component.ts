@@ -163,29 +163,21 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
             noche = datos_recuperado[i].sumaNoche[j].suma;
           }
         }
-        this.llenarArray(
-          datos_recuperado[i].matPri_Id,
-          datos_recuperado[i].matPri_Nombre,
-          datos_recuperado[i].sumaCantidad,
-          dia,
-          noche,
-          datos_recuperado[i].undMed_Id,
-          datos_recuperado[i].turno_Id
-        );
+        this.llenarArray(datos_recuperado[i].matPri_Id, dia, noche);
       }
     });
   }
 
   // Funcion que se encargará de llenar la informacio que se mostrará en la tabla
-  llenarArray(id : any, mp : any, cant : any, dia : any, noche : any, undMed : any, turno : any){
+  llenarArray(datos : any, dia : any, noche : any){
     let info : any = {
-      idMatPrima : id,
-      matPrima : mp,
-      cant : this.formatonumeros(cant),
+      idMatPrima : datos.matPri_Id,
+      matPrima : datos.matPri_Nombre,
+      cant : this.formatonumeros(datos.sumaCantidad),
       cantDia : dia,
       cantNoche : noche,
-      undMed : undMed,
-      turno : turno,
+      undMed : datos.undMed_Id,
+      turno : datos.turno_Id,
     }
     this.columnas = [
       { header: 'Id Materia Prima', field: 'idMatPrima'},
@@ -200,7 +192,6 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
   //
   validarModal(item : any, turno : any){
     this.modalInfoRecuperado = false;
-    // this.modalRecuperado.arrayRegistros = [];
     if (turno == 'DIA' && item.cantDia > 0) this.consultarPeletizadoDia(item);
     if (turno == 'NOCHE' && item.cantNoche > 0) this.consultarPeletizadoNoche(item);
   }

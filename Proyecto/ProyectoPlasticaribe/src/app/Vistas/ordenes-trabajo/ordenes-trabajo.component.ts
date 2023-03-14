@@ -1526,7 +1526,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             content : [
               {
                 columns: [
-                  { image : logoParaPdf, width : 70, height :40 },
+                  { image : logoParaPdf, width : 220, height : 50 },
                   {
                     width: 390,
                     text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${moment().format('YYYY-MM-DD')}`,
@@ -1803,7 +1803,7 @@ export class OrdenesTrabajoComponent implements OnInit {
               // Hoja 2
               {
                 columns: [
-                  { image : logoParaPdf, width : 70, height :40 },
+                  { image : logoParaPdf, width : 220, height : 50 },
                   {
                     width: 390,
                     text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${moment().format('YYYY-MM-DD')}`,
@@ -2150,7 +2150,7 @@ export class OrdenesTrabajoComponent implements OnInit {
             content : [
               {
                 columns: [
-                  { image : logoParaPdf, width : 70, height :40 },
+                  { image : logoParaPdf, width : 220, height : 50 },
                   {
                     width: 390,
                     text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${moment().format('YYYY-MM-DD')}`,
@@ -2427,7 +2427,7 @@ export class OrdenesTrabajoComponent implements OnInit {
               // Hoja 2
               {
                 columns: [
-                  { image : logoParaPdf, width : 70, height :40 },
+                  { image : logoParaPdf, width : 220, height : 50 },
                   {
                     width: 390,
                     text: `PLASTICARIBE S.A.S 800188732-2.\nORDEN DE TRABAJO. ${moment().format('YYYY-MM-DD')}`,

@@ -565,7 +565,7 @@ export class RegistroComponentComponent implements OnInit {
   /** Agregar roles o areas dependiendo la acción del dialogo. */
   agregar() {
     if(this.accionDialogoNuevo == 'Rol') this.crearRoles();
-     else this.crearAreas();
+    else this.crearAreas();
   }
 
   /** Cargar roles al datalist al momento de escribir en el campo nombre del modal*/
@@ -593,6 +593,4 @@ export class RegistroComponentComponent implements OnInit {
       });
     }
   }
-
-
 }

@@ -247,8 +247,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
               columns: [
                 {
                   image : logoParaPdf,
-                  width : 100,
-                  height : 80
+                  width : 220,
+                  height : 50
                 },
                 {
                   text: `Reporte Merma de Material - OT ${this.otSeleccionada}`,

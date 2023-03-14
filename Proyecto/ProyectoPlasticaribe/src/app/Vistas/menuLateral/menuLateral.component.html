@@ -89,7 +89,7 @@
     </ng-container>
 
     <!-- BOPP / BOPA / POLIESTER -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" (click)="clickIcon1()" aria-controls="collapseExample">
           <ng-container *ngIf="subir1; then thenTemplate1; else elseTemplate1"></ng-container>
@@ -280,7 +280,7 @@
     </ng-container> -->
 
     <!-- GESTOR DE ARCHIVOS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" (click)="clickIcon2()" aria-controls="collapseExample">
           <ng-container *ngIf="subir2; then thenTemplate; else elseTemplate"></ng-container>
@@ -467,7 +467,7 @@
     </ng-container>
 
     <!-- MOVIMIENTOS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5 || ValidarRol == 13">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5 || ValidarRol == 13">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample10" role="button" (click)="clickIcon10()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir10; then thenTemplate10; else elseTemplate10"></ng-container>
@@ -521,7 +521,7 @@
           </ng-container>
 
           <!-- Movimientos -->
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <div class="mb-2 sangria">
               <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7_1" role="button" (click)="clickIcon7_1()" aria-expanded="false" aria-controls="collapseExample">
                 <ng-container *ngIf="subir7_1; then thenTemplate7_1; else elseTemplate7_1"></ng-container>
@@ -691,7 +691,7 @@
     </ng-container>
 
     <!-- REPORTES -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60 || ValidarRol == 3 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7" role="button" (click)="clickIcon7()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir7; then thenTemplate7; else elseTemplate7"></ng-container>
@@ -725,7 +725,7 @@
           </ng-container>
 
           <!-- Inventario Materia Prima -->
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <div class="mb-2 sangria">
               <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box" style="font-size: 15px; margin-right: 2%;"></i>
