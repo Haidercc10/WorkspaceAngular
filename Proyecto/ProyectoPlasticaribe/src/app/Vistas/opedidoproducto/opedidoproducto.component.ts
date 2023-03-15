@@ -2393,13 +2393,13 @@ export class OpedidoproductoComponent implements OnInit {
 
                         /*Luego se consulta la tabla de Clientes_Productos para saber si los productos que estan en el pedido
                         tiene una relacion con el cliente, sino es asi entonces se insertará una nueva relacion */
-                        this.ClientesProductosService.srvObtenerListaPorId(datos_sede[sede].cli_Id, item).subscribe(datos_clienteProductos => {}, error => {
-                          const clienteProductos : any = {
-                            Cli_Id: datos_sede[sede].cli_Id,
-                            Prod_Id: item,
-                          }
-                          this.ClientesProductosService.srvGuardar(clienteProductos).subscribe(datos_clienteProductos => {});
-                        });
+                        // this.ClientesProductosService.srvObtenerListaPorId(datos_sede[sede].cli_Id, item).subscribe(datos_clienteProductos => {}, error => {
+                        //   const clienteProductos : any = {
+                        //     Cli_Id: datos_sede[sede].cli_Id,
+                        //     Prod_Id: item,
+                        //   }
+                        //   this.ClientesProductosService.srvGuardar(clienteProductos).subscribe(datos_clienteProductos => {});
+                        // });
 
                         /*Finalmente se procede con la tabla PedidosExternos_Productos en la que se podrá actualizar, eliminar e insertar datos.
                         Para esto primero consultamos por el producto y el pedido, si estos existen los actualizará, sino existen los gusradará
@@ -2407,28 +2407,28 @@ export class OpedidoproductoComponent implements OnInit {
                         for (let prod = 0; prod < this.ArrayProducto.length; prod++) {
                           idProducto.push(this.ArrayProducto[prod].Id);
 
-                          this.PedidoProductosService.srvObtenerListaPorId(this.ArrayProducto[prod].Id, this.id_pedido).subscribe(datos_productosPedidos => {
+                          // this.PedidoProductosService.srvObtenerListaPorId(this.ArrayProducto[prod].Id, this.id_pedido).subscribe(datos_productosPedidos => {
 
-                            const datosProductosPedidos : any = {
-                              Prod_Id: this.ArrayProducto[prod].Id,
-                              PedExt_Id: this.id_pedido,
-                              PedExtProd_Cantidad : this.ArrayProducto[prod].Cant,
-                              UndMed_Id : this.ArrayProducto[prod].UndCant,
-                              PedExtProd_PrecioUnitario : this.ArrayProducto[prod].PrecioUnd
-                            }
-                            this.PedidoProductosService.srvActualizar(this.ArrayProducto[prod].Id, this.id_pedido, datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
+                          //   const datosProductosPedidos : any = {
+                          //     Prod_Id: this.ArrayProducto[prod].Id,
+                          //     PedExt_Id: this.id_pedido,
+                          //     PedExtProd_Cantidad : this.ArrayProducto[prod].Cant,
+                          //     UndMed_Id : this.ArrayProducto[prod].UndCant,
+                          //     PedExtProd_PrecioUnitario : this.ArrayProducto[prod].PrecioUnd
+                          //   }
+                          //   this.PedidoProductosService.srvActualizar(this.ArrayProducto[prod].Id, this.id_pedido, datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
 
-                          }, error => {
-                            const datosProductosPedidos : any = {
-                              Prod_Id: this.ArrayProducto[prod].Id,
-                              PedExt_Id: this.id_pedido,
-                              PedExtProd_Cantidad : this.ArrayProducto[prod].Cant,
-                              UndMed_Id : this.ArrayProducto[prod].UndCant,
-                              PedExtProd_PrecioUnitario : this.ArrayProducto[prod].PrecioUnd
-                            }
-                            this.PedidoProductosService.srvGuardar(datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
+                          // }, error => {
+                          //   const datosProductosPedidos : any = {
+                          //     Prod_Id: this.ArrayProducto[prod].Id,
+                          //     PedExt_Id: this.id_pedido,
+                          //     PedExtProd_Cantidad : this.ArrayProducto[prod].Cant,
+                          //     UndMed_Id : this.ArrayProducto[prod].UndCant,
+                          //     PedExtProd_PrecioUnitario : this.ArrayProducto[prod].PrecioUnd
+                          //   }
+                          //   this.PedidoProductosService.srvGuardar(datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
 
-                          });
+                          // });
                         }
                       });
                     }
@@ -2438,27 +2438,27 @@ export class OpedidoproductoComponent implements OnInit {
                     for (let prod = 0; prod < this.ArrayProducto.length; prod++) {
                       idProducto.push(this.ArrayProducto[prod].Id);
 
-                      this.PedidoProductosService.srvObtenerListaPorId(this.ArrayProducto[prod].Id, this.id_pedido).subscribe(datos_productosPedidos => {
+                      // this.PedidoProductosService.srvObtenerListaPorId(this.ArrayProducto[prod].Id, this.id_pedido).subscribe(datos_productosPedidos => {
 
-                        const datosProductosPedidos : any = {
-                          Prod_Id: this.ArrayProducto[prod].Id,
-                          PedExt_Id: this.id_pedido,
-                          PedExtProd_Cantidad : this.ArrayProducto[prod].Cant,
-                          UndMed_Id : this.ArrayProducto[prod].UndCant,
-                          PedExtProd_PrecioUnitario : this.ArrayProducto[prod].PrecioUnd
-                        }
-                        this.PedidoProductosService.srvActualizar(this.ArrayProducto[prod].Id, this.id_pedido, datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
+                      //   const datosProductosPedidos : any = {
+                      //     Prod_Id: this.ArrayProducto[prod].Id,
+                      //     PedExt_Id: this.id_pedido,
+                      //     PedExtProd_Cantidad : this.ArrayProducto[prod].Cant,
+                      //     UndMed_Id : this.ArrayProducto[prod].UndCant,
+                      //     PedExtProd_PrecioUnitario : this.ArrayProducto[prod].PrecioUnd
+                      //   }
+                      //   this.PedidoProductosService.srvActualizar(this.ArrayProducto[prod].Id, this.id_pedido, datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
 
-                      }, error => {
-                        const datosProductosPedidos : any = {
-                          Prod_Id: this.ArrayProducto[prod].Id,
-                          PedExt_Id: this.id_pedido,
-                          PedExtProd_Cantidad : this.ArrayProducto[prod].Cant,
-                          UndMed_Id : this.ArrayProducto[prod].UndCant,
-                          PedExtProd_PrecioUnitario : this.ArrayProducto[prod].PrecioUnd
-                        }
-                        this.PedidoProductosService.srvGuardar(datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
-                      });
+                      // }, error => {
+                      //   const datosProductosPedidos : any = {
+                      //     Prod_Id: this.ArrayProducto[prod].Id,
+                      //     PedExt_Id: this.id_pedido,
+                      //     PedExtProd_Cantidad : this.ArrayProducto[prod].Cant,
+                      //     UndMed_Id : this.ArrayProducto[prod].UndCant,
+                      //     PedExtProd_PrecioUnitario : this.ArrayProducto[prod].PrecioUnd
+                      //   }
+                      //   this.PedidoProductosService.srvGuardar(datosProductosPedidos).subscribe(datos_productosPedidosActualizado => {});
+                      // });
                     }
                   }
                   const Toast = Swal.mixin({
@@ -2493,9 +2493,9 @@ export class OpedidoproductoComponent implements OnInit {
 
   //Funcion que se encarga de tomar el producto eliminado de la tabla en la vista y eliminarlo en la base de datos
   eliminarProductoPedido(item : number){
-    this.PedidoProductosService.srvObtenerListaPorId(item, this.id_pedido).subscribe(datos_productosPedidos => {
-      this.PedidoProductosService.srvEliminar(item, this.id_pedido).subscribe(datos_productosPedidos_eliminado => {});
-    });
+    // this.PedidoProductosService.srvObtenerListaPorId(item, this.id_pedido).subscribe(datos_productosPedidos => {
+    //   this.PedidoProductosService.srvEliminar(item, this.id_pedido).subscribe(datos_productosPedidos_eliminado => {});
+    // });
   }
 
   //Funcion que crea un pdf del pedido una vez es actualizado

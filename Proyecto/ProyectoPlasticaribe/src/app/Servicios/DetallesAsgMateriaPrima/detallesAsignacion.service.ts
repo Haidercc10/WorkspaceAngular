@@ -26,8 +26,8 @@ export class DetallesAsignacionService {
       return this.http.get<any>(this.rutaPlasticaribeAPI + '/DetalleAsignacion_MateriaPrima')
   }
 
-  srvObtenerListaPorId(asignacion : any, materiaPrima : any){
-    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/ ?AsigMp_Id=${asignacion}&MatPri_Id=${materiaPrima}`);
+  srvObtenerListaPorId(id){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleAsignacion_MateriaPrima/${id}`);
   }
 
   srvObtenerListaPorAsigId(asignacion : any){

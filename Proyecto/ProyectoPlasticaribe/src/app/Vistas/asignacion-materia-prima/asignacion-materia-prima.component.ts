@@ -169,7 +169,14 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.estadoOT = datos_procesos[index].estado;
           this.FormMateriaPrimaRetiro.patchValue({ kgOt : parseFloat(datos_procesos[index].datosotKg + adicional), });
           this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(ot)).subscribe(datos_asignacion => {
-            this.cantRestante = this.kgOT - (datos_asignacion[0] - datos_asignacion[1]);
+            let asignacion : number = datos_asignacion[0];
+            let devolucion : number = datos_asignacion[1];
+            if (asignacion == null || asignacion == undefined) {
+              asignacion = 0;
+              devolucion = 0;
+            }
+            if (devolucion == null || devolucion == undefined) devolucion = 0;
+            this.cantRestante = this.kgOT - (asignacion - devolucion);
             if (this.cantRestante <= 0) this.mensajeAdvertencia(`¡No se pueden hacer más asignaciones a la OT ${ot}!`);
             this.load = true;
           });
