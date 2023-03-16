@@ -30,39 +30,29 @@
     <div class="mb-3">
       <div class="row g-3">
         <!-- OT -->
-        <div class="form-floating col-md">
+        <div class="form-floating col-md-2">
           <input formControlName="OTRetiro" class="form-control form-control-sm" (keyup.enter)="infoOT()" id="floatingInput" type="number" required>
           <label for="floatingInput">OT</label>
         </div>
 
-        <div class="form-floating col-md">
+        <!-- <div class="form-floating col-md">
           <input formControlName="OTImp" class="form-control form-control-sm" (keyup.enter)="infoOTImpresion()" id="floatingInput" type="number" >
           <label for="floatingInput">OT Impresión</label>
-        </div>
+        </div> -->
         <!-- Maquina -->
-        <div class="form-floating col-md">
+        <div class="form-floating col-md-2">
           <input formControlName="Maquina" type="number" class="form-control form-control-sm" id="floatingInput" title="Maquina" required>
           <label for="floatingInput">Maquina</label>
         </div>
         <!-- Kg OT -->
-        <div class="form-floating col-md">
+        <!-- <div class="form-floating col-md">
           <input formControlName="kgOt" type="number" class="form-control form-control-sm" id="floatingInput" title="Maquina" readonly onmousedown="return false;" required="">
           <label for="floatingInput">KG OT</label>
           <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <label for=""><b>Kg Restante: {{cantRestante | number}}</b></label>
           </div>
-        </div>
-        <!-- Fecha entrega -->
-        <div class="form-floating col-md">
-          <input formControlName="FechaRetiro" type="date" class="form-control form-control-sm" id="floatingInput" title="Fecha Retiro" readonly onmousedown="return false;" required="">
-          <label for="floatingInput">Fecha Retiro</label>
-        </div>
-      </div>
-    </div>
+        </div> -->
 
-    <!--Inicio Fila 2-->
-    <div class="mb-3">
-      <div class="row g-3">
         <!-- Campo Observacion -->
         <div class="form-floating col-6 col-md">
           <textarea formControlName="ObservacionRetiro"  id="floatingTextArea" type="text" class="form-control form-control-sm" maxlength="200" ></textarea>
@@ -72,6 +62,41 @@
     </div>
   </form>
   <!--Fin Formulario de asignación -->
+
+  <!-- Tabla de OT -->
+  <div class="row g-3">
+    <div class="table-responsive">
+      <p-table
+      #dt
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+      responsiveLayout="scroll"
+      [paginator]="true"
+      [rows]="20"
+      [rowHover]="true"
+      [value]="infoOrdenTrabajo">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">N°</th>
+            <th scope="col">Cliente</th>
+            <th scope="col">Item</th>
+            <th scope="col">Kg Total</th>
+            <th scope="col">Kg Restante</th>
+        </ng-template>
+        <ng-template pTemplate="body" let-ot>
+          <tr>
+            <td>{{ot.ot}}</td>
+            <td>{{ot.cliente}}</td>
+            <td>{{ot.item}}</td>
+            <td>{{ot.kg | number}}</td>
+            <td><b>{{ot.kgRestante | number}}</b></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+  <br>
 
   <!--Inicio titulo -->
   <div class="mb-3">
