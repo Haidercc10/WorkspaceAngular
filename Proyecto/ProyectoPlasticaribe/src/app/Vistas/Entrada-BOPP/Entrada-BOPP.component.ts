@@ -25,6 +25,11 @@ export class EntradaBOPPComponent implements OnInit {
   unidadMedida = []; //Variable que almacenará las unidades de medida
   ArrayBOPP = []; //Varibale que almacenará los BOPP que estarán entrando
   categorias : any = []; //Variable que almacenará las categorias que se podrán seleccionar para la materia prima a ingresar
+  nombresBopp : any =[]; /** Variable que cargará los nombres de BOPP que más suelen comprarse en la empresa */
+  micrasBopp : any =[]; /** Variable que cargará las micras de BOPP que más suelen utilizarse en la empresa */
+  anchosBopp : any =[]; /** Variable que cargará los anchos de BOPP que más suelen utilizarse en la empresa */
+  preciosBopp : any =[]; /** Variable que cargará los precios por los que más se compra BOPP en la empresa */
+  serialesBopp : any =[]; /** Variable que cargará los precios por los que más se compra BOPP en la empresa */
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
@@ -51,6 +56,11 @@ export class EntradaBOPPComponent implements OnInit {
     this.lecturaStorage();
     this.obtenerUnidadesMedida();
     this.obtenerCategorias();
+    this.getNombresBOPP();
+    this.getMicrasBOPP();
+    this.getAnchosBOPP();
+    this.getPreciosBOPP();
+    this.getSerialesBOPP();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -238,5 +248,32 @@ export class EntradaBOPPComponent implements OnInit {
   // Mensaje de Error
   mensajeError(text : string, error : any = ''){
     Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+  }
+
+  /** Obtener nombres, micras, precios, anchos y seriales más utilizados y cargarlos en los combobox en la vista */
+  getNombresBOPP() {
+    this.nombresBopp = [];
+    this.entradaBOPPService.getBopp().subscribe(data => {this.nombresBopp = data});
+    this.FormEntradaBOPP.patchValue({ Observacion : this.FormEntradaBOPP.value.Nombre });
+  }
+
+  getMicrasBOPP() {
+    this.micrasBopp = [];
+    this.entradaBOPPService.getMicras().subscribe(data => {this.micrasBopp = data});
+  }
+
+  getPreciosBOPP() {
+    this.preciosBopp = [];
+    this.entradaBOPPService.getPrecios().subscribe(data => {this.preciosBopp = data});
+  }
+
+  getAnchosBOPP() {
+    this.anchosBopp = [];
+    this.entradaBOPPService.getAnchos().subscribe(data => {this.anchosBopp = data});
+  }
+
+  getSerialesBOPP() {
+    this.serialesBopp = [];
+    this.entradaBOPPService.getSeriales().subscribe(data => {this.serialesBopp = data});
   }
 }

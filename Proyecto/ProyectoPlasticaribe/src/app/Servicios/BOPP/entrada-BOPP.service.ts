@@ -98,6 +98,27 @@ export class EntradaBOPPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getCantRollosUtilizados_Mes/${fecha1}/${fecha2}`)
   }
 
+   //Metodos para buscar datos concurrentes en tabla BOPP.
+   getBopp():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getDescripcion')
+  }
+
+  getMicras():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getMicras')
+  }
+
+  getPrecios():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getPrecios')
+  }
+
+  getAnchos():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getAnchos')
+  }
+
+  getSeriales():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getSeriales')
+  }
+
   //Metodo agregar
   srvAgregar(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/BOPP', data)

@@ -34,39 +34,59 @@
         <!-- Fila 1 -->
         <div class="mb-3">
           <div class="row g-3">
+
             <!-- Nombre BOPP -->
-            <div class="form-floating col-md-5">
-              <input formControlName="Nombre" type="text" class="form-control form-control-sm" id="floatingInput" title="Nombre BOPP" >
+            <div class="form-floating col-md-4">
+              <input formControlName="Nombre" class="form-control form-control-sm" list="bopp" id="floatingInput" title="Nombre BOPP" autocomplete="off" required (change)="getNombresBOPP()">
+              <datalist id="bopp">
+                <option value={{item}} *ngFor="let item of nombresBopp">{{item}}</option>
+              </datalist>
               <label for="floatingInput">Nombre Material</label>
             </div>
 
             <!-- Serial BOPP -->
-            <div class="form-floating col-md-3">
-              <input formControlName="serial" type="number" class="form-control form-control-sm" id="floatingInput" title="Serial BOPP" >
-              <label for="floatingInput">Pallet/Serial Material</label>
+            <div class="form-floating col-md-4">
+              <input formControlName="serial" class="form-control form-control-sm" list="serial" id="floatingInput" title="Serial BOPP" autocomplete="off" required (change)="getSerialesBOPP()">
+              <datalist id="serial">
+                <option value={{item}} *ngFor="let item of serialesBopp">{{item}}</option>
+              </datalist>
+              <label for="floatingInput">Pallet/Serial</label>
             </div>
 
             <!-- Cantidad de micras -->
             <div class="form-floating col-md-2">
-              <input formControlName="cantidad" type="number" class="form-control form-control-sm" id="floatingInput" title="Cantidad Micras" >
-              <label for="floatingInput">Cantidad en micras (µm)</label>
+              <input formControlName="cantidad" class="form-control form-control-sm" list="micras" id="floatingInput" title="Micras BOPP" autocomplete="off" required (change)="getMicrasBOPP()">
+              <datalist id="micras">
+                <option value={{item}} *ngFor="let item of micrasBopp">{{item}}</option>
+              </datalist>
+              <label for="floatingInput">Cantidad Micras(µm)</label>
             </div>
 
             <!-- Cantidad de Kilogramos -->
             <div class="form-floating col-md-2">
-              <input formControlName="cantidadKG" type="number" class="form-control form-control-sm" id="floatingInput" title="Cantidad Micras" >
-              <label for="floatingInput">Cantidad en Kilogramos (Kg)</label>
+              <input formControlName="cantidadKG" type="number" class="form-control form-control-sm" id="floatingInput" title="Cantidad Kilos" autocomplete="off">
+              <label for="floatingInput">Cantidad Kilos(Kg)</label>
             </div>
 
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="row g-3">
             <!-- precio unitario -->
             <div class="form-floating col-md-2">
-              <input formControlName="precio" type="number" class="form-control form-control-sm" id="floatingInput" title="Precio Unitario" >
-              <label for="floatingInput">Precio Unitario</label>
+              <input formControlName="precio" class="form-control form-control-sm" list="precio" id="floatingInput" title="Precio BOPP" autocomplete="off" required (change)="getPreciosBOPP()">
+              <datalist id="precio">
+                <option value={{item}} *ngFor="let item of preciosBopp">{{item}}</option>
+              </datalist>
+              <label for="floatingInput">Precio Und.</label>
             </div>
 
             <!-- Ancho -->
             <div class="form-floating col-md-2">
-              <input formControlName="ancho" type="number" class="form-control form-control-sm" id="floatingInput" title="Ancho BOPP" >
+              <input formControlName="ancho" class="form-control form-control-sm" list="ancho" id="floatingInput" title="Ancho BOPP" autocomplete="off" required (change)="getAnchosBOPP()">
+              <datalist id="ancho">
+                <option value={{item}} *ngFor="let item of anchosBopp">{{item}}</option>
+              </datalist>
               <label for="floatingInput">Ancho</label>
             </div>
 
@@ -81,7 +101,7 @@
             <!-- Campo Observacion -->
             <div class="form-floating col-md">
               <textarea formControlName="Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm" title="Descripción"></textarea>
-              <label for="floatingTextArea">Decripción</label>
+              <label for="floatingTextArea">Descripción</label>
             </div>
           </div>
         </div>
