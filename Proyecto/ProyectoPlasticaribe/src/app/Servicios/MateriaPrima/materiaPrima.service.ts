@@ -38,6 +38,16 @@ export class MateriaPrimaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMpTintaBopp/${id}`);
   }
 
+  //Metodo buscar lista de Productos
+  GetInfo_MPTintasBOPP():Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Materia_Prima/GetInfo_MPTintasBOPP');
+  }
+
+  //Metodo buscar lista de Productos
+  getInfo_MpTintaBopp_Id(id : any) {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfo_MpTintasBopp_Id/${id}`);
+  }
+
   srvObtenerListaPorId(id : any){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/${id}`);
   }
@@ -84,6 +94,10 @@ export class MateriaPrimaService {
 
   GetInventarioMateriasPrimas(){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInventarioMateriasPrimas`);
+  }
+
+  GetCategoriasMateriaPrima(){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getCategoriasMateriaPrima`);
   }
 
   //Metodo agregar Productos

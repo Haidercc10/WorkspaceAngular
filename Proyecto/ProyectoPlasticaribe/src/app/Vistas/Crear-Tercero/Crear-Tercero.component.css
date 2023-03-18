@@ -1,0 +1,15 @@
+.form-select{
+  width: 100%;
+}
+
+.tituloRojo{
+  color:  #d83542;
+ }
+
+.form-floating{
+  font-size: 15px;
+}
+
+label{
+  font-size: 14px;
+}

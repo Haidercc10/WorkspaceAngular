@@ -1,0 +1,72 @@
+<form [formGroup]="FormCrearTercero">
+  <!-- Inicio Fila 1 Agregar Proveedor -->
+  <div class="mb-3">
+    <div class="row g-3">
+
+      <!-- ID Proveedor -->
+      <div class="form-floating col-md-2">
+        <input formControlName="Id" type="text" class="form-control form-control-sm" id="floatingInput" name="PrvId" required>
+        <label for="floatingInput">Id</label>
+      </div>
+
+      <!-- Nombre Proveedor -->
+      <div class="form-floating col-md">
+        <input formControlName="Nombre" type="text" class="form-control form-control-sm" id="floatingInput" required>
+        <label for="floatingInput">Nombre</label>
+      </div>
+
+      <!-- Tipo de Identificacion Proveedor -->
+      <div class="form-floating col-md-2">
+        <select formControlName="TipoId" type="text" class="form-select form-select-sm" id="floatingSelect" name="prvTipoId" aria-label="Floating label select example" required>
+          <option [ngValue]="tipoId" *ngFor="let tipoId of tipoIdentificacion">{{tipoId}}</option>
+        </select>
+        <label for="floatingSelect">Tipo ID</label>
+      </div>
+    </div>
+  </div>
+
+  <!--Inicio Fila 2-->
+  <div class="mb-3">
+    <div class="row g-3">
+      <!-- Ciudad  -->
+      <div class="form-floating col-md">
+        <input formControlName="Ciudad" type="text" class="form-control form-control-sm" id="floatingInput">
+        <label for="floatingInput">Ciudad</label>
+      </div>
+
+       <!-- Telefono -->
+      <div class="form-floating col-md-3">
+        <input formControlName="Telefono" id="floatingInput" type="text" class="form-control form-control-sm">
+        <label for="floatingInput">Teléfono</label>
+      </div>
+
+        <!-- Email  -->
+      <div class="form-floating col-md">
+        <input formControlName="Email" id="floatingInput" type="email" name="prvEmail" class="form-control form-control-sm" placeholder="Email">
+        <label for="floatingInput">Email</label>
+      </div>
+    </div>
+  </div>
+
+  <!--Inicio Fila 3 Botones y Limpiar Campos-->
+  <div class="mb-1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button class="btn btn-danger btn-danger-sm" type="submit" (click)="validarCamposVacios()">Crear</button>
+      <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="LimpiarCampos()">
+    </div>
+  </div>
+</form>
+
+<p-toast position="center" key="Advertencia" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle" style="font-size: 2rem"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <button type="button" pButton (click)="onReject()" label="OK" class="p-button-secondary"></button>
+    </div>
+  </ng-template>
+</p-toast>
+

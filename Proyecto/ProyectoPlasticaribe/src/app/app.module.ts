@@ -79,6 +79,7 @@ import { CrearMateriaprimaComponent } from './Vistas/crear-materiaprima/crear-ma
 import { CrearProductoComponent } from './Vistas/crear-producto/crear-producto.component';
 import { CrearProveedorComponent } from './Vistas/crear-proveedor/crear-proveedor.component';
 import { CrearSedesClientesComponent } from './Vistas/crear-sedes-clientes/crear-sedes-clientes.component';
+import { CrearTerceroComponent } from './Vistas/Crear-Tercero/Crear-Tercero.component';
 import { CrearTintasComponent } from './Vistas/crear-tintas/crear-tintas.component';
 import { CrearUnidadesMedidasComponent } from './Vistas/crear-unidades-medidas/crear-unidades-medidas.component';
 import { CrearCategoriasComponent } from './Vistas/CrearCategorias/CrearCategorias.component';
@@ -115,6 +116,7 @@ import { Movimientos_MantenimientoComponent } from './Vistas/Movimientos_Manteni
 import { OcompraComponent } from './Vistas/ocompra/ocompra.component';
 import { OpedidoproductoComponent } from './Vistas/opedidoproducto/opedidoproducto.component';
 import { OrdenesTrabajoComponent } from './Vistas/ordenes-trabajo/ordenes-trabajo.component';
+import { Orden_MaquilaComponent } from './Vistas/Orden_Maquila/Orden_Maquila.component';
 import { PaginaPrincipalComponent } from './Vistas/PaginaPrincipal/PaginaPrincipal.component';
 import { PedidoExternoComponent } from './Vistas/Pedido-Externo/Pedido-Externo.component';
 import { PedidoMantenimientoComponent } from './Vistas/Pedido-Mantenimiento/Pedido-Mantenimiento.component';
@@ -255,6 +257,8 @@ export const routes: Routes = [
   {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1, 12]}, component: DesperdicioComponent},
   {path: 'reporte-desperdicios', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1, 12]}, component: Reporte_DesperdiciosComponent },
 
+  /*************************************************************** ORDEN DE MAQUILA **************************************************************************/
+  {path: 'Orden-Maquila', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Orden_MaquilaComponent},
 ]
 
 @NgModule({
@@ -351,6 +355,8 @@ export const routes: Routes = [
     ReportePedidos_ZeusComponent,
     Reporte_PedidosVendedoresComponent,
     Reporte_FacturacionZeusComponent,
+    Orden_MaquilaComponent,
+    CrearTerceroComponent,
   ],
 
   imports: [

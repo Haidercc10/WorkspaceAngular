@@ -1,0 +1,205 @@
+<ng-container>
+  <app-menuLateral></app-menuLateral>
+</ng-container>
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
+<div class="contain">
+  <div class="container-fluid">
+    <!-- Titulo principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Orden de Maquila</h2>
+    </div>
+
+    <!-- Linea principal -->
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Botones que llamaran los modeles -->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button pButton pRipple class="p-button-rounded p-button-danger" label="Crear Tercero" (click)="modalCreacionTerceros = true;"></button>
+  </div>
+
+  <!-- Informacion de la orden de maquila -->
+  <div class="mb-4">
+    <h4 class="tituloRojo">Información de la Orden de Maquila</h4>
+  </div>
+
+  <form [formGroup]="FormOrdenMaquila">
+    <div class="mb-3">
+      <div class="row g-3">
+
+        <!-- Consecutivo de la orden de compra -->
+        <div class="form-floating col-md-2">
+          <input formControlName="ConsecutivoOrden" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo de la Orden de Maquila" (keyup.Enter)="buscarOrdenMaquila()">
+          <label for="floatingSelect">Concecutivo de la Orden</label>
+        </div>
+
+        <!-- Proveedor -->
+        <div class="form-floating col-md-3">
+          <input formControlName="Tercero" class="form-control" list="Proveedor" id="floatingInput" (keyup)="consultarTercero()" (change)="cambiarNombreTercero()" title="Nombre del Tercero" required>
+          <datalist id="Proveedor">
+            <option value={{item.tercero_Id}} *ngFor="let item of terceros">{{item.tercero_Nombre}}</option>
+          </datalist>
+          <label for="floatingInput">Tercero</label>
+        </div>
+
+        <!-- Observacion -->
+        <div class="form-floating col-md">
+          <textarea formControlName="Observacion" id="floatingTextarea" type="text" class="form-control form-control-sm" title="Observación"></textarea>
+          <label for="floatingTextarea">Observación</label>
+        </div>
+
+      </div>
+    </div>
+  </form>
+
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <div class="mb-4">
+    <h4 class="tituloRojo">Materia Prima</h4>
+  </div>
+
+  <form [formGroup]="FormMateriaPrima">
+    <div class="mb-3">
+      <div class="row g-3">
+
+        <!-- ID de la Materia prima -->
+        <div class="form-floating col-md">
+          <input formControlName="Id" type="number" min="0" class="form-control form-control-sm" id="floatingInput" title="Identificador de la Materia Prima" required>
+          <label for="floatingInput">ID</label>
+        </div>
+
+        <!-- Nombre Producto -->
+        <div class="form-floating col-md-5">
+          <input formControlName="Nombre" class="form-control form-control-sm" list="materiaprima" id="floatingInput" title="Nombre de la Materia Prima" required (change)="cambiarNombreMateriaPrima()">
+          <datalist id="materiaprima">
+            <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option>
+          </datalist>
+          <label for="floatingInput">Materia Prima</label>
+        </div>
+
+        <!-- STOCK DE MATERIA PRIMA  -->
+        <div class="form-floating col-md">
+          <input formControlName="Stock" type="number" id="floatingSelect" class="form-control form-control-sm" title="Cantidad de la Materia Prima en Stock" required readonly>
+          <label for="floatingInput">Stock</label>
+        </div>
+
+        <!-- CANTIDAD DE MATERIA PRIMA  -->
+        <div class="form-floating col-md">
+          <input formControlName="Cantidad" type="number" id="floatingSelect" class="form-control form-control-sm" title="Cantidad de la Materia Prima a Entregar" required>
+          <label for="floatingInput">Cantidad</label>
+        </div>
+
+        <!-- Unidad medida-->
+        <div class="form-floating col-md">
+          <select formControlName="UndMedida" id="floatingSelect" class="form-select form-select-sm" title="Unidad de Medida de la Materia Prima" required>
+            <option [ngValue]="undMed.undMed_Id" *ngFor="let undMed of unidadesMedida">{{undMed.undMed_Id}}</option>
+          </select>
+          <label for="floatingSelect">Und. Medida</label>
+        </div>
+
+        <!-- PRECIO ESTIMADO DE LA MATERIA PRIMA  -->
+        <div class="form-floating col-md">
+          <input formControlName="PrecioOculto" type="number" id="floatingSelect" class="form-control form-control-sm" title="Precio de la Materia Prima" required>
+          <label for="floatingInput">Precio Unitario</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="mb-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="btn btn-danger btn-danger-sm" type="button" (click)="cargarMateriaPrima()">Agregar Materia Prima</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMateriaPrima()">Limpiar Campos Materia Prima</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <div class="mb-4">
+    <h4 class="tituloRojo">Materias Primas Seleccionadas</h4>
+  </div>
+
+  <div class="row g-3">
+    <div class="table-responsive">
+      <p-table
+      #dt
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+      responsiveLayout="scroll"
+      [paginator]="true"
+      [rows]="20"
+      [rowHover]="true"
+      [value]="materiasPrimasSeleccionadas">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Und. Medida</th>
+            <th scope="col">Precio Unitario</th>
+            <th scope="col">Subtotal</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-materiasPrimas>
+          <tr>
+            <td>{{materiasPrimas.Id}}</td>
+            <td>{{materiasPrimas.Nombre}}</td>
+            <td>{{materiasPrimas.Cantidad | number}}</td>
+            <td>{{materiasPrimas.Und_Medida}}</td>
+            <td>{{materiasPrimas.Precio | number}}</td>
+            <td>{{materiasPrimas.SubTotal | number}}</td>
+            <td>
+              <i class="pi pi-trash" style="cursor: pointer;" title="Quitar Materia Prima" *ngIf="!edidcionOrdenMaquila" (click)="quitarMateriaPrima(materiasPrimas)"></i>
+              <i class="pi pi-trash" style="cursor: pointer;" title="Eliminar Materia Prima" *ngIf="edidcionOrdenMaquila" (click)="eliminarMateriaPrima(materiasPrimas)"></i>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="2" class="text-right">Totales</td>
+            <td>{{catidadTotalPeso | number}}</td>
+            <td>Kg</td>
+            <td></td>
+            <td colspan="2" class="text-right">{{cantidadTotalPrecio | number}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <!-- BOTONES -->
+  <div class="mb-1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button class="btn btn-danger btn-danger-sm" type="button" *ngIf="!edidcionOrdenMaquila" (click)="validarDatosOrdenMaquila()">Crear Orden de Maquila</button>
+      <button class="btn btn-danger btn-danger-sm" type="button" *ngIf="edidcionOrdenMaquila" (click)="validarDatosOrdenMaquila()">Editar Orden de Maquila</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()">Limpiar Todos los Campos</button>
+    </div>
+  </div>
+
+  <!-- Modal Para Crear Terceros-->
+  <p-dialog [(visible)]="modalCreacionTerceros" [style]="{width: '70vw'}" [resizable]="true" header="¿Qué desea crear?" [modal]="true" styleClass="p-fluid">
+    <ng-template pTemplate="content">
+      <app-Crear-Tercero></app-Crear-Tercero>
+    </ng-template>
+  </p-dialog>
+</div>

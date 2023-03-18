@@ -1,43 +1,40 @@
-<!--Inicio Formulario-->
 <form [formGroup]="FormCrearProveedor">
-
   <!-- Inicio Fila 1 Agregar Proveedor -->
-   <div class="mb-3">
-     <div class="row g-3">
+  <div class="mb-3">
+    <div class="row g-3">
 
-        <!-- ID Proveedor -->
+      <!-- ID Proveedor -->
+      <div class="form-floating col-md-2">
+        <input formControlName="provId" type="number" class="form-control form-control-sm" id="floatingInput" name="PrvId" placeholder="Id">
+        <label for="floatingInput">Id</label>
+      </div>
+
+        <!-- Nombre Proveedor -->
+        <div class="form-floating col-md">
+          <input formControlName="ProvNombre" type="text" class="form-control form-control-sm" id="floatingInput">
+          <label for="floatingInput">Nombre</label>
+        </div>
+
+      <!-- Tipo de Identificacion Proveedor -->
+      <div class="form-floating col-md-2">
+        <select formControlName="provTipoId" type="text" class="form-select form-select-sm" id="floatingSelect" name="prvTipoId" aria-label="Floating label select example" required>
+          <option [ngValue]="tipoId" *ngFor="let tipoId of tipoIdentificacion">{{tipoId}}</option>
+        </select>
+        <label for="floatingSelect">Tipo ID</label>
+      </div>
+
+        <!-- Tipo de proveedor -->
         <div class="form-floating col-md-2">
-          <input formControlName="provId" type="number" class="form-control form-control-sm" id="floatingInput" name="PrvId" placeholder="Id">
-          <label for="floatingInput">Id</label>
-        </div>
+        <select formControlName="TipoProv" type="text" class="form-select form-select-sm" id="floatingSelect" name="prvTipoProv" required >
+          <option [ngValue]="tipoProv.tpProv_Id" *ngFor="let tipoProv of tiposProveedores">{{tipoProv.tpProv_Nombre}}</option>
+        </select>
+        <label for="floatingSelect">Tipo Proveedor</label>
+      </div>
 
-          <!-- Nombre Proveedor -->
-          <div class="form-floating col-md">
-            <input formControlName="ProvNombre" type="text" class="form-control form-control-sm" id="floatingInput">
-            <label for="floatingInput">Nombre</label>
-          </div>
+    </div>
+  </div>
 
-        <!-- Tipo de Identificacion Proveedor -->
-        <div class="form-floating col-md-2">
-          <select formControlName="provTipoId" type="text" class="form-select form-select-sm" id="floatingSelect" name="prvTipoId" aria-label="Floating label select example" required>
-            <option [ngValue]="tipoId" *ngFor="let tipoId of tipoIdentificacion">{{tipoId}}</option>
-          </select>
-          <label for="floatingSelect">Tipo ID</label>
-        </div>
-
-         <!-- Tipo de proveedor -->
-         <div class="form-floating col-md-2">
-          <select formControlName="TipoProv" type="text" class="form-select form-select-sm" id="floatingSelect" name="prvTipoProv" required >
-            <option [ngValue]="tipoProv.tpProv_Id" *ngFor="let tipoProv of tiposProveedores">{{tipoProv.tpProv_Nombre}}</option>
-          </select>
-          <label for="floatingSelect">Tipo Proveedor</label>
-        </div>
-
-     </div>
-   </div>
- <!-- Fin Fila 1 Agregar Materia Prima -->
-
- <!--Inicio Fila 2-->
+  <!--Inicio Fila 2-->
   <div class="mb-3">
     <div class="row g-3">
 
@@ -60,17 +57,13 @@
       </div>
 
     </div>
- </div>
-     <!--Fin Fila 2 -->
+  </div>
 
-    <!--Inicio Fila 3 Botones y Limpiar Campos-->
-        <div class="mb-1">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="btn btn-danger btn-danger-sm" type="submit" (click)="registroProveedor()">Crear Proveedor</button>
-            <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="LimpiarCampos()">
-          </div>
-        </div>
-    <!--Fin Fila 3-->
-
+  <!--Inicio Fila 3 Botones y Limpiar Campos-->
+  <div class="mb-1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button class="btn btn-danger btn-danger-sm" type="submit" (click)="registroProveedor()">Crear Proveedor</button>
+      <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="LimpiarCampos()">
+    </div>
+  </div>
 </form>
-<!--Fin Formulario-->

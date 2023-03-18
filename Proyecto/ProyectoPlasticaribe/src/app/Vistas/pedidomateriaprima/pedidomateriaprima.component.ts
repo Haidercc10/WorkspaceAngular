@@ -209,14 +209,15 @@ export class PedidomateriaprimaComponent implements OnInit {
           let id : number = 0;
           if (dataFact[index].matPri_Id != 84) id = dataFact[index].matPri_Id;
           else if (dataFact[index].tinta_Id != 2001) id = dataFact[index].tinta_Id;
+          else if (dataFact[index].bopp_Id != 1) id = dataFact[index].bopp_Id;
           materiaPrimaIngresada.push(id);
         }
-
         this.servicioOCMatPrima.getRemisionesComprasAsociadasAOC(Orden_Compra).subscribe(dataRem => {
           for (let k = 0; k < dataRem.length; k++) {
             let id : number = 0;
             if (dataRem[k].matPri_Id != 84) id = dataRem[k].matPri_Id;
             else if (dataRem[k].tinta_Id != 2001) id = dataRem[k].tinta_Id;
+            else if (dataRem[k].bopp_Id != 1) id = dataRem[k].bopp_Id;
             materiaPrimaIngresada.push(id);
           }
 
@@ -249,14 +250,14 @@ export class PedidomateriaprimaComponent implements OnInit {
                 }
                 if (materiaPrimaIngresada.includes(info.Id)) {
                   for (let j = 0; j < dataFact.length; j++) {
-                    if (info.Id == dataFact[j].matPri_Id || info.Id == dataFact[j].tinta_Id || info.Id == dataFact[j].bopP_Id) info.Cantidad_Ingresada = dataFact[j].suma;
+                    if (info.Id == dataFact[j].matPri_Id || info.Id == dataFact[j].tinta_Id || info.Id == dataFact[j].bopp_Id) info.Cantidad_Ingresada = dataFact[j].suma;
                     info.Cantidad_Faltante = info.Cantidad - info.Cantidad_Ingresada;
                     info.Cantidad_Oculta = info.Cantidad_Faltante;
                     if (info.Cantidad_Ingresada == info.Cantidad) info.Exits = true;
                   }
 
                   for (let j = 0; j < dataRem.length; j++) {
-                    if (info.Id == dataRem[j].matPri_Id || info.Id == dataRem[j].tinta_Id || info.Id == dataRem[j].bopP_Id) info.Cantidad_Ingresada = dataRem[j].suma;
+                    if (info.Id == dataRem[j].matPri_Id || info.Id == dataRem[j].tinta_Id || info.Id == dataRem[j].bopp_Id) info.Cantidad_Ingresada = dataRem[j].suma;
                     info.Cantidad_Faltante = info.Cantidad - info.Cantidad_Ingresada;
                     info.Cantidad_Oculta = info.Cantidad_Faltante;
                     if (info.Cantidad_Ingresada == info.Cantidad) info.Exits = true;
