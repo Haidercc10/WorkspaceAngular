@@ -102,22 +102,22 @@
             <ng-template #thenTemplate>
               <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Id}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Nombre}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Cantidad | number}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Cantidad_Facturada | number}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Cantidad_Faltante | number}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Cantidad | number : '1.2-2'}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Cantidad_Facturada | number : '1.2-2'}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Cantidad_Faltante | number : '1.2-2'}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Presentacion}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Precio}}</td>
             </ng-template>
             <ng-template #elseTemplate>
               <td>{{materiaPrima.Id}}</td>
               <td>{{materiaPrima.Nombre}}</td>
-              <td>{{materiaPrima.Cantidad | number}}</td>
-              <td>{{materiaPrima.Cantidad_Facturada | number}}</td>
-              <td>{{materiaPrima.Cantidad_Faltante | number}}</td>
+              <td>{{materiaPrima.Cantidad | number : '1.2-2'}}</td>
+              <td>{{materiaPrima.Cantidad_Facturada | number : '1.2-2'}}</td>
+              <td>{{materiaPrima.Cantidad_Faltante | number : '1.2-2'}}</td>
               <td>{{materiaPrima.Presentacion}}</td>
-              <td>{{materiaPrima.Precio | number}}</td>
+              <td>{{materiaPrima.Precio | number : '1.2-2'}}</td>
               <td>
-                <p-tableCheckbox [value]="materiaPrima" (click)="llenarMateriaPrimaAIngresar(materiaPrima)"></p-tableCheckbox>
+                <p-tableCheckbox [value]="materiaPrima" (click)="llenarMateriaPrima(materiaPrima)"></p-tableCheckbox>
               </td>
             </ng-template>
           </tr>
@@ -143,6 +143,8 @@
         responsiveLayout="scroll"
         [paginator]="true"
         [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords}"
         [rowsPerPageOptions]="[10,25,50]"
         [rowHover]="true"
         dataKey="Id"
@@ -169,22 +171,22 @@
                   <p-inputNumber [(ngModel)]="materiaPrimaSeleccionads.Cantidad_Faltante_Editar" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="1" [max]="materiaPrimaSeleccionads.Cantidad_Faltante" [maxFractionDigits]="2"></p-inputNumber>
                 </ng-template>
                 <ng-template pTemplate="output">
-                  {{materiaPrimaSeleccionads.Cantidad_Faltante_Editar | number}}
+                  {{materiaPrimaSeleccionads.Cantidad_Faltante_Editar | number : '1.2-2'}}
                 </ng-template>
               </p-cellEditor>
             </td>
             <td>{{materiaPrimaSeleccionads.Presentacion}}</td>
-            <td *ngIf="ValidarRol == 1">{{materiaPrimaSeleccionads.Precio | number}}</td>
+            <td *ngIf="ValidarRol == 1">{{materiaPrimaSeleccionads.Precio | number : '1.2-2'}}</td>
             <td>
-              <p-tableCheckbox [value]="materiaPrimaSeleccionads" (click)="quitarMateriaPrimaAIngresar(materiaPrimaSeleccionads)"></p-tableCheckbox>
+              <p-tableCheckbox [value]="materiaPrimaSeleccionads" (click)="quitarMateriaPrima(materiaPrimaSeleccionads)"></p-tableCheckbox>
             </td>
           </tr>
         </ng-template>
         <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
           <tr>
             <td colspan="2" class="text-right">Totales</td>
-            <td colspan="2">{{pesoTotal | number}}</td>
-            <td>{{precioTotal | number}}</td>
+            <td colspan="2">{{pesoTotal | number : '1.2-2'}}</td>
+            <td>{{precioTotal | number : '1.2-2'}}</td>
           </tr>
         </ng-template>
       </p-table>
@@ -202,8 +204,8 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button"><i class="pi pi-check"></i> Facturar Maquila</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button"><i class="pi pi-eraser"></i> Limpiar Todo</button>
+      <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarDatos()"><i class="pi pi-check"></i> Facturar Maquila</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()"><i class="pi pi-eraser"></i> Limpiar Todo</button>
     </div>
   </div>
 </div>
