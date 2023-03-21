@@ -1,0 +1,209 @@
+<app-menuLateral></app-menuLateral>
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div class="spinner-border text-danger" role="status" style="margin: auto;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="container-fluid">
+    <!-- principal -->
+    <div class="mb-4 Titulo">
+      <h2 class="tituloRojo">Facturas de Materia Prima</h2>
+    </div>
+
+    <div class="mb-4">
+      <hr class="colorLinea">
+    </div>
+  </div>
+
+  <!-- Inicio titulo -->
+  <div class="mb-4">
+    <h4 class="tituloRojo">Facturación de Ordenes de Maquilas</h4>
+  </div>
+
+  <!-- Fomulario Imicial -->
+  <form [formGroup]="formFacturacionOrden">
+    <div class="mb-3">
+      <div class="row g-3">
+
+        <div class="form-floating col-md-2">
+          <input formControlName="OrdenMaquila" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="consultarOrdenMaquila()">
+          <label for="floatingSelect">Nro. OM</label>
+        </div>
+
+        <!-- Factura -->
+        <div class="form-floating col-md-2">
+          <input formControlName="Factura" type="text" class="form-control form-control-sm" id="floatingInput">
+          <label for="floatingSelect">Nro. Factura</label>
+        </div>
+        <!-- Remision -->
+        <div class="form-floating col-md-2">
+          <input formControlName="Remision" type="text" class="form-control form-control-sm" id="floatingInput">
+          <label for="floatingSelect">Nro. Remisión</label>
+        </div>
+
+        <div class="form-floating col-md">
+          <input formControlName="Tercero" class="form-control" id="floatingInput" title="Nombre del Tercero" required>
+          <label for="floatingInput">Tercero</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <div class="row g-3">
+        <!-- Campo Observacion -->
+        <div class="form-floating col-md">
+          <textarea formControlName="Observacion" id="floatingTextarea" type="text" class="form-control form-control-sm"></textarea>
+          <label for="floatingTextarea">Observación</label>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="mb-4">
+    <h4 class="tituloRojo">Materia Prima</h4>
+  </div>
+
+  <!--Inicio tabla Mat. Primas de la OC -->
+  <div class="mb-3" *ngIf="!cargando">
+    <div class="row g-3">
+      <p-table
+      #dt
+      [value]="materiasPrimas"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+      responsiveLayout="scroll"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords}"
+      [rowsPerPageOptions]="[10,25,50]"
+      [rowHover]="true"
+      dataKey="Id"
+      [(selection)]="materiaPrimasSeleccionadas">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Cantidad Total</th>
+            <th scope="col">Cant. Facturada</th>
+            <th scope="col">Cantidad Faltante</th>
+            <th scope="col">Presentación</th>
+            <th scope="col">Precio</th>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox (click)="validarMateriaPrima(materiasPrimas)"></p-tableHeaderCheckbox>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-materiaPrima>
+          <tr>
+            <ng-container *ngIf="materiaPrima.Cantidad_Facturada == materiaPrima.Cantidad; then thenTemplate; else elseTemplate"></ng-container>
+            <ng-template #thenTemplate>
+              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Id}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Nombre}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Cantidad | number}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Cantidad_Facturada | number}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Cantidad_Faltante | number}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Presentacion}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Precio}}</td>
+            </ng-template>
+            <ng-template #elseTemplate>
+              <td>{{materiaPrima.Id}}</td>
+              <td>{{materiaPrima.Nombre}}</td>
+              <td>{{materiaPrima.Cantidad | number}}</td>
+              <td>{{materiaPrima.Cantidad_Facturada | number}}</td>
+              <td>{{materiaPrima.Cantidad_Faltante | number}}</td>
+              <td>{{materiaPrima.Presentacion}}</td>
+              <td>{{materiaPrima.Precio | number}}</td>
+              <td>
+                <p-tableCheckbox [value]="materiaPrima" (click)="llenarMateriaPrimaAIngresar(materiaPrima)"></p-tableCheckbox>
+              </td>
+            </ng-template>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <hr class="Linea">
+  </div>
+
+  <div class="mb-4">
+    <h4 class="tituloRojo">Materia Prima Seleccionada</h4>
+  </div>
+
+  <div class="mb-3" *ngIf="!cargando">
+    <div class="row g-3">
+      <p-table
+        #dt1
+        [value]="materiaPrimasSeleccionadas"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[10,25,50]"
+        [rowHover]="true"
+        dataKey="Id"
+        [(selection)]="materiasPrimas">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Presentación</th>
+            <th scope="col" *ngIf="ValidarRol == 1">Precio Unitario</th>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox (click)="quitarTodosMateriaPrima(materiaPrimasSeleccionadas)"></p-tableHeaderCheckbox>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-materiaPrimaSeleccionads>
+          <tr *ngIf="!materiaPrimaSeleccionads.Exits">
+            <td>{{materiaPrimaSeleccionads.Id}}</td>
+            <td>{{materiaPrimaSeleccionads.Nombre}}</td>
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber [(ngModel)]="materiaPrimaSeleccionads.Cantidad_Faltante_Editar" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="1" [max]="materiaPrimaSeleccionads.Cantidad_Faltante" [maxFractionDigits]="2"></p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{materiaPrimaSeleccionads.Cantidad_Faltante_Editar | number}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>{{materiaPrimaSeleccionads.Presentacion}}</td>
+            <td *ngIf="ValidarRol == 1">{{materiaPrimaSeleccionads.Precio | number}}</td>
+            <td>
+              <p-tableCheckbox [value]="materiaPrimaSeleccionads" (click)="quitarMateriaPrimaAIngresar(materiaPrimaSeleccionads)"></p-tableCheckbox>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
+          <tr>
+            <td colspan="2" class="text-right">Totales</td>
+            <td colspan="2">{{pesoTotal | number}}</td>
+            <td>{{precioTotal | number}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <!-- BOTONES -->
+  <div class="mb-1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button class="btn btn-danger btn-danger-sm" type="button"><i class="pi pi-check"></i> Facturar Maquila</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button"><i class="pi pi-eraser"></i> Limpiar Todo</button>
+    </div>
+  </div>
+</div>

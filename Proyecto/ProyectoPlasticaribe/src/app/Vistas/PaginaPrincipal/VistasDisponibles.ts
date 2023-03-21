@@ -39,6 +39,9 @@ export let vistasDisponibles : any = [
   { id : 28, nombre : 'Movimientos Ordenes de Compra', icono : 'assets/Iconos_Menu/recibos.png', categoria: 'Movimientos', ruta : './reporte-orden-compra', roles : [1,13], },
   { id : 42, nombre : 'Movimiento de Mantenimientos de Activos', icono : 'assets/Iconos_Menu/Mantenimiento.png', categoria: 'Movimientos', ruta : './movimientos-mantenimientos', roles : [1], },
 
+  // ORDEN DE MAQUILA
+  { id : 49, nombre : 'Orden de Maquila', icono : 'assets/Iconos_Menu/crearOrden.png', categoria: 'Orden de Maquila', ruta : './Orden-Maquila', roles : [1], },
+
   // ORDEN DE TRABAJO
   { id : 29, nombre : 'Crear OT', icono : 'assets/Iconos_Menu/crearOrden.png', categoria: 'Orden de Trabajo', ruta : './ordenes-trabajo', roles : [1], },
 
@@ -72,5 +75,5 @@ export let vistasDisponibles : any = [
   // DEPERDICIO
   { id : 45, nombre : 'Deperdicio', icono : 'assets/Iconos_Menu/caja.png', categoria: 'Deperdicio', ruta : './desperdicio', roles : [1, 12], },
 
-  // SIGUIENTE 49
+  // SIGUIENTE 50
 ];

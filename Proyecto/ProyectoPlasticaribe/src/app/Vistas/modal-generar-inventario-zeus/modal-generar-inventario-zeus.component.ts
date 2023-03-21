@@ -87,13 +87,19 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     if (this.ArrayProductoZeus.length == 0) Swal.fire("Para generar el archivo de Excel, debe haber productos en la tabla");
     else {
       this.load = false;
-      setTimeout(() => {
         const title = `Inventario de Productos Terminados ${this.today}`;
         const header = ["Item", "Cliente", "Nombre", "Precio", "Existencias", "Presentación", "Subtotal", "Cantidad Minima", "Vendedor", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         let datos : any =[];
-        for (const item of this.ArrayProductoZeus) {
-          const datos1  : any = [item.Id, item.Cliente, item.Nombre, item.Precio, item.Cantidad, item.Presentacion, item.Precio_Total, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
-          datos.push(datos1);
+        if (this.dt.filteredValue != undefined) {
+          for (const item of this.dt.filteredValue) {
+            const datos1  : any = [item.Id, item.Cliente, item.Nombre, item.Precio, item.Cantidad, item.Presentacion, item.Precio_Total, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
+            datos.push(datos1);
+          }
+        } else if (this.dt._value != undefined) {
+          for (const item of this.dt._value) {
+            const datos1  : any = [item.Id, item.Cliente, item.Nombre, item.Precio, item.Cantidad, item.Presentacion, item.Precio_Total, item.Cant_Minima, item.Vendedor, item.Enero, item.Febrero, item.Marzo, item.Abril, item.Mayo, item.Junio, item.Julio, item.Agosto, item.Septiembre, item.Octubre, item.Noviembre, item.Diciembre];
+            datos.push(datos1);
+          }
         }
         let workbook = new Workbook();
         const imageId1 = workbook.addImage({
@@ -167,6 +173,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
         worksheet.getColumn(19).width = 15;
         worksheet.getColumn(20).width = 15;
         worksheet.getColumn(21).width = 15;
+      setTimeout(() => {
         setTimeout(() => {
           workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

@@ -584,6 +584,44 @@
       </li>
     </ng-container>
 
+    <!-- ORDENES DE MAQUILAS -->
+    <ng-container *ngIf="ValidarRol == 1">
+      <li>
+        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample14" role="button" (click)="clickIcon14()" aria-expanded="false" aria-controls="collapseExample">
+          <ng-container *ngIf="subir14; then thenTemplate; else elseTemplate"></ng-container>
+          <ng-template #thenTemplate>
+            <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+          </ng-template>
+          <ng-template #elseTemplate>
+            <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+          </ng-template>
+          <b>Maquilas</b>
+        </a>
+        <div class="collapse" id="collapseExample14">
+          <ng-container *ngIf="ValidarRol == 1">
+              <div class="mb-2 sangria">
+              <a class="fst-normal" data-bs-toggle="" href="/Orden-Maquila" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-book" style="font-size: 15px; margin-right: 2%;"></i>
+                Orden de Maquila
+              </a>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="ValidarRol == 1">
+              <div class="mb-2 sangria">
+              <a class="fst-normal" data-bs-toggle="" href="/Facturacion-Orden-Maquila" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-dollar" style="font-size: 15px; margin-right: 2%;"></i>
+                Facturar Orden de Maquila
+              </a>
+            </div>
+          </ng-container>
+            <div class="mb-2 sangria">
+            <hr>
+          </div>
+        </div>
+      </li>
+    </ng-container>
+
+
     <!-- ORDEN DE TRABAJO -->
     <ng-container *ngIf="ValidarRol == 1">
       <li>

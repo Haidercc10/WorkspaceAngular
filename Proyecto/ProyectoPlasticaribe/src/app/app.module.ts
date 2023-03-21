@@ -93,6 +93,7 @@ import { Entrada_TintasComponent } from './Vistas/Entrada_Tintas/Entrada_Tintas.
 import { EpsComponent } from './Vistas/eps/eps.component';
 import { EstadosComponent } from './Vistas/estados/estados.component';
 import { EstadosOT_VendedoresComponent } from './Vistas/EstadosOT_Vendedores/EstadosOT_Vendedores.component';
+import { Facturacion_OrdenMaquilaComponent } from './Vistas/Facturacion_OrdenMaquila/Facturacion_OrdenMaquila.component';
 import { FpensionComponent } from './Vistas/fpension/fpension.component';
 import { Ingresar_ProductosComponent } from './Vistas/Ingresar_Productos/Ingresar_Productos.component';
 import { IngresoRollos_ExtrusionComponent } from './Vistas/IngresoRollos_Extrusion/IngresoRollos_Extrusion.component';
@@ -259,6 +260,7 @@ export const routes: Routes = [
 
   /*************************************************************** ORDEN DE MAQUILA **************************************************************************/
   {path: 'Orden-Maquila', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Orden_MaquilaComponent},
+  {path: 'Facturacion-Orden-Maquila', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Facturacion_OrdenMaquilaComponent},
 ]
 
 @NgModule({
@@ -357,6 +359,7 @@ export const routes: Routes = [
     Reporte_FacturacionZeusComponent,
     Orden_MaquilaComponent,
     CrearTerceroComponent,
+    Facturacion_OrdenMaquilaComponent,
   ],
 
   imports: [
