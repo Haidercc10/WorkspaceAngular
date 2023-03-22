@@ -111,7 +111,7 @@
                     </tr>
                   </ng-template>
                   <ng-template pTemplate="body" let-arrayBopps>
-                    <ng-container *ngIf="arrayBopps.completado && arrayBopps.cantidad == arrayBopps.cantFacturada ; then completado else noCompletado"></ng-container>
+                    <ng-container *ngIf="arrayBopps.completado && arrayBopps.cantidad == arrayBopps.cantFacturada; then completado else noCompletado"></ng-container>
                     <ng-template #noCompletado>
                       <tr [ngClass]="{'row-accessories': arrayBopps.id < 10000}"> <!--[pSelectableRow]="arrayBopps"-->
                         <td style="text-align: center" id="id">{{arrayBopps.id}}</td>

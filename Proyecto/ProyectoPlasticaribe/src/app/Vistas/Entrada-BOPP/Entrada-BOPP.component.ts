@@ -46,6 +46,7 @@ export class EntradaBOPPComponent implements OnInit {
   valorTotal : number = 0;
   arrayBoppsFacturados : any = [];
   arrayBoppsRemisionados : any = [];
+  tipoDoc : any = null;
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
@@ -249,7 +250,8 @@ export class EntradaBOPPComponent implements OnInit {
             bopP_CantidadInicialKg : this.ArrayBOPP[i].CantKg,
             Usua_Id : this.storage_Id,
             BOPP_Hora : moment().format('H:mm:ss'),
-            BOPP_Factura : this.campoRemi_Faccompra,
+            BOPP_TipoDoc: this.tipoDoc,
+            BOPP_CodigoDoc : this.campoRemi_Faccompra,
           }
 
           this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(datos_BOPP => {
@@ -590,10 +592,12 @@ export class EntradaBOPPComponent implements OnInit {
       setTimeout(() => { this.limpiarTodosLosCampos();}, 800);
     } else if (oc != null && factura != null && remision == null) {
       this.campoRemi_Faccompra = factura;
+      this.tipoDoc = 'FCO'
       this.registrarFacturaBopp();
       setTimeout(() => { this.limpiarTodosLosCampos();}, 2000);
     } else if (oc != null && remision != null && factura == null) {
       this.campoRemi_Faccompra = remision;
+      this.tipoDoc = 'REM'
       this.registrarRemisionBopp();
       setTimeout(() => { this.limpiarTodosLosCampos();}, 2000);
     } else {

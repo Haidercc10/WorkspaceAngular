@@ -77,6 +77,7 @@
       <p-table
       #dt
       [value]="arrayOrdenCompra"
+      selectionMode = "multiple"
       styleClass="p-datatable-gridlines p-datatable-sm"
       responsiveLayout="scroll"
       [paginator]="true"
@@ -95,34 +96,37 @@
             <th scope="col">Cant. Ingresada</th>
             <th scope="col">Cantidad Faltante</th>
             <th scope="col">Presentación</th>
+            <ng-template ></ng-template>
             <th style="width: 3rem">
-              <p-tableHeaderCheckbox (click)="seleccionarTodosMateriaPrima(arrayOrdenCompra)"></p-tableHeaderCheckbox>
+              <p-tableHeaderCheckbox *ngIf="mostrarCheck" (click)="seleccionarTodosMateriaPrima(arrayOrdenCompra)"></p-tableHeaderCheckbox>
             </th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-arrayOrdenCompra>
-          <tr>
             <ng-container *ngIf="arrayOrdenCompra.Exits && arrayOrdenCompra.Cantidad_Ingresada == arrayOrdenCompra.Cantidad; then thenTemplate; else elseTemplate"></ng-container>
             <ng-template #thenTemplate>
-              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Id}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Nombre}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad | number}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Medida}}</td>
+              <tr>
+                <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Id}}</td>
+                <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Nombre}}</td>
+                <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad | number}}</td>
+                <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
+                <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
+                <td style="background-color: rgb(255, 146, 146);">{{arrayOrdenCompra.Medida}}</td>
+              </tr>
             </ng-template>
             <ng-template #elseTemplate>
-              <td>{{arrayOrdenCompra.Id}}</td>
-              <td>{{arrayOrdenCompra.Nombre}}</td>
-              <td>{{arrayOrdenCompra.Cantidad_Oculta | number}}</td>
-              <td>{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
-              <td>{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
-              <td>{{arrayOrdenCompra.Medida}}</td>
-              <td>
-                <p-tableCheckbox [value]="arrayOrdenCompra" (click)="llenarMateriaPrimaAIngresar(arrayOrdenCompra)"></p-tableCheckbox>
-              </td>
+              <tr [ngClass]="{'row-accessorios': arrayOrdenCompra.Id > 10000}" >
+                <td>{{arrayOrdenCompra.Id}}</td>
+                <td>{{arrayOrdenCompra.Nombre}}</td>
+                <td>{{arrayOrdenCompra.Cantidad_Oculta | number}}</td>
+                <td>{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
+                <td>{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
+                <td>{{arrayOrdenCompra.Medida}}</td>
+                <td>
+                  <p-tableCheckbox *ngIf="arrayOrdenCompra.Id < 10000" [value]="arrayOrdenCompra" (click)="llenarMateriaPrimaAIngresar(arrayOrdenCompra)"></p-tableCheckbox>
+                </td>
+              </tr>
             </ng-template>
-          </tr>
         </ng-template>
       </p-table>
     </div>

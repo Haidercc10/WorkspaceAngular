@@ -51,6 +51,7 @@ export class PedidomateriaprimaComponent implements OnInit {
   MpConsultada = [];
   remision : any = [];
   remConFac : any = [];
+  mostrarCheck : boolean = true;
 
   public load: boolean;
   public arrayOrdenCompra : any [] = [];
@@ -247,6 +248,7 @@ export class PedidomateriaprimaComponent implements OnInit {
                   } else if (info.Id_Mp == 84 && info.Id_Tinta == 2001 && info.Id_Bopp != 1) {
                     info.Id = info.Id_Bopp;
                     info.Nombre = datos_orden[i].boppGen_Nombre;
+                    this.mostrarCheck = false;
                   }
                   if (materiaPrimaIngresada.includes(info.Id)) {
                     for (let j = 0; j < dataFact.length; j++) {
