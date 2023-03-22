@@ -190,7 +190,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
   calcularPrecio(){
     this.pesoTotal  = 0;
     this.precioTotal = 0;
-    this.cargando = false;
+    setTimeout(() => { this.cargando = false; }, 50);
 
     for (let i = 0; i < this.materiaPrimasSeleccionadas.length; i++) {
       if (!this.materiaPrimasSeleccionadas[i].Exits) {
