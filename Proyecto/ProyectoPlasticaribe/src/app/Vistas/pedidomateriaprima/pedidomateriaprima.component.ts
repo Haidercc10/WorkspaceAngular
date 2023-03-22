@@ -224,57 +224,56 @@ export class PedidomateriaprimaComponent implements OnInit {
           this.servicioOCMatPrima.getListaOrdenesComprasxId(Orden_Compra).subscribe(datos_orden => {
             setTimeout(() => {
               for (let i = 0; i < datos_orden.length; i++) {
-                let info : any = {
-                  Id : 0,
-                  Id_Mp: datos_orden[i].matPri_Id,
-                  Id_Tinta: datos_orden[i].tinta_Id,
-                  Id_Bopp: datos_orden[i].bopP_Id,
-                  Nombre : '',
-                  Cantidad : (datos_orden[i].doc_CantidadPedida),
-                  Cantidad_Ingresada : 0,
-                  Cantidad_Faltante : 0,
-                  Cantidad_Oculta : datos_orden[i].doc_CantidadPedida,
-                  Medida : datos_orden[i].undMed_Id,
-                  Precio : datos_orden[i].doc_PrecioUnitario,
-                  Exits : false,
-                }
-                if (info.Id_Mp != 84 && info.Id_Tinta == 2001 && info.Id_Bopp == 1) {
-                  info.Id = info.Id_Mp;
-                  info.Nombre = datos_orden[i].matPri_Nombre;
-                } else if (info.Id_Mp == 84 && info.Id_Tinta != 2001 && info.Id_Bopp == 1) {
-                  info.Id = info.Id_Tinta;
-                  info.Nombre = datos_orden[i].tinta_Nombre;
-                } else if (info.Id_Mp == 84 && info.Id_Tinta == 2001 && info.Id_Bopp != 1) {
-                  info.Id = info.Id_Bopp;
-                  info.Nombre = datos_orden[i].boppGen_Nombre;
-                }
-                if (materiaPrimaIngresada.includes(info.Id)) {
-                  for (let j = 0; j < dataFact.length; j++) {
-                    if (info.Id == dataFact[j].matPri_Id || info.Id == dataFact[j].tinta_Id || info.Id == dataFact[j].bopp_Id) info.Cantidad_Ingresada = dataFact[j].suma;
-                    info.Cantidad_Faltante = info.Cantidad - info.Cantidad_Ingresada;
-                    info.Cantidad_Oculta = info.Cantidad_Faltante;
-                    if (info.Cantidad_Ingresada == info.Cantidad) info.Exits = true;
+                  let info : any = {
+                    Id : 0,
+                    Id_Mp: datos_orden[i].matPri_Id,
+                    Id_Tinta: datos_orden[i].tinta_Id,
+                    Id_Bopp: datos_orden[i].bopP_Id,
+                    Nombre : '',
+                    Cantidad : (datos_orden[i].doc_CantidadPedida),
+                    Cantidad_Ingresada : 0,
+                    Cantidad_Faltante : 0,
+                    Cantidad_Oculta : datos_orden[i].doc_CantidadPedida,
+                    Medida : datos_orden[i].undMed_Id,
+                    Precio : datos_orden[i].doc_PrecioUnitario,
+                    Exits : false,
                   }
-
-                  for (let j = 0; j < dataRem.length; j++) {
-                    if (info.Id == dataRem[j].matPri_Id || info.Id == dataRem[j].tinta_Id || info.Id == dataRem[j].bopp_Id) info.Cantidad_Ingresada = dataRem[j].suma;
-                    info.Cantidad_Faltante = info.Cantidad - info.Cantidad_Ingresada;
-                    info.Cantidad_Oculta = info.Cantidad_Faltante;
-                    if (info.Cantidad_Ingresada == info.Cantidad) info.Exits = true;
+                  if (info.Id_Mp != 84 && info.Id_Tinta == 2001 && info.Id_Bopp == 1) {
+                    info.Id = info.Id_Mp;
+                    info.Nombre = datos_orden[i].matPri_Nombre;
+                  } else if (info.Id_Mp == 84 && info.Id_Tinta != 2001 && info.Id_Bopp == 1) {
+                    info.Id = info.Id_Tinta;
+                    info.Nombre = datos_orden[i].tinta_Nombre;
+                  } else if (info.Id_Mp == 84 && info.Id_Tinta == 2001 && info.Id_Bopp != 1) {
+                    info.Id = info.Id_Bopp;
+                    info.Nombre = datos_orden[i].boppGen_Nombre;
                   }
-                }
-                if (info.Cantidad_Faltante == 0) info.Cantidad_Faltante = info.Cantidad;
-                this.FormMateriaPrimaFactura.setValue({
-                  ConsecutivoFactura : this.ultimoIdFactura,
-                  OrdenCompra : this.FormMateriaPrimaFactura.value.OrdenCompra,
-                  MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
-                  MpRemision : this.FormMateriaPrimaFactura.value.MpRemision,
-                  proveedor: datos_orden[i].prov_Id,
-                  proveedorNombre: datos_orden[i].prov_Id,
-                  MpObservacion : this.FormMateriaPrimaFactura.value.MpObservacion,
-                });
-                this.arrayOrdenCompra.push(info);
-                this.arrayOrdenCompra.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+                  if (materiaPrimaIngresada.includes(info.Id)) {
+                    for (let j = 0; j < dataFact.length; j++) {
+                      if (info.Id == dataFact[j].matPri_Id || info.Id == dataFact[j].tinta_Id || info.Id == dataFact[j].bopP_Id) info.Cantidad_Ingresada = dataFact[j].suma;
+                      info.Cantidad_Faltante = info.Cantidad - info.Cantidad_Ingresada;
+                      info.Cantidad_Oculta = info.Cantidad_Faltante;
+                      if (info.Cantidad_Ingresada == info.Cantidad) info.Exits = true;
+                    }
+                    for (let j = 0; j < dataRem.length; j++) {
+                      if (info.Id == dataRem[j].matPri_Id || info.Id == dataRem[j].tinta_Id || info.Id == dataRem[j].bopP_Id) info.Cantidad_Ingresada = dataRem[j].suma;
+                      info.Cantidad_Faltante = info.Cantidad - info.Cantidad_Ingresada;
+                      info.Cantidad_Oculta = info.Cantidad_Faltante;
+                      if (info.Cantidad_Ingresada == info.Cantidad) info.Exits = true;
+                    }
+                  }
+                  if (info.Cantidad_Faltante == 0) info.Cantidad_Faltante = info.Cantidad;
+                  this.FormMateriaPrimaFactura.setValue({
+                    ConsecutivoFactura : this.ultimoIdFactura,
+                    OrdenCompra : this.FormMateriaPrimaFactura.value.OrdenCompra,
+                    MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
+                    MpRemision : this.FormMateriaPrimaFactura.value.MpRemision,
+                    proveedor: datos_orden[i].prov_Id,
+                    proveedorNombre: datos_orden[i].prov_Id,
+                    MpObservacion : this.FormMateriaPrimaFactura.value.MpObservacion,
+                  });
+                  this.arrayOrdenCompra.push(info);
+                  this.arrayOrdenCompra.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
               }
             }, 500);
           }, error => { this.mensajeError(`No se encontró la orden de compra`, error.message); });

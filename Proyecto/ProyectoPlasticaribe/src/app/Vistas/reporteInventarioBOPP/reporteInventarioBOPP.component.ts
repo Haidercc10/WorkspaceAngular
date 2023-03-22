@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
@@ -18,6 +18,7 @@ import Swal from 'sweetalert2';
 })
 export class ReporteInventarioBOPPComponent implements OnInit {
 
+  @ViewChild('dt') dt: Table | undefined;
   public FormMateriaPrimaFactura !: FormGroup;
   public FormMateriaPrima !: FormGroup;
   public FormMateriaPrimaRetiro !: FormGroup;
@@ -141,6 +142,7 @@ export class ReporteInventarioBOPPComponent implements OnInit {
     this.obtenerCategorias();
     this.obtenerBodegas();
     this.validarConsulta();
+    console.log(this.dt)
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -476,5 +478,11 @@ export class ReporteInventarioBOPPComponent implements OnInit {
   // Funcion que va a devover un mensaje de advertencia
   mensajeAdvertencia(mensaje : string){
     Swal.fire({ icon: 'warning', title: '¡Advertencia!', text: mensaje });
+  }
+
+  aplicarfiltro($event, campo : any, valorCampo : string){
+    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+
+
   }
 }
