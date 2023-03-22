@@ -461,6 +461,7 @@ export class Orden_MaquilaComponent implements OnInit {
   // Funcion que va a consultar la informacion de la Orden de maquila creada, información que se usará para crear un PDF
   buscarInfoOrdenMaquila(id : number){
     this.cargando = true;
+    this.informacionPDF = [];
     this.dtOrdenMaquilaService.getInfoOrdenMaquila_Id(id).subscribe(datos_Orden => {
       for (let i = 0; i < datos_Orden.length; i++) {
         let info : any = {

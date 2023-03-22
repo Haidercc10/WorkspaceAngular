@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelOrdenMaquila } from 'src/app/Modelo/modelOrdenMaquila';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
@@ -23,6 +22,10 @@ export class Orden_MaquilaService {
 
   GetUltimoId() {
     return this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Maquila/GetUltimoId`);
+  }
+
+  GetConsultaDocumentos(fechaIncio : any, fechaFin : any, ruta : string) {
+    return this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Maquila/getConsultaDocumentos/${fechaIncio}/${fechaFin}${ruta}`);
   }
 
   put(id:number|string, data:any) : Observable<any> {

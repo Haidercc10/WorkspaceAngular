@@ -416,6 +416,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
 
   // Funcion que va a consultar la información de la factura o remisión que se acaba de crear
   buscarFacturacion(id : number){
+    this.informacionPDF = [];
     this.dtFacturacion_OMService.GetConsultarFacturacion(id).subscribe(datos_facturacion => {
       for (let i = 0; i < datos_facturacion.length; i++) {
         let info : any = {

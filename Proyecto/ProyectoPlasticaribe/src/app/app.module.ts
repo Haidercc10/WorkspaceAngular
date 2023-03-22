@@ -138,6 +138,7 @@ import { ReportePedidos_ZeusComponent } from './Vistas/ReportePedidos_Zeus/Repor
 import { Reporte_DesperdiciosComponent } from './Vistas/Reporte_Desperdicios/Reporte_Desperdicios.component';
 import { Reporte_FacturacionZeusComponent } from './Vistas/Reporte_FacturacionZeus/Reporte_FacturacionZeus.component';
 import { Reporte_MantenimientoComponent } from './Vistas/Reporte_Mantenimiento/Reporte_Mantenimiento.component';
+import { Reporte_MaquilasComponent } from './Vistas/Reporte_Maquilas/Reporte_Maquilas.component';
 import { Reporte_OrdenCompraComponent } from './Vistas/Reporte_OrdenCompra/reporte_OrdenCompra.component';
 import { Reporte_PedidosVendedoresComponent } from './Vistas/Reporte_PedidosVendedores/Reporte_PedidosVendedores.component';
 import { Reporte_Procesos_OTComponent } from './Vistas/Reporte_Procesos_OT/Reporte_Procesos_OT.component';
@@ -261,6 +262,7 @@ export const routes: Routes = [
   /*************************************************************** ORDEN DE MAQUILA **************************************************************************/
   {path: 'Orden-Maquila', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Orden_MaquilaComponent},
   {path: 'Facturacion-Orden-Maquila', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Facturacion_OrdenMaquilaComponent},
+  {path: 'Reporte-Maquilas', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_MaquilasComponent},
 ]
 
 @NgModule({
@@ -360,6 +362,7 @@ export const routes: Routes = [
     Orden_MaquilaComponent,
     CrearTerceroComponent,
     Facturacion_OrdenMaquilaComponent,
+    Reporte_MaquilasComponent,
   ],
 
   imports: [
