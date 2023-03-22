@@ -10,7 +10,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Facturas de Maquilas</h2>
+      <h2 class="tituloRojo">Facturación de Maquilas</h2>
     </div>
 
     <div class="mb-4">
@@ -98,7 +98,7 @@
         </ng-template>
         <ng-template pTemplate="body" let-materiaPrima>
           <tr>
-            <ng-container *ngIf="materiaPrima.Cantidad_Facturada == materiaPrima.Cantidad; then thenTemplate; else elseTemplate"></ng-container>
+            <ng-container *ngIf="materiaPrima.Cantidad_Facturada >= materiaPrima.Cantidad; then thenTemplate; else elseTemplate"></ng-container>
             <ng-template #thenTemplate>
               <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Id}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Nombre}}</td>
@@ -166,7 +166,7 @@
             <td pEditableColumn>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <p-inputNumber [(ngModel)]="materiaPrimaSeleccionads.Cantidad_Faltante_Editar" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="1" [max]="materiaPrimaSeleccionads.Cantidad_Faltante" [maxFractionDigits]="2"></p-inputNumber>
+                  <input class="form-control form-control-sm" type="number" [(ngModel)]="materiaPrimaSeleccionads.Cantidad_Faltante_Editar" [min]="1" [max]="materiaPrimaSeleccionads.Cantidad_Faltante" (keyup)="calcularPrecio()">
                 </ng-template>
                 <ng-template pTemplate="output">
                   {{materiaPrimaSeleccionads.Cantidad_Faltante_Editar | number : '1.2-2'}}

@@ -108,13 +108,13 @@
     <div class="row g-3">
       <p-table
         #dt
+        [value]="materiasPrimasRetiradas"
         styleClass="p-datatable-gridlines p-datatable-sm"
         responsiveLayout="scroll"
         [paginator]="true"
         [rows]="10"
         [rowsPerPageOptions]="[10,25,50]"
         [rowHover]="true"
-        [value]="materiasPrimasRetiradas"
         dataKey="Id"
         [(selection)]="materiasPrimas">
         <ng-template pTemplate="header">
