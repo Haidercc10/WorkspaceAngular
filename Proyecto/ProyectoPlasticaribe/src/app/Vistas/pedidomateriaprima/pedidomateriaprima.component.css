@@ -122,7 +122,6 @@ a {
   transform: translate(-50%, -50%)
 }
 
-
 :host ::ng-deep .row-accessories {
   background-color: rgba(0,0,0,.15) !important;
 }

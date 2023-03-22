@@ -72,7 +72,7 @@
   </div>
 
   <!--Inicio tabla Mat. Primas de la OC -->
-  <div class="mb-3" *ngIf="load">
+  <div class="mb-3">
     <div class="row g-3">
       <p-table
       #dt
@@ -115,7 +115,7 @@
               </tr>
             </ng-template>
             <ng-template #elseTemplate>
-              <tr [ngClass]="{'row-accessorios': arrayOrdenCompra.Id > 10000}" >
+              <tr [ngClass]="{'row-accessories': arrayOrdenCompra.Id > 10000}">
                 <td>{{arrayOrdenCompra.Id}}</td>
                 <td>{{arrayOrdenCompra.Nombre}}</td>
                 <td>{{arrayOrdenCompra.Cantidad_Oculta | number}}</td>

@@ -20,7 +20,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app_pedidomateriaprima_component',
   templateUrl: './pedidomateriaprima.component.html',
-  styleUrls: ['./Pedidomateriaprima.component.css']
+  styleUrls: ['./pedidomateriaprima.component.css']
 })
 
 export class PedidomateriaprimaComponent implements OnInit {
@@ -284,7 +284,7 @@ export class PedidomateriaprimaComponent implements OnInit {
       setTimeout(() => {
         this.load = true;
         this.cambiarNombreProveedor();
-      }, 1000);
+      }, 2000);
     }
   }
 
