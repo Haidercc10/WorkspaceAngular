@@ -708,7 +708,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
             {
               style: 'tablaEmpresa',
               table: {
-                widths: [90, '*', 90, '*'],
+                widths: [90, 167, 90, 166],
                 style: 'header',
                 body: [
                   [
@@ -927,7 +927,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
             {
               style: 'tablaEmpresa',
               table: {
-                widths: [90, '*', 90, '*'],
+                widths: [90, 167, 90, 166],
                 style: 'header',
                 body: [
                   [
@@ -956,7 +956,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
             {
               style: 'tablaCliente',
               table: {
-                widths: ['*', '*', '*'],
+                widths: [171,171, 171],
                 style: 'subtitulo',
                 body: [
                   [ `NIT Cliente: ${dataPedidos[index].id_Cliente}`, `Nombre: ${dataPedidos[index].cliente}`, `Ciudad: ${dataPedidos[index].ciudad}`, ],

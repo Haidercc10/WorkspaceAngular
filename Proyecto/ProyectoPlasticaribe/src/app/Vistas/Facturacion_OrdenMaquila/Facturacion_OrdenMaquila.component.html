@@ -10,7 +10,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Facturas de Materia Prima</h2>
+      <h2 class="tituloRojo">Facturas de Maquilas</h2>
     </div>
 
     <div class="mb-4">
@@ -106,7 +106,7 @@
               <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Cantidad_Facturada | number : '1.2-2'}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Cantidad_Faltante | number : '1.2-2'}}</td>
               <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Presentacion}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Precio}}</td>
+              <td style="background-color: rgb(255, 146, 146);">{{materiaPrima.Precio | number : '1.2-2'}}</td>
             </ng-template>
             <ng-template #elseTemplate>
               <td>{{materiaPrima.Id}}</td>
@@ -143,8 +143,6 @@
         responsiveLayout="scroll"
         [paginator]="true"
         [rows]="10"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords}"
         [rowsPerPageOptions]="[10,25,50]"
         [rowHover]="true"
         dataKey="Id"

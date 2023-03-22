@@ -5,5 +5,7 @@ export interface modelFacturacion_OrdenMaquila {
   FacOM_ValorTotal : number;
   FacOM_Observacion : string;
   Estado_Id: number;
-  Usua_Id: number
+  Usua_Id: number;
+  FacOM_Fecha : any,
+  FacOM_Hora : string,
 }

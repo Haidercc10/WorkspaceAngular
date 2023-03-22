@@ -855,7 +855,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             {
               style: 'tablaEmpresa',
               table: {
-                widths: [90, '*', 90, '*'],
+                widths: [90, 167, 90, 166],
                 style: 'header',
                 body: [
                   [
@@ -978,7 +978,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             {
               style: 'tablaEmpresa',
               table: {
-                widths: [90, '*', 90, '*'],
+                widths: [90, 167, 90, 166],
                 style: 'header',
                 body: [
                   [

@@ -503,7 +503,7 @@ export class OcompraComponent implements OnInit {
             {
               style: 'tablaEmpresa',
               table: {
-                widths: [90, '*', 90, '*'],
+                widths: [90, 167, 90, 166],
                 style: 'header',
                 body: [
                   [
@@ -576,7 +576,7 @@ export class OcompraComponent implements OnInit {
             {
               style: 'tablaCliente',
               table: {
-                widths: ['*', '*', '*'],
+                widths: [171,171, 171],
                 style: 'header',
                 body: [
                   [

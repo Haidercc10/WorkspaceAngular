@@ -2,6 +2,8 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import pdfMake from 'pdfmake/build/pdfmake';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { modelDtFacturacion_OrdenMaquila } from 'src/app/Modelo/modelDtFacturacion_OrdenMaquila';
 import { modelFacturacion_OrdenMaquila } from 'src/app/Modelo/modelFacturacion_OdenMaquila';
 import { modelOrdenMaquila_Facturacion } from 'src/app/Modelo/modelOrdenMaquila_Facturacion';
@@ -11,6 +13,7 @@ import { DtFacturacion_OrdenMaquilaService } from 'src/app/Servicios/DtFacturaci
 import { Facturacion_OrdenMaquilasService } from 'src/app/Servicios/Facturacion_OrdenMaquila/facturacion_OrdenMaquilas.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { OrdenMaquila_FacturacionService } from 'src/app/Servicios/OrdenMaquila_Facturacion/OrdenMaquila_Facturacion.service';
+import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maquila.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import Swal from 'sweetalert2';
 
@@ -32,6 +35,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
   materiaPrimasSeleccionadas : any [] = []; //Variable donde se guardará la informacion de las materia primas elegidas para facturar
   pesoTotal : number = 0; //Variable que almacenará ea cantidad total del peso de las materias primas eleginas
   precioTotal : number = 0; //Variable que almacenará el precio total de las materias primas elegidas
+  informacionPDF : any [] = []; //Variable que almcenará la informacion de la factura consultada para crear el pdf
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private frmBuilder : FormBuilder,
@@ -41,7 +45,8 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
                         private dtFacturacion_OMService : DtFacturacion_OrdenMaquilaService,
                           private materiaPrimaSerive : MateriaPrimaService,
                             private tintaService : TintasService,
-                              private boppService : EntradaBOPPService,) {
+                              private boppService : EntradaBOPPService,
+                                private ordenMaquilaService : Orden_MaquilaService,) {
 
     this.formFacturacionOrden = this.frmBuilder.group({
       OrdenMaquila : ['', Validators.required],
@@ -89,9 +94,9 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
     let id : number = this.formFacturacionOrden.value.OrdenMaquila;
     this.dtOrdenMaquilaService.getInfoOrdenMaquila_Id(id).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
-        if (datos_orden[i].mP_Id != 84) mp = datos_orden[i] .mP_Id;
+        if (datos_orden[i].mP_Id != 84) mp = datos_orden[i].mP_Id;
         else if (datos_orden[i].tinta_Id != 2001) mp = datos_orden[i].tinta_Id;
-        else if (datos_orden[i].bopp_Id != 449) mp= datos_orden[i].bopp_Id
+        else if (datos_orden[i].bopp_Id != 449) mp = datos_orden[i].bopp_Id
         this.ordenMaquila_facService.GetOrdenMaquilaFacturada(id, mp).subscribe(datos_Facturacuin => {
           for (let j = 0; j < datos_Facturacuin.length; j++) {
             this.formFacturacionOrden.patchValue({
@@ -207,11 +212,10 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
     } else this.mensajeAdvertencia(`¡Hay campos vacios!`);
   }
 
-  // funcion que va a crear el registro de facturación de orden de maquila
+  // Funcion que va a crear el registro de facturación de orden de maquila
   crearFacturacionMaquila() {
     this.cargando = true;
-    let tpDoc : string;
-    let Codigo : string;
+    let tpDoc : string, Codigo : string;
     if (this.formFacturacionOrden.value.Factura != null) {
       tpDoc = 'FOM';
       Codigo = this.formFacturacionOrden.value.Factura;
@@ -221,19 +225,20 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
     }
     let info : modelFacturacion_OrdenMaquila = {
       TpDoc_Id : tpDoc,
-      FacOM_Codigo : Codigo,
+      FacOM_Codigo : Codigo.toUpperCase(),
       Tercero_Id: this.formFacturacionOrden.value.Tercero_Id,
       FacOM_ValorTotal : this.precioTotal,
-      FacOM_Observacion : this.formFacturacionOrden.value.Observacion,
-      Estado_Id: 11,
+      FacOM_Observacion : (this.formFacturacionOrden.value.Observacion).toUpperCase(),
+      Estado_Id: 12,
       Usua_Id: this.storage_Id,
+      FacOM_Fecha : moment().format('YYYY-MM-DD'),
+      FacOM_Hora : moment().format('H:mm:ss'),
     }
     this.facturacion_OMService.insert(info).subscribe(datos => {
       this.crearDtFacturacionMaquila(datos.facOM_Id);
       this.crearRelacionFacturacionMaquila(datos.facOM_Id);
-    }, error => {
-      this.mensajeError(`¡No se pudo guardar la facturación!`);
-    });
+      this.cambiarEstadoOrden(datos.facOM_Id);
+    }, error => { this.mensajeError(`¡No se pudo guardar la facturación!`); });
   }
 
   // Funcion que va a guardar en la base de datos los detalles de la Facturación
@@ -248,9 +253,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
         UndMed_Id : this.materiaPrimasSeleccionadas[i].Presentacion,
         DtFacOM_ValorUnitario : this.materiaPrimasSeleccionadas[i].Precio,
       }
-      this.dtFacturacion_OMService.insert(info).subscribe(datos => {  }, error => {
-        this.mensajeError(`¡Ocurrió un error al guardar los detalles de las materias primas de la facturación!`);
-      });
+      this.dtFacturacion_OMService.insert(info).subscribe(datos => { }, error => { this.mensajeError(`¡Ocurrió un error al guardar los detalles de las materias primas de la facturación!`); });
     }
   }
 
@@ -265,7 +268,6 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
       this.restarMateriaPrima();
       this.restarTinta();
       this.restarBopp();
-      setTimeout(() => { this.mensajeExitoso(`Registro Exitoso`,`¡Se realizó la facuturación de la Orden de Maquila #${om}!`); }, 3000);
     }, error => { this.mensajeError(`¡No se pudo crear la relación entre la Orden Maquila y la Facturación!`); });
   }
 
@@ -348,9 +350,330 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
     }
   }
 
+  // Funcion que va a cambiar el estado de la orden de maquila teniendo en cuenta la facturación que acaba de ingresar
+  cambiarEstadoOrden(factura : number){
+    let om : number = this.formFacturacionOrden.value.OrdenMaquila, mp : number, estado : number = 11, error : boolean = false;
+    this.dtOrdenMaquilaService.getInfoOrdenMaquila_Id(om).subscribe(datos_orden => {
+      for (let i = 0; i < datos_orden.length; i++) {
+        if (datos_orden[i].mP_Id != 84) mp = datos_orden[i].mP_Id;
+        else if (datos_orden[i].tinta_Id != 2001) mp = datos_orden[i].tinta_Id;
+        else if (datos_orden[i].bopp_Id != 449) mp = datos_orden[i].bopp_Id
+        this.ordenMaquila_facService.GetOrdenMaquilaFacturada(om, mp).subscribe(datos_Facturacuion => {
+          for (let j = 0; j < datos_Facturacuion.length; j++) {
+            if (datos_Facturacuion[j].cantidad_Faltante <= 0) estado = 5;
+            else estado = 11;
+          }
+        }, err => { error = true; });
+      }
+      setTimeout(() => {
+        if (!error) {
+          for (let i = 0; i < datos_orden.length; i++) {
+            let info : any = {
+              OM_Id : om,
+              Tercero_Id : datos_orden[i].tercero_Id,
+              OM_ValorTotal : datos_orden[i].valor_Total,
+              OM_PesoTotal : datos_orden[i].peso_Total,
+              OM_Observacion : datos_orden[i].observacion,
+              TpDoc_Id : 'OM',
+              Estado_Id : estado,
+              Usua_Id : datos_orden[i].usuario_Id,
+              OM_Fecha : datos_orden[i].fecha,
+              OM_Hora : datos_orden[i].hora,
+            }
+            this.ordenMaquilaService.put(om, info).subscribe(datos_ordenMaquila => { }, error => { this.mensajeError(`¡Ocurrió un error al cambiar el estado de la Orden de Maquila!`); });
+            break;
+          }
+
+          let tpDoc : string, Codigo : string;
+          if (this.formFacturacionOrden.value.Factura != null) {
+            tpDoc = 'FOM';
+            Codigo = this.formFacturacionOrden.value.Factura;
+          } else if (this.formFacturacionOrden.value.Remision != null) {
+            tpDoc = 'REMOM'
+            Codigo = this.formFacturacionOrden.value.Remision;
+          }
+          let info : any = {
+            FacOM_Id : factura,
+            TpDoc_Id : tpDoc,
+            FacOM_Codigo : Codigo.toUpperCase(),
+            Tercero_Id: this.formFacturacionOrden.value.Tercero_Id,
+            FacOM_ValorTotal : this.precioTotal,
+            FacOM_Observacion : (this.formFacturacionOrden.value.Observacion).toUpperCase(),
+            Estado_Id: estado == 11 ? 12 : 13,
+            Usua_Id: this.storage_Id,
+            FacOM_Fecha : moment().format('YYYY-MM-DD'),
+            FacOM_Hora : moment().format('H:mm:ss'),
+          }
+          this.facturacion_OMService.put(factura, info).subscribe(data => {})
+        }
+      }, 3000);
+    }, err => {
+      error = true;
+      this.mensajeError(`¡Ocurrió un error al cambiar el estado de la orden de maquila!`);
+    });
+    setTimeout(() => { this.mensajeExitoso(factura, `Registro Exitoso`,`¡Se realizó la facuturación de la Orden de Maquila #${om}!`); }, 5000);
+  }
+
+  // Funcion que va a consultar la información de la factura o remisión que se acaba de crear
+  buscarFacturacion(id : number){
+    this.dtFacturacion_OMService.GetConsultarFacturacion(id).subscribe(datos_facturacion => {
+      for (let i = 0; i < datos_facturacion.length; i++) {
+        let info : any = {
+          Id : 0,
+          Id_Mp: datos_facturacion[i].mP_Id,
+          Id_Tinta: datos_facturacion[i].tinta_Id,
+          Id_Bopp: datos_facturacion[i].bopp_Id,
+          Nombre : '',
+          Cantidad : this.formatonumeros(datos_facturacion[i].cantidad),
+          "Und Medida" : datos_facturacion[i].und_Medida,
+          Precio : this.formatonumeros(datos_facturacion[i].precio),
+          SubTotal : this.formatonumeros(datos_facturacion[i].cantidad * datos_facturacion[i].precio),
+        }
+        if (info.Id_Tinta != 2001) {
+          info.Id = info.Id_Tinta;
+          info.Nombre = datos_facturacion[i].tinta;
+        } else if (info.Id_Mp != 84) {
+          info.Id = info.Id_Mp;
+          info.Nombre = datos_facturacion[i].mp;
+        } else if (info.Id_Bopp != 449) {
+          info.Id = info.Id_Bopp;
+          info.Nombre = datos_facturacion[i].bopp;
+        }
+        this.informacionPDF.push(info);
+        this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+      }
+      setTimeout(() => {this.crearPDF(id); }, 2500);
+    });
+  }
+
+  // Funcion que va a crear un archivo de tipo pdf de la factura o remision que se acaba de crear
+  crearPDF(id : number){
+    let nombre : string = this.storage.get('Nombre');
+    this.dtFacturacion_OMService.GetConsultarFacturacion(id).subscribe(datos_facturacion => {
+      for (let i = 0; i < datos_facturacion.length; i++) {
+        const pdfDefinicion : any = {
+          info: { title: `${datos_facturacion[i].tipo_Documento} N° ${datos_facturacion[i].codigo_Documento}` },
+          pageSize: { width: 630, height: 760 },
+          footer: function(currentPage : any, pageCount : any) {
+            return [
+              {
+                columns: [
+                  { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
+                  { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
+                  { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
+                ]
+              }
+            ]
+          },
+          content : [
+            {
+              columns: [
+                { image : logoParaPdf, width : 220, height : 50 },
+                {
+                  text: `${datos_facturacion[i].tipo_Documento} N° ${datos_facturacion[i].codigo_Documento}`,
+                  alignment: 'right',
+                  style: 'titulo',
+                  margin: 30
+                }
+              ]
+            },
+            '\n \n',
+            {
+              style: 'tablaEmpresa',
+              table: {
+                widths: [90, 167, 90, 166],
+                style: 'header',
+                body: [
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `Nombre Empresa`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_facturacion[i].empresa}`
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `Fecha`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_facturacion[i].fecha.replace('T00:00:00', ``)} ${datos_facturacion[i].hora}`
+                    },
+                  ],
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `NIT Empresa`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_facturacion[i].empresa_Id}`
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `Ciudad`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_facturacion[i].empresa_Ciudad}`
+                    },
+                  ],
+                  [
+                    {
+                      border: [false, false, false, false],
+                      text: `Dirección`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_facturacion[i].empresa_Direccion}`
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: `Tipo Documento`
+                    },
+                    {
+                      border: [false, false, false, true],
+                      text: `${datos_facturacion[i].tipo_Documento}`
+                    }
+                  ]
+                ]
+              },
+              layout: { defaultBorder: false, },
+              fontSize: 9,
+            },
+            '\n \n',
+            {
+              text: `Usuario: ${datos_facturacion[i].usuario}\n`,
+              alignment: 'left',
+              style: 'header',
+            },
+            '\n \n',
+            {
+              text: `\n Información detallada del Tercero \n \n`,
+              alignment: 'center',
+              style: 'header'
+            },
+            {
+              style: 'tablaCliente',
+              table: {
+                widths: [171, 171, 171],
+                style: 'header',
+                body: [
+                  [
+                    `Nombre: ${datos_facturacion[i].tercero}`,
+                    `ID: ${datos_facturacion[i].tercero_Id}`,
+                    `Tipo de ID: ${datos_facturacion[i].tipo_Id}`,
+                  ],
+                  [
+                    `Telefono: ${datos_facturacion[i].telefono_Tercero}`,
+                    `Ciudad: ${datos_facturacion[i].ciudad_Tercero}`,
+                    `E-mail: ${datos_facturacion[i].correo_Tercero}`,
+                  ],
+                ]
+              },
+              layout: 'lightHorizontalLines',
+              fontSize: 11,
+            },
+            {
+              text: `\n\n Información detallada de la(s) Materia(s) Prima(s) \n `,
+              alignment: 'center',
+              style: 'header'
+            },
+
+            this.table(this.informacionPDF, ['Id', 'Nombre', 'Cantidad', 'Und Medida', 'Precio', 'SubTotal']),
+
+            {
+              style: 'tablaTotales',
+              table: {
+                widths: [197, '*', 50, '*', '*', 98],
+                style: 'header',
+                body: [
+                  [
+                    '',
+                    '',
+                    '',
+                    '',
+                    {
+                      border: [true, false, true, true],
+                      text: `Valor Total`
+                    },
+                    {
+                      border: [false, false, true, true],
+                      text: `$${this.formatonumeros(datos_facturacion[i].valor_Total)}`
+                    },
+                  ],
+                ]
+              },
+              layout: { defaultBorder: false, },
+              fontSize: 8,
+            },
+            {
+              text: `\n \nObservación sobre la Orden: \n ${datos_facturacion[i].observacion}\n`,
+              style: 'header',
+            }
+          ],
+          styles: {
+            header: { fontSize: 10, bold: true },
+            titulo: { fontSize: 20, bold: true }
+          }
+        }
+        const pdf = pdfMake.createPdf(pdfDefinicion);
+        pdf.open();
+        this.cargando = false;
+        break;
+      }
+    });
+  }
+
+  // funcion que se encagará de llenar la tabla de los productos en el pdf
+  buildTableBody(data : any, columns : any) {
+    var body = [];
+    body.push(columns);
+    data.forEach(function(row) {
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
+    });
+    return body;
+  }
+
+  // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
+  table(data, columns) {
+    return {
+      table: {
+        headerRows: 1,
+        widths: [50, 197, 50, 50, 50, 98],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 8,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
+        }
+      }
+    };
+  }
+
   // Funcion que va a mostrar un mensaje de que le proceso realizado (facturar) fue exitoso
-  mensajeExitoso(titulo : string, mensaje : string){
-    Swal.fire({ icon: 'success', title: titulo, text: mensaje });
+  mensajeExitoso(id : number, titulo : string, mensaje : string){
+    Swal.fire({
+      icon: 'success',
+      title: `${titulo}`,
+      html: `<b>${mensaje}</b><hr>`,
+      showCloseButton: true,
+      showConfirmButton: true,
+      showCancelButton : true,
+      confirmButtonColor : '#d44',
+      cancelButtonText : `Cerrar`,
+      confirmButtonText : 'Ver PDF <i class="pi pi-file-pdf"></i>',
+    }).then((result) => {
+      if (result.isConfirmed) this.buscarFacturacion(id);
+    });
+    setTimeout(() => { this.limpiarTodo(); }, 1500);
     this.limpiarTodo();
   }
 
@@ -365,5 +688,4 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
     Swal.fire({ icon: 'error', title: '¡Opps...!', text: mensaje });
     this.cargando = false;
   }
-
 }

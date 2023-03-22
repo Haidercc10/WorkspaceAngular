@@ -262,7 +262,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
             {
               style: 'tablaEmpresa',
               table: {
-                widths: [90, '*', 90, '*'],
+                widths: [90, 167, 90, 166],
                 style: 'header',
                 body: [
                   [

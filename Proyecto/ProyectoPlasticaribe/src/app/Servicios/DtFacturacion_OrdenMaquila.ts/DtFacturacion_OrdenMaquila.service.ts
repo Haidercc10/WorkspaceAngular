@@ -17,7 +17,11 @@ export class DtFacturacion_OrdenMaquilaService {
   }
 
   getId(dato : any){
-    return this.http.get<any>(rutaPlasticaribeAPI + `/DetalleFacturacion_OrdenMaquila//${dato}`);
+    return this.http.get<any>(rutaPlasticaribeAPI + `/DetalleFacturacion_OrdenMaquila/${dato}`);
+  }
+
+  GetConsultarFacturacion(dato : any){
+    return this.http.get<any>(rutaPlasticaribeAPI + `/DetalleFacturacion_OrdenMaquila/getConsultarFacturacion/${dato}`);
   }
 
   put(id:number|string, data:any) : Observable<any> {
