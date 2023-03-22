@@ -123,3 +123,17 @@ a {
 .ng-autocomplete ::ng-deep .autocomplete-container {
   box-shadow: none;
 }
+
+:host ::ng-deep .row-accessories {
+  background-color: rgba(0,0,0,.15) !important;
+}
+
+.botonVerde {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background-color: #0cc50f;
+  padding: 5%;
+  color: white;
+  cursor: pointer;
+}
