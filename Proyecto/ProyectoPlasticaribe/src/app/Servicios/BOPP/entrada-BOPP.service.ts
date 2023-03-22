@@ -30,7 +30,7 @@ export class EntradaBOPPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/GetBoppConExistencias')
   }
 
-  srvObtenerListaPorId(id : any):Observable<any[]> {
+  srvObtenerListaPorId(id : any):Observable<any> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/${id}`)
   }
 
@@ -98,8 +98,8 @@ export class EntradaBOPPService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/BOPP/getCantRollosUtilizados_Mes/${fecha1}/${fecha2}`)
   }
 
-   //Metodos para buscar datos concurrentes en tabla BOPP.
-   getBopp():Observable<any[]> {
+  //Metodos para buscar datos concurrentes en tabla BOPP.
+  getBopp():Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getDescripcion')
   }
 
@@ -117,6 +117,10 @@ export class EntradaBOPPService {
 
   getSeriales():Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getSeriales')
+  }
+
+  GetCategoriasBOPP(){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/BOPP/getCategoriasBOPP')
   }
 
   //Metodo agregar

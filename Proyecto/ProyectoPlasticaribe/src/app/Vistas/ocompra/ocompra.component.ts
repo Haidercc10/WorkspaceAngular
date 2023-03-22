@@ -144,7 +144,7 @@ export class OcompraComponent implements OnInit {
     this.ordenCompraService.getUltimoId_OrdenCompra().subscribe(datos_ordenCompra => {
       this.FormOrdenCompra.patchValue({ ConsecutivoOrden : datos_ordenCompra + 1, });
     }, error => {
-      this.FormOrdenCompra = this.frmBuilder.group({ ConsecutivoOrden : 1, });
+      this.FormOrdenCompra.patchValue({ ConsecutivoOrden : 1, });
       this.cargando = false;
     });
   }
@@ -167,7 +167,7 @@ export class OcompraComponent implements OnInit {
     let id : number = this.FormMateriaPrima.value.Nombre;
     this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
       for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.FormMateriaPrima = this.frmBuilder.group({
+        this.FormMateriaPrima.patchValue({
           Id : datos_materiaPrima[i].id,
           Nombre : datos_materiaPrima[i].nombre,
           Cantidad : 0,

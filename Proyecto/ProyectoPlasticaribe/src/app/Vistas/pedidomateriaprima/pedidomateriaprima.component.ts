@@ -209,14 +209,15 @@ export class PedidomateriaprimaComponent implements OnInit {
           let id : number = 0;
           if (dataFact[index].matPri_Id != 84) id = dataFact[index].matPri_Id;
           else if (dataFact[index].tinta_Id != 2001) id = dataFact[index].tinta_Id;
+          else if (dataFact[index].bopp_Id != 1) id = dataFact[index].bopp_Id;
           materiaPrimaIngresada.push(id);
         }
-
         this.servicioOCMatPrima.getRemisionesComprasAsociadasAOC(Orden_Compra).subscribe(dataRem => {
           for (let k = 0; k < dataRem.length; k++) {
             let id : number = 0;
             if (dataRem[k].matPri_Id != 84) id = dataRem[k].matPri_Id;
             else if (dataRem[k].tinta_Id != 2001) id = dataRem[k].tinta_Id;
+            else if (dataRem[k].bopp_Id != 1) id = dataRem[k].bopp_Id;
             materiaPrimaIngresada.push(id);
           }
 

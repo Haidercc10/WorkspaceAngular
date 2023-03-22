@@ -34,6 +34,10 @@ export class TintasService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Tinta/consultaImpresion/${t1}/${t2}/${t3}/${t4}/${t5}/${t6}/${t7}/${t8}`);
   }
 
+  GetCategoriasTintas(){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + '/Tinta/getCategoriasTintas');
+  }
+
   //Metodo actualzar Productos
   srvActualizar(id:number|String, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Tinta/${id}`, data);

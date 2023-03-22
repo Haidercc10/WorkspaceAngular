@@ -39,6 +39,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   cantidadAsignada : number = 0; //Variable que va a almacenar la cantidad materia prima asignada de una orden de trabajo
   cantRestante : number = 0; //Variable que va a almacenar la cantidad que resta por asignar de una orden de trabajo
   estadoOT : any; //Variable que va a almacenar el estado de la orden de trabajo
+  infoOrdenTrabajo : any [] = []; //Variable en la que se almacenará la información de la orden de trabajo consultada
 
   otImpresion : any [] = []; //Variable que va a almacenar las diferentes ordenes de trabajo que contiene la orden de trabajo de impresión
   categoriasSeleccionadas : any [] = [];
@@ -118,6 +119,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.error = false;
     this.soloTintas = false;
     this.categoriasSeleccionadas = [];
+    this.infoOrdenTrabajo = [];
   }
 
   //Funcion que limpiará los campos de la materia pirma entrante
@@ -156,6 +158,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   // Funcion que va a consultar la orden de trabajo para saber que cantidad de materia prima se ha asignado y que cantidad se ha devuelto con respecto a la cantidad que se debe hacer en kg
   infoOT(){
     this.error = false;
+    this.infoOrdenTrabajo = [];
     let ot : string = this.FormMateriaPrimaRetiro.value.OTRetiro;
     this.cantRestante = 0;
     this.kgOT = 0;
@@ -169,8 +172,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           this.estadoOT = datos_procesos[index].estado;
           this.FormMateriaPrimaRetiro.patchValue({ kgOt : parseFloat(datos_procesos[index].datosotKg + adicional), });
           this.detallesAsignacionService.getMateriasPrimasAsignadas(parseInt(ot)).subscribe(datos_asignacion => {
-            let asignacion : number = datos_asignacion[0];
-            let devolucion : number = datos_asignacion[1];
+            let asignacion : number = datos_asignacion[0], devolucion : number = datos_asignacion[1];
             if (asignacion == null || asignacion == undefined) {
               asignacion = 0;
               devolucion = 0;
@@ -178,6 +180,16 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             if (devolucion == null || devolucion == undefined) devolucion = 0;
             this.cantRestante = this.kgOT - (asignacion - devolucion);
             if (this.cantRestante <= 0) this.mensajeAdvertencia(`¡No se pueden hacer más asignaciones a la OT ${ot}!`);
+            else {
+              let info : any = {
+                ot : ot,
+                cliente : datos_procesos[index].clienteNom,
+                item : datos_procesos[index].clienteItemsNom,
+                kg : this.kgOT,
+                kgRestante : this.cantRestante,
+              }
+              this.infoOrdenTrabajo.push(info);
+            }
             this.load = true;
           });
           break;
