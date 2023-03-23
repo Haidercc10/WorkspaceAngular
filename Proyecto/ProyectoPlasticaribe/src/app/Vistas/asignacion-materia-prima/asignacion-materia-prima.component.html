@@ -35,23 +35,11 @@
           <label for="floatingInput">OT</label>
         </div>
 
-        <!-- <div class="form-floating col-md">
-          <input formControlName="OTImp" class="form-control form-control-sm" (keyup.enter)="infoOTImpresion()" id="floatingInput" type="number" >
-          <label for="floatingInput">OT Impresión</label>
-        </div> -->
         <!-- Maquina -->
         <div class="form-floating col-md-2">
           <input formControlName="Maquina" type="number" class="form-control form-control-sm" id="floatingInput" title="Maquina" required>
           <label for="floatingInput">Maquina</label>
         </div>
-        <!-- Kg OT -->
-        <!-- <div class="form-floating col-md">
-          <input formControlName="kgOt" type="number" class="form-control form-control-sm" id="floatingInput" title="Maquina" readonly onmousedown="return false;" required="">
-          <label for="floatingInput">KG OT</label>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <label for=""><b>Kg Restante: {{cantRestante | number}}</b></label>
-          </div>
-        </div> -->
 
         <!-- Campo Observacion -->
         <div class="form-floating col-6 col-md">
@@ -203,7 +191,7 @@
             <td>{{materiasPrimasSeleccionadas.Cantidad | number}}</td>
             <td>{{materiasPrimasSeleccionadas.Und_Medida}}</td>
             <td>{{materiasPrimasSeleccionadas.Proceso}}</td>
-            <td><i class="pi pi-trash" style="cursor: pointer;" title="Quitar Materia Prima" (click)="quitarMateriaPrima(materiasPrimasSeleccionadas)"></i></td>
+            <td><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="quitarMateriaPrima(materiasPrimasSeleccionadas)"></i></td>
           </tr>
         </ng-template>
       </p-table>

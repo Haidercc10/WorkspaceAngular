@@ -104,7 +104,7 @@
             <th scope="col">Nombre</th>
             <th scope="col">Fecha Daño</th>
             <th scope="col">Tipo de Mantenimiento</th>
-            <th scope="col"><i class="pi pi-trash" style="cursor: pointer;" title="Quitar Todo" (click)="quitarTodos()"></i></th>
+            <th scope="col"><i class="pi pi-trash cursor" title="Quitar Todo" (click)="quitarTodos()"></i></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-activos>
@@ -113,7 +113,7 @@
             <td>{{activos.Nombre}}</td>
             <td>{{activos.Fecha}}</td>
             <td>{{activos.TipoMantenimiento}}</td>
-            <td><i class="pi pi-trash" style="cursor: pointer;" title="Quitar Activos" (click)="quitarActivo(activos)"></i></td>
+            <td><i class="pi pi-trash cursor" title="Quitar Activos" (click)="quitarActivo(activos)"></i></td>
           </tr>
         </ng-template>
       </p-table>

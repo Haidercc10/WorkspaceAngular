@@ -164,8 +164,8 @@
             <td>{{materiasPrimas.Precio | number}}</td>
             <td>{{materiasPrimas.SubTotal | number}}</td>
             <td>
-              <i class="pi pi-trash" style="cursor: pointer;" title="Quitar Materia Prima" (click)="quitarMateriaPrima(materiasPrimas)" *ngIf="!edicionOrdenCompra"></i>
-              <i class="pi pi-trash" style="cursor: pointer;" title="Eliminar Materia Prima" (click)="eliminarMateriaPrima(materiasPrimas)" *ngIf="edicionOrdenCompra"></i>
+              <i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="quitarMateriaPrima(materiasPrimas)" *ngIf="!edicionOrdenCompra"></i>
+              <i class="pi pi-trash cursor" title="Eliminar Materia Prima" (click)="eliminarMateriaPrima(materiasPrimas)" *ngIf="edicionOrdenCompra"></i>
             </td>
           </tr>
         </ng-template>

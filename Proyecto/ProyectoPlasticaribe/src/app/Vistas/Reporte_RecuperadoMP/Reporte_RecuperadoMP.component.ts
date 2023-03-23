@@ -163,7 +163,7 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
             noche = datos_recuperado[i].sumaNoche[j].suma;
           }
         }
-        this.llenarArray(datos_recuperado[i].matPri_Id, dia, noche);
+        this.llenarArray(datos_recuperado[i], dia, noche);
       }
     });
   }

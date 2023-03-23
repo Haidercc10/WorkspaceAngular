@@ -118,7 +118,7 @@
                   <th scope="col">Proceso</th>
 
                   <ng-container *ngIf="cantidadOT == 1">
-                    <th scope="col"><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="selccionarTodo()"></th>
+                    <th scope="col"><input class="form-check-input cursor" style="margin-left: 40%;" type="checkbox" (change)="selccionarTodo()"></th>
                   </ng-container>
 
                 </tr>
@@ -148,7 +148,7 @@
                     <td>{{item.Cantidad | number}}</td>
                     <td>{{item.Presentacion}}</td>
                     <td>{{item.Estatus}}</td>
-                    <td><input class="form-check-input" style="margin-left: 40%; cursor: pointer;" type="checkbox" (change)="cargarProducto(item)"></td>
+                    <td><input class="form-check-input cursor" style="margin-left: 40%;" type="checkbox" (change)="cargarProducto(item)"></td>
                   </ng-template>
                 </tr>
               </tbody>
@@ -184,7 +184,7 @@
                   <th scope="col">Presentación</th>
 
                   <ng-container>
-                    <th scope="col"><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
+                    <th scope="col"><a><i class="fa fa-trash cursor" aria-hidden="true" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
                   </ng-container>
 
                 </tr>
@@ -196,7 +196,7 @@
                   <td>{{item.Producto}}</td>
                   <td>{{item.Cantidad | number}}</td>
                   <td>{{item.Presentacion}}</td>
-                  <td><a><i class="fa fa-trash" aria-hidden="true" style="cursor: pointer;" title="Quitar Rollo de la tabla" (click)="quitarRollo(item)"></i></a></td>
+                  <td><a><i class="fa fa-trash cursor" aria-hidden="true" title="Quitar Rollo de la tabla" (click)="quitarRollo(item)"></i></a></td>
                 </tr>
               </tbody>
             </table>

@@ -1,11 +1,3 @@
 .g-3 {
   padding-bottom: 2%;
 }
-
-.tituloRojo{
-  color:  #d83542;
- }
-
-.ng-autocomplete ::ng-deep .autocomplete-container {
-  box-shadow: none;
-}
