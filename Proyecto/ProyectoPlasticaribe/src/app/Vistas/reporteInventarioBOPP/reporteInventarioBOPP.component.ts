@@ -5,6 +5,7 @@ import * as fs from 'file-saver';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { Table } from 'primeng/table';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
@@ -45,6 +46,7 @@ export class ReporteInventarioBOPPComponent implements OnInit {
   cantSaliente : number = 0;
   cantExistencias : number = 0;
   cantDiferencia : number = 0;
+  arrayExcel : any = [];
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -70,19 +72,39 @@ export class ReporteInventarioBOPPComponent implements OnInit {
   exportToExcel() : void {
     if (this.ArrayMateriaPrima.length == 0) this.mensajeAdvertencia("¡Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla!");
     else {
-      this.load = false;
+      //this.load = false;
+      //let datos : any =[];
+      this.arrayExcel = [];
+
+      setTimeout(() => {
+        if(this.dt.filteredValue != null) {
+          for (let i = 0; i < this.dt.filteredValue.length; i++) {
+            this.llenarArrayExcel(this.dt.filteredValue[i]);
+          }
+        }else{
+          for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
+            this.llenarArrayExcel(this.ArrayMateriaPrima[index]);
+          }
+        }
+      }, 500);
+
       setTimeout(() => {
         const title = `Inventario Materia_Prima - ${this.today}`;
         const header = ["Id", "Nombre", "Ancho", "Inventario Inicial", "Entrada", "Salida", "Cantidad Actual", "Diferencia", "Und. Cant", "Precio U", "SubTotal", "Categoria"]
-        let datos : any =[];
-        for (const item of this.ArrayMateriaPrima) {
+        /*for (const item of this.ArrayMateriaPrima) {
           const datos1  : any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria];
           datos.push(datos1);
-        }
+        }*/
         let workbook = new Workbook();
+        const imageId1 = workbook.addImage({
+          base64:  logoParaPdf,
+          extension: 'png',
+        });
         let worksheet = workbook.addWorksheet(`Inventario Materia_Prima - ${this.today}`);
+        worksheet.addImage(imageId1, 'A1:B3');
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
+        worksheet.addRow([]);
         worksheet.addRow([]);
         let headerRow = worksheet.addRow(header);
         headerRow.eachCell((cell) => {
@@ -93,9 +115,9 @@ export class ReporteInventarioBOPPComponent implements OnInit {
           }
           cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-        worksheet.mergeCells('A1:L2');
+        worksheet.mergeCells('A1:L3');
         worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-        datos.forEach(d => {
+        this.arrayExcel.forEach(d => {
           let row = worksheet.addRow(d);
           row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
           row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
@@ -132,7 +154,9 @@ export class ReporteInventarioBOPPComponent implements OnInit {
           });
           this.load = true;
         }, 1000);
-      }, 3500);
+        this.mensajeExitoso('Se ha generado correctamente el formato excel!');
+        this.validarConsulta();
+      }, 1500);
     }
   }
 
@@ -142,7 +166,6 @@ export class ReporteInventarioBOPPComponent implements OnInit {
     this.obtenerCategorias();
     this.obtenerBodegas();
     this.validarConsulta();
-    console.log(this.dt)
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -480,9 +503,62 @@ export class ReporteInventarioBOPPComponent implements OnInit {
     Swal.fire({ icon: 'warning', title: '¡Advertencia!', text: mensaje });
   }
 
+  /** Función que buscará en la tabla el dato que se digite en los campos de cada columna. */
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
+    setTimeout(() => {
+      if(this.dt.filteredValue != null) {
+        this.valorTotal = 0;
+        this.cantInicial= 0;
+        this.cantEntrante= 0;
+        this.cantSaliente = 0;
+        this.cantExistencias= 0;
+        this.cantDiferencia= 0;
 
+        for (let i = 0; i < this.dt.filteredValue.length; i++) {
+          this.valorTotal += this.dt.filteredValue[i].SubTotal;
+          this.cantInicial += this.dt.filteredValue[i].Inicial;
+          this.cantEntrante += this.dt.filteredValue[i].Entrada;
+          this.cantSaliente += this.dt.filteredValue[i].Salida;
+          this.cantExistencias += this.dt.filteredValue[i].Cant;
+          this.cantDiferencia += this.dt.filteredValue[i].Diferencia;
+        }
+      } else {
+        for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
+          this.valorTotal = this.valorTotal + this.ArrayMateriaPrima[index].PrecioUnd * this.ArrayMateriaPrima[index].Cant;
+          this.cantInicial += this.ArrayMateriaPrima[index].Inicial;
+          this.cantEntrante += this.ArrayMateriaPrima[index].Entrada;
+          this.cantSaliente += this.ArrayMateriaPrima[index].Salida;
+          this.cantExistencias += this.ArrayMateriaPrima[index].Cant;
+          this.cantDiferencia += this.ArrayMateriaPrima[index].Diferencia;
+        }
+      }
+    }, 500);
   }
+
+  /** Llenar array de datos que se mostrará en el formato excel. */
+  llenarArrayExcel(datos : any){
+    this.load = false;
+    const datos1  : any = [
+      datos.Id,
+      datos.Nombre,
+      datos.Ancho,
+      datos.Inicial,
+      datos.Entrada,
+      datos.Salida,
+      datos.Cant,
+      datos.Diferencia,
+      datos.UndCant,
+      datos.PrecioUnd,
+      datos.SubTotal,
+      datos.Categoria];
+      this.arrayExcel.push(datos1);
+  }
+
+  // Funcion que va a devover un mensaje de advertencia
+  mensajeExitoso(mensaje : string){
+    Swal.fire({ icon: 'success', title: '¡Registro Exitoso!', text: mensaje });
+  }
+
 }

@@ -426,7 +426,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
           extension: 'png',
         });
         let worksheet = workbook.addWorksheet(`Reporte de de Vendedores - ${this.today}`);
-        worksheet.addImage(imageId1, 'A1:A3');
+        worksheet.addImage(imageId1, 'A1:B3');
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
         worksheet.addRow([]);
