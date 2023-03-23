@@ -1,5 +1,7 @@
 .titulo{
   margin: 0 auto;
+  padding-top: 5%;
+  padding-bottom: 2%;
   text-align: center;
 }
 
@@ -56,7 +58,6 @@ a {
   width: 100%;
 }
 
-
 .btn:hover{
   background-color: rgb(150, 10, 10);
 }
@@ -99,4 +100,22 @@ a {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%)
+}
+
+.logo {
+  width: 30%;
+}
+
+@media(max-width : 1000px) {
+  .logo {
+    width: 60%;
+    margin: 8% 0 4% 0;
+  }
+}
+
+@media(max-width : 600px) {
+  .logo {
+    width: 90%;
+    margin: 30% 0 10% 0;
+  }
 }

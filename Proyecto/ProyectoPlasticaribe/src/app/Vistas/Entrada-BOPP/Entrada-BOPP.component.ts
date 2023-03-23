@@ -91,12 +91,12 @@ export class EntradaBOPPComponent implements OnInit {
     this.lecturaStorage();
     this.obtenerUnidadesMedida();
     this.obtenerCategorias();
-    /*this.getNombresBOPP();
+    this.getNombresBOPP();
     this.getMicrasBOPP();
     this.getAnchosBOPP();
     this.getPreciosBOPP();
     this.getSerialesBOPP();
-    this.obtenerProveeedor();*/
+    this.obtenerProveeedor();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
