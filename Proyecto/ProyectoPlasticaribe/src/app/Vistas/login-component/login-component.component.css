@@ -30,7 +30,7 @@
 
 .textoPequeno{
   text-align: center;
-  font-size: small;
+  font-size: calc(var(--font-size) * 13px);
   margin-top: 5%;
 }
 

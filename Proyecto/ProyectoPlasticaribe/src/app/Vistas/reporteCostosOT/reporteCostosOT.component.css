@@ -7,5 +7,5 @@ span{
 }
 
 .labelMateriaPrima{
-  font-size: 16px;
+  font-size: calc(var(--font-size) * 16px);
 }

@@ -45,7 +45,7 @@ a:hover {
 
 #tableProcesos td{
  /* max-width: 50px; */
- font-size: 13px;
+  font-size: calc(var(--font-size) * 13px);
 }
 
 @media (min-width: 1370px){
@@ -61,7 +61,7 @@ a:hover {
   .tableColores td .collapse{
     margin-top: 1%;
     text-align: start;
-    font-size: 11px;
+    font-size: calc(var(--font-size) * 11px);
 
   }
 }
@@ -73,7 +73,7 @@ a:hover {
 
   .tableColores td .collapse{
     margin-top: 1%;
-    font-size: 11px;
+    font-size: calc(var(--font-size) * 11px);
     text-align: center;
   }
 }
@@ -84,5 +84,5 @@ a:hover {
 
 .ng-autocomplete ::ng-deep .autocomplete-container {
   box-shadow: none;
-  font-size: smaller;
+  font-size: calc(var(--font-size) * 12px);
 }

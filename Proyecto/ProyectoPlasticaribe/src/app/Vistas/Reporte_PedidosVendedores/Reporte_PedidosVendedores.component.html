@@ -26,7 +26,7 @@
       <h3 class="tituloRojo">Información de Pedidos</h3>
     </div>
 
-    <div *ngIf="!load" id="tableProcesos" style="font-size: 14px;">
+    <div *ngIf="!load" id="tableProcesos" class="font-size-14">
       <div class="mb-4 ">
         <div class="row g-3">
           <p-treeTable #tt
@@ -114,49 +114,49 @@
                 </th>
               </tr>
               <tr>
-                <th style="text-align: center; width: max-content; font-size: 14px;" ttSortableColumn="consecutivo">Pedido
+                <th style="text-align: center; width: max-content;" class="font-size-14" ttSortableColumn="consecutivo">Pedido
                   <p-treeTableSortIcon field="consecutivo"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="cliente">Cliente
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="cliente">Cliente
                   <p-treeTableSortIcon field="cliente"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="producto">Producto
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="producto">Producto
                   <p-treeTableSortIcon field="producto"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="cant_Pedida">Cant. Pedida
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="cant_Pedida">Cant. Pedida
                   <p-treeTableSortIcon field="cant_Pedida"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="existencias">Stock
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="existencias">Stock
                   <p-treeTableSortIcon field="existencias"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="presentacion">Und
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="presentacion">Und
                   <p-treeTableSortIcon field="presentacion"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="precio">Precio
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="precio">Precio
                   <p-treeTableSortIcon field="precio"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="estado">Estado
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="estado">Estado
                   <p-treeTableSortIcon field="estado"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="vendedor">Vendedor
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="vendedor">Vendedor
                   <p-treeTableSortIcon field="vendedor"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="costo_Cant_Total">Total
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="costo_Cant_Total">Total
                   <p-treeTableSortIcon field="costo_Cant_Total"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="fechaCreacion">Fecha Creación
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="fechaCreacion">Fecha Creación
                   <p-treeTableSortIcon field="fechaCreacion"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="fechaCreacion">Fecha Entrega
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="fechaCreacion">Fecha Entrega
                   <p-treeTableSortIcon field="fechaCreacion"></p-treeTableSortIcon>
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo">Ver PDF
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="consecutivo">Ver PDF
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo">Editar
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="consecutivo">Editar
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo" *ngIf="ValidarRol == 1">Confirmar
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="consecutivo" *ngIf="ValidarRol == 1">Confirmar
                 </th>
-                <th style="text-align: center; font-size: 14px;" ttSortableColumn="consecutivo" *ngIf="ValidarRol == 1">Cancelar
+                <th style="text-align: center;" class="font-size-14" ttSortableColumn="consecutivo" *ngIf="ValidarRol == 1">Cancelar
                 </th>
               </tr>
             </ng-template>

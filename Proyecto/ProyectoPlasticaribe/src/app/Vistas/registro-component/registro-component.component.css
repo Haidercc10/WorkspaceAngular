@@ -9,5 +9,5 @@ span{
 .bg-danger1 {
   color: white;
   background-color: palevioletred;
-  font-size: 15px;
+  font-size: calc(var(--font-size) * 15px);
 }

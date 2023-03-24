@@ -7,5 +7,5 @@ span {
 }
 
 .TextosInfoTabla, .titulosTablasNuevas{
-  font-size: medium;
+  font-size: calc(var(--font-size) * 16px);
 }

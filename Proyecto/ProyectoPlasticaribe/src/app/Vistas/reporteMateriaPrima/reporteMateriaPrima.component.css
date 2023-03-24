@@ -11,5 +11,5 @@ span{
 }
 
 #table td, th{
-  font-size: 13px;
+  font-size: calc(var(--font-size) * 13px);
 }
