@@ -36,6 +36,7 @@ export class Reporte_MaquilasComponent implements OnInit {
   totalConsulta : number = 0; /** Variable que cargará el valor total de la consulta si se filtra por uno de los campos de la tabla. */
   totalAnio : boolean = true; /** Variable que mostrará el total por año o el valor total segun el filtro seleccionado en la tabla. */
   valorTotalConsulta : number = 0; //Variable que almacenará el costo total de los productos facturdos que trae la consulta
+  pesoTotal : number = 0;
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -96,11 +97,20 @@ export class Reporte_MaquilasComponent implements OnInit {
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
   }
 
-  // Funcion que va a calcular el subtotal de lo vendido en un año
+  // Funcion que va a calcular el subtotal de lo vendido en un mes
   calcularTotalVendidoAno(fecha : any){
     let total : number = 0;
     for (let i = 0; i < this.arrayConsolidado.length; i++) {
       if (this.arrayConsolidado[i].Fecha == fecha) total += this.arrayConsolidado[i].SubTotal;
+    }
+    return total;
+  }
+
+  // Funcion que va a calcular el peso de lo vendido en un mes
+  calcularTotalPesado(fecha : any){
+    let total : number = 0;
+    for (let i = 0; i < this.arrayConsolidado.length; i++) {
+      if (this.arrayConsolidado[i].Fecha == fecha) total += this.arrayConsolidado[i].Cantidad;
     }
     return total;
   }
@@ -203,6 +213,7 @@ export class Reporte_MaquilasComponent implements OnInit {
       Precio : data.precio,
       SubTotal : data.subTotal,
     }
+    this.pesoTotal += data.cantidad;
     this.valorTotalConsulta += data.subTotal;
     this.arrayConsolidado.push(info);
   }
