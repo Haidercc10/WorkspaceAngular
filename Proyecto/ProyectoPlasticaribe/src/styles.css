@@ -62,14 +62,6 @@ a {
   color: #d83542 ;
 }
 
-label{
-  font-size: calc(var(--font-size) * 16px);
-}
-
-.form-floating{
-  font-size: calc(var(--font-size) * 15px);
-}
-
 .overlay{
   z-index: 2;
   position: fixed;
@@ -96,3 +88,42 @@ label{
   box-shadow: none;
   font-size: calc(var(--font-size) * 13px);
 }
+
+.tabla-16px {
+  font-size: calc(var(--font-size) * 16px);
+}
+
+.tabla-13px {
+  font-size: calc(var(--font-size) * 13px);
+}
+
+.tituloh2-32px {
+  font-size: calc(var(--font-size) * 32px);
+}
+
+.subtituloh4-24px {
+  font-size: calc(var(--font-size) * 24px);
+}
+
+.button-16px {
+  font-size: calc(var(--font-size) * 16px);
+}
+
+.parrafo-16px {
+  font-size: calc(var(--font-size) * 16px);
+}
+
+.btn {
+  font-size: calc(var(--bs-btn-font-size) * 16px);
+}
+
+#container-fluid-70 {
+  width: 70%;
+}
+
+@media (max-width: 800px) {
+  #container-fluid-70 {
+    width: 90%;
+  }
+}
+
