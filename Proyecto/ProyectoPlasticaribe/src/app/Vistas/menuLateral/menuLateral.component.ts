@@ -40,6 +40,7 @@ export class MenuLateralComponent implements OnInit {
   subir12 : boolean = true;
   subir13 : boolean = true;
   subir14 : boolean = true;
+  subir15 : boolean = true;
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
@@ -74,7 +75,7 @@ export class MenuLateralComponent implements OnInit {
           }
         ]
       },
-  ];
+    ];
   }
 
   lecturaStorage(){
@@ -89,6 +90,18 @@ export class MenuLateralComponent implements OnInit {
         }
       }
     });
+  }
+
+  aumentarLetra() {
+    let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+    if (fontSize < 1.51626) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1}`);
+    this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'))}`, { expires: 365, sameSite: 'Lax' });
+  }
+
+  disminuirLetra(){
+    let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+    if (fontSize > 0.81) document.documentElement.style.setProperty('--font-size', `${fontSize * 0.9}`);
+    this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'))}`, { expires: 365, sameSite: 'Lax' });
   }
 
   showConfirm() {
@@ -197,5 +210,10 @@ export class MenuLateralComponent implements OnInit {
   clickIcon14(){
     if (this.subir14) this.subir14 = false;
     else this.subir14 = true;
+  }
+
+  clickIcon15(){
+    if (this.subir15) this.subir15 = false;
+    else this.subir15 = true;
   }
 }
