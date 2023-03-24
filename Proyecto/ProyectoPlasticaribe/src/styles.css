@@ -21,6 +21,19 @@
   padding-right: 2%;
 }
 
+.formulario {
+  align-items: center;
+  margin: auto;
+  width: 80%;
+  height: 100%;
+}
+
+@media (max-width : 800px) {
+  .formulario {
+    width: 90%;
+  }
+}
+
 .navbar {
   -webkit-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
   -moz-box-shadow: 0px 3px 10px -2px rgba(0,0,0,0.37);
@@ -39,8 +52,13 @@ a {
   text-align: center;
 }
 
+.Titulo .tituloRojo {
+  font-size: calc(var(--font-size) * 32px);
+}
+
 .tituloRojo{
   color:#d83542;
+  font-size: calc(var(--font-size) * 20px);
 }
 
 .colorLinea{
@@ -97,15 +115,15 @@ label{
   font-size: calc(var(--font-size) * 13px);
 }
 
-.font-size-12, .pi {
+.font-size-12 {
   font-size: calc(var(--font-size) * 12px);
 }
 
-.font-size-14, .pi {
+.font-size-14, .pi, td {
   font-size: calc(var(--font-size) * 14px);
 }
 
-.font-size-15 {
+.font-size-15, th {
   font-size: calc(var(--font-size) * 15px);
 }
 
