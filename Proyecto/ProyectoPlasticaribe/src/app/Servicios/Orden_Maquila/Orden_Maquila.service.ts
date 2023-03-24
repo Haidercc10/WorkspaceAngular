@@ -28,6 +28,10 @@ export class Orden_MaquilaService {
     return this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Maquila/getConsultaDocumentos/${fechaIncio}/${fechaFin}${ruta}`);
   }
 
+  GetConsultaConsolidado(fechaIncio : any, fechaFin : any, ruta : string) {
+    return this.http.get<any>(rutaPlasticaribeAPI + `/Orden_Maquila/getConsultaConsolidado/${fechaIncio}/${fechaFin}${ruta}`);
+  }
+
   put(id:number|string, data:any) : Observable<any> {
     return this.http.put(rutaPlasticaribeAPI + `/Orden_Maquila/${id}`, data);
   }

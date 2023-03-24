@@ -35,7 +35,7 @@
 
             <!-- Factura -->
             <div class="form-floating col-md-2">
-              <input formControlName="Documento" type="number" class="form-control form-control-sm" id="floatingInput">
+              <input formControlName="Documento" type="text" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Codigo Documento</label>
             </div>
 
@@ -73,16 +73,112 @@
       </form>
 
       <!-- Botones -->
-      <div class="mb-3" *ngIf="!cargando">
+      <div class="mb-3">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
           <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarFiltros()"><i class="pi pi-check"></i> Consultar</button>
           <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()"><i class="pi pi-eraser"></i> Limpiar Campos</button>
         </div>
       </div>
+    </div>
+  </div>
+</div>
 
+<div class="container-fluid">
+  <p-tabView>
+    <p-tabPanel header="Facturación" leftIcon="pi pi-wallet" tooltip="Consolidado de facturación de los Ordenes de Maquilas" *ngIf="ValidarRol == 1">
       <div class="mb-4">
-        <hr class="Linea">
+        <h4 class="tituloRojo">Facturación consultada</h4>
       </div>
+
+      <p-table #dt
+                [value]="arrayConsolidado"
+                sortField="Ano"
+                sortMode="single"
+                [scrollable]="true"
+                scrollHeight="900px"
+                rowGroupMode="subheader"
+                groupRowsBy="Ano"
+                [rowHover]="true"
+                styleClass="p-datatable-sm"
+                columnResizeMode="expand"
+                responsiveLayout="scroll"
+                *ngIf="!cargando">
+        <ng-template pTemplate="header">
+          <tr>
+            <th></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Tercero', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'MateriaPrima_Id', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'MateriaPrima', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')"></th>
+            <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')"></th>
+            <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
+          </tr>
+          <tr>
+            <th>#</th>
+            <th>Tercero</th>
+            <th>Id Materia Prima</th>
+            <th>Materia Prima</th>
+            <th>Cantidad</th>
+            <th>Presentación</th>
+            <th>Precio</th>
+            <th>SubTotal</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="groupheader" let-consolidado>
+          <tr pRowGroupHeader style="background-color: #83D3FF;">
+            <td colspan="9">
+              <span class="font-bold" style="color: black;"><b>{{consolidado.Fecha}}</b></span>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-consolidado let-rowIndex="rowIndex">
+          <tr>
+            <td>{{rowIndex + 1}}</td>
+            <td>{{consolidado.Tercero}}</td>
+            <td>{{consolidado.MateriaPrima_Id}}</td>
+            <td>{{consolidado.MateriaPrima}}</td>
+            <td><b>{{consolidado.Cantidad | number}}</b></td>
+            <td>{{consolidado.Presentacion}}</td>
+            <td>{{consolidado.Precio | currency : 'COP $'}}</td>
+            <td><b>{{consolidado.SubTotal | currency : 'COP $'}}</b></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="groupfooter" let-consolidado>
+          <tr style="background-color: palegreen;">
+            <td colspan="8" class="text-left font-bold pr-6"><b>{{'Total Fecha: ' + consolidado.Fecha}}</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td *ngIf="totalAnio; else Filtro" class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Fecha) | currency : 'COP $'}}</b></td>
+            <ng-template #Filtro>
+              <td class="text-left font-bold pr-6"><b>{{totalConsulta | currency : 'COP $'}}</b></td>
+            </ng-template>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td>Totales</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{valorTotalConsulta | currency : 'COP $'}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-tabPanel>
+
+    <!-- MOVIMIENTOS DE ORDENES Y FACTURACION DE MAQULAS -->
+    <p-tabPanel header="Movimientos" leftIcon="pi pi-sitemap" tooltip="Se mostrarán todas las ordenes y facturas que se han hecho">
       <!-- titulo tabla producto -->
       <div class="mb-4">
         <h4 class="tituloRojo">Registros consultados</h4>
@@ -141,6 +237,6 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </p-tabPanel>
+  </p-tabView>
 </div>

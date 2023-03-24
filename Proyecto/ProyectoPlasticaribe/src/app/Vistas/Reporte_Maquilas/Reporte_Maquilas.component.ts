@@ -1,5 +1,5 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
@@ -17,8 +17,10 @@ import Swal from 'sweetalert2';
   templateUrl: './Reporte_Maquilas.component.html',
   styleUrls: ['./Reporte_Maquilas.component.css']
 })
+
 export class Reporte_MaquilasComponent implements OnInit {
 
+  @ViewChild('dt') dt: Table | undefined;
   FormConsultarFiltros !: FormGroup;
   cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
@@ -30,6 +32,10 @@ export class Reporte_MaquilasComponent implements OnInit {
   registrosConsultados : any [] = []; //Variable que va a almacenar los diferentes registros consultados
   datosPdf : any [] = []; //variable que va a almacenar la informacion del documento consultado
   arrayTerceros : any = [];
+  arrayConsolidado : any [] = []; //Variable que tendrá la información del consolidado consultado
+  totalConsulta : number = 0; /** Variable que cargará el valor total de la consulta si se filtra por uno de los campos de la tabla. */
+  totalAnio : boolean = true; /** Variable que mostrará el total por año o el valor total segun el filtro seleccionado en la tabla. */
+  valorTotalConsulta : number = 0; //Variable que almacenará el costo total de los productos facturdos que trae la consulta
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -85,15 +91,32 @@ export class Reporte_MaquilasComponent implements OnInit {
     });
   }
 
+  /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
+  aplicarfiltro($event, campo : any, valorCampo : string){
+    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+  }
+
+  // Funcion que va a calcular el subtotal de lo vendido en un año
+  calcularTotalVendidoAno(fecha : any){
+    let total : number = 0;
+    for (let i = 0; i < this.arrayConsolidado.length; i++) {
+      if (this.arrayConsolidado[i].Fecha == fecha) total += this.arrayConsolidado[i].SubTotal;
+    }
+    return total;
+  }
+
   // funcion que va a consultar los filtros utilizados para traer ka informacion
   consultarFiltros(){
     this.registrosConsultados = [];
+    this.arrayConsolidado = [];
+    this.valorTotalConsulta = 0;
     this.cargando = true;
     let fechaInicial : any = this.FormConsultarFiltros.value.fechaDoc;
     let fechaFinal : any = this.FormConsultarFiltros.value.fechaFinalDoc;
     let estado : any = this.FormConsultarFiltros.value.estadoDoc;
     let codigo : any = this.FormConsultarFiltros.value.Documento;
-    let ruta : string = '';
+    let tercero : any = this.FormConsultarFiltros.value.id_tercero
+    let ruta : string = '', ruta2 : string = '';
 
     if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
     if (fechaFinal == null) fechaFinal = fechaInicial;
@@ -108,6 +131,23 @@ export class Reporte_MaquilasComponent implements OnInit {
       }
       setTimeout(() => { this.cargando = false; }, datos.length * 5);
     }, error => { this.mensajeError(`¡No fue posible realizar una consulta de los documentos de Maquila!`); });
+
+    if (this.ValidarRol == 1) {
+
+      if (estado != null && codigo != null && tercero != null) ruta2 = `?doc=${codigo}&estado=${estado}&tercero=${tercero}`;
+      else if (estado != null && tercero != null) ruta2 = `?estado=${estado}&tercero=${tercero}`;
+      else if (codigo != null && tercero != null) ruta2 = `?doc=${codigo}&tercero=${tercero}`;
+      else if (estado != null) ruta2 = `?estado=${estado}`;
+      else if (codigo != null) ruta2 = `?doc=${codigo}`;
+      else if (tercero != null) ruta2 = `?tercero=${tercero}`;
+
+      this.ordenMaquilaService.GetConsultaConsolidado(fechaInicial, fechaFinal, ruta2).subscribe(datos => {
+        for (let i = 0; i < datos.length; i++) {
+          this.llenartTablaConsolidado(datos[i]);
+        }
+        setTimeout(() => { this.cargando = false; }, datos.length * 5);
+      }, error => { this.mensajeError(`¡No fue posible realizar una consulta de los documentos de Maquila!`); });
+    }
   }
 
   // funcion que va a llenar la tabla con la informacion de cada documento
@@ -123,6 +163,48 @@ export class Reporte_MaquilasComponent implements OnInit {
     }
     this.registrosConsultados.push(info);
     this.registrosConsultados.sort((a,b) => a.Id - b.Id);
+  }
+
+  // Funcion que va a llenar la tabla del consolidado de facturación de ordenes de maquilas
+  llenartTablaConsolidado(data : any) {
+    if (data.mes == 1) data.mes = 'Enero';
+    if (data.mes == 2) data.mes = 'Febrero';
+    if (data.mes == 3) data.mes = 'Marzo';
+    if (data.mes == 4) data.mes = 'Abril';
+    if (data.mes == 5) data.mes = 'Mayo';
+    if (data.mes == 6) data.mes = 'Junio';
+    if (data.mes == 7) data.mes = 'Julio';
+    if (data.mes == 8) data.mes = 'Agosto';
+    if (data.mes == 9) data.mes = 'Septiembre';
+    if (data.mes == 10) data.mes = 'Octubre';
+    if (data.mes == 11) data.mes = 'Noviembre';
+    if (data.mes == 12) data.mes = 'Diciembre';
+
+    let mp_Id : number, mp : string;
+
+    if (data.materiaPrima_Id != 84) {
+      mp = data.materiaPrima;
+      mp_Id = data.materiaPrima_Id
+    } else if (data.tinta_Id != 2001) {
+      mp = data.tinta;
+      mp_Id = data.tinta_Id;
+    } else if (data.bopp_Id != 449) {
+      mp = data.bopp;
+      mp_Id = data.bopp_Id;
+    }
+
+    let info : any = {
+      Fecha : `${data.anio} - ${data.mes}`,
+      Tercero : data.tercero,
+      MateriaPrima_Id : mp_Id,
+      MateriaPrima : mp,
+      Cantidad : data.cantidad,
+      Presentacion : data.presentacion,
+      Precio : data.precio,
+      SubTotal : data.subTotal,
+    }
+    this.valorTotalConsulta += data.subTotal;
+    this.arrayConsolidado.push(info);
   }
 
   // Funion que validará el tipo de documento que es para crear el PDF

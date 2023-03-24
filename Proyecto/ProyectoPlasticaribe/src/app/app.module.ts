@@ -44,6 +44,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { SlideMenuModule } from 'primeng/slidemenu';
 import { SliderModule } from 'primeng/slider';
 import { TableModule } from 'primeng/table';
+import { TabMenuModule } from 'primeng/tabmenu';
 import { TabViewModule } from 'primeng/tabview';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -431,6 +432,7 @@ export const routes: Routes = [
     TreeTableModule,
     CheckboxModule,
     SidebarModule,
+    TabMenuModule,
   ],
 
   providers: [
