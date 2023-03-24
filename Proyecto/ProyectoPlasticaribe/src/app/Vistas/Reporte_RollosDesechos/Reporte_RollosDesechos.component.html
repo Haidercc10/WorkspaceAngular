@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Rollos eliminados</h2>
+      <h2 class="tituloRojo font-size-32">Rollos eliminados</h2>
     </div>
 
     <div class="mb-4">
@@ -21,9 +21,8 @@
 </div>
 
 <div class="formulario">
-
   <div class="mb-4">
-    <h4 class="tituloRojo">Filtros de búsqueda</h4>
+    <h4 class="tituloRojo font-size-24">Filtros de búsqueda</h4>
   </div>
 
   <form [formGroup]="formConsultaRollos">
@@ -118,32 +117,33 @@
               optionLabel="header"
               selectedItemsLabel="{0} columnas seleccionadas"
               [style]="{minWidth: '330px'}"
+              class="font-size-16"
               placeholder="Elige las columnas que quieres ver"></p-multiSelect>
           </ng-template>
           <!-- Titulos -->
           <ng-template pTemplate="header" let-columns>
-            <tr>
-              <th id="" scope="col" pSortableColumn="ot" class="font-size-12">OT
+            <tr class="font-size-13">
+              <th id="" scope="col" pSortableColumn="ot">OT
                 <p-columnFilter type="text" field="ot" display="menu"></p-columnFilter></th>
-              <th id="" scope="col" pResizableColumn class="font-size-12">Rollo</th>
-              <th id="" scope="col" pResizableColumn class="font-size-12">Cliente</th>
-              <th id="" scope="col" pResizableColumn class="font-size-12">Item</th>
-              <th id="" scope="col" pResizableColumn class="font-size-12">Nombre Item</th>
-              <th id="" scope="col" pResizableColumn class="font-size-12">Ancho</th>
-              <th id="" scope="col" pResizableColumn class="font-size-12">Largo</th>
-              <th id="" scope="col" pResizableColumn class="font-size-12">Fuelle</th>
-              <th id="" scope="col" pResizableColumn class="font-size-12">Medida</th>
-              <th id="" scope="col" pResizableColumn class="font-size-12">Peso</th>
-              <th id="" scope="col" pResizableColumn class="font-size-12">Und.</th>
-              <th id="" scope="col" pResizableColumn class="font-size-12">Fecha</th>
-              <th id="" scope="col" pResizableColumn class="font-size-12">Proceso</th>
-              <th *ngFor="let col of columns" pResizableColumn class="font-size-12">
+              <th id="" scope="col" pResizableColumn >Rollo</th>
+              <th id="" scope="col" pResizableColumn >Cliente</th>
+              <th id="" scope="col" pResizableColumn >Item</th>
+              <th id="" scope="col" pResizableColumn >Nombre Item</th>
+              <th id="" scope="col" pResizableColumn >Ancho</th>
+              <th id="" scope="col" pResizableColumn >Largo</th>
+              <th id="" scope="col" pResizableColumn >Fuelle</th>
+              <th id="" scope="col" pResizableColumn >Medida</th>
+              <th id="" scope="col" pResizableColumn >Peso</th>
+              <th id="" scope="col" pResizableColumn >Und.</th>
+              <th id="" scope="col" pResizableColumn >Fecha</th>
+              <th id="" scope="col" pResizableColumn >Proceso</th>
+              <th *ngFor="let col of columns" pResizableColumn>
                 {{col.header}}
               </th>
           </tr>
           </ng-template>
           <ng-template pTemplate="body" let-rowData let-ArrayDocumento let-columns="columns">
-            <tr class="font-size-12">
+            <tr class="font-size-13">
               <td id="OT" scope="col">{{ArrayDocumento.Orden}}</td>
               <td id="Rollo" scope="col">{{ArrayDocumento.Rollo}}</td>
               <td id="Cliente" scope="col">{{ArrayDocumento.Cliente}}</td>
