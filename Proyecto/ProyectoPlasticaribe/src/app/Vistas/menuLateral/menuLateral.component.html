@@ -882,6 +882,8 @@
       <br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Salir&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
     </li>
   </button>
+
+  <!-- BOTON DE CONFIGURACION -->
 </p-sidebar>
 
 <nav class="navbar">
@@ -897,6 +899,11 @@
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
       <span class="user"><i class="pi pi-user"></i> {{storage_Nombre}}</span>
       <span class="tipoUser"><i class="pi pi-verified"></i> {{storage_Rol}} </span>
+      <div class="justify-content-center">
+        <p-toast></p-toast>
+        <p-menu #menu [model]="items" [popup]="true"></p-menu>
+        <i (click)="menu.toggle($event)" class="pi pi-cog"></i>
+      </div>
     </div>
   </div>
 </nav>

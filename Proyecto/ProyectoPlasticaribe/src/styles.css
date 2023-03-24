@@ -1,11 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --font-size: 1;
+}
 
 * {
   text-decoration: none;
 }
 
 .TitulosTabla {
-  font-size: smaller;
+  font-size: calc(var(--font-size) * 16px);
 }
 
 .Linea {
@@ -29,7 +32,7 @@ a {
 }
 
 .textoBarraNav{
-  font-size: small;
+  font-size: calc(var(--font-size) * 13px);
 }
 
 .Titulo{
@@ -59,12 +62,12 @@ a {
   color: #d83542 ;
 }
 
-.form-floating{
-  font-size: 15px;
+label{
+  font-size: calc(var(--font-size) * 16px);
 }
 
-label{
-  font-size: 16px;
+.form-floating{
+  font-size: calc(var(--font-size) * 15px);
 }
 
 .overlay{
@@ -91,5 +94,5 @@ label{
 
 .ng-autocomplete ::ng-deep .autocomplete-container {
   box-shadow: none;
-  font-size: smaller;
+  font-size: calc(var(--font-size) * 13px);
 }

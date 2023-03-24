@@ -32,6 +32,7 @@ export class AppComponent implements OnInit{
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   rutaCarpetaArchivos : string = 'D:\\Calidad\\'; //Variable que va a almacenar la ruta principal en la que se almacenarán los archivos de la aplicacion
   public data:any=[];
+  tamanoLetra : number = 1;
 
   constructor (@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private authenticationService: AuthenticationService,
@@ -47,6 +48,8 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
     this.lecturaStorage();
+    let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+    document.documentElement.style.setProperty('--font-size', `${fontSize * this.tamanoLetra}`);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

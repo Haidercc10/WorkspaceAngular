@@ -147,6 +147,13 @@ p {
   color: #000;
 }
 
+.pi-cog {
+  color: #000;
+  font-size: 25px;
+  cursor: pointer;
+  margin-left: 55%;
+}
+
 @media (max-width: 500px){
   .menu {
     height: 150px;

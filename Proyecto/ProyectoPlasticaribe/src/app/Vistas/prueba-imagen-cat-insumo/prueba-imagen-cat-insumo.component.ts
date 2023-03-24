@@ -8,6 +8,8 @@ import { Component, OnInit } from '@angular/core';
 
 export class PruebaImagenCatInsumoComponent implements OnInit {
 
+  sidebarVisible: boolean;
+
   constructor() {}
 
   ngOnInit() {

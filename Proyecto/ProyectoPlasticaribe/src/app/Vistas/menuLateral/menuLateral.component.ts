@@ -2,13 +2,9 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { AuthenticationService } from 'src/app/_Services/authentication.service';
-import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.service';
-import { authentication_ContaZeus } from 'src/app/_Services/authentication_ContaZeus.service';
-import { AuthenticationService_InvZeus } from 'src/app/_Services/authentication_InvZeus.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-menuLateral',
@@ -17,7 +13,7 @@ import Swal from 'sweetalert2';
 })
 export class MenuLateralComponent implements OnInit {
   display : boolean = false;
-
+  items: MenuItem[];
   mode = new FormControl('over' as MatDrawerMode);
 
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
@@ -52,6 +48,29 @@ export class MenuLateralComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
+    this.items = [
+      {
+        label: 'Tamaño de Letra',
+        items: [
+          {
+            label: 'Mas',
+            icon: 'pi pi-plus',
+            command: () => {
+              let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+              if (fontSize < 1.51626) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1}`);
+            }
+          },
+          {
+            label: 'Menos',
+            icon: 'pi pi-minus',
+            command: () => {
+              let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+              if (fontSize > 0.81) document.documentElement.style.setProperty('--font-size', `${fontSize * 0.9}`);
+            }
+          }
+        ]
+      },
+  ];
   }
 
   lecturaStorage(){
