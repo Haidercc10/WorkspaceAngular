@@ -9,7 +9,7 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo tituloh2-32px">Gestión de Usuarios</h2>
+      <h2 class="tituloRojo font-size-32">Gestión de Usuarios</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -27,7 +27,7 @@
       </div>
 
       <div class="mb-4">
-        <h4 class="tituloRojo subtituloh4-24px">Tabla de Usuarios</h4>
+        <h4 class="tituloRojo font-size-24">Tabla de Usuarios</h4>
       </div>
 
       <div class="card" *ngIf="load">
@@ -85,7 +85,7 @@
           </ng-template>
           <!--Cuerpo Tabla-->
           <ng-template pTemplate="body" let-arrayUsuarios>
-            <tr class="tabla-16px">
+            <tr class="font-size-16 ">
               <td ><p-tableCheckbox [value]="arrayUsuarios"></p-tableCheckbox></td>
               <td>{{arrayUsuarios.Id}}</td>
               <td>{{arrayUsuarios.Nombre}}</td>
@@ -99,7 +99,7 @@
             </tr>
           </ng-template>
           <ng-template pTemplate="summary">
-            <div class="flex align-items-center justify-content-between parrafo-16px">
+            <div class="flex align-items-center justify-content-between font-size-16">
               En total hay {{cantidadUsuarios}} usuarios.
             </div>
           </ng-template>

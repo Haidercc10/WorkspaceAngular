@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Consolidado de Facturación</h2>
+      <h2 class="tituloRojo font-size-32">Consolidado de Facturación</h2>
     </div>
 
     <div class="mb-4">
@@ -23,7 +23,7 @@
 <div class="container-fluid">
   <div class="container">
     <div class="mb-4">
-      <h3 class="tituloRojo">Filtros de búsqueda</h3>
+      <h3 class="tituloRojo font-size-24">Filtros de búsqueda</h3>
     </div>
     <!-- Formulario para consultar filtros -->
     <form [formGroup]="formFiltros">
@@ -108,7 +108,7 @@
              columnResizeMode="expand"
              responsiveLayout="scroll">
       <ng-template pTemplate="header">
-        <tr>
+        <tr class="font-size-16">
           <th></th>
           <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes', 'contains')"></th>
           <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')"></th>
@@ -141,7 +141,7 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-consolidado let-rowIndex="rowIndex">
-        <tr>
+        <tr class="font-size-15">
           <td>{{rowIndex + 1}}</td>
           <td><b>{{consolidado.Mes}}</b></td>
           <td>{{consolidado.Vendedor}}</td>

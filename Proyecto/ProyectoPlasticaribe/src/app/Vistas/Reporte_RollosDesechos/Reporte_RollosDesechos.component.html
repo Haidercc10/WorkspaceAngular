@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo tituloh2-32px">Rollos eliminados</h2>
+      <h2 class="tituloRojo font-size-32">Rollos eliminados</h2>
     </div>
 
     <div class="mb-4">
@@ -23,7 +23,7 @@
 <div class="container-fluid" id="container-fluid-70">
 
   <div class="mb-4">
-    <h4 class="tituloRojo subtituloh4-24px">Filtros de búsqueda</h4>
+    <h4 class="tituloRojo font-size-24">Filtros de búsqueda</h4>
   </div>
 
   <form [formGroup]="formConsultaRollos">
@@ -118,12 +118,12 @@
               optionLabel="header"
               selectedItemsLabel="{0} columnas seleccionadas"
               [style]="{minWidth: '330px'}"
-              class="parrafo-16px"
+              class="font-size-16"
               placeholder="Elige las columnas que quieres ver"></p-multiSelect>
           </ng-template>
           <!-- Titulos -->
           <ng-template pTemplate="header" let-columns>
-            <tr class="tabla-13px">
+            <tr class="font-size-13">
               <th id="" scope="col" pSortableColumn="ot">OT
                 <p-columnFilter type="text" field="ot" display="menu"></p-columnFilter></th>
               <th id="" scope="col" pResizableColumn >Rollo</th>
@@ -144,7 +144,7 @@
           </tr>
           </ng-template>
           <ng-template pTemplate="body" let-rowData let-ArrayDocumento let-columns="columns">
-            <tr class="tabla-13px">
+            <tr class="font-size-13">
               <td id="OT" scope="col">{{ArrayDocumento.Orden}}</td>
               <td id="Rollo" scope="col">{{ArrayDocumento.Rollo}}</td>
               <td id="Cliente" scope="col">{{ArrayDocumento.Cliente}}</td>

@@ -89,34 +89,6 @@ a {
   font-size: calc(var(--font-size) * 13px);
 }
 
-.tabla-16px {
-  font-size: calc(var(--font-size) * 16px);
-}
-
-.tabla-13px {
-  font-size: calc(var(--font-size) * 13px);
-}
-
-.tituloh2-32px {
-  font-size: calc(var(--font-size) * 32px);
-}
-
-.subtituloh4-24px {
-  font-size: calc(var(--font-size) * 24px);
-}
-
-.button-16px {
-  font-size: calc(var(--font-size) * 16px);
-}
-
-.parrafo-16px {
-  font-size: calc(var(--font-size) * 16px);
-}
-
-.btn {
-  font-size: calc(var(--bs-btn-font-size) * 16px);
-}
-
 #container-fluid-70 {
   width: 70%;
 }
@@ -131,12 +103,20 @@ a {
   font-size: calc(var(--font-size) * 12px);
 }
 
+.font-size-13 {
+  font-size: calc(var(--font-size) * 13px);
+}
+
 .font-size-14, .pi {
   font-size: calc(var(--font-size) * 14px);
 }
 
 .font-size-15 {
   font-size: calc(var(--font-size) * 15px);
+}
+
+.font-size-16 {
+  font-size: calc(var(--font-size) * 16px);
 }
 
 .font-size-20 {
@@ -149,4 +129,8 @@ a {
 
 .font-size-48 {
   font-size: calc(var(--font-size) * 48px);
+}
+
+.font-size-24 {
+  font-size: calc(var(--font-size) * 24px);
 }

@@ -57,7 +57,7 @@ export class MenuLateralComponent implements OnInit {
             icon: 'pi pi-plus',
             command: () => {
               let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-              if (fontSize < 1.51626) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1}`);
+              if (fontSize < 2.0) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1}`);
             }
           },
           {
