@@ -34,25 +34,34 @@
           <div class="row g-3">
 
             <!-- Factura -->
-            <div class="form-floating col-md">
-              <input formControlName="Documento" type="text" class="form-control form-control-sm" id="floatingInput">
+            <div class="form-floating col-md-2">
+              <input formControlName="Documento" type="number" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">Codigo Documento</label>
             </div>
 
+            <!-- Terceros -->
+            <div class="form-floating col-md">
+              <input formControlName="tercero" class="form-control form-control-sm" list="tercero" id="floatingInput" (keyup)="cargarTerceros()" (change)="seleccionarTerceros()" autocomplete="off" required>
+              <datalist id="tercero">
+                <option value={{item.tercero_Id}} *ngFor="let item of arrayTerceros">{{item.tercero_Nombre}}</option>
+              </datalist>
+              <label for="floatingInput">Tercero</label>
+            </div>
+
              <!-- Fecha Factura -->
-             <div class="form-floating col-md">
+             <div class="form-floating col-md-2">
               <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput" >
               <label for="floatingInput">Fecha inicial</label>
             </div>
 
             <!-- Fecha ingreso rollo -->
-            <div class="form-floating col-md">
+            <div class="form-floating col-md-2">
               <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput" >
               <label for="floatingInput">Fecha Final</label>
             </div>
 
             <!-- Tipo Documento -->
-            <div class="form-floating col-md">
+            <div class="form-floating col-md-2">
               <select formControlName="estadoDoc" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example">
                 <option [ngValue]="item.estado_Id" *ngFor="let item of estados">{{item.estado_Nombre}}</option>
               </select>
@@ -66,8 +75,8 @@
       <!-- Botones -->
       <div class="mb-3" *ngIf="!cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarFiltros()">Consultar</button>
-          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarFiltros()"><i class="pi pi-check"></i> Consultar</button>
+          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()"><i class="pi pi-eraser"></i> Limpiar Campos</button>
         </div>
       </div>
 
@@ -100,22 +109,22 @@
               dataKey="Oc">
               <ng-template pTemplate="header">
                 <tr>
-                  <th scope="col">Código
+                  <th scope="col" style="text-align: center;">Código
                     <p-columnFilter type="text" field="Codigo" display="menu"></p-columnFilter>
                   </th>
-                  <th scope="col">Tipo
+                  <th scope="col" style="text-align: center;">Tipo
                     <p-columnFilter type="text" field="Tipo" display="menu"></p-columnFilter>
                   </th>
-                  <th scope="col">Usuario
+                  <th scope="col" style="text-align: center;">Usuario
                     <p-columnFilter type="text" field="Usuario" display="menu"></p-columnFilter>
                   </th>
-                  <th scope="col">Fecha
+                  <th scope="col" style="text-align: center;">Fecha
                     <p-columnFilter type="date" field="Fecha" display="menu"></p-columnFilter>
                   </th>
-                  <th scope="col">Estado
+                  <th scope="col" style="text-align: center;">Estado
                     <p-columnFilter type="date" field="Estado" display="menu"></p-columnFilter>
                   </th>
-                  <th>Ver</th>
+                  <th  style="text-align: center;">Ver</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-registros>
@@ -125,7 +134,7 @@
                   <td>{{registros.Usuario}}</td>
                   <td>{{registros.Fecha}}</td>
                   <td>{{registros.Estado}}</td>
-                  <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" (click)="validarTipoDocumento(registros)"></a></td>
+                  <td style="text-align: center;"><button style="width: 25px; height: 25px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" pTooltip="PDF" (click)="validarTipoDocumento(registros)"></button></td>
                 </tr>
               </ng-template>
             </p-table>

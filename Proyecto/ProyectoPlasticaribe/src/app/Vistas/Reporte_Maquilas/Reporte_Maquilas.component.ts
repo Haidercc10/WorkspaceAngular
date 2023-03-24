@@ -9,6 +9,7 @@ import { DetalleOrdenMaquilaService } from 'src/app/Servicios/DetalleOrdenMaquil
 import { DtFacturacion_OrdenMaquilaService } from 'src/app/Servicios/DtFacturacion_OrdenMaquila.ts/DtFacturacion_OrdenMaquila.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maquila.service';
+import { TercerosService } from 'src/app/Servicios/Terceros/Terceros.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -28,19 +29,23 @@ export class Reporte_MaquilasComponent implements OnInit {
   estados : any [] = []; //Variable que almacenará los estados que pueden tener las ordenes de compra de materia prima
   registrosConsultados : any [] = []; //Variable que va a almacenar los diferentes registros consultados
   datosPdf : any [] = []; //variable que va a almacenar la informacion del documento consultado
+  arrayTerceros : any = [];
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
                   private estadosService : EstadosService,
                     private ordenMaquilaService : Orden_MaquilaService,
                       private dtOrdenMaquilaService : DetalleOrdenMaquilaService,
-                        private dtFacturacion_OMService : DtFacturacion_OrdenMaquilaService,) {
+                        private dtFacturacion_OMService : DtFacturacion_OrdenMaquilaService,
+                          private servicioTerceros : TercerosService) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null],
       fechaDoc: [null],
       fechaFinalDoc: [null],
       estadoDoc: [null],
+      id_tercero: [null],
+      tercero: [null],
     });
   }
 
@@ -600,5 +605,20 @@ export class Reporte_MaquilasComponent implements OnInit {
   mensajeError(text : string){
     Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> `, showCloseButton: true, });
     this.cargando = false;
+  }
+
+  cargarTerceros(){
+    let tercero : any = this.FormConsultarFiltros.value.tercero;
+    this.servicioTerceros.getTerceroLike(tercero).subscribe(data => {this.arrayTerceros = data});
+  }
+
+  seleccionarTerceros(){
+    let tercero : any = this.FormConsultarFiltros.value.tercero;
+    this.servicioTerceros.getId(tercero).subscribe(data => {
+      setTimeout(() => {
+        this.FormConsultarFiltros.patchValue({tercero: data.tercero_Nombre, id_tercero: data.tercero_Id });
+      }, 10);
+
+    });
   }
 }
