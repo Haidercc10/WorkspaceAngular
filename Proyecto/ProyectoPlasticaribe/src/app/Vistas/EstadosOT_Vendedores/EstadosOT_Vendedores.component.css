@@ -74,14 +74,14 @@ span{
   .tableColores td .collapse{
     margin-top: 10%;
     text-align: start;
-    font-size: 11px;
+    font-size: calc(var(--font-size) * 11px);
   }
 }
 
 @media (max-width: 1369px){
   .modal-xl {
     max-width: 1440px;
-    font-size: smaller;
+    font-size: calc(var(--font-size) * 13px);
   }
   .tableColores {
     text-align: center;

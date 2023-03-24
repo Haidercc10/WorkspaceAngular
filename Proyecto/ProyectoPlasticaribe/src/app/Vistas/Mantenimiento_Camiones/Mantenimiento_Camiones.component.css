@@ -6,20 +6,20 @@ span{
   color: #d83542;
 }
 
-.bg-danger1 {
+
+.bg-danger1, .bg-success1, .bg-warning1 {
   color: white;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-danger1 {
   background-color: palevioletred;
-  font-size: 15px;
 }
 
 .bg-success1 {
-  color: black;
   background-color: palegreen;
-  font-size: 15px;
 }
 
 .bg-warning1 {
-  color: black;
   background-color: gold;
-  font-size: 15px;
 }

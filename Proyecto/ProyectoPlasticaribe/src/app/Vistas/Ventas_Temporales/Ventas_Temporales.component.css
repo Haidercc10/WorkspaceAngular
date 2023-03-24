@@ -3,7 +3,7 @@ span{
 }
 
 .titulo14 {
-  font-size: 14px;
+  font-size: calc(var(--font-size) * 14px);
 }
 
 .d-grid {
@@ -11,11 +11,11 @@ span{
 }
 
 .labelMateriaPrima{
-  font-size: 16px;
+  font-size: calc(var(--font-size) * 16px);
  }
 
 .card-text {
-  font-size: 13px;
+  font-size: calc(var(--font-size) * 13px);
 }
 
 .centrarImagen {

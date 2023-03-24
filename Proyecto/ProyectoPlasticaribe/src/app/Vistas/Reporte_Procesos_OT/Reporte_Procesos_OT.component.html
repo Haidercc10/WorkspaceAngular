@@ -130,7 +130,7 @@
         <div class="row g-3">
           <!--Inicio Tabla OT-->
           <div class="table-responsive">
-            <table class="table table-borderless table-hover mt-2 tableColores" style="font-size: 14px;">
+            <table class="table table-borderless table-hover mt-2 tableColores font-size-14">
               <thead class="TitulosTabla">
                 <!-- <tr> -->
                 <td class="amarillo">
@@ -246,7 +246,7 @@
       </div>
 
       <!-- Tabla donde se mostrarán las OT Consultadas -->
-      <div *ngIf="load" id="tableProcesos" style="font-size: 14px;">
+      <div *ngIf="load" id="tableProcesos" class="font-size-14">
         <div class="mb-4 ">
           <div class="row g-3">
             <!--Botones superiores de Paginado-->
@@ -286,29 +286,29 @@
               <!-- Titulos -->
               <ng-template pTemplate="header" let-columns>
                 <tr>
-                  <th scope="col" pSortableColumn="ot" pResizableColumn style="font-size: 12px;">OT
+                  <th scope="col" pSortableColumn="ot" pResizableColumn class="font-size-12">OT
                     <p-sortIcon field="ot" title="Order por OT"></p-sortIcon>
                   </th>
-                  <th id="" scope="col" pSortableColumn="cli" pResizableColumn style="font-size: 12px;">Cliente
+                  <th id="" scope="col" pSortableColumn="cli" pResizableColumn class="font-size-12">Cliente
                     <p-sortIcon field="cli"></p-sortIcon>
                   </th>
-                  <th id="" scope="col" pSortableColumn="prod" pResizableColumn style="font-size: 12px;">Producto
+                  <th id="" scope="col" pSortableColumn="prod" pResizableColumn class="font-size-12">Producto
                     <p-sortIcon field="prod"></p-sortIcon>
                   </th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Materia Prima</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Extrusión</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Impresión</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Rotograbado</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Doblado</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Laminado</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Corte</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Empaque</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Sellado</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Wiketiado</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Cant. Producir</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Estados</th>
-                  <th id="" scope="col" pResizableColumn style="font-size: 12px;">Fecha Creación</th>
-                  <th *ngFor="let col of columns" pResizableColumn style="font-size: 12px;">
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Materia Prima</th>
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Extrusión</th>
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Impresión</th>
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Rotograbado</th>
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Doblado</th>
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Laminado</th>
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Corte</th>
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Empaque</th>
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Sellado</th>
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Wiketiado</th>
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Cant. Producir</th>
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Estados</th>
+                  <th id="" scope="col" pResizableColumn class="font-size-12">Fecha Creación</th>
+                  <th *ngFor="let col of columns" pResizableColumn class="font-size-12">
                     {{col.header}}
                   </th>
                   <th></th>
@@ -643,7 +643,7 @@
                     </div>
                     <div class="p-field-radiobutton p-col-6" style="margin-left: 30%;">
                       <p-radioButton id="category4"name="category" value="18" [(ngModel)]="estadoModal"></p-radioButton>
-                      <label for="category2" style="padding-left: 3%; font-size: 20px; color: #FF7878;">Revisada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                      <label class="font-size-20" for="category2" style="padding-left: 3%; color: #FF7878;">Revisada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     </div>
                   </div>
                 </div>

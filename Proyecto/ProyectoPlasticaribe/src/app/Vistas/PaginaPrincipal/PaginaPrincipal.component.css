@@ -67,7 +67,7 @@ p-pickList span{
 }
 
 .btnclose {
-  font-size: 25px;
+  font-size: calc(var(--font-size) * 25px);
   padding: 2%;
   color: #d83542;
   cursor: pointer;
@@ -178,7 +178,7 @@ p-pickList span{
   margin: auto;
   width: 90%;
   height: 70%;
-  font-size: 50px;
+  font-size: calc(var(--font-size) * 50px);
 }
 
 @keyframes card {
@@ -208,7 +208,7 @@ p-pickList span{
 
   .flex-container > p-card {
     margin: 10px;
-    font-size: 30px;
+    font-size: calc(var(--font-size) * 30px);
     width: 20%;
   }
 

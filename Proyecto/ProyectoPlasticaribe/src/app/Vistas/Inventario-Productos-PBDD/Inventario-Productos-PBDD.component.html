@@ -54,7 +54,7 @@
         </div>
       </ng-template>
       <ng-template pTemplate="header">
-        <tr style="font-size: 13px;">
+        <tr class="font-size-14">
           <th scope="col" pSortableColumn="Item">ID Producto <p-sortIcon field="Item"></p-sortIcon></th>
           <th scope="col" pSortableColumn="NombreItem">Nombre Producto<p-sortIcon field="NombreItem"></p-sortIcon></th>
           <th scope="col" pSortableColumn="PrecioItem">Precio <p-sortIcon field="PrecioItem"></p-sortIcon></th>
@@ -66,7 +66,7 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-arrayUsuarios>
-        <tr style="font-size: 13px;">
+        <tr class="font-size-14">
           <td>{{arrayUsuarios.Item}}</td>
           <td pEditableColumn>
             <p-cellEditor>

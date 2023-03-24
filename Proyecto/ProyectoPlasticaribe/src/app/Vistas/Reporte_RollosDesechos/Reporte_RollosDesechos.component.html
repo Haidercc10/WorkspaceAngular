@@ -123,27 +123,27 @@
           <!-- Titulos -->
           <ng-template pTemplate="header" let-columns>
             <tr>
-              <th id="" scope="col" pSortableColumn="ot" style="font-size: 12px;">OT
+              <th id="" scope="col" pSortableColumn="ot" class="font-size-12">OT
                 <p-columnFilter type="text" field="ot" display="menu"></p-columnFilter></th>
-              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Rollo</th>
-              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Cliente</th>
-              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Item</th>
-              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Nombre Item</th>
-              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Ancho</th>
-              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Largo</th>
-              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Fuelle</th>
-              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Medida</th>
-              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Peso</th>
-              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Und.</th>
-              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Fecha</th>
-              <th id="" scope="col" pResizableColumn style="font-size: 13px;">Proceso</th>
-              <th *ngFor="let col of columns" pResizableColumn style="font-size: 13px;">
+              <th id="" scope="col" pResizableColumn class="font-size-12">Rollo</th>
+              <th id="" scope="col" pResizableColumn class="font-size-12">Cliente</th>
+              <th id="" scope="col" pResizableColumn class="font-size-12">Item</th>
+              <th id="" scope="col" pResizableColumn class="font-size-12">Nombre Item</th>
+              <th id="" scope="col" pResizableColumn class="font-size-12">Ancho</th>
+              <th id="" scope="col" pResizableColumn class="font-size-12">Largo</th>
+              <th id="" scope="col" pResizableColumn class="font-size-12">Fuelle</th>
+              <th id="" scope="col" pResizableColumn class="font-size-12">Medida</th>
+              <th id="" scope="col" pResizableColumn class="font-size-12">Peso</th>
+              <th id="" scope="col" pResizableColumn class="font-size-12">Und.</th>
+              <th id="" scope="col" pResizableColumn class="font-size-12">Fecha</th>
+              <th id="" scope="col" pResizableColumn class="font-size-12">Proceso</th>
+              <th *ngFor="let col of columns" pResizableColumn class="font-size-12">
                 {{col.header}}
               </th>
           </tr>
           </ng-template>
           <ng-template pTemplate="body" let-rowData let-ArrayDocumento let-columns="columns">
-            <tr style="font-size: 13px;">
+            <tr class="font-size-12">
               <td id="OT" scope="col">{{ArrayDocumento.Orden}}</td>
               <td id="Rollo" scope="col">{{ArrayDocumento.Rollo}}</td>
               <td id="Cliente" scope="col">{{ArrayDocumento.Cliente}}</td>

@@ -96,3 +96,27 @@ label{
   box-shadow: none;
   font-size: calc(var(--font-size) * 13px);
 }
+
+.font-size-12, .pi {
+  font-size: calc(var(--font-size) * 12px);
+}
+
+.font-size-14, .pi {
+  font-size: calc(var(--font-size) * 14px);
+}
+
+.font-size-15 {
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.font-size-20 {
+  font-size: calc(var(--font-size) * 20px);
+}
+
+.font-size-32 {
+  font-size: calc(var(--font-size) * 32px);
+}
+
+.font-size-48 {
+  font-size: calc(var(--font-size) * 48px);
+}
