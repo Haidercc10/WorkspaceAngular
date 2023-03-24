@@ -1,22 +1,8 @@
-<p-sidebar [(visible)]="display" id="sidebar" [style]="{width:'23rem'}">
+<p-sidebar [(visible)]="display" id="sidebar" [style]="{width:'27rem'}">
   <div class="imagen">
-    <img src=".\assets\Plascaribe_Icono.png" alt="Plasticaribe S.A.S">
-    <p><b>Plasticaribe S.A.S</b></p>
+    <img src=".\assets\PLASTICARIBE_logo.png" alt="Plasticaribe S.A.S">
   </div>
-  <div class="sidebar-header">
-    <h4 class="nombreUsuario">
-      <div class="datosUsuario">
-        <i class="pi pi-user font-size-32"></i>
-        <p><b>{{storage_Nombre}}</b></p>
-      </div>
-    </h4>
-    <h6 class="tipoUsuario">
-      <div class="datosRol">
-        <i class="pi pi-verified font-size-15"></i>
-        <p><b>{{storage_Rol}}</b></p>
-      </div>
-    </h6>
-  </div>
+  <br>
   <ul>
     <!-- INICIO -->
     <li>
@@ -876,12 +862,14 @@
     <!-- NOTIFICACIONES -->
 
   </ul>
-  <button class="btn boton" id="boton_CerrarSesion" type="button" (click)="confirm1()">
-    <li aria-hidden="true">
-      <i class="pi pi-fw pi-power-off"></i>
-      <br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Salir&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
-    </li>
-  </button>
+  <div class="botonCierreSesion">
+    <button class="btn" type="button" (click)="confirm1()">
+      <li aria-hidden="true">
+        <i class="pi pi-fw pi-power-off"></i>
+        <br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Salir&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
+      </li>
+    </button>
+  </div>
 
   <!-- BOTON DE CONFIGURACION -->
 </p-sidebar>

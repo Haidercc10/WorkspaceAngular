@@ -29,7 +29,7 @@
     "@popperjs/core": "^2.11.6",
     "@syncfusion/ej2-angular-dropdowns": "^20.3.50",
     "@types/html2canvas": "^1.0.0",
-    "@types/js-cookie": "^3.0.2",
+    "@types/js-cookie": "^3.0.3",
     "angular-ng-autocomplete": "^2.0.12",
     "bootstrap": "^5.2.2",
     "bootstrap-icons": "^1.10.2",

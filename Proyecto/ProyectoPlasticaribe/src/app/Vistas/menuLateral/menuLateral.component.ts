@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
+import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
@@ -44,7 +45,8 @@ export class MenuLateralComponent implements OnInit {
                 private rolService : RolesService,
                   private confirmationService: ConfirmationService,
                     private messageService: MessageService,
-                      private authenticationService: AuthenticationService,) { }
+                      private authenticationService: AuthenticationService,
+                        private cookieService: CookieService,) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -58,6 +60,7 @@ export class MenuLateralComponent implements OnInit {
             command: () => {
               let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
               if (fontSize < 1.51626) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1}`);
+              this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'))}`, { expires: 365, sameSite: 'Lax' });
             }
           },
           {
@@ -66,6 +69,7 @@ export class MenuLateralComponent implements OnInit {
             command: () => {
               let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
               if (fontSize > 0.81) document.documentElement.style.setProperty('--font-size', `${fontSize * 0.9}`);
+              this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'))}`, { expires: 365, sameSite: 'Lax' });
             }
           }
         ]
