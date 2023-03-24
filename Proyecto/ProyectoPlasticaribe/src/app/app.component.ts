@@ -48,8 +48,6 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
     this.lecturaStorage();
-    let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-    document.documentElement.style.setProperty('--font-size', `${fontSize * this.tamanoLetra}`);
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -57,6 +55,9 @@ export class AppComponent implements OnInit{
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
     this.ValidarRol = this.storage.get('Rol');
+    this.tamanoLetra != undefined ? this.storage.get('TamanoLetra') : 1;
+    let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+    document.documentElement.style.setProperty('--font-size', `${fontSize * this.tamanoLetra}`);
   }
 
   //Funcio para verificar la inactividad de un usuario, cuando pasa mas de 30 minutos sin actividad se cierra la sesion
