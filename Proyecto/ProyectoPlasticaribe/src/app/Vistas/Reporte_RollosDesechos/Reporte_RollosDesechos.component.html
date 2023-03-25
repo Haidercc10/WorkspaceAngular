@@ -147,14 +147,14 @@
               <td id="OT" scope="col">{{ArrayDocumento.Orden}}</td>
               <td id="Rollo" scope="col">{{ArrayDocumento.Rollo}}</td>
               <td id="Cliente" scope="col">{{ArrayDocumento.Cliente}}</td>
-              <td id="ItemId" scope="col">{{ArrayDocumento.ItemId}}</td>
+              <td id="ItemId" scope="col">{{ArrayDocumento.Item_Id}}</td>
               <td id="Item" scope="col">{{ArrayDocumento.Item}}</td>
-              <td id="Ancho" scope="col">{{ArrayDocumento.Ancho}}</td>
-              <td id="Largo" scope="col">{{ArrayDocumento.Largo}}</td>
-              <td id="Fuelle" scope="col">{{ArrayDocumento.Fuelle}}</td>
+              <td id="Ancho" scope="col">{{ArrayDocumento.Ancho | number: '1.2-2'}}</td>
+              <td id="Largo" scope="col">{{ArrayDocumento.Largo | number: '1.2-2'}}</td>
+              <td id="Fuelle" scope="col">{{ArrayDocumento.Fuelle | number: '1.2-2'}}</td>
               <td id="Medida" scope="col">{{ArrayDocumento.Medida}}</td>
               <td id="Neto" scope="col">{{ArrayDocumento.Peso}}</td>
-              <td id="Und" scope="col">{{ArrayDocumento.Kg}}</td>
+              <td id="Und" scope="col">{{ArrayDocumento.Kg }}</td>
               <td id="Fecha" scope="col">{{ArrayDocumento.Fecha}}</td>
               <td id="Fecha" scope="col">{{ArrayDocumento.Proceso}}</td>
               <td *ngFor="let col of columns">{{ArrayDocumento[col.field]}}</td>

@@ -568,21 +568,23 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       Orden : datos.rollo_OT,
       Rollo : datos.rollo_Id,
       Cliente : datos.rollo_Cliente,
-      "Item Id" : datos.prod_Id,
+      Item_Id : datos.prod_Id,
       Item : datos.prod_Nombre,
       Ancho : datos.rollo_Ancho,
       Largo : datos.rollo_Largo,
       Fuelle : datos.rollo_Fuelle,
       Medida : datos.undMed_Id,
-      Peso: parseFloat(datos.rollo_PesoNeto),
+      Peso: this.formatonumeros(parseFloat(datos.rollo_PesoNeto)),
       Kg: 'Kg',
       Material : datos.material_Id,
       Calibre : datos.rollo_Calibre,
       Operario : datos.rollo_Operario,
       Fecha : datos.rollo_FechaIngreso,
       Turno: datos.turno_Nombre,
-      Proceso : datos.proceso_Nombre
+      Proceso : datos.proceso_Nombre,
+      PesoNumero : parseFloat(datos.rollo_PesoNeto)
     }
+    console.log(info);
     this.mostrarColumnas();
     this.ArrayDocumento.push(info);
     this.consolidarRollosEliminados();
@@ -601,7 +603,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
         for (let indx = 0; indx < this.ArrayDocumento.length; indx++) {
           if(this.ArrayDocumento[indx].Orden == this.ArrayDocumento[index].Orden) {
-            cantidadPesos += this.ArrayDocumento[indx].Peso;
+            cantidadPesos += this.ArrayDocumento[indx].PesoNumero;
             cantRollos += 1;
           }
         }
@@ -609,13 +611,13 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         let infoConsolidada : any = {
           OT : this.ArrayDocumento[index].Orden,
           Cliente : this.ArrayDocumento[index].Cliente,
-          Item : this.ArrayDocumento[index].ItemId,
+          Item : this.ArrayDocumento[index].Item_Id,
           Nombre : this.ArrayDocumento[index].Item,
-          Peso : cantidadPesos,
-          "No Rollos" : cantRollos,
+          Peso : this.formatonumeros(cantidadPesos.toFixed(2)),
+          "No Rollos" : this.formatonumeros(cantRollos.toFixed(2)),
         }
         this.arrayDataConsolidada.push(infoConsolidada);
-        this.PesoTotalKg += infoConsolidada.Peso;
+        this.PesoTotalKg += cantidadPesos;
         console.log(this.PesoTotalKg);
       }
     }
@@ -752,15 +754,15 @@ export class Reporte_RollosDesechosComponent implements OnInit {
             style: 'header'
           },
 
-          this.table(this.ArrayDocumento, ['Orden', 'Rollo', 'Cliente', 'Item Id', 'Item', 'Peso', 'Fecha', 'Operario']),
+          this.table(this.ArrayDocumento, ['Orden', 'Rollo', 'Cliente', 'Item_Id', 'Item', 'Peso', 'Fecha', 'Operario']),
 
           {
-            text: `\n\nCantidad de rollos: ${this.cantidadOTs}`,
+            text: `\n\nCantidad de rollos: ${this.formatonumeros(this.cantidadOTs)}`,
             alignment: 'right',
             style: 'header',
           },
           {
-            text: `\nCantidad Total Kg: ${this.PesoTotalKg}`,
+            text: `\nCantidad Total Kg: ${this.formatonumeros(this.PesoTotalKg)}`,
             alignment: 'right',
             style: 'header',
           },
@@ -789,7 +791,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       const header = ["OT", "Rollo", "Cliente", "Nro. Item", "Nombre Item", "Peso", "Presentación", "Ancho", "Largo", "Fuelle", "Medida", "Material", "Calibre", "Operario", "Fecha", "Turno"]
       let datos : any =[];
       for (const item of this.ArrayDocumento) {
-        const datos1  : any = [item.Orden, item.Rollo, item.Cliente, item.ItemId, item.Item, item.Peso, item.Kg, item.Ancho, item.Largo, item.Fuelle, item.Medida, item.Material, item.Calibre, item.Operario, item.Fecha, item.Turno];
+        const datos1  : any = [item.Orden, item.Rollo, item.Cliente, item.Item_Id, item.Item, item.Peso, item.Kg, item.Ancho, item.Largo, item.Fuelle, item.Medida, item.Material, item.Calibre, item.Operario, item.Fecha, item.Turno];
         datos.push(datos1);
       }
       let workbook = new Workbook();
@@ -896,5 +898,12 @@ export class Reporte_RollosDesechosComponent implements OnInit {
   // Pasa a la primera pagina de la tabla
   isFirstPage(): boolean {
     return this.ArrayDocumento ? this.first === 0 : true;
+  }
+
+  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
+  formatonumeros = (number) => {
+    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
+    const rep = '$1,';
+    return number.toString().replace(exp,rep);
   }
 }
