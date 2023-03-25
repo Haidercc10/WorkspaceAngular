@@ -94,28 +94,28 @@
       currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros">
       <ng-template pTemplate="header">
         <tr title="Filtros para realizar busquedas de cada campo">
-          <th>
+          <th style="width: 10%;">
             <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'OT', 'contains')" class="w-full">
           </th>
-          <th>
+          <th style="width: 10%;">
             <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Item', 'contains')" class="w-full">
           </th>
-          <th>
+          <th style="width: 30%;">
             <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'NombreItem', 'contains')" class="w-full">
           </th>
-          <th>
+          <th style="width: 10%;">
             <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'NombreMaterial', 'contains')" class="w-full">
           </th>
-          <th>
+          <th style="width: 10%;">
             <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Impreso', 'contains')" class="w-full">
           </th>
-          <th>
+          <th style="width: 10%;">
             <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'PesoTotal', 'contains')" class="w-full">
           </th>
-          <th>
+          <th style="width: 10%;">
             <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')" class="w-full">
           </th>
-          <th></th>
+          <th style="width: 10%;"></th>
         </tr>
         <tr>
           <th scope="col">OT</th>
@@ -214,7 +214,7 @@
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-arrayModal>
-            <tr class="font-size-14">
+            <tr class="font-size-14 centrarTh">
               <td>{{arrayModal.OT}}</td>
               <td>{{arrayModal.Item}}</td>
               <td>{{arrayModal.NombreItem}}</td>

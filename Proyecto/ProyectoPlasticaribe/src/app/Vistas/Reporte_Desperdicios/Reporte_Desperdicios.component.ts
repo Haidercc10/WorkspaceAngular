@@ -195,7 +195,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       Und : 'Kg',
       Proceso : datos.proceso_Nombre,
       Material : datos.material_Nombre,
-      "No Conformidad" : datos.falla_Nombre,
+      "No_Conformidad" : datos.falla_Nombre,
       Impreso : datos.desp_Impresion,
       Maquina : datos.actv_Serial,
       Operario : datos.usua_Nombre,
@@ -211,10 +211,18 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
   /** Función que calcula la cantidad total del desperdicio */
   pesoTotalDesperdicio(){
-    this.totalDesperdicio = 0;
-    for (let index = 0; index < this.arrayModal.length; index++) {
-      this.totalDesperdicio += this.arrayModal[index].Peso;
+    setTimeout(() => {
+      this.totalDesperdicio = 0;
+      if(this.dt2.filteredValue != null) {
+        for (let indx = 0; indx < this.dt2.filteredValue.length; indx++) {
+          this.totalDesperdicio += this.dt2.filteredValue[indx].Peso;
+        }
+      } else {
+      for (let index = 0; index < this.arrayModal.length; index++) {
+            this.totalDesperdicio += this.arrayModal[index].Peso;
+          }
     }
+    }, 500);
   }
 
   /** Función que exportará el reporte en PDF */
@@ -326,7 +334,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
               alignment: 'center',
               style: 'subtitulo'
             },
-            this.table(this.arrayModal, ['OT', 'Maquina', 'Item', 'Material', 'Operario', 'No Conformidad', 'Cantidad', 'Und', 'Impreso', 'Proceso', 'Fecha', ]),
+            this.table(this.arrayModal, ['OT', 'Maquina', 'Item', 'Material', 'Operario', 'No_Conformidad', 'Cantidad', 'Und', 'Impreso', 'Proceso', 'Fecha', ]),
             '\n',
             {
               text: `Cantidad total: ${this.formatonumeros(this.totalDesperdicio)} Kg\n `,
@@ -430,6 +438,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   // Funcion que permitirá filtrar la información de la tabla
   aplicarfiltro2($event, campo : any, valorCampo : string){
     this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
+    this.pesoTotalDesperdicio();
   }
 
   // Funcion que mostrará un mensaje de error
