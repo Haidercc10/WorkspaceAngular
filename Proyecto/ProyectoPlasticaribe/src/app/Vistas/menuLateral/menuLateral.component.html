@@ -1,22 +1,8 @@
-<p-sidebar [(visible)]="display" id="sidebar" [style]="{width:'23rem'}">
+<p-sidebar [(visible)]="display" id="sidebar" [style]="{width:'27rem'}">
   <div class="imagen">
-    <img src=".\assets\Plascaribe_Icono.png" alt="Plasticaribe S.A.S">
-    <p><b>Plasticaribe S.A.S</b></p>
+    <img src=".\assets\PLASTICARIBE_logo.png" alt="Plasticaribe S.A.S">
   </div>
-  <div class="sidebar-header">
-    <h4 class="nombreUsuario">
-      <div class="datosUsuario">
-        <i class="pi pi-user font-size-32"></i>
-        <p><b>{{storage_Nombre}}</b></p>
-      </div>
-    </h4>
-    <h6 class="tipoUsuario">
-      <div class="datosRol">
-        <i class="pi pi-verified font-size-15"></i>
-        <p><b>{{storage_Rol}}</b></p>
-      </div>
-    </h6>
-  </div>
+  <br>
   <ul>
     <!-- INICIO -->
     <li>
@@ -865,6 +851,33 @@
       </li>
     </ng-container>
 
+    <!-- CONFIGURACION -->
+    <ng-container>
+      <li>
+        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample15" role="button" (click)="clickIcon15()" aria-expanded="false" aria-controls="collapseExample">
+          <ng-container *ngIf="subir15; then thenTemplate; else elseTemplate"></ng-container>
+          <ng-template #thenTemplate>
+            <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+          </ng-template>
+          <ng-template #elseTemplate>
+            <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+          </ng-template>
+          <b>Configuración</b>
+        </a>
+        <div class="collapse" id="collapseExample15">
+          <ng-container>
+            <div class="mb-2 sangria tanamoLetra">
+              Tamaño de Letra <i class="pi pi-plus" (click)="aumentarLetra()"></i> <i class="pi pi-minus" (click)="disminuirLetra()"></i>
+            </div>
+          </ng-container>
+            <div class="mb-2 sangria">
+            <hr>
+          </div>
+        </div>
+      </li>
+    </ng-container>
+
+
     <!-- PROCESOS -->
 
     <!-- FACTURA DE VENTAS -->
@@ -876,12 +889,14 @@
     <!-- NOTIFICACIONES -->
 
   </ul>
-  <button class="btn boton" id="boton_CerrarSesion" type="button" (click)="confirm1()">
-    <li aria-hidden="true">
-      <i class="pi pi-fw pi-power-off"></i>
-      <br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Salir&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
-    </li>
-  </button>
+  <div class="botonCierreSesion">
+    <button class="btn" type="button" (click)="confirm1()">
+      <li aria-hidden="true">
+        <i class="pi pi-fw pi-power-off"></i>
+        <br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Salir&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
+      </li>
+    </button>
+  </div>
 
   <!-- BOTON DE CONFIGURACION -->
 </p-sidebar>
@@ -899,11 +914,11 @@
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
       <span class="user"><i class="pi pi-user"></i> {{storage_Nombre}}</span>
       <span class="tipoUser"><i class="pi pi-verified"></i> {{storage_Rol}} </span>
-      <div class="justify-content-center">
+      <!-- <div class="justify-content-center">
         <p-toast></p-toast>
         <p-menu #menu [model]="items" [popup]="true"></p-menu>
         <i (click)="menu.toggle($event)" class="pi pi-cog"></i>
-      </div>
+      </div> -->
     </div>
   </div>
 </nav>

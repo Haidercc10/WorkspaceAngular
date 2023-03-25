@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDrawerMode } from '@angular/material/sidenav';
+import { CookieService } from 'ngx-cookie-service';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
@@ -39,12 +40,14 @@ export class MenuLateralComponent implements OnInit {
   subir12 : boolean = true;
   subir13 : boolean = true;
   subir14 : boolean = true;
+  subir15 : boolean = true;
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private rolService : RolesService,
                   private confirmationService: ConfirmationService,
                     private messageService: MessageService,
-                      private authenticationService: AuthenticationService,) { }
+                      private authenticationService: AuthenticationService,
+                        private cookieService: CookieService,) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -57,7 +60,8 @@ export class MenuLateralComponent implements OnInit {
             icon: 'pi pi-plus',
             command: () => {
               let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-              if (fontSize < 2.0) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1}`);
+              if (fontSize < 1.51626) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1}`);
+              this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'))}`, { expires: 365, sameSite: 'Lax' });
             }
           },
           {
@@ -66,11 +70,12 @@ export class MenuLateralComponent implements OnInit {
             command: () => {
               let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
               if (fontSize > 0.81) document.documentElement.style.setProperty('--font-size', `${fontSize * 0.9}`);
+              this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'))}`, { expires: 365, sameSite: 'Lax' });
             }
           }
         ]
       },
-  ];
+    ];
   }
 
   lecturaStorage(){
@@ -85,6 +90,18 @@ export class MenuLateralComponent implements OnInit {
         }
       }
     });
+  }
+
+  aumentarLetra() {
+    let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+    if (fontSize < 1.51626) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1}`);
+    this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'))}`, { expires: 365, sameSite: 'Lax' });
+  }
+
+  disminuirLetra(){
+    let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
+    if (fontSize > 0.81) document.documentElement.style.setProperty('--font-size', `${fontSize * 0.9}`);
+    this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'))}`, { expires: 365, sameSite: 'Lax' });
   }
 
   showConfirm() {
@@ -193,5 +210,10 @@ export class MenuLateralComponent implements OnInit {
   clickIcon14(){
     if (this.subir14) this.subir14 = false;
     else this.subir14 = true;
+  }
+
+  clickIcon15(){
+    if (this.subir15) this.subir15 = false;
+    else this.subir15 = true;
   }
 }

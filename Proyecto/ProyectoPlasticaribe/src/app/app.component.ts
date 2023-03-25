@@ -8,7 +8,7 @@ import { authentication_BagPro } from './_Services/authentication_BagPro.service
 import { User_Inv_Zeus } from './_Models/user_Inv_Zeus';
 import { user_Conta_Zeus } from './_Models/user_Conta_Zeus';
 import { User_BagPro } from './_Models/user_BagPro';
-import { MovimientosAplicacionService } from './Servicios/Movimientos_Aplicacion/MovimientosAplicacion.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-root',
@@ -38,7 +38,8 @@ export class AppComponent implements OnInit{
                 private authenticationService: AuthenticationService,
                   private authenticationInvZeusService : AuthenticationService_InvZeus,
                     private authenticationContaZeusService : authentication_ContaZeus,
-                      private authenticationBagProService : authentication_BagPro,) {
+                      private authenticationBagProService : authentication_BagPro,
+                        private cookieService: CookieService,) {
     this.authenticationService.user.subscribe(x => this.user = x);
     this.authenticationInvZeusService.user.subscribe(x => this.user_InvZeus = x);
     this.authenticationContaZeusService.user.subscribe(x => this.user_ContaZeus = x);
@@ -54,8 +55,8 @@ export class AppComponent implements OnInit{
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
-    this.tamanoLetra != undefined ? this.storage.get('TamanoLetra') : 1;
+    this.ValidarRol = this.storage.get('Rol');    ;
+    this.cookieService.get('TamanoLetra') != undefined ? this.tamanoLetra = parseFloat(this.cookieService.get('TamanoLetra')) : 1;
     let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
     document.documentElement.style.setProperty('--font-size', `${fontSize * this.tamanoLetra}`);
   }

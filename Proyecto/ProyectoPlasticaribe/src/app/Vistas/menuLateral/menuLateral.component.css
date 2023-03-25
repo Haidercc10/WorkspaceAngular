@@ -16,7 +16,7 @@
 }
 
 .imagen img{
-  width: 80px;
+  width: 90%;
 }
 
 .imagen p{
@@ -147,6 +147,14 @@ p {
   color: #000;
 }
 
+.botonCierreSesion {
+  width: 100%;
+}
+
+.botonCierreSesion button {
+  margin: 0 30%;
+}
+
 .pi-cog {
   color: #000;
   font-size: calc(var(--font-size) * 25px);
@@ -166,3 +174,8 @@ p {
   }
 }
 
+.tanamoLetra i {
+  cursor: pointer;
+  font-size: calc(var(--font-size) * 20px);
+  margin-left: 10%;
+}
