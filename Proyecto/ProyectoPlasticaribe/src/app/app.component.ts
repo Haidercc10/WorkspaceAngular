@@ -56,7 +56,8 @@ export class AppComponent implements OnInit{
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
     this.ValidarRol = this.storage.get('Rol');    ;
-    this.cookieService.get('TamanoLetra') != undefined ? this.tamanoLetra = parseFloat(this.cookieService.get('TamanoLetra')) : 1;
+    this.tamanoLetra = parseFloat(this.cookieService.get('TamanoLetra'));
+    if (this.tamanoLetra.toString() == 'NaN') this.tamanoLetra = 1;
     let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
     document.documentElement.style.setProperty('--font-size', `${fontSize * this.tamanoLetra}`);
   }
