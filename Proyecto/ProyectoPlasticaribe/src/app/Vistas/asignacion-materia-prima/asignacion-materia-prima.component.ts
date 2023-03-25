@@ -179,17 +179,14 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             }
             if (devolucion == null || devolucion == undefined) devolucion = 0;
             this.cantRestante = this.kgOT - (asignacion - devolucion);
-            if (this.cantRestante <= 0) this.mensajeAdvertencia(`¡No se pueden hacer más asignaciones a la OT ${ot}!`);
-            else {
-              let info : any = {
-                ot : ot,
-                cliente : datos_procesos[index].clienteNom,
-                item : datos_procesos[index].clienteItemsNom,
-                kg : this.kgOT,
-                kgRestante : this.cantRestante,
-              }
-              this.infoOrdenTrabajo.push(info);
+            let info : any = {
+              ot : ot,
+              cliente : datos_procesos[index].clienteNom,
+              item : datos_procesos[index].clienteItemsNom,
+              kg : this.kgOT,
+              kgRestante : this.cantRestante,
             }
+            this.infoOrdenTrabajo.push(info);
             this.load = true;
           });
           break;

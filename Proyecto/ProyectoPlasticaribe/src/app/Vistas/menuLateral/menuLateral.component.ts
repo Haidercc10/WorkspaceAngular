@@ -51,31 +51,6 @@ export class MenuLateralComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.items = [
-      {
-        label: 'Tamaño de Letra',
-        items: [
-          {
-            label: 'Mas',
-            icon: 'pi pi-plus',
-            command: () => {
-              let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-              if (fontSize < 1.51626) document.documentElement.style.setProperty('--font-size', `${fontSize * 1.1}`);
-              this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'))}`, { expires: 365, sameSite: 'Lax' });
-            }
-          },
-          {
-            label: 'Menos',
-            icon: 'pi pi-minus',
-            command: () => {
-              let fontSize : number = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-              if (fontSize > 0.81) document.documentElement.style.setProperty('--font-size', `${fontSize * 0.9}`);
-              this.cookieService.set('TamanoLetra', `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'))}`, { expires: 365, sameSite: 'Lax' });
-            }
-          }
-        ]
-      },
-    ];
   }
 
   lecturaStorage(){
