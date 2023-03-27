@@ -816,7 +816,7 @@ export class OcompraComponent implements OnInit {
         this.ordenCompraService.getId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden).subscribe(datos_Orden => {
           let info : any = {
             Oc_Id : this.FormOrdenCompra.value.ConsecutivoOrden,
-            Usua_Id : this.storage_Id,
+            Usua_Id : datos_Orden.usua_Id,
             Oc_Fecha : datos_Orden.oc_Fecha,
             Oc_Hora : datos_Orden.oc_Hora,
             Prov_Id : this.FormOrdenCompra.value.Id_Proveedor,
