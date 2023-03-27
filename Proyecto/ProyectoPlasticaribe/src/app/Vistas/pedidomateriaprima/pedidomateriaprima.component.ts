@@ -4,6 +4,7 @@ import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
+import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCompra/DetallesOrdenesCompra.service';
 import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
 import { FactuaMpCompradaService } from 'src/app/Servicios/FacturaMateriaPrima/facturaMpComprada.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
@@ -73,7 +74,8 @@ export class PedidomateriaprimaComponent implements OnInit {
                                   private tintasService : TintasService,
                                     private servicioOCMatPrima : OrdenCompra_MateriaPrimaService,
                                       private OrdenesFacturasService : OrdenFactura_RelacionService,
-                                        private ordenCompraRemisionService : OrdenCompra_RemisionService,) {
+                                        private ordenCompraRemisionService : OrdenCompra_RemisionService,
+                                          private dtOrdenCompraService : DetallesOrdenesCompraService,) {
 
     this.FormMateriaPrimaFactura = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
@@ -201,90 +203,67 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.load = false;
     this.arrayOrdenCompra = [];
     this.arrayInfoMatPrima = [];
-    let materiaPrimaIngresada : number [] = [];
     let Orden_Compra : any = this.FormMateriaPrimaFactura.value.OrdenCompra;
 
-    if (Orden_Compra != null) {
-      this.servicioOCMatPrima.getFacturasComprasAsociadasAOC(Orden_Compra).subscribe(dataFact => {
-        for (let index = 0; index < dataFact.length; index++) {
-          let id : number = 0;
-          if (dataFact[index].matPri_Id != 84) id = dataFact[index].matPri_Id;
-          else if (dataFact[index].tinta_Id != 2001) id = dataFact[index].tinta_Id;
-          else if (dataFact[index].bopp_Id != 1) id = dataFact[index].bopp_Id;
-          materiaPrimaIngresada.push(id);
-        }
-        this.servicioOCMatPrima.getRemisionesComprasAsociadasAOC(Orden_Compra).subscribe(dataRem => {
-          for (let k = 0; k < dataRem.length; k++) {
-            let id : number = 0;
-            if (dataRem[k].matPri_Id != 84) id = dataRem[k].matPri_Id;
-            else if (dataRem[k].tinta_Id != 2001) id = dataRem[k].tinta_Id;
-            else if (dataRem[k].bopp_Id != 1) id = dataRem[k].bopp_Id;
-            materiaPrimaIngresada.push(id);
-          }
-
-          this.servicioOCMatPrima.getListaOrdenesComprasxId(Orden_Compra).subscribe(datos_orden => {
-            setTimeout(() => {
-              for (let i = 0; i < datos_orden.length; i++) {
-                  let info : any = {
-                    Id : 0,
-                    Id_Mp: datos_orden[i].matPri_Id,
-                    Id_Tinta: datos_orden[i].tinta_Id,
-                    Id_Bopp: datos_orden[i].bopP_Id,
-                    Nombre : '',
-                    Cantidad : (datos_orden[i].doc_CantidadPedida),
-                    Cantidad_Ingresada : 0,
-                    Cantidad_Faltante : 0,
-                    Cantidad_Oculta : datos_orden[i].doc_CantidadPedida,
-                    Medida : datos_orden[i].undMed_Id,
-                    Precio : datos_orden[i].doc_PrecioUnitario,
-                    Exits : false,
-                  }
-                  if (info.Id_Mp != 84 && info.Id_Tinta == 2001 && info.Id_Bopp == 1) {
-                    info.Id = info.Id_Mp;
-                    info.Nombre = datos_orden[i].matPri_Nombre;
-                  } else if (info.Id_Mp == 84 && info.Id_Tinta != 2001 && info.Id_Bopp == 1) {
-                    info.Id = info.Id_Tinta;
-                    info.Nombre = datos_orden[i].tinta_Nombre;
-                  } else if (info.Id_Mp == 84 && info.Id_Tinta == 2001 && info.Id_Bopp != 1) {
-                    info.Id = info.Id_Bopp;
-                    info.Nombre = datos_orden[i].boppGen_Nombre;
-                    this.mostrarCheck = false;
-                  }
-                  if (materiaPrimaIngresada.includes(info.Id)) {
-                    for (let j = 0; j < dataFact.length; j++) {
-                      if (info.Id == dataFact[j].matPri_Id || info.Id == dataFact[j].tinta_Id || info.Id == dataFact[j].bopP_Id) info.Cantidad_Ingresada = dataFact[j].suma;
-                      info.Cantidad_Faltante = info.Cantidad - info.Cantidad_Ingresada;
-                      info.Cantidad_Oculta = info.Cantidad_Faltante;
-                      if (info.Cantidad_Ingresada == info.Cantidad) info.Exits = true;
-                    }
-                    for (let j = 0; j < dataRem.length; j++) {
-                      if (info.Id == dataRem[j].matPri_Id || info.Id == dataRem[j].tinta_Id || info.Id == dataRem[j].bopP_Id) info.Cantidad_Ingresada = dataRem[j].suma;
-                      info.Cantidad_Faltante = info.Cantidad - info.Cantidad_Ingresada;
-                      info.Cantidad_Oculta = info.Cantidad_Faltante;
-                      if (info.Cantidad_Ingresada == info.Cantidad) info.Exits = true;
-                    }
-                  }
-                  if (info.Cantidad_Faltante == 0) info.Cantidad_Faltante = info.Cantidad;
-                  this.FormMateriaPrimaFactura.setValue({
-                    ConsecutivoFactura : this.ultimoIdFactura,
-                    OrdenCompra : this.FormMateriaPrimaFactura.value.OrdenCompra,
-                    MpFactura: this.FormMateriaPrimaFactura.value.MpFactura,
-                    MpRemision : this.FormMateriaPrimaFactura.value.MpRemision,
-                    proveedor: datos_orden[i].prov_Id,
-                    proveedorNombre: datos_orden[i].prov_Id,
-                    MpObservacion : this.FormMateriaPrimaFactura.value.MpObservacion,
-                  });
-                  this.arrayOrdenCompra.push(info);
-                  this.arrayOrdenCompra.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+    if (Orden_Compra != null){
+      this.dtOrdenCompraService.GetListaOrdenesComprasxId(Orden_Compra).subscribe(datos_orden => {
+        for (let i = 0; i < datos_orden.length; i++) {
+          let mp : number = 0;
+          if (datos_orden[i].matPri_Id != 84) mp = datos_orden[i].matPri_Id;
+          else if (datos_orden[i].tinta_Id != 2001) mp = datos_orden[i].tinta_Id;
+          else if (datos_orden[i].bopP_Id != 1) mp = datos_orden[i].bopP_Id;
+          let mpArray : number [] = [];
+          this.servicioOCMatPrima.GetOrdenCompraFacturada(Orden_Compra, mp).subscribe(datos_facturacion => {
+            for (let j = 0; j < datos_facturacion.length; j++) {
+              let info : any = {
+                Id : mp,
+                Id_Mp: datos_facturacion[j].mP_Id,
+                Id_Tinta: datos_facturacion[j].tinta_Id,
+                Id_Bopp: datos_facturacion[j].bopp_Id,
+                Nombre : '',
+                Cantidad : datos_facturacion[j].cantidad_Total,
+                Cantidad_Ingresada : datos_facturacion[j].cantidad_Ingresada,
+                Cantidad_Faltante : datos_facturacion[j].cantidad_Faltante,
+                Cantidad_Faltante_Editar : datos_facturacion[j].cantidad_Faltante,
+                Medida : datos_facturacion[j].presentacion,
+                Precio : datos_facturacion[j].precio,
+                Exits : false,
               }
-            }, 500);
-          }, error => { this.mensajeError(`No se encontró la orden de compra`, error.message); });
-        });
-      }, error => { this.mensajeError(`No se encontró la orden de compra`, error.message); });
-      setTimeout(() => {
-        this.load = true;
-        this.cambiarNombreProveedor();
-      }, 2000);
+
+              if (mpArray.includes(mp)) {
+                for (let k = 0; k < this.arrayOrdenCompra.length; k++) {
+                  if (this.arrayOrdenCompra[k].Id == mp) {
+                    this.arrayOrdenCompra[k].Cantidad_Ingresada += info.Cantidad_Ingresada;
+                    this.arrayOrdenCompra[k].Cantidad_Faltante = this.arrayOrdenCompra[k].Cantidad - this.arrayOrdenCompra[k].Cantidad_Ingresada;
+                    this.arrayOrdenCompra[k].Cantidad_Faltante_Editar = this.arrayOrdenCompra[k].Cantidad_Faltante;
+                    if (this.arrayOrdenCompra[k].Cantidad_Ingresada >= this.arrayOrdenCompra[k].Cantidad) this.arrayOrdenCompra[k].Exits = true;
+                  } else continue;
+                }
+              } else {
+                if (info.Id_Mp != 84 && info.Id_Tinta == 2001 && info.Id_Bopp == 1) info.Nombre = datos_facturacion[j].mp;
+                else if (info.Id_Mp == 84 && info.Id_Tinta != 2001 && info.Id_Bopp == 1) info.Nombre = datos_facturacion[j].tinta;
+                else if (info.Id_Mp == 84 && info.Id_Tinta == 2001 && info.Id_Bopp != 1) {
+                  info.Id = info.Id_Bopp;
+                  info.Nombre = datos_facturacion[j].bopp;
+                  this.mostrarCheck = false;
+                }
+
+                if (info.Cantidad_Ingresada >= info.Cantidad) info.Exits = true;
+                this.FormMateriaPrimaFactura.patchValue({
+                  ConsecutivoFactura : this.ultimoIdFactura,
+                  proveedor: datos_facturacion[j].proveedor_Id,
+                  proveedorNombre: datos_facturacion[j].proveedor,
+                  MpObservacion : datos_facturacion[j].observacion,
+                });
+                mpArray.push(mp);
+                this.arrayOrdenCompra.push(info);
+                this.arrayOrdenCompra.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+              }
+              this.load = true;
+            }
+          });
+        }
+      }, error => { this.mensajeError(`¡No existe la Orden de Compra #${Orden_Compra}, por favor verifique!`); });
     }
   }
 
@@ -402,7 +381,7 @@ export class PedidomateriaprimaComponent implements OnInit {
           MatPri_Id : this.ArrayMateriaPrima[index].Id_Mp,
           Tinta_Id : this.ArrayMateriaPrima[index].Id_Tinta,
           Bopp_Id : this.ArrayMateriaPrima[index].Id_Bopp,
-          FaccoMatPri_Cantidad : this.ArrayMateriaPrima[index].Cantidad_Faltante,
+          FaccoMatPri_Cantidad : this.ArrayMateriaPrima[index].Cantidad_Faltante_Editar,
           UndMed_Id : this.ArrayMateriaPrima[index].Medida,
           FaccoMatPri_ValorUnitario : this.ArrayMateriaPrima[index].Precio,
         }
@@ -441,20 +420,26 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   // Funcion que le a cambiar el estado a la orden de compra
   estadoOrdenCompra(){
-    let Orden_Compra : any = this.FormMateriaPrimaFactura.value.OrdenCompra;
-    let cantidadIngresada : number = 0;
-    let estado : number;
-
-    if (Orden_Compra != null) {
-      this.servicioOCMatPrima.getFacturasComprasAsociadasAOC(Orden_Compra).subscribe(dataFact => {
-        for (let index = 0; index < dataFact.length; index++) {
-          cantidadIngresada += dataFact[index].suma;
-        }
-
+    let Orden_Compra : any = this.FormMateriaPrimaFactura.value.OrdenCompra, estado : number;
+    this.dtOrdenCompraService.GetListaOrdenesComprasxId(Orden_Compra).subscribe(datos_orden => {
+      for (let i = 0; i < datos_orden.length; i++) {
+        let mp : number = 0;
+        if (datos_orden[i].matPri_Id != 84) mp = datos_orden[i].matPri_Id;
+        else if (datos_orden[i].tinta_Id != 2001) mp = datos_orden[i].tinta_Id;
+        else if (datos_orden[i].bopP_Id != 1) mp = datos_orden[i].bopP_Id;
+        this.servicioOCMatPrima.GetOrdenCompraFacturada(Orden_Compra, mp).subscribe(datos_facturacion => {
+          for (let j = 0; j < datos_facturacion.length; j++) {
+            if (datos_facturacion[j].cantidad_Faltante <= 0) estado = 5
+            else {
+              estado = 11;
+              break;
+            }
+          }
+        });
+        break;
+      }
+      setTimeout(() => {
         this.servicioOCMatPrima.getId_OrdenCompra(Orden_Compra).subscribe(datos_orden => {
-          if (datos_orden.oc_PesoTotal <= cantidadIngresada) estado = 5;
-          else if (datos_orden.oc_PesoTotal > cantidadIngresada && cantidadIngresada != 0) estado = 12;
-          else if (datos_orden.oc_PesoTotal > cantidadIngresada && cantidadIngresada == 0) estado = 11;
           let info : any = {
             Oc_Id : datos_orden.oc_Id,
             Usua_Id : datos_orden.usua_Id,
@@ -472,8 +457,8 @@ export class PedidomateriaprimaComponent implements OnInit {
             this.load = true;
           });
         });
-      });
-    }
+      }, 2000);
+    });
   }
 
   // Funcion que se encargará de la relacion entre la(s) remision(es) o factura(s)
@@ -529,7 +514,7 @@ export class PedidomateriaprimaComponent implements OnInit {
           MatPri_Id : this.ArrayMateriaPrima[index].Id_Mp,
           Tinta_Id : this.ArrayMateriaPrima[index].Id_Tinta,
           Bopp_Id : this.ArrayMateriaPrima[index].Id_Bopp,
-          RemiMatPri_Cantidad : this.ArrayMateriaPrima[index].Cantidad_Faltante,
+          RemiMatPri_Cantidad : this.ArrayMateriaPrima[index].Cantidad_Faltante_Editar,
           UndMed_Id : this.ArrayMateriaPrima[index].Medida,
           RemiMatPri_ValorUnitario : this.ArrayMateriaPrima[index].Precio,
         }
@@ -543,6 +528,7 @@ export class PedidomateriaprimaComponent implements OnInit {
         if (!errorConsulta) {
           this.relacionOrdenRemision(idRemision);
           setTimeout(() => {
+            this.estadoOrdenCompra();
             this.moverInventarioMP();
             this.moverInventarioTintas();
             setTimeout(() => { this.limpiarTodosCampos(); }, 1500);
@@ -795,10 +781,12 @@ export class PedidomateriaprimaComponent implements OnInit {
   // Mensaje de Advertencia
   mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
     Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+    this.load = true;
   }
 
   // Mensaje de Error
   mensajeError(text : string, error : any = ''){
     Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+    this.load = true;
   }
 }
