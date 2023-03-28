@@ -1,3 +1,4 @@
+<p-toast position="center"></p-toast>
 <form [formGroup]="FormBopp" (ngSubmit)="crearBoppGenerico()">
   <div class="mb-3">
     <div class="row g-3">
@@ -21,8 +22,8 @@
 
       <div class="mb-1">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <input class="btn btn-danger btn-danger-sm" type="submit" value="Agregar">
-          <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="limpiarCampos()">
+          <button class="btn btn-danger btn-danger-sm" type="submit"><i class="pi pi-check"></i> Agregar</button>
+          <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()"><i class="pi pi-eraser"></i> Limpiar Campos</button>
         </div>
       </div>
     </div>

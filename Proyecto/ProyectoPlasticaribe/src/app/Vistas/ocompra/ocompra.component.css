@@ -5,3 +5,11 @@ span{
 .d-grid {
   padding-bottom: 3%;
 }
+
+@media (max-width: 800px) {
+  .d-grid {
+    padding-bottom: 10%;
+  }
+}
+
+

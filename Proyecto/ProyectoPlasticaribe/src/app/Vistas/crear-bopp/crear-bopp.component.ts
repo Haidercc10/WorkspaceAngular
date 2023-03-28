@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
+import { MessageService } from 'primeng/api';
 import { BoppGenericoService } from 'src/app/Servicios/BoppGenerico/BoppGenerico.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
@@ -12,15 +13,16 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 })
 export class CrearBoppComponent implements OnInit {
 
-  FormBopp : FormGroup;
-  categorias : any [] = [];
-  unidadMedida : any []= [];
+  FormBopp : FormGroup; /** Formulario para crear BOPP Genérico */
+  categorias : any [] = []; /** Array para cargar las categorias de bopp's */
+  unidadMedida : any []= []; /** Array para cargar las unidades de medida de bopp's */
   tintaCreada = false;
   informacion : string = '';
 
   constructor(private frmBuilder : FormBuilder,
                 private boppGenericoService : BoppGenericoService,
-                    private categoriasService : CategoriaMateriaPrimaService,) {
+                    private categoriasService : CategoriaMateriaPrimaService,
+                      private messageService: MessageService) {
 
     this.FormBopp = this.frmBuilder.group({
       Nombre : [null, Validators.required],
@@ -60,12 +62,25 @@ export class CrearBoppComponent implements OnInit {
         BoppGen_Hora : moment().format('H:mm:ss'),
       }
       this.boppGenericoService.srvGuardar(info).subscribe(datos_bopp => {
-        this.tintaCreada = true;
-        this.informacion = `¡El rollo ha sido creado con exito!`;
-      }, error => {
-        this.tintaCreada = true;
-        this.informacion = `¡Fallo al crear la rollo! \n\n ${error.message}`;
-      });
-    }
+        this.mostrarConfirmacion('¡El rollo ha sido creado con éxito!')
+        setTimeout(() => { this.limpiarCampos(); }, 500);
+      }, error => { this.mostrarError(`No fue posible crear el rollo, verifique!`) });
+    } else this.mostrarAdvertencia('Debe llenar los campos vacios!')
   }
+
+  /** Mostrar mensaje de confirmación al crear tinta */
+  mostrarConfirmacion(mensaje : any) {
+    this.messageService.add({severity:'success', detail: mensaje});
+  }
+
+  /** Mostrar mensaje de error al crear tinta */
+  mostrarError(mensaje : any) {
+    this.messageService.add({severity:'error', detail: mensaje});
+  }
+
+  /** Mostrar mensaje de advertencia al crear tinta */
+  mostrarAdvertencia(mensaje : any) {
+    this.messageService.add({severity:'warning', detail: mensaje});
+  }
+
 }

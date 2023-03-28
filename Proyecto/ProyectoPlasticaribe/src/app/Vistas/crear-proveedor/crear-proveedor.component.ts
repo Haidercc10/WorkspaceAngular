@@ -6,6 +6,7 @@ import { Tipo_ProveedorService } from 'src/app/Servicios/TipoProveedor/tipo_Prov
 import Swal from 'sweetalert2';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import moment from 'moment';
+import { MessageService } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root'
@@ -18,22 +19,22 @@ import moment from 'moment';
 })
 export class CrearProveedorComponent implements OnInit {
 
-  public FormCrearProveedor !: FormGroup;
-
-  tipoIdentificacion = [];
-  tiposProveedores = [];
+  public FormCrearProveedor !: FormGroup; /** Formulario para crear proveedores */
+  tipoIdentificacion = []; /** Array para cargar los tipos de identificación */
+  tiposProveedores = []; /** Array para cargar los proveedores */
 
   constructor(private formBuilderCrearProveedor : FormBuilder,
                 private Crearproveerdor : ProveedorService,
                   private tipoIdentificacionService : TipoIdentificacionService,
-                    private tipoProveedorService : Tipo_ProveedorService,) {
+                    private tipoProveedorService : Tipo_ProveedorService,
+                      private messageService: MessageService ) {
 
     //Creación formulario crear proveedor en modal.
     this.FormCrearProveedor = this.formBuilderCrearProveedor.group({
-      provId: ['', Validators.required],
-      ProvNombre: ['', Validators.required],
-      provTipoId: ['', Validators.required],
-      TipoProv: ['', Validators.required],
+      provId: [null, Validators.required],
+      ProvNombre: [null, Validators.required],
+      provTipoId: [null, Validators.required],
+      TipoProv: [null, Validators.required],
       ProvCiudad: [''],
       ProvTelefono: [''],
       ProvEmail: [''],
@@ -46,6 +47,7 @@ export class CrearProveedorComponent implements OnInit {
     this.tipoProveedor();
   }
 
+  /** Cargar tipos de identificación del proveedor nit/cedula */
   tipoIdntificacion() {
     this.tipoIdentificacionService.srvObtenerLista().subscribe(datos_tipoIdentificacion => {
       for(let index = 0; index < datos_tipoIdentificacion.length; index++){
@@ -54,6 +56,7 @@ export class CrearProveedorComponent implements OnInit {
     });
   }
 
+  /** Cargar los tipos de proveedores */
   tipoProveedor(){
     this.tipoProveedorService.srvObtenerLista().subscribe(datos_tiposProveedores => {
       for (let index = 0; index < datos_tiposProveedores.length; index++) {
@@ -62,16 +65,18 @@ export class CrearProveedorComponent implements OnInit {
     });
   }
 
+  /** Crear el registro del proveedor en la BD.  */
   validarCamposVaciosProveedor() : any{
     if (this.FormCrearProveedor.valid) this.registroProveedor();
-    else Swal.fire("Hay campos vacios")
+    else this.mostrarAdvertencia('Debe llenar los campos vacios!');
   }
 
-
+  /** Función para resetear el formulario */
   LimpiarCampos() {
-    this.FormCrearProveedor.reset();
+    this.FormCrearProveedor.patchValue({ provId: null, ProvNombre: null, provTipoId: null, TipoProv: null, ProvCiudad: '', ProvTelefono: '', ProvEmail: '',});
   }
 
+   /** Registrar proveedores en la BD. */
   registroProveedor(){
     let id : number = this.FormCrearProveedor.value.provId;
     let nombre : string = this.FormCrearProveedor.value.ProvNombre;
@@ -80,9 +85,7 @@ export class CrearProveedorComponent implements OnInit {
     let ciudad : string = this.FormCrearProveedor.value.ProvCiudad;
     let telefono : string = this.FormCrearProveedor.value.ProvTelefono;
     let email : string = this.FormCrearProveedor.value.ProvEmail;
-
     this.CreacionProveedor(id, tipoId, nombre, tipoProveedor, ciudad, telefono, email);
-    this.FormCrearProveedor.reset();
   }
 
   //Funcion que creará un proveedor y lo guardará en la base de datos
@@ -107,21 +110,23 @@ export class CrearProveedorComponent implements OnInit {
    }
 
    this.Crearproveerdor.srvGuardar(datosProveedor).subscribe(datos_nuevoProveedor => {
-     const Toast = Swal.mixin({
-       toast: true,
-       position: 'center',
-       showConfirmButton: false,
-       timer: 1500,
-       timerProgressBar: true,
-       didOpen: (toast) => {
-         toast.addEventListener('mouseenter', Swal.stopTimer)
-         toast.addEventListener('mouseleave', Swal.resumeTimer)
-       }
-     });
-     Toast.fire({
-       icon: 'success',
-       title: '¡Proveedor creado con exito!'
-     });
-   });
+     this.mostrarConfirmacion('Proveedor creado con éxito!');
+     setTimeout(() => { this.LimpiarCampos(); }, 500);
+   }, error => { this.mostrarError('No fue posible crear el registro, por favor, verifique!') });
+ }
+
+ /** Mostrar mensaje de confirmación al crear materia prima */
+ mostrarConfirmacion(mensaje : any) {
+    this.messageService.add({severity:'success', detail: mensaje});
+ }
+
+ /** Mostrar mensaje de confirmación al crear materia prima */
+ mostrarError(mensaje : any) {
+    this.messageService.add({severity:'error', detail: mensaje});
+ }
+
+ /** Mostrar mensaje de confirmación al crear materia prima */
+ mostrarAdvertencia(mensaje : any) {
+  this.messageService.add({severity:'warning', detail: mensaje});
  }
 }

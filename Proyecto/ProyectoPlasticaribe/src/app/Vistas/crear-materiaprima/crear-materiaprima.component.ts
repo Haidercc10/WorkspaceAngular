@@ -20,15 +20,11 @@ import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medid
 
 export class CrearMateriaprimaComponent implements OnInit {
 
-  public materiPrima !: FormGroup;
-
-
+  public materiPrima !: FormGroup; /** Formulario de Materias Primas */
   nombreCategoriasMP = []; //VAriable que va a almacenar el nombre de todas las categorias de materias primas existentes en la empresa
   unidadMedida = []; //Varibale que va a almacenar las unidades de medida registradas en la base de datos
   estado = []; //Variable que va a almacenar todos los tipos de estados de documentos
-  proveedores = [];
-  //tintaCreada = false;
-  informacion : string = '';
+  proveedores = []; /** Array para cargar los proveedores de materia prima. */
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private categoriMpService : CategoriaMateriaPrimaService,
@@ -76,10 +72,12 @@ export class CrearMateriaprimaComponent implements OnInit {
     });
   }
 
+  /** Limpiar campos al momento de crear la mat. prima. */
   limpiarCampos(){
     this.materiPrima.reset();
   }
 
+  /** Obtener Proveedor y cargarlo en el array de la vista. */
   obtenerProceedor(){
     this.proveedorservices.srvObtenerLista().subscribe(datos_proveedores => {
       for (let index = 0; index < datos_proveedores.length; index++) {
@@ -88,6 +86,7 @@ export class CrearMateriaprimaComponent implements OnInit {
     });
   }
 
+  /** Crear el registro de la materia prima en la base de datos. */
   registrarMateriPrima(){
     let nombreMateriaPrima : string = this.materiPrima.value.mpNombre;
     let descripcionMateriaPrima : string = this.materiPrima.value.mpDescripcion;
@@ -129,7 +128,7 @@ export class CrearMateriaprimaComponent implements OnInit {
     this.proveedorMPService.srvGuardar(datosMpProveedor).subscribe(datos_MpProveedorCreado => {});
   }
 
-   /** Mostrar mensaje de confirmación al crear materia prima */
+  /** Mostrar mensaje de confirmación al crear materia prima */
   mostrarConfirmacion(mensaje : any) {
     this.messageService.add({severity:'success', detail: mensaje});
   }
@@ -137,6 +136,12 @@ export class CrearMateriaprimaComponent implements OnInit {
    /** Mostrar mensaje de confirmación al crear materia prima */
   mostrarError(mensaje : any) {
     this.messageService.add({severity:'error', detail: mensaje});
+  }
+
+  /** Cargar nombre en la descripción. */
+  cargarDescripcion(){
+    let mtpNombre : any = this.materiPrima.value.MpNombre;
+    this.materiPrima.patchValue({ mpDescripcion: mtpNombre })
   }
 
 }

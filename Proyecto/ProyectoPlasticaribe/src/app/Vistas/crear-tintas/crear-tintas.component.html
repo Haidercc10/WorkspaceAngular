@@ -1,13 +1,12 @@
-
+<p-toast position="center"></p-toast>
 <form [formGroup]="formularioTintas" (ngSubmit)="agregarTintas()">
   <!-- Inicio Fila 1 Agregar Unidad Medida -->
   <div class="mb-3">
     <div class="row g-3">
-         <!-- Id -->
 
           <!-- Nombre -->
         <div class="form-floating col-md">
-          <input formControlName="TintaNombre" type="text" class="form-control form-control-sm" id="floatingInput" required>
+          <input formControlName="TintaNombre" type="text" class="form-control form-control-sm" id="floatingInput" (keyup)="cargarDescripcion()" required>
           <label for="floatingInput">Nombre</label>
         </div>
         <!-- Descripción -->
@@ -23,14 +22,14 @@
         <!-- Unidad Medida -->
         <div class="form-floating col-md-2">
           <select formControlName="TintaUndMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="unidadMedidas" *ngFor="let unidadMedidas of unidadMedida">{{unidadMedidas}}</option> <!--  {{unidadMedidas}} -->
+            <option [ngValue]="unidadMedidas" *ngFor="let unidadMedidas of unidadMedida">{{unidadMedidas}}</option>
           </select>
           <label for="floatingSelect">Und. Medida</label>
         </div>
         <!-- Categorias -->
         <div class="form-floating col-md-2">
           <select formControlName="TintaCategoria" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="cat.catMP_Id" *ngFor="let cat of categorias">{{cat.catMP_Nombre}}</option> <!--  {{unidadMedidas}} -->
+            <option [ngValue]="cat.catMP_Id" *ngFor="let cat of categorias">{{cat.catMP_Nombre}}</option>
           </select>
           <label for="floatingSelect">Categorias</label>
         </div>
@@ -47,15 +46,15 @@
   <!--Inicio Fila 2 Botones Agregar tintas y Limpiar Campos-->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="submit">Agregar Tinta</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+      <button class="btn btn-danger btn-danger-sm" type="submit"><i class="pi pi-check"></i> Agregar Tinta</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()"><i class="pi pi-eraser"></i> Limpiar Campos</button>
     </div>
   </div>
 
-  <div class="mb-1" *ngIf="tintaCreada">
+  <!--<div class="mb-1" *ngIf="tintaCreada">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <h6>{{informacion}}</h6>
     </div>
-  </div>
+  </div>-->
   <!--Fin Fila 2-->
 </form>

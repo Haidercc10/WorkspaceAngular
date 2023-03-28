@@ -5,7 +5,7 @@
     <div class="row g-3">
       <!-- Nombre Materia Prima -->
       <div class="form-floating col-md">
-        <input formControlName="mpNombre" type="text" class="form-control form-control-sm" id="floatingInput">
+        <input formControlName="mpNombre" type="text" class="form-control form-control-sm" (click)="cargarDescripcion()" id="floatingInput">
         <label for="floatingInput">Nombre</label>
       </div>
 
@@ -48,8 +48,8 @@
   <!--Inicio Fila 3 Botones y Limpiar Campos-->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button" (click)="registrarMateriPrima()">Agregar</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+      <button class="btn btn-danger btn-danger-sm" type="button" (click)="registrarMateriPrima()"><i class="pi pi-check"></i> Agregar</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()"><i class="pi pi-eraser"></i> Limpiar Campos</button>
     </div>
   </div>
 

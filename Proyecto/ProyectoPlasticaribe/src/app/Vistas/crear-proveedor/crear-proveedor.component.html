@@ -1,3 +1,4 @@
+<p-toast position="center"></p-toast>
 <form [formGroup]="FormCrearProveedor">
   <!-- Inicio Fila 1 Agregar Proveedor -->
   <div class="mb-3">
@@ -62,8 +63,8 @@
   <!--Inicio Fila 3 Botones y Limpiar Campos-->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="submit" (click)="registroProveedor()">Crear Proveedor</button>
-      <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="LimpiarCampos()">
+      <button class="btn btn-danger btn-danger-sm" type="submit" (click)="validarCamposVaciosProveedor()"><i class="pi pi-check"></i> Crear Proveedor</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()"><i class="pi pi-eraser"></i> Limpiar Campos</button>
     </div>
   </div>
 </form>
