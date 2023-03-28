@@ -6,7 +6,6 @@ import { AsignacionBOPPService } from 'src/app/Servicios/Asignacion_Bopp/asignac
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/DetallesAsgBopp/detallesAsignacionBOPP.service';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -14,6 +13,7 @@ import Swal from 'sweetalert2';
   templateUrl: './asignacionBOPP_TEMPORAL.component.html',
   styleUrls: ['./asignacionBOPP_TEMPORAL.component.css']
 })
+
 export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
   public load: boolean = true;
@@ -35,11 +35,10 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private rolService : RolesService,
-                      private boppService : EntradaBOPPService,
-                        private asignacionBOPPService : AsignacionBOPPService,
-                          private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,
-                            private bagProService : BagproService) {
+                    private boppService : EntradaBOPPService,
+                      private asignacionBOPPService : AsignacionBOPPService,
+                        private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,
+                          private bagProService : BagproService) {
 
     this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
       AsgBopp_OT : ['', Validators.required],
@@ -104,11 +103,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   //Funcion que buscará y mostrará los BOPP existentes
   obtenerBOPP(){
     this.ArrayBOPP = [];
-    this.boppService.GetBoppConExistencias().subscribe(datos_BOPP => {
-      for (let i = 0; i < datos_BOPP.length; i++) {
-        this.ArrayBOPP.push(datos_BOPP[i]);
-      }
-    });
+    this.boppService.GetBoppConExistencias().subscribe(datos_BOPP => { this.ArrayBOPP = datos_BOPP; });
   }
 
   //funcion que buscará la informacion de una orden de trabajo
@@ -326,12 +321,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
           this.boppService.srvActualizar(datos_bopp[j].bopP_Id, datosBOPP).subscribe(datos_boppActualizado => {
             this.obtenerBOPP();
-            Swal.fire({
-              icon: 'success',
-              title: 'Asignación exitosa',
-              showCloseButton: true,
-              html: `<b>¡Se ha creado exitosamente la asignación de rollos!</b><br>`
-            });
+            Swal.fire({ icon: 'success', title: 'Asignación exitosa', showCloseButton: true, html: `<b>¡Se ha creado exitosamente la asignación de rollos!</b><br>` });
             this.limpiarTodosLosCampos();
           }, error => { this.mensajeError(`¡Se ha producido un error al momento de mover el inventario del rollo ${this.ArrayBoppPedida[i].Nombre}!`); });
         }
@@ -342,10 +332,12 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   // Funcion que va a devolver un mensaje de advertencia
   mensajeAdvertencia(mensaje : string){
     Swal.fire({ icon: 'warning', title: 'Advertencia', text: mensaje, showCloseButton: true });
+    this.load = true;
   }
 
   // Funcion que va a devolver un memsaje de error
   mensajeError(mensaje : string){
     Swal.fire({ icon: 'error', title: 'Opps...', html: mensaje, showCloseButton: true, });
+    this.load = true;
   }
 }

@@ -6,7 +6,6 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import Swal from 'sweetalert2';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
@@ -96,11 +95,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     this.proveedor = [];
     let nombre : string = this.FormDocumentos.value.proveedorNombre.trim();
     if (nombre != '') {
-      this.proveedorService.getProveedorLike(nombre).subscribe(datos_Proveedores => {
-        for (let i = 0; i < datos_Proveedores.length; i++) {
-          this.proveedor.push(datos_Proveedores[i]);
-        }
-      });
+      this.proveedorService.getProveedorLike(nombre).subscribe(datos_Proveedores => { this.proveedor = datos_Proveedores; });
     }
   }
 
@@ -313,9 +308,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     }
     this.ArrayDocumento.push(infoDoc);
     this.ArrayDocumento.sort((a,b) => b.fecha.localeCompare(a.fecha));
-    this.proveedorService.srvObtenerListaPorId(infoDoc.proveedor).subscribe(datos_proveedor => {
-      infoDoc.proveedor = datos_proveedor.prov_Nombre;
-    });
+    this.proveedorService.srvObtenerListaPorId(infoDoc.proveedor).subscribe(datos_proveedor => { infoDoc.proveedor = datos_proveedor.prov_Nombre; });
     this.load = true;
   }
 

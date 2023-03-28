@@ -1,9 +1,9 @@
- <!-- Inicio Contenedor total -->
- <app-menuLateral></app-menuLateral>
+<!-- Inicio Contenedor total -->
+<app-menuLateral></app-menuLateral>
 
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
-  <div class="spinner-border text-danger" role="status" style="margin: auto;">
-    <span class="visually-hidden">Cargando...</span>
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
   </div>
 </div>
 
@@ -19,37 +19,44 @@
 </div>
 
 <div class="formulario">
-  <!--Titulo Asignación -->
   <div class="mb-3">
     <h4 class="tituloRojo">Asignación de Materia Prima</h4>
   </div>
 
-  <!--Inicio Formulario de asignación -->
+  <br>
+  <!-- Formulario Orden de Trabajo -->
   <form [formGroup]="FormMateriaPrimaRetiro">
-    <!-- Inicio Fila 1  -->
     <div class="mb-3">
-      <div class="row g-3">
-        <!-- OT -->
-        <div class="form-floating col-md-2">
-          <input formControlName="OTRetiro" class="form-control form-control-sm" (keyup.enter)="infoOT()" id="floatingInput" type="number" required>
-          <label for="floatingInput">OT</label>
+      <div class="row g-4">
+        <!-- Orden de Trabajo -->
+        <div class="col-md-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="OTRetiro" id="ordenTrabajo" class="form-control form-control-sm" type="text" pInputText (keyup.enter)="infoOT()" required/>
+            <label for="ordenTrabajo">Orden de Trabajo</label>
+          </span>
         </div>
 
         <!-- Maquina -->
-        <div class="form-floating col-md-2">
-          <input formControlName="Maquina" type="number" class="form-control form-control-sm" id="floatingInput" title="Maquina" required>
-          <label for="floatingInput">Maquina</label>
+        <div class="col-md-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-wrench"></i>
+            <input formControlName="Maquina" id="maquina" class="form-control form-control-sm" type="number" pInputText required/>
+            <label for="maquina">Maquina</label>
+          </span>
         </div>
 
-        <!-- Campo Observacion -->
-        <div class="form-floating col-6 col-md">
-          <textarea formControlName="ObservacionRetiro"  id="floatingTextArea" type="text" class="form-control form-control-sm" maxlength="200" ></textarea>
-          <label for="floatingTextArea">Observación</label>
+        <!-- Observacion -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <textarea formControlName="ObservacionRetiro" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
         </div>
+
       </div>
     </div>
   </form>
-  <!--Fin Formulario de asignación -->
 
   <!-- Tabla de OT -->
   <div class="row g-3">
@@ -90,66 +97,75 @@
   <div class="mb-3">
     <h4 class="tituloRojo">Materia Prima</h4>
   </div>
-  <!--Fin titulo -->
+  <br>
 
-  <!--Inicio de formulario de materia prima a entregar-->
+  <!-- Formulario de seleccion de materia prima  -->
   <form [formGroup]="FormMateriaPrimaRetirada">
     <div class="mb-3">
-      <div class="row g-3">
+      <div class="row g-4">
         <!-- Id Materia Prima -->
-        <div class="form-floating col-md">
-          <input formControlName="MpIdRetirada" type="number" min="0" (keyup)="cambiarNombreMateriaPrima(1)" class="form-control" id="floatingInput" name="MapId" placeholder="Id" required >
-          <label for="floatingInput">Id</label>
+        <div class="col-md-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="MpIdRetirada" id="IdMP" class="form-control form-control-sm" type="number" pInputText min="0" (keyup)="cambiarNombreMateriaPrima(1)" required/>
+            <label for="IdMP">Id Materia Prima</label>
+          </span>
         </div>
 
         <!-- Nombre Materia Prima -->
-        <div class="form-floating col-md-6">
-          <input formControlName="MpNombreRetirada" class="form-control form-control-sm" list="materiaprima" id="floatingInput" title="Nombre de la Materia Prima" required (change)="cambiarNombreMateriaPrima(2)">
-          <datalist id="materiaprima">
-            <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option>
-          </datalist>
-          <label for="floatingInput">Materia Prima</label>
+        <div class="col-md-6">
+          <span class="p-float-label">
+            <input formControlName="MpNombreRetirada" id="MP" class="form-control form-control-sm" list="materiaprima" type="text" pInputText (change)="cambiarNombreMateriaPrima(2)" required/>
+            <datalist id="materiaprima">
+              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option>
+            </datalist>
+            <label for="MP">Materia Prima</label>
+          </span>
         </div>
 
-        <!-- Stock de materia prima  -->
-        <div class="form-floating col-md-2">
-          <input formControlName="MpStockRetirada" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapStock" placeholder="Stock" required  readonly onmousedown="return false;">
-          <label for="floatingInput">Stock</label>
+        <!-- Stock de Materia Prima  -->
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="MpStockRetirada" mode="decimal" inputId="Stock" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+            <label for="Stock">Stock</label>
+          </span>
         </div>
 
         <!-- CANTIDAD A ENTREGAR DE MATERIA PRIMA  -->
-        <div class="form-floating col-md-2">
-          <input formControlName="MpCantidadRetirada" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapCantidad" placeholder="Cantidad" required>
-          <label for="floatingInput">Cantidad</label>
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="MpCantidadRetirada" mode="decimal" inputId="Cantidad" [minFractionDigits]="2"></p-inputNumber>
+            <label for="Cantidad">Cantidad</label>
+          </span>
         </div>
 
-        <!-- Unidad medida-->
-        <div class="form-floating col-md-2">
-          <select formControlName="MpUnidadMedidaRetirada" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-            <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
-          </select>
-          <label for="floatingSelect">Und. Medida</label>
+        <!-- Unidad de Medida -->
+        <div class="col-md-3">
+          <span class="p-float-label">
+            <p-dropdown formControlName="MpUnidadMedidaRetirada" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel=""></p-dropdown>
+            <label for="Und">Unidad de Medida</label>
+          </span>
         </div>
 
         <!-- Proceso -->
-        <div class="form-floating col-md-3">
-          <select formControlName="ProcesoRetiro" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="proceso.proceso_Nombre" *ngFor="let proceso of procesos">{{proceso.proceso_Nombre}}</option>
-          </select>
-          <label for="floatingSelect">Proceso</label>
+        <div class="col-md-3">
+          <span class="p-float-label">
+            <p-dropdown formControlName="ProcesoRetiro" inputId="Proceso" [autoDisplayFirst]="false" [options]="procesos" optionLabel=""></p-dropdown>
+            <label for="Proceso">Procesos</label>
+          </span>
         </div>
+
       </div>
     </div>
 
     <!-- BOTONES -->
     <div class="mb-4">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVaciosMPRetirada()">Asignar Materia Prima</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMP()">Limpiar Campos MP</button>
+        <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarCamposVaciosMPRetirada()"></button>
+        <button pButton pRipple label="Limpiar Campos MP" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarCamposMP()"></button>
       </div>
     </div>
   </form>
-  <!--Fin Formulario materia prima a entregar-->
 
   <!--Linea -->
   <div class="mb-4">
@@ -204,8 +220,8 @@
       <div class="row g-3">
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVaciosRetirada()">Asignar Materia Prima </button>
-            <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Todos Los Campos</button>
+            <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarCamposVaciosRetirada()"></button>
+            <button pButton pRipple label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
           </div>
         </div>
       </div>

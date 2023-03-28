@@ -6,7 +6,6 @@ import { modelAsignacionMPxTintas } from 'src/app/Modelo/modelAsignacionMPxTinta
 import { AsignacionMPxTintasService } from 'src/app/Servicios/CreacionTintas/asignacionMPxTintas.service';
 import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/DetallesCreacionTintas/detallesAsignacionMPxTintas.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
@@ -82,7 +81,7 @@ export class AsignacionTintasComponent implements OnInit {
 
   // Funcion limpiará todos los campos de vista
   limpiarTodosLosCampos(){
-    this.FormAsignacionMP = this.frmBuilder.group({
+    this.FormAsignacionMP.patchValue({
       Tinta : null,
       cantidadTinta : null,
       undMedTinta : null,
@@ -140,11 +139,7 @@ export class AsignacionTintasComponent implements OnInit {
 
   //Funcion para  obtener las unidades de medidas
   obtenerUnidadesMedida() {
-    this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => {
-      for (let i = 0; i < datos_unidadesMedida.length; i++) {
-        this.unidadMedida.push(datos_unidadesMedida[i].undMed_Id);
-      }
-    });
+    this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => { this.unidadMedida = datos_unidadesMedida; });
   }
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
@@ -274,7 +269,6 @@ export class AsignacionTintasComponent implements OnInit {
   // Funcion que moverá el inventario de la materia prima que se está asignando para la creacion de la tintas
   moverInventarioMP(){
     let stockMateriaPrimaFinal : number;
-
     for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
       this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Materia_Prima).subscribe(datos_materiaPrima => {
         if(this.ArrayMateriaPrima[index].Materia_Prima == 84) stockMateriaPrimaFinal = 0
@@ -346,7 +340,6 @@ export class AsignacionTintasComponent implements OnInit {
         this.limpiarTodosLosCampos();
       }, error => { this.mensajeError(`¡¡Error al sumar al inventario de la tinta ${datos_tinta.tinta_Nombre}!!`, error.message); });
     }, error => { this.mensajeError(`¡No se pudo obtener información de la tinta con Id ${tinta}!`, error.message); });
-    this.load = false;
   }
 
   // Función para quitar una materia prima de la tabla
@@ -380,10 +373,12 @@ export class AsignacionTintasComponent implements OnInit {
   // Mensaje de Advertencia
   mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
     Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+    this.load = false;
   }
 
   // Mensaje de Error
   mensajeError(text : string, error : any = ''){
     Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+    this.load = false;
   }
 }

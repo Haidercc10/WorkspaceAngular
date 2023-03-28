@@ -1,8 +1,8 @@
 <app-menuLateral></app-menuLateral>
 
 <div class="d-flex justify-content-center overlay" *ngIf="load">
-  <div class="spinner-border text-danger" role="status" style="margin: auto;">
-    <span class="visually-hidden">Cargando...</span>
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
   </div>
 </div>
 
@@ -104,7 +104,7 @@
             <!-- Unidad medida-->
             <div class="form-floating col-md-2">
               <select formControlName="undMedMateriaPrima" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-                <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
+                <option [ngValue]="undMed.undMed_Id" *ngFor="let undMed of unidadMedida">{{undMed.undMed_Id}}</option>
               </select>
               <label for="floatingSelect">Und. Medida</label>
             </div>

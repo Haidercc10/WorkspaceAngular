@@ -1,17 +1,15 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
-import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
 import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
-import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
+import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
+import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
 
@@ -28,7 +26,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   public FormEditPaquetes !: FormGroup;
 
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -60,18 +58,15 @@ export class AsignarProductosFacturasComponent implements OnInit {
   windowScrolled : any;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private bagProService : BagproService,
-                      private ExistenciasProdService : ExistenciasProductosService,
-                        private servicioProducto : ProductoService,
-                          private servicioClientes: ClientesService,
-                            private servicioClientesProductos : ClientesProductosService,
-                              private servicioUsuarios : UsuarioService,
-                                private dtEntradaRollo : DetallesEntradaRollosService,
-                                  private asgProdFactura : AsignacionProductosFacturaService,
-                                    private dtAsgProdFactura : DetallesAsignacionProductosFacturaService,
-                                      private productosService : ProductoService,) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private ExistenciasProdService : ExistenciasProductosService,
+                    private servicioProducto : ProductoService,
+                      private servicioClientes: ClientesService,
+                        private servicioClientesProductos : ClientesProductosService,
+                          private servicioUsuarios : UsuarioService,
+                            private dtEntradaRollo : DetallesEntradaRollosService,
+                              private asgProdFactura : AsignacionProductosFacturaService,
+                                private dtAsgProdFactura : DetallesAsignacionProductosFacturaService,) {
 
     this.FormConsultarProductos = this.frmBuilderPedExterno.group({
       Factura : ['', Validators.required],
@@ -82,19 +77,11 @@ export class AsignarProductosFacturasComponent implements OnInit {
       Cliente: [null, Validators.required],
       Observacion : [''],
     });
-
-    this.FormEditUnd = this.frmBuilderPedExterno.group({
-      Cantidad : [''],
-    });
-
-    this.FormEditPaquetes = this.frmBuilderPedExterno.group({
-      Cantidad : [''],
-    });
+    this.FormEditUnd = this.frmBuilderPedExterno.group({ Cantidad : [''], });
+    this.FormEditPaquetes = this.frmBuilderPedExterno.group({ Cantidad : [''], });
   }
 
   ngOnInit() {
-    // this.limpiarCampos();
-    this.fecha();
     this.lecturaStorage();
     this.ObtenerUsuariosConductores();
     this.llenadoClientes();
@@ -106,15 +93,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.idCliente = this.FormConsultarProductos.value.Cliente;
     if (this.idCliente.match(datosNumeros) != null){
       this.servicioClientes.srvObtenerListaPorId(this.FormConsultarProductos.value.Cliente).subscribe(datos_cliente => {
-        this.FormConsultarProductos = this.frmBuilderPedExterno.group({
-          Factura : this.FormConsultarProductos.value.Factura,
-          NotaCredito : this.FormConsultarProductos.value.NotaCredito,
-          IdProducto : this.FormConsultarProductos.value.IdProducto,
-          CantidadProducto : this.FormConsultarProductos.value.CantidadProducto,
-          ProdNombre: this.FormConsultarProductos.value.ProdNombre,
-          Cliente: datos_cliente.cli_Nombre,
-          Observacion : this.FormConsultarProductos.value.Observacion,
-        });
+        this.FormConsultarProductos.patchValue({ Cliente: datos_cliente.cli_Nombre, });
       });
     }
   }
@@ -135,26 +114,8 @@ export class AsignarProductosFacturasComponent implements OnInit {
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
-    let rol = this.storage.get('Rol');
-    this.rolService.srvObtenerLista().subscribe(datos_roles => {
-      for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
-          this.ValidarRol = rol;
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }
-      }
-    });
-  }
-
-  //Funcion que colocará la fecha actual y la colocará en el campo de fecha de pedido
-  fecha(){
-    this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
+    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Rol = this.storage.get('Rol');
   }
 
   // Funcion para limpiar los campos de la vista
@@ -178,7 +139,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.cargando = true;
     this.validarInputClientes = true;
     this.Total = 0;
-    // window.location.href = "./asignacion-productos-facturas";
   }
 
   //Funcion que va a agregar Productos en la tabla
@@ -337,9 +297,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
   //Funcion que va mostrar todos los productos a los que está relacionado el cliente selccionado
   obtenerProductosXClientes(){
     this.arrayProducto = [];
-    let Client : any = this.FormConsultarProductos.value.Cliente;
-
-    this.servicioClientesProductos.srvObtenerListaPorNombreCliente(Client).subscribe(registrosCliProd => {
+    this.servicioClientesProductos.srvObtenerListaPorNombreCliente(this.FormConsultarProductos.value.Cliente).subscribe(registrosCliProd => {
       for (let index = 0; index < registrosCliProd.length; index++) {
         this.servicioProducto.srvObtenerPresentacionProducto(registrosCliProd[index].prod_Id).subscribe(registrosPresentProd => {
           for (let j = 0; j < registrosPresentProd.length; j++) {
@@ -371,7 +329,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
     this.presentacionProducto = '';
     let id : number = this.FormConsultarProductos.value.IdProducto;
     this.dtEntradaRollo.srvConsultarProducto(id).subscribe(datos_rollos => {
-      console.log(9)
       let rollosExistentes : any [] = [];
       for (let i = 0; i < datos_rollos.length; i++) {
         if (datos_rollos[i].estado_Id == 19 || datos_rollos[i].estado_Id == 24) {
@@ -535,7 +492,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       }
     });
     setTimeout(() => {
-      if (this.rollos.length <= 0) Swal.fire(`El producto ${id} no tiene rollos disponibles`);
+      if (this.rollos.length <= 0) this.mensajeAdvertencia(`El producto ${id} no tiene rollos disponibles`);
     }, 700);
   }
 
@@ -582,7 +539,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
           this.rollosInsertar[i].CantPaqRestantes = cantidad;
           this.GrupoProductos();
         } else {
-          Swal.fire("¡La cantidad ingresada no es valida!");
+          this.mensajeAdvertencia("¡La cantidad ingresada no es valida!");
           this.rollosInsertar[i].CantUndRestantes = this.rollosInsertar[i].CantUndRestantesEnviar;
           this.rollosInsertar[i].CantPaqRestantes = this.rollosInsertar[i].CantPaqRestantesEnviar;
         }
@@ -614,7 +571,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
       this.cargando = false;
       let factura : string = this.FormConsultarProductos.value.Factura;
       let notaCredito : string = this.FormConsultarProductos.value.NotaCredito;
-      let cliente : any = this.FormConsultarProductos.value.Cliente;
       let observacion : string = this.FormConsultarProductos.value.Observacion;
       let facturaMayuscula : string = `${factura}`;
       if (notaCredito == '' || notaCredito == null) notaCredito = '';
@@ -667,24 +623,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
         Prod_CantidadUnidades : this.rollosInsertar[i].CantUndRestantes,
       }
       this.dtAsgProdFactura.srvGuardar(info).subscribe(datos_dtAsignacion => {
-      }, error => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'error',
-          title: '¡Error al asignar los rollos!'
-        });
-        this.cargando = true;
-      });
+      }, error => { this.mensajeError('Error', '¡Error al asignar los rollos!'); });
     }
     setTimeout(() => { this.cambiarEstado(); }, this.rollosInsertar.length * 50);
   }
@@ -956,7 +895,6 @@ export class AsignarProductosFacturasComponent implements OnInit {
           Presentacion : datos_factura[i].undMed_Id,
           "Cant. Unidades" : `${this.formatonumeros(datos_factura[i].prod_CantidadUnidades)} Und`
         }
-        console.log(info);
         this.rollosAsignados.push(info);
         this.rollosAsignados.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
@@ -982,11 +920,11 @@ export class AsignarProductosFacturasComponent implements OnInit {
     var body = [];
     body.push(columns);
     data.forEach(function(row) {
-        var dataRow = [];
-        columns.forEach(function(column) {
-            dataRow.push(row[column].toString());
-        });
-        body.push(dataRow);
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
     });
 
     return body;
@@ -995,34 +933,46 @@ export class AsignarProductosFacturasComponent implements OnInit {
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [60, 60, 200, 70, 60, 50],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 7,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [60, 60, 200, 70, 60, 50],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 7,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table2(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [60, 200, 70, 40, 80, 50],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 7,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [60, 200, 70, 40, 80, 50],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 7,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
+  }
+
+  // Funcion que va a enviar un mensaje de error
+  mensajeError(titulo : string, mensaje : string){
+    Swal.fire({ icon: 'error', title: titulo, text: mensaje });
+    this.cargando = true;
+  }
+
+  // Funcion que va a enviar un mensaje de advertencia
+  mensajeAdvertencia(mensaje : string){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', text: mensaje });
+    this.cargando = true;
   }
 }

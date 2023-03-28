@@ -73,7 +73,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // funcion que va a limpiar los campos del formulario
   limpiarForm(){
-    this.FormConsultarRollos.setValue({
+    this.FormConsultarRollos.patchValue({
       OT_Id: null,
       IdRollo: null,
       fechaDoc : null,
@@ -85,7 +85,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que va a limpiar todos los campos
   limpiarCampos(){
-    this.FormConsultarRollos.setValue({
+    this.FormConsultarRollos.patchValue({
       OT_Id: null,
       IdRollo: null,
       fechaDoc : null,
