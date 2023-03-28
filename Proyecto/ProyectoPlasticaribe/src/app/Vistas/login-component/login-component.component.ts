@@ -45,9 +45,9 @@ export class LoginComponentComponent implements OnInit {
        && this.storage.get('Token_Inv_Zeus')
        && this.storage.get('Token_Conta_Zeus')) || localStorage.getItem('user')) this.router.navigate(['/home']);
     this.formularioUsuario = this.frmBuilderUsuario.group({
-      Identificacion: [, Validators.required],
-      Contrasena: [, Validators.required],
-      Empresa: [, Validators.required],
+      Identificacion: [null, Validators.required],
+      Contrasena: [null, Validators.required],
+      Empresa: [null, Validators.required],
     });
   }
 
@@ -55,9 +55,7 @@ export class LoginComponentComponent implements OnInit {
     this.storage.clear();
     localStorage.clear();
     this.cargaDatosComboBox();
-    this.http.get("http://api.ipify.org/?format=json").subscribe((res:any)=>{
-      this.ipAddress = res.ip;
-    });
+    this.http.get("http://api.ipify.org/?format=json").subscribe((res:any)=>{ this.ipAddress = res.ip; });
   }
 
   // Funcion que guardará informacion a en la sesion
@@ -68,13 +66,18 @@ export class LoginComponentComponent implements OnInit {
 
   // FUNCION PARA CARGAR LOS DATOS DE LAS EMPRESAS EN EL COMBOBOX DEL HTML
   cargaDatosComboBox(){
-    this.empresaServices.srvObtenerLista().subscribe(datos =>{ this.empresas = datos; }, error =>{ Swal.fire('Ocurrió un error, intentelo de nuevo'); });
+    this.empresaServices.srvObtenerLista().subscribe(datos =>{ this.empresas = datos; }, error =>{ this.mensajeError('¡Ha ocurrido un error!'); });
+  }
+
+  // Funcion que va a redireccionar al apartado de archivos
+  redireccionarArchivos(){
+    window.location.pathname = '/Archivos';
   }
 
   //Funcion que va a validar si hay campos vacios
   validarCamposVacios() : any{
     if (this.formularioUsuario.valid) this.consultaLogin();
-    else this.advertenciaCamposVacios();
+    else this.advertenciaCamposVacios('¡Por favor llenar los campos vacios!');
   }
 
   // Funcion que se encargará de enviar al API la información del usuario que desea iniciar sesion y dependiendo de la respuesta de esta se actuará
@@ -111,7 +114,10 @@ export class LoginComponentComponent implements OnInit {
   }
 
   // Funcion que mostrará una advertencia para cuando haya campos vacios en la edicion o creacion de un usuario
-  advertenciaCamposVacios() { Swal.fire({icon: 'warning',  title: 'Advertencia', text: `¡Por favor, debe llenar los campos vacios!`, confirmButtonColor: '#ffc107', }); }
+  advertenciaCamposVacios(mensaje : string) {
+    Swal.fire({icon: 'warning',  title: 'Advertencia', text: mensaje, confirmButtonColor: '#ffc107', });
+    this.cargando = false;
+  }
 
   // Funcin que va a mostrar o no la contraseña del usuario
   mostrarPassword(){
@@ -127,7 +133,7 @@ export class LoginComponentComponent implements OnInit {
 
   // Funcion que mostrará un mensaje de error
   mensajeError(text : string){
-    this.cargando = false;
     Swal.fire({ icon: 'warning', title: 'Oops...', html: `<b>¡${text}!</b><hr>`, });
+    this.cargando = false;
   }
 }

@@ -4,7 +4,6 @@ import moment from 'moment';
 import { MessageService } from 'primeng/api';
 import { BoppGenericoService } from 'src/app/Servicios/BoppGenerico/BoppGenerico.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
-import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 
 @Component({
   selector: 'app-crear-bopp',

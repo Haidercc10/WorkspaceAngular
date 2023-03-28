@@ -43,13 +43,12 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   scrollx : number = 0;
 
   constructor(private frmBuilderPedExterno : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private dtIngRollosService : DtIngRollos_ExtrusionService,
-                      private bagproService : BagproService,
-                        private servicioProcesos : ProcesosService,
-                         private servcioDetEntradaRollos : DetallesEntradaRollosService,
-                          private servicioPreEntregaRollos : DtPreEntregaRollosService) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private dtIngRollosService : DtIngRollos_ExtrusionService,
+                    private bagproService : BagproService,
+                      private servicioProcesos : ProcesosService,
+                        private servcioDetEntradaRollos : DetallesEntradaRollosService,
+                        private servicioPreEntregaRollos : DtPreEntregaRollosService) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],

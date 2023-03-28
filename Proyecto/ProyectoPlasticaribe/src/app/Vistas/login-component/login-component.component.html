@@ -1,57 +1,76 @@
-<form [formGroup]="formularioUsuario" (ngSubmit)="validarCamposVacios()">
-  <div class="titulo">
-    <!--<h1 class="display-2">Plasticaribe S.A.S</h1>-->
-    <img class="logo" src="/assets/PLASTICARIBE_logo.png" alt="">
-  </div>
-  <!--Contenedor Principal-->
-  <div class="container-fluid">
-    <!--Contenedor Login-->
-    <div class="contenedorLogin">
-      <!--Titulo-->
-      <div class="mb-3">
-        <h4 class="tituloRojo">Accede a tu cuenta</h4>
-      </div>
-
-      <div class="form-floating col-md mb-3">
-        <input formControlName="Identificacion" type="number" class="form-control form-control-sm" id="floatingInput" autocomplete="off" required>
-        <label for="floatingInput">ID Usuario</label>
-      </div>
-
-      <div class="input-group mb-3">
-        <div class="form-floating">
-          <input formControlName="Contrasena" type="password" class="form-control form-control-sm" id="floatingInputGroup1" placeholder="Username" id="pass">
-          <label for="floatingInputGroup1">Contraseña</label>
-        </div>
-        <ng-container *ngIf="mostrarPass == true then noMostrar; else mostrar"></ng-container>
-        <ng-template #mostrar><span class="input-group-text cursor" (click)="mostrarPassword()"><i class="pi pi-eye"></i></span></ng-template>
-        <ng-template #noMostrar><span class="input-group-text cursor" (click)="mostrarPassword()"><i class="pi pi-eye-slash"></i></span></ng-template>
-
-      </div>
-
-      <div class="form-floating col-md mb-3">
-        <select formControlName="Empresa" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
-          <option [ngValue]="null" disabled selected>Seleccione la Empresa</option>
-          <option [ngValue]="empresa.empresa_Id" *ngFor="let empresa of empresas">{{empresa.empresa_Nombre}}</option>
-        </select>
-        <label for="floatingSelect">Empresa</label>
-      </div>
-
-      <!--Boton Ingresar al sistema-->
-      <div class="d-grid gap-2 mb-3">
-        <button class="btn btn-danger btn-danger-sm" type="submit"><i class="pi pi-check"></i> Ingresar</button>
-      </div>
-
-      <div class="mb-3">
-        <a href="/Archivos" class="invitado">Entrar como invitado</a>
-      </div>
+<div class="fondo">
+  <form [formGroup]="formularioUsuario" (ngSubmit)="validarCamposVacios()">
+    <div class="titulo">
+      <!--<h1 class="display-2">Plasticaribe S.A.S</h1>-->
+      <img class="logo" src="/assets/Logo-Plasticaribe/logo.png" alt="">
     </div>
-    <!--Contenedor Login-->
-  </div>
-  <!--Fin Contenedor Principal-->
-</form>
+    <!--Contenedor Principal-->
+    <div class="container-fluid">
+      <!--Contenedor Login-->
+      <div class="contenedorLogin">
+        <!--Titulo-->
+        <div class="mb-3">
+          <h4 class="tituloRojo">Accede a tu cuenta</h4>
+        </div>
 
-<div class="d-flex justify-content-center overlay" *ngIf="cargando">
-  <div class="spinner-border text-danger" role="status" style="margin: auto;">
-    <span class="visually-hidden">Cargando...</span>
+        <div class="col-md mb">
+          <div class="p-inputgroup">
+            <span class="p-float-label">
+              <input formControlName="Identificacion" class="form-control form-control-sm" pInputText required/>
+              <label htmlFor="username">ID Usuario</label>
+            </span>
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-user"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="col-md mb">
+          <div class="p-inputgroup">
+            <span class="p-float-label">
+              <input formControlName="Contrasena" type="password" class="form-control form-control-sm" id="floatingInputGroup1" id="pass" pInputText>
+              <label htmlFor="pass">Contraseña</label>
+            </span>
+            <ng-container *ngIf="mostrarPass == true then noMostrar; else mostrar"></ng-container>
+            <ng-template #mostrar><span class="input-group-text cursor" (click)="mostrarPassword()"><i class="pi pi-eye"></i></span></ng-template>
+            <ng-template #noMostrar><span class="input-group-text cursor" (click)="mostrarPassword()"><i class="pi pi-eye-slash"></i></span></ng-template>
+          </div>
+
+        </div>
+
+        <div class="form-floating col-md mb">
+
+          <div class="p-inputgroup">
+            <span class="p-float-label">
+              <select formControlName="Empresa" class="form-select form-select-sm" aria-placeholder="Seleccione la Empresa">
+                <option [ngValue]="null" disabled selected>Seleccione la Empresa</option>
+                <option [ngValue]="empresa.empresa_Id" *ngFor="let empresa of empresas">{{empresa.empresa_Nombre}}</option>
+              </select>
+            </span>
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-building"></i>
+            </span>
+          </div>
+        </div>
+
+        <!--Boton Ingresar al sistema-->
+        <div class="d-grid gap-2 mb-3">
+          <!-- <button class="btn btn-danger btn-danger-sm" type="submit"><i class="pi pi-check"></i> Ingresar</button> -->
+          <button pButton pRipple label="Ingresar" type="submit" class="p-button-danger"></button>
+        </div>
+
+        <div class="mb-3">
+          <button pButton pRipple type="button" label="Entrar como invitado" class="p-button-danger p-button-text" (click)="redireccionarArchivos()"></button>
+        </div>
+      </div>
+      <!--Contenedor Login-->
+    </div>
+    <!--Fin Contenedor Principal-->
+  </form>
+
+  <div class="d-flex justify-content-center overlay" *ngIf="cargando">
+    <div class="spinner-border text-danger" role="status" style="margin: auto;">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
   </div>
 </div>
