@@ -104,6 +104,7 @@ export class OcompraComponent implements OnInit {
 
   // Funcion que limpiará todos los campos de la vista
   limpiarTodo(){
+    this.edicionOrdenCompra = false;
     this.FormMateriaPrima.reset();
     this.FormOrdenCompra.reset();
     this.materiasPrimasSeleccionada_ID = [];
@@ -336,11 +337,11 @@ export class OcompraComponent implements OnInit {
           this.cantidadTotalPrecio += (datos_orden[i].cantidad * datos_orden[i].precio_Unitario);
         }
       } else {
-        this.mensajeAdvertencia(`¡No se encontraon registros para orden de compra N° ${ordenCompra}!`);
+        this.mensajeAdvertencia(`¡No se encontraron registros para orden de compra N° ${ordenCompra}!`);
         this.limpiarTodo();
       }
     }, error => {
-      this.mensajeError(`¡No se pudo obtener infroamción de la Orden de Compra N° ${ordenCompra}!`, error.message);
+      this.mensajeError(`¡No se pudo obtener información de la Orden de Compra N° ${ordenCompra}!`, error.message);
       this.limpiarTodo();
     });
   }
