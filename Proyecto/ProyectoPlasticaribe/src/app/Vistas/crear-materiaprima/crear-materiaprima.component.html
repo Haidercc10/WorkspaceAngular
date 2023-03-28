@@ -1,3 +1,4 @@
+<p-toast position="center"></p-toast>
 <form [formGroup]="materiPrima">
   <!-- Inicio Fila 1 Agregar Materia Prima -->
   <div class="mb-3">
@@ -47,15 +48,15 @@
   <!--Inicio Fila 3 Botones y Limpiar Campos-->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <input class="btn btn-danger btn-danger-sm" type="submit" value="Agregar" (click)="registrarMateriPrima()">
-      <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="limpiarCampos()">
+      <button class="btn btn-danger btn-danger-sm" type="button" (click)="registrarMateriPrima()">Agregar</button>
+      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
     </div>
   </div>
 
-  <div class="mb-1" *ngIf="tintaCreada">
+  <!--<div class="mb-1" *ngIf="tintaCreada">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <h6>{{informacion}}</h6>
     </div>
-  </div>
+  </div>-->
   <!--Fin Fila 3-->
 </form>
