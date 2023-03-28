@@ -140,10 +140,10 @@
               <td>{{ArrayProductoZeus.Nombre}}</td>
               <ng-container *ngIf="ArrayProductoZeus.Cantidad <= ArrayProductoZeus.Cant_Minima then rojo else azul;"></ng-container>
               <ng-template #rojo>
-                <td style="text-align: center;" style="background-color: rgb(255, 146, 146);">{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</td>
+                <td style="text-align: center;" style="background-color: rgb(255, 146, 146);"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
               </ng-template>
               <ng-template #azul>
-                <td style="text-align: center;" class="TextosInfoTabla2">{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</td>
+                <td style="text-align: center;" class="TextosInfoTabla2"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
               </ng-template>
               <td style="text-align: center;">{{ArrayProductoZeus.Precio | currency: 'COP $'}}</td>
               <td style="text-align: center;">{{ArrayProductoZeus.Presentacion}}</td>
