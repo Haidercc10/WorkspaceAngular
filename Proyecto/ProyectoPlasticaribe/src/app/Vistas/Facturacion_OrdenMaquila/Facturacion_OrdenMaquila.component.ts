@@ -361,7 +361,10 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
         this.ordenMaquila_facService.GetOrdenMaquilaFacturada(om, mp).subscribe(datos_Facturacuion => {
           for (let j = 0; j < datos_Facturacuion.length; j++) {
             if (datos_Facturacuion[j].cantidad_Faltante <= 0) estado = 5;
-            else estado = 11;
+            else {
+              estado = 11;
+              break;
+            }
           }
         }, err => { error = true; });
       }

@@ -31,6 +31,11 @@ export class OrdenCompra_MateriaPrimaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Compra/${dato}`);
   }
 
+  // Funcion que consultará la informacion de una orden de trabajo por su consecutivo
+  GetOrdenCompraFacturada(oc : number, mp : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Orden_Compra/getOrdenCompraFacturada/${oc}/${mp}`);
+  }
+
     //Metodo buscar lista de OC por Id
   getListaOrdenesComprasxId(IdOrden : any):Observable<any[]> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_OrdenCompra/InfoOrdenCompraxId/${IdOrden}`);

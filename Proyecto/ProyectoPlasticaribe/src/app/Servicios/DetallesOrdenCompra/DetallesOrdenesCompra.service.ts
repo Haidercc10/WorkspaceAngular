@@ -55,6 +55,11 @@ export class DetallesOrdenesCompraService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_OrdenCompra/getMateriaPrimaOrdenCompa/${orden}/${mp}`);
   }
 
+  //Metodo buscar lista de OC por Id
+  GetListaOrdenesComprasxId(IdOrden : any):Observable<any[]> {
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Detalle_OrdenCompra/InfoOrdenCompraxId/${IdOrden}`);
+  }
+
   //Metodo actualzar
   putId_DtOrdenCompra(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/Detalle_OrdenCompra/${id}`, data);

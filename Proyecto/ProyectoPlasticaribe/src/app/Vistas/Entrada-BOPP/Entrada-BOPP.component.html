@@ -165,8 +165,8 @@
 
             <!-- Nombre BOPP -->
             <div class="form-floating col-md-4">
-              <input formControlName="Nombre" class="form-control form-control-sm" list="bopp" id="floatingInput" title="Nombre BOPP" autocomplete="off" required (change)="getNombresBOPP()">
-              <datalist id="bopp">
+              <input formControlName="Nombre" class="form-control form-control-sm" list="Bopp" id="floatingInput" title="Nombre BOPP" autocomplete="off" required (change)="getNombresBOPP()">
+              <datalist id="Bopp">
                 <option value={{item}} *ngFor="let item of nombresBopp">{{item}}</option>
               </datalist>
               <label for="floatingInput">Nombre Material</label>
@@ -174,8 +174,8 @@
 
             <!-- Serial BOPP -->
             <div class="form-floating col-md-4">
-              <input formControlName="serial" class="form-control form-control-sm" list="serial" id="floatingInput" title="Serial BOPP" autocomplete="off" required (change)="getSerialesBOPP()">
-              <datalist id="serial">
+              <input formControlName="serial" class="form-control form-control-sm" list="SerialRollo" id="floatingInput" title="Serial BOPP" autocomplete="off" required (change)="getSerialesBOPP()">
+              <datalist id="SerialRollo">
                 <option value={{item}} *ngFor="let item of serialesBopp">{{item}}</option>
               </datalist>
               <label for="floatingInput">Pallet/Serial</label>
@@ -183,8 +183,8 @@
 
             <!-- Cantidad de micras -->
             <div class="form-floating col-md-2">
-              <input formControlName="cantidad" class="form-control form-control-sm" list="micras" id="floatingInput" title="Micras BOPP" autocomplete="off" required (change)="getMicrasBOPP()">
-              <datalist id="micras">
+              <input formControlName="cantidad" class="form-control form-control-sm" list="MicrasRollos" id="floatingInput" title="Micras BOPP" autocomplete="off" required (change)="getMicrasBOPP()">
+              <datalist id="MicrasRollos">
                 <option value={{item}} *ngFor="let item of micrasBopp">{{item}}</option>
               </datalist>
               <label for="floatingInput">Cantidad Micras(µm)</label>
@@ -202,8 +202,8 @@
           <div class="row g-3">
             <!-- precio unitario -->
             <div class="form-floating col-md-2">
-              <input formControlName="precio" class="form-control form-control-sm" list="precio" id="floatingInput" title="Precio BOPP" autocomplete="off" required (change)="getPreciosBOPP()">
-              <datalist id="precio">
+              <input formControlName="precio" class="form-control form-control-sm" list="PrecioRollo" id="floatingInput" title="Precio BOPP" autocomplete="off" required (change)="getPreciosBOPP()">
+              <datalist id="PrecioRollo">
                 <option value={{item}} *ngFor="let item of preciosBopp">{{item}}</option>
               </datalist>
               <label for="floatingInput">Precio Und.</label>
@@ -211,8 +211,8 @@
 
             <!-- Ancho -->
             <div class="form-floating col-md-2">
-              <input formControlName="ancho" class="form-control form-control-sm" list="ancho" id="floatingInput" title="Ancho BOPP" autocomplete="off" required (change)="getAnchosBOPP()">
-              <datalist id="ancho">
+              <input formControlName="ancho" class="form-control form-control-sm" list="AnchoRollo" id="floatingInput" title="Ancho BOPP" autocomplete="off" required (change)="getAnchosBOPP()">
+              <datalist id="AnchoRollo">
                 <option value={{item}} *ngFor="let item of anchosBopp">{{item}}</option>
               </datalist>
               <label for="floatingInput">Ancho</label>

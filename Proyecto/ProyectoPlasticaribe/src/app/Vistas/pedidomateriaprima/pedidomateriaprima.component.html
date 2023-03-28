@@ -118,7 +118,7 @@
               <tr [ngClass]="{'row-accessories': arrayOrdenCompra.Id > 10000}">
                 <td>{{arrayOrdenCompra.Id}}</td>
                 <td>{{arrayOrdenCompra.Nombre}}</td>
-                <td>{{arrayOrdenCompra.Cantidad_Oculta | number}}</td>
+                <td>{{arrayOrdenCompra.Cantidad | number}}</td>
                 <td>{{arrayOrdenCompra.Cantidad_Ingresada | number}}</td>
                 <td>{{arrayOrdenCompra.Cantidad_Faltante | number}}</td>
                 <td>{{arrayOrdenCompra.Medida}}</td>
@@ -172,10 +172,10 @@
             <td pEditableColumn>
               <p-cellEditor>
                 <ng-template pTemplate="input">
-                  <p-inputNumber [(ngModel)]="ArrayMateriaPrima.Cantidad_Faltante" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="ArrayMateriaPrima.Cantidad_Oculta" [maxFractionDigits]="2"></p-inputNumber>
+                  <p-inputNumber [(ngModel)]="ArrayMateriaPrima.Cantidad_Faltante_Editar" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="ArrayMateriaPrima.Cantidad_Faltante" [maxFractionDigits]="2"></p-inputNumber>
                 </ng-template>
                 <ng-template pTemplate="output">
-                  {{ArrayMateriaPrima.Cantidad_Faltante | number}}
+                  {{ArrayMateriaPrima.Cantidad_Faltante_Editar | number}}
                 </ng-template>
               </p-cellEditor>
             </td>
