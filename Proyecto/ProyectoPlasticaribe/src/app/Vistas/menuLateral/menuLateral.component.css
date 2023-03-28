@@ -67,15 +67,15 @@ a {
 }
 
 ul li a:hover{
-  color: #d83542;
+  color: #db4149;
 }
 
 ul li a:active > a, a[aria-expanded="true"]{
-  color: #d83542;
+  color: #db4149;
 }
 
 span{
-  color: #d83542;
+  color: #db4149;
 }
 
 .botonMenu{
@@ -84,11 +84,11 @@ span{
 }
 
 .botonMenu .user:hover{
-  color: #d83542;
+  color: #db4149;
 }
 
 .boton:hover {
-  color: #d83542;
+  color: #db4149;
 }
 
 p {

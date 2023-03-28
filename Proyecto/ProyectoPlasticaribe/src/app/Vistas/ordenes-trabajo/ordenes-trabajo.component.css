@@ -1,5 +1,5 @@
 span{
-  color: #d83542;
+  color: #db4149;
 }
 
 .d-grid {
@@ -16,11 +16,11 @@ span{
 }
 
 .nav-item {
-  color: #d83542;
+  color: #db4149;
 }
 
 .nav-tabs{
-  border-color: #d83542;
+  border-color: #db4149;
 }
 
 .nav-tabs .nav-item .nav-link {
@@ -29,13 +29,13 @@ span{
 }
 
 .nav-tabs .nav-item .nav-link.active {
-  color: #d83542;
-  border-color: #d83542;
+  color: #db4149;
+  border-color: #db4149;
 }
 
 .tab-content {
   border: 1px solid #dee2e6;
-  border-color: #d83542;
+  border-color: #db4149;
   border-top: transparent;
   padding-top: 3%;
   padding-bottom: 3%;

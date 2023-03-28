@@ -64,12 +64,9 @@
               <label for="floatingSelect">Proceso</label>
             </div>
 
-            <div class="form-floating col-md btn-consultar">
-              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Rollos</button>
-            </div>
-
-            <div class="form-floating col-md btn-limpiarForm">
-              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarForm()">Limpiar Campos</button>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button pButton class="p-button-danger" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="consultarOTbagPro()"></button>
+              <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarForm()"></button>
             </div>
           </div>
         </div>

@@ -23,7 +23,7 @@
   <div class="container-fluid bajarPagina">
     <div class="formulario">
       <div class="mb-4">
-        <h4 class="tituloRojo">Consultar Rollos</h4>
+        <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar Rollos</h4>
       </div>
       <!-- Formulario para consultar una orden de trabajo -->
       <form [formGroup]="FormConsultarRollos">
@@ -37,7 +37,7 @@
             </div>
 
             <!-- Id Rolo -->
-            <div class="form-floating col-md">
+            <div class="form-floating col-md-2">
               <input formControlName="IdRollo" type="number" class="form-control form-control-sm" id="floatingInput">
               <label for="floatingInput">N° Rollo</label>
             </div>
@@ -54,21 +54,19 @@
               <label for="floatingInput">Fecha Final</label>
             </div>
 
-            <div class="form-floating col-md btn-consultar">
-              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Rollos</button>
-            </div>
-
-            <div class="form-floating col-md btn-limpiarForm">
-              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarForm()">Limpiar Campos</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <div class="row g-3">
+            <!--Observación-->
             <div class="form-floating col-md">
               <textarea formControlName="Observacion" class="form-control" id="floatingInput"></textarea>
               <label for="floatingInput">Observación</label>
+            </div>
+          </div>
+        </div>
+        <!--Botones-->
+        <div class="mb-3">
+          <div class="row g-3">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button pButton class="p-button-danger" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="consultarOTbagPro()"></button>
+              <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarForm()"></button>
             </div>
           </div>
         </div>
@@ -79,7 +77,7 @@
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4 tabla1">
-        <h4 class="tituloRojo" style="width: 68%;">Tabla de Rollos</h4>
+        <h4 class="tituloRojo" style="width: 68%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
         <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-right: 5%;">
           <div class="form-floating col-md">
             <input type="number" class="form-control form-control-sm" id="floatingInput"[(ngModel)]="rollosIngresados" readonly>
@@ -162,7 +160,7 @@
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Tabla de Rollos por Ingresar</h4>
+        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos por Ingresar</h4>
       </div>
 
       <!--Inicio tabla Rollos a Insertar -->
@@ -214,7 +212,7 @@
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Consolidado Productos</h4>
+        <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado Productos</h4>
       </div>
 
       <!--Inicio tabla Rollos a Insertar -->
@@ -267,8 +265,8 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="ingresaroRollos()">Ingresar Rollos</button>
-          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+          <button pButton class="p-button-danger" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="ingresaroRollos()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
         </div>
       </div>
     </div>

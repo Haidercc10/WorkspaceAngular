@@ -1125,7 +1125,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   // Funcion que mostrará un mensaje de error
   mensajeError(mensaje : string) {
-    Swal.fire({ icon: 'error', title: 'Confirmación', html: mensaje, confirmButtonColor: '#d83542', confirmButtonText: 'Aceptar', });
+    Swal.fire({ icon: 'error', title: 'Confirmación', html: mensaje, confirmButtonColor: '#db4149', confirmButtonText: 'Aceptar', });
   }
 
   // Funcion que mostrará un mensaje de advertencia

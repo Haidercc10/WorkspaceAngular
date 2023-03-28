@@ -69,7 +69,7 @@ p-pickList span{
 .btnclose {
   font-size: calc(var(--font-size) * 25px);
   padding: 2%;
-  color: #d83542;
+  color: #db4149;
   cursor: pointer;
 }
 
@@ -170,7 +170,7 @@ p-pickList span{
 
 .titulo_grafica{
   margin: auto;
-  color: #d83542;
+  color: #db4149;
   padding-bottom: 2%;
 }
 

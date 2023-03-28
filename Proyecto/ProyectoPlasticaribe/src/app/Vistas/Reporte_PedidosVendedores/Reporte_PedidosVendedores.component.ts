@@ -528,7 +528,7 @@ export class Reporte_PedidosVendedoresComponent implements OnInit {
 
   /** Mensajes de error */
   mostrarError(mensaje : string) {
-    Swal.fire({ icon: 'error', title: 'Confirmación', html: mensaje, confirmButtonColor: '#d83542', confirmButtonText: 'Aceptar', });
+    Swal.fire({ icon: 'error', title: 'Confirmación', html: mensaje, confirmButtonColor: '#db4149', confirmButtonText: 'Aceptar', });
   }
 
   //

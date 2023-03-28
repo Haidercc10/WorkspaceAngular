@@ -23,6 +23,10 @@
 <div class="contain">
   <div class="container-fluid">
     <div class="formulario">
+      <div class="mb-3">
+        <h4 class="tituloRojo"><i class="pi pi-file"></i> Consultar OT's</h4>
+      </div>
+
       <!-- Información general para la asignación de materia Prima Para la creación de tintas -->
       <form [formGroup]="FormAsignacionBopp">
         <!-- Fila 1 -->
@@ -86,7 +90,7 @@
 
       <!-- Titulo Materia Prima -->
       <div class="mb-3">
-        <h4 class="tituloRojo">BOPP / BOPA / POLIESTER</h4>
+        <h4 class="tituloRojo"><i class="pi pi-database"></i> BOPP / BOPA / POLIESTER</h4>
       </div>
 
       <!-- Asignación de BOPP para la creación de tintas -->
@@ -112,8 +116,8 @@
         <!-- BOTONES -->
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposBOPP()">Asignar Rollo</button>
-            <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposBOPP()">Limpiar Campos</button>
+            <button pButton class="p-button-danger" type="button" label="Asignar Rollo" icon="pi pi-send" (click)="validarCamposBOPP()"></button>
+            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCamposBOPP()"> </button>
           </div>
         </div>
       </form>
@@ -124,7 +128,7 @@
       </div>
 
       <div class="mb-4">
-        <h4 class="tituloRojo">Tabla de material asignado</h4>
+        <h4 class="tituloRojo"><i class="pi pi-box"></i> Tabla de material asignado</h4>
       </div>
 
       <!-- Tabla de BOPP por asignar -->
@@ -175,8 +179,8 @@
           <div class="row g-3">
             <div class="mb-3">
               <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarAsignacion()">Crear Asignación</button>
-                <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosLosCampos()">Limpiar Todo</button>
+                <button pButton class="p-button-danger" type="button" label="Crear Asignación" icon="pi pi-check" (click)="validarAsignacion()"></button>
+                <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosLosCampos()"> </button>
               </div>
             </div>
           </div>
