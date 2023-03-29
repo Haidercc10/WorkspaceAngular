@@ -25,160 +25,161 @@
       <div class="mb-4">
         <h4 class="tituloRojo">Tabla de Productos</h4>
       </div>
-    </div>
 
-    <div class="contain">
-      <div class="card" *ngIf="load">
-        <p-toolbar styleClass="mb-4 gap-2">
-          <ng-template pTemplate="right">
-            <button pButton pRipple label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
-          </ng-template>
-        </p-toolbar>
 
-        <!--Inicio Tabla-->
-        <p-table
-          #dt
-          [value]="ArrayProductoZeus"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          [resizableColumns]="true"
-          columnResizeMode="expand"
-          responsiveLayout="scroll"
-          [rowHover]="true"
-          [rows]="ArrayProductoZeus.length"
-          [showCurrentPageReport]="true"
-          [paginator]="true"
-          [rowsPerPageOptions]="[10,20,30,50,70,100, ArrayProductoZeus.length]"
-          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-          scrollHeight="1000px">
+      <div class="contain">
+        <div class="card" *ngIf="load">
+          <p-toolbar styleClass="mb-4 gap-2">
+            <ng-template pTemplate="right">
+              <button pButton pRipple label="Exportar" icon="pi pi-upload" title="Exportar Excel" class="p-button-success" (click)="exportarExcel()"></button>
+            </ng-template>
+          </p-toolbar>
 
-          <ng-template pTemplate="caption">
-            <div style="text-align:left">
-              <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header" selectedItemsLabel="{0} columnas seleccionadas" [style]="{'width': '20em'}" defaultLabel="Elige las columnas que quieres ver"></p-multiSelect>
-            </div>
-          </ng-template>
+          <!--Inicio Tabla-->
+          <p-table
+            #dt
+            [value]="ArrayProductoZeus"
+            styleClass="p-datatable-gridlines p-datatable-sm"
+            [resizableColumns]="true"
+            columnResizeMode="expand"
+            responsiveLayout="scroll"
+            [rowHover]="true"
+            [rows]="ArrayProductoZeus.length"
+            [showCurrentPageReport]="true"
+            [paginator]="true"
+            [rowsPerPageOptions]="[10,20,30,50,70,100, ArrayProductoZeus.length]"
+            currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+            scrollHeight="1000px">
 
-          <!--Headers Tabla-->
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 150px" pResizableColumn>
-                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')">
-              </th>
-              <th style="width: 250px" pResizableColumn>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')">
-              </th>
-              <th style="width: 250px" pResizableColumn>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')">
-              </th>
-              <th style="width: 150px" pResizableColumn>
-                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')">
-              </th>
-              <th style="width: 150px" pResizableColumn>
-                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')">
-              </th>
-              <th style="width: 100px" pResizableColumn>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')">
-              </th>
-              <th style="width: 150px" pResizableColumn>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio_Total', 'contains')">
-              </th>
-              <th style="width: 150px" pResizableColumn>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cant_Minima', 'contains')">
-              </th>
-              <th style="width: 200px" pResizableColumn>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')">
-              </th>
-              <th style="width: 150px" pResizableColumn>
-                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes_Actual', 'contains')">
-              </th>
-              <th *ngFor="let col of columnasSeleccionada" style="width: 200px" pResizableColumn>
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')">
-              </th>
-            </tr>
+            <ng-template pTemplate="caption">
+              <div style="text-align:left">
+                <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header" selectedItemsLabel="{0} columnas seleccionadas" [style]="{'width': '20em'}" defaultLabel="Elige las columnas que quieres ver"></p-multiSelect>
+              </div>
+            </ng-template>
 
-            <tr class="font-size-14">
-              <th style="text-align: center;" scope="col" pSortableColumn="Id">Item
-                <p-sortIcon field="Id"></p-sortIcon>
-              </th>
-              <th style="text-align: center;" scope="col" pSortableColumn="Cliente">Cliente
-                <p-sortIcon field="Cliente"></p-sortIcon>
-              </th>
-              <th style="text-align: center;" scope="col" pSortableColumn="Nombre">Nombre
-                <p-sortIcon field="Nombre"></p-sortIcon>
-              </th>
-              <th style="text-align: center;" scope="col" pSortableColumn="Cantidad">Existencias
-                <p-sortIcon field="Cantidad"></p-sortIcon>
-              </th>
-              <th style="text-align: center;" scope="col" pSortableColumn="Precio">Precio
-                <p-sortIcon field="Precio"></p-sortIcon>
-              </th>
-              <th style="text-align: center;" scope="col" pSortableColumn="Presentacion">Unidad
-                <p-sortIcon field="Presentacion"></p-sortIcon>
-              </th>
-              <th style="text-align: center;" scope="col" pSortableColumn="Precio_Total">Subtotal
-                <p-sortIcon field="Precio_Total"></p-sortIcon>
-              </th>
-              <th style="text-align: center;" scope="col"  pSortableColumn="Cant_Minima">Cant. Minima
-                <p-sortIcon field="Cant_Minima"></p-sortIcon>
-              </th>
-              <th style="text-align: center;" scope="col"  pSortableColumn="Vendedor">Vendedor
-                <p-sortIcon field="Vendedor"></p-sortIcon>
-              </th>
-              <th style="text-align: center;" scope="col"  pSortableColumn="Mes_Actual">{{mesActual}}
-                <p-sortIcon field="Mes_Actual"></p-sortIcon>
-              </th>
-              <th style="text-align: center;" scope="col" *ngFor="let col of columnasSeleccionada" pSortableColumn="{{col.header}}">{{col.header}}
-                <p-sortIcon field="{{col.header}}"></p-sortIcon>
-              </th>
-            </tr>
-          </ng-template>
+            <!--Headers Tabla-->
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 150px" pResizableColumn>
+                  <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')">
+                </th>
+                <th style="width: 250px" pResizableColumn>
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cliente', 'contains')">
+                </th>
+                <th style="width: 250px" pResizableColumn>
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')">
+                </th>
+                <th style="width: 150px" pResizableColumn>
+                  <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')">
+                </th>
+                <th style="width: 150px" pResizableColumn>
+                  <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')">
+                </th>
+                <th style="width: 100px" pResizableColumn>
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')">
+                </th>
+                <th style="width: 150px" pResizableColumn>
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio_Total', 'contains')">
+                </th>
+                <th style="width: 150px" pResizableColumn>
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Cant_Minima', 'contains')">
+                </th>
+                <th style="width: 200px" pResizableColumn>
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Vendedor', 'contains')">
+                </th>
+                <th style="width: 150px" pResizableColumn>
+                  <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Mes_Actual', 'contains')">
+                </th>
+                <th *ngFor="let col of columnasSeleccionada" style="width: 200px" pResizableColumn>
+                  <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')">
+                </th>
+              </tr>
 
-          <!--Cuerpo Tabla-->
-          <ng-template pTemplate="body" let-ArrayProductoZeus>
-            <tr class="tamanoTextosTabla">
-              <td style="text-align: center;">{{ArrayProductoZeus.Id}}</td>
-              <td>{{ArrayProductoZeus.Cliente}}</td>
-              <td>{{ArrayProductoZeus.Nombre}}</td>
-              <ng-container *ngIf="ArrayProductoZeus.Cantidad <= ArrayProductoZeus.Cant_Minima then rojo else azul;"></ng-container>
-              <ng-template #rojo>
-                <td style="text-align: center;" style="background-color: rgb(255, 146, 146);"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
-              </ng-template>
-              <ng-template #azul>
-                <td style="text-align: center;" class="TextosInfoTabla2"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
-              </ng-template>
-              <td style="text-align: center;">{{ArrayProductoZeus.Precio | currency: 'COP $'}}</td>
-              <td style="text-align: center;">{{ArrayProductoZeus.Presentacion}}</td>
-              <td style="text-align: center;">{{ArrayProductoZeus.Precio_Total | currency: 'COP $'}}</td>
-              <td style="text-align: center;" pEditableColumn (click)="seleccionarProducto(ArrayProductoZeus)">
-                <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <input [(ngModel)]="ArrayProductoZeus.Cant_Minima" class="form-control form-control-sm" type="number" (change)="actualizarCantMinima(ArrayProductoZeus)">
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                    {{ArrayProductoZeus.Cant_Minima | number : '1.2-2'}}
-                  </ng-template>
-                </p-cellEditor>
-              </td>
-              <td>{{ArrayProductoZeus.Vendedor}}</td>
-              <td>{{ArrayProductoZeus.Mes_Actual | number : '1.2-2'}}</td>
-              <td *ngFor="let col of columnasSeleccionada">{{ArrayProductoZeus[col.field] | number}}</td>
-            </tr>
-          </ng-template>
+              <tr class="font-size-14">
+                <th style="text-align: center;" scope="col" pSortableColumn="Id">Item
+                  <p-sortIcon field="Id"></p-sortIcon>
+                </th>
+                <th style="text-align: center;" scope="col" pSortableColumn="Cliente">Cliente
+                  <p-sortIcon field="Cliente"></p-sortIcon>
+                </th>
+                <th style="text-align: center;" scope="col" pSortableColumn="Nombre">Nombre
+                  <p-sortIcon field="Nombre"></p-sortIcon>
+                </th>
+                <th style="text-align: center;" scope="col" pSortableColumn="Cantidad">Existencias
+                  <p-sortIcon field="Cantidad"></p-sortIcon>
+                </th>
+                <th style="text-align: center;" scope="col" pSortableColumn="Precio">Precio
+                  <p-sortIcon field="Precio"></p-sortIcon>
+                </th>
+                <th style="text-align: center;" scope="col" pSortableColumn="Presentacion">Unidad
+                  <p-sortIcon field="Presentacion"></p-sortIcon>
+                </th>
+                <th style="text-align: center;" scope="col" pSortableColumn="Precio_Total">Subtotal
+                  <p-sortIcon field="Precio_Total"></p-sortIcon>
+                </th>
+                <th style="text-align: center;" scope="col"  pSortableColumn="Cant_Minima">Cant. Minima
+                  <p-sortIcon field="Cant_Minima"></p-sortIcon>
+                </th>
+                <th style="text-align: center;" scope="col"  pSortableColumn="Vendedor">Vendedor
+                  <p-sortIcon field="Vendedor"></p-sortIcon>
+                </th>
+                <th style="text-align: center;" scope="col"  pSortableColumn="Mes_Actual">{{mesActual}}
+                  <p-sortIcon field="Mes_Actual"></p-sortIcon>
+                </th>
+                <th style="text-align: center;" scope="col" *ngFor="let col of columnasSeleccionada" pSortableColumn="{{col.header}}">{{col.header}}
+                  <p-sortIcon field="{{col.header}}"></p-sortIcon>
+                </th>
+              </tr>
+            </ng-template>
 
-          <!-- Footer de la tabla -->
-          <ng-template pTemplate="footer">
-            <tr>
-              <td colspan="6" class="text-right">Totales</td>
-              <td colspan="4" class="text-right">{{totalProductos | currency: 'COP $'}}</td>
-            </tr>
-          </ng-template>
+            <!--Cuerpo Tabla-->
+            <ng-template pTemplate="body" let-ArrayProductoZeus>
+              <tr class="tamanoTextosTabla">
+                <td style="text-align: center;">{{ArrayProductoZeus.Id}}</td>
+                <td>{{ArrayProductoZeus.Cliente}}</td>
+                <td>{{ArrayProductoZeus.Nombre}}</td>
+                <ng-container *ngIf="ArrayProductoZeus.Cantidad <= ArrayProductoZeus.Cant_Minima then rojo else azul;"></ng-container>
+                <ng-template #rojo>
+                  <td style="text-align: center;" style="background-color: rgb(255, 146, 146);"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
+                </ng-template>
+                <ng-template #azul>
+                  <td style="text-align: center;" class="TextosInfoTabla2"><b>{{ArrayProductoZeus.Cantidad | number : '1.2-2'}}</b></td>
+                </ng-template>
+                <td style="text-align: center;">{{ArrayProductoZeus.Precio | currency: 'COP $'}}</td>
+                <td style="text-align: center;">{{ArrayProductoZeus.Presentacion}}</td>
+                <td style="text-align: center;">{{ArrayProductoZeus.Precio_Total | currency: 'COP $'}}</td>
+                <td style="text-align: center;" pEditableColumn (click)="seleccionarProducto(ArrayProductoZeus)">
+                  <p-cellEditor>
+                    <ng-template pTemplate="input">
+                      <input [(ngModel)]="ArrayProductoZeus.Cant_Minima" class="form-control form-control-sm" type="number" (change)="actualizarCantMinima(ArrayProductoZeus)">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                      {{ArrayProductoZeus.Cant_Minima | number : '1.2-2'}}
+                    </ng-template>
+                  </p-cellEditor>
+                </td>
+                <td>{{ArrayProductoZeus.Vendedor}}</td>
+                <td>{{ArrayProductoZeus.Mes_Actual | number : '1.2-2'}}</td>
+                <td *ngFor="let col of columnasSeleccionada">{{ArrayProductoZeus[col.field] | number}}</td>
+              </tr>
+            </ng-template>
 
-          <!-- Pie de la tabla -->
-          <ng-template pTemplate="summary">
-            Cantidad Total de Productos Disponibles: <b>{{ArrayProductoZeus.length | number}}</b>
-          </ng-template>
+            <!-- Footer de la tabla -->
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="6" class="text-right">Totales</td>
+                <td colspan="4" class="text-right">{{totalProductos | currency: 'COP $'}}</td>
+              </tr>
+            </ng-template>
 
-        </p-table>
-        <br>
+            <!-- Pie de la tabla -->
+            <ng-template pTemplate="summary">
+              Cantidad Total de Productos Disponibles: <b>{{ArrayProductoZeus.length | number}}</b>
+            </ng-template>
+
+          </p-table>
+          <br>
+        </div>
       </div>
     </div>
   </div>

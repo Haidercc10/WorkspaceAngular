@@ -20,80 +20,76 @@
   </div>
 </div>
 
-<div class="container-fluid">
-  <div class="formulario">
-    <div class="mb-4">
-      <h3 class="tituloRojo font-size-24">Filtros de búsqueda</h3>
-    </div>
-    <!-- Formulario para consultar filtros -->
-    <form [formGroup]="formFiltros">
-      <!-- Primera Fila -->
-      <div class="mb-3">
-        <div class="row g-3">
-
-          <!-- Vendedores -->
-          <div class="form-floating col-md">
-            <input formControlName="vendedor" class="form-control form-control-sm" list="vendedores" id="campoVendedor" (keyup)="cargarVendedores()" autocomplete="off" (change)="seleccionarVendedores()" required>
-            <datalist id="vendedores">
-              <option value={{item.idvende}} *ngFor="let item of arrayVendedores">{{item.nombvende}}</option>
-            </datalist>
-            <label for="floatingInput">Vendedor</label>
-          </div>
-
-          <!-- Clientes -->
-          <div class="form-floating col-md">
-            <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" (keyup)="cargarClientes()" (change)="seleccionarClientes()" autocomplete="off" required>
-            <datalist id="clientes">
-              <option value={{item.idcliente}} *ngFor="let item of arrayClientes">{{item.razoncial}}</option>
-            </datalist>
-            <label for="floatingInput">Cliente</label>
-          </div>
-
-          <!-- Items -->
-          <div class="form-floating col-md">
-            <input formControlName="item" class="form-control form-control-sm" list="items" id="floatingInput" (keyup)="cargarProductos()" (change)="seleccionarProductos()" required autocomplete="off">
-            <datalist id="items">
-              <option value={{valor.codigo}} *ngFor="let valor of arrayItems">{{valor.nombre}}</option>
-            </datalist>
-            <label for="floatingInput">Item</label>
-          </div>
-
-          <!--Año 1-->
-          <div class="form-floating col-md-1">
-            <select formControlName="anio1" id="floatingSelect" type="text" class="form-select form-select-sm">
-              <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
-            </select>
-            <label for="floatingSelect">Año Inicial</label>
-          </div>
-
-          <!--Año 2-->
-          <div class="form-floating col-md-1">
-            <select formControlName="anio2" id="floatingSelect" type="text" class="form-select form-select-sm">
-              <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
-            </select>
-            <label for="floatingSelect">Año Final</label>
-          </div>
-      </div>
-      </div>
-
-      <!--Botones-->
-      <div class="mb-3">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class="btn btn-danger btn-danger-sm" type="submit" (click)="consultarConsolidado()"><i class="pi pi-search"></i> Consultar</button>
-          <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()"><i class="pi pi-eraser"></i> Limpiar campos</button>
-          <button class="btn btn-success btn-success-sm" type="button" (click)="exportarExcel()"><i class="pi pi-file-excel"></i> Exportar a Excel</button>
-        </div>
-      </div>
-    </form>
-
-    <!--Linea-->
-    <div class="mb-4">
-      <hr class="colorLinea">
-    </div>
+<div class="formulario">
+  <div class="mb-4">
+    <h3 class="tituloRojo font-size-24">Filtros de búsqueda</h3>
   </div>
-</div>
+  <!-- Formulario para consultar filtros -->
+  <form [formGroup]="formFiltros">
+    <!-- Primera Fila -->
+    <div class="mb-3">
+      <div class="row g-3">
 
-<div class="container-fluid">
+        <!-- Vendedores -->
+        <div class="form-floating col-md">
+          <input formControlName="vendedor" class="form-control form-control-sm" list="vendedores" id="campoVendedor" (keyup)="cargarVendedores()" autocomplete="off" (change)="seleccionarVendedores()" required>
+          <datalist id="vendedores">
+            <option value={{item.idvende}} *ngFor="let item of arrayVendedores">{{item.nombvende}}</option>
+          </datalist>
+          <label for="floatingInput">Vendedor</label>
+        </div>
+
+        <!-- Clientes -->
+        <div class="form-floating col-md">
+          <input formControlName="cliente" class="form-control form-control-sm" list="clientes" id="floatingInput" (keyup)="cargarClientes()" (change)="seleccionarClientes()" autocomplete="off" required>
+          <datalist id="clientes">
+            <option value={{item.idcliente}} *ngFor="let item of arrayClientes">{{item.razoncial}}</option>
+          </datalist>
+          <label for="floatingInput">Cliente</label>
+        </div>
+
+        <!-- Items -->
+        <div class="form-floating col-md">
+          <input formControlName="item" class="form-control form-control-sm" list="items" id="floatingInput" (keyup)="cargarProductos()" (change)="seleccionarProductos()" required autocomplete="off">
+          <datalist id="items">
+            <option value={{valor.codigo}} *ngFor="let valor of arrayItems">{{valor.nombre}}</option>
+          </datalist>
+          <label for="floatingInput">Item</label>
+        </div>
+
+        <!--Año 1-->
+        <div class="form-floating col-md-1">
+          <select formControlName="anio1" id="floatingSelect" type="text" class="form-select form-select-sm">
+            <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
+          </select>
+          <label for="floatingSelect">Año Inicial</label>
+        </div>
+
+        <!--Año 2-->
+        <div class="form-floating col-md-1">
+          <select formControlName="anio2" id="floatingSelect" type="text" class="form-select form-select-sm">
+            <option [ngValue]="anios" *ngFor="let anios of arrayAnios">{{anios}}</option>
+          </select>
+          <label for="floatingSelect">Año Final</label>
+        </div>
+    </div>
+    </div>
+
+    <!--Botones-->
+    <div class="mb-3">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="btn btn-danger btn-danger-sm" type="submit" (click)="consultarConsolidado()"><i class="pi pi-search"></i> Consultar</button>
+        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()"><i class="pi pi-eraser"></i> Limpiar campos</button>
+        <button class="btn btn-success btn-success-sm" type="button" (click)="exportarExcel()"><i class="pi pi-file-excel"></i> Exportar a Excel</button>
+      </div>
+    </div>
+  </form>
+
+  <!--Linea-->
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
   <div class="card" *ngIf="!cargando">
     <p-table #dt
              [value]="arrayConsolidado"

@@ -72,6 +72,7 @@ ul li a:hover{
 
 ul li a:active > a, a[aria-expanded="true"]{
   color: #db4149;
+
 }
 
 span{

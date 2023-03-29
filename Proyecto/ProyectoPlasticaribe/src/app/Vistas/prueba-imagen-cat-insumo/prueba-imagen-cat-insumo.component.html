@@ -1,4 +1,3 @@
-<!-- Inicio Contenedor total -->
 <app-menuLateral></app-menuLateral>
 
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
@@ -8,10 +7,13 @@
 </div>
 
 <div class="contain">
+  <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
+    <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Asignacion de Materia Prima</h2>
+      <h2 class="tituloRojo">Asignación de BOPP / BOPA / POLIESTER</h2>
     </div>
+
     <div class="mb-4">
       <hr class="colorLinea">
     </div>
@@ -20,40 +22,29 @@
 
 <div class="formulario">
   <div class="mb-3">
-    <h4 class="tituloRojo">Asignación de Materia Prima</h4>
+    <h4 class="tituloRojo"><i class="pi pi-file"></i> Consultar OT's</h4>
   </div>
-
   <br>
-  <!-- Formulario Orden de Trabajo -->
-  <form [formGroup]="FormMateriaPrimaRetiro">
+
+  <form [formGroup]="FormAsignacionBopp">
     <div class="mb-3">
       <div class="row g-4">
-        <!-- Orden de Trabajo -->
+        <!-- Buscar OT -->
         <div class="col-md-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="OTRetiro" id="ordenTrabajo" class="form-control form-control-sm" type="text" pInputText (keyup.enter)="infoOT()" required/>
-            <label for="ordenTrabajo">Orden de Trabajo</label>
-          </span>
-        </div>
-
-        <!-- Maquina -->
-        <div class="col-md-2">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-wrench"></i>
-            <input formControlName="Maquina" id="maquina" class="form-control form-control-sm" type="number" pInputText required/>
-            <label for="maquina">Maquina</label>
+            <input formControlName="AsgBopp_OT" id="ordenTrabajo" class="form-control form-control-sm" type="text" pInputText (keyup.enter)="infoOT()" required/>
+            <label for="ordenTrabajo">OT</label>
           </span>
         </div>
 
         <!-- Observacion -->
         <div class="col-md">
           <span class="p-float-label">
-            <textarea formControlName="ObservacionRetiro" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
-            <label for="textarea">Observación</label>
+            <textarea formControlName="AsgBopp_Observacion" id="observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <label for="observacion">Observación</label>
           </span>
         </div>
-
       </div>
     </div>
   </form>
@@ -70,99 +61,74 @@
       [paginator]="true"
       [rows]="20"
       [rowHover]="true"
-      [value]="infoOrdenTrabajo">
+      [value]="ordenesTrabajo">
         <ng-template pTemplate="header">
           <tr>
             <th scope="col">N°</th>
             <th scope="col">Cliente</th>
             <th scope="col">Item</th>
-            <th scope="col">Kg Total</th>
-            <th scope="col">Kg Restante</th>
+            <th scope="col">Micras</th>
+            <th scope="col">Ancho</th>
+            <th scope="col">Kg</th>
+            <th scope="col"></th>
         </ng-template>
         <ng-template pTemplate="body" let-ot>
           <tr>
             <td>{{ot.ot}}</td>
             <td>{{ot.cliente}}</td>
             <td>{{ot.item}}</td>
+            <td>{{ot.micras | number}}</td>
+            <td>{{ot.ancho | number}}</td>
             <td>{{ot.kg | number}}</td>
-            <td><b>{{ot.kgRestante | number}}</b></td>
+            <td><i class="pi pi-trash cursor" title="Quitar Orden de Trabajo" (click)="QuitarOrdenTrabajo(ot)"></i></td>
           </tr>
         </ng-template>
       </p-table>
     </div>
   </div>
-  <br>
 
-  <!--Inicio titulo -->
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <!-- Titulo Materia Prima -->
   <div class="mb-3">
-    <h4 class="tituloRojo">Materia Prima</h4>
+    <h4 class="tituloRojo"><i class="pi pi-database"></i> BOPP / BOPA / POLIESTER</h4>
   </div>
   <br>
 
-  <!-- Formulario de seleccion de materia prima  -->
-  <form [formGroup]="FormMateriaPrimaRetirada">
+  <!-- Asignación de BOPP para la creación de tintas -->
+  <form [formGroup]="FormularioBOPP">
     <div class="mb-3">
-      <div class="row g-4">
-        <!-- Id Materia Prima -->
-        <div class="col-md-2">
+      <div class="row g-3">
+        <!--Serial-->
+        <div class="col-md-3">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="MpIdRetirada" id="IdMP" class="form-control form-control-sm" type="number" pInputText min="0" (keyup)="cambiarNombreMateriaPrima(1)" required/>
-            <label for="IdMP">Id Materia Prima</label>
+            <input formControlName="boppSerial" id="boppSerial" list="materiaprima" class="form-control form-control-sm" type="text" pInputText required/>
+            <label for="boppSerial">Pallet/Serial</label>
           </span>
         </div>
 
-        <!-- Nombre Materia Prima -->
-        <div class="col-md-6">
-          <span class="p-float-label">
-            <input formControlName="MpNombreRetirada" id="MP" class="form-control form-control-sm" list="materiaprima" type="text" pInputText (change)="cambiarNombreMateriaPrima(2)" required/>
+        <!-- Nombre  -->
+        <div class="col-md">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="boppNombre" id="boppNombre" list="materiaprima" class="form-control form-control-sm" type="text" pInputText  (change)="BOPPSeleccionado()" required/>
             <datalist id="materiaprima">
-              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option>
+              <option value={{item.bopP_Serial}} *ngFor="let item of ArrayBOPP">{{item.bopP_Nombre}}</option>
             </datalist>
-            <label for="MP">Materia Prima</label>
+            <label for="boppNombre">Rollo</label>
           </span>
         </div>
-
-        <!-- Stock de Materia Prima  -->
-        <div class="col-md-2">
-          <span class="p-float-label">
-            <p-inputNumber formControlName="MpStockRetirada" mode="decimal" inputId="Stock" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
-            <label for="Stock">Stock</label>
-          </span>
-        </div>
-
-        <!-- CANTIDAD A ENTREGAR DE MATERIA PRIMA  -->
-        <div class="col-md-2">
-          <span class="p-float-label">
-            <p-inputNumber formControlName="MpCantidadRetirada" mode="decimal" inputId="Cantidad" [minFractionDigits]="2"></p-inputNumber>
-            <label for="Cantidad">Cantidad</label>
-          </span>
-        </div>
-
-        <!-- Unidad de Medida -->
-        <div class="col-md-3">
-          <span class="p-float-label">
-            <p-dropdown formControlName="MpUnidadMedidaRetirada" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel=""></p-dropdown>
-            <label for="Und">Unidad de Medida</label>
-          </span>
-        </div>
-
-        <!-- Proceso -->
-        <div class="col-md-3">
-          <span class="p-float-label">
-            <p-dropdown formControlName="ProcesoRetiro" inputId="Proceso" [autoDisplayFirst]="false" [options]="procesos" optionLabel=""></p-dropdown>
-            <label for="Proceso">Procesos</label>
-          </span>
-        </div>
-
       </div>
     </div>
 
     <!-- BOTONES -->
-    <div class="mb-4">
+    <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarCamposVaciosMPRetirada()"></button>
-        <button pButton pRipple label="Limpiar Campos MP" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarCamposMP()"></button>
+        <button pButton class="p-button-danger" type="button" label="Asignar Rollo" icon="pi pi-send" (click)="validarCamposBOPP()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCamposBOPP()"> </button>
       </div>
     </div>
   </form>
@@ -171,13 +137,12 @@
   <div class="mb-4">
     <hr class="colorLinea">
   </div>
-  <!--Fin Linea -->
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Tabla de materias primas asignadas</h4>
+    <h4 class="tituloRojo"><i class="pi pi-box"></i> Tabla de material asignado</h4>
   </div>
 
-  <!-- TABLA DE RETIRO -->
+  <!-- Tabla de BOPP por asignar -->
   <div class="row g-3">
     <div class="table-responsive">
       <p-table
@@ -189,25 +154,30 @@
       [paginator]="true"
       [rows]="20"
       [rowHover]="true"
-      [value]="materiasPrimasSeleccionadas">
+      [value]="ArrayBoppPedida">
         <ng-template pTemplate="header">
           <tr>
-            <th scope="col">ID</th>
+            <th scope="col">Pallet/Serial</th>
             <th scope="col">Nombre</th>
             <th scope="col">Cantidad</th>
-            <th scope="col">Und. Medida</th>
-            <th scope="col">Proceso</th>
             <th scope="col"></th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-materiasPrimasSeleccionadas>
+        <ng-template pTemplate="body" let-bopp>
           <tr>
-            <td>{{materiasPrimasSeleccionadas.Id}}</td>
-            <td>{{materiasPrimasSeleccionadas.Nombre}}</td>
-            <td>{{materiasPrimasSeleccionadas.Cantidad | number}}</td>
-            <td>{{materiasPrimasSeleccionadas.Und_Medida}}</td>
-            <td>{{materiasPrimasSeleccionadas.Proceso}}</td>
-            <td><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="quitarMateriaPrima(materiasPrimasSeleccionadas)"></i></td>
+            <td>{{bopp.Serial}}</td>
+            <td>{{bopp.Nombre}}</td>
+            <td pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <p-inputNumber [(ngModel)]="bopp.Cantidad2" inputId="minmaxfraction" inputId="minmax" inputId="minmax" mode="decimal" [min]="0" [max]="bopp.Cantidad2" [maxFractionDigits]="2"></p-inputNumber>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{bopp.Cantidad2 | number}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="quitarBOPP(bopp)"></i></td>
           </tr>
         </ng-template>
       </p-table>
@@ -220,8 +190,8 @@
       <div class="row g-3">
         <div class="mb-3">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarCamposVaciosRetirada()"></button>
-            <button pButton pRipple label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
+            <button pButton class="p-button-danger" type="button" label="Crear Asignación" icon="pi pi-check" (click)="validarAsignacion()"></button>
+            <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosLosCampos()"> </button>
           </div>
         </div>
       </div>

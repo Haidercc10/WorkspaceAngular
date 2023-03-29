@@ -32,7 +32,7 @@ export class CrearTintasComponent implements OnInit {
       TintaCodigoHexa: [''],
       TintaUndMedida : ['Kg', Validators.required],
       TintaPrecio: [null, Validators.required],
-      TintaCategoria : [null, Validators.required]
+      TintaCategoria : [null, Validators.required],
     });
   }
 
@@ -76,7 +76,7 @@ export class CrearTintasComponent implements OnInit {
         UndMed_Id: this.formularioTintas.get('TintaUndMedida')?.value,
         Tinta_Precio: this.formularioTintas.get('TintaPrecio')?.value,
         Tinta_Stock: cantidadTinta,
-        CatMP_Id: this.formularioTintas.value.TintaCategoria,
+        CatMP_Id: this.formularioTintas.value.TintaCategoria.catMP_Id,
         TpBod_Id: bodegaId,
         Tinta_InvInicial : cantidadTinta,
         Tinta_FechaIngreso : moment().format('YYYY-MM-DD'),
