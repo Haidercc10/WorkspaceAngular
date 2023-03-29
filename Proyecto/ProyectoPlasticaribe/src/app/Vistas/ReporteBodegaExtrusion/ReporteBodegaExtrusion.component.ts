@@ -33,6 +33,7 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
   rollosAgrupados : any [] = []; //Variable que va a almacen
   totalRollos : number = 0; //Variable que almacenará el total de rollos
   totalCantidad : number = 0; //Variable que almacenará la cantidad de total de kg de los rollos
+  tipoDocumento : string [] = ['Ingreso de Rollos', 'Salida de Rollos'];
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -95,8 +96,11 @@ export class ReporteBodegaExtrusionComponent implements OnInit {
     this.cargando = false;
     this.registrosConsultados = [];
     let ot : any = this.FormConsultarFiltros.value.ot;
-    let fechaIni : any = this.FormConsultarFiltros.value.fechaDoc;
-    let fechaFin : any = this.FormConsultarFiltros.value.fechaFinalDoc;
+    let fechaIni : any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
+    let fechaFin : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
+
+    if (fechaIni == 'Invalid date') fechaIni = null;
+    if (fechaFin == 'Invalid date') fechaFin = null;
 
     if (fechaIni != null && fechaFin != null) {
       this.ingRollosService.getconsultaRollosFechas(fechaIni, fechaFin).subscribe(datos_factura => {

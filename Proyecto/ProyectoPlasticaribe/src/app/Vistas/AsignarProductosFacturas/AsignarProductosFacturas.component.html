@@ -1,10 +1,10 @@
 <app-menuLateral></app-menuLateral>
 
-<!-- <div class="overlay" *ngIf="!cargando">
-  <div class="spinner ">
-    <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"/>
+<div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
   </div>
-</div> -->
+</div>
 
 <div class="contain" id="form">
   <!-- Navegador fin de parte superior -->
@@ -25,240 +25,244 @@
   </svg>
 </button>
 
-<div class="contain">
-  <!--Inicio info OT-->
-  <div class="container-fluid bajarPagina">
-    <div class="formulario">
-      <div class="mb-4">
-        <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar/Asignar Producto</h4>
-      </div>
-      <!-- Formulario para consultar una orden de trabajo -->
-      <form [formGroup]="FormConsultarProductos">
-        <!-- Primera Fila -->
-        <div class="mb-3">
-          <div class="row g-3">
-            <!-- Factura -->
-            <div class="form-floating col-md-2">
-              <input formControlName="Factura" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Factura</label>
-            </div>
+<div class="formulario">
+  <div class="mb-4">
+    <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar/Asignar Producto</h4>
+  </div>
+  <br>
 
-            <!-- Id Producto -->
-            <div class="form-floating col-md-2">
-              <input formControlName="IdProducto" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="buscarItem()">
-              <label for="floatingInput">N° Item</label>
-            </div>
+  <!-- Formulario para consultar una orden de trabajo -->
+  <form [formGroup]="FormConsultarProductos">
+    <!-- Primera Fila -->
+    <div class="mb-3">
+      <div class="row g-4">
 
-            <!-- Id Producto -->
-            <div class="form-floating col-md-2">
-              <input formControlName="CantidadProducto" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="mostrarRollosPorCantidad()">
-              <label for="floatingInput">Cantidad Item</label>
-            </div>
-
-            <div class="form-floating col-md">
-              <input formControlName="ProdNombre" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Item Nombre</label>
-            </div>
-
-             <!-- Cliente -->
-             <div class="form-floating col-md">
-              <input formControlName="Cliente" class="form-control" list="clientes" id="floatingInput" (change)='selectEventCliente()'>
-              <datalist id="clientes">
-                <option value={{item.cli_Id}} *ngFor="let item of arrayClientes">{{item.cli_Nombre}}</option>
-              </datalist>
-              <label for="floatingInput" *ngIf="validarInputClientes">Cliente</label>
-             </div>
-          </div>
+        <!-- Codigo Factura -->
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="Factura" id="Factura" class="form-control form-control-sm" type="text" pInputText required/>
+            <label for="Factura">Factura</label>
+          </span>
         </div>
 
-        <!--Fila 2-->
-        <div class="mb-4">
-          <div class="row g-3">
-
-            <!-- Nota Credito -->
-            <div class="form-floating col-md-2">
-              <input formControlName="NotaCredito" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Nota Credito</label>
-            </div>
-
-            <!-- Observacion -->
-            <div class="form-floating col-md">
-              <textarea formControlName="Observacion"  id="floatingTextarea" type="text" class="form-control form-control-sm" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
-              <label for="floatingTextarea">Observación</label>
-            </div>
-          </div>
+        <!-- Nota Creadito -->
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="NotaCredito" id="NotaCredito" class="form-control form-control-sm" type="text" pInputText required/>
+            <label for="NotaCredito">Nota Credito</label>
+          </span>
         </div>
-      </form>
 
-      <div class="mb-4">
-        <hr class="Linea">
-      </div>
-
-      <!-- Inicio titulo tabla producto -->
-      <div class="mb-4 tabla1">
-        <h4 class="tituloRojo" style="width: 90%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <div class="form-floating col-md">
-            <input type="number" class="form-control form-control-sm" id="floatingInput"[(ngModel)]="cantPage">
-            <label for="floatingInput">N° Filas</label>
-          </div>
+        <!-- Codigo de Producto -->
+        <div class="col-md-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="IdProducto" id="IdProducto" class="form-control form-control-sm" type="text" pInputText required (keyup.Enter)="buscarItem()"/>
+            <label for="IdProducto">N° Item</label>
+          </span>
         </div>
-      </div>
 
-      <!--Inicio tabla Rollos creados en OT -->
-      <div class="mb-3" *ngIf="cargando">
-        <div class="row g-3 tablaInicial">
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover mt-2">
-              <thead class="TitulosTabla">
-                <tr>
-                  <th scope="col">ID Rollo</th>
-                  <th scope="col">ID Producto</th>
-                  <th scope="col">Producto</th>
-                  <th scope="col">Cantidad</th>
-                  <th scope="col">Presentacion</th>
-                  <th scope="col">Total Unidades</th>
-
-                  <ng-container>
-                    <th scope="col"><input class="form-check-input cursor" style="margin-left: 40%;" type="checkbox" (change)="selccionarTodo()"></th>
-                  </ng-container>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of rollos | paginate: {itemsPerPage: cantPage, currentPage: page} let i=index">
-                  <th>{{item.Id}}</th>
-                  <td>{{item.IdProducto}}</td>
-                  <td>{{item.Producto}}</td>
-                  <td>{{item.CantPaqRestantes | number}}</td>
-                  <td>{{item.Presentacion}}</td>
-                  <td>{{item.CantUndRestantes | number}}</td>
-                  <td><input class="form-check-input cursor" id="checkbox" style="margin-left: 40%;" type="checkbox" (change)="cargarProducto(item)"></td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="mb-2">
-              <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <pagination-controls (pageChange)="page = $event"></pagination-controls>
-              </div>
-            </div>
-          </div>
+        <!-- Cantidad Producto -->
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="CantidadProducto" mode="decimal" inputId="CantidadProducto" [minFractionDigits]="2" (keyup.Enter)="mostrarRollosPorCantidad()"></p-inputNumber>
+            <label for="CantidadProducto">Cantidad Item</label>
+          </span>
         </div>
-      </div>
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end totalProd">
-        <label for=""><b>Total {{presentacionProducto}}(s): {{cantTotalProducto | number : '1.2-2'}}</b></label>
-      </div>
 
-      <div class="mb-4" *ngIf="cargando">
-        <hr class="Linea">
-      </div>
-      <!-- Inicio titulo tabla producto -->
-      <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos por Asignar</h4>
-      </div>
-
-      <!--Inicio tabla Rollos a Insertar -->
-      <div class="mb-3" *ngIf="cargando">
-        <div class="row g-3">
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover mt-2" >
-              <thead class="TitulosTabla">
-                <tr>
-                  <th scope="col">ID Rollo</th>
-                  <th scope="col">ID Producto</th>
-                  <th scope="col">Producto</th>
-                  <th scope="col">Cantidad</th>
-                  <th scope="col">Total Unidades</th>
-                  <th scope="col">Editar Paquetes</th>
-                  <th scope="col">Editar Unidades</th>
-                  <th scope="col">Presentación</th>
-                  <ng-container>
-                    <th scope="col"><a><i class="fa fa-trash cursor" aria-hidden="true" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
-                  </ng-container>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of rollosInsertar; let i=index">
-                  <th>{{item.Id}}</th>
-                  <td>{{item.IdProducto}}</td>
-                  <td>{{item.Producto}}</td>
-                  <td>{{item.CantPaqRestantes | number}}</td>
-                  <td>{{item.CantUndRestantes | number}} Und</td>
-                  <td style="width: 10%;">
-                    <form [formGroup]="FormEditPaquetes">
-                      <input *ngIf="item.Presentacion == 'Paquete'" formControlName="Cantidad" (keyup.Enter)="cambiarCantidadPaquetes(item)" type="number" class="form-control form-control-sm" style="border: none; width: 100%;">
-                    </form>
-                  </td>
-                  <td style="width: 10%;">
-                    <form [formGroup]="FormEditUnd">
-                      <input formControlName="Cantidad" (keyup.Enter)="cambiarCantidadUnidades(item)" type="number" class="form-control form-control-sm" style="border: none; width: 100%;">
-                    </form>
-                  </td>
-                  <th>{{item.Presentacion | uppercase}}</th>
-                  <td><a><i class="fa fa-trash cursor" aria-hidden="true" title="Quitar Rollo de la tabla" (click)="quitarRollo(item)"></i></a></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <!-- Cliente -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <input formControlName="Cliente" id="Cliente" list="clientes" class="form-control form-control-sm" type="text" pInputText (change)='selectEventCliente()'/>
+            <datalist id="clientes">
+              <option value={{item.cli_Id}} *ngFor="let item of arrayClientes">{{item.cli_Nombre}}</option>
+            </datalist>
+            <label for="Cliente">Cliente</label>
+          </span>
         </div>
-      </div>
 
-      <div class="mb-4" *ngIf="cargando">
-        <hr class="Linea">
-      </div>
-      <!-- Inicio titulo tabla producto -->
-      <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado de Productos</h4>
-      </div>
-
-      <!--Inicio tabla Rollos a Insertar -->
-      <div class="mb-3" *ngIf="cargando">
-        <div class="row g-3">
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover mt-2" >
-              <thead class="TitulosTabla">
-                <tr>
-                  <th scope="col">ID Producto</th>
-                  <th scope="col">Producto</th>
-                  <th scope="col">Cantidad</th>
-                  <th scope="col">N° Rollos</th>
-                  <th scope="col">Presentación</th>
-                  <th scope="col">Cantidad Unidades</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of grupoProductos; let i=index">
-                  <th>{{item.Id}}</th>
-                  <td>{{item.Nombre}}</td>
-                  <td>{{item.Cantidad}}</td>
-                  <td>{{item.Rollos}}</td>
-                  <td>{{item.Presentacion}}</td>
-                  <td>{{item.Cant_Unidades}} Und</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <!-- Observacion -->
+        <div class="col-md-12">
+          <span class="p-float-label">
+            <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
         </div>
+
       </div>
+    </div>
+  </form>
 
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <label for=""><b>Total: {{Total | number : '1.2-2'}}</b></label>
+  <div class="mb-4">
+    <hr class="Linea">
+  </div>
+
+  <!-- Rollos Buscados -->
+  <div class="mb-4 tabla1">
+    <h4 class="tituloRojo" style="width: 90%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <div class="form-floating col-md">
+        <input type="number" class="form-control form-control-sm" id="floatingInput"[(ngModel)]="cantPage">
+        <label for="floatingInput">N° Filas</label>
       </div>
-
-      <!-- Botones -->
-      <div class="bajarPagina" *ngIf="cargando">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-
-          <button pButton class="p-button-danger" type="button" label="Facturar Rollos" icon="pi pi-dollar" (click)="crearAsignacion()"></button>
-          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
-        </div>
-      </div>
-
-      <div class="d-flex justify-content-center overlay" *ngIf="!cargando">
-        <div class="spinner-border text-danger" role="status" style="margin: auto;">
-          <span class="visually-hidden">Cargando...</span>
-        </div>
-      </div>
-
     </div>
   </div>
+
+  <!--Inicio tabla Rollos creados en OT -->
+  <div class="mb-3" *ngIf="cargando">
+    <div class="row g-3 tablaInicial">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover mt-2">
+          <thead class="TitulosTabla">
+            <tr>
+              <th scope="col">ID Rollo</th>
+              <th scope="col">ID Producto</th>
+              <th scope="col">Producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Presentacion</th>
+              <th scope="col">Total Unidades</th>
+
+              <ng-container>
+                <th scope="col"><input class="form-check-input cursor" style="margin-left: 40%;" type="checkbox" (change)="selccionarTodo()"></th>
+              </ng-container>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of rollos | paginate: {itemsPerPage: cantPage, currentPage: page} let i=index">
+              <th>{{item.Id}}</th>
+              <td>{{item.IdProducto}}</td>
+              <td>{{item.Producto}}</td>
+              <td>{{item.CantPaqRestantes | number}}</td>
+              <td>{{item.Presentacion}}</td>
+              <td>{{item.CantUndRestantes | number}}</td>
+              <td><input class="form-check-input cursor" id="checkbox" style="margin-left: 40%;" type="checkbox" (change)="cargarProducto(item)"></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="mb-2">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end totalProd">
+    <label for=""><b>Total {{presentacionProducto}}(s): {{cantTotalProducto | number : '1.2-2'}}</b></label>
+  </div>
+
+  <div class="mb-4" *ngIf="cargando">
+    <hr class="Linea">
+  </div>
+
+  <!-- Inicio titulo tabla producto -->
+  <div class="mb-4" *ngIf="cargando">
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos por Asignar</h4>
+  </div>
+
+  <!--Inicio tabla Rollos a Insertar -->
+  <div class="mb-3" *ngIf="cargando">
+    <div class="row g-3">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover mt-2" >
+          <thead class="TitulosTabla">
+            <tr>
+              <th scope="col">ID Rollo</th>
+              <th scope="col">ID Producto</th>
+              <th scope="col">Producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Total Unidades</th>
+              <th scope="col">Editar Paquetes</th>
+              <th scope="col">Editar Unidades</th>
+              <th scope="col">Presentación</th>
+              <ng-container>
+                <th scope="col"><a><i class="fa fa-trash cursor" aria-hidden="true" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
+              </ng-container>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of rollosInsertar; let i=index">
+              <th>{{item.Id}}</th>
+              <td>{{item.IdProducto}}</td>
+              <td>{{item.Producto}}</td>
+              <td>{{item.CantPaqRestantes | number}}</td>
+              <td>{{item.CantUndRestantes | number}} Und</td>
+              <td style="width: 10%;">
+                <form [formGroup]="FormEditPaquetes">
+                  <input *ngIf="item.Presentacion == 'Paquete'" formControlName="Cantidad" (keyup.Enter)="cambiarCantidadPaquetes(item)" type="number" class="form-control form-control-sm" style="border: none; width: 100%;">
+                </form>
+              </td>
+              <td style="width: 10%;">
+                <form [formGroup]="FormEditUnd">
+                  <input formControlName="Cantidad" (keyup.Enter)="cambiarCantidadUnidades(item)" type="number" class="form-control form-control-sm" style="border: none; width: 100%;">
+                </form>
+              </td>
+              <th>{{item.Presentacion | uppercase}}</th>
+              <td><a><i class="fa fa-trash cursor" aria-hidden="true" title="Quitar Rollo de la tabla" (click)="quitarRollo(item)"></i></a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-4" *ngIf="cargando">
+    <hr class="Linea">
+  </div>
+
+  <!-- Inicio titulo tabla producto -->
+  <div class="mb-4" *ngIf="cargando">
+    <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado de Productos</h4>
+  </div>
+
+  <!--Inicio tabla Rollos a Insertar -->
+  <div class="mb-3" *ngIf="cargando">
+    <div class="row g-3">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover mt-2" >
+          <thead class="TitulosTabla">
+            <tr>
+              <th scope="col">ID Producto</th>
+              <th scope="col">Producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">N° Rollos</th>
+              <th scope="col">Presentación</th>
+              <th scope="col">Cantidad Unidades</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of grupoProductos; let i=index">
+              <th>{{item.Id}}</th>
+              <td>{{item.Nombre}}</td>
+              <td>{{item.Cantidad}}</td>
+              <td>{{item.Rollos}}</td>
+              <td>{{item.Presentacion}}</td>
+              <td>{{item.Cant_Unidades}} Und</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <label for=""><b>Total: {{Total | number : '1.2-2'}}</b></label>
+  </div>
+
+  <!-- Botones -->
+  <div class="bajarPagina" *ngIf="cargando">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+
+      <button pButton class="p-button-danger" type="button" label="Facturar Rollos" icon="pi pi-dollar" (click)="crearAsignacion()"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+    <div class="spinner-border text-danger" role="status" style="margin: auto;">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
 </div>

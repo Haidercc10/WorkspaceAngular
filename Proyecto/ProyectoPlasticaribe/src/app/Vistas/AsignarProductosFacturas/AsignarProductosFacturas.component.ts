@@ -72,7 +72,7 @@ export class AsignarProductosFacturasComponent implements OnInit {
       Factura : ['', Validators.required],
       NotaCredito : [''],
       IdProducto : [''],
-      CantidadProducto : [''],
+      CantidadProducto : [null],
       ProdNombre: [''],
       Cliente: [null, Validators.required],
       Observacion : [''],
