@@ -20,7 +20,7 @@
   </div>
 </div>
 
-<div class="formulario">
+<div class="formulario font-size-14">
   <form [formGroup]="FormMateriaPrima">
     <div class="mb-3">
       <div class="row g-3">
@@ -80,7 +80,7 @@
       </div>
     </div>
   </form>
-<div class="container-fluid font-size-14">
+
   <div class="mb-3" *ngIf="load">
     <div class="row g-3 font-size-14" id="table">
       <p-table
@@ -153,24 +153,24 @@
           </tr>
         </ng-template>
 
-          <ng-template pTemplate="body" let-materiaPrima>
-            <tr>
-              <td>{{materiaPrima.Id}}</td>
-              <td>{{materiaPrima.Nombre}}</td>
-              <td>{{materiaPrima.Ancho}}</td>
-              <td>{{materiaPrima.Inicial | number}}</td>
-              <td>{{materiaPrima.Entrada | number}}</td>
-              <td>{{materiaPrima.Salida | number}}</td>
-              <th class="columnaCantidad">{{materiaPrima.Cant | number}}</th>
-              <td>{{materiaPrima.Diferencia | number}}</td>
-              <td>{{materiaPrima.UndCant}}</td>
-              <ng-container *ngIf="ValidarRol == 1">
-                <td>{{materiaPrima.PrecioUnd | number}}</td>
-                <td>{{materiaPrima.SubTotal | number}}</td>
-              </ng-container>
-              <td>{{materiaPrima.Categoria}}</td>
-            </tr>
-          </ng-template>
+        <ng-template pTemplate="body" let-materiaPrima>
+          <tr>
+            <td>{{materiaPrima.Id}}</td>
+            <td>{{materiaPrima.Nombre}}</td>
+            <td>{{materiaPrima.Ancho}}</td>
+            <td>{{materiaPrima.Inicial | number}}</td>
+            <td>{{materiaPrima.Entrada | number}}</td>
+            <td>{{materiaPrima.Salida | number}}</td>
+            <th class="columnaCantidad">{{materiaPrima.Cant | number}}</th>
+            <td>{{materiaPrima.Diferencia | number}}</td>
+            <td>{{materiaPrima.UndCant}}</td>
+            <ng-container *ngIf="ValidarRol == 1">
+              <td>{{materiaPrima.PrecioUnd | number}}</td>
+              <td>{{materiaPrima.SubTotal | number}}</td>
+            </ng-container>
+            <td>{{materiaPrima.Categoria}}</td>
+          </tr>
+        </ng-template>
 
         <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
           <tr>
@@ -186,9 +186,7 @@
           </tr>
         </ng-template>
 
-        </p-table>
-      </div>
-    </div>
+      </p-table>
     </div>
   </div>
 </div>
