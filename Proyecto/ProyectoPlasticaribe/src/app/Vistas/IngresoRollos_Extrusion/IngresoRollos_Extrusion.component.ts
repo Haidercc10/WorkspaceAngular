@@ -113,6 +113,9 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
     let rollos : any = [];
     let consulta : number;
 
+    fechaInicial != null ? fechaInicial = moment(fechaInicial).format('YYYY-MM-DD') : fechaInicial = null;
+    fechaFinal != null ? fechaFinal = moment(fechaFinal).format('YYYY-MM-DD') : fechaFinal = null;
+
     if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
       this.rollos = [];
       this.rollosInsertar = [];
@@ -601,7 +604,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
           this.cargando = true;
         }, 4000);
       }, 3000);
-    } else Swal.fire("¡La fecha seleccionada no es valida!");
+    } else this.mensajeAdvertencia("¡La fecha seleccionada no es valida!");
   }
 
   // Funcion que colocará los rollos que se van a insertar
@@ -742,7 +745,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   //Funcion que se encargará de lenviar el mensaje de confirmación del envio y limpiará los campos
   finalizarInsercion(id : number){
-    Swal.fire({ icon: 'success', title: '', text : '¡${this.totalRollos} rollos han sido ingresados correctamente!', showCloseButton: true, });
+    Swal.fire({ icon: 'success', title: 'Rollos Ingresados Exitosamente', text : `¡${this.totalRollos} rollos han sido ingresados correctamente!`, showCloseButton: true, });
     this.buscarRolloPDF(id);
   }
 

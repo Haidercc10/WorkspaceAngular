@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -7,7 +7,6 @@ import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradas
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 
 
@@ -33,6 +32,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   totalCantidad : number = 0; //Variable que almacenará la cantidad de total de kg de los rollos escogidos
   rollosPDF : any [] = []; //Variable que almacenará la informacion de los rollos salientes
   error : boolean = false; //Variable que ayudará a saber si ocurre un error con la eliminación de algun rollo
+  bodegas : any [] = [{Nombre: 'Bodega Extrusion', Id: 'EXT'}, {Nombre: 'Bodega Despacho', Id: 'DESP'}];
   public arrayProcesos = [];
   public display : boolean = false;
   public bodegaExtrusion : boolean = false;
@@ -121,14 +121,19 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que va a consultar los rollos
   consultarRollos(){
+    console.log(this.FormConsultarRollos.value);
     let ot : number = this.FormConsultarRollos.value.OT_Id;
     let fechaInicial : any = this.FormConsultarRollos.value.fechaDoc;
     let fechaFinal : any = this.FormConsultarRollos.value.fechaFinalDoc;
     let rollo : number = this.FormConsultarRollos.value.IdRollo;
-    let proceso : string = this.FormConsultarRollos.value.Proceso;
-    let bodega : string = this.FormConsultarRollos.value.Bodega;
+    let proceso : any = this.FormConsultarRollos.value.Proceso;
+    let bodega : any = this.FormConsultarRollos.value.Bodega;
     let rollos : any = [];
     let consulta : number;
+    proceso != null ? proceso = proceso.proceso_Nombre : proceso = null;
+    bodega == null ? bodega = null : bodega = bodega.Id;
+    console.log(proceso)
+    console.log(bodega)
     this.rollos = [];
     this.error = false;
     this.rollosInsertar = [];
@@ -587,7 +592,8 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   eliminarRolloIngresado(){
     this.display = false;
     this.cargando = false;
-    let proceso : string = this.FormConsultarRollos.value.Proceso;
+    let proceso : any = this.FormConsultarRollos.value.Proceso;
+    proceso != null ? proceso = proceso.proceso_Nombre : proceso = null;
 
     if(proceso == 'Extrusion' && this.bodegaExtrusion == true) {
       for (let i = 0; i < this.rollosInsertar.length; i++) {
@@ -608,7 +614,8 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   eliminarRolloBagpro(){
     this.display = false;
     this.cargando = false;
-    let proceso : string = this.FormConsultarRollos.value.Proceso;
+    let proceso : any = this.FormConsultarRollos.value.Proceso;
+    proceso != null ? proceso = proceso.proceso_Nombre : proceso = null;
     if(this.bodegaExtrusion == true) {
       if(proceso == 'Extrusion') {
         for (let i = 0; i < this.rollosInsertar.length; i++) {

@@ -24,3 +24,34 @@ span{
 .tabla1{
   display: flex;
 }
+
+.p-input-icon-left {
+  width: 100%;
+}
+
+p-dropdown ::ng-deep .p-dropdown, p-inputnumber, p-inputnumber ::ng-deep span, p-calendar, p-calendar ::ng-deep span {
+  display: flex;
+  width: 100%;
+}
+
+p-calendar ::ng-deep span button {
+  background-color: var(--rojo);
+  border: 0;
+  transition: all 1s;
+}
+
+p-calendar ::ng-deep span .p-datepicker-trigger:hover {
+  background: var(--rojoHover);
+}
+
+p-calendar ::ng-deep .p-datepicker-header button {
+  background: #fff0;
+}
+
+p-calendar ::ng-deep .p-datepicker-header button:hover {
+  background: #fff0;
+}
+
+p-calendar ::ng-deep span button span {
+  display: block;
+}
