@@ -52,8 +52,8 @@ export class AsignacionTintasComponent implements OnInit {
     this.FormMateriaPrima = this.frmBuilder.group({
       idMateriaPrima : ['', Validators.required],
       nombreMateriaPrima : ['', Validators.required],
-      stockMateriaPrima : ['', Validators.required],
-      cantidadMateriaPrima : ['', Validators.required],
+      stockMateriaPrima : [null, Validators.required],
+      cantidadMateriaPrima : [null, Validators.required],
       undMedMateriaPrima : ['', Validators.required],
     });
   }
@@ -139,7 +139,11 @@ export class AsignacionTintasComponent implements OnInit {
 
   //Funcion para  obtener las unidades de medidas
   obtenerUnidadesMedida() {
-    this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => { this.unidadMedida = datos_unidadesMedida; });
+    this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => {
+      for (let i = 0; i < datos_unidadesMedida.length; i++) {
+        this.unidadMedida.push(datos_unidadesMedida[i].undMed_Id);
+      }
+    });
   }
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista

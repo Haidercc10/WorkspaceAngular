@@ -4,7 +4,6 @@
   min-height: 500px;
   background-size: cover;
   background-attachment: fixed;
-  font-family: 'Ubuntu', sans-serif;
 }
 
 .contenedorLogin {
@@ -89,7 +88,7 @@ a {
   height: 50px;
 }
 
-.pi {
+.pi-eye, .pi-eye-slash {
   cursor: pointer;
 }
 

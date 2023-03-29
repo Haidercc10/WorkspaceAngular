@@ -1,681 +1,683 @@
 <app-menuLateral></app-menuLateral>
 
-<!-- MENSAJE DE ADVERTENCIA -->
-<p-toast position="center" key="tc"></p-toast>
+<div class="fondo">
+  <!-- MENSAJE DE ADVERTENCIA -->
+  <p-toast position="center" key="tc"></p-toast>
 
-<!-- INFORMACION GENERAL DE LA EMPRESA Y SUS MOVIMIENTOS -->
-<div class="container-fluid contenedorCards" *ngIf="!displayTerminal" id="card">
-  <p-tabView (onChange)="handleChange($event)">
-    <!-- ORDENES DE TRABAJO -->
-    <p-tabPanel
-      header="Ordenes de Trabajo"
-      leftIcon="pi pi-sliders-h"
-      tooltip="Información de Ordenes de Trabajo"
-      *ngIf="ValidarRol == 1">
-      <div class="row row-cols-1 row-cols-md-3 g-4">
-        <!-- CANTIDAD ORDENES -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Ordenes de Trabajo Creadas</h5>
-              <p class="font-size-15">El último mes (desde el día <b>{{primerDiaMes}}</b> hasta el día <b>{{today}}</b>) se han creado <b>{{totalOrdenesMes | number}}</b> ordenes de trabajo.</p>
-              <p class="font-size-15">El costo estimado de las ordenes de trabajo creadas el último mes es de <b>{{costoTotalOrdenesMes | currency : ' COP $'}}</b></p>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of materialesOrdenesMes; let i=index">
-                  <span class="font-size-15">{{i+1}}) <b>{{item.extMaterialNom}}:</b> Cantidad de Ordenes: <b>{{item.cantidad | number}}</b>.<br> Peso Total: <b>{{item.peso | number}}</b> Kg.<br> Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
-                </p>
+  <!-- INFORMACION GENERAL DE LA EMPRESA Y SUS MOVIMIENTOS -->
+  <div class="container-fluid contenedorCards" *ngIf="!displayTerminal" id="card">
+    <p-tabView (onChange)="handleChange($event)">
+      <!-- ORDENES DE TRABAJO -->
+      <p-tabPanel
+        header="Ordenes de Trabajo"
+        leftIcon="pi pi-sliders-h"
+        tooltip="Información de Ordenes de Trabajo"
+        *ngIf="ValidarRol == 1">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <!-- CANTIDAD ORDENES -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Ordenes de Trabajo Creadas</h5>
+                <p class="font-size-15">El último mes (desde el día <b>{{primerDiaMes}}</b> hasta el día <b>{{today}}</b>) se han creado <b>{{totalOrdenesMes | number}}</b> ordenes de trabajo.</p>
+                <p class="font-size-15">El costo estimado de las ordenes de trabajo creadas el último mes es de <b>{{costoTotalOrdenesMes | currency : ' COP $'}}</b></p>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of materialesOrdenesMes; let i=index">
+                    <span class="font-size-15">{{i+1}}) <b>{{item.extMaterialNom}}:</b> Cantidad de Ordenes: <b>{{item.cantidad | number}}</b>.<br> Peso Total: <b>{{item.peso | number}}</b> Kg.<br> Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <!-- ESTADOS ORDENES -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Estados de Ordenes de Trabajo</h5>
-              <p class="font-size-15">De todas las ordenes de trabajo creadas el último mes, hasta el momento hay:</p>
-              <p class="font-size-15">
-                Ordenes No Iniciadas:
-                <button pButton
-                        type="button"
-                        tooltip="Graficar la información de los clientes"
-                        class="p-button-warning"
-                        data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop"
-                        style="height: 10px;"
-                        (click)="mostrarModalEstados('Abierta')">
-                        {{catidadOTAbiertas | number}}
-                </button>
-              </p>
-              <p class="font-size-15">
-                Ordenes con Materia Prima Asignada:
-                <button pButton
-                        type="button"
-                        class="azul"
-                        tooltip="Graficar la información de los clientes"
-                        data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop"
-                        style="height: 10px;"
-                        (click)="mostrarModalEstados('Asignada')">
-                        {{cantidadOTAsignadas | number}}
-                </button>
-              </p>
-              <p class="font-size-15">
-                Ordenes Inciadas:
-                <button pButton
-                        type="button"
-                        class="amarillo p-button-warning"
-                        tooltip="Graficar la información de los clientes"
-                        data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop"
-                        style="height: 10px;"
-                        (click)="mostrarModalEstados('Inciadas')">
-                        {{cantidadOTIniciada | number}}
-                </button>
-              </p>
-              <p class="font-size-15">
-                Ordenes Terminadas:
-                <button pButton
-                        type="button"
-                        class="verde p-button-success"
-                        tooltip="Graficar la información de los clientes"
-                        data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop"
-                        style="height: 10px;"
-                        (click)="mostrarModalEstados('Terminadas')">
-                        {{cantidadOTTerminada | number}}
-                </button>
-              </p>
-              <p class="font-size-15">
-                Ordenes Anuladas:
-                <button pButton
-                        type="button"
-                        class="rojo p-button-danger"
-                        tooltip="Graficar la información de los clientes"
-                        data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop"
-                        style="height: 10px;"
-                        (click)="mostrarModalEstados('Anuladas')">
-                        {{cantidadOtAnulada | number}}
-                </button>
-              </p>
-              <p class="font-size-15">
-                Ordenes Revisadas:
-                <button pButton
-                        type="button"
-                        class="verde2 p-button-success"
-                        tooltip="Graficar la información de los clientes"
-                        data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop"
-                        style="height: 10px;"
-                        (click)="mostrarModalEstados('Cerradas')">
-                        {{cantidadOTCerrada | number}}
-                </button>
-              </p>
-              <br>
-              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaEstadosOrdenes()"></button>
-            </div>
-          </div>
-        </div>
-        <!-- PRODUCCION TOTAL DEL MES -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Cantidad Producida Por Procesos</h5>
-              <ng-container *ngIf="totalOrdenesMes == 0; then OrdenesCero; else OrdenesMayorCero"></ng-container>
-              <ng-template #OrdenesCero>
-                <p class="font-size-15">Estas son las cantidades producidas por cada procesos creadas en el último mes:</p>
+          <!-- ESTADOS ORDENES -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Estados de Ordenes de Trabajo</h5>
+                <p class="font-size-15">De todas las ordenes de trabajo creadas el último mes, hasta el momento hay:</p>
                 <p class="font-size-15">
-                  <span class="font-size-15"><b>Extrusión:</b> 0 Kg</span><br>
-                  <span class="font-size-15"><b>Impresión:</b> 0 Kg</span><br>
-                  <span class="font-size-15"><b>Rotograbado</b>: 0 Kg</span><br>
-                  <span class="font-size-15"><b>Laminado:</b> 0 Kg</span><br>
-                  <span class="font-size-15"><b>Corte:</b> 0 Kg</span><br>
-                  <span class="font-size-15"><b>Doblado:</b> 0 Kg</span><br>
-                  <span class="font-size-15"><b>Sellado:</b> 0 Kg - 0 Und</span>
+                  Ordenes No Iniciadas:
+                  <button pButton
+                          type="button"
+                          tooltip="Graficar la información de los clientes"
+                          class="p-button-warning"
+                          data-bs-toggle="modal"
+                          data-bs-target="#staticBackdrop"
+                          style="height: 10px;"
+                          (click)="mostrarModalEstados('Abierta')">
+                          {{catidadOTAbiertas | number}}
+                  </button>
                 </p>
-              </ng-template>
-              <ng-template #OrdenesMayorCero>
-                <p class="font-size-15">Estas son las cantidades producidas por cada procesos creadas en el último mes:</p>
-                <p class="font-size-15" *ngFor="let item of procesosOrdenesMes; let i=index">
-                  <span class="font-size-15"><b>{{item.Nombre}}:</b> {{item.cantidad | number}} Kg <label *ngIf="item.Nombre == 'SELLADO' || item.Nombre == 'Wiketiado'"> - {{item.und | number}} Und</label></span><br>
+                <p class="font-size-15">
+                  Ordenes con Materia Prima Asignada:
+                  <button pButton
+                          type="button"
+                          class="azul"
+                          tooltip="Graficar la información de los clientes"
+                          data-bs-toggle="modal"
+                          data-bs-target="#staticBackdrop"
+                          style="height: 10px;"
+                          (click)="mostrarModalEstados('Asignada')">
+                          {{cantidadOTAsignadas | number}}
+                  </button>
                 </p>
-              </ng-template>
+                <p class="font-size-15">
+                  Ordenes Inciadas:
+                  <button pButton
+                          type="button"
+                          class="amarillo p-button-warning"
+                          tooltip="Graficar la información de los clientes"
+                          data-bs-toggle="modal"
+                          data-bs-target="#staticBackdrop"
+                          style="height: 10px;"
+                          (click)="mostrarModalEstados('Inciadas')">
+                          {{cantidadOTIniciada | number}}
+                  </button>
+                </p>
+                <p class="font-size-15">
+                  Ordenes Terminadas:
+                  <button pButton
+                          type="button"
+                          class="verde p-button-success"
+                          tooltip="Graficar la información de los clientes"
+                          data-bs-toggle="modal"
+                          data-bs-target="#staticBackdrop"
+                          style="height: 10px;"
+                          (click)="mostrarModalEstados('Terminadas')">
+                          {{cantidadOTTerminada | number}}
+                  </button>
+                </p>
+                <p class="font-size-15">
+                  Ordenes Anuladas:
+                  <button pButton
+                          type="button"
+                          class="rojo p-button-danger"
+                          tooltip="Graficar la información de los clientes"
+                          data-bs-toggle="modal"
+                          data-bs-target="#staticBackdrop"
+                          style="height: 10px;"
+                          (click)="mostrarModalEstados('Anuladas')">
+                          {{cantidadOtAnulada | number}}
+                  </button>
+                </p>
+                <p class="font-size-15">
+                  Ordenes Revisadas:
+                  <button pButton
+                          type="button"
+                          class="verde2 p-button-success"
+                          tooltip="Graficar la información de los clientes"
+                          data-bs-toggle="modal"
+                          data-bs-target="#staticBackdrop"
+                          style="height: 10px;"
+                          (click)="mostrarModalEstados('Cerradas')">
+                          {{cantidadOTCerrada | number}}
+                  </button>
+                </p>
+                <br>
+                <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaEstadosOrdenes()"></button>
+              </div>
+            </div>
+          </div>
+          <!-- PRODUCCION TOTAL DEL MES -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Cantidad Producida Por Procesos</h5>
+                <ng-container *ngIf="totalOrdenesMes == 0; then OrdenesCero; else OrdenesMayorCero"></ng-container>
+                <ng-template #OrdenesCero>
+                  <p class="font-size-15">Estas son las cantidades producidas por cada procesos creadas en el último mes:</p>
+                  <p class="font-size-15">
+                    <span class="font-size-15"><b>Extrusión:</b> 0 Kg</span><br>
+                    <span class="font-size-15"><b>Impresión:</b> 0 Kg</span><br>
+                    <span class="font-size-15"><b>Rotograbado</b>: 0 Kg</span><br>
+                    <span class="font-size-15"><b>Laminado:</b> 0 Kg</span><br>
+                    <span class="font-size-15"><b>Corte:</b> 0 Kg</span><br>
+                    <span class="font-size-15"><b>Doblado:</b> 0 Kg</span><br>
+                    <span class="font-size-15"><b>Sellado:</b> 0 Kg - 0 Und</span>
+                  </p>
+                </ng-template>
+                <ng-template #OrdenesMayorCero>
+                  <p class="font-size-15">Estas son las cantidades producidas por cada procesos creadas en el último mes:</p>
+                  <p class="font-size-15" *ngFor="let item of procesosOrdenesMes; let i=index">
+                    <span class="font-size-15"><b>{{item.Nombre}}:</b> {{item.cantidad | number}} Kg <label *ngIf="item.Nombre == 'SELLADO' || item.Nombre == 'Wiketiado'"> - {{item.und | number}} Und</label></span><br>
+                  </p>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <!-- ORDENES POR CLIENTES -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Ordenes de Trabajo Por Cliente</h5>
+                <p class="font-size-15">Ranking de clientes a los que se le ha hecho más ordenes de trabajo en el último mes:</p>
+                <div style="height: 10%; text-align: center;">
+                  <button pButton pTooltip="Ordenar por Número de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarClientesCantOrdenes()"></button>
+                  <button pButton pTooltip="Ordenar por Costo Total de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarClientesCostoOrdenes()"></button>
+                  <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button>
+                </div>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of clientesOrdenesMes; let i=index;">
+                    <span>{{i + 1}}) <b>{{item.clienteNom}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas por un valor total de <b>{{item.costo | currency : ' COP $'}}</b> y un peso total de <b>{{item.peso | number}} Kg</b>.</span>
+                  </p>
+                </div>
+                <br>
+                <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaClientes()"></button>
+              </div>
+            </div>
+          </div>
+          <!-- ORDENES POR PRODUCTOS -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Ordenes de Trabajo Por Producto</h5>
+                <p class="font-size-15">Ranking de productos a los que más se le ha hecho ordenes de trabajo en el último mes:</p>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of productosOrdenesMes; let i=index">
+                    <span>{{i + 1}}) <b>{{item.prod_Nombre}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas.</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- ORDENES POR VENDEDORES -->
+          <div class="col">
+            <div class="card h-100">
+              <!-- <img class="banner" src="assets/Imagenes_Cards/vendedor.jpg" class="card-img-top" alt="..."> -->
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Ordenes de Trabajo Por Vendedores</h5>
+                <p class="font-size-15">Ranking de vendedores a los que más se les ha hecho ordenes de trabajo en el ultimo mes: </p>
+                <div style="height: 10%; text-align: center;">
+                  <button pButton pTooltip="Ordenar por Número de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarVendedoresCantOrdenes()"></button>
+                  <button pButton pTooltip="Ordenar por Costo Total de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarVendedoresCostoOrdenes()"></button>
+                  <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarVendedoresPesoOrdenes()"></button>
+                </div>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of vendedorOrdenesMes; let i=index">
+                    <span>{{i + 1}}) <b>{{item.nombreCompleto}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas por un valor total de <b>{{item.costo | currency : ' COP $'}}</b> y un peso de <b>{{item.peso | number}} Kg</b>.</span>
+                  </p>
+                </div>
+                <br>
+                <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los vendedores" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaVendedores()"></button>
+              </div>
             </div>
           </div>
         </div>
-        <!-- ORDENES POR CLIENTES -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Ordenes de Trabajo Por Cliente</h5>
-              <p class="font-size-15">Ranking de clientes a los que se le ha hecho más ordenes de trabajo en el último mes:</p>
-              <div style="height: 10%; text-align: center;">
-                <button pButton pTooltip="Ordenar por Número de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarClientesCantOrdenes()"></button>
-                <button pButton pTooltip="Ordenar por Costo Total de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarClientesCostoOrdenes()"></button>
-                <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button>
-              </div>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of clientesOrdenesMes; let i=index;">
-                  <span>{{i + 1}}) <b>{{item.clienteNom}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas por un valor total de <b>{{item.costo | currency : ' COP $'}}</b> y un peso total de <b>{{item.peso | number}} Kg</b>.</span>
-                </p>
-              </div>
-              <br>
-              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaClientes()"></button>
-            </div>
-          </div>
-        </div>
-        <!-- ORDENES POR PRODUCTOS -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Ordenes de Trabajo Por Producto</h5>
-              <p class="font-size-15">Ranking de productos a los que más se le ha hecho ordenes de trabajo en el último mes:</p>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of productosOrdenesMes; let i=index">
-                  <span>{{i + 1}}) <b>{{item.prod_Nombre}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas.</span>
-                </p>
+      </p-tabPanel>
+
+      <!-- FACTURACION -->
+      <p-tabPanel
+        header="Facturación"
+        leftIcon="pi pi-wallet"
+        tooltip="Información de las Materias Primas"
+        *ngIf="ValidarRol == 1 || ValidarRol == 60">
+        <div class="row row-cols-1 row-cols-md-4 g-3">
+          <!-- Facturacion Dia  -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20"></h5>
+                <h6><i class="pi pi-truck"></i> Ventas del Mes</h6>
+                <h4><b>{{totalFacuturadoMes | currency : ' COP $'}}</b></h4>
+                <p class="font-size-15"></p>
               </div>
             </div>
           </div>
+          <!--  -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20"></h5>
+                <h6><i class="pi pi-wallet"></i> Iva Ventas del Mes</h6>
+                <h4><b>{{totalIvaVentaMes | currency : ' COP $'}}</b></h4>
+                <p class="font-size-15"></p>
+              </div>
+            </div>
+          </div>
+          <!--  -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20"></h5>
+                <h6><i class="pi pi-money-bill"></i> Total Ventas del Mes</h6>
+                <h4><b>{{totalFacuturadoMes +  totalIvaVentaMes | currency : ' COP $'}}</b></h4>
+                <p class="font-size-15"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20"></h5>
+                <h6 class="tituloRojo"><i class="pi pi-credit-card"></i> Total Iva Compras del Mes</h6>
+                <h4><b>{{totalIvaCompraMes | currency : ' COP $'}}</b></h4>
+                <p class="font-size-15"></p>
+              </div>
+            </div>
+          </div> -->
+
+          <!--  -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20"></h5>
+                <h6><i class="pi pi-dollar"></i> Ventas del Día</h6>
+                <h4><b>{{totalFacturadoDia | currency : ' COP $'}}</b></h4>
+                <p class="font-size-15"></p>
+              </div>
+            </div>
+          </div>
         </div>
-        <!-- ORDENES POR VENDEDORES -->
-        <div class="col">
-          <div class="card h-100">
-            <!-- <img class="banner" src="assets/Imagenes_Cards/vendedor.jpg" class="card-img-top" alt="..."> -->
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Ordenes de Trabajo Por Vendedores</h5>
-              <p class="font-size-15">Ranking de vendedores a los que más se les ha hecho ordenes de trabajo en el ultimo mes: </p>
-              <div style="height: 10%; text-align: center;">
-                <button pButton pTooltip="Ordenar por Número de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarVendedoresCantOrdenes()"></button>
-                <button pButton pTooltip="Ordenar por Costo Total de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarVendedoresCostoOrdenes()"></button>
-                <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarVendedoresPesoOrdenes()"></button>
+
+        <!-- Graficas de facturación -->
+        <br>
+        <div class="row row-cols-1 row-cols-md-1 g-3 graficaFacturacion">
+          <p-tabView>
+            <!-- VENTAS -->
+            <p-tabPanel
+              header="Ventas"
+              leftIcon="pi pi-wallet"
+              tooltip="Información de las Materias Primas"
+              *ngIf="ValidarRol == 1 || ValidarRol == 60">
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <p-dropdown [options]="anos" [(ngModel)]="anoSeleccionado" (onChange)="facturacion()"></p-dropdown>
               </div>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of vendedorOrdenesMes; let i=index">
-                  <span>{{i + 1}}) <b>{{item.nombreCompleto}}</b> con <label class="verdeClientes">{{item.cantidad | number}}</label> ordenes creadas por un valor total de <b>{{item.costo | currency : ' COP $'}}</b> y un peso de <b>{{item.peso | number}} Kg</b>.</span>
-                </p>
+              <div class="row row-cols-1 row-cols-md-1 g-3">
+                <div class="card">
+                  <p-chart type="line" [data]="facturasData" [options]="facturasOptions"></p-chart>
+                </div>
               </div>
-              <br>
-              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los vendedores" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaVendedores()"></button>
+            </p-tabPanel>
+
+            <!-- IVA COMPRA -->
+            <!-- <p-tabPanel
+              header="Iva Compra"
+              leftIcon="pi pi-wallet"
+              tooltip="Información de las Materias Primas"
+              *ngIf="ValidarRol == 1">
+              <div class="row row-cols-1 row-cols-md-1 g-3">
+                <div class="card">
+                  <p-chart type="line" width="100%" height="100%" [data]="ivaCompraData" [options]="ivaCompraOptions"></p-chart>
+                </div>
+              </div>
+            </p-tabPanel> -->
+          </p-tabView>
+        </div>
+      </p-tabPanel>
+
+      <!-- MATERIA PRIMA -->
+      <p-tabPanel
+        header="Materia Prima"
+        leftIcon="pi pi-box"
+        tooltip="Información de las Materias Primas"
+        *ngIf="ValidarRol == 1 || ValidarRol == 60">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <!--  -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Inventario de Materias Primas.</h5>
+                <p class="font-size-15">Esta es una breve vista del inventario de materia prima donde se podrá ver la cantidad con la que inició cada materia prima hoy y en cuanto está su inventario actual.</p>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of inventarioMateriaPrima; let i=index">
+                    <span>{{i + 1}}) <b>{{item.nombre_Materia_Prima}}</b> con un inventario inicial de <b>{{item.inicial | number}} Kg</b> y un inventario actual de <b>{{item.actual | number}} Kg</b>. <br></span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- INFORMACION ROLLOS DEPOLIPROPILENO BIORIENTADO -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Rollos de polipropileno biorientado.</h5>
+                <p class="font-size-15">En la bodega de materias primas hay <b>{{cantRollosBopp | number}}</b> rollo de BOPP.</p>
+                <p class="font-size-15">En la bodega de materias primas hay <b>{{cantRollosBopa | number}}</b> rollo de BOPA.</p>
+                <p class="font-size-15">En la bodega de materias primas hay <b>{{cantRollosPoliester | number}}</b> rollo de Poliester.</p>
+                <!-- <p class="font-size-15">El costo de estos rollos de polipropileno biorientado es de {{sumaPrecioRollos | currency : ' COP $'}}.</p> -->
+                <p class="font-size-15">En el mes (desde el día <b>{{primerDiaMes}}</b> hasta el día <b>{{today}}</b>) se han ingresado <b>{{cantRollosEntrantes | number}}</b> rollo(s) al inventario y se han utilizado <b>{{cantRollosUtilizados | number}}</b> rollo(s) en el mes.</p>
+              </div>
+            </div>
+          </div>
+          <!-- MATERIAS PRIMAS QUE SE MOVIERON DURANTE EL DIA -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Materia primas que se asignaron hoy.</h5>
+                <p class="font-size-15">Estas son las materias primas que se han asignado el día de hoy:</p>
+                <p *ngIf="materiasPrimasMovidasHoy.length == 0"><b>No ha habido asignaciones de materias primas el día de hoy.</b></p>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of materiasPrimasMovidasHoy; let i = index">
+                    <span>{{i + 1}})<b> {{item.nombre}}</b> ha sido utilizada en <b>{{item.asignaciones | number}}</b> asignacion(es), se han utilizado <label class="rojo">{{item.cantidad | number}}</label> Kg.</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- TINTAS CREADAS DURANTE EL MES Y LA CANTIDAD DE CADA UNA -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Tintas creadas en el mes y cantidad total de cada una.</h5>
+                <p>En lo que va del mes se han creado {{cantTintasCreadas}} tintas las cuales son:</p>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of tintasCreadas; let i=index">
+                    <span>{{i + 1}}) <b>{{item.tinta_Nombre}}</b> con una cantidad de <b>{{item.cantidad | number}} Kg</b></span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- MATERIAS PRIMAS MAS UTILIZADAS EN EL MES -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Ranking de materias primas que más se ha utilizado en el mes.</h5>
+                <p>Ranking de materias primas y tintas más utilizadas en el mes</p>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of materiasPrimasMasUtilizadasMes; let i=index">
+                    <span>{{i + 1}}) <b>{{item.nombre}}</b>, se han utilizado <b>{{item.cantidad | number}} Kg.</b> </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- MATERIAS PRIMAS MAS UTILIZADAS PARA LA CREACION DE TINTAS -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Ranking de materia primas que más se utilizan para crear tintas.</h5>
+                <p>Este es el ranking que mas se han utilizado durante el mes para la crecaión de tintas.</p>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of materiasPrimasMasUtilizadasCrearTintaMes; let i=index">
+                    <span>{{i + 1}}) <b>{{item.tinta_Nombre}}</b> con una cantidad de <b>{{item.cantidad | number}} Kg</b>.</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--  -->
+          <div class="col">
+            <div class="card h-100">
+              <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Comparativo de Materia Prima</h5>
+                <span class="font-size-15">
+                  Comparativo de la Materia Prima que se ha asignado a las Ordenes de Trabajo creadas en el último mes con la Materia Prima que se ha extruido de las Ordenes de Trabajo creadas en el último mes:
+                  <ol>
+                    <b><li>Materia Prima Asignada {{totalMpAsignada | number}} Kg</li></b>
+                    <b><li>Materia Prima Extruida {{totalExtruidoMes | number}} Kg</li></b>
+                  </ol>
+                </span>
+                <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar el comparativo de materia prima" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#comparativoMP" (click)="llenarGraficaComparativo()"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- PEDIDOS -->
+      <p-tabPanel
+        header="Pedidos"
+        leftIcon="pi pi-shopping-bag"
+        tooltip="Información de los Pedidos creados en Zeus"
+        *ngIf="ValidarRol == 1 || ValidarRol == 60">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <!-- CARD 1 -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Cantidad Total de pedidos.</h5>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of pedidosTotales; let i=index">
+                    <span class="font-size-15">Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
+                  </p>
+                </div>
+                <br>
+                <h5 class="font-size-20">Número de pedidos por estados.</h5>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of pedidosEstados; let i=index">
+                    <span class="font-size-15">{{i+1}}) <b>{{item.estado}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 2 -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Número de pedidos con ordenes de trabajo asociadas.</h5>
+                <p class="font-size-15"></p>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of pedidos_Ot; let i=index">
+                    <span class="font-size-15">{{i+1}}) Pedido: <b>{{item.pedido}}</b> <br> Orden de Trabajo: <b>{{item.orden}}</b> <br> Producto: <b>{{item.producto}}</b><br> Cliente: <b>{{item.cliente}}</b>. <br> Proceso de La OT: <b>{{item.proceso}}</b></span><br>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 3 -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Listado de pedidos en los que el stock del producto pedido sea mayor o igual que la cantidad que está pendiente.</h5>
+                <p class="font-size-15"></p>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of pedidosStock; let i=index">
+                    <span class="font-size-15">{{i+1}}) Pedido: <b>{{item.consecutivo}}</b> <br> Producto: <b>{{item.producto}}</b><br> Existencias: <label class="verdePedidos"><b>{{item.existencias | number}}</b></label>.<br> Cantidad Pendiente: <b>{{item.cant_Pendiente | number}}</b></span><br>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- CARD 4 -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Ranking de cantidad de pedidos por clientes. <br> Ranking de costo de pedidos por clientes.</h5>
+                <p class="font-size-15"></p>
+                <div style="height: 10%; text-align: center;">
+                  <button pButton pTooltip="Ordenar por Número de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarClienteCantidad_Pedidos()"></button>
+                  <button pButton pTooltip="Ordenar por Costo Total de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarClienteCosto_Pedidos()"></button>
+                  <!-- <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button> -->
+                </div>
+                <br>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of pedidosClientes; let i=index">
+                    <span class="font-size-15">{{i+1}}) <b>{{item.cliente}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
+                  </p>
+                </div>
+                <br>
+                <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaClientes_Pedidos()"></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 5 -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Ranking de cantidad de pedidos por productos</h5>
+                <p class="font-size-15"></p>
+                <div style="height: 10%; text-align: center;">
+                  <button pButton pTooltip="Ordenar por Número de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarProductoCantidad_Pedidos()"></button>
+                  <button pButton pTooltip="Ordenar por Costo Total de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarProductoCosto_Pedidos()"></button>
+                  <!-- <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button> -->
+                </div>
+                <br>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of pedidosProductos; let i=index">
+                    <span class="font-size-15">{{i+1}}) <b>{{item.producto}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
+                  </p>
+                </div>
+                <br>
+                <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaProductos_Pedidos()"></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 6 -->
+          <div class="col">
+            <div class="card h-100">
+              <div class="banner"></div>
+              <div class="card-body">
+                <h5 class="font-size-20">Ranking de cantidad de pedidos por Vendedores. <br> Ranking de costo de pedidos por Vendedores.</h5>
+                <p class="font-size-15"></p>
+                <div style="height: 10%; text-align: center;">
+                  <button pButton pTooltip="Ordenar por Número de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarVendedorCantidad_Pedidos()"></button>
+                  <button pButton pTooltip="Ordenar por Costo Total de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarVendedorCosto_Pedidos()"></button>
+                  <!-- <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button> -->
+                </div>
+                <br>
+                <div class="scrollCard">
+                  <p class="font-size-15" *ngFor="let item of pedidosVendedores; let i = index;">
+                    <span>{{i + 1}}) <b>{{item.vendedor}}: </b>Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad}}</b></label> Costo Total: <b>{{item.costo | currency : 'COP $'}}</b></span><br>
+                  </p>
+                </div>
+                <br>
+                <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los vendedores" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaVendedores_Pedidos()"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
+
+    <!-- Model que mostrará la información de las ordenes de trabajo con un estado especifico -->
+    <ng-container *ngIf="modalEstadosOrdenes">
+      <div class="modal fade" id="staticBackdrop" aria-labelledby="reporteCostos" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabe">{{nombreModalEstados}}</h5>
+              <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
             </div>
           </div>
         </div>
       </div>
-    </p-tabPanel>
+    </ng-container>
 
-    <!-- FACTURACION -->
-    <p-tabPanel
-      header="Facturación"
-      leftIcon="pi pi-wallet"
-      tooltip="Información de las Materias Primas"
-      *ngIf="ValidarRol == 1 || ValidarRol == 60">
-      <div class="row row-cols-1 row-cols-md-4 g-3">
-        <!-- Facturacion Dia  -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20"></h5>
-              <h6><i class="pi pi-truck"></i> Ventas del Mes</h6>
-              <h4><b>{{totalFacuturadoMes | currency : ' COP $'}}</b></h4>
-              <p class="font-size-15"></p>
+    <!-- Modal en el que se va a mostrar la grafica con la información que se le pase -->
+    <ng-container *ngIf="mostrarGrafica">
+      <div class="modal fade" id="staticBackdrop2" aria-labelledby="reporteCostos" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel2">{{nombreGrafica}}</h5>
+              <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-          </div>
-        </div>
-        <!--  -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20"></h5>
-              <h6><i class="pi pi-wallet"></i> Iva Ventas del Mes</h6>
-              <h4><b>{{totalIvaVentaMes | currency : ' COP $'}}</b></h4>
-              <p class="font-size-15"></p>
-            </div>
-          </div>
-        </div>
-        <!--  -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20"></h5>
-              <h6><i class="pi pi-money-bill"></i> Total Ventas del Mes</h6>
-              <h4><b>{{totalFacuturadoMes +  totalIvaVentaMes | currency : ' COP $'}}</b></h4>
-              <p class="font-size-15"></p>
-            </div>
-          </div>
-        </div>
-
-        <!-- <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20"></h5>
-              <h6 class="tituloRojo"><i class="pi pi-credit-card"></i> Total Iva Compras del Mes</h6>
-              <h4><b>{{totalIvaCompraMes | currency : ' COP $'}}</b></h4>
-              <p class="font-size-15"></p>
-            </div>
-          </div>
-        </div> -->
-
-        <!--  -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20"></h5>
-              <h6><i class="pi pi-dollar"></i> Ventas del Día</h6>
-              <h4><b>{{totalFacturadoDia | currency : ' COP $'}}</b></h4>
-              <p class="font-size-15"></p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Graficas de facturación -->
-      <br>
-      <div class="row row-cols-1 row-cols-md-1 g-3 graficaFacturacion">
-        <p-tabView>
-          <!-- VENTAS -->
-          <p-tabPanel
-            header="Ventas"
-            leftIcon="pi pi-wallet"
-            tooltip="Información de las Materias Primas"
-            *ngIf="ValidarRol == 1 || ValidarRol == 60">
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-              <p-dropdown [options]="anos" [(ngModel)]="anoSeleccionado" (onChange)="facturacion()"></p-dropdown>
-            </div>
-            <div class="row row-cols-1 row-cols-md-1 g-3">
+            <div class="modal-body">
               <div class="card">
-                <p-chart type="line" [data]="facturasData" [options]="facturasOptions"></p-chart>
+                <h5 class="titulo_grafica">{{nombreGrafica}}</h5>
+                <p-chart type="bar" width="100%" height="100%" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
               </div>
             </div>
-          </p-tabPanel>
-
-          <!-- IVA COMPRA -->
-          <!-- <p-tabPanel
-            header="Iva Compra"
-            leftIcon="pi pi-wallet"
-            tooltip="Información de las Materias Primas"
-            *ngIf="ValidarRol == 1">
-            <div class="row row-cols-1 row-cols-md-1 g-3">
-              <div class="card">
-                <p-chart type="line" width="100%" height="100%" [data]="ivaCompraData" [options]="ivaCompraOptions"></p-chart>
-              </div>
-            </div>
-          </p-tabPanel> -->
-        </p-tabView>
+          </div>
+        </div>
       </div>
-    </p-tabPanel>
+    </ng-container>
 
-    <!-- MATERIA PRIMA -->
-    <p-tabPanel
-      header="Materia Prima"
-      leftIcon="pi pi-box"
-      tooltip="Información de las Materias Primas"
-      *ngIf="ValidarRol == 1 || ValidarRol == 60">
-      <div class="row row-cols-1 row-cols-md-3 g-4">
-        <!--  -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Inventario de Materias Primas.</h5>
-              <p class="font-size-15">Esta es una breve vista del inventario de materia prima donde se podrá ver la cantidad con la que inició cada materia prima hoy y en cuanto está su inventario actual.</p>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of inventarioMateriaPrima; let i=index">
-                  <span>{{i + 1}}) <b>{{item.nombre_Materia_Prima}}</b> con un inventario inicial de <b>{{item.inicial | number}} Kg</b> y un inventario actual de <b>{{item.actual | number}} Kg</b>. <br></span>
-                </p>
+    <!-- Modal en el que se mostrará una grafica de barras comparando la cantidad de materia prima asignada y la cantidad extruida -->
+    <ng-container *ngIf="mostrarGraficaComparativo">
+      <div class="modal fade" id="comparativoMP" aria-labelledby="Comparativo" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel2">Materia Prima Asignada vs Materia Prima Extruida</h5>
+              <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="card">
+                <h5 class="titulo_grafica">Materia Prima Asignada vs Materia Prima Extruida</h5>
+                <p-chart type="bar" width="100%" height="100%" [data]="ComparativoData" [options]="ComparativoOptions"></p-chart>
               </div>
             </div>
           </div>
         </div>
-        <!-- INFORMACION ROLLOS DEPOLIPROPILENO BIORIENTADO -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Rollos de polipropileno biorientado.</h5>
-              <p class="font-size-15">En la bodega de materias primas hay <b>{{cantRollosBopp | number}}</b> rollo de BOPP.</p>
-              <p class="font-size-15">En la bodega de materias primas hay <b>{{cantRollosBopa | number}}</b> rollo de BOPA.</p>
-              <p class="font-size-15">En la bodega de materias primas hay <b>{{cantRollosPoliester | number}}</b> rollo de Poliester.</p>
-              <!-- <p class="font-size-15">El costo de estos rollos de polipropileno biorientado es de {{sumaPrecioRollos | currency : ' COP $'}}.</p> -->
-              <p class="font-size-15">En el mes (desde el día <b>{{primerDiaMes}}</b> hasta el día <b>{{today}}</b>) se han ingresado <b>{{cantRollosEntrantes | number}}</b> rollo(s) al inventario y se han utilizado <b>{{cantRollosUtilizados | number}}</b> rollo(s) en el mes.</p>
-            </div>
-          </div>
-        </div>
-        <!-- MATERIAS PRIMAS QUE SE MOVIERON DURANTE EL DIA -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Materia primas que se asignaron hoy.</h5>
-              <p class="font-size-15">Estas son las materias primas que se han asignado el día de hoy:</p>
-              <p *ngIf="materiasPrimasMovidasHoy.length == 0"><b>No ha habido asignaciones de materias primas el día de hoy.</b></p>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of materiasPrimasMovidasHoy; let i = index">
-                  <span>{{i + 1}})<b> {{item.nombre}}</b> ha sido utilizada en <b>{{item.asignaciones | number}}</b> asignacion(es), se han utilizado <label class="rojo">{{item.cantidad | number}}</label> Kg.</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- TINTAS CREADAS DURANTE EL MES Y LA CANTIDAD DE CADA UNA -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Tintas creadas en el mes y cantidad total de cada una.</h5>
-              <p>En lo que va del mes se han creado {{cantTintasCreadas}} tintas las cuales son:</p>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of tintasCreadas; let i=index">
-                  <span>{{i + 1}}) <b>{{item.tinta_Nombre}}</b> con una cantidad de <b>{{item.cantidad | number}} Kg</b></span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- MATERIAS PRIMAS MAS UTILIZADAS EN EL MES -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Ranking de materias primas que más se ha utilizado en el mes.</h5>
-              <p>Ranking de materias primas y tintas más utilizadas en el mes</p>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of materiasPrimasMasUtilizadasMes; let i=index">
-                  <span>{{i + 1}}) <b>{{item.nombre}}</b>, se han utilizado <b>{{item.cantidad | number}} Kg.</b> </span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- MATERIAS PRIMAS MAS UTILIZADAS PARA LA CREACION DE TINTAS -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Ranking de materia primas que más se utilizan para crear tintas.</h5>
-              <p>Este es el ranking que mas se han utilizado durante el mes para la crecaión de tintas.</p>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of materiasPrimasMasUtilizadasCrearTintaMes; let i=index">
-                  <span>{{i + 1}}) <b>{{item.tinta_Nombre}}</b> con una cantidad de <b>{{item.cantidad | number}} Kg</b>.</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!--  -->
-        <div class="col">
-          <div class="card h-100">
-            <!-- <img class="banner" src="assets/Imagenes_Cards/bodega.jpg" class="card-img-top" alt="..." height="127.57px"> -->
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Comparativo de Materia Prima</h5>
-              <span class="font-size-15">
-                Comparativo de la Materia Prima que se ha asignado a las Ordenes de Trabajo creadas en el último mes con la Materia Prima que se ha extruido de las Ordenes de Trabajo creadas en el último mes:
-                <ol>
-                  <b><li>Materia Prima Asignada {{totalMpAsignada | number}} Kg</li></b>
-                  <b><li>Materia Prima Extruida {{totalExtruidoMes | number}} Kg</li></b>
-                </ol>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- DOCKER PARA ELEGIR LAS VISTAS FAVORITAS -->
+  <div class="dock-window dock-advanced">
+    <!-- Docker -->
+    <div class="fixed-bottom">
+      <p-dock [model]="dockItems" position="bottom">
+        <ng-template pTemplate="item" let-item>
+          <img [src]="item.icon" [alt]="item.label" width="100%" style="cursor: pointer;">
+        </ng-template>
+      </p-dock>
+    </div>
+
+    <!-- PickList -->
+    <div class="contenedorLista" id="contenedorLista" *ngIf="displayTerminal">
+      <div class="d-grid gap-2 d-md-flex justify-content-end">
+        <!-- Para cerrar el apartado donde se escogen y modifican las vistas favoritas se creó un label que al dar click sobre el dejará de mostrar este apartado -->
+        <label class="btnclose pi pi-times" mat-button (click)="cerrarLista()"></label>
+      </div>
+      <p-pickList
+        [source]="disponiblesMostrar"
+        [target]="targetProducts"
+        [showTargetControls]="false"
+        [showSourceControls]="false"
+        sourceHeader="Disponible"
+        targetHeader="Seleccionado"
+        [dragdrop]="true"
+        [metaKeySelection]="false"
+        [responsive]="true"
+        [sourceStyle]="{'height':'30rem'}"
+        [targetStyle]="{'height':'30rem'}"
+        filterBy="nombre"
+        sourceFilterPlaceholder="Buscar por nombre"
+        targetFilterPlaceholder="Buscar por nombre"
+        (onMoveToTarget)="elegirFavoritos()"
+        (onMoveAllToTarget)="llenarDatosRol()"
+        (onMoveToSource)="elegirFavoritos()"
+        (onMoveAllToSource)="elegirFavoritos()">
+        <ng-template let-product pTemplate="item">
+          <div class="product-item">
+            <div class="product-list-detail">
+              <span>
+                <img class="image-container" [src]="product.icono" [alt]="product.nombre" width="10%">
+                <p style="color: #000; padding-left: 5%;">{{product.nombre}}</p>
               </span>
-              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar el comparativo de materia prima" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#comparativoMP" (click)="llenarGraficaComparativo()"></button>
+              <p style="color: #db4149; padding-left: 20%;">{{product.categoria}}</p>
             </div>
           </div>
-        </div>
-      </div>
-    </p-tabPanel>
-
-    <!-- PEDIDOS -->
-    <p-tabPanel
-      header="Pedidos"
-      leftIcon="pi pi-shopping-bag"
-      tooltip="Información de los Pedidos creados en Zeus"
-      *ngIf="ValidarRol == 1 || ValidarRol == 60">
-      <div class="row row-cols-1 row-cols-md-3 g-4">
-        <!-- CARD 1 -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Cantidad Total de pedidos.</h5>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of pedidosTotales; let i=index">
-                  <span class="font-size-15">Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
-                </p>
-              </div>
-              <br>
-              <h5 class="font-size-20">Número de pedidos por estados.</h5>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of pedidosEstados; let i=index">
-                  <span class="font-size-15">{{i+1}}) <b>{{item.estado}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- CARD 2 -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Número de pedidos con ordenes de trabajo asociadas.</h5>
-              <p class="font-size-15"></p>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of pedidos_Ot; let i=index">
-                  <span class="font-size-15">{{i+1}}) Pedido: <b>{{item.pedido}}</b> <br> Orden de Trabajo: <b>{{item.orden}}</b> <br> Producto: <b>{{item.producto}}</b><br> Cliente: <b>{{item.cliente}}</b>. <br> Proceso de La OT: <b>{{item.proceso}}</b></span><br>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- CARD 3 -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Listado de pedidos en los que el stock del producto pedido sea mayor o igual que la cantidad que está pendiente.</h5>
-              <p class="font-size-15"></p>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of pedidosStock; let i=index">
-                  <span class="font-size-15">{{i+1}}) Pedido: <b>{{item.consecutivo}}</b> <br> Producto: <b>{{item.producto}}</b><br> Existencias: <label class="verdePedidos"><b>{{item.existencias | number}}</b></label>.<br> Cantidad Pendiente: <b>{{item.cant_Pendiente | number}}</b></span><br>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- CARD 4 -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Ranking de cantidad de pedidos por clientes. <br> Ranking de costo de pedidos por clientes.</h5>
-              <p class="font-size-15"></p>
-              <div style="height: 10%; text-align: center;">
-                <button pButton pTooltip="Ordenar por Número de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarClienteCantidad_Pedidos()"></button>
-                <button pButton pTooltip="Ordenar por Costo Total de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarClienteCosto_Pedidos()"></button>
-                <!-- <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button> -->
-              </div>
-              <br>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of pedidosClientes; let i=index">
-                  <span class="font-size-15">{{i+1}}) <b>{{item.cliente}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
-                </p>
-              </div>
-              <br>
-              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaClientes_Pedidos()"></button>
-            </div>
-          </div>
-        </div>
-
-        <!-- CARD 5 -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Ranking de cantidad de pedidos por productos</h5>
-              <p class="font-size-15"></p>
-              <div style="height: 10%; text-align: center;">
-                <button pButton pTooltip="Ordenar por Número de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarProductoCantidad_Pedidos()"></button>
-                <button pButton pTooltip="Ordenar por Costo Total de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarProductoCosto_Pedidos()"></button>
-                <!-- <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button> -->
-              </div>
-              <br>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of pedidosProductos; let i=index">
-                  <span class="font-size-15">{{i+1}}) <b>{{item.producto}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
-                </p>
-              </div>
-              <br>
-              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaProductos_Pedidos()"></button>
-            </div>
-          </div>
-        </div>
-
-        <!-- CARD 6 -->
-        <div class="col">
-          <div class="card h-100">
-            <div class="banner"></div>
-            <div class="card-body">
-              <h5 class="font-size-20">Ranking de cantidad de pedidos por Vendedores. <br> Ranking de costo de pedidos por Vendedores.</h5>
-              <p class="font-size-15"></p>
-              <div style="height: 10%; text-align: center;">
-                <button pButton pTooltip="Ordenar por Número de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarVendedorCantidad_Pedidos()"></button>
-                <button pButton pTooltip="Ordenar por Costo Total de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarVendedorCosto_Pedidos()"></button>
-                <!-- <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button> -->
-              </div>
-              <br>
-              <div class="scrollCard">
-                <p class="font-size-15" *ngFor="let item of pedidosVendedores; let i = index;">
-                  <span>{{i + 1}}) <b>{{item.vendedor}}: </b>Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad}}</b></label> Costo Total: <b>{{item.costo | currency : 'COP $'}}</b></span><br>
-                </p>
-              </div>
-              <br>
-              <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los vendedores" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaVendedores_Pedidos()"></button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </p-tabPanel>
-  </p-tabView>
-
-  <!-- Model que mostrará la información de las ordenes de trabajo con un estado especifico -->
-  <ng-container *ngIf="modalEstadosOrdenes">
-    <div class="modal fade" id="staticBackdrop" aria-labelledby="reporteCostos" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabe">{{nombreModalEstados}}</h5>
-            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
-          </div>
-        </div>
-      </div>
+        </ng-template>
+        <button pButton pRipple type="button" label="Secondary" class="p-button-secondary"></button>
+      </p-pickList>
     </div>
-  </ng-container>
 
-  <!-- Modal en el que se va a mostrar la grafica con la información que se le pase -->
-  <ng-container *ngIf="mostrarGrafica">
-    <div class="modal fade" id="staticBackdrop2" aria-labelledby="reporteCostos" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel2">{{nombreGrafica}}</h5>
-            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="card">
-              <h5 class="titulo_grafica">{{nombreGrafica}}</h5>
-              <p-chart type="bar" width="100%" height="100%" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </ng-container>
-
-  <!-- Modal en el que se mostrará una grafica de barras comparando la cantidad de materia prima asignada y la cantidad extruida -->
-  <ng-container *ngIf="mostrarGraficaComparativo">
-    <div class="modal fade" id="comparativoMP" aria-labelledby="Comparativo" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel2">Materia Prima Asignada vs Materia Prima Extruida</h5>
-            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="card">
-              <h5 class="titulo_grafica">Materia Prima Asignada vs Materia Prima Extruida</h5>
-              <p-chart type="bar" width="100%" height="100%" [data]="ComparativoData" [options]="ComparativoOptions"></p-chart>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </ng-container>
-</div>
-
-<!-- DOCKER PARA ELEGIR LAS VISTAS FAVORITAS -->
-<div class="dock-window dock-advanced">
-  <!-- Docker -->
-  <div class="fixed-bottom">
-    <p-dock [model]="dockItems" position="bottom">
-      <ng-template pTemplate="item" let-item>
-        <img [src]="item.icon" [alt]="item.label" width="100%" style="cursor: pointer;">
-      </ng-template>
-    </p-dock>
   </div>
-
-  <!-- PickList -->
-  <div class="contenedorLista" id="contenedorLista" *ngIf="displayTerminal">
-    <div class="d-grid gap-2 d-md-flex justify-content-end">
-      <!-- Para cerrar el apartado donde se escogen y modifican las vistas favoritas se creó un label que al dar click sobre el dejará de mostrar este apartado -->
-      <label class="btnclose pi pi-times" mat-button (click)="cerrarLista()"></label>
-    </div>
-    <p-pickList
-      [source]="disponiblesMostrar"
-      [target]="targetProducts"
-      [showTargetControls]="false"
-      [showSourceControls]="false"
-      sourceHeader="Disponible"
-      targetHeader="Seleccionado"
-      [dragdrop]="true"
-      [metaKeySelection]="false"
-      [responsive]="true"
-      [sourceStyle]="{'height':'30rem'}"
-      [targetStyle]="{'height':'30rem'}"
-      filterBy="nombre"
-      sourceFilterPlaceholder="Buscar por nombre"
-      targetFilterPlaceholder="Buscar por nombre"
-      (onMoveToTarget)="elegirFavoritos()"
-      (onMoveAllToTarget)="llenarDatosRol()"
-      (onMoveToSource)="elegirFavoritos()"
-      (onMoveAllToSource)="elegirFavoritos()">
-      <ng-template let-product pTemplate="item">
-        <div class="product-item">
-          <div class="product-list-detail">
-            <span>
-              <img class="image-container" [src]="product.icono" [alt]="product.nombre" width="10%">
-              <p style="color: #000; padding-left: 5%;">{{product.nombre}}</p>
-            </span>
-            <p style="color: #db4149; padding-left: 20%;">{{product.categoria}}</p>
-          </div>
-        </div>
-      </ng-template>
-      <button pButton pRipple type="button" label="Secondary" class="p-button-secondary"></button>
-    </p-pickList>
-  </div>
-
 </div>

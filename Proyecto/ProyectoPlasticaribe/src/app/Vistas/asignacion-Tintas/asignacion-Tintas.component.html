@@ -1,69 +1,79 @@
 <app-menuLateral></app-menuLateral>
 
-<div class="d-flex justify-content-center overlay" *ngIf="load">
-  <div style="margin: auto;">
-    <p-progressSpinner></p-progressSpinner>
-  </div>
-</div>
-
-<div class="contain">
-  <div class="container-fluid">
-    <!-- principal -->
-    <div class="mb-4 Titulo">
-      <h2 class="tituloRojo font-size-32">Creación de Tintas</h2>
-    </div>
-    <div class="mb-4">
-      <hr class="colorLinea">
+<div class="fondo">
+  <div class="d-flex justify-content-center overlay" *ngIf="load">
+    <div style="margin: auto;">
+      <p-progressSpinner></p-progressSpinner>
     </div>
   </div>
-</div>
 
-<div class="contain">
-  <div class="container-fluid">
+  <div class="contain">
+    <div class="container-fluid">
+      <!-- principal -->
+      <div class="mb-4 Titulo">
+        <h2 class="tituloRojo font-size-32">Creación de Tintas</h2>
+      </div>
+      <div class="mb-4">
+        <hr class="colorLinea">
+      </div>
+    </div>
+  </div>
+
+  <div class="contain">
     <div class="formulario">
-
       <!-- Inicio Botones que llaman el modal de crear materias primas y Crear tintas-->
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"(click)="llamarModalCrearTintas()" title="¡Crealo aquí!"> Crear Tinta</button>
-        <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"(click)="llamarModalMateriasPrimas()" title="¡Crealo aquí!">Crear Materia Prima</button>
+        <button pButton pRipple type="button" icon="pi pi-check-circle" label="Crear Tinta" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"(click)="llamarModalCrearTintas()"></button>
+        <button pButton pRipple type="button" icon="pi pi-check-circle" label="Crear Materia Prima" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop"(click)="llamarModalMateriasPrimas()"></button>
       </div>
 
       <!--Titulo Asignación -->
       <div class="mb-3">
         <h4 class="tituloRojo">Creación de Tintas</h4>
       </div>
+      <br>
 
       <!-- Información general para la asignación de materia Prima Para la creación de tintas -->
       <form [formGroup]="FormAsignacionMP">
-        <!-- Fila 1 -->
         <div class="mb-3">
-          <div class="row g-3">
-            <!-- Nombre tinta -->
-            <div class="form-floating col-md-3">
-              <input formControlName="Tinta" class="form-control form-control-sm" list="Tinta" id="floatingInput" title="Nombre de la Tinta" (change)="buscarTintaSeleccionada()">
-              <datalist id="Tinta">
-                <option value={{item.id}} *ngFor="let item of tintas">{{item.name}}</option>
-              </datalist>
-              <label for="floatingInput">Tinta</label>
+          <div class="row g-4">
+
+            <!-- Tinta -->
+            <div class="col-md-4">
+              <span class="p-input-icon-left p-float-label">
+                <i class="pi pi-search"></i>
+                <input formControlName="Tinta" id="Tinta" list="ListaTinta" class="form-control form-control-sm" type="text" pInputText  (change)="buscarTintaSeleccionada()" required/>
+                <datalist id="ListaTinta">
+                  <option value={{item.id}} *ngFor="let item of tintas">{{item.name}}</option>
+                </datalist>
+                <label for="Tinta">Tinta</label>
+              </span>
             </div>
 
-            <!-- Cantidad Tinta -->
-            <div class="form-floating col-md-2">
-              <input formControlName="cantidadTinta" type="number" class="form-control form-control-sm" id="floatingInput" min="1" max="99" title="Maquina">
-              <label for="floatingInput">Cantidad (Kg) Tinta</label>
+            <!-- Cantidad -->
+            <div class="col-md">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="cantidadTinta" mode="decimal" inputId="CantidadTinta" [minFractionDigits]="2"></p-inputNumber>
+                <label for="CantidadTinta">Cantidad</label>
+              </span>
             </div>
-            <!-- Unidad medida-->
-            <div class="form-floating col-md-2">
-              <select formControlName="undMedTinta" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida">
-                <option [ngValue]="undMed" *ngFor="let undMed of unidadMedida">{{undMed}}</option>
-              </select>
-              <label for="floatingSelect">Und. Medida</label>
+
+            <!-- Unidad de Medida -->
+            <div class="col-md-2">
+              <span class="p-float-label">
+                <p-dropdown formControlName="undMedTinta" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel=""></p-dropdown>
+                <label for="Und">Und</label>
+              </span>
             </div>
-            <!-- Campo Observacion -->
-            <div class="form-floating col-md">
-              <textarea formControlName="Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm" maxlength="200" ></textarea>
-              <label for="floatingTextArea">Observación</label>
+
+            <!-- Observación -->
+            <div class="col-md">
+              <span class="p-float-label">
+                <textarea formControlName="Observacion" [rows]="1" inputId="Observacion" class="form-control form-control-sm" pInputTextarea></textarea>
+                <label for="Observacion">Observación</label>
+              </span>
             </div>
+
           </div>
         </div>
       </form>
@@ -73,40 +83,51 @@
         <h4 class="tituloRojo">Materia Prima</h4>
       </div>
 
-      <!-- Asignación de materia Prima para la creación de tintas -->
+      <!-- Formulario de Materia Prima -->
       <form [formGroup]="FormMateriaPrima">
         <div class="mb-3">
-          <div class="row g-3">
+          <div class="row g-4">
             <!-- Id Materia Prima -->
-            <div class="form-floating col-md">
-              <input formControlName="idMateriaPrima" type="number" min="0" class="form-control" id="floatingInput" placeholder="Id">
-              <label for="floatingInput">Id</label>
-            </div>
-            <!-- Nombre Materia Prima -->
-            <div class="form-floating col-md-4">
-              <input formControlName="nombreMateriaPrima" class="form-control form-control-sm" list="materiaprima" id="floatingInput" title="Nombre de la Materia Prima" (change)="buscarMpSeleccionada()">
-              <datalist id="materiaprima">
-                <option value={{item.id}} *ngFor="let item of materiasPrimas">{{item.name}}</option>
-              </datalist>
-              <label for="floatingInput">Materia Prima</label>
+            <div class="col-md-2">
+              <span class="p-float-label">
+                <input formControlName="idMateriaPrima" id="IdMP" class="form-control form-control-sm" type="number" pInputText required/>
+                <label for="IdMP">Id</label>
+              </span>
             </div>
 
-              <!-- stock DE MATERIA PRIMA  -->
-            <div class="form-floating col-md-2">
-              <input formControlName="stockMateriaPrima" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapStock" placeholder="Stock" required  readonly onmousedown="return false;">
-              <label for="floatingInput">Stock</label>
+            <!-- Nombre Materia Prima -->
+            <div class="col-md-6">
+              <span class="p-float-label">
+                <input formControlName="nombreMateriaPrima" id="MP" class="form-control form-control-sm" list="materiaprima" type="text" pInputText (change)="buscarMpSeleccionada()" required/>
+                <datalist id="materiaprima">
+                  <option value={{item.id}} *ngFor="let item of materiasPrimas">{{item.name}}</option>
+                </datalist>
+                <label for="MP">Materia Prima</label>
+              </span>
             </div>
+
+            <!-- Stock de Materia Prima  -->
+            <div class="col-md">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="stockMateriaPrima" mode="decimal" inputId="Stock" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+                <label for="Stock">Stock</label>
+              </span>
+            </div>
+
             <!-- CANTIDAD A ENTREGAR DE MATERIA PRIMA  -->
-            <div class="form-floating col-md-2">
-              <input formControlName="cantidadMateriaPrima" type="number" id="floatingSelect" class="form-control form-control-sm" name="MapCantidad" placeholder="Cantidad" required>
-              <label for="floatingInput">Cantidad</label>
+            <div class="col-md">
+              <span class="p-float-label">
+                <p-inputNumber formControlName="cantidadMateriaPrima" mode="decimal" inputId="Cantidad" [minFractionDigits]="2"></p-inputNumber>
+                <label for="Cantidad">Cantidad</label>
+              </span>
             </div>
-            <!-- Unidad medida-->
-            <div class="form-floating col-md-2">
-              <select formControlName="undMedMateriaPrima" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" name="MapUnidadMedida" placeholder="Und. Medida" required>
-                <option [ngValue]="undMed.undMed_Id" *ngFor="let undMed of unidadMedida">{{undMed.undMed_Id}}</option>
-              </select>
-              <label for="floatingSelect">Und. Medida</label>
+
+            <!-- Unidad de Medida -->
+            <div class="col-md">
+              <span class="p-float-label">
+                <p-dropdown formControlName="undMedMateriaPrima" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel=""></p-dropdown>
+                <label for="Und">Und</label>
+              </span>
             </div>
           </div>
         </div>
@@ -114,8 +135,8 @@
         <!-- BOTONES -->
         <div class="mb-4">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposMateriaPrima()">Agregar Materia Prima</button>
-            <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMateriaPrima()">Limpiar Campos MP</button>
+            <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarCamposMateriaPrima()"></button>
+            <button pButton pRipple label="Limpiar Campos MP" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarCamposMateriaPrima()"></button>
           </div>
         </div>
       </form>
@@ -169,8 +190,8 @@
         <div class="row g-3">
           <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarAsignacion()">Asignar Materia Prima </button>
-              <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosLosCampos()">Limpiar Todos Los Campos</button>
+              <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarAsignacion()"></button>
+              <button pButton pRipple label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarTodosLosCampos()"></button>
             </div>
           </div>
         </div>
@@ -185,12 +206,11 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <app-crear-tintas></app-crear-tintas>  <!--Carga componente crear Tinta-->
+              <app-crear-tintas></app-crear-tintas>
             </div>
           </div>
         </div>
       </div>
-      <!-- Fin Modal de crear Crear Tinta -->
 
       <!-- Modal de crear Materia Prima -->
       <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
@@ -201,13 +221,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <app-modal-crear-materias-primas></app-modal-crear-materias-primas> <!--Carga componente crear Unidad Medida-->
-              <!-- <app-crear-materiaprima></app-crear-materiaprima> Carga componente crear Unidad Medida -->
+              <app-modal-crear-materias-primas></app-modal-crear-materias-primas>
             </div>
           </div>
         </div>
       </div>
-      <!-- Fin Modal de crear Crear Unidad Medida-->
+
     </div>
   </div>
 </div>

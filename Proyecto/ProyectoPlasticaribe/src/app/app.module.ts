@@ -245,18 +245,18 @@ export const routes: Routes = [
   {path: 'registro-usuario', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: RegistroComponentComponent},
 
  /*************************************************************************************************************************************************************/
- {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
-//  {path: 'ventas', component: Ventas_TemporalesComponent},
+  {path: 'prueba-cat-insumo',  component: PruebaImagenCatInsumoComponent},
+  //  {path: 'ventas', component: Ventas_TemporalesComponent},
 
  /******************************************************************* MANTENIMIENTO ***************************************************************************/
- {path: 'pedido-mantenimiento', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PedidoMantenimientoComponent},
- {path: 'movimientos-mantenimientos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Movimientos_MantenimientoComponent},
- {path: 'reporte-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_MantenimientoComponent},
- {path: 'mantenimiento-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
+  {path: 'pedido-mantenimiento', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component: PedidoMantenimientoComponent},
+  {path: 'movimientos-mantenimientos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Movimientos_MantenimientoComponent},
+  {path: 'reporte-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Reporte_MantenimientoComponent},
+  {path: 'mantenimiento-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
 
 /*********************************************************************** REPORTE PEDIDOS ZEUS *****************************************************************/
- {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: ReportePedidos_ZeusComponent},
- {path: 'rpt-facturacion-zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: Reporte_FacturacionZeusComponent},
+  {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: ReportePedidos_ZeusComponent},
+  {path: 'rpt-facturacion-zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: Reporte_FacturacionZeusComponent},
 
  /*************************************************************** DESPERDICIO *********************************************************************************/
   {path: 'desperdicio', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1, 12]}, component: DesperdicioComponent},

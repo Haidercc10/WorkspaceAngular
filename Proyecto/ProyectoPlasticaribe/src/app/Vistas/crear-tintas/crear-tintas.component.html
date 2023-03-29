@@ -2,59 +2,62 @@
 <form [formGroup]="formularioTintas" (ngSubmit)="agregarTintas()">
   <!-- Inicio Fila 1 Agregar Unidad Medida -->
   <div class="mb-3">
-    <div class="row g-3">
+    <div class="row g-4">
+      <!-- Nombre -->
+      <div class="col-md-4">
+        <span class="p-float-label">
+          <input formControlName="TintaNombre" id="TintaNombre" class="form-control form-control-sm" type="text" (keyup)="cargarDescripcion()" pInputText required/>
+          <label for="TintaNombre">Nombre</label>
+        </span>
+      </div>
 
-          <!-- Nombre -->
-        <div class="form-floating col-md">
-          <input formControlName="TintaNombre" type="text" class="form-control form-control-sm" id="floatingInput" (keyup)="cargarDescripcion()" required>
-          <label for="floatingInput">Nombre</label>
-        </div>
-        <!-- Descripción -->
-        <div class="form-floating col-md">
-          <input formControlName="TintaDescripcion" type="text" class="form-control form-control-sm" id="floatingInput" required>
-          <label for="floatingInput">Descripción</label>
-        </div>
-         <!-- Código Hexadecimal -->
-        <div class="form-floating col-md-2">
-          <input formControlName="TintaCodigoHexa" type="text" class="form-control form-control-sm" id="floatingInput">
-          <label for="floatingInput" alt="Si no conoce el código Hexadecimal para este color, puede omitir este campo">Código Hexa</label>
-        </div>
-        <!-- Unidad Medida -->
-        <div class="form-floating col-md-2">
-          <select formControlName="TintaUndMedida" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="unidadMedidas" *ngFor="let unidadMedidas of unidadMedida">{{unidadMedidas}}</option>
-          </select>
-          <label for="floatingSelect">Und. Medida</label>
-        </div>
-        <!-- Categorias -->
-        <div class="form-floating col-md-2">
-          <select formControlName="TintaCategoria" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-            <option [ngValue]="cat.catMP_Id" *ngFor="let cat of categorias">{{cat.catMP_Nombre}}</option>
-          </select>
-          <label for="floatingSelect">Categorias</label>
-        </div>
-        <!-- Precio -->
-        <div class="form-floating col-md-2">
-          <input formControlName="TintaPrecio" class="form-control form-control-sm" id="floatingInput" type="number" required>
-          <label for="floatingInput">Precio</label>
-        </div>
+      <!-- Descripcion -->
+      <div class="col-md-4">
+        <span class="p-float-label">
+          <input formControlName="TintaDescripcion" id="TintaDescripcion" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="TintaDescripcion">Descripción</label>
+        </span>
+      </div>
 
+      <!-- Codigo Hexadecimal -->
+      <div class="col-md-4">
+        <span class="p-float-label">
+          <input formControlName="TintaCodigoHexa" id="TintaCodigoHexa" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="TintaCodigoHexa">Código Hexa</label>
+        </span>
+      </div>
+
+      <!-- Unidad de Medida -->
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="TintaUndMedida" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel="" [required]="true"></p-dropdown>
+          <label for="Und">Und</label>
+        </span>
+      </div>
+
+      <!-- Categorias -->
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="TintaCategoria" inputId="TintaCategoria" [autoDisplayFirst]="false" [options]="categorias" optionLabel="catMP_Nombre" [required]="true"></p-dropdown>
+          <label for="TintaCategoria">Categorias</label>
+        </span>
+      </div>
+
+      <!-- Precio -->
+      <div class="col-md">
+        <span class="p-float-label">
+          <p-inputNumber formControlName="TintaPrecio" mode="decimal" inputId="TintaPrecio" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+          <label for="TintaPrecio">Precio</label>
+        </span>
+      </div>
     </div>
   </div>
-  <!-- Fin Fila 1 -->
 
   <!--Inicio Fila 2 Botones Agregar tintas y Limpiar Campos-->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="submit"><i class="pi pi-check"></i> Agregar Tinta</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()"><i class="pi pi-eraser"></i> Limpiar Campos</button>
+      <button pButton pRipple label="Crear Tinta" type="submit" icon="pi pi-check" class="p-button-danger"></button>
+      <button pButton pRipple label="Limpiar Campos" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
     </div>
   </div>
-
-  <!--<div class="mb-1" *ngIf="tintaCreada">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <h6>{{informacion}}</h6>
-    </div>
-  </div>-->
-  <!--Fin Fila 2-->
 </form>
