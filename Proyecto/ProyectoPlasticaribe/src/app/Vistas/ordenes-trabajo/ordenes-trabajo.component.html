@@ -22,13 +22,12 @@
 
 <div class="formulario">
   <!--Inicio info OT-->
-  <div class="container-fluid bajarPagina">
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
       <h4 class="tituloRojo" title="Consecutivo sobre el cual se crea una nueva OT">OT N° {{ultimaOrdenTrabajo}}</h4>
     </div>
 
     <div class="mb-4">
-      <h4 class="tituloRojo">Consultar/Crear OT</h4>
+      <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar / <i class="pi pi-plus-circle"></i> Crear OT</h4>
     </div>
 
     <form [formGroup]="FormOrdenTrabajo">
@@ -123,7 +122,7 @@
 
     <!-- Titulo tabla -->
     <div class="mb-3">
-      <h4 class="tituloRojo">Tabla de Productos Pedidos</h4>
+      <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Productos Pedidos</h4>
     </div>
 
     <!-- Tabla producto -->
@@ -263,7 +262,7 @@
 
         <!-- Titulo procesos -->
         <div class="mb-3">
-          <h4 class="tituloRojo">Procesos de Producción</h4>
+          <h4 class="tituloRojo"><i class="pi pi-sitemap"></i> Procesos de Producción</h4>
         </div>
 
         <!-- TABS de Procesos -->
@@ -759,21 +758,25 @@
             </form>
           </div>
 
+          <!-- Mezclas -->
           <div class="tab-pane fade" id="Mezclas" role="tabpanel" aria-labelledby="Mezclas-tab">
 
             <!--Boton para llamar el modal de crear mezclas-->
-            <div class="formulario">
-              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button pButton pRipple label="Crear Mezclas" icon="pi pi-plus" type="button" class="p-button-danger r-2" (click)="cargarModalMezclas()"></button>
+
+            <div class="container-fluid">
+              <div class="mb-5">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <button pButton pRipple label="Crear Mezclas" icon="pi pi-plus" type="button" class="p-button-danger r-2" (click)="cargarModalMezclas()"></button>
+                </div>
               </div>
             </div>
 
             <!-- Modal para crear mezclas -->
-            <p-dialog header="Crear Mezclas Predefinidas" [(visible)]="modalMezclas" [style]="{width: '70%'}" [modal]="true" [resizable]="true" styleClass="p-fluid">
+            <p-dialog header="Crear Mezclas Predefinidas" [(visible)]="modalMezclas" [style]="{width: '70%'}" [modal]="true" [resizable]="true">
 
-              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button class=" btn btn-danger btn-danger-sm" type="button" (click)="cargarModalMateriales()"><i class="pi pi-plus"></i> Crear Materiales</button>
-                <button class=" btn btn-danger btn-danger-sm" type="button" (click)="cargarModalPigmentos()"><i class="pi pi-plus"></i> Crear Pigmentos</button>
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+                <button pButton class="p-button-danger" type="button" label="Crear Materiales" icon="pi pi-check-circle" (click)="cargarModalMateriales()"> </button>
+                <button pButton class="p-button-secondary" type="button" label="Crear Pigmentos" icon="pi pi-check-circle" (click)="cargarModalPigmentos()"> </button>
               </div>
 
               <!--Modal Materiales -->
@@ -834,6 +837,11 @@
                 <div class="mb-3">
                   <div class="row g-3 justify-content-md-center">
                       <!-- Nombre Mezcla -->
+
+                    <div class="mb-3"  style="text-align: center;">
+                      <h6 class="tituloRojo"><i class="pi pi-slack"> </i> Ingresar mezcla / <i class="pi pi-box"> </i> Material</h6>
+                    </div>
+
                     <div class="form-floating col-md-6">
                       <input formControlName="Nombre_Mezclas" class="form-control form-control-sm" list="mezclas" id="floatingInput" title="Nombre de la Mezcla" required (change)="cargarCombinacionMezclas2()">
                       <datalist id="mezclas">
@@ -852,12 +860,16 @@
                   </div>
                 </div>
 
+                <div class="mb-4">
+                  <hr class="colorLinea2">
+                </div>
+
                 <!--Fila 2 y 3 Checkbox-->
                 <div class="mb-4">
                   <div style="text-align: center;">
 
                     <div class="mb-3">
-                      <h6 class="tituloRojo">N° de capas</h6>
+                      <h6 class="tituloRojo"><i class="pi pi-server"></i> N° de capas</h6>
                     </div>
 
                     <div class="form-floating col-md-2 form-check-inline" style="text-align: center">
@@ -878,8 +890,12 @@
                   </div>
                 </div>
 
+                <div class="mb-4">
+                  <hr class="colorLinea2">
+                </div>
+
                 <div class="mb-3"  style="text-align: center;">
-                  <h6 class="tituloRojo">Porcentajes de mezcla de capas</h6>
+                  <h6 class="tituloRojo"><i class="pi pi-percentage"></i> Porcentajes de mezcla de capas</h6>
                 </div>
 
                 <!--Fila 4-->
@@ -904,12 +920,16 @@
                   </div>
                 </div>
 
+                <div class="mb-4">
+                  <hr class="colorLinea2">
+                </div>
+
                 <div class="mb-3"  style="text-align: center;">
-                  <h6 class="tituloRojo">Porcentajes de mezcla de materiales</h6>
+                  <h6 class="tituloRojo"><i class="pi pi-percentage"></i> Porcentajes de mezcla de materiales</h6>
                 </div>
 
                 <!--fila 5-->
-                <div class="formulario">
+                <div class="container-fluid">
                   <div class="row">
                     <!--Materiales y pigmentos capa 1-->
                     <div class="col-md">
@@ -1269,15 +1289,19 @@
 
               <!--Botones-->
               <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <button class=" btn btn-danger btn-danger-sm" type="button" (click)="crearMezclaPredefinida()">Crear Mezcla</button>
-                <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="initFormCrearMezclas()">Limpiar Campos</button>
+                <button pButton class="p-button-danger" type="button" label="Crear Mezcla" icon="pi pi-check" (click)="crearMezclaPredefinida()"></button>
+                <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="initFormCrearMezclas()"></button>
               </div>
 
             </p-dialog>
 
             <!-- Formulario de mezclas predefinidas -->
-            <div class="formulario">
+            <div class="container">
               <form [formGroup]="FormOrdenTrabajoMezclas">
+
+                <div class="mb-3" style="text-align: center;">
+                  <h4 class="tituloRojo">Nombre Mezcla</h4>
+                </div>
 
                 <!--Fila 1-->
                 <div class="mb-3" >
@@ -1292,12 +1316,16 @@
                   </div>
                 </div>
 
+                <div class="mb-4">
+                  <hr class="colorLinea2">
+                </div>
+
                 <!--Fila 2 y 3 Checkbox-->
                 <div class="mb-4">
                   <div style="text-align: center;">
 
                     <div class="mb-3">
-                      <h6 class="tituloRojo">N° de capas</h6>
+                      <h4 class="tituloRojo">N° de capas</h4>
                     </div>
 
                     <div class="form-floating col-md-2 form-check-inline" style="text-align: center">
@@ -1314,44 +1342,51 @@
                         <label style="margin-left: 5px;" for="city3"> 3</label>
                       </div>
                     </div>
-
                   </div>
                 </div>
 
-                <div class="mb-3"  style="text-align: center;">
-                  <h6 class="tituloRojo">Porcentajes de mezcla de capas</h6>
+                <div class="mb-4">
+                  <hr class="colorLinea2">
+                </div>
+
+                <div class="mb-3" style="text-align: center;">
+                  <h4 class="tituloRojo">Porcentajes de mezcla de capas</h4>
                 </div>
 
                 <!--Fila 4-->
                 <div class="mb-4" >
-                  <div class="row g-3 justify-content-md-center">
+                    <div class="row g-3 justify-content-md-center">
 
-                    <!--Capa 1 unica-->
-                    <div class="form-floating col-md-2">
-                      <input formControlName="Proc_Capa1" type="number" class="form-control form-control-sm" id="floatingInput" required >
-                      <label for="floatingInput">% Capa 1</label>
-                    </div>
+                      <!--Capa 1 unica-->
+                      <div class="form-floating col-md-2">
+                        <input formControlName="Proc_Capa1" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                        <label for="floatingInput">% Capa 1</label>
+                      </div>
 
-                    <!--Capa 2 interna-->
-                    <div class="form-floating col-md-2">
-                      <input formControlName="Proc_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required >
-                      <label for="floatingInput">% Capa 2</label>
-                    </div>
+                      <!--Capa 2 interna-->
+                      <div class="form-floating col-md-2">
+                        <input formControlName="Proc_Capa2" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                        <label for="floatingInput">% Capa 2</label>
+                      </div>
 
-                    <!--Capa 3 Externa-->
-                    <div class="form-floating col-md-2">
-                      <input formControlName="Proc_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required >
-                      <label for="floatingInput">% Capa 3</label>
+                      <!--Capa 3 Externa-->
+                      <div class="form-floating col-md-2">
+                        <input formControlName="Proc_Capa3" type="number" class="form-control form-control-sm" id="floatingInput" required >
+                        <label for="floatingInput">% Capa 3</label>
+                      </div>
                     </div>
-                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <hr class="colorLinea2">
                 </div>
 
                 <div class="mb-3"  style="text-align: center;">
-                  <h6 class="tituloRojo">Porcentajes de mezcla de materiales</h6>
+                  <h4 class="tituloRojo">Porcentajes de mezcla de materiales</h4>
                 </div>
 
                 <!-- Inicio Columnas de capas -->
-                <div class="formulario">
+                <div class="container-fluid">
                   <div class="row justify-content-md-center" >
 
                     <!--Materiales y pigmentos capa 1-->
@@ -1715,14 +1750,14 @@
         <!-- Botones -->
         <div class="bajarPagina">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class=" btn btn-danger btn-danger-sm" type="button" (click)="validarDatos()" *ngIf="!edicionOrdenTrabajo">Crear Orden de Trabajo</button>
-            <button class=" btn btn-danger btn-danger-sm" type="button" (click)="validarActualizacionOT()" *ngIf="edicionOrdenTrabajo">Editar Orden de Trabajo</button>
-            <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
-            <button class=" btn btn-danger btn-danger-sm" type="button" (click)="pdfOrdenTrabajo()">Ver PDF <i class="pi pi-file-pdf"></i></button>
+            <button pButton class="p-button-danger" type="button" label="Crear OT" icon="pi pi-check" *ngIf="!edicionOrdenTrabajo" (click)="validarDatos()"></button>
+            <button pButton class="p-button-danger" type="button" label="Editar OT" icon="pi pi-check" *ngIf="edicionOrdenTrabajo" (click)="validarActualizacionOT()"></button>
+            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
+            <button pButton class="p-button-danger" type="button" label="Ver PDF" icon="pi pi-file-pdf" (click)="pdfOrdenTrabajo()"></button>
           </div>
         </div>
 
       </div>
     </div>
-  </div>
+
 </div>

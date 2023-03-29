@@ -10,7 +10,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Movimientos Ordenes de Compra</h2>
+      <h2 class="tituloRojo">Movimientos de Ordenes de Compras</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -23,7 +23,7 @@
   <div class="container-fluid bajarPagina">
     <div class="formulario">
       <div class="mb-4">
-        <h4 class="tituloRojo">Filtros de búsqueda</h4>
+        <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
       </div>
 
       <!-- Formulario para consultar filtros -->
@@ -31,7 +31,7 @@
 
         <!-- Primera Fila -->
         <div class="mb-3">
-          <div class="row g-3">
+          <div class="row g-3 justify-content-md-center">
 
             <!-- Factura -->
             <div class="form-floating col-md-2">
@@ -66,9 +66,8 @@
       <!-- Botones -->
       <div class="mb-3" *ngIf="!cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarFiltros()">Consultar</button>
-          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
-          <!-- <button class=" btn btn-danger btn-danger-sm" type="button">Exportar Excel</button> -->
+          <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarFiltros()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
         </div>
       </div>
 
@@ -77,7 +76,7 @@
       </div>
       <!-- titulo tabla producto -->
       <div class="mb-4">
-        <h4 class="tituloRojo">Registros consultados</h4>
+        <h4 class="tituloRojo"><i class="pi pi-list"></i> Registros consultados</h4>
       </div>
 
       <!-- Inicio tabla de registros consultados -->
@@ -127,7 +126,7 @@
                   <td>{{registros.Usuario}}</td>
                   <td>{{registros.Fecha}}</td>
                   <td>{{registros.Estado}}</td>
-                  <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" (click)="buscarinfoOrdenCompra(registros.Oc)"></a></td>
+                  <td style="text-align: center;"><a style="width: 30px; height: 30px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-danger mr-2" pTooltip="PDF" (click)="buscarinfoOrdenCompra(registros.Oc)"></a></td>
                 </tr>
               </ng-template>
             </p-table>

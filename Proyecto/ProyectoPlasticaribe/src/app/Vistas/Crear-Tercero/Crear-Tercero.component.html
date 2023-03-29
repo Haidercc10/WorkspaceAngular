@@ -49,10 +49,10 @@
   </div>
 
   <!--Inicio Fila 3 Botones y Limpiar Campos-->
-  <div class="mb-1">
+  <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="submit" (click)="validarCamposVacios()">Crear</button>
-      <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpiar Campos" (click)="LimpiarCampos()">
+      <button pButton class="p-button-danger" type="button" label="Crear Tercero" icon="pi pi-check" (click)="validarCamposVacios()"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
     </div>
   </div>
 </form>

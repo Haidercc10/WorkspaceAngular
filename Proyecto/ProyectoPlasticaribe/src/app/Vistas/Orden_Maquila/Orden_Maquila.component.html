@@ -25,12 +25,12 @@
 <div class="formulario">
   <!-- Botones que llamaran los modeles -->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <button pButton pRipple class="p-button-rounded p-button-danger" label="Crear Tercero" (click)="modalCreacionTerceros = true;"></button>
+    <button pButton pRipple class="p-button-danger" icon="pi pi-user-plus" label="Crear Tercero" (click)="modalCreacionTerceros = true;"></button>
   </div>
 
   <!-- Informacion de la orden de maquila -->
   <div class="mb-4">
-    <h4 class="tituloRojo">Información de la Orden de Maquila</h4>
+    <h4 class="tituloRojo"><i class="pi pi-info-circle"></i> Información de la Orden de Maquila</h4>
   </div>
 
   <form [formGroup]="FormOrdenMaquila">
@@ -40,7 +40,7 @@
         <!-- Consecutivo de la orden de compra -->
         <div class="form-floating col-md-2">
           <input formControlName="ConsecutivoOrden" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo de la Orden de Maquila" (keyup.Enter)="buscarOrdenMaquila()">
-          <label for="floatingSelect">Concecutivo de la Orden</label>
+          <label for="floatingSelect">Consecutivo</label>
         </div>
 
         <!-- Proveedor -->
@@ -67,7 +67,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Materia Prima</h4>
+    <h4 class="tituloRojo"><i class="pi pi-check-square"></i> Seleccionar Mat. Prima</h4>
   </div>
 
   <form [formGroup]="FormMateriaPrima">
@@ -120,8 +120,8 @@
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="cargarMateriaPrima()">Agregar Materia Prima</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMateriaPrima()">Limpiar Campos Materia Prima</button>
+        <button pButton class="p-button-danger" type="button" label="Agregar Mat. Prima" icon="pi pi-send" (click)="cargarMateriaPrima()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos Mat. Prima" icon="pi pi-eraser" (click)="limpiarCamposMateriaPrima()"></button>
       </div>
     </div>
   </form>
@@ -131,7 +131,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Materias Primas Seleccionadas</h4>
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Mat. Primas Seleccionadas</h4>
   </div>
 
   <div class="row g-3">
@@ -190,14 +190,14 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button" *ngIf="!edidcionOrdenMaquila" (click)="validarDatosOrdenMaquila()">Crear Orden de Maquila</button>
-      <button class="btn btn-danger btn-danger-sm" type="button" *ngIf="edidcionOrdenMaquila" (click)="validarDatosOrdenMaquila()">Editar Orden de Maquila</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()">Limpiar Todos los Campos</button>
+      <button pButton class="p-button-danger" type="button" label="Crear Orden de Maquila" icon="pi pi-check" *ngIf="!edidcionOrdenMaquila" (click)="validarDatosOrdenMaquila()"></button>
+      <button pButton class="p-button-danger" type="button" label="Editar Orden de Maquila" icon="pi pi-pencil" *ngIf="edidcionOrdenMaquila" (click)="validarDatosOrdenMaquila()"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
     </div>
   </div>
 
   <!-- Modal Para Crear Terceros-->
-  <p-dialog [(visible)]="modalCreacionTerceros" [style]="{width: '70vw'}" [resizable]="true" header="¿Qué desea crear?" [modal]="true" styleClass="p-fluid">
+  <p-dialog [(visible)]="modalCreacionTerceros" [style]="{width: '60%'}" [resizable]="true" header="Crear nuevo tercero" [modal]="true">
     <ng-template pTemplate="content">
       <app-Crear-Tercero></app-Crear-Tercero>
     </ng-template>

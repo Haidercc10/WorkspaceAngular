@@ -24,7 +24,7 @@
 
   <!-- Informacion del pedido de mantenimiento -->
   <div class="mb-4">
-    <h4 class="tituloRojo">Información del Pedido</h4>
+    <h4 class="tituloRojo"><i class="pi pi-info-circle"></i> Información del Pedido</h4>
   </div>
 
   <!-- Formulario del pedido de mantenimiento -->
@@ -34,7 +34,7 @@
         <!-- Consecutivo del pedido -->
         <div class="form-floating col-md-2">
           <input formControlName="ConsecutivoPedido" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo del Pedido" min="0" readonly>
-          <label for="floatingSelect">Concecutivo del Pedido</label>
+          <label for="floatingSelect">Consecutivo Pedido</label>
         </div>
 
         <!-- Activos -->
@@ -64,7 +64,7 @@
         <!-- Observacion -->
         <div class="form-floating col-md-12">
           <textarea formControlName="Observacion" id="floatingTextarea" type="text" class="form-control form-control-sm" title="Observación"></textarea>
-          <label for="floatingTextarea">Observación General del Pedido</label>
+          <label for="floatingTextarea">Observación del Pedido</label>
         </div>
       </div>
     </div>
@@ -72,8 +72,8 @@
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="seleccionarActivo()">Añadir Activo</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+        <button pButton class="p-button-danger" type="button" label="Añadir Activo" icon="pi pi-send" (click)="seleccionarActivo()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
       </div>
     </div>
   </form>
@@ -83,7 +83,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Materias Primas Seleccionadas</h4>
+    <h4 class="tituloRojo"><i class="pi pi-car"></i> Activos Seleccionados</h4>
   </div>
 
   <div class="row g-3">
@@ -103,7 +103,7 @@
             <th scope="col">Serial / Placa</th>
             <th scope="col">Nombre</th>
             <th scope="col">Fecha Daño</th>
-            <th scope="col">Tipo de Mantenimiento</th>
+            <th scope="col">Tipo Mantenimiento</th>
             <th scope="col"><i class="pi pi-trash cursor" title="Quitar Todo" (click)="quitarTodos()"></i></th>
           </tr>
         </ng-template>
@@ -113,7 +113,7 @@
             <td>{{activos.Nombre}}</td>
             <td>{{activos.Fecha}}</td>
             <td>{{activos.TipoMantenimiento}}</td>
-            <td><i class="pi pi-trash cursor" title="Quitar Activos" (click)="quitarActivo(activos)"></i></td>
+            <td><button pButton type="button" style="width: 30px; height: 30px;" class="p-button-rounded p-button-danger" icon="pi pi-trash" (click)="quitarActivo(activos)" pTooltip="Quitar activos"></button></td>
           </tr>
         </ng-template>
       </p-table>
@@ -124,8 +124,8 @@
   <br>
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button" (click)="crearPedido()">Crear Pedido</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()">Limpiar Todo</button>
+      <button pButton class="p-button-danger" type="button" label="Crear Pedido" icon="pi pi-check" (click)="crearPedido()"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
     </div>
   </div>
 </div>

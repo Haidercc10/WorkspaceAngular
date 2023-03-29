@@ -27,8 +27,8 @@
 
   <!-- Botones que llamaran los modeles -->
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <button pButton pRipple class="p-button-rounded p-button-danger" label="Crear Proveedor" icon="pi pi-user-plus" (click)="LlamarModalCrearProveedor()"></button>
-    <button pButton pRipple class="p-button-rounded p-button-danger" label="Crear Materia Prima" icon="pi pi-check-circle" (click)="LlamarModalCrearMateriaPrima()"></button>
+    <button pButton pRipple class="p-button-danger" label="Crear Proveedor" icon="pi pi-user-plus" (click)="LlamarModalCrearProveedor()"></button>
+    <button pButton pRipple class="p-button-danger" label="Crear Materia Prima" icon="pi pi-check-circle" (click)="LlamarModalCrearMateriaPrima()"></button>
   </div>
 
   <!-- Informacion de la orden de compra -->
@@ -43,7 +43,7 @@
         <!-- Consecutivo de la orden de compra -->
         <div class="form-floating col-md-2">
           <input formControlName="ConsecutivoOrden" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo de la Orden de Compra" (keyup.enter)="consultarOrdenCompra()">
-          <label for="floatingSelect">Concecutivo de la Orden</label>
+          <label for="floatingSelect">Consecutivo OC</label>
         </div>
 
         <!-- Proveedor -->
@@ -118,8 +118,8 @@
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="cargarMateriaPrima()"><i class="pi pi-send"></i> Agregar Mat. Prima</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMateriaPrima()"><i class="pi pi-eraser"></i> Limpiar Campos Mat. Prima</button>
+        <button pButton class="p-button-danger" type="button" label="Agregar Mat. Prima" icon="pi pi-send" (click)="cargarMateriaPrima()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos Mat. Prima" icon="pi pi-eraser" (click)="limpiarCamposMateriaPrima()"></button>
       </div>
     </div>
   </form>
@@ -129,7 +129,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-table"></i> Materias Primas Seleccionadas</h4>
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Materias Primas Seleccionadas</h4>
   </div>
 
   <div class="row g-3">
@@ -188,9 +188,9 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarDatosOrdenCompra()" *ngIf="!edicionOrdenCompra"><i class="pi pi-check"></i> Crear Orden de Compra</button>
-      <button class="btn btn-danger btn-danger-sm" type="button" (click)="editarOrdenCompra()" *ngIf="edicionOrdenCompra"><i class="pi pi-pencil"></i> Editar Orden de Compra</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()"><i class="pi pi-eraser"></i> Limpiar Todo</button>
+      <button pButton class="p-button-danger" type="button" label="Crear Orden de Compra" icon="pi pi-check" *ngIf="!edicionOrdenCompra" (click)="validarDatosOrdenCompra()"></button>
+      <button pButton class="p-button-danger" type="button" label="Editar Orden de Compra" icon="pi pi-pencil" *ngIf="edicionOrdenCompra" (click)="editarOrdenCompra()"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"></button>
     </div>
   </div>
 

@@ -20,7 +20,7 @@
 <div class="formulario">
   <!-- Inicio titulo -->
   <div class="mb-4">
-    <h4 class="tituloRojo">Facturación de Ordenes de Maquilas</h4>
+    <h4 class="tituloRojo"><i class="pi pi-dollar"></i> Facturación de Ordenes de Maquilas</h4>
   </div>
 
   <!-- Fomulario Imicial -->
@@ -63,7 +63,7 @@
   </form>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Materia Prima</h4>
+    <h4 class="tituloRojo"><i class="pi pi-check-square"></i> Seleccionar Mat. Prima</h4>
   </div>
 
   <!--Inicio tabla Mat. Primas de la OC -->
@@ -131,7 +131,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Materia Prima Seleccionada</h4>
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Mat. Prima Seleccionada</h4>
   </div>
 
   <div class="mb-3" *ngIf="!cargando">
@@ -202,8 +202,8 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarDatos()"><i class="pi pi-check"></i> Facturar Maquila</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()"><i class="pi pi-eraser"></i> Limpiar Todo</button>
+      <button pButton class="p-button-danger" type="button" label="Facturar Maquila" icon="pi pi-check" (click)="validarDatos()"> </button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
     </div>
   </div>
 </div>

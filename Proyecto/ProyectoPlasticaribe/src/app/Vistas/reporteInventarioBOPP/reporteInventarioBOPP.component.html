@@ -22,6 +22,7 @@
 
 <div class="formulario font-size-14">
   <form [formGroup]="FormMateriaPrima">
+
     <div class="mb-3">
       <div class="row g-3">
         <!-- Id de Materia Prima -->
@@ -67,16 +68,17 @@
           <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Fecha Final</label>
         </div>
+
       </div>
     </div>
 
     <!-- BOTONES -->
-    <div class="mb-1">
+    <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="validarConsulta()"></button>
         <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCampos()"> </button>
         <button pButton class="p-button-warning" type="button" label="Con Existencias" icon="pi pi-eye" (click)="mostrarBOPPConStock()"></button>
-        <button type="button" pButton pRipple icon="pi pi-file-excel" class="p-button-success mr" (click)="exportToExcel()"  pTooltip="Exportar a Excel" tooltipPosition="bottom"></button>
+        <button type="button" pButton pRipple icon="pi pi-file-excel" class="p-button-success mr" (click)="exportToExcel()" pTooltip="Exportar a Excel" tooltipPosition="bottom"></button>
       </div>
     </div>
   </form>

@@ -20,6 +20,10 @@
 </div>
 
 <div class="formulario font-size-14">
+  <div class="mb-4">
+    <h2 class="tituloRojo"><i class="pi pi-list"></i> Listado de activos</h2>
+  </div>
+
   <div class="mb-3" *ngIf="!cargando">
     <div class="row g-3 font-size-14" id="table">
       <p-table
@@ -43,41 +47,31 @@
           <tr>
             <th scope="col">ID/Placa/Serial
               <p-sortIcon field="Id" title="Ordenar por ID/Placa/Serial"></p-sortIcon>
-              <p-columnFilter type="text" field="Id" display="menu"></p-columnFilter>
             </th>
             <th scope="col">Nombre
               <p-sortIcon field="Nombre" title="Ordenar por Nombre"></p-sortIcon>
-              <p-columnFilter type="text" field="Nombre" display="menu"></p-columnFilter>
             </th>
             <th scope="col">Tipo Activo
               <p-sortIcon field="TipoActivo" title="Ordenar por Nombre"></p-sortIcon>
-              <p-columnFilter type="text" field="TipoActivo" display="menu"></p-columnFilter>
             </th>
             <th scope="col">Fecha Compra
               <p-sortIcon field="Fecha" title="Ordenar por Fecha de Compra"></p-sortIcon>
-              <p-columnFilter type="date" field="Fecha" display="menu"></p-columnFilter>
             </th>
             <th scope="col">Precio Compra
               <p-sortIcon field="PrecioCompra" title="Ordenar por Precio de Compra"></p-sortIcon>
-              <p-columnFilter type="numeric" field="PrecioCompra" display="menu"></p-columnFilter>
             </th>
             <th scope="col"> Fecha Último Mtto
               <p-sortIcon field="FechaUltMtto" title="Ordenar por Fecha del Último Mantenimiento"></p-sortIcon>
-              <p-columnFilter type="date" field="FechaUltMtto" display="menu"></p-columnFilter>
             </th>
             <th scope="col">Precio Ultimo Mtto
               <p-sortIcon field="PrecioUltMtto" title="Ordenar por Precio del Último Mantenimiento"></p-sortIcon>
-              <p-columnFilter type="numeric" field="PrecioUltMtto" display="menu"></p-columnFilter>
             </th>
             <th scope="col">Precio Total Mtto
               <p-sortIcon field="PrecioTotalMtto" title="Ordenar por Precio Total de los Mantenimientos"></p-sortIcon>
-              <p-columnFilter type="numeric" field="PrecioTotalMtto" display="menu"></p-columnFilter>
             </th>
             <th scope="col">Depreciación
               <p-sortIcon field="Depreciacion" title="Ordenar por Depreciación"></p-sortIcon>
-              <p-columnFilter type="numeric" field="Depreciacion" display="menu"></p-columnFilter>
             </th>
-            <th><button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" class="p-button-success mr" (click)="exportToExcel()" pTooltip="XLS" tooltipPosition="bottom"></button></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-reporte>

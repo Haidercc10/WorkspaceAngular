@@ -19,7 +19,7 @@
 <div class="formulario">
   <!-- Inicio titulo -->
   <div class="mb-4">
-    <h4 class="tituloRojo">Ingresar Materia Prima Recuperada</h4>
+    <h4 class="tituloRojo"><i class="pi pi-cloud-download"></i> Ingresar Mat. Prima Recuperada</h4>
   </div>
   <!-- Fin titulo -->
   <form [formGroup]="FormMateriaPrimaRecuperada">
@@ -28,20 +28,20 @@
       <div class="row g-3">
 
         <!-- Id Operario -->
-        <div class="form-floating col-md-3">
+        <div class="form-floating col-md">
           <input formControlName="usuarioId" type="number" class="form-control form-control-sm" id="floatingInput">
           <label for="floatingSelect">ID Operario</label>
         </div>
 
         <!-- Nombre Operario -->
-        <div class="form-floating col-md-4">
+        <div class="form-floating col-md-3">
           <select formControlName="usuarioNombre" id="floatingSelect" type="text" (change)="llenarUsuarioSeleccionado()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
             <option [ngValue]="usuario.usua_Id" *ngFor="let usuario of usuarios">{{usuario.usua_Nombre}}</option>
           </select>
           <label for="floatingSelect">Nombre Operario</label>
         </div>
 
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <select formControlName="Turno" id="floatingSelect" type="text" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
             <option [ngValue]="turno.turno_Id" *ngFor="let turno of turnos">{{turno.turno_Nombre}}</option>
           </select>
@@ -49,13 +49,13 @@
         </div>
 
         <!-- Fecha Ingreso -->
-        <div class="form-floating col-md-3">
+        <div class="form-floating col-md">
           <input formControlName="MpingresoFecha" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Ingreso">
           <label for="floatingInput">Fecha Ingreso</label>
         </div>
 
         <!-- Campo Observacion -->
-        <div class="form-floating col-md">
+        <div class="form-floating col-md-4">
           <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm" name="MpObservacion"></textarea>
           <label for="floatingTextarea">Observación</label>
         </div>
@@ -64,7 +64,7 @@
   </form>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Materia Prima</h4>
+    <h4 class="tituloRojo"><i class="pi pi-box"></i> Seleccionar Mat. Prima</h4>
   </div>
 
   <form [formGroup]="FormMateriaPrima">
@@ -72,7 +72,7 @@
       <div class="row g-3">
         <div class="form-floating col-md-2">
           <input formControlName="MpId" type="number" min="0" (keyup.enter)="buscarMpId()" class="form-control" id="floatingInput"required >
-          <label for="floatingInput">Id Materia Prima</label>
+          <label for="floatingInput">Id</label>
         </div>
 
         <!-- ID/Nombre Producto -->
@@ -81,13 +81,13 @@
           <datalist id="mp">
             <option value={{item.id}} *ngFor="let item of materiasPrimas">{{item.name}}</option>
           </datalist>
-          <label for="floatingInput">Materia Prima</label>
+          <label for="floatingInput">Mat. Prima</label>
         </div>
 
         <!-- CANTIDAD DE MATERIA PRIMA  -->
         <div class="form-floating col-md-2">
           <input formControlName="MpCantidad" type="number" id="floatingSelect" class="form-control form-control-sm" title="Ancho" min="0" >
-          <label for="floatingInput">Cantidad de Materia Prima</label>
+          <label for="floatingInput">Cantidad Mat. Prima</label>
         </div>
 
         <!-- Unidad medida-->
@@ -103,8 +103,9 @@
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCamposVaciosMP()">{{AccionBoton}} Materia Prima</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCamposMP()">Limpiar Campos Materia Prima</button>
+
+        <button pButton class="p-button-danger" type="button" label="Agregar Mat. Prima" icon="pi pi-send" (click)="validarCamposVaciosMP()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos Mat. Prima" icon="pi pi-eraser" (click)="limpiarCamposMP()"></button>
       </div>
     </div>
   </form>
@@ -114,7 +115,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Tabla Materia Prima Recuperada</h4>
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla Mat. Prima Recuperada</h4>
   </div>
 
   <!-- TABLA DE INGRESO -->
@@ -156,8 +157,8 @@
   <br>
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button" (click)="registrarRecuperado()">Agregar Recuperado</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosCampos()">Limpiar Todos los Campos</button>
+      <button pButton class="p-button-danger" type="button" label="Registrar Recuperado" icon="pi pi-check" (click)="registrarRecuperado()"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"></button>
     </div>
   </div>
 </div>

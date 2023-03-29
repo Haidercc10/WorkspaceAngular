@@ -25,7 +25,7 @@
 
   <!-- Informacion del pedido de mantenimiento -->
   <div class="mb-4">
-    <h4 class="tituloRojo">Información del Pedido</h4>
+    <h4 class="tituloRojo"><i class="pi pi-info-circle"></i> Información del Pedido</h4>
   </div>
 
   <!-- Formulario del pedido de mantenimiento -->
@@ -33,34 +33,25 @@
     <div class="mb-3">
       <div class="row g-3">
         <!-- Consecutivo del pedido -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="ConsecutivoMovimiento" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo del Pedido" min="0">
-          <label for="floatingSelect">Concecutivo del Movimiento</label>
+          <label for="floatingSelect">Consecutivo Mov.</label>
         </div>
 
-        <!-- Tipo de Movimiento -->
-        <!-- <div class="form-floating col-md-3">
-          <select formControlName="TipoMovimiento" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
-            <option value="1">Pedido de Mantenimiento</option>
-            <option value="2">Mantenimiento</option>
-          </select>
-          <label for="floatingSelect">Tipo de Movimiento</label>
-        </div> -->
-
         <!-- Fecha Inicial -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="FechaInicial" type="date" class="form-control" id="floatingInput">
           <label for="floatingInput">Fecha Inicial</label>
         </div>
 
         <!-- Fecha Final -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="FechaFinal" type="date" class="form-control" id="floatingInput">
           <label for="floatingInput">Fecha Final</label>
         </div>
 
         <!-- Estados -->
-        <div class="form-floating col-md-3">
+        <div class="form-floating col-md">
           <select formControlName="Estado" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
             <option [ngValue]="item.estado_Id" *ngFor="let item of estados; let i=index">{{item.estado_Nombre}}</option>
           </select>
@@ -77,30 +68,39 @@
         </div>
 
         <!-- Fecha en que presentó el daño -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="FechaDaño" type="date" class="form-control" id="floatingInput">
           <label for="floatingInput">Fecha Daño</label>
         </div>
 
         <!-- Tipos de Mantenimientos -->
-        <div class="form-floating col-md-3">
+        <div class="form-floating col-md-2">
           <input formControlName="TipoMantenimiento" class="form-control" list="tipos" id="floatingInput" title="Nombre del Tipo de Mantenimiento" (change)="buscarTipoMantenimientoSeleccionado()">
           <datalist id="tipos">
             <option value={{item.tpMtto_Id}} *ngFor="let item of tiposMantenimiento">{{item.tpMtto_Nombre}}</option>
           </datalist>
-          <label for="floatingInput">Tipo de Mantenimiento</label>
+          <label for="floatingInput">Tipo Mantenimiento</label>
         </div>
       </div>
     </div>
 
+
     <!-- BOTONES -->
-    <div class="mb-1">
+    <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="consultar()">Consultar</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()">Limpiar Campos</button>
+        <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultar()"> </button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
       </div>
     </div>
   </form>
+
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <div class="mb-4">
+    <h2 class="tituloRojo"><i class="pi pi-list"></i> Listado de registros consultados</h2>
+  </div>
 
   <div class="container-fluid font-size-14">
     <div class="mb-3" *ngIf="!cargando">
@@ -126,31 +126,24 @@
             <tr>
               <th scope="col">Consecutivo
                 <p-sortIcon field="Consecutivo" title="Order por Consecutivo"></p-sortIcon>
-                <p-columnFilter type="text" field="Consecutivo" display="menu"></p-columnFilter>
               </th>
               <th scope="col">Tipo Movimiento
                 <p-sortIcon field="TipoMov" title="Order por TipoMov"></p-sortIcon>
-                <p-columnFilter type="text" field="TipoMov" display="menu"></p-columnFilter>
               </th>
               <th scope="col">Fecha
                 <p-sortIcon field="Fecha" title="Order por Fecha"></p-sortIcon>
-                <p-columnFilter type="date" field="Fecha" display="menu"></p-columnFilter>
               </th>
               <th scope="col">Estado
                 <p-sortIcon field="Estado" title="Order por Estado"></p-sortIcon>
-                <p-columnFilter type="text" field="Estado" display="menu"></p-columnFilter>
               </th>
               <th scope="col">Activo
                 <p-sortIcon field="Activo" title="Order por Activo"></p-sortIcon>
-                <p-columnFilter type="text" field="Activo" display="menu"></p-columnFilter>
               </th>
               <th scope="col">Fecha Daño
                 <p-sortIcon field="FechaDano" title="Order por Fecha Daño"></p-sortIcon>
-                <p-columnFilter type="date" field="FechaDano" display="menu"></p-columnFilter>
               </th>
               <th scope="col">Tipo Mtto
                 <p-sortIcon field="TipoMtto" title="Order por Tipo Mantenimiento"></p-sortIcon>
-                <p-columnFilter type="text" field="TipoMtto" display="menu"></p-columnFilter>
               </th>
               <th></th>
             </tr>
@@ -164,7 +157,8 @@
               <td>{{movimientos.Activo}}</td>
               <td>{{movimientos.FechaDano}}</td>
               <td>{{movimientos.TipoMtto}}</td>
-              <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" (click)="validarPDF(movimientos)"></a></td>
+              <td style="text-align: center;">
+                <button pButton type="button" style="width: 30px; height: 30px;" class="p-button-danger p-button-rounded" pTooltip="PDF" icon="pi pi-file-pdf" (click)="validarPDF(movimientos)"></button>
             </tr>
           </ng-template>
         </p-table>
