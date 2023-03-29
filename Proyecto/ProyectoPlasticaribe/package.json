@@ -26,6 +26,7 @@
     "@fortawesome/fontawesome-free": "6.2.0",
     "@fortawesome/fontawesome-svg-core": "^6.2.0",
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
+    "@ngx-translate/core": "^14.0.0",
     "@popperjs/core": "^2.11.6",
     "@syncfusion/ej2-angular-dropdowns": "^20.3.50",
     "@types/html2canvas": "^1.0.0",

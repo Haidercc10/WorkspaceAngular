@@ -124,6 +124,8 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       rollos.push(this.rollosInsertar[i].Id);
     }
+    fechaInicial = moment(fechaInicial).format('YYYY-MM-DD');
+    fechaFinal = moment(fechaFinal).format('YYYY-MM-DD');
     setTimeout(() => {
       if (ot != null && fechaInicial != null && fechaFinal != null) {
         this.dtIngRollosService.getRollosDisponiblesOT(ot).subscribe(datos_Rollos => {
@@ -259,7 +261,10 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
           }
         });
       }
-      setTimeout(() => { if (consulta <= 0) this.mensajeAdvertencia('¡No hay rollos por salir!'); }, 2000);
+      setTimeout(() => {
+        if (consulta <= 0) this.mensajeAdvertencia('¡No hay rollos por salir!');
+        this.cargando = true;
+      }, 2000);
     }, 3000);
   }
 
@@ -384,7 +389,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que ingresará los rollos que están saliendo
   dtSalidaRollos(id : number){
-    let procesos : string = this.FormConsultarRollos.value.Proceso;
+    let procesos : string = this.FormConsultarRollos.value.Proceso.proceso_Id;
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       if (!this.rollosInsertar[i].exits) {
         let info : any = {

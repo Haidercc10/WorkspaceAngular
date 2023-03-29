@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 :root {
   --font-size: 1;
+  --rojo: #db4149;
+  --rojoHover: #a8262c;
 }
 
 body {
@@ -66,7 +68,7 @@ a {
 }
 
 .tituloRojo{
-  color:#db4149;
+  color: var(--rojo);
   font-size: calc(var(--font-size) * 20px);
 }
 
@@ -86,7 +88,7 @@ a {
 }
 
 .modal-title {
-  color: #db4149 ;
+  color: var(--rojo) ;
 }
 
 .overlay{

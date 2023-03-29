@@ -9,6 +9,7 @@ import { User_Inv_Zeus } from './_Models/user_Inv_Zeus';
 import { user_Conta_Zeus } from './_Models/user_Conta_Zeus';
 import { User_BagPro } from './_Models/user_BagPro';
 import { CookieService } from 'ngx-cookie-service';
+import { PrimeNGConfig } from 'primeng/api';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,9 @@ import { CookieService } from 'ngx-cookie-service';
   styleUrls: ['./app.component.css']
 })
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 
 export class AppComponent implements OnInit{
 
@@ -39,7 +42,8 @@ export class AppComponent implements OnInit{
                   private authenticationInvZeusService : AuthenticationService_InvZeus,
                     private authenticationContaZeusService : authentication_ContaZeus,
                       private authenticationBagProService : authentication_BagPro,
-                        private cookieService: CookieService,) {
+                        private cookieService: CookieService,
+                          private config: PrimeNGConfig,) {
     this.authenticationService.user.subscribe(x => this.user = x);
     this.authenticationInvZeusService.user.subscribe(x => this.user_InvZeus = x);
     this.authenticationContaZeusService.user.subscribe(x => this.user_ContaZeus = x);
@@ -49,7 +53,17 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
     this.lecturaStorage();
+    this.config.setTranslation({
+      accept: 'Aceptar',
+      reject: 'Cancelar',
+      monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+      dayNames: ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'],
+      dayNamesShort: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
+      dayNamesMin: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
+    });
   }
+
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
