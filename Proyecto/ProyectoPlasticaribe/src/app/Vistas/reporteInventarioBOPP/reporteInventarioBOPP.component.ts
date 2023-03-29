@@ -56,15 +56,15 @@ export class ReporteInventarioBOPPComponent implements OnInit {
                         private boppService : EntradaBOPPService,) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
-      MpId : ['', Validators.required],
-      MpNombre: ['', Validators.required],
-      MpCantidad : ['', Validators.required],
-      MpPrecio: ['', Validators.required],
-      MpUnidadMedida: ['', Validators.required],
-      fecha: [this.today, Validators.required],
-      fechaFinal: ['', Validators.required],
-      MpCategoria : ['', Validators.required],
-      MpBodega : ['', Validators.required],
+      MpId : [null, Validators.required],
+      MpNombre: [null, Validators.required],
+      MpCantidad : [null, Validators.required],
+      MpPrecio: [null, Validators.required],
+      MpUnidadMedida: [null, Validators.required],
+      fecha: [null, Validators.required],
+      fechaFinal: [null, Validators.required],
+      MpCategoria : [null, Validators.required],
+      MpBodega : [null, Validators.required],
     });
   }
 
@@ -235,31 +235,33 @@ export class ReporteInventarioBOPPComponent implements OnInit {
 
   // Funcion que cargará las informacion de las materias primas segun los filtros que se consulten
   cargarTabla(data : any){
-    if (!this.idMateriasPrimas.includes(data.id) && data.id != 84 && data.id != 2001 && data.id != 88 && data.id != 89 && data.id != 2072){
-      this.valorTotal = this.valorTotal + data.precio * data.stock;
-      this.cantInicial += data.inicial;
-      this.cantEntrante += data.entrada;
-      this.cantSaliente += data.salida;
-      this.cantExistencias += data.stock;
-      this.cantDiferencia += data.diferencia;
+    if (data.categoria == 'BOPP' || data.categoria == 'BOPA' || data.categoria == 'Poliester'){
+      if (!this.idMateriasPrimas.includes(data.id) && data.id != 84 && data.id != 2001 && data.id != 88 && data.id != 89 && data.id != 2072){
+        this.valorTotal = this.valorTotal + data.precio * data.stock;
+        this.cantInicial += data.inicial;
+        this.cantEntrante += data.entrada;
+        this.cantSaliente += data.salida;
+        this.cantExistencias += data.stock;
+        this.cantDiferencia += data.diferencia;
 
-      let productoExt : any = {
-        Id : data.id,
-        Nombre : data.nombre,
-        Ancho : data.ancho,
-        Inicial : data.inicial,
-        Entrada : data.entrada,
-        Salida : data.salida,
-        Cant : data.stock,
-        Diferencia : data.diferencia,
-        UndCant : data.presentacion,
-        PrecioUnd : data.precio,
-        SubTotal : data.subTotal,
-        Categoria : data.categoria,
+        let productoExt : any = {
+          Id : data.id,
+          Nombre : data.nombre,
+          Ancho : data.ancho,
+          Inicial : data.inicial,
+          Entrada : data.entrada,
+          Salida : data.salida,
+          Cant : data.stock,
+          Diferencia : data.diferencia,
+          UndCant : data.presentacion,
+          PrecioUnd : data.precio,
+          SubTotal : data.subTotal,
+          Categoria : data.categoria,
+        }
+        this.idMateriasPrimas.push(data.id);
+        this.ArrayMateriaPrima.push(productoExt);
+        this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
-      this.idMateriasPrimas.push(data.id);
-      this.ArrayMateriaPrima.push(productoExt);
-      this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
     }
   }
 
@@ -267,8 +269,8 @@ export class ReporteInventarioBOPPComponent implements OnInit {
   validarConsulta(){
     this.load = false;
     let idMateriaPrima : number = this.FormMateriaPrima.value.MpId;
-    let fecha : any = this.FormMateriaPrima.value.fecha;
-    let fechaFinal : any = this.FormMateriaPrima.value.fechaFinal;
+    let fecha : any = moment(this.FormMateriaPrima.value.fecha).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormMateriaPrima.value.fechaFinal).format('YYYY-MM-DD');
     let categoria : any = this.FormMateriaPrima.value.MpCategoria;
     let bodega : any = this.FormMateriaPrima.value.MpBodega;
     this.ArrayMateriaPrima = [];
@@ -279,6 +281,10 @@ export class ReporteInventarioBOPPComponent implements OnInit {
     this.cantSaliente = 0;
     this.cantExistencias = 0;
     this.cantDiferencia = 0;
+    if (fecha == 'Invalid date') fecha = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if (categoria != null) categoria = categoria.catMP_Id;
+    if (bodega != null) bodega = bodega.tpBod_Id;
 
     if (fecha != null && fechaFinal != null && idMateriaPrima != null && categoria != null) {
       if (categoria != 0) {

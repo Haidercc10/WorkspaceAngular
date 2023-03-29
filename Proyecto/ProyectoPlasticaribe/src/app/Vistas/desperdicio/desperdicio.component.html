@@ -22,36 +22,46 @@
   <div class="mb-4">
     <h4 class="tituloRojo"><i class="pi pi-cloud-download"></i>  Registro de Desperdicio</h4>
   </div>
+  <br>
 
   <!-- Formulario del pedido de mantenimiento -->
   <form [formGroup]="FormDesperdicio">
     <div class="mb-3">
-      <div class="row g-3">
+      <div class="row g-4">
         <!-- OT -->
-        <div class="form-floating col-md-2">
-          <input formControlName="OTDesperdicio" class="form-control form-control-sm" id="floatingInput" type="number" min="100000" (keyup.enter)="consultarOrdenTrabajo()">
-          <label for="floatingInput">OT</label>
+        <div class="col-md-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="OTDesperdicio" id="ordenTrabajo" class="form-control form-control-sm" type="text" pInputText (keyup.enter)="consultarOrdenTrabajo()"/>
+            <label for="ordenTrabajo">OT</label>
+          </span>
         </div>
 
         <!-- ID PRODUCTO -->
-        <div class="form-floating col-md-2">
-          <input formControlName="IdProducto" class="form-control form-control-sm" id="floatingInput" type="number" readonly onmousedown="return false;">
-          <label for="floatingInput">Id Producto</label>
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="IdProducto" id="IdProducto" [readonly]="true"></p-inputNumber>
+            <label for="IdProducto">Id Producto</label>
+          </span>
         </div>
 
         <!-- NOMBRE PRODUCTO -->
-        <div class="form-floating col-md-4">
-          <input formControlName="Producto" class="form-control form-control-sm" id="floatingInput" type="text" readonly onmousedown="return false;">
-          <label for="floatingInput">Nombre Producto</label>
+        <div class="col-md-4">
+          <span class="p-float-label">
+            <input formControlName="Producto" id="Producto" class="form-control form-control-sm" type="text" pInputText readonly/>
+            <label for="Producto">Producto</label>
+          </span>
         </div>
 
         <!-- TIPO DE MATERIAL -->
-        <div class="form-floating col-md-4">
-          <input formControlName="TipoMaterial" class="form-control form-control-sm" list="material" id="floatingInput" type="text" (change)="buscarMaterial()" required>
-          <datalist id="material">
-            <option value={{item.material_Id}} *ngFor="let item of materiales">{{item.material_Nombre}}</option>
-          </datalist>
-          <label for="floatingInput">Tipo de Material</label>
+        <div class="col-md-3">
+          <span class="p-float-label">
+            <input formControlName="TipoMaterial" id="Nombre" list="material" class="form-control form-control-sm" type="text" pInputText/>
+            <datalist id="material">
+              <option value={{item.material_Id}} *ngFor="let item of materiales">{{item.material_Nombre}}</option>
+            </datalist>
+            <label for="material">Material</label>
+          </span>
         </div>
 
         <!-- IMPRESO -->
@@ -67,57 +77,71 @@
         </div>
 
         <!-- MAQUINA -->
-        <div class="form-floating col-md-2">
-          <input formControlName="Maquina" class="form-control form-control-sm" list="Maquinas" id="floatingInput" (change)="buscarMaquina()" required>
-          <datalist id="Maquinas">
-            <option value={{item.actv_Id}} *ngFor="let item of maquinas">{{item.actv_Nombre}}</option>
-          </datalist>
-          <label for="floatingInput">Maquina</label>
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="Maquina" id="Maquina" list="Maquinas" class="form-control form-control-sm" type="text" pInputText (change)="buscarMaquina()" />
+            <datalist id="Maquinas">
+              <option value={{item.actv_Id}} *ngFor="let item of maquinas">{{item.actv_Nombre}}</option>
+            </datalist>
+            <label for="Maquina">Maquinas</label>
+          </span>
         </div>
 
         <!-- OPERARIO -->
-        <div class="form-floating col-md-3">
-          <input formControlName="Operario" class="form-control form-control-sm" list="Operario" id="floatingInput" (change)="buscarOperario()" required>
-          <datalist id="Operario">
-            <option value={{item.usua_Id}} *ngFor="let item of operarios">{{item.usua_Nombre}}</option>
-          </datalist>
-          <label for="floatingInput">Operarios</label>
+        <div class="col-md-3">
+          <span class="p-float-label">
+            <input formControlName="Operario" id="Operario" list="Operarios" class="form-control form-control-sm" type="text" pInputText (change)="buscarOperario()"/>
+            <datalist id="Operarios">
+              <option value={{item.usua_Id}} *ngFor="let item of operarios">{{item.usua_Nombre}}</option>
+            </datalist>
+            <label for="Operario">Operarios</label>
+          </span>
         </div>
 
         <!-- NO CONFORMIDAD -->
-        <div class="form-floating col-md-3">
-          <input formControlName="TipoNoConformidad" class="form-control form-control-sm" list="TipoNoConformidad" id="floatingInput" (change)="buscarFalla()" required>
-          <datalist id="TipoNoConformidad">
-            <option value={{item.falla_Id}} *ngFor="let item of fallas">{{item.falla_Nombre}}</option>
-          </datalist>
-          <label for="floatingInput">No Conformidad</label>
+        <div class="col-md-3">
+          <span class="p-float-label">
+            <input formControlName="TipoNoConformidad" id="NoConformidad" list="TipoNoConformidad" class="form-control form-control-sm" type="text" pInputText (change)="buscarFalla()"/>
+            <datalist id="TipoNoConformidad">
+              <option value={{item.falla_Id}} *ngFor="let item of fallas">{{item.falla_Nombre}}</option>
+            </datalist>
+            <label for="NoConformidad">No Conformidad</label>
+          </span>
         </div>
 
         <!-- CANTIDAD DE DESPERDICIO -->
-        <div class="form-floating col-md-2">
-          <input formControlName="CantidadKg" type="number" id="floatingSelect" class="form-control form-control-sm" min="1" required>
-          <label for="floatingInput">Cantidad</label>
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="CantidadKg" id="Cantidad" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
+            <label for="Cantidad">Cantidad</label>
+          </span>
         </div>
 
         <!-- AREA -->
-        <div class="form-floating col-md-2">
-          <input formControlName="Area" class="form-control form-control-sm" list="Area" id="floatingInput" (change)="buscarProceso()" required>
-          <datalist id="Area">
-            <option value={{item.proceso_Id}} *ngFor="let item of procesos">{{item.proceso_Nombre}}</option>
-          </datalist>
-          <label for="floatingInput">Procesos</label>
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="Area" id="Areas" list="Area" class="form-control form-control-sm" type="text" pInputText (change)="buscarProceso()"/>
+            <datalist id="Area">
+              <option value={{item.proceso_Id}} *ngFor="let item of procesos">{{item.proceso_Nombre}}</option>
+            </datalist>
+            <label for="Areas">Area</label>
+          </span>
         </div>
 
         <!-- FECHA ENTREGA -->
-        <div class="form-floating col-md-2">
-          <input formControlName="Fecha" type="date" class="form-control form-control-sm" id="floatingInput">
-          <label for="floatingInput">Fecha Entrega</label>
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <p-calendar formControlName="Fecha" inputId="FechaInicial" [showIcon]="true"></p-calendar>
+            <label for="FechaInicial">Fecha Entrega</label>
+          </span>
         </div>
 
         <!-- OBSERVACION -->
-        <div class="form-floating col-6 col-md">
-          <textarea formControlName="Observacion" id="floatingTextArea" type="text" class="form-control form-control-sm"></textarea>
-          <label for="floatingTextArea">Observación</label>
+        <div class="col-md">
+          <span class="p-float-label">
+            <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
         </div>
       </div>
     </div>
@@ -183,5 +207,4 @@
     <button pButton class="p-button-danger" type="button" label="Crear Desperdicio" icon="pi pi-check" (click)="crearDesperdicio()"></button>
     <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
   </div>
-
 </div>

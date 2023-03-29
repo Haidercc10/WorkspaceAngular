@@ -24,64 +24,71 @@
     <div class="mb-4">
       <h2 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de Búsqueda</h2>
     </div>
+    <br>
+
     <!-- Formulario con filtros de busqueda -->
     <form [formGroup]="FormDocumentos">
       <!-- Fila 1 -->
       <div class="mb-3">
-        <div class="row g-3">
+        <div class="row g-4">
+
           <!-- ID Documento -->
-          <div class="form-floating col-md">
-            <input formControlName="idDocumento" type="text" class="form-control" id="floatingInput"required >
-            <label for="floatingInput">OT</label>
+          <div class="col-md">
+            <span class="p-float-label">
+              <p-inputNumber formControlName="idDocumento" id="Orden"></p-inputNumber>
+              <label for="Orden">OT</label>
+            </span>
           </div>
 
-          <!-- Fecha inicial -->
-          <div class="form-floating col-md">
-            <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput"required >
-            <label for="floatingInput">Fecha Inicial</label>
+          <!-- Fecha Inicial -->
+          <div class="col-md">
+            <span class="p-float-label">
+              <p-calendar formControlName="fecha" inputId="FechaInicial" [showIcon]="true"></p-calendar>
+              <label for="FechaInicial">Fecha Inicial</label>
+            </span>
           </div>
 
-          <!-- Fecha final -->
-          <div class="form-floating col-md">
-            <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
-            <label for="floatingInput">Fecha Final</label>
+          <!-- Fecha Final -->
+          <div class="col-md">
+            <span class="p-float-label">
+              <p-calendar formControlName="fechaFinal" inputId="FechaFinal" [showIcon]="true"></p-calendar>
+              <label for="FechaFinal">Fecha Final</label>
+            </span>
           </div>
 
-          <!-- Tipo Docuemtno -->
-          <div class="form-floating col-md">
-            <select formControlName="TipoDocumento" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
-              <option [ngValue]="null" disabled selected>Seleccionar</option>
-              <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
-                <option [ngValue]="tiposDocumentos.tpDoc_Id" *ngFor="let tiposDocumentos of tipoDocumento">{{tiposDocumentos.tpDoc_Nombre}}</option>
-              </ng-container>
-            </select>
-            <label for="floatingSelect">Tipo Movimiento</label>
-          </div>
-
-          <!-- Materia Prima -->
-          <div class="form-floating col-md-4">
-            <input formControlName="materiaPrima" class="form-control form-control-sm" list="materiaprima" id="floatingInput" title="Nombre de la Materia Prima" required (change)="cambiarNombreMateriaPrima()">
-            <datalist id="materiaprima">
-              <option value={{item.matPri_Id}} *ngFor="let item of ArrayMateriaPrima">{{item.matPri_Nombre}}</option>
-            </datalist>
-            <label for="floatingInput">Materia Prima</label>
+          <!-- Tipo Documento -->
+          <div class="col-md">
+            <span class="p-float-label">
+              <p-dropdown formControlName="TipoDocumento" inputId="TipoDocumento" [autoDisplayFirst]="false" [options]="tipoDocumento" optionLabel="tpDoc_Nombre"></p-dropdown>
+              <label for="TipoDocumento">Tipo Movimiento</label>
+            </span>
           </div>
 
           <!-- Estados -->
           <ng-container *ngIf="ValidarRol == 1">
-            <div class="form-floating col-md">
-              <select formControlName="estado" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example" required>
-                <option [ngValue]="estados.estado_Id" *ngFor="let estados of ArrayEstados">{{estados.estado_Nombre}}</option>
-              </select>
-              <label for="floatingSelect">Estado OT</label>
+            <div class="col-md">
+              <span class="p-float-label">
+                <p-dropdown formControlName="estado" inputId="Estado" [autoDisplayFirst]="false" [options]="ArrayEstados" optionLabel="estado_Nombre"></p-dropdown>
+                <label for="Estado">Estado OT</label>
+              </span>
             </div>
           </ng-container>
 
+          <!-- Materia Prima -->
+          <div class="col-md-4">
+            <span class="p-float-label">
+              <input formControlName="materiaPrima" id="Nombre" list="materiaprima" class="form-control form-control-sm" type="text" pInputText (change)="cambiarNombreMateriaPrima()"/>
+              <datalist id="materiaprima">
+                <option value={{item.matPri_Id}} *ngFor="let item of ArrayMateriaPrima">{{item.matPri_Nombre}}</option>
+              </datalist>
+              <label for="Orden">Materia Prima</label>
+            </span>
+          </div>
         </div>
       </div>
 
       <!-- BOTONES -->
-      <div class="mb-3">
+      <div class="mb-1">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
           <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultar()"></button>
           <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCampos()"> </button>

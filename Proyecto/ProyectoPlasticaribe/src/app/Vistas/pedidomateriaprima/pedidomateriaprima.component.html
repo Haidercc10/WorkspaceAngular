@@ -9,59 +9,69 @@
   </div>
 </div>
 
-<div class="formulario">
-  <div class="container-fluid">
-    <!-- principal -->
-    <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Facturas de Materia Prima</h2>
-    </div>
-
-    <div class="mb-4">
-      <hr class="colorLinea">
-    </div>
+<div class="container-fluid">
+  <!-- principal -->
+  <div class="mb-4 Titulo">
+    <h2 class="tituloRojo">Facturas de Materia Prima</h2>
   </div>
+
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+</div>
+
+<div class="formulario">
 
   <!-- Inicio titulo -->
   <div class="mb-4">
     <h4 class="tituloRojo"><i class="pi pi-cloud-download"></i> Ingresar Factura</h4>
   </div>
+  <br>
 
   <form [formGroup]="FormMateriaPrimaFactura">
     <div class="mb-3">
-      <div class="row g-3">
-
-        <div class="form-floating col-md-2">
-          <input formControlName="OrdenCompra" (keyup.enter)="cargarInfoOrdenCompraEnTabla()" type="number" class="form-control form-control-sm" id="floatingInput" name="Mpid">
-          <label for="floatingSelect">Nro. OC</label>
+      <div class="row g-4">
+        <div class="col-md-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="OrdenCompra" id="orden" class="form-control form-control-sm" type="text" pInputText (keyup.enter)="cargarInfoOrdenCompraEnTabla()"/>
+            <label for="orden">N° OC</label>
+          </span>
         </div>
 
         <!-- Factura -->
-        <div class="form-floating col-md-2">
-          <input formControlName="MpFactura" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
-          <label for="floatingSelect">Nro. Factura</label>
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="MpFactura" id="Factura" class="form-control form-control-sm" type="text" pInputText/>
+            <label for="Factura">Factura</label>
+          </span>
         </div>
+
         <!-- Remision -->
-        <div class="form-floating col-md-2">
-          <input formControlName="MpRemision" type="text" class="form-control form-control-sm" id="floatingInput" name="Mpid" >
-          <label for="floatingSelect">Nro. Remisión</label>
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="MpRemision" id="Remision" class="form-control form-control-sm" type="text" pInputText/>
+            <label for="Remision">Remisión</label>
+          </span>
         </div>
 
-        <div class="form-floating col-md">
-          <input formControlName="proveedorNombre" class="form-control" list="clientes" id="floatingInput" (change)="cambiarNombreProveedor()" title="Nombre del Proveedor" required>
-          <datalist id="clientes">
-            <option value={{item.prov_Id}} *ngFor="let item of proveedor">{{item.prov_Nombre}}</option>
-          </datalist>
-          <label for="floatingInput">Proveedor</label>
+        <!-- Proveedor -->
+        <div class="col-md-6">
+          <span class="p-float-label">
+            <input formControlName="proveedorNombre" id="Proveedor" list="proveedor" class="form-control form-control-sm" type="text" pInputText (change)="cambiarNombreProveedor()"/>
+            <datalist id="proveedor">
+              <option value={{item.prov_Id}} *ngFor="let item of proveedor">{{item.prov_Nombre}}</option>
+            </datalist>
+            <label for="Proveedor">Proveedor</label>
+          </span>
         </div>
-      </div>
-    </div>
 
-    <div class="mb-3">
-      <div class="row g-3">
-        <!-- Campo Observacion -->
-        <div class="form-floating col-md">
-          <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm" name="MpObservacion"></textarea>
-          <label for="floatingTextarea">Observación</label>
+        <!-- Observacion -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <textarea formControlName="MpObservacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
         </div>
       </div>
     </div>

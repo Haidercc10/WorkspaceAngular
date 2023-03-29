@@ -132,17 +132,21 @@ export class MovimientosTintasComponent implements OnInit {
     });
   }
 
-
   // Funcion que va a consultar por cada combinacion de filtro que se le indiquen
   consultar(){
     this.load = false;
     this.ArrayInfoConsulta = [];
     let ot : number = this.FormDocumentos.value.idDocumento;
-    let tipoDoc : string = this.FormDocumentos.value.TipoDocumento;
-    let fechaIncial : any = this.FormDocumentos.value.fecha;
-    let fechaFinal : any = this.FormDocumentos.value.fechaFinal;
+    let tipoDoc : any = this.FormDocumentos.value.TipoDocumento;
     let tintaConsulta : any = this.FormDocumentos.value.TintaId;
+    let fechaIncial : any = moment(this.FormDocumentos.value.fecha).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormDocumentos.value.fechaFinal).format('YYYY-MM-DD');
     let estado : any = this.FormDocumentos.value.estado;
+
+    if (tipoDoc != null) tipoDoc = tipoDoc.tpDoc_Id;
+    if (estado != null) estado = estado.estado_Id;
+    if (fechaIncial == 'Invalid date') fechaIncial = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
 
     if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && tintaConsulta != null && estado != null) {
       if (tipoDoc == 'ASIGTINTAS') {

@@ -26,21 +26,27 @@
   <div class="mb-4">
     <h4 class="tituloRojo"><i class="pi pi-cloud-download"></i> Ingresar Materia Prima devuelta</h4>
   </div>
+  <br>
   <!-- Fin titulo -->
   <form [formGroup]="FormDevolucion">
     <!-- Inicio Fila 1 Agregar producto -->
     <div class="mb-3">
       <div class="row g-3">
         <!-- Orden de TRabajo -->
-        <div class="form-floating col-md-2">
-          <input formControlName="ot" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.Enter)="consultarOt()">
-          <label for="floatingSelect">OT</label>
+        <div class="col-md-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="ot" id="ordenTrabajo" class="form-control form-control-sm" type="text" pInputText (keyup.enter)="consultarOt()" required/>
+            <label for="ordenTrabajo">OT</label>
+          </span>
         </div>
 
         <!-- Campo Observacion -->
-        <div class="form-floating col-md">
-          <textarea formControlName="MpObservacion" id="floatingTextarea" type="text" class="form-control form-control-sm" name="MpObservacion"></textarea>
-          <label for="floatingTextarea">Observación</label>
+        <div class="col-md">
+          <span class="p-float-label">
+            <textarea formControlName="MpObservacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
         </div>
       </div>
     </div>

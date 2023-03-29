@@ -119,13 +119,17 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   Consultar() {
     this.load = false;
     let OT : any = this.formFiltros.value.OT;
-    let fecha1 : any = this.formFiltros.value.fechaInicio
-    let fecha2 : any = this.formFiltros.value.fechaFinal
+    let fecha1 : any = moment(this.formFiltros.value.fechaInicio).format('YYYY-MM-DD');
+    let fecha2 : any = moment(this.formFiltros.value.fechaFinal).format('YYYY-MM-DD');
     let material : any = this.formFiltros.value.Material
     let item : any = this.formFiltros.value.Producto
     this.arrayConsulta = [];
     let ruta : string = '';
 
+    if (material != null) material = material.material_Id;
+
+    if (fecha1 == 'Invalid date') fecha1 = null;
+    if (fecha2 == 'Invalid date') fecha2 = null;
     if (fecha1 == null) fecha1 = this.today;
     if (fecha2 == null) fecha2 = fecha1;
 

@@ -1,15 +1,19 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Workbook } from 'exceljs';
-import * as fs from 'file-saver';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import pdfMake from 'pdfmake/build/pdfmake';
-import { Table } from 'primeng/table';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
-import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollosExtrusion/DetallesAsgRollos_Extrusion.service';
-import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
-import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
+import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
+import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/facturaMp.service';
+import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
+import { FactuaMpCompradaService } from 'src/app/Servicios/FacturaMateriaPrima/facturaMpComprada.service';
+import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
+import { OrdenFactura_RelacionService } from 'src/app/Servicios/OrdenCompra_Facturas/OrdenFactura_Relacion.service';
+import { OrdenCompra_RemisionService } from 'src/app/Servicios/OrdenCompra_Remision/OrdenCompra_Remision.service';
+import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
+import { RemisionService } from 'src/app/Servicios/Remisiones/Remision.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -20,41 +24,79 @@ import Swal from 'sweetalert2';
 
 export class PruebaImagenCatInsumoComponent implements OnInit {
 
-  public FormConsultarFiltros !: FormGroup;
-  cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
-  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
+  load: boolean = true;
+  public FormEntradaBOPP !: FormGroup;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  estados : any [] = []; //Variable que almacenará los estados que pueden tener los rollos en esta bodega
-  registrosConsultados : any [] = []; //Variable que va a almacenar los diferentes registros consultados
-  rollosPdf : any [] = []; //Variable que va a almacenar los rollos que se consultar de una asignacion
-  rollosAgrupados : any [] = []; //Variable que va a almacen
-  totalRollos : number = 0; //Variable que almacenará el total de rollos
-  totalCantidad : number = 0; //Variable que almacenará la cantidad de total de kg de los rollos
-  tipoDocumento : string [] = ['Ingreso de Rollos', 'Salida de Rollos']
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
+  unidadMedida = []; //Variable que almacenará las unidades de medida
+  ArrayBOPP = []; //Varibale que almacenará los BOPP que estarán entrando
+  categorias : any = []; //Variable que almacenará las categorias que se podrán seleccionar para la materia prima a ingresar
+  nombresBopp : any =[]; /** Variable que cargará los nombres de BOPP que más suelen comprarse en la empresa */
+  micrasBopp : any =[]; /** Variable que cargará las micras de BOPP que más suelen utilizarse en la empresa */
+  anchosBopp : any =[]; /** Variable que cargará los anchos de BOPP que más suelen utilizarse en la empresa */
+  preciosBopp : any =[]; /** Variable que cargará los precios por los que más se compra BOPP en la empresa */
+  serialesBopp : any =[]; /** Variable que cargará los precios por los que más se compra BOPP en la empresa */
+  proveedor = []; //Variable que almacenará los diferentes proveedores de materia prima
+  public FormOpcional !: FormGroup;
+  arrayBopps : any = [];
+  campoRemi_Faccompra: any = null;
+  valorTotal : number = 0;
+  arrayBoppsFacturados : any = [];
+  arrayBoppsRemisionados : any = [];
+  tipoDoc : any = null;
 
-  constructor(private frmBuilder : FormBuilder,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                  private estadosService : EstadosService,
-                    private ingRollosService : DtIngRollos_ExtrusionService,
-                      private salidaRollosService : DetallesAsgRollos_ExtrusionService,) {
+  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private rolService : RolesService,
+                  private frmBuilder : FormBuilder,
+                    private unidadMedidaService : UnidadMedidaService,
+                      private entradaBOPPService : EntradaBOPPService,
+                        private categoriaService : CategoriaMateriaPrimaService,
+                          private servicioProveedores : ProveedorService,
+                            private servicioOC_MatPrimas : OrdenCompra_MateriaPrimaService,
+                              private servicioFacturasCompras : FactuaMpCompradaService,
+                                private servicioOC_Faccompra : OrdenFactura_RelacionService,
+                                  private servicioRemisiones : RemisionService,
+                                    private servicioOC_Remisiones : OrdenCompra_RemisionService,
+                                      private servicioDetalleFacco_MatPrima : FacturaMpService,
+                                        private servicioDetRemisiones : RemisionesMPService) {
 
-    this.FormConsultarFiltros = this.frmBuilder.group({
-      Documento : [null, Validators.required],
-      ProdNombre : ['', Validators.required],
-      Rollo : ['', Validators.required ],
-      tipoDoc : ['', Validators.required ],
-      fechaDoc: [null, Validators.required],
-      fechaFinalDoc: [null, Validators.required],
-      estadoRollo: ['', Validators.required],
+    this.FormEntradaBOPP = this.frmBuilder.group({
+      Id : [''],
+      Nombre : [''],
+      serial : [null],
+      cantidad : [null],
+      cantidadKG : [null],
+      precio : [null],
+      ancho : [null],
+      undMed : [''],
+      Fecha : [this.today],
+      Observacion : [''],
+      Categoria : [''],
+    });
+
+    this.FormOpcional = this.frmBuilder.group({
+      OrdenCompra : [null],
+      Factura : [null],
+      Remision : [null],
+      PrvId : [null],
+      PrvNombre : [null],
+      Observacion : [null],
     });
   }
 
   ngOnInit() {
     this.lecturaStorage();
-    this.obtenerEstados();
+    this.obtenerUnidadesMedida();
+    this.obtenerCategorias();
+    this.getNombresBOPP();
+    this.getMicrasBOPP();
+    this.getAnchosBOPP();
+    this.getPreciosBOPP();
+    this.getSerialesBOPP();
+    this.obtenerProveeedor();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -64,538 +106,490 @@ export class PruebaImagenCatInsumoComponent implements OnInit {
     this.ValidarRol = this.storage.get('Rol');
   }
 
-  // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
-
-  // Funcion que va a consultar y almacenar los estados que pueden tener los rollos en la bodega de extrusion
-  obtenerEstados(){
-    this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
-      for (let i = 0; i < datos_estados.length; i++) {
-        if (datos_estados[i].estado_Id == 19 || datos_estados[i].estado_Id == 23) this.estados.push(datos_estados[i]);
+  //Funcion para  obtener las unidades de medidas
+  obtenerUnidadesMedida() {
+    this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => {
+      for (let i = 0; i < datos_unidadesMedida.length; i++) {
+        this.unidadMedida.push(datos_unidadesMedida[i].undMed_Id);
       }
     });
   }
 
-  //
+  // Funcion que servirá para cargar las categorias
+  obtenerCategorias(){
+    this.categorias = [],
+    this.categoriaService.srvObtenerLista().subscribe(datos_categorias => {
+      for (let i = 0; i < datos_categorias.length; i++) {
+        if (datos_categorias[i].catMP_Id == 6 || datos_categorias[i].catMP_Id == 14 || datos_categorias[i].catMP_Id == 15) this.categorias.push(datos_categorias[i]);
+      }
+    });
+  }
+
+  // Funcion limpiará todos los campos de vista
+  limpiarTodosLosCampos(){
+    this.FormEntradaBOPP.reset();
+    this.FormEntradaBOPP.patchValue({ Fecha : this.today });
+    this.ArrayBOPP = [];
+    this.arrayBopps = [];
+    this.campoRemi_Faccompra = null;
+    this.valorTotal = 0;
+    this.FormOpcional.reset();
+  }
+
+  // funcion que va a limpiar los campos
   limpiarCampos(){
-    this.cargando = true;
-    this.FormConsultarFiltros.reset();
-    this.registrosConsultados = [];
-    this.rollosAgrupados = [];
-    this.rollosPdf = [];
-    this.totalCantidad = 0;
-    this.totalRollos = 0;
+    this.FormEntradaBOPP.reset();
+    this.FormEntradaBOPP.patchValue({ Fecha : this.today });
   }
 
-  // Funcion que va a consultar por los filtros que se busquen
-  consultarFiltros(){
-    this.cargando = false;
-    this.registrosConsultados = [];
-    let ot : any = this.FormConsultarFiltros.value.ot;
-    let fechaIni : any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
-    let fechaFin : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
+  //Funcion que va a cargar en la tabla el rollo que se va a crear
+  cargarBOPPTabla(){
+    if (this.FormEntradaBOPP.valid) {
+      this.load = false;
+      let serial : number = this.FormEntradaBOPP.value.serial;
+      let cantidad : number = this.FormEntradaBOPP.value.cantidad;
+      let cantidadKg : number = this.FormEntradaBOPP.value.cantidadKG;
+      let nombre : string = this.FormEntradaBOPP.value.Nombre;
+      let descripcion : string = this.FormEntradaBOPP.value.Observacion;
+      let precio : number = this.FormEntradaBOPP.value.precio;
+      let ancho : number = this.FormEntradaBOPP.value.ancho;
+      let categoria : any = this.FormEntradaBOPP.value.Categoria;
+      let id : number = this.FormEntradaBOPP.value.Id;
+      categoria != null ? categoria = categoria.catMP_Id : categoria;
 
-    if (fechaIni == 'Invalid date') fechaIni = null;
-    if (fechaFin == 'Invalid date') fechaFin = null;
+      this.entradaBOPPService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
+        if (datos_bopp.length != 0) {
+          this.mensajeAdvertencia(`¡Ya existe un bopp con el serial ${serial}, por favor colocar un serial distinto!`);
+          this.load = true;
+        } else {
+          this.categoriaService.srvObtenerListaPorId(categoria).subscribe(datos_categorias => {
+            let productoExt : any = {
+              Id : id,
+              Serial : serial,
+              Nombre : nombre,
+              Descripcion : descripcion,
+              Ancho : ancho,
+              Cant : cantidad,
+              UndCant : 'µm',
+              CantKg : cantidadKg,
+              UndCantKg : 'Kg',
+              Precio : precio,
+              Subtotal : 0,
+              Cat_Id : categoria,
+              Cat : datos_categorias.catMP_Nombre,
+            }
+            productoExt.Subtotal = parseInt(productoExt.Precio) * parseInt(productoExt.CantKg);
+            this.ArrayBOPP.push(productoExt);
+            this.obtenerValorTotal();
 
-    if (fechaIni != null && fechaFin != null) {
-      this.ingRollosService.getconsultaRollosFechas(fechaIni, fechaFin).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i]);
+            this.FormEntradaBOPP = this.frmBuilder.group({
+              Id : '',
+              Nombre : '',
+              serial : '',
+              cantidad : '',
+              cantidadKG : '',
+              precio : '',
+              ancho : '',
+              undMed : '',
+              Fecha : this.today,
+              Observacion : '',
+              Categoria : '',
+            });
+            this.load = true;
+          });
         }
       });
-      this.salidaRollosService.getconsultaRollosFechas(fechaIni, fechaFin).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i]);
+    } else this.mensajeAdvertencia(`¡Hay campos vacios!`);
+  }
+
+  // funcion que crea los rollos en la tabla
+  crearEntrada(){
+    if (this.ArrayBOPP.length == 0) this.mensajeAdvertencia("¡Debe cargar minimo un BOPP en la tabla!");
+    else {
+      this.load = false
+
+        for (let i = 0; i < this.ArrayBOPP.length; i++) {
+          let bodega : number;
+          if (this.ArrayBOPP[i].Cat_Id == 6) bodega = 8;
+          else if (this.ArrayBOPP[i].Cat_Id == 14) bodega = 11;
+          else if (this.ArrayBOPP[i].Cat_Id == 15) bodega = 12;
+
+          let datosBOPP : any = {
+            bopP_Nombre : `${this.ArrayBOPP[i].Nombre} - ${this.ArrayBOPP[i].Serial} - ${this.ArrayBOPP[i].CantKg} - ${this.ArrayBOPP[i].Ancho}`,
+            bopP_Descripcion : this.ArrayBOPP[i].Descripcion,
+            bopP_Serial : this.ArrayBOPP[i].Serial,
+            bopP_CantidadMicras : this.ArrayBOPP[i].Cant,
+            undMed_Id : 'µm',
+            catMP_Id : this.ArrayBOPP[i].Cat_Id,
+            bopP_Precio : this.ArrayBOPP[i].Precio,
+            tpBod_Id : bodega,
+            bopP_FechaIngreso : this.today,
+            bopP_Ancho : this.ArrayBOPP[i].Ancho,
+            BOPP_Stock : this.ArrayBOPP[i].CantKg,
+            undMed_Kg : 'Kg',
+            bopP_CantidadInicialKg : this.ArrayBOPP[i].CantKg,
+            Usua_Id : this.storage_Id,
+            BOPP_Hora : moment().format('H:mm:ss'),
+            BOPP_TipoDoc: this.tipoDoc,
+            BOPP_CodigoDoc : this.campoRemi_Faccompra,
+          }
+
+          this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(datos_BOPP => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Registro Exitoso',
+              text: "¡Entrada de BOPP registrada con exito!",
+              showCloseButton: true
+            });
+            this.load = true;
+          }, error => {
+            this.mensajeError(`¡¡Error al ingresar el rollo!!`, error.message);
+          });
         }
-      });
-    } else if (ot != null) {
-      this.ingRollosService.getconsultaRollosOT(ot).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i]);
-        }
-      });
-      this.salidaRollosService.getconsultaRollosOT(ot).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i]);
-        }
-      });
-    } else if (fechaIni != null) {
-      this.ingRollosService.getconsultaRollosFechas(fechaIni, fechaIni).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i]);
-        }
-      });
-      this.salidaRollosService.getconsultaRollosFechas(fechaIni, fechaIni).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i]);
-        }
-      });
-    } else {
-      this.ingRollosService.getconsultaRollosFechas(this.today, this.today).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i]);
-        }
-      });
-      this.salidaRollosService.getconsultaRollosFechas(this.today, this.today).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          this.llenarTabla(datos_factura[i]);
-        }
-      });
     }
-    setTimeout(() => { this.cargando = true; }, 2500);
   }
 
-  // Funcion que servirá para llenar la tabla que se verá que está en la vista con la informacion que devuelve la consulta
-  llenarTabla(data : any){
-    let info : any = {
-      Ot : data.ot,
-      Fecha : data.fecha.replace('T00:00:00', ''),
-      Tipo : data.tipo,
-      Usuario : data.usuario,
-    }
-    this.registrosConsultados.push(info);
-    this.registrosConsultados.sort((a,b) => Number(a.Ot) - Number(b.Ot));
-  }
-
-  // Funcion que limpiará la tabla de cualquier filtro que se le haya aplicado
-  clear(table: Table) {
-    table.clear();
-  }
-
-  //Funcion que enviará a una funcion u otra dependiendo del tipo de documento que se desea ver
-  tipoPdf(datos : any){
-    this.totalCantidad = 0;
-    this.totalRollos = 0;
-    this.cargando = false;
-    this.rollosPdf = [];
-    this.rollosAgrupados = [];
-    if (datos.Tipo == 'Ingreso de Rollos') this.buscarInfoIngreso(datos.Ot);
-    else if (datos.Tipo == 'Salida de Rollos') this.buscarRolloPDFSalida(datos.Ot);
-  }
-
-  // Funcion que va a buscar la informacion de los rollos que fueron ingresados
-  buscarInfoIngreso(id : number){
-    this.ingRollosService.crearPdf(id).subscribe(datos_ingreso => {
-      for (let i = 0; i < datos_ingreso.length; i++) {
-        let info : any = {
-          OT : datos_ingreso[i].dtIngRollo_OT,
-          Producto : datos_ingreso[i].prod_Id,
-          Nombre : datos_ingreso[i].prod_Nombre,
-          Rollo : datos_ingreso[i].rollo_Id,
-          Cantidad : this.formatonumeros(datos_ingreso[i].dtIngRollo_Cantidad),
-          Cantidad2 : datos_ingreso[i].dtIngRollo_Cantidad,
-          Presentacion : datos_ingreso[i].undMed_Id,
-          Proceso : 'Extrusión',
-        }
-        this.rollosPdf.push(info);
-        this.rollosPdf.sort((a,b) => Number(a.OT) - Number(b.OT));
-      }
-    });
-    setTimeout(() => { this.AgruparRollos(); }, 1000);
-    setTimeout(() => { this.crearPdfEntrada(id) }, 3000);
-  }
-
-  // Funcion que traerá los rollos que fueron asignados
-  buscarRolloPDFSalida(id : number){
-    this.salidaRollosService.crearPdf(id).subscribe(datos_ingreso => {
-      for (let i = 0; i < datos_ingreso.length; i++) {
-        let info : any = {
-          OT : datos_ingreso[i].dtAsgRollos_OT,
-          Producto : datos_ingreso[i].prod_Id,
-          Nombre : datos_ingreso[i].prod_Nombre,
-          Rollo : datos_ingreso[i].rollo_Id,
-          Cantidad : this.formatonumeros(datos_ingreso[i].dtAsgRollos_Cantidad),
-          Cantidad2 : datos_ingreso[i].dtAsgRollos_Cantidad,
-          Presentacion : datos_ingreso[i].undMed_Id,
-          Proceso : datos_ingreso[i].proceso_Nombre,
-        }
-        this.rollosPdf.push(info);
-        this.rollosPdf.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
-      }
-    });
-    setTimeout(() => { this.AgruparRollos(); }, 1000);
-    setTimeout(() => { this.crearPDFSalida(id); }, 3000);
-  }
-
-  // Funcion que va a agrupar los rollos consultados
-  AgruparRollos(){
-    let producto : any = [];
-    for (let i = 0; i < this.rollosPdf.length; i++) {
-      if (!producto.includes(this.rollosPdf[i].OT)) {
-        let cantidad : number = 0, cantRollo : number = 0;
-        for (let j = 0; j < this.rollosPdf.length; j++) {
-          if (this.rollosPdf[i].Producto == this.rollosPdf[j].Producto) {
-            cantidad += this.rollosPdf[j].Cantidad2;
-            cantRollo += 1;
+  // Funcion que va a quitar un rollo de la tabla
+  quitarRollo(data : any){
+    Swal.fire({
+      title: '¿Estás seguro de eliminar la Materia Prima de la Asignación?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Eliminar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        for (let i = 0; i < this.ArrayBOPP.length; i++) {
+          if (data.Serial == this.ArrayBOPP[i].Serial) {
+            this.ArrayBOPP.splice(i, 1) ;
           }
         }
-        if (cantRollo > 0){
-          producto.push(this.rollosPdf[i].OT);
-          let info : any = {
-            OT: this.rollosPdf[i].OT,
-            Producto : this.rollosPdf[i].Producto,
-            Nombre : this.rollosPdf[i].Nombre,
-            Cantidad : this.formatonumeros(cantidad.toFixed(2)),
-            Cantidad2 : cantidad,
-            Rollos: this.formatonumeros(cantRollo),
-            Rollos2: cantRollo,
-            Presentacion : this.rollosPdf[i].Presentacion,
-          }
-          this.rollosAgrupados.push(info);
+        this.obtenerValorTotal();
+      }
+    });
+  }
+
+  // Mensaje de Advertencia
+  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
+    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+    this.load = true;
+  }
+
+  // Mensaje de Error
+  mensajeError(text : string, error : any = ''){
+    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+    this.load = true;
+  }
+
+  /** Obtener nombres, micras, precios, anchos y seriales más utilizados y cargarlos en los combobox en la vista */
+ getNombresBOPP() {
+    this.nombresBopp = [];
+    this.entradaBOPPService.getBopp().subscribe(data => {this.nombresBopp = data});
+    this.FormEntradaBOPP.patchValue({ Observacion : this.FormEntradaBOPP.value.Nombre });
+  }
+
+  getMicrasBOPP() {
+    this.micrasBopp = [];
+    this.entradaBOPPService.getMicras().subscribe(data => {this.micrasBopp = data});
+  }
+
+  getPreciosBOPP() {
+    this.preciosBopp = [];
+    this.entradaBOPPService.getPrecios().subscribe(data => {this.preciosBopp = data});
+  }
+
+  getAnchosBOPP() {
+    this.anchosBopp = [];
+    this.entradaBOPPService.getAnchos().subscribe(data => {this.anchosBopp = data});
+  }
+
+  getSerialesBOPP() {
+    this.serialesBopp = [];
+    this.entradaBOPPService.getSeriales().subscribe(data => {this.serialesBopp = data});
+  }
+
+  // Funcion que le va a cambiar el nombre al proveedor
+  cambiarNombreProveedor(){
+    let id : number = this.FormOpcional.value.PrvNombre;
+    this.servicioProveedores.srvObtenerListaPorId(id).subscribe(datos_proveedor => {
+      this.FormOpcional.setValue({
+        //ConsecutivoFactura : this.ultimoIdFactura,
+        OrdenCompra : this.FormOpcional.value.OrdenCompra,
+        Factura: this.FormOpcional.value.Factura,
+        Remision : this.FormOpcional.value.Remision,
+        PrvId: id,
+        PrvNombre: datos_proveedor.prov_Nombre,
+        Observacion : this.FormOpcional.value.Observacion,
+      });
+    }, error => { this.mensajeError(`No se encontró información del proveedor`, error.message); });
+  }
+
+  // Funcion que se encargará de obtener los proveedores
+  obtenerProveeedor(){
+    this.servicioProveedores.srvObtenerLista().subscribe(datos_proveedor => {
+      for (let index = 0; index < datos_proveedor.length; index++) {
+        this.proveedor.push(datos_proveedor[index]);
+      }
+    });
+  }
+
+  /** Función para consultar solo ordenes de compra de BOPP */
+  consultarOrdenCompra_Bopp() {
+    this.FormEntradaBOPP.reset();
+    this.arrayBopps = [];
+    let OC : number = this.FormOpcional.value.OrdenCompra;
+    /** Facturado */
+    this.servicioOC_MatPrimas.getFacturasAsociadasAOC(OC).subscribe(dataFacturada => {
+      if(dataFacturada.length > 0) {
+        for (let indx = 0; indx < dataFacturada.length; indx++) {
+          this.arrayBoppsFacturados.push(dataFacturada[indx].bopp_Id);
         }
       }
+      /** Remisionado */
+      this.servicioOC_MatPrimas.getRemisionesComprasAsociadasAOC(OC).subscribe(dataRemisionada => {
+        if(dataRemisionada.length > 0) {
+          for (let inx = 0; inx < dataRemisionada.length; inx++) {
+            this.arrayBoppsRemisionados.push(dataRemisionada[inx].bopp_Id);
+          }
+        }
+        /** Cargar lista de OC */
+        this.servicioOC_MatPrimas.getListaOrdenesComprasxId(OC).subscribe(data => {
+          if (data.length == 0) this.mensajeAdvertencia(`No existe una OC con el Nro. ${OC}, por favor, verifique!`);
+          else {
+            for (let index = 0; index < data.length; index++) {
+               this.cargarBopps(data[index], dataFacturada, dataRemisionada);
+            }
+          }
+        });
+      });
+    });
+  }
+
+   /** Función para cargar BOPPs a la tabla, segun la OC consultada. */
+  cargarBopps(datos : any, dataFact? : any, dataRem?: any) {
+    let infoOc : any = {
+      idMatPrima : datos.matPri_Id,
+      idTinta : datos.tinta_Id,
+      idBopp : datos.bopP_Id,
+      id : 0,
+      nombre: '',
+      micras: datos.boppGen_Micra,
+      undMicras: 'µm',
+      cantidad: datos.doc_CantidadPedida,
+      cantFacturada : 0,
+      cantFaltante : 0,
+      undKilos: 'Kg',
+      ancho: datos.boppGen_Ancho,
+      precio: datos.doc_PrecioUnitario,
+      proveedor : datos.prov_Id,
+      completado : false
+    }
+
+    if (infoOc.matPri_Id != 84 && infoOc.idTinta == 2001 && infoOc.idBopp == 1) {
+      infoOc.id = infoOc.idMatPrima;
+      infoOc.nombre = datos.matPri_Nombre;
+    } else if (infoOc.idMatPrima == 84 && infoOc.idTinta != 2001 && infoOc.idBopp == 1) {
+      infoOc.id = infoOc.idTinta;
+      infoOc.nombre = datos.tinta_Nombre;
+    } else if (infoOc.idMatPrima == 84 && infoOc.idTinta == 2001 && infoOc.idBopp != 1) {
+      infoOc.id = infoOc.idBopp;
+      infoOc.nombre = datos.boppGen_Nombre;
+    }
+
+    if(this.arrayBoppsFacturados.includes(infoOc.id)) {
+      for (let inx = 0; inx < dataFact.length; inx++) {
+        if(infoOc.id == dataFact[inx].bopp_Id) {
+          infoOc.cantFacturada = dataFact[inx].suma;
+          infoOc.Cantidad_Faltante = (infoOc.cantidad - infoOc.cantFacturada);
+          if(infoOc.cantFacturada == infoOc.cantidad) infoOc.completado = true;
+        }
+      }
+    }
+
+    if(this.arrayBoppsRemisionados.includes(infoOc.id)) {
+      for (let ix = 0; ix < dataRem.length; ix++) {
+        if(infoOc.id == dataRem[ix].bopp_Id) {
+          infoOc.cantFacturada = dataRem[ix].suma;
+          infoOc.Cantidad_Faltante = (infoOc.cantidad - infoOc.cantFacturada);
+          if(infoOc.cantFacturada == infoOc.cantidad) infoOc.completado = true;
+        }infoOc
+      }
+    }
+    this.FormOpcional.patchValue({ PrvId: datos.prov_Id, PrvNombre: datos.prov_Nombre,});
+    this.arrayBopps.push(infoOc);
+  }
+
+  /**Función que cargará la información de los rollos de la tabla a los campos */
+  editarRolloBopp(item : any) {
+      this.FormEntradaBOPP.patchValue({
+        Id : item.id,
+        Nombre: item.nombre,
+        cantidad: item.micras,
+        cantidadKG: item.cantidad,
+        precio: item.precio,
+        ancho: item.ancho,
+        Observacion: item.nombre,
+        Categoria: item.categoria,
+      });
+  }
+
+  /** Factura */
+  /** Funcion para registrar el encabezado de la factura */
+  registrarFacturaBopp(){
+    if (this.ArrayBOPP.length == 0) this.mensajeAdvertencia("Debe cargar minimo un BOPP/BOPA/Poliester en la tabla")
+    else {
+      const datosFactura : any = {
+        Facco_Codigo : this.FormOpcional.value.Factura,
+        Facco_FechaFactura : this.today,
+        Facco_FechaVencimiento : this.today,
+        Facco_Hora : moment().format('H:mm:ss'),
+        Prov_Id : this.FormOpcional.value.PrvId,
+        Facco_ValorTotal : this.valorTotal,
+        Facco_Observacion : this.FormOpcional.value.Observacion,
+        Estado_Id : 13,
+        Usua_Id : this.storage_Id,
+        TpDoc_Id : 'FCO',
+      }
+      this.servicioFacturasCompras.srvGuardar(datosFactura).subscribe(datos_EncabezadoFactura => { this.obtenerUltimoIdFacturaCompra(); }, error => {
+        this.mensajeError(`¡Error al crear la factura!`, error.message);
+      });
+    }
+  }
+
+  /** Funcion para registrar el máximo ID de la factura */
+  obtenerUltimoIdFacturaCompra() {
+    this.servicioFacturasCompras.UltimoIdFactura().subscribe(datos_facturas => { this.creacionDetalleFactura(datos_facturas); }, error => {
+      this.mensajeError(`¡Error al obtener la ultima factura creada!`, error.message);
+    });
+  }
+
+   /** Funcion para registrar el detalle de la factura */
+  creacionDetalleFactura(idUltimafactura : any) {
+    let detalleError : boolean;
+    for (let index = 0; index < this.ArrayBOPP.length; index++) {
+      let info : any = {
+        Facco_Id: idUltimafactura,
+        MatPri_Id: 84,
+        Tinta_Id: 2001,
+        Bopp_Id: this.ArrayBOPP[index].Id,
+        FaccoMatPri_Cantidad: this.ArrayBOPP[index].CantKg,
+        UndMed_Id: this.ArrayBOPP[index].UndCantKg,
+        FaccoMatPri_ValorUnitario: this.ArrayBOPP[index].Precio,
+      }
+      this.servicioDetalleFacco_MatPrima.srvGuardar(info).subscribe(dataDetalleFaccompraMP => { detalleError = false; }, error => {
+        this.mensajeError('No fue posible registrar el detalle de la factura, por favor, verifique!'); detalleError = true
+      });
     }
     setTimeout(() => {
-      this.rollosPdf.sort((a,b) => Number(a.OT) - Number(b.OT));
-      this.rollosAgrupados.sort((a,b) => Number(a.OT) - Number(b.OT));
-      this.calcularTotalRollos();
-      this.calcularTotalCantidad();
+      if(!detalleError) this.crearRelacionOrdenCompra_Faccompra(idUltimafactura);
     }, 500);
+
   }
 
-  // Funcion que calculará el total de rollos
-  calcularTotalRollos() {
-    let total = 0;
-    for(let sale of this.rollosAgrupados) {
-      total += sale.Rollos2;
+  /** Funcion para registrar la relación entre la factura y la OC */
+  crearRelacionOrdenCompra_Faccompra(factura : number){
+    let info : any = {
+      Oc_Id : this.FormOpcional.value.OrdenCompra,
+      Facco_Id : factura,
     }
-    this.totalRollos = total;
+    this.servicioOC_Faccompra.insert_OrdenCompra(info).subscribe(datos_insertados => { this.crearEntrada(); }, error => {
+      this.mensajeError(`¡No se ha creado la relacion entre la factura y la orden de compra!`, error.message);
+    });
   }
 
-  // Funcion que calculará el total de la kg
-  calcularTotalCantidad() {
-    let total = 0;
-    for(let sale of this.rollosAgrupados) {
-      total += sale.Cantidad2;
+  /** Remisión */
+  /** Función que creará el encabezado de las remisiones */
+  registrarRemisionBopp(){
+    const datosRemision : any = {
+      Rem_Codigo : this.FormOpcional.value.Remision,
+      Rem_Fecha : this.today,
+      Rem_Hora : moment().format('H:mm:ss'),
+      Rem_PrecioEstimado :  this.valorTotal,
+      Prov_Id : this.FormOpcional.value.PrvId,
+      Estado_Id : 12,
+      Usua_Id : this.storage_Id,
+      TpDoc_Id : 'REM',
+      Rem_Observacion : this.FormOpcional.value.Observacion,
     }
-    this.totalCantidad = total;
-  }
-
-  // Funcion que creará el pdf del ingreso
-  crearPdfEntrada(id : any){
-    let nombre : string = this.storage.get('Nombre');
-    this.ingRollosService.crearPdf(id).subscribe(datos_ingreso => {
-      for (let i = 0; i < datos_ingreso.length; i++) {
-        for (let j = 0; j < this.rollosPdf.length; j++) {
-          const pdfDefinicion : any = {
-            info: {
-              title: `${id}`
-            },
-            pageSize: {
-              width: 630,
-              height: 760
-            },
-            footer: function(currentPage : any, pageCount : any) {
-              return [
-                {
-                  columns: [
-                    { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                    { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                    { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                  ]
-                }
-              ]
-            },
-            content : [
-              {
-                columns: [
-                  {
-                    image : logoParaPdf,
-                    width : 220,
-                    height : 50
-                  },
-                  {
-                    text: `Ingreso de Rollos a Bodega de Extrusión`,
-                    alignment: 'right',
-                    style: 'titulo',
-                    margin: 30
-                  }
-                ]
-              },
-              '\n \n',
-              {
-                style: 'tablaEmpresa',
-                table: {
-                  widths: [90, '*', 90, '*'],
-                  style: 'header',
-                  body: [
-                    [
-                      {
-                        border: [false, false, false, false],
-                        text: `Nombre Empresa`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `Plasticaribe S.A.S`
-                      },
-                      {
-                        border: [false, false, false, false],
-                        text: `Fecha`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `${datos_ingreso[i].ingRollo_Fecha.replace('T00:00:00', '')} ${datos_ingreso[i].ingRollo_Hora}`
-                      },
-                    ],
-                    [
-                      {
-                        border: [false, false, false, false],
-                        text: `Dirección`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `${datos_ingreso[i].empresa_Direccion}`
-                      },
-                      {
-                        border: [false, false, false, false],
-                        text: `Ciudad`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `${datos_ingreso[i].empresa_Ciudad}`
-                      },
-                    ],
-                  ]
-                },
-                layout: {
-                  defaultBorder: false,
-                },
-                fontSize: 9,
-              },
-              '\n \n',
-              {
-                text: `Ingresado Por: ${datos_ingreso[i].nombreCreador}\n`,
-                alignment: 'left',
-                style: 'header',
-              },
-              {
-                text: `\n\n Consolidado de producto(s) \n `,
-                alignment: 'center',
-                style: 'header'
-              },
-              this.table2(this.rollosAgrupados, ['OT', 'Producto', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion']),
-              {
-                text: `\n\n Información detallada de los Rollos \n `,
-                alignment: 'center',
-                style: 'header'
-              },
-
-              this.table(this.rollosPdf, ['OT', 'Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion', 'Proceso']),
-              {
-                text: `\nCant. Total: ${this.formatonumeros(this.totalCantidad.toFixed(2))}\n Rollos Totales: ${this.formatonumeros(this.totalRollos.toFixed(2))}`,
-                alignment: 'right',
-                style: 'header',
-              },
-            ],
-            styles: {
-              header: {
-                fontSize: 10,
-                bold: true
-              },
-              titulo: {
-                fontSize: 20,
-                bold: true
-              }
-            }
-          }
-          const pdf = pdfMake.createPdf(pdfDefinicion);
-          pdf.open();
-          setTimeout(() => { (this.cargando = true); }, 1200);
-          break;
-        }
-        break;
-      }
+    this.servicioRemisiones.srvGuardar(datosRemision).subscribe(datos_remisionCreada => { this.obtenerUltimoIdRemision(); }, error => {
+      this.mensajeError(`¡Error al crear la remisión!`, error.message);
     });
   }
 
-  //Funcion que creará el pdf de la asignacion
-  crearPDFSalida(id : number){
-    let nombre : string = this.storage.get('Nombre');
-    this.salidaRollosService.crearPdf(id).subscribe(datos_ingreso => {
-      for (let i = 0; i < datos_ingreso.length; i++) {
-        for (let j = 0; j < this.rollosPdf.length; j++) {
-          const pdfDefinicion : any = {
-            info: {
-              title: `${id}`
-            },
-            pageSize: {
-              width: 630,
-              height: 760
-            },
-            footer: function(currentPage : any, pageCount : any) {
-              return [
-                {
-                  columns: [
-                    { text: `Reporte generado por ${nombre}`, alignment: ' left', fontSize: 8, margin: [30, 0, 0, 0] },
-                    { text: `Fecha Expedición Documento ${moment().format('YYYY-MM-DD')} - ${moment().format('H:mm:ss')}`, alignment: 'right', fontSize: 8 },
-                    { text: `${currentPage.toString() + ' de ' + pageCount}`, alignment: 'right', fontSize: 8, margin: [0, 0, 30, 0] },
-                  ]
-                }
-              ]
-            },
-            content : [
-              {
-                columns: [
-                  {
-                    image : logoParaPdf,
-                    width : 220,
-                    height : 50
-                  },
-                  {
-                    text: `Salida de Rollos a Bodega de Extrusión`,
-                    alignment: 'right',
-                    style: 'titulo',
-                    margin: 30
-                  }
-                ]
-              },
-              '\n \n',
-              {
-                style: 'tablaEmpresa',
-                table: {
-                  widths: [90, '*', 90, '*'],
-                  style: 'header',
-                  body: [
-                    [
-                      {
-                        border: [false, false, false, false],
-                        text: `Nombre Empresa`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `Plasticaribe S.A.S`
-                      },
-                      {
-                        border: [false, false, false, false],
-                        text: `Fecha`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `${datos_ingreso[i].asgRollos_Fecha.replace('T00:00:00', '')} ${datos_ingreso[i].asgRollos_Hora}`
-                      },
-                    ],
-                    [
-                      {
-                        border: [false, false, false, false],
-                        text: `Dirección`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `${datos_ingreso[i].empresa_Direccion}`
-                      },
-                      {
-                        border: [false, false, false, false],
-                        text: `Ciudad`
-                      },
-                      {
-                        border: [false, false, false, true],
-                        text: `${datos_ingreso[i].empresa_Ciudad}`
-                      },
-                    ],
-                  ]
-                },
-                layout: {
-                  defaultBorder: false,
-                },
-                fontSize: 9,
-              },
-              '\n \n',
-              {
-                text: `Ingresado Por: ${datos_ingreso[i].nombreCreador}\n`,
-                alignment: 'left',
-                style: 'header',
-              },
-              {
-                text: `\n\n Consolidado de producto(s) \n `,
-                alignment: 'center',
-                style: 'header'
-              },
-              this.table2(this.rollosAgrupados, ['OT', 'Producto', 'Nombre', 'Cantidad', 'Rollos', 'Presentacion']),
-              {
-                text: `\n\n Información detallada de los Rollos \n `,
-                alignment: 'center',
-                style: 'header'
-              },
-
-              this.table(this.rollosPdf, ['OT', 'Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion', 'Proceso']),
-              {
-                text: `\nCant. Total: ${this.formatonumeros(this.totalCantidad.toFixed(2))}\n Rollos Totales: ${this.formatonumeros(this.totalRollos.toFixed(2))}`,
-                alignment: 'right',
-                style: 'header',
-              },
-            ],
-            styles: {
-              header: {
-                fontSize: 10,
-                bold: true
-              },
-              titulo: {
-                fontSize: 20,
-                bold: true
-              }
-            }
-          }
-          const pdf = pdfMake.createPdf(pdfDefinicion);
-          pdf.open();
-          setTimeout(() => { (this.cargando = true); }, 1200);
-          break;
-        }
-        break;
-      }
+  // Funcion que se encargará de obtener el ultimo Id de las remisiones
+  obtenerUltimoIdRemision(){
+    this.servicioRemisiones.UltimoIdRemision().subscribe(datos_remision => { this.crearDetalleRemision(datos_remision); }, error => {
+      this.mensajeError(`¡Error al obtener el Id de la ultima remisión!`, error.message);
+      this.load = true;
     });
   }
 
-  // funcion que se encagará de llenar la tabla de los rollos en el pdf
-  buildTableBody(data, columns) {
-    var body = [];
-    body.push(columns);
-    data.forEach(function(row) {
-      var dataRow = [];
-      columns.forEach(function(column) {
-        dataRow.push(row[column].toString());
-      });
-      body.push(dataRow);
-    });
-
-    return body;
-  }
-
-  // Funcion que genera la tabla donde se mostrará la información de los rollos
-  table(data, columns) {
-    return {
-        table: {
-          headerRows: 1,
-          widths: [40, 40, 40, 221, 40, 50, 60],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 7,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+  //Funcion que creará el detalle de la remisión
+  crearDetalleRemision(idRemision : any){
+    let detalleError : boolean;
+    if (this.ArrayBOPP.length == 0) this.mensajeAdvertencia("Debe cargar minimo un BOPP/BOPA/Poliester en la tabla")
+    else {
+      for (let index = 0; index < this.ArrayBOPP.length; index++) {
+        const datosRemisionMp : any = {
+          Rem_Id : idRemision,
+          MatPri_Id : 84,
+          Tinta_Id : 2001,
+          Bopp_Id : this.ArrayBOPP[index].Id,
+          RemiMatPri_Cantidad : this.ArrayBOPP[index].CantKg,
+          UndMed_Id : this.ArrayBOPP[index].UndCantKg,
+          RemiMatPri_ValorUnitario : this.ArrayBOPP[index].Precio,
         }
-    };
-  }
-
-  // Funcion que genera la tabla donde se mostrará la información de los rollos
-  table2(data, columns) {
-    return {
-      table: {
-        headerRows: 1,
-        widths: [60, 50, 240, 60, 40, 50],
-        body: this.buildTableBody(data, columns),
-      },
-      fontSize: 7,
-      layout: {
-        fillColor: function (rowIndex, node, columnIndex) {
-          return (rowIndex == 0) ? '#CCCCCC' : null;
-        }
+        this.servicioDetRemisiones.srvGuardar(datosRemisionMp).subscribe(datos_remisionMpCreada => { detalleError = false; }, error => {
+          detalleError = true;
+          this.mensajeError(`¡Error al crear el detalle de la remisión!`, error.message);
+          this.load = true;
+        });
       }
-    };
+      setTimeout(() => { if (!detalleError) this.crearRelacionOrdenCompra_Remision(idRemision); }, 500);
+    }
+  }
+
+  /** Crear relación entre remisión y orden de compra */
+  crearRelacionOrdenCompra_Remision(remision : number){
+    let info : any = {
+      Oc_Id : this.FormOpcional.value.OrdenCompra,
+      Rem_Id : remision,
+    }
+    this.servicioOC_Remisiones.insert_OrdenCompra(info).subscribe(datos_insertados => { this.crearEntrada(); }, error => {
+      this.mensajeError(`¡No se ha creado la relacion entre la remisión y la orden de compra!`, error.message);
+    });
+  }
+
+  /** Funcion para validar que tipo de entrada de BOPP */
+  validarTipoEntradaBopp() {
+    let oc : number = this.FormOpcional.value.OrdenCompra;
+    let factura : any = this.FormOpcional.value.Factura;
+    let remision : any = this.FormOpcional.value.Remision;
+
+    if((oc == null && factura == null && remision == null)) {
+      this.crearEntrada();
+      setTimeout(() => { this.limpiarTodosLosCampos();}, 800);
+    } else if (oc != null && factura != null && remision == null) {
+      this.campoRemi_Faccompra = factura;
+      this.tipoDoc = 'FCO'
+      this.registrarFacturaBopp();
+      setTimeout(() => { this.limpiarTodosLosCampos();}, 2000);
+    } else if (oc != null && remision != null && factura == null) {
+      this.campoRemi_Faccompra = remision;
+      this.tipoDoc = 'REM'
+      this.registrarRemisionBopp();
+      setTimeout(() => { this.limpiarTodosLosCampos();}, 2000);
+    } else {
+      this.mensajeAdvertencia('Solo debe diligenciar el campo factura o remisión, por favor verifique!');
+    }
+  }
+
+  /** Función para obtener el valor total del Bopp a ingresar */
+  obtenerValorTotal(){
+    this.valorTotal = 0;
+    for (let index = 0; index < this.ArrayBOPP.length; index++) {
+      this.valorTotal += parseInt(this.ArrayBOPP[index].Subtotal);
+    }
   }
 }

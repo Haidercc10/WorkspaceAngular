@@ -228,7 +228,6 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a llenar la tabla con la informacion del desperdicio digitadi
   llenarTabla(){
     this.cargando = true;
-    let exits : boolean = false;
     if (this.FormDesperdicio.valid) {
       if (this.FormDesperdicio.value.OTDesperdicio == null) this.FormDesperdicio.value.OTDesperdicio = 0;
       if (this.FormDesperdicio.value.Producto == null) this.FormDesperdicio.value.Producto = `No aplica`;
@@ -248,7 +247,7 @@ export class DesperdicioComponent implements OnInit {
         Cantidad : this.FormDesperdicio.value.CantidadKg,
         Impreso : this.FormDesperdicio.value.Impreso,
         Observacion : this.FormDesperdicio.value.Observacion,
-        Fecha : this.FormDesperdicio.value.Fecha,
+        Fecha : moment(this.FormDesperdicio.value.Fecha).format('YYYY-MM-DD'),
         IdArea : this.FormDesperdicio.value.IdArea,
         Area : this.FormDesperdicio.value.Area,
       }

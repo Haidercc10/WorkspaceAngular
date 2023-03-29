@@ -8,7 +8,6 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/DetallesAsgBopp/detallesAsignacionBOPP.service';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
@@ -220,11 +219,16 @@ export class MovimientosBOPPComponent implements OnInit {
   consultar(){
     this.load = false;
     let ot : number = this.FormDocumentos.value.idDocumento;
-    let tipoDoc : string = this.FormDocumentos.value.TipoDocumento;
+    let tipoDoc : any = this.FormDocumentos.value.TipoDocumento;
     let fechaIncial : any = this.FormDocumentos.value.fecha;
     let fechaFinal : any = this.FormDocumentos.value.fechaFinal;
     let bopp : any = this.FormDocumentos.value.boppId;
     let estado : any = this.FormDocumentos.value.estado;
+
+    if (tipoDoc != null) tipoDoc = tipoDoc.tpDoc_Id;
+    if (estado != null) estado = estado.estado_Id;
+    if (fechaIncial == 'Invalid date') fechaIncial = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
 
     if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && bopp != null && estado != null) {
       if (tipoDoc == 'ASIGBOPP') {

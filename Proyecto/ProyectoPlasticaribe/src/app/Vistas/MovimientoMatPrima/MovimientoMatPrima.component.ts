@@ -217,11 +217,16 @@ export class MovimientoMatPrimaComponent implements OnInit {
     this.cantRestante = 0;
     this.estadoOt = '';
     let ot : number = this.FormDocumentos.value.idDocumento;
-    let tipoDoc : string = this.FormDocumentos.value.TipoDocumento;
-    let fechaIncial : any = this.FormDocumentos.value.fecha;
-    let fechaFinal : any = this.FormDocumentos.value.fechaFinal;
+    let tipoDoc : any = this.FormDocumentos.value.TipoDocumento;
+    let fechaIncial : any = moment(this.FormDocumentos.value.fecha).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormDocumentos.value.fechaFinal).format('YYYY-MM-DD');
     let materiaPrima : any = this.FormDocumentos.value.IdMateriaPrima;
     let estado : any = this.FormDocumentos.value.estado;
+
+    if (tipoDoc != null) tipoDoc = tipoDoc.tpDoc_Id;
+    if (estado != null) estado = estado.estado_Id;
+    if (fechaIncial == 'Invalid date') fechaIncial = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
 
     if (ot != null && tipoDoc != null && fechaIncial != null && fechaFinal != null && materiaPrima != null && estado != null) {
       if (tipoDoc == 'ASIGMP') {

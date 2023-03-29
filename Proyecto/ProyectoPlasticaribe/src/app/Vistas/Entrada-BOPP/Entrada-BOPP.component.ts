@@ -66,11 +66,11 @@ export class EntradaBOPPComponent implements OnInit {
     this.FormEntradaBOPP = this.frmBuilder.group({
       Id : [''],
       Nombre : [''],
-      serial : [''],
-      cantidad : [''],
-      cantidadKG : [''],
-      precio : [''],
-      ancho : [''],
+      serial : [null],
+      cantidad : [null],
+      cantidadKG : [null],
+      precio : [null],
+      ancho : [null],
       undMed : [''],
       Fecha : [this.today],
       Observacion : [''],
@@ -127,19 +127,8 @@ export class EntradaBOPPComponent implements OnInit {
 
   // Funcion limpiará todos los campos de vista
   limpiarTodosLosCampos(){
-    this.FormEntradaBOPP = this.frmBuilder.group({
-      Id : '',
-      Nombre : '',
-      serial : '',
-      cantidad : '',
-      cantidadKG : '',
-      precio : '',
-      ancho : '',
-      undMed : '',
-      Fecha : this.today,
-      Observacion : '',
-      Categoria : '',
-    });
+    this.FormEntradaBOPP.reset();
+    this.FormEntradaBOPP.patchValue({ Fecha : this.today });
     this.ArrayBOPP = [];
     this.arrayBopps = [];
     this.campoRemi_Faccompra = null;
@@ -149,18 +138,8 @@ export class EntradaBOPPComponent implements OnInit {
 
   // funcion que va a limpiar los campos
   limpiarCampos(){
-    this.FormEntradaBOPP = this.frmBuilder.group({
-      Nombre : '',
-      serial : '',
-      cantidad : '',
-      cantidadKG : '',
-      precio : '',
-      ancho : '',
-      undMed : '',
-      Fecha : this.today,
-      Observacion : '',
-      Categoria : '',
-    });
+    this.FormEntradaBOPP.reset();
+    this.FormEntradaBOPP.patchValue({ Fecha : this.today });
   }
 
   //Funcion que va a cargar en la tabla el rollo que se va a crear
@@ -174,8 +153,9 @@ export class EntradaBOPPComponent implements OnInit {
       let descripcion : string = this.FormEntradaBOPP.value.Observacion;
       let precio : number = this.FormEntradaBOPP.value.precio;
       let ancho : number = this.FormEntradaBOPP.value.ancho;
-      let categoria : number = this.FormEntradaBOPP.value.Categoria;
+      let categoria : any = this.FormEntradaBOPP.value.Categoria;
       let id : number = this.FormEntradaBOPP.value.Id;
+      categoria != null ? categoria = categoria.catMP_Id : categoria;
 
       this.entradaBOPPService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
         if (datos_bopp.length != 0) {

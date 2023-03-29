@@ -2,8 +2,19 @@ span {
   color: #db4149;
 }
 
-
-
 .TextosInfoTabla, .titulosTablasNuevas{
   font-size: calc(var(--font-size) * 16px);
+}
+
+.p-input-icon-left {
+  width: 100%;
+}
+
+p-dropdown ::ng-deep .p-dropdown {
+  display: flex;
+}
+
+p-inputnumber, p-inputnumber ::ng-deep span {
+  display: flex;
+  width: 100%;
 }

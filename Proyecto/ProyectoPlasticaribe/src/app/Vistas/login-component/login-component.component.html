@@ -2,7 +2,7 @@
   <form [formGroup]="formularioUsuario" (ngSubmit)="validarCamposVacios()">
     <div class="titulo">
       <!--<h1 class="display-2">Plasticaribe S.A.S</h1>-->
-      <img class="logo" src="/assets/Logo-Plasticaribe/logo.png" alt="">
+      <img class="logo" src="/assets/PLASTICARIBE_logo.png" alt="">
     </div>
     <!--Contenedor Principal-->
     <div class="container-fluid">
@@ -28,7 +28,7 @@
         <div class="col-md mb">
           <div class="p-inputgroup">
             <span class="p-float-label">
-              <input formControlName="Contrasena" type="password" class="form-control form-control-sm" id="floatingInputGroup1" id="pass" pInputText>
+              <input formControlName="Contrasena" type="password" class="form-control form-control-sm" id="pass" pInputText>
               <label htmlFor="pass">Contraseña</label>
             </span>
             <ng-container *ngIf="mostrarPass == true then noMostrar; else mostrar"></ng-container>
@@ -69,8 +69,8 @@
   </form>
 
   <div class="d-flex justify-content-center overlay" *ngIf="cargando">
-    <div class="spinner-border text-danger" role="status" style="margin: auto;">
-      <span class="visually-hidden">Cargando...</span>
+    <div style="margin: auto;">
+      <p-progressSpinner></p-progressSpinner>
     </div>
   </div>
 </div>

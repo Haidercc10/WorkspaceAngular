@@ -1,9 +1,14 @@
 .fondo {
-  background: url("/assets/Background/background_1.jpg") no-repeat center;
+  background: url("/assets/Background/plastic-industry.jpeg") no-repeat center;
+  transform: scaleX(-1);
   height: 100vh;
   min-height: 500px;
   background-size: cover;
   background-attachment: fixed;
+}
+
+form {
+  transform: scaleX(-1);
 }
 
 .contenedorLogin {
@@ -33,9 +38,9 @@
   border-radius: 1%;
   border-color: rgba(240, 240, 240, 0.603);
   border-style: solid;
-  -webkit-box-shadow: 1px 18px 60px -19px rgba(0,0,0,0.75);
-  -moz-box-shadow: 1px 18px 60px -19px rgba(0,0,0,0.75);
-  box-shadow: 1px 18px 60px -19px rgba(0,0,0,0.75);
+  -webkit-box-shadow: 1px 18px 60px -19px rgba(0,0,0);
+  -moz-box-shadow: 1px 18px 60px -19px rgba(0,0,0);
+  box-shadow: 1px 18px 60px -19px rgba(0,0,0);
 }
 
 .tituloRojo {

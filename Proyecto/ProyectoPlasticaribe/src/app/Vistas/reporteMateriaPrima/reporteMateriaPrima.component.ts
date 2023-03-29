@@ -261,6 +261,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     this.cantSaliente = 0;
     this.cantExistencias = 0;
     this.cantDiferencia = 0;
+    if (fecha == 'Invalid date') fecha = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
+    if (categoria != null) categoria = categoria.catMP_Id;
+    if (bodega != null) bodega = bodega.tpBod_Id;
 
     if (fecha != null && fechaFinal != null && idMateriaPrima != null && categoria != null) {
       if (categoria != 0) {
