@@ -23,7 +23,7 @@
 
   <!-- Inicio titulo -->
   <div class="mb-4">
-    <h4 class="tituloRojo">Ingresar Factura de Materia Prima</h4>
+    <h4 class="tituloRojo"><i class="pi pi-cloud-download"></i> Ingresar Factura</h4>
   </div>
 
   <form [formGroup]="FormMateriaPrimaFactura">
@@ -68,7 +68,7 @@
   </form>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Materia Prima</h4>
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Materia Prima</h4>
   </div>
 
   <!--Inicio tabla Mat. Primas de la OC -->
@@ -137,7 +137,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Tabla Ingreso</h4>
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Ingreso</h4>
   </div>
 
   <div class="mb-3" *ngIf="load">
@@ -204,7 +204,7 @@
   <p-accordion>
     <p-accordionTab header="Añadir Remisiones a una Factura">
       <div class="mb-4">
-        <h4 class="tituloRojo">Buscar Remisiones</h4>
+        <h4 class="tituloRojo"><i class="pi pi-search"></i> Buscar Remisiones</h4>
       </div>
       <form [formGroup]="FormRemisiones">
         <div class="form-floating col-md-2">
@@ -258,8 +258,8 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarCampos()">Agregar Factura</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosCampos()">Limpiar Todos los Campos</button>
+      <button pButton class="p-button-danger" type="button" label="Agregar Factura" icon="pi pi-check" (click)="validarCampos()"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"> </button>
     </div>
   </div>
 </div>

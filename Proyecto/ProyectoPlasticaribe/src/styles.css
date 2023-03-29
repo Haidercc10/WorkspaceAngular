@@ -167,4 +167,8 @@ a {
   font-size: calc(var(--font-size) * 24px);
 }
 
+.d-grid {
+  padding-bottom: 1%;
+}
+
 

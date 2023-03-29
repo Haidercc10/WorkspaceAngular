@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Materia Prima</h2>
+      <h2 class="tituloRojo">Inventario de Materia Prima</h2>
     </div>
 
     <div class="mb-4">
@@ -21,35 +21,40 @@
 </div>
 
 <div class="formulario">
+
+  <div class="mb-4">
+    <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de consulta</h4>
+  </div>
+
   <form [formGroup]="FormMateriaPrima">
     <div class="mb-3">
       <div class="row g-3">
         <!-- Id de Materia Prima -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="MpId" type="number" min="0"  class="form-control" id="floatingInput"required > <!-- (change)="buscarMpId()" -->
-          <label for="floatingInput">Id Materia Prima</label>
+          <label for="floatingInput">Id</label>
         </div>
 
         <!-- Nombre de la materia prima -->
-        <div class="form-floating col-md-6">
+        <div class="form-floating col-md-4">
           <input formControlName="MpNombre" class="form-control form-control-sm" list="materiaprima" id="floatingInput" title="Nombre de la Materia Prima" (keyup)="obtenerMateriasPrimas()" (change)="cambiarNombreMateriaPrima()">
           <datalist id="materiaprima">
             <option value={{item.id}} *ngFor="let item of materiasPrimas">{{item.nombre}}</option>
           </datalist>
-          <label for="floatingInput">Materia Prima</label>
+          <label for="floatingInput">Material</label>
         </div>
 
         <!-- Categoria Producto -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <select formControlName="MpCategoria" class="form-select form-select-sm" id="floatingSelect"  aria-label="Floating label select example" required>
             <option [ngValue]="categoria.catMP_Id" *ngFor="let categoria of categorias">{{categoria.catMP_Nombre}}</option>
             <option value="0">Con Existencias</option>
           </select>
-          <label for="floatingSelect">Categorias de Materia Prima</label>
+          <label for="floatingSelect">Categorias</label>
         </div>
 
         <!-- Bodegas -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <select formControlName="MpBodega" class="form-select form-select-sm" id="floatingSelect"  aria-label="Floating label select example" required>
             <option [ngValue]="item.tpBod_Id" *ngFor="let item of bodegas">{{item.tpBod_Nombre}}</option>
           </select>
@@ -57,13 +62,13 @@
         </div>
 
         <!-- Fecha inicial -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Fecha Inicial</label>
         </div>
 
         <!-- Fecha final -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Fecha Final</label>
         </div>
@@ -71,18 +76,22 @@
     </div>
 
     <!-- BOTONES -->
-    <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarConsulta()"><i class="pi pi-search"></i> Consultar Materia Prima</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()"><i class="pi pi-eraser"></i> Limpiar Campos</button>
-        <button class="btn btn-danger btn-danger-sm" type="button" title="Mostrar Materias Primas con existencias" (click)="mostrarMateriasPrimasConStock()"><i class="pi pi-eye"></i> Con Existencias</button>
-        <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-danger mr" pTooltip="Exportar a Excel" tooltipPosition="bottom"></button>
-      </div>
+        <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="validarConsulta()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCampos()"> </button>
+        <button pButton class="p-button-warning" type="button" label="Con Existencias" icon="pi pi-eye" (click)="mostrarMateriasPrimasConStock()"></button>
+        <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr" pTooltip="Exportar a Excel" tooltipPosition="bottom"></button>
     </div>
   </form>
-</div>
 
-<div class="container-fluid font-size-14">
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <div class="mb-4">
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Materias Primas</h4>
+  </div>
+
   <div class="mb-3" *ngIf="load">
     <div class="row g-3 font-size-14" id="table">
       <p-table
@@ -105,54 +114,39 @@
         <ng-template pTemplate="header">
           <tr>
             <th scope="col">ID
-              <p-columnFilter type="text" field="Id" display="menu"></p-columnFilter>
             </th>
             <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre
-              <p-columnFilter type="text" field="Nombre" display="menu"></p-columnFilter>
               <p-sortIcon field="Nombre"></p-sortIcon>
             </th>
             <th scope="col">Ancho
-              <p-columnFilter type="text" field="Ancho" display="menu"></p-columnFilter>
             </th>
             <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
-              <p-columnFilter type="number" field="Inicial" display="menu"></p-columnFilter>
               <p-sortIcon field="Inicial"></p-sortIcon>
             </th>
             <th pSortableColumn="Entrada" pReorderableColumn scope="col">Entrada
-              <p-columnFilter type="number" field="Entrada" display="menu"></p-columnFilter>
               <p-sortIcon field="Entrada"></p-sortIcon>
             </th>
             <th pSortableColumn="Salida" pReorderableColumn scope="col">Salida
-              <p-columnFilter type="number" field="Salida" display="menu"></p-columnFilter>
               <p-sortIcon field="Salida"></p-sortIcon>
             </th>
             <th pSortableColumn="Cant" pReorderableColumn scope="col">Existencias
-              <p-columnFilter type="number" field="Cant" display="menu"></p-columnFilter>
               <p-sortIcon field="Cant"></p-sortIcon>
             </th>
             <th pSortableColumn="Diferencia" pReorderableColumn scope="col">Diferencia
-              <p-columnFilter type="number" field="Diferencia" display="menu"></p-columnFilter>
               <p-sortIcon field="Diferencia"></p-sortIcon>
             </th>
             <th scope="col">Und. Medida
-              <p-columnFilter type="text" field="UndCant" display="menu"></p-columnFilter>
             </th>
             <ng-container *ngIf="ValidarRol == 1">
               <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col">Precio Unitario
-                <p-columnFilter type="numeric" currency="COP" field="PrecioUnd" display="menu"></p-columnFilter>
                 <p-sortIcon field="PrecioUnd"></p-sortIcon>
               </th>
               <th pSortableColumn="SubTotal" pReorderableColumn scope="col">SubTotal
-                <p-columnFilter type="numeric" currency="COP" field="SubTotal" display="menu"></p-columnFilter>
                 <p-sortIcon field="SubTotal"></p-sortIcon>
               </th>
             </ng-container>
             <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
-              <p-columnFilter type="text" field="Categoria" display="menu"></p-columnFilter>
               <p-sortIcon field="Categoria"></p-sortIcon>
-            </th>
-            <th>
-              <button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button>
             </th>
           </tr>
         </ng-template>
@@ -185,7 +179,6 @@
             <td colspan="2" class="text-right">{{'Kg'}}</td>
             <td>{{valorTotal | number}}</td>
             <td>COP</td>
-            <td><button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button></td>
           </tr>
         </ng-template>
       </p-table>

@@ -3,9 +3,7 @@ span{
   color: #db4149;
 }
 
-.d-grid {
-  padding-bottom: 3%;
-}
+
 
 .columnaCantidad {
   background-color: #90c0f1;
@@ -14,3 +12,4 @@ span{
 #table td, th{
   font-size: calc(var(--font-size) * 13px);
 }
+

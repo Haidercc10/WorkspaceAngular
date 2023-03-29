@@ -30,7 +30,7 @@
   <div class="container-fluid bajarPagina">
     <div class="formulario">
       <div class="mb-4">
-        <h4 class="tituloRojo">Consultar/Asignar Producto</h4>
+        <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar/Asignar Producto</h4>
       </div>
       <!-- Formulario para consultar una orden de trabajo -->
       <form [formGroup]="FormConsultarProductos">
@@ -96,7 +96,7 @@
 
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4 tabla1">
-        <h4 class="tituloRojo" style="width: 90%;">Tabla de Rollos</h4>
+        <h4 class="tituloRojo" style="width: 90%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <div class="form-floating col-md">
             <input type="number" class="form-control form-control-sm" id="floatingInput"[(ngModel)]="cantPage">
@@ -153,7 +153,7 @@
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Tabla de Rollos por Asignar</h4>
+        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos por Asignar</h4>
       </div>
 
       <!--Inicio tabla Rollos a Insertar -->
@@ -207,7 +207,7 @@
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Consolidado de Productos</h4>
+        <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado de Productos</h4>
       </div>
 
       <!--Inicio tabla Rollos a Insertar -->
@@ -247,8 +247,9 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="crearAsignacion()" id="bajar">Facturar Rollos</button>
-          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+
+          <button pButton class="p-button-danger" type="button" label="Facturar Rollos" icon="pi pi-dollar" (click)="crearAsignacion()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
         </div>
       </div>
 

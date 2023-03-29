@@ -20,10 +20,7 @@
 
       <ng-container *ngIf="ValidarRol == 5 || ValidarRol == 1 || (ValidarRol != null && ValidarRol != 2 && ValidarRol != 3 && ValidarRol != 4) ">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <button type="button" class="btn btn-danger btn-danger-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"
-             title="¡Crealo aquí!">
-            Crear Categorias
-          </button>
+          <button pButton class="p-button-danger" type="button" label="Crear Categorias" icon="pi pi-plus-circle" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"> </button>
           <br>
         </div>
       </ng-container>
@@ -54,9 +51,9 @@
         <!-- Botones para agregar productos -->
         <div class="mb-1">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <input class="btn btn-danger btn-danger-sm" type="submit" value="Subir Archivo">
-            <input class="btn btn-secondary btn-secondary-sm" type="button" value="Limpíar Campos" (click)="limpiarCampos()">
-            <button class="btn btn-danger btn-danger-sm" type="button" value="Crear Carpeta" (click)="crearCarpeta()">Crear Carpeta</button>
+            <button pButton class="p-button-danger" type="submit" label="Subir Archivo" icon="pi pi-cloud-upload"></button>
+            <button pButton class="p-button-success" type="button" label="Crear Carpeta" icon="pi pi-plus-circle" (click)="crearCarpeta()"> </button>
+            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
           </div>
         </div>
         </form>

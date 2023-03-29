@@ -26,7 +26,7 @@
 
       <!--Titulo Entrada BOPP -->
       <div class="mb-3">
-        <h4 class="tituloRojo">Opcional</h4>
+        <h4 class="tituloRojo"><i class="pi pi-info-circle"></i> Opcional</h4>
       </div>
 
       <!--Entrada opcional-->
@@ -78,7 +78,7 @@
             </form>
 
             <div class="mb-3">
-              <h4 class="tituloRojo">Tabla de materiales asociados a la OC.</h4>
+              <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de materiales asociados a la OC.</h4>
             </div>
 
             <!--Tabla de datos-->
@@ -154,7 +154,7 @@
 
       <!--Titulo Entrada BOPP -->
       <div class="mb-3">
-        <h4 class="tituloRojo">Entrada de Material</h4>
+        <h4 class="tituloRojo"><i class="pi pi-cloud-download"></i> Entrada de Material</h4>
       </div>
 
       <!-- Información general para la asignación de materia Prima Para la creación de tintas -->
@@ -237,8 +237,8 @@
         <!-- BOTONES -->
         <div class="mb-4">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="btn btn-danger btn-danger-sm" type="button" (click)="cargarBOPPTabla()"> Añadir Material</button>
-            <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+            <button pButton class="p-button-danger" type="button" label="Añadir Material" icon="pi pi-send" (click)="cargarBOPPTabla()"></button>
+            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
           </div>
         </div>
       </form>
@@ -249,7 +249,7 @@
       </div>
 
       <div class="mb-4">
-        <h4 class="tituloRojo">Tabla de material Entrante</h4>
+        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de material Entrante</h4>
       </div>
 
       <!-- Tabla de BOPP entrante -->
@@ -311,8 +311,8 @@
           <div class="row g-3">
             <div class="mb-3">
               <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarTipoEntradaBopp()">Crear Entrada </button>
-                <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosLosCampos()">Limpiar Todo</button>
+                <button pButton class="p-button-danger" type="button" label="Crear Entrada" icon="pi pi-check" (click)="validarTipoEntradaBopp()"></button>
+                <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosLosCampos()"> </button>
               </div>
             </div>
           </div>

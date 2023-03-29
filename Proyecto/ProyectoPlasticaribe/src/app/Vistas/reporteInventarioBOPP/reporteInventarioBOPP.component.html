@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Materia Prima</h2>
+      <h2 class="tituloRojo">Inventario de BOPP / BOPA / Poliester</h2>
     </div>
 
     <div class="mb-4">
@@ -25,31 +25,31 @@
     <div class="mb-3">
       <div class="row g-3">
         <!-- Id de Materia Prima -->
-        <div class="form-floating col-md-2">
-          <input formControlName="MpId" type="number" min="0"  class="form-control" id="floatingInput"required > <!-- (change)="buscarMpId()" -->
-          <label for="floatingInput">Id Materia Prima</label>
+        <div class="form-floating col-md">
+          <input formControlName="MpId" type="number" min="0"  class="form-control" id="floatingInput" required>
+          <label for="floatingInput">Id</label>
         </div>
 
         <!-- Nombre de la materia prima -->
-        <div class="form-floating col-md-6">
+        <div class="form-floating col-md">
           <input formControlName="MpNombre" class="form-control form-control-sm" list="materiaprima" id="floatingInput" title="Nombre de la Materia Prima" (keyup)="obtenerMateriasPrimas()" (change)="cambiarNombreMateriaPrima()">
           <datalist id="materiaprima">
             <option value={{item.id}} *ngFor="let item of materiasPrimas">{{item.nombre}}</option>
           </datalist>
-          <label for="floatingInput">Materia Prima</label>
+          <label for="floatingInput">Material</label>
         </div>
 
         <!-- Categoria Producto -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <select formControlName="MpCategoria" class="form-select form-select-sm" id="floatingSelect"  aria-label="Floating label select example" required>
             <option [ngValue]="categoria.catMP_Id" *ngFor="let categoria of categorias">{{categoria.catMP_Nombre}}</option>
             <option value="0">Con Existencias</option>
           </select>
-          <label for="floatingSelect">Categorias de Materia Prima</label>
+          <label for="floatingSelect">Categorias</label>
         </div>
 
         <!-- Bodegas -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <select formControlName="MpBodega" class="form-select form-select-sm" id="floatingSelect"  aria-label="Floating label select example" required>
             <option [ngValue]="item.tpBod_Id" *ngFor="let item of bodegas">{{item.tpBod_Nombre}}</option>
           </select>
@@ -57,13 +57,13 @@
         </div>
 
         <!-- Fecha inicial -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Fecha Inicial</label>
         </div>
 
         <!-- Fecha final -->
-        <div class="form-floating col-md-2">
+        <div class="form-floating col-md">
           <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
           <label for="floatingInput">Fecha Final</label>
         </div>
@@ -73,14 +73,14 @@
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarConsulta()">Consultar Materia Prima</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos</button>
-        <button class="btn btn-danger btn-danger-sm" type="button" title="Mostrar Materias Primas con existencias" (click)="mostrarBOPPConStock()"><i class="pi pi-eye"></i> Con Existencias</button>
-        <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-danger mr" pTooltip="Exportar a Excel" tooltipPosition="bottom"></button>
+        <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="validarConsulta()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCampos()"> </button>
+        <button pButton class="p-button-warning" type="button" label="Con Existencias" icon="pi pi-eye" (click)="mostrarBOPPConStock()"></button>
+        <button type="button" pButton pRipple icon="pi pi-file-excel" class="p-button-success mr" (click)="exportToExcel()"  pTooltip="Exportar a Excel" tooltipPosition="bottom"></button>
       </div>
     </div>
   </form>
-</div>
+
 
 <div class="container-fluid font-size-14">
   <div class="mb-3" *ngIf="load">
@@ -97,72 +97,61 @@
           [rowsPerPageOptions]="[10,25,50,100,ArrayMateriaPrima.length]"
           [rowHover]="true"
           dataKey="Id">
-        <!--<ng-template pTemplate="caption">
-          <div class="flex">
-            <button pButton label="Limpiar Filtros" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt)"></button>
-          </div>
-        </ng-template>-->
         <ng-template pTemplate="header">
           <tr>
-            <th dtResizableColumn style="width: 120px">
+            <th dtResizableColumn style="width: 6%">
               <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')">
             </th>
-            <th dtResizableColumn style="width: 300px">
+            <th dtResizableColumn style="width: 20%">
               <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Nombre', 'contains')">
             </th>
-            <th dtResizableColumn style="width: 90px">
+            <th dtResizableColumn style="width: 7%">
               <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Ancho', 'contains')">
             </th>
-            <th dtResizableColumn style="width: 90px">
+            <th dtResizableColumn style="width: 7%">
               <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Inicial', 'contains')">
             </th>
-            <th dtResizableColumn style="width: 90px">
+            <th dtResizableColumn style="width: 7%">
               <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Entrada', 'contains')">
             </th>
-            <th dtResizableColumn style="width: 90px">
+            <th dtResizableColumn style="width: 7%">
               <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Salida', 'contains')">
             </th>
-            <th dtResizableColumn style="width: 120px">
+            <th dtResizableColumn style="width: 6%">
               <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cant', 'contains')">
             </th>
-            <th dtResizableColumn style="width: 120px">
+            <th dtResizableColumn style="width: 9%">
               <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Diferencia', 'contains')">
             </th>
-            <th dtResizableColumn style="width: 100px">
+            <th dtResizableColumn style="width: 6%">
               <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'UndCant', 'contains')">
             </th>
-            <th dtResizableColumn style="width: 120px">
+            <th dtResizableColumn style="width: 9%">
               <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'PrecioUnd', 'contains')">
             </th>
-            <th dtResizableColumn style="width: 100px">
+            <th dtResizableColumn style="width: 8%">
               <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')">
             </th>
-            <th dtResizableColumn style="width: 120px">
+            <th dtResizableColumn style="width: 8%">
               <input pInputText type="text"style="width: 100%;"  (input)="aplicarfiltro($event, 'Categoria', 'contains')">
-            </th>
-            <th dtResizableColumn style="width: 50px">
-              <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Id', 'contains')">
             </th>
           </tr>
 
           <tr>
             <th scope="col">ID</th>
-            <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
-            <th pSortableColumn="Ancho" pReorderableColumn scope="col">Ancho <p-sortIcon field="Ancho"></p-sortIcon></th>
-            <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial <p-sortIcon field="Inicial"></p-sortIcon></th>
-            <th pSortableColumn="Entrada" pReorderableColumn scope="col">Entrada <p-sortIcon field="Entrada"></p-sortIcon></th>
-            <th pSortableColumn="Salida" pReorderableColumn scope="col">Salida <p-sortIcon field="Salida"></p-sortIcon></th>
-            <th pSortableColumn="Cant" pReorderableColumn scope="col">Existencias <p-sortIcon field="Cant"></p-sortIcon></th>
+            <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre<p-sortIcon field="Nombre" ></p-sortIcon></th>
+            <th pSortableColumn="Ancho" pReorderableColumn scope="col">Ancho<p-sortIcon field="Ancho"></p-sortIcon></th>
+            <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial<p-sortIcon field="Inicial"></p-sortIcon></th>
+            <th pSortableColumn="Entrada" pReorderableColumn scope="col">Entrada<p-sortIcon field="Entrada"></p-sortIcon></th>
+            <th pSortableColumn="Salida" pReorderableColumn scope="col">Salida<p-sortIcon field="Salida"></p-sortIcon></th>
+            <th pSortableColumn="Cant" pReorderableColumn scope="col">Stock<p-sortIcon field="Cant"></p-sortIcon></th>
             <th pSortableColumn="Diferencia" pReorderableColumn scope="col">Diferencia <p-sortIcon field="Diferencia"></p-sortIcon></th>
-            <th pSortableColumn="UndCant" pReorderableColumn scope="col" scope="col">Medida <p-sortIcon field="UndCant"></p-sortIcon></th>
+            <th pSortableColumn="UndCant" pReorderableColumn scope="col" scope="col">Und.<p-sortIcon field="UndCant"></p-sortIcon></th>
             <ng-container *ngIf="ValidarRol == 1">
-              <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col">Precio Und <p-sortIcon field="PrecioUnd"></p-sortIcon></th>
-              <th pSortableColumn="SubTotal" pReorderableColumn scope="col">SubTotal <p-sortIcon field="SubTotal"></p-sortIcon></th>
+              <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col">Precio Und<p-sortIcon field="PrecioUnd"></p-sortIcon></th>
+              <th pSortableColumn="SubTotal" pReorderableColumn scope="col">SubTotal<p-sortIcon field="SubTotal"></p-sortIcon></th>
             </ng-container>
-            <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria <p-sortIcon field="Categoria"></p-sortIcon></th>
-            <th>
-              <button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button>
-            </th>
+            <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria<p-sortIcon field="Categoria"></p-sortIcon></th>
           </tr>
         </ng-template>
 
@@ -196,11 +185,11 @@
             <td colspan="2" class="text-right">{{'Kg'}}</td>
             <td>{{valorTotal | number}}</td>
             <td>COP</td>
-            <td><button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button></td>
           </tr>
         </ng-template>
 
       </p-table>
+    </div>
     </div>
   </div>
 </div>

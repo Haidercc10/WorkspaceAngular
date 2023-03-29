@@ -23,7 +23,7 @@
   <div class="container-fluid bajarPagina">
     <div class="formulario">
       <div class="mb-4">
-        <h4 class="tituloRojo">Consultar OT</h4>
+        <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar OT</h4>
       </div>
       <!-- Formulario para consultar una orden de trabajo -->
       <form [formGroup]="FormConsultarRollos">
@@ -66,20 +66,20 @@
 
           </div>
         </div>
-
-        <!-- (Botones) -->
-        <div class="mb-3">
+          <!--Botones-->
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarOTbagPro()">Consultar Producción</button>
-              <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+            <button pButton class="p-button-danger" type="button" label="Consultar Producción" icon="pi pi-search" (click)="consultarOTbagPro()"></button>
+            <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
           </div>
-        </div>
       </form>
 
+      <div class="mb-4">
+        <hr class="Linea">
+      </div>
 
       <!-- Inicio titulo tabla producto -->
       <div class="mb-0 tabla1">
-        <h4 class="tituloRojo" style="width: 90%;">Tabla de Rollos</h4>
+        <h4 class="tituloRojo" style="width: 90%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <div class="form-floating col-md">
             <input type="number" class="form-control form-control-sm" id="floatingInput" [(ngModel)]="cantPage" autocomplete="off">
@@ -134,7 +134,7 @@
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Tabla de rollos por ingresar</h4>
+        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de rollos por ingresar</h4>
       </div>
 
       <div class="mb-3" *ngIf="cargando">
@@ -183,7 +183,7 @@
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Consolidado Productos</h4>
+        <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado Productos</h4>
       </div>
 
       <div class="mb-3" *ngIf="cargando">
@@ -223,8 +223,8 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="IngresarInfoRollos()">Ingresar Producción</button>
-          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+          <button pButton class="p-button-danger" type="button" label="Ingresar Producción" icon="pi pi-check" (click)="IngresarInfoRollos()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
         </div>
       </div>
     </div>

@@ -21,14 +21,14 @@
   <div class="container-fluid bajarPagina">
     <div class="formulario">
       <div class="mb-4">
-        <h4 class="tituloRojo">Tabla de Rollos</h4>
+        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos</h4>
       </div>
 
       <div class="card" *ngIf="!cargando">
-        <p-toolbar styleClass="mb-4 gap-2">
+        <p-toolbar styleClass="mb-5 gap-2">
           <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
-            <input type="text" placeholder="Buscar Factura" class="form-control form-control-sm busquedaFactura" [(ngModel)]="facturaConsultada" (keyup.enter)="consultarFactura()"/>
+            <input type="text" placeholder="Factura" class="form-control form-control-lg busquedaFactura" [(ngModel)]="facturaConsultada" (keyup.enter)="consultarFactura()"/>
           </span>
           <textarea class="form-control form-control-sm" placeholder="Observación" [(ngModel)]="observacionFactura"></textarea>
         </p-toolbar>
@@ -77,7 +77,7 @@
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4">
-        <h4 class="tituloRojo">Tabla de Rollos por Devolver</h4>
+        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos a devolver</h4>
       </div>
 
       <div class="card" *ngIf="!cargando">
@@ -123,8 +123,8 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="!cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="creardevolucion()">Crear Devolución</button>
-          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+          <button pButton class="p-button-danger" type="button" label="Crear Devolución" icon="pi pi-undo" (click)="creardevolucion()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
         </div>
       </div>
   </div>

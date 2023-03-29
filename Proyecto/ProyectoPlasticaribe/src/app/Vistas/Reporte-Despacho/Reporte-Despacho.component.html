@@ -69,9 +69,8 @@
       <!-- Botones -->
       <div class="mb-3" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="consultarFiltros()">Consultar</button>
-          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
-          <!-- <button class=" btn btn-danger btn-danger-sm" type="button">Exportar Excel</button> -->
+          <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-check" (click)="consultarFiltros()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
         </div>
       </div>
 

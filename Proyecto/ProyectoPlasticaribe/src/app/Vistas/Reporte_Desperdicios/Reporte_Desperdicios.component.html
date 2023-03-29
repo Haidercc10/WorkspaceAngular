@@ -23,7 +23,7 @@
 <div class="formulario">
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Filtros de búsqueda</h4>
+    <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
   </div>
 
   <form [formGroup]="formFiltros">
@@ -69,14 +69,14 @@
     <!-- BOTONES -->
     <div class="mb-0">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="Consultar()"><i class="pi pi-search"></i> Consultar</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()"><i class="pi pi-eraser"></i> Limpiar Campos</button>
+        <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="Consultar()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
       </div>
     </div>
   </form>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Resultados de búsqueda</h4>
+    <h4 class="tituloRojo"> <i class="pi pi-list"></i> Resultados de búsqueda</h4>
   </div>
 
   <!-- TABLA DE RETIRO -->

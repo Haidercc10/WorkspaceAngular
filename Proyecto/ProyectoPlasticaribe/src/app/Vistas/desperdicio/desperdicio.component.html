@@ -20,7 +20,7 @@
 
 <div class="formulario">
   <div class="mb-4">
-    <h4 class="tituloRojo">Registro de Desperdicio</h4>
+    <h4 class="tituloRojo"><i class="pi pi-cloud-download"></i>  Registro de Desperdicio</h4>
   </div>
 
   <!-- Formulario del pedido de mantenimiento -->
@@ -125,8 +125,8 @@
     <!-- BOTONES -->
     <div class="mb-4">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="llenarTabla()">Añadir Desperdicio</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+        <button pButton class="p-button-danger" type="button" label="Añadir Desperdicio" icon="pi pi-send" (click)="llenarTabla()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
       </div>
     </div>
   </form>
@@ -180,8 +180,8 @@
 
   <br>
   <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-    <button class="btn btn-danger btn-danger-sm" type="button" (click)="crearDesperdicio()">Crear Desperdicio</button>
-    <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodo()">Limpiar Todo</button>
+    <button pButton class="p-button-danger" type="button" label="Crear Desperdicio" icon="pi pi-check" (click)="crearDesperdicio()"></button>
+    <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
   </div>
 
 </div>

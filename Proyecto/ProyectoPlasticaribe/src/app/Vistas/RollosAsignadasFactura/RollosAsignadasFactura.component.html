@@ -28,12 +28,12 @@
   <div class="container-fluid bajarPagina">
     <div class="formulario">
       <div class="mb-4">
-        <h4 class="tituloRojo">Consultar Factura</h4>
+        <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar Factura</h4>
       </div>
       <!-- Formulario para consultar Factura -->
       <form [formGroup]="FormConsultarFactura">
         <!-- Primera Fila -->
-        <div class="mb-3">
+        <div class="mb-3" >
           <div class="row g-3">
             <!-- OT -->
             <div class="form-floating col-md-2">
@@ -69,7 +69,7 @@
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4">
-        <h4 class="tituloRojo">Tabla de Rollos</h4>
+        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos</h4>
       </div>
 
       <!--Inicio tabla Rollos creados en OT -->
@@ -103,7 +103,7 @@
       </div>
 
       <div class="mb-4">
-        <h4 class="tituloRojo">Tabla de Rollos Verificados</h4>
+        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos Verificados</h4>
       </div>
 
       <!--Inicio tabla Rollos a Insertar -->
@@ -141,7 +141,7 @@
       </div>
       <!-- Inicio titulo tabla producto -->
       <div class="mb-4" *ngIf="cargando">
-        <h4 class="tituloRojo">Consolidado Productos</h4>
+        <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado Productos</h4>
       </div>
 
       <!--Inicio tabla Rollos a Insertar -->
@@ -175,8 +175,8 @@
       <!-- Botones -->
       <div class="bajarPagina" *ngIf="cargando">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class=" btn btn-danger btn-danger-sm" type="button" (click)="actualizarFactura()">Confirmar Rollos</button>
-          <button class="btn btn-secondary btn-outline-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
+          <button pButton class="p-button-danger" type="button" label="Confirmar Rollos" icon="pi pi-check" (click)="actualizarFactura()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
         </div>
       </div>
     </div>

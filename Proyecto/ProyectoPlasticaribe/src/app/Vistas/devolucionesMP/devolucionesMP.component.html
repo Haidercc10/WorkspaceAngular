@@ -24,7 +24,7 @@
 <div class="formulario">
   <!-- Inicio titulo -->
   <div class="mb-4">
-    <h4 class="tituloRojo">Ingresar Materia Prima devuelta</h4>
+    <h4 class="tituloRojo"><i class="pi pi-cloud-download"></i> Ingresar Materia Prima devuelta</h4>
   </div>
   <!-- Fin titulo -->
   <form [formGroup]="FormDevolucion">
@@ -51,7 +51,7 @@
   </div>
 
   <div class="mb-4">
-    <h4 class="tituloRojo">Tabla Materia Prima asignada</h4>
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla Materia Prima asignada</h4>
   </div>
 
   <div class="mb-3" *ngIf="load">
@@ -100,7 +100,7 @@
   </div>
 
   <div class="mb-4" ><!--*ngIf="!load"-->
-    <h4 class="tituloRojo">Materias Primas a devolver</h4>
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Materias Primas a devolver</h4>
   </div>
 
   <!--Inicio tabla Rollos a Insertar -->
@@ -157,12 +157,8 @@
   <!-- BOTONES -->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="button" (click)="registrarDevolucion()">Agregar Recuperado</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarTodosCampos()">Limpiar Todos los Campos</button>
+      <button pButton class="p-button-danger" type="button" label="Agregar Devolución" icon="pi pi-check" (click)="registrarDevolucion()"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"> </button>
     </div>
-  </div>
-
-  <div class="mb-4">
-    <hr class="colorLinea">
   </div>
 </div>
