@@ -22,7 +22,7 @@
 
   <div class="formulario">
     <div class="mb-4">
-      <h4 class="tituloRojo font-size-24">Búsqueda por filtros</h4>
+      <h4 class="tituloRojo font-size-24"><i class="pi pi-search"></i> Búsqueda por filtros</h4>
     </div>
     <!-- Inicio formulario Estado OT -->
     <form [formGroup]="formularioOT">
@@ -112,10 +112,10 @@
       <!-- Botones para consultar OT -->
       <div class="mb-3">
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class="btn btn-danger btn-danger-sm" type="button" (click)="consultarOT()">Consultar</button>
-          <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar campos</button>
-          <button class="btn btn-danger btn-danger-sm" type="button" (click)="anadirFalla()" title="Para agregar una falla debe seleccionar una OT.">Agregar Falla</button>
-          <button type="button" style="width: 160px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr" pTooltip="Exportar a Excel" tooltipPosition="bottom">Exporta a Excel</button>
+          <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarOT()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+          <button pButton class="p-button-warning" type="button" label="Agregar Falla" icon="pi pi-check-circle" (click)="anadirFalla()"></button>
+          <button pButton class="p-button-success" type="button" label="Exportar a Excel" icon="pi pi-file-excel" (click)="exportToExcel()"></button>
         </div>
       </div>
     </form>
@@ -126,6 +126,7 @@
     </div>
 
     <!-- Tabla informativa de colores -->
+
     <div class="mb-4">
       <div class="row g-3">
         <!--Inicio Tabla OT-->
@@ -239,7 +240,7 @@
     <div>
       <div>
         <div class="mb-4 titulos_Paginador">
-          <h4 class="tituloRojo font-size-24" style="width: 90%;">Ordenes de Trabajo</h4>
+          <h4 class="tituloRojo font-size-24" style="width: 90%;"><i class="pi pi-file-edit"></i> Ordenes de Trabajo</h4>
         </div>
 
         <!-- Tabla donde se mostrarán las OT Consultadas -->
@@ -282,30 +283,30 @@
                 </ng-template>
                 <!-- Titulos -->
                 <ng-template pTemplate="header" let-columns>
-                  <tr>
-                    <th scope="col" pSortableColumn="ot" pResizableColumn class="font-size-12">OT
+                  <tr class="font-size-13">
+                    <th scope="col" pSortableColumn="ot" pResizableColumn>OT
                       <p-sortIcon field="ot" title="Order por OT"></p-sortIcon>
                     </th>
-                    <th id="" scope="col" pSortableColumn="cli" pResizableColumn class="font-size-12">Cliente
+                    <th id="" scope="col" pSortableColumn="cli" pResizableColumn>Cliente
                       <p-sortIcon field="cli"></p-sortIcon>
                     </th>
-                    <th id="" scope="col" pSortableColumn="prod" pResizableColumn class="font-size-12">Producto
+                    <th id="" scope="col" pSortableColumn="prod" pResizableColumn>Producto
                       <p-sortIcon field="prod"></p-sortIcon>
                     </th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Materia Prima</th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Extrusión</th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Impresión</th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Rotograbado</th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Doblado</th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Laminado</th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Corte</th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Empaque</th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Sellado</th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Wiketiado</th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Cant. Producir</th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Estados</th>
-                    <th id="" scope="col" pResizableColumn class="font-size-12">Fecha Creación</th>
-                    <th *ngFor="let col of columns" pResizableColumn class="font-size-12">
+                    <th id="" scope="col" pResizableColumn>Materia Prima</th>
+                    <th id="" scope="col" pResizableColumn>Extrusión</th>
+                    <th id="" scope="col" pResizableColumn>Impresión</th>
+                    <th id="" scope="col" pResizableColumn>Rotograbado</th>
+                    <th id="" scope="col" pResizableColumn>Doblado</th>
+                    <th id="" scope="col" pResizableColumn>Laminado</th>
+                    <th id="" scope="col" pResizableColumn>Corte</th>
+                    <th id="" scope="col" pResizableColumn>Empaque</th>
+                    <th id="" scope="col" pResizableColumn>Sellado</th>
+                    <th id="" scope="col" pResizableColumn>Wiketiado</th>
+                    <th id="" scope="col" pResizableColumn>Cant. Producir</th>
+                    <th id="" scope="col" pResizableColumn>Estados</th>
+                    <th id="" scope="col" pResizableColumn>Fecha Creación</th>
+                    <th *ngFor="let col of columns" pResizableColumn>
                       {{col.header}}
                     </th>
                     <th></th>

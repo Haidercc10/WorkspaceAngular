@@ -21,6 +21,11 @@
 </div>
 
 <div class="formulario">
+
+  <div class="mb-4">
+    <h2 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h2>
+  </div>
+
   <form [formGroup]="FormMateriaPrima">
     <div class="mb-3">
       <div class="row g-3">
@@ -40,12 +45,12 @@
             <datalist id="materiaprima">
               <option value={{item.id}} *ngFor="let item of materiasPrimas">{{item.nombre}}</option>
             </datalist>
-            <label for="Nombre">Nombre Rollo</label>
+            <label for="Nombre">Mat. Prima</label>
           </span>
         </div>
 
         <!-- Categoria Producto -->
-        <div class="col-md-2">
+        <div class="col-md">
           <span class="p-float-label">
             <p-dropdown formControlName="MpCategoria" inputId="Categoria" [autoDisplayFirst]="false" [options]="categorias" optionValue="catMP_Id" optionLabel="catMP_Nombre"></p-dropdown>
             <label for="Categoria">Categorias</label>
@@ -53,7 +58,7 @@
         </div>
 
         <!-- Bodegas -->
-        <div class="col-md-2">
+        <div class="col-md">
           <span class="p-float-label">
             <p-dropdown formControlName="MpBodega" inputId="Bodegas" [autoDisplayFirst]="false" [options]="bodegas" optionValue="tpBod_Id" optionLabel="tpBod_Nombre"></p-dropdown>
             <label for="Bodegas">Bodegas</label>
@@ -88,6 +93,10 @@
       </div>
     </div>
   </form>
+
+  <div class="mb-4">
+    <h2 class="tituloRojo"><i class="pi pi-list"></i> Registros consultados</h2>
+  </div>
 
   <div class="container-fluid font-size-14">
     <div class="mb-3" *ngIf="load">

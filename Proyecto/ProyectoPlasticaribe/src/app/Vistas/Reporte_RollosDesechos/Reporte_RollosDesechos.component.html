@@ -22,7 +22,7 @@
 
 <div class="formulario">
   <div class="mb-4">
-    <h4 class="tituloRojo font-size-24">Filtros de búsqueda</h4>
+    <h4 class="tituloRojo font-size-24"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
   </div>
 
   <form [formGroup]="formConsultaRollos">
@@ -74,9 +74,9 @@
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="validarConsulta()">Consultar Documento</button>
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar Campos</button>
-        <button class="btn btn-danger btn-danger-sm" type="button" title="Generar archivo Excel/PDF" (click)="elegirFormatoExportacion()">Exportar</button>
+        <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="validarConsulta()"> </button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCampos()"> </button>
+        <button pButton class="p-button-danger" type="button" label="Exportar" pTooltip="Generar archivo Excel/PDF" icon="pi pi-file-export" (click)="validarConsulta()"> </button>
       </div>
     </div>
   </form>

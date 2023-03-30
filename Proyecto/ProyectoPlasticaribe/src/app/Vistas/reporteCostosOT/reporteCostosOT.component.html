@@ -22,6 +22,11 @@
 </div>
 
 <div class="formulario">
+
+  <div class="mb-4">
+    <h3 class="tituloRojo"><i class="pi pi-search"></i> Consultar OT's</h3>
+  </div>
+
   <form [formGroup]="infoOT">
     <div class="mb-3">
       <div class="row g-3">
@@ -114,15 +119,11 @@
     <!-- BOTONES -->
     <div class="mb-1">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="consultaOTBagPro()">Consultar OT</button>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="limpiarCampos()">Limpiar Campos</button>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="CargarPDF()" *ngIf="ValidarRol == 1">Reporte en PDF</button>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="cambiarEstado()" *ngIf="ValidarRol == 1">Cambiar Estado</button>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <button class="btn btn-danger btn-danger-sm" type="button" (click)="cerrarOrden()" *ngIf="ValidarRol == 1">Revisada</button>
+        <button pButton class="p-button-danger" type="button" label="Consultar OT" icon="pi pi-search" (click)="consultaOTBagPro()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        <button pButton class="p-button-danger" type="button" label="Reporte en PDF" icon="pi pi-file-pdf" *ngIf="ValidarRol == 1" (click)="CargarPDF()"></button>
+        <button pButton class="p-button-warning" type="button" label="Cambiar Estado" icon="pi pi-sync" *ngIf="ValidarRol == 1" (click)="cambiarEstado()"></button>
+        <button pButton class="p-button-success" type="button" label="Revisada" icon="pi pi-check-square" *ngIf="ValidarRol == 1" (click)="cerrarOrden()"></button>
       </div>
     </div>
   </form>
@@ -133,7 +134,7 @@
     </div>
 
     <div class="mb-4">
-      <h4 class="tituloRojo">Tabla de Materia Prima</h4>
+      <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Materia Prima</h4>
     </div>
 
     <div class="mb-2">
@@ -182,7 +183,7 @@
     </div>
 
     <div class="mb-4">
-      <h4 class="tituloRojo">Tabla de Procesos</h4>
+      <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Procesos</h4>
     </div>
 
     <div class="mb-2">

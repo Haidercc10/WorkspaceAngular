@@ -1,5 +1,5 @@
 <div class="fondo">
-  <form [formGroup]="formularioUsuario" (ngSubmit)="validarCamposVacios()">
+  <form [formGroup]="formularioUsuario" (ngSubmit)="validarCamposVacios()" autocomplete="off">
     <div class="titulo">
       <!--<h1 class="display-2">Plasticaribe S.A.S</h1>-->
       <img class="logo" src="/assets/PLASTICARIBE_logo.png" alt="">
@@ -16,8 +16,7 @@
         <div class="col-md mb">
           <div class="p-inputgroup">
             <span class="p-float-label">
-              <input formControlName="Identificacion" class="form-control form-control-sm" pInputText required/>
-              <label htmlFor="username">ID Usuario</label>
+              <input formControlName="Identificacion" autocomplete="off" placeholder="ID Usuario" pInputText required/>
             </span>
             <span class="p-inputgroup-addon">
               <i class="pi pi-user"></i>
@@ -28,8 +27,7 @@
         <div class="col-md mb">
           <div class="p-inputgroup">
             <span class="p-float-label">
-              <input formControlName="Contrasena" type="password" class="form-control form-control-sm" id="pass" pInputText>
-              <label htmlFor="pass">Contraseña</label>
+              <input formControlName="Contrasena" type="password" placeholder="Contraseña" id="pass" pInputText>
             </span>
             <ng-container *ngIf="mostrarPass == true then noMostrar; else mostrar"></ng-container>
             <ng-template #mostrar><span class="input-group-text cursor" (click)="mostrarPassword()"><i class="pi pi-eye"></i></span></ng-template>

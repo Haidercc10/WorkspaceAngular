@@ -27,7 +27,7 @@
       </div>
 
       <div class="mb-4">
-        <h4 class="tituloRojo font-size-24">Tabla de Usuarios</h4>
+        <h4 class="tituloRojo font-size-24"><i class="pi pi-list"></i> Tabla de Usuarios</h4>
       </div>
 
       <div class="card" *ngIf="load">
@@ -74,7 +74,7 @@
             <tr >
               <th style="width: 4rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
               <th scope="col" pSortableColumn="Id">ID Usuario <p-sortIcon field="Id"></p-sortIcon></th>
-              <th scope="col" pSortableColumn="Nombre">Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
+              <th scope="col" pSortableColumn="Nombre"> Nombre <p-sortIcon field="Nombre"></p-sortIcon></th>
               <th scope="col" pSortableColumn="Tipo">Tipo <p-sortIcon field="Tipo"></p-sortIcon></th>
               <th scope="col" pSortableColumn="Area">Área <p-sortIcon field="Area"></p-sortIcon></th>
               <th scope="col" pSortableColumn="Rol">Rol <p-sortIcon field="Rol"></p-sortIcon></th>
@@ -88,9 +88,9 @@
             <tr class="font-size-16 ">
               <td ><p-tableCheckbox [value]="arrayUsuarios"></p-tableCheckbox></td>
               <td>{{arrayUsuarios.Id}}</td>
-              <td>{{arrayUsuarios.Nombre}}</td>
+              <td><b>{{arrayUsuarios.Nombre}}</b></td>
               <td>{{arrayUsuarios.Tipo}}</td>
-              <td>{{arrayUsuarios.Area}}</td>
+              <td><b>{{arrayUsuarios.Area}}</b></td>
               <td>{{arrayUsuarios.Rol}}</td>
               <td *ngIf="arrayUsuarios.Estado == 'Activo'; else Inactivo">{{arrayUsuarios.Estado}}</td>
               <ng-template #Inactivo><td><span class="badge bg-danger1">{{arrayUsuarios.Estado}}</span></td></ng-template>
