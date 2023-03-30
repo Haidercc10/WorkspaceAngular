@@ -23,7 +23,7 @@
 <div class="formulario">
   <!--Inicio info OT-->
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <h4 class="tituloRojo" title="Consecutivo sobre el cual se crea una nueva OT">OT N° {{ultimaOrdenTrabajo}}</h4>
+      <h4 class="tituloRojo" title="Consecutivo sobre el cual se crea una nueva OT"><i class="pi pi-file-edit"></i> OT N° <b>{{ultimaOrdenTrabajo}}</b></h4>
     </div>
 
     <div class="mb-4">
@@ -143,15 +143,15 @@
       (onRowSelect)="consultarInfoProducto($event.data)"
       (onRowUnselect)="onRowUnselect()">
       <ng-template pTemplate="header">
-        <tr>
-          <th scope="col" class="font-size-12">Id</th>
-          <th scope="col" class="font-size-12">Producto</th>
-          <th scope="col" class="font-size-12">Cantidad Pedida</th>
-          <th scope="col" class="font-size-12">Cantidad Restante</th>
-          <th scope="col" class="font-size-12">Und</th>
-          <th scope="col" class="font-size-12">Fecha Entrega</th>
-          <th scope="col" class="font-size-12">Precio</th>
-          <th scope="col" class="font-size-12">SubTotal</th>
+        <tr class="font-size-13">
+          <th scope="col">Id</th>
+          <th scope="col">Producto</th>
+          <th scope="col">Cantidad Pedida</th>
+          <th scope="col">Cantidad Restante</th>
+          <th scope="col">Und</th>
+          <th scope="col">Fecha Entrega</th>
+          <th scope="col">Precio</th>
+          <th scope="col">SubTotal</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-item>
@@ -185,7 +185,7 @@
 
     <!--Fila 6-->
     <div class="mb-4">
-      <div class="row g-3">
+      <div class="row">
 
         <!-- Checkbox Procesos -->
         <div class="mb-4">
@@ -268,25 +268,25 @@
         <!-- TABS de Procesos -->
         <ul class="nav nav-tabs justify-content-md-center" >
           <li class="nav-item">
-            <button class="nav-link active" id="tabDatosOT" data-bs-toggle="tab" data-bs-target="#DatosOT" type="button" role="tab">Datos OT</button>
+            <button class="nav-link active" id="tabDatosOT" data-bs-toggle="tab" data-bs-target="#DatosOT" type="button" role="tab"><b><i class="pi pi-calculator"></i> Datos OT</b></button>
           </li>
           <li class="nav-item">
-            <button class="nav-link" id="tabExtrusion" data-bs-toggle="tab" data-bs-target="#Extrusión" type="button" role="tab" *ngIf="extrusion">Extrusión</button>
+            <button class="nav-link" id="tabExtrusion" data-bs-toggle="tab" data-bs-target="#Extrusión" type="button" role="tab" *ngIf="extrusion"><b><i class="pi pi-bolt"></i> Extrusión</b></button>
           </li>
           <li class="nav-item">
-            <button class="nav-link" id="tabImpresion" data-bs-toggle="tab" data-bs-target="#Impresión" type="button" role="tab" *ngIf="impresion || rotograbado">Impresión</button>
+            <button class="nav-link" id="tabImpresion" data-bs-toggle="tab" data-bs-target="#Impresión" type="button" role="tab" *ngIf="impresion || rotograbado"><b><i class="pi pi-print"></i> Impresión</b></button>
           </li>
           <li class="nav-item">
-            <button class="nav-link" id="tabLaminadosion" data-bs-toggle="tab" data-bs-target="#Laminado" type="button" role="tab" *ngIf="laminado">Laminado</button>
+            <button class="nav-link" id="tabLaminadosion" data-bs-toggle="tab" data-bs-target="#Laminado" type="button" role="tab" *ngIf="laminado"><b><i class="pi pi-map"></i> Laminado</b> </button>
           </li>
           <li class="nav-item">
-            <button class="nav-link" id="tabCorte" data-bs-toggle="tab" data-bs-target="#Corte" type="button" role="tab" *ngIf="checkedCorte">Corte</button>
+            <button class="nav-link" id="tabCorte" data-bs-toggle="tab" data-bs-target="#Corte" type="button" role="tab" *ngIf="checkedCorte"><b> <i class="pi pi-th-large"></i> Corte</b></button>
           </li>
           <li class="nav-item">
-            <button class="nav-link" id="tabSellado" data-bs-toggle="tab" data-bs-target="#Sellado" type="button" role="tab" *ngIf="sellado">Sellado</button>
+            <button class="nav-link" id="tabSellado" data-bs-toggle="tab" data-bs-target="#Sellado" type="button" role="tab" *ngIf="sellado"><b><i class="pi pi-tags"></i> Sellado</b></button>
           </li>
           <li class="nav-item">
-            <button class="nav-link" id="tabMezclas" data-bs-toggle="tab" data-bs-target="#Mezclas" type="button" role="tab">Mezclas</button>
+            <button class="nav-link" id="tabMezclas" data-bs-toggle="tab" data-bs-target="#Mezclas" type="button" role="tab"><b><i class="pi pi-slack"></i> Mezclas</b></button>
           </li>
         </ul>
 
@@ -764,9 +764,9 @@
             <!--Boton para llamar el modal de crear mezclas-->
 
             <div class="container-fluid">
-              <div class="mb-5">
+              <div class="mb-4">
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                  <button pButton pRipple label="Crear Mezclas" icon="pi pi-plus" type="button" class="p-button-danger r-2" (click)="cargarModalMezclas()"></button>
+                  <button pButton pRipple label="Crear Mezclas" icon="pi pi-check-circle" type="button" class="p-button-danger r-2" (click)="cargarModalMezclas()"></button>
                 </div>
               </div>
             </div>
@@ -776,7 +776,7 @@
 
               <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
                 <button pButton class="p-button-danger" type="button" label="Crear Materiales" icon="pi pi-check-circle" (click)="cargarModalMateriales()"> </button>
-                <button pButton class="p-button-secondary" type="button" label="Crear Pigmentos" icon="pi pi-check-circle" (click)="cargarModalPigmentos()"> </button>
+                <button pButton class="p-button-danger" type="button" label="Crear Pigmentos" icon="pi pi-check-circle" (click)="cargarModalPigmentos()"> </button>
               </div>
 
               <!--Modal Materiales -->
@@ -834,14 +834,17 @@
                 <p-toast position="center"></p-toast>
 
                 <!--Fila 1-->
-                <div class="mb-3">
+                <div class="container-fluid mb-4">
+                  <p-divider align="left">
+                    <span class="p-tag"><i class="pi pi-slack"> </i> Ingresar mezcla / <i class="pi pi-box"> </i> Material</span>
+                  </p-divider>
+                </div>
+
+
+                <div class="mb-5">
                   <div class="row g-3 justify-content-md-center">
+
                       <!-- Nombre Mezcla -->
-
-                    <div class="mb-3"  style="text-align: center;">
-                      <h6 class="tituloRojo"><i class="pi pi-slack"> </i> Ingresar mezcla / <i class="pi pi-box"> </i> Material</h6>
-                    </div>
-
                     <div class="form-floating col-md-6">
                       <input formControlName="Nombre_Mezclas" class="form-control form-control-sm" list="mezclas" id="floatingInput" title="Nombre de la Mezcla" required (change)="cargarCombinacionMezclas2()">
                       <datalist id="mezclas">
@@ -860,18 +863,15 @@
                   </div>
                 </div>
 
-                <div class="mb-4">
-                  <hr class="colorLinea2">
+                <!--Fila 2 y 3 Checkbox-->
+                <div class="container-fluid mb-4">
+                  <p-divider align="left">
+                    <span class="p-tag"><i class="pi pi-server"></i> N° de capas</span>
+                  </p-divider>
                 </div>
 
-                <!--Fila 2 y 3 Checkbox-->
-                <div class="mb-4">
+                <div class="mb-5">
                   <div style="text-align: center;">
-
-                    <div class="mb-3">
-                      <h6 class="tituloRojo"><i class="pi pi-server"></i> N° de capas</h6>
-                    </div>
-
                     <div class="form-floating col-md-2 form-check-inline" style="text-align: center">
                       <div class="field-radiobutton form-check-inline" style="text-align: center">
                         <p-radioButton formControlName="Chechbox_Capa1" name="Chechbox_Capa1" value="1" inputId="city1" (click)="habilitarCapa1()"> </p-radioButton>
@@ -886,20 +886,17 @@
                         <label style="margin-left: 5px;" for="city3"> 3</label>
                       </div>
                     </div>
-
                   </div>
                 </div>
 
-                <div class="mb-4">
-                  <hr class="colorLinea2">
-                </div>
-
-                <div class="mb-3"  style="text-align: center;">
-                  <h6 class="tituloRojo"><i class="pi pi-percentage"></i> Porcentajes de mezcla de capas</h6>
-                </div>
-
                 <!--Fila 4-->
-                <div class="mb-4" >
+                <div class="container-fluid mb-4">
+                  <p-divider align="left">
+                    <span class="p-tag"><i class="pi pi-percentage"></i> Porc. de mezcla de capas</span>
+                  </p-divider>
+                </div>
+
+                <div class="mb-5" >
                   <div class="row g-3 justify-content-md-center">
                     <!--Capa 1 unica-->
                     <div class="form-floating col-md-2">
@@ -920,16 +917,14 @@
                   </div>
                 </div>
 
-                <div class="mb-4">
-                  <hr class="colorLinea2">
-                </div>
-
-                <div class="mb-3"  style="text-align: center;">
-                  <h6 class="tituloRojo"><i class="pi pi-percentage"></i> Porcentajes de mezcla de materiales</h6>
-                </div>
-
                 <!--fila 5-->
-                <div class="container-fluid">
+                <div class="container-fluid mb-4">
+                  <p-divider align="left">
+                    <span class="p-tag"><i class="pi pi-percentage"></i> Porc. de mezcla de materiales</span>
+                  </p-divider>
+                </div>
+
+                <div class="container-fluid mb-5">
                   <div class="row">
                     <!--Materiales y pigmentos capa 1-->
                     <div class="col-md">
@@ -1299,12 +1294,14 @@
             <div class="container">
               <form [formGroup]="FormOrdenTrabajoMezclas">
 
-                <div class="mb-3" style="text-align: center;">
-                  <h4 class="tituloRojo">Nombre Mezcla</h4>
+                <div class="container-fluid mb-4">
+                  <p-divider align="left">
+                    <span class="p-tag"><i class="pi pi-slack"></i> Nombre de Mezcla</span>
+                  </p-divider>
                 </div>
 
-                <!--Fila 1-->
-                <div class="mb-3" >
+                  <!--Fila 1-->
+                <div class="mb-5" >
                   <div class="row g-3 justify-content-md-center">
                     <div class="form-floating col-md-8">
                       <input formControlName="Nombre_Mezclas" class="form-control" name="Nombre_Mezclas" list="Mezlas" id="floatingInput" (change)="cargarCombinacionMezclas()" autocomplete="off" required>
@@ -1316,17 +1313,15 @@
                   </div>
                 </div>
 
-                <div class="mb-4">
-                  <hr class="colorLinea2">
+                <!--Fila 2-->
+                <div class="container-fluid mb-4">
+                  <p-divider align="left">
+                    <span class="p-tag"><i class="pi pi-server"></i> N° de capas</span>
+                  </p-divider>
                 </div>
 
-                <!--Fila 2 y 3 Checkbox-->
-                <div class="mb-4">
+                <div class="mb-5">
                   <div style="text-align: center;">
-
-                    <div class="mb-3">
-                      <h4 class="tituloRojo">N° de capas</h4>
-                    </div>
 
                     <div class="form-floating col-md-2 form-check-inline" style="text-align: center">
                       <div class="field-radiobutton form-check-inline" style="text-align: center">
@@ -1345,16 +1340,15 @@
                   </div>
                 </div>
 
-                <div class="mb-4">
-                  <hr class="colorLinea2">
-                </div>
-
-                <div class="mb-3" style="text-align: center;">
-                  <h4 class="tituloRojo">Porcentajes de mezcla de capas</h4>
+                <!--fila 3-->
+                <div class="container-fluid mb-4">
+                  <p-divider align="left">
+                    <span class="p-tag"><i class="pi pi-percentage"></i> Porc. de mezcla de capas</span>
+                  </p-divider>
                 </div>
 
                 <!--Fila 4-->
-                <div class="mb-4" >
+                <div class="mb-5">
                     <div class="row g-3 justify-content-md-center">
 
                       <!--Capa 1 unica-->
@@ -1377,16 +1371,14 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
-                  <hr class="colorLinea2">
-                </div>
-
-                <div class="mb-3"  style="text-align: center;">
-                  <h4 class="tituloRojo">Porcentajes de mezcla de materiales</h4>
+                <div class="container-fluid mb-4">
+                  <p-divider align="left">
+                    <span class="p-tag"><i class="pi pi-percentage"></i> Porc. de mezcla de materiales</span>
+                  </p-divider>
                 </div>
 
                 <!-- Inicio Columnas de capas -->
-                <div class="container-fluid">
+                <div class="container-fluid mb-3">
                   <div class="row justify-content-md-center" >
 
                     <!--Materiales y pigmentos capa 1-->
@@ -1739,11 +1731,14 @@
                       </div>
 
                     </div>
+
                   </div>
                 </div>
                 <!--Fin Columnas-->
+
               </form>
             </div>
+
           </div>
         </div>
 

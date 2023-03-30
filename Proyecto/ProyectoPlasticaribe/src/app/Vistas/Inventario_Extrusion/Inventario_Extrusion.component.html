@@ -12,7 +12,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Inventario Extrusión</h2>
+      <h2 class="tituloRojo">Inventario de Extrusión</h2>
     </div>
 
     <div class="mb-4">
@@ -22,6 +22,15 @@
 </div>
 
 <div class="formulario">
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button pButton pRipple label="Exportar Excel" icon="pi pi-file-excel" class="p-button-success r-2" (click)="exportToExcel()"></button>
+  </div>
+
+  <div class="mb-4">
+    <h3 class="tituloRojo"><i class="pi pi-info-circle"></i> Información de rollos de extrusión</h3>
+  </div>
+
   <div class="container-fluid font-size-14">
     <div class="mb-3" *ngIf="!cargando">
       <div class="row g-3 font-size-14" id="table">

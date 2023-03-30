@@ -11,7 +11,7 @@
   <div class="container-fluid">
     <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Materia Prima</h2>
+      <h2 class="tituloRojo">Reporte de Materia Prima / BOPP / Tintas</h2>
     </div>
 
     <div class="mb-4">
@@ -112,54 +112,39 @@
           <ng-template pTemplate="header">
             <tr>
               <th scope="col">ID
-                <p-columnFilter type="text" field="Id" display="menu"></p-columnFilter>
               </th>
               <th pSortableColumn="Nombre" pReorderableColumn scope="col">Nombre
-                <p-columnFilter type="text" field="Nombre" display="menu"></p-columnFilter>
                 <p-sortIcon field="Nombre"></p-sortIcon>
               </th>
               <th scope="col">Ancho
-                <p-columnFilter type="text" field="Ancho" display="menu"></p-columnFilter>
               </th>
               <th pSortableColumn="Inicial" pReorderableColumn scope="col">Inicial
-                <p-columnFilter type="number" field="Inicial" display="menu"></p-columnFilter>
                 <p-sortIcon field="Inicial"></p-sortIcon>
               </th>
               <th pSortableColumn="Entrada" pReorderableColumn scope="col">Entrada
-                <p-columnFilter type="number" field="Entrada" display="menu"></p-columnFilter>
                 <p-sortIcon field="Entrada"></p-sortIcon>
               </th>
               <th pSortableColumn="Salida" pReorderableColumn scope="col">Salida
-                <p-columnFilter type="number" field="Salida" display="menu"></p-columnFilter>
                 <p-sortIcon field="Salida"></p-sortIcon>
               </th>
-              <th pSortableColumn="Cant" pReorderableColumn scope="col">Existencias
-                <p-columnFilter type="number" field="Cant" display="menu"></p-columnFilter>
+              <th pSortableColumn="Cant" pReorderableColumn scope="col">Stock
                 <p-sortIcon field="Cant"></p-sortIcon>
               </th>
               <th pSortableColumn="Diferencia" pReorderableColumn scope="col">Diferencia
-                <p-columnFilter type="number" field="Diferencia" display="menu"></p-columnFilter>
                 <p-sortIcon field="Diferencia"></p-sortIcon>
               </th>
-              <th scope="col">Und. Medida
-                <p-columnFilter type="text" field="UndCant" display="menu"></p-columnFilter>
+              <th scope="col">Medida
               </th>
               <ng-container *ngIf="ValidarRol == 1">
-                <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col">Precio Unitario
-                  <p-columnFilter type="numeric" currency="COP" field="PrecioUnd" display="menu"></p-columnFilter>
+                <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col">Precio Und
                   <p-sortIcon field="PrecioUnd"></p-sortIcon>
                 </th>
                 <th pSortableColumn="SubTotal" pReorderableColumn scope="col">SubTotal
-                  <p-columnFilter type="numeric" currency="COP" field="SubTotal" display="menu"></p-columnFilter>
                   <p-sortIcon field="SubTotal"></p-sortIcon>
                 </th>
               </ng-container>
               <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
-                <p-columnFilter type="text" field="Categoria" display="menu"></p-columnFilter>
                 <p-sortIcon field="Categoria"></p-sortIcon>
-              </th>
-              <th>
-                <button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button>
               </th>
             </tr>
           </ng-template>
@@ -192,7 +177,6 @@
               <td colspan="2" class="text-right">{{'Kg'}}</td>
               <td>{{valorTotal | number}}</td>
               <td>COP</td>
-              <td><button type="button" style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-excel" (click)="exportToExcel()" class="p-button-success mr"  pTooltip="XLS" tooltipPosition="bottom"></button></td>
             </tr>
           </ng-template>
         </p-table>

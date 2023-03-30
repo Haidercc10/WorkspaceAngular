@@ -157,6 +157,8 @@ import { JwtInterceptor } from './_helpers/jwt.interceptor';
 import { jwtInterceptor_BagPro } from './_helpers/jwt.interceptor_BagPro';
 import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
+import { FieldsetModule } from 'primeng/fieldset';
+import {DividerModule} from 'primeng/divider';
 
 export const routes: Routes = [
 
@@ -436,7 +438,9 @@ export const routes: Routes = [
     SidebarModule,
     TabMenuModule,
     PasswordModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    FieldsetModule,
+    DividerModule,
   ],
 
   providers: [

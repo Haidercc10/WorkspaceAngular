@@ -21,7 +21,7 @@
 </div>
 
 <!-- Tabla de Pedidos -->
-<div class="container-fluid">
+<div class="formulario">
   <div class="d-grid gap-2 d-md-flex justify-content-md-center" >
     <!--Inicio Tabla OT-->
     <div class="mb-4">
@@ -76,7 +76,7 @@
     <button pButton pRipple label="Exportar Excel" icon="pi pi-file-excel" class="p-button-success r-2" (click)="exportarExcel()"></button>
   </div>
   <div class="mb-4">
-    <h3 class="tituloRojo">Información de Pedidos</h3>
+    <h3 class="tituloRojo"><i class="pi pi-info-circle"></i> Información de Pedidos</h3>
   </div>
   <div *ngIf="!cargando" id="tableProcesos" class="font-size-14">
     <div class="mb-4 ">
