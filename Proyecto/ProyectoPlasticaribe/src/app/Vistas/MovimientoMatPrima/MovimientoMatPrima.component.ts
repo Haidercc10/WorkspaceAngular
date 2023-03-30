@@ -223,8 +223,6 @@ export class MovimientoMatPrimaComponent implements OnInit {
     let materiaPrima : any = this.FormDocumentos.value.IdMateriaPrima;
     let estado : any = this.FormDocumentos.value.estado;
 
-    if (tipoDoc != null) tipoDoc = tipoDoc.tpDoc_Id;
-    if (estado != null) estado = estado.estado_Id;
     if (fechaIncial == 'Invalid date') fechaIncial = null;
     if (fechaFinal == 'Invalid date') fechaFinal = null;
 

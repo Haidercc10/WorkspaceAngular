@@ -114,8 +114,8 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   // Funcion que va a consultar los rollos
   consultarRollos(){
     let ot : number = this.FormConsultarRollos.value.OT_Id;
-    let fechaInicial : any = this.FormConsultarRollos.value.fechaDoc;
-    let fechaFinal : any = this.FormConsultarRollos.value.fechaFinalDoc;
+    let fechaInicial : any = moment(this.FormConsultarRollos.value.fechaDoc).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormConsultarRollos.value.fechaFinalDoc).format('YYYY-MM-DD');
     let rollo : number = this.FormConsultarRollos.value.IdRollo;
     let rollos : any = [];
     let consulta : number;
@@ -124,8 +124,8 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       rollos.push(this.rollosInsertar[i].Id);
     }
-    fechaInicial = moment(fechaInicial).format('YYYY-MM-DD');
-    fechaFinal = moment(fechaFinal).format('YYYY-MM-DD');
+    if (fechaInicial == 'Invalid date') fechaInicial = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
     setTimeout(() => {
       if (ot != null && fechaInicial != null && fechaFinal != null) {
         this.dtIngRollosService.getRollosDisponiblesOT(ot).subscribe(datos_Rollos => {
@@ -389,7 +389,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que ingresará los rollos que están saliendo
   dtSalidaRollos(id : number){
-    let procesos : string = this.FormConsultarRollos.value.Proceso.proceso_Id;
+    let procesos : string = this.FormConsultarRollos.value.Proceso;
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       if (!this.rollosInsertar[i].exits) {
         let info : any = {

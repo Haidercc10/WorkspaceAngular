@@ -18,138 +18,137 @@
   </div>
 </div>
 
-<div class="contain">
-  <!--Inicio info OT-->
-  <div class="container-fluid bajarPagina">
-    <div class="formulario">
-      <div class="mb-4">
-        <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
-      </div>
+<div class="formulario">
+  <div class="mb-4">
+    <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
+  </div>
 
-      <!-- Formulario para consultar filtros -->
-      <form [formGroup]="FormConsultarFiltros">
+  <!-- Formulario para consultar filtros -->
+  <form [formGroup]="FormConsultarFiltros">
+    <div class="mb-3">
+      <div class="row g-3 justify-content-md-center">
 
-        <!-- Primera Fila -->
-        <div class="mb-3">
-          <div class="row g-3 justify-content-md-center">
-
-            <!-- Factura -->
-            <div class="form-floating col-md-2">
-              <input formControlName="Documento" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Orden de Compra</label>
-            </div>
-
-             <!-- Fecha Factura -->
-             <div class="form-floating col-md-2">
-              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput" >
-              <label for="floatingInput">Fecha inicial</label>
-            </div>
-
-            <!-- Fecha ingreso rollo -->
-            <div class="form-floating col-md-2">
-              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput" >
-              <label for="floatingInput">Fecha Final</label>
-            </div>
-
-            <!-- Tipo Documento -->
-            <div class="form-floating col-md-2">
-              <select formControlName="estadoDoc" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example">
-                <option [ngValue]="item.estado_Id" *ngFor="let item of estados">{{item.estado_Nombre}}</option>
-              </select>
-              <label for="floatingSelect">Estados</label>
-            </div>
-
-          </div>
+        <!-- Orden de Compra -->
+        <div class="col-md">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="Documento" id="orden" class="form-control form-control-sm" type="text" pInputText required/>
+            <label for="orden">Orden de Compra</label>
+          </span>
         </div>
-      </form>
 
-      <!-- Botones -->
-      <div class="mb-3" *ngIf="!cargando">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarFiltros()"></button>
-          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        <!-- Fecha Inicial -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-calendar formControlName="fechaDoc" inputId="FechaInicial" [showIcon]="true"></p-calendar>
+            <label for="FechaInicial">Fecha Inicial</label>
+          </span>
+        </div>
+
+        <!-- Fecha Final -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-calendar formControlName="fechaFinalDoc" inputId="FechaFinal" [showIcon]="true"></p-calendar>
+            <label for="FechaFinal">Fecha Final</label>
+          </span>
+        </div>
+
+        <!-- Estados -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-dropdown formControlName="estadoDoc" inputId="Estado" [autoDisplayFirst]="false" [options]="estados" optionValue="estado_Id" optionLabel="estado_Nombre"></p-dropdown>
+            <label for="Estado">Estados</label>
+          </span>
         </div>
       </div>
+    </div>
+  </form>
 
-      <div class="mb-4">
-        <hr class="Linea">
-      </div>
-      <!-- titulo tabla producto -->
-      <div class="mb-4">
-        <h4 class="tituloRojo"><i class="pi pi-list"></i> Registros consultados</h4>
-      </div>
+  <!-- Botones -->
+  <div class="mb-3" *ngIf="!cargando">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarFiltros()"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+    </div>
+  </div>
 
-      <!-- Inicio tabla de registros consultados -->
-      <div class="mb-3" *ngIf=" !cargando">
-        <div class="row g-3">
-          <div class="table-responsive">
-            <p-table
-              #dt1
-              [resizableColumns]="true"
-              columnResizeMode="expand"
-              styleClass="p-datatable-gridlines p-datatable-sm"
-              responsiveLayout="scroll"
-              [paginator]="true"
-              [rows]="20"
-              [showCurrentPageReport]="true"
-              responsiveLayout="scroll"
-              currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-              [rowsPerPageOptions]="[10,20,30,50,70,100]"
-              [rowHover]="true"
-              [value]="registrosConsultados"
-              dataKey="Oc">
-              <ng-template pTemplate="caption">
-                <div class="flex">
-                  <button pButton label="Limpiar" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
-                </div>
-              </ng-template>
-              <ng-template pTemplate="header">
-                <tr>
-                  <th scope="col">Código
-                    <p-columnFilter type="text" field="Oc" display="menu"></p-columnFilter>
-                  </th>
-                  <th scope="col">Usuario
-                    <p-columnFilter type="text" field="Usuario" display="menu"></p-columnFilter>
-                  </th>
-                  <th scope="col">Fecha
-                    <p-columnFilter type="date" field="Fecha" display="menu"></p-columnFilter>
-                  </th>
-                  <th scope="col">Tipo
-                    <p-columnFilter type="text" field="Estado" display="menu"></p-columnFilter>
-                  </th>
-                  <th>Ver</th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-registros>
-                <tr data-bs-toggle="modal" data-bs-target="#editarOrden" (click)="llenarModal(registros.Oc)">
-                  <td>{{registros.Oc}}</td>
-                  <td>{{registros.Usuario}}</td>
-                  <td>{{registros.Fecha}}</td>
-                  <td>{{registros.Estado}}</td>
-                  <td style="text-align: center;"><a style="width: 30px; height: 30px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-danger mr-2" pTooltip="PDF" (click)="buscarinfoOrdenCompra(registros.Oc)"></a></td>
-                </tr>
-              </ng-template>
-            </p-table>
-          </div>
+  <div class="mb-4">
+    <hr class="Linea">
+  </div>
+  <!-- titulo tabla producto -->
+  <div class="mb-4">
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Registros consultados</h4>
+  </div>
+
+  <!-- Inicio tabla de registros consultados -->
+  <div class="mb-3" *ngIf=" !cargando">
+    <div class="row g-3">
+      <div class="table-responsive">
+        <p-table
+          #dt1
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [paginator]="true"
+          [rows]="20"
+          [showCurrentPageReport]="true"
+          responsiveLayout="scroll"
+          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+          [rowsPerPageOptions]="[10,20,30,50,70,100]"
+          [rowHover]="true"
+          [value]="registrosConsultados"
+          dataKey="Oc">
+          <ng-template pTemplate="caption">
+            <div class="flex">
+              <button pButton label="Limpiar" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">Código
+                <p-columnFilter type="text" field="Oc" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col">Usuario
+                <p-columnFilter type="text" field="Usuario" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col">Fecha
+                <p-columnFilter type="date" field="Fecha" display="menu"></p-columnFilter>
+              </th>
+              <th scope="col">Tipo
+                <p-columnFilter type="text" field="Estado" display="menu"></p-columnFilter>
+              </th>
+              <th>Ver</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-registros>
+            <tr data-bs-toggle="modal" data-bs-target="#editarOrden" (click)="llenarModal(registros.Oc)">
+              <td>{{registros.Oc}}</td>
+              <td>{{registros.Usuario}}</td>
+              <td>{{registros.Fecha}}</td>
+              <td>{{registros.Estado}}</td>
+              <td style="text-align: center;"><a style="font-size: medium;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" pTooltip="PDF" (click)="buscarinfoOrdenCompra(registros.Oc)"></a></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-container *ngIf="mostrarModal">
+  <div class="modal fade" id="editarOrden" aria-labelledby="Editar Orden" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel2">Editar Orden de Compra N° {{numeroOrdenCompra}}</h5>
+          <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <app_ocompra_component></app_ocompra_component>
         </div>
       </div>
     </div>
   </div>
+</ng-container>
 
-  <ng-container *ngIf="mostrarModal">
-    <div class="modal fade" id="editarOrden" aria-labelledby="Editar Orden" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel2">Editar Orden de Compra N° {{numeroOrdenCompra}}</h5>
-            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <app_ocompra_component></app_ocompra_component>
-          </div>
-        </div>
-      </div>
-    </div>
-  </ng-container>
-
-</div>

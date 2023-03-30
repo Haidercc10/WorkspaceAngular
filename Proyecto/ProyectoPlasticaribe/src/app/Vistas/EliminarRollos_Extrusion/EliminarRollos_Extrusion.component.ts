@@ -121,19 +121,14 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que va a consultar los rollos
   consultarRollos(){
-    console.log(this.FormConsultarRollos.value);
     let ot : number = this.FormConsultarRollos.value.OT_Id;
-    let fechaInicial : any = this.FormConsultarRollos.value.fechaDoc;
-    let fechaFinal : any = this.FormConsultarRollos.value.fechaFinalDoc;
+    let fechaInicial : any = moment(this.FormConsultarRollos.value.fechaDoc).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormConsultarRollos.value.fechaFinalDoc).format('YYYY-MM-DD');
     let rollo : number = this.FormConsultarRollos.value.IdRollo;
     let proceso : any = this.FormConsultarRollos.value.Proceso;
     let bodega : any = this.FormConsultarRollos.value.Bodega;
     let rollos : any = [];
     let consulta : number;
-    proceso != null ? proceso = proceso.proceso_Nombre : proceso = null;
-    bodega == null ? bodega = null : bodega = bodega.Id;
-    console.log(proceso)
-    console.log(bodega)
     this.rollos = [];
     this.error = false;
     this.rollosInsertar = [];
@@ -144,6 +139,9 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
     this.cargando = true;
     this.bodegaExtrusion = false;
     this.bodegaDespacho = false;
+
+    if (fechaInicial == 'Invalid date') fechaInicial = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
 
     if(proceso != null && bodega != null) {
       if ((proceso == 'Empaque' || proceso == 'Sellado') && bodega == 'EXT') Swal.fire({ icon: 'warning', title: 'Advertencia', text: 'La combinación de búsqueda es incorrecta, por favor verifique!', confirmButtonColor: '#f29643', });

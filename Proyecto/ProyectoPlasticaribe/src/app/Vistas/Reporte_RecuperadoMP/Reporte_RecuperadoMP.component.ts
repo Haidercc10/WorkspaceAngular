@@ -147,6 +147,9 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
     if (fechaFinal == null) fechaFinal = moment().format('YYYY-MM-DD');
 
+    if (fechaInicial == 'Invalid date') fechaInicial = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
+
     this.recuperadoService.consultaRecuperado(fechaInicial, fechaFinal, operario, turno, materiaPrima).subscribe(datos_recuperado => {
       if (datos_recuperado.length <= 0) Swal.fire(`No se encontraron registros para los filtros consultados`);
       for (let i = 0; i < datos_recuperado.length; i++) {

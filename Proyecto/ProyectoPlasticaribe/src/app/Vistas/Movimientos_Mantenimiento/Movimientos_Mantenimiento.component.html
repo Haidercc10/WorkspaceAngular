@@ -27,11 +27,12 @@
   <div class="mb-4">
     <h4 class="tituloRojo"><i class="pi pi-info-circle"></i> Información del Pedido</h4>
   </div>
+  <br>
 
   <!-- Formulario del pedido de mantenimiento -->
   <form [formGroup]="FormMovimientosMantenimiento">
     <div class="mb-3">
-      <div class="row g-3">
+      <div class="row g-4">
         <!-- Consecutivo del pedido -->
         <div class="form-floating col-md">
           <input formControlName="ConsecutivoMovimiento" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo del Pedido" min="0">

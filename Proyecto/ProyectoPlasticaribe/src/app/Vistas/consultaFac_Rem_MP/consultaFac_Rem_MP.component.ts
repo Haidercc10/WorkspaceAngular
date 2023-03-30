@@ -106,7 +106,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
       this.FormDocumentos = this.frmBuilderMateriaPrima.group({
         idDocumento : this.FormDocumentos.value.idDocumento,
         TipoDocumento: this.FormDocumentos.value.TipoDocumento,
-        proveedorNombre : `${datos_proveedor.prov_Id} - ${datos_proveedor.prov_Nombre}`,
+        proveedorNombre : ` ${datos_proveedor.prov_Nombre}`,
         proveedorId : datos_proveedor.prov_Id,
         fecha: this.FormDocumentos.value.fecha,
         fechaFinal : this.FormDocumentos.value.fechaFinal,
@@ -133,10 +133,13 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     this.remision = [];
     this.remConFac = [];
     let idDoc : number = this.FormDocumentos.value.idDocumento;
-    let fecha : any = this.FormDocumentos.value.fecha;
-    let fechaFinal : any = this.FormDocumentos.value.fechaFinal;
+    let fecha : any = moment(this.FormDocumentos.value.fecha).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormDocumentos.value.fechaFinal).format('YYYY-MM-DD');
     let TipoDocumento : string = this.FormDocumentos.value.TipoDocumento;
     let proveedores : any = this.FormDocumentos.value.proveedorId;
+
+    if (fecha == 'Invalid date') fecha = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
 
     if (idDoc != null && fecha != null && fechaFinal != null && TipoDocumento != null && proveedores != null) {
       this.facturaCompraMPService.GetEntradaFacRem_Codigo(idDoc).subscribe(datos_entradas => {

@@ -10,6 +10,7 @@ import { user_Conta_Zeus } from './_Models/user_Conta_Zeus';
 import { User_BagPro } from './_Models/user_BagPro';
 import { CookieService } from 'ngx-cookie-service';
 import { PrimeNGConfig } from 'primeng/api';
+import { endWith } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -61,6 +62,18 @@ export class AppComponent implements OnInit{
       dayNames: ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'],
       dayNamesShort: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
       dayNamesMin: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
+      matchAll: 'Todo',
+      matchAny: 'Cualquiera',
+      startsWith: 'Empiece con',
+      contains: 'Contiene',
+      notContains: 'No Contiene',
+      equals: 'Igual',
+      notEquals: 'No Igual',
+      endsWith: 'Termina con',
+      apply: 'Aplicar',
+      clear: 'Limpiar',
+      addRule: 'Añadir Regla',
+      removeRule: 'Quitar Regla',
     });
   }
 

@@ -52,7 +52,7 @@
         <!-- Categoria Producto -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-dropdown formControlName="MpCategoria" inputId="Categoria" [autoDisplayFirst]="false" [options]="categorias" optionLabel="catMP_Nombre"></p-dropdown>
+            <p-dropdown formControlName="MpCategoria" inputId="Categoria" [autoDisplayFirst]="false" [options]="categorias" optionValue="catMP_Id" optionLabel="catMP_Nombre"></p-dropdown>
             <label for="Categoria">Categorias</label>
           </span>
         </div>
@@ -60,7 +60,7 @@
         <!-- Bodegas -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-dropdown formControlName="MpBodega" inputId="Bodegas" [autoDisplayFirst]="false" [options]="bodegas" optionLabel="tpBod_Nombre"></p-dropdown>
+            <p-dropdown formControlName="MpBodega" inputId="Bodegas" [autoDisplayFirst]="false" [options]="bodegas" optionValue="tpBod_Id" optionLabel="tpBod_Nombre"></p-dropdown>
             <label for="Bodegas">Bodegas</label>
           </span>
         </div>

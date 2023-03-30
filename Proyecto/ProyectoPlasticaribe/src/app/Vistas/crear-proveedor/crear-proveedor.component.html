@@ -1,60 +1,64 @@
 <p-toast position="center"></p-toast>
+<br>
 <form [formGroup]="FormCrearProveedor">
   <!-- Inicio Fila 1 Agregar Proveedor -->
   <div class="mb-3">
-    <div class="row g-3">
+    <div class="row g-4">
 
       <!-- ID Proveedor -->
-      <div class="form-floating col-md-2">
-        <input formControlName="provId" type="number" class="form-control form-control-sm" id="floatingInput" name="PrvId" placeholder="Id">
-        <label for="floatingInput">Id</label>
+      <div class="col-md">
+        <span class="p-float-label">
+          <input formControlName="provId" id="provId" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="provId">Id</label>
+        </span>
       </div>
 
-        <!-- Nombre Proveedor -->
-        <div class="form-floating col-md">
-          <input formControlName="ProvNombre" type="text" class="form-control form-control-sm" id="floatingInput">
-          <label for="floatingInput">Nombre</label>
-        </div>
+      <!-- Nombre Proveedor -->
+      <div class="col-md-4">
+        <span class="p-float-label">
+          <input formControlName="ProvNombre" id="ProvNombre" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="ProvNombre">Nombre</label>
+        </span>
+      </div>
 
       <!-- Tipo de Identificacion Proveedor -->
-      <div class="form-floating col-md-2">
-        <select formControlName="provTipoId" type="text" class="form-select form-select-sm" id="floatingSelect" name="prvTipoId" aria-label="Floating label select example" required>
-          <option [ngValue]="tipoId" *ngFor="let tipoId of tipoIdentificacion">{{tipoId}}</option>
-        </select>
-        <label for="floatingSelect">Tipo ID</label>
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="provTipoId" inputId="tipoIdentificacion" [autoDisplayFirst]="false" [options]="tipoIdentificacion" optionLabel=""></p-dropdown>
+          <label for="tipoIdentificacion">Tipo Id</label>
+        </span>
       </div>
 
-        <!-- Tipo de proveedor -->
-        <div class="form-floating col-md-2">
-        <select formControlName="TipoProv" type="text" class="form-select form-select-sm" id="floatingSelect" name="prvTipoProv" required >
-          <option [ngValue]="tipoProv.tpProv_Id" *ngFor="let tipoProv of tiposProveedores">{{tipoProv.tpProv_Nombre}}</option>
-        </select>
-        <label for="floatingSelect">Tipo Proveedor</label>
+      <!-- Tipo de proveedor -->
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="TipoProv" inputId="TipoProv" optionValue="tpProv_Id" [autoDisplayFirst]="false" [options]="tiposProveedores" optionLabel="tpProv_Nombre"></p-dropdown>
+          <label for="TipoProv">Tipo Proveedor</label>
+        </span>
       </div>
-
-    </div>
-  </div>
-
-  <!--Inicio Fila 2-->
-  <div class="mb-3">
-    <div class="row g-3">
 
       <!-- Ciudad  -->
-      <div class="form-floating col-md">
-        <input formControlName="ProvCiudad" type="text" class="form-control form-control-sm" id="floatingInput">
-        <label for="floatingInput">Ciudad</label>
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <input formControlName="ProvCiudad" id="ProvCiudad" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="ProvCiudad">Ciudad</label>
+        </span>
       </div>
 
        <!-- Telefono -->
-       <div class="form-floating col-md-3">
-        <input formControlName="ProvTelefono" id="floatingInput" type="text" class="form-control form-control-sm">
-        <label for="floatingInput">Teléfono</label>
+      <div class="col-md">
+        <span class="p-float-label">
+          <input formControlName="ProvTelefono" id="ProvTelefono" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="ProvTelefono">Telefono</label>
+        </span>
       </div>
 
         <!-- Email  -->
-      <div class="form-floating col-md">
-        <input formControlName="ProvEmail" id="floatingInput" type="email" name="prvEmail" class="form-control form-control-sm" placeholder="Email">
-        <label for="floatingInput">Email</label>
+      <div class="col-md">
+        <span class="p-float-label">
+          <input formControlName="ProvEmail" id="ProvEmail" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="ProvEmail">Correo/Email</label>
+        </span>
       </div>
 
     </div>
@@ -63,8 +67,8 @@
   <!--Inicio Fila 3 Botones y Limpiar Campos-->
   <div class="mb-1">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="submit" (click)="validarCamposVaciosProveedor()"><i class="pi pi-check"></i> Crear Proveedor</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()"><i class="pi pi-eraser"></i> Limpiar Campos</button>
+      <button pButton class="p-button-danger" type="submit" label="Crear Proveedor" icon="pi pi-pencil" (click)="validarCamposVaciosProveedor()"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
     </div>
   </div>
 </form>

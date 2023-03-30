@@ -42,7 +42,8 @@ export class Mantenimiento_CamionesComponent implements OnInit {
   public arrayEstados : any = [];
   public identProveedor : number;
   public precioTotalMtto : number = 0;
-  public PedMtto : string = ''
+  public PedMtto : string = '';
+  tipoMovimientos : any [] = [{Id : 1, Nombre: 'Pedido de Mantenimiento'}, {Id : 2, Nombre: 'Mantenimiento'}];
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -137,10 +138,13 @@ export class Mantenimiento_CamionesComponent implements OnInit {
     let pedido : number = this.formConsultarPedidoMtto.value.idPedido;
     let mtto : number = this.formConsultarPedidoMtto.value.idMtto;
     let tipoMov : string = this.formConsultarPedidoMtto.value.tipoMov;
-    let fechaInicio : any = this.formConsultarPedidoMtto.value.fechaInicio;
-    let fechaFin : any = this.formConsultarPedidoMtto.value.fechaFin;
+    let fechaInicio : any = moment(this.formConsultarPedidoMtto.value.fechaInicio).format('YYYY-MM-DD');
+    let fechaFin : any = moment(this.formConsultarPedidoMtto.value.fechaFin).format('YYYY-MM-DD');
     let ruta : string = ``;
     this.arrayPedido = [];
+
+    if (fechaInicio == 'Invalid date') fechaInicio = null;
+    if (fechaFin == 'Invalid date') fechaFin = null;
 
     if(fechaInicio == null) fechaInicio = fechaInicio = this.today;
     if(fechaFin == null) fechaFin = fechaFin = fechaInicio;

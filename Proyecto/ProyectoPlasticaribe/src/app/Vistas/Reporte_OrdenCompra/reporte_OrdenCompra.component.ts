@@ -35,10 +35,9 @@ export class Reporte_OrdenCompraComponent implements OnInit {
   numeroOrdenCompra : number = 0; //Variable que va a almcenar el numero de la orden de compra que se desea editar
 
   constructor(private frmBuilder : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private estadosService : EstadosService,
-                      private dtOrdenCompraService : DetallesOrdenesCompraService,) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private estadosService : EstadosService,
+                    private dtOrdenCompraService : DetallesOrdenesCompraService,) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -91,9 +90,12 @@ export class Reporte_OrdenCompraComponent implements OnInit {
     let ocConsultadas : number [] = [];
     let size_query : number;
     let oc : number = this.FormConsultarFiltros.value.Documento;
-    let fechaInicial : any = this.FormConsultarFiltros.value.fechaDoc;
-    let fechaFinal : any = this.FormConsultarFiltros.value.fechaFinalDoc;
+    let fechaInicial : any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
     let estado : any = this.FormConsultarFiltros.value.estadoDoc;
+
+    if (fechaInicial == 'Invalid date') fechaInicial = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
 
     if (oc != null && fechaFinal != null && fechaInicial != null && estado != null) {
       this.dtOrdenCompraService.GetOrdenCompra(oc).subscribe(datos_orden => {

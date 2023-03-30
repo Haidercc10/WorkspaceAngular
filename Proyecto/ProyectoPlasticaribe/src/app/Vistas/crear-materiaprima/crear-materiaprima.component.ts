@@ -40,8 +40,7 @@ export class CrearMateriaprimaComponent implements OnInit {
       mpStock: ['', Validators.required],
       mpCategoria: ['', Validators.required],
       mpEstado: ['', Validators.required],
-      mpProveedor: ['', Validators.required],
-      mpValor: ['', Validators.required],
+      mpValor: [null, Validators.required],
       Stock : ['', Validators.required],
       mpUnidadMedida : ['', Validators.required],
       MpObservacion : ['', Validators.required],
@@ -91,7 +90,7 @@ export class CrearMateriaprimaComponent implements OnInit {
     let nombreMateriaPrima : string = this.materiPrima.value.mpNombre;
     let descripcionMateriaPrima : string = this.materiPrima.value.mpDescripcion;
     let stockMateriaPrima : number = 0;
-    let categoriaMateriaPrima : number = this.materiPrima.value.mpCategoria;
+    let categoriaMateriaPrima : any = this.materiPrima.value.mpCategoria;
     let precioMateriaPrima : number = this.materiPrima.value.mpValor;
 
     this.CreacionMateriaPrima(nombreMateriaPrima, descripcionMateriaPrima, stockMateriaPrima, categoriaMateriaPrima, precioMateriaPrima);
