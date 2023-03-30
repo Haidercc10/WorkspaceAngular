@@ -145,12 +145,10 @@ export class PedidoExternoComponent implements OnInit {
   //Funcion que validar si cambia uno de los input se muestre la misma informacion en la parde abajo de la tabla
   ivaDescuento(){
     if (this.valorTotal == 0) {
-      this.descuento = this.FormPedidoExternoClientes.value.PedDescuento;
       this.valorMenosDescuento = 0;
       this.valorMenosIva = 0;
       this.valorfinal = 0;
     } else {
-      this.descuento = this.FormPedidoExternoClientes.value.PedDescuento;
       this.valorMenosDescuento = (this.valorTotal * this.descuento) / 100;
       this.valorMenosIva = (this.valorTotal * this.iva) / 100;
       this.valorfinal = this.valorTotal - this.valorMenosDescuento + this.valorMenosIva;
@@ -419,8 +417,8 @@ export class PedidoExternoComponent implements OnInit {
                   ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
                   ProdUnidadMedidaCant: datos_producto[j].undMed_Id,
                   ProdPrecioUnd: datos_producto[j].exProd_PrecioVenta.toFixed(2),
-                  ProdUltFacturacion: this.formatonumeros(this.ultimoPrecio.toFixed(2)),
-                  ProdStock: this.formatonumeros(datos_existencis[i].existencias.toFixed(2)),
+                  ProdUltFacturacion: this.ultimoPrecio,
+                  ProdStock: datos_existencis[i].existencias,
                   ProdFechaEnt : this.FormPedidoExternoProductos.value.ProdFechaEnt,
                 });
               }, 100);
@@ -480,7 +478,7 @@ export class PedidoExternoComponent implements OnInit {
             PrecioUnd : precioProducto,
             Stock : this.formatonumeros(this.FormPedidoExternoProductos.get('ProdStock').value),
             SubTotal : this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad,
-            FechaEntrega : this.FormPedidoExternoProductos.value.ProdFechaEnt,
+            FechaEntrega : moment(this.FormPedidoExternoProductos.value.ProdFechaEnt).format('YYYY-MM-DD'),
           }
           this.ArrayProducto.push(productoExt);
           this.LimpiarCamposProductos();
@@ -497,7 +495,7 @@ export class PedidoExternoComponent implements OnInit {
               PrecioUnd : precioProducto,
               Stock : this.formatonumeros(this.FormPedidoExternoProductos.get('ProdStock').value),
               SubTotal : (this.FormPedidoExternoProductos.value.ProdPrecioUnd * this.FormPedidoExternoProductos.value.ProdCantidad),
-              FechaEntrega : this.FormPedidoExternoProductos.value.ProdFechaEnt,
+              FechaEntrega : moment(this.FormPedidoExternoProductos.value.ProdFechaEnt).format('YYYY-MM-DD'),
             }
             this.ArrayProducto.push(productoExt);
             this.LimpiarCamposProductos();

@@ -13,308 +13,333 @@
     <div class="mb-4 Titulo">
       <h2 class="tituloRojo">Ordenes de Pedidos</h2>
     </div>
+
     <div class="mb-4">
       <hr class="colorLinea">
     </div>
+  </div>
+</div>
 
-    <div class="formulario">
-      <ng-container *ngIf="ValidarRol == 1">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <button pButton class="p-button-danger" type="button" label="Crear Clientes" icon="pi pi-check-circle" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="LlamarModalCrearCliente()"> </button>
-          <button pButton class="p-button-danger" type="button" label="Crear productos" icon="pi pi-check-circle" data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="LlamarModalCrearProducto()"> </button>
+<div class="formulario">
+  <ng-container *ngIf="ValidarRol == 1">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button pButton class="p-button-danger" type="button" label="Crear Clientes" icon="pi pi-check-circle" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="LlamarModalCrearCliente()"> </button>
+      <button pButton class="p-button-danger" type="button" label="Crear productos" icon="pi pi-check-circle" data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="LlamarModalCrearProducto()"> </button>
+    </div>
+  </ng-container>
+
+  <!-- Inicio titulo -->
+  <div class="mb-4">
+    <h4 class="tituloRojo"><i class="pi pi-plus-circle"></i> Crear Pedido</h4>
+  </div>
+  <br>
+
+  <!--Inicio Crear Pedidos-->
+  <form [formGroup]="FormPedidoExternoClientes">
+    <div class="mb-3">
+      <div class="row g-4">
+
+        <!-- Cliente -->
+        <div class="col-md-4">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="PedClienteNombre" id="PedClienteNombre" list="cliente" class="form-control form-control-sm" type="text" pInputText (change)="clienteSeleccionado()" required/>
+            <datalist id="cliente">
+              <option value={{item.cli_Nombre}} *ngFor="let item of cliente">{{item.cli_Id}}</option>
+            </datalist>
+            <label for="PedClienteNombre">Cliente</label>
+          </span>
         </div>
-      </ng-container>
 
-      <!-- Inicio titulo -->
-      <div class="mb-4">
-        <h4 class="tituloRojo"><i class="pi pi-plus-circle"></i> Crear Pedido</h4>
+        <!-- Ciudad -->
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="ciudad_sede" inputId="ciudad_sede" [autoDisplayFirst]="false" [options]="ciudad" optionLabel="" (onChange)="llenarDireccionCliente()" [required]="true"></p-dropdown>
+            <label for="ciudad_sede">Ciudad(es)</label>
+          </span>
+        </div>
+
+        <!-- Sede Cliente -->
+        <div class="col-md-3">
+          <span class="p-float-label">
+            <p-dropdown formControlName="PedSedeCli_Id" inputId="PedSedeCli_Id" [autoDisplayFirst]="false" [options]="sedeCliente" optionLabel="" (onChange)="verificarCartera()" [required]="true"></p-dropdown>
+            <label for="PedSedeCli_Id">Dirección Sede</label>
+          </span>
+        </div>
+
+        <!-- Usuario -->
+        <div class="col-md-3">
+          <span class="p-float-label">
+            <p-dropdown formControlName="PedUsuarioNombre" inputId="PedUsuarioNombre" [autoDisplayFirst]="false" [options]="usuarioVende" optionLabel="" [required]="true"></p-dropdown>
+            <label for="PedUsuarioNombre">Vendedor</label>
+          </span>
+        </div>
+
+        <!-- Descuento -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="PedDescuento" mode="decimal" inputId="Descuento" [minFractionDigits]="2" (onBlur)="ivaDescuento()" [(ngModel)]="descuento"></p-inputNumber>
+            <label for="Descuento">(%) Descuento</label>
+          </span>
+        </div>
+
+        <!-- Campo Observacion -->
+        <div class="col-md-8">
+          <span class="p-float-label">
+            <textarea formControlName="PedObservacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
+        </div>
+
+        <!-- Iva -->
+        <div class="col-md">
+          <div class="field-checkbox" style="padding: 5%;">
+            <p-checkbox formControlName="PedIva" [(ngModel)]="checked" label="Iva (%)" (click)="checkboxIva()" [binary]="true"></p-checkbox>
+          </div>
+        </div>
+
       </div>
+    </div>
+  </form>
 
-      <!--Inicio Crear Pedidos-->
-      <form [formGroup]="FormPedidoExternoClientes">
-        <div class="mb-3">
-          <div class="row g-3">
-            <!-- Cliente -->
-            <div class="form-floating col-md-3">
-              <input formControlName="PedClienteNombre" type="search" class="form-control form-control-sm" list="cliente" id="floatingInput" title="Nombre del Cliente" (change)="clienteSeleccionado()">
-              <datalist id="cliente">
-                <option value={{item.cli_Nombre}} *ngFor="let item of cliente">{{item.cli_Id}}</option>
-              </datalist>
-              <label for="floatingInput">Cliente</label>
-            </div>
+  <!-- Linea -->
+  <div class="mb-4">
+    <hr class="Linea">
+  </div>
 
-            <!-- Ciudad -->
-            <div class="form-floating col-md">
-              <select formControlName="ciudad_sede" type="text" id="floatingSelect" name="ciudad_sede" (change)="llenarDireccionCliente()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="ciudades" *ngFor="let ciudades of ciudad">{{ciudades}}</option>
-              </select>
-              <label for="floatingSelect">Ciudad(es)</label>
-            </div>
+  <!-- Inicio Titulo Agregar Productos al pedido -->
+  <div class="mb-4">
+    <h4 class="tituloRojo"><i class="pi pi-check-square"></i> Agregar Productos</h4>
+  </div>
+  <br>
 
-            <!-- Sede Cliente -->
-            <div class="form-floating col-md-2">
-              <select formControlName="PedSedeCli_Id" type="text" id="floatingSelect" name="PSedeCli_Id" (change)="verificarCartera()" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="sedesclientes" *ngFor="let sedesclientes of sedeCliente">{{sedesclientes}}</option>
-              </select>
-              <label for="floatingSelect">Dirección Sede</label>
-            </div>
+  <form [formGroup]="FormPedidoExternoProductos" autocomplete="off">
+    <div class="mb-3">
+      <div class="row g-4">
 
-            <!-- Usuario -->
-            <div class="form-floating col-md-3">
-              <select formControlName="PedUsuarioNombre" type="text" id="floatingSelect" name="PextUsuarioId" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                <option [ngValue]="vendedor" *ngFor="let vendedor of usuarioVende">{{vendedor}}</option>
-              </select>
-              <label for="floatingSelect">Vendedor</label>
-            </div>
-
-            <!-- Campo Observacion -->
-            <div class="form-floating col-md">
-              <input formControlName="PedDescuento" type="number" (keyup)="ivaDescuento()" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido">
-              <label for="floatingInput">(%) Descuento</label>
-            </div>
-
-            <!-- Iva -->
-            <div class="form-floating col-md-1">
-              <div class="field-checkbox" style="padding: 5%;">
-                <p-checkbox formControlName="PedIva" [(ngModel)]="checked" (click)="checkboxIva()" [binary]="true"></p-checkbox>
-                <label>&nbsp;&nbsp;IVA(%)</label>
-              </div>
-            </div>
-
-          </div>
+        <!-- ID Producto -->
+        <div class="col-md-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="ProdId" id="ProdId" class="form-control form-control-sm" type="text" pInputText (keyup)="buscarProductoId()" required/>
+            <label for="ProdId">Id</label>
+          </span>
         </div>
 
-        <div class="mb-3">
-          <div class="row g-3">
-            <!-- Campo Observacion -->
-            <div class="form-floating col-md">
-              <textarea formControlName="PedObservacion"  id="floatingTextarea" type="text" class="form-control form-control-sm" maxlength="200" placeholder="Observacion" name="PextObservacion"></textarea>
-              <label for="floatingTextarea">Observación</label>
-            </div>
-          </div>
+        <!-- ID/Nombre Producto -->
+        <div class="col-md-5">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="ProdNombre" id="ProdNombre" list="producto" class="form-control form-control-sm" type="text" pInputText (change)="buscarProducto()" required/>
+            <datalist id="producto">
+              <option value={{item.prod_Id}} *ngFor="let item of producto">{{item.prod_Nombre}}</option>
+            </datalist>
+            <label for="ProdNombre">Producto</label>
+          </span>
         </div>
-      </form>
 
-      <!-- Linea -->
-      <div class="mb-4">
-        <hr class="Linea">
+        <!-- Cantidad Pedida -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="ProdCantidad" mode="decimal" inputId="Cant" [minFractionDigits]="2"></p-inputNumber>
+            <label for="Cant">Cant. Pedida</label>
+          </span>
+        </div>
+
+        <!-- Presentacion -->
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="ProdUnidadMedidaCant" inputId="Und" [autoDisplayFirst]="false" [options]="presentacion" [required]="true"></p-dropdown>
+            <label for="Und">Presentación</label>
+          </span>
+        </div>
+
+        <!-- Precio Producto -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="ProdPrecioUnd" mode="decimal" inputId="Precio" [minFractionDigits]="2"></p-inputNumber>
+            <label for="Precio">Precio Und.</label>
+          </span>
+        </div>
+
+        <!-- Fecha Entrega Producto -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-calendar formControlName="ProdFechaEnt" inputId="FechaEntrega" [showIcon]="true"></p-calendar>
+            <label for="FechaEntrega">Fecha Entrega</label>
+          </span>
+        </div>
+
+        <!-- Stock Producto -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="ProdStock" mode="decimal" inputId="Precio" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+            <label for="Precio">Stock</label>
+          </span>
+        </div>
+
+        <!-- Ultima venta -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="ProdUltFacturacion" mode="decimal" inputId="Precio" [minFractionDigits]="2" [readonly]="true"></p-inputNumber>
+            <label for="Precio">Ultimo Precio Facturado</label>
+          </span>
+        </div>
+
+        <!-- Ultima fecha Facturada -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-chip label="Ultima Fecha Facturada: {{fechaUltFacuracion}}" icon="pi pi-calendar"></p-chip>
+          </span>
+        </div>
       </div>
+    </div>
+  </form>
 
-      <!-- Inicio Titulo Agregar Productos al pedido -->
-      <div class="mb-4">
-        <h4 class="tituloRojo"><i class="pi pi-check-square"></i> Agregar Productos</h4>
+  <!-- Inicio botones -->
+  <div class="mb-3">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button pButton class="p-button-danger" type="button" label="{{AccionBoton}} Producto" icon="pi pi-send" (click)="validarCamposVacios()"> </button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCamposProductos()"> </button>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <hr class="Linea">
+  </div>
+
+  <div class="mb-4">
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Productos</h4>
+  </div>
+
+  <div class="mb-3" *ngIf="!cargando">
+    <div class="row g-3">
+      <div class="table-responsive">
+        <p-table
+          #dt
+          [value]="ArrayProducto"
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [paginator]="true"
+          [rows]="20"
+          [showCurrentPageReport]="true"
+          responsiveLayout="scroll"
+          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+          [rowsPerPageOptions]="[10,20,30,50,70,100]"
+          [rowHover]="true"
+          dataKey="id">
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+              <th scope="col" class="idProducto">ID</th>
+              <th id="nombre" scope="col">Nombre</th>
+              <th id="cantidad" scope="col">Cantidad</th>
+              <th id="undMedidaCantidad" scope="col">Unidad Medida</th>
+              <th id="precioUnitario" scope="col">Precio Und</th>
+              <th id="Subtotal" scope="col">Subtotal</th>
+              <th scope="col">Fecha Entrega</th>
+              <th id="acciones" scope="col">Acciones</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rowData let-listaProductos let-columns="columns">
+            <tr class="font-size-14">
+              <td>{{listaProductos.Id}}</td>
+              <td>{{listaProductos.Nombre}}</td>
+              <td>{{listaProductos.Cant | number}}</td>
+              <td>{{listaProductos.UndCant}}</td>
+              <td>{{listaProductos.PrecioUnd | number}}</td>
+              <td>{{listaProductos.SubTotal | number}}</td>
+              <td>{{listaProductos.FechaEntrega}}</td>
+              <td *ngIf="!modalMode" style="text-align: center;">
+                <button pButton class="p-button-danger p-button-rounded" type="button" style="width: 30px; height: 30px" icon="pi pi-trash" title="Quitar producto de la tabla" (click)="QuitarProductoTabla(listaProductos)"></button>
+              </td>
+              <td *ngIf="modalMode" style="text-align: center;">
+                <button pButton class="p-button-danger p-button-rounded" type="button" style="width: 30px; height: 30px" icon="pi pi-trash" title="Quitar producto de la tabla" (click)="eliminarProducto(listaProductos)"></button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="summary"></ng-template>
+        </p-table>
       </div>
+    </div>
+  </div>
 
-      <form [formGroup]="FormPedidoExternoProductos" autocomplete="off">
-        <!-- Inicio Fila 1 Agregar producto -->
-        <div class="mb-3">
-          <div class="row g-3">
-            <!-- ID Producto -->
-            <div class="form-floating col-md">
-              <input formControlName="ProdId" type="search" min="0" class="form-control" id="floatingInput" name="PrdId" (keyup)="buscarProductoId()" required>
-              <label for="floatingInput">Id</label>
-            </div>
-
-            <!-- ID/Nombre Producto -->
-            <div class="form-floating col-md-4">
-              <input formControlName="ProdNombre" type="search" (change)="buscarProducto()" class="form-control form-control-sm" list="producto" id="floatingInput" title="Nombre del Cliente">
-              <datalist id="producto">
-                <option value={{item.prod_Id}} *ngFor="let item of producto">{{item.prod_Nombre}}</option>
-              </datalist>
-              <label for="floatingInput">Producto</label>
-            </div>
-
-            <div class="form-floating col-md">
-              <input formControlName="ProdCantidad" type="number" class="form-control form-control-sm" id="floatingInput" required>
-              <label for="floatingSelect">Cant. Pedida</label>
-            </div>
-
-            <!-- UM Cantidad Producto -->
-            <div class="form-floating col-md">
-              <select formControlName="ProdUnidadMedidaCant" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" name="PrdUnidadMedidaCant" required >
-                <option [ngValue]="presentaciones" *ngFor="let presentaciones of presentacion">{{presentaciones}}</option>
-              </select>
-              <label for="floatingSelect">Presentación</label>
-            </div>
-
-            <!-- Precio Producto -->
-            <div class="form-floating col-md">
-              <input formControlName="ProdPrecioUnd" type="number" class="form-control form-control-sm" id="floatingInput" name="PrdPrecioUnd">
-              <label for="floatingInput">Precio Und.</label>
-            </div>
-
-            <!-- Fecha Entrega Producto -->
-            <div class="form-floating col-md">
-              <input formControlName="ProdFechaEnt" type="date" class="form-control form-control-sm" id="floatingInput" required title="Fecha Pedido">
-              <label for="floatingInput">Fecha Entrega</label>
-            </div>
-            <!-- Stock Producto -->
-            <div class="form-floating col-md">
-              <input formControlName="ProdStock" type="text" class="form-control form-control-sm" id="floatingInput" name="PrdStock" readonly onmousedown="return false;">
-              <label for="floatingSelect">Stock</label>
-            </div>
-
-          </div>
-          </div>
-
-         <!-- Inicio Descripción producto -->
-        <div class="mb-4">
-          <div class="row g-3">
-            <!-- Ultima venta -->
-            <div class="form-floating col-md-2">
-              <input formControlName="ProdUltFacturacion" type="text" class="form-control form-control-sm" id="floatingInput" name="ProdUltFacturacion" readonly onmousedown="return false;">
-              <label for="floatingInput">Ultimo Precio Facturado</label>
-              <div>
-                <label><b><i class="pi pi-dollar"></i> Ult. Facturación: </b>{{fechaUltFacuracion}}</label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </form>
-
-      <!-- Inicio botones -->
+  <p-card>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <div class="mb-3">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" type="button" label="{{AccionBoton}} Producto" icon="pi pi-send" (click)="validarCamposVacios()"> </button>
-          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCamposProductos()"> </button>
-        </div>
-      </div>
-
-      <div class="mb-4">
-        <hr class="Linea">
-      </div>
-
-      <div class="mb-4">
-        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Productos</h4>
-      </div>
-
-      <div class="mb-3" *ngIf="!cargando">
         <div class="row g-3">
-          <div class="table-responsive">
-            <p-table
-              #dt
-              [value]="ArrayProducto"
-              [resizableColumns]="true"
-              columnResizeMode="expand"
-              styleClass="p-datatable-gridlines p-datatable-sm"
-              responsiveLayout="scroll"
-              [paginator]="true"
-              [rows]="20"
-              [showCurrentPageReport]="true"
-              responsiveLayout="scroll"
-              currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-              [rowsPerPageOptions]="[10,20,30,50,70,100]"
-              [rowHover]="true"
-              dataKey="id">
-              <ng-template pTemplate="header" let-columns>
-                <tr>
-                  <th scope="col" class="idProducto">ID</th>
-                  <th id="nombre" scope="col">Nombre</th>
-                  <th id="cantidad" scope="col">Cantidad</th>
-                  <th id="undMedidaCantidad" scope="col">Unidad Medida</th>
-                  <th id="precioUnitario" scope="col">Precio Und</th>
-                  <th id="Subtotal" scope="col">Subtotal</th>
-                  <th scope="col">Fecha Entrega</th>
-                  <th id="acciones" scope="col">Acciones</th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-rowData let-listaProductos let-columns="columns">
-                <tr class="font-size-14">
-                  <td>{{listaProductos.Id}}</td>
-                  <td>{{listaProductos.Nombre}}</td>
-                  <td>{{listaProductos.Cant | number}}</td>
-                  <td>{{listaProductos.UndCant}}</td>
-                  <td>{{listaProductos.PrecioUnd | number}}</td>
-                  <td>{{listaProductos.SubTotal | number}}</td>
-                  <td>{{listaProductos.FechaEntrega}}</td>
-                  <td *ngIf="!modalMode" style="text-align: center;">
-                    <button pButton class="p-button-danger p-button-rounded" type="button" style="width: 30px; height: 30px" icon="pi pi-trash" title="Quitar producto de la tabla" (click)="QuitarProductoTabla(listaProductos)"></button>
-                  </td>
-                  <td *ngIf="modalMode" style="text-align: center;">
-                    <button pButton class="p-button-danger p-button-rounded" type="button" style="width: 30px; height: 30px" icon="pi pi-trash" title="Quitar producto de la tabla" (click)="eliminarProducto(listaProductos)"></button>
-                  </td>
-                </tr>
-              </ng-template>
-            </p-table>
-          </div>
+          <p-chip label="Valor total" icon="pi pi-dollar"></p-chip>
+          <label for="">${{valorTotal | number}}</label>
         </div>
       </div>
-
-      <br>
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <div class="mb-3">
-          <div class="row g-3">
-            <label for=""><b>Valor total</b></label>
-            <label for="">${{valorTotal | number}}</label>
-          </div>
-        </div>
-        <div class="mb-3">
-          <div class="row g-3">
-            <label for=""><b>Descuento (%)</b></label>
-            <label for="">{{descuento | number}}%</label>
-          </div>
-        </div>
-        <div class="mb-3">
-          <div class="row g-3">
-            <label for=""><b>Subtotal menos Descuento</b></label>
-            <label for="">${{valorMenosDescuento | number}}</label>
-          </div>
-        </div>
-        <div class="mb-3">
-          <div class="row g-3">
-            <label for=""><b>IVA (%)</b></label>
-            <label for="">{{iva | number}}%</label>
-          </div>
-        </div>
-        <div class="mb-3">
-          <div class="row g-3">
-            <label for=""><b>Subtotal Iva</b></label>
-            <label for="">${{valorMenosIva | number}}</label>
-          </div>
-        </div>
-        <div class="mb-3">
-          <div class="row g-3">
-            <label for=""><b>Total</b></label>
-            <label for="">${{valorfinal | number}}</label>
-          </div>
+      <div class="mb-3">
+        <div class="row g-3">
+          <p-chip label="Descuento" icon="pi pi-percentage"></p-chip>
+          <label for="">{{descuento | number}}%</label>
         </div>
       </div>
-
-      <div class="bajarPagina">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button pButton class="p-button-danger" type="button" label="Crear Pedido"  *ngIf="!modalMode && !cargando" icon="pi pi-check" (click)="confirmarPedido()"> </button>
-        <button pButton class="p-button-danger" type="button" label="Editar Pedido" icon="pi pi-pencil" *ngIf="modalMode && !cargando" (click)="confirmarPedido()"> </button>
-        <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"> </button>
+      <div class="mb-3">
+        <div class="row g-3">
+          <p-chip label="Subtotal menos Descuento" icon="pi pi-wallet"></p-chip>
+          <label for="">${{valorMenosDescuento | number}}</label>
         </div>
       </div>
-
-      <!-- Modal de crear producto -->
-      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="staticBackdropLabel">Crear productos</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <app-crear-producto></app-crear-producto>
-            </div>
-          </div>
+      <div class="mb-3">
+        <div class="row g-3">
+          <p-chip label="IVA" icon="pi pi-percentage"></p-chip>
+          <label for="">{{iva | number}}%</label>
         </div>
       </div>
+      <div class="mb-3">
+        <div class="row g-3">
+          <p-chip label="Subtotal Iva" icon="pi pi-money-bill"></p-chip>
+          <label for="">${{valorMenosIva | number}}</label>
+        </div>
+      </div>
+      <div class="mb-3">
+        <div class="row g-3">
+          <p-chip label="Total" icon="pi pi-shopping-cart"></p-chip>
+          <label for="">${{valorfinal | number}}</label>
+        </div>
+      </div>
+    </div>
+  </p-card>
+  <br>
 
-      <!-- Modal de crear cliente -->
-      <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="staticBackdropLabel2">Crear clientes</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <app-crear-clientes></app-crear-clientes>
-            </div>
-          </div>
+  <div class="bajarPagina">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+    <button pButton class="p-button-danger" type="button" label="Crear Pedido"  *ngIf="!modalMode && !cargando" icon="pi pi-check" (click)="confirmarPedido()"> </button>
+    <button pButton class="p-button-danger" type="button" label="Editar Pedido" icon="pi pi-pencil" *ngIf="modalMode && !cargando" (click)="confirmarPedido()"> </button>
+    <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodosCampos()"> </button>
+    </div>
+  </div>
+
+  <!-- Modal de crear producto -->
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Crear productos</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <app-crear-producto></app-crear-producto>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de crear cliente -->
+  <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel2">Crear clientes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <app-crear-clientes></app-crear-clientes>
         </div>
       </div>
     </div>

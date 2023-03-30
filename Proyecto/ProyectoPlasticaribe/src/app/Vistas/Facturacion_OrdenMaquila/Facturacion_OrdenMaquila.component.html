@@ -26,37 +26,48 @@
   <!-- Fomulario Imicial -->
   <form [formGroup]="formFacturacionOrden">
     <div class="mb-3">
-      <div class="row g-3">
+      <div class="row g-4">
 
-        <div class="form-floating col-md-2">
-          <input formControlName="OrdenMaquila" type="number" class="form-control form-control-sm" id="floatingInput" (keyup.enter)="consultarOrdenMaquila()">
-          <label for="floatingSelect">Nro. OM</label>
+        <!-- Orden Maquila -->
+        <div class="col-md-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="OrdenMaquila" id="orden" class="form-control form-control-sm" type="text" pInputText (keyup.enter)="consultarOrdenMaquila()"/>
+            <label for="orden">N° OM</label>
+          </span>
         </div>
 
         <!-- Factura -->
-        <div class="form-floating col-md-2">
-          <input formControlName="Factura" type="text" class="form-control form-control-sm" id="floatingInput">
-          <label for="floatingSelect">Nro. Factura</label>
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="Factura" id="Factura" class="form-control form-control-sm" type="text" pInputText/>
+            <label for="Factura">Factura</label>
+          </span>
         </div>
+
         <!-- Remision -->
-        <div class="form-floating col-md-2">
-          <input formControlName="Remision" type="text" class="form-control form-control-sm" id="floatingInput">
-          <label for="floatingSelect">Nro. Remisión</label>
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="Remision" id="Remision" class="form-control form-control-sm" type="text" pInputText/>
+            <label for="Remision">Remisión</label>
+          </span>
         </div>
 
-        <div class="form-floating col-md">
-          <input formControlName="Tercero" class="form-control" id="floatingInput" title="Nombre del Tercero" required>
-          <label for="floatingInput">Tercero</label>
+        <!-- Tercero -->
+        <div class="col-md">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="Tercero" id="orden" class="form-control form-control-sm" type="text" pInputText readonly/>
+            <label for="orden">Tercero</label>
+          </span>
         </div>
-      </div>
-    </div>
 
-    <div class="mb-3">
-      <div class="row g-3">
-        <!-- Campo Observacion -->
-        <div class="form-floating col-md">
-          <textarea formControlName="Observacion" id="floatingTextarea" type="text" class="form-control form-control-sm"></textarea>
-          <label for="floatingTextarea">Observación</label>
+        <!-- Observacion -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
         </div>
       </div>
     </div>

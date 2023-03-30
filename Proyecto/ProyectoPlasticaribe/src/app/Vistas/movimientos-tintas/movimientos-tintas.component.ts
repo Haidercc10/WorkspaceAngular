@@ -143,8 +143,6 @@ export class MovimientosTintasComponent implements OnInit {
     let fechaFinal : any = moment(this.FormDocumentos.value.fechaFinal).format('YYYY-MM-DD');
     let estado : any = this.FormDocumentos.value.estado;
 
-    if (tipoDoc != null) tipoDoc = tipoDoc.tpDoc_Id;
-    if (estado != null) estado = estado.estado_Id;
     if (fechaIncial == 'Invalid date') fechaIncial = null;
     if (fechaFinal == 'Invalid date') fechaFinal = null;
 

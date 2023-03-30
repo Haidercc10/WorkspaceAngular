@@ -67,7 +67,7 @@ export class CrearTerceroComponent implements OnInit {
     }
 
     this.terceroService.insert(info).subscribe(datos => {
-      this.messageService.add({key: 'Advertencia', severity:'success', summary:'¡Registro Exitos!'});
+      this.messageService.add({severity:'success', detail: '¡Registro Exitoso!'});
       this.LimpiarCampos();
     }, error => {
 

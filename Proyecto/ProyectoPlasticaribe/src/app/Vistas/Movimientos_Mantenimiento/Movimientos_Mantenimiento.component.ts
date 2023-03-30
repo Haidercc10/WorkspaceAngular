@@ -137,14 +137,16 @@ export class Movimientos_MantenimientoComponent implements OnInit {
   consultar(){
     this.movimientosConsultados = [];
     let consecutivo : any = this.FormMovimientosMantenimiento.value.ConsecutivoMovimiento;
-    let fechaInicial : any = this.FormMovimientosMantenimiento.value.FechaInicial;
-    let fechaFinal : any = this.FormMovimientosMantenimiento.value.FechaFinal;
+    let fechaInicial : any = moment(this.FormMovimientosMantenimiento.value.FechaInicial).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormMovimientosMantenimiento.value.FechaFinal).format('YYYY-MM-DD');
     let estado : any = this.FormMovimientosMantenimiento.value.Estado;
     let activo : any = this.FormMovimientosMantenimiento.value.IdActivo;
     let fechaDano : any = this.FormMovimientosMantenimiento.value.FechaDaño;
     let tipoMantenimiento : any = this.FormMovimientosMantenimiento.value.IdTipoMantenimiento;
     let ruta : string = ``;
 
+    if (fechaInicial == 'Invalid date') fechaInicial = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
     if (fechaInicial == null) fechaInicial = this.today;
     if (fechaFinal == null) fechaFinal = fechaInicial;
 

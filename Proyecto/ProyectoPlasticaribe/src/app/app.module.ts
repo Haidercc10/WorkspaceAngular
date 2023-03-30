@@ -159,6 +159,7 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { FieldsetModule } from 'primeng/fieldset';
 import {DividerModule} from 'primeng/divider';
+import { ChipModule } from 'primeng/chip';
 
 export const routes: Routes = [
 
@@ -441,6 +442,7 @@ export const routes: Routes = [
     ProgressSpinnerModule,
     FieldsetModule,
     DividerModule,
+    ChipModule,
   ],
 
   providers: [

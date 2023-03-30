@@ -1,49 +1,55 @@
+<br>
 <form [formGroup]="FormCrearTercero">
   <!-- Inicio Fila 1 Agregar Proveedor -->
   <div class="mb-3">
-    <div class="row g-3">
+    <div class="row g-4">
 
-      <!-- ID Proveedor -->
-      <div class="form-floating col-md-2">
-        <input formControlName="Id" type="text" class="form-control form-control-sm" id="floatingInput" name="PrvId" required>
-        <label for="floatingInput">Id</label>
+      <!-- ID Tercero -->
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <input formControlName="Id" id="Id" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="Id">Id</label>
+        </span>
       </div>
 
-      <!-- Nombre Proveedor -->
-      <div class="form-floating col-md">
-        <input formControlName="Nombre" type="text" class="form-control form-control-sm" id="floatingInput" required>
-        <label for="floatingInput">Nombre</label>
+      <!-- Nombre Tercero -->
+      <div class="col-md-6">
+        <span class="p-float-label">
+          <input formControlName="Nombre" id="Nombre" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="Nombre">Nombre</label>
+        </span>
       </div>
 
-      <!-- Tipo de Identificacion Proveedor -->
-      <div class="form-floating col-md-2">
-        <select formControlName="TipoId" type="text" class="form-select form-select-sm" id="floatingSelect" name="prvTipoId" aria-label="Floating label select example" required>
-          <option [ngValue]="tipoId" *ngFor="let tipoId of tipoIdentificacion">{{tipoId}}</option>
-        </select>
-        <label for="floatingSelect">Tipo ID</label>
+      <!-- Tipo de Identificacion Tercero -->
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="TipoId" inputId="TipoId" [autoDisplayFirst]="false" [options]="tipoIdentificacion" optionLabel=""></p-dropdown>
+          <label for="TipoId">Tipo Id</label>
+        </span>
       </div>
-    </div>
-  </div>
 
-  <!--Inicio Fila 2-->
-  <div class="mb-3">
-    <div class="row g-3">
       <!-- Ciudad  -->
-      <div class="form-floating col-md">
-        <input formControlName="Ciudad" type="text" class="form-control form-control-sm" id="floatingInput">
-        <label for="floatingInput">Ciudad</label>
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <input formControlName="Ciudad" id="Ciudad" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="Ciudad">Ciudad</label>
+        </span>
       </div>
 
        <!-- Telefono -->
-      <div class="form-floating col-md-3">
-        <input formControlName="Telefono" id="floatingInput" type="text" class="form-control form-control-sm">
-        <label for="floatingInput">Teléfono</label>
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <input formControlName="Telefono" id="Telefono" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="Telefono">Telefono</label>
+        </span>
       </div>
 
         <!-- Email  -->
-      <div class="form-floating col-md">
-        <input formControlName="Email" id="floatingInput" type="email" name="prvEmail" class="form-control form-control-sm" placeholder="Email">
-        <label for="floatingInput">Email</label>
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <input formControlName="Email" id="Email" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="Email">Email</label>
+        </span>
       </div>
     </div>
   </div>
@@ -57,16 +63,4 @@
   </div>
 </form>
 
-<p-toast position="center" key="Advertencia" [baseZIndex]="5000">
-  <ng-template let-message pTemplate="message">
-    <div class="flex flex-column" style="flex: 1">
-      <div class="text-center">
-        <i class="pi pi-exclamation-triangle" style="font-size: 2rem"></i>
-        <h4>{{message.summary}}</h4>
-        <p>{{message.detail}}</p>
-      </div>
-      <button type="button" pButton (click)="onReject()" label="OK" class="p-button-secondary"></button>
-    </div>
-  </ng-template>
-</p-toast>
-
+<p-toast position="center"></p-toast>

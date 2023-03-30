@@ -18,223 +18,225 @@
   </div>
 </div>
 
-<div class="contain">
-  <!--Inicio info OT-->
-  <div class="container-fluid bajarPagina">
-    <div class="formulario">
-      <div class="mb-4">
-        <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
-      </div>
+<div class="formulario">
+  <div class="mb-4">
+    <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
+  </div>
+  <br>
 
-      <!-- Formulario para consultar filtros -->
-      <form [formGroup]="FormConsultarFiltros">
+  <!-- Formulario para consultar filtros -->
+  <form [formGroup]="FormConsultarFiltros">
+    <div class="mb-3">
+      <div class="row g-3">
 
-        <!-- Primera Fila -->
-        <div class="mb-3">
-          <div class="row g-3">
-
-            <!-- Factura -->
-            <div class="form-floating col-md-2">
-              <input formControlName="Documento" type="text" class="form-control form-control-sm" id="floatingInput">
-              <label for="floatingInput">Codigo Doc.</label>
-            </div>
-
-            <!-- Terceros -->
-            <div class="form-floating col-md">
-              <input formControlName="tercero" class="form-control form-control-sm" list="tercero" id="floatingInput" (keyup)="cargarTerceros()" (change)="seleccionarTerceros()" autocomplete="off" required>
-              <datalist id="tercero">
-                <option value={{item.tercero_Id}} *ngFor="let item of arrayTerceros">{{item.tercero_Nombre}}</option>
-              </datalist>
-              <label for="floatingInput">Tercero</label>
-            </div>
-
-             <!-- Fecha Factura -->
-             <div class="form-floating col-md-2">
-              <input formControlName="fechaDoc" type="date" min="0" class="form-control" id="floatingInput" >
-              <label for="floatingInput">Fecha inicial</label>
-            </div>
-
-            <!-- Fecha ingreso rollo -->
-            <div class="form-floating col-md-2">
-              <input formControlName="fechaFinalDoc" type="date" min="0" class="form-control" id="floatingInput" >
-              <label for="floatingInput">Fecha Final</label>
-            </div>
-
-            <!-- Tipo Documento -->
-            <div class="form-floating col-md-2">
-              <select formControlName="estadoDoc" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example">
-                <option [ngValue]="item.estado_Id" *ngFor="let item of estados">{{item.estado_Nombre}}</option>
-              </select>
-              <label for="floatingSelect">Estados</label>
-            </div>
-
-          </div>
+        <!-- Factura -->
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="Documento" id="Documento" class="form-control form-control-sm" type="text" pInputText/>
+            <label for="Documento">Codigo Doc.</label>
+          </span>
         </div>
-      </form>
 
-      <!-- Botones -->
-      <div class="mb-3">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarFiltros()"> </button>
-          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
+        <!-- Terceros -->
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="tercero" id="terceros" list="tercero" class="form-control form-control-sm" type="text" (keyup)="cargarTerceros()" (change)="seleccionarTerceros()" pInputText/>
+            <datalist id="tercero">
+              <option value={{item.tercero_Id}} *ngFor="let item of arrayTerceros">{{item.tercero_Nombre}}</option>
+            </datalist>
+            <label for="terceros">Tercero.</label>
+          </span>
         </div>
+
+        <!-- Fecha Inicial -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-calendar formControlName="fechaDoc" inputId="FechaInicial" [showIcon]="true"></p-calendar>
+            <label for="FechaInicial">Fecha Inicial</label>
+          </span>
+        </div>
+
+        <!-- Fecha ingreso rollo -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-calendar formControlName="fechaFinalDoc" inputId="fechaFinalDoc" [showIcon]="true"></p-calendar>
+            <label for="fechaFinalDoc">Fecha Final</label>
+          </span>
+        </div>
+
+        <!-- Tipo Documento -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-dropdown formControlName="estadoDoc" inputId="Estados" optionValue="estado_Id" [autoDisplayFirst]="false" [options]="estados" optionLabel="estado_Nombre"></p-dropdown>
+            <label for="Estados">Estados</label>
+          </span>
+        </div>
+
       </div>
+    </div>
+  </form>
+
+  <!-- Botones -->
+  <div class="mb-3">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarFiltros()"> </button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
+    </div>
+  </div>
 
 
-    <div class="container-fluid">
-      <p-tabView>
-        <p-tabPanel header="Facturación" leftIcon="pi pi-wallet" tooltip="Consolidado de facturación de los Ordenes de Maquilas" *ngIf="ValidarRol == 1">
-          <div class="mb-4">
-            <h4 class="tituloRojo"><i class="pi pi-dollar"></i> Facturación consultada</h4>
-          </div>
+  <div class="container-fluid">
+    <p-tabView>
+      <p-tabPanel header="Facturación" leftIcon="pi pi-wallet" tooltip="Consolidado de facturación de los Ordenes de Maquilas" *ngIf="ValidarRol == 1">
+        <div class="mb-4">
+          <h4 class="tituloRojo"><i class="pi pi-dollar"></i> Facturación consultada</h4>
+        </div>
 
-          <p-table #dt
-                    [value]="arrayConsolidado"
-                    sortField="Ano"
-                    sortMode="single"
-                    [scrollable]="true"
-                    scrollHeight="900px"
-                    rowGroupMode="subheader"
-                    groupRowsBy="Ano"
-                    [rowHover]="true"
-                    styleClass="p-datatable-sm"
-                    columnResizeMode="expand"
-                    responsiveLayout="scroll"
-                    *ngIf="!cargando">
-            <ng-template pTemplate="header">
-              <tr>
-                <th></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Tercero', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'MateriaPrima_Id', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'MateriaPrima', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')"></th>
-                <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')"></th>
-                <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
-              </tr>
-              <tr>
-                <th>#</th>
-                <th>Tercero</th>
-                <th>Id Materia Prima</th>
-                <th>Materia Prima</th>
-                <th>Cantidad</th>
-                <th>Presentación</th>
-                <th>Precio</th>
-                <th>SubTotal</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="groupheader" let-consolidado>
-              <tr pRowGroupHeader style="background-color: #83D3FF;">
-                <td colspan="9">
-                  <span class="font-bold" style="color: black;"><b>{{consolidado.Fecha}}</b></span>
-                </td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-consolidado let-rowIndex="rowIndex">
-              <tr>
-                <td>{{rowIndex + 1}}</td>
-                <td>{{consolidado.Tercero}}</td>
-                <td>{{consolidado.MateriaPrima_Id}}</td>
-                <td>{{consolidado.MateriaPrima}}</td>
-                <td><b>{{consolidado.Cantidad | number : '1.2-2'}}</b></td>
-                <td>{{consolidado.Presentacion}}</td>
-                <td>{{consolidado.Precio | currency : 'COP $'}}</td>
-                <td><b>{{consolidado.SubTotal | currency : 'COP $'}}</b></td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="groupfooter" let-consolidado>
-              <tr style="background-color: palegreen;">
-                <td colspan="8" class="text-left font-bold pr-6"><b>{{'Total Fecha: ' + consolidado.Fecha}}</b></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>{{calcularTotalPesado(consolidado.Fecha) | number : '1.2-2'}} Kg</td>
-                <td></td>
-                <td></td>
-                <td *ngIf="totalAnio; else Filtro" class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Fecha) | currency : 'COP $'}}</b></td>
-                <ng-template #Filtro>
-                  <td class="text-left font-bold pr-6"><b>{{totalConsulta | currency : 'COP $'}}</b></td>
-                </ng-template>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="footer">
-              <tr>
-                <td>Totales</td>
-                <td></td>
-                <td></td>
-                <td>Peso Total</td>
-                <td>{{pesoTotal | number : '1.2-2'}}</td>
-                <td></td>
-                <td>Costo</td>
-                <td>{{valorTotalConsulta | currency : 'COP $'}}</td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </p-tabPanel>
-
-        <!-- MOVIMIENTOS DE ORDENES Y FACTURACION DE MAQULAS -->
-        <p-tabPanel header="Movimientos" leftIcon="pi pi-sitemap" tooltip="Se mostrarán todas las ordenes y facturas que se han hecho">
-          <!-- titulo tabla producto -->
-          <div class="mb-4">
-            <h4 class="tituloRojo"><i class="pi pi-list"></i> Registros consultados</h4>
-          </div>
-
-          <!-- Inicio tabla de registros consultados -->
-          <div class="mb-3" *ngIf=" !cargando">
-            <div class="row g-3">
-              <div class="table-responsive">
-                <p-table
-                  #dt1
-                  [resizableColumns]="true"
-                  columnResizeMode="expand"
-                  styleClass="p-datatable-gridlines p-datatable-sm"
-                  responsiveLayout="scroll"
-                  [paginator]="true"
-                  [rows]="20"
-                  [showCurrentPageReport]="true"
-                  responsiveLayout="scroll"
-                  currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-                  [rowsPerPageOptions]="[10,20,30,50,70,100]"
+        <p-table #dt
+                  [value]="arrayConsolidado"
+                  sortField="Ano"
+                  sortMode="single"
+                  [scrollable]="true"
+                  scrollHeight="900px"
+                  rowGroupMode="subheader"
+                  groupRowsBy="Ano"
                   [rowHover]="true"
-                  [value]="registrosConsultados"
-                  dataKey="Oc">
-                  <ng-template pTemplate="header">
-                    <tr>
-                      <th scope="col" style="text-align: center;">Código
-                        <p-columnFilter type="text" field="Codigo" display="menu"></p-columnFilter>
-                      </th>
-                      <th scope="col" style="text-align: center;">Tipo
-                        <p-columnFilter type="text" field="Tipo" display="menu"></p-columnFilter>
-                      </th>
-                      <th scope="col" style="text-align: center;">Usuario
-                        <p-columnFilter type="text" field="Usuario" display="menu"></p-columnFilter>
-                      </th>
-                      <th scope="col" style="text-align: center;">Fecha
-                        <p-columnFilter type="date" field="Fecha" display="menu"></p-columnFilter>
-                      </th>
-                      <th scope="col" style="text-align: center;">Estado
-                        <p-columnFilter type="date" field="Estado" display="menu"></p-columnFilter>
-                      </th>
-                      <th  style="text-align: center;">Ver</th>
-                    </tr>
-                  </ng-template>
-                  <ng-template pTemplate="body" let-registros>
-                    <tr>
-                      <td>{{registros.Codigo}}</td>
-                      <td>{{registros.Tipo}}</td>
-                      <td>{{registros.Usuario}}</td>
-                      <td>{{registros.Fecha}}</td>
-                      <td>{{registros.Estado}}</td>
-                      <td style="text-align: center;"><button style="width: 25px; height: 25px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" pTooltip="PDF" (click)="validarTipoDocumento(registros)"></button></td>
-                    </tr>
-                  </ng-template>
-                </p-table>
-              </div>
+                  styleClass="p-datatable-sm"
+                  columnResizeMode="expand"
+                  responsiveLayout="scroll"
+                  *ngIf="!cargando">
+          <ng-template pTemplate="header">
+            <tr>
+              <th></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Tercero', 'contains')"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'MateriaPrima_Id', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'MateriaPrima', 'contains')"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cantidad', 'contains')"></th>
+              <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Presentacion', 'contains')"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Precio', 'contains')"></th>
+              <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
+            </tr>
+            <tr>
+              <th>#</th>
+              <th>Tercero</th>
+              <th>Id Materia Prima</th>
+              <th>Materia Prima</th>
+              <th>Cantidad</th>
+              <th>Presentación</th>
+              <th>Precio</th>
+              <th>SubTotal</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="groupheader" let-consolidado>
+            <tr pRowGroupHeader style="background-color: #83D3FF;">
+              <td colspan="9">
+                <span class="font-bold" style="color: black;"><b>{{consolidado.Fecha}}</b></span>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-consolidado let-rowIndex="rowIndex">
+            <tr>
+              <td>{{rowIndex + 1}}</td>
+              <td>{{consolidado.Tercero}}</td>
+              <td>{{consolidado.MateriaPrima_Id}}</td>
+              <td>{{consolidado.MateriaPrima}}</td>
+              <td><b>{{consolidado.Cantidad | number : '1.2-2'}}</b></td>
+              <td>{{consolidado.Presentacion}}</td>
+              <td>{{consolidado.Precio | currency : 'COP $'}}</td>
+              <td><b>{{consolidado.SubTotal | currency : 'COP $'}}</b></td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="groupfooter" let-consolidado>
+            <tr style="background-color: palegreen;">
+              <td colspan="8" class="text-left font-bold pr-6"><b>{{'Total Fecha: ' + consolidado.Fecha}}</b></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>{{calcularTotalPesado(consolidado.Fecha) | number : '1.2-2'}} Kg</td>
+              <td></td>
+              <td></td>
+              <td *ngIf="totalAnio; else Filtro" class="text-left font-bold pr-6"><b>{{calcularTotalVendidoAno(consolidado.Fecha) | currency : 'COP $'}}</b></td>
+              <ng-template #Filtro>
+                <td class="text-left font-bold pr-6"><b>{{totalConsulta | currency : 'COP $'}}</b></td>
+              </ng-template>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr>
+              <td>Totales</td>
+              <td></td>
+              <td></td>
+              <td>Peso Total</td>
+              <td>{{pesoTotal | number : '1.2-2'}}</td>
+              <td></td>
+              <td>Costo</td>
+              <td>{{valorTotalConsulta | currency : 'COP $'}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-tabPanel>
+
+      <!-- MOVIMIENTOS DE ORDENES Y FACTURACION DE MAQULAS -->
+      <p-tabPanel header="Movimientos" leftIcon="pi pi-sitemap" tooltip="Se mostrarán todas las ordenes y facturas que se han hecho">
+        <!-- titulo tabla producto -->
+        <div class="mb-4">
+          <h4 class="tituloRojo"><i class="pi pi-list"></i> Registros consultados</h4>
+        </div>
+
+        <!-- Inicio tabla de registros consultados -->
+        <div class="mb-3" *ngIf=" !cargando">
+          <div class="row g-3">
+            <div class="table-responsive">
+              <p-table
+                #dt1
+                [resizableColumns]="true"
+                columnResizeMode="expand"
+                styleClass="p-datatable-gridlines p-datatable-sm"
+                responsiveLayout="scroll"
+                [paginator]="true"
+                [rows]="20"
+                [showCurrentPageReport]="true"
+                responsiveLayout="scroll"
+                currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+                [rowsPerPageOptions]="[10,20,30,50,70,100]"
+                [rowHover]="true"
+                [value]="registrosConsultados"
+                dataKey="Oc">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th scope="col" style="text-align: center;">Código
+                      <p-columnFilter type="text" field="Codigo" display="menu"></p-columnFilter>
+                    </th>
+                    <th scope="col" style="text-align: center;">Tipo
+                      <p-columnFilter type="text" field="Tipo" display="menu"></p-columnFilter>
+                    </th>
+                    <th scope="col" style="text-align: center;">Usuario
+                      <p-columnFilter type="text" field="Usuario" display="menu"></p-columnFilter>
+                    </th>
+                    <th scope="col" style="text-align: center;">Fecha
+                      <p-columnFilter type="date" field="Fecha" display="menu"></p-columnFilter>
+                    </th>
+                    <th scope="col" style="text-align: center;">Estado
+                      <p-columnFilter type="date" field="Estado" display="menu"></p-columnFilter>
+                    </th>
+                    <th  style="text-align: center;">Ver</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-registros>
+                  <tr>
+                    <td>{{registros.Codigo}}</td>
+                    <td>{{registros.Tipo}}</td>
+                    <td>{{registros.Usuario}}</td>
+                    <td>{{registros.Fecha}}</td>
+                    <td>{{registros.Estado}}</td>
+                    <td style="text-align: center;"><button style="width: 25px; height: 25px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" pTooltip="PDF" (click)="validarTipoDocumento(registros)"></button></td>
+                  </tr>
+                </ng-template>
+              </p-table>
             </div>
           </div>
-        </p-tabPanel>
-      </p-tabView>
-    </div>
-    </div>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
   </div>
 </div>

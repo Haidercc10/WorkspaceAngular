@@ -32,30 +32,39 @@
   <div class="mb-4">
     <h4 class="tituloRojo"><i class="pi pi-info-circle"></i> Información de la Orden de Maquila</h4>
   </div>
+  <br>
 
   <form [formGroup]="FormOrdenMaquila">
     <div class="mb-3">
-      <div class="row g-3">
+      <div class="row g-4">
 
         <!-- Consecutivo de la orden de compra -->
-        <div class="form-floating col-md-2">
-          <input formControlName="ConsecutivoOrden" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo de la Orden de Maquila" (keyup.Enter)="buscarOrdenMaquila()">
-          <label for="floatingSelect">Consecutivo</label>
+        <div class="col-md">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="ConsecutivoOrden" id="orden" class="form-control form-control-sm" type="text" pInputText (keyup.enter)="buscarOrdenMaquila()" required/>
+            <label for="orden">Consecutivo OC</label>
+          </span>
         </div>
 
-        <!-- Proveedor -->
-        <div class="form-floating col-md-3">
-          <input formControlName="Tercero" class="form-control" list="Proveedor" id="floatingInput" (keyup)="consultarTercero()" (change)="cambiarNombreTercero()" title="Nombre del Tercero" required>
-          <datalist id="Proveedor">
-            <option value={{item.tercero_Id}} *ngFor="let item of terceros">{{item.tercero_Nombre}}</option>
-          </datalist>
-          <label for="floatingInput">Tercero</label>
+        <!-- Tercero -->
+        <div class="col-md-4">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-search"></i>
+            <input formControlName="Tercero" id="Terceros" list="Proveedor" class="form-control form-control-sm" type="text" pInputText (keyup)="consultarTercero()" (change)="cambiarNombreTercero()" required/>
+            <datalist id="Proveedor">
+              <option value={{item.tercero_Id}} *ngFor="let item of terceros">{{item.tercero_Nombre}}</option>
+            </datalist>
+            <label for="Terceros">Tercero</label>
+          </span>
         </div>
 
         <!-- Observacion -->
-        <div class="form-floating col-md">
-          <textarea formControlName="Observacion" id="floatingTextarea" type="text" class="form-control form-control-sm" title="Observación"></textarea>
-          <label for="floatingTextarea">Observación</label>
+        <div class="col-md-6">
+          <span class="p-float-label">
+            <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
         </div>
 
       </div>
@@ -72,47 +81,57 @@
 
   <form [formGroup]="FormMateriaPrima">
     <div class="mb-3">
-      <div class="row g-3">
+      <div class="row g-4">
 
         <!-- ID de la Materia prima -->
-        <div class="form-floating col-md">
-          <input formControlName="Id" type="number" min="0" class="form-control form-control-sm" id="floatingInput" title="Identificador de la Materia Prima" required>
-          <label for="floatingInput">ID</label>
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="Id" inputId="Id" [required]="true"></p-inputNumber>
+            <label for="Id">Id</label>
+          </span>
         </div>
 
         <!-- Nombre Producto -->
-        <div class="form-floating col-md-5">
-          <input formControlName="Nombre" class="form-control form-control-sm" list="materiaprima" id="floatingInput" title="Nombre de la Materia Prima" required (change)="cambiarNombreMateriaPrima()">
-          <datalist id="materiaprima">
-            <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option>
-          </datalist>
-          <label for="floatingInput">Materia Prima</label>
+        <div class="col-md-4">
+          <span class="p-float-label">
+            <input formControlName="Nombre" id="Nombre" list="materiaprima" class="form-control form-control-sm" type="text" pInputText (change)="cambiarNombreMateriaPrima()" required/>
+            <datalist id="materiaprima">
+              <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option>
+            </datalist>
+            <label for="Nombre">Materia Prima</label>
+          </span>
         </div>
 
         <!-- STOCK DE MATERIA PRIMA  -->
         <div class="form-floating col-md">
-          <input formControlName="Stock" type="number" id="floatingSelect" class="form-control form-control-sm" title="Cantidad de la Materia Prima en Stock" required readonly>
-          <label for="floatingInput">Stock</label>
+          <span class="p-float-label">
+            <p-inputNumber formControlName="Stock" inputId="Stock" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+            <label for="Stock">Stock</label>
+          </span>
         </div>
 
         <!-- CANTIDAD DE MATERIA PRIMA  -->
-        <div class="form-floating col-md">
-          <input formControlName="Cantidad" type="number" id="floatingSelect" class="form-control form-control-sm" title="Cantidad de la Materia Prima a Entregar" required>
-          <label for="floatingInput">Cantidad</label>
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="Cantidad" inputId="Cantidad" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+            <label for="Cantidad">Cantidad</label>
+          </span>
         </div>
 
         <!-- Unidad medida-->
-        <div class="form-floating col-md">
-          <select formControlName="UndMedida" id="floatingSelect" class="form-select form-select-sm" title="Unidad de Medida de la Materia Prima" required>
-            <option [ngValue]="undMed.undMed_Id" *ngFor="let undMed of unidadesMedida">{{undMed.undMed_Id}}</option>
-          </select>
-          <label for="floatingSelect">Und. Medida</label>
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-dropdown formControlName="UndMedida" inputId="Und" [autoDisplayFirst]="false" [options]="unidadesMedida" optionValue="undMed_Id" optionLabel="undMed_Id"></p-dropdown>
+            <label for="Und">Und</label>
+          </span>
         </div>
 
         <!-- PRECIO ESTIMADO DE LA MATERIA PRIMA  -->
-        <div class="form-floating col-md">
-          <input formControlName="PrecioOculto" type="number" id="floatingSelect" class="form-control form-control-sm" title="Precio de la Materia Prima" required>
-          <label for="floatingInput">Precio Unitario</label>
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-inputNumber formControlName="PrecioOculto" inputId="PrecioOculto" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+            <label for="PrecioOculto">Precio Unitario</label>
+          </span>
         </div>
       </div>
     </div>
