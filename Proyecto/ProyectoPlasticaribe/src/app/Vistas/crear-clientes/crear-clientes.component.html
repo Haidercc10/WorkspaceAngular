@@ -1,66 +1,76 @@
-<!--Inicio formulario crear clientes -->
+<br>
 <form [formGroup]="FormCrearClientes" (ngSubmit)="validarCamposVaciosClientes()">
-  <!-- Inicio Fila 1 Crear clientes -->
-  <div class="row g-3">
-    <!-- ID Cliente -->
-    <div class="form-floating col-md-2">
-      <input formControlName="CliId" type="number" class="form-control form-control-sm" id="floatingInput"  required>
-      <label for="floatingInput">Id Cliente</label>
-    </div>
+  <div class="mb-3">
+    <div class="row g-4">
 
-    <!-- Tipo ID Cliente-->
-    <div class="form-floating col-md-1">
-      <select formControlName="TipoIdCliente" type="text" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-        <option [ngValue]="tipo_identificacion" *ngFor="let tipo_identificacion of tipoIdentificacion">{{tipo_identificacion}}</option>
-      </select>
-      <label for="floatingSelect">Tipo ID</label>
-    </div>
+      <!-- ID Cliente -->
+      <div class="col-md-2">
+        <span class="p-float-label">
+          <input formControlName="CliId" id="CliId" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="CliId">Id</label>
+        </span>
+      </div>
 
-    <!-- Nombre Cliente-->
-    <div class="form-floating col-md">
-      <input formControlName="CliNombre" class="form-control form-control-sm" list="cliente" id="floatingInput" title="Nombre del Cliente">
-      <datalist id="cliente">
-        <option value={{item.cli_Nombre}} *ngFor="let item of cliente">{{item.cli_Nombre}}</option>
-      </datalist>
-      <label for="floatingInput">Cliente</label>
-    </div>
-  </div>
+      <!-- Tipo ID -->
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <p-dropdown formControlName="TipoIdCliente" inputId="tipoIdentificacion" [autoDisplayFirst]="false" [options]="tipoIdentificacion" optionLabel=""></p-dropdown>
+          <label for="tipoIdentificacion">Tipo Id</label>
+        </span>
+      </div>
 
-  <div class="row g-3">
-    <!-- Telefono Cliente -->
-    <div class="form-floating col-md-2">
-      <input formControlName="CliTelefono" type="text" class="form-control form-control-sm" id="floatingInput">
-      <label for="floatingInput">Telefono Cliente</label>
-    </div>
+      <!-- Nombre Cliente-->
+      <div class="col-md-4">
+        <span class="p-float-label">
+          <input formControlName="CliNombre" id="CliNombre" list="cliente" class="form-control form-control-sm" type="text" pInputText required/>
+          <datalist id="cliente">
+            <option value={{item.cli_Nombre}} *ngFor="let item of cliente">{{item.cli_Nombre}}</option>
+          </datalist>
+          <label for="CliNombre">Nombre</label>
+        </span>
+      </div>
+
+      <!-- Telefono Cliente -->
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <input formControlName="CliTelefono" id="CliTelefono" class="form-control form-control-sm" type="text" pInputText/>
+          <label for="CliTelefono">Telefono</label>
+        </span>
+      </div>
 
       <!-- Email cliente -->
-    <div class="form-floating col-md">
-      <input formControlName="CliEmail" type="text" class="form-control form-control-sm" id="floatingInput">
-      <label for="floatingInput">E-mail Cliente</label>
-    </div>
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <input formControlName="CliEmail" id="CliEmail" class="form-control form-control-sm" type="text" pInputText/>
+          <label for="CliEmail">Correo/Email</label>
+        </span>
+      </div>
 
-    <!-- Tipo cliente -->
-    <div class="form-floating col-md-2">
-      <select formControlName="TipoClienteId" type="text" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" required >
-        <option [ngValue]="tipo_Cliente.tpCli_Id" *ngFor="let tipo_Cliente of tiposClientes">{{tipo_Cliente.tpCli_Nombre}}</option>
-      </select>
-      <label for="floatingSelect">Tipo Cliente</label>
-    </div>
+      <!-- Tipo cliente -->
+      <div class="col-md">
+        <span class="p-float-label">
+          <p-dropdown formControlName="TipoClienteId" inputId="TipoClienteId" optionValue="tpCli_Id" optionLabel="tpCli_Nombre" [autoDisplayFirst]="false" [options]="tiposClientes"></p-dropdown>
+          <label for="TipoClienteId">Tipo Cliente</label>
+        </span>
+      </div>
 
-    <!-- ID/Nombre Usuario -->
-    <div class="form-floating col-md">
-      <input formControlName="UsuIdNombre" class="form-control form-control-sm" list="vendedor" id="floatingInput" (change)="vendedoreSeleccionado()" required>
-      <datalist id="vendedor">
-        <option value={{item.usua_Id}} *ngFor="let item of usuario">{{item.usua_Nombre}}</option>
-      </datalist>
-      <label for="floatingInput">Vededor</label>
+      <!-- ID/Nombre Usuario -->
+      <div class="col-md">
+        <span class="p-float-label">
+          <input formControlName="UsuIdNombre" id="UsuIdNombre" list="vendedor" class="form-control form-control-sm" type="text" (change)="vendedoreSeleccionado()" pInputText required/>
+          <datalist id="vendedor">
+            <option value={{item.usua_Id}} *ngFor="let item of usuario">{{item.usua_Nombre}}</option>
+          </datalist>
+          <label for="UsuIdNombre">Vendedor</label>
+        </span>
+      </div>
     </div>
   </div>
 
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="submit">Crear cliente</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCampos()">Limpiar campos</button>
+      <button pButton class="p-button-danger" type="submit" label="Crear Cliente" icon="pi pi-pencil"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCampos()"></button>
     </div>
   </div>
 </form>
@@ -72,42 +82,50 @@
 <div class="mb-4">
   <h5 class="tituloRojo">Crear sedes a clientes</h5>
 </div>
+<br>
 
 <form [formGroup]="FormCrearSedeClientes" (ngSubmit)="validarCamposVaciosSedes()">
   <div class="mb-4">
-    <div class="row g-3">
+    <div class="row g-4">
+
       <!-- Nombre del cliente -->
-      <div class="form-floating col-md">
-        <input formControlName="CliId2" class="form-control form-control-sm" list="cliente" id="floatingInput" required>
-        <datalist id="cliente">
-          <option value={{item.cli_Id}} *ngFor="let item of cliente">{{item.cli_Nombre}}</option>
-        </datalist>
-        <label for="floatingInput">Cliente</label>
+      <div class="col-md-4">
+        <span class="p-float-label">
+          <input formControlName="CliId2" id="CliNombre" list="cliente" class="form-control form-control-sm" type="text" pInputText required/>
+          <label for="CliNombre">Cliente</label>
+        </span>
       </div>
 
       <!-- Ciudad sede cliente -->
-      <div class="form-floating col-md">
-        <input formControlName="SedeCli_Ciudad" type="text" class="form-control form-control-sm" id="floatingInput" required>
-        <label for="floatingInput">Ciudad Sede</label>
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <input formControlName="SedeCli_Ciudad" id="Ciudad" class="form-control form-control-sm" type="text" pInputText/>
+          <label for="Ciudad">Ciudad Sede</label>
+        </span>
       </div>
 
-      <div class="form-floating col-md">
-        <input formControlName="SedeCli_Direccion" type="text" class="form-control form-control-sm" id="floatingInput" required>
-        <label for="floatingInput">Direccion Sede</label>
+      <!-- Direccion -->
+      <div class="col-md-3">
+        <span class="p-float-label">
+          <input formControlName="SedeCli_Direccion" id="Direccion" class="form-control form-control-sm" type="text" pInputText/>
+          <label for="Direccion">Direccion Sede</label>
+        </span>
       </div>
 
       <!-- Codigo postal -->
-      <div class="form-floating col-md">
-        <input formControlName="SedeCli_Postal" type="number" class="form-control form-control-sm" id="floatingInput">
-        <label for="floatingInput">Codigo Postal Sede</label>
+      <div class="col-md">
+        <span class="p-float-label">
+          <input formControlName="SedeCli_Postal" id="Postal" class="form-control form-control-sm" type="text" pInputText/>
+          <label for="Postal">Codigo Postal Sede</label>
+        </span>
       </div>
     </div>
   </div>
 
   <div class="mb-3">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button class="btn btn-danger btn-danger-sm" type="submit">Crear Sede de Cliente</button>
-      <button class="btn btn-secondary btn-secondary-sm" type="button" (click)="LimpiarCamposSede()">Limpiar campos</button>
+      <button pButton class="p-button-danger" type="submit" label="Crear Sede de Cliente" icon="pi pi-pencil"></button>
+      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="LimpiarCamposSede()"></button>
     </div>
   </div>
 </form>

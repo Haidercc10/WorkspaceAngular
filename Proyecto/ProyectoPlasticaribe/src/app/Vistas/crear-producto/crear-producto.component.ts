@@ -1,21 +1,20 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
-import { TipoMonedaService } from 'src/app/Servicios/TipoMoneda/tipo-moneda.service';
-import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service';
-import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
-import Swal from 'sweetalert2';
-import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
-import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
-import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
+import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { PigmentoProductoService } from 'src/app/Servicios/PigmentosProductos/pigmentoProducto.service';
-import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
+import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { TipoMonedaService } from 'src/app/Servicios/TipoMoneda/tipo-moneda.service';
+import { TipoProductoService } from 'src/app/Servicios/TipoProducto/tipo-producto.service';
 import { TiposSelladoService } from 'src/app/Servicios/TiposSellado/TiposSellado.service';
-import { ClientesProductosService } from 'src/app/Servicios/Clientes_Productos/ClientesProductos.service';
-import moment from 'moment';
+import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
+import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -48,16 +47,15 @@ export class CrearProductoComponent implements OnInit {
                   private tipoProductoService : TipoProductoService,
                     private tipoMonedaService : TipoMonedaService,
                       private productoService : ProductoService,
-                        private pedidosProducto : PedidoExternoComponent,
-                          private existenciasService : ExistenciasProductosService,
-                            private clientesService : ClientesService,
-                              private usuarioService : UsuarioService,
-                                @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                  private rolService : RolesService,
-                                    private materialService : MaterialProductoService,
-                                      private pigmentoServices : PigmentoProductoService,
-                                        private tipoSelladoService : TiposSelladoService,
-                                          private ClientesProductosService : ClientesProductosService,) {
+                        private existenciasService : ExistenciasProductosService,
+                          private clientesService : ClientesService,
+                            private usuarioService : UsuarioService,
+                              @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                                private rolService : RolesService,
+                                  private materialService : MaterialProductoService,
+                                    private pigmentoServices : PigmentoProductoService,
+                                      private tipoSelladoService : TiposSelladoService,
+                                        private ClientesProductosService : ClientesProductosService,) {
 
     this.FormCrearProducto = this.frmBuilderCrearProducto.group({
       ProduId:[null, Validators.required],
@@ -102,36 +100,14 @@ export class CrearProductoComponent implements OnInit {
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
-    let rol = this.storage.get('Rol');
-    this.rolService.srvObtenerLista().subscribe(datos_roles => {
-      for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
-          this.ValidarRol = rol;
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }
-      }
-    });
+    this.ValidarRol = this.storage.get('Rol');
   }
 
   // Funcion que va a limpiar los campos del formulario de producto
   LimpiarCampos() {
     this.productoService.GetIdUltimoProducto().subscribe(datos => {
-      this.FormCrearProducto.setValue({
+      this.FormCrearProducto.patchValue({
         ProduId:datos + 1,
-        ProduNombre: null,
-        ProduAncho: null,
-        ProduFuelle: null,
-        ProduCalibre: null,
-        ProduLargo : null,
-        ProduUnidadMedidaACF: null,
-        ProduTipo: null,
-        ProduSellado: null,
-        ProduMaterial: null,
-        ProduPigmento: null,
-        ProdDescripcion: '',
-        ClienteNombre: null,
-        ProduBolsasBulto : 0,
-        ProduBolsasPaquete : 0,
       });
     });
   }
