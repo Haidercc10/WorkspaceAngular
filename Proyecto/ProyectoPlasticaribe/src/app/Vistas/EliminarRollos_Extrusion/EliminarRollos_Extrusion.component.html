@@ -50,7 +50,7 @@
         <!-- Procesos -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-dropdown formControlName="Proceso" inputId="Proceso" [autoDisplayFirst]="false" [options]="arrayProcesos" optionLabel="proceso_Nombre"></p-dropdown>
+            <p-dropdown formControlName="Proceso" optionValue="proceso_Nombre" inputId="Proceso" [autoDisplayFirst]="false" [options]="arrayProcesos" optionLabel="proceso_Nombre"></p-dropdown>
             <label for="Proceso">Procesos</label>
           </span>
         </div>
@@ -58,7 +58,7 @@
         <!-- Bodega -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-dropdown formControlName="Bodega" inputId="Bodega" [autoDisplayFirst]="false" [options]="bodegas" optionLabel="Nombre"></p-dropdown>
+            <p-dropdown formControlName="Bodega" optionValue="Id" inputId="Bodega" [autoDisplayFirst]="false" [options]="bodegas" optionLabel="Nombre"></p-dropdown>
             <label for="Bodega">Bodega</label>
           </span>
         </div>

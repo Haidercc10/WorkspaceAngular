@@ -82,7 +82,7 @@ export class ModalCrearMateriasPrimasComponent implements OnInit {
     const camposMateriasPrimas : any = {
       MatPri_Nombre: this.FormCrearMateriaPrima.get('mpNombre')?.value,
       MatPri_Descripcion: this.FormCrearMateriaPrima.get('mpdescripcion')?.value,
-      CatMP_Id: this.FormCrearMateriaPrima.get('mpCategoria')?.value.catMP_Id,
+      CatMP_Id: this.FormCrearMateriaPrima.get('mpCategoria')?.value,
       UndMed_Id: this.FormCrearMateriaPrima.get('mpUnidadMedida')?.value,
       MatPri_Precio: this.FormCrearMateriaPrima.get('mpValor')?.value,
       Tinta_Id: this.FormCrearMateriaPrima.get('mpTinta')?.value,

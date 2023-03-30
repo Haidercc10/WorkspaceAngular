@@ -13,113 +13,124 @@
   </div>
 </div>
 
-<div class="contain">
-<!-- Navegador fin de parte superior -->
-<div class="container-fluid">
-  <div class="formulario">
-    <div class="mb-4">
-      <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
-    </div>
-    <!-- FORMULARIO DE MATERIAS PRIMAS -->
-    <form [formGroup]="formReporteRMP">
-      <div class="mb-3">
-        <div class="row g-3">
-          <!-- Fecha Inicial -->
-          <div class="form-floating col-md-2">
-            <input formControlName="FechaInicial" type="date" class="form-control form-control-sm" id="floatingInput">
-            <label for="floatingInput">Fecha Inicial</label>
-          </div>
-          <!-- Fecha Final -->
-          <div class="form-floating col-md-2">
-            <input formControlName="FechaFinal" type="date" class="form-control form-control-sm" id="floatingInput">
-            <label for="floatingInput">Fecha Final</label>
-          </div>
-          <!-- Materia Prima -->
-          <div class="form-floating col-md">
-            <input formControlName="MateriaPrima" class="form-control" list="materiasPrimas" id="floatingInput" (change)='buscarMateriaPrima()'>
+<div class="formulario">
+  <div class="mb-4">
+    <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
+  </div>
+  <!-- FORMULARIO DE MATERIAS PRIMAS -->
+  <form [formGroup]="formReporteRMP">
+    <div class="mb-3">
+      <div class="row g-3">
+
+        <!-- Fecha Inicial -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-calendar formControlName="FechaInicial" inputId="FechaInicial" [showIcon]="true"></p-calendar>
+            <label for="FechaInicial">Fecha Inicial</label>
+          </span>
+        </div>
+
+        <!-- Fecha Final -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-calendar formControlName="FechaFinal" inputId="FechaFinal" [showIcon]="true"></p-calendar>
+            <label for="FechaFinal">Fecha Final</label>
+          </span>
+        </div>
+
+        <!-- Materia Prima -->
+        <div class="col-md-4">
+          <span class="p-float-label">
+            <input formControlName="MateriaPrima" id="materiaPrima" list="materiasPrimas" class="form-control form-control-sm" type="text" pInputText (change)="buscarMateriaPrima()"/>
             <datalist id="materiasPrimas">
               <option value={{item.matPri_Id}} *ngFor="let item of materiasPrimas">{{item.matPri_Nombre}}</option>
             </datalist>
-            <label for="floatingInput">Materia Prima</label>
-          </div>
-          <!-- Turnos -->
-          <div class="form-floating col-md-1">
-            <input formControlName="Turno" class="form-control" list="turnos" id="floatingInput">
+            <label for="materiaPrima">Materia Prima</label>
+          </span>
+        </div>
+
+        <!-- Turno -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <input formControlName="Turno" id="Turno" list="turnos" class="form-control form-control-sm" type="text" pInputText/>
             <datalist id="turnos">
               <option value={{item.turno_Id}} *ngFor="let item of turnos">{{item.turno_Nombre}}</option>
             </datalist>
-            <label for="floatingInput">Turno</label>
-          </div>
-          <!-- Operarios -->
-          <div class="form-floating col-md">
-            <input formControlName="Operario" class="form-control" list="operarios" id="floatingInput" (change)='buscarOperarios()'>
+            <label for="Turno">Turnos</label>
+          </span>
+        </div>
+
+        <!-- Operario -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <input formControlName="Operario" id="Operario" list="operarios" class="form-control form-control-sm" type="text" pInputText (change)="buscarOperarios()"/>
             <datalist id="operarios">
               <option value={{item.usua_Id}} *ngFor="let item of operarios">{{item.usua_Nombre}}</option>
             </datalist>
-            <label for="floatingInput">Operario</label>
-          </div>
+            <label for="Operario">Operario</label>
+          </span>
         </div>
-      </div>
-
-      <!-- Botones -->
-      <div class="mb-1">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultar()"></button>
-          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
-        </div>
-      </div>
-    </form>
-
-    <div class="mb-4">
-      <hr class="colorLinea">
-    </div>
-
-    <div class="mb-4">
-      <h4 class="tituloRojo"><i class="pi pi-list"></i> Listado de movimientos consultados</h4>
-    </div>
-
-    <div class="mb-2">
-      <div class="row g-1">
-        <p-table
-          [columns]="columnas"
-          [value]="registros"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          [rowHover]="true"
-          dataKey="id"
-          responsiveLayout="scroll">
-          <ng-template pTemplate="header" let-columns>
-            <tr>
-              <th *ngFor="let col of columns">{{col.header}}</th>
-              <th>Día</th>
-              <th>Noche</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-rowData let-registros let-columns="columns">
-            <tr>
-              <td *ngFor="let col of columns">{{rowData[col.field]}}</td>
-              <td (click)="validarModal(rowData, 'DIA')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{registros.cantDia | number}}</td>
-              <td (click)="validarModal(rowData, 'NOCHE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{registros.cantNoche | number}}</td>
-            </tr>
-          </ng-template>
-        </p-table>
       </div>
     </div>
 
-    <ng-container *ngIf="modalInfoRecuperado">
-      <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="staticBackdropLabel2">Datos Peletizado Turno {{consultaTurno}}</h5>
-              <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="limpiarModal()"></button>
-            </div>
-            <div class="modal-body">
-              <app-Modal_RptRecuperadoMP></app-Modal_RptRecuperadoMP>
-            </div>
-          </div>
-        </div>
+    <!-- Botones -->
+    <div class="mb-1">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultar()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
       </div>
-    </ng-container>
+    </div>
+  </form>
 
+  <div class="mb-4">
+    <hr class="colorLinea">
   </div>
+
+  <div class="mb-4">
+    <h4 class="tituloRojo"><i class="pi pi-list"></i> Listado de movimientos consultados</h4>
+  </div>
+
+  <div class="mb-2">
+    <div class="row g-1">
+      <p-table
+        [columns]="columnas"
+        [value]="registros"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        [rowHover]="true"
+        dataKey="id"
+        responsiveLayout="scroll">
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th *ngFor="let col of columns">{{col.header}}</th>
+            <th>Día</th>
+            <th>Noche</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowData let-registros let-columns="columns">
+          <tr>
+            <td *ngFor="let col of columns">{{rowData[col.field]}}</td>
+            <td (click)="validarModal(rowData, 'DIA')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{registros.cantDia | number}}</td>
+            <td (click)="validarModal(rowData, 'NOCHE')" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{registros.cantNoche | number}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <ng-container *ngIf="modalInfoRecuperado">
+    <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel2">Datos Peletizado Turno {{consultaTurno}}</h5>
+            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="limpiarModal()"></button>
+          </div>
+          <div class="modal-body">
+            <app-Modal_RptRecuperadoMP></app-Modal_RptRecuperadoMP>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
 </div>

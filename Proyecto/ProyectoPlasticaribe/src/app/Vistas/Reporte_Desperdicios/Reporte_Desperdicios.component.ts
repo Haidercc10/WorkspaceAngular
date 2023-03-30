@@ -126,8 +126,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.arrayConsulta = [];
     let ruta : string = '';
 
-    if (material != null) material = material.material_Id;
-
     if (fecha1 == 'Invalid date') fecha1 = null;
     if (fecha2 == 'Invalid date') fecha2 = null;
     if (fecha1 == null) fecha1 = this.today;

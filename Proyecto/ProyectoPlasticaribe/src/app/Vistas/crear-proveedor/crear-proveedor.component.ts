@@ -81,7 +81,7 @@ export class CrearProveedorComponent implements OnInit {
     let id : number = this.FormCrearProveedor.value.provId;
     let nombre : string = this.FormCrearProveedor.value.ProvNombre;
     let tipoId : string = this.FormCrearProveedor.value.provTipoId;
-    let tipoProveedor : number = this.FormCrearProveedor.value.TipoProv;
+    let tipoProveedor : any = this.FormCrearProveedor.value.TipoProv;
     let ciudad : string = this.FormCrearProveedor.value.ProvCiudad;
     let telefono : string = this.FormCrearProveedor.value.ProvTelefono;
     let email : string = this.FormCrearProveedor.value.ProvEmail;
@@ -92,7 +92,7 @@ export class CrearProveedorComponent implements OnInit {
   CreacionProveedor( idProveedor : number,
     TipoIdProveedor : string,
     nombreProveedor : string,
-    tipoproveedor : number,
+    tipoproveedor : any,
     ciudadProveedor : string,
     telefonoProveedor : string,
     emailProveedor : string){

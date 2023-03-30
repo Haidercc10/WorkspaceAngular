@@ -31,40 +31,51 @@
   <form [formGroup]="FormPedidoMantenimiento">
     <div class="mb-3">
       <div class="row g-3">
+
         <!-- Consecutivo del pedido -->
-        <div class="form-floating col-md-2">
-          <input formControlName="ConsecutivoPedido" type="number" class="form-control form-control-sm" id="floatingInput" title="Concecutivo del Pedido" min="0" readonly>
-          <label for="floatingSelect">Consecutivo Pedido</label>
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="ConsecutivoPedido" id="ConsecutivoPedido" class="form-control form-control-sm" type="text" pInputText readonly required/>
+            <label for="ConsecutivoPedido">Consecutivo Pedido</label>
+          </span>
         </div>
 
         <!-- Activos -->
-        <div class="form-floating col-md">
-          <input formControlName="Activo" class="form-control" list="Activo" id="floatingInput" title="Nombre del Activo" (change)="buscarActivoSeleccionado()" required>
-          <datalist id="Activo">
-            <option value={{item.actv_Id}} *ngFor="let item of activos">{{item.actv_Nombre}}</option>
-          </datalist>
-          <label for="floatingInput">Activo</label>
+        <div class="col-md">
+          <span class="p-float-label">
+            <input formControlName="Activo" id="activos" list="Activo" class="form-control form-control-sm" type="text" pInputText (change)="buscarActivoSeleccionado()" required/>
+            <datalist id="Activo">
+              <option value={{item.actv_Id}} *ngFor="let item of activos">{{item.actv_Nombre}}</option>
+            </datalist>
+            <label for="activos">Activo</label>
+          </span>
         </div>
 
         <!-- Fecha en que presentó el daño -->
-        <div class="form-floating col-md-2">
-          <input formControlName="FechaDaño" type="date" min="0" class="form-control" id="floatingInput" required>
-          <label for="floatingInput">Fecha Daño</label>
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-calendar formControlName="FechaDaño" inputId="FechaDaño" [showIcon]="true"></p-calendar>
+            <label for="FechaDaño">Fecha Daño</label>
+          </span>
         </div>
 
         <!-- Tipos de Mantenimientos -->
-        <div class="form-floating col-md-3">
-          <input formControlName="TipoMantenimiento" class="form-control" list="tipos" id="floatingInput" title="Nombre del Tipo de Mantenimiento" (change)="buscarTipoMantenimientoSeleccionado()" required>
-          <datalist id="tipos">
-            <option value={{item.tpMtto_Id}} *ngFor="let item of tiposMantenimiento">{{item.tpMtto_Nombre}}</option>
-          </datalist>
-          <label for="floatingInput">Tipo de Mantenimiento</label>
+        <div class="col-md">
+          <span class="p-float-label">
+            <input formControlName="TipoMantenimiento" id="Tipo" list="tipos" class="form-control form-control-sm" type="text" pInputText (change)="buscarTipoMantenimientoSeleccionado()" required/>
+            <datalist id="tipos">
+              <option value={{item.tpMtto_Id}} *ngFor="let item of tiposMantenimiento">{{item.tpMtto_Nombre}}</option>
+            </datalist>
+            <label for="Tipo">Tipo de Mantenimiento</label>
+          </span>
         </div>
 
         <!-- Observacion -->
-        <div class="form-floating col-md-12">
-          <textarea formControlName="Observacion" id="floatingTextarea" type="text" class="form-control form-control-sm" title="Observación"></textarea>
-          <label for="floatingTextarea">Observación del Pedido</label>
+        <div class="col-md-12">
+          <span class="p-float-label">
+            <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
         </div>
       </div>
     </div>

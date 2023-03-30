@@ -105,7 +105,7 @@
           </ng-template>
         </p-table>
       </div>
-      <p-dialog [(visible)]="dialogUsuarios" [style]="{width: '450px'}" header="{{accion}} Usuarios" [modal]="true" styleClass="p-fluid">
+      <p-dialog [(visible)]="dialogUsuarios" [style]="{width: '450px'}" header="{{accion}} Usuarios" [modal]="true" >
         <ng-template pTemplate="content">
           <form [formGroup]="FormUsuarios">
 
@@ -189,7 +189,7 @@
       </p-dialog>
 
 
-      <p-dialog [(visible)]="nuevoDialogo" [style]="{width: '450px'}" header="Crear {{accionDialogoNuevo}}" [modal]="true" styleClass="p-fluid">
+      <p-dialog [(visible)]="nuevoDialogo" [style]="{width: '450px'}" header="Crear {{accionDialogoNuevo}}" [modal]="true" >
         <ng-container *ngIf="accionDialogoNuevo == 'Rol' then rol; else area"></ng-container>
         <p-toast position="center"></p-toast>
         <!-- FORMULARIO ROLES -->

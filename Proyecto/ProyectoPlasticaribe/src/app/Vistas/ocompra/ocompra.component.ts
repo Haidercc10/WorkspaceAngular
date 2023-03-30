@@ -8,7 +8,6 @@ import { DetallesOrdenesCompraService } from 'src/app/Servicios/DetallesOrdenCom
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { OrdenCompra_MateriaPrimaService } from 'src/app/Servicios/OrdenCompra/OrdenCompra_MateriaPrima.service';
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import Swal from 'sweetalert2';
@@ -54,14 +53,13 @@ export class OcompraComponent implements OnInit {
   edicionOrdenCompra : boolean = false;
 
   constructor(private frmBuilder : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private proveedorService : ProveedorService,
-                      private materiaPrimaService : MateriaPrimaService,
-                        private undMedidaService : UnidadMedidaService,
-                          private ordenCompraService : OrdenCompra_MateriaPrimaService,
-                            private dtOrdenCompraService : DetallesOrdenesCompraService,
-                              private servicioTintas : TintasService) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private proveedorService : ProveedorService,
+                    private materiaPrimaService : MateriaPrimaService,
+                      private undMedidaService : UnidadMedidaService,
+                        private ordenCompraService : OrdenCompra_MateriaPrimaService,
+                          private dtOrdenCompraService : DetallesOrdenesCompraService,
+                            private servicioTintas : TintasService) {
 
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -160,7 +158,11 @@ export class OcompraComponent implements OnInit {
 
   // Funcion que va a consultar las unidades de medida
   obtenerUnidadesMedida(){
-    this.undMedidaService.srvObtenerLista().subscribe(datos_undMedida => { this.unidadesMedida = datos_undMedida; });
+    this.undMedidaService.srvObtenerLista().subscribe(datos_undMedida => {
+      for (let i = 0; i < datos_undMedida.length; i++) {
+        this.unidadesMedida.push(datos_undMedida[i].undMed_Id);
+      }
+    });
   }
 
   //Funcion que va a mostrar el nombre de la materia prima

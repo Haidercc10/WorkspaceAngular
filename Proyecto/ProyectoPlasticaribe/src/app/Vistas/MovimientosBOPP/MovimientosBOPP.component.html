@@ -60,7 +60,7 @@
         <!-- Tipo Documento -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-dropdown formControlName="TipoDocumento" inputId="TipoDocumento" [autoDisplayFirst]="false" [options]="tipoDocumento" optionLabel="tpDoc_Nombre"></p-dropdown>
+            <p-dropdown formControlName="TipoDocumento" inputId="TipoDocumento" [autoDisplayFirst]="false" [options]="tipoDocumento" optionValue="tpDoc_Id" optionLabel="tpDoc_Nombre"></p-dropdown>
             <label for="TipoDocumento">Tipo Movimiento</label>
           </span>
         </div>
@@ -69,7 +69,7 @@
         <ng-container *ngIf="ValidarRol == 1">
           <div class="col-md">
             <span class="p-float-label">
-              <p-dropdown formControlName="estado" inputId="Estado" [autoDisplayFirst]="false" [options]="ArrayEstados" optionLabel="estado_Nombre"></p-dropdown>
+              <p-dropdown formControlName="estado" inputId="Estado" [autoDisplayFirst]="false" [options]="ArrayEstados" optionValue="estado_Id" optionLabel="estado_Nombre"></p-dropdown>
               <label for="Estado">Estado OT</label>
             </span>
           </div>

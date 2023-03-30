@@ -68,7 +68,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : ['', Validators.required],
       MpNombre: ['', Validators.required],
-      MpCantidad : ['', Validators.required],
+      MpCantidad : [null, Validators.required],
       MpUnidadMedida: ['', Validators.required],
     });
   }
@@ -169,8 +169,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     else {
       let idUsuario: number = this.FormMateriaPrimaRecuperada.value.usuarioId;
       let observacion : string = this.FormMateriaPrimaRecuperada.value.MpObservacion;
-      let fecha : any = this.FormMateriaPrimaRecuperada.value.MpingresoFecha;
-      let turno : string = this.FormMateriaPrimaRecuperada.value.Turno;
+      let fecha : any = moment(this.FormMateriaPrimaRecuperada.value.MpingresoFecha).format('YYYY-MM-DD');
+      let turno : any = this.FormMateriaPrimaRecuperada.value.Turno;
 
       const datosRecuperado : any = {
         RecMp_FechaIngreso : this.today,
@@ -180,7 +180,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         RecMp_FechaEntrega : fecha,
         RecMp_HoraIngreso : moment().format("H:mm:ss"),
         RecMp_Maquina : 0,
-        Turno_Id : turno,
+        Turno_Id : turno.turno_Id,
         Usua_Operador: idUsuario,
       }
 
