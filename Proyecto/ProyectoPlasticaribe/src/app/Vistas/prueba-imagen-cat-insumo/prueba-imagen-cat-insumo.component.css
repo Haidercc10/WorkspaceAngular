@@ -1,19 +1,90 @@
 span{
-  color: var(--rojo);
+  color: #db4149;
 }
 
-:host ::ng-deep .row-accessories {
-  background-color: rgba(0,0,0,.15) !important;
+.id {
+  border: none;
+  width: 100%;
 }
 
-.botonVerde {
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  background-color: #0cc50f;
-  padding: 5%;
-  color: white;
-  cursor: pointer;
+.amarillo {
+  background-color: #F3FC20;
+}
+
+.naranja {
+  background-color: #F6D45D;
+}
+
+.rojo {
+  background-color: #FF7878;
+}
+
+.verde {
+  background-color: #8AFC9B;
+}
+
+.azul {
+  background-color: #83D3FF;
+}
+
+.gris{
+  background-color: #DDDDDD;
+}
+
+.verde2 {
+  background-color: #53CC48;
+}
+
+a {
+  color: #000;
+}
+
+a:hover {
+  color: #555;
+}
+
+#tableProcesos td{
+ /* max-width: 50px; */
+  font-size: calc(var(--font-size) * 13px);
+}
+
+@media (min-width: 1370px){
+  .tablaDatos{
+    min-width: 1500px;
+  }
+
+  .table-responsive {
+    width: 100%;
+  }
+
+  .tableColores {
+    text-align: center;
+    width: 1250px;
+    margin: auto;
+  }
+
+  .tableColores td .collapse{
+    margin-top: 1%;
+    text-align: start;
+    font-size: calc(var(--font-size) * 11px);
+
+  }
+}
+
+@media (max-width: 1369px){
+  .tableColores {
+    text-align: center;
+  }
+
+  .tableColores td .collapse{
+    margin-top: 1%;
+    font-size: calc(var(--font-size) * 11px);
+    text-align: center;
+  }
+}
+
+.titulos_Paginador{
+  display: flex;
 }
 
 .p-input-icon-left {

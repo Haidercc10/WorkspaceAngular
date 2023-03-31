@@ -1,4 +1,5 @@
-<!-- Navegador parte superior -->
+<p-toast position="center"></p-toast>
+
 <ng-container *ngIf="!modeModal">
   <app-menuLateral></app-menuLateral>
 </ng-container>
@@ -10,8 +11,6 @@
 </div>
 
 <div class="contain">
-  <!--  fin Navegador de parte superior -->
-
   <div class="mb-4 Titulo">
     <h2 class="tituloRojo font-size-32">Reporte de Procesos OT</h2>
   </div>
@@ -19,658 +18,628 @@
   <div class="mb-4">
     <hr class="colorLinea">
   </div>
+</div>
 
-  <div class="formulario">
+<div class="formulario">
+  <div class="mb-4">
+    <h4 class="tituloRojo font-size-24"><i class="pi pi-search"></i> Búsqueda por filtros</h4>
+  </div>
+
+  <!-- Inicio formulario Estado OT -->
+  <form [formGroup]="formularioOT">
     <div class="mb-4">
-      <h4 class="tituloRojo font-size-24"><i class="pi pi-search"></i> Búsqueda por filtros</h4>
-    </div>
-    <!-- Inicio formulario Estado OT -->
-    <form [formGroup]="formularioOT">
-      <!-- Inicio fila 1 de campos -->
-      <div class="mb-4">
-        <div class="row g-3">
+      <div class="row g-4">
+
         <!--OT-->
-          <div class="form-floating col-md-2">
-            <input formControlName="idDocumento" type="number" class="form-control" id="floatingInput" title="N° de la Orden de Trabajo" required >
-            <label for="floatingInput">OT</label>
-          </div>
-          <!-- Fecha inicial -->
-          <div class="form-floating col-md-2">
-            <input formControlName="fecha" type="date" min="0" class="form-control" id="floatingInput" title="Fecha de creación de la Orden de trabajo" required >
-            <label for="floatingInput">Fecha Inicial</label>
-          </div>
-          <!-- Fecha final -->
-          <div class="form-floating col-md-2">
-            <input formControlName="fechaFinal" type="date" min="0" class="form-control" id="floatingInput"required >
-            <label for="floatingInput">Fecha Final</label>
-          </div>
-
-          <div class="ng-autocomplete form-floating col-md form-control form-control-sm">
-            <ng-autocomplete
-              class=""
-              [data]="vendedores"
-              [searchKeyword]="keyword"
-              [itemTemplate]="itemTemplate"
-              [notFoundTemplate]="notFoundTemplate"
-              id="floatingInput"
-              placeholder="Nombre Vendedor"
-              formControlName="Vendedor">
-            </ng-autocomplete>
-            <ng-template #itemTemplate let-item>
-              <a [innerHTML]="item.usua_Nombre"></a>
-            </ng-template>
-            <ng-template #notFoundTemplate let-notFound>
-              <div [innerHTML]="notFound"></div>
-            </ng-template>
-            <!-- <label for="floatingInput" >Nombre Vendedor</label> -->
-          </div>
-
-          <!-- Estados -->
-          <div class="form-floating col-md-2">
-            <select formControlName="estado" class="form-select form-select-sm" id="floatingSelect" title="Estado de la Orden de Trabajo" required>
-              <option [ngValue]="estado.estado_Id" *ngFor="let estado of estados">{{estado.estado_Nombre}}</option>
-            </select>
-            <label for="floatingSelect">Estado OT</label>
-          </div>
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="idDocumento" id="OT" class="form-control form-control-sm" type="text" pInputText/>
+            <label for="OT">OT</label>
+          </span>
         </div>
-      </div>
 
-      <div class="mb-4">
-        <div class="row g-3">
-          <!-- Clientes -->
-          <div class="form-floating col-md-3">
-            <input formControlName="cliente" class="form-control" list="clientes" id="floatingInput" (change)='selectEventCliente()'>
+        <!-- Fecha Inicial -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-calendar formControlName="fecha" inputId="FechaInicial" [showIcon]="true"></p-calendar>
+            <label for="FechaInicial">Fecha Inicial</label>
+          </span>
+        </div>
+
+        <!-- Fecha Final -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <p-calendar formControlName="fechaFinal" inputId="FechaFinal" [showIcon]="true"></p-calendar>
+            <label for="FechaFinal">Fecha Final</label>
+          </span>
+        </div>
+
+        <!-- Vendedores -->
+        <div class="col-md-4">
+          <span class="p-float-label">
+            <input formControlName="Vendedor" id="Vendedores" list="Vendedor" class="form-control form-control-sm" (change)="buscarVendedor()" type="text" pInputText/>
+            <datalist id="Vendedor">
+              <option value={{item.usua_Id}} *ngFor="let item of vendedores">{{item.usua_Nombre}}</option>
+            </datalist>
+            <label for="Vendedores">Vendedor</label>
+          </span>
+        </div>
+
+        <!-- Estados -->
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="estado" inputId="estado" [options]="estados" optionValue="estado_Id" optionLabel="estado_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+            <label for="estado">Estado OT</label>
+          </span>
+        </div>
+
+        <!-- Clientes -->
+        <div class="col-md-4">
+          <span class="p-float-label">
+            <input formControlName="cliente" id="Cliente" class="form-control form-control-sm" list="clientes" type="text" pInputText (change)="selectEventCliente()"/>
             <datalist id="clientes">
               <option value={{item.cli_Id}} *ngFor="let item of clientes">{{item.cli_Nombre}}</option>
             </datalist>
-            <label for="floatingInput">Cliente</label>
-          </div>
-
-          <!-- Producto -->
-          <div class="form-floating col-md-2">
-            <input formControlName="producto" type="number" class="form-control" id="floatingInput" title="N° del productos" required >
-            <label for="floatingInput">Producto</label>
-          </div>
-
-          <!-- Fallas -->
-          <div class="form-floating col-md-2">
-            <select formControlName="fallasOT" class="form-select form-select-sm" id="floatingSelect" aria-label="Floating label select example">
-              <option [ngValue]="falla.falla_Id" *ngFor="let falla of fallas">{{falla.falla_Nombre}}</option>
-            </select>
-            <label for="floatingSelect">Fallas OT</label>
-          </div>
-
-          <!-- Observación -->
-          <div class="form-floating col-6 col-md">
-            <textarea formControlName="ObservacionOT" id="floatingTextArea" type="text" class="form-control form-control-sm"></textarea>
-            <label for="floatingTextArea">Observación</label>
-          </div>
+            <label for="Cliente">Cliente</label>
+          </span>
         </div>
-      </div>
-      <!-- Fin fila 1 de campos -->
 
-      <!-- Botones para consultar OT -->
-      <div class="mb-3">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarOT()"></button>
-          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
-          <button pButton class="p-button-warning" type="button" label="Agregar Falla" icon="pi pi-check-circle" (click)="anadirFalla()"></button>
-          <button pButton class="p-button-success" type="button" label="Exportar a Excel" icon="pi pi-file-excel" (click)="exportToExcel()"></button>
+        <!-- Producto -->
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <input formControlName="producto" id="Producto" class="form-control form-control-sm" type="text" pInputText/>
+            <label for="Producto">Producto</label>
+          </span>
         </div>
-      </div>
-    </form>
-    <!--Fin Formulario -->
 
-    <div class="mb-4">
-      <hr class="colorLinea">
-    </div>
+        <!-- Fallas -->
+        <div class="col-md-2">
+          <span class="p-float-label">
+            <p-dropdown formControlName="fallasOT" inputId="Fallas" [options]="fallas" optionValue="falla_Id" optionLabel="falla_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+            <label for="Fallas">Fallas OT</label>
+          </span>
+        </div>
 
-    <!-- Tabla informativa de colores -->
-
-    <div class="mb-4">
-      <div class="row g-3">
-        <!--Inicio Tabla OT-->
-        <div class="table-responsive">
-          <table class="table table-borderless table-hover mt-2 tableColores font-size-14">
-            <thead class="TitulosTabla">
-              <!-- <tr> -->
-              <td class="amarillo">
-                <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Iniciado <b>{{cantidadOTIniciada}}</b></a>
-                <div class="row">
-                  <div class="col">
-                    <div class="collapse multi-collapse" id="multiCollapseExample1">
-                      <div class="card card-body">
-                        Este color indica que la OT ya inició su producción.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <!-- </tr> -->
-              <!-- <tr> -->
-              <td class="naranja">
-                <a class="btn naranja" data-bs-toggle="collapse" href="#multiCollapseExample2" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Abierta <b>{{catidadOTAbiertas}}</b></a>
-                <div class="row">
-                  <div class="col">
-                    <div class="collapse multi-collapse" id="multiCollapseExample2">
-                      <div class="card card-body">
-                        Este color indica que la OT está abierta, es decir, no tiene asignaciones y tampoco ha empazado su producción.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <!-- </tr> -->
-              <!-- <tr> -->
-              <td class="verde">
-                <a class="btn verde" data-bs-toggle="collapse" href="#multiCollapseExample4" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Terminada <b>{{cantidadOTTerminada}}</b></a>
-                <div class="row">
-                  <div class="col">
-                    <div class="collapse multi-collapse" id="multiCollapseExample4">
-                      <div class="card card-body">
-                        Este color indica que la orden de trabajo está terminada, es decir, que su producción ya alcanzó la cantidad pedida.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <!-- </tr> -->
-              <!-- <tr> -->
-              <td class="azul">
-                <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample5" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Asignada <b>{{cantidadOTAsignadas}}</b></a>
-                <div class="row">
-                  <div class="col">
-                    <div class="collapse multi-collapse" id="multiCollapseExample5">
-                      <div class="card card-body">
-                        Este color indica que la orden de trabajo está asignada, es decir, ya se hicieron asignaciones pero no ha empazado su producción.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <!-- </tr> -->
-              <!-- <tr> -->
-              <td class="rojo">
-                  <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample6" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Anulada <b>{{cantidadOtAnulada}}</b></a>
-                  <div class="row">
-                    <div class="col">
-                      <div class="collapse multi-collapse" id="multiCollapseExample6">
-                        <div class="card card-body">
-                          Este color indica que la orden de trabajo está asignada, es decir, ya se hicieron asignaciones pero no ha empazado su producción.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-              </td>
-              <!-- </tr> -->
-              <!-- <tr> -->
-              <td class="verde2">
-                <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample8" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Cerrada <b>{{cantidadOTCerrada}}</b></a>
-                <div class="row">
-                  <div class="col">
-                    <div class="collapse multi-collapse" id="multiCollapseExample8">
-                      <div class="card card-body">
-                        Este color indica que la orden de trabajo está cerrada, es decir, ya se finalizó su producción y se cerró la orden para que no haya más producción.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <!-- </tr> -->
-              <!-- <tr> -->
-              <td class="gris">
-                <a class="btn gris" data-bs-toggle="collapse" href="#multiCollapseExample3" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>No iniciado</b></a>
-                <div class="row">
-                  <div class="col">
-                    <div class="collapse multi-collapse" id="multiCollapseExample3">
-                      <div class="card card-body">
-                        Este color indica la OT ya inició su producción en otros procesos, pero no ha llegado aún al proceso con este color.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <!-- </tr> -->
-            </thead>
-          </table>
+        <!-- Observación -->
+        <div class="col-md">
+          <span class="p-float-label">
+            <textarea formControlName="ObservacionOT" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+            <label for="textarea">Observación</label>
+          </span>
         </div>
       </div>
     </div>
 
-    <div>
-      <div>
-        <div class="mb-4 titulos_Paginador">
-          <h4 class="tituloRojo font-size-24" style="width: 90%;"><i class="pi pi-file-edit"></i> Ordenes de Trabajo</h4>
-        </div>
+    <!-- Botones para consultar OT -->
+    <div class="mb-3">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarOT()"></button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
+        <button pButton class="p-button-warning" type="button" label="Agregar Falla" icon="pi pi-check-circle" (click)="anadirFalla()"></button>
+        <button pButton class="p-button-success" type="button" label="Exportar a Excel" icon="pi pi-file-excel" (click)="exportToExcel()"></button>
+      </div>
+    </div>
+  </form>
+  <!--Fin Formulario -->
 
-        <!-- Tabla donde se mostrarán las OT Consultadas -->
-        <div *ngIf="load" id="tableProcesos" class="font-size-14">
-          <div class="mb-4 ">
-            <div class="row g-3">
-              <!--Botones superiores de Paginado-->
-              <div class="mb-3">
-                <p-button type="button" icon="pi pi-chevron-left" (click)="prev()" [disabled]="isFirstPage()" styleClass="p-button-text"></p-button>
-                <p-button type="button" icon="pi pi-refresh" (click)="reset()" styleClass="p-button-text"></p-button>
-                <p-button type="button" icon="pi pi-chevron-right" (click)="next()" [disabled]="isLastPage()" styleClass="p-button-text"></p-button>
+  <div class="mb-4">
+    <hr class="colorLinea">
+  </div>
+
+  <!-- Tabla informativa de colores -->
+  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+    <div class="table-responsive">
+      <table class="table tableColores">
+        <thead class="TitulosTabla">
+          <td class="amarillo">
+            <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Iniciado <b>{{cantidadOTIniciada}}</b></a>
+            <div class="row">
+              <div class="col">
+                <div class="collapse multi-collapse" id="multiCollapseExample1">
+                  <div class="card card-body">
+                    Este color indica que la OT ya inició su producción.
+                  </div>
+                </div>
               </div>
-
-              <!-- Tabla con información de la orden de trabajo -->
-              <p-table
-                #dt
-                [columns]="columnasSeleccionada"
-                [value]="ArrayDocumento"
-                [resizableColumns]="true"
-                columnResizeMode="expand"
-                styleClass="p-datatable-gridlines p-datatable-sm"
-                responsiveLayout="scroll"
-                [paginator]="true"
-                [rows]="rows"
-                [showCurrentPageReport]="true"
-                [(first)]="first"
-                currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-                [rowsPerPageOptions]="[10,20,30,50,70,100]"
-                [rowHover]="true"
-                dataKey="ot">
-                <!-- Buscador de columnas -->
-                <ng-template pTemplate="caption">
-                  <p-multiSelect
-                    [options]="columnas"
-                    [(ngModel)]="columnasSeleccionada"
-                    optionLabel="header"
-                    selectedItemsLabel="{0} columnas seleccionadas"
-                    [style]="{minWidth: '330px'}"
-                    placeholder="Elige las columnas que quieres ver"></p-multiSelect>
-                </ng-template>
-                <!-- Titulos -->
-                <ng-template pTemplate="header" let-columns>
-                  <tr class="font-size-13">
-                    <th scope="col" pSortableColumn="ot" pResizableColumn>OT
-                      <p-sortIcon field="ot" title="Order por OT"></p-sortIcon>
-                    </th>
-                    <th id="" scope="col" pSortableColumn="cli" pResizableColumn>Cliente
-                      <p-sortIcon field="cli"></p-sortIcon>
-                    </th>
-                    <th id="" scope="col" pSortableColumn="prod" pResizableColumn>Producto
-                      <p-sortIcon field="prod"></p-sortIcon>
-                    </th>
-                    <th id="" scope="col" pResizableColumn>Materia Prima</th>
-                    <th id="" scope="col" pResizableColumn>Extrusión</th>
-                    <th id="" scope="col" pResizableColumn>Impresión</th>
-                    <th id="" scope="col" pResizableColumn>Rotograbado</th>
-                    <th id="" scope="col" pResizableColumn>Doblado</th>
-                    <th id="" scope="col" pResizableColumn>Laminado</th>
-                    <th id="" scope="col" pResizableColumn>Corte</th>
-                    <th id="" scope="col" pResizableColumn>Empaque</th>
-                    <th id="" scope="col" pResizableColumn>Sellado</th>
-                    <th id="" scope="col" pResizableColumn>Wiketiado</th>
-                    <th id="" scope="col" pResizableColumn>Cant. Producir</th>
-                    <th id="" scope="col" pResizableColumn>Estados</th>
-                    <th id="" scope="col" pResizableColumn>Fecha Creación</th>
-                    <th *ngFor="let col of columns" pResizableColumn>
-                      {{col.header}}
-                    </th>
-                    <th></th>
-                  </tr>
-                </ng-template>
-                <!-- Cuerpo -->
-                <ng-template pTemplate="body" let-ArrayDocumento let-columns="columns">
-                  <tr style="cursor: pointer; cursor: hand;">
-                    <td id="ot" scope="col" (click)="reporteOT(ArrayDocumento.ot)"><b>{{ArrayDocumento.ot}}</b></td>
-                    <td id="mp" scope="col">{{ArrayDocumento.cli}}</td>
-                    <td id="mp" scope="col">{{ArrayDocumento.prod}}</td>
-                    <td id="mp" scope="col">{{ArrayDocumento.Mp | number : '1.2-2'}}</td>
-                    <!-- Extrusion -->
-                    <!-- Termianda -->
-                    <ng-container *ngIf="ArrayDocumento.ext >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
-                      <td id="ext" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
-                    </ng-container>
-                    <!-- Iniciada -->
-                    <ng-container *ngIf="ArrayDocumento.ext < ArrayDocumento.cant && ArrayDocumento.ext > 0">
-                      <td id="ext" scope="col" style="background-color: #F3FC20;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
-                    </ng-container>
-                    <!-- Abierta / Asignada / Anulada -->
-                    <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila1">
-                      <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                        <td id="ext" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                        <td id="ext" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                        <td id="ext" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
-                      </ng-container>
-                    </ng-container>
-                    <!-- No iniciado -->
-                    <ng-template #fila1>
-                      <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.ext == 0 && ArrayDocumento.ext < ArrayDocumento.cant" id="ext" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
-                      <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.ext == 0 && ArrayDocumento.ext < ArrayDocumento.cant" id="ext" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
-                    </ng-template>
-
-                    <!-- Impresion -->
-                    <!-- Termianda -->
-                    <ng-container *ngIf="ArrayDocumento.imp >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
-                      <td id="imp" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')" >{{ArrayDocumento.imp | number}}</td>
-                    </ng-container>
-                    <!-- Iniciada -->
-                    <ng-container *ngIf="ArrayDocumento.imp < ArrayDocumento.cant && ArrayDocumento.imp > 0">
-                      <td id="imp" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
-                    </ng-container>
-                    <!-- Abierta / Asignada / Anulada -->
-                    <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila2">
-                      <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                        <td id="imp" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                        <td id="imp" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                        <td id="imp" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
-                      </ng-container>
-                    </ng-container>
-                    <!-- No iniciado -->
-                    <ng-template #fila2>
-                      <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.imp == 0 && ArrayDocumento.imp < ArrayDocumento.cant" id="imp" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
-                      <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.imp == 0 && ArrayDocumento.imp < ArrayDocumento.cant" id="imp" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
-                    </ng-template>
-
-                    <!-- Rotograbado -->
-                    <!-- Termianda -->
-                    <ng-container *ngIf="ArrayDocumento.rot >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
-                      <td id="rot" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')">{{ArrayDocumento.rot | number}}</td>
-                    </ng-container>
-                    <!-- Iniciada -->
-                    <ng-container *ngIf="ArrayDocumento.rot < ArrayDocumento.cant && ArrayDocumento.rot > 0">
-                      <td id="rot" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
-                    </ng-container>
-                    <!-- Abierta / Asignada / Anulada -->
-                    <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila3">
-                      <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                        <td id="rot" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.rot | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                        <td id="rot" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.rot | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                        <td id="rot" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.rot | number}}</td>
-                      </ng-container>
-                    </ng-container>
-                    <!-- No iniciado -->
-                    <ng-template #fila3>
-                      <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.rot == 0 && ArrayDocumento.rot < ArrayDocumento.cant" id="rot" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
-                      <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.rot == 0 && ArrayDocumento.rot < ArrayDocumento.cant" id="rot" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
-                    </ng-template>
-
-                    <!-- Doblado -->
-                    <!-- Termianda -->
-                    <ng-container *ngIf="ArrayDocumento.dbl >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
-                      <td id="dbl" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
-                    </ng-container>
-                    <!-- Iniciada -->
-                    <ng-container *ngIf="ArrayDocumento.dbl < ArrayDocumento.cant && ArrayDocumento.dbl > 0">
-                      <td id="dbl" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
-                    </ng-container>
-                    <!-- Abierta / Asignada / Anulado -->
-                    <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila4">
-                      <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                        <td id="dbl" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                        <td id="dbl" scope="col" style="background-color: #F6D45D;;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                        <td id="dbl" scope="col" style="background-color: #FF7878;;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
-                      </ng-container>
-                    </ng-container>
-                    <!-- No iniciado -->
-                    <ng-template #fila4>
-                      <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.dbl == 0 && ArrayDocumento.dbl < ArrayDocumento.cant" id="dbl" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
-                      <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.dbl == 0 && ArrayDocumento.dbl < ArrayDocumento.cant" id="dbl" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
-                    </ng-template>
-
-                    <!-- laminado -->
-                    <!-- Termianda -->
-                    <ng-container *ngIf="ArrayDocumento.lam >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
-                      <td id="lam" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
-                    </ng-container>
-                    <!-- Iniciada -->
-                    <ng-container *ngIf="ArrayDocumento.lam < ArrayDocumento.cant && ArrayDocumento.lam > 0">
-                      <td id="lam" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
-                    </ng-container>
-                    <!-- Abierta / Asignada / Anulado -->
-                    <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila5">
-                      <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                        <td id="lam" scope="col" style="background-color: #83D3FF" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                        <td id="lam" scope="col" style="background-color: #F6D45D" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                        <td id="lam" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
-                      </ng-container>
-                    </ng-container>
-                    <!-- No iniciado -->
-                    <ng-template #fila5>
-                      <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.lam == 0 && ArrayDocumento.lam < ArrayDocumento.cant" id="lam" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
-                      <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.lam == 0 && ArrayDocumento.lam < ArrayDocumento.cant" id="lam" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
-                    </ng-template>
-
-                    <!-- Corte -->
-                    <!-- Termianda -->
-                    <ng-container *ngIf="ArrayDocumento.cor >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
-                      <td id="cor" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
-                    </ng-container>
-                    <!-- Iniciada -->
-                    <ng-container *ngIf="ArrayDocumento.cor < ArrayDocumento.cant && ArrayDocumento.cor > 0">
-                      <td id="cor" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
-                    </ng-container>
-                    <!-- Abierta / Asignada / Anulado -->
-                    <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila6">
-                      <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                        <td id="cor" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                        <td id="cor" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                        <td id="cor" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
-                      </ng-container>
-                    </ng-container>
-                    <!-- No iniciado -->
-                    <ng-template #fila6>
-                      <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.cor == 0 && ArrayDocumento.cor < ArrayDocumento.cant" id="cor" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
-                      <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.cor == 0 && ArrayDocumento.cor < ArrayDocumento.cant" id="cor" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
-                    </ng-template>
-
-                    <!-- Empaque -->
-                    <!-- Termianda -->
-                    <ng-container *ngIf="ArrayDocumento.emp >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
-                      <td id="emp" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
-                    </ng-container>
-                    <!-- Iniciada -->
-                    <ng-container *ngIf="ArrayDocumento.emp < ArrayDocumento.cant && ArrayDocumento.emp > 0">
-                      <td id="emp" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
-                    </ng-container>
-                    <!-- Abierta / Asignada / Anulada -->
-                    <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila7">
-                      <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                        <td id="emp" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                        <td id="emp" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                        <td id="emp" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
-                      </ng-container>
-                    </ng-container>
-                    <!-- No iniciado -->
-                    <ng-template #fila7>
-                      <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.emp == 0 && ArrayDocumento.emp < ArrayDocumento.cant" id="emp" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
-                      <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.emp == 0 && ArrayDocumento.emp < ArrayDocumento.cant" id="emp" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
-                    </ng-template>
-
-                    <!-- Sellado -->
-                    <!-- Termianda -->
-                    <ng-container *ngIf="ArrayDocumento.sel >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
-                      <td id="sel" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
-                    </ng-container>
-                    <!-- Iniciada -->
-                    <ng-container *ngIf="ArrayDocumento.sel < ArrayDocumento.cant && ArrayDocumento.sel > 0">
-                      <td id="sel" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
-                    </ng-container>
-                    <!-- Abierta / Asignada / Anulada -->
-                    <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila8">
-                      <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                        <td id="sel" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                        <td id="sel" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
-                      </ng-container>
-                      <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                        <td id="sel" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
-                      </ng-container>
-                    </ng-container>
-                    <!-- No iniciado -->
-                    <ng-template #fila8>
-                      <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.sel == 0 && ArrayDocumento.sel < ArrayDocumento.cant" id="sel" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
-                      <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.sel == 0 && ArrayDocumento.sel < ArrayDocumento.cant" id="sel" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
-                    </ng-template>
-
-                    <!-- Wiketiado -->
-                    <!-- Termianda -->
-                    <ng-container *ngIf="ArrayDocumento.wik >= (ArrayDocumento.cant) && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
-                      <td id="wik" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
-                    </ng-container>
-                    <!-- Iniciada -->
-                    <ng-container *ngIf="ArrayDocumento.wik < (ArrayDocumento.cant) && ArrayDocumento.wik > 0">
-                      <td id="wik" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
-                    </ng-container>
-                    <!-- Asignada -->
-                    <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila9">
-                      <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                        <td id="wik" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
-                      </ng-container>
-                      <!-- Abierta -->
-                      <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                        <td id="wik" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
-                      </ng-container>
-                      <!-- Anulada -->
-                      <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                        <td id="wik" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
-                      </ng-container>
-                    </ng-container>
-                    <!-- No iniciado -->
-                    <ng-template #fila9>
-                      <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
-                      <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
-                    </ng-template>
-
-                    <td id="cant" scope="col"><b>{{ArrayDocumento.cantUnd}}</b></td>
-
-                    <!-- Terminada -->
-                    <ng-container *ngIf="ArrayDocumento.est == 'Terminada'">
-                      <td id="est" scope="col" style="background-color: #8AFC9B;">{{ArrayDocumento.est | uppercase}}</td>
-                    </ng-container>
-                    <!-- Iniciada -->
-                    <ng-container *ngIf="ArrayDocumento.est == 'En proceso'">
-                      <td id="est" scope="col" style="background-color: #F9FC5B;" >{{ArrayDocumento.est | uppercase}}</td>
-                    </ng-container>
-                    <!-- Asignada -->
-                    <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
-                      <td id="est" scope="col" style="background-color: #83D3FF;">{{ArrayDocumento.est | uppercase}}</td>
-                    </ng-container>
-                    <!-- Abierta -->
-                    <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
-                      <td id="est" scope="col" style="background-color: #F6D45D;">{{ArrayDocumento.est | uppercase}}</td>
-                    </ng-container>
-                    <!-- Finalizada -->
-                    <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
-                      <td id="est" scope="col" style="background-color: #FF7878">{{ArrayDocumento.est | uppercase}}</td>
-                    </ng-container>
-                    <!-- Cerradas -->
-                    <ng-container *ngIf="ArrayDocumento.est == 'Cerrada'">
-                      <td id="est" scope="col" style="background-color: #53CC48; color: #FFF">{{ArrayDocumento.est | uppercase}}</td>
-                    </ng-container>
-
-                    <!-- Fecha Creacion OT -->
-                    <td id="fecha" scope="col">{{ArrayDocumento.fecha | date : 'yyyy-MM-dd'}}</td>
-
-                    <td *ngFor="let col of columns">{{ArrayDocumento[col.field]}}</td>
-
-                    <td *ngIf="ValidarRol == 1">
-                      <button pButton pRipple icon="pi pi-pencil" [style]="{width: '40px', height: '15px'}" class="p-button-rounded p-button-success p-mr-2" (click)="editProduct(ArrayDocumento)"></button>
-                    </td>
-                  </tr>
-                </ng-template>
-                <!-- Suma total de registros -->
-                <ng-template pTemplate="summary">
-                  <div class="p-d-flex p-ai-center p-jc-between">
-                    En total hay {{ArrayDocumento ? ArrayDocumento.length : 0 | number}} orden(es) de trabajo.
+            </div>
+          </td>
+          <td class="naranja">
+            <a class="btn naranja" data-bs-toggle="collapse" href="#multiCollapseExample2" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Abierta <b>{{catidadOTAbiertas}}</b></a>
+            <div class="row">
+              <div class="col">
+                <div class="collapse multi-collapse" id="multiCollapseExample2">
+                  <div class="card card-body">
+                    Este color indica que la OT está abierta, es decir, no tiene asignaciones y tampoco ha empazado su producción.
                   </div>
-                </ng-template>
-              </p-table>
-
-              <!-- Modal Para cambiar el estado de la orden de trabajo -->
-              <p-dialog [(visible)]="ArrayDocumentoDialog" [style]="{width: '350px'}" header="Cambio de estado de OT" [modal]="true" >
-                <ng-template pTemplate="content">
-                  <div class="p-field">
-                    <h6 for="name">Orden de Trabajo <b>{{otSeleccionada}}</b></h6>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="verde">
+            <a class="btn verde" data-bs-toggle="collapse" href="#multiCollapseExample4" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Terminada <b>{{cantidadOTTerminada}}</b></a>
+            <div class="row">
+              <div class="col">
+                <div class="collapse multi-collapse" id="multiCollapseExample4">
+                  <div class="card card-body">
+                    Este color indica que la orden de trabajo está terminada, es decir, que su producción ya alcanzó la cantidad pedida.
                   </div>
-
-                  <div class="p-field">
-                    <label class="p-mb-3">Estados de las ordenes de trabajo</label>
-                    <div class="p-formgrid p-grid">
-                      <div class="p-field-radiobutton p-col-6">
-                        <p-radioButton id="category1" name="category" value="15" [(ngModel)]="estadoModal"></p-radioButton>
-                        <label for="category1" style="padding-left: 3%;">Abierta&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                      </div>
-                      <div class="p-field-radiobutton p-col-6">
-                        <p-radioButton id="category2" name="category" value="3" [(ngModel)]="estadoModal"></p-radioButton>
-                        <label for="category1" style="padding-left: 3%;">Anulada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                      </div>
-                      <div class="p-field-radiobutton p-col-6">
-                        <p-radioButton id="category3" name="category" value="14" [(ngModel)]="estadoModal"></p-radioButton>
-                        <label for="category2" style="padding-left: 3%;">Asignada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                      </div>
-                      <div class="p-field-radiobutton p-col-6">
-                        <p-radioButton id="category5" name="category" value="16" [(ngModel)]="estadoModal"></p-radioButton>
-                        <label for="category3" style="padding-left: 3%;">En Proceso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                      </div>
-                      <div class="p-field-radiobutton p-col-6">
-                        <p-radioButton id="category6" name="category" value="17" [(ngModel)]="estadoModal"></p-radioButton>
-                        <label for="category4" style="padding-left: 3%;">Terminada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                      </div>
-                      <div class="p-field-radiobutton p-col-6" style="margin-left: 30%;">
-                        <p-radioButton id="category4"name="category" value="18" [(ngModel)]="estadoModal"></p-radioButton>
-                        <label class="font-size-20" for="category2" style="padding-left: 3%; color: #FF7878;">Revisada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                      </div>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="azul">
+            <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample5" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Asignada <b>{{cantidadOTAsignadas}}</b></a>
+            <div class="row">
+              <div class="col">
+                <div class="collapse multi-collapse" id="multiCollapseExample5">
+                  <div class="card card-body">
+                    Este color indica que la orden de trabajo está asignada, es decir, ya se hicieron asignaciones pero no ha empazado su producción.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="rojo">
+              <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample6" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Anulada <b>{{cantidadOtAnulada}}</b></a>
+              <div class="row">
+                <div class="col">
+                  <div class="collapse multi-collapse" id="multiCollapseExample6">
+                    <div class="card card-body">
+                      Este color indica que la orden de trabajo está asignada, es decir, ya se hicieron asignaciones pero no ha empazado su producción.
                     </div>
                   </div>
-                </ng-template>
-
-                <ng-template pTemplate="footer">
-                  <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-                  <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="cambiarEstado()"></button>
-                </ng-template>
-              </p-dialog>
-              <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
-
-
-              <p-dialog [(visible)]="modalProcesos" [style]="{width: 'auto'}" header="Rollos de la OT" [modal]="true" >
-                <ng-template pTemplate="content">
-                  <app-DatosOT-Status></app-DatosOT-Status>
-                </ng-template>
-              </p-dialog>
-
-
-              <p-dialog [(visible)]="mostrarModalCostos" [style]="{width: 'auto'}" header="Reporte de costos" [modal]="true" >
-                <ng-template pTemplate="content">
-                  <app-reporteCostosOT></app-reporteCostosOT>
-                </ng-template>
-              </p-dialog>
-
+                </div>
+              </div>
+          </td>
+          <td class="verde2">
+            <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample8" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Cerrada <b>{{cantidadOTCerrada}}</b></a>
+            <div class="row">
+              <div class="col">
+                <div class="collapse multi-collapse" id="multiCollapseExample8">
+                  <div class="card card-body">
+                    Este color indica que la orden de trabajo está cerrada, es decir, ya se finalizó su producción y se cerró la orden para que no haya más producción.
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </td>
+          <td class="gris">
+            <a class="btn gris" data-bs-toggle="collapse" href="#multiCollapseExample3" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>No iniciado</b></a>
+            <div class="row">
+              <div class="col">
+                <div class="collapse multi-collapse" id="multiCollapseExample3">
+                  <div class="card card-body">
+                    Este color indica la OT ya inició su producción en otros procesos, pero no ha llegado aún al proceso con este color.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </thead>
+      </table>
+    </div>
+  </div>
+
+  <div class="mb-4 titulos_Paginador">
+    <h4 class="tituloRojo font-size-24" style="width: 90%;"><i class="pi pi-file-edit"></i> Ordenes de Trabajo</h4>
+  </div>
+
+  <!-- Tabla donde se mostrarán las OT Consultadas -->
+  <div *ngIf="load" id="tableProcesos" class="font-size-14">
+    <div class="mb-4 ">
+      <div class="row g-3">
+
+        <!-- Tabla con información de la orden de trabajo -->
+        <p-table
+          #dt
+          [columns]="columnasSeleccionada"
+          [value]="ArrayDocumento"
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          responsiveLayout="scroll"
+          [paginator]="true"
+          [rows]="30"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+          [rowsPerPageOptions]="[10,20,30,50,70,100]"
+          [rowHover]="true"
+          dataKey="ot">
+          <!-- Buscador de columnas -->
+          <ng-template pTemplate="caption">
+            <p-multiSelect
+              [options]="columnas"
+              [(ngModel)]="columnasSeleccionada"
+              optionLabel="header"
+              selectedItemsLabel="{0} columnas seleccionadas"
+              [style]="{minWidth: '330px'}"
+              placeholder="Elige las columnas que quieres ver"></p-multiSelect>
+          </ng-template>
+          <!-- Titulos -->
+          <ng-template pTemplate="header" let-columns>
+            <tr class="font-size-13">
+              <th scope="col" pSortableColumn="ot" pResizableColumn>OT
+                <p-sortIcon field="ot" title="Order por OT"></p-sortIcon>
+              </th>
+              <th id="" scope="col" pSortableColumn="cli" pResizableColumn>Cliente
+                <p-sortIcon field="cli"></p-sortIcon>
+              </th>
+              <th id="" scope="col" pSortableColumn="prod" pResizableColumn>Producto
+                <p-sortIcon field="prod"></p-sortIcon>
+              </th>
+              <th id="" scope="col" pResizableColumn>Materia Prima</th>
+              <th id="" scope="col" pResizableColumn>Extrusión</th>
+              <th id="" scope="col" pResizableColumn>Impresión</th>
+              <th id="" scope="col" pResizableColumn>Rotograbado</th>
+              <th id="" scope="col" pResizableColumn>Doblado</th>
+              <th id="" scope="col" pResizableColumn>Laminado</th>
+              <th id="" scope="col" pResizableColumn>Corte</th>
+              <th id="" scope="col" pResizableColumn>Empaque</th>
+              <th id="" scope="col" pResizableColumn>Sellado</th>
+              <th id="" scope="col" pResizableColumn>Wiketiado</th>
+              <th id="" scope="col" pResizableColumn>Cant. Producir</th>
+              <th id="" scope="col" pResizableColumn>Estados</th>
+              <th id="" scope="col" pResizableColumn>Fecha Creación</th>
+              <th *ngFor="let col of columns" pResizableColumn>{{col.header}}</th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <!-- Cuerpo -->
+          <ng-template pTemplate="body" let-ArrayDocumento let-columns="columns">
+            <tr style="cursor: pointer; cursor: hand;">
+              <td id="ot" scope="col" (click)="reporteOT(ArrayDocumento.ot)"><b>{{ArrayDocumento.ot}}</b></td>
+              <td id="mp" scope="col">{{ArrayDocumento.cli}}</td>
+              <td id="mp" scope="col">{{ArrayDocumento.prod}}</td>
+              <td id="mp" scope="col">{{ArrayDocumento.Mp | number : '1.2-2'}}</td>
+              <!-- Extrusion -->
+              <!-- Termianda -->
+              <ng-container *ngIf="ArrayDocumento.ext >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                <td id="ext" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
+              </ng-container>
+              <!-- Iniciada -->
+              <ng-container *ngIf="ArrayDocumento.ext < ArrayDocumento.cant && ArrayDocumento.ext > 0">
+                <td id="ext" scope="col" style="background-color: #F3FC20;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
+              </ng-container>
+              <!-- Abierta / Asignada / Anulada -->
+              <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila1">
+                <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
+                  <td id="ext" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
+                  <td id="ext" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                  <td id="ext" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
+                </ng-container>
+              </ng-container>
+              <!-- No iniciado -->
+              <ng-template #fila1>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.ext == 0 && ArrayDocumento.ext < ArrayDocumento.cant" id="ext" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.ext == 0 && ArrayDocumento.ext < ArrayDocumento.cant" id="ext" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'EXTRUSION')">{{ArrayDocumento.ext | number}}</td>
+              </ng-template>
+
+              <!-- Impresion -->
+              <!-- Termianda -->
+              <ng-container *ngIf="ArrayDocumento.imp >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                <td id="imp" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')" >{{ArrayDocumento.imp | number}}</td>
+              </ng-container>
+              <!-- Iniciada -->
+              <ng-container *ngIf="ArrayDocumento.imp < ArrayDocumento.cant && ArrayDocumento.imp > 0">
+                <td id="imp" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
+              </ng-container>
+              <!-- Abierta / Asignada / Anulada -->
+              <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila2">
+                <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
+                  <td id="imp" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
+                  <td id="imp" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                  <td id="imp" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
+                </ng-container>
+              </ng-container>
+              <!-- No iniciado -->
+              <ng-template #fila2>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.imp == 0 && ArrayDocumento.imp < ArrayDocumento.cant" id="imp" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.imp == 0 && ArrayDocumento.imp < ArrayDocumento.cant" id="imp" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.imp | number}}</td>
+              </ng-template>
+
+              <!-- Rotograbado -->
+              <!-- Termianda -->
+              <ng-container *ngIf="ArrayDocumento.rot >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                <td id="rot" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')">{{ArrayDocumento.rot | number}}</td>
+              </ng-container>
+              <!-- Iniciada -->
+              <ng-container *ngIf="ArrayDocumento.rot < ArrayDocumento.cant && ArrayDocumento.rot > 0">
+                <td id="rot" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
+              </ng-container>
+              <!-- Abierta / Asignada / Anulada -->
+              <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila3">
+                <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
+                  <td id="rot" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.rot | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
+                  <td id="rot" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.rot | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                  <td id="rot" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'IMPRESION')">{{ArrayDocumento.rot | number}}</td>
+                </ng-container>
+              </ng-container>
+              <!-- No iniciado -->
+              <ng-template #fila3>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.rot == 0 && ArrayDocumento.rot < ArrayDocumento.cant" id="rot" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.rot == 0 && ArrayDocumento.rot < ArrayDocumento.cant" id="rot" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'ROTOGRABADO')"data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{ArrayDocumento.rot | number}}</td>
+              </ng-template>
+
+              <!-- Doblado -->
+              <!-- Termianda -->
+              <ng-container *ngIf="ArrayDocumento.dbl >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                <td id="dbl" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
+              </ng-container>
+              <!-- Iniciada -->
+              <ng-container *ngIf="ArrayDocumento.dbl < ArrayDocumento.cant && ArrayDocumento.dbl > 0">
+                <td id="dbl" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
+              </ng-container>
+              <!-- Abierta / Asignada / Anulado -->
+              <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila4">
+                <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
+                  <td id="dbl" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
+                  <td id="dbl" scope="col" style="background-color: #F6D45D;;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                  <td id="dbl" scope="col" style="background-color: #FF7878;;" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
+                </ng-container>
+              </ng-container>
+              <!-- No iniciado -->
+              <ng-template #fila4>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.dbl == 0 && ArrayDocumento.dbl < ArrayDocumento.cant" id="dbl" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.dbl == 0 && ArrayDocumento.dbl < ArrayDocumento.cant" id="dbl" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'DOBLADO')">{{ArrayDocumento.dbl | number}}</td>
+              </ng-template>
+
+              <!-- laminado -->
+              <!-- Termianda -->
+              <ng-container *ngIf="ArrayDocumento.lam >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                <td id="lam" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
+              </ng-container>
+              <!-- Iniciada -->
+              <ng-container *ngIf="ArrayDocumento.lam < ArrayDocumento.cant && ArrayDocumento.lam > 0">
+                <td id="lam" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
+              </ng-container>
+              <!-- Abierta / Asignada / Anulado -->
+              <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila5">
+                <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
+                  <td id="lam" scope="col" style="background-color: #83D3FF" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
+                  <td id="lam" scope="col" style="background-color: #F6D45D" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                  <td id="lam" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
+                </ng-container>
+              </ng-container>
+              <!-- No iniciado -->
+              <ng-template #fila5>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.lam == 0 && ArrayDocumento.lam < ArrayDocumento.cant" id="lam" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.lam == 0 && ArrayDocumento.lam < ArrayDocumento.cant" id="lam" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'LAMINADO')">{{ArrayDocumento.lam | number}}</td>
+              </ng-template>
+
+              <!-- Corte -->
+              <!-- Termianda -->
+              <ng-container *ngIf="ArrayDocumento.cor >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                <td id="cor" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
+              </ng-container>
+              <!-- Iniciada -->
+              <ng-container *ngIf="ArrayDocumento.cor < ArrayDocumento.cant && ArrayDocumento.cor > 0">
+                <td id="cor" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
+              </ng-container>
+              <!-- Abierta / Asignada / Anulado -->
+              <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila6">
+                <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
+                  <td id="cor" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
+                  <td id="cor" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                  <td id="cor" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
+                </ng-container>
+              </ng-container>
+              <!-- No iniciado -->
+              <ng-template #fila6>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.cor == 0 && ArrayDocumento.cor < ArrayDocumento.cant" id="cor" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.cor == 0 && ArrayDocumento.cor < ArrayDocumento.cant" id="cor" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'CORTE')">{{ArrayDocumento.cor | number}}</td>
+              </ng-template>
+
+              <!-- Empaque -->
+              <!-- Termianda -->
+              <ng-container *ngIf="ArrayDocumento.emp >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                <td id="emp" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
+              </ng-container>
+              <!-- Iniciada -->
+              <ng-container *ngIf="ArrayDocumento.emp < ArrayDocumento.cant && ArrayDocumento.emp > 0">
+                <td id="emp" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
+              </ng-container>
+              <!-- Abierta / Asignada / Anulada -->
+              <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila7">
+                <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
+                  <td id="emp" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
+                  <td id="emp" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                  <td id="emp" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
+                </ng-container>
+              </ng-container>
+              <!-- No iniciado -->
+              <ng-template #fila7>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.emp == 0 && ArrayDocumento.emp < ArrayDocumento.cant" id="emp" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.emp == 0 && ArrayDocumento.emp < ArrayDocumento.cant" id="emp" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'EMPAQUE')">{{ArrayDocumento.emp | number}}</td>
+              </ng-template>
+
+              <!-- Sellado -->
+              <!-- Termianda -->
+              <ng-container *ngIf="ArrayDocumento.sel >= ArrayDocumento.cant && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                <td id="sel" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
+              </ng-container>
+              <!-- Iniciada -->
+              <ng-container *ngIf="ArrayDocumento.sel < ArrayDocumento.cant && ArrayDocumento.sel > 0">
+                <td id="sel" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
+              </ng-container>
+              <!-- Abierta / Asignada / Anulada -->
+              <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila8">
+                <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
+                  <td id="sel" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
+                  <td id="sel" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
+                </ng-container>
+                <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                  <td id="sel" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
+                </ng-container>
+              </ng-container>
+              <!-- No iniciado -->
+              <ng-template #fila8>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.sel == 0 && ArrayDocumento.sel < ArrayDocumento.cant" id="sel" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.sel == 0 && ArrayDocumento.sel < ArrayDocumento.cant" id="sel" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'SELLADO')">{{ArrayDocumento.sel | number}} Kg - {{ArrayDocumento.selUnd | number}} Und</td>
+              </ng-template>
+
+              <!-- Wiketiado -->
+              <!-- Termianda -->
+              <ng-container *ngIf="ArrayDocumento.wik >= (ArrayDocumento.cant) && ArrayDocumento.est != 'Abierta'  && ArrayDocumento.est != 'Asignada'">
+                <td id="wik" scope="col" style="background-color: #8AFC9B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
+              </ng-container>
+              <!-- Iniciada -->
+              <ng-container *ngIf="ArrayDocumento.wik < (ArrayDocumento.cant) && ArrayDocumento.wik > 0">
+                <td id="wik" scope="col" style="background-color: #F9FC5B;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
+              </ng-container>
+              <!-- Asignada -->
+              <ng-container *ngIf="(ArrayDocumento.ext + ArrayDocumento.imp + ArrayDocumento.rot + ArrayDocumento.dbl + ArrayDocumento.lam + ArrayDocumento.cor + ArrayDocumento.emp  + ArrayDocumento.sel + ArrayDocumento.wik) == 0; else fila9">
+                <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
+                  <td id="wik" scope="col" style="background-color: #83D3FF;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
+                </ng-container>
+                <!-- Abierta -->
+                <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
+                  <td id="wik" scope="col" style="background-color: #F6D45D;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
+                </ng-container>
+                <!-- Anulada -->
+                <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                  <td id="wik" scope="col" style="background-color: #FF7878;" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
+                </ng-container>
+              </ng-container>
+              <!-- No iniciado -->
+              <ng-template #fila9>
+                <td *ngIf="ArrayDocumento.est != 'Anulado' && ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #EAEAEA" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
+                <td *ngIf="ArrayDocumento.est == 'Anulado' && ArrayDocumento.wik == 0 && ArrayDocumento.wik < ArrayDocumento.cant" id="wik" scope="col" style="background-color: #FF7878" (click)="seleccionarOTxStatus(ArrayDocumento, 'Wiketiado')">{{ArrayDocumento.wikUnd | number}} Und</td>
+              </ng-template>
+
+              <td id="cant" scope="col"><b>{{ArrayDocumento.cantUnd}}</b></td>
+
+              <!-- Terminada -->
+              <ng-container *ngIf="ArrayDocumento.est == 'Terminada'">
+                <td id="est" scope="col" style="background-color: #8AFC9B;">{{ArrayDocumento.est | uppercase}}</td>
+              </ng-container>
+              <!-- Iniciada -->
+              <ng-container *ngIf="ArrayDocumento.est == 'En proceso'">
+                <td id="est" scope="col" style="background-color: #F9FC5B;" >{{ArrayDocumento.est | uppercase}}</td>
+              </ng-container>
+              <!-- Asignada -->
+              <ng-container *ngIf="ArrayDocumento.est == 'Asignada'">
+                <td id="est" scope="col" style="background-color: #83D3FF;">{{ArrayDocumento.est | uppercase}}</td>
+              </ng-container>
+              <!-- Abierta -->
+              <ng-container *ngIf="ArrayDocumento.est == 'Abierta'">
+                <td id="est" scope="col" style="background-color: #F6D45D;">{{ArrayDocumento.est | uppercase}}</td>
+              </ng-container>
+              <!-- Finalizada -->
+              <ng-container *ngIf="ArrayDocumento.est == 'Anulado'">
+                <td id="est" scope="col" style="background-color: #FF7878">{{ArrayDocumento.est | uppercase}}</td>
+              </ng-container>
+              <!-- Cerradas -->
+              <ng-container *ngIf="ArrayDocumento.est == 'Cerrada'">
+                <td id="est" scope="col" style="background-color: #53CC48; color: #FFF">{{ArrayDocumento.est | uppercase}}</td>
+              </ng-container>
+
+              <!-- Fecha Creacion OT -->
+              <td id="fecha" scope="col">{{ArrayDocumento.fecha | date : 'yyyy-MM-dd'}}</td>
+
+              <td *ngFor="let col of columns">{{ArrayDocumento[col.field]}}</td>
+
+              <td *ngIf="ValidarRol == 1">
+                <button pButton pRipple icon="pi pi-pencil" [style]="{width: '40px', height: '15px'}" class="p-button-rounded p-button-success p-mr-2" (click)="editProduct(ArrayDocumento)"></button>
+              </td>
+            </tr>
+          </ng-template>
+          <!-- Suma total de registros -->
+          <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+              En total hay {{ArrayDocumento ? ArrayDocumento.length : 0 | number}} orden(es) de trabajo.
+            </div>
+          </ng-template>
+        </p-table>
+
+        <!-- Modal Para cambiar el estado de la orden de trabajo -->
+        <p-dialog [(visible)]="modalEstadosOT" [style]="{width: '350px'}" header="Cambio de estado de OT" [modal]="true" >
+          <ng-template pTemplate="content">
+            <div class="p-field">
+              <h6 for="name">Orden de Trabajo <b>{{otSeleccionada}}</b></h6>
+            </div>
+
+            <div class="p-field">
+              <label class="p-mb-3">Estados de las ordenes de trabajo</label>
+              <div class="p-formgrid p-grid">
+                <div class="p-field-radiobutton p-col-6">
+                  <p-radioButton id="category1" name="category" value="15" [(ngModel)]="estadoModal"></p-radioButton>
+                  <label for="category1" style="padding-left: 3%;">Abierta&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div class="p-field-radiobutton p-col-6">
+                  <p-radioButton id="category2" name="category" value="3" [(ngModel)]="estadoModal"></p-radioButton>
+                  <label for="category1" style="padding-left: 3%;">Anulada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div class="p-field-radiobutton p-col-6">
+                  <p-radioButton id="category3" name="category" value="14" [(ngModel)]="estadoModal"></p-radioButton>
+                  <label for="category2" style="padding-left: 3%;">Asignada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div class="p-field-radiobutton p-col-6">
+                  <p-radioButton id="category5" name="category" value="16" [(ngModel)]="estadoModal"></p-radioButton>
+                  <label for="category3" style="padding-left: 3%;">En Proceso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div class="p-field-radiobutton p-col-6">
+                  <p-radioButton id="category6" name="category" value="17" [(ngModel)]="estadoModal"></p-radioButton>
+                  <label for="category4" style="padding-left: 3%;">Terminada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                </div>
+                <div class="p-field-radiobutton p-col-6" style="margin-left: 30%;">
+                  <p-radioButton id="category4"name="category" value="18" [(ngModel)]="estadoModal"></p-radioButton>
+                  <label class="font-size-20" for="category2" style="padding-left: 3%; color: #FF7878;">Revisada&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+
+          <ng-template pTemplate="footer">
+            <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+            <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="cambiarEstado()"></button>
+          </ng-template>
+        </p-dialog>
+        <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+
+
+        <p-dialog [(visible)]="modalProcesos" [style]="{width: 'auto'}" header="Rollos de la OT" [modal]="true" >
+          <ng-template pTemplate="content">
+            <app-DatosOT-Status></app-DatosOT-Status>
+          </ng-template>
+        </p-dialog>
+
+
+        <p-dialog [(visible)]="mostrarModalCostos" [style]="{width: 'auto'}" header="Reporte de costos" [modal]="true" >
+          <ng-template pTemplate="content">
+            <app-reporteCostosOT></app-reporteCostosOT>
+          </ng-template>
+        </p-dialog>
+
       </div>
     </div>
   </div>
