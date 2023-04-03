@@ -2,9 +2,11 @@ span{
   color: #db4149;
 }
 
-
-
 .busquedaFactura{
   padding-left: 25%;
   width: 180px;
+}
+
+.p-input-icon-left {
+  width: 100%;
 }

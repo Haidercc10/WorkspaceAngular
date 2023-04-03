@@ -252,15 +252,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       Estado_Id : 13,
       AsigBOPP_Hora : moment().format('H:mm:ss'),
     }
-    this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => { this.obtenerIdUltimaAsignacion(); }, error => {
+    this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => { this.detallesAsginacionBOPP(datos_asginacionBOPP.asigBOPP_Id); }, error => {
       this.mostrarError(`Error`, `Se ha producido un error al momento de crear la asignación!`);
-    });
-  }
-
-  // funcion que buscará el id de la ultima asignacion de rollos
-  obtenerIdUltimaAsignacion(){
-    this.asignacionBOPPService.srvObtenerListaUltimoId().subscribe(datos_asignaciones => { this.detallesAsginacionBOPP(datos_asignaciones); }, error => {
-      this.mostrarError(`Error`, `Se ha producido un error al obtener el último Id de la asignación!`);
     });
   }
 
@@ -277,7 +270,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
               else if (datos_bopp[k].catMP_Id == 15) documento = 'ASIGPOLY';
               let cantidad = this.ArrayBoppPedida[j].Cantidad2 / this.ordenesTrabajo.length;
               let datos : any = {
-                AsigBOPP_Id : idAsignacion.asigBOPP_Id,
+                AsigBOPP_Id : idAsignacion,
                 BOPP_Id : datos_bopp[k].bopP_Id,
                 DtAsigBOPP_Cantidad : cantidad,
                 UndMed_Id : 'Kg',

@@ -155,7 +155,6 @@ export class EntradaBOPPComponent implements OnInit {
       let ancho : number = this.FormEntradaBOPP.value.ancho;
       let categoria : any = this.FormEntradaBOPP.value.Categoria;
       let id : number = this.FormEntradaBOPP.value.Id;
-      categoria != null ? categoria = categoria.catMP_Id : categoria;
 
       this.entradaBOPPService.srvObtenerListaPorSerial(serial).subscribe(datos_bopp => {
         if (datos_bopp.length != 0) {

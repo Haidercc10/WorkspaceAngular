@@ -3,12 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
-import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
+import { MessageService } from 'primeng/api';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
+import { AsignacionProductosFacturaService } from 'src/app/Servicios/FacturacionRollos/AsignacionProductosFactura.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
-import Swal from 'sweetalert2';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -19,43 +18,49 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 export class RollosAsignadasFacturaComponent implements OnInit {
 
   public FormConsultarFactura !: FormGroup; //formulario para consultar una factura y ver los rollos que tiene asignados
-
-  cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
-  today : any = new Date(); //Variable que se usará para llenar la fecha actual
+  cargando : boolean = false; //Variable para validar que salga la animacion de carga
+  today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  rollos : any [] = []; //Variable que almacenará los difrentes rollos que se hicieron en la orden de trabajo
-  arrayConductor =[];  /** Array que guardará los conductores en el select input */
-  rollosInsertar : any [] = []; //Variable que va a amacenar los diferentes rollos que se van a insertar
-  validarRollo : any [] = []; //Variable para validará que el rollo no esté en la tabla
-  check : boolean = false; //Variable que nos a ayudar para saber si un rollo ya fue seleccionado
-  rollosAsignados : any [] = []; //Variable que va a almacenar los rollos que fueron asignados a la factura creada
-  Total : any = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
+  rollosDisponibles : any [] = []; //Variable que guardará la informacion de los rollos estan disponibles para facturar
+  rollosSeleccionados : any [] = []; //Variable que guardará la informacion de los rollos que se seleccionaron para facturar
+  presentacionProducto : string = ''; //Variable que almacenará la presentación del producto consultado
+  cantTotalProducto : number = 0; //Variable que almacenará la cantidad total que hay del producto seleccionado
+  cantTotalSeleccionados : number = 0; //Variable que almacenará la cantidad total que hay del producto seleccionado
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
-  Productos = [];
+  conductores : any [] = []; //Variable que almcenará la información de los conductores
+  Productos : any [] = [];
+  rollosAsignados : any [] = [];
 
-  constructor(private frmBuilderPedExterno : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private dtAsgProdFactura : DetallesAsignacionProductosFacturaService,
-                      private rollosService : DetallesEntradaRollosService,
-                        private servicioUsuarios : UsuarioService,
-                          private facturaService : AsignacionProductosFacturaService,) {
+  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private frmBuilder : FormBuilder,
+                  private messageService: MessageService,
+                    private dtAsgProdFacturaService : DetallesAsignacionProductosFacturaService,
+                      private usuariosService : UsuarioService,
+                        private facturaService : AsignacionProductosFacturaService,
+                          private rollosService : DetallesEntradaRollosService,){
 
-    this.FormConsultarFactura = this.frmBuilderPedExterno.group({
-      Fact_Id: ['', Validators.required],
-      Cliente : [''],
-      Conductor : ['', Validators.required],
-      PlacaCamion : ['', Validators.required],
+    this.FormConsultarFactura = this.frmBuilder.group({
+      Fact_Id: [null, Validators.required],
+      Conductor : [null, Validators.required],
+      Conductor_Id : [null, Validators.required],
+      PlacaCamion : [null, Validators.required],
     });
   }
 
-  ngOnInit() {
-    this.fecha();
+  ngOnInit(): void {
     this.lecturaStorage();
-    this.ObtenerUsuariosConductores();
+    this.obtenerCondutores();
+  }
+
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage(){
+    this.storage_Id = this.storage.get('Id');
+    this.storage_Nombre = this.storage.get('Nombre');
+    this.ValidarRol = this.storage.get('Rol');
+    this.storage_Rol = this.storage.get('Rol');
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -65,57 +70,41 @@ export class RollosAsignadasFacturaComponent implements OnInit {
     return number.toString().replace(exp,rep);
   }
 
-  //Funcion que leerá la informacion que se almacenará en el storage del navegador
-  lecturaStorage(){
-    this.storage_Id = this.storage.get('Id');
-    this.storage_Nombre = this.storage.get('Nombre');
-    this.ValidarRol = this.storage.get('Rol');
-  }
-
-  //Funcion que colocará la fecha actual
-  fecha(){
-    this.today = new Date();
-    var dd : any = this.today.getDate();
-    var mm : any = this.today.getMonth() + 1;
-    var yyyy : any = this.today.getFullYear();
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
-    this.today = yyyy + '-' + mm + '-' + dd;
-  }
-
   // Funcion para limpiar los campos de la vista
   limpiarCampos(){
-    this.FormConsultarFactura.setValue({
-      Fact_Id: '',
-      Cliente : '',
-      Conductor : '',
-      PlacaCamion : '',
-    });
-    this.rollos = [];
-    this.rollosInsertar = [];
-    this.rollosAsignados = [];
-    this.Productos = [];
-    this.grupoProductos = [];
-    this.cargando = true;
-    this.Total = 0;
-    window.location.href = "./factura-rollos-productos";
+    this.FormConsultarFactura.reset();
+    this.cargando = false;
+    this.rollosDisponibles = [];
+    this.rollosSeleccionados = [];
+    this.presentacionProducto = '';
+    this.cantTotalProducto = 0;
+    this.cantTotalSeleccionados = 0;
   }
 
-  //Funcion que a mostrar los usuarios de tipo conductor
-  ObtenerUsuariosConductores() {
-    this.servicioUsuarios.srvObtenerListaUsuario().subscribe(registrosUsuarios => {
-      for (let i = 0; i < registrosUsuarios.length; i++) {
-        this.servicioUsuarios.srvObtenerListaPorIdConductor(registrosUsuarios[i].usua_Id).subscribe(registrosConductores => { this.arrayConductor = registrosConductores; });
-      }
+  // Funcion que va a consultar la informacion de los usuarios de tipo conductor
+  obtenerCondutores(){
+    this.usuariosService.GetConsdutores().subscribe(data => { this.conductores = data });
+  }
+
+  // Funcion que va a buscar el nombre del conductor
+  cambiarNombreConductor(){
+    let id : string = this.FormConsultarFactura.value.Conductor;
+    let nuevo : any [] = this.conductores.filter((item) => item.id == id);
+    this.FormConsultarFactura.patchValue({
+      Conductor : nuevo[0].nombre,
+      Conductor_Id : nuevo[0].id,
     });
   }
 
   //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
   consultarFactura(){
-    this.rollos = [];
+    this.cargando = true;
+    this.rollosDisponibles = [];
+    this.presentacionProducto = '';
+    this.cantTotalProducto = 0;
     let factura : string = this.FormConsultarFactura.value.Fact_Id;
-    this.dtAsgProdFactura.srvObtenerListaPorCodigoFactura(factura.toUpperCase()).subscribe(datos_factura => {
-      if (datos_factura.length == 0) Swal.fire(`¡La factura ${factura} no existe!`);
+    this.dtAsgProdFacturaService.srvObtenerListaPorCodigoFactura(factura.toUpperCase()).subscribe(datos_factura => {
+      if (datos_factura.length == 0) this.mensajeAdvertencia(`¡La factura ${factura} no existe!`);
       for (let i = 0; i < datos_factura.length; i++) {
         if ((datos_factura[i].estado_Id == 20 || datos_factura[i].estado_Id == 19) && datos_factura[i].asigProdFV_PlacaCamion == '') {
           let info : any = {
@@ -125,211 +114,134 @@ export class RollosAsignadasFacturaComponent implements OnInit {
             Cantidad : datos_factura[i].dtAsigProdFV_Cantidad,
             Presentacion : datos_factura[i].undMed_Id,
           }
-          this.rollos.push(info);
-          this.FormConsultarFactura.patchValue({
-            Fact_Id: factura.toUpperCase(),
-            Cliente : datos_factura[i].cli_Nombre,
-          });
+          this.rollosDisponibles.push(info);
+          this.presentacionProducto = info.Presentacion;
+          this.cantTotalProducto += info.Cantidad;
         }
       }
       setTimeout(() => {
-        if (this.rollos.length == 0 && datos_factura.length != 0) Swal.fire(`¡Todos los rollos de la factura ${factura} fueron enviados!`);
+        this.cargando = false;
+        if (this.rollosDisponibles.length == 0 && datos_factura.length != 0) this.mensajeAdvertencia(`¡Todos los rollos de la factura ${factura} fueron enviados!`);
       }, 500);
     });
   }
 
-  //Funcion que va a agregar Productos en la tabla
-  cargarProducto(item : any){
-    if (this.rollosInsertar.length == 0) {
-      let info : any = {
-        Id : item.Id,
-        IdProducto : item.IdProducto,
-        Producto : item.Producto,
-        Cantidad : item.Cantidad,
-        Presentacion : item.Presentacion,
-      }
-      this.Total += item.Cantidad;
-      this.rollosInsertar.push(info);
-      this.validarRollo.push(item.Id);
-    } else {
-      if (!this.validarRollo.includes(item.Id)) {
-        let info : any = {
-          Id : item.Id,
-          IdProducto : item.IdProducto,
-          Producto : item.Producto,
-          Cantidad : item.Cantidad,
-          Presentacion : item.Presentacion,
-        }
-        this.Total += item.Cantidad;
-        this.rollosInsertar.push(info);
-        this.validarRollo.push(item.Id);
-      } else if (this.validarRollo.includes(item.Id)) {
-        for (let i = 0; i < this.rollosInsertar.length; i++) {
-          if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
-        }
-        for (let i = 0; i < this.validarRollo.length; i++) {
-          if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
-        }
-      }
-    }
-    for (let i = 0; i < this.rollos.length; i++) {
-      if (this.rollos[i].Id == item.Id) this.rollos.splice(i,1);
-    }
-    setTimeout(() => { this.GrupoProductos(); }, 500);
+  // Funcion que va a validar cuando se seleccionen todos los rollos
+  seleccionTodos_Rollos(){
+    this.cargando = true;
+    this.rollosDisponibles = [];
+    this.presentacionProducto = '';
+    this.cantTotalProducto = 0;
+    this.rollosSeleccionados.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    this.GrupoProductos();
   }
 
-  // Funcion que va a seleccionar todo lo que hay en la tabla
-  selccionarTodo(){
-    for (const item of this.rollos) {
-      let info : any = {
-        Ot : item.Ot,
-        Id : item.Id,
-        IdCliente : item.IdCliente,
-        Cliente : item.Cliente,
-        IdProducto : item.IdProducto,
-        Producto : item.Producto,
-        Cantidad : item.Cantidad,
-        Presentacion : item.Presentacion,
-        Estatus : item.Estatus,
-        Proceso : item.Proceso,
-      }
-      this.Total += item.Cantidad;
-      this.rollosInsertar.push(info);
-      this.validarRollo.push(item.Id);
-      console.log(this.rollosInsertar)
+  // Funcion que va a validar cuando se seleccione 1 rollo
+  seleccionRollo(data : any){
+    this.cargando = true;
+    let rolloSeleccionado : any [] = this.rollosDisponibles.filter((item) => item.Id === data.Id);
+    this.cantTotalProducto -= rolloSeleccionado[0].Cantidad;
+    this.cantTotalSeleccionados += rolloSeleccionado[0].Cantidad;
+    for (let i = 0; i < this.rollosDisponibles.length; i++) {
+      if (this.rollosDisponibles[i].Id === data.Id) this.rollosDisponibles.splice(i, 1);
     }
-    setTimeout(() => { this.rollos = []; }, 100);
-    setTimeout(() => { this.GrupoProductos(); }, 500);
+    this.rollosSeleccionados.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    this.GrupoProductos();
   }
 
-  // Funcion que se va a encargar de quitar rollos de la tabla inferior
-  quitarRollo(item : any){
-    let info : any = {
-      Id : item.Id,
-      IdProducto : item.IdProducto,
-      Producto : item.Producto,
-      Cantidad : item.Cantidad,
-      Presentacion : item.Presentacion,
-      checkbox : true,
+  // Funcion que va a validar cuando se deseleccionen todos los rollos
+  quitarTodos_Rollos(){
+    this.cargando = true;
+    this.rollosSeleccionados = [];
+    this.presentacionProducto = this.rollosDisponibles[0].Presentacion;
+    for (let i = 0; i < this.rollosDisponibles.length; i++) {
+      this.cantTotalProducto += this.rollosDisponibles[i].Cantidad;
     }
-    this.Total -= item.Cantidad;
-    this.rollos.push(info);
-    for (let i = 0; i < this.rollosInsertar.length; i++) {
-      if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
-    }
-    for (let i = 0; i < this.validarRollo.length; i++) {
-      if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
-    }
-    setTimeout(() => { this.GrupoProductos(); }, 500);
+    this.rollosDisponibles.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    this.GrupoProductos();
   }
 
-  // Funcion que va a quitar todo lo que hay en la tabla
-  quitarTodo(){
-    for (const item of this.rollosInsertar) {
-      let info : any = {
-        Ot : item.Ot,
-        Id : item.Id,
-        IdCliente : item.IdCliente,
-        Cliente : item.Cliente,
-        IdProducto : item.IdProducto,
-        Producto : item.Producto,
-        Cantidad : item.Cantidad,
-        Presentacion : item.Presentacion,
-        Estatus : item.Estatus,
-        Proceso : item.Proceso,
-        checkbox : true,
-      }
-      this.rollos.push(info);
-      this.Total = 0;
+  // Funcion que va a validar cuando se deseleccione 1 rollo
+  quitarRollo(data : any){
+    this.cargando = true;
+    let rolloSeleccionado : any [] = this.rollosSeleccionados.filter((item) => item.Id === data.Id);
+    this.cantTotalSeleccionados -= rolloSeleccionado[0].Cantidad;
+    this.cantTotalProducto += rolloSeleccionado[0].Cantidad;
+    for (let i = 0; i < this.rollosSeleccionados.length; i++) {
+      if (this.rollosSeleccionados[i].Id === data.Id) this.rollosSeleccionados.splice(i, 1);
     }
-    setTimeout(() => {
-      this.rollosInsertar = [];
-      this.validarRollo = [];
-    }, 100);
-    setTimeout(() => { this.GrupoProductos(); }, 500);
+    this.rollosDisponibles.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    this.GrupoProductos();
   }
 
   // Funcion que permitirá ver el total de lo escogido para cada producto
   GrupoProductos(){
     let producto : any = [];
     this.grupoProductos = [];
-    for (let i = 0; i < this.rollosInsertar.length; i++) {
-      if (!producto.includes(this.rollosInsertar[i].IdProducto)) {
+    this.cantTotalSeleccionados = 0;
+    for (let i = 0; i < this.rollosSeleccionados.length; i++) {
+      if (!producto.includes(this.rollosSeleccionados[i].IdProducto)) {
         let cantidad : number = 0;
         let cantRollo : number = 0;
-        for (let j = 0; j < this.rollosInsertar.length; j++) {
-          if (this.rollosInsertar[i].IdProducto == this.rollosInsertar[j].IdProducto) {
-            cantidad += this.rollosInsertar[j].Cantidad;
+        for (let j = 0; j < this.rollosSeleccionados.length; j++) {
+          if (this.rollosSeleccionados[i].IdProducto == this.rollosSeleccionados[j].IdProducto) {
+            cantidad += this.rollosSeleccionados[j].Cantidad;
             cantRollo += 1;
           }
         }
-        producto.push(this.rollosInsertar[i].IdProducto);
+        producto.push(this.rollosSeleccionados[i].IdProducto);
         let info : any = {
-          Id : this.rollosInsertar[i].IdProducto,
-          Nombre : this.rollosInsertar[i].Producto,
+          Id : this.rollosSeleccionados[i].IdProducto,
+          Nombre : this.rollosSeleccionados[i].Producto,
           Cantidad : this.formatonumeros(cantidad.toFixed(2)),
+          Cantidad2 : cantidad,
           Rollos: this.formatonumeros(cantRollo.toFixed(2)),
-          Presentacion : this.rollosInsertar[i].Presentacion,
+          Presentacion : this.rollosSeleccionados[i].Presentacion,
         }
+        this.cantTotalSeleccionados += cantidad;
         this.grupoProductos.push(info);
       }
     }
+    setTimeout(() => { this.cargando = false; }, 50);
   }
 
   // Funcion que agregará el condutor y la placa del camion en que irá el pedido
   actualizarFactura(){
     if (this.FormConsultarFactura.valid) {
-      this.cargando = false;
+      this.cargando = true;
       let factura : string = this.FormConsultarFactura.value.Fact_Id;
-      let conductor : number = this.FormConsultarFactura.value.Conductor;
+      let conductor : number = this.FormConsultarFactura.value.Conductor_Id;
       let placa : string = this.FormConsultarFactura.value.PlacaCamion;
       this.facturaService.srvObtenerListaPorFactura(factura).subscribe(datos_factura => {
-        for (let i = 0; i < datos_factura.length; i++) {
-          let info : any = {
-            FacturaVta_Id : datos_factura[i].facturaVta_Id,
-            NotaCredito_Id : datos_factura[i].notaCredito_Id,
-            Usua_Id : datos_factura[i].usua_Id,
-            AsigProdFV_Fecha : datos_factura[i].asigProdFV_Fecha,
-            AsigProdFV_FechaHora : datos_factura[i].asigProdFV_FechaHora,
-            AsigProdFV_Observacion : datos_factura[i].asigProdFV_Observacion,
-            Cli_Id : datos_factura[i].cli_Id,
-            Usua_Conductor : conductor,
-            AsigProdFV_PlacaCamion : placa.toUpperCase(),
-            AsigProdFV_FechaEnvio : this.today,
-            AsigProdFV_HoraEnvio : moment().format('H:mm:ss'),
-          }
-          this.facturaService.srvActualizarFactura(factura, info).subscribe(datos_facturaActualizada => { this.cambiarEstado(); }, error => {
-            const Toast = Swal.mixin({
-              toast: true,
-              position: 'center',
-              showConfirmButton: false,
-              timer: 2500,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-              }
-            });
-            Toast.fire({
-              icon: 'error',
-              title: '¡Error al despachar los rollos!'
-            });
-            this.cargando = true;
-          });
+        let info : any = {
+          FacturaVta_Id : datos_factura.facturaVta_Id,
+          NotaCredito_Id : datos_factura.notaCredito_Id,
+          Usua_Id : datos_factura.usua_Id,
+          AsigProdFV_Fecha : datos_factura.asigProdFV_Fecha,
+          AsigProdFV_FechaHora : datos_factura.asigProdFV_FechaHora,
+          AsigProdFV_Observacion : datos_factura.asigProdFV_Observacion,
+          Cli_Id : datos_factura.cli_Id,
+          Usua_Conductor : conductor,
+          AsigProdFV_PlacaCamion : placa.toUpperCase(),
+          AsigProdFV_FechaEnvio : moment().format('YYYY-MM-DD'),
+          AsigProdFV_HoraEnvio : moment().format('H:mm:ss'),
         }
+        this.facturaService.srvActualizarFactura(factura, info).subscribe(datos_facturaActualizada => { this.cambiarEstado(); }, error => {
+          this.mensajeError(`¡Ha ocurrido un Error!`,`¡Ocurrió un error al momento de despachar los rollos seleccionados!`);
+        });
       });
-    } else Swal.fire("¡Hay campos vacios!");
+    } else this.mensajeAdvertencia("¡Hay campos vacios!");
   }
 
   // Funcion que cambiará el estado de los rollos a enviados
   cambiarEstado(){
-    if (this.rollosInsertar.length != 0) {
-      for (let i = 0; i < this.rollosInsertar.length; i++) {
-        this.rollosService.srvObtenerVerificarRollo(this.rollosInsertar[i].Id).subscribe(datos_rollos => {
+    if (this.rollosSeleccionados.length != 0) {
+      for (let i = 0; i < this.rollosSeleccionados.length; i++) {
+        this.rollosService.srvObtenerVerificarRollo(this.rollosSeleccionados[i].Id).subscribe(datos_rollos => {
           for (let j = 0; j < datos_rollos.length; j++) {
             if (datos_rollos[j].prod_CantBolsasRestates <= 0) {
               let info : any = {
-                DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
+                Codigo : datos_rollos[j].codigo,
                 EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
                 Rollo_Id : datos_rollos[j].rollo_Id,
                 DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
@@ -345,44 +257,11 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                 Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
                 Proceso_Id : datos_rollos[j].proceso_Id,
               }
-              this.Total += datos_rollos[j].dtEntRolloProd_Cantidad;
-              this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
-                const Toast = Swal.mixin({
-                  toast: true,
-                  position: 'center',
-                  showConfirmButton: false,
-                  timer: 2500,
-                  timerProgressBar: true,
-                  didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                  }
-                });
-                Toast.fire({
-                  icon: 'success',
-                  title: '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!'
-                });
-              }, error => {
-                const Toast = Swal.mixin({
-                  toast: true,
-                  position: 'center',
-                  showConfirmButton: false,
-                  timer: 2500,
-                  timerProgressBar: true,
-                  didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                  }
-                });
-                Toast.fire({
-                  icon: 'error',
-                  title: '¡Error al despachar los rollos!'
-                });
-                this.cargando = true;
-              });
+              this.rollosService.srvActualizar(datos_rollos[j].codigo, info).subscribe(datos_rolloActuializado => {
+              }, error => { this.mensajeError(`¡Ha ocurrio un Error!`, `¡Ocurrió un error al intentar cambiar el estado de la factura!`); });
             } else if (datos_rollos[j].prod_CantBolsasRestates > 0) {
               let info : any = {
-                DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
+                Codigo : datos_rollos[j].codigo,
                 EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
                 Rollo_Id : datos_rollos[j].rollo_Id,
                 DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
@@ -398,60 +277,23 @@ export class RollosAsignadasFacturaComponent implements OnInit {
                 Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
                 Proceso_Id : datos_rollos[j].proceso_Id,
               }
-              this.Total += datos_rollos[j].dtEntRolloProd_Cantidad;
-              this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
-                const Toast = Swal.mixin({
-                  toast: true,
-                  position: 'center',
-                  showConfirmButton: false,
-                  timer: 2500,
-                  timerProgressBar: true,
-                  didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                  }
-                });
-                Toast.fire({
-                  icon: 'success',
-                  title: '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!'
-                });
-              }, error => {
-                const Toast = Swal.mixin({
-                  toast: true,
-                  position: 'center',
-                  showConfirmButton: false,
-                  timer: 2500,
-                  timerProgressBar: true,
-                  didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                  }
-                });
-                Toast.fire({
-                  icon: 'error',
-                  title: '¡Error al despachar los rollos!'
-                });
-                this.cargando = true;
-              });
+              this.rollosService.srvActualizar(datos_rollos[j].codigo, info).subscribe(datos_rolloActuializado => {
+              }, error => { this.mensajeError(`¡Ha ocurrio un Error!`, `¡Ocurrió un error al intentar cambiar el estado de los rollos seleccionados!`); });
             }
           }
         });
       }
-      if (this.rollosInsertar.length > 100) setTimeout(() => { this.buscarRolloPDF(); }, 7000);
-      else if (this.rollosInsertar.length > 70) setTimeout(() => { this.buscarRolloPDF(); }, 6000);
-      else if (this.rollosInsertar.length > 50) setTimeout(() => { this.buscarRolloPDF(); }, 5000);
-      else if (this.rollosInsertar.length > 20) setTimeout(() => { this.buscarRolloPDF(); }, 4000);
-      else setTimeout(() => { this.buscarRolloPDF(); }, 3000);
-    } else Swal.fire("¡Debe cargar minimo un rollo en la tabla!");
+      setTimeout(() => { this.buscarRolloPDF(); }, 100 * this.rollosSeleccionados.length);
+    } else this.mensajeAdvertencia("¡Debe cargar minimo un rollo en la tabla!");
   }
 
   // Funcion que cambiará el estado de los rollos a enviados
   cambiarEstadoRollosNoVerificados(){
-    for (let i = 0; i < this.rollos.length; i++) {
-      this.rollosService.srvObtenerVerificarRollo(this.rollos[i].Id).subscribe(datos_rollos => {
+    for (let i = 0; i < this.rollosSeleccionados.length; i++) {
+      this.rollosService.srvObtenerVerificarRollo(this.rollosSeleccionados[i].Id).subscribe(datos_rollos => {
         for (let j = 0; j < datos_rollos.length; j++) {
           let info : any = {
-              DtEntRolloProd_Codigo : datos_rollos[j].dtEntRolloProd_Codigo,
+              Codigo : datos_rollos[j].codigo,
               EntRolloProd_Id : datos_rollos[j].entRolloProd_Id,
               Rollo_Id : datos_rollos[j].rollo_Id,
               DtEntRolloProd_Cantidad : datos_rollos[j].dtEntRolloProd_Cantidad,
@@ -466,23 +308,9 @@ export class RollosAsignadasFacturaComponent implements OnInit {
               Prod_CantBolsasRestates : datos_rollos[j].prod_CantBolsasRestates,
               Prod_CantBolsasFacturadas : datos_rollos[j].prod_CantBolsasFacturadas,
           }
-          this.rollosService.srvActualizar(datos_rollos[j].dtEntRolloProd_Codigo, info).subscribe(datos_rolloActuializado => {
-            const Toast = Swal.mixin({
-              toast: true,
-              position: 'center',
-              showConfirmButton: false,
-              timer: 2500,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-              }
-            });
-            Toast.fire({
-              icon: 'success',
-              title: '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!'
-            });
-          });
+          this.rollosService.srvActualizar(datos_rollos[j].codigo, info).subscribe(datos_rolloActuializado => {
+            this.mensajeConfirmacion(`¡Registro Exitoso!`, '¡Factura confirmada, el/los Rollo(s) pasa a ser enviado!');
+          }, error => { this.mensajeError(`¡Ha ocurrido un error!`, `¡No se pudo actualizar el estado de los rollos seleccionados!`); });
         }
       });
     }
@@ -491,10 +319,9 @@ export class RollosAsignadasFacturaComponent implements OnInit {
   // Funcion que creará un pdf a base de la informacion ingresada en las asignacion de rollos a facturas
   crearPDF(){
     let factura : string = this.FormConsultarFactura.value.Fact_Id;
-
-    this.dtAsgProdFactura.srvObtenerListaParaPDF(factura.toUpperCase()).subscribe(datos_factura => {
+    this.dtAsgProdFacturaService.srvObtenerListaParaPDF(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
-        for (let j = 0; j < this.rollosAsignados.length; j++) {
+        for (let j = 0; j < this.rollosSeleccionados.length; j++) {
           const pdfDefinicion : any = {
             info: {
               title: `${factura.toUpperCase()}`
@@ -618,11 +445,6 @@ export class RollosAsignadasFacturaComponent implements OnInit {
 
               this.table(this.rollosAsignados, ['Rollo', 'Producto', 'Nombre', 'Cantidad', 'Presentacion']),
               {
-                text: `\nCant. Total: ${this.formatonumeros(this.Total.toFixed(2))}\n`,
-                alignment: 'right',
-                style: 'header',
-              },
-              {
                 text: `\n \nObervación sobre el pedido: \n ${datos_factura[i].asigProdFV_Observacion}\n`,
                 style: 'header',
               }
@@ -650,11 +472,10 @@ export class RollosAsignadasFacturaComponent implements OnInit {
 
   // Funcion que traerá los rollos que fueron asignados a la factura creada
   buscarRolloPDF(){
-    this.Total = 0;
     this.Productos = [];
     this.rollosAsignados = [];
     let factura : string = this.FormConsultarFactura.value.Fact_Id;
-    this.dtAsgProdFactura.srvObtenerListaParaPDF(factura.toUpperCase()).subscribe(datos_factura => {
+    this.dtAsgProdFacturaService.srvObtenerListaParaPDF(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         let info : any = {
           Rollo : datos_factura[i].rollo_Id,
@@ -667,7 +488,7 @@ export class RollosAsignadasFacturaComponent implements OnInit {
       }
     });
 
-    this.dtAsgProdFactura.srvObtenerListaParaPDF2(factura.toUpperCase()).subscribe(datos_factura => {
+    this.dtAsgProdFacturaService.srvObtenerListaParaPDF2(factura.toUpperCase()).subscribe(datos_factura => {
       for (let i = 0; i < datos_factura.length; i++) {
         let info : any = {
           Producto : datos_factura[i].prod_Id,
@@ -676,7 +497,6 @@ export class RollosAsignadasFacturaComponent implements OnInit {
           Presentacion : datos_factura[i].undMed_Id,
         }
         this.Productos.push(info);
-        this.Total += datos_factura[i].suma;
       }
     });
     setTimeout(() => { this.crearPDF(); }, 1200);
@@ -687,48 +507,64 @@ export class RollosAsignadasFacturaComponent implements OnInit {
     var body = [];
     body.push(columns);
     data.forEach(function(row) {
-        var dataRow = [];
-        columns.forEach(function(column) {
-            dataRow.push(row[column].toString());
-        });
-        body.push(dataRow);
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
     });
-
     return body;
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [60, 60, 250, 70, 70],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 7,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [60, 60, 250, 70, 70],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 7,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table2(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [60, 270, 100, 90],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 7,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [60, 270, 100, 90],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 7,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
   }
 
+  // Funcion que devolverá un mensaje de satisfactorio
+  mensajeConfirmacion(titulo : string, mensaje : any) {
+    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
+    this.cargando = false;
+  }
+
+  // Funcion que va a devolver un mensaje de error
+  mensajeError(titulo : string, mensaje : any) {
+    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
+    this.cargando = false;
+  }
+
+  // Funcion que va a devolver un mensaje de advertencia
+  mensajeAdvertencia(mensaje : any) {
+    this.messageService.add({severity:'warn', summary: '¡Advertencia!', detail: mensaje, life: 1500});
+    this.cargando = false;
+  }
 }

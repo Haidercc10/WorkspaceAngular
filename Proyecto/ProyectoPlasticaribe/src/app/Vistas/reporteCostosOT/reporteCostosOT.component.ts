@@ -163,17 +163,8 @@ export class ReporteCostosOTComponent implements OnInit {
 
   //Funcion que consultará la OT que le sea pasada y mostrará la información general de dicha Orden de Trabajo
   consultaOTBagPro(){
-    this.ArrayMateriaPrima = [];
-    this.totalMPEntregada = 0;
-    this.ValorMPEntregada = 0;
-    this.load = false;
-    this.valorFinalOT = 0;
-    this.diferencia = 0;
-    this.diferenciaPorcentaje = 0;
-    this.estado = '';
-    this.devolucion = 0;
-
     let ot : number = this.infoOT.value.ot;
+    this.limpiarCampos();
     let porcentajeMargen : number = 0;
     this.bagProServices.srvObtenerListaClienteOT_ItemCostos(ot).subscribe(datos_OT => {
       if (datos_OT.length == 0) this.mostrarAdvertencia(`Advertencia`, `No se encuentran registros de la OT ${ot}`);
