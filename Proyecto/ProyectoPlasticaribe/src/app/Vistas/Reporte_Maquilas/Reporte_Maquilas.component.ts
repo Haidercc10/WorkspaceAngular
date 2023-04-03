@@ -281,7 +281,7 @@ export class Reporte_MaquilasComponent implements OnInit {
               columns: [
                 { image : logoParaPdf, width : 220, height : 50 },
                 {
-                  text: `${datos_facturacion[i].tipo_Documento} N° ${datos_facturacion[i].codigo_Documento}`,
+                  text: `${datos_facturacion[i].tipo_Documento} N° ${id}`,
                   alignment: 'right',
                   style: 'titulo',
                   margin: 30
@@ -496,7 +496,7 @@ export class Reporte_MaquilasComponent implements OnInit {
               columns: [
                 { image : logoParaPdf, width : 220, height : 50 },
                 {
-                  text: `Orden de Maquila N° ${datos_orden[i].consecutivo}`,
+                  text: `Orden de Maquila N° ${datos_orden[i].orden}`,
                   alignment: 'right',
                   style: 'titulo',
                   margin: 30

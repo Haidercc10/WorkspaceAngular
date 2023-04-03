@@ -46,6 +46,7 @@ export class LoginComponentComponent implements OnInit {
        && this.storage.get('Token_BagPro')
        && this.storage.get('Token_Inv_Zeus')
        && this.storage.get('Token_Conta_Zeus')) || localStorage.getItem('user')) this.router.navigate(['/home']);
+
     this.formularioUsuario = this.frmBuilderUsuario.group({
       Identificacion: [null, Validators.required],
       Contrasena: [null, Validators.required],
@@ -143,6 +144,4 @@ export class LoginComponentComponent implements OnInit {
    this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
    this.cargando = false;
   }
-
-
 }

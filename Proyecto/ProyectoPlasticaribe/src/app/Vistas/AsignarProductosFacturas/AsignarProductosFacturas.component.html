@@ -1,13 +1,16 @@
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+
 <app-menuLateral></app-menuLateral>
 
-<div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+<!-- Animacion de Carga -->
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
   </div>
 </div>
 
+<!-- Titulo principal -->
 <div class="contain" id="form">
-  <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
       <h2 class="tituloRojo">Asignar Rollos/Productos</h2>
@@ -33,7 +36,6 @@
 
   <!-- Formulario para consultar una orden de trabajo -->
   <form [formGroup]="FormConsultarProductos">
-    <!-- Primera Fila -->
     <div class="mb-3">
       <div class="row g-4">
 
@@ -48,7 +50,7 @@
         <!-- Nota Creadito -->
         <div class="col-md-2">
           <span class="p-float-label">
-            <input formControlName="NotaCredito" id="NotaCredito" class="form-control form-control-sm" type="text" pInputText required/>
+            <input formControlName="NotaCredito" id="NotaCredito" class="form-control form-control-sm" type="text" pInputText/>
             <label for="NotaCredito">Nota Credito</label>
           </span>
         </div>
@@ -57,15 +59,15 @@
         <div class="col-md-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="IdProducto" id="IdProducto" class="form-control form-control-sm" type="text" pInputText required (keyup.Enter)="buscarItem()"/>
-            <label for="IdProducto">N° Item</label>
+            <input formControlName="IdProducto" id="IdProducto" class="form-control form-control-sm" type="text" pInputText (keyup.Enter)="buscarProducto()"/>
+            <label for="IdProducto">Cod. Producto</label>
           </span>
         </div>
 
         <!-- Cantidad Producto -->
         <div class="col-md-2">
           <span class="p-float-label">
-            <p-inputNumber formControlName="CantidadProducto" mode="decimal" inputId="CantidadProducto" [minFractionDigits]="2" (keyup.Enter)="mostrarRollosPorCantidad()"></p-inputNumber>
+            <p-inputNumber formControlName="CantidadProducto" mode="decimal" inputId="CantidadProducto" [minFractionDigits]="2" (keyup.Enter)="buscarProducto()"></p-inputNumber>
             <label for="CantidadProducto">Cantidad Item</label>
           </span>
         </div>
@@ -73,7 +75,7 @@
         <!-- Cliente -->
         <div class="col-md">
           <span class="p-float-label">
-            <input formControlName="Cliente" id="Cliente" list="clientes" class="form-control form-control-sm" type="text" pInputText (change)='selectEventCliente()'/>
+            <input formControlName="Cliente" id="Cliente" list="clientes" class="form-control form-control-sm" type="text" pInputText (change)='buscarCliente()' required/>
             <datalist id="clientes">
               <option value={{item.cli_Id}} *ngFor="let item of arrayClientes">{{item.cli_Nombre}}</option>
             </datalist>
@@ -97,171 +99,180 @@
     <hr class="Linea">
   </div>
 
-  <!-- Rollos Buscados -->
+  <!-- Titulo Rollos Disponibles -->
   <div class="mb-4 tabla1">
-    <h4 class="tituloRojo" style="width: 90%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <div class="form-floating col-md">
-        <input type="number" class="form-control form-control-sm" id="floatingInput"[(ngModel)]="cantPage">
-        <label for="floatingInput">N° Filas</label>
-      </div>
+    <h4 class="tituloRojo"><i class="pi pi-list"></i>Rollos Disponibles</h4>
+  </div>
+
+  <!-- Tabla con Rollos Disponibles -->
+  <div class="mb-3" *ngIf="!cargando">
+    <div class="row g-3 font-size-14">
+      <p-table
+        #dt
+        [value]="rollosDisponibles"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos"
+        [rowsPerPageOptions]="[10,25,50]"
+        [rowHover]="true"
+        dataKey="Id"
+        [(selection)]="rollosSeleccionados">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">ID Rollo</th>
+            <th scope="col">ID Producto</th>
+            <th scope="col">Producto</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Presentacion</th>
+            <th scope="col">Total Unidades</th>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox (click)="seleccionTodos_Rollos()"></p-tableHeaderCheckbox>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rollo>
+          <tr>
+            <td>{{rollo.Id}}</td>
+            <td>{{rollo.IdProducto}}</td>
+            <td>{{rollo.Producto}}</td>
+            <td>{{rollo.CantPaqRestantes | number : '1.2-2'}}</td>
+            <td>{{rollo.Presentacion}}</td>
+            <td>{{rollo.CantUndRestantes | number : '1.2-2'}}</td>
+            <td>
+              <p-tableCheckbox [value]="rollo" (click)="seleccionRollo(rollo)"></p-tableCheckbox>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+          <tr>
+            <td colspan="5">Total:</td>
+            <td>{{cantTotalProducto | number : '1.2-2'}} {{presentacionProducto}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
   </div>
 
-  <!--Inicio tabla Rollos creados en OT -->
-  <div class="mb-3" *ngIf="cargando">
-    <div class="row g-3 tablaInicial">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover mt-2">
-          <thead class="TitulosTabla">
-            <tr>
-              <th scope="col">ID Rollo</th>
-              <th scope="col">ID Producto</th>
-              <th scope="col">Producto</th>
-              <th scope="col">Cantidad</th>
-              <th scope="col">Presentacion</th>
-              <th scope="col">Total Unidades</th>
-
-              <ng-container>
-                <th scope="col"><input class="form-check-input cursor" style="margin-left: 40%;" type="checkbox" (change)="selccionarTodo()"></th>
-              </ng-container>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of rollos | paginate: {itemsPerPage: cantPage, currentPage: page} let i=index">
-              <th>{{item.Id}}</th>
-              <td>{{item.IdProducto}}</td>
-              <td>{{item.Producto}}</td>
-              <td>{{item.CantPaqRestantes | number}}</td>
-              <td>{{item.Presentacion}}</td>
-              <td>{{item.CantUndRestantes | number}}</td>
-              <td><input class="form-check-input cursor" id="checkbox" style="margin-left: 40%;" type="checkbox" (change)="cargarProducto(item)"></td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="mb-2">
-          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <pagination-controls (pageChange)="page = $event"></pagination-controls>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end totalProd">
-    <label for=""><b>Total {{presentacionProducto}}(s): {{cantTotalProducto | number : '1.2-2'}}</b></label>
-  </div>
-
-  <div class="mb-4" *ngIf="cargando">
+  <div class="mb-4">
     <hr class="Linea">
   </div>
 
-  <!-- Inicio titulo tabla producto -->
-  <div class="mb-4" *ngIf="cargando">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos por Asignar</h4>
+  <!-- Titulo Rollos Seleccionados -->
+  <div class="mb-4">
+    <h4 class="tituloRojo"><i class="pi pi-list"></i>Rollos Seleccionados</h4>
   </div>
 
-  <!--Inicio tabla Rollos a Insertar -->
-  <div class="mb-3" *ngIf="cargando">
-    <div class="row g-3">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover mt-2" >
-          <thead class="TitulosTabla">
-            <tr>
-              <th scope="col">ID Rollo</th>
-              <th scope="col">ID Producto</th>
-              <th scope="col">Producto</th>
-              <th scope="col">Cantidad</th>
-              <th scope="col">Total Unidades</th>
-              <th scope="col">Editar Paquetes</th>
-              <th scope="col">Editar Unidades</th>
-              <th scope="col">Presentación</th>
-              <ng-container>
-                <th scope="col"><a><i class="fa fa-trash cursor" aria-hidden="true" title="Quitar Rollo de la tabla" (click)="quitarTodo()"></i></a></th>
-              </ng-container>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of rollosInsertar; let i=index">
-              <th>{{item.Id}}</th>
-              <td>{{item.IdProducto}}</td>
-              <td>{{item.Producto}}</td>
-              <td>{{item.CantPaqRestantes | number}}</td>
-              <td>{{item.CantUndRestantes | number}} Und</td>
-              <td style="width: 10%;">
-                <form [formGroup]="FormEditPaquetes">
-                  <input *ngIf="item.Presentacion == 'Paquete'" formControlName="Cantidad" (keyup.Enter)="cambiarCantidadPaquetes(item)" type="number" class="form-control form-control-sm" style="border: none; width: 100%;">
-                </form>
-              </td>
-              <td style="width: 10%;">
-                <form [formGroup]="FormEditUnd">
-                  <input formControlName="Cantidad" (keyup.Enter)="cambiarCantidadUnidades(item)" type="number" class="form-control form-control-sm" style="border: none; width: 100%;">
-                </form>
-              </td>
-              <th>{{item.Presentacion | uppercase}}</th>
-              <td><a><i class="fa fa-trash cursor" aria-hidden="true" title="Quitar Rollo de la tabla" (click)="quitarRollo(item)"></i></a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+  <!-- Tabla con Rollos Seleccionados -->
+  <div class="mb-3" *ngIf="!cargando">
+    <div class="row g-3 font-size-14">
+      <p-table
+        #dt
+        [value]="rollosSeleccionados"
+        styleClass="p-datatable-gridlines p-datatable-sm"
+        responsiveLayout="scroll"
+        [paginator]="true"
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos"
+        [rowsPerPageOptions]="[10,25,50]"
+        [rowHover]="true"
+        dataKey="Id"
+        [(selection)]="rollosDisponibles">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">ID Rollo</th>
+            <th scope="col">ID Producto</th>
+            <th scope="col">Producto</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Presentacion</th>
+            <th scope="col">Total Unidades</th>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox (click)="quitarTodos_Rollos()"></p-tableHeaderCheckbox>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rollo>
+          <tr>
+            <td>{{rollo.Id}}</td>
+            <td>{{rollo.IdProducto}}</td>
+            <td>{{rollo.Producto}}</td>
+            <td [pEditableColumn]="rollo.CantPaqRestantes" pEditableColumnField="code">
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <p-inputNumber mode="decimal" [(ngModel)]="rollo.CantPaqRestantes" [minFractionDigits]="2" [max]="rollo.CantPaqRestantesEnviar" [min]="0"></p-inputNumber>
+                  </ng-template>
+                  <ng-template pTemplate="output"> {{rollo.CantPaqRestantes}} </ng-template>
+              </p-cellEditor>
+            </td>
+            <td [pEditableColumn]="rollo.CantUndRestantes" pEditableColumnField="code">
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <p-inputNumber mode="decimal" [(ngModel)]="rollo.CantUndRestantes" [minFractionDigits]="2" [max]="rollo.CantUndRestantesEnviar" [min]="0"></p-inputNumber>
+                  </ng-template>
+                  <ng-template pTemplate="output"> {{rollo.CantUndRestantes}} </ng-template>
+              </p-cellEditor>
+            </td>
+            <td>{{rollo.Presentacion}}</td>
+            <td>
+              <p-tableCheckbox [value]="rollo" (click)="quitarRollo(rollo)"></p-tableCheckbox>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
   </div>
 
-  <div class="mb-4" *ngIf="cargando">
+  <div class="mb-4">
     <hr class="Linea">
   </div>
 
-  <!-- Inicio titulo tabla producto -->
-  <div class="mb-4" *ngIf="cargando">
+  <!-- Titulo Consolidado Productos -->
+  <div class="mb-4">
     <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado de Productos</h4>
   </div>
 
-  <!--Inicio tabla Rollos a Insertar -->
-  <div class="mb-3" *ngIf="cargando">
-    <div class="row g-3">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover mt-2" >
-          <thead class="TitulosTabla">
-            <tr>
-              <th scope="col">ID Producto</th>
-              <th scope="col">Producto</th>
-              <th scope="col">Cantidad</th>
-              <th scope="col">N° Rollos</th>
-              <th scope="col">Presentación</th>
-              <th scope="col">Cantidad Unidades</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of grupoProductos; let i=index">
-              <th>{{item.Id}}</th>
-              <td>{{item.Nombre}}</td>
-              <td>{{item.Cantidad}}</td>
-              <td>{{item.Rollos}}</td>
-              <td>{{item.Presentacion}}</td>
-              <td>{{item.Cant_Unidades}} Und</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+  <!-- Tabla Consolidado -->
+  <p-table
+    #dt
+    [value]="grupoProductos"
+    styleClass="p-datatable-gridlines p-datatable-sm"
+    responsiveLayout="scroll"
+    [paginator]="true"
+    [rows]="20"
+    [rowHover]="true"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[5, 10, 15, 20]"
+    currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros">
+    <ng-template pTemplate="header">
+      <tr>
+        <th scope="col">ID Producto</th>
+        <th scope="col">Producto</th>
+        <th scope="col">Cantidad</th>
+        <th scope="col">N° Rollos</th>
+        <th scope="col">Presentación</th>
+        <th scope="col">Cantidad Unidades</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td>{{item.Id}}</td>
+        <td>{{item.Nombre}}</td>
+        <td>{{item.Cantidad}}</td>
+        <td>{{item.Rollos}}</td>
+        <td>{{item.Presentacion}}</td>
+        <td>{{item.Cant_Unidades}} Und</td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <br>
 
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <label for=""><b>Total: {{Total | number : '1.2-2'}}</b></label>
-  </div>
-
-  <!-- Botones -->
-  <div class="bajarPagina" *ngIf="cargando">
+  <div class="bajarPagina">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-
       <button pButton class="p-button-danger" type="button" label="Facturar Rollos" icon="pi pi-dollar" (click)="crearAsignacion()"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
-    </div>
-  </div>
-
-  <div class="d-flex justify-content-center overlay" *ngIf="!cargando">
-    <div class="spinner-border text-danger" role="status" style="margin: auto;">
-      <span class="visually-hidden">Cargando...</span>
     </div>
   </div>
 

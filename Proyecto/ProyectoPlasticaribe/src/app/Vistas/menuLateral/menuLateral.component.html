@@ -555,7 +555,7 @@
           </ng-container>
 
           <!-- MOVIMIENTOS ORDENES DE COMPRA -->
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 13">
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <div class="mb-2 sangria">
               <a class="fst-normal" data-bs-toggle="" href="/reporte-orden-compra" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-shopping-cart font-size-15" style="margin-right: 2%;"></i>
@@ -581,7 +581,7 @@
     </ng-container>
 
     <!-- ORDENES DE MAQUILAS -->
-    <ng-container *ngIf="ValidarRol == 1">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample14" role="button" (click)="clickIcon14()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir14; then thenTemplate; else elseTemplate"></ng-container>
@@ -602,7 +602,7 @@
               </a>
             </div>
           </ng-container>
-          <ng-container *ngIf="ValidarRol == 1">
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
               <div class="mb-2 sangria">
               <a class="fst-normal" data-bs-toggle="" href="/Facturacion-Orden-Maquila" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-dollar font-size-15" style="margin-right: 2%;"></i>
@@ -610,7 +610,7 @@
               </a>
             </div>
           </ng-container>
-          <ng-container *ngIf="ValidarRol == 1">
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
               <div class="mb-2 sangria">
               <a class="fst-normal" data-bs-toggle="" href="/Reporte-Maquilas" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
