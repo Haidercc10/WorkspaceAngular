@@ -11,10 +11,6 @@ form {
   transform: scaleX(-1);
 }
 
-.contenedorLogin {
-  background-color: #ffff;
-}
-
 .titulo{
   margin: 0 auto;
   padding-top: 5%;
@@ -32,10 +28,11 @@ form {
 }
 
 .contenedorLogin {
+  background-color: #fffd;
   width: 400px;
   padding: 2%;
   margin: 0 auto;
-  border-radius: 1%;
+  border-radius: 3%;
   border-color: rgba(240, 240, 240, 0.603);
   border-style: solid;
   -webkit-box-shadow: 1px 18px 60px -19px rgba(0,0,0);
@@ -105,6 +102,11 @@ a {
   .logo {
     width: 60%;
     margin: 8% 0 4% 0;
+  }
+
+  .contenedorLogin {
+    background-color: #fffe;
+    padding: 0 2rem;
   }
 }
 

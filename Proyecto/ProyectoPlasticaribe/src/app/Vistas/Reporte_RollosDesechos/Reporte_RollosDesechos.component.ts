@@ -1,19 +1,18 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
+import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { SrvRollosEliminadosService } from 'src/app/Servicios/RollosDesechos/srvRollosEliminados.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
-import Swal from 'sweetalert2';
-import * as fs from 'file-saver';
-import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-Reporte_RollosDesechos',
@@ -122,11 +121,14 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     this.ArrayDocumento = [];
     let ordenTrabajo : number = this.formConsultaRollos.value.OT
     let rolloEliminado : number = this.formConsultaRollos.value.rollo;
-    let fecha1 : any = this.formConsultaRollos.value.fecha;
-    let fecha2 : any  = this.formConsultaRollos.value.fechaFinal;
+    let fecha1 : any = moment(this.formConsultaRollos.value.fecha).format('YYYY-MM-DD');
+    let fecha2 : any  = moment(this.formConsultaRollos.value.fechaFinal).format('YYYY-MM-DD');
     let proceso : any = this.formConsultaRollos.value.Proceso;
     let productoConsulta : any = this.formConsultaRollos.value.id_producto;
     if (this.idProducto == 0) productoConsulta = null;
+
+    if (fecha1 == 'Invalid date') fecha1 = null;
+    if (fecha2 == 'Invalid date') fecha2 = null;
 
     if(fecha1 != null && fecha2 != null && rolloEliminado != null && productoConsulta != null && ordenTrabajo != null && proceso != null) {
       this.servicioRollos.srvObtenerListaRollosxFechasxOT(fecha1, fecha2, ordenTrabajo).subscribe(dataRollos => {

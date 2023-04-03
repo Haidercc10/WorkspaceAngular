@@ -1,16 +1,15 @@
-import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { AuthenticationService } from './_Services/authentication.service';
-import { User } from './_Models/user';
-import { AuthenticationService_InvZeus } from './_Services/authentication_InvZeus.service';
-import { authentication_ContaZeus } from './_Services/authentication_ContaZeus.service';
-import { authentication_BagPro } from './_Services/authentication_BagPro.service';
-import { User_Inv_Zeus } from './_Models/user_Inv_Zeus';
-import { user_Conta_Zeus } from './_Models/user_Conta_Zeus';
-import { User_BagPro } from './_Models/user_BagPro';
+import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { PrimeNGConfig } from 'primeng/api';
-import { endWith } from 'rxjs';
+import { User } from './_Models/user';
+import { User_BagPro } from './_Models/user_BagPro';
+import { user_Conta_Zeus } from './_Models/user_Conta_Zeus';
+import { User_Inv_Zeus } from './_Models/user_Inv_Zeus';
+import { AuthenticationService } from './_Services/authentication.service';
+import { authentication_BagPro } from './_Services/authentication_BagPro.service';
+import { authentication_ContaZeus } from './_Services/authentication_ContaZeus.service';
+import { AuthenticationService_InvZeus } from './_Services/authentication_InvZeus.service';
 
 @Component({
   selector: 'app-root',
@@ -74,6 +73,9 @@ export class AppComponent implements OnInit{
       clear: 'Limpiar',
       addRule: 'Añadir Regla',
       removeRule: 'Quitar Regla',
+      emptyFilterMessage: 'No hay resultados',
+      emptyMessage: 'No hay resultados',
+      today: 'Hoy',
     });
   }
 
