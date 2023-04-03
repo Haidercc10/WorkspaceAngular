@@ -11,6 +11,7 @@ import { AuthenticationService_InvZeus } from 'src/app/_Services/authentication_
 import { authentication_ContaZeus } from 'src/app/_Services/authentication_ContaZeus.service';
 import { authentication_BagPro } from 'src/app/_Services/authentication_BagPro.service';
 import { HttpClient } from '@angular/common/http';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-Vista-login-component',
@@ -37,7 +38,8 @@ export class LoginComponentComponent implements OnInit {
                           private authenticationInvZeusService : AuthenticationService_InvZeus,
                             private authenticationContaZeusService : authentication_ContaZeus,
                               private authenticationBagPro : authentication_BagPro,
-                                private http : HttpClient) {
+                                private http : HttpClient,
+                                  private messageService: MessageService) {
 
     if (!this.storage.get('Token')) localStorage.clear();
     if ((this.storage.get('Token')
@@ -66,7 +68,7 @@ export class LoginComponentComponent implements OnInit {
 
   // FUNCION PARA CARGAR LOS DATOS DE LAS EMPRESAS EN EL COMBOBOX DEL HTML
   cargaDatosComboBox(){
-    this.empresaServices.srvObtenerLista().subscribe(datos =>{ this.empresas = datos; }, error =>{ this.mensajeError('¡Ha ocurrido un error!'); });
+    this.empresaServices.srvObtenerLista().subscribe(datos =>{ this.empresas = datos; }, error =>{ this.mensajeError('Error', '¡No fue posible consultar la Empresa, verifique!'); });
   }
 
   // Funcion que va a redireccionar al apartado de archivos
@@ -77,7 +79,7 @@ export class LoginComponentComponent implements OnInit {
   //Funcion que va a validar si hay campos vacios
   validarCamposVacios() : any{
     if (this.formularioUsuario.valid) this.consultaLogin();
-    else this.advertenciaCamposVacios('¡Por favor llenar los campos vacios!');
+    else this.mensajeAdvertencia('Advertencia', '¡Por favor llenar los campos vacios!');
   }
 
   // Funcion que se encargará de enviar al API la información del usuario que desea iniciar sesion y dependiendo de la respuesta de esta se actuará
@@ -113,12 +115,6 @@ export class LoginComponentComponent implements OnInit {
     }, err => { this.mensajeError(`¡No fue posible iniciar sesión!`) });
   }
 
-  // Funcion que mostrará una advertencia para cuando haya campos vacios en la edicion o creacion de un usuario
-  advertenciaCamposVacios(mensaje : string) {
-    Swal.fire({icon: 'warning',  title: 'Advertencia', text: mensaje, confirmButtonColor: '#ffc107', });
-    this.cargando = false;
-  }
-
   // Funcin que va a mostrar o no la contraseña del usuario
   mostrarPassword(){
     let password : any = document.getElementById('pass');
@@ -131,9 +127,22 @@ export class LoginComponentComponent implements OnInit {
     }
   }
 
-  // Funcion que mostrará un mensaje de error
-  mensajeError(text : string){
-    Swal.fire({ icon: 'warning', title: 'Oops...', html: `<b>¡${text}!</b><hr>`, });
-    this.cargando = false;
+  /** Mostrar mensaje de confirmación  */
+  mensajeConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
   }
+
+  /** Mostrar mensaje de error  */
+  mensajeError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
+   this.cargando = false;
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mensajeAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
+   this.cargando = false;
+  }
+
+
 }

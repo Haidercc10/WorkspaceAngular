@@ -1,3 +1,6 @@
+
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+
 <app-menuLateral></app-menuLateral>
 
 <div class="d-flex justify-content-center overlay" *ngIf="!cargando">
@@ -275,8 +278,28 @@
   <!-- Botones -->
   <div class="bajarPagina" *ngIf="cargando">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Eliminar Rollos" (click)="showDialog()" icon="pi pi-trash"></button>
+      <button pButton class="p-button-danger" type="button" label="Eliminar Rollos" (click)="mostrarEleccion()" icon="pi pi-trash"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" (click)="limpiarCampos()" icon="pi pi-eraser"></button>
     </div>
   </div>
 </div>
+
+<p-toast position="center" key="eleccion" (onClose)="onReject()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="onConfirm()" icon="pi pi-database" label="BD BagPro" class="p-button-warning"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onConfirm2()" icon="pi pi-database" label="BD Nueva" class="p-button-success"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

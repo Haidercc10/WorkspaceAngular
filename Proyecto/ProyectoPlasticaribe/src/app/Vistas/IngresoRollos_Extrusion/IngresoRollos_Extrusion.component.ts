@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { IngRollos_ExtrusuionService } from 'src/app/Servicios/IngresoRollosBodegaExtrusion/IngRollos_Extrusuion.service';
@@ -38,7 +39,8 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
                   private bagProService : BagproService,
                     private IngRollosService : IngRollos_ExtrusuionService,
-                      private dtIngRollosService : DtIngRollos_ExtrusionService,) {
+                      private dtIngRollosService : DtIngRollos_ExtrusionService,
+                        private messageService: MessageService) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -128,7 +130,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         for (let i = 0; i < datos_rollos.length; i++) {
           rollos.push(datos_rollos[i]);
         }
-      }, error => { this.mensajeError(`¡No se pudo consultar la informacion de los rollos ingresados anteriormente!`, error.message); });
+      }, error => { this.mostrarError(`Error`,`No se pudo consultar la informacion de los rollos ingresados anteriormente!`); });
 
       setTimeout(() => {
         if (ot != null && fechaInicial != null && fechaFinal != null) {
@@ -600,11 +602,11 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         }
 
         setTimeout(() => {
-          if (consulta <= 0) Swal.fire(`No hay rollos por ingresar`);
+          if (consulta <= 0) this.mostrarAdvertencia(`Advertencia`,`No hay rollos por ingresar!`);
           this.cargando = true;
         }, 4000);
       }, 3000);
-    } else this.mensajeAdvertencia("¡La fecha seleccionada no es valida!");
+    } else this.mostrarAdvertencia(`Advertencia`,`La fecha seleccionada no es valida!`);
   }
 
   // Funcion que colocará los rollos que se van a insertar
@@ -704,7 +706,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   //Funcion que creará el ingreso de los rollos
   ingresaroRollos(){
-    if (this.rollosInsertar.length == 0) this.mensajeAdvertencia(`¡Debe selecionar minimo un rollo para realizar el ingreso!`);
+    if (this.rollosInsertar.length == 0) this.mostrarAdvertencia(`Advertencia`,`Debe selecionar minimo un rollo para realizar el ingreso!`);
     else {
       let Observacion : string = this.FormConsultarRollos.value.Observacion;
       this.cargando = false;
@@ -718,7 +720,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         this.IngRollosService.obtenerUltimoId().subscribe(datos_ingreso => {
           this.DtIngresarRollos(datos_ingreso.ingRollo_Id);
         });
-      }, error => { this.mensajeError(`¡¡Error al ingresar los rollos!!`, error.message); });
+      }, error => { this.mostrarError(`Error`,`Error al ingresar los rollos!`); });
     }
   }
 
@@ -737,7 +739,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
           Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
         }
         this.dtIngRollosService.srvGuardar(info).subscribe(datos_rollos => {
-        }, error => { this.mensajeError(`¡¡Error al ingresar los rollos!!`, error.message); });
+        }, error => { this.mostrarError(`Error`,`Error al ingresar los rollos!`); });
       }
     }
     setTimeout(() => { this.finalizarInsercion(id); }, 5000);
@@ -745,7 +747,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
 
   //Funcion que se encargará de lenviar el mensaje de confirmación del envio y limpiará los campos
   finalizarInsercion(id : number){
-    Swal.fire({ icon: 'success', title: 'Rollos Ingresados Exitosamente', text : `¡${this.totalRollos} rollos han sido ingresados correctamente!`, showCloseButton: true, });
+    this.mostrarConfirmacion(`Confirmación`,`${this.totalRollos} rollos han sido ingresados correctamente!`)
     this.buscarRolloPDF(id);
   }
 
@@ -873,7 +875,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         }
         break;
       }
-    }, error => { this.mensajeError(`¡No se pudo obtener la información del último ingreso de rollos!`, error.message); });
+    }, error => { this.mostrarError(`Error`,`No se pudo obtener la información del último ingreso de rollos!`); });
   }
 
   // Funcion que traerá los rollos que fueron ingresados
@@ -893,7 +895,7 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
         this.rollosPDF.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
       setTimeout(() => { this.crearPDF(id); }, 1200);
-    }, error => { this.mensajeError(`¡No se pudo obtener información del último ingreso de rollos!`, error.message); });
+    }, error => { this.mostrarError(`Error`,`No se pudo obtener información del último ingreso de rollos!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
@@ -955,5 +957,20 @@ export class IngresoRollos_ExtrusionComponent implements OnInit {
   mensajeError(text : string, error : any = ''){
     Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
     this.cargando = true;
+  }
+
+    /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
   }
 }

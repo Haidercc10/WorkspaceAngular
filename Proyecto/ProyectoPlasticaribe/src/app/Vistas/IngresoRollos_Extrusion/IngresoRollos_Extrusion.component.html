@@ -1,3 +1,4 @@
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 <app-menuLateral></app-menuLateral>
 
 <div class="d-flex justify-content-center overlay" *ngIf="!cargando">
@@ -280,7 +281,7 @@
   <!-- Botones -->
   <div class="bajarPagina" *ngIf="cargando">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="ingresaroRollos()"></button>
+      <button pButton class="p-button-danger" type="button" label="Ingresar Rollos" icon="pi pi-check" (click)="ingresaroRollos()"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"></button>
     </div>
   </div>

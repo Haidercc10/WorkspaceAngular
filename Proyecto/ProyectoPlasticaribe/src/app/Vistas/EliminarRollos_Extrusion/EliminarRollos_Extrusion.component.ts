@@ -1,14 +1,14 @@
+import { HtmlTagDefinition } from '@angular/compiler';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
-import Swal from 'sweetalert2';
-
 
 @Component({
   selector: 'app-EliminarRollos_Extrusion',
@@ -48,7 +48,8 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
                     private bagproService : BagproService,
                       private servicioProcesos : ProcesosService,
                         private servcioDetEntradaRollos : DetallesEntradaRollosService,
-                        private servicioPreEntregaRollos : DtPreEntregaRollosService) {
+                          private servicioPreEntregaRollos : DtPreEntregaRollosService,
+                            private messageService: MessageService) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -144,7 +145,8 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
     if (fechaFinal == 'Invalid date') fechaFinal = null;
 
     if(proceso != null && bodega != null) {
-      if ((proceso == 'Empaque' || proceso == 'Sellado') && bodega == 'EXT') Swal.fire({ icon: 'warning', title: 'Advertencia', text: 'La combinación de búsqueda es incorrecta, por favor verifique!', confirmButtonColor: '#f29643', });
+      if ((proceso == 'Empaque' || proceso == 'Sellado') && bodega == 'EXT')
+      this.mostrarAdvertencia(`Advertencia`, `La combinación de búsqueda es incorrecta, por favor verifique`);
       else {
         this.cargando = false;
         if(bodega == 'EXT') this.bodegaExtrusion = true;
@@ -472,12 +474,12 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
             }
           }
           setTimeout(() => {
-            if (consulta <= 0) Swal.fire({ icon: 'warning', title: 'Advertencia', text: 'No se encontraron rollos con la combinación de búsqueda realizada!', confirmButtonColor: '#f29643', });
+            if (consulta <= 0) this.mostrarAdvertencia(`Advertencia`,`No se encontraron rollos con la combinación de búsqueda realizada!`)
             this.cargando = true;
           }, 3000);
         }, 1500);
        }
-    } else Swal.fire({icon: 'warning',  title: 'Advertencia', text: 'Debe diligenciar los campos Proceso y/o Bodega!', confirmButtonColor: '#f29643', });
+    } else this.mostrarAdvertencia(`Advertencia`,`Debe diligenciar los campos Proceso y/o Bodega!`);
   }
 
   // Funcion que colocará los rollos que se van a insertar
@@ -619,13 +621,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
           this.bagproService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe(datos_eliminados => {  }, error => {
             this.error = true;
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              html:
-              `<b>¡No fue posible eliminar los rollos de BagPro dado que no fueron encontrados allí!</b><hr> `+
-              `<b style="color: #f00">${error.mensaje}</b>`,
-            });
+            this.mostrarError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
             this.cargando = true;
           });
         }
@@ -635,13 +631,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
           this.bagproService.EliminarRollExtrusion(this.rollosInsertar[i].Id).subscribe(datos_eliminados => {  }, error => {
             this.error = true;
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              html:
-              `<b>¡No fue posible eliminar los rollos de BagPro dado que no fueron encontrados allí!</b><hr> `+
-              `<b style="color: #f00">${error.mensaje}</b>`,
-            });
+            this.mostrarError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
             this.cargando = true;
           });
         }
@@ -649,13 +639,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
         for (let i = 0; i < this.rollosInsertar.length; i++) {
           this.bagproService.DeleteRollosSellado_Wiketiado(this.rollosInsertar[i].Id).subscribe(datos_eliminados => {  }, error => {
             this.error = true;
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              html:
-              `<b>¡No fue posible eliminar los rollos de BagPro dado que no fueron encontrados allí!</b><hr> `+
-              `<b style="color: #f00">${error.mensaje}</b>`,
-            });
+            this.mostrarError(`Error`,`No fue posible eliminar los rollos de BagPro, dado que no fueron encontrados allí!`);
             this.cargando = true;
           });
         }
@@ -676,12 +660,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   //Funcion que se encargará de lenviar el mensaje de confirmación del envio y limpiará los campos
   finalizarEliminacion(){
     setTimeout(() => {
-      Swal.fire({
-        icon: 'success',
-        title: 'Eliminación exitosa',
-        html:
-        `<b>¡${this.totalRollos} rollo(s) han sido eliminado(s) correctamente!</b><hr> `,
-      });
+      this.mostrarConfirmacion(`Confirmación`,`${this.totalRollos} rollo(s) han sido eliminado(s) correctamente!`);
       this.limpiarCampos();
     }, 2000);
   }
@@ -695,46 +674,47 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
     });
   }
 
-  /** Función para mostrar el modal */
-  showDialog() {
-    if (this.rollosInsertar.length > 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Confirmación BD',
-        text : '¿De qué Base de Datos desea eliminar la información?',
-        showDenyButton: true,
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        confirmButtonText: 'BD BagPro',
-        denyButtonText: `BD Nueva`,
-        cancelButtonText : `Cancelar`,
-      }).then((result) => {
-        if (result.isConfirmed) this.eliminarRolloBagpro();
-        else if (result.isDenied) this.eliminarRolloIngresado();
-        else if (result.isDismissed) {
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          });
-          Toast.fire({
-            icon: 'info',
-            title: 'No ha eliminado los rollos'
-          });
-        }
-      });
-    } else Swal.fire({ icon: 'warning', title: 'Advertencia', text: 'Debe cargar al menos un rollo en la tabla!', confirmButtonColor: '#f29643', });
-  }
-
   evitarMovimientoScroll() {
     let idTabla : any = document.getElementById('dt');
-
     console.log();
+  }
+
+    /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de Eleccion */
+  mostrarEleccion(){
+    if (this.rollosInsertar.length > 0) {
+      this.messageService.add({severity:'warn', key: 'eleccion', summary: `Elección`, detail: `De cual base de datos desea eliminar la información?`, sticky: true});
+    } else this.mostrarAdvertencia(`Advertencia`,`Debe cargar al menos un rollo en la tabla!`);
+  }
+
+  /** Eliminar rollos de bagpro al confirmar con el primer botón */
+  onConfirm() {
+    this.messageService.clear('eleccion');
+    this.eliminarRolloBagpro();
+  }
+
+  /** Eliminar rollos de Plasticaribe BDD al confirmar con el primer botón */
+  onConfirm2() {
+    this.messageService.clear('eleccion');
+    this.eliminarRolloIngresado();
+  }
+
+  /** Cerrar Dialogo de eliminación de rollos.*/
+  onReject() {
+    this.messageService.clear('eleccion');
   }
 }

@@ -4,6 +4,7 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import Swal from 'sweetalert2';
@@ -32,7 +33,8 @@ export class Inventario_ExtrusionComponent implements OnInit {
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                  private ingRollosService : DtIngRollos_ExtrusionService) {
+                  private ingRollosService : DtIngRollos_ExtrusionService,
+                    private messageService: MessageService) {
 
     this.FormInventario = this.frmBuilder.group({
       OrdenTrabajo : [null],
@@ -63,7 +65,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
 
   // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
-    if (this.ArrayRollos.length == 0) this.mensajeAdvertencia('¡Para poder crear el archivo de Excel primero debe cargar los rollos en la tabla!');
+    if (this.ArrayRollos.length == 0) this.mostrarAdvertencia('Advertencia', '¡Para exportar el archivo a Excel debe cargar rollos en la tabla!');
     else {
       const title = `Inventario Extrusión - ${this.today}`;
       const header = ["OT", "Producto", "Nombre Producto", "Peso", "Unidad Medida"]
@@ -101,6 +103,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
         workbook.xlsx.writeBuffer().then((data) => {
           let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
           fs.saveAs(blob, `Inventario Extrusión - ${this.today}.xlsx`);
+          this.mostrarConfirmacion(`Confirmación`,`Inventario de extrusión exportado con éxito!`);
         });
       }, 500);
     }
@@ -146,6 +149,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         fs.saveAs(blob, `Inventario Extrusión OT ${this.numeroOrden} - ${this.today}.xlsx`);
+        this.mostrarConfirmacion(`Confirmación`,`Inventario de extrusión de la OT ${this.numeroOrden} exportado con éxito!`)
       });
     }, 500);
   }
@@ -166,7 +170,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
       for (let i = 0; i < datos_rollos.length; i++) {
         this.llenarTabla(datos_rollos[i]);
       }
-    }, error => { this.mensajeError(`¡No se pudo obtener el inventario de la bodega de extrusión!`, error.message); });
+    }, error => { this.mostrarError(`Error`,`No se pudo obtener el inventario de la bodega de extrusión!`); });
   }
 
   // funcion que va a lenar la tabla con la informacion cosultada
@@ -195,7 +199,7 @@ export class Inventario_ExtrusionComponent implements OnInit {
         for (let i = 0; i < datos_rollos.length; i++) {
           this.llenarTablaModal(datos_rollos[i]);
         }
-      }, error => { this.mensajeError(`¡No se pudo obtener información de los rollos en bodega de la orden de tranajo N° ${this.numeroOrden}!`, error.message); });
+      }, error => { this.mostrarError(`Error`,`No se pudo obtener información de los rollos en bodega de la OT N° ${this.numeroOrden}!`); });
       this.aperturaModal += 1;
     }
   }
@@ -231,13 +235,18 @@ export class Inventario_ExtrusionComponent implements OnInit {
     table.clear();
   }
 
-  // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
   }
 
-  // Mensaje de Error
-  mensajeError(text : string, error : any = ''){
-    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
   }
 }

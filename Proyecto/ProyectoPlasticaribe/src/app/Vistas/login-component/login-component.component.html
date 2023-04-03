@@ -1,3 +1,6 @@
+
+<p-toast position="center"></p-toast>
+
 <div class="fondo">
   <form [formGroup]="formularioUsuario" (ngSubmit)="validarCamposVacios()" autocomplete="off">
     <div class="titulo">
@@ -10,7 +13,7 @@
       <div class="contenedorLogin">
         <!--Titulo-->
         <div class="mb-3">
-          <h4 class="tituloRojo">Accede a tu cuenta</h4>
+          <h4 class="tituloRojo"><i class="pi pi-sign-in"></i> Accede a tu cuenta</h4>
         </div>
 
         <div class="col-md mb">
@@ -54,11 +57,11 @@
         <!--Boton Ingresar al sistema-->
         <div class="d-grid gap-2 mb-3">
           <!-- <button class="btn btn-danger btn-danger-sm" type="submit"><i class="pi pi-check"></i> Ingresar</button> -->
-          <button pButton pRipple label="Ingresar" type="submit" class="p-button-danger"></button>
+          <button pButton pRipple label="Ingresar" type="submit" icon="pi pi-check" class="p-button-danger"></button>
         </div>
 
         <div class="mb-3">
-          <button pButton pRipple type="button" label="Entrar como invitado" class="p-button-danger p-button-text" (click)="redireccionarArchivos()"></button>
+          <button pButton pRipple type="button" icon="pi pi-users" label="Entrar como invitado" class="p-button-danger p-button-text" (click)="redireccionarArchivos()"></button>
         </div>
       </div>
       <!--Contenedor Login-->

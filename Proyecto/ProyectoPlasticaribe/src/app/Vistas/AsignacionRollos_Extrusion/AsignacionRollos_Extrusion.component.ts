@@ -3,11 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { MessageService } from 'primeng/api';
 import { AsignacionRollos_ExtrusionService } from 'src/app/Servicios/AsignaciinRollosExtrusion/AsignacionRollos_Extrusion.service';
 import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollosExtrusion/DetallesAsgRollos_Extrusion.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-AsignacionRollos_Extrusion',
@@ -40,7 +40,8 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
                   private dtIngRollosService : DtIngRollos_ExtrusionService,
                     private procesosService : ProcesosService,
                       private asgRollos : AsignacionRollos_ExtrusionService,
-                        private dtAsgRollos : DetallesAsgRollos_ExtrusionService,) {
+                        private dtAsgRollos : DetallesAsgRollos_ExtrusionService,
+                          private messageService: MessageService) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -262,7 +263,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         });
       }
       setTimeout(() => {
-        if (consulta <= 0) this.mensajeAdvertencia('¡No hay rollos por salir!');
+        if (consulta <= 0) this.mostrarAdvertencia(`Advertencia`,`No hay rollos por salir!`);
         this.cargando = true;
       }, 2000);
     }, 3000);
@@ -367,7 +368,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // Funcion que almacenará en la base de datos la información general de la salida de los rollos
   salidaRollos(){
-    if (this.rollosInsertar.length == 0 || this.FormConsultarRollos.value.Proceso == null) this.mensajeAdvertencia(`¡Debe selecionar minimo un rollo para realizar la salida de este mismo y elegir el proceso hacia el que irán los rollos!`);
+    if (this.rollosInsertar.length == 0 || this.FormConsultarRollos.value.Proceso == null) this.mostrarAdvertencia(`Advertencia`, `Para realizar la asignación debe seleccionar minimo un rollo y el proceso hacía el que va dirigido!`);
     else {
       let Observacion : string = this.FormConsultarRollos.value.Observacion;
       this.cargando = false;
@@ -379,9 +380,9 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
       }
       this.asgRollos.srvGuardar(info).subscribe(datos_rollos => {
         this.asgRollos.obtenerUltimoId().subscribe(datos_salida => { this.dtSalidaRollos(datos_salida.asgRollos_Id);
-        }, error => { this.mensajeError(`¡¡Error al obtener el último Id de asignación!!`, error.message); });
+        }, error => { this.mostrarError(`Error al obtener el último Id de asignación!`); });
       }, error => {
-        this.mensajeError(`¡¡Error al dar salida a los rollos!!`, error.message);
+        this.mostrarError(`Error`, `Error al asignar los rollos!`);
         this.cargando = true;
       });
     }
@@ -402,7 +403,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
           Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
         }
         this.dtAsgRollos.srvGuardar(info).subscribe(datos_rollos => {
-        }, error => { this.mensajeError(`¡¡Error al dar salida a los rollos!!`, error.message); });
+        }, error => { this.mostrarError(`Error`, `Error al dar salida a los rollos!!`); });
       }
     }
     setTimeout(() => { this.finalizarInsercion(id); }, 3000);
@@ -425,7 +426,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
             Prod_Id : datos_Rollos[j].prod_Id,
           }
           this.dtIngRollosService.srvActualizar(datos_Rollos[j].dtIngRollo_Id, info).subscribe(datos_actualizados => {
-          }, error => { this.mensajeError(`¡¡No fue posible actualizar el estado de los rollos!!`, error.message); });
+          }, error => { this.mostrarError(`Error`, `No fue posible actualizar el estado de los rollos!`); });
         }
       });
     }
@@ -435,7 +436,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   finalizarInsercion(id : number){
     this.cambioEstado();
     setTimeout(() => {
-      Swal.fire({ icon: 'success', title: 'Registro Exitoso', html: `<b>¡${this.totalRollos} fueron asignados correctamente!</b><hr>`, });
+      this.mostrarConfirmacion(`Confirmación`,`${this.totalRollos} fueron asignados correctamente!`);
       this.buscarRolloPDF(id);
     }, 2000);
   }
@@ -561,7 +562,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         setTimeout(() => { (this.limpiarCampos()); }, 1200);
         break;
       }
-    }, error => { this.mensajeError(`¡No se pudo obtener la información necesaria para crear el archivo de tipo PDF!`, error.message); });
+    }, error => { this.mostrarError(`Error`,`No se pudo obtener la información necesaria para crear el archivo PDF!`); });
   }
 
   // Funcion que traerá los rollos que fueron ingresados
@@ -582,7 +583,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         this.rollosPDF.sort((a,b) => Number(a.Rollo) - Number(b.Rollo));
       }
       setTimeout(() => { this.crearPDF(id); }, 1200);
-    }, error => { this.mensajeError(`¡No se pudo obtener la información necesaria para crear llenar el archivo de tipo PDF!`, error.message); });
+    }, error => {  this.mostrarError(`Error`, `No se pudo obtener la información necesaria para crear llenar el archivo de tipo PDF!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los rollos en el pdf
@@ -634,15 +635,20 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
     };
   }
 
-  // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
-    this.cargando = true;
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000 });
   }
 
-  // Mensaje de Error
-  mensajeError(text : string, error : any = ''){
-    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
-    this.cargando = true;
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000 });
   }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000 });
+  }
+
+
 }

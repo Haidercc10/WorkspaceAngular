@@ -7,6 +7,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/DetallesAsgBopp/detallesAsignacionBOPP.service';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import Swal from 'sweetalert2';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-asignacionBOPP_TEMPORAL',
@@ -31,6 +32,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   ordenesTrabajo = []; //Variable que almacenará las ordenes de trabajo que se consulten
   cantidadKG : number = 0; //Variable almacenará la cantidad en kilogramos pedida en la OT
   arrayOT : any = [];
+  itemSeleccionado : any;
+
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -38,7 +41,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
                     private boppService : EntradaBOPPService,
                       private asignacionBOPPService : AsignacionBOPPService,
                         private detallesAsignacionBOPPService : DetalleAsignacion_BOPPService,
-                          private bagProService : BagproService) {
+                          private bagProService : BagproService,
+                            private messageService: MessageService) {
 
     this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
       AsgBopp_OT : ['', Validators.required],
@@ -126,7 +130,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
             this.ordenesTrabajo.push(infoOT);
             this.FormAsignacionBopp.patchValue({ AsgBopp_OT : '', AsgBopp_Fecha : this.today, });
             this.cantidadKG = item.datosotKg + this.cantidadKG;
-          } else if (item.estado == 4 || item.estado == 1) this.mensajeAdvertencia(`¡No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada!`);
+          } else if (item.estado == 4 || item.estado == 1) this.mostrarAdvertencia(`Advertencia`, `No es posible asignar a la ${ordenTrabajo}, ya se encuentra cerrada!`);
         }
       });
     } else {
@@ -147,35 +151,32 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
               this.cantidadKG = itemOT.datosotKg + this.cantidadKG;
               this.FormAsignacionBopp.patchValue({ AsgBopp_OT : '', AsgBopp_Fecha : this.today, });
             } else if (itemOT.estado == 4 || itemOT.estado == 1) {
-              this.mensajeAdvertencia(`¡No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada!`);
+              this.mostrarAdvertencia(`No es posible asignar a la ${ordenTrabajo}, ya se encuentra cerrada!`);
             }
           }
         });
-      } else this.mensajeAdvertencia(`¡La OT ${ordenTrabajo} ya se encuentra en la tabla!`);
+      } else this.mostrarAdvertencia(`¡La OT ${ordenTrabajo} ya se encuentra en la tabla!`);
     }
+  }
+
+  mostrarEleccion(item : any){
+    this.messageService.add({severity:'warn', key: 'eleccion', summary: `Elección`, detail: `Está seguro de eliminar la OT ${item.ot} de la asignación`, sticky: true});
+    this.itemSeleccionado = item;
   }
 
   // Función para quitar una Ot de la tabla
   QuitarOrdenTrabajo(data : any) {
-    Swal.fire({
-      title: '¿Estás seguro de eliminar la OT de la Asignación?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Eliminar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.cantidadKG = this.cantidadKG - data.kg;
-        for (let i = 0; i < this.ordenesTrabajo.length; i++) {
-          if (this.ordenesTrabajo[i].ot == data.ot)  this.ordenesTrabajo.splice(i, 1);
-        }
-        for (let i = 0; i < this.arrayOT.length; i++) {
-          if (this.arrayOT[i] == data.ot)  this.arrayOT.splice(i, 1);
-        }
-        Swal.fire('Orden de Trabajo eliminada');
-      }
-    });
+    this.messageService.clear('eleccion');
+    data = this.itemSeleccionado;
+
+    this.cantidadKG = this.cantidadKG - data.kg;
+    for (let i = 0; i < this.ordenesTrabajo.length; i++) {
+      if (this.ordenesTrabajo[i].ot == data.ot)  this.ordenesTrabajo.splice(i, 1);
+    }
+    for (let i = 0; i < this.arrayOT.length; i++) {
+      if (this.arrayOT[i] == data.ot)  this.arrayOT.splice(i, 1);
+    }
+    this.mostrarConfirmacion(`Confirmación`, 'OT eliminada de la tabla!');
   }
 
   // funcion que buscará la informacion del rollo seleccionado
@@ -213,7 +214,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   // funcion que validará que haya un rollo seleccionado para asignar
   validarCamposBOPP(){
     if (this.FormularioBOPP.valid) this.cargarBOPPTabla();
-    else this.mensajeAdvertencia(`¡Debe cargar seleccionar un rollo!`);
+    else this.mostrarAdvertencia('Advertencia', `Debe cargar al menos un rollo!`);
   }
 
   //funcion que cargará la informacion de los rollos en la tabla
@@ -236,8 +237,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   validarAsignacion(){
     if (this.ordenesTrabajo.length > 0){
       if (this.ArrayBoppPedida.length > 0) this.asignarBOPP();
-      else this.mensajeAdvertencia(`¡Debe cargar minimo un rollo!`);
-    } else this.mensajeAdvertencia(`¡Debe cargar minimo una Orden de Trabajo!`);
+      else this.mostrarAdvertencia(`Advertencia`, `Debe cargar minimo un rollo!`);
+    } else this.mostrarAdvertencia(`Advertencia`, `Debe cargar minimo una Orden de Trabajo!`);
   }
 
   // funcion que creará la asignacion de rollo
@@ -252,14 +253,14 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       AsigBOPP_Hora : moment().format('H:mm:ss'),
     }
     this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => { this.obtenerIdUltimaAsignacion(); }, error => {
-      this.mensajeError(`¡Se ha producido un error al momento de crear la asignación!`);
+      this.mostrarError(`Error`, `Se ha producido un error al momento de crear la asignación!`);
     });
   }
 
   // funcion que buscará el id de la ultima asignacion de rollos
   obtenerIdUltimaAsignacion(){
     this.asignacionBOPPService.srvObtenerListaUltimoId().subscribe(datos_asignaciones => { this.detallesAsginacionBOPP(datos_asignaciones); }, error => {
-      this.mensajeError(`¡Se ha producido un error al Id de la asignación!`);
+      this.mostrarError(`Error`, `Se ha producido un error al obtener el último Id de la asignación!`);
     });
   }
 
@@ -286,7 +287,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
                 TpDoc_Id : documento,
               }
               this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => { }, error => {
-                this.mensajeError(`¡Se ha producido un error al momento de crear la asignación del rollo!`);
+                this.mostrarError(`Error`, `Se ha producido un error al momento de crear la asignación del rollo!`);
               });
             }
           }
@@ -321,9 +322,9 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
           this.boppService.srvActualizar(datos_bopp[j].bopP_Id, datosBOPP).subscribe(datos_boppActualizado => {
             this.obtenerBOPP();
-            Swal.fire({ icon: 'success', title: 'Asignación exitosa', showCloseButton: true, html: `<b>¡Se ha creado exitosamente la asignación de rollos!</b><br>` });
+            this.mostrarConfirmacion(`Asignación exitosa`,`Se ha creado exitosamente la asignación de rollos!`);
             this.limpiarTodosLosCampos();
-          }, error => { this.mensajeError(`¡Se ha producido un error al momento de mover el inventario del rollo ${this.ArrayBoppPedida[i].Nombre}!`); });
+          }, error => { this.mostrarError(`Error`, `Se ha producido un error al momento de mover el inventario del rollo ${this.ArrayBoppPedida[i].Nombre}!`); });
         }
       });
     }
@@ -339,5 +340,25 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   mensajeError(mensaje : string){
     Swal.fire({ icon: 'error', title: 'Opps...', html: mensaje, showCloseButton: true, });
     this.load = true;
+  }
+
+    /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 1500 });
+  }
+
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 1500 });
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 1500 });
+  }
+
+  /** Cerrar Dialogo de eliminación de rollos.*/
+  onReject() {
+    this.messageService.clear('eleccion');
   }
 }

@@ -14,6 +14,7 @@ import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-reporteCostosOT',
@@ -30,12 +31,10 @@ export class ReporteCostosOTComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  titulosTabla : any; //Variable que tendrá los titulos de la tabla de materia prima
   ArrayMateriaPrima = []; //Variable quetendrá la información de la materia prima que se asignó en la ot consultada
   ArrayMateriaPrima2 = [];
   totalMPEntregada : number = 0; //Variable que servirá pra almacenar el total de materia prima que se entregó en una OT
   ValorMPEntregada : number = 0; //Variable que almacenará el valor total de la materia entregada a una OT
-  titulosTablaprocesos = []; // Variable que almacenará los titulos de la tabla en la que saldrán cada uno de los procesos
   ArrayProcesos = []; //Variable que almacenará la informacion de la cantidad en kg que se hizo en cada proceso
   cantidadTotalExt : number = 0; //Variable que va a almacenar el total de la cantidad extruida en una OT
   cantidadTotalImp : number = 0; //Variable que va a almacenar el total de la cantidad impresa en una OT
@@ -76,6 +75,7 @@ export class ReporteCostosOTComponent implements OnInit {
   fechaFinalOT : any;
   usuarioCreador : any;
   estado : any;
+  arrayEstados : any = [];
 
   constructor(private frmBuilderMateriaPrima : FormBuilder,
                 private bagProServices : BagproService,
@@ -87,7 +87,8 @@ export class ReporteCostosOTComponent implements OnInit {
                             private boppService : EntradaBOPPService,
                               private tintaService : TintasService,
                                 private estadosProcesos_OTService : EstadosProcesos_OTService,
-                                  private paginaPrincipal : PaginaPrincipalComponent) {
+                                  private paginaPrincipal : PaginaPrincipalComponent,
+                                    private messageService: MessageService) {
 
     this.infoOT = this.frmBuilderMateriaPrima.group({
       ot : ['',Validators.required],
@@ -110,8 +111,8 @@ export class ReporteCostosOTComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.ColumnasTabla();
-    this.ColumnasTablaProcesos();
+    this.cargarEstados();
+    this.inhabilitarCampos();
   }
 
   limpiarCampos(){
@@ -160,37 +161,6 @@ export class ReporteCostosOTComponent implements OnInit {
     return number.toString().replace(exp,rep);
   }
 
-  // Funcion que llenará el Array de los titulos de la tabla de materia prima
-  ColumnasTabla(){
-    this.titulosTabla = [];
-    this.titulosTabla = [{
-      mpId : "Id",
-      mpNombre : "Nombre",
-      mpCantidad : "Cantidad",
-      mpUndMedCant : "Presentación",
-      mpPrecioU : "Precio U",
-      mpSubTotal : "SubTotal",
-      mpProceso : "Proceso"
-    }]
-  }
-
-  //Funcion para darle el nombre a cada columna de la tabla de procesos
-  ColumnasTablaProcesos(){
-    this.titulosTablaprocesos = [];
-    this.titulosTablaprocesos = [{
-      ot : "Info",
-      ext : "Extrusión",
-      imp : "Impresión",
-      rot : "Rotograbado",
-      dbld : "Doblado",
-      lam : "Laminado",
-      emp : "Empaque",
-      corte : "Corte",
-      sel : "Sellado",
-      wik : "Wiketiado",
-    }]
-  }
-
   //Funcion que consultará la OT que le sea pasada y mostrará la información general de dicha Orden de Trabajo
   consultaOTBagPro(){
     this.ArrayMateriaPrima = [];
@@ -206,7 +176,7 @@ export class ReporteCostosOTComponent implements OnInit {
     let ot : number = this.infoOT.value.ot;
     let porcentajeMargen : number = 0;
     this.bagProServices.srvObtenerListaClienteOT_ItemCostos(ot).subscribe(datos_OT => {
-      if (datos_OT.length == 0) this.mensajeAdvertencia(`No se encuentran registros de la OT ${ot}`);
+      if (datos_OT.length == 0) this.mostrarAdvertencia(`Advertencia`, `No se encuentran registros de la OT ${ot}`);
       else {
         for (const item of datos_OT) {
           porcentajeMargen = (item.datosmargenKg / item.datosotKg) * 100;
@@ -414,7 +384,7 @@ export class ReporteCostosOTComponent implements OnInit {
       }
     }
     this.diferencia = this.valorFinalOT - this.ValorMPEntregada;
-    Math.round(this.diferenciaPorcentaje = (this.diferencia / this.valorFinalOT) * 100);
+    Math.round((this.diferenciaPorcentaje) = (this.diferencia / this.valorFinalOT) * 100);
     this.load = true;
   }
 
@@ -531,7 +501,7 @@ export class ReporteCostosOTComponent implements OnInit {
   // Funcion que cargará el PDF con la infomración de la OT
   CargarPDF(){
     let nombre : string = this.storage.get('Nombre');
-    if (this.ArrayMateriaPrima.length == 0) this.mensajeAdvertencia("Debe buscar una OT para crear el reporte");
+    if (this.ArrayMateriaPrima.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe buscar una OT para crear el reporte");
     else {
       for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
         for (const item of this.ArrayProcesos) {
@@ -1200,7 +1170,7 @@ export class ReporteCostosOTComponent implements OnInit {
   // Funcion que cambiará el estado de una Orden de trabajo consultada
   cambiarEstado(){
     let estado : any = this.infoOT.value.estadoOT;
-    if (this.ordenTrabajo == 0) Swal.fire(`¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
+    if (this.ordenTrabajo == 0) this.mostrarAdvertencia(`Advertencia`, `¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
     else {
       const data : any = {
         item : this.ordenTrabajo,
@@ -1211,14 +1181,14 @@ export class ReporteCostosOTComponent implements OnInit {
       }
       this.bagProServices.srvActualizar(this.ordenTrabajo, data, estado).subscribe(datos_clientesOT => {
         this.cambiarEstado2(this.ordenTrabajo, estado);
-        Swal.fire({ icon : 'success', title: 'Orden Cerrada', text: `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo}!`, showCloseButton : true });
-      }, error => { this.mensajeError('No se ha podido cambiar el estado de la OT'); });
+        this.mostrarConfirmacion(`Confirmación`, `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo}!`)
+      }, error => { this.mostrarError(`Error`, 'No se ha podido cambiar el estado de la OT'); });
     }
   }
 
   // Cerrar Orden
   cerrarOrden(){
-    if (this.ordenTrabajo == 0) Swal.fire(`¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
+    if (this.ordenTrabajo == 0) this.mostrarAdvertencia(`Advertencia`, `¡Para poder cambiarle el estado a una Orden de Trabajo primero debe consultar una!`);
     else {
       const data : any = {
         item : this.ordenTrabajo,
@@ -1229,20 +1199,32 @@ export class ReporteCostosOTComponent implements OnInit {
       }
       this.bagProServices.srvActualizar(this.ordenTrabajo, data, '1').subscribe(datos_clientesOT => {
         this.cambiarEstado2(this.ordenTrabajo, 18);
-        Swal.fire({ icon : 'success', title: 'Orden Cerrada', text: `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo} a Cerrada!`, showCloseButton : true });
-      }, error => { this.mensajeError(`No se ha podido cambiar el estado de la OT`); });
+        this.mostrarConfirmacion(`Confirmación`, `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo} a Cerrada!`);
+      }, error => { this.mostrarError(`Error`, `No se ha podido cambiar el estado de la OT`); });
     }
   }
 
-  // Funcion que mostrará un mensaje de error
-  mensajeError(mensaje : string){
-    Swal.fire({icon: 'error', title: '¡Algo salió mal!', text: mensaje });
-    this.load = true;
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
   }
 
-  // funcion que mostrará un mensaje de advertencia
-  mensajeAdvertencia(mensaje : string) {
-    Swal.fire({icon: 'warning', title: '¡Advertencia!', text: mensaje });
-    this.load = true;
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
+  }
+
+  inhabilitarCampos(){
+    setTimeout(() => { this.infoOT.disable(); this.infoOT.get('ot').enable();this.infoOT.get('estadoOT').enable(); }, 1000);
+  }
+
+  cargarEstados(){
+    this.arrayEstados = [];
+    this.arrayEstados = [ {valor: '0', nombre: 'Abierto'}, {valor: '4', nombre: 'Anulado'}]
   }
 }
