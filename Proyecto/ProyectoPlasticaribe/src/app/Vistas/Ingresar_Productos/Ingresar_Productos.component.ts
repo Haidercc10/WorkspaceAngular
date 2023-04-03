@@ -3,13 +3,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { MessageService } from 'primeng/api';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
-import { EntradaRollosService } from 'src/app/Servicios/IngresoRollosDespacho/EntradaRollos.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
+import { EntradaRollosService } from 'src/app/Servicios/IngresoRollosDespacho/EntradaRollos.service';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
-import Swal from 'sweetalert2';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -25,7 +24,6 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 export class Ingresar_ProductosComponent implements OnInit {
 
   public FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
-
   cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   hora : any = moment().format("H:mm:ss"); //Variable que almacenará la hora
@@ -48,14 +46,17 @@ export class Ingresar_ProductosComponent implements OnInit {
   rollosIngresados : number = 0; //variable para calcular la cantidad de rollos que se han ingresado
   public page : number;
   fechaBusqueda : any = moment().subtract(4, 'day').format('YYYY-MM-DD'); // Variable que va a ayudar al momento de saber hasta que fecha se va a buscar
+  procesos : any [] = [{Id : 'EMP', Nombre: 'Empaque'}, {Id : 'EXT', Nombre: 'Extrusión'}, {Id : 'SELLA', Nombre: 'Sellado'}]; //Variable que va a guardar los diferentes procesos de donde vienen los rollos
+  minDate: Date = new Date(); //Variable que validará la fecha minima para los campos Date en el HTML
 
   constructor(private frmBuilderPedExterno : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
                   private ExistenciasProdService : ExistenciasProductosService,
                     private entradaRolloService : EntradaRollosService,
                       private dtEntradaRollosService : DetallesEntradaRollosService,
-                          private productosService : ProductoService,
-                              private dtPreEntregaService : DtPreEntregaRollosService,) {
+                        private productosService : ProductoService,
+                          private dtPreEntregaService : DtPreEntregaRollosService,
+                            private messageService: MessageService,) {
 
     this.FormConsultarRollos = this.frmBuilderPedExterno.group({
       OT_Id: [null],
@@ -69,6 +70,8 @@ export class Ingresar_ProductosComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
+    this.minDate.setMonth(8);
+    this.minDate.setFullYear(2022);
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -120,15 +123,16 @@ export class Ingresar_ProductosComponent implements OnInit {
   consultarOTbagPro(){
     let ProcConsulta : any = this.FormConsultarRollos.value.Proceso;
     let ot : number = this.FormConsultarRollos.value.OT_Id;
-    let fechaInicial : any = this.FormConsultarRollos.value.fechaDoc;
-    let fechaFinal : any = this.FormConsultarRollos.value.fechaFinalDoc;
+    let fechaInicial : any = moment(this.FormConsultarRollos.value.fechaDoc).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormConsultarRollos.value.fechaFinalDoc).format('YYYY-MM-DD');
     let rollo : number = this.FormConsultarRollos.value.IdRollo;
     let proceso = this.FormConsultarRollos.value.Proceso;
-    if (proceso == '1') proceso = 'EMP';
-    if (proceso == '2') proceso = 'EXT';
-    if (proceso == '3') proceso = 'SELLA';
     this.rollosSinIngresar = 0;
     this.rollosIngresados = 0;
+
+    if (fechaInicial == 'Invalid date') fechaInicial = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
+
     let rollos : any = [];
 
     if (ProcConsulta != null) {
@@ -139,17 +143,13 @@ export class Ingresar_ProductosComponent implements OnInit {
         this.cargando = false;
         this.cantidadOT = 0;
 
-        this.dtEntradaRollosService.getRollosProceso(proceso).subscribe(datos_rollos => {
-          for (let i = 0; i < datos_rollos.length; i++) {
-            rollos.push(datos_rollos[i]);
-          }
-        });
+        this.dtEntradaRollosService.getRollosProceso(proceso).subscribe(datos_rollos => { rollos = datos_rollos; });
 
         setTimeout(() => {
           if (ot != null && fechaInicial != null && fechaFinal != null) {
             this.dtPreEntregaService.getRollosPreEntregadosOT(ot, proceso).subscribe(datos_ot => {
               setTimeout(() => {
-                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
                 this.cargando = true;
               }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
@@ -197,7 +197,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           } else if (fechaInicial != null &&  fechaFinal != null) {
             this.dtPreEntregaService.getRollosPreEntregadosFechas(fechaInicial, fechaFinal, proceso).subscribe(datos_ot => {
               setTimeout(() => {
-                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
                 this.cargando = true;
               }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
@@ -245,7 +245,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           } else if (ot != null && fechaInicial != null) {
             this.dtPreEntregaService.getRollosPreEntregadosOT(ot, proceso).subscribe(datos_ot => {
               setTimeout(() => {
-                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
                 this.cargando = true;
               }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
@@ -293,7 +293,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           } else if (fechaInicial != null) {
             this.dtPreEntregaService.getRollosPreEntregadosFechas(fechaInicial, fechaInicial, proceso).subscribe(datos_ot => {
               setTimeout(() => {
-                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
                 this.cargando = true;
               }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
@@ -341,7 +341,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           } else if (ot != null) {
             this.dtPreEntregaService.getRollosPreEntregadosOT(ot, proceso).subscribe(datos_ot => {
               setTimeout(() => {
-                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
                 this.cargando = true;
               }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
@@ -389,7 +389,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           } else if (rollo != null) {
             this.dtPreEntregaService.getRollosPreEntregadosRollo(rollo, proceso).subscribe(datos_ot => {
               setTimeout(() => {
-                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
                 this.cargando = true;
               }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
@@ -437,7 +437,7 @@ export class Ingresar_ProductosComponent implements OnInit {
           } else {
             this.dtPreEntregaService.getRollosPreEntregadosFechas(this.fechaBusqueda, this.today, proceso).subscribe(datos_ot => {
               setTimeout(() => {
-                if (datos_ot.length <= 0) Swal.fire(`No hay rollos por ingresar`);
+                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
                 this.cargando = true;
               }, 1000);
               for (let i = 0; i < datos_ot.length; i++) {
@@ -484,45 +484,18 @@ export class Ingresar_ProductosComponent implements OnInit {
             });
           }
         }, 4000);
-      } else Swal.fire("¡La fecha seleccionada no es valida!");
-    } else Swal.fire("¡Seleccione un proceso!");
+      } else this.mensajeAdvertencia("¡La fecha seleccionada no es valida!");
+    } else this.mensajeAdvertencia("¡Seleccione un proceso!");
   }
 
   //Funcion que va a agregar Productos en la tabla
   cargarProducto(item : any){
+    this.cargando = false;
     if (this.rollosInsertar.length == 0) {
-      let info : any = {
-        Ot : item.Ot,
-        Id : item.Id,
-        IdCliente : item.IdCliente,
-        Cliente : item.Cliente,
-        IdProducto : item.IdProducto,
-        Producto : item.Producto,
-        Cantidad : item.Cantidad,
-        Presentacion : item.Presentacion,
-        Estatus : item.Estatus,
-        Proceso : item.Proceso,
-        Fecha : item.Fecha,
-      }
-      this.rollosInsertar.push(info);
       this.validarRollo.push(item.Id);
       this.Total += item.Cantidad;
     } else {
       if (!this.validarRollo.includes(item.Id)) {
-        let info : any = {
-          Ot : item.Ot,
-          Id : item.Id,
-          IdCliente : item.IdCliente,
-          Cliente : item.Cliente,
-          IdProducto : item.IdProducto,
-          Producto : item.Producto,
-          Cantidad : item.Cantidad,
-          Presentacion : item.Presentacion,
-          Estatus : item.Estatus,
-          Proceso : item.Proceso,
-          Fecha : item.Fecha,
-        }
-        this.rollosInsertar.push(info);
         this.validarRollo.push(item.Id);
         this.Total += item.Cantidad;
       } else if (this.validarRollo.includes(item.Id)) {
@@ -537,58 +510,23 @@ export class Ingresar_ProductosComponent implements OnInit {
     for (let i = 0; i < this.rollos.length; i++) {
       if (this.rollos[i].Id == item.Id) this.rollos.splice(i,1);
     }
-    setTimeout(() => { this.GrupoProductos(); }, 500);
+    setTimeout(() => { this.GrupoProductos(); }, 100);
   }
 
   // Funcion que va a seleccionar todo lo que hay en la tabla
   selccionarTodo(){
+    this.cargando = false;
     this.Total = 0;
-    for (const item of this.rollos) {
-      if (!item.exits) {
-        let info : any = {
-          Ot : item.Ot,
-          Id : item.Id,
-          IdCliente : item.IdCliente,
-          Cliente : item.Cliente,
-          IdProducto : item.IdProducto,
-          Producto : item.Producto,
-          Cantidad : item.Cantidad,
-          Presentacion : item.Presentacion,
-          Estatus : item.Estatus,
-          Proceso : item.Proceso,
-          Fecha : item.Fecha,
-        }
-        this.rollosInsertar.push(info);
-        this.validarRollo.push(item.Id);
-        this.Total += item.Cantidad;
-      }
-    }
-    setTimeout(() => {
-      let nuevo : any = this.rollos.filter((item) => item.exits === true);
-      this.rollos = [];
-      this.rollos = nuevo;
-    }, 500);
-    setTimeout(() => { this.GrupoProductos(); }, 500);
+    let nuevo : any = this.rollos.filter((item) => item.exits === true);
+    this.rollos = [];
+    this.rollos = nuevo;
+    setTimeout(() => { this.GrupoProductos(); }, 100);
   }
 
   // Funcion que va a quitar todo lo que hay en la tabla
   quitarTodo(){
+    this.cargando = false;
     for (const item of this.rollosInsertar) {
-      let info : any = {
-        Ot : item.Ot,
-        Id : item.Id,
-        IdCliente : item.IdCliente,
-        Cliente : item.Cliente,
-        IdProducto : item.IdProducto,
-        Producto : item.Producto,
-        Cantidad : item.Cantidad,
-        Presentacion : item.Presentacion,
-        Estatus : item.Estatus,
-        Proceso : item.Proceso,
-        exits : false,
-        Fecha : item.Fecha,
-      }
-      this.rollos.push(info);
       this.Total -= item.Cantidad;
       this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
       this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
@@ -599,26 +537,12 @@ export class Ingresar_ProductosComponent implements OnInit {
       this.rollosInsertar = [];
       this.validarRollo = [];
     }, 500);
-    setTimeout(() => { this.GrupoProductos(); }, 500);
+    setTimeout(() => { this.GrupoProductos(); }, 100);
   }
 
   // Funcion que se va a encargar de quitar rollos de la tabla inferior
   quitarRollo(item : any){
-    let info : any = {
-      Ot : item.Ot,
-      Id : item.Id,
-      IdCliente : item.IdCliente,
-      Cliente : item.Cliente,
-      IdProducto : item.IdProducto,
-      Producto : item.Producto,
-      Cantidad : item.Cantidad,
-      Presentacion : item.Presentacion,
-      Estatus : item.Estatus,
-      Proceso : item.Proceso,
-      exits : false,
-      Fecha : item.Fecha,
-    }
-    this.rollos.push(info);
+    this.cargando = false;
     this.Total -= item.Cantidad;
     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
@@ -630,7 +554,7 @@ export class Ingresar_ProductosComponent implements OnInit {
     for (let i = 0; i < this.validarRollo.length; i++) {
       if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
     }
-    setTimeout(() => { this.GrupoProductos(); }, 500);
+    setTimeout(() => { this.GrupoProductos(); }, 100);
   }
 
   // Funcion que permitirá ver el total de lo escogido para cada producto
@@ -638,7 +562,6 @@ export class Ingresar_ProductosComponent implements OnInit {
     let producto : any = [];
     this.grupoProductos = [];
     for (let i = 0; i < this.rollosInsertar.length; i++) {
-      console.log(this.rollosInsertar[i]);
       if (!producto.includes(this.rollosInsertar[i].IdProducto)) {
         let cantidad : number = 0;
         let cantRollo : number = 0;
@@ -660,11 +583,12 @@ export class Ingresar_ProductosComponent implements OnInit {
         this.grupoProductos.push(info);
       }
     }
+    this.cargando = true;
   }
 
   //Funcion para meter el encabezado de la entrada
   IngresarInfoRollos(){
-    if (this.rollosInsertar.length == 0) Swal.fire("¡Debe tener minimo un rollo seleccionado!");
+    if (this.rollosInsertar.length == 0) this.mensajeAdvertencia("¡Debe tener minimo un rollo seleccionado!");
     else {
       this.cargando = false;
       let info : any = {
@@ -677,24 +601,7 @@ export class Ingresar_ProductosComponent implements OnInit {
         this.entradaRolloService.srvObtenerUltimoId().subscribe(datos_ultEntrada => {
           this.ingresarRollos(datos_entradaRollo.entRolloProd_Id);
         });
-      }, error => {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'error',
-          title: '¡Error al ingresar los rollos!'
-        });
-        this.cargando = true;
-      });
+      }, error => { this.mensajeError('¡Rollos No Ingresados!', `¡Error al ingresar los rollos!`); });
     }
   }
 
@@ -727,22 +634,7 @@ export class Ingresar_ProductosComponent implements OnInit {
               Proceso_Id : proceso,
             }
             this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => { }, error => {
-              const Toast = Swal.mixin({
-                toast: true,
-                position: 'center',
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                  toast.addEventListener('mouseenter', Swal.stopTimer)
-                  toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-              });
-              Toast.fire({
-                icon: 'error',
-                title: '¡Error al ingresar los rollos!'
-              });
-              this.cargando = true;
+              this.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
             });
           } else {
             let info : any = {
@@ -762,22 +654,7 @@ export class Ingresar_ProductosComponent implements OnInit {
               Proceso_Id : proceso,
             }
             this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => { }, error => {
-              const Toast = Swal.mixin({
-                toast: true,
-                position: 'center',
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                  toast.addEventListener('mouseenter', Swal.stopTimer)
-                  toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-              });
-              Toast.fire({
-                icon: 'error',
-                title: '¡Error al ingresar los rollos!'
-              });
-              this.cargando = true;
+              this.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
             });
           }
         }
@@ -804,24 +681,9 @@ export class Ingresar_ProductosComponent implements OnInit {
             ExProd_PrecioVenta: datos_productos[j].exProd_PrecioVenta,
           }
           this.ExistenciasProdService.srvActualizar(datos_productos[j].exProd_Id, info).subscribe(datos_existenciaActualizada => {
-            const Toast = Swal.mixin({
-              toast: true,
-              position: 'center',
-              showConfirmButton: false,
-              timer: 2500,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-              }
-            });
-            Toast.fire({
-              icon: 'success',
-              title: '¡Entrada de Rollos registrada con exito!'
-            });
+            this.mensajeConfirmacion('¡Rollos Ingresados!', `¡Entrada de Rollos registrada con exito!`);;
           }, error => {
-            Swal.fire(`¡Error al mover el inventario del Producto ${datos_productos[j].prod_Id}, mover el inventario manualmente!`);
-            this.cargando = true;
+            this.mensajeError('¡Rollos Ingresados con Er!', `¡Error al mover el inventario del Producto ${datos_productos[j].prod_Id}, mover el inventario manualmente!`);
             this.limpiarCampos();
           });
         }
@@ -1035,4 +897,21 @@ export class Ingresar_ProductosComponent implements OnInit {
     };
   }
 
+  // Funcion que devolverá un mensaje de satisfactorio
+  mensajeConfirmacion(titulo : string, mensaje : any) {
+    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
+    this.cargando = true;
+  }
+
+  // Funcion que va a devolver un mensaje de error
+  mensajeError(titulo : string, mensaje : any) {
+    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 2000});
+    this.cargando = true;
+  }
+
+  // Funcion que va a devolver un mensaje de advertencia
+  mensajeAdvertencia(mensaje : any) {
+    this.messageService.add({severity:'warn', summary: '¡Advertencia!', detail: mensaje, life: 1500});
+    this.cargando = true;
+  }
 }

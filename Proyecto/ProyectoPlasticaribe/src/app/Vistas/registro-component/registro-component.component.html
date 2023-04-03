@@ -105,84 +105,93 @@
           </ng-template>
         </p-table>
       </div>
-      <p-dialog [(visible)]="dialogUsuarios" [style]="{width: '450px'}" header="{{accion}} Usuarios" [modal]="true" >
+
+      <p-dialog [(visible)]="dialogUsuarios" [style]="{width: '470px'}" header="{{accion}} Usuarios" [modal]="true" >
         <ng-template pTemplate="content">
+          <br>
           <form [formGroup]="FormUsuarios">
-
-            <!-- ID -->
-            <div class="form-floating col-md mb-3" *ngIf="accion == 'Crear'; else Editar">
-              <input formControlName="usuId" type="number" class="form-control form-control-sm" id="floatingInput" autocomplete="off" >
-              <label for="floatingInput">ID Usuario</label>
-            </div>
-
-            <ng-template #Editar>
-              <div class="form-floating col-md mb-3">
-                <input formControlName="usuId" type="number" class="form-control form-control-sm" id="floatingInput" autocomplete="off" readonly onmousedown="return false">
-                <label for="floatingInput">ID Usuario</label>
-              </div>
-            </ng-template>
-
-            <!-- Nombre -->
-            <div class="form-floating col-md mb-3">
-              <input formControlName="usuNombre" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off">
-              <label for="floatingInput">Nombre Usuario</label>
-            </div>
-
             <div class="mb-3">
-              <div class="row g-3">
-                 <!-- Tipo de Usuario -->
-                <div class="form-floating col-md">
-                  <select formControlName="usuTipo" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
-                    <option [ngValue]="item.tpUsu_Id" *ngFor="let item of arrayTiposUsuarios">{{item.tpUsu_Nombre}}</option>
-                  </select>
-                  <label for="floatingSelect">Tipo Usuario</label>
+              <div class="row g-4">
+
+                <!-- ID -->
+                <div class="col-md-12" *ngIf="accion == 'Crear'; else Editar">
+                  <span class="p-float-label">
+                    <input formControlName="usuId" id="usuId" class="form-control form-control-sm" type="number" pInputText required/>
+                    <label for="usuId">ID Usuario</label>
+                  </span>
+                </div>
+
+                <ng-template #Editar>
+                  <span class="p-float-label">
+                    <input formControlName="usuId" id="usuId" class="form-control form-control-sm" type="number" pInputText required readonly/>
+                    <label for="usuId">ID Usuario</label>
+                  </span>
+                </ng-template>
+
+                <!-- Nombre -->
+                <div class="col-md-12">
+                  <span class="p-float-label">
+                    <input formControlName="usuNombre" id="usuNombre" class="form-control form-control-sm" type="number" pInputText required/>
+                    <label for="usuNombre">Nombre Usuario</label>
+                  </span>
+                </div>
+
+                <!-- Tipo de Usuario -->
+                <div class="col-md-6">
+                  <span class="p-float-label">
+                    <p-dropdown formControlName="usuTipo" inputId="usuTipo" [options]="arrayTiposUsuarios" optionValue="tpUsu_Id" optionLabel="tpUsu_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+                    <label for="usuTipo">Tipo Usuario</label>
+                  </span>
                 </div>
 
                   <!-- Area -->
-                <div class="form-floating col-md">
-                  <select formControlName="usuArea" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
-                    <option [ngValue]="item.area_Id" *ngFor="let item of arrayAreas">{{item.area_Nombre}}</option>
-                  </select>
-                  <label for="floatingSelect">Área</label>
+                <div class="col-md-6">
+                  <span class="p-float-label">
+                    <p-dropdown formControlName="usuArea" inputId="usuArea" [options]="arrayAreas" optionValue="area_Id" optionLabel="area_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+                    <label for="usuArea">Área</label>
+                  </span>
                 </div>
-              </div>
-            </div>
 
-            <div class="mb-3">
-              <div class="row g-3">
                 <!-- Rol -->
-                <div class="form-floating col-md">
-                  <select formControlName="usuRol" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
-                    <option [ngValue]="item.rolUsu_Id" *ngFor="let item of arrayRoles">{{item.rolUsu_Nombre}}</option>
-                  </select>
-                  <label for="floatingSelect">Rol Usuario</label>
+                <div class="col-md-6">
+                  <span class="p-float-label">
+                    <p-dropdown formControlName="usuRol" inputId="usuRol" [options]="arrayRoles" optionValue="rolUsu_Id" optionLabel="rolUsu_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+                    <label for="usuRol">Rol Usuario</label>
+                  </span>
                 </div>
+
                 <!-- Estado -->
-                <div class="form-floating col-md">
-                  <select formControlName="usuEstado" id="floatingSelect" class="form-select form-select-sm" aria-label=".form-select-sm example" autocomplete="off">
-                    <option [ngValue]="item.estado_Id" *ngFor="let item of arrayEstados">{{item.estado_Nombre}}</option>
-                  </select>
-                  <label for="floatingSelect">Estado</label>
+                <div class="col-md-6">
+                  <span class="p-float-label">
+                    <p-dropdown formControlName="usuEstado" inputId="usuEstado" [options]="arrayEstados" optionValue="estado_Id" optionLabel="estado_Nombre" [autoDisplayFirst]="false"></p-dropdown>
+                    <label for="usuEstado">Estado</label>
+                  </span>
+                </div>
+
+                <!-- PassWord -->
+                <!-- <div class="col-md-12">
+                  <span class="p-float-label">
+                    <p-password formControlName="usuPassword" inputId="Contrasena" [toggleMask]="true"></p-password>
+                    <label for="Contrasena">Contraseña</label>
+                  </span>
+                </div> -->
+                <div class="col-md mb">
+                  <div class="p-inputgroup">
+                    <span class="p-float-label">
+                      <input formControlName="usuPassword" type="password" id="pass" pInputText>
+                      <label for="pass">Contraseña</label>
+                    </span>
+                    <ng-container *ngIf="mostrarPass == true then noMostrar; else mostrar"></ng-container>
+                    <ng-template #mostrar><span class="input-group-text cursor" (click)="mostrarPassword()"><i class="pi pi-eye"></i></span></ng-template>
+                    <ng-template #noMostrar><span class="input-group-text cursor" (click)="mostrarPassword()"><i class="pi pi-eye-slash"></i></span></ng-template>
+                  </div>
+                </div>
+
+                <!--Boton Ingresar al sistema-->
+                <div class="mb-3">
+                  <button pButton pRipple label="{{accion}} Usuario" (click)="accionesModal()" class="p-button-success"></button>
                 </div>
               </div>
-            </div>
-            <!-- PassWord -->
-            <div class="input-group col-md mb-3">
-              <input formControlName="usuPassword" type="password" class="form-control form-control-sm" aria-describedby="button-addon2" id="pass" autocomplete="off">
-
-              <ng-container *ngIf="mostrarPass; then noMostrar else mostrar"></ng-container>
-              <ng-template #mostrar>
-                <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="mostrarPassword()"><i class="pi pi-eye"></i></button>
-              </ng-template>
-
-              <ng-template #noMostrar>
-                <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="mostrarPassword()"><i class="pi pi-eye-slash"></i></button>
-              </ng-template>
-            </div>
-
-            <!--Boton Ingresar al sistema-->
-            <div class="mb-3">
-              <button pButton pRipple label="{{accion}} Usuario" (click)="accionesModal()" class="p-button-success"></button>
             </div>
           </form>
         </ng-template>
@@ -192,22 +201,35 @@
       <p-dialog [(visible)]="nuevoDialogo" [style]="{width: '450px'}" header="Crear {{accionDialogoNuevo}}" [modal]="true" >
         <ng-container *ngIf="accionDialogoNuevo == 'Rol' then rol; else area"></ng-container>
         <p-toast position="center"></p-toast>
+
         <!-- FORMULARIO ROLES -->
         <ng-template #rol>
+          <br>
           <form [formGroup]="formRoles">
-            <!-- Nombre -->
-            <div class="form-floating col-md mb-3">
-              <input formControlName="rolNombre" class="form-control form-control-sm" list="roles" id="floatingInput" required (keyup)="cargarRoles_Like()">
-              <datalist id="roles">
-                <option value={{item.rolUsu_Nombre}} *ngFor="let item of arrayRoles">{{item.rolUsu_Nombre}}</option>
-              </datalist>
-              <label for="floatingInput">Nombre</label>
-            </div>
+            <div class="mb-3">
+              <div class="row g-4">
 
-            <!-- Descripcion -->
-            <div class="form-floating col-md mb-3">
-              <textarea formControlName="rolDescripcion" style="height: 80px;"  type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off"></textarea>
-              <label for="floatingInput">Descripción</label>
+                <!-- Nombre -->
+                <div class="col-md-12">
+                  <div class="p-inputgroup">
+                    <span class="p-float-label">
+                      <input formControlName="rolNombre" type="text" list="roles" id="rolNombre" pInputText required (keyup)="cargarRoles_Like()">
+                      <datalist id="roles">
+                        <option value={{item.rolUsu_Nombre}} *ngFor="let item of arrayRoles">{{item.rolUsu_Nombre}}</option>
+                      </datalist>
+                      <label for="rolNombre">Nombre</label>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Descripcion -->
+                <div class="col-md-12">
+                  <span class="p-float-label">
+                    <textarea formControlName="rolDescripcion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+                    <label for="textarea">Descripción</label>
+                  </span>
+                </div>
+              </div>
             </div>
           </form>
         </ng-template>
@@ -215,20 +237,32 @@
         <!-- FORMULARIO AREAS -->
         <ng-template #area>
           <form [formGroup]="formAreas">
-            <!-- Nombre -->
-            <div class="form-floating col-md mb-3">
-              <input formControlName="areaNombre" class="form-control form-control-sm" list="areas" id="floatingInput" required (keyup)="cargarAreas_Like()">
-              <datalist id="areas">
-                <option value={{item.area_Nombre}} *ngFor="let item of arrayAreas">{{item.area_Nombre}}</option>
-              </datalist>
-              <label for="floatingInput">Nombre</label>
+            <div class="mb-3">
+              <div class="row g-4">
+
+                <!-- Nombre -->
+                <div class="col-md-12">
+                  <div class="p-inputgroup">
+                    <span class="p-float-label">
+                      <input formControlName="areaNombre" type="text" list="areas" id="areaNombre" pInputText required (keyup)="cargarAreas_Like()">
+                      <datalist id="areas">
+                        <option value={{item.area_Nombre}} *ngFor="let item of arrayAreas">{{item.area_Nombre}}</option>
+                      </datalist>
+                      <label for="areaNombre">Nombre</label>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Descripcion -->
+                <div class="col-md-12">
+                  <span class="p-float-label">
+                    <textarea formControlName="areaDescripcion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+                    <label for="textarea">Descripción</label>
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <!-- Descripcion -->
-            <div class="form-floating col-md mb-3">
-              <textarea formControlName="areaDescripcion" style="height: 80px;" type="text" class="form-control form-control-sm" id="floatingInput" autocomplete="off"></textarea>
-              <label for="floatingInput">Descripción</label>
-            </div>
           </form>
         </ng-template>
 

@@ -2,10 +2,26 @@ span{
   color: #db4149;
 }
 
-
-
 .bg-danger1 {
   color: white;
   background-color: palevioletred;
   font-size: calc(var(--font-size) * 15px);
 }
+
+.p-input-icon-left {
+  width: 100%;
+}
+
+p-dropdown ::ng-deep .p-dropdown {
+  display: flex;
+  width: 100%;
+}
+
+p-password ::ng-deep .p-password, p-password ::ng-deep .p-inputtext {
+  display: flex;
+  width: 100%;
+}
+
+/* p-password ::ng-deep .pi {
+  display: flex;
+} */

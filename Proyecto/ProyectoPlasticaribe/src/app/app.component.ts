@@ -76,6 +76,10 @@ export class AppComponent implements OnInit{
       emptyFilterMessage: 'No hay resultados',
       emptyMessage: 'No hay resultados',
       today: 'Hoy',
+      passwordPrompt: 'Ingrese la Contraseña',
+      strong: 'Fuerte',
+      medium: 'Medio',
+      weak: 'Debil'
     });
   }
 
