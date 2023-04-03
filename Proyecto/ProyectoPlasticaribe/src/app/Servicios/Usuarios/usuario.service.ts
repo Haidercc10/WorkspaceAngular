@@ -44,6 +44,10 @@ export class UsuarioService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/UsuarioConductor/${id}`);
   }
 
+  GetConsdutores(){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Usuarios/getConductores`);
+  }
+
 //Metodo agregar Usuario
   srvAgregarUsuario(data:any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Usuarios', data)

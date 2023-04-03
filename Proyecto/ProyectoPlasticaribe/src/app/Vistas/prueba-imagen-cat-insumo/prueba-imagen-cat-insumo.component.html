@@ -13,7 +13,7 @@
 <div class="contain" id="form">
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Asignar Rollos/Productos</h2>
+      <h2 class="tituloRojo">Revisar Factura</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -21,259 +21,48 @@
   </div>
 </div>
 
-<!-- Boton que llevrá hacia abajo+ -->
-<button class="scroll btn btn-ligth btn-ligth-sm" (click)="scrollToTop()" title="Bajar">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="width: 30px; padding-bottom: 10%">
-    <path d="M246.6 470.6c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L224 402.7 361.4 265.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3l-160 160zm160-352l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L224 210.7 361.4 73.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3z"/>
-  </svg>
-</button>
-
 <div class="formulario">
   <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar/Asignar Producto</h4>
+    <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar Factura</h4>
   </div>
   <br>
 
-  <!-- Formulario para consultar una orden de trabajo -->
-  <form [formGroup]="FormConsultarProductos">
-    <div class="mb-3">
+  <!-- Formulario para consultar Codigo de factura -->
+  <form [formGroup]="FormConsultarFactura">
+    <div class="mb-3" >
       <div class="row g-4">
 
         <!-- Codigo Factura -->
         <div class="col-md-2">
-          <span class="p-float-label">
-            <input formControlName="Factura" id="Factura" class="form-control form-control-sm" type="text" pInputText required/>
-            <label for="Factura">Factura</label>
-          </span>
-        </div>
-
-        <!-- Nota Creadito -->
-        <div class="col-md-2">
-          <span class="p-float-label">
-            <input formControlName="NotaCredito" id="NotaCredito" class="form-control form-control-sm" type="text" pInputText/>
-            <label for="NotaCredito">Nota Credito</label>
-          </span>
-        </div>
-
-        <!-- Codigo de Producto -->
-        <div class="col-md-2">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="IdProducto" id="IdProducto" class="form-control form-control-sm" type="text" pInputText (keyup.Enter)="buscarProducto()"/>
-            <label for="IdProducto">Cod. Producto</label>
+            <input formControlName="Fact_Id" id="IdProducto" class="form-control form-control-sm" type="text" pInputText (keyup.Enter)="consultarFactura()"/>
+            <label for="IdProducto">Cod. Factura</label>
           </span>
         </div>
 
-        <!-- Cantidad Producto -->
-        <div class="col-md-2">
-          <span class="p-float-label">
-            <p-inputNumber formControlName="CantidadProducto" mode="decimal" inputId="CantidadProducto" [minFractionDigits]="2" (keyup.Enter)="buscarProducto()"></p-inputNumber>
-            <label for="CantidadProducto">Cantidad Item</label>
-          </span>
-        </div>
-
-        <!-- Cliente -->
+       <!-- Conductor -->
         <div class="col-md">
-          <span class="p-float-label">
-            <input formControlName="Cliente" id="Cliente" list="clientes" class="form-control form-control-sm" type="text" pInputText (change)='buscarCliente()' required/>
-            <datalist id="clientes">
-              <option value={{item.cli_Id}} *ngFor="let item of arrayClientes">{{item.cli_Nombre}}</option>
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-user"></i>
+            <input formControlName="Conductor" id="Conductor" list="conductores" class="form-control form-control-sm" type="text" pInputText (change)='cambiarNombreConductor()' required/>
+            <datalist id="conductores">
+              <option value={{item.id}} *ngFor="let item of conductores">{{item.nombre}}</option>
             </datalist>
-            <label for="Cliente">Cliente</label>
+            <label for="Conductor">Conductor</label>
           </span>
         </div>
 
-        <!-- Observacion -->
-        <div class="col-md-12">
-          <span class="p-float-label">
-            <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
-            <label for="textarea">Observación</label>
+        <!--Placa camión-->
+        <div class="col-md-2">
+          <span class="p-input-icon-left p-float-label">
+            <i class="pi pi-truck"></i>
+            <input formControlName="PlacaCamion" id="placa" class="form-control form-control-sm" type="text" pInputText/>
+            <label for="placa">Placa Vehiculo</label>
           </span>
         </div>
-
       </div>
     </div>
   </form>
-
-  <div class="mb-4">
-    <hr class="Linea">
-  </div>
-
-  <!-- Titulo Rollos Disponibles -->
-  <div class="mb-4 tabla1">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i>Rollos Disponibles</h4>
-  </div>
-
-  <!-- Tabla con Rollos Disponibles -->
-  <div class="mb-3" *ngIf="!cargando">
-    <div class="row g-3 font-size-14">
-      <p-table
-        #dt
-        [value]="rollosDisponibles"
-        styleClass="p-datatable-gridlines p-datatable-sm"
-        responsiveLayout="scroll"
-        [paginator]="true"
-        [rows]="10"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos"
-        [rowsPerPageOptions]="[10,25,50]"
-        [rowHover]="true"
-        dataKey="Id"
-        [(selection)]="rollosSeleccionados">
-        <ng-template pTemplate="header">
-          <tr>
-            <th scope="col">ID Rollo</th>
-            <th scope="col">ID Producto</th>
-            <th scope="col">Producto</th>
-            <th scope="col">Cantidad</th>
-            <th scope="col">Presentacion</th>
-            <th scope="col">Total Unidades</th>
-            <th style="width: 3rem">
-              <p-tableHeaderCheckbox (click)="seleccionTodos_Rollos()"></p-tableHeaderCheckbox>
-            </th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-rollo>
-          <tr>
-            <td>{{rollo.Id}}</td>
-            <td>{{rollo.IdProducto}}</td>
-            <td>{{rollo.Producto}}</td>
-            <td>{{rollo.CantPaqRestantes | number : '1.2-2'}}</td>
-            <td>{{rollo.Presentacion}}</td>
-            <td>{{rollo.CantUndRestantes | number : '1.2-2'}}</td>
-            <td>
-              <p-tableCheckbox [value]="rollo" (click)="seleccionRollo(rollo)"></p-tableCheckbox>
-            </td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="summary">
-          <tr>
-            <td colspan="5">Total:</td>
-            <td>{{cantTotalProducto | number : '1.2-2'}} {{presentacionProducto}}</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
-  </div>
-
-  <div class="mb-4">
-    <hr class="Linea">
-  </div>
-
-  <!-- Titulo Rollos Seleccionados -->
-  <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-list"></i>Rollos Seleccionados</h4>
-  </div>
-
-  <!-- Tabla con Rollos Seleccionados -->
-  <div class="mb-3" *ngIf="!cargando">
-    <div class="row g-3 font-size-14">
-      <p-table
-        #dt
-        [value]="rollosSeleccionados"
-        styleClass="p-datatable-gridlines p-datatable-sm"
-        responsiveLayout="scroll"
-        [paginator]="true"
-        [rows]="10"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos"
-        [rowsPerPageOptions]="[10,25,50]"
-        [rowHover]="true"
-        dataKey="Id"
-        [(selection)]="rollosDisponibles">
-        <ng-template pTemplate="header">
-          <tr>
-            <th scope="col">ID Rollo</th>
-            <th scope="col">ID Producto</th>
-            <th scope="col">Producto</th>
-            <th scope="col">Cantidad</th>
-            <th scope="col">Presentacion</th>
-            <th scope="col">Total Unidades</th>
-            <th style="width: 3rem">
-              <p-tableHeaderCheckbox (click)="quitarTodos_Rollos()"></p-tableHeaderCheckbox>
-            </th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-rollo>
-          <tr>
-            <td>{{rollo.Id}}</td>
-            <td>{{rollo.IdProducto}}</td>
-            <td>{{rollo.Producto}}</td>
-            <td [pEditableColumn]="rollo.CantPaqRestantes" pEditableColumnField="code">
-              <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <p-inputNumber mode="decimal" [(ngModel)]="rollo.CantPaqRestantes" [minFractionDigits]="2" [max]="rollo.CantPaqRestantesEnviar" [min]="0"></p-inputNumber>
-                  </ng-template>
-                  <ng-template pTemplate="output"> {{rollo.CantPaqRestantes}} </ng-template>
-              </p-cellEditor>
-            </td>
-            <td [pEditableColumn]="rollo.CantUndRestantes" pEditableColumnField="code">
-              <p-cellEditor>
-                  <ng-template pTemplate="input">
-                    <p-inputNumber mode="decimal" [(ngModel)]="rollo.CantUndRestantes" [minFractionDigits]="2" [max]="rollo.CantUndRestantesEnviar" [min]="0"></p-inputNumber>
-                  </ng-template>
-                  <ng-template pTemplate="output"> {{rollo.CantUndRestantes}} </ng-template>
-              </p-cellEditor>
-            </td>
-            <td>{{rollo.Presentacion}}</td>
-            <td>
-              <p-tableCheckbox [value]="rollo" (click)="quitarRollo(rollo)"></p-tableCheckbox>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
-  </div>
-
-  <div class="mb-4">
-    <hr class="Linea">
-  </div>
-
-  <!-- Titulo Consolidado Productos -->
-  <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado de Productos</h4>
-  </div>
-
-  <!-- Tabla Consolidado -->
-  <p-table
-    #dt
-    [value]="grupoProductos"
-    styleClass="p-datatable-gridlines p-datatable-sm"
-    responsiveLayout="scroll"
-    [paginator]="true"
-    [rows]="20"
-    [rowHover]="true"
-    [showCurrentPageReport]="true"
-    [rowsPerPageOptions]="[5, 10, 15, 20]"
-    currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros">
-    <ng-template pTemplate="header">
-      <tr>
-        <th scope="col">ID Producto</th>
-        <th scope="col">Producto</th>
-        <th scope="col">Cantidad</th>
-        <th scope="col">N° Rollos</th>
-        <th scope="col">Presentación</th>
-        <th scope="col">Cantidad Unidades</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-item>
-      <tr>
-        <td>{{item.Id}}</td>
-        <td>{{item.Nombre}}</td>
-        <td>{{item.Cantidad}}</td>
-        <td>{{item.Rollos}}</td>
-        <td>{{item.Presentacion}}</td>
-        <td>{{item.Cant_Unidades}} Und</td>
-      </tr>
-    </ng-template>
-  </p-table>
-  <br>
-
-  <div class="bajarPagina">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Facturar Rollos" icon="pi pi-dollar" (click)="crearAsignacion()"></button>
-      <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
-    </div>
-  </div>
 
 </div>
