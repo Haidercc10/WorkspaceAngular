@@ -28,12 +28,11 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   ArrayBOPP = []; //Varibale que almacenará los BOPP existentes
   ArrayBoppPedida = []; //variable que almacenará el BOPPP pedido por una orden de trabajo
-  boppSeleccionado : any = []; //Variable que almacenará la informacion del bopp que haya sido selccionado
+  boppSeleccionado : any; //Variable que almacenará la informacion del bopp que haya sido selccionado
   ordenesTrabajo = []; //Variable que almacenará las ordenes de trabajo que se consulten
   cantidadKG : number = 0; //Variable almacenará la cantidad en kilogramos pedida en la OT
   arrayOT : any = [];
   itemSeleccionado : any;
-
 
   constructor(private FormBuilderAsignacion : FormBuilder,
                 private FormBuilderBOPP : FormBuilder,
@@ -159,14 +158,17 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     }
   }
 
-  mostrarEleccion(item : any){
-    this.messageService.add({severity:'warn', key: 'eleccion', summary: `Elección`, detail: `Está seguro de eliminar la OT ${item.ot} de la asignación`, sticky: true});
-    this.itemSeleccionado = item;
+  /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
+  mostrarEleccion(item : any, eleccion : any, mensaje? : any){
+    if (eleccion == 'OT') { this.itemSeleccionado = item; mensaje = `Está seguro que desea eliminar la OT ${item.ot} de la tabla?`; }
+    if (eleccion == 'Bopp') { this.boppSeleccionado = item; mensaje = `Está seguro que desea eliminar el rollo ${item.Serial} de la tabla?`; }
+
+    this.messageService.add({severity:'warn', key: eleccion, summary: 'Elección', detail: mensaje, sticky: true});
   }
 
   // Función para quitar una Ot de la tabla
   QuitarOrdenTrabajo(data : any) {
-    this.messageService.clear('eleccion');
+    this.messageService.clear('OT');
     data = this.itemSeleccionado;
 
     this.cantidadKG = this.cantidadKG - data.kg;
@@ -194,21 +196,12 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
   // funcion que quitará un rollo de la tabla
   quitarBOPP(data : any){
-    Swal.fire({
-      title: '¿Estás seguro de eliminar la Materia Prima de la Asignación?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Eliminar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        for (let i = 0; i < this.ArrayBoppPedida.length; i++) {
-          if (this.ArrayBoppPedida[i].Serial == data.Serial) this.ArrayBoppPedida.splice(i, 1);
-        }
-        Swal.fire('Orden de Trabajo eliminada');
-      }
-    });
+    this.messageService.clear('Bopp');
+    data = this.boppSeleccionado;
+    for (let i = 0; i < this.ArrayBoppPedida.length; i++) {
+      if (this.ArrayBoppPedida[i].Serial == data.Serial) this.ArrayBoppPedida.splice(i, 1);
+    }
+    this.mostrarConfirmacion(`Confirmación`, 'BOPP eliminado de la tabla!');
   }
 
   // funcion que validará que haya un rollo seleccionado para asignar
@@ -330,19 +323,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
     }
   }
 
-  // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia(mensaje : string){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', text: mensaje, showCloseButton: true });
-    this.load = true;
-  }
-
-  // Funcion que va a devolver un memsaje de error
-  mensajeError(mensaje : string){
-    Swal.fire({ icon: 'error', title: 'Opps...', html: mensaje, showCloseButton: true, });
-    this.load = true;
-  }
-
-    /** Mostrar mensaje de confirmación  */
+  /** Mostrar mensaje de confirmación  */
   mostrarConfirmacion(mensaje : any, titulo?: any) {
    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 1500 });
   }
@@ -357,8 +338,8 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
    this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 1500 });
   }
 
-  /** Cerrar Dialogo de eliminación de rollos.*/
-  onReject() {
-    this.messageService.clear('eleccion');
+  /** Cerrar Dialogo de eliminación de OT/rollos.*/
+  onReject(dato : any) {
+    this.messageService.clear(dato);
   }
 }

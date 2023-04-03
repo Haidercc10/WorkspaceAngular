@@ -80,7 +80,7 @@
             <td>{{ot.micras | number}}</td>
             <td>{{ot.ancho | number}}</td>
             <td>{{ot.kg | number}}</td>
-            <td><i class="pi pi-trash cursor" title="Quitar Orden de Trabajo" (click)="mostrarEleccion(ot)"></i></td>
+            <td><i class="pi pi-trash cursor" title="Quitar Orden de Trabajo" (click)="mostrarEleccion(ot, 'OT')"></i></td>
           </tr>
         </ng-template>
       </p-table>
@@ -177,7 +177,7 @@
                 </ng-template>
               </p-cellEditor>
             </td>
-            <td><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="quitarBOPP(bopp)"></i></td>
+            <td><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(bopp, 'Bopp')"></i></td>
           </tr>
         </ng-template>
       </p-table>
@@ -199,7 +199,7 @@
   </div>
 </div>
 
-<p-toast position="center" key="eleccion" (onClose)="onReject()" [baseZIndex]="5000">
+<p-toast position="center" key="OT" (onClose)="onReject('OT')" [baseZIndex]="5000">
   <ng-template let-message pTemplate="message" let-orden>
     <div class="flex flex-column" style="flex: 1">
       <div class="text-center">
@@ -212,7 +212,27 @@
           <button type="button" pButton (click)="QuitarOrdenTrabajo(orden)" icon="pi pi-check" label="Si" class="p-button-success"></button>
         </div>
         <div class="col-6">
-          <button type="button" pButton (click)="onReject()" icon="pi pi-database" label="No" class="p-button-secondary"></button>
+          <button type="button" pButton (click)="onReject('OT')" icon="pi pi-database" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<p-toast position="center" key="Bopp" (onClose)="onReject('Bopp')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-bopp>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="quitarBOPP(bopp)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('Bopp')" icon="pi pi-database" label="No" class="p-button-secondary"></button>
         </div>
       </div>
     </div>
