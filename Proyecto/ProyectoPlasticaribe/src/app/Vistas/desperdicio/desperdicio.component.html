@@ -1,6 +1,6 @@
 <!--Navegador parte superior -->
 <app-menuLateral></app-menuLateral>
-
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -40,7 +40,7 @@
         <!-- ID PRODUCTO -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-inputNumber formControlName="IdProducto" id="IdProducto" [readonly]="true"></p-inputNumber>
+            <p-inputNumber formControlName="IdProducto" id="IdProducto" [useGrouping]="false" [readonly]="true"></p-inputNumber>
             <label for="IdProducto">Id Producto</label>
           </span>
         </div>
@@ -56,7 +56,7 @@
         <!-- TIPO DE MATERIAL -->
         <div class="col-md-3">
           <span class="p-float-label">
-            <input formControlName="TipoMaterial" id="Nombre" list="material" class="form-control form-control-sm" type="text" pInputText/>
+            <input formControlName="TipoMaterial" id="Nombre" list="material" class="form-control form-control-sm" (change)="buscarMaterial()" type="text" pInputText/>
             <datalist id="material">
               <option value={{item.material_Id}} *ngFor="let item of materiales">{{item.material_Nombre}}</option>
             </datalist>
@@ -195,7 +195,7 @@
             <td>{{desperdicio.Cantidad}}</td>
             <td>{{desperdicio.Impreso}}</td>
             <td>{{desperdicio.Observacion}}</td>
-            <td><i class="pi pi-trash cursor" title="Quitar Desperdicio" (click)="quitarDesperdicio(desperdicio)"></i></td>
+            <td><i class="pi pi-trash cursor" title="Quitar Desperdicio" (click)="mostrarEleccion(desperdicio)"></i></td>
           </tr>
         </ng-template>
       </p-table>
@@ -208,3 +208,23 @@
     <button pButton class="p-button-secondary" type="button" label="Limpiar Todo" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
   </div>
 </div>
+
+<p-toast position="center" key="eleccion" (onClose)="onReject()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-desperdicio>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="quitarDesperdicio(desperdicio)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject()" icon="pi pi-database" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

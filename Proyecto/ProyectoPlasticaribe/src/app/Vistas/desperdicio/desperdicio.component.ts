@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { MessageService } from 'primeng/api';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
@@ -36,6 +37,7 @@ export class DesperdicioComponent implements OnInit {
   grupoDespercios : any [] = []; //Variable que almacenará los desperdicios que se vayan ingresando para mstrarlos en la tabla
   datosPdf : any [] = []; //Variable que va a almacenar los datos ingresados a la base de datos
   materiales : any [] = []; //Variable que va a tener la información de los materiales
+  registroSeleccionado : any =[]; /** Variable que contendrá el registro a quitar de la tabla. */
 
   constructor(private frmBuilder : FormBuilder,
                 private rolService : RolesService,
@@ -46,7 +48,8 @@ export class DesperdicioComponent implements OnInit {
                           private fallasService : FallasTecnicasService,
                             private maquinasService : ActivosService,
                               private deperdicioService : DesperdicioService,
-                                private materiaService : MaterialProductoService,) {
+                                private materiaService : MaterialProductoService,
+                                  private messageService: MessageService) {
 
     this.FormDesperdicio = this.frmBuilder.group({
       OTDesperdicio : [null],
@@ -151,52 +154,58 @@ export class DesperdicioComponent implements OnInit {
 
   // Funcion que va a consultar el id de la falla y en su lugar colocará el nombre en el formulario
   buscarFalla(){
-    this.fallasService.srvObtenerListaPorId(this.FormDesperdicio.value.TipoNoConformidad).subscribe(datos_falla => {
-      this.FormDesperdicio.patchValue({
-        IdTipoNoConformidad : datos_falla.falla_Id,
-        TipoNoConformidad : datos_falla.falla_Nombre,
-      });
-    }, error => { this.mensajesError(`¡No se pudo obtener información de la "No Conformidad" seleccionada!`, error.message); });
+    let noConformidad : any = this.FormDesperdicio.value.TipoNoConformidad;
+    let nuevo : any[] =  this.fallas.filter((item) => item.falla_Id == noConformidad)
+
+    this.FormDesperdicio.patchValue({
+      IdTipoNoConformidad : nuevo[0].falla_Id,
+      TipoNoConformidad : nuevo[0].falla_Nombre,
+    });
   }
 
   // Funcion que va a consultar el id del operario y en su lugar colocará el nombre en el formulario
   buscarOperario(){
-    this.operariosService.srvObtenerListaPorId(this.FormDesperdicio.value.Operario).subscribe(datos_operario => {
-      this.FormDesperdicio.patchValue({
-        IdOperario : datos_operario.usua_Id,
-        Operario : datos_operario.usua_Nombre,
-      });
-    }, error => { this.mensajesError(`¡No se pudo obtener información del operario seleccionada!`, error.message); });
+    let operario : any = this.FormDesperdicio.value.Operario;
+    let nuevo : any[] =  this.operarios.filter((item) => item.usua_Id == operario)
+
+    this.FormDesperdicio.patchValue({
+      IdOperario : nuevo[0].usua_Id,
+      Operario : nuevo[0].usua_Nombre,
+    });
   }
 
   // Funcion que va a consultar el id de la maquina y en su lugar colocará el serial de la maquina
   buscarMaquina(){
-    this.maquinasService.GetId(this.FormDesperdicio.value.Maquina).subscribe(datos_maquinas => {
-      this.FormDesperdicio.patchValue({
-        IdMaquina : datos_maquinas.actv_Id,
-        Maquina : datos_maquinas.actv_Serial,
-      });
-    }, error => { this.mensajesError(`¡No se pudo obtener información de la maquina seleccionada!`, error.message); });
+    let maquina : any = this.FormDesperdicio.value.Maquina;
+    let nuevo : any[] =  this.maquinas.filter((item) => item.actv_Id == maquina)
+
+    this.FormDesperdicio.patchValue({
+      IdMaquina : nuevo[0].actv_Id,
+      Maquina : nuevo[0].actv_Nombre,
+    });
   }
 
   // Funcion que va a consultar el id del area y en su lugar colocará el nombre del area o proceso
   buscarProceso(){
-    this.procesosService.srvObtenerListaPorId(this.FormDesperdicio.value.Area).subscribe(datos_procesos => {
-      this.FormDesperdicio.patchValue({
-        IdArea : datos_procesos.proceso_Id,
-        Area : datos_procesos.proceso_Nombre,
-      });
-    }, error => { this.mensajesError(`¡No se pudo obtener información del área seleccionada!`, error.message); });
+    let proceso : any = this.FormDesperdicio.value.Area;
+    let nuevo : any[] =  this.procesos.filter((item) => item.proceso_Id == proceso)
+
+    this.FormDesperdicio.patchValue({
+      IdArea : nuevo[0].proceso_Id,
+      Area : nuevo[0].proceso_Nombre,
+    });
   }
 
   // Funcion que va a consultar el id del material y en su lugar colocará el nombre de este
   buscarMaterial(){
-    this.materiaService.srvObtenerListaPorId(this.FormDesperdicio.value.TipoMaterial).subscribe(datos_material => {
-      this.FormDesperdicio.patchValue({
-        IdTipoMaterial : datos_material.material_Id,
-        TipoMaterial : datos_material.material_Nombre,
-      });
-    }, error => { this.mensajesError(`¡No se pudo obtener información del material seleccionado!`, error.message); });
+    let material : any = this.FormDesperdicio.value.TipoMaterial;
+    let nuevo : any[] =  this.materiales.filter((item) => item.material_Id == material)
+
+    this.FormDesperdicio.patchValue({
+      IdTipoMaterial : nuevo[0].material_Id,
+      TipoMaterial : nuevo[0].material_Nombre,
+    });
+
   }
 
   // Funcion que consultará la informacion de la orden de trabajo
@@ -206,7 +215,7 @@ export class DesperdicioComponent implements OnInit {
     this.bagProService.srvObtenerListaClienteOT_Item(orden).subscribe(datos_orden => {
       if (datos_orden.length == 0) {
         this.cargando = false;
-        this.mensajesError(`¡No se pudo obtener información de la orden de trabajo N° ${orden}!`);
+        this.mostrarError(`Error`, `¡No se pudo obtener información de la orden de trabajo N° ${orden}!`);
       }
       for (let i = 0; i < datos_orden.length; i++) {
         let imp : any = datos_orden[i].impresion.trim();
@@ -222,7 +231,7 @@ export class DesperdicioComponent implements OnInit {
         });
         this.cargando = false;
       }
-    }, error => { this.mensajesError(`¡No se pudo obtener información de la orden de trabajo N° ${orden}!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `No se pudo obtener información de la OT N° ${orden}!`); });
   }
 
   // Funcion que va a llenar la tabla con la informacion del desperdicio digitadi
@@ -253,7 +262,7 @@ export class DesperdicioComponent implements OnInit {
       }
       this.grupoDespercios.push(info);
       this.cargando = false;
-    } else this.mensajesAdvertencia(`¡Hay Campos Vacios!`);
+    } else this.mostrarError(`Error`, `Debe llenar los campos vacios!`);
   }
 
   // Funcion que va a crear el registro de desperdicio
@@ -281,13 +290,13 @@ export class DesperdicioComponent implements OnInit {
           Proceso_Id : this.grupoDespercios[i].IdArea,
         }
         this.deperdicioService.Insert(info).subscribe(datos_insertados => {
-          Swal.fire({ icon : 'success', title : `Registro Exitoso`, text : 'Se ha ingresado el desperdicio exitosamente' });
+          this.mostrarConfirmacion(`Confirmación`, `Se ha ingresado el desperdicio exitosamente!`);
         }, error => {
-          this.mensajesError(`¡Ha ocurrido un error, no se pudo ingresar el desperdicio!`, error.message);
+          this.mostrarError(`Error`, `Ha ocurrido un error, no se pudo ingresar el desperdicio!`);
           error = true;
         });
       }
-    } else this.mensajesAdvertencia(`¡Debe añadir minimo un registro a la tabla para crear un desperdicio!`);
+    } else this.mostrarAdvertencia(`Advertencia`, `¡Debe añadir minimo un registro a la tabla para crear un desperdicio!`);
 
     setTimeout(() => {
       if (!error) {
@@ -365,7 +374,7 @@ export class DesperdicioComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => { this.mensajesError(`¡Error al consultar la información del ultimo registro!`, error.message); });
+    }, error => { this.mostrarError(`Error`,`¡Error al consultar la información del último registro!`); });
   }
 
   // Funcion que va a consultar los datos de desperdicio
@@ -389,7 +398,7 @@ export class DesperdicioComponent implements OnInit {
         this.datosPdf.push(info);
       }
       setTimeout(() => { this.crearPdf(); }, 2000);
-    }, error => { this.mensajesError(`¡Error al consultar la información del ultimo registro!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡Error al consultar la información del último registro!`); });
   }
 
   // Funcion que se encagará de llenar la tabla del pdf
@@ -425,49 +434,38 @@ export class DesperdicioComponent implements OnInit {
   }
 
   // Funcion que va a quitar un desperdicio de la tabla
-  quitarDesperdicio(data){
-    Swal.fire({
-      title: '¿Estás seguro de eliminar el desperdicio?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Eliminar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        for (let i = 0; i < this.grupoDespercios.length; i++) {
-          if (this.grupoDespercios[i].Ot == data.Ot && this.grupoDespercios[i].NoConformidad == data.NoConformidad) {
-            this.grupoDespercios.splice(i, 1);
-            const Toast = Swal.mixin({
-              toast: true,
-              position: 'center',
-              showConfirmButton: false,
-              timer: 1500,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-              }
-            });
-            Toast.fire({
-              icon: 'success',
-              title: `¡Se ha quitado el desperdicio de la Orden de Trabajo ${data.Ot} con la "No Conformidad" ${data.NoConformidad}!`
-            });
-          }
-        }
+  quitarDesperdicio(data: any){
+    data = this.registroSeleccionado;
+    this.onReject();
+    for (let i = 0; i < this.grupoDespercios.length; i++) {
+      if (this.grupoDespercios[i].Ot == data.Ot && this.grupoDespercios[i].NoConformidad == data.NoConformidad) {
+        this.grupoDespercios.splice(i, 1);
+        this.mostrarConfirmacion(`Confirmación`, `Registro de desperdicio eliminado con éxito!`);
       }
-    });
+    }
   }
 
-  // Funcion que pasará mensajes de advertencia
-  mensajesAdvertencia(texto : string){
-    Swal.fire({ icon : 'warning', title : `Advertencia`, text : texto });
-    this.cargando = false;
+    /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
   }
 
-  // Funcion que enviaraá mensajes de error
-  mensajesError(texto : string, error : any = ''){
-    Swal.fire({ icon : 'error', title : `Opps...`, html: `<b>${texto}</b><br>` + `<spam style="color: #f00">${error}</spam>` });
-    this.cargando = false;
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
+  }
+
+  onReject(){
+    this.messageService.clear('eleccion');
+  }
+
+  mostrarEleccion(item : any){
+    this.registroSeleccionado = item;
+    this.messageService.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea eliminar el desperdicio de la tabla?`, sticky: true});
   }
 }
