@@ -120,6 +120,10 @@ export class BagproService {
     return this.http.delete(this.rutaBagPro + `/ProcSellado/EliminarRollosSellado_Wiketiado/${id}`);
   }
 
+  GetRollosExtrusion_Empaque_Sellado(fechaInicial : any, fechaFinal : any, proceso : string, ruta : string){
+    return this.http.get<any>(this.rutaBagPro + `/ProcExtrusion/getRollosExtrusion_Empaque_Sellado/${fechaInicial}/${fechaFinal}/${proceso}${ruta}`);
+  }
+
 
   /*************************************************************** CLIENTESOT *******************************************************************/
 

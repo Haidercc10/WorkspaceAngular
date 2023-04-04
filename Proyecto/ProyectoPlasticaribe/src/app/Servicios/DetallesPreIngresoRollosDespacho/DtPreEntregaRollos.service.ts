@@ -65,6 +65,14 @@ export class DtPreEntregaRollosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/${dato}`);
   }
 
+  GetRollos(data : any []): Observable<any>{
+    return this.http.post(this.rutaPlasticaribeAPI + '/DetallePreEntrega_RolloDespacho/getRollos', data);
+  }
+
+  GetRollos_Ingresar(fechaInicial : any, fechaFinal : any, proceso : string, ruta : string){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/getRollos_Ingresar/${fechaInicial}/${fechaFinal}/${proceso}/${ruta}`);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/DetallePreEntrega_RolloDespacho/${id}`, data);
   }

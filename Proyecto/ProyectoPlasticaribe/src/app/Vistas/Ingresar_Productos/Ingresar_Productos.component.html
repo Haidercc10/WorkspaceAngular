@@ -2,7 +2,7 @@
 
 <app-menuLateral></app-menuLateral>
 
-<div class="d-flex justify-content-center overlay" *ngIf="!cargando">
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
   </div>
@@ -76,7 +76,7 @@
 
     <!-- Botones -->
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-      <button pButton class="p-button-danger" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="consultarOTbagPro()"></button>
+      <button pButton class="p-button-danger" type="button" label="Consultar Rollos" icon="pi pi-search" (click)="consultarRollos()"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarForm()"></button>
     </div>
   </form>
@@ -101,7 +101,7 @@
   </div>
 
   <!--Inicio tabla Rollos creados en OT -->
-  <div class="mb-3" *ngIf="cargando">
+  <div class="mb-3" *ngIf="!cargando">
     <div class="row g-3 font-size-14">
       <p-table
           #dt
@@ -163,17 +163,17 @@
     </div>
   </div>
 
-  <div class="mb-4" *ngIf="cargando">
+  <div class="mb-4" *ngIf="!cargando">
     <hr class="Linea">
   </div>
 
   <!-- Inicio titulo tabla producto -->
-  <div class="mb-4" *ngIf="cargando">
+  <div class="mb-4" *ngIf="!cargando">
     <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Rollos por Ingresar</h4>
   </div>
 
   <!--Inicio tabla Rollos a Insertar -->
-  <div class="mb-3" *ngIf="cargando">
+  <div class="mb-3" *ngIf="!cargando">
     <div class="row g-3 font-size-14">
       <p-table
           #dt
@@ -182,8 +182,6 @@
           responsiveLayout="scroll"
           [paginator]="true"
           [rows]="10"
-          [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} rollos"
           [rowsPerPageOptions]="[10,25,50]"
           [rowHover]="true"
           dataKey="Id"
@@ -204,43 +202,30 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-rollo>
-          <tr>
-            <ng-container *ngIf="rollo.exits; then thenTemplate; else elseTemplate"></ng-container>
-            <ng-template #thenTemplate>
-              <td style="background-color: rgb(255, 146, 146);">{{rollo.Ot}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{rollo.Id}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{rollo.IdProducto}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{rollo.Producto}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{rollo.Fecha}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{rollo.Cantidad | number}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{rollo.Presentacion}}</td>
-              <td style="background-color: rgb(255, 146, 146);">{{rollo.Estatus}}</td>
-            </ng-template>
-            <ng-template #elseTemplate>
-              <td>{{rollo.Ot}}</td>
-              <td>{{rollo.Id}}</td>
-              <td>{{rollo.IdProducto}}</td>
-              <td>{{rollo.Producto}}</td>
-              <td>{{rollo.Fecha}}</td>
-              <td>{{rollo.Cantidad | number}}</td>
-              <td>{{rollo.Presentacion}}</td>
-              <td>{{rollo.Estatus}}</td>
-              <td>
-                <p-tableCheckbox [value]="rollo" (click)="quitarRollo(rollo)"></p-tableCheckbox>
-              </td>
-            </ng-template>
+          <tr *ngIf="!rollo.exits;">
+            <td>{{rollo.Ot}}</td>
+            <td>{{rollo.Id}}</td>
+            <td>{{rollo.IdProducto}}</td>
+            <td>{{rollo.Producto}}</td>
+            <td>{{rollo.Fecha}}</td>
+            <td>{{rollo.Cantidad | number}}</td>
+            <td>{{rollo.Presentacion}}</td>
+            <td>{{rollo.Estatus}}</td>
+            <td>
+              <p-tableCheckbox [value]="rollo" (click)="quitarRollo(rollo)"></p-tableCheckbox>
+            </td>
           </tr>
         </ng-template>
       </p-table>
     </div>
   </div>
 
-  <div class="mb-4" *ngIf="cargando">
+  <div class="mb-4" *ngIf="!cargando">
     <hr class="Linea">
   </div>
 
   <!-- Inicio titulo tabla producto -->
-  <div class="mb-4" *ngIf="cargando">
+  <div class="mb-4" *ngIf="!cargando">
     <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado Productos</h4>
   </div>
 
@@ -254,7 +239,7 @@
     columnResizeMode="expand"
     responsiveLayout="scroll"
     [rowHover]="true"
-    *ngIf="cargando">
+    *ngIf="!cargando">
     <ng-template pTemplate="header">
       <tr>
         <th>#</th>
@@ -279,7 +264,7 @@
   <br>
 
   <!-- Botones -->
-  <div class="bajarPagina" *ngIf="cargando">
+  <div class="bajarPagina" *ngIf="!cargando">
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
       <button pButton class="p-button-danger" type="button" label="Ingresar Rollos" icon="pi pi-check" (click)="IngresarInfoRollos()"></button>
       <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>

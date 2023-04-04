@@ -66,6 +66,10 @@ export class DetallesEntradaRollosService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/ConsultarOTReporteProcesosSalidas/${ot}`);
   }
 
+  GetRollos(data : any []): Observable<any>{
+    return this.http.post(this.rutaPlasticaribeAPI + '/DetalleEntradaRollo_Producto/getRollos', data);
+  }
+
   srvActualizar(id:number|string, data:any) {
     return this.http.put(this.rutaPlasticaribeAPI + `/DetalleEntradaRollo_Producto/${id}`, data);
   }
