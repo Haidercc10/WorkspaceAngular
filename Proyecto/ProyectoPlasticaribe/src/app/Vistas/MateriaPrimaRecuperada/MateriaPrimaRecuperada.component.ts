@@ -180,7 +180,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
         RecMp_FechaEntrega : fecha,
         RecMp_HoraIngreso : moment().format("H:mm:ss"),
         RecMp_Maquina : 0,
-        Turno_Id : turno.turno_Id,
+        Turno_Id : turno,
         Usua_Operador: idUsuario,
       }
 

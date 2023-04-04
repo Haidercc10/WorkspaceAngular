@@ -135,8 +135,8 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
   // Funcion que va a Consultar segun los filtros que le pasemos
   consultar(){
     this.registros = [];
-    let fechaInicial : any = this.formReporteRMP.value.FechaInicial;
-    let fechaFinal : any = this.formReporteRMP.value.FechaFinal;
+    let fechaInicial : any = moment(this.formReporteRMP.value.FechaInicial).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.formReporteRMP.value.FechaFinal).format('YYYY-MM-DD');
     let materiaPrima : any = this.idMateriaPrima;
     let turno : any = this.formReporteRMP.value.Turno;
     let operario : any = this.idOperario;
@@ -211,8 +211,8 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
       this.modalInfoRecuperado = true;
       this.modalRecuperado.arrayRegistros = [];
       this.consultaTurno = 'Día';
-      let fechaInicial : any = this.formReporteRMP.value.FechaInicial;
-      let fechaFinal : any = this.formReporteRMP.value.FechaFinal;
+      let fechaInicial : any = moment(this.formReporteRMP.value.FechaInicial).format('YYYY-MM-DD');
+      let fechaFinal : any = moment(this.formReporteRMP.value.FechaFinal).format('YYYY-MM-DD');
       if (fechaInicial != null && fechaFinal == null) fechaFinal = fechaInicial;
       if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
       if (fechaFinal == null) fechaFinal = moment().format('YYYY-MM-DD');
@@ -240,8 +240,8 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
       this.modalInfoRecuperado = true;
       this.modalRecuperado.arrayRegistros = [];
       this.consultaTurno = 'Noche';
-      let fechaInicial : any = this.formReporteRMP.value.FechaInicial;
-      let fechaFinal : any = this.formReporteRMP.value.FechaFinal;
+      let fechaInicial : any = moment(this.formReporteRMP.value.FechaInicial).format('YYYY-MM-DD');
+      let fechaFinal : any = moment(this.formReporteRMP.value.FechaFinal).format('YYYY-MM-DD');
       if (fechaInicial != null && fechaFinal == null) fechaFinal = fechaInicial;
       if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
       if (fechaFinal == null) fechaFinal = moment().format('YYYY-MM-DD');
