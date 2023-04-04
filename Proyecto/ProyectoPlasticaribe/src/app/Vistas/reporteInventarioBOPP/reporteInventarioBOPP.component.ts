@@ -4,13 +4,13 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-reporteInventarioBOPP',
@@ -53,7 +53,8 @@ export class ReporteInventarioBOPPComponent implements OnInit {
                   private tipoBodegaService : TipoBodegaService,
                     private frmBuilderMateriaPrima : FormBuilder,
                       @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                        private boppService : EntradaBOPPService,) {
+                        private boppService : EntradaBOPPService,
+                          private messageService: MessageService) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : [null, Validators.required],
@@ -70,7 +71,7 @@ export class ReporteInventarioBOPPComponent implements OnInit {
 
   // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
-    if (this.ArrayMateriaPrima.length == 0) this.mensajeAdvertencia("¡Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla!");
+    if (this.ArrayMateriaPrima.length == 0) this.mostrarAdvertencia(`Advertencia`, "Para exportar el archivo a Excel, debe cargar materia prima en la tabla!");
     else {
       //this.load = false;
       //let datos : any =[];
@@ -154,7 +155,7 @@ export class ReporteInventarioBOPPComponent implements OnInit {
           });
           this.load = true;
         }, 1000);
-        this.mensajeExitoso('Se ha generado correctamente el formato excel!');
+        this.mostrarConfirmacion(`Confirmación`, 'Se ha generado correctamente el formato excel!');
         this.validarConsulta();
       }, 1500);
     }
@@ -215,21 +216,16 @@ export class ReporteInventarioBOPPComponent implements OnInit {
   obtenerMateriasPrimas(){
     this.materiasPrimas = [];
     let nombre : string = this.FormMateriaPrima.value.MpNombre;
-    this.materiaPrimaService.GetMateriaPrima_LikeNombre(nombre).subscribe(datos_materiaPrima => {
-      this.materiasPrimas = datos_materiaPrima;
-    });
+    this.materiaPrimaService.GetMateriaPrima_LikeNombre(nombre).subscribe(datos_materiaPrima => { this.materiasPrimas = datos_materiaPrima; });
   }
 
   //Funcion que va a mostrar el nombre de la materia prima
   cambiarNombreMateriaPrima(){
     let id : number = this.FormMateriaPrima.value.MpNombre;
-    this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
-      for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.FormMateriaPrima.patchValue({
-          MpId : datos_materiaPrima[i].id,
-          MpNombre: datos_materiaPrima[i].nombre,
-        });
-      }
+    let nuevo : any [] = this.materiasPrimas.filter((item) => item.id == id)
+    this.FormMateriaPrima.patchValue({
+      MpId : nuevo[0].id,
+      MpNombre: nuevo[0].nombre,
     });
   }
 
@@ -497,16 +493,6 @@ export class ReporteInventarioBOPPComponent implements OnInit {
     table.clear();
   }
 
-  // Funcion que va a devolver un mensaje de error
-  mensajeError(mensaje : string){
-    Swal.fire({ icon: 'error', title: '¡Ha ocurrido un error!', text: mensaje });
-  }
-
-  // Funcion que va a devover un mensaje de advertencia
-  mensajeAdvertencia(mensaje : string){
-    Swal.fire({ icon: 'warning', title: '¡Advertencia!', text: mensaje });
-  }
-
   /** Función que buscará en la tabla el dato que se digite en los campos de cada columna. */
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
@@ -560,9 +546,19 @@ export class ReporteInventarioBOPPComponent implements OnInit {
       this.arrayExcel.push(datos1);
   }
 
-  // Funcion que va a devover un mensaje de advertencia
-  mensajeExitoso(mensaje : string){
-    Swal.fire({ icon: 'success', title: '¡Registro Exitoso!', text: mensaje });
+    /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
+  }
+
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
   }
 
 }

@@ -100,9 +100,9 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
     if(this.idProducto.match(expresion) != null) {
       this.servicioProductos.obtenerNombreProductos(this.formFiltros.value.Producto).subscribe(dataProducto => { this.initForm_SeleccionProducto(dataProducto);
-      }, error => { this.mensajeError(`¡No se encontró información del producto seleccionado!`, error.message); });
+      }, error => { this.mostrarError(`Error`, `No se encontró información del producto seleccionado!`); });
     } else {
-      this.advertencia('Debe cargar un Item válido.');
+      this.mostrarAdvertencia(`Advertencia`, 'Debe cargar un Item válido.');
       this.idProducto = 0;
     }
   }
@@ -142,7 +142,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
     setTimeout(() => {
       this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, ruta).subscribe(dataDesperdicios => {
-        if (dataDesperdicios.length == 0) this.advertencia(`¡No se encontraron resultados de búsqueda con los filtros consultados.!`);
+        if (dataDesperdicios.length == 0) this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados.!`);
         else {
           for (let index = 0; index < dataDesperdicios.length; index++) {
             this.llenarTabla(dataDesperdicios[index]);
@@ -367,7 +367,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
          const pdf = pdfMake.createPdf(infoPdf);
          pdf.open();
          this.load = true;
-         this.Confirmacion(`¡PDF generado con éxito!`);
+         this.mostrarConfirmacion(`Confirmación`,`PDF generado con éxito!`);
          break;
       }
     });
@@ -422,16 +422,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     };
   }
 
-  /** Mensaje de confirmación que se motrará al generar un Pdf */
-  Confirmacion(mensaje : string) {
-    this.messageService.add({severity:'success', detail: mensaje});
-  }
-
-  /** Mensaje de alerta que se emitirá al momento de no encontrar datos de una consulta o por alguna inconsistencia */
-  advertencia(mensaje : any){
-    Swal.fire({icon: 'warning',  title: 'Advertencia', text: mensaje, confirmButtonColor: '#ffc107',});
-  }
-
   // Funcion que permitirá filtrar la información de la tabla
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
@@ -441,11 +431,6 @@ export class Reporte_DesperdiciosComponent implements OnInit {
   aplicarfiltro2($event, campo : any, valorCampo : string){
     this.dt2!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
     this.pesoTotalDesperdicio();
-  }
-
-  // Funcion que mostrará un mensaje de error
-  mensajeError(text : string, error : any){
-    Swal.fire({icon: 'error',  title: 'Opps...', showCloseButton : true, html: `<b>${text}</b>` + `<span style="color: #F00">${error}</span>`});
   }
 
   //Agrupar valores en PDF.
@@ -481,6 +466,21 @@ export class Reporte_DesperdiciosComponent implements OnInit {
       "No Conformidades" : cantDesperdicios
     }
     this.arrayDatosAgrupadosPdf.push(info);
+  }
+
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life:2000});
+  }
+
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life:2000});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life:2000});
   }
 }
 

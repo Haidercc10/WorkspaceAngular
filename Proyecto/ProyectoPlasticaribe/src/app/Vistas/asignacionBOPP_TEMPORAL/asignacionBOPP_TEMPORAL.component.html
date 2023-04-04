@@ -80,7 +80,7 @@
             <td>{{ot.micras | number}}</td>
             <td>{{ot.ancho | number}}</td>
             <td>{{ot.kg | number}}</td>
-            <td><i class="pi pi-trash cursor" title="Quitar Orden de Trabajo" (click)="mostrarEleccion(ot, 'OT')"></i></td>
+            <td><i class="pi pi-trash cursor" title="Quitar Orden de Trabajo" (click)="mostrarEleccion(ot, 'OT', '')"></i></td>
           </tr>
         </ng-template>
       </p-table>
@@ -177,7 +177,7 @@
                 </ng-template>
               </p-cellEditor>
             </td>
-            <td><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(bopp, 'Bopp')"></i></td>
+            <td><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(bopp, 'Bopp', '')"></i></td>
           </tr>
         </ng-template>
       </p-table>

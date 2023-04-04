@@ -159,7 +159,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   }
 
   /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
-  mostrarEleccion(item : any, eleccion : any, mensaje? : any){
+  mostrarEleccion(item : any, eleccion : any, mensaje : any){
     if (eleccion == 'OT') { this.itemSeleccionado = item; mensaje = `Está seguro que desea eliminar la OT ${item.ot} de la tabla?`; }
     if (eleccion == 'Bopp') { this.boppSeleccionado = item; mensaje = `Está seguro que desea eliminar el rollo ${item.Serial} de la tabla?`; }
 
@@ -183,14 +183,12 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
   // funcion que buscará la informacion del rollo seleccionado
   BOPPSeleccionado(){
-    this.boppService.srvObtenerListaPorSerial(this.FormularioBOPP.value.boppNombre).subscribe(datos_bopp => {
-      for (let i = 0; i < datos_bopp.length; i++) {
-        this.FormularioBOPP.setValue({
-          boppSerial: datos_bopp[i].bopP_Serial,
-          boppNombre : datos_bopp[i].bopP_Nombre,
-          boppCantidad : datos_bopp[i].bopP_Stock,
-        });
-      }
+    let serial : any = this.FormularioBOPP.value.boppNombre;
+    let nuevo : any [] = this.ArrayBOPP.filter((item) => item.bopP_Serial == serial);
+    this.FormularioBOPP.patchValue({
+      boppSerial: nuevo[0].bopP_Serial,
+      boppNombre: nuevo[0].bopP_Nombre,
+      boppCantidad: nuevo[0].bopP_Stock
     });
   }
 

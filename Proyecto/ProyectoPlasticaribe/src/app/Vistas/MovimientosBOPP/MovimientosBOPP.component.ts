@@ -13,6 +13,7 @@ import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
 import Swal from 'sweetalert2';
 import { ModalEditarAsignacionesBOPPComponent } from '../modal-editar-asignaciones-bopp/modal-editar-asignaciones-bopp.component';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-MovimientosBOPP',
@@ -54,7 +55,8 @@ export class MovimientosBOPPComponent implements OnInit {
                         private estadoService : EstadosService,
                           private asignacionBOPPService : AsignacionBOPPService,
                             private dtAsgBOPPService : DetalleAsignacion_BOPPService,
-                              private usuarioService : UsuarioService,) {
+                              private usuarioService : UsuarioService,
+                                private messageService: MessageService) {
 
     this.FormDocumentos = this.frmBuilderMateriaPrima.group({
       idDocumento : [null, Validators.required],
@@ -964,10 +966,25 @@ export class MovimientosBOPPComponent implements OnInit {
             this.EditarAsignacionesBOPP.ordenesTrabajo.push(infoOT);
             this.EditarAsignacionesBOPP.otRegistradas.push(ordenTrabajo);
             break;
-          } else if (itemOT.estado == 4 || itemOT.estado == 1) Swal.fire(`No es podible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
+          } else if (itemOT.estado == 4 || itemOT.estado == 1) this.mostrarAdvertencia(`Advertencia`, `No es posible asignar a esta orden de trabajo, la OT ${ordenTrabajo} se encuentra cerrada.`);
         }
       });
     }
+  }
+
+    /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
   }
 
 }
