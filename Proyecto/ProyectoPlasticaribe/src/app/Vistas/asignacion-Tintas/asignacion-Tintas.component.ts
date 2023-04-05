@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { MessageService } from 'primeng/api';
 import { modelAsignacionMPxTintas } from 'src/app/Modelo/modelAsignacionMPxTintas';
 import { AsignacionMPxTintasService } from 'src/app/Servicios/CreacionTintas/asignacionMPxTintas.service';
 import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/DetallesCreacionTintas/detallesAsignacionMPxTintas.service';
@@ -31,6 +32,7 @@ export class AsignacionTintasComponent implements OnInit {
   ArrayMateriaPrima = []; //Varibale que almacenará las materias primas que se estan asignando para crear una tinta
   componenteCrearTintas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalCrearTintas();
   componenteCrearMateriasPrimas : boolean = false; //Variable del componente de crear tintas, cambia su estado al llamar la función llamarModalMateriasPrimas();
+  mpSeleccionada : any = [];
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private frmBuilder : FormBuilder,
@@ -38,7 +40,8 @@ export class AsignacionTintasComponent implements OnInit {
                     private materiaPrimaService : MateriaPrimaService,
                       private tintasService : TintasService,
                         private asignacionMPxTintas : AsignacionMPxTintasService,
-                          private detallesAsignacionMPxTintas : DetallesAsignacionMPxTintasService,)  {
+                          private detallesAsignacionMPxTintas : DetallesAsignacionMPxTintasService,
+                            private messageService: MessageService)  {
 
     this.FormAsignacionMP = this.frmBuilder.group({
       Id_Tinta : [null, Validators.required],
@@ -101,10 +104,7 @@ export class AsignacionTintasComponent implements OnInit {
   obtenerTintas(){
     this.tintasService.srvObtenerListaXColores().subscribe(datos_tintas => {
       for (let i = 0; i < datos_tintas.length; i++) {
-        let tinta : any = {
-          id : datos_tintas[i].tinta_Id,
-          name : datos_tintas[i].tinta_Nombre,
-        }
+        let tinta : any = { id : datos_tintas[i].tinta_Id, name : datos_tintas[i].tinta_Nombre, und : datos_tintas[i].undMed_Id}
         this.tintas.push(tinta);
       }
     });
@@ -113,13 +113,12 @@ export class AsignacionTintasComponent implements OnInit {
   // funcion que servirá para llenar el campo de unidad de medida de la tinta dependiendo la tinta seleccionada
   buscarTintaSeleccionada(){
     let tinta : any = this.FormAsignacionMP.value.Tinta;
-    this.tintasService.srvObtenerListaPorId(tinta).subscribe(datos_tinta => {
+    let nuevo : any[] = this.tintas.filter((item) => item.id == tinta);
       this.FormAsignacionMP .patchValue({
-        Id_Tinta: datos_tinta.tinta_Id,
-        Tinta : datos_tinta.tinta_Nombre,
-        undMedTinta : datos_tinta.undMed_Id,
+        Id_Tinta: nuevo[0].id,
+        Tinta : nuevo[0].name,
+        undMedTinta : nuevo[0].und,
       });
-    }, error => { this.mensajeError(`¡No se ha podido obtener información de la tinta seleccionada!`, error.message); });
   }
 
   // Función que buscará las materias primas que se utilizan para crear tintas
@@ -159,13 +158,13 @@ export class AsignacionTintasComponent implements OnInit {
           undMedMateriaPrima : datos_materiasPrimas[index].unidad,
         });
       }
-    }, error => { this.mensajeError(`¡No se ha podido obtener información de la materia prima seleccionada!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡No se ha podido obtener información de la materia prima seleccionada!`); });
   }
 
   //Funcion que validará si alguno de los campos del fomulario de materia prima esta vacio
   validarCamposMateriaPrima(){
     if (this.FormMateriaPrima.valid) this.cargarMateriaPrimaEnTabla();
-    else this.mensajeAdvertencia("Hay campos vacios en el apartado de seleccion de materia prima");
+    else this.mostrarAdvertencia(`Advertencia`, "Hay campos vacios en el apartado de selección de materia prima");
   }
 
   // Funcion que cargará las materias primas en las tabla
@@ -193,33 +192,23 @@ export class AsignacionTintasComponent implements OnInit {
       }
       this.ArrayMateriaPrima.push(productoExt);
       this.FormMateriaPrima.reset();
-    } else this.mensajeAdvertencia('¡La cantidad a asignar no debe superar lo que hay en stock!');
+    } else this.mostrarAdvertencia(`Advertencia`, '¡La cantidad a asignar no debe superar lo que hay en stock!');
   }
 
   // Funcion que validará la asignación
   validarAsignacion(){
     if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
       this.tintasService.srvObtenerListaPorId(this.FormAsignacionMP.value.Id_Tinta).subscribe(datos_tinta => {
-        Swal.fire({
-          icon: 'warning',
-          title: '¡Confirmación!',
-          html:
-          `<b>¡Creación de ${this.formatonumeros(this.FormAsignacionMP.value.cantidadTinta)} Kg de la Tinta ${datos_tinta.tinta_Nombre}!</b><hr>`,
-          showCloseButton: true,
-          showConfirmButton: true,
-          showCancelButton : true,
-          confirmButtonColor : '#d44',
-          cancelButtonText : `Cerrar`,
-          confirmButtonText : 'Crear Tinta <i class="pi pi-arrow-right"></i>',
-        }).then((result) => {
-          if (result.isConfirmed) this.asignarMPCrearTintas();
-        });
+
+        this.mostrarEleccion();
+        //this.asignarMPCrearTintas();
       });
-    } else this.mensajeAdvertencia("¡Hay campos vacios!");
+    } else this.mostrarAdvertencia(`Advertencia`, "Debe llenar los campos vacios!");
   }
 
   //Funcion que almacenará en la base de datos la informacion general sobre la asignacion de materia prima
   asignarMPCrearTintas(){
+    this.onReject('asignacion');
     if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
       this.load = false;
       let tinta : any = this.FormAsignacionMP.value.Id_Tinta;
@@ -244,8 +233,8 @@ export class AsignacionTintasComponent implements OnInit {
       this.asignacionMPxTintas.srvGuardar(datos_asignacionMP).subscribe(datos_asignacionMPxTintas => {
         this.obtenerUltimoIdAsignacion();
         setTimeout(() => {  }, 3000);
-      }, error => { this.mensajeError(`¡¡Error al registrar la creación de tinta!!`, error.message); });
-    } else this.mensajeAdvertencia("¡Hay campos vacios!");
+      }, error => { this.mostrarAdvertencia(`¡Error al registrar la creación de tinta!`, error.message); });
+    } else this.mostrarAdvertencia(`Advertencia`, "Debe llenar los campos vacios!");
   }
 
   // Funcion que servirá para poder obtener el ultimo Id de la asignacion creada y pasarlo a la funcion de creacion de AsignacionMP para que pueda tener el ID de la asignacion
@@ -261,13 +250,13 @@ export class AsignacionTintasComponent implements OnInit {
           proceso_Id : 'TINTAS',
         }
         this.detallesAsignacionMPxTintas.srvGuardar(datosDetallesAsignacion).subscribe(datos_detallesAsignacionMPxTintas => {
-        }, error => { this.mensajeError(`¡¡Error al registrar los detalles de la creación de tinta!!`, error.message); });
+        }, error => { this.mostrarError(`Error`, `¡Error al registrar los detalles de la creación de tinta!`); });
       }
       this.moverInventarioMP();
       this.moverInventarioTintas();
       setTimeout(() => { this.sumarInventarioTintas(); }, 1000);
       this.load = false;
-    }, error => { this.mensajeError(`¡¡Error al consultar el último Id de asignación!!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡Error al consultar el último Id de asignación!`); });
   }
 
   // Funcion que moverá el inventario de la materia prima que se está asignando para la creacion de la tintas
@@ -288,8 +277,8 @@ export class AsignacionTintasComponent implements OnInit {
           TpBod_Id : datos_materiaPrima.tpBod_Id,
         }
         this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].Materia_Prima, datosMPActualizada).subscribe(datos_mp_creada => {
-        }, error => { this.mensajeError(`¡¡Error al mover el inventario de materia prima!!`, error.message); });
-      }, error => { this.mensajeError(`¡¡Error al consultar la materia prima!!`, error.message); });
+        }, error => { this.mostrarError(`Error`, `¡Error al mover el inventario de materia prima!`); });
+      }, error => { this.mostrarError(`Error`, `¡Error al consultar la materia prima!`); });
     }
   }
 
@@ -316,8 +305,8 @@ export class AsignacionTintasComponent implements OnInit {
           Tinta_Hora : datos_tinta.tinta_Hora,
         }
         this.tintasService.srvActualizar(this.ArrayMateriaPrima[index].Tinta, datosTintaActualizada).subscribe(datos_mp_creada => {
-        }, error => { this.mensajeError(`¡¡Error al mover el invantario de tinta!!`, error.message); });
-      }, error => { this.mensajeError(`¡¡Error al consultar la tinta!!`, error.message); });
+        }, error => { this.mostrarError(`Error`, `¡Error al mover el invantario de tinta!`); });
+      }, error => { this.mostrarError(`Error`, `¡Error al consultar la tinta!`); });
     }
   }
 
@@ -340,28 +329,19 @@ export class AsignacionTintasComponent implements OnInit {
         Tinta_Hora : datos_tinta.tinta_Hora,
       }
       this.tintasService.srvActualizar(tinta, datosTintaCreada).subscribe(datos_mp_creada => {
-        Swal.fire({ icon: 'success', title: 'Registro Exitoso', html: `<b>¡Registro completado con exito!</b>`, showCloseButton: true, });
+        this.mostrarConfirmacion(`Confirmación`, `¡Registro completado con exito!`);
         this.limpiarTodosLosCampos();
-      }, error => { this.mensajeError(`¡¡Error al sumar al inventario de la tinta ${datos_tinta.tinta_Nombre}!!`, error.message); });
-    }, error => { this.mensajeError(`¡No se pudo obtener información de la tinta con Id ${tinta}!`, error.message); });
+      }, error => { this.mostrarError(`¡Error al sumar al inventario de la tinta ${datos_tinta.tinta_Nombre}!`, error.message); });
+    }, error => { this.mostrarError(`¡No se pudo obtener información de la tinta con Id ${tinta}!`, error.message); });
   }
 
   // Función para quitar una materia prima de la tabla
   QuitarMateriaPrimaTabla(formulario : any) {
-    Swal.fire({
-      title: '¿Estás seguro de eliminar la Materia Prima de la Asignación?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Eliminar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
-          if (this.ArrayMateriaPrima[i].Id == formulario.Id) this.ArrayMateriaPrima.splice(i, 1);
-        }
-      }
-    });
+    formulario = this.mpSeleccionada;
+    this.onReject('mp');
+    for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
+      if (this.ArrayMateriaPrima[i].Id == formulario.Id) this.ArrayMateriaPrima.splice(i, 1);
+    }
   }
 
   //
@@ -377,12 +357,44 @@ export class AsignacionTintasComponent implements OnInit {
   // Mensaje de Advertencia
   mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
     Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
-    this.load = false;
+
   }
 
   // Mensaje de Error
   mensajeError(text : string, error : any = ''){
     Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
-    this.load = false;
+
+  }
+
+    /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
+   this.load = false;
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
+   this.load = false;
+  }
+
+  /** Cerrar Dialogo de eliminación*/
+  onReject(dato : any) {
+   this.messageService.clear(dato);
+  }
+
+  /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
+  mostrarEleccion(){
+    this.messageService.add({severity:'warn', key:'asignacion', summary:'Elección', detail: `¿Está seguro que desea crear ${this.FormAsignacionMP.value.cantidadTinta} Kg de la tinta ${this.FormAsignacionMP.value.Tinta}?`, sticky: true});
+  }
+
+  mostrarEleccion2(item: any){
+    this.mpSeleccionada = item;
+    this.messageService.add({severity:'warn', key:'mp', summary:'Elección', detail: `¿Está seguro que desea quitar la materia prima ${this.mpSeleccionada.Nombre} de la tabla?`, sticky: true});
   }
 }

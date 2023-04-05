@@ -99,20 +99,13 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     this.idProducto = this.formFiltros.value.Producto;
 
     if(this.idProducto.match(expresion) != null) {
-      this.servicioProductos.obtenerNombreProductos(this.formFiltros.value.Producto).subscribe(dataProducto => { this.initForm_SeleccionProducto(dataProducto);
-      }, error => { this.mostrarError(`Error`, `No se encontró información del producto seleccionado!`); });
-    } else {
-      this.mostrarAdvertencia(`Advertencia`, 'Debe cargar un Item válido.');
-      this.idProducto = 0;
-    }
-  }
-
-  /** Función que actualizará los filtros de busqueda, agregando el nombre del Item */
-  initForm_SeleccionProducto(nombreProducto : any){
-    this.formFiltros.patchValue({
-      productoId : this.idProducto,
-      Producto: nombreProducto,
-    });
+      let nuevo: any[] = this.arrayProductos.filter((item) => item.prod_Id == this.idProducto);
+      this.formFiltros.patchValue({
+        productoId : nuevo[0].prod_Id,
+        Producto: nuevo[0].prod_Nombre,
+      });
+      console.log(this.formFiltros.value)
+    } else this.mostrarAdvertencia(`Advertencia`, 'Debe cargar un Item válido.');
   }
 
   /** Función que consultará según los campos de busqueda diferentes de vacio. */
@@ -121,8 +114,8 @@ export class Reporte_DesperdiciosComponent implements OnInit {
     let OT : any = this.formFiltros.value.OT;
     let fecha1 : any = moment(this.formFiltros.value.fechaInicio).format('YYYY-MM-DD');
     let fecha2 : any = moment(this.formFiltros.value.fechaFinal).format('YYYY-MM-DD');
-    let material : any = this.formFiltros.value.Material
-    let item : any = this.formFiltros.value.Producto
+    let material : any = this.formFiltros.value.Material;
+    let item : any = this.formFiltros.value.productoId;
     this.arrayConsulta = [];
     let ruta : string = '';
 
@@ -142,7 +135,7 @@ export class Reporte_DesperdiciosComponent implements OnInit {
 
     setTimeout(() => {
       this.servicioDesperdicios.getDesperdicio(fecha1, fecha2, ruta).subscribe(dataDesperdicios => {
-        if (dataDesperdicios.length == 0) this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados.!`);
+        if (dataDesperdicios.length == 0) this.mostrarAdvertencia(`Advertencia`, `No se encontraron resultados de búsqueda con los filtros consultados!`);
         else {
           for (let index = 0; index < dataDesperdicios.length; index++) {
             this.llenarTabla(dataDesperdicios[index]);

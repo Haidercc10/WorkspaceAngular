@@ -8,7 +8,7 @@ import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMater
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
-import Swal from 'sweetalert2';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-devolucionesMP',
@@ -38,7 +38,8 @@ export class DevolucionesMPComponent implements OnInit {
                       private devolucionMPService : DevolucionesMPService,
                         private servicioTintas : TintasService,
                           private detallesAsignacionService : DetallesAsignacionService,
-                            private boppService : EntradaBOPPService,) {
+                            private boppService : EntradaBOPPService,
+                              private messageService: MessageService) {
 
     this.FormDevolucion = this.frmBuilderMateriaPrima.group({
       ot : ['', Validators.required],
@@ -110,7 +111,7 @@ export class DevolucionesMPComponent implements OnInit {
           }
         }
       }
-    }, error => { this.mensajeError(`¡¡No hay materia prima asignadas a la orden de trabajo ${ot}!!`, error.message); });
+    }, error => { this.mostrarAdvertencia(`Error`, `¡No hay materias primas asignadas a la OT ${ot}!`); });
     setTimeout(() => {
       this.devolucionMPService.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
         for (let j = 0; j < datos_devolucion.length; j++) {
@@ -122,7 +123,7 @@ export class DevolucionesMPComponent implements OnInit {
             }
           }
         }
-      }, error => { this.mensajeError(`¡¡Error al obtener las devoluciones de la ot ${ot}!!`, error.message); });
+      }, error => { this.mostrarError(`Error`, `¡Error al obtener las devoluciones de la OT ${ot}!`); });
       this.load = true;
     }, 2500);
   }
@@ -178,8 +179,8 @@ export class DevolucionesMPComponent implements OnInit {
       }
 
       this.devolucionService.srvGuardar(datosDevolucion).subscribe(datos_DevolucionCreada => { this.creacionDevolucionMateriaPrima();
-      }, error => { this.mensajeError(`¡¡Error al crear la  devolución de materia prima!!`, error.message); });
-    } else this.mensajeAdvertencia(`¡Debe seleccionar minimo 1 materia prima para devolver!`);
+      }, error => { this.mostrarError(`Error`, `¡Error al crear la devolución de materia prima!`); });
+    } else this.mostrarAdvertencia(`Advertencia`, `¡Debe seleccionar minimo una materia prima para devolver!`);
   }
 
   //Funcion que creará el registro de la materia que viene en un pedido
@@ -197,7 +198,7 @@ export class DevolucionesMPComponent implements OnInit {
             Proceso_Id : this.materiasPrimasRetiradas[i].Proceso,
           }
           this.devolucionMPService.srvGuardar(datosDevolucionMp).subscribe(datos_recuperadoMpCreada => {
-          }, error => { this.mensajeError(`¡¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!!`, error.message); });
+          }, error => { this.mostrarError(`Error`, `¡No se ha podido crear la devolución de la materia prima ${this.materiasPrimasRetiradas[i].Nombre}!`); });
         }
       }
     });
@@ -230,8 +231,8 @@ export class DevolucionesMPComponent implements OnInit {
             TpBod_Id : datos_materiaPrima.tpBod_Id,
           }
           this.materiaPrimaService.srvActualizar(this.materiasPrimasRetiradas[index].Id_MateriaPrima, datosMP).subscribe(datos_mp_creada => {
-            Swal.fire({ icon: 'success', title: '¡Registro Exitoso!', html: `<b>¡Registro de Devolución Creado Con Exito!</b><hr>` });
-          }, error => { this.mensajeError(`¡¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!!`, error.message); });
+            this.mostrarConfirmacion(`Confirmación`, `Registro de devolución creado con éxito`);
+          }, error => { this.mostrarError(`Error`, `¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!`); });
         });
       }
     }
@@ -260,8 +261,8 @@ export class DevolucionesMPComponent implements OnInit {
             tinta_InvInicial : datos_tinta.tinta_InvInicial,
           }
           this.servicioTintas.srvActualizar(this.materiasPrimasRetiradas[index].Id_Tinta, datosTintaActualizada).subscribe(datos_mp_creada => {
-            Swal.fire({ icon: 'success', title: '¡Registro Exitoso!', html: `<b>¡Registro de Devolución Creado Con Exito!</b><hr> ` });
-          }, error => { this.mensajeError(`¡¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!!`, error.message); });
+            this.mostrarConfirmacion(`Confirmación`, `Registro de devolución creado con éxito!`);
+          }, error => { this.mostrarError(`Error`, `¡No se ha podido mover el inventario de la materia prima ${this.materiasPrimasRetiradas[index].Nombre}!`); });
         });
       }
     }
@@ -297,8 +298,8 @@ export class DevolucionesMPComponent implements OnInit {
               Usua_Id : item.usua_Id
             }
             this.boppService.srvActualizar(this.materiasPrimasRetiradas[i].Id_Bopp, datosBOPP).subscribe(datos_boppActualizado => {
-              Swal.fire({ icon: 'success', title: '¡Registro Exitoso!', html: `<b>¡Registro de Devolución Creado Con Exito!</b><hr> ` });
-            }, error => { this.mensajeError(`¡¡No se ha podido mover el inventario del bopp ${this.materiasPrimasRetiradas[i].Nombre}!!`, error.message); });
+              this.mostrarConfirmacion(`Confirmación`, `Registro de devolución creado con éxito!`);
+            }, error => { this.mostrarError(`Error`, `¡No se ha podido mover el inventario del bopp ${this.materiasPrimasRetiradas[i].Nombre}!`); });
           }
         });
       }
@@ -317,15 +318,18 @@ export class DevolucionesMPComponent implements OnInit {
     this.materiasPrimasRetiradas = [];
   }
 
-  // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
-    this.load = true;
+    /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
   }
 
-  // Mensaje de Error
-  mensajeError(text : string, error : any = ''){
-    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
-    this.load = true;
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
   }
 }

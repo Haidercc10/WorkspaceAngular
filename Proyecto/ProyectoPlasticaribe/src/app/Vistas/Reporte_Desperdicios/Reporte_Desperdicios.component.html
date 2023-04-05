@@ -57,7 +57,7 @@
          <!--Item-->
         <div class="col-md-4">
           <span class="p-float-label">
-            <input formControlName="Producto" id="Producto" list="productos" class="form-control form-control-sm" type="text" pInputText (keyup)="likeCargarProductos()" (change)="seleccionarProducto()"/>
+            <input formControlName="Producto" id="Producto" list="productos" class="form-control form-control-sm" autocomplete="off" type="text" pInputText (keyup)="likeCargarProductos()" (change)="seleccionarProducto()"/>
             <datalist id="productos">
               <option value={{item.prod_Id}} *ngFor="let item of arrayProductos">{{item.prod_Nombre}}</option>
             </datalist>

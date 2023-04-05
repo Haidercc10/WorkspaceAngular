@@ -262,7 +262,7 @@ export class DesperdicioComponent implements OnInit {
       }
       this.grupoDespercios.push(info);
       this.cargando = false;
-    } else this.mostrarError(`Error`, `Debe llenar los campos vacios!`);
+    } else this.mostrarAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
   }
 
   // Funcion que va a crear el registro de desperdicio
@@ -453,11 +453,13 @@ export class DesperdicioComponent implements OnInit {
   /** Mostrar mensaje de error  */
   mostrarError(mensaje : any, titulo?: any) {
    this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
+   this.cargando =false;
   }
 
   /** Mostrar mensaje de advertencia */
   mostrarAdvertencia(mensaje : any, titulo?: any) {
    this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
+   this.cargando =false;
   }
 
   onReject(){

@@ -1,5 +1,5 @@
 <app-menuLateral></app-menuLateral>
-
+<p-toast position="center"></p-toast>
 <div class="fondo">
   <div class="d-flex justify-content-center overlay" *ngIf="load">
     <div style="margin: auto;">
@@ -29,7 +29,7 @@
 
       <!--Titulo Asignación -->
       <div class="mb-3">
-        <h4 class="tituloRojo">Creación de Tintas</h4>
+        <h4 class="tituloRojo"><i class="pi pi-check-circle"></i> Creación de Tintas</h4>
       </div>
       <br>
 
@@ -42,7 +42,7 @@
             <div class="col-md-4">
               <span class="p-input-icon-left p-float-label">
                 <i class="pi pi-search"></i>
-                <input formControlName="Tinta" id="Tinta" list="ListaTinta" class="form-control form-control-sm" type="text" pInputText  (change)="buscarTintaSeleccionada()" required/>
+                <input formControlName="Tinta" id="Tinta" list="ListaTinta" class="form-control form-control-sm" type="text" pInputText (change)="buscarTintaSeleccionada()" required/>
                 <datalist id="ListaTinta">
                   <option value={{item.id}} *ngFor="let item of tintas">{{item.name}}</option>
                 </datalist>
@@ -80,7 +80,7 @@
 
       <!-- Titulo Materia Prima -->
       <div class="mb-3">
-        <h4 class="tituloRojo">Materia Prima</h4>
+        <h4 class="tituloRojo"><i class="pi pi-box"></i> Materia Prima</h4>
       </div>
 
       <!-- Formulario de Materia Prima -->
@@ -135,7 +135,7 @@
         <!-- BOTONES -->
         <div class="mb-4">
           <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarCamposMateriaPrima()"></button>
+            <button pButton pRipple label="Agregar Materia Prima" type="button" icon="pi pi-send" class="p-button-danger" (click)="validarCamposMateriaPrima()"></button>
             <button pButton pRipple label="Limpiar Campos MP" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarCamposMateriaPrima()"></button>
           </div>
         </div>
@@ -147,7 +147,7 @@
       </div>
 
       <div class="mb-4">
-        <h4 class="tituloRojo">Tabla de materias primas asignadas</h4>
+        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de materias primas asignadas</h4>
       </div>
 
       <!-- TABLA DE Materias Primas Asignadas -->
@@ -172,13 +172,13 @@
                 <th scope="col">Eliminar</th>
               </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-ArrayMateriaPrima>
+            <ng-template pTemplate="body" let-ArrayMateriaPrima >
               <tr>
                 <td>{{ArrayMateriaPrima.Id}}</td>
                 <td>{{ArrayMateriaPrima.Nombre}}</td>
                 <td>{{ArrayMateriaPrima.Cant | number}}</td>
                 <td>{{ArrayMateriaPrima.UndCant}}</td>
-                <td><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="QuitarMateriaPrimaTabla(ArrayMateriaPrima)"></i></td>
+                <td><i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion2(ArrayMateriaPrima)"></i></td>
               </tr>
             </ng-template>
           </p-table>
@@ -190,7 +190,7 @@
         <div class="row g-3">
           <div class="mb-3">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="validarAsignacion()"></button>
+              <button pButton pRipple label="Asignar Materia Prima" type="button" icon="pi pi-check" class="p-button-danger" (click)="mostrarEleccion()"></button>
               <button pButton pRipple label="Limpiar Todo" type="button" class="p-button-secondary" icon="pi pi-eraser" (click)="limpiarTodosLosCampos()"></button>
             </div>
           </div>
@@ -231,3 +231,42 @@
   </div>
 </div>
 
+<p-toast position="center" key="asignacion" (onClose)="onReject('asignacion')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="asignarMPCrearTintas()" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('asignacion')" icon="pi pi-cancel" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<p-toast position="center" key="mp" (onClose)="onReject('mp')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-mp>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="QuitarMateriaPrimaTabla(mp)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('mp')" icon="pi pi-cancel" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

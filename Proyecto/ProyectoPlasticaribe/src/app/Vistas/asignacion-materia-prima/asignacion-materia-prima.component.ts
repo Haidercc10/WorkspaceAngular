@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { MessageService } from 'primeng/api';
 import { AsignacionMPService } from 'src/app/Servicios/Asignacion_MateriaPrima/asignacionMP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
@@ -22,7 +23,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   public FormMateriaPrimaRetiro !: FormGroup;
   public FormMateriaPrimaRetirada !: FormGroup;
 
-  /* Vaiables*/
+  /* Variables*/
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -46,6 +47,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   otImpresion : any [] = []; //Variable que va a almacenar las diferentes ordenes de trabajo que contiene la orden de trabajo de impresión
   categoriasSeleccionadas : any [] = [];
   soloTintas : boolean = false;
+  mpSeleccionada : any = [];
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private unidadMedidaService : UnidadMedidaService,
@@ -56,7 +58,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                           private detallesAsignacionService : DetallesAsignacionService,
                             private bagProServices : BagproService,
                               private tintasService : TintasService,
-                                private detallesAsignacionTintas : DetallesAsignacionTintasService,) {
+                                private detallesAsignacionTintas : DetallesAsignacionTintasService,
+                                  private messageService: MessageService) {
 
     this.FormMateriaPrimaRetiro = this.frmBuilderMateriaPrima.group({
       OTRetiro : [null, Validators.required],
@@ -198,8 +201,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           });
           break;
         }
-      } else this.mensajeAdvertencia(`La orden de trabajo N° ${ot} no se encuentra registrada en BagPro`);
-    }, error => { this.mensajeError(`¡Error al consultar la OT ${ot}!`, error.message); });
+      } else this.mostrarAdvertencia(`La OT N° ${ot} no se encuentra registrada en BagPro`);
+    }, error => { this.mostrarError(`¡Error al consultar la OT ${ot}!`); });
   }
 
   //Funcion que va a mostrar el nombre de la materia prima
@@ -252,52 +255,28 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               this.materiasPrimasSeleccionada_ID.push(this.FormMateriaPrimaRetirada.value.MpIdRetirada);
               this.materiasPrimasSeleccionadas.push(info);
               this.FormMateriaPrimaRetirada.reset();
-            } else this.mensajeAdvertencia(`¡La cantidad a asignar supera a la cantidad en stock!`);
-          } else this.mensajeAdvertencia(`¡Debe seleccionar hacia que proceso va la materia prima!`);
-        } else this.mensajeAdvertencia(`¡La materia prima ${this.FormMateriaPrimaRetirada.value.MpNombreRetirada} ya ha sido seleccionada!`);
-      } else this.mensajeAdvertencia(`¡La cantidad a asignar debe ser mayor a cero (0)!`);
-    } else this.mensajeAdvertencia(`¡Hay campos de la materia prima vacios!`);
+            } else this.mostrarAdvertencia(`¡La cantidad a asignar supera a la cantidad en stock!`);
+          } else this.mostrarAdvertencia(`¡Debe seleccionar hacia que proceso va la materia prima!`);
+        } else this.mostrarAdvertencia(`¡La materia prima ${this.FormMateriaPrimaRetirada.value.MpNombreRetirada} ya ha sido seleccionada!`);
+      } else this.mostrarAdvertencia(`¡La cantidad a asignar debe ser mayor a cero (0)!`);
+    } else this.mostrarAdvertencia(`¡Hay campos vacios en el formulario de materia prima!`);
   }
 
   // Funcion que va a quitar la materia prima
   quitarMateriaPrima(data : any){
-    Swal.fire({
-      title: '¿Estás seguro de eliminar la Materia Prima de la Asignación?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Eliminar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
-          if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
-            this.materiasPrimasSeleccionadas.splice(i, 1);
-            for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
-              if (data.Id == this.materiasPrimasSeleccionada_ID[j]) {
-                this.materiasPrimasSeleccionada_ID.splice(j, 1);
-                this.categoriasSeleccionadas.splice(j, 1);
-              }
-            }
-            const Toast = Swal.mixin({
-              toast: true,
-              position: 'center',
-              showConfirmButton: false,
-              timer: 1500,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-              }
-            });
-            Toast.fire({
-              icon: 'success',
-              title: `¡Se ha quitado la Materia Prima ${data.Nombre} de la Asignación!`
-            });
+    this.onReject('eleccion');
+    data = this.mpSeleccionada;
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
+        this.materiasPrimasSeleccionadas.splice(i, 1);
+        for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
+          if (data.Id == this.materiasPrimasSeleccionada_ID[j]) {
+            this.materiasPrimasSeleccionada_ID.splice(j, 1);
+            this.categoriasSeleccionadas.splice(j, 1);
           }
         }
       }
-    });
+    }
   }
 
   // Funcion que hará validaciones antes de realizar la asignación
@@ -306,9 +285,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     if (this.FormMateriaPrimaRetiro.valid) {
       if (this.materiasPrimasSeleccionadas.length != 0){
         if (maquina >= 1 && maquina != 0) this.asignacionMateriaPrima();
-        else this.mensajeAdvertencia('¡El numero de la maquina no es valido!');
-      } else this.mensajeAdvertencia('¡Debe selccionar minimo una materia prima para crear la asignación!');
-    } else this.mensajeAdvertencia('¡Hay campos vaios!');
+        else this.mostrarAdvertencia('¡El numero de la maquina no es valido!');
+      } else this.mostrarAdvertencia('¡Debe seleccionar minimo una materia prima para crear la asignación!');
+    } else this.mostrarAdvertencia('¡Debe llenar los campos vacios!');
   }
 
   //Funcion que asignará la materia prima a una Orden de trabajo y Proceso y lo guardará en la base de datos
@@ -326,33 +305,20 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
               this.crearAsignacion();
             } else {
               this.load = true;
-              if (this.ValidarRol != 1) this.mensajeAdvertencia(`¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}!`, `Debe solicitar permisos a un usuario administrador.`);
+              if (this.ValidarRol != 1) this.mostrarAdvertencia(`¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos a un usuario administrador.`);
               else if (this.ValidarRol == 1) {
-                Swal.fire({
-                  icon: 'warning',
-                  title: 'Advertencia',
-                  html:
-                  `<b>¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}!</b><hr> ` +
-                  `<spam>¿Desea asignar de todas formas?</spam>`,
-                  showCloseButton: true,
-                  showCancelButton: true,
-                  showConfirmButton: true,
-                  showDenyButton: true,
-                  confirmButtonText: 'Si',
-                  denyButtonText: 'No'
-                }).then((result) => {
-                  if (result.isConfirmed) this.crearAsignacion();
-                });
+                this.confirmarAsignacion(idOrdenTrabajo);
               }
             }
           }
         }, 2000);
-      } else if (this.estadoOT == 4 || this.estadoOT == 1) this.mensajeAdvertencia(`¡No es podible asignar a esta orden de trabajo, la OT ${idOrdenTrabajo} se encuentra cerrada.!`);
+      } else if (this.estadoOT == 4 || this.estadoOT == 1) this.mostrarAdvertencia(`¡No es posible asignar a la OT ${idOrdenTrabajo},porque ya se encuentra cerrada!`);
     }
   }
 
   // Crear Asignacion
   crearAsignacion(){
+    this.onReject('asignacion');
     this.load = false;
     const datosAsignacion : any = {
       AsigMP_OrdenTrabajo : this.FormMateriaPrimaRetiro.value.OTRetiro,
@@ -366,7 +332,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     }
     this.asignacionMPService.srvGuardar(datosAsignacion).subscribe(datos_asignacionCreada => { this.obtenerUltimoIdAsignacaion(); }, error => {
       this.error = true;
-      this.mensajeError(`¡Error al crear la asignación de materia prima!`, error.message);
+      this.mostrarError(`¡Error al crear la asignación de materia prima!`);
     });
   }
 
@@ -375,7 +341,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     if (!this.error) {
       this.asignacionMPService.srvObtenerUltimaAsignacion().subscribe(datos_asignaciones => { this.obtenerProcesoId(datos_asignaciones.asigMp_Id); }, error => {
         this.error = true;
-        this.mensajeError(`¡No se pudo extraer el ultimo Id de asignación!`, error.message);
+        this.mostrarError(`¡No se pudo extraer el último Id de asignación!`);
       });
     }
   }
@@ -400,7 +366,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 }
                 this.detallesAsignacionTintas.srvGuardar(datosDetallesAsignacionTintas).subscribe(datos_asignacionTintas => {}, error => {
                   this.error = true;
-                  this.mensajeError(`¡Error al insertar la tinta asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`, error.message);
+                  this.mostrarError(`¡Error al insertar la tinta asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`);
                 });
                 this.moverInventarioTintas(idMateriaPrima, cantidadMateriaPrima);
               } else if (this.materiasPrimasSeleccionadas[index].Id_Mp != 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta == 2001 && !this.soloTintas) {
@@ -413,7 +379,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
                 }
                 this.detallesAsignacionService.srvGuardar(datosDetallesAsignacion).subscribe(datos_asignacionDtallada => {}, error => {
                   this.error = true;
-                  this.mensajeError(`¡Error al insertar la materia prima asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`, error.message);
+                  this.mostrarError(`¡Error al insertar la materia prima asignada ${this.materiasPrimasSeleccionadas[index].Nombre}!`);
                 });
                 this.moverInventarioMpPedida(idMateriaPrima, cantidadMateriaPrima);
               }
@@ -421,7 +387,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           }
         }, error => {
           this.error = true;
-          this.mensajeError(`¡Error al consultar el proceso!`, error.message);
+          this.mostrarError(`¡Error al consultar el proceso!`);
         });
       }
       setTimeout(() => { if (!this.error) this.asignacionExitosa(); }, 3500);
@@ -431,20 +397,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   // Funcion que va a enviar un mensaje de confirmación indicando que la asignacion se creó bien
   asignacionExitosa() {
     if (!this.error && !this.soloTintas) {
-      Swal.fire({
-        icon: 'success',
-        title: '¡Asignacón Creada Satisfactoriamente!',
-        html: `<b>¡La asignación ha sido creada de manera satisfactoria!</b><hr> `,
-        showCloseButton: true,
-      });
+      this.mostrarConfirmacion(`Asignación creada satisfactoriamente!`);
       this.LimpiarCampos();
     } else if (this.soloTintas && this.cantidadAsignada > this.cantRestante) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Asignación de Tintas',
-        html:`<b>¡La asignación se ha registrado satisfactoriamente!</b><hr> ` + `<spam>¡Solo se crearon las asignaciones de tintas!</spam>`,
-        showCloseButton: true,
-      });
+      this.mostrarConfirmacion(`Solo se crearon las asignaciones de tintas!`);
       this.LimpiarCampos();
     }
   }
@@ -467,7 +423,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         }
         this.materiaPrimaService.srvActualizar(idMateriaPrima, datosMP).subscribe(datos_mp_creada => { }, error => {
           this.error = true;
-          this.mensajeError(`¡Error al mover el invenatario de la materia prima ${datos_materiaPrima.matPri_Nombre}!`, error.message);
+          this.mostrarError(`¡Error al mover el inventario de la materia prima ${datos_materiaPrima.matPri_Nombre}!`);
         });
       });
     }
@@ -493,7 +449,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
         }
         this.tintasService.srvActualizar(idMateriaPrima, datosTintas).subscribe(datos_tintasActualizada => { }, error => {
           this.error = true;
-          this.mensajeError(`¡Error al mover el invenatario de la tinta ${datos_tintas.tinta_Nombre}!`, error.message);
+          this.mostrarError(`¡Error al mover el inventario de la tinta ${datos_tintas.tinta_Nombre}!`);
         });
       });
     }
@@ -509,15 +465,36 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     });
   }
 
-  // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
-    this.load = true;
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any) {
+   this.messageService.add({severity: 'success', summary: `Confirmación`,  detail: mensaje});
   }
 
-  // Mensaje de Error
-  mensajeError(text : string, error : any = ''){
-    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
-    this.load = true;
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any) {
+   this.messageService.add({severity:'error', summary:`Error` , detail: mensaje});
+   this.load = true;
   }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any) {
+   this.messageService.add({severity:'warn', summary: `Advertencia`, detail: mensaje});
+   this.load = true;
+  }
+
+   /** Cerrar Dialogo de eliminación*/
+  onReject(dato : any) {
+   this.messageService.clear(dato);
+  }
+
+    /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
+  mostrarEleccion(item : any){
+    this.mpSeleccionada = item;
+    this.messageService.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea quitar la materia prima de la asignación?`, sticky: true});
+  }
+
+  confirmarAsignacion(OT : any){
+    this.messageService.add({severity:'warn', key:'asignacion', summary:'Confirmar Elección', detail: `La cantidad a asignar supera el limite de Kg permitidos para la OT ${OT}, ¿Desea asignar de todas formas?`, sticky: true});
+  }
+
 }
