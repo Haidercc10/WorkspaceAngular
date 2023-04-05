@@ -1,19 +1,17 @@
+<app-menuLateral></app-menuLateral>
 <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 
-<app-menuLateral></app-menuLateral>
-
-<!-- Animacion de Carga -->
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
   </div>
 </div>
 
-<!-- Titulo principal -->
 <div class="contain">
+  <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Movimientos de Despacho</h2>
+      <h2 class="tituloRojo">Ingresar Producción</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -21,52 +19,218 @@
   </div>
 </div>
 
-<div class="formulario">
-  <div class="mb-4">
-    <h4 class="tituloRojo"><i class="pi pi-filter"></i> Filtros de búsqueda</h4>
-  </div>
-  <br>
+<div class="contain">
+  <!--Inicio info OT-->
+  <div class="container-fluid bajarPagina">
+    <div class="formulario">
+      <div class="mb-4">
+        <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar OT</h4>
+      </div>
+      <!-- Formulario para consultar una orden de trabajo -->
+      <form [formGroup]="FormConsultarRollos">
+        <div class="mb-3">
+          <div class="row g-4">
 
-  <!-- Formulario para consultar filtros -->
-  <form [formGroup]="FormConsultarFiltros">
-    <div class="mb-3">
-      <div class="row g-4">
+            <!-- OT -->
+            <div class="col-md">
+              <span class="p-input-icon-left p-float-label">
+                <i class="pi pi-search"></i>
+                <input formControlName="OT_Id" id="OT_Id" class="form-control form-control-sm" type="text" pInputText/>
+                <label for="OT_Id">Nro. OT</label>
+              </span>
+            </div>
 
-        <!-- Factura -->
-        <div class="col-md-2">
-          <span class="p-input-icon-left p-float-label">
-            <i class="pi pi-search"></i>
-            <input formControlName="Documento" id="Documento" class="form-control form-control-sm" type="text" pInputText/>
-            <label for="Documento">Cod. Documento</label>
-          </span>
+             <!-- Tipo de Proceso -->
+            <div class="col-md">
+              <span class="p-float-label">
+                <p-dropdown formControlName="Proceso" inputId="Tipo" optionValue="Id" optionLabel="Nombre" [options]="procesos"></p-dropdown>
+                <label for="Tipo">Tipo Doc.</label>
+              </span>
+            </div>
+
+            <!-- Fecha Inicial -->
+            <div class="col-md">
+              <span class="p-float-label">
+                <p-calendar formControlName="fechaDoc" inputId="FechaInicial" [minDate]="minDate" [showIcon]="true"></p-calendar>
+                <label for="FechaInicial">Fecha Inicial</label>
+              </span>
+            </div>
+
+            <!-- Fecha Final -->
+            <div class="col-md">
+              <span class="p-float-label">
+                <p-calendar formControlName="fechaFinalDoc" inputId="FechaFinal" [minDate]="minDate" [showIcon]="true"></p-calendar>
+                <label for="FechaFinal">Fecha Final</label>
+              </span>
+            </div>
+
+            <!-- Observacion -->
+            <div class="col-md-4">
+              <span class="p-float-label">
+                <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
+                <label for="textarea">Observación</label>
+              </span>
+            </div>
+
+          </div>
         </div>
 
-        <!-- Fecha Inicial -->
-        <div class="col-md">
-          <span class="p-float-label">
-            <p-calendar formControlName="fechaDoc" inputId="FechaInicial" [showIcon]="true"></p-calendar>
-            <label for="FechaInicial">Fecha Inicial</label>
-          </span>
+        <!--Botones-->
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-danger" type="button" label="Consultar Producción" icon="pi pi-search" (click)="consultarRollosBagPro()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
         </div>
+      </form>
 
-        <!-- Fecha Final -->
-        <div class="col-md">
-          <span class="p-float-label">
-            <p-calendar formControlName="fechaFinalDoc" inputId="FechaFinal" [showIcon]="true"></p-calendar>
-            <label for="FechaFinal">Fecha Final</label>
-          </span>
+      <div class="mb-4">
+        <hr class="Linea">
+      </div>
+
+      <!-- Inicio titulo tabla producto -->
+      <div class="mb-0 tabla1">
+        <h4 class="tituloRojo" style="width: 90%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
+      </div>
+
+      <div class="mb-3" *ngIf="!cargando">
+        <p-table
+          #dt1
+          [value]="rollosDisponibles"
+          [rows]="25"
+          [paginator]="true"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          [rowHover]="true"
+          [rowsPerPageOptions]="[10, 25, 50, 100, 120, 150, rollosDisponibles.length]"
+          responsiveLayout="scroll"
+          currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
+          [(selection)]="rollosSeleccionados"
+          dataKey="Rollo"
+          [showCurrentPageReport]="true">
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">OT</th>
+              <th scope="col">ID Rollo</th>
+              <th scope="col">ID Producto</th>
+              <th scope="col">producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Presentación</th>
+              <th scope="col">Proceso</th>
+              <th style="width: 4rem"><p-tableHeaderCheckbox (click)="cargarTodosRollosInsertar()"></p-tableHeaderCheckbox></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rollos>
+            <tr>
+              <td>{{rollos.Ot}}</td>
+              <td>{{rollos.Rollo}}</td>
+              <td>{{rollos.Id_Producto}}</td>
+              <td>{{rollos.Producto}}</td>
+              <td>{{rollos.Cantidad}}</td>
+              <td>{{rollos.Presentacion}}</td>
+              <td>{{rollos.Estatus}}</td>
+              <td><p-tableCheckbox [value]="rollos" (click)="cargarRollosInsertar(rollos)"></p-tableCheckbox></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <div class="mb-4" *ngIf="!cargando">
+        <hr class="Linea">
+      </div>
+
+      <!-- Inicio titulo tabla producto -->
+      <div class="mb-4" *ngIf="!cargando">
+        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de rollos por ingresar</h4>
+      </div>
+
+      <div class="mb-3" *ngIf="!cargando">
+        <p-table
+          #dt
+          [value]="rollosSeleccionados"
+          [rows]="10"
+          dataKey="Rollo"
+          [paginator]="true"
+          [(selection)]="rollosDisponibles"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          [rowHover]="true"
+          [rowsPerPageOptions]="[10,25,50,rollosSeleccionados.length]"
+          responsiveLayout="scroll"
+          currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
+          [showCurrentPageReport]="true">
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">OT</th>
+              <th scope="col">ID Rollo</th>
+              <th scope="col">ID Producto</th>
+              <th scope="col">producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Presentación</th>
+              <th scope="col">Proceso</th>
+              <th style="width: 4rem"><p-tableHeaderCheckbox (click)="quitarTodosRollosInsertar()"></p-tableHeaderCheckbox></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rollosInsertar>
+            <tr>
+              <td>{{rollosInsertar.Ot}}</td>
+              <td>{{rollosInsertar.Rollo}}</td>
+              <td>{{rollosInsertar.Id_Producto}}</td>
+              <td>{{rollosInsertar.Producto}}</td>
+              <td>{{rollosInsertar.Cantidad}}</td>
+              <td>{{rollosInsertar.Presentacion}}</td>
+              <td>{{rollosInsertar.Estatus}}</td>
+              <td><p-tableCheckbox [value]="rollosInsertar" (click)="quitarRollosInsertar(rollosInsertar)"></p-tableCheckbox></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <div class="mb-4" *ngIf="!cargando">
+        <hr class="Linea">
+      </div>
+      <!-- Inicio titulo tabla producto -->
+      <div class="mb-4" *ngIf="!cargando">
+        <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado Productos</h4>
+      </div>
+
+      <div class="mb-3" *ngIf="!cargando">
+        <p-table
+          #dt
+          [value]="grupoProductos"
+          [rows]="10"
+          dataKey="Id"
+          [paginator]="true"
+          styleClass="p-datatable-gridlines p-datatable-sm"
+          [rowHover]="true"
+          [rowsPerPageOptions]="[10,25,50]"
+          responsiveLayout="scroll"
+          currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
+          [showCurrentPageReport]="true">
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">ID Producto</th>
+              <th scope="col">Producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">N° Rollos</th>
+              <th scope="col">Presentación</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rollosInsertar>
+            <tr>
+              <td>{{rollosInsertar.Id}}</td>
+              <td>{{rollosInsertar.Nombre}}</td>
+              <td>{{rollosInsertar.Cantidad}}</td>
+              <td>{{rollosInsertar.Rollos}}</td>
+              <td>{{rollosInsertar.Presentacion}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <!-- Botones -->
+      <div class="bajarPagina" *ngIf="!cargando">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button pButton class="p-button-danger" type="button" label="Ingresar Producción" icon="pi pi-check" (click)="IngresarInfoRollos()"></button>
+          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
         </div>
-
-        <!-- Tipo Documento -->
-        <div class="col-md">
-          <span class="p-float-label">
-            <p-dropdown formControlName="tipoDoc" inputId="Proceso" optionValue="proceso_Id" [autoDisplayFirst]="false" [options]="tiposdocumentos" optionLabel="proceso_Nombre"></p-dropdown>
-            <label for="Proceso">Procesos</label>
-          </span>
-        </div>
-
       </div>
     </div>
-  </form>
-
+  </div>
 </div>

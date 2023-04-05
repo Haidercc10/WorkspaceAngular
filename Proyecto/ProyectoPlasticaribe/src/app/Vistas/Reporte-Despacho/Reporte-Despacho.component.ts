@@ -3,13 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
+import { MessageService } from 'primeng/api';
 import { DetallesDevolucionesProductosService } from 'src/app/Servicios/DetallesDevolucionRollosFacturados/DetallesDevolucionesProductos.service';
 import { DetallesEntradaRollosService } from 'src/app/Servicios/DetallesEntradasRollosDespacho/DetallesEntradaRollos.service';
+import { DetallesAsignacionProductosFacturaService } from 'src/app/Servicios/DetallesFacturacionRollos/DetallesAsignacionProductosFactura.service';
 import { DtPreEntregaRollosService } from 'src/app/Servicios/DetallesPreIngresoRollosDespacho/DtPreEntregaRollos.service';
-import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
@@ -20,40 +18,27 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 })
 export class ReporteDespachoComponent implements OnInit {
 
-  public FormConsultarFiltros !: FormGroup;
-  public arrayProducto = [];
-  public arrayRollo = [];
-  public arrayEstadoRollo = [];
-  public arrayTipoDoc = [];
-  public arrayClientes = [];
-  rolloFiltrados : any [] = [];
-  cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
+  cargando : boolean = false; //Variable para validar que salga la animacion de carga
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
+  FormConsultarFiltros !: FormGroup; //Variable que será el formulario en el que se buscará los filtros
+  tiposdocumentos : any [] = [];
   infoDoc : any [] = []; //Variable que almacenará la información que se verá en la tabla
-  public page : number; //Variable que tendrá el paginado de la tabla
   rollosAsignados : any [] = []; //Variable que va a almacenar los rollos que fueron asignados
   consolidadoRollo : any [] = []; //Variable que va a almacenar el consolidado de la cantidad de rollos ingresados o facturados
-  public Codigo = ''; /** Variable para pipe de documento */
-  public Rollo = ''; /** Variable para pipe de Rollo */
-  public Producto = ''; /** Variable para pipe de Producto */
-  public Cliente = ''; /** Variable para pipe de Producto */
-  public TipoDocumento = '';
-  public Estado = '';
 
-  constructor(private servicioProducto : ProductoService,
-                private frmBuilder : FormBuilder,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private servicioEstados : EstadosService,
-                      private servicioTipoDoc : TipoDocumentoService,
-                        private servicioDtlEntradaRollos: DetallesEntradaRollosService,
-                          private dtAsigFactService : DetallesAsignacionProductosFacturaService,
-                            private dtDevolucion : DetallesDevolucionesProductosService,
-                              private dtEntradaService : DetallesEntradaRollosService,
-                                private preCargueService : DtPreEntregaRollosService,) {
+
+  constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
+                private messageService: MessageService,
+                  private frmBuilder : FormBuilder,
+                    private tipoDocService : TipoDocumentoService,
+                      private dtAsigFactService : DetallesAsignacionProductosFacturaService,
+                        private dtDevolucion : DetallesDevolucionesProductosService,
+                          private dtEntradaService : DetallesEntradaRollosService,
+                            private preCargueService : DtPreEntregaRollosService,){
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null, Validators.required],
@@ -67,12 +52,9 @@ export class ReporteDespachoComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.lecturaStorage();
-    this.llenadoProducto();
-    this.llenadoEstadoRollos();
-    this.llenadoTipoDocumento();
-    this.llenadoRollosIngresados();
+    this.obtenerTipoDocumento();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -80,6 +62,7 @@ export class ReporteDespachoComponent implements OnInit {
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
     this.ValidarRol = this.storage.get('Rol');
+    this.storage_Rol = this.storage.get('Rol');
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
@@ -89,65 +72,39 @@ export class ReporteDespachoComponent implements OnInit {
     return number.toString().replace(exp,rep);
   }
 
-  //
+  // Funcion para limpiar los campos de la vista
   limpiarCampos(){
-    this.FormConsultarFiltros.patchValue({
-      Documento : null,
-      ProdNombre : '',
-      Rollo : '',
-      Cliente : '',
-      tipoDoc : '',
-      fechaDoc: null,
-      fechaFinalDoc: null,
-      estadoRollo: '',
-    });
-    this.infoDoc = [];
+    this.cargando = false;
   }
 
-  /** Cargar Productos en Select Input */
-  llenadoProducto(){
-    this.servicioProducto.srvObtenerLista().subscribe(registrosProductos => { this.arrayProducto = registrosProductos; });
-  }
-
-  /** Cargar combo estados rollos */
-  llenadoEstadoRollos() {
-    this.servicioEstados.srvObtenerEstadosRollos().subscribe(registroEstadosRollos => { this.arrayEstadoRollo = registroEstadosRollos; })
-  }
-
-  /** Cargar tipos de documentos a los combos. */
-  llenadoTipoDocumento() {
-    this.servicioTipoDoc.srvObtenerLista().subscribe(registrosTipoDoc => {
-      for(let rtd = 0; rtd < registrosTipoDoc.length; rtd++) {
-        if(registrosTipoDoc[rtd].tpDoc_Id == 'ASIGPRODFV'
-        && (this.ValidarRol == 1 || this.ValidarRol == 6)) this.arrayTipoDoc.push(registrosTipoDoc[rtd]);
-        else if (registrosTipoDoc[rtd].tpDoc_Id == 'DEVPRODFAC'
-        && (this.ValidarRol == 1 || this.ValidarRol == 10 || this.ValidarRol == 7 || this.ValidarRol == 8 || this.ValidarRol == 9)) this.arrayTipoDoc.push(registrosTipoDoc[rtd]);
-        else if (registrosTipoDoc[rtd].tpDoc_Id == 'ENTROLLO'
-        && (this.ValidarRol == 1 || this.ValidarRol == 10 || this.ValidarRol == 7 || this.ValidarRol == 8 || this.ValidarRol == 9)) this.arrayTipoDoc.push(registrosTipoDoc[rtd]);
-      }
-    });
-  }
-
- /** Cargar rollos desde EntradasRollos_Productos */
-  llenadoRollosIngresados() {
-    this.servicioDtlEntradaRollos.srvObtenerLista().subscribe(registrosRollos => {
-      for (let index = 0; index < registrosRollos.length; index++) {
-        let info : any = { rollo_Id : `${registrosRollos[index].rollo_Id}` };
-        this.arrayRollo.push(info);
+  // Funcion que va a consultar la información de los tipos de docuemntos
+  obtenerTipoDocumento() {
+    if (this.ValidarRol == 1 || this.ValidarRol == 9 || this.ValidarRol == 12) this.tiposdocumentos.push('Pre Cargue Empaque');
+    if (this.ValidarRol == 1 || this.ValidarRol == 8) this.tiposdocumentos.push('Pre Cargue Sellado');
+    if (this.ValidarRol == 1 || this.ValidarRol == 7) this.tiposdocumentos.push('Pre Cargue Extrusión');
+    this.tipoDocService.srvObtenerLista().subscribe(data => {
+      for(let i = 0; i < data.length; i++) {
+        if(data[i].tpDoc_Id == 'ASIGPRODFV'
+        && (this.ValidarRol == 1 || this.ValidarRol == 6)) this.tiposdocumentos.push(data[i].tpDoc_Nombre);
+        else if (data[i].tpDoc_Id == 'DEVPRODFAC'
+        && (this.ValidarRol == 1 || this.ValidarRol == 10 || this.ValidarRol == 7 || this.ValidarRol == 8 || this.ValidarRol == 9)) this.tiposdocumentos.push(data[i].tpDoc_Nombre);
+        else if (data[i].tpDoc_Id == 'ENTROLLO'
+        && (this.ValidarRol == 1 || this.ValidarRol == 10 || this.ValidarRol == 7 || this.ValidarRol == 8 || this.ValidarRol == 9)) this.tiposdocumentos.push(data[i].tpDoc_Nombre);
+        this.tiposdocumentos.sort();
       }
     });
   }
 
   // Funcion que va a consultar por los filtros que se busquen
   consultarFiltros(){
-    this.cargando = false;
+    this.cargando = true;
     this.infoDoc = [];
     let documento : any = this.FormConsultarFiltros.value.Documento;
-    let fechaIni : any = this.FormConsultarFiltros.value.fechaDoc;
-    let fechaFin : any = this.FormConsultarFiltros.value.fechaFinalDoc;
+    let fechaIni : any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
+    let fechaFin : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
     if (documento == '') documento = null;
-    if (fechaIni == '') documento = null;
-    if (fechaFin == '') documento = null;
+    if (fechaIni == 'Invalid date') fechaIni = null;
+    if (fechaFin == 'Invalid date') fechaFin = null;
 
 
     if (fechaIni != null && fechaFin != null) {
@@ -175,7 +132,7 @@ export class ReporteDespachoComponent implements OnInit {
         }
       });
     }
-    setTimeout(() => { this.cargando = true; }, 2500);
+    setTimeout(() => { this.cargando = false; }, 2500);
   }
 
   // Funcion que se encagará de llenar la tabla con la informacion consultada
@@ -406,7 +363,7 @@ export class ReporteDespachoComponent implements OnInit {
           }
           const pdf = pdfMake.createPdf(pdfDefinicion);
           pdf.open();
-          this.cargando = true;
+          this.cargando = false;
           break;
         }
         break;
@@ -560,10 +517,6 @@ export class ReporteDespachoComponent implements OnInit {
                       `Código: ${factura.toUpperCase()}`,
                       ``
                     ],
-                    // [
-                    //   `Id Cliente: ${datos_factura[i].cli_Id}`,
-                    //   `Nombre Cliente: ${datos_factura[i].cli_Nombre}`
-                    // ]
                   ]
                 },
                 layout: 'lightHorizontalLines',
@@ -595,7 +548,7 @@ export class ReporteDespachoComponent implements OnInit {
           }
           const pdf = pdfMake.createPdf(pdfDefinicion);
           pdf.open();
-          this.cargando = true;
+          this.cargando = false;
           break;
         }
         break;
@@ -749,7 +702,7 @@ export class ReporteDespachoComponent implements OnInit {
           }
           const pdf = pdfMake.createPdf(pdfDefinicion);
           pdf.open();
-          this.cargando = true;
+          this.cargando = false;
           break;
         }
         break;
@@ -915,7 +868,7 @@ export class ReporteDespachoComponent implements OnInit {
           }
           const pdf = pdfMake.createPdf(pdfDefinicion);
           pdf.open();
-          this.cargando = true;
+          this.cargando = false;
           break;
         }
         break;
@@ -961,11 +914,11 @@ export class ReporteDespachoComponent implements OnInit {
     var body = [];
     body.push(columns);
     data.forEach(function(row) {
-        var dataRow = [];
-        columns.forEach(function(column) {
-            dataRow.push(row[column].toString());
-        });
-        body.push(dataRow);
+      var dataRow = [];
+      columns.forEach(function(column) {
+        dataRow.push(row[column].toString());
+      });
+      body.push(dataRow);
     });
 
     return body;
@@ -974,35 +927,52 @@ export class ReporteDespachoComponent implements OnInit {
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [60, 60, 250, 70, 70],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 9,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [60, 60, 250, 70, 70],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 9,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
   table2(data, columns) {
     return {
-        table: {
-          headerRows: 1,
-          widths: [60, '*', 70, 100, 50],
-          body: this.buildTableBody(data, columns),
-        },
-        fontSize: 9,
-        layout: {
-          fillColor: function (rowIndex, node, columnIndex) {
-            return (rowIndex == 0) ? '#CCCCCC' : null;
-          }
+      table: {
+        headerRows: 1,
+        widths: [60, '*', 70, 100, 50],
+        body: this.buildTableBody(data, columns),
+      },
+      fontSize: 9,
+      layout: {
+        fillColor: function (rowIndex, node, columnIndex) {
+          return (rowIndex == 0) ? '#CCCCCC' : null;
         }
+      }
     };
   }
 
+  // Funcion que devolverá un mensaje de satisfactorio
+  mensajeConfirmacion(titulo : string, mensaje : any) {
+    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
+    this.cargando = false;
+  }
+
+  // Funcion que va a devolver un mensaje de error
+  mensajeError(titulo : string, mensaje : any) {
+    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
+    this.cargando = false;
+  }
+
+  // Funcion que va a devolver un mensaje de advertencia
+  mensajeAdvertencia(mensaje : any) {
+    this.messageService.add({severity:'warn', summary: '¡Advertencia!', detail: mensaje, life: 1500});
+    this.cargando = false;
+  }
 }

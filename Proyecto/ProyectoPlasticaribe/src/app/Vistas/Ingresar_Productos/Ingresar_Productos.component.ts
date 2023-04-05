@@ -24,28 +24,21 @@ import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 export class Ingresar_ProductosComponent implements OnInit {
 
   public FormConsultarRollos !: FormGroup; //formulario para consultar y crear un ingreso de rollos
-  cargando : boolean = true; //Variable para validar que salga o no la imagen de carga
+  cargando : boolean = false; //Variable para validar que salga o no la imagen de carga
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   hora : any = moment().format("H:mm:ss"); //Variable que almacenará la hora
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  checked : boolean = false; //Variable para saber si el checkbox está seleccionado o no
   rollos : any [] = []; //Variable que almacenará los difrentes rollos que se hicieron en la orden de trabajo
   rollosInsertar : any [] = []; //Variable que va a amacenar los diferentes rollos que se van a insertar
-  validarRollo : any [] = []; //Variable para validará que el rollo no esté en la tabla
-  idProducto : any = 0; //Variable que va a almacenar el id del producto que fue hecho en la ot consultada
   presentacionProducto : string = ''; //Variable que almacenará la presentacion del producto de la orden de trabajo consultada
-  cantidadOT : number = 0; //
   rollosAsignados : any = [];
   Total : number = 0; //Variable que va a almacenar la cantidad total de kg de los rollos asignados
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
-  cantPage : number = 25;
   rollosSinIngresar : number = 0; // variable para calcular la cantidad de rollos que no se han ingresado
   rollosIngresados : number = 0; //variable para calcular la cantidad de rollos que se han ingresado
-  public page : number;
-  fechaBusqueda : any = moment().subtract(4, 'day').format('YYYY-MM-DD'); // Variable que va a ayudar al momento de saber hasta que fecha se va a buscar
   procesos : any [] = [{Id : 'EMP', Nombre: 'Empaque'}, {Id : 'EXT', Nombre: 'Extrusión'}, {Id : 'SELLA', Nombre: 'Sellado'}]; //Variable que va a guardar los diferentes procesos de donde vienen los rollos
   minDate: Date = new Date(); //Variable que validará la fecha minima para los campos Date en el HTML
 
@@ -100,9 +93,8 @@ export class Ingresar_ProductosComponent implements OnInit {
     });
     this.rollos = [];
     this.rollosInsertar = [];
-    this.validarRollo = [];
     this.grupoProductos = [];
-    this.cargando = true;
+    this.cargando = false;
     this.Total = 0;
     this.rollosAsignados = [];
   }
@@ -119,394 +111,100 @@ export class Ingresar_ProductosComponent implements OnInit {
     });
   }
 
-  //Funcion que traerá los diferentes rollos que se hicieron en la orden de trabajo
-  consultarOTbagPro(){
-    let ProcConsulta : any = this.FormConsultarRollos.value.Proceso;
-    let ot : number = this.FormConsultarRollos.value.OT_Id;
-    let fechaInicial : any = moment(this.FormConsultarRollos.value.fechaDoc).format('YYYY-MM-DD');
-    let fechaFinal : any = moment(this.FormConsultarRollos.value.fechaFinalDoc).format('YYYY-MM-DD');
-    let rollo : number = this.FormConsultarRollos.value.IdRollo;
-    let proceso = this.FormConsultarRollos.value.Proceso;
+  // Funcion que va a consultar los rollos que estan por ingresar
+  consultarRollos(){
     this.rollosSinIngresar = 0;
     this.rollosIngresados = 0;
-
-    if (fechaInicial == 'Invalid date') fechaInicial = null;
-    if (fechaFinal == 'Invalid date') fechaFinal = null;
-
-    let rollos : any = [];
+    let ProcConsulta : any = this.FormConsultarRollos.value.Proceso;
+    let ot : number = this.FormConsultarRollos.value.OT_Id;
+    let rollo : number = this.FormConsultarRollos.value.IdRollo;
+    let fechaInicial : any = moment(this.FormConsultarRollos.value.fechaDoc).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormConsultarRollos.value.fechaFinalDoc).format('YYYY-MM-DD');
+    if (fechaInicial == 'Invalid date') fechaInicial = this.today;
+    if (fechaFinal == 'Invalid date') fechaFinal = fechaInicial;
+    let ruta : string = '';
+    let rollosIngresar : number [] = [];
+    let rollosIngresados : number [] = [];
 
     if (ProcConsulta != null) {
-      if (!moment(fechaInicial).isBefore('2022-09-23', 'days') && !moment(fechaFinal).isBefore('2022-09-23', 'days')) {
+      if (!moment(fechaInicial).isBefore('2022-09-25', 'days') && !moment(fechaFinal).isBefore('2022-09-25', 'days')) {
+        this.cargando = true;
         this.rollos = [];
-        let RollosConsultados : any [] = [];
-        let otTemporral : number = 0;
-        this.cargando = false;
-        this.cantidadOT = 0;
-
-        this.dtEntradaRollosService.getRollosProceso(proceso).subscribe(datos_rollos => { rollos = datos_rollos; });
-
-        setTimeout(() => {
-          if (ot != null && fechaInicial != null && fechaFinal != null) {
-            this.dtPreEntregaService.getRollosPreEntregadosOT(ot, proceso).subscribe(datos_ot => {
-              setTimeout(() => {
-                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
-                this.cargando = true;
-              }, 1000);
-              for (let i = 0; i < datos_ot.length; i++) {
-                if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id) && moment(datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', '')).isBetween(fechaInicial, fechaFinal)) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : false,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosSinIngresar += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                } else if (rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id) && moment(datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', '')).isBetween(fechaInicial, fechaFinal)) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : true,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosIngresados += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                }
-              }
-            });
-          } else if (fechaInicial != null &&  fechaFinal != null) {
-            this.dtPreEntregaService.getRollosPreEntregadosFechas(fechaInicial, fechaFinal, proceso).subscribe(datos_ot => {
-              setTimeout(() => {
-                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
-                this.cargando = true;
-              }, 1000);
-              for (let i = 0; i < datos_ot.length; i++) {
-                if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : false,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosSinIngresar += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                } else if (rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : true,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosIngresados += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                }
-              }
-            });
-          } else if (ot != null && fechaInicial != null) {
-            this.dtPreEntregaService.getRollosPreEntregadosOT(ot, proceso).subscribe(datos_ot => {
-              setTimeout(() => {
-                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
-                this.cargando = true;
-              }, 1000);
-              for (let i = 0; i < datos_ot.length; i++) {
-                if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id) && fechaInicial == datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', '')) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : false,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosSinIngresar += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                } else if (rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id) && fechaInicial == datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', '')) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : true,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosIngresados += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                }
-              }
-            });
-          } else if (fechaInicial != null) {
-            this.dtPreEntregaService.getRollosPreEntregadosFechas(fechaInicial, fechaInicial, proceso).subscribe(datos_ot => {
-              setTimeout(() => {
-                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
-                this.cargando = true;
-              }, 1000);
-              for (let i = 0; i < datos_ot.length; i++) {
-                if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : false,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosSinIngresar += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                } else if (rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : true,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosIngresados += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                }
-              }
-            });
-          } else if (ot != null) {
-            this.dtPreEntregaService.getRollosPreEntregadosOT(ot, proceso).subscribe(datos_ot => {
-              setTimeout(() => {
-                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
-                this.cargando = true;
-              }, 1000);
-              for (let i = 0; i < datos_ot.length; i++) {
-                if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : false,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosSinIngresar += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                } else if (rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : true,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosIngresados += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                }
-              }
-            });
-          } else if (rollo != null) {
-            this.dtPreEntregaService.getRollosPreEntregadosRollo(rollo, proceso).subscribe(datos_ot => {
-              setTimeout(() => {
-                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
-                this.cargando = true;
-              }, 1000);
-              for (let i = 0; i < datos_ot.length; i++) {
-                if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : false,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosSinIngresar += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                } else if (rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : true,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosIngresados += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                }
-              }
-            });
-          } else {
-            this.dtPreEntregaService.getRollosPreEntregadosFechas(this.fechaBusqueda, this.today, proceso).subscribe(datos_ot => {
-              setTimeout(() => {
-                if (datos_ot.length <= 0) this.mensajeAdvertencia(`No hay rollos por ingresar`);
-                this.cargando = true;
-              }, 1000);
-              for (let i = 0; i < datos_ot.length; i++) {
-                if (!rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : false,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosSinIngresar += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                } else if (rollos.includes(datos_ot[i].rollo_Id) && !RollosConsultados.includes(datos_ot[i].rollo_Id)) {
-                  let info : any = {
-                    Ot : datos_ot[i].dtlPreEntRollo_OT,
-                    Id : datos_ot[i].rollo_Id,
-                    IdProducto : datos_ot[i].prod_Id,
-                    Producto : datos_ot[i].prod_Nombre,
-                    Cantidad : datos_ot[i].dtlPreEntRollo_Cantidad,
-                    Presentacion : datos_ot[i].undMed_Rollo,
-                    Estatus : datos_ot[i].proceso_Nombre,
-                    exits : true,
-                    Fecha : datos_ot[i].preEntRollo_Fecha.replace('T00:00:00', ''),
-                  }
-                  this.rollosIngresados += 1;
-                  if (otTemporral != datos_ot[i].ot) this.cantidadOT += 1;
-                  otTemporral = datos_ot[i].ot;
-                  this.rollos.push(info);
-                  RollosConsultados.push(datos_ot[i].item);
-                  this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
-                  this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
-                }
-              }
-            });
+        if (ot != null && rollo != null) ruta = `?ot=${ot}&rollo=${rollo}`;
+        else if (ot != null) ruta = `?ot=${ot}`;
+        else if (rollo != null) ruta = `?rollo=${rollo}`;
+        else ruta = ``;
+        this.dtPreEntregaService.GetRollos_Ingresar(fechaInicial, fechaFinal, ProcConsulta, ruta).subscribe(data => {
+          for (let i = 0; i < data.length; i++) {
+            rollosIngresar.push(data[i].rollo);
           }
-        }, 4000);
-      } else this.mensajeAdvertencia("¡La fecha seleccionada no es valida!");
-    } else this.mensajeAdvertencia("¡Seleccione un proceso!");
+          setTimeout(() => {
+            this.dtEntradaRollosService.GetRollos(rollosIngresar).subscribe(datos => {
+              for (let i = 0; i < datos.length; i++) {
+                rollosIngresados.push(datos[i].rollo_Id);
+              }
+              setTimeout(() => {
+                for (let i = 0; i < data.length; i++) {
+                  if (datos.length > 0 && !rollosIngresados.includes(parseInt(data[i].rollo))) this.llenarRollosIngresar(data[i]);
+                  else if (datos.length > 0 && rollosIngresados.includes(parseInt(data[i].rollo))) {
+                    let nuevo : any [] = datos.filter((item) => item.rollo_Id == data[i].rollo);
+                    for (let j = 0; j < nuevo.length; j++) {
+                      if (nuevo[j].proceso_Id != ProcConsulta) this.llenarRollosIngresar(data[i]);
+                      else this.llenarRollosIngresados(data[i]);
+                    }
+                  }
+                  if (datos.length == 0) this.llenarRollosIngresar(data[i]);
+                }
+              }, 1500);
+            });
+          }, 1500);
+        });
+        setTimeout(() => { this.cargando = false; }, 5000);
+      } else this.mensajeAdvertencia(`¡Las fechas digitadas no son validas!`);
+    } else this.mensajeAdvertencia(`¡Debe seleccionar un proceso!`);
+  }
+
+  // Funcion que va a llenar los rollos que están por ingresar
+  llenarRollosIngresar(data : any){
+    let info : any = {
+      Ot : data.orden,
+      Id : data.rollo,
+      IdProducto : data.id_Producto,
+      Producto : data.producto,
+      Cantidad : data.cantidad,
+      Presentacion : data.presentacion,
+      Estatus : data.proceso,
+      Fecha : data.fecha_Ingreso.replace('T00:00:00', ''),
+      exits : false,
+    }
+    this.rollosSinIngresar += 1;
+    this.rollos.push(info);
+    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
+  }
+
+  // Funcion que va a llenar los rollos que ya están ingresados
+  llenarRollosIngresados(data : any){
+    let info : any = {
+      Ot : data.orden,
+      Id : data.rollo,
+      IdProducto : data.id_Producto,
+      Producto : data.producto,
+      Cantidad : data.cantidad,
+      Presentacion : data.presentacion,
+      Estatus : data.proceso,
+      Fecha : data.fecha_Ingreso.replace('T00:00:00', ''),
+      exits : true,
+    }
+    this.rollosIngresados += 1;
+    this.rollos.push(info);
+    this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
+    this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
   }
 
   //Funcion que va a agregar Productos en la tabla
   cargarProducto(item : any){
-    this.cargando = false;
-    if (this.rollosInsertar.length == 0) {
-      this.validarRollo.push(item.Id);
-      this.Total += item.Cantidad;
-    } else {
-      if (!this.validarRollo.includes(item.Id)) {
-        this.validarRollo.push(item.Id);
-        this.Total += item.Cantidad;
-      } else if (this.validarRollo.includes(item.Id)) {
-        for (let i = 0; i < this.rollosInsertar.length; i++) {
-          if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
-        }
-        for (let i = 0; i < this.validarRollo.length; i++) {
-          if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
-        }
-      }
-    }
+    this.cargando = true;
     for (let i = 0; i < this.rollos.length; i++) {
       if (this.rollos[i].Id == item.Id) this.rollos.splice(i,1);
     }
@@ -516,7 +214,6 @@ export class Ingresar_ProductosComponent implements OnInit {
   // Funcion que va a seleccionar todo lo que hay en la tabla
   selccionarTodo(){
     this.cargando = false;
-    this.Total = 0;
     let nuevo : any = this.rollos.filter((item) => item.exits === true);
     this.rollos = [];
     this.rollos = nuevo;
@@ -525,34 +222,26 @@ export class Ingresar_ProductosComponent implements OnInit {
 
   // Funcion que va a quitar todo lo que hay en la tabla
   quitarTodo(){
-    this.cargando = false;
+    this.cargando = true;
     for (const item of this.rollosInsertar) {
-      this.Total -= item.Cantidad;
       this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
       this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
       this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
       this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
     }
-    setTimeout(() => {
-      this.rollosInsertar = [];
-      this.validarRollo = [];
-    }, 500);
+    setTimeout(() => { this.rollosInsertar = []; }, 500);
     setTimeout(() => { this.GrupoProductos(); }, 100);
   }
 
   // Funcion que se va a encargar de quitar rollos de la tabla inferior
   quitarRollo(item : any){
-    this.cargando = false;
-    this.Total -= item.Cantidad;
+    this.cargando = true;
     this.rollos.sort((a,b) => Number(a.Ot) - Number(b.Ot) );
     this.rollos.sort((a,b) => Number(a.Id) - Number(b.Id) );
     this.rollos.sort((a,b) => Number(a.IdProducto) - Number(b.IdProducto) );
     this.rollos.sort((a,b) => Number(a.exits) - Number(b.exits) );
     for (let i = 0; i < this.rollosInsertar.length; i++) {
       if (this.rollosInsertar[i].Id == item.Id) this.rollosInsertar.splice(i,1);
-    }
-    for (let i = 0; i < this.validarRollo.length; i++) {
-      if (this.validarRollo[i] == item.Id) this.validarRollo.splice(i,1);
     }
     setTimeout(() => { this.GrupoProductos(); }, 100);
   }
@@ -562,12 +251,13 @@ export class Ingresar_ProductosComponent implements OnInit {
     let producto : any = [];
     this.grupoProductos = [];
     for (let i = 0; i < this.rollosInsertar.length; i++) {
-      if (!producto.includes(this.rollosInsertar[i].IdProducto)) {
+      if (!producto.includes(this.rollosInsertar[i].IdProducto) && !this.rollosInsertar[i].exits) {
         let cantidad : number = 0;
         let cantRollo : number = 0;
         for (let j = 0; j < this.rollosInsertar.length; j++) {
           if (this.rollosInsertar[i].IdProducto == this.rollosInsertar[j].IdProducto) {
             cantidad += this.rollosInsertar[j].Cantidad;
+            this.Total += cantidad;
             cantRollo += 1;
           }
         }
@@ -583,14 +273,14 @@ export class Ingresar_ProductosComponent implements OnInit {
         this.grupoProductos.push(info);
       }
     }
-    this.cargando = true;
+    this.cargando = false;
   }
 
   //Funcion para meter el encabezado de la entrada
   IngresarInfoRollos(){
     if (this.rollosInsertar.length == 0) this.mensajeAdvertencia("¡Debe tener minimo un rollo seleccionado!");
     else {
-      this.cargando = false;
+      this.cargando = true;
       let info : any = {
         EntRolloProd_Fecha : this.today,
         EntRolloProd_Observacion : this.FormConsultarRollos.value.Observacion,
@@ -608,57 +298,56 @@ export class Ingresar_ProductosComponent implements OnInit {
   // Funcion par ingresar los rollos
   ingresarRollos(idEntrada : number){
     for (let i = 0; i < this.rollosInsertar.length; i++) {
-      let proceso = this.rollosInsertar[i].Estatus;
-      if (proceso == 'Empaque') proceso = 'EMP';
-      if (proceso == 'Extrusion') proceso = 'EXT';
-      if (proceso == 'Sellado') proceso = 'SELLA';
-      this.productosService.srvObtenerListaPorId(parseInt(this.rollosInsertar[i].IdProducto)).subscribe(datos_producto => {
-        let productos : any = [];
-        productos.push(datos_producto);
-        for (const item of productos) {
-          if(this.rollosInsertar[i].Presentacion == 'Paquete') {
-            let info : any = {
-              EntRolloProd_Id : idEntrada,
-              Rollo_Id : this.rollosInsertar[i].Id,
-              DtEntRolloProd_Cantidad : this.rollosInsertar[i].Cantidad,
-              UndMed_Rollo : this.rollosInsertar[i].Presentacion,
-              Estado_Id : 19,
-              DtEntRolloProd_OT : parseInt(this.rollosInsertar[i].Ot),
-              Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
-              UndMed_Prod : this.rollosInsertar[i].Presentacion,
-              Prod_CantPaquetesRestantes : this.rollosInsertar[i].Cantidad,
-              Prod_CantBolsasPaquete : item.prod_CantBolsasPaquete,
-              Prod_CantBolsasBulto : item.prod_CantBolsasBulto,
-              Prod_CantBolsasRestates : (this.rollosInsertar[i].Cantidad * item.prod_CantBolsasPaquete),
-              Prod_CantBolsasFacturadas : 0,
-              Proceso_Id : proceso,
+      if (!this.rollosInsertar[i].exits) {
+        let proceso = this.rollosInsertar[i].Estatus;
+        this.productosService.srvObtenerListaPorId(parseInt(this.rollosInsertar[i].IdProducto)).subscribe(datos_producto => {
+          let productos : any = [];
+          productos.push(datos_producto);
+          for (const item of productos) {
+            if(this.rollosInsertar[i].Presentacion == 'Paquete') {
+              let info : any = {
+                EntRolloProd_Id : idEntrada,
+                Rollo_Id : this.rollosInsertar[i].Id,
+                DtEntRolloProd_Cantidad : this.rollosInsertar[i].Cantidad,
+                UndMed_Rollo : this.rollosInsertar[i].Presentacion,
+                Estado_Id : 19,
+                DtEntRolloProd_OT : parseInt(this.rollosInsertar[i].Ot),
+                Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
+                UndMed_Prod : this.rollosInsertar[i].Presentacion,
+                Prod_CantPaquetesRestantes : this.rollosInsertar[i].Cantidad,
+                Prod_CantBolsasPaquete : item.prod_CantBolsasPaquete,
+                Prod_CantBolsasBulto : item.prod_CantBolsasBulto,
+                Prod_CantBolsasRestates : (this.rollosInsertar[i].Cantidad * item.prod_CantBolsasPaquete),
+                Prod_CantBolsasFacturadas : 0,
+                Proceso_Id : proceso,
+              }
+              this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => { }, error => {
+                this.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
+              });
+            } else {
+              let info : any = {
+                EntRolloProd_Id : idEntrada,
+                Rollo_Id : this.rollosInsertar[i].Id,
+                DtEntRolloProd_Cantidad : this.rollosInsertar[i].Cantidad,
+                UndMed_Rollo : this.rollosInsertar[i].Presentacion,
+                Estado_Id : 19,
+                DtEntRolloProd_OT : parseInt(this.rollosInsertar[i].Ot),
+                Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
+                UndMed_Prod : this.rollosInsertar[i].Presentacion,
+                Prod_CantPaquetesRestantes : this.rollosInsertar[i].Cantidad,
+                Prod_CantBolsasPaquete : item.prod_CantBolsasPaquete,
+                Prod_CantBolsasBulto : item.prod_CantBolsasBulto,
+                Prod_CantBolsasRestates : this.rollosInsertar[i].Cantidad,
+                Prod_CantBolsasFacturadas : 0,
+                Proceso_Id : proceso,
+              }
+              this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => { }, error => {
+                this.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
+              });
             }
-            this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => { }, error => {
-              this.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
-            });
-          } else {
-            let info : any = {
-              EntRolloProd_Id : idEntrada,
-              Rollo_Id : this.rollosInsertar[i].Id,
-              DtEntRolloProd_Cantidad : this.rollosInsertar[i].Cantidad,
-              UndMed_Rollo : this.rollosInsertar[i].Presentacion,
-              Estado_Id : 19,
-              DtEntRolloProd_OT : parseInt(this.rollosInsertar[i].Ot),
-              Prod_Id : parseInt(this.rollosInsertar[i].IdProducto),
-              UndMed_Prod : this.rollosInsertar[i].Presentacion,
-              Prod_CantPaquetesRestantes : this.rollosInsertar[i].Cantidad,
-              Prod_CantBolsasPaquete : item.prod_CantBolsasPaquete,
-              Prod_CantBolsasBulto : item.prod_CantBolsasBulto,
-              Prod_CantBolsasRestates : this.rollosInsertar[i].Cantidad,
-              Prod_CantBolsasFacturadas : 0,
-              Proceso_Id : proceso,
-            }
-            this.dtEntradaRollosService.srvGuardar(info).subscribe(datos_entrada => { }, error => {
-              this.mensajeError('¡Rollos No Ingresados!', `¡No se pudo ingresar la información de cada rollo ingresado!`);
-            });
           }
-        }
-      });
+        });
+      }
     }
     setTimeout(() => { this.InventarioProductos(idEntrada); }, (50 * this.rollosInsertar.length));
   }
@@ -900,18 +589,18 @@ export class Ingresar_ProductosComponent implements OnInit {
   // Funcion que devolverá un mensaje de satisfactorio
   mensajeConfirmacion(titulo : string, mensaje : any) {
     this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
-    this.cargando = true;
+    this.cargando = false;
   }
 
   // Funcion que va a devolver un mensaje de error
   mensajeError(titulo : string, mensaje : any) {
     this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 2000});
-    this.cargando = true;
+    this.cargando = false;
   }
 
   // Funcion que va a devolver un mensaje de advertencia
   mensajeAdvertencia(mensaje : any) {
     this.messageService.add({severity:'warn', summary: '¡Advertencia!', detail: mensaje, life: 1500});
-    this.cargando = true;
+    this.cargando = false;
   }
 }
