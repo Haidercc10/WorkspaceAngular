@@ -1,12 +1,12 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import { Table } from 'primeng/table';
-import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
-import Swal from 'sweetalert2';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
+import moment from 'moment';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { MessageService } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 
 @Component({
   selector: 'app-Reporte_FacturacionZeus',
@@ -37,7 +37,8 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                  private invetarioZeusService : InventarioZeusService,) {
+                  private invetarioZeusService : InventarioZeusService,
+                    private messageService: MessageService) {
 
     this.formFiltros = this.frmBuilder.group({
       vendedor: [null],
@@ -279,9 +280,8 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     else if (vendedor && nombreVendedor) ruta = `?vendedor=${vendedor}&nombreVendedor=${nombreVendedor}`;
 
     this.invetarioZeusService.GetConsolidadClientesArticulo(anoInicial, anoFinal, ruta).subscribe(datos_consolidado => {
-      if(datos_consolidado.length == 0) {
-        this.advertencia('No se encontraron resultados de búsqueda con la combinación de filtros seleccionada!')
-      } else {
+      if(datos_consolidado.length == 0) this.mensajeAdvertencia('No se encontraron resultados de búsqueda con la combinación de filtros seleccionada!')
+      else {
         for (let i = 0; i < datos_consolidado.length; i++) {
           this.llenarConsolidado(datos_consolidado[i]);
         }
@@ -333,7 +333,7 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
 
   // Funcion que va a exportar a excel la informacion que este cargada en la tabla
   exportarExcel(){
-    if (this.arrayConsolidado.length == 0) this.advertencia('Debe haber al menos un pedido en la tabla.');
+    if (this.arrayConsolidado.length == 0) this.mensajeAdvertencia('Debe haber al menos un pedido en la tabla.');
     else {
       this.cargando = true;
       setTimeout(() => {
@@ -414,9 +414,19 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
     }
   }
 
-  // Funcion que mostrará una advertencia si no se encuentran registros de búsqueda
-  advertencia(mensaje : string) {
-    Swal.fire({  icon: 'warning', title: 'Advertencia', text: mensaje, confirmButtonColor: '#ffc107', })
+  /** Mostrar mensaje de confirmación  */
+  mensajeConfirmacion(titulo : string, mensaje : any) {
+    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+   }
+
+  /** Mostrar mensaje de error  */
+  mensajeError(titulo : string, mensaje : string) {
+  this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mensajeAdvertencia(mensaje : string) {
+  this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
   }
 
 }

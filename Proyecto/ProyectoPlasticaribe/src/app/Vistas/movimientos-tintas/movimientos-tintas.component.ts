@@ -772,6 +772,7 @@ export class MovimientosTintasComponent implements OnInit {
           }
           this.ArrayMpPDF.push(items);
         }
+        console.log(this.ArrayMpPDF)
         setTimeout(() => { this.verPDF(data); }, 2000);
       });
     } else if (data.tipoId == 'FCO') {
