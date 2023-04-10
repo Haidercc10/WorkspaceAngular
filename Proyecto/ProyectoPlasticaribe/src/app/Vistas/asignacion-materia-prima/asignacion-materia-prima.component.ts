@@ -487,7 +487,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
    this.messageService.clear(dato);
   }
 
-    /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
+  /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
   mostrarEleccion(item : any){
     this.mpSeleccionada = item;
     this.messageService.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea quitar la materia prima de la asignación?`, sticky: true});

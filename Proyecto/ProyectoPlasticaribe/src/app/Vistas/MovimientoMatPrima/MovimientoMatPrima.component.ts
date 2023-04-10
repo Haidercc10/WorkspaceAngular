@@ -94,20 +94,13 @@ export class MovimientoMatPrimaComponent implements OnInit {
 
   // Funcion que va cambiar el nombre de la materia prima
   cambiarNombreMateriaPrima() {
-    let id : number = this.FormDocumentos.value.materiaPrima
-    this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
-      for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.FormDocumentos = this.frmBuilderMateriaPrima.group({
-          idDocumento : this.FormDocumentos.value.idDocumento,
-          TipoDocumento: this.FormDocumentos.value.TipoDocumento,
-          IdMateriaPrima: datos_materiaPrima[i].id,
-          materiaPrima : datos_materiaPrima[i].nombre,
-          fecha: this.FormDocumentos.value.fecha,
-          fechaFinal: this.FormDocumentos.value.fechaFinal,
-          estado : this.FormDocumentos.value.estado,
-        });
-      }
-    }, error => { this.load = true; });
+    let id : number = this.FormDocumentos.value.materiaPrima;
+    let nuevo : any[] = this.ArrayMateriaPrima.filter((item) => item.matPri_Id == id);
+    console.log(nuevo)
+    this.FormDocumentos.patchValue({
+      IdMateriaPrima: nuevo[0].matPri_Id,
+      materiaPrima: nuevo[0].matPri_Nombre
+    });
   }
 
   // Funcion que va a limpiar los campos
@@ -1372,7 +1365,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
             Cant : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad),
             "Und Cant" : datos_factura[i].undMed_Id,
             "Precio Und" : this.formatonumeros(datos_factura[i].faccoMatPri_ValorUnitario),
-            SubTotal : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad * datos_factura[i].faccoMatPri_ValorUnitario),
+            "Sub Total" : this.formatonumeros(datos_factura[i].faccoMatPri_Cantidad * datos_factura[i].faccoMatPri_ValorUnitario),
           }
           this.ArrayMpPDF.push(items);
         }
@@ -1387,7 +1380,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
             Cant : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad),
             "Und Cant" : datos_remision[i].undMed_Id,
             "Precio Und" : this.formatonumeros(datos_remision[i].remiMatPri_ValorUnitario),
-            SubTotal : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad * datos_remision[i].remiMatPri_ValorUnitario),
+            "Sub Total" : this.formatonumeros(datos_remision[i].remiMatPri_Cantidad * datos_remision[i].remiMatPri_ValorUnitario),
           }
           this.ArrayMpPDF.push(items);
         }
@@ -1440,14 +1433,14 @@ export class MovimientoMatPrimaComponent implements OnInit {
                       height : 50
                     },
                     {
-                      text: `Plasticaribe S.A.S ---- Asignación de Materia Prima`,
-                      alignment: 'center',
+                      text: `Asignación de Materia Prima`,
+                      alignment: 'right',
                       style: 'titulo',
-                      margin: 30
+                      margin: [0, 14, 0, 0]
                     }
                   ]
                 },
-                '\n \n',
+                '\n',
                 {
                   text: `Fecha de registro: ${datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00', '')}`,
                   style: 'header',
@@ -1459,9 +1452,9 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   style: 'header',
                 },
                 {
-                  text: `\n Información la Asignación \n \n`,
+                  text: `\n Información sobre la asignación \n \n`,
                   alignment: 'center',
-                  style: 'header'
+                  style: 'cuerpo'
                 },
                 {
                   style: 'tablaCliente',
@@ -1480,13 +1473,13 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   fontSize: 12,
                 },
                 {
-                  text: `\n \nObervación sobre la remisión: \n ${datos_asignacion[i].asigMp_Observacion}\n`,
+                  text: `\n \nObservación del documento: \n ${datos_asignacion[i].asigMp_Observacion}\n`,
                   style: 'header',
                 },
                 {
                   text: `\n Información detallada de Materia(s) Prima(s) asignada(s) \n `,
                   alignment: 'center',
-                  style: 'header'
+                  style: 'cuerpo'
                 },
 
                 this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant']),
@@ -1496,8 +1489,12 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   fontSize: 10,
                   bold: true
                 },
+                cuerpo: {
+                  fontSize: 12,
+                  bold: true
+                },
                 titulo: {
-                  fontSize: 15,
+                  fontSize: 20,
                   bold: true
                 }
               }
@@ -1537,14 +1534,14 @@ export class MovimientoMatPrimaComponent implements OnInit {
                       height : 50
                     },
                     {
-                      text: `Plasticaribe S.A.S ---- Devolución de Materia Prima`,
-                      alignment: 'center',
+                      text: `Devolución de Materia Prima`,
+                      alignment: 'right',
                       style: 'titulo',
-                      margin: 30
+                      margin: [0, 14, 0, 0]
                     }
                   ]
                 },
-                '\n \n',
+                '\n',
                 {
                   text: `Fecha de registro: ${datos_devolucion[i].devMatPri_Fecha.replace('T00:00:00', '')}`,
                   style: 'header',
@@ -1558,7 +1555,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                 {
                   text: `\n Información la Asignación \n \n`,
                   alignment: 'center',
-                  style: 'header'
+                  style: 'cuerpo'
                 },
                 {
                   style: 'tablaCliente',
@@ -1574,27 +1571,31 @@ export class MovimientoMatPrimaComponent implements OnInit {
                     ]
                   },
                   layout: 'lightHorizontalLines',
-                  fontSize: 9,
+                  fontSize: 10,
                 },
                 {
-                  text: `\n \nObervación sobre la remisión: \n ${datos_devolucion[i].devMatPri_Motivo}\n`,
+                  text: `\n \nObservación sobre la devolución: \n ${datos_devolucion[i].devMatPri_Motivo}\n`,
                   style: 'header',
                 },
                 {
                   text: `\n Información detallada de Materia(s) Prima(s) asignada(s) \n `,
                   alignment: 'center',
-                  style: 'header'
+                  style: 'cuerpo'
                 },
 
                 this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant']),
               ],
               styles: {
                 header: {
-                  fontSize: 8,
+                  fontSize: 10,
+                  bold: true
+                },
+                cuerpo: {
+                  fontSize: 12,
                   bold: true
                 },
                 titulo: {
-                  fontSize: 15,
+                  fontSize: 20,
                   bold: true
                 }
               }
@@ -1603,6 +1604,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
             pdf.open();
             break;
           }
+          break;
         }
       });
     } else if (data.tipoId == 'FCO') {
@@ -1633,10 +1635,10 @@ export class MovimientoMatPrimaComponent implements OnInit {
                       height : 50
                     },
                     {
-                      text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
-                      alignment: 'center',
+                      text: `Factura de Compra de Materia Prima`,
+                      alignment: 'right',
                       style: 'titulo',
-                      margin: 30
+                      margin: [0, 14, 0, 0]
                     }
                   ]
                 },
@@ -1654,7 +1656,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                 {
                   text: `\n Información detallada del Proveedor \n \n`,
                   alignment: 'center',
-                  style: 'header'
+                  style: 'cuerpo'
                 },
                 {
                   style: 'tablaCliente',
@@ -1680,16 +1682,16 @@ export class MovimientoMatPrimaComponent implements OnInit {
                     ]
                   },
                   layout: 'lightHorizontalLines',
-                  fontSize: 9,
+                  fontSize: 10,
                 },
                 {
-                  text: `\n \nObervación sobre la factura: \n ${datos_factura[i].facco_Observacion}\n`,
+                  text: `\n \nObservación sobre la factura: \n ${datos_factura[i].facco_Observacion}\n`,
                   style: 'header',
                 },
                 {
                   text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
                   alignment: 'center',
-                  style: 'header'
+                  style: 'cuerpo'
                 },
 
                 this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant', 'Precio Und', 'Sub Total']),
@@ -1702,11 +1704,15 @@ export class MovimientoMatPrimaComponent implements OnInit {
               ],
               styles: {
                 header: {
-                  fontSize: 8,
+                  fontSize: 10,
+                  bold: true
+                },
+                cuerpo: {
+                  fontSize: 12,
                   bold: true
                 },
                 titulo: {
-                  fontSize: 15,
+                  fontSize: 20,
                   bold: true
                 }
               }
@@ -1746,14 +1752,14 @@ export class MovimientoMatPrimaComponent implements OnInit {
                       height : 50
                     },
                     {
-                      text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
-                      alignment: 'center',
+                      text: `Remisión de Compra de Materia Prima`,
+                      alignment: 'right',
                       style: 'titulo',
-                      margin: 30
+                      margin: [0, 14, 0, 0]
                     }
                   ]
                 },
-                '\n \n',
+                '\n',
                 {
                   text: `Fecha de registro: ${datos_remision[i].rem_Fecha.replace('T00:00:00', '')}`,
                   style: 'header',
@@ -1767,7 +1773,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                 {
                   text: `\n Información detallada del Proveedor \n \n`,
                   alignment: 'center',
-                  style: 'header'
+                  style: 'cuerpo'
                 },
                 {
                   style: 'tablaCliente',
@@ -1796,24 +1802,28 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   fontSize: 9,
                 },
                 {
-                  text: `\n \nObervación sobre la remisión: \n ${datos_remision[i].rem_Observacion}\n`,
+                  text: `\n \nObservación sobre la remisión: \n ${datos_remision[i].rem_Observacion}\n`,
                   style: 'header',
                 },
                 {
                   text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
                   alignment: 'center',
-                  style: 'header'
+                  style: 'cuerpo'
                 },
 
                 this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant', 'Precio Und', 'Sub Total']),
               ],
               styles: {
                 header: {
-                  fontSize: 8,
+                  fontSize: 10,
+                  bold: true
+                },
+                cuerpo: {
+                  fontSize: 12,
                   bold: true
                 },
                 titulo: {
-                  fontSize: 15,
+                  fontSize: 20,
                   bold: true
                 }
               }
@@ -1853,16 +1863,16 @@ export class MovimientoMatPrimaComponent implements OnInit {
                       height : 50
                     },
                     {
-                      text: `Plasticaribe S.A.S ---- Recuperado de Materia Prima`,
-                      alignment: 'center',
+                      text: `Recuperado de Materia Prima`,
+                      alignment: 'right',
                       style: 'titulo',
-                      margin: 30
+                      margin: [0, 14, 0, 0]
                     }
                   ]
                 },
-                '\n \n',
+                '\n',
                 {
-                  text: `Fecha de registro: ${datos_recuperado[i]}`,
+                  text: `Fecha de registro: ${datos_recuperado[i].recMp_FechaIngreso}`,
                   style: 'header',
                   alignment: 'right',
                 },
@@ -1874,7 +1884,7 @@ export class MovimientoMatPrimaComponent implements OnInit {
                 {
                   text: `\n Información la Asignación \n \n`,
                   alignment: 'center',
-                  style: 'header'
+                  style: 'cuerpo'
                 },
                 {
                   style: 'tablaCliente',
@@ -1893,24 +1903,28 @@ export class MovimientoMatPrimaComponent implements OnInit {
                   fontSize: 9,
                 },
                 {
-                  text: `\n \nObervación sobre la remisión: \n ${datos_recuperado[i].recMp_Observacion}\n`,
+                  text: `\n \nObservación sobre la remisión: \n ${datos_recuperado[i].recMp_Observacion}\n`,
                   style: 'header',
                 },
                 {
                   text: `\n Información detallada de Materia(s) Prima(s) asignada(s) \n `,
                   alignment: 'center',
-                  style: 'header'
+                  style: 'cuerpo'
                 },
 
                 this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant']),
               ],
               styles: {
                 header: {
-                  fontSize: 8,
+                  fontSize: 10,
+                  bold: true
+                },
+                cuerpo: {
+                  fontSize: 12,
                   bold: true
                 },
                 titulo: {
-                  fontSize: 15,
+                  fontSize: 20,
                   bold: true
                 }
               }

@@ -1,5 +1,5 @@
 <app-menuLateral></app-menuLateral>
-
+<p-toast position="center"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -127,7 +127,7 @@
               <td>{{registros.Usuario}}</td>
               <td>{{registros.Fecha}}</td>
               <td>{{registros.Estado}}</td>
-              <td style="text-align: center;"><a style="font-size: medium;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" pTooltip="PDF" (click)="buscarinfoOrdenCompra(registros.Oc)"></a></td>
+              <td style="text-align: center;"><a style="font-size: medium; width: 30px; height: 30px; text-decoration: none;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-danger mr-2" pTooltip="PDF" (click)="buscarinfoOrdenCompra(registros.Oc)"></a></td>
             </tr>
           </ng-template>
         </p-table>

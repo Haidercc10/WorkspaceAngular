@@ -681,6 +681,7 @@ export class MovimientosTintasComponent implements OnInit {
 
   // Funcion para llenar la tabla con la informcion consultada
   llenarTabla(datos : any){
+    console.log('entre 2')
     if (datos.estado != 'Creación Tintas' && datos.estado != 'Remisión' && datos.estado != 'Factura de Compra') {
       let info : any = {
         ot : datos.ot,
@@ -694,6 +695,7 @@ export class MovimientosTintasComponent implements OnInit {
       }
       this.ArrayInfoConsulta.push(info);
     } else if (datos.estado == 'Creación Tintas'){
+      console.log('entre 3.1')
       if (datos.materiaPrima == 84 && datos.tinta2 != 2001){
         let info : any = {
           Id : datos.id,
@@ -708,6 +710,7 @@ export class MovimientosTintasComponent implements OnInit {
         }
         this.ArrayInfoConsulta.push(info);
       } else if (datos.materiaPrima != 84 && datos.tinta2 == 2001){
+        console.log('entre 3')
         let info : any = {
           Id : datos.id,
           ot : `${datos.ot} - ${datos.nombreTinta}`,
@@ -762,10 +765,10 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerTintasAsignadasxOT(data.ot).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
           let items : any = {
-            Id : datos_asignacion[i].tinta_Id,
-            Nombre : datos_asignacion[i].tinta_Nombre,
-            Cant : this.formatonumeros(datos_asignacion[i].sum),
-            "Und Cant" : datos_asignacion[i].undMed_Id,
+            Id : datos_asignacion[i].tinta,
+            Nombre : datos_asignacion[i].nombreTinta,
+            Cant :datos_asignacion[i].suma,
+            UndCant : datos_asignacion[i].presentacion,
           }
           this.ArrayMpPDF.push(items);
         }
@@ -826,7 +829,7 @@ export class MovimientosTintasComponent implements OnInit {
           }
         }
       });
-      setTimeout(() => { this.verPDF(data); }, 2000);
+      setTimeout(() => { this.verPDF(data); }, 2300);
     }
   }
 
@@ -837,9 +840,10 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerpdfMovimientos(data.ot).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
           for (let j = 0; j < this.ArrayMpPDF.length; j++) {
+            console.log(this.ArrayMpPDF[i])
             const pdfDefinicion : any = {
               info: {
-                title: `${datos_asignacion[i].ASIGTINTAS_Id}`
+                title: `${datos_asignacion[i].asigMp_Id}`
               },
               footer: function(currentPage : any, pageCount : any) {
                 return [
@@ -861,16 +865,16 @@ export class MovimientosTintasComponent implements OnInit {
                       height : 50
                     },
                     {
-                      text: `Plasticaribe S.A.S ---- Asignación de Tintas`,
-                      alignment: 'center',
+                      text: `Asignación de Tintas`,
+                      alignment: 'right',
                       style: 'titulo',
-                      margin: 30
+                      margin: [0, 14, 0, 0]
                     }
                   ]
                 },
                 '\n \n',
                 {
-                  text: `Fecha de registro: ${datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '')}`,
+                  text: `Fecha de registro: ${datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00', '')}`,
                   style: 'header',
                   alignment: 'right',
                 },
@@ -892,8 +896,8 @@ export class MovimientosTintasComponent implements OnInit {
                     style: 'header',
                     body: [
                       [
-                        `OT: ${datos_asignacion[i].ASIGTINTAS_OrdenTrabajo}`,
-                        `Maquina: ${datos_asignacion[i].ASIGTINTAS_Maquina}`,
+                        `OT: ${datos_asignacion[i].asigMP_OrdenTrabajo}`,
+                        `Maquina: ${datos_asignacion[i].asigMp_Maquina}`,
                         `Proceso: ${datos_asignacion[i].proceso_Nombre}`
                       ]
                     ]
@@ -902,7 +906,7 @@ export class MovimientosTintasComponent implements OnInit {
                   fontSize: 12,
                 },
                 {
-                  text: `\n \nObservación: \n ${datos_asignacion[i].ASIGTINTAS_Observacion}\n`,
+                  text: `\n \nObservación: \n ${datos_asignacion[i].asigMp_Observacion} \n`,
                   style: 'header',
                 },
                 {
@@ -912,7 +916,7 @@ export class MovimientosTintasComponent implements OnInit {
                   fontSize: 12,
                 },
 
-                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant']),
+                this.tableAsignacion(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'UndCant']),
               ],
               styles: {
                 header: {
@@ -920,7 +924,7 @@ export class MovimientosTintasComponent implements OnInit {
                   bold: true
                 },
                 titulo: {
-                  fontSize: 15,
+                  fontSize: 20,
                   bold: true
                 }
               }
@@ -960,10 +964,10 @@ export class MovimientosTintasComponent implements OnInit {
                       height : 50
                     },
                     {
-                      text: `Plasticaribe S.A.S ---- Factura de Compra de Materia Prima`,
+                      text: `Factura de Compra de Materia Prima`,
                       alignment: 'center',
                       style: 'titulo',
-                      margin: 30
+                      margin: [0, 14, 0, 0]
                     }
                   ]
                 },
@@ -981,7 +985,7 @@ export class MovimientosTintasComponent implements OnInit {
                 {
                   text: `\n Información detallada del Proveedor \n \n`,
                   alignment: 'center',
-                  style: 'header'
+                  style: 'cuerpo'
                 },
                 {
                   style: 'tablaCliente',
@@ -1016,7 +1020,7 @@ export class MovimientosTintasComponent implements OnInit {
                 {
                   text: `\n Información detallada de Materia(s) Prima(s) comprada(s) \n `,
                   alignment: 'center',
-                  style: 'header'
+                  style: 'cuerpo'
                 },
 
                 this.table(this.ArrayMpPDF, ['Id', 'Nombre', 'Cant', 'Und Cant', 'Precio Und', 'SubTotal']),
@@ -1029,11 +1033,15 @@ export class MovimientosTintasComponent implements OnInit {
               ],
               styles: {
                 header: {
-                  fontSize: 8,
+                  fontSize: 10,
+                  bold: true
+                },
+                cuerpo: {
+                  fontSize: 12,
                   bold: true
                 },
                 titulo: {
-                  fontSize: 15,
+                  fontSize: 20,
                   bold: true
                 }
               }
@@ -1073,10 +1081,10 @@ export class MovimientosTintasComponent implements OnInit {
                       height : 50
                     },
                     {
-                      text: `Plasticaribe S.A.S ---- Remisión de Compra de Materia Prima`,
+                      text: `Remisión de Compra de Materia Prima`,
                       alignment: 'center',
                       style: 'titulo',
-                      margin: 30
+                      margin: [0, 14, 0, 0]
                     }
                   ]
                 },
@@ -1136,11 +1144,15 @@ export class MovimientosTintasComponent implements OnInit {
               ],
               styles: {
                 header: {
-                  fontSize: 8,
+                  fontSize: 10,
+                  bold: true
+                },
+                cuerpo: {
+                  fontSize: 12,
                   bold: true
                 },
                 titulo: {
-                  fontSize: 15,
+                  fontSize: 20,
                   bold: true
                 }
               }
@@ -1179,10 +1191,10 @@ export class MovimientosTintasComponent implements OnInit {
                     height : 50
                   },
                   {
-                    text: `Plasticaribe S.A.S ---- Creación de Tinta`,
-                    alignment: 'center',
+                    text: `Creación de Tinta`,
+                    alignment: 'right',
                     style: 'titulo',
-                    margin: 30
+                    margin: [0, 14, 0, 0]
                   }
                 ]
               },
@@ -1198,13 +1210,13 @@ export class MovimientosTintasComponent implements OnInit {
                 style: 'header',
               },
               {
-                text: `\n \nObervación sobre la remisión: \n ${datos_creacion[i].asigMPxTinta_Observacion}\n`,
+                text: `\n \nObservación sobre la remisión: \n ${datos_creacion[i].asigMPxTinta_Observacion}\n`,
                 style: 'header',
               },
               {
                 text: `\n Información detallada de la Tinta Creada \n `,
                 alignment: 'center',
-                style: 'header'
+                style: 'cuerpo'
               },
               {
                 text: `\n La tinta creada fue: \n `,
@@ -1223,8 +1235,12 @@ export class MovimientosTintasComponent implements OnInit {
                 fontSize: 10,
                 bold: true
               },
+              cuerpo: {
+                fontSize: 12,
+                bold: true
+              },
               titulo: {
-                fontSize: 15,
+                fontSize: 20,
                 bold: true
               },
               tintaCreada: {
