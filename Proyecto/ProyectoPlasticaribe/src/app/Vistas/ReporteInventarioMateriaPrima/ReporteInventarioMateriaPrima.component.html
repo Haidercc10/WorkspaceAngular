@@ -1,5 +1,5 @@
 <app-menuLateral></app-menuLateral>
-
+<p-toast position="center"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -33,8 +33,8 @@
         <!-- Id de Materia Prima -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-inputNumber formControlName="MpId" id="MpId" list="SerialRollo" [required]="true"></p-inputNumber>
-            <label for="MpId">Id</label>
+            <p-inputNumber formControlName="MpId" id="MpId" list="SerialRollo" [useGrouping]="false" [required]="true"></p-inputNumber>
+            <label for="MpId">Id Mat. Prima</label>
           </span>
         </div>
 
@@ -45,7 +45,7 @@
             <datalist id="materiaprima">
               <option value={{item.id}} *ngFor="let item of materiasPrimas">{{item.nombre}}</option>
             </datalist>
-            <label for="Nombre">Nombre Rollo</label>
+            <label for="Nombre">Mat. Prima</label>
           </span>
         </div>
 

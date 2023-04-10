@@ -2,6 +2,7 @@
   <app-menuLateral></app-menuLateral>
 </ng-container>
 
+<p-toast position="center"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -53,7 +54,7 @@
         <div class="col-md-3">
           <span class="p-input-icon-left p-float-label">
             <i class="pi pi-search"></i>
-            <input formControlName="Proveedor" id="Proveedores" list="Proveedor" class="form-control form-control-sm" type="text" pInputText (keyup)="consultarProveedores()" (change)="cambiarNombreProveedor()" required/>
+            <input formControlName="Proveedor" id="Proveedores" autocomplete="off" list="Proveedor" class="form-control form-control-sm" type="text" pInputText (keyup)="consultarProveedores()" (change)="cambiarNombreProveedor()" required/>
             <datalist id="Proveedor">
               <option value={{item.prov_Id}} *ngFor="let item of proveedores">{{item.prov_Nombre}}</option>
             </datalist>
@@ -89,7 +90,7 @@
         <!-- ID de la Materia prima -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-inputNumber formControlName="Id" inputId="Id" [required]="true"></p-inputNumber>
+            <p-inputNumber formControlName="Id" inputId="Id" [useGrouping]="false" [required]="true"></p-inputNumber>
             <label for="Id">Id</label>
           </span>
         </div>
@@ -97,7 +98,7 @@
         <!-- Nombre Producto -->
         <div class="col-md-4">
           <span class="p-float-label">
-            <input formControlName="Nombre" id="Nombre" list="materiaprima" class="form-control form-control-sm" type="text" pInputText (change)="cambiarNombreMateriaPrima()" required/>
+            <input formControlName="Nombre" autocomplete="off" id="Nombre" list="materiaprima" class="form-control form-control-sm" type="text" pInputText (change)="cambiarNombreMateriaPrima()" required/>
             <datalist id="materiaprima">
               <option value={{item.id}} *ngFor="let item of materiaPrima">{{item.nombre}}</option>
             </datalist>
@@ -180,8 +181,8 @@
             <td>{{materiasPrimas.Precio | number}}</td>
             <td>{{materiasPrimas.SubTotal | number}}</td>
             <td>
-              <i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="quitarMateriaPrima(materiasPrimas)" *ngIf="!edicionOrdenCompra"></i>
-              <i class="pi pi-trash cursor" title="Eliminar Materia Prima" (click)="eliminarMateriaPrima(materiasPrimas)" *ngIf="edicionOrdenCompra"></i>
+              <i class="pi pi-trash cursor" title="Quitar Materia Prima" (click)="mostrarEleccion(materiasPrimas, 'quitar')" *ngIf="!edicionOrdenCompra"></i>
+              <i class="pi pi-trash cursor" title="Eliminar Materia Prima" (click)="mostrarEleccion(materiasPrimas, 'eliminar')" *ngIf="edicionOrdenCompra"></i>
             </td>
           </tr>
         </ng-template>
@@ -257,3 +258,25 @@
   </p-dialog>
 
 </div>
+
+<p-toast position="center" key="{{llave}}" (onClose)="onReject()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-matPrima>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button *ngIf="llave == 'eliminar'" type="button" pButton (click)="eliminarMateriaPrima(matPrima)" icon="pi pi-check" label="Si" class="p-button-warning"></button>
+          <button *ngIf="llave == 'quitar'" type="button" pButton (click)="quitarMateriaPrima(matPrima)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button *ngIf="llave == 'pdf'" type="button" pButton (click)="buscarinfoOrdenCompra()" icon="pi pi-file-pdf" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

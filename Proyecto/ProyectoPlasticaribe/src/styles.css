@@ -178,5 +178,9 @@ a {
   font-weight: 600;
 }
 
+.p-toast .p-toast-message .p-toast-message-content .p-toast-detail {
+  font-weight: 500;
+}
+
 
 

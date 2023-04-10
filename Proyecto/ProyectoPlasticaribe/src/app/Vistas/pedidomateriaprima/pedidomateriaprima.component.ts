@@ -171,6 +171,7 @@ export class PedidomateriaprimaComponent implements OnInit {
     this.valorTotal = 0;
     this.load = true;
     this.ArrayMateriaPrima = [];
+    this.arrayOrdenCompra = [];
   }
 
   //Funcion que colocará el nombre a las columnas de la tabla en la cual se muestran los productos pedidos por los clientes
@@ -208,62 +209,64 @@ export class PedidomateriaprimaComponent implements OnInit {
 
     if (Orden_Compra != null){
       this.dtOrdenCompraService.GetListaOrdenesComprasxId(Orden_Compra).subscribe(datos_orden => {
-        for (let i = 0; i < datos_orden.length; i++) {
-          let mp : number = 0;
-          if (datos_orden[i].matPri_Id != 84) mp = datos_orden[i].matPri_Id;
-          else if (datos_orden[i].tinta_Id != 2001) mp = datos_orden[i].tinta_Id;
-          else if (datos_orden[i].bopP_Id != 1) mp = datos_orden[i].bopP_Id;
-          let mpArray : number [] = [];
-          this.servicioOCMatPrima.GetOrdenCompraFacturada(Orden_Compra, mp).subscribe(datos_facturacion => {
-            for (let j = 0; j < datos_facturacion.length; j++) {
-              let info : any = {
-                Id : mp,
-                Id_Mp: datos_facturacion[j].mP_Id,
-                Id_Tinta: datos_facturacion[j].tinta_Id,
-                Id_Bopp: datos_facturacion[j].bopp_Id,
-                Nombre : '',
-                Cantidad : datos_facturacion[j].cantidad_Total,
-                Cantidad_Ingresada : datos_facturacion[j].cantidad_Ingresada,
-                Cantidad_Faltante : datos_facturacion[j].cantidad_Faltante,
-                Cantidad_Faltante_Editar : datos_facturacion[j].cantidad_Faltante,
-                Medida : datos_facturacion[j].presentacion,
-                Precio : datos_facturacion[j].precio,
-                Exits : false,
-              }
-
-              if (mpArray.includes(mp)) {
-                for (let k = 0; k < this.arrayOrdenCompra.length; k++) {
-                  if (this.arrayOrdenCompra[k].Id == mp) {
-                    this.arrayOrdenCompra[k].Cantidad_Ingresada += info.Cantidad_Ingresada;
-                    this.arrayOrdenCompra[k].Cantidad_Faltante = this.arrayOrdenCompra[k].Cantidad - this.arrayOrdenCompra[k].Cantidad_Ingresada;
-                    this.arrayOrdenCompra[k].Cantidad_Faltante_Editar = this.arrayOrdenCompra[k].Cantidad_Faltante;
-                    if (this.arrayOrdenCompra[k].Cantidad_Ingresada >= this.arrayOrdenCompra[k].Cantidad) this.arrayOrdenCompra[k].Exits = true;
-                  } else continue;
-                }
-              } else {
-                if (info.Id_Mp != 84 && info.Id_Tinta == 2001 && info.Id_Bopp == 1) info.Nombre = datos_facturacion[j].mp;
-                else if (info.Id_Mp == 84 && info.Id_Tinta != 2001 && info.Id_Bopp == 1) info.Nombre = datos_facturacion[j].tinta;
-                else if (info.Id_Mp == 84 && info.Id_Tinta == 2001 && info.Id_Bopp != 1) {
-                  info.Id = info.Id_Bopp;
-                  info.Nombre = datos_facturacion[j].bopp;
-                  this.mostrarCheck = false;
+        if(datos_orden.length > 0) {
+          for (let i = 0; i < datos_orden.length; i++) {
+            let mp : number = 0;
+            if (datos_orden[i].matPri_Id != 84) mp = datos_orden[i].matPri_Id;
+            else if (datos_orden[i].tinta_Id != 2001) mp = datos_orden[i].tinta_Id;
+            else if (datos_orden[i].bopP_Id != 1) mp = datos_orden[i].bopP_Id;
+            let mpArray : number [] = [];
+            this.servicioOCMatPrima.GetOrdenCompraFacturada(Orden_Compra, mp).subscribe(datos_facturacion => {
+              for (let j = 0; j < datos_facturacion.length; j++) {
+                let info : any = {
+                  Id : mp,
+                  Id_Mp: datos_facturacion[j].mP_Id,
+                  Id_Tinta: datos_facturacion[j].tinta_Id,
+                  Id_Bopp: datos_facturacion[j].bopp_Id,
+                  Nombre : '',
+                  Cantidad : datos_facturacion[j].cantidad_Total,
+                  Cantidad_Ingresada : datos_facturacion[j].cantidad_Ingresada,
+                  Cantidad_Faltante : datos_facturacion[j].cantidad_Faltante,
+                  Cantidad_Faltante_Editar : datos_facturacion[j].cantidad_Faltante,
+                  Medida : datos_facturacion[j].presentacion,
+                  Precio : datos_facturacion[j].precio,
+                  Exits : false,
                 }
 
-                if (info.Cantidad_Ingresada >= info.Cantidad) info.Exits = true;
-                this.FormMateriaPrimaFactura.patchValue({
-                  ConsecutivoFactura : this.ultimoIdFactura,
-                  proveedor: datos_facturacion[j].proveedor_Id,
-                  proveedorNombre: datos_facturacion[j].proveedor,
-                  MpObservacion : datos_facturacion[j].observacion,
-                });
-                mpArray.push(mp);
-                this.arrayOrdenCompra.push(info);
-                this.arrayOrdenCompra.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+                if (mpArray.includes(mp)) {
+                  for (let k = 0; k < this.arrayOrdenCompra.length; k++) {
+                    if (this.arrayOrdenCompra[k].Id == mp) {
+                      this.arrayOrdenCompra[k].Cantidad_Ingresada += info.Cantidad_Ingresada;
+                      this.arrayOrdenCompra[k].Cantidad_Faltante = this.arrayOrdenCompra[k].Cantidad - this.arrayOrdenCompra[k].Cantidad_Ingresada;
+                      this.arrayOrdenCompra[k].Cantidad_Faltante_Editar = this.arrayOrdenCompra[k].Cantidad_Faltante;
+                      if (this.arrayOrdenCompra[k].Cantidad_Ingresada >= this.arrayOrdenCompra[k].Cantidad) this.arrayOrdenCompra[k].Exits = true;
+                    } else continue;
+                  }
+                } else {
+                  if (info.Id_Mp != 84 && info.Id_Tinta == 2001 && info.Id_Bopp == 1) info.Nombre = datos_facturacion[j].mp;
+                  else if (info.Id_Mp == 84 && info.Id_Tinta != 2001 && info.Id_Bopp == 1) info.Nombre = datos_facturacion[j].tinta;
+                  else if (info.Id_Mp == 84 && info.Id_Tinta == 2001 && info.Id_Bopp != 1) {
+                    info.Id = info.Id_Bopp;
+                    info.Nombre = datos_facturacion[j].bopp;
+                    this.mostrarCheck = false;
+                  }
+
+                  if (info.Cantidad_Ingresada >= info.Cantidad) info.Exits = true;
+                  this.FormMateriaPrimaFactura.patchValue({
+                    ConsecutivoFactura : this.ultimoIdFactura,
+                    proveedor: datos_facturacion[j].proveedor_Id,
+                    proveedorNombre: datos_facturacion[j].proveedor,
+                    MpObservacion : datos_facturacion[j].observacion,
+                  });
+                  mpArray.push(mp);
+                  this.arrayOrdenCompra.push(info);
+                  this.arrayOrdenCompra.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
+                }
+                this.load = true;
               }
-              this.load = true;
-            }
-          });
-        }
+            });
+          }
+        } else this.mostrarAdvertencia(`Advertencia`,`La orden de compra '${Orden_Compra}' no existe!`);
       }, error => { this.mostrarError(`Error`, `¡No existe la Orden de Compra #${Orden_Compra}, por favor verifique!`); });
     }
   }
@@ -337,7 +340,7 @@ export class PedidomateriaprimaComponent implements OnInit {
 
   //Funcion que validará el campo sobre el que se está colocando del consecutivo, factura o remisimos
   validarCampos(){
-    if (this.FormMateriaPrimaFactura.value.MpRemision == '' && this.FormMateriaPrimaFactura.value.MpFactura == '') this.mostrarAdvertencia(`Advertencia`, "Los campos 'N° Factura' y 'N° Remisión' no pueden tener información al mismo tiempo, por favor llenar solo uno.");
+    if (this.FormMateriaPrimaFactura.value.MpRemision == '' && this.FormMateriaPrimaFactura.value.MpFactura == '') this.mostrarAdvertencia(`Advertencia`, "Solo debe llenar el campo Remisión o Factura.");
     else if (this.FormMateriaPrimaFactura.value.MpRemision != '' && this.FormMateriaPrimaFactura.value.MpFactura == '') this.registrarRemisionMP();
     else if (this.FormMateriaPrimaFactura.value.MpRemision == '' && this.FormMateriaPrimaFactura.value.MpFactura != '') this.registrarFacturaMP();
   }
@@ -781,18 +784,18 @@ export class PedidomateriaprimaComponent implements OnInit {
 
     /** Mostrar mensaje de confirmación  */
   mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life : 2000});
   }
 
   /** Mostrar mensaje de error  */
   mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life : 2000});
    this.load = true;
   }
 
   /** Mostrar mensaje de advertencia */
   mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000 });
    this.load = true;
   }
 }

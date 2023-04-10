@@ -35,7 +35,7 @@
           <!-- ID Documento -->
           <div class="col-md">
             <span class="p-float-label">
-              <p-inputNumber formControlName="idDocumento" id="Orden"></p-inputNumber>
+              <p-inputNumber formControlName="idDocumento" [useGrouping]="false" id="Orden"></p-inputNumber>
               <label for="Orden">OT</label>
             </span>
           </div>
@@ -105,7 +105,7 @@
     </div>
 
     <!-- Tabla -->
-    <div *ngIf="load">
+    <div class="mb-4" *ngIf="load">
       <div class="row g-3">
         <div class="table-responsive">
           <p-table
@@ -132,16 +132,16 @@
             </ng-template>
             <ng-template pTemplate="body" let-doc>
               <tr>
-                <td id="CodigoFactura" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.ot}}</td>
-                <td id="Tipo" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.tipo}}</td>
-                <td id="fecha" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
-                <td id="proveedor" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.usuario}}</td>
-                <td id="mp" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.matPrima}}</td>
-                <td id="mp" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.cant | number}}</td>
+                <td id="CodigoFactura">{{doc.ot}}</td>
+                <td id="Tipo">{{doc.tipo}}</td>
+                <td id="fecha">{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
+                <td id="proveedor">{{doc.usuario}}</td>
+                <td id="mp">{{doc.matPrima}}</td>
+                <td id="mp">{{doc.cant | number}}</td>
                 <ng-container *ngIf="ValidarRol == 1">
-                  <td id="mp" data-bs-toggle="modal" data-bs-target="#editar" (click)="editarDocumento(doc)">{{doc.estado}}</td>
+                  <td id="mp">{{doc.estado}}</td>
                 </ng-container>
-                <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" (click)="articulosPdf(doc)"></a></td>
+                <td style="text-align: center;"><a style="text-decoration: none; width: 28px; height: 28px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-danger mr-2" pTooltip="PDF" (click)="articulosPdf(doc)"></a></td>
               </tr>
             </ng-template>
           </p-table>
@@ -150,17 +150,14 @@
     </div>
 
     <!-- Labels con información -->
-    <br>
     <div *ngIf="load">
-      <div class="mb-1">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <label><b>Total Materia Prima Entregada: {{totalMPEntregada | number}} KG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
-          <ng-container *ngIf="ValidarRol == 1">
-            <label><b>Cantidad de KG Producida en total: {{kgProduciodosOT | number}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
-          </ng-container>
-          <label><b>KG Restante Por Entregar: {{cantRestante | number}}</b></label>
-        </div>
+    <div class="mb-3">
+      <div class="gap-2 d-grid d-md-flex justify-content-md-center">
+        <p-chip label="Total Materia Prima Entregada: {{totalMPEntregada | number : '1.2-2'}}" icon="pi pi-cloud-upload" class="mr-2"></p-chip>
+        <p-chip label="Cantidad de Kg Producida en total: {{kgProduciodosOT | number: '1.2-2' }}" icon="pi pi-database" class="mr-2"></p-chip>
+        <p-chip label="Kg Restante Por Entregar: {{cantRestante | number: '1.2-2'}}" icon="pi pi-exclamation-circle" class="mr-2"></p-chip>
       </div>
+    </div>
     </div>
 
 

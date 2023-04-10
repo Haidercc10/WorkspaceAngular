@@ -5,8 +5,8 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { RecuperadoMPService } from 'src/app/Servicios/DetallesRecuperado/recuperadoMP.service';
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
-import Swal from 'sweetalert2';
 import { Modal_RptRecuperadoMPComponent } from 'src/app/Vistas/Modal_RptRecuperadoMP/Modal_RptRecuperadoMP.component';
+import { MessageService } from 'primeng/api';
 
 
 @Component({
@@ -34,7 +34,8 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
                 private materiaPrimaService : MateriaPrimaService,
                   private turnosService : TurnosService,
                     private usuariosService : UsuarioService,
-                      private recuperadoService : RecuperadoMPService) {
+                      private recuperadoService : RecuperadoMPService,
+                        private messageService: MessageService) {
 
     this.formReporteRMP = this.frmBuilder.group({
       FechaInicial: [null],
@@ -151,7 +152,7 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
     if (fechaFinal == 'Invalid date') fechaFinal = null;
 
     this.recuperadoService.consultaRecuperado(fechaInicial, fechaFinal, operario, turno, materiaPrima).subscribe(datos_recuperado => {
-      if (datos_recuperado.length <= 0) Swal.fire(`No se encontraron registros para los filtros consultados`);
+      if (datos_recuperado.length <= 0) this.mostrarAdvertencia(`Advertencia`, `No se encontraron registros para los filtros consultados`);
       for (let i = 0; i < datos_recuperado.length; i++) {
         let dia : number = 0;
         let noche : number = 0;
@@ -209,6 +210,7 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
   consultarPeletizadoDia(item : any){
     if (item.cantDia > 0) {
       this.modalInfoRecuperado = true;
+      console.log(1)
       this.modalRecuperado.arrayRegistros = [];
       this.consultaTurno = 'Día';
       let fechaInicial : any = moment(this.formReporteRMP.value.FechaInicial).format('YYYY-MM-DD');
@@ -259,5 +261,20 @@ export class Reporte_RecuperadoMPComponent implements OnInit {
         }
       });
     } else if (item.cantNoche <= 0) this.modalInfoRecuperado = false;
+  }
+
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
+  }
+
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
   }
 }

@@ -128,16 +128,16 @@
             </ng-template>
             <ng-template pTemplate="body" let-doc>
               <tr>
-                <td id="CodigoFactura" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.ot}}</td>
-                <td id="Tipo" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">{{doc.tipo}}</td>
-                <td id="fecha" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
-                <td id="proveedor" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.usuario}}</td>
-                <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.matPrima}}</td>
-                <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.cant | number}}</td>
+                <td id="CodigoFactura">{{doc.ot}}</td>
+                <td id="Tipo">{{doc.tipo}}</td>
+                <td id="fecha" >{{doc.fecha | date : 'yyyy-MM-dd'}}</td>
+                <td id="proveedor" >{{doc.usuario}}</td>
+                <td id="mp">{{doc.matPrima}}</td>
+                <td id="mp">{{doc.cant | number}}</td>
                 <ng-container *ngIf="ValidarRol == 1">
-                  <td id="mp" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" >{{doc.estado}}</td>
+                  <td id="mp" >{{doc.estado}}</td>
                 </ng-container>
-                <td style="text-align: center;"><a style="width: 20px; height: 10px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-warning mr-2" pTooltip="PDF" (click)="articulosPdf(doc)"></a></td>
+                <td style="text-align: center;"><a style="text-decoration: none; width: 28px; height: 28px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-danger mr-2" pTooltip="PDF" (click)="articulosPdf(doc)"></a></td>
               </tr>
             </ng-template>
           </p-table>

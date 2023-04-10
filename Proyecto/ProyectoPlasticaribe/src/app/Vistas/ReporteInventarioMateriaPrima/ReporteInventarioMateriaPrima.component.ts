@@ -11,6 +11,7 @@ import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import { Table } from 'primeng/table/table';
 import moment from 'moment';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-ReporteInventarioMateriaPrima',
@@ -52,7 +53,8 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
                     private tipoBodegaService : TipoBodegaService,
                       private frmBuilderMateriaPrima : FormBuilder,
                         @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                          private boppService : EntradaBOPPService,) {
+                          private boppService : EntradaBOPPService,
+                            private messageService: MessageService) {
 
     this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
       MpId : ['', Validators.required],
@@ -69,7 +71,7 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
 
   // Funcion que exportará a excel todo el contenido de la tabla
   exportToExcel() : void {
-    if (this.ArrayMateriaPrima.length == 0) this.mensajeAdvertencia("¡Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla!");
+    if (this.ArrayMateriaPrima.length == 0) this.mostrarAdvertencia(`Advertencia`, "¡Para exportar a excel, debe cargar registros de materia prima en la tabla!");
     else {
       this.load = false;
       setTimeout(() => {
@@ -132,6 +134,7 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
             fs.saveAs(blob, `Inventario Materia Prima - ${this.today}.xlsx`);
           });
           this.load = true;
+          this.mostrarConfirmacion(`Confirmación`, `Formato exportado a excel con éxito!`);
         }, 1000);
       }, 3500);
     }
@@ -204,13 +207,11 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
   //Funcion que va a mostrar el nombre de la materia prima
   cambiarNombreMateriaPrima(){
     let id : number = this.FormMateriaPrima.value.MpNombre;
-    this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
-      for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.FormMateriaPrima.patchValue({
-          MpId : datos_materiaPrima[i].id,
-          MpNombre: datos_materiaPrima[i].nombre,
-        });
-      }
+    let nuevo : any [] = this.materiasPrimas.filter((item) => item.id == id);
+    console.log(nuevo)
+    this.FormMateriaPrima.patchValue({
+      MpId : nuevo[0].id,
+      MpNombre: nuevo[0].nombre,
     });
   }
 
@@ -610,14 +611,14 @@ export class ReporteInventarioMateriaPrimaComponent implements OnInit {
     table.clear();
   }
 
-  // Funcion que va a devolver un mensahje de error
-  mensajeError(mensaje : string) {
-    Swal.fire({ icon: 'error', title: '¡Ha ocurrido un error!', text: mensaje });
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000 });
   }
 
-  // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia(mensaje : string){
-    Swal.fire({ icon: 'warning', title: '¡Advertencia!', text: mensaje });
-  }
+  /** Mostrar mensaje de advertencia */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+    this.messageService.add({severity:'success', summary: mensaje, detail: titulo, life : 2000 });
+   }
 
 }
