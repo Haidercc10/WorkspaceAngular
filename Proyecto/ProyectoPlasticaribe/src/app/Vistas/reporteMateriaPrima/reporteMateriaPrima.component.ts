@@ -20,11 +20,6 @@ import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.servi
 })
 export class ReporteMateriaPrimaComponent implements OnInit {
 
-  public FormMateriaPrimaFactura !: FormGroup;
-  public FormMateriaPrima !: FormGroup;
-  public FormMateriaPrimaRetiro !: FormGroup;
-  public FormMateriaPrimaRetirada !: FormGroup;
-
   /* Vaiables*/
   @ViewChild('dt') dt: Table | undefined;
   @ViewChild('dt_Polientileno') dt_Polientileno: Table | undefined;
@@ -65,98 +60,11 @@ export class ReporteMateriaPrimaComponent implements OnInit {
                         @Inject(SESSION_STORAGE) private storage: WebStorageService,
                           private boppService : EntradaBOPPService,
                             private messageService: MessageService) {
-
-    this.FormMateriaPrima = this.frmBuilderMateriaPrima.group({
-      MpId : [null, Validators.required],
-      MpNombre: [null, Validators.required],
-      MpCategoria : [null, Validators.required],
-      MpBodega : [null, Validators.required],
-      fecha: [null, Validators.required],
-      fechaFinal: [null, Validators.required],
-    });
-  }
-
-  // Funcion que exportará a excel todo el contenido de la tabla
-  exportToExcel() : void {
-    if (this.ArrayMateriaPrima.length == 0) this.mensajeAdvertencia("¡Para poder crear el archivo de Excel primero debe cargar la Materia Prima en la tabla!");
-    else {
-      this.load = true;
-      setTimeout(() => {
-        const title = `Inventario Materia_Prima - ${this.today}`;
-        const header = ["Id", "Nombre", "Ancho", "Inventario Inicial", "Entrada", "Salida", "Cantidad Actual", "Diferencia", "Und. Cant", "Precio U", "SubTotal", "Categoria"]
-        let datos : any =[];
-        for (const item of this.ArrayMateriaPrima) {
-          const datos1  : any = [item.Id, item.Nombre, item.Ancho, item.Inicial, item.Entrada, item.Salida, item.Cant, item.Diferencia, item.UndCant, item.PrecioUnd, item.SubTotal, item.Categoria];
-          datos.push(datos1);
-        }
-        let workbook = new Workbook();
-        const imageId1 = workbook.addImage({
-          base64: logoParaPdf,
-          extension: 'png',
-        });
-        let worksheet = workbook.addWorksheet(`Inventario Materia_Prima - ${this.today}`);
-        worksheet.addImage(imageId1, 'A1:A3');
-        let titleRow = worksheet.addRow([title]);
-        titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
-        worksheet.addRow([]);
-        worksheet.addRow([]);
-        let headerRow = worksheet.addRow(header);
-        headerRow.eachCell((cell, number) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'eeeeee' }
-          }
-          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-        });
-        worksheet.mergeCells('A1:L3');
-        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
-        datos.forEach(d => {
-          let row = worksheet.addRow(d);
-          row.getCell(3).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(4).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(5).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(6).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(7).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(8).numFmt = '""#,##0.00;[Red]\-""#,##0.00';
-          row.getCell(10).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-          row.getCell(11).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00';
-          let qty= row.getCell(7);
-          let color = 'ADD8E6';
-          qty.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: color }
-          }
-        });
-        worksheet.getColumn(1).width = 10;
-        worksheet.getColumn(2).width = 60;
-        worksheet.getColumn(3).width = 12;
-        worksheet.getColumn(4).width = 22;
-        worksheet.getColumn(5).width = 12;
-        worksheet.getColumn(6).width = 12;
-        worksheet.getColumn(7).width = 22;
-        worksheet.getColumn(8).width = 12;
-        worksheet.getColumn(9).width = 12;
-        worksheet.getColumn(10).width = 12;
-        worksheet.getColumn(11).width = 20;
-        worksheet.getColumn(12).width = 20;
-        setTimeout(() => {
-          workbook.xlsx.writeBuffer().then((data) => {
-            let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            fs.saveAs(blob, `Inventario Materia Prima - ${this.today}.xlsx`);
-          });
-          this.load = true;
-        }, 1000);
-      }, 3500);
-    }
   }
 
   ngOnInit(): void {
     this.lecturaStorage();
-    this.LimpiarCampos();
     this.obtenerCategorias();
-    this.obtenerBodegas();
     this.consultarInventario();
     this.consultarCategorias();
   }
@@ -168,32 +76,11 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     return number.toString().replace(exp,rep);
   }
 
-  //
-  LimpiarCampos() {
-    this.FormMateriaPrima.reset()
-    this.valorTotal = 0;
-    this.materiasPrimas = [];
-    this.obtenerMateriasPrimas();
-  }
-
   // Funcion que va a consultar las categorias de las tablas Materia_Prima, Tintas y BOPP
   consultarCategorias(){
     this.materiaPrimaService.GetCategoriasMateriaPrima().subscribe(datos => { this.categoriasMP = datos; });
     this.tintasService.GetCategoriasTintas().subscribe(datos => { this.categoriasTintas = datos; });
     this.boppService.GetCategoriasBOPP().subscribe(datos => { this.categoriasBOPP = datos; });
-  }
-
-  //  Funcion que tomará y almacenará las bdoegas
-  obtenerBodegas(){
-    this.bodegas = [];
-    this.tipoBodegaService.srvObtenerLista().subscribe(datos_bodegas => {
-      for (let i = 0; i < datos_bodegas.length; i++) {
-        if (datos_bodegas[i].tpBod_Id == 5 || datos_bodegas[i].tpBod_Id == 8 || datos_bodegas[i].tpBod_Id == 9 || datos_bodegas[i].tpBod_Id == 10){
-          this.bodegas.push(datos_bodegas[i]);
-          this.bodegas.sort((a,b) => a.tpBod_Nombre.localeCompare(b.tpBod_Nombre));
-        }
-      }
-    });
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -207,25 +94,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   obtenerCategorias(){
     this.categoriMpService.srvObtenerLista().subscribe(datos_categorias => { this.categorias = datos_categorias; });
     this.categorias.sort((a,b) => a.catMP_Nombre.localeCompare(b.catMP_Nombre));
-  }
-
-  // Funcion para obtener las materias primas registradas
-  obtenerMateriasPrimas(){
-    this.materiasPrimas = [];
-    this.materiaPrimaService.GetMateriaPrima_LikeNombre(this.FormMateriaPrima.value.MpNombre).subscribe(datos_materiaPrima => { this.materiasPrimas = datos_materiaPrima; });
-  }
-
-  //Funcion que va a mostrar el nombre de la materia prima
-  cambiarNombreMateriaPrima(){
-    let id : number = this.FormMateriaPrima.value.MpNombre;
-    this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
-      for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.FormMateriaPrima.patchValue({
-          MpId : datos_materiaPrima[i].id,
-          MpNombre: datos_materiaPrima[i].nombre,
-        });
-      }
-    });
   }
 
   // Funcion que cargará las informacion de las materias primas segun los filtros que se consulten
@@ -305,53 +173,6 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     let biorientados : unknown [] = this.biorientados.filter((item) => item.Cant > 0);
     this.ArrayMateriaPrima = biorientados;
     this.load = true;
-  }
-
-  /** Función para mostrar las materias primas que tienen existencias. */
-  mostrarMateriasPrimasConStock(){
-    this.load = true;
-    this.idMateriasPrimas = [];
-    this.ArrayMateriaPrima = [];
-    this.valorTotal = 0;
-    this.cantInicial  = 0;
-    this.cantEntrante = 0;
-    this.cantSaliente = 0;
-    this.cantExistencias = 0;
-    this.cantDiferencia = 0;
-
-    this.materiaPrimaService.srvObtenerLista().subscribe(datos_materiaPrima => {
-      for (let i = 0; i < datos_materiaPrima.length; i++) {
-        this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_materiaPrima[i].matPri_Id).subscribe(datos_consulta => {
-          for (let j = 0; j < datos_consulta.length; j++) {
-            if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j]);
-          }
-        });
-      }
-    });
-    this.boppService.srvObtenerLista().subscribe(datos_bopp => {
-      for (let i = 0; i < datos_bopp.length; i++) {
-        this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_bopp[i].bopP_Serial).subscribe(datos_consulta => {
-          for (let j = 0; j < datos_consulta.length; j++) {
-            if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j]);
-          }
-        });
-      }
-    });
-    this.tintasService.srvObtenerLista().subscribe(datos_tintas => {
-      for (let i = 0; i < datos_tintas.length; i++) {
-        this.materiaPrimaService.GetConsultaMateriaPrimaF(this.today, this.today, datos_tintas[i].tinta_Id).subscribe(datos_consulta => {
-          for (let j = 0; j < datos_consulta.length; j++) {
-            if (datos_consulta[j].stock > 0) this.cargarTabla(datos_consulta[j]);
-          }
-        });
-      }
-    });
-    setTimeout(() => { this.load = true; }, 5000);
-  }
-
-  // Funcion que limpiará los filtros utilizados en la tabla
-  clear(table: Table) {
-    table.clear();
   }
 
   /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
