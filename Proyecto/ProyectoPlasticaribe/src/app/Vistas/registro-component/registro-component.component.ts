@@ -81,29 +81,18 @@ export class RegistroComponentComponent implements OnInit {
   // Funcion que crgará las areas
   cargarAreas() {
     this.arrayAreas = [];
-
-    this.servicioAreas.srvObtenerLista().subscribe(dataAreas => {
-      for (let index = 0; index < dataAreas.length; index++) {
-        this.arrayAreas.push(dataAreas[index]);
-      }
-    });
+    this.servicioAreas.srvObtenerLista().subscribe(dataAreas => { this.arrayAreas = dataAreas; });
   }
 
   // Funcion que cargará los roles
   cargarRoles() {
     this.arrayRoles = [];
-
-    this.servicioRoles.srvObtenerLista().subscribe(dataRoles => {
-      for (let index = 0; index < dataRoles.length; index++) {
-        this.arrayRoles.push(dataRoles[index]);
-      }
-    });
+    this.servicioRoles.srvObtenerLista().subscribe(dataRoles => { this.arrayRoles = dataRoles; });
   }
 
   // Funcion que cargará los estados que pueden tener los usuarios
   cargarEstados() {
     this.arrayEstados = [];
-
     this.servicioEstados.srvObtenerListaEstados().subscribe(dataEstados => {
       for (let index = 0; index < dataEstados.length; index++) {
         if(dataEstados[index].estado_Nombre == 'Activo' ||
@@ -116,12 +105,7 @@ export class RegistroComponentComponent implements OnInit {
   // Funcion que cargará los tipos de usuarios
   cargarTiposUsuarios() {
     this.arrayTiposUsuarios = [];
-
-    this.servicioTpUsuarios.srvObtenerLista().subscribe(dataTipoUsu => {
-      for (let index = 0; index < dataTipoUsu.length; index++) {
-        this.arrayTiposUsuarios.push(dataTipoUsu[index]);
-      }
-    });
+    this.servicioTpUsuarios.srvObtenerLista().subscribe(dataTipoUsu => { this.arrayTiposUsuarios = dataTipoUsu; });
   }
 
   // Funcion que cargará los usuarios
@@ -161,28 +145,20 @@ export class RegistroComponentComponent implements OnInit {
 
   // Funcion que actualizará los usuarios
   actualizarUsuario() {
-    let id : number = this.FormUsuarios.value.usuId;
-    let nombre : number = this.FormUsuarios.value.usuNombre;
-    let tipoUsuario : number = this.FormUsuarios.value.usuTipo;
-    let area : number = this.FormUsuarios.value.usuArea;
-    let rol : number = this.FormUsuarios.value.usuRol;
-    let estado : number = this.FormUsuarios.value.usuEstado;
-    let password : number = this.FormUsuarios.value.usuPassword;
-
-    this.servicioUsuarios.getUsuariosxId(id).subscribe(dataUsuarios => {
+    this.servicioUsuarios.getUsuariosxId(this.FormUsuarios.value.usuId).subscribe(dataUsuarios => {
       for (let index = 0; index < dataUsuarios.length; index++) {
         const infoUsuarios : any = {
           Usua_Id : dataUsuarios[index].usua_Id,
-          Usua_Nombre : nombre,
-          TpUsu_Id : tipoUsuario,
-          Area_Id : area,
-          RolUsu_Id : rol,
-          Estado_Id : estado,
+          Usua_Nombre : this.FormUsuarios.value.usuNombre,
+          TpUsu_Id : this.FormUsuarios.value.usuTipo,
+          Area_Id : this.FormUsuarios.value.usuArea,
+          RolUsu_Id : this.FormUsuarios.value.usuRol,
+          Estado_Id : this.FormUsuarios.value.usuEstado,
           Usua_Telefono : dataUsuarios[index].usua_Telefono,
-          Usua_Contrasena : password,
+          Usua_Contrasena : this.FormUsuarios.value.usuPassword,
           Usua_Email : dataUsuarios[index].usua_Email,
           TipoIdentificacion_Id : 'C.C',
-          Empresa_Id : 800188730,
+          Empresa_Id : 800188732,
           cajComp_Id : dataUsuarios[index].cajComp_Id,
           eps_Id : dataUsuarios[index].eps_Id,
           fPen_Id : dataUsuarios[index].fPen_Id,
@@ -190,7 +166,9 @@ export class RegistroComponentComponent implements OnInit {
           Usua_Hora : this.HoraActual,
         }
         this.dialogUsuarios = false;
-        this.servicioUsuarios.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(dataUsu => { this.confirmUsuarioActualizado(); });
+        this.servicioUsuarios.srvActualizarUsuario(infoUsuarios.Usua_Id, infoUsuarios).subscribe(dataUsu => {
+          this.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${this.FormUsuarios.value.usuNombre} han sido actualizados!`);
+        }, error => { this.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${this.FormUsuarios.value.usuNombre}!`); });
       }
     });
   }
@@ -223,7 +201,7 @@ export class RegistroComponentComponent implements OnInit {
     let Id : number = this.FormUsuarios.value.usuId;
     if(this.FormUsuarios.valid) {
       this.servicioUsuarios.getUsuariosxId(Id).subscribe(dataUsuarios => {
-        if(dataUsuarios.length > 0) this.advertenciaUsuarios(Id);
+        if(dataUsuarios.length > 0) this.mensajeAdvertencia(`¡Ya existe un usuario con el Id ${Id}!`);
         else {
           const data : modelUsuario = {
             Usua_Id: this.FormUsuarios.value.usuId,
@@ -245,87 +223,18 @@ export class RegistroComponentComponent implements OnInit {
             Usua_Hora: this.HoraActual
           }
           this.dialogUsuarios = false;
-          this.servicioUsuarios.srvGuardarUsuario(data).subscribe(dataUsuario => { this.confirmUsuarioCreado(); })
+          this.servicioUsuarios.srvGuardarUsuario(data).subscribe(dataUsuario => {
+            this.mensajeConfirmacion(`¡Usuairo creado!`, `¡Se ha creado un nuevo usuario!`);
+          }, error => { this.mensajeError(`¡Ocurrió un error`, `¡Ocurrió un error al crear el nuevo usuario!`); })
         }
       });
-    } else this.advertenciaCamposVacios();
+    } else this.mensajeAdvertencia(`¡Para poder crear un usuario debe diligenciar todos los campos!`);
   }
 
   // Funcion permitirá a una u otra de las funciones que tiene el modal
   accionesModal() {
     if(this.accion == 'Crear') this.crearUsuario();
     else if (this.accion == 'Editar') this.actualizarUsuario();
-  }
-
-  // Funcion que mostrará una advertencia
-  advertenciaUsuarios(id : any) {
-    this.dialogUsuarios = false;
-    Swal.fire({
-      icon: 'warning',
-      title: 'Advertencia',
-      text: `Ya existe un usuario con el ID ${id}`,
-      confirmButtonColor: '#ffc107',
-    }).then((result) => {
-      if (result.isConfirmed) this.dialogUsuarios = true;
-    });
-  }
-
-  // Funcion que mostrará una advertencia para cuando se quiere innactivar un usuario
-  advertenciaInactivarUsuario(item) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Advertencia',
-      text: `Esta seguro que desea eliminar el usuario ${item.Nombre}`,
-      confirmButtonColor: '#ffc107',
-      showConfirmButton : true,
-      showCancelButton : true
-    }).then((result) => {
-      if (result.isConfirmed) this.colocarUsuarioInactivo(item.Id);
-    });
-  }
-
-  // Funcion que mostrará una advertencia para cuando se quiera innactivar varios usuarios
-  advertenciaInactivarVariosUsuarios() {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Advertencia',
-      text: `¿Esta seguro que desea eliminar los usuarios seleccionados?`,
-      confirmButtonColor: '#ffc107',
-      showConfirmButton : true,
-      showCancelButton : true
-    }).then((result) => {
-      if (result.isConfirmed) this.inactivarUsuarios();
-    });
-  }
-
-  // Funcion que mostrará una advertencia para cuando haya campos vacios en la edicion o creacion de un usuario
-  advertenciaCamposVacios() {
-    Swal.fire({icon: 'warning',  title: 'Advertencia', text: `Debe llenar los campos vacios.`, confirmButtonColor: '#ffc107', });
-  }
-
-  // Funcion que mostrará un mensaje cuando se actualiza un usuario
-  confirmUsuarioActualizado() {
-    this.load = false
-    setTimeout(() => {
-      this.load = true;
-      Swal.fire({icon: 'success', title: 'Confirmación', text: '¡Registro(s) actualizado(s) con éxito!', showConfirmButton: false, timer: 1500 });
-      this.cargarUsuarios();
-    }, 1000);
-  }
-
-  // Funcion que mostrará un mensaje cuando se haya creado un nuevo usuario
-  confirmUsuarioCreado() {
-    this.load = false
-    setTimeout(() => {
-      this.load = true;
-      Swal.fire({icon: 'success', title: 'Confirmación', text: '¡Registro creado con éxito!', showConfirmButton: false, timer: 1500 });
-      this.cargarUsuarios();
-    }, 1000);
-  }
-
-  // Funcion que confirmará la exportacion de los datos de los usuarios a excel
-  confirmExportacion() {
-    Swal.fire({icon: 'success', title: 'Confirmación', text: '¡Archivo generado con éxito!!', showConfirmButton: false, timer: 1500 });
   }
 
   // Funcion que va a innactivar un usuario
@@ -352,7 +261,9 @@ export class RegistroComponentComponent implements OnInit {
           Usua_Hora : dataUsuarios[index].usua_Hora,
         }
         this.dialogUsuarios = false;
-        this.servicioUsuarios.srvActualizarUsuario(item, infoUsuarios).subscribe(dataUsu => { this.confirmUsuarioActualizado(); });
+        this.servicioUsuarios.srvActualizarUsuario(item, infoUsuarios).subscribe(dataUsu => {
+          this.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${dataUsuarios[index].usua_Nombre} han sido actualizados!`);
+        }, error => { this.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${dataUsuarios[index].usua_Nombre}!`); });
       }
     });
   }
@@ -412,7 +323,7 @@ export class RegistroComponentComponent implements OnInit {
         this.load = true;
       }, 1000);
     }, 3500);
-    setTimeout(() => { this.confirmExportacion(); }, 4000);
+    setTimeout(() => { this.mensajeConfirmacion(`¡Exportación a excel!`, `¡Se ha exportado a un archivo de excel la información de todos los usuarios!`); }, 4000);
   }
 
   // Funcion que va a innactivar varios usuarios
@@ -439,7 +350,9 @@ export class RegistroComponentComponent implements OnInit {
             Usua_Hora : dataUsuarios[index].usua_Hora,
           }
 		      this.dialogUsuarios = false;
-          this.servicioUsuarios.srvActualizarUsuario(this.usuariosInactivar[i].Id, infoUsuarios).subscribe(dataUsu => {this.confirmUsuarioActualizado(); });
+          this.servicioUsuarios.srvActualizarUsuario(this.usuariosInactivar[i].Id, infoUsuarios).subscribe(dataUsu => {
+            this.mensajeConfirmacion(`¡Usuario Actualizado!`,`¡Los datos del usuario ${dataUsuarios[index].usua_Nombre} han sido actualizados!`);
+          }, error => { this.mensajeError(`¡Ocurrió un error!`,`¡Ocurrió un error al actualizar los datos del usuario ${dataUsuarios[index].usua_Nombre}!`); });
         }
       });
     }
@@ -448,7 +361,6 @@ export class RegistroComponentComponent implements OnInit {
   // Funcin que va a mostrar o no la contraseña del usuario
   mostrarPassword(){
     let password : any = document.getElementById('pass');
-
     if(password.type == 'password') {
       password.type = 'text';
       this.mostrarPass = true;
@@ -497,69 +409,46 @@ export class RegistroComponentComponent implements OnInit {
   crearRoles(){
     let nombreRol : any = this.formRoles.value.rolNombre;
     let descripcionRol : any = this.formRoles.value.rolDescripcion;
-
     if(this.formRoles.valid) {
       this.servicioRoles.getRolxNombre(nombreRol).subscribe(dataRoles => {
-        if(dataRoles.length > 0) {
-          this.mostrarError(nombreRol);
-        } else {
+        if(dataRoles.length > 0) this.mensajeAdvertencia(`¡No se pudo crear el rol debido a que ya existe uno con el nombre indicado!`);
+        else {
           const roles : modelRol = { RolUsu_Id : 0, RolUsu_Nombre : nombreRol, RolUsu_Descripcion : descripcionRol, }
           const tipoUsu : modelTipoUsuario = { tpUsu_Id: 0, tpUsu_Nombre: nombreRol, tpUsu_Descripcion: descripcionRol, }
-
-          this.servicioRoles.srvGuardar(roles).subscribe(dataRol => {  this.crearTipo_Usuario(tipoUsu); }, error => { this.mostrarError2(); })
+          this.servicioRoles.srvGuardar(roles).subscribe(dataRol => {  this.crearTipo_Usuario(tipoUsu); }, error => {
+            this.mensajeError(`¡Ocurrió un error!`, `¡No fue posible crear el Rol!`);
+          });
         }
       });
-    } else {
-      this.camposVacios();
-    }
+    } else this.mensajeAdvertencia(`¡Para poder crear un rol debe diligenciar todos los campos!`);
   }
 
   /** Crea tipo de usuario con el mismo nombre de rol */
   crearTipo_Usuario(tipo_usuario : any) {
     this.servicioTpUsuarios.Insert(tipo_usuario).subscribe(dataRol => {
-      this.mostrarConfirmacion();
+      this.mensajeConfirmacion(`¡Se ha creado un tipo de usuario!`, `¡Se creó un tipo de usuario!`)
       this.formRoles.reset();
       setTimeout(() => { this.cargarRoles(); this.cargarTiposUsuarios();  }, 1000);
-    }, error => { this.mostrarError2(); });
+    }, error => { this.mensajeError(`¡Ocurrió un error!`, `¡No fue posible crear el tipo de usuario!`) });
   }
 
   /** Crear areas desde el modal */
   crearAreas(){
     let nombreArea : any = this.formAreas.value.areaNombre;
     let descripcionArea : any = this.formAreas.value.areaDescripcion;
-
     if(this.formAreas.valid){
       this.servicioAreas.getNombre(nombreArea).subscribe(dataAreas => {
-        if(dataAreas.length > 0) this.mostrarError(nombreArea);
+        if(dataAreas.length > 0) this.mensajeAdvertencia(`¡Ya existe un área con el nombre ${nombreArea}!`);
         else {
           const areas : modelAreas = {area_Id: 0, area_Nombre: nombreArea, area_Descripcion: descripcionArea, }
-          this.servicioAreas.srvGuardar(areas).subscribe(dataArea => { this.mostrarConfirmacion(); this.formAreas.reset(); setTimeout(() => { this.cargarAreas(); }, 1000); }, error => { this.mostrarError2(); })
+          this.servicioAreas.srvGuardar(areas).subscribe(dataArea => {
+            this.mensajeConfirmacion(`¡Área creada!`, `¡Se creó un área satisfactoriamente!`);
+            this.formAreas.reset();
+            setTimeout(() => { this.cargarAreas(); }, 1000);
+          }, error => { this.mensajeError(`¡Ocurrió un error!`, `¡Ha ocurrido un error al intentar crear una nueva área!`); })
         }
       });
-    } else {
-      this.camposVacios();
-    }
-  }
-
-  /** Mostrar mensaje de error por nombre de rol duplicado */
-  mostrarError(dato : any) {
-    this.messageService.add({severity:'warn', detail: `El nombre de ${this.accionDialogoNuevo} ${dato} ya existe!`});
-  }
-
-  /** Mostrar mensaje de confirmación al crear rol o area */
-  mostrarConfirmacion() {
-    this.messageService.add({severity:'success', detail:`Registro creado con éxito!`});
-  }
-
-  /** Mostrar mensaje de error por cualquier razón. */
-  mostrarError2() {
-    this.messageService.add({severity:'error', detail: `No fue posible crear el registro.`});
-    this.load = true;
-  }
-
-  /** Mostrar mensaje de campos vacios al momento de guardar un registro */
-  camposVacios() {
-    this.messageService.add({severity:'warn', detail: `Debe llenar los campos vacios en el formulario!`});
+    } else this.mensajeAdvertencia(`¡Para poder crear un area debe diligenciar todos los campos!`);
   }
 
   /** Agregar roles o areas dependiendo la acción del dialogo. */
@@ -593,4 +482,21 @@ export class RegistroComponentComponent implements OnInit {
       });
     }
   }
+
+  /** Mostrar mensaje de confirmación  */
+  mensajeConfirmacion(titulo : string, mensaje : any) {
+    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+    this.cargarUsuarios();
+   }
+
+  /** Mostrar mensaje de error  */
+  mensajeError(titulo : string, mensaje : string) {
+  this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mensajeAdvertencia(mensaje : string) {
+  this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
+  }
+
 }

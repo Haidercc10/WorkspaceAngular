@@ -8,6 +8,7 @@ import { AsignacionRollos_ExtrusionService } from 'src/app/Servicios/AsignaciinR
 import { DetallesAsgRollos_ExtrusionService } from 'src/app/Servicios/DetallesAsgRollosExtrusion/DetallesAsgRollos_Extrusion.service';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-AsignacionRollos_Extrusion',
@@ -27,9 +28,6 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   grupoProductos : any [] = []; //Variable que guardará de manera descriminada a cada producto
   rollos : any [] = []; //Variable que almacenará los difrentes rollos que se hicieron en la orden de trabajo
   rollosInsertar : any [] = []; //Variable que va a amacenar los diferentes rollos que se van a insertar
-  validarRollo : any [] = []; //Variable para validará que el rollo no esté en la tabla
-  first = 0;
-  rows = 20;
   procesos : any [] = []; //Variable que va a almacenar los diferentes procesos
   totalRollos : number = 0; //Variable que almacenará el total de rollos escogidos
   totalCantidad : number = 0; //Variable que almacenará la cantidad de total de kg de los rollos escogidos
@@ -74,29 +72,14 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   // funcion que va a limpiar los campos del formulario
   limpiarForm(){
-    this.FormConsultarRollos.patchValue({
-      OT_Id: null,
-      IdRollo: null,
-      fechaDoc : null,
-      fechaFinalDoc: null,
-      Observacion : '',
-      Proceso : null,
-    });
+    this.FormConsultarRollos.reset();
   }
 
   // Funcion que va a limpiar todos los campos
   limpiarCampos(){
-    this.FormConsultarRollos.patchValue({
-      OT_Id: null,
-      IdRollo: null,
-      fechaDoc : null,
-      fechaFinalDoc: null,
-      Observacion : '',
-      Proceso : null,
-    });
+    this.FormConsultarRollos.reset();
     this.rollos = [];
     this.rollosInsertar = [];
-    this.validarRollo = [];
     this.grupoProductos = [];
     this,this.totalCantidad = 0;
     this.totalRollos = 0;
@@ -266,7 +249,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
         if (consulta <= 0) this.mostrarAdvertencia(`Advertencia`,`No hay rollos por salir!`);
         this.cargando = true;
       }, 2000);
-    }, 3000);
+    }, 4000);
   }
 
   // Funcion que colocará los rollos que se van a insertar
@@ -467,9 +450,19 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
           },
           content : [
             {
-              text: `Salida de Rollos a Bodega de Extrusión`,
-              alignment: 'right',
-              style: 'titulo',
+              columns: [
+                {
+                  image : logoParaPdf,
+                  width : 220,
+                  height : 50
+                },
+                {
+                  text: `Cargue de Rollos`,
+                  alignment: 'right',
+                  style: 'titulo',
+                  margin: 30
+                }
+              ]
             },
             '\n \n',
             {
@@ -642,7 +635,7 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
 
   /** Mostrar mensaje de error  */
   mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000 });
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000 });
   }
 
   /** Mostrar mensaje de advertencia */

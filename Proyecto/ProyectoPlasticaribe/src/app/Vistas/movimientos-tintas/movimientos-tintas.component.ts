@@ -762,13 +762,14 @@ export class MovimientosTintasComponent implements OnInit {
       this.dtAsgTinta.srvObtenerTintasAsignadasxOT(data.ot).subscribe(datos_asignacion => {
         for (let i = 0; i < datos_asignacion.length; i++) {
           let items : any = {
-            Id : datos_asignacion[i].tinta_Id,
-            Nombre : datos_asignacion[i].tinta_Nombre,
-            Cant : this.formatonumeros(datos_asignacion[i].sum),
-            "Und Cant" : datos_asignacion[i].undMed_Id,
+            Id : datos_asignacion[i].tinta,
+            Nombre : datos_asignacion[i].nombreTinta,
+            Cant : this.formatonumeros(datos_asignacion[i].suma),
+            "Und Cant" : datos_asignacion[i].presentacion,
           }
           this.ArrayMpPDF.push(items);
         }
+        console.log(this.ArrayMpPDF)
         setTimeout(() => { this.verPDF(data); }, 2000);
       });
     } else if (data.tipoId == 'FCO') {
@@ -870,7 +871,7 @@ export class MovimientosTintasComponent implements OnInit {
                 },
                 '\n \n',
                 {
-                  text: `Fecha de registro: ${datos_asignacion[i].ASIGTINTAS_FechaEntrega.replace('T00:00:00', '')}`,
+                  text: `Fecha de registro: ${datos_asignacion[i].asigMp_FechaEntrega.replace('T00:00:00', '')}`,
                   style: 'header',
                   alignment: 'right',
                 },

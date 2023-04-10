@@ -36,3 +36,7 @@ p-calendar ::ng-deep .p-datepicker-header button:hover {
 p-calendar ::ng-deep span button span {
   display: block;
 }
+
+.botonesOpciones {
+  margin-left: 10px;
+}

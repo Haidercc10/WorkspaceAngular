@@ -73,8 +73,6 @@ export class ReporteInventarioBOPPComponent implements OnInit {
   exportToExcel() : void {
     if (this.ArrayMateriaPrima.length == 0) this.mostrarAdvertencia(`Advertencia`, "Para exportar el archivo a Excel, debe cargar materia prima en la tabla!");
     else {
-      //this.load = false;
-      //let datos : any =[];
       this.arrayExcel = [];
 
       setTimeout(() => {

@@ -96,6 +96,10 @@ export class MateriaPrimaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInventarioMateriasPrimas`);
   }
 
+  GetInventario(fechaInicial : any, fechaFinal : any, id : number){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInventario/${fechaInicial}/${fechaFinal}/${id}`);
+  }
+
   GetCategoriasMateriaPrima(){
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getCategoriasMateriaPrima`);
   }

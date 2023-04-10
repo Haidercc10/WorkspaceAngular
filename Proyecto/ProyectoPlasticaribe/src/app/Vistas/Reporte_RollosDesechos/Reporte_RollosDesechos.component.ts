@@ -5,6 +5,7 @@ import * as fs from 'file-saver';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { MessageService } from 'primeng/api';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
@@ -57,7 +58,8 @@ export class Reporte_RollosDesechosComponent implements OnInit {
                       private servicioBagPro : BagproService,
                         private servicioRollos : SrvRollosEliminadosService,
                           @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                            private servicioProcesos : ProcesosService,) {
+                            private servicioProcesos : ProcesosService,
+                              private messageService: MessageService) {
 
     this.formConsultaRollos = this.formbuilder.group({
       OT : [null],
@@ -96,7 +98,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         });
       });
     } else {
-      Swal.fire('Debe cargar un item válido');
+      this.mensajeAdvertencia('Debe cargar un item válido');
       this.idProducto = 0;
     }
   }
@@ -544,7 +546,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
   /** Mensaje que aparecerá cuando no se encuentrén resultados luego de una busqueda. */
   rollosNoEncontrados() {
-    Swal.fire({icon: 'warning',  title: 'Advertencia', text: 'No se encontraron resultados de búsqueda!', confirmButtonColor: '#ffc107', });
+    this.mensajeAdvertencia('No se encontraron resultados de búsqueda!');
   }
 
   /** NO USADA: Función para cargar los turnos en el combobox de la vista */
@@ -586,7 +588,6 @@ export class Reporte_RollosDesechosComponent implements OnInit {
       Proceso : datos.proceso_Nombre,
       PesoNumero : parseFloat(datos.rollo_PesoNeto)
     }
-    console.log(info);
     this.mostrarColumnas();
     this.ArrayDocumento.push(info);
     this.consolidarRollosEliminados();
@@ -620,7 +621,6 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         }
         this.arrayDataConsolidada.push(infoConsolidada);
         this.PesoTotalKg += cantidadPesos;
-        console.log(this.PesoTotalKg);
       }
     }
   }
@@ -848,7 +848,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         this.load = true;
       }, 1000);
     }, 3500);
-    setTimeout(() => {Swal.fire('Archivo generado con éxito!') }, 4000);
+    setTimeout(() => { this.mensajeConfirmacion(`¡Información exportada a excel!`, 'Archivo generado con éxito!') }, 4000);
   }
 
   /** Elegir formato en el que desea exportar el documento. */
@@ -865,7 +865,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
         if (result.isDenied) this.exportarExcel();
         else if (result.isConfirmed) this.exportarPdf();
       });
-    } else Swal.fire('Debe cargar al menos un registro en la tabla.');
+    } else this.mensajeAdvertencia('Debe cargar al menos un registro en la tabla.');
   }
 
   /** Prime NG */
@@ -877,35 +877,25 @@ export class Reporte_RollosDesechosComponent implements OnInit {
     this._columnasSeleccionada = this.columnas.filter(col => val.includes(col));
   }
 
-  // Pasa a la siguiente pagina de la tabla
-  next() {
-    this.first = this.first + this.rows;
-  }
-
-  // Pasa a la pagina anterior de la tabla
-  prev() {
-    this.first = this.first - this.rows;
-  }
-
-  // Reinicia el paginado y te devuelve a la pagina numero 1
-  reset() {
-    this.first = 0;
-  }
-
-  // Pasa a la ultima pagina de la tabla
-  isLastPage(): boolean {
-    return this.ArrayDocumento ? this.first === (this.ArrayDocumento.length - this.rows): true;
-  }
-
-  // Pasa a la primera pagina de la tabla
-  isFirstPage(): boolean {
-    return this.ArrayDocumento ? this.first === 0 : true;
-  }
-
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
   formatonumeros = (number) => {
     const exp = /(\d)(?=(\d{3})+(?!\d))/g;
     const rep = '$1,';
     return number.toString().replace(exp,rep);
+  }
+
+  /** Mostrar mensaje de confirmación  */
+  mensajeConfirmacion(titulo : string, mensaje : any) {
+    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+   }
+
+  /** Mostrar mensaje de error  */
+  mensajeError(titulo : string, mensaje : string) {
+  this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mensajeAdvertencia(mensaje : string) {
+  this.messageService.add({severity:'warn', summary: `¡Advertencia!`, detail: mensaje, life: 2000});
   }
 }

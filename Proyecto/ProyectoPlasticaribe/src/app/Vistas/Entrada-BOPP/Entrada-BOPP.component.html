@@ -182,7 +182,7 @@
         <!-- Serial BOPP -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-inputNumber formControlName="serial" id="Serial" list="SerialRollo" [required]="true" [useGrouping]="false" (change)="getSerialesBOPP()"></p-inputNumber>
+            <p-inputNumber formControlName="serial" id="Serial" list="SerialRollo" [required]="true" (onInput)="getSerialesBOPP()"></p-inputNumber>
             <datalist id="SerialRollo">
               <option value={{item}} *ngFor="let item of nombresBopp">{{item}}</option>
             </datalist>
@@ -193,7 +193,7 @@
         <!-- Cantidad de micras -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-inputNumber formControlName="cantidad" inputId="Micras" [minFractionDigits]="2" [required]="true" (change)="getMicrasBOPP()"></p-inputNumber>
+            <p-inputNumber formControlName="cantidad" inputId="Micras" [minFractionDigits]="2" [required]="true" (onInput)="getMicrasBOPP()"></p-inputNumber>
             <label for="Micras">Micras µm</label>
           </span>
         </div>
@@ -209,7 +209,7 @@
         <!-- Precio unitario -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-inputNumber formControlName="precio" inputId="Precio" list="PrecioRollo" [minFractionDigits]="2" [required]="true" (change)="getPreciosBOPP()"></p-inputNumber>
+            <p-inputNumber formControlName="precio" inputId="Precio" list="PrecioRollo" [minFractionDigits]="2" [required]="true" (onInput)="getPreciosBOPP()"></p-inputNumber>
             <datalist id="PrecioRollo">
               <option value={{item}} *ngFor="let item of preciosBopp">{{item}}</option>
             </datalist>
@@ -220,7 +220,7 @@
         <!-- Ancho -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-inputNumber formControlName="ancho" inputId="Ancho" list="AnchoRollo" [minFractionDigits]="2" [required]="true" (change)="getAnchosBOPP()"></p-inputNumber>
+            <p-inputNumber formControlName="ancho" inputId="Ancho" list="AnchoRollo" [minFractionDigits]="2" [required]="true" (onInput)="getAnchosBOPP()"></p-inputNumber>
             <datalist id="AnchoRollo">
               <option value={{item}} *ngFor="let item of anchosBopp">{{item}}</option>
             </datalist>
