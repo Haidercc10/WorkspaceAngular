@@ -7,7 +7,6 @@ import { FacturaMpService } from 'src/app/Servicios/DetallesFacturaMateriaPrima/
 import { ProveedorService } from 'src/app/Servicios/Proveedor/proveedor.service';
 import { RemisionesMPService } from 'src/app/Servicios/DetallesRemisiones/remisionesMP.service';
 import { TipoDocumentoService } from 'src/app/Servicios/TipoDocumento/tipoDocumento.service';
-import Swal from 'sweetalert2';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
@@ -57,7 +56,6 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
 
   ngOnInit(): void {
     this.lecturaStorage();
-    this.ColumnasTabla();
     this.obtenerTipoDocumento();
   }
 
@@ -102,32 +100,18 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
   // Funcion que le va a cambiar el nombre al proveedor
   cambiarNombreProveedor(){
     let id : number = this.FormDocumentos.value.proveedorNombre;
-    this.proveedorService.srvObtenerListaPorId(id).subscribe(datos_proveedor => {
-      this.FormDocumentos = this.frmBuilderMateriaPrima.group({
-        idDocumento : this.FormDocumentos.value.idDocumento,
-        TipoDocumento: this.FormDocumentos.value.TipoDocumento,
-        proveedorNombre : ` ${datos_proveedor.prov_Nombre}`,
-        proveedorId : datos_proveedor.prov_Id,
-        fecha: this.FormDocumentos.value.fecha,
-        fechaFinal : this.FormDocumentos.value.fechaFinal,
-      });
+    let nuevo : any[] = this.proveedor.filter((item) => item.prov_Id == id);
+    this.FormDocumentos = this.frmBuilderMateriaPrima.group({
+      idDocumento : this.FormDocumentos.value.idDocumento,
+      TipoDocumento: this.FormDocumentos.value.TipoDocumento,
+      proveedorNombre : ` ${nuevo[0].prov_Nombre}`,
+      proveedorId : nuevo[0].prov_Id,
+      fecha: this.FormDocumentos.value.fecha,
+      fechaFinal : this.FormDocumentos.value.fechaFinal,
     });
   }
 
-  //Funcion que colocará el nombre a las columnas de la tabla en la cual se muestran los productos pedidos por los clientes
-  ColumnasTabla(){
-    this.titulosTabla = [];
-    this.titulosTabla = [{
-      idFact : "Id",
-      tipo : "Tipo de Documento",
-      FechaFact : "Fecha Registro",
-      proveedor : "Proveedor",
-      Costo : "Costo Total",
-      Ver : "Ver",
-    }]
-  }
-
-  //
+  //Función que consultará segun los filtros seleccionados
   validarConsulta(){
     this.ArrayDocumento = [];
     this.remision = [];
@@ -299,7 +283,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     }
   }
 
-  //
+  //Función que llenará la tabla con los registros de la consulta realizada en los filtros
   lenarTabla(formulario : any){
     const infoDoc : any = {
       id : formulario.id,
@@ -592,45 +576,5 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
         }
       });
     }
-  }
-
-  //
-  organizacionPrecioDblClick(){
-    this.ArrayDocumento.sort((a,b)=> Number(b.subTotal) - Number(a.subTotal));
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2500,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-      }
-    });
-    Toast.fire({
-      icon: 'warning',
-      title: 'Ordenado por "Precio Total" de mayor a menor'
-    });
-  }
-
-  //Funcion que organiza los campos de la tabla de pedidos de menor a mayor
-  organizacionPrecio(){
-    this.ArrayDocumento.sort((a,b)=> Number(a.subTotal) - Number(b.subTotal));
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2500,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-      }
-    });
-    Toast.fire({
-      icon: 'warning',
-      title: 'Ordenado por "Precio Total" de menor a mayor'
-    });
   }
 }

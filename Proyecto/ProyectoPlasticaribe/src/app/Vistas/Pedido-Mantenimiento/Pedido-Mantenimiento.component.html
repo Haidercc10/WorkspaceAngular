@@ -1,5 +1,6 @@
 <app-menuLateral></app-menuLateral>
 
+<p-toast position="center"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -23,14 +24,14 @@
 <div class="formulario">
 
   <!-- Informacion del pedido de mantenimiento -->
-  <div class="mb-4">
+  <div class="mb-5">
     <h4 class="tituloRojo"><i class="pi pi-info-circle"></i> Información del Pedido</h4>
   </div>
 
   <!-- Formulario del pedido de mantenimiento -->
   <form [formGroup]="FormPedidoMantenimiento">
-    <div class="mb-3">
-      <div class="row g-3">
+    <div class="mb-4">
+      <div class="row g-4">
 
         <!-- Consecutivo del pedido -->
         <div class="col-md-2">
@@ -115,7 +116,7 @@
             <th scope="col">Nombre</th>
             <th scope="col">Fecha Daño</th>
             <th scope="col">Tipo Mantenimiento</th>
-            <th scope="col"><i class="pi pi-trash cursor" title="Quitar Todo" (click)="quitarTodos()"></i></th>
+            <th scope="col"><i class="pi pi-trash cursor" title="Quitar Todo" (click)="mostrarEleccion(0, 'todos')"></i></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-activos>
@@ -124,7 +125,7 @@
             <td>{{activos.Nombre}}</td>
             <td>{{activos.Fecha}}</td>
             <td>{{activos.TipoMantenimiento}}</td>
-            <td><button pButton type="button" style="width: 30px; height: 30px;" class="p-button-rounded p-button-danger" icon="pi pi-trash" (click)="quitarActivo(activos)" pTooltip="Quitar activos"></button></td>
+            <td><button pButton type="button" style="width: 30px; height: 30px;" class="p-button-rounded p-button-danger" icon="pi pi-trash" (click)="mostrarEleccion(activos, 'uno')" pTooltip="Quitar activos"></button></td>
           </tr>
         </ng-template>
       </p-table>
@@ -140,3 +141,24 @@
     </div>
   </div>
 </div>
+
+<p-toast position="center" key="{{llave}}" (onClose)="onReject()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-activo>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" *ngIf="this.llave == 'uno'" pButton (click)="quitarActivo(activo)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button type="button" *ngIf="this.llave == 'todos'" pButton (click)="quitarTodos()" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject()" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

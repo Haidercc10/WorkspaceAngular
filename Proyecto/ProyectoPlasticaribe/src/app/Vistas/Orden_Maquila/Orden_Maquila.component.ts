@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { MessageService } from 'primeng/api';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { modelDetallesOrdenMaquila } from 'src/app/Modelo/modelDetallesOrdenMaquila';
 import { modelOrdenMaquila } from 'src/app/Modelo/modelOrdenMaquila';
@@ -13,7 +14,6 @@ import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maqu
 import { TercerosService } from 'src/app/Servicios/Terceros/Terceros.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
-import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -48,6 +48,9 @@ export class Orden_MaquilaComponent implements OnInit {
   modalCreacionTerceros : boolean = false; //Variable que servirá para validar cuando se muestra el modal de creación de terceros o no
   edidcionOrdenMaquila : boolean = false; //Variable que servirá para validar cuando se está creado una orden y cuando se está editando
   informacionPDF : any [] = []; //Variable que tendrá la informacion de la materia prima pedida en la orden de maquila
+  soloLectura : boolean; /** Variable que se utilizará para colocar el campo Stock de solo lectura */
+  llave : string = 'pdf'; /** Variable que se utilizará como palabra clave para cargar el mensaje de Ver Pdf/Quitar MP/Eliminar MP de la tabla*/
+  itemSeleccionado : any; /** Variable que tomará diferentes valores, generalmente id para mostrar el pdf o id del item a quitar o eliminar de la tabla. */
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -57,7 +60,8 @@ export class Orden_MaquilaComponent implements OnInit {
                         private undMedidaService : UnidadMedidaService,
                           private terceroService : TercerosService,
                             private ordenMaquilaService : Orden_MaquilaService,
-                              private dtOrdenMaquilaService : DetalleOrdenMaquilaService,) {
+                              private dtOrdenMaquilaService : DetalleOrdenMaquilaService,
+                                private messageService: MessageService ) {
 
     this.FormOrdenMaquila = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
@@ -84,6 +88,8 @@ export class Orden_MaquilaComponent implements OnInit {
     this.consultarCategorias();
     this.obtenerUnidadesMedida();
     this.generarConsecutivo();
+    this.soloLectura = true;
+    this.llave = 'pdf';
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -119,8 +125,11 @@ export class Orden_MaquilaComponent implements OnInit {
     this.cargando = false;
     this.cantidadTotalPrecio = 0;
     this.catidadTotalPeso = 0;
-    this.generarConsecutivo();
     this.edidcionOrdenMaquila = false;
+    this.itemSeleccionado = null;
+    this.generarConsecutivo();
+    this.onReject();
+    this.llave = 'pdf';
   }
 
   // Funcion que va a limpiar los campos de materia prima
@@ -145,12 +154,12 @@ export class Orden_MaquilaComponent implements OnInit {
   // Funcion que le va a cambiar el nombre al proveedor
   cambiarNombreTercero(){
     let id : number = this.FormOrdenMaquila.value.Tercero;
-    this.terceroService.getId(id).subscribe(datos_tercero => {
-      this.FormOrdenMaquila.patchValue({
-        Tercero : datos_tercero.tercero_Nombre,
-        Id_Tercero : id,
-      });
-    }, error => { this.mensajeError(`¡No se pudo obtener información del proveedor!`, error.message); });
+    let nuevo : any[] = this.terceros.filter((item) => item.tercero_Id == id);
+
+    this.FormOrdenMaquila.patchValue({
+      Tercero : nuevo[0].tercero_Nombre,
+      Id_Tercero : nuevo[0].tercero_Id,
+    });
   }
 
   // Funcion que va a consultar la materia prima
@@ -214,6 +223,8 @@ export class Orden_MaquilaComponent implements OnInit {
           this.catidadTotalPeso += datos_Orden[i].cantidad;
           this.cantidadTotalPrecio += (datos_Orden[i].cantidad * datos_Orden[i].precio);
         }
+      } else {
+        this.mostrarAdvertencia(`Advertencia`, `No se ha encontrado la orden de maquila N° ${id}`);
       }
     });
   }
@@ -234,7 +245,7 @@ export class Orden_MaquilaComponent implements OnInit {
           Stock : datos_materiaPrima[i].stock,
         });
       }
-    }, error => { this.mensajeError(`¡No se pudo obtener información sobre la materia prima seleccionada!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información sobre la materia prima seleccionada!`); });
   }
 
   // Funcion que va a añadir la materia prima a la tabla
@@ -264,68 +275,39 @@ export class Orden_MaquilaComponent implements OnInit {
             this.catidadTotalPeso += this.FormMateriaPrima.value.Cantidad;
             this.cantidadTotalPrecio += (this.FormMateriaPrima.value.Cantidad * this.FormMateriaPrima.value.PrecioOculto);
             this.FormMateriaPrima.reset();
-          } else this.mensajeAdvertencia(`¡La cantidad a entegar es superior a la cantidad en stock!`);
-        } else this.mensajeAdvertencia(`¡La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
-      } else this.mensajeAdvertencia(`¡La materia prima '${this.FormMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
-    } else this.mensajeAdvertencia(`¡Hay campos vacios!`);
+          } else this.mostrarAdvertencia(`Advertencia`, `¡La cantidad a entegar es superior a la cantidad en stock!`);
+        } else this.mostrarAdvertencia(`Advertencia`, `¡La cantidad de la materia prima seleccionada debe ser mayor que 0!`);
+      } else this.mostrarAdvertencia(`Advertencia`, `¡La materia prima '${this.FormMateriaPrima.value.Nombre}' ya fue seleccionada previamante!`);
+    } else this.mostrarAdvertencia(`Advertencia`, `Debe llenar los campos vacios!`);
   }
 
   // Funcion que va a quitar la materia prima
   quitarMateriaPrima(data : any){
-    Swal.fire({
-      title: '¿Estás seguro de eliminar la Materia Prima de la Orden de Compra?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Eliminar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
-          if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
-            this.materiasPrimasSeleccionadas.splice(i, 1);
-            this.catidadTotalPeso -= data.Cantidad;
-            this.cantidadTotalPrecio -= data.SubTotal;
-            for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
-              if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
-            }
-            const Toast = Swal.mixin({
-              toast: true,
-              position: 'center',
-              showConfirmButton: false,
-              timer: 1500,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-              }
-            });
-            Toast.fire({
-              icon: 'success',
-              title: `¡Se ha quitado la Materia Prima ${data.Nombre} de la Orden de Compra!`
-            });
+    data = this.itemSeleccionado;
+    this.onReject();
+    for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+      if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
+          this.materiasPrimasSeleccionadas.splice(i, 1);
+          this.catidadTotalPeso -= data.Cantidad;
+          this.cantidadTotalPrecio -= data.SubTotal;
+          for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
+            if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
           }
-        }
+          this.mostrarConfirmacion(`Confirmación`, `Se ha quitado la materia Prima ${data.Nombre} de la tabla`);
+          this.llave = 'pdf';
       }
-    });
+    }
   }
 
   // Funcion que va a elminar de la base de datos una de las materias primas, bopp, tintas escogidas al momento de editar la orden de compra
   eliminarMateriaPrima(data : any){
-    this.dtOrdenMaquilaService.getMateriaPrimaOrdenMaquila(this.FormOrdenMaquila.value.ConsecutivoOrden, data.Id).subscribe(datos_orden => {
-      if (datos_orden.length > 0) {
-        Swal.fire({
-          title: '¿Estás seguro de eliminar la Materia Prima de la Orden de Maquila?',
-          text: `Al eliminar la materia prima en este apartado de edición se Eliminará Tambien de la Base de Datos`,
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Eliminar'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            for (let i = 0; i < datos_orden.length; i++) {
-              this.dtOrdenMaquilaService.delete(datos_orden[i]).subscribe(datos_eliminados => {
+    data = this.itemSeleccionado;
+    setTimeout(() => {
+      this.dtOrdenMaquilaService.getMateriaPrimaOrdenMaquila(this.FormOrdenMaquila.value.ConsecutivoOrden, data.Id).subscribe(datos_orden => {
+        if (datos_orden.length > 0) {
+          this.onReject();
+          for (let i = 0; i < datos_orden.length; i++) {
+            this.dtOrdenMaquilaService.delete(datos_orden[i]).subscribe(datos_eliminados => {
                 for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
                   if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
                     this.materiasPrimasSeleccionadas.splice(i, 1);
@@ -334,30 +316,18 @@ export class Orden_MaquilaComponent implements OnInit {
                     for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
                       if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
                     }
-                    const Toast = Swal.mixin({
-                      toast: true,
-                      position: 'center',
-                      showConfirmButton: false,
-                      timer: 1500,
-                      timerProgressBar: true,
-                      didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
-                      }
-                    });
-                    Toast.fire({
-                      icon: 'success',
-                      title: `¡Se ha quitado la Materia Prima ${data.Nombre} de la Orden de Maquila!`
-                    });
+
+                    this.mostrarConfirmacion(`Confirmación`, `Se ha eliminado la materia prima ${data.Nombre} de la orden de maquila`);
+                    this.llave = 'pdf';
                     break;
                   }
                 }
-              }, error => { this.mensajeError(`¡No se pudo eliminar la materia de la orden de Maquila!`, error.message); });
-            }
+            }, error => { this.mostrarError(`¡No se pudo eliminar la materia de la orden de Maquila!`, error.message); });
           }
-        });
-      } else this.quitarMateriaPrima(data);
-    });
+        } else this.quitarMateriaPrima(data);
+      });
+    }, 100);
+
   }
 
   // Funcion que va a validar que los campos necesarios esten llenos para crear la Orden de Maquila
@@ -366,8 +336,9 @@ export class Orden_MaquilaComponent implements OnInit {
       if (this.materiasPrimasSeleccionadas.length > 0) {
         if (!this.edidcionOrdenMaquila) this.crearOrdenMaquila();
         else this.editarOrdenMaquila();
-      } else this.mensajeAdvertencia(`¡Debe escoger minimos 1 Materia Prima!`);
-    } else this.mensajeAdvertencia(`¡Hay Campos Vacios!`);
+
+      } else this.mostrarAdvertencia(`Advertencia`, `¡Debe escoger minimo una materia prima!`);
+    } else this.mostrarAdvertencia(`Advertencia`, `¡Debe llenar los campos vacios!`);
   }
 
   // Funcion que va a crear una Orden de Maquila
@@ -387,12 +358,13 @@ export class Orden_MaquilaComponent implements OnInit {
       OM_Hora : moment().format("H:mm:ss"),
     }
     this.ordenMaquilaService.insert(info).subscribe(datos_ordenMaquila => { this.crearDtOrdenMaquila(datos_ordenMaquila.oM_Id); }, error => {
-      this.mensajeError(`¡Ocurrió un error al Crear la Orden de Maquila!`, error.message);
+      this.mostrarError(`Error`, `¡Ocurrió un error al crear la orden de maquila!`);
     });
   }
 
   // Funcion que va a crear en la base de datos los detalles de la Orden de Maquila
   crearDtOrdenMaquila(id : number){
+    let error : boolean = false;
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
       let info : modelDetallesOrdenMaquila = {
         OM_Id : id,
@@ -403,9 +375,12 @@ export class Orden_MaquilaComponent implements OnInit {
         UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
         DtOM_PrecioUnitario : parseFloat(this.materiasPrimasSeleccionadas[i].Precio),
       }
-      this.dtOrdenMaquilaService.insert(info).subscribe(datos => {
-        this.mensajeExitoso(`¡Orden de Maquila Creada!`, `¡Se ha creado una Orden de Maquila. Número de Orden #${id}!`, id);
-      }, error => { this.mensajeError(`¡Ocurrió un error al guardar los detalles de la Orden de Maquila!`); });
+      this.dtOrdenMaquilaService.insert(info).subscribe(datos => { error = false; },
+      error => { this.mostrarError(`Error`, `¡Ocurrió un error al guardar los detalles de la orden de maquila!`); error = true;});
+    }
+    if(!error) {
+      this.itemSeleccionado = id;
+      this.mostrarEleccion(`pdf`, id, );
     }
   }
 
@@ -428,13 +403,14 @@ export class Orden_MaquilaComponent implements OnInit {
       OM_Hora : moment().format("H:mm:ss"),
     }
     this.ordenMaquilaService.put(id, info).subscribe(datos_ordenMaquila => { this.editarDtOrdenMaquila(); }, error => {
-      this.mensajeError(`¡Ocurrió un error al Editar la Orden de Maquila!`, error.message);
+      this.mostrarError(`Error`, `¡Ocurrió un error al Editar la Orden de Maquila!`);
     });
   }
 
   // Funcion que va a crear en la base de datos los detalles de la Orden de Maquila
   editarDtOrdenMaquila(){
     let id : number = this.FormOrdenMaquila.value.ConsecutivoOrden;
+    let error : boolean = false;
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
       this.dtOrdenMaquilaService.getMateriaPrimaOrdenMaquila(id, this.materiasPrimasSeleccionadas[i].Id).subscribe(datos_orden => {
         if (datos_orden.length == 0) {
@@ -447,19 +423,23 @@ export class Orden_MaquilaComponent implements OnInit {
             UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
             DtOM_PrecioUnitario : parseFloat(this.materiasPrimasSeleccionadas[i].Precio),
           }
-          this.dtOrdenMaquilaService.insert(info).subscribe(datos => { }, error => {
-            this.mensajeError(`¡Ocurrió un error al editar los detalles de la Orden de Maquila!`);
+          this.dtOrdenMaquilaService.insert(info).subscribe(datos => { error = false; }, error => {
+            this.mostrarError(`Error`, `¡Ocurrió un error al editar los detalles de la Orden de Maquila!`);
           });
         }
-      }, error => { this.mensajeError(``); });
+      }, error => { this.mostrarError(``); error = true; });
     }
-    setTimeout(() => {
-      this.mensajeExitoso(`¡Orden de Maquila Editada!`, `¡Se ha editado una Orden de Maquila. Número de Orden #${id}!`, id);
-    }, this.materiasPrimasSeleccionadas.length * 10);
+    if(!error) {
+       setTimeout(() => {
+        this.mostrarEleccion(`edicion`, id);
+      }, this.materiasPrimasSeleccionadas.length * 10);
+    }
+
   }
 
   // Funcion que va a consultar la informacion de la Orden de maquila creada, información que se usará para crear un PDF
   buscarInfoOrdenMaquila(id : number){
+    this.onReject();
     this.cargando = true;
     this.informacionPDF = [];
     this.dtOrdenMaquilaService.getInfoOrdenMaquila_Id(id).subscribe(datos_Orden => {
@@ -489,7 +469,7 @@ export class Orden_MaquilaComponent implements OnInit {
         this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
       setTimeout(() => {this.crearPDF(id); }, 2500);
-    }, error => { this.mensajeError(`¡No se pudo obtener información de la última orden de maquila!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`); });
   }
 
   // Funcion que va a crear un PDF que será una orde de Maquila
@@ -516,7 +496,7 @@ export class Orden_MaquilaComponent implements OnInit {
               columns: [
                 { image : logoParaPdf, width : 220, height : 50 },
                 {
-                  text: `Orden de Maquila N° ${datos_orden[i].consecutivo}`,
+                  text: `Orden de Maquila N° ${datos_orden[i].orden}`,
                   alignment: 'right',
                   style: 'titulo',
                   margin: 30
@@ -671,10 +651,10 @@ export class Orden_MaquilaComponent implements OnInit {
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
         pdf.open();
-        this.cargando = false;
+        this.limpiarTodo();
         break;
       }
-    }, error => { this.mensajeError(`¡No se pudo obtener la información de la última orden de maquila!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la última orden de maquila!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -708,33 +688,59 @@ export class Orden_MaquilaComponent implements OnInit {
     };
   }
 
-  // Funcion que mostrará el mensaje de que todo el proceso de guardado fue exitoso
-  mensajeExitoso(titulo : string, mensaje : string, id : number) {
-    Swal.fire({
-      icon: 'success',
-      title: `${titulo}`,
-      html: `<b>${mensaje}</b><hr>`,
-      showCloseButton: true,
-      showConfirmButton: true,
-      showCancelButton : true,
-      confirmButtonColor : '#d44',
-      cancelButtonText : `Cerrar`,
-      confirmButtonText : 'Ver PDF <i class="pi pi-file-pdf"></i>',
-    }).then((result) => {
-      if (result.isConfirmed) this.buscarInfoOrdenMaquila(id);
-    });
-    setTimeout(() => { this.limpiarTodo(); }, 1500);
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any, id? : any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life : 2000});
   }
 
-  // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
-    this.cargando = false;
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life : 5000});
+   this.cargando = false;
   }
 
-  // Mensaje de Error
-  mensajeError(text : string, error : any = ''){
-    Swal.fire({ icon: 'error', title: 'Error', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
-    this.cargando = false;
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000});
+   this.cargando = false;
+  }
+
+  mostrarEleccion(modo : any, item?: any,  mensaje?: any, titulo?: any){
+    this.llave = modo;
+    this.itemSeleccionado = item;
+
+    setTimeout(() => {
+      if(this.llave == 'pdf') {
+        titulo = `Confirmación`;
+        mensaje = `¡Se ha creado la orden de maquila N° ${item}!, ¿desea ver el detalle en pdf?`;
+        this.messageService.add({severity:'success', key: this.llave, summary: titulo, detail: mensaje, sticky: true});
+      }
+
+      if(this.llave == 'quitar') {
+        this.itemSeleccionado = item;
+        titulo = `Advertencia`;
+        mensaje = `Está seguro que desea quitar la materia prima ${item.Nombre} de la tabla?`;
+        this.messageService.add({severity:'warn', key: this.llave, summary: titulo, detail: mensaje, sticky: true});
+      }
+
+      if(this.llave == 'eliminar') {
+        this.itemSeleccionado = item;
+        titulo = `Advertencia`;
+        mensaje = `Está seguro que desea eliminar definitivamente la materia prima ${item.Nombre} de la orden de maquila?`;
+        this.messageService.add({severity:'warn', key: this.llave, summary: titulo, detail: mensaje, sticky: true});
+      }
+
+      if(this.llave == 'edicion') {
+        this.itemSeleccionado = item;
+        titulo = `Confirmación`;
+        mensaje = `¡Se ha editado la orden de maquila N° ${item}!, ¿desea ver el detalle en pdf?`;
+        this.messageService.add({severity:'success', key: this.llave, summary: titulo, detail: mensaje, sticky: true});
+      }
+    }, 200);
+  }
+
+  /** Función para quitar mensaje de elección */
+  onReject(){
+    this.messageService.clear(this.llave);
   }
 }

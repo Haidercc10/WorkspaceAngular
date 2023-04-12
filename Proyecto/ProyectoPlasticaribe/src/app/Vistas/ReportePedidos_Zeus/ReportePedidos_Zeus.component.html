@@ -1,5 +1,5 @@
 <app-menuLateral></app-menuLateral>
-
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -35,7 +35,7 @@
                   <div class="col">
                     <div class="collapse multi-collapse" id="multiCollapseExample4">
                       <div class="card card-body">
-                        Este color indica que todos los item del pedido puede n fecturados y enviados dado que la cantidad que hay en existencias es igual o superior a la cantidad pendiente del respectivo item.
+                        Este color indica que todos los item del pedido pueden ser facturados y enviados dado que la cantidad que hay en existencias es igual o superior a la cantidad pendiente del respectivo item.
                       </div>
                     </div>
                   </div>
@@ -412,8 +412,8 @@
                 <td *ngFor="let col of columnasSeleccionada; let i = index"> {{data[col.field]}} </td>
                 <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="productosPedido(data.consecutivo)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
                 <td style="text-align: center;" scope="col" title="Editar Pedido"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="editarPedido(data)" style="width: 30px; height: 30px;"></button></td>
-                <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button (click)="confirmarActualizacion(data.consecutivo)" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
-                <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button (click)="confirmarCancelacion(data.consecutivo)" pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger mr-2" style="width: 30px; height: 30px;"></button></td>
+                <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button (click)="mostrarEleccion(data.consecutivo, 'aceptar')" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button (click)="mostrarEleccion(data.consecutivo, 'cancelar')" pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger mr-2" style="width: 30px; height: 30px;"></button></td>
               </tr>
             </ng-template>
           </ng-template>
@@ -459,3 +459,45 @@
     </div>
   </div>
 </div>
+
+<!-- Mensaje de elección para cancelar -->
+<p-toast position="center" key="aceptar" (onClose)="onReject('aceptar')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="aceptarPedido(itemSeleccionado)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('aceptar')" icon="pi pi-cancel" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<!-- Mensaje de elección para cancelar -->
+<p-toast position="center" key="cancelar" (onClose)="onReject('cancelar')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="cancelarPedido(itemSeleccionado)" icon="pi pi-exclamation-circle" label="Si" class="p-button-warning"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('cancelar')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

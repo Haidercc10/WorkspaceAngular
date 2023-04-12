@@ -1,7 +1,7 @@
 <ng-container *ngIf="!modeModal">
   <app-menuLateral></app-menuLateral>
 </ng-container>
-
+<p-toast position="center"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -27,11 +27,10 @@
   <div class="mb-4">
     <h4 class="tituloRojo"><i class="pi pi-info-circle"></i> Información del Pedido</h4>
   </div>
-  <br>
 
   <!-- Formulario del pedido de mantenimiento -->
   <form [formGroup]="FormMovimientosMantenimiento">
-    <div class="mb-3">
+    <div class="mb-4">
       <div class="row g-4">
 
         <!-- Consecutivo del pedido -->

@@ -1,5 +1,6 @@
 <app-menuLateral></app-menuLateral>
 
+<p-toast position="center"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -14,8 +15,6 @@
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
-    </div>
-    <div class="formulario">
     </div>
   </div>
 </div>
@@ -108,13 +107,13 @@
                   <input class="form-control form-control-sm" type="number" [(ngModel)]="arrayUsuarios.Stock" (change)="actualizarExistenciasProducto(arrayUsuarios)" min="0">
                 </ng-template>
                 <ng-template pTemplate="output">
-                  {{arrayUsuarios.Stock | number : '1.2-2'}}
+                  <b>{{arrayUsuarios.Stock | number : '1.2-2'}}</b>
                 </ng-template>
               </p-cellEditor>
             </td>
           </ng-template>
           <td>{{arrayUsuarios.Presentacion}}</td>
-          <td>{{arrayUsuarios.Subtotal | number : '1.2-2'}}</td>
+          <td><b>{{arrayUsuarios.Subtotal | number : '1.2-2'}}</b></td>
           <td pEditableColumn>
             <p-cellEditor>
               <ng-template pTemplate="input">

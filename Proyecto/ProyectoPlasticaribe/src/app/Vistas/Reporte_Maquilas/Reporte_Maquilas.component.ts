@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { DetalleOrdenMaquilaService } from 'src/app/Servicios/DetalleOrdenMaquila/DetalleOrdenMaquila.service';
@@ -44,7 +45,8 @@ export class Reporte_MaquilasComponent implements OnInit {
                     private ordenMaquilaService : Orden_MaquilaService,
                       private dtOrdenMaquilaService : DetalleOrdenMaquilaService,
                         private dtFacturacion_OMService : DtFacturacion_OrdenMaquilaService,
-                          private servicioTerceros : TercerosService) {
+                          private servicioTerceros : TercerosService,
+                            private messageService: MessageService ) {
 
     this.FormConsultarFiltros = this.frmBuilder.group({
       Documento : [null],
@@ -121,13 +123,15 @@ export class Reporte_MaquilasComponent implements OnInit {
     this.arrayConsolidado = [];
     this.valorTotalConsulta = 0;
     this.cargando = true;
-    let fechaInicial : any = this.FormConsultarFiltros.value.fechaDoc;
-    let fechaFinal : any = this.FormConsultarFiltros.value.fechaFinalDoc;
+    let fechaInicial : any = moment(this.FormConsultarFiltros.value.fechaDoc).format('YYYY-MM-DD');
+    let fechaFinal : any = moment(this.FormConsultarFiltros.value.fechaFinalDoc).format('YYYY-MM-DD');
     let estado : any = this.FormConsultarFiltros.value.estadoDoc;
     let codigo : any = this.FormConsultarFiltros.value.Documento;
     let tercero : any = this.FormConsultarFiltros.value.id_tercero
     let ruta : string = '', ruta2 : string = '';
 
+    if (fechaInicial == 'Invalid date') fechaInicial = null;
+    if (fechaFinal == 'Invalid date') fechaFinal = null;
     if (fechaInicial == null) fechaInicial = moment().format('YYYY-MM-DD');
     if (fechaFinal == null) fechaFinal = fechaInicial;
 
@@ -136,14 +140,16 @@ export class Reporte_MaquilasComponent implements OnInit {
     else if (codigo != null) ruta = `?doc=${codigo}`;
 
     this.ordenMaquilaService.GetConsultaDocumentos(fechaInicial, fechaFinal, ruta).subscribe(datos => {
-      for (let i = 0; i < datos.length; i++) {
-        this.llenarTabla(datos[i]);
-      }
+      if(datos.length > 0 ) {
+        for (let i = 0; i < datos.length; i++) {
+          this.llenarTabla(datos[i]);
+        }
+      } else this.mostrarAdvertencia(`Advertencia`,`No se encontraron resultados con los filtros consultados!`)
+
       setTimeout(() => { this.cargando = false; }, datos.length * 5);
-    }, error => { this.mensajeError(`¡No fue posible realizar una consulta de los documentos de Maquila!`); });
+    }, error => { this.mostrarError(`¡No fue posible realizar una consulta de los documentos de Maquila!`); });
 
     if (this.ValidarRol == 1) {
-
       if (estado != null && codigo != null && tercero != null) ruta2 = `?doc=${codigo}&estado=${estado}&tercero=${tercero}`;
       else if (estado != null && tercero != null) ruta2 = `?estado=${estado}&tercero=${tercero}`;
       else if (codigo != null && tercero != null) ruta2 = `?doc=${codigo}&tercero=${tercero}`;
@@ -156,7 +162,7 @@ export class Reporte_MaquilasComponent implements OnInit {
           this.llenartTablaConsolidado(datos[i]);
         }
         setTimeout(() => { this.cargando = false; }, datos.length * 5);
-      }, error => { this.mensajeError(`¡No fue posible realizar una consulta de los documentos de Maquila!`); });
+      }, error => { this.mostrarError(`Error`, `¡No fue posible realizar una consulta de los documentos de Maquila!`); });
     }
   }
 
@@ -469,7 +475,7 @@ export class Reporte_MaquilasComponent implements OnInit {
         this.datosPdf.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
       setTimeout(() => {this.crearPDF_Orden(id); }, 2500);
-    }, error => { this.mensajeError(`¡No se pudo obtener información de la última orden de maquila!`); });
+    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la última orden de maquila!`); });
   }
 
   // Funcion que va a crear un archivo de tipo pdf de la factura o remision que se acaba de crear
@@ -654,7 +660,7 @@ export class Reporte_MaquilasComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => { this.mensajeError(`¡No se pudo obtener la información de la última orden de maquila!`); });
+    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la última orden de maquila!`); });
   }
 
   // funcion que se encagará de llenar la tabla de los productos en el pdf
@@ -688,18 +694,6 @@ export class Reporte_MaquilasComponent implements OnInit {
     };
   }
 
-  // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> `, showCloseButton: true, });
-    this.cargando = false;
-  }
-
-  // Mensaje de Error
-  mensajeError(text : string){
-    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> `, showCloseButton: true, });
-    this.cargando = false;
-  }
-
   cargarTerceros(){
     let tercero : any = this.FormConsultarFiltros.value.tercero;
     this.servicioTerceros.getTerceroLike(tercero).subscribe(data => {this.arrayTerceros = data});
@@ -707,11 +701,25 @@ export class Reporte_MaquilasComponent implements OnInit {
 
   seleccionarTerceros(){
     let tercero : any = this.FormConsultarFiltros.value.tercero;
-    this.servicioTerceros.getId(tercero).subscribe(data => {
-      setTimeout(() => {
-        this.FormConsultarFiltros.patchValue({tercero: data.tercero_Nombre, id_tercero: data.tercero_Id });
-      }, 10);
+    let nuevo : any[] = this.arrayTerceros.filter((item) => item.tercero_Id == tercero);
+    setTimeout(() => { this.FormConsultarFiltros.patchValue({tercero: nuevo[0].tercero_Nombre, id_tercero: nuevo[0].tercero_Id });}, 30);
+    console.log(nuevo)
+  }
 
-    });
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
+  }
+
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
+   this.cargando = false;
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
+   this.cargando = false;
   }
 }

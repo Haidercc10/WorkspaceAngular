@@ -11,7 +11,7 @@ import { Detalle_MantenimientoService } from 'src/app/Servicios/Detalle_Mantenim
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { Tipo_MantenimientoService } from 'src/app/Servicios/TiposMantenimientos/Tipo_Mantenimiento.service';
-import Swal from 'sweetalert2';
+import { MessageService } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root'
@@ -45,7 +45,8 @@ export class Movimientos_MantenimientoComponent implements OnInit {
                     private tipoMantenimientoService : Tipo_MantenimientoService,
                       private estadosService : EstadosService,
                         private dtMantenimientoService : Detalle_MantenimientoService,
-                          private dtPedidoMttoService : DetallePedido_MantenimientoService,) {
+                          private dtPedidoMttoService : DetallePedido_MantenimientoService,
+                            private messageService: MessageService) {
 
     this.FormMovimientosMantenimiento = this.frmBuilder.group({
       ConsecutivoMovimiento : [null],
@@ -87,7 +88,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
       for (let i = 0; i < datos_activos.length; i++) {
         this.activos.push(datos_activos[i]);
       }
-    }, error => { this.mensajesError(`¡No se encontraron activos para realizar la consulta!`, error.message) });
+    }, error => { this.mostrarError(`Error`, `¡No se encontraron activos para realizar la consulta!`) });
   }
 
   // Función que obtendrá todos los tipos de mantenimiento
@@ -96,7 +97,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
       for (let i = 0; i < datos_tiposMantenimiento.length; i++) {
         this.tiposMantenimiento.push(datos_tiposMantenimiento[i]);
       }
-    }, error => { this.mensajesError(`¡No se pudieron obtener los diferentes tipos de mantenimientos!`, error.message) });
+    }, error => { this.mostrarError(`Error`, `¡No se pudieron obtener los diferentes tipos de mantenimientos!`) });
   }
 
   // Funcion que obtendrá todos los posibles estados que pueden tener los movimientos de mantenimiento
@@ -110,27 +111,28 @@ export class Movimientos_MantenimientoComponent implements OnInit {
             || datos_estados[i].estado_Id == 17) this.estados.push(datos_estados[i]);
         this.estados.sort((a,b) => a.estado_Nombre.localeCompare(b.estado_Nombre));
       }
-    }, error => { this.mensajesError(`¡Error al consultar los estados de los movimientos de mantenimiento!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡Error al consultar los estados de los movimientos de mantenimiento!`); });
   }
 
   // Funcion que tomará el id del activo seleccionado, lo almacenará y cambiará el id por el nombre en el campo de activo
   buscarActivoSeleccionado(){
-    this.activosService.GetId(this.FormMovimientosMantenimiento.value.Activo).subscribe(datos_activo => {
+    let idActivo : any = this.FormMovimientosMantenimiento.value.Activo;
+    let nuevo : any[] = this.activos.filter((item) => item.actv_Id == idActivo);
       this.FormMovimientosMantenimiento.patchValue({
-        IdActivo : datos_activo.actv_Id,
-        Activo : datos_activo.actv_Nombre,
+        IdActivo : nuevo[0].actv_Id,
+        Activo : nuevo[0].actv_Nombre,
       });
-    }, error => { this.mensajesError(`¡No se puede encontrar la información del activo ${this.FormMovimientosMantenimiento.value.Activo}!`, error.message) });
+      console.log(nuevo)
   }
 
-  // Funcion que va a tomar el id de l tipo de mantenimiento seleccionado, lo almacenará y cambiará el id por el nombre en el campo de tipo de mantenimiento
+  // Funcion que va a tomar el id del tipo de mantenimiento seleccionado, lo almacenará y cambiará el id por el nombre en el campo de tipo de mantenimiento
   buscarTipoMantenimientoSeleccionado(){
-    this.tipoMantenimientoService.GetId(this.FormMovimientosMantenimiento.value.TipoMantenimiento).subscribe(datos_tipoMtto => {
-      this.FormMovimientosMantenimiento.patchValue({
-        IdTipoMantenimiento : datos_tipoMtto.tpMtto_Id,
-        TipoMantenimiento : datos_tipoMtto.tpMtto_Nombre,
-      });
-    }, error => { this.mensajesError(`¡No se puedo obtner información acerca del tipo de mantenimiento ${this.FormMovimientosMantenimiento.value.TipoMantenimiento}!`, error.message) });
+    let idMtto : any = this.FormMovimientosMantenimiento.value.TipoMantenimiento;
+    let nuevo : any[] = this.tiposMantenimiento.filter((item) => item.tpMtto_Id == idMtto);
+    this.FormMovimientosMantenimiento.patchValue({
+      IdTipoMantenimiento : nuevo[0].tpMtto_Id,
+      TipoMantenimiento : nuevo[0].tpMtto_Nombre,
+    });
   }
 
   // Funcion que va a realizar la consulta de los movimientos
@@ -185,7 +187,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
       for (let i = 0; i < datos_movimientos.length; i++) {
         this.llenarTabla(datos_movimientos[i]);
       }
-    }, error => { this.mensajesError(`¡No se ha encontrado información de movimientos entre el día ${fechaInicial} y el día ${fechaFinal}!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡No se ha encontrado información de movimientos entre el día ${fechaInicial} y el día ${fechaFinal}!`); });
   }
 
   // Funcion que va a llenar la tabla con la información colsutada
@@ -226,7 +228,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
         this.infoPdf.push(info);
       }
       setTimeout(() => { this.crearPdfPedido(data); }, datos_pedido.length * 5);
-    }, error => { this.mensajesError(`¡No se ha podido encontrar información sobre el pedido con el consecutivo ${data.consecutivo}!`, error.message); });
+    }, error => { this.mostrarError(`¡No se ha podido encontrar información sobre el pedido con el consecutivo ${data.consecutivo}!`); });
   }
 
   // Funcion que va a llenar un array con la información de los activos de un mantenimiento
@@ -244,7 +246,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
         this.infoPdf.push(info);
       }
       setTimeout(() => { this.crearPdfMantenimiento(data); }, datos_mantenimiento.length * 5);
-    }, error => { this.mensajesError(`¡No se ha podido encontrar información sobre el mantenimiento con el consecutivo ${data.consecutivo}!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡No se ha podido encontrar información sobre el mantenimiento con el consecutivo ${data.consecutivo}!`); });
   }
 
   // Funcion que va a crear un PDF con base en la información que le sea suministrada
@@ -305,7 +307,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => { this.mensajesError(`¡No se ha podido encontrar información sobre el pedido con el consecutivo ${data.consecutivo}!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡No se ha podido encontrar información sobre el pedido con el consecutivo ${data.consecutivo}!`); });
   }
 
   // Funcion que va a crear un PDF con base en la información que le sea suministrada
@@ -480,7 +482,7 @@ export class Movimientos_MantenimientoComponent implements OnInit {
         this.cargando = false;
         break;
       }
-    }, error => { this.mensajesError(`¡No se ha podido encontrar información sobre el mantenimiento con el consecutivo ${data.consecutivo}!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡No se ha podido encontrar información sobre el mantenimiento con el consecutivo ${data.consecutivo}!`); });
   }
 
   // funcion que se encagará de llenar la tabla del pdf
@@ -515,21 +517,26 @@ export class Movimientos_MantenimientoComponent implements OnInit {
     };
   }
 
-  // Funcion que pasará mensajes de advertencia
-  mensajesAdvertencia(texto : string){
-    Swal.fire({ icon : 'warning', title : `Advertencia`, text : texto });
-    this.cargando = false;
-  }
-
-  // Funcion que enviaraá mensajes de error
-  mensajesError(texto : string, error : any = ''){
-    Swal.fire({ icon : 'error', title : `Opps...`, html: `<b>${texto}</b><br>` + `<spam style="color: #f00">${error}</spam>` });
-    this.cargando = false;
-  }
-
   // Funcion que limpiará los filtros utilizados en la tabla
   clear(table: Table) {
     table.clear();
+  }
+
+    /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
+  }
+
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000});
+   this.cargando = false;
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
+   this.cargando = false;
   }
 
 }

@@ -2,6 +2,7 @@ import { Component, Inject, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { MessageService } from 'primeng/api';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { DetallePedido_MantenimientoService } from 'src/app/Servicios/DetallePedido_Mantenimiento/DetallePedido_Mantenimiento.service';
 import { Pedido_MantenimientoService } from 'src/app/Servicios/Pedido_Mantenimiento/Pedido_Mantenimiento.service';
@@ -32,14 +33,16 @@ export class PedidoMantenimientoComponent implements OnInit {
   tiposMantenimiento : any [] = []; //Variable que almacenará los diferentes tipos de mantenimientos
   activosSeleccionados : any [] = []; //Variable que almacenará los activos seleccionados para el mantenimiento
   idActivosSeleccionados : number [] = []; //Variable que va a almacenar el id de cada uno de los activos selccionados
-
+  activoSeleccionado : any = [];
+  llave : string = '';
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
                   private rolService : RolesService,
                     private pedidoMantenimientoService : Pedido_MantenimientoService,
                       private dtPedidoMantenimientoService : DetallePedido_MantenimientoService,
                         private activosService : ActivosService,
-                          private tipoMantenimientoService : Tipo_MantenimientoService,) {
+                          private tipoMantenimientoService : Tipo_MantenimientoService,
+                            private messageService: MessageService) {
 
     this.FormPedidoMantenimiento = this.frmBuilder.group({
       ConsecutivoPedido : [null],
@@ -72,7 +75,7 @@ export class PedidoMantenimientoComponent implements OnInit {
       for (let i = 0; i < datos_activos.length; i++) {
         this.activos.push(datos_activos[i]);
       }
-    }, error => { this.mensajesError(`¡No se encontraron activos para realizar el pedido!`, error.message) });
+    }, error => { this.mostrarError(`Error`, `¡No se encontraron activos para realizar el pedido!`) });
   }
 
   // Funcion que obtendrá el id el ultimo pedido creado para saber que consecutivo es el siguiente
@@ -87,7 +90,7 @@ export class PedidoMantenimientoComponent implements OnInit {
         TipoMantenimiento : this.FormPedidoMantenimiento.value.TipoMantenimiento,
         FechaDaño : this.FormPedidoMantenimiento.value.FechaDaño,
       });
-    }, error => { this.mensajesError(`¡No se puedo obtener el consecutivo del próximo pedido!`, error.message) });
+    }, error => { this.mostrarError(`Error`, `¡No se puedo obtener el consecutivo del próximo pedido!`) });
   }
 
   // Función que obtendrá todos los tipos de mantenimiento
@@ -96,37 +99,38 @@ export class PedidoMantenimientoComponent implements OnInit {
       for (let i = 0; i < datos_tiposMantenimiento.length; i++) {
         this.tiposMantenimiento.push(datos_tiposMantenimiento[i]);
       }
-    }, error => { this.mensajesError(`¡No se pudieron obtener los diferentes tipos de mantenimientos!`, error.message) });
+    }, error => { this.mostrarError(`Error`, `¡No se pudieron obtener los diferentes tipos de mantenimientos!`) });
   }
 
   // Funcion que tomará el id del activo seleccionado, lo almacenará y cambiará el id por el nombre en el campo de activo
   buscarActivoSeleccionado(){
-    this.activosService.GetId(this.FormPedidoMantenimiento.value.Activo).subscribe(datos_activo => {
-      this.FormPedidoMantenimiento.setValue({
-        ConsecutivoPedido : this.FormPedidoMantenimiento.value.ConsecutivoPedido,
-        Observacion : this.FormPedidoMantenimiento.value.Observacion,
-        IdActivo : datos_activo.actv_Id,
-        Activo : datos_activo.actv_Nombre,
-        IdTipoMantenimiento : this.FormPedidoMantenimiento.value.IdTipoMantenimiento,
-        TipoMantenimiento : this.FormPedidoMantenimiento.value.TipoMantenimiento,
-        FechaDaño : this.FormPedidoMantenimiento.value.FechaDaño,
-      });
-    }, error => { this.mensajesError(`¡No se puede encontrar la información del activo ${this.FormPedidoMantenimiento.value.Activo}!`, error.message) });
+    let id : any = this.FormPedidoMantenimiento.value.Activo;
+    let nuevo : any[] = this.activos.filter((item) => item.actv_Id == id);
+    this.FormPedidoMantenimiento.setValue({
+      ConsecutivoPedido : this.FormPedidoMantenimiento.value.ConsecutivoPedido,
+      Observacion : this.FormPedidoMantenimiento.value.Observacion,
+      IdActivo : nuevo[0].actv_Id,
+      Activo : nuevo[0].actv_Nombre,
+      IdTipoMantenimiento : this.FormPedidoMantenimiento.value.IdTipoMantenimiento,
+      TipoMantenimiento : this.FormPedidoMantenimiento.value.TipoMantenimiento,
+      FechaDaño : this.FormPedidoMantenimiento.value.FechaDaño,
+    });
   }
 
   // Funcion que va a tomar el id de l tipo de mantenimiento seleccionado, lo almacenará y cambiará el id por el nombre en el campo de tipo de mantenimiento
   buscarTipoMantenimientoSeleccionado(){
-    this.tipoMantenimientoService.GetId(this.FormPedidoMantenimiento.value.TipoMantenimiento).subscribe(datos_tipoMtto => {
-      this.FormPedidoMantenimiento.setValue({
-        ConsecutivoPedido : this.FormPedidoMantenimiento.value.ConsecutivoPedido,
-        Observacion : this.FormPedidoMantenimiento.value.Observacion,
-        IdActivo : this.FormPedidoMantenimiento.value.IdActivo,
-        Activo : this.FormPedidoMantenimiento.value.Activo,
-        IdTipoMantenimiento : datos_tipoMtto.tpMtto_Id,
-        TipoMantenimiento : datos_tipoMtto.tpMtto_Nombre,
-        FechaDaño : this.FormPedidoMantenimiento.value.FechaDaño,
-      });
-    }, error => { this.mensajesError(`¡No se puedo obtner información acerca del tipo de mantenimiento ${this.FormPedidoMantenimiento.value.TipoMantenimiento}!`, error.message) });
+    let id : any = this.FormPedidoMantenimiento.value.TipoMantenimiento;
+    let nuevo : any[] = this.tiposMantenimiento.filter((item) => item.tpMtto_Id == id);
+
+    this.FormPedidoMantenimiento.setValue({
+      ConsecutivoPedido : this.FormPedidoMantenimiento.value.ConsecutivoPedido,
+      Observacion : this.FormPedidoMantenimiento.value.Observacion,
+      IdActivo : this.FormPedidoMantenimiento.value.IdActivo,
+      Activo : this.FormPedidoMantenimiento.value.Activo,
+      IdTipoMantenimiento : nuevo[0].tpMtto_Id,
+      TipoMantenimiento : nuevo[0].tpMtto_Nombre,
+      FechaDaño : this.FormPedidoMantenimiento.value.FechaDaño,
+    });
   }
 
   // Funcion que limpiará los campos donde se elegen los activos a los que se les hará mantenimiento
@@ -156,82 +160,36 @@ export class PedidoMantenimientoComponent implements OnInit {
           TipoMantenimiento: this.FormPedidoMantenimiento.value.TipoMantenimiento,
           Id_TipoMantenimiento: this.FormPedidoMantenimiento.value.IdTipoMantenimiento,
         }
+        info.Fecha = moment(this.FormPedidoMantenimiento.value.FechaDaño).format('YYYY-MM-DD');
         this.activosSeleccionados.push(info);
         this.idActivosSeleccionados.push(info.Id);
         this.cargando = false;
-      } else this.mensajesAdvertencia(`¡El activo ${this.FormPedidoMantenimiento.value.Activo} ha sido seleccionado previamente!`);;
-    } else this.mensajesAdvertencia(`¡Hay campos vacios!`);
+      } else this.mostrarAdvertencia(`Advertencia`, `¡El activo ${this.FormPedidoMantenimiento.value.Activo} ha sido seleccionado previamente!`);;
+    } else this.mostrarAdvertencia(`Advertencia`, `¡Debe llenar los campos vacios!`);
   }
 
   // Funcion que quitará de la tabla de los activos seleccionados
   quitarActivo(item : any){
-    Swal.fire({
-      title: `¿Estás seguro de eliminar el activo ${item.Nombre} del pedido?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Eliminar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        for (let i = 0; i < this.activosSeleccionados.length; i++) {
-          for (let j = 0; j < this.idActivosSeleccionados.length; j++) {
-            if (item.Id == this.activosSeleccionados[i].Id && item.Id == this.idActivosSeleccionados[j]) {
-              this.activosSeleccionados.splice(i,1);
-              this.idActivosSeleccionados.splice(j,1);
-              const Toast = Swal.mixin({
-                toast: true,
-                position: 'center',
-                showConfirmButton: false,
-                timer: 3500,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                  toast.addEventListener('mouseenter', Swal.stopTimer)
-                  toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-              });
-              Toast.fire({
-                icon: 'success',
-                title: `¡Se ha quitado el activo ${item.Nombre} del pedido!`
-              });
-              break;
-            }
-          }
+    item = this.activoSeleccionado;
+    this.onReject();
+    for (let i = 0; i < this.activosSeleccionados.length; i++) {
+      for (let j = 0; j < this.idActivosSeleccionados.length; j++) {
+        if (item.Id == this.activosSeleccionados[i].Id && item.Id == this.idActivosSeleccionados[j]) {
+          this.activosSeleccionados.splice(i,1);
+          this.idActivosSeleccionados.splice(j,1);
+          this.mostrarConfirmacion('Confirmación', `Se ha eliminado el activo ${item.Nombre} de la tabla!`);
+          break;
         }
       }
-    });
+    }
   }
 
   // Funcion que quitará todos los activos seleccionados para mantenimiento
-  quitarTodos(){
-    Swal.fire({
-      title: `¿Estás seguro de eliminar todos los activos del pedido?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Eliminar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.activosSeleccionados = [];
-        this.idActivosSeleccionados = [];
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 3500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-        Toast.fire({
-          icon: 'success',
-          title: `¡Se han eliminado todos los activos del pedido!`
-        });
-      }
-    });
+  quitarTodos() {
+    this.onReject();
+    this.activosSeleccionados = [];
+    this.idActivosSeleccionados = [];
+    this.mostrarConfirmacion('Confirmación', `Se han eliminado todos los activos de la tabla!`);
   }
 
   // Funcion que creará el pedido de mantenimiento de activos
@@ -246,8 +204,8 @@ export class PedidoMantenimientoComponent implements OnInit {
         Estado_Id : 11,
         PedMtto_Observacion : observacion,
       }
-      this.pedidoMantenimientoService.Insert(info).subscribe(datos_pedido => { this.buscarUltimoID(); }, error => { this.mensajesError('¡Ha ocurrido un error al crear el pedido de mantenimiento!', error.message) });
-    } else this.mensajesAdvertencia(`¡Debe seleccionar minimo un activo para crear el pedido de mantenimiento!`);
+      this.pedidoMantenimientoService.Insert(info).subscribe(datos_pedido => { this.buscarUltimoID(); }, error => { this.mostrarError(`Error`, '¡Ha ocurrido un error al crear el pedido de mantenimiento!'); });
+    } else this.mostrarAdvertencia(`Advertencia`, `¡Debe seleccionar minimo un activo para crear el pedido de mantenimiento!`);
   }
 
   // Funcion que va a buscar el ultimo Id del ultimo pedido creado y creará los detalles de manteniientos
@@ -260,24 +218,47 @@ export class PedidoMantenimientoComponent implements OnInit {
           TpMtto_Id : this.activosSeleccionados[i].Id_TipoMantenimiento,
           DtPedMtto_FechaFalla : this.activosSeleccionados[i].Fecha,
         }
-        this.dtPedidoMantenimientoService.Insert(info).subscribe(datos_pedidoCreado => {}, error => { this.mensajesError(`¡Error al almacenar los activos a los que se les hará mantenimientos!`, error.message) });
+        this.dtPedidoMantenimientoService.Insert(info).subscribe(datos_pedidoCreado => {}, error => { this.mostrarError(`Error`, `¡Error al almacenar los activos a los que se les hará mantenimientos!`); });
       }
       setTimeout(() => {
-        Swal.fire({ icon : 'success', title : `Registro Exitoso`, text : `¡Se ha creado un Pedido de Mantenimiento para ${this.activosSeleccionados.length} activo(s)!` });
+        this.mostrarConfirmacion('Confirmación', `Se ha creado un Pedido de mantenimiento para ${this.activosSeleccionados.length} activo(s)!`)
         this.limpiarTodo();
       }, 10 * this.activosSeleccionados.length);
-    }, error => { this.mensajesError(`¡No se puedo obtener el consecutivo del próximo pedido!`, error.message) });
+    }, error => { this.mostrarError(`Error`, `¡No se puedo obtener el consecutivo del próximo pedido!`) });
   }
 
-  // Funcion que pasará mensajes de advertencia
-  mensajesAdvertencia(texto : string){
-    Swal.fire({ icon : 'warning', title : `Advertencia`, text : texto });
-    this.cargando = false;
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life : 2000});
   }
 
-  // Funcion que enviaraá mensajes de error
-  mensajesError(texto : string, error : any = ''){
-    Swal.fire({ icon : 'error', title : `Opps...`, html: `<b>${texto}</b><br>` + `<spam style="color: #f00">${error}</spam>` });
-    this.cargando = false;
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life : 5000});
+   this.cargando = false;
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000});
+   this.cargando = false;
+  }
+
+  mostrarEleccion(item : any, modo : string){
+    this.llave = modo;
+    setTimeout(() => {
+      if(this.llave == 'uno') {
+        this.activoSeleccionado = item;
+        this.messageService.add({severity:'warn', key: this.llave, summary:'Elección', detail: `Está seguro que desea quitar el activo ${item.Nombre} de la tabla?`, sticky: true});
+      }
+
+      if(this.llave == 'todos') {
+        this.messageService.add({severity:'warn', key: this.llave, summary:'Elección', detail: `Está seguro que desea eliminar todos los activos de la tabla?`, sticky: true});
+      }
+    }, 200);
+  }
+
+  onReject(){
+    this.messageService.clear(this.llave);
   }
 }

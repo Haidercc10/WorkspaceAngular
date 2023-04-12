@@ -8,6 +8,7 @@ import * as fs from 'file-saver';
 import { Table } from 'primeng/table';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
 import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-Inventario-Productos-PBDD',
@@ -36,7 +37,8 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   constructor(private clienteOtItems : BagproService,
                 private existencias_ProductosService : ExistenciasProductosService,
-                  private productosService : ProductoService,) {
+                  private productosService : ProductoService,
+                    private messageService: MessageService) {
   }
 
   ngOnInit(): void {
@@ -77,7 +79,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
 
   //Funcion que exportará a un documrnto excel los datos de los productos
   exportarExcel() : void {
-    if (this.ArrayProductosBDNueva.length == 0) Swal.fire("Para generar el archivo de Excel, debe haber productos en la tabla");
+    if (this.ArrayProductosBDNueva.length == 0) this.mostrarAdvertencia(`Advertencia`, "Para generar el archivo de Excel, debe haber productos en la tabla");
     else {
       this.load = false;
       setTimeout(() => {
@@ -134,6 +136,7 @@ export class InventarioProductosPBDDComponent implements OnInit {
           });
           this.load = true;
         }, 500);
+        this.mostrarConfirmacion(`Confirmación`,`Se ha generado el archivo de excel exitosamente!`);
       }, 500);
     }
   }
@@ -188,16 +191,11 @@ export class InventarioProductosPBDDComponent implements OnInit {
               ExProd_Hora: datos_existencias[j].exProd_Hora,
             }
             this.existencias_ProductosService.srvActualizar(datos_existencias[j].exProd_Id, datosExistencias).subscribe(datos_actualizados => {
-              Swal.fire({
-                icon: 'success',
-                title: 'Actualización Exitosa',
-                showCloseButton: true,
-                html: `<b>¡Se actualizó la información del producto ${data.NombreItem}!</b>`,
-              });
+              this.mostrarConfirmacion(`Advertencia`, `¡Se actualizó la información del producto ${data.NombreItem}!</b>`);
               this.InventarioExistenciaBDNueva();
-            }, error => { this.mensajeError(`¡Error al actualizar la información del producto ${data.NombreItem}!`); });
+            }, error => { this.mostrarError(`Error`, `¡Error al actualizar la información del producto ${data.NombreItem}!`); });
           }
-        }, error => { this.mensajeError(`¡Error al buscar la información del producto ${data.NombreItem}!`); });
+        }, error => { this.mostrarError(`Error`, `¡Error al buscar la información del producto ${data.NombreItem}!`); });
         break;
       }
     }
@@ -233,25 +231,25 @@ export class InventarioProductosPBDDComponent implements OnInit {
           Prod_Hora: datos[i].prod_Hora,
         }
         this.productosService.srvActualizar(datos[i].prod_Id, datosProducto).subscribe(datos_actualizados => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Actualización Exitosa',
-            showCloseButton: true,
-            html: `<b>¡Se actualizó la información del producto ${data.NombreItem}!</b>`,
-          });
+          this.mostrarConfirmacion(`Confirmación`,`¡Se actualizó la información del producto ${data.NombreItem}!`);
           this.InventarioExistenciaBDNueva();
-        }, error => { this.mensajeError(`¡Error al actualizar la información del producto ${data.NombreItem}!`); });
+        }, error => { this.mostrarError(`Error`, `¡Error al actualizar la información del producto ${data.NombreItem}!`); });
       }
-    }, error => { this.mensajeError(`¡Error al buscar la información del producto ${data.NombreItem}!`); });
+    }, error => { this.mostrarError(`Error`, `¡Error al buscar la información del producto ${data.NombreItem}!`); });
   }
 
-  // Funcion que va a devolver un mensaje de error
-  mensajeError(mensaje : string){
-    Swal.fire({ icon: 'error', title: 'Opps...', text: mensaje, showCloseButton: true });
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
   }
 
-  // Funcion que va a devolver un mensaje de advertencia
-  mensajeAdvertencia(mensaje : string) {
-    Swal.fire({ icon: 'warning', title: 'Advertencia', text: mensaje, showCloseButton: true, });
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
   }
 }

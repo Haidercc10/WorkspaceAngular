@@ -1,5 +1,6 @@
 <app-menuLateral></app-menuLateral>
 
+<p-toast position="center"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -25,7 +26,7 @@
 
   <!-- Fomulario Imicial -->
   <form [formGroup]="formFacturacionOrden">
-    <div class="mb-3">
+    <div class="mb-4">
       <div class="row g-4">
 
         <!-- Orden Maquila -->
@@ -218,3 +219,23 @@
     </div>
   </div>
 </div>
+
+<p-toast position="center" key="pdf" (onClose)="limpiarTodo()" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message" let-matPrima>
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="buscarFacturacion(documento)" icon="pi pi-file-pdf" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="limpiarTodo()" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

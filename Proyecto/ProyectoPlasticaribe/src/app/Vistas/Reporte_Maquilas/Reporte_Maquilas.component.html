@@ -1,5 +1,5 @@
 <app-menuLateral></app-menuLateral>
-
+<p-toast position="center"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -10,7 +10,7 @@
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Movimientos Maquilas</h2>
+      <h2 class="tituloRojo">Movimientos de Maquilas</h2>
     </div>
     <div class="mb-4">
       <hr class="colorLinea">
@@ -40,11 +40,11 @@
         <!-- Terceros -->
         <div class="col-md-2">
           <span class="p-float-label">
-            <input formControlName="tercero" id="terceros" list="tercero" class="form-control form-control-sm" type="text" (keyup)="cargarTerceros()" (change)="seleccionarTerceros()" pInputText/>
+            <input formControlName="tercero" autocomplete="off" id="terceros" list="tercero" class="form-control form-control-sm" type="text" (keyup)="cargarTerceros()" (change)="seleccionarTerceros()" pInputText/>
             <datalist id="tercero">
               <option value={{item.tercero_Id}} *ngFor="let item of arrayTerceros">{{item.tercero_Nombre}}</option>
             </datalist>
-            <label for="terceros">Tercero.</label>
+            <label for="terceros">Tercero</label>
           </span>
         </div>
 
@@ -229,7 +229,7 @@
                     <td>{{registros.Usuario}}</td>
                     <td>{{registros.Fecha}}</td>
                     <td>{{registros.Estado}}</td>
-                    <td style="text-align: center;"><button style="width: 25px; height: 25px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-warning mr-2" pTooltip="PDF" (click)="validarTipoDocumento(registros)"></button></td>
+                    <td style="text-align: center;"><button style="width: 25px; height: 25px;" pButton pRipple icon="pi pi-file-pdf" class="p-button-rounded p-button-danger mr-2" pTooltip="PDF" (click)="validarTipoDocumento(registros)"></button></td>
                   </tr>
                 </ng-template>
               </p-table>

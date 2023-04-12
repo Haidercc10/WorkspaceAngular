@@ -1,6 +1,7 @@
 <!-- Inicio  -->
 <app-menuLateral></app-menuLateral>
 
+<p-toast position="center"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="!load">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -18,9 +19,12 @@
     </div>
 
     <div class="formulario">
-      <div style="text-align: right;">
-        <label><b><i class="pi pi-dollar"></i> Total Stock Zeus ${{totalProductos | number : '1.2-2'}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
+      <div class="mb-3">
+        <div class="gap-2 d-grid d-md-flex justify-content-md-end">
+          <p-chip label="Total Stock Zeus $ {{totalProductos | number : '1.2-2'}}"  class="mr-2"></p-chip>
+        </div>
       </div>
+
 
       <div class="mb-4">
         <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de Productos</h4>
@@ -147,7 +151,7 @@
                 </ng-template>
                 <td style="text-align: center;">{{ArrayProductoZeus.Precio | currency: 'COP $'}}</td>
                 <td style="text-align: center;">{{ArrayProductoZeus.Presentacion}}</td>
-                <td style="text-align: center;">{{ArrayProductoZeus.Precio_Total | currency: 'COP $'}}</td>
+                <td style="text-align: center;"><b>{{ArrayProductoZeus.Precio_Total | currency: 'COP $'}}</b></td>
                 <td style="text-align: center;" pEditableColumn (click)="seleccionarProducto(ArrayProductoZeus)">
                   <p-cellEditor>
                     <ng-template pTemplate="input">

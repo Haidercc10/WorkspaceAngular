@@ -9,7 +9,7 @@ import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
-import Swal from 'sweetalert2';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -43,7 +43,8 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
                 private clienteOtItems : BagproService,
                   @Inject(SESSION_STORAGE) private storage: WebStorageService,
                     private existencias_ProductosService : ExistenciasProductosService,
-                      private invMesProductoService : Inventario_Mes_ProductosService,) {
+                      private invMesProductoService : Inventario_Mes_ProductosService,
+                        private messageService: MessageService) {
 
     this.load = true;
   }
@@ -84,7 +85,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
   // Funcion que va a exportar la informacion de los productos a un archivo de tipo excel
   exportarExcel() : void {
-    if (this.ArrayProductoZeus.length == 0) Swal.fire("Para generar el archivo de Excel, debe haber productos en la tabla");
+    if (this.ArrayProductoZeus.length == 0) this.mostrarAdvertencia(`Advertencia`, "Para generar el archivo de Excel, debe haber productos en la tabla");
     else {
       this.load = false;
         const title = `Inventario de Productos Terminados ${this.today}`;
@@ -180,6 +181,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
             fs.saveAs(blob, `Inventario de Productos Terminados ${this.today}.xlsx`);
           });
           this.load = true;
+          this.mostrarConfirmacion(`Confirmación`,`Archivo excel generado con éxito!`)
         }, 500);
       }, 2000);
     }
@@ -396,7 +398,22 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
     this.load = false
     setTimeout(() => {
       this.load = true;
-      Swal.fire({icon: 'success', title: 'Confirmación', text: `¡Cantidad minima del producto ${nombre} actualizada con éxito!`, showConfirmButton: false, timer: 1500 });
+      this.mostrarConfirmacion(`Confirmación`, `¡Cantidad minima del producto ${nombre} actualizada con éxito!`);
     }, 5500);
+  }
+
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life : 2000});
+  }
+
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life : 5000});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000});
   }
 }

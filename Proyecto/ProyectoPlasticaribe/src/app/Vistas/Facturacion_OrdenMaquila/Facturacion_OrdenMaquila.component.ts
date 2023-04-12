@@ -16,6 +16,7 @@ import { OrdenMaquila_FacturacionService } from 'src/app/Servicios/OrdenMaquila_
 import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maquila.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import Swal from 'sweetalert2';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-Facturacion_OrdenMaquila',
@@ -36,6 +37,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
   pesoTotal : number = 0; //Variable que almacenará ea cantidad total del peso de las materias primas eleginas
   precioTotal : number = 0; //Variable que almacenará el precio total de las materias primas elegidas
   informacionPDF : any [] = []; //Variable que almcenará la informacion de la factura consultada para crear el pdf
+  documento : number = 0;
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private frmBuilder : FormBuilder,
@@ -46,7 +48,8 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
                           private materiaPrimaSerive : MateriaPrimaService,
                             private tintaService : TintasService,
                               private boppService : EntradaBOPPService,
-                                private ordenMaquilaService : Orden_MaquilaService,) {
+                                private ordenMaquilaService : Orden_MaquilaService,
+                                  private messageService: MessageService ) {
 
     this.formFacturacionOrden = this.frmBuilder.group({
       OrdenMaquila : ['', Validators.required],
@@ -84,6 +87,8 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
     this.materiaPrimasSeleccionadas = [];
     this.pesoTotal  = 0;
     this.precioTotal = 0;
+    this.documento = 0;
+    this.onReject();
   }
 
   // Funcion que va a consultar la orden de maquila
@@ -134,9 +139,9 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
             this.materiasPrimas.sort((a,b) => Number(a.Id) - Number(b.Id) );
             this.materiasPrimas.sort((a,b) => Number(a.Exits) - Number(b.Exits) );
           }
-        }, error => { this.mensajeError(`¡Ocurrió un error al consultar la Orden de Maquila #${id}, verifique que esta existe e intentelo de nuevo!`); });
+        }, error => { this.mostrarError(`Error`, `¡Ocurrió un error al consultar la orden de Maquila #${id}, verifique que esta existe e intentelo de nuevo!`); });
       }
-    }, error => { this.mensajeError(`¡Ocurrió un error al consultar la Orden de Maquila #${id}, verifique que esta existe e intentelo de nuevo!`); });
+    }, error => { this.mostrarError(`Error`, `¡Ocurrió un error al consultar la orden de Maquila #${id}, verifique que esta existe e intentelo de nuevo!`); });
     setTimeout(() => { this.cargando = false; }, 2000);
   }
 
@@ -207,9 +212,9 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
     if (this.formFacturacionOrden.valid) {
       if ((factura != null && remision == null) || (factura == null && remision != null)){
         if (this.materiaPrimasSeleccionadas.length > 0) this.crearFacturacionMaquila();
-        else this.mensajeAdvertencia(`¡Debe cargar minimo una materia prima a entregar!`);
-      } else this.mensajeAdvertencia(`¡Debe llenar el campo "Nro. Factura" o el campo "Nro. Remisión" para crear la facturación!`);
-    } else this.mensajeAdvertencia(`¡Hay campos vacios!`);
+        else this.mostrarAdvertencia(`Advertencia`, `¡Debe cargar minimo una materia prima a entregar!`);
+      } else this.mostrarAdvertencia(`Advertencia`, `¡Debe llenar el campo "Nro. Factura" o el campo "Nro. Remisión" para crear la facturación!`);
+    } else this.mostrarAdvertencia(`Advertencia`, `¡Hay campos vacios!`);
   }
 
   // Funcion que va a crear el registro de facturación de orden de maquila
@@ -228,7 +233,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
       FacOM_Codigo : Codigo.toUpperCase(),
       Tercero_Id: this.formFacturacionOrden.value.Tercero_Id,
       FacOM_ValorTotal : this.precioTotal,
-      FacOM_Observacion : (this.formFacturacionOrden.value.Observacion).toUpperCase(),
+      FacOM_Observacion :  this.formFacturacionOrden.value.Observacion != null ? (this.formFacturacionOrden.value.Observacion).toUpperCase() : '',
       Estado_Id: 12,
       Usua_Id: this.storage_Id,
       FacOM_Fecha : moment().format('YYYY-MM-DD'),
@@ -238,7 +243,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
       this.crearDtFacturacionMaquila(datos.facOM_Id);
       this.crearRelacionFacturacionMaquila(datos.facOM_Id);
       this.cambiarEstadoOrden(datos.facOM_Id);
-    }, error => { this.mensajeError(`¡No se pudo guardar la facturación!`); });
+    }, error => { this.mostrarError(`Error`, `¡No se pudo guardar la facturación!`); });
   }
 
   // Funcion que va a guardar en la base de datos los detalles de la Facturación
@@ -253,7 +258,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
         UndMed_Id : this.materiaPrimasSeleccionadas[i].Presentacion,
         DtFacOM_ValorUnitario : this.materiaPrimasSeleccionadas[i].Precio,
       }
-      this.dtFacturacion_OMService.insert(info).subscribe(datos => { }, error => { this.mensajeError(`¡Ocurrió un error al guardar los detalles de las materias primas de la facturación!`); });
+      this.dtFacturacion_OMService.insert(info).subscribe(datos => { }, error => { this.mostrarError(`Error`, `¡Ocurrió un error al guardar los detalles de las materias primas de la facturación!`); });
     }
   }
 
@@ -268,7 +273,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
       this.restarMateriaPrima();
       this.restarTinta();
       this.restarBopp();
-    }, error => { this.mensajeError(`¡No se pudo crear la relación entre la Orden Maquila y la Facturación!`); });
+    }, error => { this.mostrarError(`Error`, `¡No se pudo crear la relación entre la Orden Maquila y la Facturación!`); });
   }
 
   // Funcion que va a restar del inventario de materia prima
@@ -383,7 +388,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
               OM_Fecha : datos_orden[i].fecha,
               OM_Hora : datos_orden[i].hora,
             }
-            this.ordenMaquilaService.put(om, info).subscribe(datos_ordenMaquila => { }, error => { this.mensajeError(`¡Ocurrió un error al cambiar el estado de la Orden de Maquila!`); });
+            this.ordenMaquilaService.put(om, info).subscribe(datos_ordenMaquila => { }, error => { this.mostrarError(`Error`, `¡Ocurrió un error al cambiar el estado de la Orden de Maquila!`); });
             break;
           }
 
@@ -401,7 +406,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
             FacOM_Codigo : Codigo.toUpperCase(),
             Tercero_Id: this.formFacturacionOrden.value.Tercero_Id,
             FacOM_ValorTotal : this.precioTotal,
-            FacOM_Observacion : (this.formFacturacionOrden.value.Observacion).toUpperCase(),
+            FacOM_Observacion : this.formFacturacionOrden.value.Observacion != null ? (this.formFacturacionOrden.value.Observacion).toUpperCase() : '',
             Estado_Id: estado == 11 ? 12 : 13,
             Usua_Id: this.storage_Id,
             FacOM_Fecha : moment().format('YYYY-MM-DD'),
@@ -412,13 +417,15 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
       }, 3000);
     }, err => {
       error = true;
-      this.mensajeError(`¡Ocurrió un error al cambiar el estado de la orden de maquila!`);
+      this.mostrarError(`Error`, `¡Ocurrió un error al cambiar el estado de la orden de maquila!`);
     });
-    setTimeout(() => { this.mensajeExitoso(factura, `Registro Exitoso`,`¡Se realizó la facuturación de la Orden de Maquila #${om}!`); }, 5000);
+    setTimeout(() => { this.cargando = false; this.mostrarEleccion(factura, `Advertencia`, `¡Se realizó la facturación de la orden de maquila #${om}!, ¿desea ver el detalle en pdf?`); }, 5000);
   }
 
   // Funcion que va a consultar la información de la factura o remisión que se acaba de crear
   buscarFacturacion(id : number){
+    this.onReject();
+    this.cargando = true;
     this.informacionPDF = [];
     this.dtFacturacion_OMService.GetConsultarFacturacion(id).subscribe(datos_facturacion => {
       for (let i = 0; i < datos_facturacion.length; i++) {
@@ -625,7 +632,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
         pdf.open();
-        this.cargando = false;
+        this.limpiarTodo();
         break;
       }
     });
@@ -662,25 +669,6 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
     };
   }
 
-  // Funcion que va a mostrar un mensaje de que le proceso realizado (facturar) fue exitoso
-  mensajeExitoso(id : number, titulo : string, mensaje : string){
-    Swal.fire({
-      icon: 'success',
-      title: `${titulo}`,
-      html: `<b>${mensaje}</b><hr>`,
-      showCloseButton: true,
-      showConfirmButton: true,
-      showCancelButton : true,
-      confirmButtonColor : '#d44',
-      cancelButtonText : `Cerrar`,
-      confirmButtonText : 'Ver PDF <i class="pi pi-file-pdf"></i>',
-    }).then((result) => {
-      if (result.isConfirmed) this.buscarFacturacion(id);
-    });
-    setTimeout(() => { this.limpiarTodo(); }, 1500);
-    this.limpiarTodo();
-  }
-
   // Funcion que mostrará un mensaje de advertencia
   mensajeAdvertencia(mensaje : string) {
     Swal.fire({ icon: 'warning', title: '¡Advertencia!', text: mensaje });
@@ -691,5 +679,32 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
   mensajeError(mensaje : string) {
     Swal.fire({ icon: 'error', title: '¡Opps...!', text: mensaje });
     this.cargando = false;
+  }
+
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
+  }
+
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
+   this.cargando = false;
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
+   this.cargando = false;
+  }
+
+  mostrarEleccion(item: any,  mensaje?: any, titulo?: any){
+    this.documento = item;
+    this.messageService.add({severity:'success', key: 'pdf', summary: mensaje, detail: titulo, sticky: true});
+  }
+
+  /** Función para quitar mensaje de elección */
+  onReject(){
+    this.messageService.clear('pdf');
   }
 }

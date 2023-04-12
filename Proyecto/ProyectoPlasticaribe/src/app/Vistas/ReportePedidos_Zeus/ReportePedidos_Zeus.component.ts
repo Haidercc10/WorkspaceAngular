@@ -16,6 +16,7 @@ import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import Swal from 'sweetalert2';
 import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -49,13 +50,15 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   consecutivoPedido : any = '';
   sumaCostoPendiente : number = 0;
   sumaCostoTotal : number = 0;
+  itemSeleccionado : any;
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private inventarioZeusService : InventarioZeusService,
                   private FormBuild : FormBuilder,
                     private estadosProcesos_OTService : EstadosProcesos_OTService,
                       private pedidoProductosService : PedidoProductosService,
-                        private pedidoExternoService : OpedidoproductoService,) {
+                        private pedidoExternoService : OpedidoproductoService,
+                          private messageService: MessageService) {
 
     this.formFiltros = this.FormBuild.group({
       IdVendedor : [null],
@@ -460,8 +463,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
               this.modalEstadosProcesos_OT.llenarArray(datos_orden[i]);
             }
           }, 500);
-        } else this.mensajeAdvertencia(`¡No hay orden asociada al pedido ${data.consecutivo}!`);
-      }, error => { this.mensajeError(`¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`); });
+        } else this.mostrarAdvertencia(`Advertencia`, `¡No hay orden asociada al pedido ${data.consecutivo}!`);
+      }, error => { this.mostrarError(`Error`, `¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`); });
     }
   }
 
@@ -506,12 +509,12 @@ export class ReportePedidos_ZeusComponent implements OnInit {
               EstProcOT_Pedido : null,
             }
             this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
-              Swal.fire({icon: 'success', title: 'Cambio Exitoso', text: `¡Se eliminó la relación del pedido ${data.consecutivo} con la OT ${datos_ot[i].estProcOT_OrdenTrabajo}!`, showCloseButton: true})
+              this.mostrarConfirmacion(`Confirmación`, `¡Se eliminó la relación del pedido ${data.consecutivo} con la OT ${datos_ot[i].estProcOT_OrdenTrabajo}!`);
             });
           }
         }
       }
-    }, error => { this.mensajeError(`¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`); });
+    }, error => { this.mostrarError(`Error`, `¡No se obtuvo información de las ordenes de trabajo asociadas al pedido ${data.consecutivo}!`); });
 
     this.estadosProcesos_OTService.srvObtenerListaPorOT(data.OT).subscribe(datos_ot => {
       for (let i = 0; i < datos_ot.length; i++) {
@@ -552,29 +555,29 @@ export class ReportePedidos_ZeusComponent implements OnInit {
               EstProcOT_Pedido : data.consecutivo,
             }
             this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
-              Swal.fire({icon: 'success', title: 'Cambio Exitoso', text: `¡Se cambió la orden de trabajo asociada al pedido ${data.consecutivo}!`, showCloseButton: true})
+              this.mostrarConfirmacion(`Confirmación`, `¡Se cambió la orden de trabajo asociada al pedido ${data.consecutivo}!`);
             });
-          } else this.mensajeAdvertencia(`¡El Producto de la OT ${datos_ot[i].estProcOT_OrdenTrabajo} no coincide con el del pedido ${data.consecutivo}!`);
-        } else this.mensajeAdvertencia(`¡La OT ${datos_ot[i].estProcOT_OrdenTrabajo} ya tiene un pedido asignado!`);
+          } else this.mostrarAdvertencia(`Advertencia`, `¡El producto de la OT ${datos_ot[i].estProcOT_OrdenTrabajo} no coincide con el del pedido ${data.consecutivo}!`);
+        } else this.mostrarAdvertencia(`Advertencia`, `¡La OT ${datos_ot[i].estProcOT_OrdenTrabajo} ya tiene un pedido asignado!`);
       }
     });
     setTimeout(() => { this.consultarPedidos(); }, 1000);
   }
 
   // Funcion que mostrará un mensaje de confirmación para aceptar un pedido o no
-  confirmarActualizacion(item : any){
-    Swal.fire({
-      icon: 'warning',
-      title: 'Advertencia',
-      text: 'Está seguro que desea aceptar el pedido?',
-      showCancelButton: true,
-      confirmButtonText: 'Confirmar',
-      confirmButtonColor: '#53CC48',
-    }).then((result) => { if (result.isConfirmed) this.aceptarPedido(item); });
+  mostrarEleccion(item : any, eleccion : any){
+    let mensaje : string = "";
+    this.itemSeleccionado = item;
+    console.log(this.itemSeleccionado);
+    if (eleccion == 'aceptar') { this.onReject('cancelar'); mensaje = `Está seguro que desea aceptar el pedido N° ${item}?`; }
+    if(eleccion == 'cancelar') { this.onReject('aceptar'); mensaje = `Está seguro que desea cancelar el pedido N° ${item}?`; }
+
+    this.messageService.add({severity:'warn', key: eleccion, summary: 'Elección', detail: mensaje, sticky: true});
   }
 
   /** Aceptar Pedido para luego crearlo en Zeus */
   aceptarPedido(item : any){
+    this.onReject('aceptar');
     this.pedidoExternoService.srvObtenerListaPorId(item).subscribe(dataPedidos => {
       const info : modelOpedido = {
         PedExt_Id : dataPedidos.pedExt_Id,
@@ -594,12 +597,12 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         Creador_Id : dataPedidos.creador_Id,
       }
       this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
-        this.Confirmacion(`Pedido Nro. ${item} aceptado con exito!`);
+        this.mostrarConfirmacion(`Confirmación`, `Pedido Nro. ${item} aceptado con exito!`);
         setTimeout(() => {
           this.consultarPedidosZeus();
           this.consultarPedidos();
         }, 100);
-      }, error => { this.mensajeError(`No fue posible aceptar el pedido ${item}, por favor, verifique!`); });
+      }, error => { this.mostrarError(`Error`, `No fue posible aceptar el pedido ${item}, por favor, verifique!`); });
     });
   }
 
@@ -617,6 +620,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   /** Aceptar Pedido para luego crearlo en Zeus */
   cancelarPedido(item : any){
+    this.onReject('cancelar');
     this.pedidoExternoService.srvObtenerListaPorId(item).subscribe(dataPedidos => {
       const info : any = {
         PedExt_Id : dataPedidos.pedExt_Id,
@@ -636,18 +640,18 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         Creador_Id : dataPedidos.creador_Id,
       }
       this.pedidoExternoService.srvActualizarPedidosProductos(item, info).subscribe(data_Pedido => {
-        this.Confirmacion(`Pedido Nro. ${item} cancelado con exito!`);
+        this.mostrarConfirmacion(`Confirmación`, `Pedido Nro. ${item} cancelado con exito!`);
         setTimeout(() => {
           this.consultarPedidosZeus();
           this.consultarPedidos();
         }, 100);
-      }, error => { this.mensajeError(`No fue posible cancelar el pedido ${item}, por favor, verifique!`); });
+      }, error => { this.mostrarError(`Error`, `No fue posible cancelar el pedido ${item}, por favor, verifique!`); });
     });
   }
 
   // Funcion que creará un archivo de excel con base de lo que esté en la tabla
   exportarExcel(){
-    if (this.ArrayDocumento.length == 0) this.mensajeAdvertencia('Debe haber al menos un pedido en la tabla.');
+    if (this.ArrayDocumento.length == 0) this.mostrarAdvertencia(`Advertencia`, 'Debe haber al menos un pedido en la tabla.');
     else {
       let datos : any =[];
       setTimeout(() => {
@@ -767,7 +771,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           this.cargando = false;
         }, 1000);
       }, 1500);
-      setTimeout(() => {  this.Confirmacion('¡Archivo de Excel generado exitosamente!'); }, 3100);
+      setTimeout(() => {  this.mostrarConfirmacion(`Confirmación`, '¡Archivo de excel generado exitosamente!'); }, 3100);
     }
   }
 
@@ -920,7 +924,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         const pdf = pdfMake.createPdf(infoPdf);
         pdf.open();
         this.cargando = false;
-        this.Confirmacion(`¡PDF generado con éxito!`);
+        this.mostrarConfirmacion(`Confirmación`, `¡PDF generado con éxito!`);
         break;
       }
     });
@@ -1067,7 +1071,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
         pdf.open();
-        this.Confirmacion(`¡PDF generado con éxito!`);
+        this.mostrarConfirmacion(`Confirmación`, `¡PDF generado con éxito!`);
         break;
       }
     });
@@ -1123,18 +1127,24 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     };
   }
 
-  // Funcion que mostrará un mensaje de error
-  mensajeError(mensaje : string) {
-    Swal.fire({ icon: 'error', title: 'Confirmación', html: mensaje, confirmButtonColor: '#db4149', confirmButtonText: 'Aceptar', });
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
   }
 
-  // Funcion que mostrará un mensaje de advertencia
-  mensajeAdvertencia(mensaje : string) {
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html: mensaje, confirmButtonColor: '#ffc107', confirmButtonText: 'Aceptar', });
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000});
   }
 
-  // Funcion que mostrará un mensaje de confirmación
-  Confirmacion(mensaje : string) {
-    Swal.fire({ icon: 'success', title: 'Confirmación', html: mensaje, confirmButtonColor: '#53CC48', confirmButtonText: 'Aceptar', });
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000});
+  }
+
+  /** Cerrar Dialogo de eliminación de OT/rollos.*/
+  onReject(dato : any) {
+    console.log(`1: ${dato}`);
+    this.messageService.clear(dato);
   }
 }

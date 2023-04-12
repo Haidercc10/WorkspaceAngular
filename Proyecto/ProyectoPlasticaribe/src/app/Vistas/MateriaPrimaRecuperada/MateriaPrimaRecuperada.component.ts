@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { MessageService } from 'primeng/api';
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { RecuperadoMPService } from 'src/app/Servicios/DetallesRecuperado/recuperadoMP.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
@@ -43,6 +44,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   ArrayMateriaPrima : any [] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
   AccionBoton = "Agregar"; //Variable que almanará informacio para saber si una materia prima está en edicion o no (Se editará una materia prima cargada en la tabla, no una en la base de datos)
   turnos : any [] = []; //Variable que almacenará los diferentes turnos que se trabajan en la empresa
+  mpSeleccionada : any = [];
 
   modalMode : boolean = false;
   constructor(private materiaPrimaService : MateriaPrimaService,
@@ -53,7 +55,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
                         @Inject(SESSION_STORAGE) private storage: WebStorageService,
                           private recuperadoService : RecuperadoService,
                             private recuperadoMPService : RecuperadoMPService,
-                              private turnosService : TurnosService,) {
+                              private turnosService : TurnosService,
+                                private messageService: MessageService) {
 
     this.FormMateriaPrimaRecuperada = this.frmBuilderMateriaPrima.group({
       ConsecutivoFactura : ['', Validators.required],
@@ -160,12 +163,12 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     let usuarioSelccionado : string = this.FormMateriaPrimaRecuperada.value.usuarioNombre;
     this.usuarioService.srvObtenerListaPorId(usuarioSelccionado).subscribe(datos_usuario => {
       this.FormMateriaPrimaRecuperada.patchValue({ usuarioId: datos_usuario.usua_Id, });
-    }, error => { this.mensajeError(`¡No se pudo obtener información del operario con el Id ${usuarioSelccionado}!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información del operario con el Id ${usuarioSelccionado}!`); });
   }
 
   //Funcion que registrará y guardará en la base de datos la infomacion de la materia prima entrante
   registrarRecuperado(){
-    if (this.ArrayMateriaPrima.length == 0) this.mensajeAdvertencia("Debe cargar minimo una materia prima en la tabla")
+    if (this.ArrayMateriaPrima.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe cargar minimo una materia prima en la tabla")
     else {
       let idUsuario: number = this.FormMateriaPrimaRecuperada.value.usuarioId;
       let observacion : string = this.FormMateriaPrimaRecuperada.value.MpObservacion;
@@ -186,7 +189,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
 
       this.recuperadoService.srvGuardar(datosRecuperado).subscribe(datos_RecuperadoCreada => {
         this.obtenerUltimoIdRecuperado();
-      }, error => { this.mensajeError(`¡Error al ingresar el Peletizado!`, error.message); });
+      }, error => { this.mostrarError(`Error`, `¡Error al ingresar el peletizado!`); });
     }
   }
 
@@ -213,17 +216,17 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
             TpRecu_Id : tipoRecuperado,
           }
           this.recuperadoMPService.srvGuardar(datosRecuperadoMp).subscribe(datos_recuperadoMpCreada => {
-          }, error => { this.mensajeError(`¡Error al registrar la materia prima recuperada!`, error.message); });
+          }, error => { this.mostrarError(`Error`, `¡Error al registrar la materia prima recuperada!`); });
           this.moverInventarioMpAgregada();
         }
       }
-    }, error => { this.mensajeError(`¡¡Error al consultar el ultimo Id de Recuperado!!`, error.message); });
+    }, error => { this.mostrarError(`Error`, `¡Error al consultar el último Id de recuperado!`); });
   }
 
   //Funcion que va a validar la informacion que se ingresa a la tabla
   validarCamposVaciosMP(){
     if (this.FormMateriaPrima.valid) this.cargarFormMpEnTablas();
-    else this.mensajeAdvertencia("Hay campos de la Materi Prima vacios");
+    else this.mostrarAdvertencia(`Advertencia`, "Hay campos vacios en el formulario de materia prima ");
   }
 
   //Funcion que envia la informacion de los productos a la tabla.
@@ -239,12 +242,17 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
       Cant : cantidad,
       UndCant : presentacion,
     }
-    this.ArrayMateriaPrima.push(productoExt);
-    this.FormMateriaPrima.reset();
+    if(productoExt.Cant > 0) {
+      this.ArrayMateriaPrima.push(productoExt);
+      this.FormMateriaPrima.reset();
+    } else {
+      this.mostrarAdvertencia(`Advertencia`, `La cantidad de mat. prima recuperada debe ser mayor a 0!`)
+    }
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima entrante
   moverInventarioMpAgregada(){
+    let error : boolean = false;
     for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
       this.materiaPrimaService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Id).subscribe(datos_materiaPrima => {
         const datosMP : any = {
@@ -258,16 +266,14 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
           TpBod_Id : datos_materiaPrima.tpBod_Id,
         }
         this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].Id, datosMP).subscribe(datos_mp_creada => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Registro Exitos',
-            html: `<b>¡Registro De Materia Prima Recuperada Creado Con Exito!</b>`,
-            showCloseButton: true,
-          });
+          error = false;
           this.limpiarTodosCampos();
-        }, error => { this.mensajeError(`¡Error al mover el inventario de la materia prima recuperada!`, error.message); });
-      }, error => { this.mensajeError(`¡No se pudo obtener la información de la materia prima ${this.ArrayMateriaPrima[index].Id}!`, error.message); });
+        });
+      }, error => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la materia prima ${this.ArrayMateriaPrima[index].Id}!`);
+        error = true;
+      });
     }
+    if(!error) this.mostrarConfirmacion(`Confirmación`, `¡Registro de materia prima recuperada creado con éxito!`);
   }
 
   // Funcion que limpiará todos los campos
@@ -279,55 +285,61 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
 
   // Función para quitar un producto de la tabla
   QuitarProductoTabla(formulario : any) {
-    Swal.fire({
-      title: '¿Estás seguro de eliminar la Materia Prima?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Eliminar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
-          if (this.ArrayMateriaPrima[i].Id == formulario.Id) this.ArrayMateriaPrima.splice(i, 1);
-        }
-      }
-    });
+    formulario = this.mpSeleccionada;
+    this.onReject();
+    for (let i = 0; i < this.ArrayMateriaPrima.length; i++) {
+      if (this.ArrayMateriaPrima[i].Id == formulario.Id) this.ArrayMateriaPrima.splice(i, 1);
+      this.mostrarConfirmacion(`Confirmación`,`Se ha quitado la mat. prima ${formulario.Nombre} de la tabla`);
+    }
   }
 
   //Funcion que consultara una materia prima con base a un ID pasado en la vista
   buscarMpId(){
     let idMateriaPrima : number = this.FormMateriaPrima.value.MpId;
-    this.materiaPrimaService.srvObtenerListaPorId(idMateriaPrima).subscribe(datos_materiaPrima => {
-      this.FormMateriaPrima.setValue({
-        MpId : datos_materiaPrima.matPri_Id,
-        MpNombre: datos_materiaPrima.matPri_Nombre,
-        MpCantidad: '',
-        MpUnidadMedida : datos_materiaPrima.undMed_Id,
-      });
-    }, error => { this.mensajeError(`¡No se encontró el Id de materia prima bucado!`, error.message); });
+    let nuevo : any[] = this.materiasPrimas.filter((item) => item.id == idMateriaPrima);
+    this.FormMateriaPrima.setValue({
+      MpId : nuevo[0].id,
+      MpNombre: nuevo[0].name,
+      MpCantidad: 0,
+      MpUnidadMedida : 'Kg',
+    });
   }
 
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
   buscarMpSeleccionada(){
     let nombreMateriaPrima : string = this.FormMateriaPrima.value.MpNombre;
-    this.materiaPrimaService.srvObtenerListaPorId(nombreMateriaPrima).subscribe(datos_materiasPrimas => {
+    let nuevo : any[] = this.materiasPrimas.filter((item) => item.id == nombreMateriaPrima)
       this.FormMateriaPrima.setValue({
-        MpId : datos_materiasPrimas.matPri_Id,
-        MpNombre: datos_materiasPrimas.matPri_Nombre,
-        MpCantidad: '',
-        MpUnidadMedida : datos_materiasPrimas.undMed_Id,
+        MpId : nuevo[0].id,
+        MpNombre: nuevo[0].name,
+        MpCantidad: 0,
+        MpUnidadMedida : 'Kg',
       });
-    }, error => { this.mensajeError(`¡No se pudo obtener la información de la materia prima buscada!`, error.message); });
   }
 
-  // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
+  /** Mostrar mensaje de confirmación  */
+  mostrarConfirmacion(mensaje : any, titulo?: any) {
+   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
   }
 
-  // Mensaje de Error
-  mensajeError(text : string, error : any = ''){
-    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
+  /** Mostrar mensaje de error  */
+  mostrarError(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
+  }
+
+  /** Mostrar mensaje de advertencia */
+  mostrarAdvertencia(mensaje : any, titulo?: any) {
+   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
+  }
+
+  /** Mostrar mensaje de elección */
+  mostrarEleccion(item : any){
+    this.mpSeleccionada = item;
+    this.messageService.add({severity:'warn', key: 'recuperado', summary:'Elección', detail: `Está seguro que desea quitar ${item.Nombre} de la tabla?`, sticky: true});
+  }
+
+  /** Función para quitar mensaje de elección */
+  onReject(){
+    this.messageService.clear('recuperado');
   }
 }
