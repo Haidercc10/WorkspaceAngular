@@ -43,9 +43,8 @@ export class CrearBoppComponent implements OnInit {
   obtenerCategorias(){
     this.categoriasService.srvObtenerLista().subscribe(datos_categorias => {
       for (let i = 0; i < datos_categorias.length; i++) {
-        if (datos_categorias[i].catMP_Id == 6
-            || datos_categorias[i].catMP_Id == 14
-            || datos_categorias[i].catMP_Id == 15) this.categorias.push(datos_categorias[i]);
+        let cat : number [] = [6,14,15];
+        if (cat.includes(datos_categorias[i].catMP_Id)) this.categorias.push(datos_categorias[i]);
       }
     });
   }

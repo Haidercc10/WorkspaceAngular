@@ -7,7 +7,6 @@ import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { DtIngRollos_ExtrusionService } from 'src/app/Servicios/DetallesIngresoRollosExtrusion/DtIngRollos_Extrusion.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-Inventario_Extrusion',

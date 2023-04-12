@@ -9,7 +9,6 @@ import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/DetallesCr
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-asignacion-Tintas',
@@ -84,13 +83,8 @@ export class AsignacionTintasComponent implements OnInit {
 
   // Funcion limpiará todos los campos de vista
   limpiarTodosLosCampos(){
-    this.FormAsignacionMP.patchValue({
-      Tinta : null,
-      cantidadTinta : null,
-      undMedTinta : null,
-      Observacion : null,
-      Fecha : this.today,
-    });
+    this.FormAsignacionMP.reset();
+    this.FormAsignacionMP.patchValue({ Fecha : this.today, });
     this.FormMateriaPrima.reset();
     this.ArrayMateriaPrima = [];
   }
@@ -104,8 +98,11 @@ export class AsignacionTintasComponent implements OnInit {
   obtenerTintas(){
     this.tintasService.srvObtenerListaXColores().subscribe(datos_tintas => {
       for (let i = 0; i < datos_tintas.length; i++) {
-        let tinta : any = { id : datos_tintas[i].tinta_Id, name : datos_tintas[i].tinta_Nombre, und : datos_tintas[i].undMed_Id}
-        this.tintas.push(tinta);
+        let mp : number [] = [84, 2001, 88, 89, 2072];
+        if (!mp.includes(datos_tintas[i].tinta_Id)) {
+          let tinta : any = { id : datos_tintas[i].tinta_Id, name : datos_tintas[i].tinta_Nombre, und : datos_tintas[i].undMed_Id}
+          this.tintas.push(tinta);
+        }
       }
     });
   }
@@ -114,18 +111,22 @@ export class AsignacionTintasComponent implements OnInit {
   buscarTintaSeleccionada(){
     let tinta : any = this.FormAsignacionMP.value.Tinta;
     let nuevo : any[] = this.tintas.filter((item) => item.id == tinta);
+    let mp : number [] = [84, 2001, 88, 89, 2072];
+    if (!mp.includes(nuevo[0].id)) {
       this.FormAsignacionMP .patchValue({
         Id_Tinta: nuevo[0].id,
         Tinta : nuevo[0].name,
         undMedTinta : nuevo[0].und,
       });
+    }
   }
 
   // Función que buscará las materias primas que se utilizan para crear tintas
   obtenerMateriaPrima(){
     this.asignacionMPxTintas.srvObtenerListaMatPrimas().subscribe(data_materiasPrimas => {
       for (let i = 0; i < data_materiasPrimas.length; i++) {
-        if (data_materiasPrimas[i].matPrima != 84 && data_materiasPrimas[i].matPrima != 2001 && data_materiasPrimas[i].matPrima != 88 && data_materiasPrimas[i].matPrima != 89 && data_materiasPrimas[i].matPrima != 2072) {
+        let mp : number [] = [84, 2001, 88, 89, 2072];
+        if (!mp.includes(data_materiasPrimas[i].matPrima)) {
           let mp : any = {
             id : data_materiasPrimas[i].matPrima,
             name : data_materiasPrimas[i].nombreMP,
@@ -150,13 +151,16 @@ export class AsignacionTintasComponent implements OnInit {
     let materiaPrima : string = this.FormMateriaPrima.value.nombreMateriaPrima;
     this.asignacionMPxTintas.srvObtenerListaMatPrimasPorId(materiaPrima).subscribe(datos_materiasPrimas => {
       for (let index = 0; index < datos_materiasPrimas.length; index++) {
-        this.FormMateriaPrima.setValue({
-          idMateriaPrima : datos_materiasPrimas[index].matPrima,
-          nombreMateriaPrima : datos_materiasPrimas[index].nombreMP,
-          stockMateriaPrima : datos_materiasPrimas[index].stock,
-          cantidadMateriaPrima : '',
-          undMedMateriaPrima : datos_materiasPrimas[index].unidad,
-        });
+        let mp : number [] = [84, 2001, 88, 89, 2072];
+        if (!mp.includes(datos_materiasPrimas[index].matPrima)) {
+          this.FormMateriaPrima.setValue({
+            idMateriaPrima : datos_materiasPrimas[index].matPrima,
+            nombreMateriaPrima : datos_materiasPrimas[index].nombreMP,
+            stockMateriaPrima : datos_materiasPrimas[index].stock,
+            cantidadMateriaPrima : '',
+            undMedMateriaPrima : datos_materiasPrimas[index].unidad,
+          });
+        }
       }
     }, error => { this.mostrarError(`Error`, `¡No se ha podido obtener información de la materia prima seleccionada!`); });
   }
@@ -198,11 +202,7 @@ export class AsignacionTintasComponent implements OnInit {
   // Funcion que validará la asignación
   validarAsignacion(){
     if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
-      this.tintasService.srvObtenerListaPorId(this.FormAsignacionMP.value.Id_Tinta).subscribe(datos_tinta => {
-
-        this.mostrarEleccion();
-        //this.asignarMPCrearTintas();
-      });
+      this.tintasService.srvObtenerListaPorId(this.FormAsignacionMP.value.Id_Tinta).subscribe(datos_tinta => { this.mostrarEleccion(); });
     } else this.mostrarAdvertencia(`Advertencia`, "Debe llenar los campos vacios!");
   }
 
@@ -232,7 +232,6 @@ export class AsignacionTintasComponent implements OnInit {
 
       this.asignacionMPxTintas.srvGuardar(datos_asignacionMP).subscribe(datos_asignacionMPxTintas => {
         this.obtenerUltimoIdAsignacion();
-        setTimeout(() => {  }, 3000);
       }, error => { this.mostrarAdvertencia(`¡Error al registrar la creación de tinta!`, error.message); });
     } else this.mostrarAdvertencia(`Advertencia`, "Debe llenar los campos vacios!");
   }
@@ -284,17 +283,15 @@ export class AsignacionTintasComponent implements OnInit {
 
   //Función que restará a las tintas de categoria diferente a TINTAS TIPO COLORES.
   moverInventarioTintas(){
-    let stockMateriaPrimaFinal : number;
-
+    let stock : number;
     for (let index = 0; index < this.ArrayMateriaPrima.length; index++) {
       this.tintasService.srvObtenerListaPorId(this.ArrayMateriaPrima[index].Tinta).subscribe(datos_tinta => {
-        if (this.ArrayMateriaPrima[index].Tinta == 2001) stockMateriaPrimaFinal = 0;
-        else stockMateriaPrimaFinal = datos_tinta.tinta_Stock - this.ArrayMateriaPrima[index].Cant
+        this.ArrayMateriaPrima[index].Tinta == 2001 ? stock = 0 : stock = datos_tinta.tinta_Stock - this.ArrayMateriaPrima[index].Cant;
         const datosTintaActualizada : any = {
           Tinta_Id : this.ArrayMateriaPrima[index].Tinta,
           Tinta_Nombre : datos_tinta.tinta_Nombre,
           Tinta_Descripcion : datos_tinta.tinta_Descripcion,
-          Tinta_Stock : stockMateriaPrimaFinal,
+          Tinta_Stock : stock,
           Tinta_CodigoHexadecimal : datos_tinta.tinta_CodigoHexadecimal,
           UndMed_Id : datos_tinta.undMed_Id,
           CatMP_Id : datos_tinta.catMP_Id,
@@ -354,19 +351,7 @@ export class AsignacionTintasComponent implements OnInit {
     this.componenteCrearTintas = true;
   }
 
-  // Mensaje de Advertencia
-  mensajeAdvertencia(mensaje : string, mensaje2 : string = ''){
-    Swal.fire({ icon: 'warning', title: 'Advertencia', html:`<b>${mensaje}</b><hr> ` + `<spam>${mensaje2}</spam>`, showCloseButton: true, });
-
-  }
-
-  // Mensaje de Error
-  mensajeError(text : string, error : any = ''){
-    Swal.fire({ icon: 'error', title: 'Oops...', html: `<b>${text}</b><hr> ` +  `<spam style="color : #f00;">${error}</spam> `, showCloseButton: true, });
-
-  }
-
-    /** Mostrar mensaje de confirmación  */
+  /** Mostrar mensaje de confirmación  */
   mostrarConfirmacion(mensaje : any, titulo?: any) {
    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
   }

@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { MessageService } from 'primeng/api';
 import { modelDtFacturacion_OrdenMaquila } from 'src/app/Modelo/modelDtFacturacion_OrdenMaquila';
 import { modelFacturacion_OrdenMaquila } from 'src/app/Modelo/modelFacturacion_OdenMaquila';
 import { modelOrdenMaquila_Facturacion } from 'src/app/Modelo/modelOrdenMaquila_Facturacion';
@@ -15,8 +15,7 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { OrdenMaquila_FacturacionService } from 'src/app/Servicios/OrdenMaquila_Facturacion/OrdenMaquila_Facturacion.service';
 import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maquila.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
-import Swal from 'sweetalert2';
-import { MessageService } from 'primeng/api';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-Facturacion_OrdenMaquila',
@@ -293,8 +292,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
             MatPri_Fecha : datos.matPri_Fecha,
             MatPri_Hora : datos.matPri_Hora,
           }
-          this.materiaPrimaSerive.srvActualizar(this.materiaPrimasSeleccionadas[i].Mp, info).subscribe(datosActualizados => {
-          });
+          this.materiaPrimaSerive.srvActualizar(this.materiaPrimasSeleccionadas[i].Mp, info).subscribe(datosActualizados => { });
         });
       }
     }
@@ -319,8 +317,7 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
             tinta_FechaIngreso : datos.tinta_FechaIngreso,
             tinta_Hora : datos.tinta_Hora,
           }
-          this.tintaService.srvActualizar(this.materiaPrimasSeleccionadas[i].Tinta, info).subscribe(datosactualizados => {
-          });
+          this.tintaService.srvActualizar(this.materiaPrimasSeleccionadas[i].Tinta, info).subscribe(datosactualizados => { });
         });
       }
     }
@@ -667,18 +664,6 @@ export class Facturacion_OrdenMaquilaComponent implements OnInit {
         }
       }
     };
-  }
-
-  // Funcion que mostrará un mensaje de advertencia
-  mensajeAdvertencia(mensaje : string) {
-    Swal.fire({ icon: 'warning', title: '¡Advertencia!', text: mensaje });
-    this.cargando = false;
-  }
-
-  // Funcion que mostará un mensaje de error
-  mensajeError(mensaje : string) {
-    Swal.fire({ icon: 'error', title: '¡Opps...!', text: mensaje });
-    this.cargando = false;
   }
 
   /** Mostrar mensaje de confirmación  */

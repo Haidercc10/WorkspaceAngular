@@ -49,20 +49,19 @@ export class EntradaBOPPComponent implements OnInit {
   boppSeleccionado : any = [];
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
-                private rolService : RolesService,
-                  private frmBuilder : FormBuilder,
-                    private unidadMedidaService : UnidadMedidaService,
-                      private entradaBOPPService : EntradaBOPPService,
-                        private categoriaService : CategoriaMateriaPrimaService,
-                          private servicioProveedores : ProveedorService,
-                            private servicioOC_MatPrimas : OrdenCompra_MateriaPrimaService,
-                              private servicioFacturasCompras : FactuaMpCompradaService,
-                                private servicioOC_Faccompra : OrdenFactura_RelacionService,
-                                  private servicioRemisiones : RemisionService,
-                                    private servicioOC_Remisiones : OrdenCompra_RemisionService,
-                                      private servicioDetalleFacco_MatPrima : FacturaMpService,
-                                        private servicioDetRemisiones : RemisionesMPService,
-                                          private messageService: MessageService) {
+                private frmBuilder : FormBuilder,
+                  private unidadMedidaService : UnidadMedidaService,
+                    private entradaBOPPService : EntradaBOPPService,
+                      private categoriaService : CategoriaMateriaPrimaService,
+                        private servicioProveedores : ProveedorService,
+                          private servicioOC_MatPrimas : OrdenCompra_MateriaPrimaService,
+                            private servicioFacturasCompras : FactuaMpCompradaService,
+                              private servicioOC_Faccompra : OrdenFactura_RelacionService,
+                                private servicioRemisiones : RemisionService,
+                                  private servicioOC_Remisiones : OrdenCompra_RemisionService,
+                                    private servicioDetalleFacco_MatPrima : FacturaMpService,
+                                      private servicioDetRemisiones : RemisionesMPService,
+                                        private messageService: MessageService) {
 
     this.FormEntradaBOPP = this.frmBuilder.group({
       Id : [''],
@@ -121,7 +120,8 @@ export class EntradaBOPPComponent implements OnInit {
     this.categorias = [],
     this.categoriaService.srvObtenerLista().subscribe(datos_categorias => {
       for (let i = 0; i < datos_categorias.length; i++) {
-        if (datos_categorias[i].catMP_Id == 6 || datos_categorias[i].catMP_Id == 14 || datos_categorias[i].catMP_Id == 15) this.categorias.push(datos_categorias[i]);
+        let cat : number [] = [6,14,15];
+        if (cat.includes(datos_categorias[i].catMP_Id)) this.categorias.push(datos_categorias[i]);
       }
     });
   }
@@ -162,7 +162,6 @@ export class EntradaBOPPComponent implements OnInit {
           this.mostrarAdvertencia(`Advertencia`, `¡Ya existe un bopp con el serial ${serial}, por favor colocar un serial distinto!`);
           this.load = true;
         } else {
-          console.log(categoria)
           this.categoriaService.srvObtenerListaPorId(categoria).subscribe(datos_categorias => {
             let productoExt : any = {
               Id : id,
@@ -196,7 +195,6 @@ export class EntradaBOPPComponent implements OnInit {
     if (this.ArrayBOPP.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe cargar minimo un rollo en la tabla!");
     else {
       this.load = false
-
         for (let i = 0; i < this.ArrayBOPP.length; i++) {
           let bodega : number;
           if (this.ArrayBOPP[i].Cat_Id == 6) bodega = 8;
@@ -222,13 +220,10 @@ export class EntradaBOPPComponent implements OnInit {
             BOPP_TipoDoc: this.tipoDoc,
             BOPP_CodigoDoc : this.campoRemi_Faccompra,
           }
-
           this.entradaBOPPService.srvGuardar(datosBOPP).subscribe(datos_BOPP => {
             this.mostrarConfirmacion(`Confirmación`,`Entrada de rollos realizada con éxito!`);
             this.load = true;
-          }, error => {
-            this.mostrarError(`Error`, `Error al ingresar el rollo!`);
-          });
+          }, error => { this.mostrarError(`Error`, `Error al ingresar el rollo!`); });
         }
     }
   }
@@ -280,13 +275,8 @@ export class EntradaBOPPComponent implements OnInit {
     let id : number = this.FormOpcional.value.PrvNombre;
     let nuevo : any [] = this.proveedor.filter((item) => item.prov_Id == id);
     this.FormOpcional.patchValue({
-      //ConsecutivoFactura : this.ultimoIdFactura,
-      OrdenCompra : this.FormOpcional.value.OrdenCompra,
-      Factura: this.FormOpcional.value.Factura,
-      Remision : this.FormOpcional.value.Remision,
       PrvId: nuevo[0].prov_Id,
       PrvNombre: nuevo[0].prov_Nombre,
-      Observacion : this.FormOpcional.value.Observacion,
     });
   }
 
@@ -323,7 +313,7 @@ export class EntradaBOPPComponent implements OnInit {
           if (data.length == 0) this.mostrarAdvertencia(`Advertencia` ,`No existe la OC ${OC}, por favor, verifique!`);
           else {
             for (let index = 0; index < data.length; index++) {
-               this.cargarBopps(data[index], dataFacturada, dataRemisionada);
+              this.cargarBopps(data[index], dataFacturada, dataRemisionada);
             }
           }
         });
@@ -402,7 +392,7 @@ export class EntradaBOPPComponent implements OnInit {
   /** Factura */
   /** Funcion para registrar el encabezado de la factura */
   registrarFacturaBopp(){
-    if (this.ArrayBOPP.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe cargar minimo un rollo en la tabla")
+    if (this.ArrayBOPP.length == 0) this.mostrarAdvertencia(`Advertencia`, "Debe cargar minimo un rollo en la tabla");
     else {
       const datosFactura : any = {
         Facco_Codigo : this.FormOpcional.value.Factura,
@@ -446,9 +436,7 @@ export class EntradaBOPPComponent implements OnInit {
         this.mostrarError('No fue posible registrar el detalle de la factura, verifique!'); detalleError = true
       });
     }
-    setTimeout(() => {
-      if(!detalleError) this.crearRelacionOrdenCompra_Faccompra(idUltimafactura);
-    }, 500);
+    setTimeout(() => { if(!detalleError) this.crearRelacionOrdenCompra_Faccompra(idUltimafactura); }, 500);
 
   }
 
@@ -545,9 +533,7 @@ export class EntradaBOPPComponent implements OnInit {
       this.tipoDoc = 'REM'
       this.registrarRemisionBopp();
       setTimeout(() => { this.limpiarTodosLosCampos();}, 2000);
-    } else {
-      this.mostrarAdvertencia(`Advertencia`, 'Solo debe diligenciar el campo factura o remisión, verifique!');
-    }
+    } else this.mostrarAdvertencia(`Advertencia`, 'Solo debe diligenciar el campo factura o remisión, verifique!');
   }
 
   /** Función para obtener el valor total del Bopp a ingresar */

@@ -5,18 +5,17 @@ import * as fs from 'file-saver';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { MessageService } from 'primeng/api';
 import { TreeTable } from 'primeng/treetable';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { modelOpedido } from 'src/app/Modelo/modelOpedido';
 import { PedidoProductosService } from 'src/app/Servicios/DetallesPedidoProductos/pedidoProductos.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { OpedidoproductoService } from 'src/app/Servicios/PedidosProductos/opedidoproducto.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import Swal from 'sweetalert2';
 import { PedidoExternoComponent } from '../Pedido-Externo/Pedido-Externo.component';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
-import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-ReportePedidos_Zeus',
@@ -568,7 +567,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
   mostrarEleccion(item : any, eleccion : any){
     let mensaje : string = "";
     this.itemSeleccionado = item;
-    console.log(this.itemSeleccionado);
     if (eleccion == 'aceptar') { this.onReject('cancelar'); mensaje = `Está seguro que desea aceptar el pedido N° ${item}?`; }
     if(eleccion == 'cancelar') { this.onReject('aceptar'); mensaje = `Está seguro que desea cancelar el pedido N° ${item}?`; }
 
@@ -1144,7 +1142,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
 
   /** Cerrar Dialogo de eliminación de OT/rollos.*/
   onReject(dato : any) {
-    console.log(`1: ${dato}`);
     this.messageService.clear(dato);
   }
 }

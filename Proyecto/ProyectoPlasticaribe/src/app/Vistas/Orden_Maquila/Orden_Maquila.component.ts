@@ -48,7 +48,6 @@ export class Orden_MaquilaComponent implements OnInit {
   modalCreacionTerceros : boolean = false; //Variable que servirá para validar cuando se muestra el modal de creación de terceros o no
   edidcionOrdenMaquila : boolean = false; //Variable que servirá para validar cuando se está creado una orden y cuando se está editando
   informacionPDF : any [] = []; //Variable que tendrá la informacion de la materia prima pedida en la orden de maquila
-  soloLectura : boolean; /** Variable que se utilizará para colocar el campo Stock de solo lectura */
   llave : string = 'pdf'; /** Variable que se utilizará como palabra clave para cargar el mensaje de Ver Pdf/Quitar MP/Eliminar MP de la tabla*/
   itemSeleccionado : any; /** Variable que tomará diferentes valores, generalmente id para mostrar el pdf o id del item a quitar o eliminar de la tabla. */
 
@@ -88,7 +87,6 @@ export class Orden_MaquilaComponent implements OnInit {
     this.consultarCategorias();
     this.obtenerUnidadesMedida();
     this.generarConsecutivo();
-    this.soloLectura = true;
     this.llave = 'pdf';
   }
 
@@ -108,12 +106,8 @@ export class Orden_MaquilaComponent implements OnInit {
 
   // Generar Consecutivo de Orden de Compra
   generarConsecutivo(){
-    this.ordenMaquilaService.GetUltimoId().subscribe(datos_ordenCompra => {
-      this.FormOrdenMaquila.patchValue({ ConsecutivoOrden : datos_ordenCompra + 1, });
-    }, error => {
-      this.FormOrdenMaquila.patchValue({ ConsecutivoOrden : 1, });
-      this.cargando = false;
-    });
+    this.ordenMaquilaService.GetUltimoId().subscribe(datos_ordenCompra => { this.FormOrdenMaquila.patchValue({ ConsecutivoOrden : datos_ordenCompra + 1, });
+    }, error => { this.FormOrdenMaquila.patchValue({ ConsecutivoOrden : 1, }); });
   }
 
   // Funcion que limpiará todos los campos de la vista
@@ -153,9 +147,7 @@ export class Orden_MaquilaComponent implements OnInit {
 
   // Funcion que le va a cambiar el nombre al proveedor
   cambiarNombreTercero(){
-    let id : number = this.FormOrdenMaquila.value.Tercero;
-    let nuevo : any[] = this.terceros.filter((item) => item.tercero_Id == id);
-
+    let nuevo : any [] = this.terceros.filter((item) => item.tercero_Id == this.FormOrdenMaquila.value.Tercero);
     this.FormOrdenMaquila.patchValue({
       Tercero : nuevo[0].tercero_Nombre,
       Id_Tercero : nuevo[0].tercero_Id,
@@ -223,9 +215,7 @@ export class Orden_MaquilaComponent implements OnInit {
           this.catidadTotalPeso += datos_Orden[i].cantidad;
           this.cantidadTotalPrecio += (datos_Orden[i].cantidad * datos_Orden[i].precio);
         }
-      } else {
-        this.mostrarAdvertencia(`Advertencia`, `No se ha encontrado la orden de maquila N° ${id}`);
-      }
+      } else this.mostrarAdvertencia(`Advertencia`, `No se ha encontrado la orden de maquila N° ${id}`);
     });
   }
 
@@ -282,52 +272,50 @@ export class Orden_MaquilaComponent implements OnInit {
   }
 
   // Funcion que va a quitar la materia prima
-  quitarMateriaPrima(data : any){
-    data = this.itemSeleccionado;
+  quitarMateriaPrima(){
+    let data = this.itemSeleccionado;
     this.onReject();
     for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
       if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
-          this.materiasPrimasSeleccionadas.splice(i, 1);
-          this.catidadTotalPeso -= data.Cantidad;
-          this.cantidadTotalPrecio -= data.SubTotal;
-          for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
-            if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
-          }
-          this.mostrarConfirmacion(`Confirmación`, `Se ha quitado la materia Prima ${data.Nombre} de la tabla`);
-          this.llave = 'pdf';
+        this.materiasPrimasSeleccionadas.splice(i, 1);
+        this.catidadTotalPeso -= data.Cantidad;
+        this.cantidadTotalPrecio -= data.SubTotal;
+        for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
+          if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
+        }
+        this.mostrarConfirmacion(`Confirmación`, `Se ha quitado la materia Prima ${data.Nombre} de la tabla`);
+        this.llave = 'pdf';
       }
     }
   }
 
   // Funcion que va a elminar de la base de datos una de las materias primas, bopp, tintas escogidas al momento de editar la orden de compra
-  eliminarMateriaPrima(data : any){
-    data = this.itemSeleccionado;
+  eliminarMateriaPrima(){
+    let data = this.itemSeleccionado;
     setTimeout(() => {
       this.dtOrdenMaquilaService.getMateriaPrimaOrdenMaquila(this.FormOrdenMaquila.value.ConsecutivoOrden, data.Id).subscribe(datos_orden => {
         if (datos_orden.length > 0) {
           this.onReject();
           for (let i = 0; i < datos_orden.length; i++) {
             this.dtOrdenMaquilaService.delete(datos_orden[i]).subscribe(datos_eliminados => {
-                for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
-                  if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
-                    this.materiasPrimasSeleccionadas.splice(i, 1);
-                    this.catidadTotalPeso -= data.Cantidad;
-                    this.cantidadTotalPrecio -= data.SubTotal;
-                    for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
-                      if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
-                    }
-
-                    this.mostrarConfirmacion(`Confirmación`, `Se ha eliminado la materia prima ${data.Nombre} de la orden de maquila`);
-                    this.llave = 'pdf';
-                    break;
+              for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
+                if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
+                  this.materiasPrimasSeleccionadas.splice(i, 1);
+                  this.catidadTotalPeso -= data.Cantidad;
+                  this.cantidadTotalPrecio -= data.SubTotal;
+                  for (let j = 0; j < this.materiasPrimasSeleccionada_ID.length; j++) {
+                    if (data.Id == this.materiasPrimasSeleccionada_ID[j]) this.materiasPrimasSeleccionada_ID.splice(j, 1);
                   }
+                  this.mostrarConfirmacion(`Confirmación`, `Se ha eliminado la materia prima ${data.Nombre} de la orden de maquila`);
+                  this.llave = 'pdf';
+                  break;
                 }
+              }
             }, error => { this.mostrarError(`¡No se pudo eliminar la materia de la orden de Maquila!`, error.message); });
           }
-        } else this.quitarMateriaPrima(data);
+        } else this.quitarMateriaPrima();
       });
     }, 100);
-
   }
 
   // Funcion que va a validar que los campos necesarios esten llenos para crear la Orden de Maquila
@@ -336,7 +324,6 @@ export class Orden_MaquilaComponent implements OnInit {
       if (this.materiasPrimasSeleccionadas.length > 0) {
         if (!this.edidcionOrdenMaquila) this.crearOrdenMaquila();
         else this.editarOrdenMaquila();
-
       } else this.mostrarAdvertencia(`Advertencia`, `¡Debe escoger minimo una materia prima!`);
     } else this.mostrarAdvertencia(`Advertencia`, `¡Debe llenar los campos vacios!`);
   }
@@ -423,18 +410,11 @@ export class Orden_MaquilaComponent implements OnInit {
             UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
             DtOM_PrecioUnitario : parseFloat(this.materiasPrimasSeleccionadas[i].Precio),
           }
-          this.dtOrdenMaquilaService.insert(info).subscribe(datos => { error = false; }, error => {
-            this.mostrarError(`Error`, `¡Ocurrió un error al editar los detalles de la Orden de Maquila!`);
-          });
+          this.dtOrdenMaquilaService.insert(info).subscribe(datos => { error = false; }, error => { this.mostrarError(`Error`, `¡Ocurrió un error al editar los detalles de la Orden de Maquila!`); });
         }
       }, error => { this.mostrarError(``); error = true; });
     }
-    if(!error) {
-       setTimeout(() => {
-        this.mostrarEleccion(`edicion`, id);
-      }, this.materiasPrimasSeleccionadas.length * 10);
-    }
-
+    if(!error) setTimeout(() => { this.mostrarEleccion(`edicion`, id); }, this.materiasPrimasSeleccionadas.length * 10);
   }
 
   // Funcion que va a consultar la informacion de la Orden de maquila creada, información que se usará para crear un PDF
@@ -711,30 +691,26 @@ export class Orden_MaquilaComponent implements OnInit {
 
     setTimeout(() => {
       if(this.llave == 'pdf') {
-        titulo = `Confirmación`;
         mensaje = `¡Se ha creado la orden de maquila N° ${item}!, ¿desea ver el detalle en pdf?`;
-        this.messageService.add({severity:'success', key: this.llave, summary: titulo, detail: mensaje, sticky: true});
+        this.messageService.add({severity:'success', key: this.llave, summary: `Confirmación`, detail: mensaje, sticky: true});
       }
 
       if(this.llave == 'quitar') {
         this.itemSeleccionado = item;
-        titulo = `Advertencia`;
         mensaje = `Está seguro que desea quitar la materia prima ${item.Nombre} de la tabla?`;
-        this.messageService.add({severity:'warn', key: this.llave, summary: titulo, detail: mensaje, sticky: true});
+        this.messageService.add({severity:'warn', key: this.llave, summary: `Advertencia`, detail: mensaje, sticky: true});
       }
 
       if(this.llave == 'eliminar') {
         this.itemSeleccionado = item;
-        titulo = `Advertencia`;
         mensaje = `Está seguro que desea eliminar definitivamente la materia prima ${item.Nombre} de la orden de maquila?`;
-        this.messageService.add({severity:'warn', key: this.llave, summary: titulo, detail: mensaje, sticky: true});
+        this.messageService.add({severity:'warn', key: this.llave, summary: `Advertencia`, detail: mensaje, sticky: true});
       }
 
       if(this.llave == 'edicion') {
         this.itemSeleccionado = item;
-        titulo = `Confirmación`;
         mensaje = `¡Se ha editado la orden de maquila N° ${item}!, ¿desea ver el detalle en pdf?`;
-        this.messageService.add({severity:'success', key: this.llave, summary: titulo, detail: mensaje, sticky: true});
+        this.messageService.add({severity:'success', key: this.llave, summary: `Confirmación`, detail: mensaje, sticky: true});
       }
     }, 200);
   }

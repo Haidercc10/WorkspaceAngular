@@ -1,14 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Workbook } from 'exceljs';
+import * as fs from 'file-saver';
 import moment from 'moment';
+import { MessageService } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
-import Swal from 'sweetalert2';
-import * as fs from 'file-saver';
-import { Table } from 'primeng/table';
 import { ProductoService } from 'src/app/Servicios/Productos/producto.service';
-import { modelExistenciaProductos } from 'src/app/Modelo/modelExisteciaProductos';
-import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-Inventario-Productos-PBDD',

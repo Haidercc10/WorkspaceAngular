@@ -11,7 +11,6 @@ import { DtFacturacion_OrdenMaquilaService } from 'src/app/Servicios/DtFacturaci
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
 import { Orden_MaquilaService } from 'src/app/Servicios/Orden_Maquila/Orden_Maquila.service';
 import { TercerosService } from 'src/app/Servicios/Terceros/Terceros.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-Reporte_Maquilas',
@@ -703,7 +702,6 @@ export class Reporte_MaquilasComponent implements OnInit {
     let tercero : any = this.FormConsultarFiltros.value.tercero;
     let nuevo : any[] = this.arrayTerceros.filter((item) => item.tercero_Id == tercero);
     setTimeout(() => { this.FormConsultarFiltros.patchValue({tercero: nuevo[0].tercero_Nombre, id_tercero: nuevo[0].tercero_Id });}, 30);
-    console.log(nuevo)
   }
 
   /** Mostrar mensaje de confirmación  */

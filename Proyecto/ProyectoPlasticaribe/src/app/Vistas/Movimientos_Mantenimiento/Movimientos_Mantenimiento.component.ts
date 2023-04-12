@@ -3,15 +3,14 @@ import { FormBuilder, FormGroup, } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { DetallePedido_MantenimientoService } from 'src/app/Servicios/DetallePedido_Mantenimiento/DetallePedido_Mantenimiento.service';
 import { Detalle_MantenimientoService } from 'src/app/Servicios/Detalle_Mantenimiento/Detalle_Mantenimiento.service';
 import { EstadosService } from 'src/app/Servicios/Estados/estados.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { Tipo_MantenimientoService } from 'src/app/Servicios/TiposMantenimientos/Tipo_Mantenimiento.service';
-import { MessageService } from 'primeng/api';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Injectable({
   providedIn: 'root'
@@ -104,11 +103,8 @@ export class Movimientos_MantenimientoComponent implements OnInit {
   obtenerEstados(){
     this.estadosService.srvObtenerListaEstados().subscribe(datos_estados => {
       for (let i = 0; i < datos_estados.length; i++) {
-        if (datos_estados[i].estado_Id == 11
-            || datos_estados[i].estado_Id == 26
-            || datos_estados[i].estado_Id == 4
-            || datos_estados[i].estado_Id == 2
-            || datos_estados[i].estado_Id == 17) this.estados.push(datos_estados[i]);
+        let estados : number [] = [11,26,4,2,17];
+        if (estados.includes(datos_estados[i].estado_Id)) this.estados.push(datos_estados[i]);
         this.estados.sort((a,b) => a.estado_Nombre.localeCompare(b.estado_Nombre));
       }
     }, error => { this.mostrarError(`Error`, `¡Error al consultar los estados de los movimientos de mantenimiento!`); });
@@ -118,11 +114,10 @@ export class Movimientos_MantenimientoComponent implements OnInit {
   buscarActivoSeleccionado(){
     let idActivo : any = this.FormMovimientosMantenimiento.value.Activo;
     let nuevo : any[] = this.activos.filter((item) => item.actv_Id == idActivo);
-      this.FormMovimientosMantenimiento.patchValue({
-        IdActivo : nuevo[0].actv_Id,
-        Activo : nuevo[0].actv_Nombre,
-      });
-      console.log(nuevo)
+    this.FormMovimientosMantenimiento.patchValue({
+      IdActivo : nuevo[0].actv_Id,
+      Activo : nuevo[0].actv_Nombre,
+    });
   }
 
   // Funcion que va a tomar el id del tipo de mantenimiento seleccionado, lo almacenará y cambiará el id por el nombre en el campo de tipo de mantenimiento
@@ -496,7 +491,6 @@ export class Movimientos_MantenimientoComponent implements OnInit {
       });
       body.push(dataRow);
     });
-
     return body;
   }
 

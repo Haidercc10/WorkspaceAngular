@@ -107,7 +107,7 @@
         <!-- STOCK DE MATERIA PRIMA  -->
         <div class="form-floating col-md">
           <span class="p-float-label">
-            <p-inputNumber formControlName="Stock" [disabled]="soloLectura" inputId="Stock" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
+            <p-inputNumber formControlName="Stock" [readonly]="true" inputId="Stock" mode="decimal" [minFractionDigits]="2" [required]="true"></p-inputNumber>
             <label for="Stock">Stock</label>
           </span>
         </div>
@@ -235,8 +235,8 @@
       </div>
       <div class="p-fluid" style="display: flex;">
         <div class="col-6" style="margin-right: 5px;">
-          <button *ngIf="llave == 'eliminar'" type="button" pButton (click)="eliminarMateriaPrima(matPrima)" icon="pi pi-check" label="Si" class="p-button-warning"></button>
-          <button *ngIf="llave == 'quitar'" type="button" pButton (click)="quitarMateriaPrima(matPrima)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+          <button *ngIf="llave == 'eliminar'" type="button" pButton (click)="eliminarMateriaPrima()" icon="pi pi-check" label="Si" class="p-button-warning"></button>
+          <button *ngIf="llave == 'quitar'" type="button" pButton (click)="quitarMateriaPrima()" icon="pi pi-check" label="Si" class="p-button-success"></button>
           <button *ngIf="llave == 'pdf'" type="button" pButton (click)="buscarInfoOrdenMaquila(itemSeleccionado)" icon="pi pi-file-pdf" label="Si" class="p-button-success"></button>
           <button *ngIf="llave == 'edicion'" type="button" pButton (click)="buscarInfoOrdenMaquila(itemSeleccionado)" icon="pi pi-file-pdf" label="Si" class="p-button-success"></button>
         </div>

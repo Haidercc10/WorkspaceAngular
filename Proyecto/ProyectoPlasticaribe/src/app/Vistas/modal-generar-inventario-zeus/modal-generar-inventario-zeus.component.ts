@@ -1,15 +1,14 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { ExistenciasProductosService } from 'src/app/Servicios/ExistenciasProductos/existencias-productos.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { Inventario_Mes_ProductosService } from 'src/app/Servicios/Inventario_Mes_Productos/Inventario_Mes_Productos.service';
-import { MessageService } from 'primeng/api';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
 
 @Component({
   selector: 'app-modal-generar-inventario-zeus',
@@ -25,7 +24,7 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  load : boolean; //Variable que servirá para validar cuando mostrar la animacion de carga
+  load : boolean = true; //Variable que servirá para validar cuando mostrar la animacion de carga
   totalProductos : number = 0; //Variable que almacenará la suma del valor total de todos los productos consultados
   columnas : any = []; //Variable que tendrá las posibles columnas que se pueden seleccionar para ver
   columnasSeleccionada : any [] = []; //Variable que almcanará las columnas que se han elegido para ver adicional a las iniciales
@@ -41,13 +40,9 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
 
   constructor(private existenciasZeus : InventarioZeusService,
                 private clienteOtItems : BagproService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private existencias_ProductosService : ExistenciasProductosService,
-                      private invMesProductoService : Inventario_Mes_ProductosService,
-                        private messageService: MessageService) {
-
-    this.load = true;
-  }
+                  private existencias_ProductosService : ExistenciasProductosService,
+                    private invMesProductoService : Inventario_Mes_ProductosService,
+                      private messageService: MessageService) { }
 
   ngOnInit(): void {
     this.invetarioProductos();
@@ -384,8 +379,6 @@ export class ModalGenerarInventarioZeusComponent implements OnInit {
   // Funcion que permitirá filtrar la información de la tabla
   aplicarfiltro($event, campo : any, valorCampo : string){
     this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-    setTimeout(() => {
-    }, 400);
   }
 
   //
