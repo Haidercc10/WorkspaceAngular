@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
 
@@ -12,7 +11,7 @@ export class MovimientosAplicacionService {
   readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
-  constructor(private http : HttpClient, @Inject(SESSION_STORAGE) private storage: WebStorageService) { }
+  constructor(private http : HttpClient,) { }
 
   getTodo() {
     return this.http.get<any>(this.rutaPlasticaribeAPI + '/MovientosAplicacion');

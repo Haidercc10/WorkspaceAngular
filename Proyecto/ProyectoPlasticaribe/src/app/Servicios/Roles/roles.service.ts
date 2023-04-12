@@ -1,9 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { rutaPlasticaribeAPI, } from 'src/polyfills';
 import { modelRol } from '../../Modelo/modelRol';
-import { rutaPlasticaribeAPI,  } from 'src/polyfills';
 
 @Injectable({
   providedIn: 'root'
@@ -13,12 +12,7 @@ export class RolesService {
   readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
-  constructor(private http : HttpClient,
-    @Inject(SESSION_STORAGE) private storage: WebStorageService) {
-
-    // if (this.storage.get('BD') == 1) this.rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = ;
-  }
+  constructor(private http : HttpClient,) { }
 
   //Metodo buscar lista de roles
   srvObtenerLista():Observable<any[]> {
