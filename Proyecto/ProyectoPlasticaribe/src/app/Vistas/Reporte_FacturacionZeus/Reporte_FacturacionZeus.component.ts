@@ -129,21 +129,18 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   /** Al momento de seleccionar un vendedor, se cargaran sus clientes en el combobox*/
   seleccionarVendedores(){
     let vendedorSeleccionado : any = this.formFiltros.value.vendedor;
-    this.invetarioZeusService.getVendedoresxId(vendedorSeleccionado).subscribe(dataClientes => {
-      for (let index = 0; index < dataClientes.length; index++) {
-        this.formFiltros = this.frmBuilder.group({
-          vendedor: dataClientes[index].nombvende,
-          idvendedor : dataClientes[index].idvende,
-          cliente: this.formFiltros.value.cliente,
-          idcliente : this.formFiltros.value.idcliente,
-          item: this.formFiltros.value.item,
-          idItem : this.formFiltros.value.idItem,
-          anio1: this.formFiltros.value.anio1,
-          anio2: this.formFiltros.value.anio2,
-        });
-        this.cargarClientesxVendedor(dataClientes[index].idvende);
-      }
+    let nuevo : any[] = this.arrayVendedores.filter((item) => item.idvende == vendedorSeleccionado);
+    this.formFiltros = this.frmBuilder.group({
+      vendedor: nuevo[0].nombvende,
+      idvendedor : nuevo[0].idvende,
+      cliente: this.formFiltros.value.cliente,
+      idcliente : this.formFiltros.value.idcliente,
+      item: this.formFiltros.value.item,
+      idItem : this.formFiltros.value.idItem,
+      anio1: this.formFiltros.value.anio1,
+      anio2: this.formFiltros.value.anio2,
     });
+    this.cargarClientesxVendedor(nuevo[0].idvende);
   }
 
   /** Se cargarán los clientes del vendedor seleccionado. */
@@ -156,25 +153,22 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   seleccionarClientes() {
     let expresion : any = /^[0-9]*(\.?)[ 0-9]+$/;
     let clienteSeleccionado : any = this.formFiltros.value.cliente;
+    let nuevo : any[] = this.arrayClientes.filter((item) => item.idcliente == clienteSeleccionado);
 
     if(clienteSeleccionado.match(expresion) != null) {
-      this.invetarioZeusService.getClientesxId(clienteSeleccionado).subscribe(dataClientes3 => {
-        for (let index = 0; index < dataClientes3.length; index++) {
-          this.formFiltros.setValue({
-            vendedor: this.formFiltros.value.vendedor,
-            idvendedor : this.formFiltros.value.idvendedor,
-            cliente: dataClientes3[index].razoncial,
-            idcliente : dataClientes3[index].idcliente,
-            item: this.formFiltros.value.item,
-            idItem : this.formFiltros.value.idItem,
-            anio1: this.formFiltros.value.anio1,
-            anio2: this.formFiltros.value.anio2,
-          });
-          this.cargarItemsxClientes(dataClientes3[index].idcliente);
-        }
-       });
+      this.formFiltros.setValue({
+        vendedor: this.formFiltros.value.vendedor,
+        idvendedor : this.formFiltros.value.idvendedor,
+        cliente: nuevo[0].razoncial,
+        idcliente : nuevo[0].idcliente,
+        item: this.formFiltros.value.item,
+        idItem : this.formFiltros.value.idItem,
+        anio1: this.formFiltros.value.anio1,
+        anio2: this.formFiltros.value.anio2,
+      });
+      this.cargarItemsxClientes(nuevo[0].idcliente);
     } else {
-      if(this.formFiltros.value.vendedor) this.cargarClientesxVendedor(this.formFiltros.value.idvendedor);
+      if(this.formFiltros.value.vendedor != null) this.cargarClientesxVendedor(this.formFiltros.value.idvendedor);
       else this.arrayClientes = []; this.arrayItems = [];
     }
   }
@@ -182,32 +176,25 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
   /** Cargar los items del cliente seleccionado */
   cargarItemsxClientes(cliente : any) {
     this.arrayItems = [];
-    this.invetarioZeusService.getArticulosxCliente(cliente).subscribe(dataArticulo => {
-      for (let index = 0; index < dataArticulo.length; index++) {
-        this.arrayItems.push(dataArticulo[index]);
-      }
-    });
+    this.invetarioZeusService.getArticulosxCliente(cliente).subscribe(dataArticulo => { this.arrayItems = dataArticulo });
   }
 
   /** Funcion que se ejecutará al seleccionar un producto. */
   seleccionarProductos() {
     let expresion : any = /^[0-9]*(\.?)[ 0-9]+$/;
     let itemSeleccionado : any = this.formFiltros.value.item;
+    let nuevo : any[] = this.arrayItems.filter((item) => item.codigo == itemSeleccionado);
 
     if(itemSeleccionado.match(expresion) != null) {
-      this.invetarioZeusService.getArticulosxId(itemSeleccionado).subscribe(dataItems => {
-        for (let index = 0; index < dataItems.length; index++) {
-          this.formFiltros.setValue({
-            vendedor: this.formFiltros.value.vendedor,
-            idvendedor : this.formFiltros.value.idvendedor,
-            cliente: this.formFiltros.value.cliente,
-            idcliente : this.formFiltros.value.idcliente,
-            item: dataItems[index].nombre,
-            idItem : dataItems[index].codigo,
-            anio1: this.formFiltros.value.anio1,
-            anio2: this.formFiltros.value.anio2,
-          });
-        }
+      this.formFiltros.setValue({
+        vendedor: this.formFiltros.value.vendedor,
+        idvendedor : this.formFiltros.value.idvendedor,
+        cliente: this.formFiltros.value.cliente,
+        idcliente : this.formFiltros.value.idcliente,
+        item: nuevo[0].nombre,
+        idItem : nuevo[0].codigo,
+        anio1: this.formFiltros.value.anio1,
+        anio2: this.formFiltros.value.anio2,
       });
     } else {
       if (this.formFiltros.value.idcliente != null) this.cargarItemsxClientes(this.formFiltros.value.idcliente);
@@ -409,7 +396,9 @@ export class Reporte_FacturacionZeusComponent implements OnInit {
             fs.saveAs(blob, `Consolidado Facturacion - ${this.today}.xlsx`);
           });
           this.cargando = false;
+          this.mensajeConfirmacion(`Confirmación`, `¡Archivo de excel generado con éxito!`)
         }, 1000);
+
       }, 1500);
     }
   }

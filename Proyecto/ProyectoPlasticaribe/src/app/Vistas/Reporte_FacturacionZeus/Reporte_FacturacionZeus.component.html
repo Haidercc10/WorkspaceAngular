@@ -36,7 +36,7 @@
         <!-- Vendedores -->
         <div class="col-md-3">
           <span class="p-float-label">
-            <input formControlName="vendedor" id="Vendedor" list="vendedores" class="form-control form-control-sm" (keyup)="cargarVendedores()" (change)="seleccionarVendedores()" type="text" pInputText/>
+            <input formControlName="vendedor" id="Vendedor" list="vendedores" class="form-control form-control-sm" (keyup)="cargarVendedores()" (change)="seleccionarVendedores()" type="text" pInputText autocomplete="off"/>
             <datalist id="vendedores">
               <option value={{item.idvende}} *ngFor="let item of arrayVendedores">{{item.nombvende}}</option>
             </datalist>
@@ -58,7 +58,7 @@
         <!-- Items -->
         <div class="col-md-3">
           <span class="p-float-label">
-            <input formControlName="item" id="Cliente" list="Item" class="form-control form-control-sm" (keyup)="cargarProductos()" (change)="seleccionarProductos()" type="text" pInputText/>
+            <input formControlName="item" id="Cliente" list="items" class="form-control form-control-sm" (keyup)="cargarProductos()" (change)="seleccionarProductos()" type="text" pInputText/>
             <datalist id="items">
               <option value={{valor.codigo}} *ngFor="let valor of arrayItems">{{valor.nombre}}</option>
             </datalist>
@@ -89,8 +89,8 @@
     <div class="mb-3">
       <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button pButton class="p-button-danger" type="button" label="Consultar" icon="pi pi-search" (click)="consultarConsolidado()"> </button>
-        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-file-excel" (click)="limpiarTodo()"> </button>
-        <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-eraser" (click)="exportarExcel()"> </button>
+        <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarTodo()"> </button>
+        <button pButton class="p-button-success" type="button" label="Exportar Excel" icon="pi pi-file-excel" (click)="exportarExcel()"> </button>
       </div>
     </div>
   </form>
