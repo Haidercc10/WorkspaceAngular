@@ -409,9 +409,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   // Funcion que nu cliente y guardará su id y mostrará en el campo el nombre
   selectEventCliente() {
     let cliente = this.formularioOT.value.cliente;
-    this.clientesService.srvObtenerListaPorId(cliente).subscribe(datos_cliente => {
-      this.formularioOT.patchValue({ cliente : datos_cliente.cli_Nombre, });
-    });
+    let nuevo: any[] = this.clientes.filter((item) => item.cli_Id == cliente)
+    //this.clientesService.srvObtenerListaPorId(cliente).subscribe(datos_cliente => {
+      this.formularioOT.patchValue({ cliente : nuevo[0].cli_Nombre, });
+    //});
   }
 
   // Funcion que traerá los vendedores
@@ -428,11 +429,10 @@ export class Reporte_Procesos_OTComponent implements OnInit {
   // Funcion que va a llenar y buscar el campos vendedor
   buscarVendedor(){
     let vendedor : any = this.formularioOT.value.Vendedor;
-    this.usuarioService.srvObtenerListaPorId(vendedor).subscribe(datos_vendedores => {
-      this.formularioOT.patchValue({
-        Vendedor : datos_vendedores.usua_Nombre,
-        Id_Vendedor : vendedor,
-      });
+    let nuevo : any[] = this.vendedores.filter((item) => item.usua_Id == vendedor)
+    this.formularioOT.patchValue({
+      Vendedor : nuevo[0].usua_Nombre,
+      Id_Vendedor : nuevo[0].usua_Id,
     });
   }
 
@@ -531,7 +531,7 @@ export class Reporte_Procesos_OTComponent implements OnInit {
       });
     } else if (fechaincial != null && fechaFinal != null && vendedor != null) {
       masDeUnFiltros = false;
-      if (fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') setTimeout(() => {Swal.fire('Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)');}, 4800);
+      if (fechaincial < '2022-05-01' && fechaFinal < '2022-05-01') setTimeout(() => { this.mensajeAdvertencia(`Advertencia`, 'Solo se mostrarán OTs desde el inicio de las Asignaciones de Materia Prima (01/05/2022)');}, 4800);
       else if (fechaFinal < fechaincial) setTimeout(() => {this.mensajeAdvertencia('¡Advertencia!','La fecha final debe ser mayor que la fecha inicial');}, 4800);
       else {
         this.srvEstadosOTVendedores.srvObtenerListaPorFechas(fechaincial, fechaFinal, vendedor).subscribe(datos_ot => {
@@ -1310,17 +1310,17 @@ export class Reporte_Procesos_OTComponent implements OnInit {
 
   // Funcion que devolverá un mensaje de satisfactorio
   mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, sticky: true});
+    this.messageService.add({severity:'success', summary: titulo, detail: mensaje, life: 2000});
   }
 
   // Funcion que va a devolver un mensaje de error
   mensajeError(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, sticky: true});
+    this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life: 5000});
   }
 
   // Funcion que va a devolver un mensaje de advertencia
   mensajeAdvertencia(titulo : string, mensaje : any) {
-    this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, sticky: true});
+    this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life : 2000});
   }
 
 }

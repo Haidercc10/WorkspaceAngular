@@ -891,7 +891,7 @@ export class Reporte_RollosDesechosComponent implements OnInit {
 
   /** Mostrar mensaje de error  */
   mensajeError(titulo : string, mensaje : string) {
-  this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
+  this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 5000});
   }
 
   /** Mostrar mensaje de advertencia */

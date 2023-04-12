@@ -569,8 +569,8 @@ export class ReportePedidos_ZeusComponent implements OnInit {
     let mensaje : string = "";
     this.itemSeleccionado = item;
     console.log(this.itemSeleccionado);
-    if (eleccion == 'aceptar') { this.onReject('cancelar'); mensaje = `Está seguro que desea aceptar el pedido N° ${item}?`; }
-    if(eleccion == 'cancelar') { this.onReject('aceptar'); mensaje = `Está seguro que desea cancelar el pedido N° ${item}?`; }
+    if (eleccion == 'aceptar') { this.onReject('aceptar'); this.onReject('cancelar'); mensaje = `Está seguro que desea aceptar el pedido N° ${item}?`; }
+    if(eleccion == 'cancelar') { this.onReject('cancelar'); this.onReject('aceptar'); mensaje = `Está seguro que desea cancelar el pedido N° ${item}?`; }
 
     this.messageService.add({severity:'warn', key: eleccion, summary: 'Elección', detail: mensaje, sticky: true});
   }
