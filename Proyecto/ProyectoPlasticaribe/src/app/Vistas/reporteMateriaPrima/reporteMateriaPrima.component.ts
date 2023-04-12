@@ -135,10 +135,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         SubTotal : data.subTotal,
         Categoria : data.categoria,
       }
-      this.ArrayMateriaPrima.push(info);
+      if (this.ValidarRol == 1 || this.ValidarRol == 3) this.ArrayMateriaPrima.push(info);
       this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
 
-      if (this.categoriasMP.includes(data.categoria_Id)) {
+      if (this.categoriasMP.includes(data.categoria_Id) && (this.ValidarRol == 1 || this.ValidarRol == 3)) {
         this.polietilenos.push(info);
         this.valorTotalPolietileno += data.precio * data.stock;
         this.cantInicialPolietileno += data.inicial;
@@ -147,7 +147,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         this.cantExistenciasPolientileno += data.stock;
         this.cantDiferenciaPolietileno += data.diferencia;
       }
-      if (this.categoriasTintas.includes(data.categoria_Id)) {
+      if (this.categoriasTintas.includes(data.categoria_Id) && (this.ValidarRol == 1 || this.ValidarRol == 3)) {
         this.tintas.push(info);
         this.valorTotalTintas += data.precio * data.stock;
         this.cantInicialTintas += data.inicial;
@@ -156,7 +156,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         this.cantExistenciasTintas += data.stock;
         this.cantDiferenciaTintas += data.diferencia;
       }
-      if (this.categoriasBOPP.includes(data.categoria_Id)) {
+      if (this.categoriasBOPP.includes(data.categoria_Id) && (this.ValidarRol == 1 || this.ValidarRol == 3 || this.ValidarRol == 4)) {
         this.biorientados.push(info);
         this.valorTotalBiorientado += data.precio * data.stock;
         this.cantInicialBiorientado += data.inicial;

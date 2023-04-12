@@ -134,13 +134,13 @@
         <!-- CANTIDAD A ENTREGAR DE MATERIA PRIMA  -->
         <div class="col-md">
           <span class="p-float-label">
-            <p-inputNumber formControlName="MpCantidadRetirada" mode="decimal" inputId="Cantidad" [minFractionDigits]="2"></p-inputNumber>
+            <p-inputNumber formControlName="MpCantidadRetirada" mode="currency" currency="COP" [showClear]="true" inputId="Cantidad" [minFractionDigits]="2"></p-inputNumber>
             <label for="Cantidad">Cantidad</label>
           </span>
         </div>
 
         <!-- Unidad de Medida -->
-        <div class="col-md-3">
+        <div class="col-md">
           <span class="p-float-label">
             <p-dropdown formControlName="MpUnidadMedidaRetirada" inputId="Und" [autoDisplayFirst]="false" [options]="unidadMedida" optionLabel=""></p-dropdown>
             <label for="Und">Und</label>
@@ -148,7 +148,7 @@
         </div>
 
         <!-- Proceso -->
-        <div class="col-md-3">
+        <div class="col-md">
           <span class="p-float-label">
             <p-dropdown formControlName="ProcesoRetiro" inputId="Proceso" [autoDisplayFirst]="false" [options]="procesos" optionLabel=""></p-dropdown>
             <label for="Proceso">Procesos</label>
