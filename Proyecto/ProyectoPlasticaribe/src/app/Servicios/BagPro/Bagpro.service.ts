@@ -1,9 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AnyPtrRecord } from 'dns';
 import { Observable } from 'rxjs';
 import { rutaBagPro } from 'src/polyfills';
-import internal from 'stream';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +13,6 @@ export class BagproService {
   constructor(private http : HttpClient) { }
 
   /* PROCSELLADO */
-
   srvObtenerListaProcSellado():Observable<any[]> {
     return this.http.get<any>(this.rutaBagPro + '/ProcSellado');
   }

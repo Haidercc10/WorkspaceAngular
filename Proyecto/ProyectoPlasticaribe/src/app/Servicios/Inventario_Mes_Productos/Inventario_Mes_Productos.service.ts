@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { modelPistas } from 'src/app/Modelo/modelPistas';
 import { rutaPlasticaribeAPI } from 'src/polyfills';
@@ -11,8 +10,7 @@ import { rutaPlasticaribeAPI } from 'src/polyfills';
 export class Inventario_Mes_ProductosService {
 
   //Encapsular httpclient en el constructor
-  constructor(private http : HttpClient,
-                @Inject(SESSION_STORAGE) private storage: WebStorageService) { }
+  constructor(private http : HttpClient,) { }
 
   srvObtenerLista() {
     return this.http.get<any>(rutaPlasticaribeAPI + '/Inventario_Mensual_Productos');

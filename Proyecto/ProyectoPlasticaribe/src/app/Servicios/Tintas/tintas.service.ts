@@ -14,12 +14,7 @@ export class TintasService {
   readonly rutaPlasticaribeAPI = rutaPlasticaribeAPI;
 
   //Encapsular httpclient en el constructor
-  constructor(private http : HttpClient,
-    @Inject(SESSION_STORAGE) private storage: WebStorageService) {
-
-    // if (this.storage.get('BD') == 1) this.rutaPlasticaribeAPI = rutaPlasticaribeAPI;
-    // else if (this.storage.get('BD') == 2) this.rutaPlasticaribeAPI = ;
-  }
+  constructor(private http : HttpClient,) { }
 
   //Metodo buscar lista de Productos
   srvObtenerLista():Observable<any[]> {
