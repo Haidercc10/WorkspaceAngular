@@ -104,6 +104,27 @@ export class MateriaPrimaService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getCategoriasMateriaPrima`);
   }
 
+  // Metodo que nos servirá para obtener informacion sobre los movimientos de materias primas
+  GetMoviemientos(fechaInicial : any, fechaFinal : any, ruta : string){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getMovimientos/${fechaInicial}/${fechaFinal}/${ruta}`);
+  }
+
+  GetInfoMovimientoAsignaciones(codigo : string, tipoMov : string){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientoAsignaciones/${codigo}/${tipoMov}`);
+  }
+
+  GetInfoMovimientosDevoluciones(codigo : string){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientosDevoluciones/${codigo}`);
+  }
+
+  GetInfoMovimientoCreacionTinta(codigo : string){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientoCreacionTinta/${codigo}`);
+  }
+
+  GetInfoMovimientosEntradas(codigo : string, tipoMov : string){
+    return this.http.get<any>(this.rutaPlasticaribeAPI + `/Materia_Prima/getInfoMovimientosEntradas/${codigo}/${tipoMov}`);
+  }
+
   //Metodo agregar Productos
   srvAgregar(data : any) {
     return this.http.post(this.rutaPlasticaribeAPI + '/Materia_Prima', data)

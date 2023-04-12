@@ -48,7 +48,8 @@
       <p-tabPanel
         header="Materias Primas"
         leftIcon="pi pi-th-large"
-        tooltip="Información del Inventario de Materias Primas">
+        tooltip="Información del Inventario de Materias Primas"
+        *ngIf="ValidarRol != 4">
         <div class="mb-3" *ngIf="load">
           <div class="row g-3 font-size-14" id="table">
             <p-table
@@ -73,8 +74,8 @@
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Cant', 'contains')"></th>
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'Diferencia', 'contains')"></th>
                   <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'UndCant', 'contains')"></th>
-                  <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'PrecioUnd', 'contains')"></th>
-                  <th><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
+                  <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'PrecioUnd', 'contains')"></th>
+                  <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'SubTotal', 'contains')"></th>
                   <th><input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Categoria', 'contains')"></th>
                 </tr>
                 <tr>
@@ -104,14 +105,12 @@
                   </th>
                   <th scope="col">Medida
                   </th>
-                  <ng-container *ngIf="ValidarRol == 1">
-                    <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col">Precio Und
-                      <p-sortIcon field="PrecioUnd"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="SubTotal" pReorderableColumn scope="col">SubTotal
-                      <p-sortIcon field="SubTotal"></p-sortIcon>
-                    </th>
-                  </ng-container>
+                  <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">Precio Und
+                    <p-sortIcon field="PrecioUnd"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="SubTotal" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">SubTotal
+                    <p-sortIcon field="SubTotal"></p-sortIcon>
+                  </th>
                   <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
                     <p-sortIcon field="Categoria"></p-sortIcon>
                   </th>
@@ -160,7 +159,8 @@
       <p-tabPanel
         header="Polietilenos"
         leftIcon="pi pi-box"
-        tooltip="Información del Inventario de los Polietilenos">
+        tooltip="Información del Inventario de los Polietilenos"
+        *ngIf="ValidarRol != 4">
         <div class="mb-3" *ngIf="load">
           <div class="row g-3 font-size-14" id="table">
             <p-table
@@ -187,8 +187,8 @@
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Cant', 'contains')"></th>
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Diferencia', 'contains')"></th>
                   <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'UndCant', 'contains')"></th>
-                  <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'PrecioUnd', 'contains')"></th>
-                  <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'SubTotal', 'contains')"></th>
+                  <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'PrecioUnd', 'contains')"></th>
+                  <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'SubTotal', 'contains')"></th>
                   <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroPolietilenos($event, 'Categoria', 'contains')"></th>
                 </tr>
                 <tr>
@@ -218,14 +218,12 @@
                   </th>
                   <th scope="col">Medida
                   </th>
-                  <ng-container *ngIf="ValidarRol == 1">
-                    <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col">Precio Und
-                      <p-sortIcon field="PrecioUnd"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="SubTotal" pReorderableColumn scope="col">SubTotal
-                      <p-sortIcon field="SubTotal"></p-sortIcon>
-                    </th>
-                  </ng-container>
+                  <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">Precio Und
+                    <p-sortIcon field="PrecioUnd"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="SubTotal" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">SubTotal
+                    <p-sortIcon field="SubTotal"></p-sortIcon>
+                  </th>
                   <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
                     <p-sortIcon field="Categoria"></p-sortIcon>
                   </th>
@@ -254,13 +252,13 @@
               <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
                 <tr>
                   <td colspan="4" class="text-right">Totales</td>
-                  <td>{{cantInicial | number}}</td>
-                  <td>{{cantEntrante | number}}</td>
-                  <td>{{cantSaliente | number}}</td>
-                  <td>{{cantExistencias | number}}</td>
-                  <td>{{cantDiferencia | number}}</td>
+                  <td>{{cantInicialPolietileno | number}}</td>
+                  <td>{{cantEntrantePolietileno | number}}</td>
+                  <td>{{cantSalientePolietileno | number}}</td>
+                  <td>{{cantExistenciasPolientileno | number}}</td>
+                  <td>{{cantDiferenciaPolietileno | number}}</td>
                   <td colspan="2" class="text-right">{{'Kg'}}</td>
-                  <td>{{valorTotal | number}}</td>
+                  <td>{{valorTotalPolietileno | number}}</td>
                   <td>COP</td>
                   <td><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" (click)="exportarExcel(3)"></button></td>
                 </tr>
@@ -274,7 +272,8 @@
       <p-tabPanel
         header="Tintas"
         leftIcon="pi pi-palette"
-        tooltip="Información del Inventario de los Polietilenos">
+        tooltip="Información del Inventario de los Polietilenos"
+        *ngIf="ValidarRol != 4">
         <div class="mb-3" *ngIf="load">
           <div class="row g-3 font-size-14" id="table">
             <p-table
@@ -292,7 +291,7 @@
               <ng-template pTemplate="header">
                 <tr class="font-size-16">
                   <th></th>
-                  <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Id', 'contains')"></th>
+                  <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Id', 'contains')"></th>
                   <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Nombre', 'contains')"></th>
                   <th ><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Ancho', 'contains')"></th>
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Inicial', 'contains')"></th>
@@ -301,8 +300,8 @@
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Cant', 'contains')"></th>
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Diferencia', 'contains')"></th>
                   <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'UndCant', 'contains')"></th>
-                  <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'PrecioUnd', 'contains')"></th>
-                  <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'SubTotal', 'contains')"></th>
+                  <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'PrecioUnd', 'contains')"></th>
+                  <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'SubTotal', 'contains')"></th>
                   <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltroTintas($event, 'Categoria', 'contains')"></th>
                 </tr>
                 <tr>
@@ -332,14 +331,12 @@
                   </th>
                   <th scope="col">Medida
                   </th>
-                  <ng-container *ngIf="ValidarRol == 1">
-                    <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col">Precio Und
-                      <p-sortIcon field="PrecioUnd"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="SubTotal" pReorderableColumn scope="col">SubTotal
-                      <p-sortIcon field="SubTotal"></p-sortIcon>
-                    </th>
-                  </ng-container>
+                  <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">Precio Und
+                    <p-sortIcon field="PrecioUnd"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="SubTotal" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">SubTotal
+                    <p-sortIcon field="SubTotal"></p-sortIcon>
+                  </th>
                   <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
                     <p-sortIcon field="Categoria"></p-sortIcon>
                   </th>
@@ -368,13 +365,13 @@
               <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
                 <tr>
                   <td colspan="4" class="text-right">Totales</td>
-                  <td>{{cantInicial | number}}</td>
-                  <td>{{cantEntrante | number}}</td>
-                  <td>{{cantSaliente | number}}</td>
-                  <td>{{cantExistencias | number}}</td>
-                  <td>{{cantDiferencia | number}}</td>
+                  <td>{{cantInicialTintas | number}}</td>
+                  <td>{{cantEntranteTintas | number}}</td>
+                  <td>{{cantSalienteTintas | number}}</td>
+                  <td>{{cantExistenciasTintas | number}}</td>
+                  <td>{{cantDiferenciaTintas | number}}</td>
                   <td colspan="2" class="text-right">{{'Kg'}}</td>
-                  <td>{{valorTotal | number}}</td>
+                  <td>{{valorTotalTintas | number}}</td>
                   <td>COP</td>
                   <td><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" (click)="exportarExcel(4)"></button></td>
                 </tr>
@@ -415,8 +412,8 @@
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Cant', 'contains')"></th>
                   <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Diferencia', 'contains')"></th>
                   <th ><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'UndCant', 'contains')"></th>
-                  <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'PrecioUnd', 'contains')"></th>
-                  <th><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'SubTotal', 'contains')"></th>
+                  <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'PrecioUnd', 'contains')"></th>
+                  <th *ngIf="ValidarRol == 1"><input pInputText type="number" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'SubTotal', 'contains')"></th>
                   <th><input pInputText type="text" style="width: 100%;" (input)="aplicarFiltrosBiorientados($event, 'Categoria', 'contains')"></th>
                 </tr>
                 <tr>
@@ -446,14 +443,12 @@
                   </th>
                   <th scope="col">Medida
                   </th>
-                  <ng-container *ngIf="ValidarRol == 1">
-                    <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col">Precio Und
-                      <p-sortIcon field="PrecioUnd"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="SubTotal" pReorderableColumn scope="col">SubTotal
-                      <p-sortIcon field="SubTotal"></p-sortIcon>
-                    </th>
-                  </ng-container>
+                  <th pSortableColumn="PrecioUnd" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">Precio Und
+                    <p-sortIcon field="PrecioUnd"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="SubTotal" pReorderableColumn scope="col" *ngIf="ValidarRol == 1">SubTotal
+                    <p-sortIcon field="SubTotal"></p-sortIcon>
+                  </th>
                   <th pSortableColumn="Categoria" pReorderableColumn scope="col">Categoria
                     <p-sortIcon field="Categoria"></p-sortIcon>
                   </th>
@@ -482,13 +477,13 @@
               <ng-template pTemplate="footer" *ngIf="ValidarRol == 1">
                 <tr>
                   <td colspan="4" class="text-right">Totales</td>
-                  <td>{{cantInicial | number}}</td>
-                  <td>{{cantEntrante | number}}</td>
-                  <td>{{cantSaliente | number}}</td>
-                  <td>{{cantExistencias | number}}</td>
-                  <td>{{cantDiferencia | number}}</td>
+                  <td>{{cantInicialBiorientado | number}}</td>
+                  <td>{{cantEntranteBiorientado | number}}</td>
+                  <td>{{cantSalienteBiorientado | number}}</td>
+                  <td>{{cantExistenciasBiorientado | number}}</td>
+                  <td>{{cantDiferenciaBiorientado | number}}</td>
                   <td colspan="2" class="text-right">{{'Kg'}}</td>
-                  <td>{{valorTotal | number}}</td>
+                  <td>{{valorTotalBiorientado | number}}</td>
                   <td>COP</td>
                   <td><button pButton pRipple pTooltip="Exportar a Excel" icon="pi pi-file-excel" class="p-button-success" (click)="exportarExcel(5)"></button></td>
                 </tr>

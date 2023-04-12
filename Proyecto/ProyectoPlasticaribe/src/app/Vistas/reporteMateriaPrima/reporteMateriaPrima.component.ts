@@ -18,9 +18,9 @@ import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.servi
   templateUrl: './reporteMateriaPrima.component.html',
   styleUrls: ['./reporteMateriaPrima.component.css']
 })
+
 export class ReporteMateriaPrimaComponent implements OnInit {
 
-  /* Vaiables*/
   @ViewChild('dt') dt: Table | undefined;
   @ViewChild('dt_Polientileno') dt_Polientileno: Table | undefined;
   @ViewChild('dt_Tintas') dt_Tintas: Table | undefined;
@@ -29,13 +29,7 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
-  materiasPrimas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
-  polietilenos : any [] = []; //Variable que va a almacenar la informacion de los polietilenos
-  tintas : any [] = []; //Variable que va a almacenar la informacion de las tintas
-  biorientados : any [] = []; //Variable que va a almacenar la información de los biorientados
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
-  ArrayMateriaPrima : any [] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
-  valorTotal : number = 0; //Variable que guardará el valor total de la factura de entrada de materia prima
   categorias : any = []; //variable que almacenará las categorias existentes
   bodegas : any = []; //variable que almacenará las bodegas
   rongoFechas : any [] = []; //Variable que va a guardar el rango de fechas en el que se buscará informacion
@@ -43,14 +37,35 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   categoriasTintas : any [] = []; //Variable que almcanará las categorias de la tabla Tintas
   categoriasBOPP : any [] = []; //Variable que almcanará las categorias de la tabla BOPP
   arryMateriaPrimaFiltrada : any [] = []; //Variable que tendrá la informacion filtrada en las tablas
-
-  load: boolean = true;
-  idMateriasPrimas = [];
-  cantInicial : number = 0;
-  cantEntrante : number = 0;
-  cantSaliente : number = 0;
-  cantExistencias : number = 0;
-  cantDiferencia : number = 0;
+  load: boolean = true; //Variable que validará cuando vaya a salir la animacion de carga
+  ArrayMateriaPrima : any [] = []; //Variable que tendrá la informacion de los productos que se piden en el nuevo pedido
+  valorTotal : number = 0; //Variable que guardará el valor total de la total de toda la materia prima
+  cantInicial : number = 0; //Variable que guardará la cantidad inicial total de materia prima
+  cantEntrante : number = 0; //Variable que guardará la cantidad total entrante de la materia prima
+  cantSaliente : number = 0; //Variable que guardará la cantidad total saliente de la materia prima
+  cantExistencias : number = 0; //Variable que guardará la cantidad total en existencias de la materia prima
+  cantDiferencia : number = 0; //Variable que guardará la cantidad total de diferencia entre lo inical y lo actual
+  polietilenos : any [] = []; //Variable que va a almacenar la informacion de los polietilenos
+  valorTotalPolietileno : number = 0; //Variable que guardará el valor tatal de la cantidad de todos los polietilenos
+  cantInicialPolietileno : number = 0; //Variable que guardará la cantidad inicial total de polietilenos
+  cantEntrantePolietileno : number = 0; //Variable que guardará la cantidad total entrante de polietilenos
+  cantSalientePolietileno : number = 0; //Variable que guardará la cantidad total saliente de polietilenos
+  cantExistenciasPolientileno : number = 0; //Variable que guardará la cantidad total en existencias de polietilenos
+  cantDiferenciaPolietileno : number = 0; //Variable que guardará la cantidad total de diferencia entre lo inical y lo actual de los polietilenos
+  tintas : any [] = []; //Variable que va a almacenar la informacion de las tintas
+  valorTotalTintas : number = 0; //Variable que guardará el valor tatal de la cantidad de todos las tintas
+  cantInicialTintas : number = 0; //Variable que guardará la cantidad inicial total de las tintas
+  cantEntranteTintas : number = 0; //Variable que guardará la cantidad total entrante de las tintas
+  cantSalienteTintas : number = 0; //Variable que guardará la cantidad total saliente de las tintas
+  cantExistenciasTintas : number = 0; //Variable que guardará la cantidad total en existencias de las tintas
+  cantDiferenciaTintas : number = 0; //Variable que guardará la cantidad total de diferencia entre lo inical y lo actual de las tintas
+  biorientados : any [] = []; //Variable que va a almacenar la información de los biorientados
+  valorTotalBiorientado : number = 0; //Variable que guardará el valor tatal de la cantidad de todos los biorientados
+  cantInicialBiorientado : number = 0; //Variable que guardará la cantidad inicial total de los biorientados
+  cantEntranteBiorientado : number = 0; //Variable que guardará la cantidad total entrante de los biorientados
+  cantSalienteBiorientado : number = 0; //Variable que guardará la cantidad total saliente de los biorientados
+  cantExistenciasBiorientado : number = 0; //Variable que guardará la cantidad total en existencias de los biorientados
+  cantDiferenciaBiorientado : number = 0; //Variable que guardará la cantidad total de diferencia entre lo inical y lo actual de los biorientados
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private tintasService : TintasService,
@@ -120,13 +135,36 @@ export class ReporteMateriaPrimaComponent implements OnInit {
         SubTotal : data.subTotal,
         Categoria : data.categoria,
       }
-      this.idMateriasPrimas.push(info.Id);
-      this.ArrayMateriaPrima.push(info);
+      if (this.ValidarRol == 1 || this.ValidarRol == 3) this.ArrayMateriaPrima.push(info);
       this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
 
-      if (this.categoriasMP.includes(data.categoria_Id)) this.polietilenos.push(info);
-      if (this.categoriasTintas.includes(data.categoria_Id)) this.tintas.push(info);
-      if (this.categoriasBOPP.includes(data.categoria_Id)) this.biorientados.push(info);
+      if (this.categoriasMP.includes(data.categoria_Id) && (this.ValidarRol == 1 || this.ValidarRol == 3)) {
+        this.polietilenos.push(info);
+        this.valorTotalPolietileno += data.precio * data.stock;
+        this.cantInicialPolietileno += data.inicial;
+        this.cantEntrantePolietileno += data.entrada;
+        this.cantSalientePolietileno += data.salida;
+        this.cantExistenciasPolientileno += data.stock;
+        this.cantDiferenciaPolietileno += data.diferencia;
+      }
+      if (this.categoriasTintas.includes(data.categoria_Id) && (this.ValidarRol == 1 || this.ValidarRol == 3)) {
+        this.tintas.push(info);
+        this.valorTotalTintas += data.precio * data.stock;
+        this.cantInicialTintas += data.inicial;
+        this.cantEntranteTintas += data.entrada;
+        this.cantSalienteTintas += data.salida;
+        this.cantExistenciasTintas += data.stock;
+        this.cantDiferenciaTintas += data.diferencia;
+      }
+      if (this.categoriasBOPP.includes(data.categoria_Id) && (this.ValidarRol == 1 || this.ValidarRol == 3 || this.ValidarRol == 4)) {
+        this.biorientados.push(info);
+        this.valorTotalBiorientado += data.precio * data.stock;
+        this.cantInicialBiorientado += data.inicial;
+        this.cantEntranteBiorientado += data.entrada;
+        this.cantSalienteBiorientado += data.salida;
+        this.cantExistenciasBiorientado += data.stock;
+        this.cantDiferenciaBiorientado += data.diferencia;
+      }
       this.polietilenos.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       this.tintas.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       this.biorientados.sort((a,b) => a.Nombre.localeCompare(b.Nombre));

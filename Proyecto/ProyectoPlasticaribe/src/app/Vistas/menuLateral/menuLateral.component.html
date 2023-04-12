@@ -106,7 +106,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-BOPP" role="button" aria-expanded="false" aria-controls="">
+              <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
                 Inventario de BOPP / BOPA / POLIESTER
               </a>
@@ -114,7 +114,7 @@
           </ng-container>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/movimientos-bopp" role="button" aria-expanded="false" aria-controls="">
+              <a class="fst-normal" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
                 Movimientos BOPP
               </a>
@@ -254,17 +254,6 @@
       </li>
     </ng-container>
 
-
-    <!-- GERENCIA -->
-    <!-- <ng-container *ngIf="ValidarRol == 1">
-      <li>
-        <a class="fw-normal" href="reporte-ventas" role="button">
-          <i class="pi pi-chart-line" style="margin-right: 2%;"></i>
-          <b>Gerencia</b>
-        </a>
-      </li>
-    </ng-container> -->
-
     <!-- GESTOR DE ARCHIVOS -->
     <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
       <li>
@@ -329,20 +318,12 @@
           </div>
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/reporte-Inventario-MateriaPrima" role="button" aria-expanded="false" aria-controls="">
+              <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
                 Inventario de Materia Prima
               </a>
             </div>
           </ng-container>
-          <!-- <ng-container *ngIf="ValidarRol == 1">
-              <div class="mb-2 sangria">
-              <a class="fst-normal" data-bs-toggle="" href="/materias_primas" role="button" aria-expanded="false" aria-controls="">
-                <i class="pi pi-box" style="margin-right: 2%;"></i>
-                Materias Primas
-              </a>
-            </div>
-          </ng-container> -->
           <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
             <div class="mb-2 sangria">
               <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7_1" role="button" (click)="clickIcon7_1()" aria-expanded="false" aria-controls="collapseExample">
@@ -357,17 +338,9 @@
               </a>
               <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
                 <div class="mb-2 subSangria">
-                  <a class="fst-normal" data-bs-toggle="" href="/movimientos-matprima" role="button" aria-expanded="false" aria-controls="">
+                  <a class="fst-normal" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
                     <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
                     Movimientos MP
-                  </a>
-                </div>
-              </div>
-              <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
-                <div class="mb-2 subSangria">
-                  <a class="fst-normal" data-bs-toggle="" href="/movimientos-tintas" role="button" aria-expanded="false" aria-controls="">
-                    <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
-                    Movimientos Tintas
                   </a>
                 </div>
               </div>
@@ -521,25 +494,9 @@
               </a>
               <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
                 <div class="mb-2 subSangria">
-                  <a class="fst-normal" data-bs-toggle="" href="/movimientos-bopp" role="button" aria-expanded="false" aria-controls="">
+                  <a class="fst-normal" data-bs-toggle="" href="/movimiento-mp" role="button" aria-expanded="false" aria-controls="">
                     <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
-                    Movimientos BOPP
-                  </a>
-                </div>
-              </div>
-              <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
-                <div class="mb-2 subSangria">
-                  <a class="fst-normal" data-bs-toggle="" href="/movimientos-matprima" role="button" aria-expanded="false" aria-controls="">
-                    <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
-                    Movimientos MP
-                  </a>
-                </div>
-              </div>
-              <div class="collapse" id="collapseExample7_1" *ngIf="ValidarRol == 1 || ValidarRol == 3">
-                <div class="mb-2 subSangria">
-                  <a class="fst-normal" data-bs-toggle="" href="/movimientos-tintas" role="button" aria-expanded="false" aria-controls="">
-                    <i class="pi pi-sitemap font-size-15" style="margin-right: 2%;"></i>
-                    Movimientos Tintas
+                    Movimientos Materias Primas
                   </a>
                 </div>
               </div>
@@ -624,7 +581,6 @@
         </div>
       </li>
     </ng-container>
-
 
     <!-- ORDEN DE TRABAJO -->
     <ng-container *ngIf="ValidarRol == 1">
@@ -733,7 +689,7 @@
     </ng-container>
 
     <!-- REPORTES -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60 || ValidarRol == 3 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 5">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 5 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9|| ValidarRol == 10 || ValidarRol == 12 || ValidarRol == 60">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample7" role="button" (click)="clickIcon7()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir7; then thenTemplate7; else elseTemplate7"></ng-container>
@@ -767,7 +723,7 @@
           </ng-container>
 
           <!-- Inventario Materia Prima -->
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3">
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 3 || ValidarRol == 4">
             <div class="mb-2 sangria">
               <a class="fst-normal" data-bs-toggle="" href="/reporte-Materia-Prima" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
@@ -876,18 +832,6 @@
         </div>
       </li>
     </ng-container>
-
-
-    <!-- PROCESOS -->
-
-    <!-- FACTURA DE VENTAS -->
-
-    <!-- CLIENTES -->
-
-    <!-- PROVEEDORES -->
-
-    <!-- NOTIFICACIONES -->
-
   </ul>
   <div class="botonCierreSesion">
     <button class="btn" type="button" (click)="confirm1()">

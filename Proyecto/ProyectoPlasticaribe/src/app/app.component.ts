@@ -58,9 +58,9 @@ export class AppComponent implements OnInit{
       reject: 'Cancelar',
       monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-      dayNames: ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'],
-      dayNamesShort: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
-      dayNamesMin: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
+      dayNames: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'],
+      dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+      dayNamesMin: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
       matchAll: 'Todo',
       matchAny: 'Cualquiera',
       startsWith: 'Empiece con',
@@ -79,7 +79,8 @@ export class AppComponent implements OnInit{
       passwordPrompt: 'Ingrese la Contraseña',
       strong: 'Fuerte',
       medium: 'Medio',
-      weak: 'Debil'
+      weak: 'Debil',
+      noFilter: 'Sin Filtros',
     });
   }
 
