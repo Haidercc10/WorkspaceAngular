@@ -1,5 +1,4 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
 import moment from 'moment';
@@ -11,7 +10,6 @@ import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service'
 import { CategoriaMateriaPrimaService } from 'src/app/Servicios/CategoriasMateriaPrima/categoriaMateriaPrima.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
-import { TipoBodegaService } from 'src/app/Servicios/TipoBodega/tipoBodega.service';
 
 @Component({
   selector: 'app-reporteMateriaPrima',
@@ -70,11 +68,9 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   constructor(private materiaPrimaService : MateriaPrimaService,
                 private tintasService : TintasService,
                   private categoriMpService : CategoriaMateriaPrimaService,
-                    private tipoBodegaService : TipoBodegaService,
-                      private frmBuilderMateriaPrima : FormBuilder,
-                        @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                          private boppService : EntradaBOPPService,
-                            private messageService: MessageService) {
+                    @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                      private boppService : EntradaBOPPService,
+                        private messageService: MessageService) {
   }
 
   ngOnInit(): void {
@@ -371,19 +367,10 @@ export class ReporteMateriaPrimaComponent implements OnInit {
     let datos : any [] = [];
     let infoDocumento : any [] = [];
     if (num == 1) datos = this.ArrayMateriaPrima; //Todas las materias primas
-    else if (num == 2) { //Primer Tab de Materias Primas
-      if (this.dt.filteredValue != null) datos = this.dt.filteredValue; //Materias primas Filtradas
-      else datos = this.ArrayMateriaPrima; //Materias primas no filtradas
-    } else if (num == 3) { //Segundo Tab - Polietilenos
-      if (this.dt_Polientileno.filteredValue != null) datos = this.dt_Polientileno.filteredValue; //Polietilenos filtrados
-      else datos = this.polietilenos; //Polietilenos no filtrados
-    } else if (num == 4) { //Tercer Tab - Tintas
-      if (this.dt_Tintas.filteredValue != null) datos = this.dt_Tintas.filteredValue; //Tintas Filtradas
-      else datos = this.tintas;
-    } else if (num == 5) { //Cuarto tab - Biorientado
-      if (this.dt_Biorientados.filteredValue != null) datos = this.dt_Biorientados.filteredValue; //Biorientado filtrado
-      else datos = this.biorientados; //Biorientado no filtrado
-    }
+    else if (num == 2) this.dt.filteredValue != null ? datos = this.dt.filteredValue : datos = this.ArrayMateriaPrima; //Materias primas filtradas y no filtradas
+    else if (num == 3) this.dt_Polientileno.filteredValue != null ? datos = this.dt_Polientileno.filteredValue : datos = this.polietilenos; //Polietilenos filtrados y no filtrados
+    else if (num == 4) this.dt_Tintas.filteredValue != null ? datos = this.dt_Tintas.filteredValue : datos = this.tintas; //Tintas Filtradas y no Filtradas
+    else if (num == 5) this.dt_Biorientados.filteredValue != null ? datos = this.dt_Biorientados.filteredValue : datos = this.biorientados; //Biorientado filtrada y no filtrado
 
     setTimeout(() => {
       const title = `Inventario Materia_Prima - ${this.today}`;
@@ -453,17 +440,11 @@ export class ReporteMateriaPrimaComponent implements OnInit {
   }
 
   /** Mostrar mensaje de confirmación  */
-  mensajeConfirmacion(titulo : string, mensaje : any) {
-    this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-   }
+  mensajeConfirmacion = (titulo : string, mensaje : any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
 
   /** Mostrar mensaje de error  */
-  mensajeError(titulo : string, mensaje : string) {
-  this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
-  }
+  mensajeError = (titulo : string, mensaje : string) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 2000});
 
   /** Mostrar mensaje de advertencia */
-  mensajeAdvertencia(mensaje : string) {
-  this.messageService.add({severity:'warn', summary: mensaje, detail: `¡Advertencia!`, life: 2000});
-  }
+  mensajeAdvertencia = (mensaje : string) => this.messageService.add({severity:'warn', summary: mensaje, detail: `¡Advertencia!`, life: 2000});
 }

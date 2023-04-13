@@ -76,9 +76,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   }
 
   // funcion que limpiara los campos donde se selecciona en bopp
-  limpiarCamposBOPP(){
-    this.FormularioBOPP.reset();
-  }
+  limpiarCamposBOPP = () => this.FormularioBOPP.reset();
 
   //funcion qeu limpiará todos los campos
   limpiarTodosLosCampos(){
@@ -98,9 +96,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   }
 
   //Funcion que buscará y mostrará los BOPP existentes
-  obtenerBOPP(){
-    this.boppService.GetBoppConExistencias().subscribe(datos_BOPP => { this.ArrayBOPP = datos_BOPP; });
-  }
+  obtenerBOPP = () => this.boppService.GetBoppConExistencias().subscribe(datos_BOPP => { this.ArrayBOPP = datos_BOPP; });
 
   //funcion que buscará la informacion de una orden de trabajo
   infoOT(){
@@ -223,17 +219,14 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   // funcion que creará la asignacion de rollo
   asignarBOPP(){
     this.load = false;
-    let observacion : string = this.FormAsignacionBopp.value.AsgBopp_Observacion;
     const datos : any = {
       AsigBOPP_FechaEntrega : this.today,
-      AsigBOPP_Observacion : observacion,
+      AsigBOPP_Observacion : this.FormAsignacionBopp.value.AsgBopp_Observacion == null ? '' : this.FormAsignacionBopp.value.AsgBopp_Observacion,
       Usua_Id : this.storage_Id,
       Estado_Id : 13,
       AsigBOPP_Hora : moment().format('H:mm:ss'),
     }
-    this.asignacionBOPPService.srvGuardar(datos).subscribe(datos_asginacionBOPP => { this.detallesAsginacionBOPP(datos_asginacionBOPP.asigBOPP_Id); }, error => {
-      this.mostrarError(`Error`, `Se ha producido un error al momento de crear la asignación!`);
-    });
+    this.asignacionBOPPService.srvGuardar(datos).subscribe(data => this.detallesAsginacionBOPP(data.asigBOPP_Id), error => this.mostrarError(`Error`, `Se ha producido un error al momento de crear la asignación!`));
   }
 
   // funcion que creará los detalles de la asignacion de rollos
@@ -247,20 +240,17 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
               if (datos_bopp[k].catMP_Id == 6) documento = 'ASIGBOPP';
               else if (datos_bopp[k].catMP_Id == 14) documento = 'ASIGBOPA';
               else if (datos_bopp[k].catMP_Id == 15) documento = 'ASIGPOLY';
-              let cantidad = this.ArrayBoppPedida[j].Cantidad2 / this.ordenesTrabajo.length;
               let datos : any = {
                 AsigBOPP_Id : idAsignacion,
                 BOPP_Id : datos_bopp[k].bopP_Id,
-                DtAsigBOPP_Cantidad : cantidad,
+                DtAsigBOPP_Cantidad : this.ArrayBoppPedida[j].Cantidad2 / this.ordenesTrabajo.length,
                 UndMed_Id : 'Kg',
                 Proceso_Id : 'CORTE',
                 DtAsigBOPP_OrdenTrabajo : this.ordenesTrabajo[i].ot,
                 Estado_OrdenTrabajo : 14,
                 TpDoc_Id : documento,
               }
-              this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(datos_detallesAsignacion => { }, error => {
-                this.mostrarError(`Error`, `Se ha producido un error al momento de crear la asignación del rollo!`);
-              });
+              this.detallesAsignacionBOPPService.srvGuardar(datos).subscribe(data => { }, error => this.mostrarError(`Error`, `Se ha producido un error al momento de crear la asignación del rollo!`));
             }
           }
         });
@@ -303,22 +293,14 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   }
 
   /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 1500 });
-  }
+  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 1500 });
 
   /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 1500 });
-  }
+  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life: 1500 });
 
   /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 1500 });
-  }
+  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 1500 });
 
   /** Cerrar Dialogo de eliminación de OT/rollos.*/
-  onReject(dato : any) {
-    this.messageService.clear(dato);
-  }
+  onReject = (dato : any) => this.messageService.clear(dato);
 }

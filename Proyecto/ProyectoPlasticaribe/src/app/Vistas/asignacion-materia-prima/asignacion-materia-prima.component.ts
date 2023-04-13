@@ -119,18 +119,10 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   //Funcion que limpiará los campos de la materia pirma entrante
-  limpiarCamposMP(){
-    this.FormMateriaPrimaRetirada.reset();
-  }
+  limpiarCamposMP = () => this.FormMateriaPrimaRetirada.reset();
 
   //Funcion que va almacenar todas las unidades de medida existentes en la empresa
-  obtenerUnidadMedida(){
-    this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => {
-      for (let i = 0; i < datos_unidadesMedida.length; i++) {
-        this.unidadMedida.push(datos_unidadesMedida[i].undMed_Id);
-      }
-    });
-  }
+  obtenerUnidadMedida = () => this.unidadMedidaService.srvObtenerLista().subscribe(datos_unidadesMedida => this.unidadMedida = datos_unidadesMedida);
 
   //Funcion que se encagará de obtener los procesos de la empresa
   obtenerProcesos(){
@@ -194,7 +186,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
           break;
         }
       } else this.mostrarAdvertencia(`La OT N° ${ot} no se encuentra registrada en BagPro`);
-    }, error => { this.mostrarError(`¡Error al consultar la OT ${ot}!`); });
+    }, error => this.mostrarError(`¡Error al consultar la OT ${ot}!`));
   }
 
   //Funcion que va a mostrar el nombre de la materia prima
@@ -299,9 +291,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
             } else {
               this.load = true;
               if (this.ValidarRol != 1) this.mostrarAdvertencia(`¡La cantidad a asignar supera el limite de Kg permitidos para la OT ${idOrdenTrabajo}, Debe solicitar permisos a un usuario administrador.`);
-              else if (this.ValidarRol == 1) {
-                this.confirmarAsignacion(idOrdenTrabajo);
-              }
+              else if (this.ValidarRol == 1) this.confirmarAsignacion(idOrdenTrabajo);
             }
           }
         }, 2000);
@@ -389,13 +379,9 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   // Funcion que va a enviar un mensaje de confirmación indicando que la asignacion se creó bien
   asignacionExitosa() {
-    if (!this.error && !this.soloTintas) {
-      this.mostrarConfirmacion(`Asignación creada satisfactoriamente!`);
-      this.LimpiarCampos();
-    } else if (this.soloTintas && this.cantidadAsignada > this.cantRestante) {
-      this.mostrarConfirmacion(`Solo se crearon las asignaciones de tintas!`);
-      this.LimpiarCampos();
-    }
+    if (!this.error && !this.soloTintas) this.mostrarConfirmacion(`Asignación creada satisfactoriamente!`);
+    else if (this.soloTintas && this.cantidadAsignada > this.cantRestante) this.mostrarConfirmacion(`Solo se crearon las asignaciones de tintas!`);
+    this.LimpiarCampos();
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima saliente
@@ -459,9 +445,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   }
 
   /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any) {
-   this.messageService.add({severity: 'success', summary: `Confirmación`,  detail: mensaje});
-  }
+  mostrarConfirmacion = (mensaje : any) => this.messageService.add({severity: 'success', summary: `Confirmación`,  detail: mensaje});
 
   /** Mostrar mensaje de error  */
   mostrarError(mensaje : any) {
@@ -475,10 +459,8 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
    this.load = true;
   }
 
-   /** Cerrar Dialogo de eliminación*/
-  onReject(dato : any) {
-   this.messageService.clear(dato);
-  }
+  /** Cerrar Dialogo de eliminación*/
+  onReject = (dato : any) => this.messageService.clear(dato);
 
   /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
   mostrarEleccion(item : any){
@@ -486,8 +468,5 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
     this.messageService.add({severity:'warn', key:'eleccion', summary:'Elección', detail: `Está seguro que desea quitar la materia prima de la asignación?`, sticky: true});
   }
 
-  confirmarAsignacion(OT : any){
-    this.messageService.add({severity:'warn', key:'asignacion', summary:'Confirmar Elección', detail: `La cantidad a asignar supera el limite de Kg permitidos para la OT ${OT}, ¿Desea asignar de todas formas?`, sticky: true});
-  }
-
+  confirmarAsignacion = (OT : any) => this.messageService.add({severity:'warn', key:'asignacion', summary:'Confirmar Elección', detail: `La cantidad a asignar supera el limite de Kg permitidos para la OT ${OT}, ¿Desea asignar de todas formas?`, sticky: true});
 }

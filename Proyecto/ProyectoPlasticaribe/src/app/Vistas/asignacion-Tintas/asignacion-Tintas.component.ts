@@ -90,9 +90,7 @@ export class AsignacionTintasComponent implements OnInit {
   }
 
   // Funcion que limpiará los campos del apartado de Materias Primas
-  limpiarCamposMateriaPrima(){
-    this.FormMateriaPrima.reset();
-  }
+  limpiarCamposMateriaPrima = () => this.FormMateriaPrima.reset();
 
   // Funcion que buscará las tintas que se utilizan en la empresa
   obtenerTintas(){
@@ -166,10 +164,7 @@ export class AsignacionTintasComponent implements OnInit {
   }
 
   //Funcion que validará si alguno de los campos del fomulario de materia prima esta vacio
-  validarCamposMateriaPrima(){
-    if (this.FormMateriaPrima.valid) this.cargarMateriaPrimaEnTabla();
-    else this.mostrarAdvertencia(`Advertencia`, "Hay campos vacios en el apartado de selección de materia prima");
-  }
+  validarCamposMateriaPrima = () => this.FormMateriaPrima.valid ? this.cargarMateriaPrimaEnTabla() : this.mostrarAdvertencia(`Advertencia`, "Hay campos vacios en el apartado de selección de materia prima");
 
   // Funcion que cargará las materias primas en las tabla
   cargarMateriaPrimaEnTabla(){
@@ -202,7 +197,7 @@ export class AsignacionTintasComponent implements OnInit {
   // Funcion que validará la asignación
   validarAsignacion(){
     if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
-      this.tintasService.srvObtenerListaPorId(this.FormAsignacionMP.value.Id_Tinta).subscribe(datos_tinta => { this.mostrarEleccion(); });
+      this.tintasService.srvObtenerListaPorId(this.FormAsignacionMP.value.Id_Tinta).subscribe(datos_tinta => this.mostrarEleccion() );
     } else this.mostrarAdvertencia(`Advertencia`, "Debe llenar los campos vacios!");
   }
 
@@ -211,28 +206,18 @@ export class AsignacionTintasComponent implements OnInit {
     this.onReject('asignacion');
     if (this.FormAsignacionMP.value.Tinta != null && this.FormAsignacionMP.value.cantidadTinta != null && this.ArrayMateriaPrima.length > 0) {
       this.load = false;
-      let tinta : any = this.FormAsignacionMP.value.Id_Tinta;
-      let cantidad : number = this.FormAsignacionMP.value.cantidadTinta;
-      let presentacion : string = this.FormAsignacionMP.value.undMedTinta;
-      let Observacion : string = this.FormAsignacionMP.value.Observacion;
-      let usuario : number = this.storage_Id;
-      let fecha : Date = this.today;
-
-      let datos_asignacionMP : modelAsignacionMPxTintas = {
+      let info : modelAsignacionMPxTintas = {
         AsigMPxTinta_Id: 0,
-        Tinta_Id: tinta,
-        AsigMPxTinta_Cantidad: cantidad,
-        UndMed_Id: presentacion,
-        AsigMPxTinta_FechaEntrega: fecha,
-        AsigMPxTinta_Observacion: Observacion,
-        Usua_Id: usuario,
+        Tinta_Id: this.FormAsignacionMP.value.Id_Tinta,
+        AsigMPxTinta_Cantidad: this.FormAsignacionMP.value.cantidadTinta,
+        UndMed_Id: this.FormAsignacionMP.value.undMedTinta,
+        AsigMPxTinta_FechaEntrega: this.today,
+        AsigMPxTinta_Observacion: this.FormAsignacionMP.value.Observacion == null ? '' : this.FormAsignacionMP.value.Observacion,
+        Usua_Id: this.storage_Id,
         Estado_Id: 13,
         AsigMPxTinta_Hora : moment().format('H:mm:ss'),
       }
-
-      this.asignacionMPxTintas.srvGuardar(datos_asignacionMP).subscribe(datos_asignacionMPxTintas => {
-        this.obtenerUltimoIdAsignacion();
-      }, error => { this.mostrarAdvertencia(`¡Error al registrar la creación de tinta!`, error.message); });
+      this.asignacionMPxTintas.srvGuardar(info).subscribe(data => this.obtenerUltimoIdAsignacion(), error => { this.mostrarAdvertencia(`¡Error al registrar la creación de tinta!`, error.message); });
     } else this.mostrarAdvertencia(`Advertencia`, "Debe llenar los campos vacios!");
   }
 
@@ -249,13 +234,13 @@ export class AsignacionTintasComponent implements OnInit {
           proceso_Id : 'TINTAS',
         }
         this.detallesAsignacionMPxTintas.srvGuardar(datosDetallesAsignacion).subscribe(datos_detallesAsignacionMPxTintas => {
-        }, error => { this.mostrarError(`Error`, `¡Error al registrar los detalles de la creación de tinta!`); });
+        }, error => this.mostrarError(`Error`, `¡Error al registrar los detalles de la creación de tinta!`));
       }
       this.moverInventarioMP();
       this.moverInventarioTintas();
       setTimeout(() => { this.sumarInventarioTintas(); }, 1000);
       this.load = false;
-    }, error => { this.mostrarError(`Error`, `¡Error al consultar el último Id de asignación!`); });
+    }, error => this.mostrarError(`Error`, `¡Error al consultar el último Id de asignación!`));
   }
 
   // Funcion que moverá el inventario de la materia prima que se está asignando para la creacion de la tintas
@@ -276,8 +261,8 @@ export class AsignacionTintasComponent implements OnInit {
           TpBod_Id : datos_materiaPrima.tpBod_Id,
         }
         this.materiaPrimaService.srvActualizar(this.ArrayMateriaPrima[index].Materia_Prima, datosMPActualizada).subscribe(datos_mp_creada => {
-        }, error => { this.mostrarError(`Error`, `¡Error al mover el inventario de materia prima!`); });
-      }, error => { this.mostrarError(`Error`, `¡Error al consultar la materia prima!`); });
+        }, error => this.mostrarError(`Error`, `¡Error al mover el inventario de materia prima!`));
+      }, error => this.mostrarError(`Error`, `¡Error al consultar la materia prima!`));
     }
   }
 
@@ -302,8 +287,8 @@ export class AsignacionTintasComponent implements OnInit {
           Tinta_Hora : datos_tinta.tinta_Hora,
         }
         this.tintasService.srvActualizar(this.ArrayMateriaPrima[index].Tinta, datosTintaActualizada).subscribe(datos_mp_creada => {
-        }, error => { this.mostrarError(`Error`, `¡Error al mover el invantario de tinta!`); });
-      }, error => { this.mostrarError(`Error`, `¡Error al consultar la tinta!`); });
+        }, error => this.mostrarError(`Error`, `¡Error al mover el invantario de tinta!`));
+      }, error => this.mostrarError(`Error`, `¡Error al consultar la tinta!`));
     }
   }
 
@@ -328,8 +313,8 @@ export class AsignacionTintasComponent implements OnInit {
       this.tintasService.srvActualizar(tinta, datosTintaCreada).subscribe(datos_mp_creada => {
         this.mostrarConfirmacion(`Confirmación`, `¡Registro completado con exito!`);
         this.limpiarTodosLosCampos();
-      }, error => { this.mostrarError(`¡Error al sumar al inventario de la tinta ${datos_tinta.tinta_Nombre}!`, error.message); });
-    }, error => { this.mostrarError(`¡No se pudo obtener información de la tinta con Id ${tinta}!`, error.message); });
+      }, error => this.mostrarError(`¡Error al sumar al inventario de la tinta ${datos_tinta.tinta_Nombre}!`, error.message));
+    }, error => this.mostrarError(`¡No se pudo obtener información de la tinta con Id ${tinta}!`, error.message));
   }
 
   // Función para quitar una materia prima de la tabla
@@ -342,19 +327,13 @@ export class AsignacionTintasComponent implements OnInit {
   }
 
   //
-  llamarModalMateriasPrimas() {
-    this.componenteCrearMateriasPrimas = true;
-  }
+  llamarModalMateriasPrimas = () => this.componenteCrearMateriasPrimas = true;
 
   //
-  llamarModalCrearTintas(){
-    this.componenteCrearTintas = true;
-  }
+  llamarModalCrearTintas = () => this.componenteCrearTintas = true;
 
   /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
-  }
+  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life: 2000});
 
   /** Mostrar mensaje de error  */
   mostrarError(mensaje : any, titulo?: any) {
@@ -374,9 +353,7 @@ export class AsignacionTintasComponent implements OnInit {
   }
 
   /** Función para mostrar una elección de eliminación de OT/Rollo de la tabla. */
-  mostrarEleccion(){
-    this.messageService.add({severity:'warn', key:'asignacion', summary:'Elección', detail: `¿Está seguro que desea crear ${this.FormAsignacionMP.value.cantidadTinta} Kg de la tinta ${this.FormAsignacionMP.value.Tinta}?`, sticky: true});
-  }
+  mostrarEleccion = () => this.messageService.add({severity:'warn', key:'asignacion', summary:'Elección', detail: `¿Está seguro que desea crear ${this.FormAsignacionMP.value.cantidadTinta} Kg de la tinta ${this.FormAsignacionMP.value.Tinta}?`, sticky: true});
 
   mostrarEleccion2(item: any){
     this.mpSeleccionada = item;
