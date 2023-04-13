@@ -1067,6 +1067,7 @@ export class PaginaPrincipalComponent implements OnInit {
         ObservacionOT : '',
         Vendedor : '',
         cliente : null,
+        Id_Vendedor : null,
         producto : null,
       });
       this.modalEstadosProcesos_OT.consultarOT();
@@ -1081,6 +1082,7 @@ export class PaginaPrincipalComponent implements OnInit {
         ObservacionOT : '',
         Vendedor : '',
         cliente : null,
+        Id_Vendedor : null,
         producto : null,
       });
       this.modalEstadosProcesos_OT.consultarOT();
@@ -1095,6 +1097,7 @@ export class PaginaPrincipalComponent implements OnInit {
         ObservacionOT : '',
         Vendedor : '',
         cliente : null,
+        Id_Vendedor : null,
         producto : null,
       });
       this.modalEstadosProcesos_OT.consultarOT();
@@ -1109,6 +1112,7 @@ export class PaginaPrincipalComponent implements OnInit {
         ObservacionOT : '',
         Vendedor : '',
         cliente : null,
+        Id_Vendedor : null,
         producto : null,
       });
       this.modalEstadosProcesos_OT.consultarOT();
@@ -1123,6 +1127,7 @@ export class PaginaPrincipalComponent implements OnInit {
         ObservacionOT : '',
         Vendedor : '',
         cliente : null,
+        Id_Vendedor : null,
         producto : null,
       });
       this.modalEstadosProcesos_OT.consultarOT();
@@ -1137,6 +1142,7 @@ export class PaginaPrincipalComponent implements OnInit {
         ObservacionOT : '',
         Vendedor : '',
         cliente : null,
+        Id_Vendedor : null,
         producto : null,
       });
       this.modalEstadosProcesos_OT.consultarOT();
