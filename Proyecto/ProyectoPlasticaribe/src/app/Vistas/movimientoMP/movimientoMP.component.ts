@@ -153,7 +153,7 @@ export class MovimientoMPComponent implements OnInit {
         this.cargando = false;
       }
       if (datos.length == 0) this.mensajeAdvertencia(`¡No se encontró información con los parametros consultados!`);
-    });
+    }, error => this.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`));
   }
 
   // Funcion que va a validar el tipo de movimiento para crear el pdf
