@@ -642,6 +642,4 @@ export class AsignacionRollos_ExtrusionComponent implements OnInit {
   mostrarAdvertencia(mensaje : any, titulo?: any) {
    this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life: 2000 });
   }
-
-
 }

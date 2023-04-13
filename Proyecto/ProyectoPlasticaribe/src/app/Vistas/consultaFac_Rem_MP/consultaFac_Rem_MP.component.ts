@@ -53,7 +53,6 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     });
   }
 
-
   ngOnInit(): void {
     this.lecturaStorage();
     this.obtenerTipoDocumento();
@@ -83,7 +82,8 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
   obtenerTipoDocumento(){
     this.tipoDocuemntoService.srvObtenerLista().subscribe(datos_tiposDocumentos => {
       for (let index = 0; index < datos_tiposDocumentos.length; index++) {
-        if (datos_tiposDocumentos[index].tpDoc_Id == 'REM' || datos_tiposDocumentos[index].tpDoc_Id == 'FCO') this.tipoDocumento.push(datos_tiposDocumentos[index])
+        let doc : string [] = ['REM', 'FCO'];
+        if (doc.includes(datos_tiposDocumentos[index].tpDoc_Id)) this.tipoDocumento.push(datos_tiposDocumentos[index])
       }
     });
   }
@@ -92,22 +92,16 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
   consultarProveedores(){
     this.proveedor = [];
     let nombre : string = this.FormDocumentos.value.proveedorNombre.trim();
-    if (nombre != '') {
-      this.proveedorService.getProveedorLike(nombre).subscribe(datos_Proveedores => { this.proveedor = datos_Proveedores; });
-    }
+    if (nombre != '') this.proveedorService.getProveedorLike(nombre).subscribe(datos_Proveedores => { this.proveedor = datos_Proveedores; });
   }
 
   // Funcion que le va a cambiar el nombre al proveedor
   cambiarNombreProveedor(){
     let id : number = this.FormDocumentos.value.proveedorNombre;
     let nuevo : any[] = this.proveedor.filter((item) => item.prov_Id == id);
-    this.FormDocumentos = this.frmBuilderMateriaPrima.group({
-      idDocumento : this.FormDocumentos.value.idDocumento,
-      TipoDocumento: this.FormDocumentos.value.TipoDocumento,
+    this.FormDocumentos.patchValue({
       proveedorNombre : ` ${nuevo[0].prov_Nombre}`,
       proveedorId : nuevo[0].prov_Id,
-      fecha: this.FormDocumentos.value.fecha,
-      fechaFinal : this.FormDocumentos.value.fechaFinal,
     });
   }
 
@@ -343,7 +337,7 @@ export class ConsultaFac_Rem_MPComponent implements OnInit {
     data.forEach(function(row) {
       var dataRow = [];
       columns.forEach(function(column) {
-          dataRow.push(row[column].toString());
+        dataRow.push(row[column].toString());
       });
       body.push(dataRow);
     });

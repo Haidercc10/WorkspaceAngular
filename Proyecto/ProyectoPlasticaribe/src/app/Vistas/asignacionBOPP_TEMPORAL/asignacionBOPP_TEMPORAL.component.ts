@@ -2,12 +2,11 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { MessageService } from 'primeng/api';
 import { AsignacionBOPPService } from 'src/app/Servicios/Asignacion_Bopp/asignacionBOPP.service';
+import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
 import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetalleAsignacion_BOPPService } from 'src/app/Servicios/DetallesAsgBopp/detallesAsignacionBOPP.service';
-import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
-import Swal from 'sweetalert2';
-import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-asignacionBOPP_TEMPORAL',
@@ -20,7 +19,6 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   public load: boolean = true;
   public FormAsignacionBopp !: FormGroup;
   public FormularioBOPP !: FormGroup;
-  public FormularioEdicion !: FormGroup;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
   storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
   storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
@@ -56,10 +54,6 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
       boppSerial: ['', Validators.required],
       boppCantidad : ['', Validators.required],
     });
-
-    this.FormularioEdicion = this.FormBuilderBOPP.group({
-      boppCantidad : ['', Validators.required],
-    });
   }
 
   ngOnInit(): void {
@@ -88,7 +82,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
   //funcion qeu limpiará todos los campos
   limpiarTodosLosCampos(){
-    this.FormAsignacionBopp = this.FormBuilderAsignacion.group({
+    this.FormAsignacionBopp.patchValue({
       AsgBopp_OT : '',
       AsgBopp_Ancho : 0,
       AsgBopp_Fecha : this.today,
@@ -105,14 +99,12 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
 
   //Funcion que buscará y mostrará los BOPP existentes
   obtenerBOPP(){
-    this.ArrayBOPP = [];
     this.boppService.GetBoppConExistencias().subscribe(datos_BOPP => { this.ArrayBOPP = datos_BOPP; });
   }
 
   //funcion que buscará la informacion de una orden de trabajo
   infoOT(){
     let ordenTrabajo : string = this.FormAsignacionBopp.value.AsgBopp_OT;
-
     if (this.ordenesTrabajo.length == 0) {
       this.bagProService.srvObtenerListaClienteOT_Item(ordenTrabajo).subscribe(datos_OT => {
         for (const item of datos_OT) {
@@ -149,9 +141,7 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
               this.ordenesTrabajo.push(infoOT);
               this.cantidadKG = itemOT.datosotKg + this.cantidadKG;
               this.FormAsignacionBopp.patchValue({ AsgBopp_OT : '', AsgBopp_Fecha : this.today, });
-            } else if (itemOT.estado == 4 || itemOT.estado == 1) {
-              this.mostrarAdvertencia(`No es posible asignar a la ${ordenTrabajo}, ya se encuentra cerrada!`);
-            }
+            } else if (itemOT.estado == 4 || itemOT.estado == 1) this.mostrarAdvertencia(`No es posible asignar a la ${ordenTrabajo}, ya se encuentra cerrada!`);
           }
         });
       } else this.mostrarAdvertencia(`¡La OT ${ordenTrabajo} ya se encuentra en la tabla!`);
@@ -162,7 +152,6 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   mostrarEleccion(item : any, eleccion : any, mensaje : any){
     if (eleccion == 'OT') { this.itemSeleccionado = item; mensaje = `Está seguro que desea eliminar la OT ${item.ot} de la tabla?`; }
     if (eleccion == 'Bopp') { this.boppSeleccionado = item; mensaje = `Está seguro que desea eliminar el rollo ${item.Serial} de la tabla?`; }
-
     this.messageService.add({severity:'warn', key: eleccion, summary: 'Elección', detail: mensaje, sticky: true});
   }
 
@@ -170,7 +159,6 @@ export class AsignacionBOPP_TEMPORALComponent implements OnInit {
   QuitarOrdenTrabajo(data : any) {
     this.messageService.clear('OT');
     data = this.itemSeleccionado;
-
     this.cantidadKG = this.cantidadKG - data.kg;
     for (let i = 0; i < this.ordenesTrabajo.length; i++) {
       if (this.ordenesTrabajo[i].ot == data.ot)  this.ordenesTrabajo.splice(i, 1);

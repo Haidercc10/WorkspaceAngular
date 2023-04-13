@@ -1,4 +1,3 @@
-import { HtmlTagDefinition } from '@angular/compiler';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
@@ -601,9 +600,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
       }
     }else if ((proceso == 'Sellado' || proceso == 'Empaque' || proceso == 'Extrusion') && this.bodegaDespacho == true) {
       for (let i = 0; i < this.rollosInsertar.length; i++) {
-        this.servcioDetEntradaRollos.deleteRollosDespacho(this.rollosInsertar[i].Id).subscribe(datos_eliminados => { }, error => {
-          console.log(error);
-        });
+        this.servcioDetEntradaRollos.deleteRollosDespacho(this.rollosInsertar[i].Id).subscribe(datos_eliminados => { }, error => { });
         this.eliminarRollosPreEntrega();
       }
     }
@@ -651,9 +648,7 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   // Eliminación de rollos de la pre entrega
   eliminarRollosPreEntrega() {
     for (let i = 0; i < this.rollosInsertar.length; i++) {
-      this.servicioPreEntregaRollos.deleteRollosPreEntregados(this.rollosInsertar[i].Id).subscribe(datos_eliminados => { }, error => {
-        console.log(error);
-      });
+      this.servicioPreEntregaRollos.deleteRollosPreEntregados(this.rollosInsertar[i].Id).subscribe(datos_eliminados => { }, error => { });
     }
   }
 
@@ -669,14 +664,10 @@ export class EliminarRollos_ExtrusionComponent implements OnInit {
   obtenerProcesos(){
     this.servicioProcesos.srvObtenerLista().subscribe(dataProcesos => {
       for (let index = 0; index < dataProcesos.length; index++) {
-       if(dataProcesos[index].proceso_Id == 'EXT' || dataProcesos[index].proceso_Id == 'EMP' || dataProcesos[index].proceso_Id == 'SELLA') this.arrayProcesos.push(dataProcesos[index]);
+        let pro : string [] = ['EXT', 'EMP', 'SELLA'];
+        if(pro.includes(dataProcesos[index].proceso_Id)) this.arrayProcesos.push(dataProcesos[index]);
       }
     });
-  }
-
-  evitarMovimientoScroll() {
-    let idTabla : any = document.getElementById('dt');
-    console.log();
   }
 
     /** Mostrar mensaje de confirmación  */

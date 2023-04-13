@@ -6,9 +6,7 @@ import { MessageService } from 'primeng/api';
 import { ActivosService } from 'src/app/Servicios/Activos/Activos.service';
 import { DetallePedido_MantenimientoService } from 'src/app/Servicios/DetallePedido_Mantenimiento/DetallePedido_Mantenimiento.service';
 import { Pedido_MantenimientoService } from 'src/app/Servicios/Pedido_Mantenimiento/Pedido_Mantenimiento.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { Tipo_MantenimientoService } from 'src/app/Servicios/TiposMantenimientos/Tipo_Mantenimiento.service';
-import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -37,12 +35,11 @@ export class PedidoMantenimientoComponent implements OnInit {
   llave : string = '';
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                  private rolService : RolesService,
-                    private pedidoMantenimientoService : Pedido_MantenimientoService,
-                      private dtPedidoMantenimientoService : DetallePedido_MantenimientoService,
-                        private activosService : ActivosService,
-                          private tipoMantenimientoService : Tipo_MantenimientoService,
-                            private messageService: MessageService) {
+                  private pedidoMantenimientoService : Pedido_MantenimientoService,
+                    private dtPedidoMantenimientoService : DetallePedido_MantenimientoService,
+                      private activosService : ActivosService,
+                        private tipoMantenimientoService : Tipo_MantenimientoService,
+                          private messageService: MessageService) {
 
     this.FormPedidoMantenimiento = this.frmBuilder.group({
       ConsecutivoPedido : [null],
@@ -81,15 +78,7 @@ export class PedidoMantenimientoComponent implements OnInit {
   // Funcion que obtendrá el id el ultimo pedido creado para saber que consecutivo es el siguiente
   obtenerUlimoId(){
     this.pedidoMantenimientoService.getUltimoIdPedido().subscribe(datos_ultimoPedido => {
-      this.FormPedidoMantenimiento.setValue({
-        ConsecutivoPedido : datos_ultimoPedido + 1,
-        Observacion : this.FormPedidoMantenimiento.value.Observacion,
-        IdActivo : this.FormPedidoMantenimiento.value.IdActivo,
-        Activo : this.FormPedidoMantenimiento.value.Activo,
-        IdTipoMantenimiento : this.FormPedidoMantenimiento.value.IdTipoMantenimiento,
-        TipoMantenimiento : this.FormPedidoMantenimiento.value.TipoMantenimiento,
-        FechaDaño : this.FormPedidoMantenimiento.value.FechaDaño,
-      });
+      this.FormPedidoMantenimiento.patchValue({ ConsecutivoPedido : datos_ultimoPedido + 1, });
     }, error => { this.mostrarError(`Error`, `¡No se puedo obtener el consecutivo del próximo pedido!`) });
   }
 
@@ -106,14 +95,9 @@ export class PedidoMantenimientoComponent implements OnInit {
   buscarActivoSeleccionado(){
     let id : any = this.FormPedidoMantenimiento.value.Activo;
     let nuevo : any[] = this.activos.filter((item) => item.actv_Id == id);
-    this.FormPedidoMantenimiento.setValue({
-      ConsecutivoPedido : this.FormPedidoMantenimiento.value.ConsecutivoPedido,
-      Observacion : this.FormPedidoMantenimiento.value.Observacion,
+    this.FormPedidoMantenimiento.patchValue({
       IdActivo : nuevo[0].actv_Id,
       Activo : nuevo[0].actv_Nombre,
-      IdTipoMantenimiento : this.FormPedidoMantenimiento.value.IdTipoMantenimiento,
-      TipoMantenimiento : this.FormPedidoMantenimiento.value.TipoMantenimiento,
-      FechaDaño : this.FormPedidoMantenimiento.value.FechaDaño,
     });
   }
 
@@ -121,15 +105,9 @@ export class PedidoMantenimientoComponent implements OnInit {
   buscarTipoMantenimientoSeleccionado(){
     let id : any = this.FormPedidoMantenimiento.value.TipoMantenimiento;
     let nuevo : any[] = this.tiposMantenimiento.filter((item) => item.tpMtto_Id == id);
-
-    this.FormPedidoMantenimiento.setValue({
-      ConsecutivoPedido : this.FormPedidoMantenimiento.value.ConsecutivoPedido,
-      Observacion : this.FormPedidoMantenimiento.value.Observacion,
-      IdActivo : this.FormPedidoMantenimiento.value.IdActivo,
-      Activo : this.FormPedidoMantenimiento.value.Activo,
+    this.FormPedidoMantenimiento.patchValue({
       IdTipoMantenimiento : nuevo[0].tpMtto_Id,
       TipoMantenimiento : nuevo[0].tpMtto_Nombre,
-      FechaDaño : this.FormPedidoMantenimiento.value.FechaDaño,
     });
   }
 

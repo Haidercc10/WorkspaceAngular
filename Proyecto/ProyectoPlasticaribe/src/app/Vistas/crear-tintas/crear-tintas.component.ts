@@ -46,9 +46,8 @@ export class CrearTintasComponent implements OnInit {
   obtenerCategorias(){
     this.categoriasService.srvObtenerLista().subscribe(datos_categorias => {
       for (let i = 0; i < datos_categorias.length; i++) {
-        if (datos_categorias[i].catMP_Id == 7
-            || datos_categorias[i].catMP_Id == 8
-            || datos_categorias[i].catMP_Id == 13) this.categorias.push(datos_categorias[i]);
+        let cat : number [] = [7,8,13];
+        if (cat.includes(datos_categorias[i].catMP_Id)) this.categorias.push(datos_categorias[i]);
       }
     });
   }

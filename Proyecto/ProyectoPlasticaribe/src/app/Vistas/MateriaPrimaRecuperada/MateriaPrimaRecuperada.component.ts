@@ -10,7 +10,6 @@ import { RecuperadoService } from 'src/app/Servicios/Recuperado/recuperado.servi
 import { TurnosService } from 'src/app/Servicios/Turnos/Turnos.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app_MateriaPrimaRecuperada',
@@ -245,9 +244,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
     if(productoExt.Cant > 0) {
       this.ArrayMateriaPrima.push(productoExt);
       this.FormMateriaPrima.reset();
-    } else {
-      this.mostrarAdvertencia(`Advertencia`, `La cantidad de mat. prima recuperada debe ser mayor a 0!`)
-    }
+    } else this.mostrarAdvertencia(`Advertencia`, `La cantidad de mat. prima recuperada debe ser mayor a 0!`);
   }
 
   //Funcion que moverá el inventario de materia prima con base a la materia prima entrante
@@ -269,7 +266,8 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
           error = false;
           this.limpiarTodosCampos();
         });
-      }, error => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la materia prima ${this.ArrayMateriaPrima[index].Id}!`);
+      }, error => {
+        this.mostrarError(`Error`, `¡No se pudo obtener la información de la materia prima ${this.ArrayMateriaPrima[index].Id}!`);
         error = true;
       });
     }
@@ -297,7 +295,7 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   buscarMpId(){
     let idMateriaPrima : number = this.FormMateriaPrima.value.MpId;
     let nuevo : any[] = this.materiasPrimas.filter((item) => item.id == idMateriaPrima);
-    this.FormMateriaPrima.setValue({
+    this.FormMateriaPrima.patchValue({
       MpId : nuevo[0].id,
       MpNombre: nuevo[0].name,
       MpCantidad: 0,
@@ -308,13 +306,13 @@ export class MateriaPrimaRecuperadaComponent implements OnInit {
   //Funcion que consultara una materia prima con base a la que está seleccionada en la vista
   buscarMpSeleccionada(){
     let nombreMateriaPrima : string = this.FormMateriaPrima.value.MpNombre;
-    let nuevo : any[] = this.materiasPrimas.filter((item) => item.id == nombreMateriaPrima)
-      this.FormMateriaPrima.setValue({
-        MpId : nuevo[0].id,
-        MpNombre: nuevo[0].name,
-        MpCantidad: 0,
-        MpUnidadMedida : 'Kg',
-      });
+    let nuevo : any[] = this.materiasPrimas.filter((item) => item.id == nombreMateriaPrima);
+    this.FormMateriaPrima.patchValue({
+      MpId : nuevo[0].id,
+      MpNombre: nuevo[0].name,
+      MpCantidad: 0,
+      MpUnidadMedida : 'Kg',
+    });
   }
 
   /** Mostrar mensaje de confirmación  */

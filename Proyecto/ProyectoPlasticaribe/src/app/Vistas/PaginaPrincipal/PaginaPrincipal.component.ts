@@ -1,23 +1,19 @@
 import { Component, Inject, Injectable, OnInit, ViewChild } from '@angular/core';
+import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MenuItem, MessageService } from 'primeng/api';
-import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
 import { DetallesAsignacionMPxTintasService } from 'src/app/Servicios/DetallesCreacionTintas/detallesAsignacionMPxTintas.service';
 import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
 import { InventarioZeusService } from 'src/app/Servicios/InventarioZeus/inventario-zeus.service';
 import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { VistasFavoritasService } from 'src/app/Servicios/VistasFavoritas/VistasFavoritas.service';
-import Swal from 'sweetalert2';
 import { Reporte_Procesos_OTComponent } from '../Reporte_Procesos_OT/Reporte_Procesos_OT.component';
-import DataLabelsPlugin from 'chartjs-plugin-datalabels';
 import { vistasDisponibles } from './VistasDisponibles';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({  providedIn: 'root' })
 
 @Component({
   selector: 'app-PaginaPrincipal',
@@ -145,16 +141,14 @@ export class PaginaPrincipalComponent implements OnInit {
   estadosPedidos : any [] = [];
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
-                private rolService : RolesService,
-                  private vistasFavService : VistasFavoritasService,
-                    private messageService: MessageService,
-                      private ordenTrabajoService : EstadosProcesos_OTService,
-                        private bagProService : BagproService,
-                          private materiaPrimaService : MateriaPrimaService,
-                            private boppService : EntradaBOPPService,
-                              private tintasCreadasService : DetallesAsignacionMPxTintasService,
-                                private zeusService : InventarioZeusService,) {
-  }
+                private vistasFavService : VistasFavoritasService,
+                  private messageService: MessageService,
+                    private ordenTrabajoService : EstadosProcesos_OTService,
+                      private bagProService : BagproService,
+                        private materiaPrimaService : MateriaPrimaService,
+                          private boppService : EntradaBOPPService,
+                            private tintasCreadasService : DetallesAsignacionMPxTintasService,
+                              private zeusService : InventarioZeusService,) { }
 
   ngOnInit() {
     this.lecturaStorage();
@@ -175,9 +169,7 @@ export class PaginaPrincipalComponent implements OnInit {
   }
 
   //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
-  recargar(){
-    setTimeout(() => { this.tiempoExcedido(); }, 60000);
-  }
+  recargar = () => setTimeout(() => { this.tiempoExcedido(); }, 60000);
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
@@ -192,15 +184,7 @@ export class PaginaPrincipalComponent implements OnInit {
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
-    let rol = this.storage.get('Rol');
-    this.rolService.srvObtenerLista().subscribe(datos_roles => {
-      for (let index = 0; index < datos_roles.length; index++) {
-        if (datos_roles[index].rolUsu_Id == rol) {
-          this.ValidarRol = rol;
-          this.storage_Rol = datos_roles[index].rolUsu_Nombre;
-        }
-      }
-    }, error => { this.mensajeError(`¡No se pudo conectar con el API de rubick, por favor recargue la pagina y si el problema persiste concatese con sistemas!`, error.message); });
+    this.ValidarRol = this.storage.get('Rol');
   }
 
   // Funcion que va a llenar el array de años
@@ -213,9 +197,7 @@ export class PaginaPrincipalComponent implements OnInit {
   }
 
   // Llenar datos con todas las opciones de vistas que puede seleccionar como favoritas
-  llenarDatosSeleccionables(){
-    this.disponibles = vistasDisponibles
-  }
+  llenarDatosSeleccionables = () => this.disponibles = vistasDisponibles;
 
   // Funcion que va a colocar en la vista las vistas escogidas por un usuario como favoritas, las ociones favoritas siempre tendrán predeterminadas, 1: Inicio y 2: Añadir
   mostrarVistasFav(){
@@ -270,18 +252,9 @@ export class PaginaPrincipalComponent implements OnInit {
       }
     );
     this.responsiveOptions = [
-      {
-        breakpoint: '1024px',
-        numVisible: 3
-      },
-      {
-        breakpoint: '768px',
-        numVisible: 2
-      },
-      {
-        breakpoint: '560px',
-        numVisible: 1
-      }
+      { breakpoint: '1024px', numVisible: 3 },
+      { breakpoint: '768px', numVisible: 2 },
+      { breakpoint: '560px', numVisible: 1 }
     ];
   }
 
@@ -339,7 +312,7 @@ export class PaginaPrincipalComponent implements OnInit {
             datos_vistasFav[i].vistaFav_Num5,
           ];
         }
-      }, error => { this.mensajeError('¡No se pudieron encontrar sus vistas favoritas!', error.message); });
+      }, error => this.mensajeError(`¡No se pudo obtener información de las vistas favoritas!`, '¡No se pudieron encontrar sus vistas favoritas!'));
     }
   }
 
@@ -347,35 +320,20 @@ export class PaginaPrincipalComponent implements OnInit {
   añadirVistasFavoritas(){
     if (this.vistasFavoritas.length == 0) {
       for (let i = 0; i < this.targetProducts.length; i++) {
-        let vista1 : number = this.targetProducts[i];
-        let vista2 : number = this.targetProducts[i + 1];
-        let vista3 : number = this.targetProducts[i + 2];
-        let vista4 : number = this.targetProducts[i + 3];
-        let vista5 : number = this.targetProducts[i + 4];
-        if (vista1 == undefined) vista1 = 0;
-        else vista1 = this.targetProducts[i].id;
-        if (vista2 == undefined) vista2 = 0;
-        else vista2 = this.targetProducts[i + 1].id;
-        if (vista3 == undefined) vista3 = 0;
-        else vista3 = this.targetProducts[i + 2].id;
-        if (vista4 == undefined) vista4 = 0;
-        else vista4 = this.targetProducts[i + 3].id;
-        if (vista5 == undefined) vista5 = 0;
-        else vista5 = this.targetProducts[i + 4].id;
         let info : any = {
           Usua_Id : this.storage_Id,
-          VistaFav_Num1 : vista1,
-          VistaFav_Num2 : vista2,
-          VistaFav_Num3 : vista3,
-          VistaFav_Num4 : vista4,
-          VistaFav_Num5 : vista5,
+          VistaFav_Num1 : this.targetProducts[i] == undefined ? 0 : this.targetProducts[i].id,
+          VistaFav_Num2 : this.targetProducts[i + 1] == undefined ? 0 : this.targetProducts[i + 1].id,
+          VistaFav_Num3 : this.targetProducts[i + 2] == undefined ? 0 : this.targetProducts[i + 2].id,
+          VistaFav_Num4 : this.targetProducts[i + 3] == undefined ? 0 : this.targetProducts[i + 3].id,
+          VistaFav_Num5 : this.targetProducts[i + 4] == undefined ? 0 : this.targetProducts[i + 4].id,
           VistaFav_Fecha : moment().format('YYYY-MM-DD'),
           VistaFav_Hora : moment().format('H:mm:ss'),
         }
         this.vistasFavService.insertVistasFavoritas(info).subscribe(() => {
           this.buscarFavoritos();
           setTimeout(() => { this.mostrarVistasFav(); }, 1000);
-        }, error => { this.mensajeError('¡No se pudieron guardar las vistas elegidas!', error.message); });
+        }, error => { this.mensajeError(`¡Ocurrió un error al guardar las vistas elegidas!`, '¡No se pudieron guardar las vistas elegidas!'); });
         break;
       }
     } else {
@@ -396,39 +354,24 @@ export class PaginaPrincipalComponent implements OnInit {
             this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => {
               this.buscarFavoritos();
               setTimeout(() => { this.mostrarVistasFav(); }, 1000);
-            }, error => { this.mensajeError('¡No se pudieron guardar las vistas elegidas!', error.message); });
+            }, error => this.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
           } else {
             for (let j = 0; j < this.targetProducts.length; j++) {
-              let vista1 : number = this.targetProducts[i];
-              let vista2 : number = this.targetProducts[i + 1];
-              let vista3 : number = this.targetProducts[i + 2];
-              let vista4 : number = this.targetProducts[i + 3];
-              let vista5 : number = this.targetProducts[i + 4];
-              if (vista1 == undefined) vista1 = 0;
-              else vista1 = this.targetProducts[i].id;
-              if (vista2 == undefined) vista2 = 0;
-              else vista2 = this.targetProducts[i + 1].id;
-              if (vista3 == undefined) vista3 = 0;
-              else vista3 = this.targetProducts[i + 2].id;
-              if (vista4 == undefined) vista4 = 0;
-              else vista4 = this.targetProducts[i + 3].id;
-              if (vista5 == undefined) vista5 = 0;
-              else vista5 = this.targetProducts[i + 4].id;
               let info : any = {
                 VistasFav_Id: datos_vistasFav[i].vistasFav_Id ,
                 Usua_Id : this.storage_Id,
-                VistaFav_Num1 : vista1,
-                VistaFav_Num2 : vista2,
-                VistaFav_Num3 : vista3,
-                VistaFav_Num4 : vista4,
-                VistaFav_Num5 : vista5,
+                VistaFav_Num1 : this.targetProducts[i] == undefined ? 0 : this.targetProducts[i].id,
+                VistaFav_Num2 : this.targetProducts[i + 1] == undefined ? 0 : this.targetProducts[i + 1].id,
+                VistaFav_Num3 : this.targetProducts[i + 2] == undefined ? 0 : this.targetProducts[i + 2].id,
+                VistaFav_Num4 : this.targetProducts[i + 3] == undefined ? 0 : this.targetProducts[i + 3].id,
+                VistaFav_Num5 : this.targetProducts[i + 4] == undefined ? 0 : this.targetProducts[i + 4].id,
                 VistaFav_Fecha : moment().format('YYYY-MM-DD'),
                 VistaFav_Hora : moment().format('H:mm:ss'),
               }
               this.vistasFavService.updateVistasFavoritas(datos_vistasFav[i].vistasFav_Id, info).subscribe(() => {
                 this.buscarFavoritos();
                 setTimeout(() => { this.mostrarVistasFav(); }, 1000);
-              }, error => { this.mensajeError('¡No se pudieron guardar las vistas elegidas!', error.message); });
+              }, error => this.mensajeError( `¡No se pudieron actualizar las vistas favoritas!`, '¡No se pudieron guardar las vistas elegidas!'));
               break;
             }
           }
@@ -455,7 +398,7 @@ export class PaginaPrincipalComponent implements OnInit {
 
     if(this.ValidarRol == 1) {
       this.ordenTrabajoService.srvObtenerListaPorFechas(this.primerDiaMes, this.today).subscribe(datos_ot => {
-        if (datos_ot.length == 0) setTimeout(() => { this.mensajeError('No existen OTs creadas en las el último mes.'); }, 3000);
+        if (datos_ot.length == 0) setTimeout(() => this.mensajeError('¡No hay ninguna OT creada en el último mes!', `¡!`), 3000);
         else {
           for (let i = 0; i < datos_ot.length; i++) {
             if (datos_ot[i].estado_Nombre == 'Abierta') this.catidadOTAbiertas += 1;
@@ -478,15 +421,8 @@ export class PaginaPrincipalComponent implements OnInit {
 
       this.bagProService.GetPesoProcesosUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
         for (let i = 0; i < datos_ordenes.length; i++) {
-          if (datos_ordenes[i].nomStatus == 'IMPRESION'
-            || datos_ordenes[i].nomStatus == 'LAMINADO'
-            || datos_ordenes[i].nomStatus == 'EXTRUSION'
-            || datos_ordenes[i].nomStatus == 'CORTE'
-            || datos_ordenes[i].nomStatus == 'ROTOGRABADO'
-            || datos_ordenes[i].nomStatus == 'DOBLADO'
-            || datos_ordenes[i].nomStatus == 'EMPAQUE'
-            || datos_ordenes[i].nomStatus == 'SELLADO'
-            || datos_ordenes[i].nomStatus == 'Wiketiado') {
+          let estados : string [] = ['IMPRESION', 'LAMINADO', 'EXTRUSION', 'CORTE', 'ROTOGRABADO', 'DOBLADO', 'EMPAQUE', 'SELLADO', 'Wiketiado'];
+          if (estados.includes(datos_ordenes[i].nomStatus)) {
               let id : number = 0;
               if (datos_ordenes[i].nomStatus == 'EXTRUSION') id = 1;
               if (datos_ordenes[i].nomStatus == 'IMPRESION') id = 2;
@@ -517,27 +453,19 @@ export class PaginaPrincipalComponent implements OnInit {
         }
       });
 
-      this.bagProService.GetCostoOrdenesUltimoMes_Vendedores(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-        for (let i = 0; i < datos_ordenes.length; i++) {
-          this.vendedorOrdenesMes.push(datos_ordenes[i]);
-          this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-        }
-      });
+      this.bagProService.GetCostoOrdenesUltimoMes_Vendedores(this.primerDiaMes, this.today).subscribe(datos => this.vendedorOrdenesMes = datos );
+      this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
 
       this.bagProService.GetCostoOrdenesUltimoMes_Clientes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+        this.clientesOrdenesMes = datos_ordenes;
+        this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
         for (let i = 0; i < datos_ordenes.length; i++) {
-          this.clientesOrdenesMes.push(datos_ordenes[i]);
-          this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
           this.totalOrdenesMes += datos_ordenes[i].cantidad;
         }
       });
 
-      this.bagProService.GetCantOrdenesMateriales(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-        for (let i = 0; i < datos_ordenes.length; i++) {
-          this.materialesOrdenesMes.push(datos_ordenes[i]);
-          this.materialesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-        }
-      });
+      this.bagProService.GetCantOrdenesMateriales(this.primerDiaMes, this.today).subscribe(datos => this.materialesOrdenesMes = datos );
+      this.materialesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
     }
   }
 
@@ -586,34 +514,22 @@ export class PaginaPrincipalComponent implements OnInit {
         }
       });
 
-      this.materiaPrimaService.GetMateriasPrimasUtilizadasHoy(this.today).subscribe(datos_materiasPrimas => {
-        for (let i = 0; i < datos_materiasPrimas.length; i++) {
-          this.materiasPrimasMovidasHoy.push(datos_materiasPrimas[i]);
-          this.materiasPrimasMovidasHoy.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-        }
-      });
+      this.materiaPrimaService.GetMateriasPrimasUtilizadasHoy(this.today).subscribe(datos => { this.materiasPrimasMovidasHoy = datos; });
+      this.materiasPrimasMovidasHoy.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
 
       this.tintasCreadasService.GetTintasCreadasMes(this.primerDiaMes, this.today).subscribe(datos_tintas => {
+        this.tintasCreadas = datos_tintas;
+        this.tintasCreadas.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
         for (let i = 0; i < datos_tintas.length; i++) {
-          this.tintasCreadas.push(datos_tintas[i]);
-          this.tintasCreadas.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
           this.cantTintasCreadas += 1;
         }
       });
 
-      this.materiaPrimaService.GetMateriasPrimasUltilizadasMes(this.primerDiaMes, this.today).subscribe(datos_materiasPrimas => {
-        for (let i = 0; i < datos_materiasPrimas.length; i++) {
-          this.materiasPrimasMasUtilizadasMes.push(datos_materiasPrimas[i]);
-          this.materiasPrimasMasUtilizadasMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-        }
-      });
+      this.materiaPrimaService.GetMateriasPrimasUltilizadasMes(this.primerDiaMes, this.today).subscribe(datos => { this.materiasPrimasMasUtilizadasMes = datos; });
+      this.materiasPrimasMasUtilizadasMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
 
-      this.tintasCreadasService.GetMateriasPrimasCrearTintasMes(this.primerDiaMes, this.today).subscribe(datos_tintas => {
-        for (let i = 0; i < datos_tintas.length; i++) {
-          this.materiasPrimasMasUtilizadasCrearTintaMes.push(datos_tintas[i]);
-          this.materiasPrimasMasUtilizadasCrearTintaMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-        }
-      });
+      this.tintasCreadasService.GetMateriasPrimasCrearTintasMes(this.primerDiaMes, this.today).subscribe(datos => { this.materiasPrimasMasUtilizadasCrearTintaMes = datos; });
+      this.materiasPrimasMasUtilizadasCrearTintaMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
 
       this.ordenTrabajoService.GetTotalMateriaPrimaAsignadaMes(this.primerDiaMes, this.today).subscribe(datos_ot => {
         for (let i = 0; i < datos_ot.length; i++) {
@@ -631,21 +547,13 @@ export class PaginaPrincipalComponent implements OnInit {
     this.totalIvaVentaMes = 0;
     this.totalIvaCompraMes = 0;
     if(this.ValidarRol == 1 || this.ValidarRol == 60) {
-      this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => {
-        this.totalFacturadoDia = datos_facturacion;
-      });
+      this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => { this.totalFacturadoDia = datos_facturacion; });
 
-      this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
-        this.totalFacuturadoMes = datos_facturacion;
-      });
+      this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalFacuturadoMes = datos_facturacion; });
 
-      this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
-        this.totalIvaVentaMes = datos_facturacion;
-      });
+      this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalIvaVentaMes = datos_facturacion; });
 
-      // this.zeusService.GetIvaCompraMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => {
-      //   this.totalIvaCompraMes = datos_facturacion;
-      // }, error => { this.mensajeError(`¡No se pudo obtener información sobre el iva de las compras de mes actual!`, error.message); });
+      // this.zeusService.GetIvaCompraMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalIvaCompraMes = datos_facturacion; });
 
       for (let i = 0; i < 12; i++) {
         this.zeusService.GetFacturacionTodosMeses(i+ 1, this.anoSeleccionado).subscribe(datos_facturacion => {
@@ -688,11 +596,11 @@ export class PaginaPrincipalComponent implements OnInit {
   // Funcion que va a consultar la información general de los pedidos creados en Zeus
   pedidosZeus(){
     // Pedidos CLientes
-    this.zeusService.getPedidosCliente().subscribe(datos_pedidos => { this.pedidosClientes = datos_pedidos; });
+    this.zeusService.getPedidosCliente().subscribe(datos_pedidos => this.pedidosClientes = datos_pedidos );
     // Pedidos Productos
-    this.zeusService.getPedidosProductos().subscribe(datos_pedidos => { this.pedidosProductos = datos_pedidos; });
+    this.zeusService.getPedidosProductos().subscribe(datos_pedidos => this.pedidosProductos = datos_pedidos );
     //Pedidos Vendedores
-    this.zeusService.getPedidosVendedores().subscribe(datos_pedidos => { this.pedidosVendedores = datos_pedidos });
+    this.zeusService.getPedidosVendedores().subscribe(datos_pedidos => this.pedidosVendedores = datos_pedidos );
     // Pedidos Estados
     this.zeusService.getPedidosEstados().subscribe(datos_pedidos => {
       this.pedidosTotales = [];
@@ -735,7 +643,7 @@ export class PaginaPrincipalComponent implements OnInit {
       }
     });
     //Pedidos Stock
-    this.zeusService.getPedidosStock().subscribe(datos_pedidos => { this.pedidosStock = datos_pedidos; });
+    this.zeusService.getPedidosStock().subscribe(datos_pedidos => this.pedidosStock = datos_pedidos );
 
     setTimeout(() => {
       this.pedidosClientes.sort((a,b) => b.cantidad - a.cantidad);
@@ -751,16 +659,8 @@ export class PaginaPrincipalComponent implements OnInit {
     this.ComparativoData = {
       labels: ['Materia Prima'],
       datasets: [
-        {
-          label: 'Materia Prima Asignada',
-          backgroundColor: '#42A5F5',
-          data: [this.totalMpAsignada]
-        },
-        {
-          label: 'Materia Prima Extruida',
-          backgroundColor: '#FFA726',
-          data: [this.totalExtruidoMes]
-        }
+        { label: 'Materia Prima Asignada', backgroundColor: '#42A5F5', data: [this.totalMpAsignada] },
+        { label: 'Materia Prima Extruida', backgroundColor: '#FFA726', data: [this.totalExtruidoMes] }
       ]
     };
 
@@ -790,22 +690,15 @@ export class PaginaPrincipalComponent implements OnInit {
     }
     this.multiAxisData = {
       labels: vendedores,
-      datasets: [{
-        label: 'Cantidad de Ordenes de Trabajo hechas ',
-        backgroundColor: [ '#42A5F5', ],
-        yAxisID: 'y',
-        data: cantOt
-      },
-      {
-        label: 'Valor Total de Ordenes de Trabajo ',
-        backgroundColor: '#4169E1',ayAxisID: 'y1', ata: costoVentas
-      }]
+      datasets: [
+        { label: 'Cantidad de Ordenes de Trabajo hechas ', backgroundColor: [ '#42A5F5', ], yAxisID: 'y', data: cantOt },
+        { label: 'Valor Total de Ordenes de Trabajo ', backgroundColor: '#4169E1', ayAxisID: 'y1', ata: costoVentas }
+      ]
     };
     this.multiAxisOptions = {
       plugins: {
         legend: {  labels: { color: '#495057' } },
-        tooltips: { ode: 'index', intersect: true
-        }
+        tooltips: { ode: 'index', intersect: true }
       },
       scales: {
         x: {
@@ -844,24 +737,15 @@ export class PaginaPrincipalComponent implements OnInit {
     }
     this.multiAxisData = {
       labels: clientes,
-      datasets: [{
-        label: 'Cantidad de Ordenes de Trabajo hechas ',
-        backgroundColor: [
-          '#AB47BC',
-          '#42A5F5',
-          '#66BB6A',
-          '#FFCA28',
-          '#26A69A'
-        ],
-        yAxisID: 'y',
-        data: cantOt
-      },
-      {
-        label: 'Valor Total de Ordenes de Trabajo ',
-        backgroundColor: [ '#F5B041', ],
-        yAxisID: 'y1',
-        data: costo
-      }]
+      datasets: [
+        {
+          label: 'Cantidad de Ordenes de Trabajo hechas ',
+          backgroundColor: [ '#AB47BC', '#42A5F5', '#66BB6A', '#FFCA28', '#26A69A' ],
+          yAxisID: 'y',
+          data: cantOt
+        },
+        { label: 'Valor Total de Ordenes de Trabajo ',  backgroundColor: [ '#F5B041', ], yAxisID: 'y1', data: costo }
+      ]
     };
     this.multiAxisOptions = {
       plugins: {
@@ -870,17 +754,14 @@ export class PaginaPrincipalComponent implements OnInit {
       },
       scales: {
         x: {
-          ticks: {
-            color: '#495057'
-          },
+          ticks: { color: '#495057' },
           grid: { color: '#ebedef' }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { min: 0, max: 100, olor: '#495057'
-          },
+          ticks: { min: 0, max: 100, olor: '#495057' },
           grid: { color: '#ebedef' }
         },
         y1: {
@@ -900,19 +781,14 @@ export class PaginaPrincipalComponent implements OnInit {
     this.nombreGrafica = `Grafica de Estados de Ordenes`;
     this.multiAxisData = {
       labels: ['Abierta', 'Asignada', 'En proceso', 'Terminada', 'Anulado', 'Cerrada'],
-      datasets: [{
-        label: 'Cantidad de Ordenes de Trabajo',
-        backgroundColor: [ '#F6D45D', '#83D3FF', '#F3FC20', '#8AFC9B', '#FF7878', '#53CC48' ],
-        yAxisID: 'y',
-        data: [
-          this.catidadOTAbiertas,
-          this.cantidadOTAsignadas,
-          this.cantidadOTIniciada,
-          this.cantidadOTTerminada,
-          this.cantidadOtAnulada,
-          this.cantidadOTCerrada
-        ]
-      }]
+      datasets: [
+        {
+          label: 'Cantidad de Ordenes de Trabajo',
+          backgroundColor: [ '#F6D45D', '#83D3FF', '#F3FC20', '#8AFC9B', '#FF7878', '#53CC48' ],
+          yAxisID: 'y',
+          data: [ this.catidadOTAbiertas, this.cantidadOTAsignadas, this.cantidadOTIniciada, this.cantidadOTTerminada, this.cantidadOtAnulada, this.cantidadOTCerrada ]
+        }
+      ]
     };
     this.multiAxisOptions = {
       plugins: {
@@ -1018,9 +894,7 @@ export class PaginaPrincipalComponent implements OnInit {
     };
 
     this.ivaCompraOptions = {
-      plugins: {
-        legend: { labels: { color: '#495057' } }
-      },
+      plugins: { legend: { labels: { color: '#495057' } } },
       scales: {
         x: { ticks: { color: '#495057' }, grid: { color: '#ebedef' } },
         y: { icks: { color: '#495057' }, grid: { color: '#ebedef' } }
@@ -1270,44 +1144,44 @@ export class PaginaPrincipalComponent implements OnInit {
   }
 
   // Funcion que va a ordenar el ranking de clientes
-  ordenarClientesCostoOrdenes(){ this.clientesOrdenesMes.sort((a,b) => Number(b.costo) - Number(a.costo)); }
+  ordenarClientesCostoOrdenes = () => this.clientesOrdenesMes.sort((a,b) => Number(b.costo) - Number(a.costo));
 
   // Funcion que va a ordenar el ranking de clientes
-  ordenarClientesCantOrdenes(){ this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad)); }
+  ordenarClientesCantOrdenes = () => this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
 
   // Funcion que va a ordenar el ranking de clientes
-  ordenarClientesPesoOrdenes(){ this.clientesOrdenesMes.sort((a,b) => Number(b.peso) - Number(a.peso)); }
+  ordenarClientesPesoOrdenes = () => this.clientesOrdenesMes.sort((a,b) => Number(b.peso) - Number(a.peso));
 
   // Funcion que va a ordenar el ranking de vendedores
-  ordenarVendedoresCostoOrdenes(){ this.vendedorOrdenesMes.sort((a,b) => Number(b.costo) - Number(a.costo)); }
+  ordenarVendedoresCostoOrdenes = () => this.vendedorOrdenesMes.sort((a,b) => Number(b.costo) - Number(a.costo));
 
   // Funcion que va a ordenar el ranking de clientes
-  ordenarVendedoresCantOrdenes(){ this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad)); }
+  ordenarVendedoresCantOrdenes = () => this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
 
   // Funcion que va a ordenar el ranking de clientes
-  ordenarVendedoresPesoOrdenes(){ this.vendedorOrdenesMes.sort((a,b) => Number(b.peso) - Number(a.peso)); }
+  ordenarVendedoresPesoOrdenes = () => this.vendedorOrdenesMes.sort((a,b) => Number(b.peso) - Number(a.peso));
 
   // Funcion que va a ordenar el ranking de clientes en pedidos
-  ordenarClienteCantidad_Pedidos(){ this.pedidosClientes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad)); }
+  ordenarClienteCantidad_Pedidos = () => this.pedidosClientes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
 
   // Funcion que va a ordenar el ranking de clientes en pedidos
-  ordenarClienteCosto_Pedidos(){ this.pedidosClientes.sort((a,b) => Number(b.costo) - Number(a.costo)); }
+  ordenarClienteCosto_Pedidos = () => this.pedidosClientes.sort((a,b) => Number(b.costo) - Number(a.costo));
 
   // Funcion que va a ordenar el ranking de productos en pedidos
-  ordenarProductoCantidad_Pedidos(){ this.pedidosProductos.sort((a,b) => Number(b.cantidad) - Number(a.cantidad)); }
+  ordenarProductoCantidad_Pedidos = () => this.pedidosProductos.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
 
   // Funcion que va a ordenar el ranking de productos en pedidos
-  ordenarProductoCosto_Pedidos(){ this.pedidosProductos.sort((a,b) => Number(b.costo) - Number(a.costo)); }
+  ordenarProductoCosto_Pedidos = () => this.pedidosProductos.sort((a,b) => Number(b.costo) - Number(a.costo));
 
   // Funcion que va a ordenar el ranking de vendedores en pedidos
-  ordenarVendedorCantidad_Pedidos(){ this.pedidosVendedores.sort((a,b) => Number(b.cantidad) - Number(a.cantidad)); }
+  ordenarVendedorCantidad_Pedidos = () => this.pedidosVendedores.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
 
   // Funcion que va a ordenar el ranking de vendedores en pedidos
-  ordenarVendedorCosto_Pedidos(){ this.pedidosVendedores.sort((a,b) => Number(b.costo) - Number(a.costo)); }
+  ordenarVendedorCosto_Pedidos = () => this.pedidosVendedores.sort((a,b) => Number(b.costo) - Number(a.costo));
 
   // Funcion que tomará unos parametros para mostrar un mensaje de error
-  mensajeError(texto : string, error : string = ''){ Swal.fire({ icon: 'error', title: 'Opps...', showCloseButton : true, html: `<b>${texto}</b><br>` + `<spam style="color: #f00">${error}</spam>`, }); }
+  mensajeError = (titulo : string, mensaje : string) => this.messageService.add({severity:'error', key: 'tc', summary: titulo, detail: mensaje, sticky: true});
 
   // Funcion que va a detectar sorbe que panel está siendo seleccionado
-  handleChange(e) { if (e.index == 3) this.pedidosZeus(); }
+  handleChange = (e) => e.index == 3 ?  this.pedidosZeus() : 0;
 }

@@ -11,7 +11,6 @@ import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
 import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
 import { UnidadMedidaService } from 'src/app/Servicios/UnidadMedida/unidad-medida.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-asignacion-materia-prima',
@@ -106,14 +105,7 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
   // Funcion que limpia los todos los campos de la vista
   LimpiarCampos() {
     this.FormMateriaPrimaRetirada.reset();
-    this.FormMateriaPrimaRetiro.patchValue({
-      OTRetiro : null,
-      OTImp : null,
-      FechaRetiro : this.today,
-      Maquina : null,
-      kgOt : null,
-      ObservacionRetiro : null,
-    });
+    this.FormMateriaPrimaRetiro.patchValue({ FechaRetiro : this.today, });
     this.cantidadAsignada = 0;
     this.cantRestante = 0;
     this.kgOT = 0;
@@ -207,21 +199,22 @@ export class AsignacionMateriaPrimaComponent implements OnInit {
 
   //Funcion que va a mostrar el nombre de la materia prima
   cambiarNombreMateriaPrima(dato : number){
-    let id : number;
-    if (dato == 1) id = this.FormMateriaPrimaRetirada.value.MpIdRetirada;
-    else if (dato == 2) id = this.FormMateriaPrimaRetirada.value.MpNombreRetirada;
+    let id : number = dato == 1 ? this.FormMateriaPrimaRetirada.value.MpIdRetirada : this.FormMateriaPrimaRetirada.value.MpNombreRetirada;
     this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
       for (let i = 0; i < datos_materiaPrima.length; i++) {
         if (datos_materiaPrima[i].categoria != 6) {
-          this.FormMateriaPrimaRetirada = this.frmBuilderMateriaPrima.group({
-            MpIdRetirada : datos_materiaPrima[i].id,
-            MpNombreRetirada: datos_materiaPrima[i].nombre,
-            MpCantidadRetirada : 0,
-            MpUnidadMedidaRetirada: datos_materiaPrima[i].undMedida,
-            MpStockRetirada: datos_materiaPrima[i].stock,
-            ProcesoRetiro : '',
-            Categoria : datos_materiaPrima[i].categoria,
-          });
+          let mp : number [] = [84, 2001, 88, 89, 2072];
+          if (!mp.includes(datos_materiaPrima[i].id)) {
+            this.FormMateriaPrimaRetirada.patchValue({
+              MpIdRetirada : datos_materiaPrima[i].id,
+              MpNombreRetirada: datos_materiaPrima[i].nombre,
+              MpCantidadRetirada : 0,
+              MpUnidadMedidaRetirada: datos_materiaPrima[i].undMedida,
+              MpStockRetirada: datos_materiaPrima[i].stock,
+              ProcesoRetiro : '',
+              Categoria : datos_materiaPrima[i].categoria,
+            });
+          }
         }
       }
     }, error => {

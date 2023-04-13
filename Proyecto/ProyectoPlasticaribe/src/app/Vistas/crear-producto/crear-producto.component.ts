@@ -51,11 +51,10 @@ export class CrearProductoComponent implements OnInit {
                           private clientesService : ClientesService,
                             private usuarioService : UsuarioService,
                               @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                                private rolService : RolesService,
-                                  private materialService : MaterialProductoService,
-                                    private pigmentoServices : PigmentoProductoService,
-                                      private tipoSelladoService : TiposSelladoService,
-                                        private ClientesProductosService : ClientesProductosService,) {
+                                private materialService : MaterialProductoService,
+                                  private pigmentoServices : PigmentoProductoService,
+                                    private tipoSelladoService : TiposSelladoService,
+                                      private ClientesProductosService : ClientesProductosService,) {
 
     this.FormCrearProducto = this.frmBuilderCrearProducto.group({
       ProduId:[null, Validators.required],
@@ -106,9 +105,7 @@ export class CrearProductoComponent implements OnInit {
   // Funcion que va a limpiar los campos del formulario de producto
   LimpiarCampos() {
     this.productoService.GetIdUltimoProducto().subscribe(datos => {
-      this.FormCrearProducto.patchValue({
-        ProduId:datos + 1,
-      });
+      this.FormCrearProducto.patchValue({ ProduId:datos + 1, });
     });
   }
 

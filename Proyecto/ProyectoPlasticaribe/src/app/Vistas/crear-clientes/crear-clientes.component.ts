@@ -1,16 +1,16 @@
 import { Component, Inject, Injectable, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
+import { RolesService } from 'src/app/Servicios/Roles/roles.service';
+import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
 import { TipoClienteService } from 'src/app/Servicios/TipoCliente/tipo-cliente.service';
 import { TipoIdentificacionService } from 'src/app/Servicios/TipoIdentificacion/tipo-identificacion.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
+import { OpedidoproductoComponent } from 'src/app/Vistas/opedidoproducto/opedidoproducto.component';
 import Swal from 'sweetalert2';
-import {OpedidoproductoComponent} from 'src/app/Vistas/opedidoproducto/opedidoproducto.component';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { CrearProductoComponent } from '../crear-producto/crear-producto.component';
-import { ClientesService } from 'src/app/Servicios/Clientes/clientes.service';
-import { SedeClienteService } from 'src/app/Servicios/SedeCliente/sede-cliente.service';
-import moment from 'moment';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 
 @Injectable({
   providedIn: 'root'
@@ -43,8 +43,7 @@ export class ClientesComponent implements OnInit {
                         private pedidoCliente : OpedidoproductoComponent,
                           private crearProducto : CrearProductoComponent,
                             private clientesService :ClientesService,
-                              private sedesClientesService: SedeClienteService,
-                                private tipoClientService : TipoClienteService,) {
+                              private sedesClientesService: SedeClienteService,) {
 
     this.FormCrearClientes = this.formBuilderCrearClientes.group({
       CliId: [null, Validators.required],

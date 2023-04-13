@@ -11,9 +11,7 @@ import { DesperdicioService } from 'src/app/Servicios/Desperdicio/desperdicio.se
 import { FallasTecnicasService } from 'src/app/Servicios/FallasTecnicas/FallasTecnicas.service';
 import { MaterialProductoService } from 'src/app/Servicios/MaterialProducto/materialProducto.service';
 import { ProcesosService } from 'src/app/Servicios/Procesos/procesos.service';
-import { RolesService } from 'src/app/Servicios/Roles/roles.service';
 import { UsuarioService } from 'src/app/Servicios/Usuarios/usuario.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app.desperdicio.component',
@@ -40,16 +38,15 @@ export class DesperdicioComponent implements OnInit {
   registroSeleccionado : any =[]; /** Variable que contendrá el registro a quitar de la tabla. */
 
   constructor(private frmBuilder : FormBuilder,
-                private rolService : RolesService,
-                  @Inject(SESSION_STORAGE) private storage: WebStorageService,
-                    private bagProService : BagproService,
-                      private operariosService : UsuarioService,
-                        private procesosService : ProcesosService,
-                          private fallasService : FallasTecnicasService,
-                            private maquinasService : ActivosService,
-                              private deperdicioService : DesperdicioService,
-                                private materiaService : MaterialProductoService,
-                                  private messageService: MessageService) {
+                @Inject(SESSION_STORAGE) private storage: WebStorageService,
+                  private bagProService : BagproService,
+                    private operariosService : UsuarioService,
+                      private procesosService : ProcesosService,
+                        private fallasService : FallasTecnicasService,
+                          private maquinasService : ActivosService,
+                            private deperdicioService : DesperdicioService,
+                              private materiaService : MaterialProductoService,
+                                private messageService: MessageService) {
 
     this.FormDesperdicio = this.frmBuilder.group({
       OTDesperdicio : [null],
@@ -122,9 +119,8 @@ export class DesperdicioComponent implements OnInit {
     this.procesos = [];
     this.procesosService.srvObtenerLista().subscribe(datos_procesos => {
       for (let i = 0; i < datos_procesos.length; i++) {
-        if (datos_procesos[i].proceso_Codigo != 12 && datos_procesos[i].proceso_Codigo != 11 && datos_procesos[i].proceso_Codigo != 10) {
-          this.procesos.push(datos_procesos[i]);
-        }
+        let pro : number [] = [10,11,12];
+        if (pro.includes(datos_procesos[i].proceso_Codigo)) this.procesos.push(datos_procesos[i]);
       }
     });
   }
@@ -155,8 +151,7 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar el id de la falla y en su lugar colocará el nombre en el formulario
   buscarFalla(){
     let noConformidad : any = this.FormDesperdicio.value.TipoNoConformidad;
-    let nuevo : any[] =  this.fallas.filter((item) => item.falla_Id == noConformidad)
-
+    let nuevo : any [] =  this.fallas.filter((item) => item.falla_Id == noConformidad);
     this.FormDesperdicio.patchValue({
       IdTipoNoConformidad : nuevo[0].falla_Id,
       TipoNoConformidad : nuevo[0].falla_Nombre,
@@ -166,8 +161,7 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar el id del operario y en su lugar colocará el nombre en el formulario
   buscarOperario(){
     let operario : any = this.FormDesperdicio.value.Operario;
-    let nuevo : any[] =  this.operarios.filter((item) => item.usua_Id == operario)
-
+    let nuevo : any [] =  this.operarios.filter((item) => item.usua_Id == operario);
     this.FormDesperdicio.patchValue({
       IdOperario : nuevo[0].usua_Id,
       Operario : nuevo[0].usua_Nombre,
@@ -177,8 +171,7 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar el id de la maquina y en su lugar colocará el serial de la maquina
   buscarMaquina(){
     let maquina : any = this.FormDesperdicio.value.Maquina;
-    let nuevo : any[] =  this.maquinas.filter((item) => item.actv_Id == maquina)
-
+    let nuevo : any [] =  this.maquinas.filter((item) => item.actv_Id == maquina);
     this.FormDesperdicio.patchValue({
       IdMaquina : nuevo[0].actv_Id,
       Maquina : nuevo[0].actv_Nombre,
@@ -188,8 +181,7 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar el id del area y en su lugar colocará el nombre del area o proceso
   buscarProceso(){
     let proceso : any = this.FormDesperdicio.value.Area;
-    let nuevo : any[] =  this.procesos.filter((item) => item.proceso_Id == proceso)
-
+    let nuevo : any [] =  this.procesos.filter((item) => item.proceso_Id == proceso);
     this.FormDesperdicio.patchValue({
       IdArea : nuevo[0].proceso_Id,
       Area : nuevo[0].proceso_Nombre,
@@ -199,8 +191,7 @@ export class DesperdicioComponent implements OnInit {
   // Funcion que va a consultar el id del material y en su lugar colocará el nombre de este
   buscarMaterial(){
     let material : any = this.FormDesperdicio.value.TipoMaterial;
-    let nuevo : any[] =  this.materiales.filter((item) => item.material_Id == material)
-
+    let nuevo : any [] =  this.materiales.filter((item) => item.material_Id == material);
     this.FormDesperdicio.patchValue({
       IdTipoMaterial : nuevo[0].material_Id,
       TipoMaterial : nuevo[0].material_Nombre,
@@ -289,8 +280,7 @@ export class DesperdicioComponent implements OnInit {
           Desp_HoraRegistro : moment().format('H:mm:ss'),
           Proceso_Id : this.grupoDespercios[i].IdArea,
         }
-        this.deperdicioService.Insert(info).subscribe(datos_insertados => {
-          this.mostrarConfirmacion(`Confirmación`, `Se ha ingresado el desperdicio exitosamente!`);
+        this.deperdicioService.Insert(info).subscribe(datos_insertados => { this.mostrarConfirmacion(`Confirmación`, `Se ha ingresado el desperdicio exitosamente!`);
         }, error => {
           this.mostrarError(`Error`, `Ha ocurrido un error, no se pudo ingresar el desperdicio!`);
           error = true;
