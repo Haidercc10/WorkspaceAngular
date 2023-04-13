@@ -33,7 +33,7 @@ p-calendar ::ng-deep span button span {
   display: block;
 }
 
-.bg-danger1, .bg-success1, .bg-warning1 {
+.bg-danger1, .bg-success1, .bg-warning1, .bg-secondary1, .bg-primary1, .bg-info1 {
   color: white;
   font-size: calc(var(--font-size) * 15px);
 }
@@ -44,8 +44,24 @@ p-calendar ::ng-deep span button span {
 
 .bg-success1 {
   background-color: palegreen;
+  color: black;
 }
 
 .bg-warning1 {
   background-color: gold;
+  color: black;
+}
+
+.bg-secondary1 {
+  background-color: gray;
+}
+
+.bg-primary1 {
+  background-color: rgb(164, 206, 255);
+  color: black;
+}
+
+.bg-info1 {
+  background-color: rgb(228, 228, 228);
+  color: black;
 }
