@@ -393,8 +393,8 @@ export class ReporteCostosOTComponent implements OnInit {
             SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio)),
             Proceso : 'Devolución',
           }
-          this.totalMPEntregada = this.totalMPEntregada - infoDoc.Cantidad;
-          this.ValorMPEntregada = this.ValorMPEntregada - (formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio);
+          this.totalMPEntregada -= infoDoc.Cantidad;
+          this.ValorMPEntregada -= (formulario.dtDevMatPri_CantidadDevuelta * datos_materiaPrima.matPri_Precio);
           this.ArrayMateriaPrima.push(infoDoc);
           this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
           this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
@@ -410,8 +410,8 @@ export class ReporteCostosOTComponent implements OnInit {
             SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_tinta.tinta_Precio)),
             Proceso : 'Devolución',
           }
-          this.totalMPEntregada = this.totalMPEntregada - infoDoc.Cantidad;
-          this.ValorMPEntregada = this.ValorMPEntregada - (formulario.dtDevMatPri_CantidadDevuelta * datos_tinta.tinta_Precio);
+          this.totalMPEntregada -= infoDoc.Cantidad;
+          this.ValorMPEntregada -= (formulario.dtDevMatPri_CantidadDevuelta * datos_tinta.tinta_Precio);
           this.ArrayMateriaPrima.push(infoDoc);
           this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
           this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
@@ -429,8 +429,8 @@ export class ReporteCostosOTComponent implements OnInit {
               SubTotal : this.formatonumeros(Math.round(formulario.dtDevMatPri_CantidadDevuelta * datos_bopp[i].bopP_Precio)),
               Proceso : 'Devolución',
             }
-            this.totalMPEntregada = this.totalMPEntregada - infoDoc.Cantidad;
-            this.ValorMPEntregada = this.ValorMPEntregada - (formulario.dtDevMatPri_CantidadDevuelta * datos_bopp[i].bopP_Precio);
+            this.totalMPEntregada -= infoDoc.Cantidad;
+            this.ValorMPEntregada -= (formulario.dtDevMatPri_CantidadDevuelta * datos_bopp[i].bopP_Precio);
             this.ArrayMateriaPrima.push(infoDoc);
             this.ArrayMateriaPrima.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
             this.ArrayMateriaPrima.sort((a,b) => a.Proceso.localeCompare(b.Proceso));
@@ -1191,31 +1191,20 @@ export class ReporteCostosOTComponent implements OnInit {
       this.bagProServices.srvActualizar(this.ordenTrabajo, data, '1').subscribe(datos_clientesOT => {
         this.cambiarEstado2(this.ordenTrabajo, 18);
         this.mostrarConfirmacion(`Confirmación`, `¡Se ha cambiado el estado de la OT ${this.ordenTrabajo} a Cerrada!`);
-      }, error => { this.mostrarError(`Error`, `No se ha podido cambiar el estado de la OT`); });
+      }, error => this.mostrarError(`Error`, `No se ha podido cambiar el estado de la OT`));
     }
   }
 
   /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
-  }
+  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
 
   /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
-  }
+  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
 
   /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
-  }
+  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
 
-  inhabilitarCampos(){
-    setTimeout(() => { this.infoOT.disable(); this.infoOT.get('ot').enable();this.infoOT.get('estadoOT').enable(); }, 1000);
-  }
+  inhabilitarCampos = () => setTimeout(() => { this.infoOT.disable(); this.infoOT.get('ot').enable();this.infoOT.get('estadoOT').enable(); }, 1000);
 
-  cargarEstados(){
-    this.arrayEstados = [];
-    this.arrayEstados = [ {valor: '0', nombre: 'Abierto'}, {valor: '4', nombre: 'Anulado'}]
-  }
+  cargarEstados = () => this.arrayEstados = [ {valor: '0', nombre: 'Abierto'}, {valor: '4', nombre: 'Anulado'}];
 }

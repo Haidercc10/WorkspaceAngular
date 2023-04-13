@@ -29,7 +29,6 @@ export class DevolucionesMPComponent implements OnInit {
   materiasPrimasRetiradas = []; //Variable que va almacenar el nombre de todas las materias primas existentes en la empresa
   today : any = moment().format('YYYY-MM-DD'); //Variable que se usará para llenar la fecha actual
   load : boolean = true;
-  maximoIdMp : number = 0; /** Variable que almacenará el ultimo id de la matprima para la validación que se realiza al cargar las MP/Tintas/BOPP a la tabla.  */
 
   constructor(private materiaPrimaService : MateriaPrimaService,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -52,11 +51,6 @@ export class DevolucionesMPComponent implements OnInit {
     this.lecturaStorage();
   }
 
-  /** Función que obtendrá el ultimo ID de la tabla de matprimas. */
-  ultimoIdMatPrima(){
-    this.materiaPrimaService.getMaximoIdMatPrima().subscribe(data => { this.maximoIdMp = data; });
-  }
-
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
     this.storage_Id = this.storage.get('Id');
@@ -72,17 +66,10 @@ export class DevolucionesMPComponent implements OnInit {
   }
 
   // Funcion que limpia los todos los campos de la vista
-  LimpiarCampos() {
-    this.FormDevolucion.setValue({
-      ot : '',
-      MpingresoFecha: this.today,
-      MpObservacion : '',
-    });
-  }
+  LimpiarCampos = () => this.FormDevolucion.patchValue({ ot : '', MpingresoFecha: this.today, MpObservacion : '', });
 
   // Funcion que va a consultar por OT todas las materia primas asignadas a una orden de trabajo
   consultarOt(){
-    this.ultimoIdMatPrima();
     this.load = false;
     this.materiasPrimas = [];
     let ot : number = this.FormDevolucion.value.ot;
@@ -309,27 +296,17 @@ export class DevolucionesMPComponent implements OnInit {
   // Funcion que va a limpiar todos los campos
   limpiarTodosCampos(){
     this.load = true;
-    this.FormDevolucion.setValue({
-      ot : '',
-      MpingresoFecha: this.today,
-      MpObservacion : '',
-    });
+    this.FormDevolucion.patchValue({ ot : '', MpingresoFecha: this.today, MpObservacion : '', });
     this.materiasPrimas = [];
     this.materiasPrimasRetiradas = [];
   }
 
     /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
-  }
+  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo});
 
   /** Mostrar mensaje de error  */
-  mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
-  }
+  mostrarError = (mensaje : any, titulo?: any) => this.messageService.add({severity:'error', summary: mensaje, detail: titulo});
 
   /** Mostrar mensaje de advertencia */
-  mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
-  }
+  mostrarAdvertencia = (mensaje : any, titulo?: any) => this.messageService.add({severity:'warn', summary: mensaje, detail: titulo});
 }

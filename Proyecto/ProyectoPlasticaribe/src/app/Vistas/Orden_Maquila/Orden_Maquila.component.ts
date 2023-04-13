@@ -127,9 +127,7 @@ export class Orden_MaquilaComponent implements OnInit {
   }
 
   // Funcion que va a limpiar los campos de materia prima
-  limpiarCamposMateriaPrima(){
-    this.FormMateriaPrima.reset();
-  }
+  limpiarCamposMateriaPrima = () => this.FormMateriaPrima.reset();
 
   // Funcion que va a consultar las categorias de las tablas Materia_Prima, Tintas y BOPP
   consultarCategorias(){
@@ -163,9 +161,7 @@ export class Orden_MaquilaComponent implements OnInit {
   }
 
   // Funcion que va a consultar las unidades de medida
-  obtenerUnidadesMedida(){
-    this.undMedidaService.srvObtenerLista().subscribe(datos_undMedida => { this.unidadesMedida = datos_undMedida; });
-  }
+  obtenerUnidadesMedida = () => this.undMedidaService.srvObtenerLista().subscribe(datos_undMedida => { this.unidadesMedida = datos_undMedida; });
 
   // Funcion que va a buscar la informacion de una orden de maquila creada
   buscarOrdenMaquila(){
@@ -209,7 +205,6 @@ export class Orden_MaquilaComponent implements OnInit {
             info.Id = info.Id_Bopp;
             info.Nombre = datos_Orden[i].bopp;
           }
-
           this.materiasPrimasSeleccionada_ID.push(info.Id);
           this.materiasPrimasSeleccionadas.push(info);
           this.catidadTotalPeso += datos_Orden[i].cantidad;
@@ -221,8 +216,7 @@ export class Orden_MaquilaComponent implements OnInit {
 
   //Funcion que va a mostrar el nombre de la materia prima
   cambiarNombreMateriaPrima(){
-    let id : number = this.FormMateriaPrima.value.Nombre;
-    this.materiaPrimaService.getInfo_MpTintaBopp_Id(id).subscribe(datos_materiaPrima => {
+    this.materiaPrimaService.getInfo_MpTintaBopp_Id(this.FormMateriaPrima.value.Nombre).subscribe(datos_materiaPrima => {
       for (let i = 0; i < datos_materiaPrima.length; i++) {
         this.FormMateriaPrima.patchValue({
           Id : datos_materiaPrima[i].id,
@@ -322,8 +316,7 @@ export class Orden_MaquilaComponent implements OnInit {
   validarDatosOrdenMaquila(){
     if (this.FormOrdenMaquila.valid) {
       if (this.materiasPrimasSeleccionadas.length > 0) {
-        if (!this.edidcionOrdenMaquila) this.crearOrdenMaquila();
-        else this.editarOrdenMaquila();
+        !this.edidcionOrdenMaquila ? this.crearOrdenMaquila() : this.editarOrdenMaquila();
       } else this.mostrarAdvertencia(`Advertencia`, `¡Debe escoger minimo una materia prima!`);
     } else this.mostrarAdvertencia(`Advertencia`, `¡Debe llenar los campos vacios!`);
   }
@@ -331,13 +324,11 @@ export class Orden_MaquilaComponent implements OnInit {
   // Funcion que va a crear una Orden de Maquila
   crearOrdenMaquila(){
     this.cargando = false;
-    let observacion : string = this.FormOrdenMaquila.value.Observacion;
-    if (observacion == null) observacion = '';
     let info : modelOrdenMaquila = {
       Tercero_Id : this.FormOrdenMaquila.value.Id_Tercero,
       OM_ValorTotal : this.cantidadTotalPrecio,
       OM_PesoTotal : this.catidadTotalPeso,
-      OM_Observacion : (observacion).toUpperCase(),
+      OM_Observacion : this.FormOrdenMaquila.value.Observacion == null ? '' : (this.FormOrdenMaquila.value.Observacion).toUpperCase(),
       TpDoc_Id : 'OM',
       Estado_Id : 11,
       Usua_Id : this.storage_Id,
@@ -375,14 +366,12 @@ export class Orden_MaquilaComponent implements OnInit {
   editarOrdenMaquila(){
     this.cargando = false;
     let id : number = this.FormOrdenMaquila.value.ConsecutivoOrden;
-    let observacion : string = this.FormOrdenMaquila.value.Observacion;
-    if (observacion == null) observacion = '';
     let info : any = {
       OM_Id : id,
       Tercero_Id : this.FormOrdenMaquila.value.Id_Tercero,
       OM_ValorTotal : this.cantidadTotalPrecio,
       OM_PesoTotal : this.catidadTotalPeso,
-      OM_Observacion : (observacion).toUpperCase(),
+      OM_Observacion : this.FormOrdenMaquila.value.Observacion == null ? '' : (this.FormOrdenMaquila.value.Observacion).toUpperCase(),
       TpDoc_Id : 'OM',
       Estado_Id : 11,
       Usua_Id : this.storage_Id,
@@ -669,19 +658,17 @@ export class Orden_MaquilaComponent implements OnInit {
   }
 
   /** Mostrar mensaje de confirmación  */
-  mostrarConfirmacion(mensaje : any, titulo?: any, id? : any) {
-   this.messageService.add({severity: 'success', summary: mensaje,  detail: titulo, life : 2000});
-  }
+  mostrarConfirmacion = (mensaje : any, titulo?: any) => this.messageService.add({severity: 'success', summary: titulo, detail: mensaje, life : 2000});
 
   /** Mostrar mensaje de error  */
   mostrarError(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'error', summary: mensaje, detail: titulo, life : 5000});
+   this.messageService.add({severity:'error', summary: titulo, detail: mensaje, life : 5000});
    this.cargando = false;
   }
 
   /** Mostrar mensaje de advertencia */
   mostrarAdvertencia(mensaje : any, titulo?: any) {
-   this.messageService.add({severity:'warn', summary: mensaje, detail: titulo, life : 2000});
+   this.messageService.add({severity:'warn', summary: titulo, detail: mensaje, life : 2000});
    this.cargando = false;
   }
 
@@ -716,7 +703,5 @@ export class Orden_MaquilaComponent implements OnInit {
   }
 
   /** Función para quitar mensaje de elección */
-  onReject(){
-    this.messageService.clear(this.llave);
-  }
+  onReject = () => this.messageService.clear(this.llave);
 }

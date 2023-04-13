@@ -76,14 +76,10 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   // Funcion que va a obtener la información de las materias primas
-  obtenerMateriasPrimas(){
-    this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos => { this.materiasPrimas = datos; });
-  }
+  obtenerMateriasPrimas = () => this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos => { this.materiasPrimas = datos; });
 
   // Funcion que va a limpiar el formulario
-  limpiarCampos(){
-    this.formMovimientos.reset();
-  }
+  limpiarCampos = () => this.formMovimientos.reset();
 
   // Funcion que le va a colocar el nombre a la materia prima seleccionada
   cambiarNombreMateriaPrima(){
@@ -157,7 +153,7 @@ export class MovimientoMPComponent implements OnInit {
         this.cargando = false;
       }
       if (datos.length == 0) this.mensajeAdvertencia(`¡No se encontró información con los parametros consultados!`);
-    });
+    }, error => this.mensajeError(`¡Ocurrió un error!`, `¡No se pudo realizar la consulta, error en el servidor!`));
   }
 
   // Funcion que va a validar el tipo de movimiento para crear el pdf
@@ -984,9 +980,7 @@ export class MovimientoMPComponent implements OnInit {
   }
 
   /** Funcion para filtrar busquedas y mostrar el valor total segun el filtro seleccionado. */
-  aplicarfiltro($event, campo : any, valorCampo : string){
-    this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
-  }
+  aplicarfiltro = ($event, campo : any, valorCampo : string) => this.dt!.filter(($event.target as HTMLInputElement).value, campo, valorCampo);
 
   // Mostrar mensaje de confirmación
   mensajeConfirmacion(titulo : string, mensaje : any) {
