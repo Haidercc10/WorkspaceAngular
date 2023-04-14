@@ -1,0 +1,68 @@
+.fondo {
+  background: rgba(255, 0, 0, 0.037);
+  height: 100%;
+}
+
+.header h3, .header .pi, .rojo {
+  font-size: calc(var(--font-size) * 1.5rem);
+  color: var(--rojo);
+}
+
+.header h3:hover, .header .pi:hover, .rojo:hover {
+  color: var(--rojoHover);
+}
+
+.fila-1, .fila-2, .fila-3, .fila-4 {
+  padding: 0 2%;
+}
+
+p-card, p-card ::ng-deep .p-card {
+  height: 100%;
+}
+
+p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title {
+  color: var(--rojo);
+  text-align: center;
+}
+
+canvas {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+.bg-naranja {
+  color: black;
+  background-color: #F6D45D;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-azul {
+  color: black;
+  background-color: #83D3FF;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-amarillo {
+  color: black;
+  background-color: #F3FC20;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-verde {
+  color: black;
+  background-color: #8AFC9B;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-rojo {
+  color: black;
+  background-color: #FF7878;
+  font-size: calc(var(--font-size) * 15px);
+}
+
+.bg-verde2 {
+  color: black;
+  background-color: #53CC48;
+  font-size: calc(var(--font-size) * 15px);
+}

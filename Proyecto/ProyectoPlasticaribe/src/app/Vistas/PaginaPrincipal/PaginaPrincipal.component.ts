@@ -152,7 +152,6 @@ export class PaginaPrincipalComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    this.llenarArrayAnos();
     this.llenarDatosSeleccionables();
     this.buscarFavoritos();
     setTimeout(() => {
@@ -173,7 +172,6 @@ export class PaginaPrincipalComponent implements OnInit {
 
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
-    this.facturacion();
     this.cantOrdenesUltimoMes();
     this.materiasPrimas();
     this.pedidosZeus();
@@ -185,15 +183,6 @@ export class PaginaPrincipalComponent implements OnInit {
     this.storage_Id = this.storage.get('Id');
     this.storage_Nombre = this.storage.get('Nombre');
     this.ValidarRol = this.storage.get('Rol');
-  }
-
-  // Funcion que va a llenar el array de años
-  llenarArrayAnos(){
-    for (let i = 0; i < this.anos.length; i++) {
-      let num_Mayor : number = Math.max(...this.anos);
-      if (num_Mayor == moment().year()) break;
-      this.anos.push(num_Mayor + 1);
-    }
   }
 
   // Llenar datos con todas las opciones de vistas que puede seleccionar como favoritas
@@ -537,59 +526,6 @@ export class PaginaPrincipalComponent implements OnInit {
           this.totalExtruidoMes += datos_ot[i].extruido;
         }
       });
-    }
-  }
-
-  // Funcion que va a consultar la información de la facturación
-  facturacion(){
-    this.totalFacturadoDia = 0;
-    this.totalFacuturadoMes = 0;
-    this.totalIvaVentaMes = 0;
-    this.totalIvaCompraMes = 0;
-    if(this.ValidarRol == 1 || this.ValidarRol == 60) {
-      this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => { this.totalFacturadoDia = datos_facturacion; });
-
-      this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalFacuturadoMes = datos_facturacion; });
-
-      this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalIvaVentaMes = datos_facturacion; });
-
-      // this.zeusService.GetIvaCompraMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalIvaCompraMes = datos_facturacion; });
-
-      for (let i = 0; i < 12; i++) {
-        this.zeusService.GetFacturacionTodosMeses(i+ 1, this.anoSeleccionado).subscribe(datos_facturacion => {
-          if (i == 0) this.totalFacturado1 = datos_facturacion;
-          if (i == 1) this.totalFacturado2 = datos_facturacion;
-          if (i == 2) this.totalFacturado3 = datos_facturacion;
-          if (i == 3) this.totalFacturado4 = datos_facturacion;
-          if (i == 4) this.totalFacturado5 = datos_facturacion;
-          if (i == 5) this.totalFacturado6 = datos_facturacion;
-          if (i == 6) this.totalFacturado7 = datos_facturacion;
-          if (i == 7) this.totalFacturado8 = datos_facturacion;
-          if (i == 8) this.totalFacturado9 = datos_facturacion;
-          if (i == 9) this.totalFacturado10 = datos_facturacion;
-          if (i == 10) this.totalFacturado11 = datos_facturacion;
-          if (i == 11) this.totalFacturado12 = datos_facturacion;
-        });
-      }
-      setTimeout(() => { this.llenarGraficaFacturacion(); }, 2500);
-
-      // for (let i = 0; i < 12; i++) {
-      //   this.zeusService.GetIvaCompraTodosMeses(i+ 1).subscribe(datos_facturacion => {
-      //     if (i == 0) this.totalIvaCompra1 = datos_facturacion;
-      //     if (i == 1) this.totalIvaCompra2 = datos_facturacion;
-      //     if (i == 2) this.totalIvaCompra3 = datos_facturacion;
-      //     if (i == 3) this.totalIvaCompra4 = datos_facturacion;
-      //     if (i == 4) this.totalIvaCompra5 = datos_facturacion;
-      //     if (i == 5) this.totalIvaCompra6 = datos_facturacion;
-      //     if (i == 6) this.totalIvaCompra7 = datos_facturacion;
-      //     if (i == 7) this.totalIvaCompra8 = datos_facturacion;
-      //     if (i == 8) this.totalIvaCompra9 = datos_facturacion;
-      //     if (i == 9) this.totalIvaCompra10 = datos_facturacion;
-      //     if (i == 10) this.totalIvaCompra11 = datos_facturacion;
-      //     if (i == 11) this.totalIvaCompra12 = datos_facturacion;
-      //   });
-      // }
-      // setTimeout(() => { this.llenarGraficaIvaCompra(); }, 1800);
     }
   }
 
