@@ -582,7 +582,7 @@
         </p-table>
 
         <!-- Modal Para cambiar el estado de la orden de trabajo -->
-        <p-dialog [(visible)]="modalEstadosOT" [style]="{width: '350px'}" header="Cambio de estado de OT" [modal]="true" >
+        <p-dialog [(visible)]="modalEstadosOT" [draggable]="false" [style]="{width: '350px'}" header="Cambio de estado de OT" [modal]="true" >
           <ng-template pTemplate="content">
             <div class="p-field">
               <h6 for="name">Orden de Trabajo <b>{{otSeleccionada}}</b></h6>
@@ -627,14 +627,14 @@
         <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
 
 
-        <p-dialog [(visible)]="modalProcesos" [style]="{width: 'auto'}" header="Rollos de la OT" [modal]="true" >
+        <p-dialog [(visible)]="modalProcesos" [draggable]="false" [style]="{width: 'auto'}" header="Rollos de la OT" [modal]="true" >
           <ng-template pTemplate="content">
             <app-DatosOT-Status></app-DatosOT-Status>
           </ng-template>
         </p-dialog>
 
 
-        <p-dialog [(visible)]="mostrarModalCostos" [style]="{width: 'auto'}" header="Reporte de costos" [modal]="true" >
+        <p-dialog [(visible)]="mostrarModalCostos" [draggable]="false" [style]="{width: '90%'}" header="Reporte de costos" [modal]="true" >
           <ng-template pTemplate="content">
             <app-reporteCostosOT></app-reporteCostosOT>
           </ng-template>

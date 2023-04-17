@@ -25,6 +25,7 @@ import { ChipModule } from 'primeng/chip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ContextMenuModule } from 'primeng/contextmenu';
+import { DataViewModule } from 'primeng/dataview';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
 import { DockModule } from 'primeng/dock';
@@ -75,6 +76,7 @@ import { AsignacionRollos_ExtrusionComponent } from './Vistas/AsignacionRollos_E
 import { AsignarProductosFacturasComponent } from './Vistas/AsignarProductosFacturas/AsignarProductosFacturas.component';
 import { CrearTerceroComponent } from './Vistas/Crear-Tercero/Crear-Tercero.component';
 import { CrearCategoriasComponent } from './Vistas/CrearCategorias/CrearCategorias.component';
+import { DashBoard_FacturacionComponent } from './Vistas/DashBoard_Facturacion/DashBoard_Facturacion.component';
 import { DatosOTStatusComponent } from './Vistas/DatosOT-Status/DatosOT-Status.component';
 import { Devoluciones_Productos_RollosComponent } from './Vistas/Devoluciones_Productos_Rollos/Devoluciones_Productos_Rollos.component';
 import { EliminarRollos_ExtrusionComponent } from './Vistas/EliminarRollos_Extrusion/EliminarRollos_Extrusion.component';
@@ -261,6 +263,9 @@ export const routes: Routes = [
   {path: 'Facturacion-Orden-Maquila', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Facturacion_OrdenMaquilaComponent},
   {path: 'Reporte-Maquilas', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Reporte_MaquilasComponent},
   {path: 'dashboard-matprima', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Dashboard_MatPrimaComponent},
+
+  /*************************************************************** DASBOARD **************************************************************************/
+  {path: 'Dashboard', component: DashBoard_FacturacionComponent},
 ]
 
 @NgModule({
@@ -356,6 +361,7 @@ export const routes: Routes = [
     Facturacion_OrdenMaquilaComponent,
     Reporte_MaquilasComponent,
     Dashboard_MatPrimaComponent,
+    DashBoard_FacturacionComponent,
   ],
 
   imports: [
@@ -433,6 +439,7 @@ export const routes: Routes = [
     TagModule,
     VirtualScrollerModule,
     KnobModule,
+    DataViewModule,
   ],
 
   providers: [
