@@ -160,6 +160,8 @@ import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { Dashboard_MatPrimaComponent } from './Vistas/Dashboard_MatPrima/Dashboard_MatPrima.component';
+import { RippleModule } from 'primeng/ripple';
+import { DashBoard_PedidosComponent } from './Vistas/DashBoard_Pedidos/DashBoard_Pedidos.component';
 
 export const routes: Routes = [
 
@@ -265,7 +267,7 @@ export const routes: Routes = [
   {path: 'dashboard-matprima', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Dashboard_MatPrimaComponent},
 
   /*************************************************************** DASBOARD **************************************************************************/
-  {path: 'Dashboard', component: DashBoard_FacturacionComponent},
+  {path: 'Dashboard', component: DashBoard_PedidosComponent},
 ]
 
 @NgModule({
@@ -362,6 +364,7 @@ export const routes: Routes = [
     Reporte_MaquilasComponent,
     Dashboard_MatPrimaComponent,
     DashBoard_FacturacionComponent,
+    DashBoard_PedidosComponent,
   ],
 
   imports: [
@@ -376,7 +379,6 @@ export const routes: Routes = [
     BrowserAnimationsModule,
     MatNativeDateModule,
     MaterialExampleModule,
-    NgxMatSelectSearchModule,
     AutocompleteLibModule,
     TableModule,
     CalendarModule,
@@ -440,6 +442,7 @@ export const routes: Routes = [
     VirtualScrollerModule,
     KnobModule,
     DataViewModule,
+    RippleModule,
   ],
 
   providers: [

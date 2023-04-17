@@ -71,7 +71,7 @@ export class OcompraComponent implements OnInit {
     this.FormOrdenCompra = this.frmBuilder.group({
       ConsecutivoOrden : ['', Validators.required],
       Proveedor : ['', Validators.required],
-      Id_Proveedor : [''],
+      Id_Proveedor : ['', Validators.required],
       Observacion : [''],
     });
 
@@ -91,6 +91,7 @@ export class OcompraComponent implements OnInit {
     this.obtenerUnidadesMedida();
     this.obtenerMateriaPrima();
     this.generarConsecutivo();
+    this.consultarCategorias();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -263,7 +264,7 @@ export class OcompraComponent implements OnInit {
   // Funcion que va a validar que los campos necesarios esten llenos para crear la ORden de Compra
   validarDatosOrdenCompra(){
     if (this.FormOrdenCompra.valid) this.materiasPrimasSeleccionadas.length > 0 ? this.crearOrdenCompra() : this.mostrarAdvertencia(`¡Debe escoger minimo 1 materia prima!`);
-    this.mostrarAdvertencia(`¡Hay campos vacios!`);
+    else this.mostrarAdvertencia(`¡Hay campos vacios!`);
   }
 
   // Funcion que va a consultar la información de una orden de compra existente y prepará los campos para que sea editable
@@ -647,7 +648,7 @@ export class OcompraComponent implements OnInit {
   /** Actualizar Precio de la materia prima al momento de crear la OC*/
   actualizarPrecioMatPrimas(){
     for (let index = 0; index < this.materiasPrimasSeleccionadas.length; index++) {
-      if(this.materiasPrimasSeleccionadas[index].Id_Mp != 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta < 2000) {
+      if(this.materiasPrimasSeleccionadas[index].Id_Mp != 84 && this.materiasPrimasSeleccionadas[index].Id_Tinta == 2001 && this.materiasPrimasSeleccionadas[index].Id_Bopp == 1) {
         this.materiaPrimaService.srvObtenerListaPorId(this.materiasPrimasSeleccionadas[index].Id).subscribe(dataMatPrimas =>{
           this.cargarDatosMatPrima(this.materiasPrimasSeleccionadas[index], dataMatPrimas);
         });

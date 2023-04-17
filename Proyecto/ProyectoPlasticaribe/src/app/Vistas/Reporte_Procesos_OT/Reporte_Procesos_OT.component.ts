@@ -1274,7 +1274,6 @@ export class Reporte_Procesos_OTComponent implements OnInit {
           this.consultarOT();
           this.cambiarEstadoBagPro();
           this.modalEstadosOT = false;
-          setTimeout(() => { if (this.modeModal) this.paginaPrincipal.cantOrdenesUltimoMes(); }, 1500);
         });
       }
     });
