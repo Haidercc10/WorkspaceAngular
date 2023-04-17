@@ -1,5 +1,5 @@
 .fondo {
-  background: rgba(255, 0, 0, 0.037);
+  background: #F001;
   height: 100%;
 }
 
@@ -20,12 +20,13 @@ p-card, p-card ::ng-deep .p-card {
   height: 100%;
 }
 
-p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title {
+p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-footer {
   color: var(--rojo);
   text-align: center;
+  width: 100%;
 }
 
-canvas {
+p-chart ::ng-deep div ::ng-deep canvas {
   display: inline-block;
   width: 100%;
   height: 100%;

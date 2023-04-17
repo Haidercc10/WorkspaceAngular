@@ -1151,9 +1151,7 @@ export class ReporteCostosOTComponent implements OnInit {
             else info.Estado_Id = 15; //ABIERTA
           }
         } else if (estado == '4')estado = 3; //ANULADA
-        this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => {
-          setTimeout(() => { if (this.modeModal) this.paginaPrincipal.cantOrdenesUltimoMes(); }, 1500);
-        });
+        this.estadosProcesos_OTService.srvActualizarPorOT(datos_ot[i].estProcOT_OrdenTrabajo, info).subscribe(datos_otActualizada => { });
       }
     });
   }

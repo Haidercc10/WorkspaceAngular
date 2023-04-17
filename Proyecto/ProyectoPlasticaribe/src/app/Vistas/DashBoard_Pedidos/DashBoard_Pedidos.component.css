@@ -1,0 +1,29 @@
+.fondo {
+  background: rgba(255, 128, 0, 0.04);
+  height: 100%;
+}
+
+.fila-1, .fila-2, .fila-3 {
+  padding: 0 2%;
+}
+
+p-card, p-card ::ng-deep .p-card {
+  height: 100%;
+}
+
+p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-footer {
+  color: var(--rojo);
+  text-align: center;
+  width: 100%;
+}
+
+p-chart ::ng-deep div ::ng-deep canvas {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+p-dialog ::ng-deep div span {
+  color: var(--rojo);
+  align-items: center;
+}

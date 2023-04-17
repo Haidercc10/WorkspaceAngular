@@ -74,13 +74,19 @@ export class DashBoard_FacturacionComponent implements OnInit {
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
                 private zeusService : InventarioZeusService,
                   private bagProService : BagproService,
-                    private ordenTrabajoService : EstadosProcesos_OTService,
-                      private cookieService: CookieService,) { }
+                    private ordenTrabajoService : EstadosProcesos_OTService,) { }
 
   ngOnInit() {
-    this.tiempoExcedido();
+    this.lecturaStorage();
     this.llenarArrayAnos();
-    this.llenarEstadosOrdenes();
+    this.tiempoExcedido();
+  }
+
+  //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage(){
+    this.storage_Id = this.storage.get('Id');
+    this.storage_Nombre = this.storage.get('Nombre');
+    this.ValidarRol = this.storage.get('Rol');
   }
 
   //Funcion que se va a encargar de contar cuando pasen 1 minuto, al pasar este tiempo se cargarán nueva mente las consultas de algunas de las cards
@@ -89,6 +95,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
   //Funcion que va a encargarse de cargar la información de las cards y llama a la funcion de que contará en cunato tiempo se recargará la información
   tiempoExcedido() {
     this.facturacion();
+    this.llenarEstadosOrdenes();
     this.recargar();
   }
 
@@ -103,25 +110,27 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
   // Funcion que va a consultar la información de la facturación
   facturacion(){
-    this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => { this.totalFacturadoDia = datos_facturacion; });
-    this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalFacuturadoMes = datos_facturacion; });
-    this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalIvaVentaMes = datos_facturacion; });
-    for (let i = 0; i < 12; i++) {
-      this.zeusService.GetFacturacionTodosMeses(i+ 1, this.anoSeleccionado).subscribe(datos_facturacion => {
-        if (i == 0) this.totalFacturado1 = datos_facturacion;
-        if (i == 1) this.totalFacturado2 = datos_facturacion;
-        if (i == 2) this.totalFacturado3 = datos_facturacion;
-        if (i == 3) this.totalFacturado4 = datos_facturacion;
-        if (i == 4) this.totalFacturado5 = datos_facturacion;
-        if (i == 5) this.totalFacturado6 = datos_facturacion;
-        if (i == 6) this.totalFacturado7 = datos_facturacion;
-        if (i == 7) this.totalFacturado8 = datos_facturacion;
-        if (i == 8) this.totalFacturado9 = datos_facturacion;
-        if (i == 9) this.totalFacturado10 = datos_facturacion;
-        if (i == 10) this.totalFacturado11 = datos_facturacion;
-        if (i == 11) this.totalFacturado12 = datos_facturacion;
-      });
-      setTimeout(() => { this.llenarGraficaFacturacion(); }, 500);
+    if (this.ValidarRol == 1 || this.ValidarRol == 60) {
+      this.zeusService.GetValorFacturadoHoy().subscribe(datos_facturacion => { this.totalFacturadoDia = datos_facturacion; });
+      this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalFacuturadoMes = datos_facturacion; });
+      this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalIvaVentaMes = datos_facturacion; });
+      for (let i = 0; i < 12; i++) {
+        this.zeusService.GetFacturacionTodosMeses(i+ 1, this.anoSeleccionado).subscribe(datos_facturacion => {
+          if (i == 0) this.totalFacturado1 = datos_facturacion;
+          if (i == 1) this.totalFacturado2 = datos_facturacion;
+          if (i == 2) this.totalFacturado3 = datos_facturacion;
+          if (i == 3) this.totalFacturado4 = datos_facturacion;
+          if (i == 4) this.totalFacturado5 = datos_facturacion;
+          if (i == 5) this.totalFacturado6 = datos_facturacion;
+          if (i == 6) this.totalFacturado7 = datos_facturacion;
+          if (i == 7) this.totalFacturado8 = datos_facturacion;
+          if (i == 8) this.totalFacturado9 = datos_facturacion;
+          if (i == 9) this.totalFacturado10 = datos_facturacion;
+          if (i == 10) this.totalFacturado11 = datos_facturacion;
+          if (i == 11) this.totalFacturado12 = datos_facturacion;
+        });
+        setTimeout(() => { this.llenarGraficaFacturacion(); }, 1500);
+      }
     }
   }
 
@@ -147,7 +156,7 @@ export class DashBoard_FacturacionComponent implements OnInit {
             this.totalFacturado12,
           ],
           yAxisID: 'y',
-          borderColor: '#FFA726',
+          borderColor: '#FF7878',
           backgroundColor: 'rgba(255,167,38,0.2)',
           pointStyle: 'rectRot',
           pointRadius: 10,
@@ -160,125 +169,128 @@ export class DashBoard_FacturacionComponent implements OnInit {
 
     this.facturasOptions = {
       stacked: false,
-        plugins: {
-          legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 20 } } },
-          tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
+      plugins: {
+        legend: { labels: { color: '#495057', usePointStyle: true, font: { size: 20 } } },
+        tooltip: { titleFont: { size: 50, }, usePointStyle: true, bodyFont: { size: 30 } }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#495057', font: { size: 20 }},
+          grid: { color: '#ebedef' }
         },
-        scales: {
-          x: {
-            ticks: { color: '#495057', font: { size: 20 }},
-            grid: { color: '#ebedef' }
-          },
-          y: {
-            type: 'linear',
-            display: true,
-            position: 'left',
-            ticks: { color: '#495057', font: { size: 20 } },
-            grid: { color: '#ebedef' }
-          },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          ticks: { color: '#495057', font: { size: 20 } },
+          grid: { color: '#ebedef' }
         },
-        datalabels: { anchor: 'end', align: 'end' }
+      },
+      datalabels: { anchor: 'end', align: 'end' }
     };
   }
 
   // Funcion que va a llenar la informacion de los estados de ordenes de trabajo
   llenarEstadosOrdenes() {
+    this.estadosOrdenes = [];
+    this.clientesOrdenesMes = [];
+    this.productosOrdenesMes = [];
+    this.vendedorOrdenesMes = [];
+    this.materialesOrdenesMes = [];
+    this.procesosOrdenesMes = [];
+    this.totalOrdenesMes = 0;
     this.costoTotalOrdenesMes = 0;
-    this.catidadOTAbiertas = 0;
-    this.cantidadOTAsignadas = 0;
-    this.cantidadOTTerminada = 0;
-    this.cantidadOTIniciada = 0;
-    this.cantidadOtAnulada = 0;
-    this.cantidadOTCerrada = 0;
 
-    this.estadosOrdenes = [
-      { Nombre : 'Abierta', Cantidad : 0, Class : 'bg-naranja', },
-      { Nombre : 'Asignada', Cantidad : 0, Class : 'bg-azul', },
-      { Nombre : 'Terminada', Cantidad : 0, Class : 'bg-verde', },
-      { Nombre : 'En proceso', Cantidad : 0, Class : 'bg-amarillo', },
-      { Nombre : 'Anulado', Cantidad : 0, Class : 'bg-rojo', },
-      { Nombre : 'Cerrada', Cantidad : 0, Class : 'bg-verde2', },
-    ];
+    if (this.ValidarRol == 1) {
+      this.estadosOrdenes = [
+        { Nombre : 'Abierta', Cantidad : 0, Class : 'bg-naranja', },
+        { Nombre : 'Asignada', Cantidad : 0, Class : 'bg-azul', },
+        { Nombre : 'Terminada', Cantidad : 0, Class : 'bg-verde', },
+        { Nombre : 'En proceso', Cantidad : 0, Class : 'bg-amarillo', },
+        { Nombre : 'Anulado', Cantidad : 0, Class : 'bg-rojo', },
+        { Nombre : 'Cerrada', Cantidad : 0, Class : 'bg-verde2', },
+      ];
 
-    this.ordenTrabajoService.srvObtenerListaPorFechas(this.primerDiaMes, this.today).subscribe(datos_ot => {
-      for (let i = 0; i < datos_ot.length; i++) {
-        for (let j = 0; j < this.estadosOrdenes.length; j++) {
-          if (datos_ot[i].estado_Nombre == this.estadosOrdenes[j].Nombre) this.estadosOrdenes[j].Cantidad += 1;
+      this.ordenTrabajoService.srvObtenerListaPorFechas(this.primerDiaMes, this.today).subscribe(datos_ot => {
+        for (let i = 0; i < datos_ot.length; i++) {
+          for (let j = 0; j < this.estadosOrdenes.length; j++) {
+            if (datos_ot[i].estado_Nombre == this.estadosOrdenes[j].Nombre) this.estadosOrdenes[j].Cantidad += 1;
+          }
         }
-      }
-    });
+      });
 
-    this.bagProService.GetCostoOrdenesUltimoMes_Clientes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      this.clientesOrdenesMes = datos_ordenes;
-      this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        this.totalOrdenesMes += datos_ordenes[i].cantidad;
-      }
-    });
-
-    this.ordenTrabajoService.GetProductosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        this.productosOrdenesMes.push(datos_ordenes[i]);
-        this.productosOrdenesMes.sort((a,b) => a.prod_Nombre.localeCompare(b.prod_Nombre));
-        this.productosOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-      }
-    });
-
-    this.bagProService.GetCostoOrdenesUltimoMes_Vendedores(this.primerDiaMes, this.today).subscribe(datos => this.vendedorOrdenesMes = datos );
-    this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-
-    this.bagProService.GetCantOrdenesMateriales(this.primerDiaMes, this.today).subscribe(datos => this.materialesOrdenesMes = datos );
-    this.materialesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
-
-    this.bagProService.GetPesoProcesosUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        let estados : string [] = ['IMPRESION', 'LAMINADO', 'EXTRUSION', 'CORTE', 'ROTOGRABADO', 'DOBLADO', 'EMPAQUE', 'SELLADO', 'Wiketiado'];
-        if (estados.includes(datos_ordenes[i].nomStatus)) {
-          let id : number = 0;
-          if (datos_ordenes[i].nomStatus == 'EXTRUSION') {
-            id = 1;
-            datos_ordenes[i].und = 0;
-          }
-          if (datos_ordenes[i].nomStatus == 'IMPRESION') {
-            id = 2;
-            datos_ordenes[i].und = 0;
-          }
-          if (datos_ordenes[i].nomStatus == 'ROTOGRABADO') {
-            id = 3;
-            datos_ordenes[i].und = 0;
-          }
-          if (datos_ordenes[i].nomStatus == 'LAMINADO') {
-            id = 4;
-            datos_ordenes[i].und = 0;
-          }
-          if (datos_ordenes[i].nomStatus == 'EMPAQUE') {
-            id = 5;
-            datos_ordenes[i].nomStatus = 'CORTE';
-            datos_ordenes[i].und = 0;
-          }
-          if (datos_ordenes[i].nomStatus == 'DOBLADO') {
-            id = 6;
-            datos_ordenes[i].und = 0;
-          }
-          if (datos_ordenes[i].nomStatus == 'SELLADO') id = 7;
-          if (datos_ordenes[i].nomStatus == 'Wiketiado') id = 8;
-          let info : any  = {
-            id : id,
-            Nombre : datos_ordenes[i].nomStatus,
-            cantidad : datos_ordenes[i].peso,
-            und : datos_ordenes[i].und,
-          }
-          this.procesosOrdenesMes.push(info);
-          this.procesosOrdenesMes.sort((a,b) => Number(a.id) - Number(b.id));
+      this.bagProService.GetCostoOrdenesUltimoMes_Clientes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+        this.clientesOrdenesMes = datos_ordenes;
+        this.clientesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+        for (let i = 0; i < datos_ordenes.length; i++) {
+          this.totalOrdenesMes += datos_ordenes[i].cantidad;
         }
-      }
-    });
+      });
 
-    this.bagProService.GetCostoOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
-      for (let i = 0; i < datos_ordenes.length; i++) {
-        this.costoTotalOrdenesMes += datos_ordenes[i].costo;
-      }
-    });
+      this.ordenTrabajoService.GetProductosOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+        for (let i = 0; i < datos_ordenes.length; i++) {
+          this.productosOrdenesMes.push(datos_ordenes[i]);
+          this.productosOrdenesMes.sort((a,b) => a.prod_Nombre.localeCompare(b.prod_Nombre));
+          this.productosOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+        }
+      });
+
+      this.bagProService.GetCostoOrdenesUltimoMes_Vendedores(this.primerDiaMes, this.today).subscribe(datos => this.vendedorOrdenesMes = datos );
+      this.vendedorOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+
+      this.bagProService.GetCantOrdenesMateriales(this.primerDiaMes, this.today).subscribe(datos => this.materialesOrdenesMes = datos );
+      this.materialesOrdenesMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
+
+      this.bagProService.GetPesoProcesosUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+        for (let i = 0; i < datos_ordenes.length; i++) {
+          let estados : string [] = ['IMPRESION', 'LAMINADO', 'EXTRUSION', 'CORTE', 'ROTOGRABADO', 'DOBLADO', 'EMPAQUE', 'SELLADO', 'Wiketiado'];
+          if (estados.includes(datos_ordenes[i].nomStatus)) {
+            let id : number = 0;
+            if (datos_ordenes[i].nomStatus == 'EXTRUSION') {
+              id = 1;
+              datos_ordenes[i].und = 0;
+            }
+            if (datos_ordenes[i].nomStatus == 'IMPRESION') {
+              id = 2;
+              datos_ordenes[i].und = 0;
+            }
+            if (datos_ordenes[i].nomStatus == 'ROTOGRABADO') {
+              id = 3;
+              datos_ordenes[i].und = 0;
+            }
+            if (datos_ordenes[i].nomStatus == 'LAMINADO') {
+              id = 4;
+              datos_ordenes[i].und = 0;
+            }
+            if (datos_ordenes[i].nomStatus == 'EMPAQUE') {
+              id = 5;
+              datos_ordenes[i].nomStatus = 'CORTE';
+              datos_ordenes[i].und = 0;
+            }
+            if (datos_ordenes[i].nomStatus == 'DOBLADO') {
+              id = 6;
+              datos_ordenes[i].und = 0;
+            }
+            if (datos_ordenes[i].nomStatus == 'SELLADO') id = 7;
+            if (datos_ordenes[i].nomStatus == 'Wiketiado') id = 8;
+            let info : any  = {
+              id : id,
+              Nombre : datos_ordenes[i].nomStatus,
+              cantidad : datos_ordenes[i].peso,
+              und : datos_ordenes[i].und,
+            }
+            this.procesosOrdenesMes.push(info);
+            this.procesosOrdenesMes.sort((a,b) => Number(a.id) - Number(b.id));
+          }
+        }
+      });
+
+      this.bagProService.GetCostoOrdenesUltimoMes(this.primerDiaMes, this.today).subscribe(datos_ordenes => {
+        for (let i = 0; i < datos_ordenes.length; i++) {
+          this.costoTotalOrdenesMes += datos_ordenes[i].costo;
+        }
+      });
+    }
   }
 
   // Funcion que mostrará el modal de los estados de las ordenes de trabajo, adicional a eso le enviará parametros para que realice la consulta
@@ -393,25 +405,26 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.multiAxisData = {
       labels: vendedores,
       datasets: [
-        { label: 'Cantidad de Ordenes de Trabajo hechas ', backgroundColor: [ '#42A5F5', ], yAxisID: 'y', data: cantOt },
-        { label: 'Valor Total de Ordenes de Trabajo ', backgroundColor: '#4169E1', ayAxisID: 'y1', ata: costoVentas }
+        { label: 'Cantidad de Ordenes de Trabajo hechas ', backgroundColor: [ '#83D3FF', ], yAxisID: 'y', data: cantOt },
+        { label: 'Valor Total de Ordenes de Trabajo ', backgroundColor: '#8AFC9B', yAxisID: 'y1', data: costoVentas }
       ]
     };
     this.multiAxisOptions = {
+      stacked: false,
       plugins: {
-        legend: {  labels: { color: '#495057' } },
-        tooltips: { ode: 'index', intersect: true }
+        legend: { labels: { color: '#495057', font: { size: 20 } } },
+        tooltip: { titleFont: { size: 30, }, bodyFont: { size: 20 } }
       },
       scales: {
         x: {
-          ticks: { color: '#495057' },
+          ticks: { color: '#495057', font: { size: 15 } },
           grid: { color: '#ebedef' }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { min: 0, max: 100, color: '#495057' },
+          ticks: { min: 0, max: 100, color: '#495057', font: { size: 20 } },
           grid: { color: '#ebedef' }
         },
         y1: {
@@ -419,9 +432,10 @@ export class DashBoard_FacturacionComponent implements OnInit {
           display: true,
           position: 'right',
           grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: { min: 0, max: 100, color: '#495057' }
+          ticks: { min: 0, max: 100, color: '#495057', font: { size: 20 } }
         }
-      }
+      },
+      datalabels: { anchor: 'end', align: 'end' }
     };
   }
 
@@ -440,30 +454,26 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.multiAxisData = {
       labels: clientes,
       datasets: [
-        {
-          label: 'Cantidad de Ordenes de Trabajo hechas ',
-          backgroundColor: [ '#AB47BC', '#42A5F5', '#66BB6A', '#FFCA28', '#26A69A' ],
-          yAxisID: 'y',
-          data: cantOt
-        },
+        { label: 'Cantidad de Ordenes de Trabajo hechas ', backgroundColor: [ '#FF7878'], yAxisID: 'y', data: cantOt },
         { label: 'Valor Total de Ordenes de Trabajo ',  backgroundColor: [ '#F5B041', ], yAxisID: 'y1', data: costo }
       ]
     };
     this.multiAxisOptions = {
+      stacked: false,
       plugins: {
-        legend: { labels: { color: '#495057' } },
-        tooltips: { mode: 'index', intersect: true }
+        legend: {  labels: { color: '#495057', font: { size: 20 } } },
+        tooltips: { titleFont: { size: 30, }, bodyFont: { size: 20 } }
       },
       scales: {
         x: {
-          ticks: { color: '#495057' },
+          ticks: { color: '#495057', font: { size: 15 } },
           grid: { color: '#ebedef' }
         },
         y: {
           type: 'linear',
           display: true,
           position: 'left',
-          ticks: { min: 0, max: 100, olor: '#495057' },
+          ticks: { min: 0, max: 100, olor: '#495057', font: { size: 20 } },
           grid: { color: '#ebedef' }
         },
         y1: {
@@ -471,9 +481,10 @@ export class DashBoard_FacturacionComponent implements OnInit {
           display: true,
           position: 'right',
           grid: { drawOnChartArea: false, color: '#ebedef' },
-          ticks: { min: 0, max: 100, color: '#495057' }
+          ticks: { min: 0, max: 100, color: '#495057', font: { size: 20 } }
         }
-      }
+      },
+      datalabels: { anchor: 'end', align: 'end' }
     };
   }
 

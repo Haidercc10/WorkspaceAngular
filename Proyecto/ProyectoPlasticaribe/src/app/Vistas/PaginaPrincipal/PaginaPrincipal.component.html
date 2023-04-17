@@ -4,15 +4,15 @@
   <!-- MENSAJE DE ADVERTENCIA -->
   <p-toast position="center" key="tc" [preventOpenDuplicates]="true"></p-toast>
 
-  <!-- INFORMACION GENERAL DE LA EMPRESA Y SUS MOVIMIENTOS -->
+<div class="fondo">
   <div class="container-fluid contenedorCards" *ngIf="!displayTerminal" id="card">
-    <p-tabView (onChange)="handleChange($event)">
+    <p-tabView>
       <!-- ORDENES DE TRABAJO -->
       <p-tabPanel
         header="Facturación y Ordenes de Trabajo"
         leftIcon="pi pi-sliders-h"
         tooltip="Información de la Facturación Mensual y las Ordenes de Trabajo"
-        *ngIf="ValidarRol == 1">
+        *ngIf="ValidarRol == 1 || ValidarRol == 60">
         <div class="row">
           <app-DashBoard_Facturacion></app-DashBoard_Facturacion>
         </div>
@@ -33,191 +33,11 @@
         leftIcon="pi pi-shopping-bag"
         tooltip="Información de los Pedidos creados en Zeus"
         *ngIf="ValidarRol == 1 || ValidarRol == 60">
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-          <!-- CARD 1 -->
-          <div class="col">
-            <div class="card h-100">
-              <div class="banner"></div>
-              <div class="card-body">
-                <h5 class="font-size-20">Cantidad Total de pedidos.</h5>
-                <div class="scrollCard">
-                  <p class="font-size-15" *ngFor="let item of pedidosTotales; let i=index">
-                    <span class="font-size-15">Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
-                  </p>
-                </div>
-                <br>
-                <h5 class="font-size-20">Número de pedidos por estados.</h5>
-                <div class="scrollCard">
-                  <p class="font-size-15" *ngFor="let item of pedidosEstados; let i=index">
-                    <span class="font-size-15">{{i+1}}) <b>{{item.estado}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- CARD 2 -->
-          <div class="col">
-            <div class="card h-100">
-              <div class="banner"></div>
-              <div class="card-body">
-                <h5 class="font-size-20">Número de pedidos con ordenes de trabajo asociadas.</h5>
-                <p class="font-size-15"></p>
-                <div class="scrollCard">
-                  <p class="font-size-15" *ngFor="let item of pedidos_Ot; let i=index">
-                    <span class="font-size-15">{{i+1}}) Pedido: <b>{{item.pedido}}</b> <br> Orden de Trabajo: <b>{{item.orden}}</b> <br> Producto: <b>{{item.producto}}</b><br> Cliente: <b>{{item.cliente}}</b>. <br> Proceso de La OT: <b>{{item.proceso}}</b></span><br>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- CARD 3 -->
-          <div class="col">
-            <div class="card h-100">
-              <div class="banner"></div>
-              <div class="card-body">
-                <h5 class="font-size-20">Listado de pedidos en los que el stock del producto pedido sea mayor o igual que la cantidad que está pendiente.</h5>
-                <p class="font-size-15"></p>
-                <div class="scrollCard">
-                  <p class="font-size-15" *ngFor="let item of pedidosStock; let i=index">
-                    <span class="font-size-15">{{i+1}}) Pedido: <b>{{item.consecutivo}}</b> <br> Producto: <b>{{item.producto}}</b><br> Existencias: <label class="verdePedidos"><b>{{item.existencias | number}}</b></label>.<br> Cantidad Pendiente: <b>{{item.cant_Pendiente | number}}</b></span><br>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- CARD 4 -->
-          <div class="col">
-            <div class="card h-100">
-              <div class="banner"></div>
-              <div class="card-body">
-                <h5 class="font-size-20">Ranking de cantidad de pedidos por clientes. <br> Ranking de costo de pedidos por clientes.</h5>
-                <p class="font-size-15"></p>
-                <div style="height: 10%; text-align: center;">
-                  <button pButton pTooltip="Ordenar por Número de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarClienteCantidad_Pedidos()"></button>
-                  <button pButton pTooltip="Ordenar por Costo Total de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarClienteCosto_Pedidos()"></button>
-                  <!-- <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button> -->
-                </div>
-                <br>
-                <div class="scrollCard">
-                  <p class="font-size-15" *ngFor="let item of pedidosClientes; let i=index">
-                    <span class="font-size-15">{{i+1}}) <b>{{item.cliente}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
-                  </p>
-                </div>
-                <br>
-                <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaClientes_Pedidos()"></button>
-              </div>
-            </div>
-          </div>
-
-          <!-- CARD 5 -->
-          <div class="col">
-            <div class="card h-100">
-              <div class="banner"></div>
-              <div class="card-body">
-                <h5 class="font-size-20">Ranking de cantidad de pedidos por productos</h5>
-                <p class="font-size-15"></p>
-                <div style="height: 10%; text-align: center;">
-                  <button pButton pTooltip="Ordenar por Número de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarProductoCantidad_Pedidos()"></button>
-                  <button pButton pTooltip="Ordenar por Costo Total de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarProductoCosto_Pedidos()"></button>
-                  <!-- <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button> -->
-                </div>
-                <br>
-                <div class="scrollCard">
-                  <p class="font-size-15" *ngFor="let item of pedidosProductos; let i=index">
-                    <span class="font-size-15">{{i+1}}) <b>{{item.producto}}:</b> Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad | number}}</b></label>. Costo Total: <b>{{item.costo | currency : ' COP $'}}</b></span><br>
-                  </p>
-                </div>
-                <br>
-                <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los clientes" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaProductos_Pedidos()"></button>
-              </div>
-            </div>
-          </div>
-
-          <!-- CARD 6 -->
-          <div class="col">
-            <div class="card h-100">
-              <div class="banner"></div>
-              <div class="card-body">
-                <h5 class="font-size-20">Ranking de cantidad de pedidos por Vendedores. <br> Ranking de costo de pedidos por Vendedores.</h5>
-                <p class="font-size-15"></p>
-                <div style="height: 10%; text-align: center;">
-                  <button pButton pTooltip="Ordenar por Número de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-warning p-button-text p-button-outlined" (click)="ordenarVendedorCantidad_Pedidos()"></button>
-                  <button pButton pTooltip="Ordenar por Costo Total de Pedidos" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-success p-button-text p-button-outlined" (click)="ordenarVendedorCosto_Pedidos()"></button>
-                  <!-- <button pButton pTooltip="Ordenar por Peso Total las de Ordenes" pRipple type="button" icon="pi pi-sort-numeric-down-alt" class="p-button-rounded p-button-text p-button-outlined" (click)="ordenarClientesPesoOrdenes()"></button> -->
-                </div>
-                <br>
-                <div class="scrollCard">
-                  <p class="font-size-15" *ngFor="let item of pedidosVendedores; let i = index;">
-                    <span>{{i + 1}}) <b>{{item.vendedor}}: </b>Cantidad de Pedidos: <label class="verdeClientes"><b>{{item.cantidad}}</b></label> Costo Total: <b>{{item.costo | currency : 'COP $'}}</b></span><br>
-                  </p>
-                </div>
-                <br>
-                <button pButton type="button" icon="pi pi-chart-bar" tooltip="Graficar la información de los vendedores" class="p-button-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="llenarGraficaVendedores_Pedidos()"></button>
-              </div>
-            </div>
-          </div>
+        <div class="row">
+          <app-DashBoard_Pedidos></app-DashBoard_Pedidos>
         </div>
       </p-tabPanel>
     </p-tabView>
-
-    <!-- Model que mostrará la información de las ordenes de trabajo con un estado especifico -->
-    <ng-container *ngIf="modalEstadosOrdenes">
-      <div class="modal fade" id="staticBackdrop" aria-labelledby="reporteCostos" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="staticBackdropLabe">{{nombreModalEstados}}</h5>
-              <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
-            </div>
-          </div>
-        </div>
-      </div>
-    </ng-container>
-
-    <!-- Modal en el que se va a mostrar la grafica con la información que se le pase -->
-    <ng-container *ngIf="mostrarGrafica">
-      <div class="modal fade" id="staticBackdrop2" aria-labelledby="reporteCostos" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="staticBackdropLabel2">{{nombreGrafica}}</h5>
-              <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <div class="card">
-                <h5 class="titulo_grafica">{{nombreGrafica}}</h5>
-                <p-chart type="bar" width="100%" height="100%" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </ng-container>
-
-    <!-- Modal en el que se mostrará una grafica de barras comparando la cantidad de materia prima asignada y la cantidad extruida -->
-    <ng-container *ngIf="mostrarGraficaComparativo">
-      <div class="modal fade" id="comparativoMP" aria-labelledby="Comparativo" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="staticBackdropLabel2">Materia Prima Asignada vs Materia Prima Extruida</h5>
-              <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <div class="card">
-                <h5 class="titulo_grafica">Materia Prima Asignada vs Materia Prima Extruida</h5>
-                <p-chart type="bar" width="100%" height="100%" [data]="ComparativoData" [options]="ComparativoOptions"></p-chart>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </ng-container>
   </div>
 
   <!-- DOCKER PARA ELEGIR LAS VISTAS FAVORITAS -->

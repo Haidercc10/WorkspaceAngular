@@ -1,80 +1,5 @@
-/* *{
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-} */
-
 p-pickList span{
   display: flex;
-}
-
-.banner{
-  background: #F1948A;
-  height: 30px;
-}
-
-.banner:hover{
-  background: #d88981;
-}
-
-.card{
-  cursor: pointer;
-}
-
-.modal{
-  overflow-x: scroll;
-  min-width: 300px;
-}
-
-.scrollCard{
-  overflow-y: scroll;
-  max-height: 300px;
-}
-
-.scrollCard::-webkit-scrollbar, .modal::-webkit-scrollbar{
-  width: 8px;     /* Tamaño del scroll en vertical */
-  height: 8px;    /* Tamaño del scroll en horizontal */
-}
-
-/* Ponemos un color de fondo y redondeamos las esquinas del thumb */
-.scrollCard::-webkit-scrollbar-thumb, .modal::-webkit-scrollbar-thumb {
-  background: #EBEDEF;
-  border-radius: 4px;
-}
-
-/* Cambiamos el fondo y agregamos una sombra cuando esté en hover */
-.scrollCard::-webkit-scrollbar-thumb:hover, .modal::-webkit-scrollbar-thumb:hover {
-  background: #D5DBDB;
-  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
-}
-
-/* Cambiamos el fondo cuando esté en active */
-.scrollCard::-webkit-scrollbar-thumb:active, .modal::-webkit-scrollbar-thumb:active {
-  background-color: #E5E8E8;
-}
-
-.card-body:hover{
-  background: #EBF5FB;
-}
-
-.contenedorLista {
-  width: 55%;
-  margin: auto;
-  border: solid #bbb 3px;
-  border-radius: 1%;
-  z-index: 5000;
-}
-
-.btnclose {
-  font-size: calc(var(--font-size) * 25px);
-  padding: 2%;
-  color: #db4149;
-  cursor: pointer;
-}
-
-.btnclose:hover {
-  color: #952731;
 }
 
 .card_animations {
@@ -90,92 +15,6 @@ p-pickList span{
   z-index: 5000;
   position: relative;
   animation: card 0.5s linear;
-}
-
-.amarillo {
-  background-color: #F3FC20;
-  color: #000;
-  /* width: 20%; */
-  text-align: center;
-  border-radius: 10%;
-}
-
-.naranja {
-  background-color: #F6D45D;
-  color: #000;
-  /* width: 20%; */
-  text-align: center;
-  border-radius: 10%;
-}
-
-.rojo {
-  background-color: #FF7878;
-  color: #000;
-  /* width: 20%; */
-  text-align: center;
-  border-radius: 10%;
-}
-
-.verde {
-  background-color: #8AFC9B;
-  color: #000;
-  /* width: 20%; */
-  text-align: center;
-  border-radius: 10%;
-}
-
-.azul {
-  background-color: #83D3FF;
-  color: #000;
-  /* width: 20%; */
-  text-align: center;
-  border-radius: 10%;
-}
-
-.gris{
-  background-color: #DDDDDD;
-  color: #000;
-  /* width: 20%; */
-  text-align: center;
-  border-radius: 10%;
-}
-
-.verde2 {
-  background-color: #53CC48;
-  color: #000;
-  /* width: 20%; */
-  text-align: center;
-  border-radius: 10%;
-}
-
-.verdeClientes {
-  background-color: #8AFC9B;
-  color: #000;
-  width: 10%;
-  text-align: center;
-  border-radius: 10%;
-}
-
-.verdePedidos {
-  background-color: #8AFC9B;
-  color: #000;
-  width: 20%;
-  text-align: center;
-  border-radius: 10%;
-}
-
-
-.titulo_grafica{
-  margin: auto;
-  color: #db4149;
-  padding-bottom: 2%;
-}
-
-.graficaFacturacion{
-  margin: auto;
-  width: 90%;
-  height: 70%;
-  font-size: calc(var(--font-size) * 50px);
 }
 
 @keyframes card {
@@ -208,13 +47,6 @@ p-pickList span{
     font-size: calc(var(--font-size) * 30px);
     width: 20%;
   }
-
-  .modal-xl {
-    width: 85%;
-    max-width: none;
-    height: 80%;
-    margin: auto;
-  }
 }
 
 @media screen and (max-width: 576px) {
@@ -242,12 +74,5 @@ p-pickList span{
   p-pickList img {
     margin: 0 0 1rem 0;
     width: 50px;
-  }
-
-  .modal-xl {
-    width: 200%;
-    max-width: none;
-    height: 80%;
-    margin: auto;
   }
 }
