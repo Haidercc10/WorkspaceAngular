@@ -108,15 +108,31 @@ export class Dashboard_MatPrimaComponent implements OnInit {
           if (datos_materiaPrima[i].id_Materia_Prima != 84 && datos_materiaPrima[i].id_Materia_Prima != 2001 && datos_materiaPrima[i].id_Materia_Prima != 449) {
             let info : any = {
               numero : i + 1,
+              id : datos_materiaPrima[i].id_Materia_Prima,
+              idMatPrima : 0,
+              idBopp : 0,
+              idTinta : 0,
               nombre : datos_materiaPrima[i].nombre_Materia_Prima,
               inicial : datos_materiaPrima[i].inicial,
               actual : datos_materiaPrima[i].actual,
               estado : ''
             }
-            if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
-            else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 10) info.estado = 'Bajo';
-            else if (datos_materiaPrima[i].actual > 10 && datos_materiaPrima[i].actual < 20) info.estado = 'Normal';
-            else info.estado = 'Alto';
+            if(info.id < 2000) {
+              if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
+              else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 1000) info.estado = 'Bajo';
+              else if (datos_materiaPrima[i].actual > 1000 && datos_materiaPrima[i].actual < 3000) info.estado = 'Medio';
+              else info.estado = 'Alto';
+            } else if(info.id > 2000 && info.id < 4000) {
+              if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
+              else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 100) info.estado = 'Bajo';
+              else if (datos_materiaPrima[i].actual > 100 && datos_materiaPrima[i].actual < 200) info.estado = 'Medio';
+              else info.estado = 'Alto';
+            } else if (info.id >= 4000) {
+              if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
+              else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 100) info.estado = 'Bajo';
+              else if (datos_materiaPrima[i].actual > 100 && datos_materiaPrima[i].actual < 300) info.estado = 'Medio';
+              else info.estado = 'Alto';
+            }
             info.nombre = info.nombre.split(' -');
             info.nombre = info.nombre[0].concat(' - ', info.nombre[1]).replace('- undefined', '');
             this.inventarioMateriaPrima.push(info);
@@ -156,6 +172,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
             und : 'Kg',
           }
           this.materiasPrimasMovidasHoy.push(info);
+          this.materiasPrimasMovidasHoy.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
         }
       });
 
