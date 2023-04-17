@@ -175,7 +175,14 @@ export class DashBoard_FacturacionComponent implements OnInit {
       },
       scales: {
         x: {
-          ticks: { color: '#495057', font: { size: 20 }},
+          ticks: {
+            color: '#495057',
+            font: { size: 20 },
+            callback: function(value) {
+              if (this.getLabelForValue(value).length > 4) return `${this.getLabelForValue(value).substring(0, 4)}...`;
+              else return this.getLabelForValue(value);
+            }
+          },
           grid: { color: '#ebedef' }
         },
         y: {
@@ -417,7 +424,14 @@ export class DashBoard_FacturacionComponent implements OnInit {
       },
       scales: {
         x: {
-          ticks: { color: '#495057', font: { size: 15 } },
+          ticks: {
+            color: '#495057',
+            font: { size: 15 },
+            callback: function(value) {
+              if (this.getLabelForValue(value).length > 6) return `${this.getLabelForValue(value).substring(0, 6)}...`;
+              else return this.getLabelForValue(value);
+            }
+          },
           grid: { color: '#ebedef' }
         },
         y: {
@@ -461,12 +475,19 @@ export class DashBoard_FacturacionComponent implements OnInit {
     this.multiAxisOptions = {
       stacked: false,
       plugins: {
-        legend: {  labels: { color: '#495057', font: { size: 20 } } },
-        tooltips: { titleFont: { size: 30, }, bodyFont: { size: 20 } }
+        legend: { labels: { color: '#495057', font: { size: 20 } } },
+        tooltip: { titleFont: { size: 30, }, bodyFont: { size: 20 } }
       },
       scales: {
         x: {
-          ticks: { color: '#495057', font: { size: 15 } },
+          ticks: {
+            color: '#495057',
+            font: { size: 15 },
+            callback: function(value) {
+              if (this.getLabelForValue(value).length > 6) return `${this.getLabelForValue(value).substring(0, 6)}...`;
+              else return this.getLabelForValue(value);
+            }
+          },
           grid: { color: '#ebedef' }
         },
         y: {
