@@ -55,21 +55,42 @@ export class Dashboard_MatPrimaComponent implements OnInit {
 
 
   constructor(@Inject(SESSION_STORAGE) private storage: WebStorageService,
-                private vistasFavService : VistasFavoritasService,
-                  private messageService: MessageService,
                     private ordenTrabajoService : EstadosProcesos_OTService,
-                      private bagProService : BagproService,
                         private materiaPrimaService : MateriaPrimaService,
                           private boppService : EntradaBOPPService,
-                            private tintasCreadasService : DetallesAsignacionMPxTintasService,
-                                private zeusService : InventarioZeusService,) { }
+                            private tintasCreadasService : DetallesAsignacionMPxTintasService,) { }
 
   ngOnInit() {
-    this.materiasPrimas();
-    setTimeout(() => { this.llenarGraficaComparativo(); }, 1500);
-    this.cambiarNombreMes();
+    this.tiempoExcedido();
+    this.lecturaStorage();
+
   }
 
+   //Funcion que leerá la informacion que se almacenará en el storage del navegador
+  lecturaStorage(){
+    this.storage_Id = this.storage.get('Id');
+    this.storage_Nombre = this.storage.get('Nombre');
+    this.ValidarRol = this.storage.get('Rol');
+  }
+
+  /** Función para recargar el tab de materias primas */
+  recargarTab() {
+    setTimeout(() => {
+      this.tiempoExcedido();
+
+    }, 10000);
+
+  }
+
+  /** Función que se ejecutará cada un minuto y mostrará la info de las materias primas */
+  tiempoExcedido(){
+    this.materiasPrimas();
+    this.cambiarNombreMes();
+    this.recargarTab();
+    setTimeout(() => { this.llenarGraficaComparativo(); }, 1500);
+  }
+
+  /** Función paracambiar el nombre del mes a español */
   cambiarNombreMes() {
     let mes : any = moment().format('MMMM');
     if(mes == 'January') this.mesActual = 'Enero';
@@ -86,6 +107,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     else if(mes == 'December') this.mesActual = 'Diciembre';
   }
 
+  /** Función para cargar la info de las materias primas cada card */
   materiasPrimas(){
     this.inventarioMateriaPrima = [];
     this.cantMateriasPrimas = [];
@@ -122,7 +144,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
               else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 1000) info.estado = 'Bajo';
               else if (datos_materiaPrima[i].actual > 1000 && datos_materiaPrima[i].actual < 3000) info.estado = 'Medio';
               else info.estado = 'Alto';
-            } else if(info.id > 2000 && info.id < 4000) {
+            } else if(info.id >= 2000 && info.id < 4000) {
               if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
               else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 100) info.estado = 'Bajo';
               else if (datos_materiaPrima[i].actual > 100 && datos_materiaPrima[i].actual < 200) info.estado = 'Medio';
@@ -226,6 +248,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     //}
   }
 
+  /** Función para llamar la grafica de la mat. prima asignada vs extruida*/
   llenarGraficaComparativo(){
     console.log(this.totalMpAsignada)
     this.ComparativoData = {
@@ -239,7 +262,8 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     this.ComparativoOptions = {
       indexAxis: 'y',
       plugins: {
-        legend: { abels: { color: '#495057' } }
+        legend: { abels: { color: '#495057' } },
+        tooltip: { titleFont: { size: 35, }, usePointStyle: true, bodyFont: { size: 15 } }
       },
       scales: {
         x: { ticks: { color: '#495057' }, grid: { color: '#ebedef' } },
@@ -248,6 +272,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     };
   }
 
+  /** Grafica de pipe en des uso */
   grafica(cantBopp : number, cantBopa: number, cantPoliester: number) {
     this.arrayBopps = {
       labels: ['BOPP','BOPA','POLIESTER'],
