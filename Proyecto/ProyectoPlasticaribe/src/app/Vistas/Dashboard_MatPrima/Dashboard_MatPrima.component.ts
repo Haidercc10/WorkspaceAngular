@@ -122,7 +122,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
               else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 1000) info.estado = 'Bajo';
               else if (datos_materiaPrima[i].actual > 1000 && datos_materiaPrima[i].actual < 3000) info.estado = 'Medio';
               else info.estado = 'Alto';
-            } else if(info.id > 2000 && info.id < 4000) {
+            } else if(info.id >= 2000 && info.id < 4000) {
               if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
               else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 100) info.estado = 'Bajo';
               else if (datos_materiaPrima[i].actual > 100 && datos_materiaPrima[i].actual < 200) info.estado = 'Medio';
