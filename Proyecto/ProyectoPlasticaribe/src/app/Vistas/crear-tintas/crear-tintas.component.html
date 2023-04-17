@@ -1,4 +1,4 @@
-<p-toast position="center"></p-toast>
+ <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 <form [formGroup]="formularioTintas" (ngSubmit)="agregarTintas()">
   <!-- Inicio Fila 1 Agregar Unidad Medida -->
   <div class="mb-3">

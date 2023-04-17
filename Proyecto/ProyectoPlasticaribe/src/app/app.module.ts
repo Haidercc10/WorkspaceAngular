@@ -55,6 +55,8 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TreeTableModule } from 'primeng/treetable';
+import {VirtualScrollerModule} from 'primeng/virtualscroller';
+import {KnobModule} from 'primeng/knob';
 import { MaterialExampleModule } from '../material.module';
 import { RoleGuardServiceGuard } from './Guards/role-guard-service.guard';
 import { BuscarInventarioXProductoPipe } from './Pipes/BuscarInventarioXProducto.pipe';
@@ -155,6 +157,7 @@ import { JwtInterceptor_ContaZeus } from './_helpers/jwt.interceptor_ContaZeus';
 import { JwtInterceptor_InvZeus } from './_helpers/jwt.interceptor_InvZeus';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { Dashboard_MatPrimaComponent } from './Vistas/Dashboard_MatPrima/Dashboard_MatPrima.component';
 
 export const routes: Routes = [
 
@@ -257,6 +260,7 @@ export const routes: Routes = [
   {path: 'Orden-Maquila', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Orden_MaquilaComponent},
   {path: 'Facturacion-Orden-Maquila', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Facturacion_OrdenMaquilaComponent},
   {path: 'Reporte-Maquilas', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Reporte_MaquilasComponent},
+  {path: 'dashboard-matprima', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Dashboard_MatPrimaComponent},
 ]
 
 @NgModule({
@@ -351,6 +355,7 @@ export const routes: Routes = [
     CrearTerceroComponent,
     Facturacion_OrdenMaquilaComponent,
     Reporte_MaquilasComponent,
+    Dashboard_MatPrimaComponent,
   ],
 
   imports: [
@@ -426,6 +431,8 @@ export const routes: Routes = [
     DividerModule,
     ChipModule,
     TagModule,
+    VirtualScrollerModule,
+    KnobModule,
   ],
 
   providers: [

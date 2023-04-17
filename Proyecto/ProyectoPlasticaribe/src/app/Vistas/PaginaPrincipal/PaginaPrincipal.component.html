@@ -2,7 +2,7 @@
 
 <div class="fondo">
   <!-- MENSAJE DE ADVERTENCIA -->
-  <p-toast position="center" key="tc"></p-toast>
+  <p-toast position="center" key="tc" [preventOpenDuplicates]="true"></p-toast>
 
   <!-- INFORMACION GENERAL DE LA EMPRESA Y SUS MOVIMIENTOS -->
   <div class="container-fluid contenedorCards" *ngIf="!displayTerminal" id="card">
@@ -333,7 +333,7 @@
                 <p class="font-size-15">Esta es una breve vista del inventario de materia prima donde se podrá ver la cantidad con la que inició cada materia prima hoy y en cuanto está su inventario actual.</p>
                 <div class="scrollCard">
                   <p class="font-size-15" *ngFor="let item of inventarioMateriaPrima; let i=index">
-                    <span>{{i + 1}}) <b>{{item.nombre_Materia_Prima}}</b> con un inventario inicial de <b>{{item.inicial | number}} Kg</b> y un inventario actual de <b>{{item.actual | number}} Kg</b>. <br></span>
+                    <span>{{i + 1}} <b>{{item.nombre_Materia_Prima}}</b> con un inventario inicial de <b>{{item.inicial | number}} Kg</b> y un inventario actual de <b>{{item.actual | number}} Kg</b>. <br></span>
                   </p>
                 </div>
               </div>
@@ -363,7 +363,7 @@
                 <p *ngIf="materiasPrimasMovidasHoy.length == 0"><b>No ha habido asignaciones de materias primas el día de hoy.</b></p>
                 <div class="scrollCard">
                   <p class="font-size-15" *ngFor="let item of materiasPrimasMovidasHoy; let i = index">
-                    <span>{{i + 1}})<b> {{item.nombre}}</b> ha sido utilizada en <b>{{item.asignaciones | number}}</b> asignacion(es), se han utilizado <label class="rojo">{{item.cantidad | number}}</label> Kg.</span>
+                    <span>{{i + 1}}<b> {{item.nombre}}</b> ha sido utilizada en <b>{{item.asignaciones | number}}</b> asignacion(es), se han utilizado <label class="rojo">{{item.cantidad | number}}</label> Kg.</span>
                   </p>
                 </div>
               </div>

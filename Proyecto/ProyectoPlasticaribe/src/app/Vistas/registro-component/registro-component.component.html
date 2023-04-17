@@ -202,7 +202,7 @@
 
       <p-dialog [(visible)]="nuevoDialogo" [style]="{width: '450px'}" header="Crear {{accionDialogoNuevo}}" [modal]="true" >
         <ng-container *ngIf="accionDialogoNuevo == 'Rol' then rol; else area"></ng-container>
-        <p-toast position="center"></p-toast>
+         <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 
         <!-- FORMULARIO ROLES -->
         <ng-template #rol>

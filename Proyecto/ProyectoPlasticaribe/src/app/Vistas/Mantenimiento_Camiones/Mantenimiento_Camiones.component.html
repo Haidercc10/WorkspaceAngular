@@ -1,5 +1,5 @@
 <app-menuLateral></app-menuLateral>
-<p-toast position="center"></p-toast>
+ <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
 <div class="d-flex justify-content-center overlay" *ngIf="!cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -250,7 +250,7 @@
 
     <!--Modal Mantenimiento -->
     <ng-template #Mantenimiento>
-      <p-toast position="center"></p-toast>
+       <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
       <br>
 
       <form [formGroup]="formMantenimiento">
