@@ -72,7 +72,6 @@ export class Dashboard_MatPrimaComponent implements OnInit {
 
   cambiarNombreMes() {
     let mes : any = moment().format('MMMM');
-
     if(mes == 'January') this.mesActual = 'Enero';
     else if(mes == 'February') this.mesActual = 'Febrero';
     else if(mes == 'March') this.mesActual = 'Marzo';
@@ -147,6 +146,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
       });
 
       this.materiaPrimaService.GetMateriasPrimasUtilizadasHoy(this.today).subscribe(datos => {
+        console.log(datos);
         for (let index = 0; index < datos.length; index++) {
           let info : any = {
             nro : index + 1,
@@ -167,7 +167,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
         }
       });
 
-        this.materiaPrimaService.GetMateriasPrimasUltilizadasMes(this.primerDiaMes, this.today).subscribe(datos => {
+      this.materiaPrimaService.GetMateriasPrimasUltilizadasMes(this.primerDiaMes, this.today).subscribe(datos => {
           for (let index = 0; index < datos.length; index++) {
             let info : any = {
               nro : index + 1,
@@ -182,7 +182,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
             this.materiasPrimasMasUtilizadasMes.push(info);
             this.materiasPrimasMasUtilizadasMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
           }
-        });
+      });
 
       this.tintasCreadasService.GetMateriasPrimasCrearTintasMes(this.primerDiaMes, this.today).subscribe(datos => {
         for (let index = 0; index < datos.length; index++) {
@@ -199,7 +199,6 @@ export class Dashboard_MatPrimaComponent implements OnInit {
           this.materiasPrimasMasUtilizadasCrearTintaMes.sort((a,b) => Number(b.cantidad) - Number(a.cantidad));
         }
       });
-
 
       this.ordenTrabajoService.GetTotalMateriaPrimaAsignadaMes(this.primerDiaMes, this.today).subscribe(datos_ot => {
         for (let i = 0; i < datos_ot.length; i++) {

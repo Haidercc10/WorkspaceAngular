@@ -24,6 +24,17 @@
 
 p-card, p-card ::ng-deep .p-card {
   height: 100%;
+  margin : 0;
+}
+
+.advertencia {
+  text-align: center;
+  color: darkgray;
+}
+
+p-knob ::ng-deep .p-knob-text {
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
 
