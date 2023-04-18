@@ -17,17 +17,16 @@
             [rowHover]="true">
               <ng-template pTemplate="header">
                 <tr>
-                  <th scope="col" pSortableColumn="nombre" style="min-width: 70%; max-width: 70%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
-                  <th scope="col" pSortableColumn="nro" style="min-width: 10%; max-width: 10%" class="font-size-13"></th>
-                  <th scope="col" pSortableColumn="cantidad" style="min-width: 20%; max-width: 20%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
+                  <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
+                  <th scope="col" pSortableColumn="nombre" style="min-width: 60%; max-width: 60%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
+                  <th scope="col" pSortableColumn="cantidad" style="min-width: 30%; max-width: 30%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
                 </tr>
               </ng-template>
-              <ng-template pTemplate="body" let-stock >
+              <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
                 <tr class="font-size-12" pTooltip="Cantidad de asignaciones {{stock.asignaciones}}">
-
-                  <td style="min-width: 70%; max-width: 70%"><b><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/{{stock.imagen}}" alt=""> {{stock.nombre}}</b></td>
-                  <td style="min-width: 10%; max-width: 10%"></td>
-                  <td style="min-width: 20%; max-width: 20%"><b>{{stock.cantidad | number : '1.2-2'}}</b> </td>
+                  <td style="min-width: 10%; max-width: 10%">{{rowIndex + 1}}</td>
+                  <td style="min-width: 60%; max-width: 60%"><b><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/{{stock.imagen}}" alt=""> {{stock.nombre}}</b></td>
+                  <td style="min-width: 30%; max-width: 30%"><b>{{stock.cantidad | number : '1.2-2'}}</b> </td>
                 </tr>
               </ng-template>
           </p-table>
@@ -62,17 +61,17 @@
             styleClass="p-datatable-sm">
               <ng-template pTemplate="header">
                 <tr>
-                  <th scope="col" pSortableColumn="numero" style="min-width: 10%; max-width: 10%" class="font-size-13">N°<p-sortIcon field="numero"></p-sortIcon></th>
-                  <th scope="col" pSortableColumn="nombre" style="min-width: 55%; max-width: 55%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
+                  <th scope="col" style="min-width: 20%; max-width: 20%" class="font-size-13">N°</th>
+                  <th scope="col" pSortableColumn="nombre" style="min-width: 30%; max-width: 30%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
                   <th scope="col" pSortableColumn="estado"  style="min-width: 20%; max-width: 20%" class="font-size-13">Estado<p-sortIcon field="estado"></p-sortIcon></th>
                   <th scope="col" pSortableColumn="actual" style="min-width: 15%; max-width: 15%" class="font-size-13">Actual<p-sortIcon field="actual"></p-sortIcon></th>
                   <th scope="col" pSortableColumn="inicial" style="min-width: 15%; max-width: 15%" class="font-size-13">Inicial<p-sortIcon field="inicial"></p-sortIcon></th>
                 </tr>
               </ng-template>
-              <ng-template pTemplate="body" let-stock>
+              <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
                 <tr class="font-size-12">
-                  <td style="min-width: 10%; max-width: 10%">{{stock.numero}}</td>
-                  <td style="min-width: 55%; max-width: 55%"><b>{{stock.nombre}}</b></td>
+                  <td style="min-width: 20%; max-width: 20%">{{rowIndex + 1}}</td>
+                  <td style="min-width: 30%; max-width: 30%"><b>{{stock.nombre}}</b></td>
                   <ng-container *ngIf="stock.estado == 'Sin stock'">
                     <td style="min-width: 20%; max-width: 20%"><span class="badge bg-danger1">{{stock.estado}}</span></td>
                   </ng-container>
@@ -113,7 +112,7 @@
             styleClass="p-datatable-sm">
               <ng-template pTemplate="header">
                 <tr>
-                  <th scope="col" style="min-width: 10%; max-width: 10%" pSortableColumn="nro" class="font-size-13">N°<p-sortIcon field="nro"></p-sortIcon></th>
+                  <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
                   <th scope="col" style="min-width: 40%; max-width: 40%" pSortableColumn="nombre" class="font-size-13">Nombre<p-sortIcon style="width: 10px; height: 10px;" field="nombre"></p-sortIcon></th>
                   <th scope="col" style="min-width: 30%; max-width: 30%" pSortableColumn="asignaciones" class="font-size-13">Asignaciones<p-sortIcon field="asignaciones"></p-sortIcon></th>
                   <th scope="col" style="min-width: 20%; max-width: 20%" pSortableColumn="cantidad" class="font-size-13">Cant.<p-sortIcon field="cantidad"></p-sortIcon></th>
@@ -153,13 +152,15 @@
               [rowHover]="true">
                 <ng-template pTemplate="header">
                   <tr>
-                    <th scope="col" pSortableColumn="tinta_Nombre" style="min-width: 70%; max-width: 70%" class="font-size-13">Nombre<p-sortIcon field="tinta_Nombre"></p-sortIcon></th>
+                    <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
+                    <th scope="col" pSortableColumn="tinta_Nombre" style="min-width: 60%; max-width: 60%" class="font-size-13">Nombre<p-sortIcon field="tinta_Nombre"></p-sortIcon></th>
                     <th scope="col" pSortableColumn="cantidad" style="min-width: 30%; max-width: 30%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
                   </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-stock>
+                <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
                   <tr class="font-size-12">
-                    <td style="min-width: 70%; max-width: 70%"><b><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/tinta2.png" alt=""> {{stock.tinta_Nombre}}</b></td>
+                    <td style="min-width: 10%; max-width: 10%"><b>{{rowIndex + 1}}</b></td>
+                    <td style="min-width: 60%; max-width: 60%"><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/tinta2.png" alt=""> {{stock.tinta_Nombre}}</td>
                     <td style="min-width: 30%; max-width: 30%"><b>{{stock.cantidad | number : '1.2-2'}}</b></td>
                   </tr>
                 </ng-template>
@@ -238,13 +239,15 @@
               [rowHover]="true">
                 <ng-template pTemplate="header">
                   <tr>
+                    <th scope="col" style="min-width: 30%; max-width: 30%" class="font-size-13">N°</th>
                     <th scope="col" pSortableColumn="nombre" style="min-width: 70%; max-width: 70%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
                     <th scope="col" pSortableColumn="cantidad" style="min-width: 30%; max-width: 30%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
                   </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-stock>
+                <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
                   <tr class="font-size-12">
-                    <td style="min-width: 70%; max-width: 70%"><b><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/{{stock.imagen}}" alt=""> {{stock.nombre}}</b></td>
+                    <td style="min-width: 10%; max-width: 10%"><b>{{rowIndex + 1}} </b></td>
+                    <td style="min-width: 60%; max-width: 60%"><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/{{stock.imagen}}" alt=""> {{stock.nombre}}</td>
                     <td style="min-width: 30%; max-width: 30%"><b>{{stock.cantidad | number : '1.2-2'}}</b></td>
                   </tr>
                 </ng-template>

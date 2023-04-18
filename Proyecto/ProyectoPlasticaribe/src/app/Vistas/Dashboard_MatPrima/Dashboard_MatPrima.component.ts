@@ -75,11 +75,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
 
   /** Función para recargar el tab de materias primas */
   recargarTab() {
-    setTimeout(() => {
-      this.tiempoExcedido();
-
-    }, 10000);
-
+    setTimeout(() => { this.tiempoExcedido(); }, 60000);
   }
 
   /** Función que se ejecutará cada un minuto y mostrará la info de las materias primas */
@@ -272,7 +268,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     };
   }
 
-  /** Grafica de pipe en des uso */
+  /** Grafica de pie en des uso */
   grafica(cantBopp : number, cantBopa: number, cantPoliester: number) {
     this.arrayBopps = {
       labels: ['BOPP','BOPA','POLIESTER'],
