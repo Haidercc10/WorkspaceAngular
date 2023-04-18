@@ -3,8 +3,6 @@
 <div class="fondo">
   <!-- MENSAJE DE ADVERTENCIA -->
   <p-toast position="center" key="tc" [preventOpenDuplicates]="true"></p-toast>
-
-<div class="fondo">
   <div class="container-fluid contenedorCards" *ngIf="!displayTerminal" id="card">
     <p-tabView>
       <!-- ORDENES DE TRABAJO -->
@@ -13,9 +11,7 @@
         leftIcon="pi pi-sliders-h"
         tooltip="Información de la Facturación Mensual y las Ordenes de Trabajo"
         *ngIf="ValidarRol == 1 || ValidarRol == 60">
-        <div class="row">
-          <app-DashBoard_Facturacion></app-DashBoard_Facturacion>
-        </div>
+        <app-DashBoard_Facturacion></app-DashBoard_Facturacion>
       </p-tabPanel>
 
       <!-- MATERIA PRIMA -->
@@ -33,9 +29,7 @@
         leftIcon="pi pi-shopping-bag"
         tooltip="Información de los Pedidos creados en Zeus"
         *ngIf="ValidarRol == 1 || ValidarRol == 60">
-        <div class="row">
-          <app-DashBoard_Pedidos></app-DashBoard_Pedidos>
-        </div>
+        <app-DashBoard_Pedidos></app-DashBoard_Pedidos>
       </p-tabPanel>
     </p-tabView>
   </div>

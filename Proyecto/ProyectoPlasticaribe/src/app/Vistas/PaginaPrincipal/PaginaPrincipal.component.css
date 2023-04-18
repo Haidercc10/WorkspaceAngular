@@ -17,6 +17,10 @@ p-pickList span{
   animation: card 0.5s linear;
 }
 
+p-tabView p-tabPanel {
+  margin: 0;
+}
+
 @keyframes card {
   0%   {left:0px;}
   25%  {left:25%;}
