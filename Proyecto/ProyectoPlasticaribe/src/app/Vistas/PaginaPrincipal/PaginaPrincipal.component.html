@@ -4,7 +4,7 @@
   <!-- MENSAJE DE ADVERTENCIA -->
   <p-toast position="center" key="tc" [preventOpenDuplicates]="true"></p-toast>
   <div class="container-fluid contenedorCards" *ngIf="!displayTerminal" id="card">
-    <p-tabView>
+    <p-tabView [scrollable]="true">
       <!-- ORDENES DE TRABAJO -->
       <p-tabPanel
         header="Facturación y Ordenes de Trabajo"

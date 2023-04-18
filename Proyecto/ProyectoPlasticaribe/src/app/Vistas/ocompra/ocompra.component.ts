@@ -359,27 +359,32 @@ export class OcompraComponent implements OnInit {
         UndMed_Id : this.materiasPrimasSeleccionadas[j].Und_Medida,
         Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[j].Precio,
       }
-      this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => { this.GuardadoExitoso(); error = false; }, error => {
+      this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => {
+        this.GuardadoExitoso();
+        error = false;
+        this.mostrarEleccion(0, 'pdf')
+      }, error => {
         this.mostrarError(`Error`, `¡Error al insertar la(s) materia(s) prima(s) pedida(s)!`);
         this.cargando = false;
         error = true;
+        this.mostrarError('No se mostrará la informacion del PDF');
       });
     }
-    !error ? this.mostrarEleccion(0, 'pdf') : this.mostrarError('No se mostrará la informacion del PDF');
   }
 
   // Funcion que mostrará el mensaje de que todo el proceso de guardado fue exitoso
   GuardadoExitoso(){
     this.actualizarPrecioMatPrimas();
     this.actualizarPrecioTintas();
-    setTimeout(() => { this.limpiarTodo(); }, 1500);
+    setTimeout(() => { this.limpiarTodo(); }, 3500);
   }
 
   //Buscar informacion de la orden de compra creada
   buscarinfoOrdenCompra(){
     this.onReject();
     this.cargando = true;
-    this.dtOrdenCompraService.GetUltimaOrdenCompra().subscribe(datos_orden => {
+    let ordenCompra : number = this.FormOrdenCompra.value.ConsecutivoOrden;
+    this.dtOrdenCompraService.GetOrdenCompra(ordenCompra).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         let info : any = {
           Id : 0,
@@ -405,14 +410,15 @@ export class OcompraComponent implements OnInit {
         this.informacionPDF.push(info);
         this.informacionPDF.sort((a,b) => a.Nombre.localeCompare(b.Nombre));
       }
-      setTimeout(() => {this.generarPDF(); }, 2500);
+      setTimeout(() => {this.generarPDF(); }, 1000);
     }, error => { this.mostrarError(`Error`, `¡No se pudo obtener información de la última orden de compra creada!`); });
   }
 
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
   generarPDF(){
     let nombre : string = this.storage.get('Nombre');
-    this.dtOrdenCompraService.GetUltimaOrdenCompra().subscribe(datos_orden => {
+    let ordenCompra : number = this.FormOrdenCompra.value.ConsecutivoOrden;
+    this.dtOrdenCompraService.GetOrdenCompra(ordenCompra).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         const pdfDefinicion : any = {
           info: {

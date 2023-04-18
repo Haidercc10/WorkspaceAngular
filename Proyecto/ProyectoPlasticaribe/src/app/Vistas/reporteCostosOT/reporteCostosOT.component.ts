@@ -1,20 +1,19 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
-import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
-import Swal from 'sweetalert2';
-import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
-import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
-import pdfMake from 'pdfmake/build/pdfmake';
-import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
-import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
 import moment from 'moment';
-import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
-import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
-import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
-import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
-import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
+import pdfMake from 'pdfmake/build/pdfmake';
 import { MessageService } from 'primeng/api';
+import { EntradaBOPPService } from 'src/app/Servicios/BOPP/entrada-BOPP.service';
+import { BagproService } from 'src/app/Servicios/BagPro/Bagpro.service';
+import { DetallesAsignacionService } from 'src/app/Servicios/DetallesAsgMateriaPrima/detallesAsignacion.service';
+import { DevolucionesMPService } from 'src/app/Servicios/DetallesDevolucionMateriaPrima/devolucionesMP.service';
+import { DevolucionesService } from 'src/app/Servicios/DevolucionMateriaPrima/devoluciones.service';
+import { EstadosProcesos_OTService } from 'src/app/Servicios/EstadosProcesosOT/EstadosProcesos_OT.service';
+import { MateriaPrimaService } from 'src/app/Servicios/MateriaPrima/materiaPrima.service';
+import { TintasService } from 'src/app/Servicios/Tintas/tintas.service';
+import { logoParaPdf } from 'src/app/logoPlasticaribe_Base64';
+import { PaginaPrincipalComponent } from '../PaginaPrincipal/PaginaPrincipal.component';
 
 @Component({
   selector: 'app-reporteCostosOT',
