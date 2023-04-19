@@ -46,6 +46,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   arrayBopps : any = [];
   chartOptions : any;
   mesActual ;
+  cargando : boolean = false;
 
   /* GRAFICA */
   ComparativoData: any;
@@ -63,7 +64,6 @@ export class Dashboard_MatPrimaComponent implements OnInit {
   ngOnInit() {
     this.tiempoExcedido();
     this.lecturaStorage();
-
   }
 
    //Funcion que leerá la informacion que se almacenará en el storage del navegador
@@ -80,10 +80,11 @@ export class Dashboard_MatPrimaComponent implements OnInit {
 
   /** Función que se ejecutará cada un minuto y mostrará la info de las materias primas */
   tiempoExcedido(){
+    //this.cargando = true;
     this.materiasPrimas();
     this.cambiarNombreMes();
     this.recargarTab();
-    setTimeout(() => { this.llenarGraficaComparativo(); }, 1500);
+    setTimeout(() => { this.llenarGraficaComparativo(); }, 1000);
   }
 
   /** Función paracambiar el nombre del mes a español */
@@ -121,42 +122,39 @@ export class Dashboard_MatPrimaComponent implements OnInit {
     this.materiasPrimasMasUtilizadasCrearTintaMes = [];
 
     //if(this.ValidarRol == 1 || this.ValidarRol == 60) {
-      this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos_materiaPrima => {
-        for (let i = 0; i < datos_materiaPrima.length; i++) {
-          if (datos_materiaPrima[i].id_Materia_Prima != 84 && datos_materiaPrima[i].id_Materia_Prima != 2001 && datos_materiaPrima[i].id_Materia_Prima != 449) {
-            let info : any = {
-              numero : i + 1,
-              id : datos_materiaPrima[i].id_Materia_Prima,
-              idMatPrima : 0,
-              idBopp : 0,
-              idTinta : 0,
-              nombre : datos_materiaPrima[i].nombre_Materia_Prima,
-              inicial : datos_materiaPrima[i].inicial,
-              actual : datos_materiaPrima[i].actual,
-              estado : ''
+        this.materiaPrimaService.GetInventarioMateriasPrimas().subscribe(datos_materiaPrima => {
+          for (let i = 0; i < datos_materiaPrima.length; i++) {
+            if (datos_materiaPrima[i].id_Materia_Prima != 84 && datos_materiaPrima[i].id_Materia_Prima != 2001 && datos_materiaPrima[i].id_Materia_Prima != 449) {
+              let info : any = {
+                numero : i + 1,
+                id : datos_materiaPrima[i].id_Materia_Prima,
+                nombre : datos_materiaPrima[i].nombre_Materia_Prima,
+                inicial : datos_materiaPrima[i].inicial,
+                actual : datos_materiaPrima[i].actual,
+                estado : ''
+              }
+              if(info.id < 2000) {
+                if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
+                else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 1000) info.estado = 'Bajo';
+                else if (datos_materiaPrima[i].actual > 1000 && datos_materiaPrima[i].actual < 3000) info.estado = 'Medio';
+                else info.estado = 'Alto';
+              } else if(info.id >= 2000 && info.id < 4000) {
+                if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
+                else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 100) info.estado = 'Bajo';
+                else if (datos_materiaPrima[i].actual > 100 && datos_materiaPrima[i].actual < 200) info.estado = 'Medio';
+                else info.estado = 'Alto';
+              } else if (info.id >= 4000) {
+                if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
+                else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 100) info.estado = 'Bajo';
+                else if (datos_materiaPrima[i].actual > 100 && datos_materiaPrima[i].actual < 300) info.estado = 'Medio';
+                else info.estado = 'Alto';
+              }
+              info.nombre = info.nombre.split(' -');
+              info.nombre = info.nombre[0].concat(' - ', info.nombre[1]).replace('- undefined', '');
+              this.inventarioMateriaPrima.push(info);
             }
-            if(info.id < 2000) {
-              if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
-              else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 1000) info.estado = 'Bajo';
-              else if (datos_materiaPrima[i].actual > 1000 && datos_materiaPrima[i].actual < 3000) info.estado = 'Medio';
-              else info.estado = 'Alto';
-            } else if(info.id >= 2000 && info.id < 4000) {
-              if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
-              else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 100) info.estado = 'Bajo';
-              else if (datos_materiaPrima[i].actual > 100 && datos_materiaPrima[i].actual < 200) info.estado = 'Medio';
-              else info.estado = 'Alto';
-            } else if (info.id >= 4000) {
-              if(datos_materiaPrima[i].actual <= 0) info.estado = 'Sin stock';
-              else if (datos_materiaPrima[i].actual > 0 && datos_materiaPrima[i].actual < 100) info.estado = 'Bajo';
-              else if (datos_materiaPrima[i].actual > 100 && datos_materiaPrima[i].actual < 300) info.estado = 'Medio';
-              else info.estado = 'Alto';
-            }
-            info.nombre = info.nombre.split(' -');
-            info.nombre = info.nombre[0].concat(' - ', info.nombre[1]).replace('- undefined', '');
-            this.inventarioMateriaPrima.push(info);
           }
-        }
-      });
+        });
 
       this.boppService.GetBoppStockInventario().subscribe(datos_bopp => {
         for (let i = 0; i < datos_bopp.length; i++) {
@@ -246,7 +244,7 @@ export class Dashboard_MatPrimaComponent implements OnInit {
 
   /** Función para llamar la grafica de la mat. prima asignada vs extruida*/
   llenarGraficaComparativo(){
-    console.log(this.totalMpAsignada)
+    //this.cargando = false;
     this.ComparativoData = {
       labels: [''],
       datasets: [
