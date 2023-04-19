@@ -118,11 +118,7 @@ export class PedidoExternoComponent implements OnInit {
   }
 
   // Funcion que colcará la puntuacion a los numeros que se le pasen a la funcion
-  formatonumeros = (number) => {
-    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
-    const rep = '$1,';
-    return number.toString().replace(exp,rep);
-  }
+  formatonumeros = (number) => number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador
   lecturaStorage(){
@@ -156,19 +152,13 @@ export class PedidoExternoComponent implements OnInit {
   }
 
   //Cargar modal de crear producto
-  LlamarModalCrearProducto() {
-    this.ModalCrearProductos = true;
-  }
+  LlamarModalCrearProducto = () => this.ModalCrearProductos = true;
 
   // Funcion para llamar el modal que crea clientes
-  LlamarModalCrearCliente() {
-    this.ModalCrearCliente = true;
-  }
+  LlamarModalCrearCliente = () => this.ModalCrearCliente = true;
 
   // Funcion para limpiar los campos de el apartado de productos
-  LimpiarCamposProductos(){
-    this.FormPedidoExternoProductos.reset();
-  }
+  LimpiarCamposProductos = () => this.FormPedidoExternoProductos.reset();
 
   //Funcion que limpiará TODOS los campos de la vista de pedidos
   limpiarTodosCampos(){
@@ -282,9 +272,7 @@ export class PedidoExternoComponent implements OnInit {
       setTimeout(() => {
         if (this.sedeCliente.length <= 1) {
           for (let i = 0; i < this.sedeCliente.length; i++) {
-            this.FormPedidoExternoClientes.patchValue({
-              PedSedeCli_Id: datos_sedesClientes[i].sedeCliente_Direccion,
-            });
+            this.FormPedidoExternoClientes.patchValue({ PedSedeCli_Id: datos_sedesClientes[i].sedeCliente_Direccion, });
             this.verificarCartera();
           }
         }
@@ -329,9 +317,7 @@ export class PedidoExternoComponent implements OnInit {
     this.producto = [];
     this.ClientesProductosService.srvObtenerListaPorNombreCliente(this.FormPedidoExternoClientes.value.PedClienteId).subscribe(datos_clientesProductos => {
       for (let index = 0; index < datos_clientesProductos.length; index++) {
-        this.productosServices.srvObtenerListaPorId(datos_clientesProductos[index].prod_Id).subscribe(datos_productos => {
-          this.producto.push(datos_productos);
-        });
+        this.productosServices.srvObtenerListaPorId(datos_clientesProductos[index].prod_Id).subscribe(datos_productos => this.producto.push(datos_productos));
       }
     });
   }
@@ -356,15 +342,13 @@ export class PedidoExternoComponent implements OnInit {
 
               setTimeout(() => {
                 this.presentacion.push(datos_producto[j].undMed_Id);
-                this.FormPedidoExternoProductos.setValue({
+                this.FormPedidoExternoProductos.patchValue({
                   ProdId: datos_producto[j].prod_Id,
                   ProdNombre: datos_producto[j].prod_Nombre,
-                  ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
                   ProdUnidadMedidaCant: datos_producto[j].undMed_Id,
                   ProdPrecioUnd: datos_producto[j].exProd_PrecioVenta.toFixed(2),
                   ProdUltFacturacion: this.formatonumeros(this.ultimoPrecio.toFixed(2)),
                   ProdStock: this.formatonumeros(datos_existencis[i].existencias.toFixed(2)),
-                  ProdFechaEnt : this.FormPedidoExternoProductos.value.ProdFechaEnt,
                 });
               }, 100);
             }
@@ -379,15 +363,13 @@ export class PedidoExternoComponent implements OnInit {
 
         this.productosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
           for (let i = 0; i < datos_producto.length; i++) {
-            this.FormPedidoExternoProductos.setValue({
+            this.FormPedidoExternoProductos.patchValue({
               ProdId: datos_producto[i].prod_Id,
               ProdNombre: datos_producto[i].prod_Nombre,
-              ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
               ProdUnidadMedidaCant: '',
               ProdPrecioUnd: 0,
               ProdUltFacturacion: this.ultimoPrecio,
               ProdStock: 0,
-              ProdFechaEnt : this.FormPedidoExternoProductos.value.ProdFechaEnt,
             });
           }
         });
@@ -411,15 +393,13 @@ export class PedidoExternoComponent implements OnInit {
 
               setTimeout(() => {
                 this.presentacion.push(datos_producto[j].undMed_Id);
-                this.FormPedidoExternoProductos.setValue({
+                this.FormPedidoExternoProductos.patchValue({
                   ProdId: datos_producto[j].prod_Id,
                   ProdNombre: datos_producto[j].prod_Nombre,
-                  ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
                   ProdUnidadMedidaCant: datos_producto[j].undMed_Id,
                   ProdPrecioUnd: datos_producto[j].exProd_PrecioVenta.toFixed(2),
                   ProdUltFacturacion: this.ultimoPrecio,
                   ProdStock: datos_existencis[i].existencias,
-                  ProdFechaEnt : this.FormPedidoExternoProductos.value.ProdFechaEnt,
                 });
               }, 100);
             }
@@ -434,15 +414,13 @@ export class PedidoExternoComponent implements OnInit {
 
         this.productosServices.srvObtenerListaPorIdProducto(idProducto).subscribe(datos_producto => {
           for (let i = 0; i < datos_producto.length; i++) {
-            this.FormPedidoExternoProductos.setValue({
+            this.FormPedidoExternoProductos.patchValue({
               ProdId: datos_producto[i].prod_Id,
               ProdNombre: datos_producto[i].prod_Nombre,
-              ProdCantidad: this.FormPedidoExternoProductos.value.ProdCantidad,
               ProdUnidadMedidaCant: '',
               ProdPrecioUnd: 0,
               ProdUltFacturacion: 0,
               ProdStock: 0,
-              ProdFechaEnt : this.FormPedidoExternoProductos.value.ProdFechaEnt,
             });
           }
         });
@@ -513,8 +491,7 @@ export class PedidoExternoComponent implements OnInit {
     let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
     let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
-    let mensaje : string = 'Crear Pedido';
-    if (this.modalMode) mensaje = 'Editar Pedido';
+    let mensaje : string = this.modalMode ? 'Editar Pedido' : 'Crear Pedido';
 
     if (this.FormPedidoExternoClientes.valid) {
       if (!this.ArrayProducto.length) this.mensajeAdvertencia('Debe cargar al menos un producto en la tabla.');
@@ -537,8 +514,7 @@ export class PedidoExternoComponent implements OnInit {
           cancelButtonText : `Cancelar Pedido`,
         }).then((result) => {
           if (result.isConfirmed) {
-            if (!this.modalMode) this.CrearPedidoExterno();
-            else this.editarPedido();
+            !this.modalMode ? this.CrearPedidoExterno() : this.editarPedido();
           } else if (result.isDenied) {
             const Toast = Swal.mixin({
               toast: true,
@@ -567,8 +543,7 @@ export class PedidoExternoComponent implements OnInit {
     let direccionSede : string = this.FormPedidoExternoClientes.value.PedSedeCli_Id;
     let ciudad : string = this.FormPedidoExternoClientes.value.ciudad_sede;
     let clienteNombre : any = this.FormPedidoExternoClientes.value.PedClienteNombre;
-    let observacion = this.FormPedidoExternoClientes.get('PedObservacion')?.value;
-    if (observacion == null) observacion = '';
+    let observacion = this.FormPedidoExternoClientes.value.PedObservacion == null ? '' : this.FormPedidoExternoClientes.value.PedObservacion;
 
     this.sedesClientesService.srvObtenerListaPorClienteSede(clienteNombre, ciudad, direccionSede).subscribe(datos_sedeCliente => {
       for (let i = 0; i < datos_sedeCliente.length; i++) {
@@ -602,24 +577,20 @@ export class PedidoExternoComponent implements OnInit {
   // Funcion que creará los detalles del pedido
   crearDetallesPedido(){
     this.pedidoproductoService.srvObtenerUltimoPedido().subscribe(dataPedExternos =>{
-      let datos : any = [];
-      datos.push(dataPedExternos);
-      for (const item of datos) {
-        for (let index = 0; index < this.ArrayProducto.length; index++) {
-          const productosPedidos : any = {
-            Prod_Id: this.ArrayProducto[index].Id,
-            PedExt_Id: item.pedExt_Id,
-            PedExtProd_Cantidad : this.ArrayProducto[index].Cant,
-            UndMed_Id : this.ArrayProducto[index].UndCant,
-            PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd,
-            PedExtProd_FechaEntrega : this.ArrayProducto[index].FechaEntrega,
-            PedExtProd_CantidadFaltante : this.ArrayProducto[index].Cant,
-            PedExtProd_CantidadFacturada : 0,
-          }
-          this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(_registro_pedido_productos => {
-            Swal.fire({icon: 'success', title: 'Pedido Creado Exitosamente', text: 'El pedido fue creado de manera satisfactoria'});
-          }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!', error.message); });
+      for (let index = 0; index < this.ArrayProducto.length; index++) {
+        const productosPedidos : any = {
+          Prod_Id: this.ArrayProducto[index].Id,
+          PedExt_Id: dataPedExternos.pedExt_Id,
+          PedExtProd_Cantidad : this.ArrayProducto[index].Cant,
+          UndMed_Id : this.ArrayProducto[index].UndCant,
+          PedExtProd_PrecioUnitario : this.ArrayProducto[index].PrecioUnd,
+          PedExtProd_FechaEntrega : this.ArrayProducto[index].FechaEntrega,
+          PedExtProd_CantidadFaltante : this.ArrayProducto[index].Cant,
+          PedExtProd_CantidadFacturada : 0,
         }
+        this.PedidoProductosService.srvGuardar(productosPedidos).subscribe(_registro_pedido_productos => {
+          Swal.fire({icon: 'success', title: 'Pedido Creado Exitosamente', text: 'El pedido fue creado de manera satisfactoria'});
+        }, error => { this.mensajeError('¡No se pudo crear el pedido, por favor intente de nuevo!', error.message); });
       }
     });
   }

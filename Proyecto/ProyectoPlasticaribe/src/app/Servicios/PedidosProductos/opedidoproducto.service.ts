@@ -27,7 +27,7 @@ export class OpedidoproductoService {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/idPedidoLlenarPDF/${dato}`);
   }
 
-  srvObtenerUltimoPedido(){
+  srvObtenerUltimoPedido() : Observable<any> {
     return this.http.get<any>(this.rutaPlasticaribeAPI + `/PedidoExterno/UltimoPedido/`);
   }
 
