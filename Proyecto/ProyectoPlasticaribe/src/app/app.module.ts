@@ -162,6 +162,11 @@ import { AppComponent } from './app.component';
 import { Dashboard_MatPrimaComponent } from './Vistas/Dashboard_MatPrima/Dashboard_MatPrima.component';
 import { RippleModule } from 'primeng/ripple';
 import { DashBoard_PedidosComponent } from './Vistas/DashBoard_Pedidos/DashBoard_Pedidos.component';
+import { TicketsComponent } from './Vistas/Tickets/Tickets.component';
+import { EditorModule } from 'primeng/editor';
+import { Gestion_TicketsComponent } from './Vistas/Gestion_Tickets/Gestion_Tickets.component';
+import { ImageModule } from 'primeng/image'
+import { GalleriaModule } from 'primeng/galleria';
 
 export const routes: Routes = [
 
@@ -169,7 +174,7 @@ export const routes: Routes = [
   {path: 'inicio', component: InicioComponent},
   {path: 'Login', component: LoginComponentComponent},
   {path: '', component: LoginComponentComponent},
-  {path: 'home', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,3,4,5,6,7,8,9,10,11,12,13,60]}, component: PaginaPrincipalComponent},
+  {path: 'home', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2,3,4,5,6,7,8,9,10,11,12,13,60,61]}, component: PaginaPrincipalComponent},
   {path: 'Archivos', component: ArchivosComponent},
 
   /******************************************************************* Materia Prima ************************************************************************/
@@ -231,7 +236,7 @@ export const routes: Routes = [
 
   /****************************************************************** INVENTARIO DE PRODUCTOS ****************************************************************/
   {path: 'inventario-productos', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1]}, component : InventarioProductosPBDDComponent},
-  {path: 'inventario-productos-terminados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,60]}, component: ModalGenerarInventarioZeusComponent},
+  {path: 'inventario-productos-terminados', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,60,61]}, component: ModalGenerarInventarioZeusComponent},
 
   /****************************************************************** PEDIDO DE PRODUCTOS ****************************************************************/
   {path: 'opedidoproducto', canActivate: [RoleGuardServiceGuard], data: {expectedRole : [1,2]}, component: OpedidoproductoComponent},
@@ -253,7 +258,7 @@ export const routes: Routes = [
   {path: 'mantenimiento-activos', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Mantenimiento_CamionesComponent },
 
 /*********************************************************************** REPORTE PEDIDOS ZEUS *****************************************************************/
-  {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: ReportePedidos_ZeusComponent},
+  {path: 'Pedidos-Zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60,61]}, component: ReportePedidos_ZeusComponent},
   {path: 'rpt-facturacion-zeus', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,60]}, component: Reporte_FacturacionZeusComponent},
 
  /*************************************************************** DESPERDICIO *********************************************************************************/
@@ -267,7 +272,8 @@ export const routes: Routes = [
   {path: 'dashboard-matprima', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,3]}, component: Dashboard_MatPrimaComponent},
 
   /*************************************************************** DASBOARD **************************************************************************/
-  {path: 'Dashboard', component: DashBoard_PedidosComponent},
+  {path: 'Tickets', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1,2,3,4,5,6,7,8,9,10,11,12,13,59,60]}, component: TicketsComponent},
+  {path: 'Gestion-Tickets', canActivate: [RoleGuardServiceGuard], data: {expectedRole: [1]}, component: Gestion_TicketsComponent}
 ]
 
 @NgModule({
@@ -365,6 +371,8 @@ export const routes: Routes = [
     Dashboard_MatPrimaComponent,
     DashBoard_FacturacionComponent,
     DashBoard_PedidosComponent,
+    TicketsComponent,
+    Gestion_TicketsComponent,
   ],
 
   imports: [
@@ -443,6 +451,9 @@ export const routes: Routes = [
     KnobModule,
     DataViewModule,
     RippleModule,
+    EditorModule,
+    ImageModule,
+    GalleriaModule,
   ],
 
   providers: [

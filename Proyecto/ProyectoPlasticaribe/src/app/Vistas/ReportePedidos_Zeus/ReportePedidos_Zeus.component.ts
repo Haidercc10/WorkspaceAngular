@@ -100,7 +100,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
       for (let i = 0; i < datos_pedidos.length; i++) {
         if (this.ValidarRol == 2){
           if (this.storage_Id == parseInt(datos_pedidos[i].id_Vendedor)) this.llenarEncabezadoPedidosZeus(datos_pedidos[i]);
-        } else if (this.ValidarRol == 1 || this.ValidarRol == 60) this.llenarEncabezadoPedidosZeus(datos_pedidos[i]);
+        } else if (this.ValidarRol == 1 || this.ValidarRol == 60 || this.ValidarRol == 61) this.llenarEncabezadoPedidosZeus(datos_pedidos[i]);
       }
     });
 
@@ -675,7 +675,7 @@ export class ReportePedidos_ZeusComponent implements OnInit {
           extension: 'png',
         });
         let worksheet = workbook.addWorksheet(`Reporte de Pedidos Zeus - ${this.today}`);
-        worksheet.addImage(imageId1, 'A1:A3');
+        worksheet.addImage(imageId1, 'A1:B3');
         let titleRow = worksheet.addRow([title]);
         titleRow.font = { name: 'Calibri', family: 4, size: 16, underline: 'double', bold: true };
         worksheet.addRow([]);

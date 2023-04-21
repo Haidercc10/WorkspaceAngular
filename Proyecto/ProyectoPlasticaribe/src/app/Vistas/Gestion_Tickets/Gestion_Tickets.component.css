@@ -1,0 +1,13 @@
+p-card, p-card ::ng-deep .p-card {
+  height: 100%;
+}
+
+p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-title, p-card ::ng-deep div ::ng-deep .p-card-body ::ng-deep .p-card-footer {
+  color: var(--rojo);
+  text-align: center;
+  width: 100%;
+}
+
+p-dialog ::ng-deep div ::ng-deep div ::ng-deep div ::ng-deep span {
+  color: var(--rojo);
+}

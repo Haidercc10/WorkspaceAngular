@@ -1,0 +1,16 @@
+.p-input-icon-left {
+  width: 100%;
+}
+
+textarea {
+  width: 100%;
+}
+/*
+p-fileupload ::ng-deep button, p-fileupload ::ng-deep span {
+  background-color: var(--rojo);
+  border: none;
+}
+
+p-fileupload ::ng-deep button:hover, p-fileupload ::ng-deep span:hover {
+  background-color: var(--rojoHover) !important;
+} */

@@ -57,7 +57,7 @@ export class DashBoard_PedidosComponent implements OnInit {
 
   ngOnInit() {
     this.lecturaStorage();
-    if (this.ValidarRol == 1 || this.ValidarRol == 60) this.tiempoExcedido();
+    if (this.ValidarRol == 1 || this.ValidarRol == 60 || this.ValidarRol == 61) this.tiempoExcedido();
   }
 
   //Funcion que leerá la informacion que se almacenará en el storage del navegador

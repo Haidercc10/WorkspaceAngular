@@ -56,6 +56,7 @@ export class OcompraComponent implements OnInit {
   mpSeleccionada : any [];
   edicionOrdenCompra : boolean = false;
   llave : string = 'pdf';
+  ordenCreada : number;
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -120,6 +121,8 @@ export class OcompraComponent implements OnInit {
     this.catidadTotalPeso = 0;
     this.generarConsecutivo();
     this.mpSeleccionada = [];
+    this.ordenCreada = 0;
+    this.onReject();
   }
 
   // Funcion que va a limpiar los campos de materia prima
@@ -340,7 +343,11 @@ export class OcompraComponent implements OnInit {
       TpDoc_Id : 'OCMP',
       Oc_Observacion : this.FormOrdenCompra.value.Observacion == null ? '' : (this.FormOrdenCompra.value.Observacion).toUpperCase(),
     }
-    this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => { this.crearDtOrdenCompra(datos_ordenCompra.oc_Id); }, error => {
+    this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => {
+      this.ordenCreada = datos_ordenCompra.oc_Id;
+      this.mostrarEleccion(0, 'pdf')
+      this.crearDtOrdenCompra(datos_ordenCompra.oc_Id);
+    }, error => {
       this.mostrarError(`Error`, `¡Error al crear la orden de compra!`);
       this.cargando = false;
     });
@@ -362,7 +369,6 @@ export class OcompraComponent implements OnInit {
       this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => {
         this.GuardadoExitoso();
         error = false;
-        this.mostrarEleccion(0, 'pdf')
       }, error => {
         this.mostrarError(`Error`, `¡Error al insertar la(s) materia(s) prima(s) pedida(s)!`);
         this.cargando = false;
@@ -376,15 +382,13 @@ export class OcompraComponent implements OnInit {
   GuardadoExitoso(){
     this.actualizarPrecioMatPrimas();
     this.actualizarPrecioTintas();
-    setTimeout(() => { this.limpiarTodo(); }, 3500);
   }
 
   //Buscar informacion de la orden de compra creada
   buscarinfoOrdenCompra(){
     this.onReject();
     this.cargando = true;
-    let ordenCompra : number = this.FormOrdenCompra.value.ConsecutivoOrden;
-    this.dtOrdenCompraService.GetOrdenCompra(ordenCompra).subscribe(datos_orden => {
+    this.dtOrdenCompraService.GetOrdenCompra(this.ordenCreada).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         let info : any = {
           Id : 0,
@@ -417,8 +421,7 @@ export class OcompraComponent implements OnInit {
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
   generarPDF(){
     let nombre : string = this.storage.get('Nombre');
-    let ordenCompra : number = this.FormOrdenCompra.value.ConsecutivoOrden;
-    this.dtOrdenCompraService.GetOrdenCompra(ordenCompra).subscribe(datos_orden => {
+    this.dtOrdenCompraService.GetOrdenCompra(this.ordenCreada).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         const pdfDefinicion : any = {
           info: {
@@ -614,7 +617,7 @@ export class OcompraComponent implements OnInit {
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
         pdf.open();
-        this.cargando = false;
+        this.limpiarTodo();
         break;
       }
     }, error => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la última orden de compra creada!`); });
@@ -781,6 +784,7 @@ export class OcompraComponent implements OnInit {
             UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
             Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[i].Precio,
           }
+          this.ordenCreada = this.FormOrdenCompra.value.ConsecutivoOrden;
           this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => { error = false; }, error => {
             this.mostrarError(`Error`, `¡Error al crear la(s) materia(s) prima(s) pedida(s)!`);
             this.cargando = false;
@@ -819,5 +823,7 @@ export class OcompraComponent implements OnInit {
   }
 
   /** Función para quitar mensaje de elección */
-  onReject = () => this.messageService.clear(this.llave);
+  onReject(){
+    this.messageService.clear(this.llave);
+  }
 }
