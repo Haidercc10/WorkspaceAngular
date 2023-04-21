@@ -121,8 +121,6 @@ export class OcompraComponent implements OnInit {
     this.catidadTotalPeso = 0;
     this.generarConsecutivo();
     this.mpSeleccionada = [];
-    this.ordenCreada = 0;
-    this.onReject();
   }
 
   // Funcion que va a limpiar los campos de materia prima
@@ -275,6 +273,7 @@ export class OcompraComponent implements OnInit {
     let ordenCompra : number = this.FormOrdenCompra.value.ConsecutivoOrden;
     this.dtOrdenCompraService.GetOrdenCompra(ordenCompra).subscribe(datos_orden => {
       if (datos_orden.length > 0) {
+        this.ordenCreada = ordenCompra
         this.edicionOrdenCompra = true;
         this.FormOrdenCompra.reset();
         this.FormMateriaPrima.reset();
@@ -382,6 +381,7 @@ export class OcompraComponent implements OnInit {
   GuardadoExitoso(){
     this.actualizarPrecioMatPrimas();
     this.actualizarPrecioTintas();
+    setTimeout(() => { this.limpiarTodo(); }, 3000);
   }
 
   //Buscar informacion de la orden de compra creada
@@ -617,6 +617,7 @@ export class OcompraComponent implements OnInit {
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
         pdf.open();
+        this.ordenCreada = 0;
         this.limpiarTodo();
         break;
       }
@@ -760,6 +761,7 @@ export class OcompraComponent implements OnInit {
             TpDoc_Id : 'OCMP',
             Oc_Observacion : (observacion).toUpperCase(),
           }
+          this.ordenCreada = this.FormOrdenCompra.value.ConsecutivoOrden;
           this.ordenCompraService.putId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden, info).subscribe(datos_ordenCompra => { this.editarDtOrdenCompa(); }, error => {
             this.mostrarError(`Error`, `¡Error al Editar la Orden de Compra!`);
             this.cargando = false;
@@ -784,7 +786,6 @@ export class OcompraComponent implements OnInit {
             UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
             Doc_PrecioUnitario : this.materiasPrimasSeleccionadas[i].Precio,
           }
-          this.ordenCreada = this.FormOrdenCompra.value.ConsecutivoOrden;
           this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => { error = false; }, error => {
             this.mostrarError(`Error`, `¡Error al crear la(s) materia(s) prima(s) pedida(s)!`);
             this.cargando = false;
