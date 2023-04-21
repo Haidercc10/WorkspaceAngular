@@ -1,9 +1,11 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
+import { Tickets_ResueltosService } from 'src/app/Servicios/Tickets_Resueltos/Tickets_Resueltos.service';
 @Component({
   selector: 'app-Gestion_Tickets',
   templateUrl: './Gestion_Tickets.component.html',
@@ -30,7 +32,8 @@ export class Gestion_TicketsComponent implements OnInit {
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
                   private ticketService : TicketsService,
-                    private messageService: MessageService,) {
+                    private messageService: MessageService,
+                      private ticketsResueltosService : Tickets_ResueltosService,) {
 
     this.FormTicketResuelto = this.frmBuilder.group({
       Descripcion : [null],
@@ -56,6 +59,7 @@ export class Gestion_TicketsComponent implements OnInit {
     this.imagenesTicket = [];
     this.cargando = true;
     this.tickets = [];
+    this.visible = false;
     this.consultarTickets();
     this.cantultarCantidadTickets();
   }
@@ -138,12 +142,37 @@ export class Gestion_TicketsComponent implements OnInit {
     }
   }
 
+  // Funcion que va a mostrar el modal donde se puede cambiar el estado del ticket a resuelto
+  mostrarModalTicket_Resuelto = () => this.ticketSeleccionado.Codigo == '' ? this.mensajeAdvertencia(`¡Debe seleccionar un ticket para cambiar su estado!`) : this.visible = true;
+
   // Funcion que va a colocar el ticket con estado 'Resuleto' y va a crear un registro en la tabla 'Tickets_Revisados'
   ticket_Resuelto(){
-    if (this.ticketSeleccionado.Codigo == '') this.mensajeAdvertencia(`¡Debe seleccionar un ticket para cambiar su estado!`);
-    else {
-      this.visible = true;
-    }
+    this.ticketService.Get_Id(this.ticketSeleccionado.Codigo).subscribe(datos => {
+      if (datos.estado_Id != 30) {
+        let info : any = {
+          Ticket_Id : datos.ticket_Id,
+          Ticket_Fecha : datos.ticket_Fecha,
+          Ticket_Hora : datos.ticket_Hora,
+          Usua_Id : datos.usua_Id,
+          Estado_Id : 30,
+          Ticket_Descripcion : datos.ticket_Descripcion,
+          Ticket_RutaImagen : datos.ticket_RutaImagen,
+          Ticket_NombreImagen : datos.ticket_NombreImagen,
+        }
+        this.ticketService.actualizarTicket(datos.ticket_Id, info).subscribe(data => {
+          let info : any = {
+            TicketRev_Fecha : moment().format('YYYY-MM-DD'),
+            TicketRev_Hora : moment().format('H:mm:ss'),
+            Usua_Id : this.storage_Id,
+            TicketRev_Descripcion : this.FormTicketResuelto.value.Descripcion == null ? '' : this.FormTicketResuelto.value.Descripcion,
+            Ticket_Id : datos.ticket_Id,
+          }
+          this.ticketsResueltosService.Insert(info).subscribe(data_TicketResuelto => {
+            this.mensajeConfirmacion(`¡EL Ticket #${datos.ticket_Id} ha cambiado de estado!`, `¡Se ha cambiado el estado del ticket, el ticket ahora se encuentra resuelto!`)
+          }, err => { return this.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al crear el registro del ticket resuelto!`); });
+        }, error => { return this.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al cambiar el estado del ticket!`); });
+      } else this.mensajeAdvertencia(`¡El ticket ya se encuentra en estado de revisión!`);
+    });
   }
 
   // Funcion que permitirá filtrar la información de la tabla

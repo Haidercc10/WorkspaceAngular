@@ -148,7 +148,7 @@
         <div class="row p-2">
           <div class="p-5 d-grid gap-2 d-md-flex justify-content-md-center">
             <p-button label="En Revisión" icon="pi pi-wrench" iconPos="right" styleClass="p-button-danger" (click)="ticket_EnRevision()"></p-button>
-            <p-button label="Resuelto" icon="pi pi-check" iconPos="right" styleClass="p-button-success" (click)="ticket_Resuelto()"></p-button>
+            <p-button label="Resuelto" icon="pi pi-check" iconPos="right" styleClass="p-button-success" (click)="mostrarModalTicket_Resuelto()"></p-button>
           </div>
         </div>
       </p-card>
@@ -156,19 +156,19 @@
   </div>
 </div>
 
-<p-dialog header="Cambiar Estado De Ticket" [(visible)]="visible" [modal]="true" [style]="{ width: '90%' }" [draggable]="false" [resizable]="false">
-  <div class="row g-2">
-    <form [formGroup]="FormTicketResuelto">
-      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+<p-dialog header="Cambiar Estado De Ticket" [(visible)]="visible" [modal]="true" [style]="{ width: '80%' }" [draggable]="false" [resizable]="false">
+  <div class="row g-4">
+    <form [formGroup]="FormTicketResuelto" (ngSubmit)="ticket_Resuelto()">
+      <div class="p-5 col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <span class="p-float-label">
-          <textarea formControlName="Descripcion" id="float-input" [autoResize]="true" rows="1" pInputTextarea></textarea>
+          <textarea formControlName="Descripcion" [rows]="3" class="form-control form-control-sm" maxlength="200"id="float-input"  pInputTextarea></textarea>
           <label for="float-input">Descripción</label>
         </span>
       </div>
 
-      <div class="p-5 d-grid gap-2 d-md-flex justify-content-md-center">
-        <p-button label="Ticket Resuelto" icon="pi pi-check" iconPos="right" styleClass="p-button-danger"></p-button>
-        <p-button label="Cancelar" icon="pi pi-eraser" iconPos="right" styleClass="p-button-success"></p-button>
+      <div class="p-2 d-grid gap-2 d-md-flex justify-content-md-center" >
+        <p-button label="Ticket Resuelto" type="submit" icon="pi pi-check" iconPos="right" styleClass="p-button-success"></p-button>
+        <p-button label="Cancelar" icon="pi pi-ban" iconPos="right" styleClass="p-button-secondary" (click)="this.visible = false"></p-button>
       </div>
     </form>
   </div>
