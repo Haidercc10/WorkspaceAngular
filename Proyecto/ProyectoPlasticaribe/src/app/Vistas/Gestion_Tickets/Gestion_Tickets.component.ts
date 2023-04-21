@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { SESSION_STORAGE, WebStorageService } from 'ngx-webstorage-service';
 import { MessageService } from 'primeng/api';
@@ -68,13 +68,10 @@ export class Gestion_TicketsComponent implements OnInit {
   consultarTickets(){
     this.ticketService.Get_Tickets_AbiertosEnRevision().subscribe(datos => {
       for (let i = 0; i < datos.length; i++) {
-        let info : any = {
-          codigo : datos[i].codigo,
-          fecha : datos[i].fecha,
-          estado : datos[i].estado,
-          descripcion : datos[i].descripcion.length > 50 ? `${datos[i].descripcion.substring(0,50)}...` : datos[i].descripcion,
-          descripcionTotal : datos[i].descripcion,
-        }
+        const {codigo, fecha, estado, descripcion} = datos[i];
+        const descripcionTotal = descripcion;
+        const descripcionCorta = descripcion.length > 50 ? `${descripcion.substring(0,50)}...` : descripcion;
+        const info : any = {codigo, fecha, estado, descripcion: descripcionCorta, descripcionTotal};
         this.tickets.push(info);
         this.tickets.sort((a,b) => Number(a.codigo) - Number(b.codigo))
         this.tickets.sort((a,b) => b.estado.localeCompare(a.estado));
@@ -95,7 +92,7 @@ export class Gestion_TicketsComponent implements OnInit {
   }
 
   // Funcion que va a colocar en la card de la parte de la derecha la informacion del ticket seleccionado
-  ticketSelccionado(data : any){
+  async ticketSelccionado(data : any){
     this.imagenesTicket = [];
     this.ticketSeleccionado = {
       Codigo : data.codigo,
@@ -103,17 +100,16 @@ export class Gestion_TicketsComponent implements OnInit {
       Estado : data.estado,
       Descripcion : data.descripcionTotal,
     }
-    this.ticketService.Get_Id(data.codigo).subscribe(datos => {
-      let imagenes : any = datos.ticket_NombreImagen.trim().split('|');
-      for (let i = 0; i < imagenes.length; i++) {
-        if (imagenes[i] != '') {
-          this.ticketService.Get_ImagenesTicket(imagenes[i].trim(), datos.ticket_RutaImagen).subscribe(datos_img => {
-            this.imagenesTicket.length == 0 ? this.imagenesTicket = [datos_img.body] : this.imagenesTicket.push(datos_img.body);
-            this.imagenesTicket = this.imagenesTicket.filter((item) => item != undefined);
-          });
-        }
+    let datos = await this.ticketService.Get_Id(this.ticketSeleccionado.Codigo).toPromise();
+    let imagenes : any = datos.ticket_NombreImagen.trim().split('|');
+    for (let i = 0; i < imagenes.length; i++) {
+      if (imagenes[i] != '') {
+        this.ticketService.Get_ImagenesTicket(imagenes[i].trim(), datos.ticket_RutaImagen).subscribe(datos_img => {
+          this.imagenesTicket.length == 0 ? this.imagenesTicket = [datos_img.body] : this.imagenesTicket.push(datos_img.body);
+          this.imagenesTicket = this.imagenesTicket.filter((item) => item != undefined);
+        });
       }
-    });
+    }
   }
 
   // Funcion que va a quitar de la card el ticket deseleccionado

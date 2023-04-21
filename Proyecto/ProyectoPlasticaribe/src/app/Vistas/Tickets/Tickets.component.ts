@@ -18,8 +18,8 @@ export class TicketsComponent implements OnInit {
   FormTickets !: FormGroup;
   cargando : boolean = false;
   storage_Id : number; //Variable que se usará para almacenar el id que se encuentra en el almacenamiento local del navegador
-  storage_Nombre : any; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
-  storage_Rol : any; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
+  storage_Nombre : string; //Variable que se usará para almacenar el nombre que se encuentra en el almacenamiento local del navegador
+  storage_Rol : number; //Variable que se usará para almacenar el rol que se encuentra en el almacenamiento local del navegador
   ValidarRol : number; //Variable que se usará en la vista para validar el tipo de rol, si es tipo 2 tendrá una vista algo diferente
   archivoSeleccionado : any;
 
@@ -76,20 +76,24 @@ export class TicketsComponent implements OnInit {
         Ticket_RutaImagen : 'C:\\Users\\SANDRA\\Desktop\\Plasticaribe',
         Ticket_NombreImagen : imagenes.length == 0 ? '' : imagenes.substring(0, imagenes.length - 1),
       }
-      this.ticketService.crearTicket(info).subscribe(data => this.mensajeConfirmacion(`¡Ticket #${data.ticket_Id} Creado!`, `¡Se ha creado un nuevo ticket!`),
-      error => { return this.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al crear el ticket!`); });
-      this.enviarArchivos();
+      this.ticketService.crearTicket(info).subscribe(data => {
+        this.crearPDF(data.ticket_Id);
+        this.mensajeConfirmacion(`¡Ticket #${data.ticket_Id} Creado!`, `¡Se ha creado un nuevo ticket!`)
+      }, error => { return this.mensajeError(`¡Ha ocurrido un error!`,`¡Ha ocurrido un error al crear el ticket!`); });
+      if (this.archivoSeleccionado.length > 0) this.enviarArchivos(this.archivoSeleccionado);
     } else this.mensajeAdvertencia(`¡Hay Campos Vacios!`);
   }
 
   // Funcion que va a enaviar los datos de los archivos al api
-  enviarArchivos(){
-    if (this.archivoSeleccionado.length > 0) {
-      for (let i = 0; i < this.archivoSeleccionado.length; i++) {
-        const formData = new FormData();
-        formData.append('archivo', this.archivoSeleccionado[i]);
-        this.ticketService.crearImgTicket(formData).subscribe(data => this.mensajeConfirmacion(`¡Se ha subido el Archivo!`, `¡Archivo adjuntado al ticket creado!`),
-        error => { return this.mensajeError(`¡Ha ocurrido un error al subir la imagen!`, `¡Ocurrió un error al intentar subir la imagen : ${error}!`); });
+  async enviarArchivos(archivos: File[]) {
+    for (let i = 0; i < archivos.length; i++) {
+      const formData = new FormData();
+      formData.append('archivo', archivos[i]);
+      try {
+        const data = await this.ticketService.crearImgTicket(formData).toPromise();
+        this.mensajeConfirmacion(`¡Se ha subido el Archivo!`, `¡Archivo adjuntado al ticket creado!`);
+      } catch (error) {
+        this.mensajeError(`¡Ha ocurrido un error al subir la imagen!`, `¡Ocurrió un error al intentar subir la imagen : ${error}!`);
       }
     }
   }

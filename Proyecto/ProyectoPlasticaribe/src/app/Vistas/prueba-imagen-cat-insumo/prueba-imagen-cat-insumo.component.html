@@ -1,6 +1,5 @@
 <app-menuLateral></app-menuLateral>
 <p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
-
 <div class="d-flex justify-content-center overlay" *ngIf="cargando">
   <div style="margin: auto;">
     <p-progressSpinner></p-progressSpinner>
@@ -10,227 +9,276 @@
 <div class="contain">
   <!-- Navegador fin de parte superior -->
   <div class="container-fluid">
+    <!-- principal -->
     <div class="mb-4 Titulo">
-      <h2 class="tituloRojo">Ingresar Producción</h2>
+      <h2 class="tituloRojo">Pedidos de Productos</h2>
     </div>
+
     <div class="mb-4">
       <hr class="colorLinea">
     </div>
   </div>
 </div>
 
-<div class="contain">
-  <!--Inicio info OT-->
-  <div class="container-fluid bajarPagina">
-    <div class="formulario">
-      <div class="mb-4">
-        <h4 class="tituloRojo"><i class="pi pi-search"></i> Consultar OT</h4>
-      </div>
-      <!-- Formulario para consultar una orden de trabajo -->
-      <form [formGroup]="FormConsultarRollos">
-        <div class="mb-3">
-          <div class="row g-4">
-
-            <!-- OT -->
-            <div class="col-md">
-              <span class="p-input-icon-left p-float-label">
-                <i class="pi pi-search"></i>
-                <input formControlName="OT_Id" id="OT_Id" class="form-control form-control-sm" type="text" pInputText/>
-                <label for="OT_Id">Nro. OT</label>
-              </span>
+<!-- Tabla de Pedidos -->
+<div class="formulario">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+    <div class="table-responsive">
+      <table class="table table-borderless table-hover mt-2 tableColores font-size-14">
+        <thead class="TitulosTabla">
+          <td class="verde">
+            <a class="btn verde" data-bs-toggle="collapse" href="#multiCollapseExample4" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>Se puede facturar todo el pedido</b></a>
+            <div class="row">
+              <div class="col">
+                <div class="collapse multi-collapse" id="multiCollapseExample4">
+                  <div class="card card-body">
+                    Este color indica que todos los item del pedido pueden ser facturados y enviados dado que la cantidad que hay en existencias es igual o superior a la cantidad pendiente del respectivo item.
+                  </div>
+                </div>
+              </div>
             </div>
-
-             <!-- Tipo de Proceso -->
-            <div class="col-md">
-              <span class="p-float-label">
-                <p-dropdown formControlName="Proceso" inputId="Tipo" optionValue="Id" optionLabel="Nombre" [options]="procesos"></p-dropdown>
-                <label for="Tipo">Tipo Doc.</label>
-              </span>
+          </td>
+          <td class="azul">
+            <a class="btn" data-bs-toggle="collapse" href="#multiCollapseExample5" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>Se puede facturar minimo un item del pedido</b></a>
+            <div class="row">
+              <div class="col">
+                <div class="collapse multi-collapse" id="multiCollapseExample5">
+                  <div class="card card-body">
+                    Este color indica que minimo uno de los items del pedido puede ser facturado, ese siempre estará para pedidos con más de un item.
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <!-- Fecha Inicial -->
-            <div class="col-md">
-              <span class="p-float-label">
-                <p-calendar formControlName="fechaDoc" inputId="FechaInicial" [minDate]="minDate" [showIcon]="true"></p-calendar>
-                <label for="FechaInicial">Fecha Inicial</label>
-              </span>
+          </td>
+          <td class="rojo">
+            <a class="btn rojo" data-bs-toggle="collapse" href="#multiCollapseExample6" role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><b>Pedidos que no han sido aprobados</b></a>
+            <div class="row">
+              <div class="col">
+                <div class="collapse multi-collapse" id="multiCollapseExample6">
+                  <div class="card card-body">
+                    Este color indica que un pedido no ha sido revisado por una persona autorizada, al ser revisado el pedido será aprobado o anulado.
+                  </div>
+                </div>
+              </div>
             </div>
+          </td>
+        </thead>
+      </table>
+    </div>
+  </div>
 
-            <!-- Fecha Final -->
-            <div class="col-md">
-              <span class="p-float-label">
-                <p-calendar formControlName="fechaFinalDoc" inputId="FechaFinal" [minDate]="minDate" [showIcon]="true"></p-calendar>
-                <label for="FechaFinal">Fecha Final</label>
-              </span>
-            </div>
+  <p-toolbar>
+    <ng-template pTemplate="right">
+      <button pButton pRipple label="Exportar Excel" icon="pi pi-file-excel" class="p-button-success r-2" (click)="exportarExcel()"></button>
+    </ng-template>
 
-            <!-- Observacion -->
-            <div class="col-md-4">
-              <span class="p-float-label">
-                <textarea formControlName="Observacion" [rows]="1" class="form-control form-control-sm" maxlength="200" pInputTextarea></textarea>
-                <label for="textarea">Observación</label>
-              </span>
-            </div>
+    <ng-template pTemplate="left">
+      <h3 class="tituloRojo"><i class="pi pi-info-circle"></i> Información de Pedidos</h3>
+    </ng-template>
+  </p-toolbar>
+  <br>
 
-          </div>
-        </div>
-
-        <!--Botones-->
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" type="button" label="Consultar Producción" icon="pi pi-search" (click)="consultarRollosBagPro()"></button>
-          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
-        </div>
-      </form>
-
-      <div class="mb-4">
-        <hr class="Linea">
-      </div>
-
-      <!-- Inicio titulo tabla producto -->
-      <div class="mb-0 tabla1">
-        <h4 class="tituloRojo" style="width: 90%;"><i class="pi pi-list"></i> Tabla de Rollos</h4>
-      </div>
-
-      <div class="mb-3" *ngIf="!cargando">
-        <p-table
-          #dt1
-          [value]="rollosDisponibles"
-          [rows]="25"
+  <div *ngIf="!cargando" id="tableProcesos" class="font-size-14">
+    <div class="mb-4 ">
+      <div class="row g-3">
+        <p-treeTable #tt
+          [value]="ArrayDocumento"
+          [columns]="columnasSeleccionada"
+          [resizableColumns]="true"
+          columnResizeMode="expand"
+          styleClass="p-treetable-sm p-treetable-gridlines"
           [paginator]="true"
-          styleClass="p-datatable-gridlines p-datatable-sm"
+          [rows]="ArrayDocumento.length"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+          [rowsPerPageOptions]="[10,20,30,50,70,100, ArrayDocumento.length]"
           [rowHover]="true"
-          [rowsPerPageOptions]="[10, 25, 50, 100, 120, 150, rollosDisponibles.length]"
-          responsiveLayout="scroll"
-          currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
-          [(selection)]="rollosSeleccionados"
-          dataKey="Rollo"
-          [showCurrentPageReport]="true">
-          <ng-template pTemplate="header">
+          [scrollable]="true"
+          scrollHeight="1000px"
+          [reorderableColumns]="true">
+          <!-- Tamaño de columnas -->
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col *ngFor="let col of columnasSeleccionada" style="width:200px">
+              <col style="width:100px">
+              <col style="width:100px">
+              <col style="width:100px" *ngIf="ValidarRol == 1">
+              <col style="width:100px" *ngIf="ValidarRol == 1">
+            </colgroup>
+          </ng-template>
+          <!-- Dropdown para elegir columnas -->
+          <ng-template pTemplate="caption">
+            <div style="text-align:left">
+              <p-multiSelect [options]="columnas" [(ngModel)]="columnasSeleccionada" optionLabel="header" selectedItemsLabel="{0} columnas seleccionadas" [style]="{'width': '20em'}" defaultLabel="Elige las columnas que quieres ver"></p-multiSelect>
+            </div>
+          </ng-template>
+          <!-- Encabezados de columnas -->
+          <ng-template pTemplate="header" let-columns>
+            <!-- Propiedades de las columnas -->
             <tr>
-              <th scope="col">OT</th>
-              <th scope="col">ID Rollo</th>
-              <th scope="col">ID Producto</th>
-              <th scope="col">producto</th>
-              <th scope="col">Cantidad</th>
-              <th scope="col">Presentación</th>
-              <th scope="col">Proceso</th>
-              <th style="width: 4rem"><p-tableHeaderCheckbox (click)="cargarTodosRollosInsertar()"></p-tableHeaderCheckbox></th>
+              <th *ngFor="let col of columns" ttResizableColumn style="width: 200px">
+                <input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 100px">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 100px">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 100px" *ngIf="ValidarRol == 1">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
+              </th>
+              <th ttResizableColumn style="width: 100px" *ngIf="ValidarRol == 1">
+                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
+              </th>
+            </tr>
+            <!-- Titulos -->
+            <tr>
+              <th *ngFor="let col of columnasSeleccionada" [ttSortableColumn]="col.field" ttReorderableColumn>{{col.header}}
+                <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
+              </th>
+              <th style="text-align: center;" class="font-size-14" ttReorderableColumn>Ver PDF</th>
+              <th style="text-align: center;" class="font-size-14" ttReorderableColumn>Editar</th>
+              <th style="text-align: center;" class="font-size-14" *ngIf="ValidarRol == 1" ttReorderableColumn>Aceptar</th>
+              <th style="text-align: center;" class="font-size-14" *ngIf="ValidarRol == 1" ttReorderableColumn>Anular / Cancelar</th>
             </tr>
           </ng-template>
-          <ng-template pTemplate="body" let-rollos>
+          <!-- Cuerpo de la tabla con los datos -->
+          <ng-template pTemplate="body" let-rowNode let-data="rowData">
+            <!-- Validará que sea o no un pedido de Zeus -->
+            <ng-container *ngIf="data.Zeus == 1; then EnZeus; else NoZeus"></ng-container>
+            <ng-template #EnZeus>
+              <ng-container *ngIf="data.ExistenciaMayor; then thenTemplate; else elseTemplate"></ng-container>
+              <!-- Existencias mayores o iguales a la cantidad pendiente -->
+              <ng-template #thenTemplate>
+                <ng-container *ngIf="data.Cant_Items_ExistenciaMayor < data.Cant_Items; then azul; else verde"></ng-container>
+                <!-- Cuando un pedido tiene al menos 1 de sus productos con stock suficiente para entregarlo, pero no tiene todos los productos listos para entregar -->
+                <ng-template #azul>
+                  <tr style="background-color: #aad0f3;">
+                    <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)">
+                      <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0"></p-treeTableToggler>
+                      {{data[col.field]}}
+                    </td>
+                    <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                  </tr>
+                </ng-template>
+                <!-- Cuando tiene todos sus productos con stock suficiente para ser entregados -->
+                <ng-template #verde>
+                  <tr style="background-color: #ABEBC6 ;">
+                    <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)">
+                      <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0"></p-treeTableToggler>
+                      {{data[col.field]}}
+                    </td>
+                    <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                  </tr>
+                </ng-template>
+              </ng-template>
+              <!-- Existencias menores a la cantidad pendiente -->
+              <ng-template #elseTemplate>
+                <tr>
+                  <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)">
+                    <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0"></p-treeTableToggler>
+                    {{data[col.field]}}
+                  </td>
+                  <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                </tr>
+              </ng-template>
+            </ng-template>
+            <!-- Se muestra cuando no es un pedido de zeus -->
+            <ng-template #NoZeus>
+              <tr style="background-color: #FAACAC;">
+                <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)">
+                  <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0"></p-treeTableToggler>
+                  {{data[col.field]}}
+                </td>
+                <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="productosPedido(data.consecutivo)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                <td style="text-align: center;" scope="col" title="Editar Pedido"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="editarPedido(data)" style="width: 30px; height: 30px;"></button></td>
+                <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button (click)="mostrarEleccion(data.consecutivo, 'aceptar')" pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
+                <td style="text-align: center;" scope="col" title="Confirmar Pedido" *ngIf="ValidarRol == 1"><button (click)="mostrarEleccion(data.consecutivo, 'cancelar')" pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger mr-2" style="width: 30px; height: 30px;"></button></td>
+              </tr>
+            </ng-template>
+          </ng-template>
+          <!-- Footer de la Tabla -->
+          <ng-template pTemplate="footer">
             <tr>
-              <td>{{rollos.Ot}}</td>
-              <td>{{rollos.Rollo}}</td>
-              <td>{{rollos.Id_Producto}}</td>
-              <td>{{rollos.Producto}}</td>
-              <td>{{rollos.Cantidad}}</td>
-              <td>{{rollos.Presentacion}}</td>
-              <td>{{rollos.Estatus}}</td>
-              <td><p-tableCheckbox [value]="rollos" (click)="cargarRollosInsertar(rollos)"></p-tableCheckbox></td>
+              <td colspan="12" class="text-right">Totales</td>
+              <td>{{sumaCostoPendiente | number : '1.2-2'}}</td>
+              <td>{{sumaCostoTotal | number : '1.2-2'}}</td>
+              <td>COP</td>
             </tr>
           </ng-template>
-        </p-table>
-      </div>
-
-      <div class="mb-4" *ngIf="!cargando">
-        <hr class="Linea">
-      </div>
-
-      <!-- Inicio titulo tabla producto -->
-      <div class="mb-4" *ngIf="!cargando">
-        <h4 class="tituloRojo"><i class="pi pi-list"></i> Tabla de rollos por ingresar</h4>
-      </div>
-
-      <div class="mb-3" *ngIf="!cargando">
-        <p-table
-          #dt
-          [value]="rollosSeleccionados"
-          [rows]="10"
-          dataKey="Rollo"
-          [paginator]="true"
-          [(selection)]="rollosDisponibles"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          [rowHover]="true"
-          [rowsPerPageOptions]="[10,25,50,rollosSeleccionados.length]"
-          responsiveLayout="scroll"
-          currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
-          [showCurrentPageReport]="true">
-          <ng-template pTemplate="header">
-            <tr>
-              <th scope="col">OT</th>
-              <th scope="col">ID Rollo</th>
-              <th scope="col">ID Producto</th>
-              <th scope="col">producto</th>
-              <th scope="col">Cantidad</th>
-              <th scope="col">Presentación</th>
-              <th scope="col">Proceso</th>
-              <th style="width: 4rem"><p-tableHeaderCheckbox (click)="quitarTodosRollosInsertar()"></p-tableHeaderCheckbox></th>
-            </tr>
+          <!-- Cantidad de datos en la tabla -->
+          <ng-template pTemplate="summary">
+            <div class="p-d-flex p-ai-center p-jc-between">
+              En total hay {{ArrayDocumento ? ArrayDocumento.length : 0 | number : '1.2-2'}} Pedido(s).
+            </div>
           </ng-template>
-          <ng-template pTemplate="body" let-rollosInsertar>
-            <tr>
-              <td>{{rollosInsertar.Ot}}</td>
-              <td>{{rollosInsertar.Rollo}}</td>
-              <td>{{rollosInsertar.Id_Producto}}</td>
-              <td>{{rollosInsertar.Producto}}</td>
-              <td>{{rollosInsertar.Cantidad}}</td>
-              <td>{{rollosInsertar.Presentacion}}</td>
-              <td>{{rollosInsertar.Estatus}}</td>
-              <td><p-tableCheckbox [value]="rollosInsertar" (click)="quitarRollosInsertar(rollosInsertar)"></p-tableCheckbox></td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
-
-      <div class="mb-4" *ngIf="!cargando">
-        <hr class="Linea">
-      </div>
-      <!-- Inicio titulo tabla producto -->
-      <div class="mb-4" *ngIf="!cargando">
-        <h4 class="tituloRojo"><i class="pi pi-table"></i> Consolidado Productos</h4>
-      </div>
-
-      <div class="mb-3" *ngIf="!cargando">
-        <p-table
-          #dt
-          [value]="grupoProductos"
-          [rows]="10"
-          dataKey="Id"
-          [paginator]="true"
-          styleClass="p-datatable-gridlines p-datatable-sm"
-          [rowHover]="true"
-          [rowsPerPageOptions]="[10,25,50]"
-          responsiveLayout="scroll"
-          currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} registros"
-          [showCurrentPageReport]="true">
-          <ng-template pTemplate="header">
-            <tr>
-              <th scope="col">ID Producto</th>
-              <th scope="col">Producto</th>
-              <th scope="col">Cantidad</th>
-              <th scope="col">N° Rollos</th>
-              <th scope="col">Presentación</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-rollosInsertar>
-            <tr>
-              <td>{{rollosInsertar.Id}}</td>
-              <td>{{rollosInsertar.Nombre}}</td>
-              <td>{{rollosInsertar.Cantidad}}</td>
-              <td>{{rollosInsertar.Rollos}}</td>
-              <td>{{rollosInsertar.Presentacion}}</td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
-
-      <!-- Botones -->
-      <div class="bajarPagina" *ngIf="!cargando">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button pButton class="p-button-danger" type="button" label="Ingresar Producción" icon="pi pi-check" (click)="IngresarInfoRollos()"></button>
-          <button pButton class="p-button-secondary" type="button" label="Limpiar Campos" icon="pi pi-eraser" (click)="limpiarCampos()"> </button>
-        </div>
+        </p-treeTable>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Model que mostrará la información de las ordenes de trabajo con un estado especifico -->
+<p-dialog [(visible)]="modalEstadosOrdenes" [style]="{width: '1800px'}" [breakpoints]="{'960px': '75vw', '640px': '100vw'}" header="Estados de la orden de trabajo del pedido {{consecutivoPedido}}" [modal]="true" >
+  <ng-template pTemplate="content">
+    <app-Reporte_Procesos_OT></app-Reporte_Procesos_OT>
+  </ng-template>
+</p-dialog>
+
+<!-- Modal desde el que se podrá editar un pedido -->
+<div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel2">Editar Pedido</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="ngOnInit()"></button>
+      </div>
+      <div class="modal-body">
+        <app-Pedido-Externo></app-Pedido-Externo>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mensaje de elección para cancelar -->
+<p-toast position="center" key="aceptar" (onClose)="onReject('aceptar')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="aceptarPedido(itemSeleccionado)" icon="pi pi-check" label="Si" class="p-button-success"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('aceptar')" icon="pi pi-cancel" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
+
+<!-- Mensaje de elección para cancelar -->
+<p-toast position="center" key="cancelar" (onClose)="onReject('cancelar')" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column" style="flex: 1">
+      <div class="text-center">
+        <i class="pi pi-exclamation-triangle font-size-48"></i>
+        <h4>{{message.summary}}</h4>
+        <p>{{message.detail}}</p>
+      </div>
+      <div class="p-fluid" style="display: flex;">
+        <div class="col-6" style="margin-right: 5px;">
+          <button type="button" pButton (click)="cancelarPedido(itemSeleccionado)" icon="pi pi-exclamation-circle" label="Si" class="p-button-warning"></button>
+        </div>
+        <div class="col-6">
+          <button type="button" pButton (click)="onReject('cancelar')" icon="pi pi-times" label="No" class="p-button-secondary"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>
