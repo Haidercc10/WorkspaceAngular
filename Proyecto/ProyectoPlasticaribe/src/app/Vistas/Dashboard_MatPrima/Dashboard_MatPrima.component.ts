@@ -180,7 +180,6 @@ export class Dashboard_MatPrimaComponent implements OnInit {
       });
 
       this.materiaPrimaService.GetMateriasPrimasUtilizadasHoy(this.today).subscribe(datos => {
-        console.log(datos);
         for (let index = 0; index < datos.length; index++) {
           let info : any = {
             nro : index + 1,
@@ -246,7 +245,6 @@ export class Dashboard_MatPrimaComponent implements OnInit {
 
   /** Función para llamar la grafica de la mat. prima asignada vs extruida*/
   llenarGraficaComparativo(){
-    console.log(this.totalMpAsignada)
     this.ComparativoData = {
       labels: [''],
       datasets: [

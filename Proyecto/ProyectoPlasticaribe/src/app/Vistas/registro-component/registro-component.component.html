@@ -36,7 +36,7 @@
         <p-toolbar styleClass="mb-4 gap-2">
           <ng-template pTemplate="left">
             <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success r-2" style="margin-right: 3%;" (click)="cargarModalUsuarios()"></button>
-            <button pButton pRipple label="Eliminar" icon="pi pi-trash" *ngIf="usuariosInactivar.length > 0; else inactivo" class="p-button-danger"></button>
+            <button pButton pRipple label="Eliminar" icon="pi pi-trash" *ngIf="usuariosInactivar.length > 0; else inactivo" class="p-button-danger" (click)="inactivarUsuarios()"></button>
             <ng-template #inactivo>
               <button pButton pRipple label="Eliminar" icon="pi pi-trash" [disabled]="true" class="p-button-danger"></button>
             </ng-template>
@@ -97,7 +97,7 @@
               <td *ngIf="arrayUsuarios.Estado == 'Activo'; else Inactivo">{{arrayUsuarios.Estado}}</td>
               <ng-template #Inactivo><td><span class="badge bg-danger1">{{arrayUsuarios.Estado}}</span></td></ng-template>
               <td style="text-align: center;"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="cargarModalEditarUsuario(arrayUsuarios)" style="width: 30px; height: 30px;"></button></td>
-              <td style="text-align: center;"><button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" style="width: 30px; height: 30px;"></button></td>
+              <td style="text-align: center;"><button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" style="width: 30px; height: 30px;" (click)="colocarUsuarioInactivo(arrayUsuarios.Id)"></button></td>
             </tr>
           </ng-template>
           <ng-template pTemplate="summary">
