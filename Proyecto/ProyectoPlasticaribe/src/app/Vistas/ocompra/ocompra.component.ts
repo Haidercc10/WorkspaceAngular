@@ -362,7 +362,6 @@ export class OcompraComponent implements OnInit {
       this.dtOrdenCompraService.insert_DtOrdenCompra(info).subscribe(datos_dtOrden => {
         this.GuardadoExitoso();
         error = false;
-        this.mostrarEleccion(0, 'pdf')
       }, error => {
         this.mostrarError(`Error`, `¡Error al insertar la(s) materia(s) prima(s) pedida(s)!`);
         this.cargando = false;
@@ -370,6 +369,7 @@ export class OcompraComponent implements OnInit {
         this.mostrarError('No se mostrará la informacion del PDF');
       });
     }
+    if(!error) this.mostrarEleccion(0, 'pdf');
   }
 
   // Funcion que mostrará el mensaje de que todo el proceso de guardado fue exitoso
