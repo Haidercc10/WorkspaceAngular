@@ -178,7 +178,6 @@ export class Dashboard_MatPrimaComponent implements OnInit {
       });
 
       this.materiaPrimaService.GetMateriasPrimasUtilizadasHoy(this.today).subscribe(datos => {
-        console.log(datos);
         for (let index = 0; index < datos.length; index++) {
           let info : any = {
             nro : index + 1,

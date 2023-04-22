@@ -22,7 +22,7 @@
 
 <!-- Tabla de Pedidos -->
 <div class="formulario">
-  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+  <div class="d-grid d-md-flex justify-content-md-center">
     <div class="table-responsive">
       <table class="table table-borderless table-hover mt-2 tableColores font-size-14">
         <thead class="TitulosTabla">
@@ -99,7 +99,7 @@
           <!-- Tamaño de columnas -->
           <ng-template pTemplate="colgroup" let-columns>
             <colgroup>
-              <col *ngFor="let col of columnasSeleccionada" style="width:200px">
+              <col *ngFor="let col of columnasSeleccionada" style="min-width:230px">
               <col style="width:100px">
               <col style="width:100px">
               <col style="width:100px" *ngIf="ValidarRol == 1">
@@ -116,31 +116,31 @@
           <ng-template pTemplate="header" let-columns>
             <!-- Propiedades de las columnas -->
             <tr>
-              <th *ngFor="let col of columns" ttResizableColumn style="width: 200px">
-                <input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')">
+              <th *ngFor="let col of columns">
+                <input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.fieldd, 'contains')">
               </th>
-              <th ttResizableColumn style="width: 100px">
+              <th style="width: 100px">
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 100px">
+              <th style="width: 100px">
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 100px" *ngIf="ValidarRol == 1">
+              <th style="width: 100px" *ngIf="ValidarRol == 1">
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 100px" *ngIf="ValidarRol == 1">
+              <th style="width: 100px" *ngIf="ValidarRol == 1">
                 <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
               </th>
             </tr>
             <!-- Titulos -->
             <tr>
-              <th *ngFor="let col of columnasSeleccionada" [ttSortableColumn]="col.field" ttReorderableColumn>{{col.header}}
-                <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
+              <th *ngFor="let col of columnasSeleccionada" class="text-center" [ttSortableColumn]="col.fieldd" ttReorderableColumn ttResizableColumn>{{col.header}}
+                <p-treeTableSortIcon [field]="col.fieldd"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttReorderableColumn>Ver PDF</th>
-              <th style="text-align: center;" class="font-size-14" ttReorderableColumn>Editar</th>
-              <th style="text-align: center;" class="font-size-14" *ngIf="ValidarRol == 1" ttReorderableColumn>Aceptar</th>
-              <th style="text-align: center;" class="font-size-14" *ngIf="ValidarRol == 1" ttReorderableColumn>Anular / Cancelar</th>
+              <th style="text-align: center;" class="font-size-14" ttReorderableColumn ttResizableColumn>Ver PDF</th>
+              <th style="text-align: center;" class="font-size-14" ttReorderableColumn ttResizableColumn>Editar</th>
+              <th style="text-align: center;" class="font-size-14" *ngIf="ValidarRol == 1" ttReorderableColumn ttResizableColumn>Aceptar</th>
+              <th style="text-align: center;" class="font-size-14" *ngIf="ValidarRol == 1" ttReorderableColumn ttResizableColumn>Anular / Cancelar</th>
             </tr>
           </ng-template>
           <!-- Cuerpo de la tabla con los datos -->
@@ -155,9 +155,17 @@
                 <!-- Cuando un pedido tiene al menos 1 de sus productos con stock suficiente para entregarlo, pero no tiene todos los productos listos para entregar -->
                 <ng-template #azul>
                   <tr style="background-color: #aad0f3;">
-                    <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)">
+                    <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)" [ngClass]="{'text-center': col.field != 'consecutivo'}">
                       <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0"></p-treeTableToggler>
-                      {{data[col.field]}}
+                      <span
+                        [ngClass]="{'badge verde': (col.field === 'OT' || col.field === 'Proceso_OT') && data.Estado_OT === 17,
+                        'badge verde2': col.field === 'OT' && data.Estado_OT === 18,
+                        'badge rojo' : col.field === 'OT' && data.Estado_OT === 3,
+                        'badge azul': col.field === 'OT' && data.Estado_OT === 14,
+                        'badge amarillo': (col.field === 'OT' || col.field === 'Proceso_OT') && data.Estado_OT === 16,
+                        'badge naranja' : col.field === 'OT' && data.Estado_OT === 15,
+                        'badge bg-danger1' : col.field === 'estado' && data.estado === 'Pendiente',
+                        'badge bg-warning1' : col.field === 'estado' && data.estado === 'Parcialmente Satisfecho', }">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</span>
                     </td>
                     <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
                   </tr>
@@ -165,9 +173,16 @@
                 <!-- Cuando tiene todos sus productos con stock suficiente para ser entregados -->
                 <ng-template #verde>
                   <tr style="background-color: #ABEBC6 ;">
-                    <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)">
+                    <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)" [ngClass]="{'text-center': col.field != 'consecutivo'}">
                       <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0"></p-treeTableToggler>
-                      {{data[col.field]}}
+                      <span [ngClass]="{'badge verde': (col.field === 'OT' || col.field === 'Proceso_OT') && data.Estado_OT === 17,
+                                      'badge verde2': col.field === 'OT' && data.Estado_OT === 18,
+                                      'badge rojo' : col.field === 'OT' && data.Estado_OT === 3,
+                                      'badge azul': col.field === 'OT' && data.Estado_OT === 14,
+                                      'badge amarillo': (col.field === 'OT' || col.field === 'Proceso_OT') && data.Estado_OT === 16,
+                                      'badge naranja' : col.field === 'OT' && data.Estado_OT === 15,
+                                      'badge bg-danger1' : col.field === 'estado' && data.estado === 'Pendiente',
+                                      'badge bg-warning1' : col.field === 'estado' && data.estado === 'Parcialmente Satisfecho', }">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</span>
                     </td>
                     <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
                   </tr>
@@ -176,9 +191,16 @@
               <!-- Existencias menores a la cantidad pendiente -->
               <ng-template #elseTemplate>
                 <tr>
-                  <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)">
+                  <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)" [ngClass]="{'text-center': col.field != 'consecutivo'}">
                     <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0"></p-treeTableToggler>
-                    {{data[col.field]}}
+                    <span [ngClass]="{'badge verde': (col.field === 'OT' || col.field === 'Proceso_OT') && data.Estado_OT === 17,
+                                      'badge verde2': col.field === 'OT' && data.Estado_OT === 18,
+                                      'badge rojo' : col.field === 'OT' && data.Estado_OT === 3,
+                                      'badge azul': col.field === 'OT' && data.Estado_OT === 14,
+                                      'badge amarillo': (col.field === 'OT' || col.field === 'Proceso_OT') && data.Estado_OT === 16,
+                                      'badge naranja' : col.field === 'OT' && data.Estado_OT === 15,
+                                      'badge bg-danger1' : col.field === 'estado' && data.estado === 'Pendiente',
+                                      'badge bg-warning1' : col.field === 'estado' && data.estado === 'Parcialmente Satisfecho', }">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</span>
                   </td>
                   <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="mostrarPedidoPdf(data)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
                 </tr>
@@ -187,9 +209,10 @@
             <!-- Se muestra cuando no es un pedido de zeus -->
             <ng-template #NoZeus>
               <tr style="background-color: #FAACAC;">
-                <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)">
+                <td *ngFor="let col of columnasSeleccionada; let i = index" (dblclick)="varOrdenTranajo(data)" [ngClass]="{'text-center': col.field != 'consecutivo'}">
                   <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0"></p-treeTableToggler>
-                  {{data[col.field]}}
+                  <span [ngClass]="{'badge bg-danger1' : col.field === 'estado' && data.estado === 'Pendiente',
+                                    'badge bg-warning1' : col.field === 'estado' && data.estado === 'Parcialmente Satisfecho', }">{{col.tipo == 'numero' ? (data[col.field] | number : '1.2-2') : (data[col.field])}}</span>
                 </td>
                 <td style="text-align: center;" scope="col" title="Ver detalle del pedido"><button pButton pRipple (click)="productosPedido(data.consecutivo)" icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" style="width: 30px; height: 30px;"></button></td>
                 <td style="text-align: center;" scope="col" title="Editar Pedido"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2" (click)="editarPedido(data)" style="width: 30px; height: 30px;"></button></td>

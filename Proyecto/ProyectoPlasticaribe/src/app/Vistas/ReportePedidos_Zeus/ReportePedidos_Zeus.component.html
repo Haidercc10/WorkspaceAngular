@@ -135,115 +135,115 @@
           <ng-template pTemplate="header" let-columns>
             <!-- Propiedades de las columnas -->
             <tr>
-              <th ttResizableColumn style="width: 150px">
-                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
+              <th style="width: 150px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 200px">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'cliente', 'contains')">
+              <th style="width: 200px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'cliente', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 200px">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'producto', 'contains')">
+              <th style="width: 200px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'producto', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 150px">
-                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'cant_Pedida', 'contains')">
+              <th style="width: 150px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'cant_Pedida', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 150px">
-                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'cant_Pendiente', 'contains')">
+              <th style="width: 150px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'cant_Pendiente', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 150px">
-                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'cant_Facturada', 'contains')">
+              <th style="width: 150px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'cant_Facturada', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 100px">
-                <input pInputText type="number" style="width: 100%;" (input)="aplicarfiltro($event, 'existencias', 'contains')">
+              <th style="width: 100px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'existencias', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 100px">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'presentacion', 'contains')">
+              <th style="width: 100px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'presentacion', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 200px">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'estado', 'contains')">
+              <th style="width: 200px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'estado', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 200px">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'vendedor', 'contains')">
+              <th style="width: 200px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'vendedor', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 100px">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'OT', 'contains')">
+              <th style="width: 100px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'OT', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 300px">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'Proceso_OT', 'contains')">
+              <th style="width: 300px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'Proceso_OT', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 200px">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costo_Cant_Pendiente', 'contains')">
+              <th style="width: 200px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'costo_Cant_Pendiente', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 150px">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'costo_Cant_Total', 'contains')">
+              <th style="width: 150px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'costo_Cant_Total', 'contains')">
               </th>
-              <th *ngFor="let col of columns" ttResizableColumn style="width: 200px">
-                <input pInputText type="{{col.type}}" style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')">
+              <th *ngFor="let col of columns" style="width: 200px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, col.field, 'contains')">
               </th>
-              <th ttResizableColumn style="width: 100px">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
+              <th style="width: 100px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 100px">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
+              <th style="width: 100px">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 100px" *ngIf="ValidarRol == 1">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
+              <th style="width: 100px" *ngIf="ValidarRol == 1">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
               </th>
-              <th ttResizableColumn style="width: 100px" *ngIf="ValidarRol == 1">
-                <input pInputText type="text" style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
+              <th style="width: 100px" *ngIf="ValidarRol == 1">
+                <input pInputText style="width: 100%;" (input)="aplicarfiltro($event, 'consecutivo', 'contains')">
               </th>
             </tr>
             <!-- Titulos -->
             <tr>
-              <th style="text-align: center; width: max-content;" class="font-size-14" ttSortableColumn="consecutivo" ttReorderableColumn>Pedido
+              <th style="text-align: center; width: max-content;" class="font-size-14" ttSortableColumn="consecutivo" ttResizableColumn>Pedido
                 <p-treeTableSortIcon field="consecutivo"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttSortableColumn="cliente" ttReorderableColumn>Cliente
+              <th style="text-align: center;" class="font-size-14" ttSortableColumn="cliente" ttResizableColumn>Cliente
                 <p-treeTableSortIcon field="cliente"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttSortableColumn="producto" ttReorderableColumn>Producto
+              <th style="text-align: center;" class="font-size-14" ttSortableColumn="producto" ttResizableColumn>Producto
                 <p-treeTableSortIcon field="producto"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttSortableColumn="cant_Pedida" ttReorderableColumn>Cant. Pedida
+              <th style="text-align: center;" class="font-size-14" ttSortableColumn="cant_Pedida" ttResizableColumn>Cant. Pedida
                 <p-treeTableSortIcon field="cant_Pedida"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttSortableColumn="cant_Pendiente" ttReorderableColumn>Pendiente
+              <th style="text-align: center;" class="font-size-14" ttSortableColumn="cant_Pendiente" ttResizableColumn>Pendiente
                 <p-treeTableSortIcon field="cant_Pendiente"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttSortableColumn="cant_Facturada" ttReorderableColumn>Facturada
+              <th style="text-align: center;" class="font-size-14" ttSortableColumn="cant_Facturada" ttResizableColumn>Facturada
                 <p-treeTableSortIcon field="cant_Facturada"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttSortableColumn="existencias" ttReorderableColumn>Stock
+              <th style="text-align: center;" class="font-size-14" ttSortableColumn="existencias" ttResizableColumn>Stock
                 <p-treeTableSortIcon field="existencias"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttSortableColumn="presentacion" ttReorderableColumn>Und
+              <th style="text-align: center;" class="font-size-14" ttSortableColumn="presentacion" ttResizableColumn>Und
                 <p-treeTableSortIcon field="presentacion"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttSortableColumn="estado" ttReorderableColumn>Estado
+              <th style="text-align: center;" class="font-size-14" ttSortableColumn="estado" ttResizableColumn>Estado
                 <p-treeTableSortIcon field="estado"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttSortableColumn="vendedor" ttReorderableColumn>Vendedor
+              <th style="text-align: center;" class="font-size-14" ttSortableColumn="vendedor" ttResizableColumn>Vendedor
                 <p-treeTableSortIcon field="vendedor"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttSortableColumn="OT" ttReorderableColumn>OT
+              <th style="text-align: center;" class="font-size-14" ttSortableColumn="OT" ttResizableColumn>OT
                 <p-treeTableSortIcon field="OT"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttSortableColumn="Proceso_OT" ttReorderableColumn>Proceso Actual
+              <th style="text-align: center;" class="font-size-14" ttSortableColumn="Proceso_OT" ttResizableColumn>Proceso Actual
                 <p-treeTableSortIcon field="Proceso_OT"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center; width: 100px;" class="font-size-14" ttSortableColumn="costo_Cant_Pendiente" ttReorderableColumn>Total Pendiente
+              <th style="text-align: center; width: 100px;" class="font-size-14" ttSortableColumn="costo_Cant_Pendiente" ttResizableColumn>Total Pendiente
                 <p-treeTableSortIcon field="costo_Cant_Pendiente"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttSortableColumn="costo_Cant_Total" ttReorderableColumn>Total
+              <th style="text-align: center;" class="font-size-14" ttSortableColumn="costo_Cant_Total" ttResizableColumn>Total
                 <p-treeTableSortIcon field="costo_Cant_Total"></p-treeTableSortIcon>
               </th>
-              <th *ngFor="let col of columnasSeleccionada" [ttSortableColumn]="col.field" ttReorderableColumn>{{col.header}}
+              <th *ngFor="let col of columnasSeleccionada" [ttSortableColumn]="col.field" ttResizableColumn>{{col.header}}
                 <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
               </th>
-              <th style="text-align: center;" class="font-size-14" ttReorderableColumn>Ver PDF</th>
-              <th style="text-align: center;" class="font-size-14" ttReorderableColumn>Editar</th>
-              <th style="text-align: center;" class="font-size-14" *ngIf="ValidarRol == 1" ttReorderableColumn>Aceptar</th>
-              <th style="text-align: center;" class="font-size-14" *ngIf="ValidarRol == 1" ttReorderableColumn>Anular / Cancelar</th>
+              <th style="text-align: center;" class="font-size-14" ttReorderableColumn ttResizableColumn>Ver PDF</th>
+              <th style="text-align: center;" class="font-size-14" ttReorderableColumn ttResizableColumn>Editar</th>
+              <th style="text-align: center;" class="font-size-14" *ngIf="ValidarRol == 1" ttReorderableColumn ttResizableColumn>Aceptar</th>
+              <th style="text-align: center;" class="font-size-14" *ngIf="ValidarRol == 1" ttReorderableColumn ttResizableColumn>Anular / Cancelar</th>
             </tr>
           </ng-template>
           <!-- Cuerpo de la tabla con los datos -->

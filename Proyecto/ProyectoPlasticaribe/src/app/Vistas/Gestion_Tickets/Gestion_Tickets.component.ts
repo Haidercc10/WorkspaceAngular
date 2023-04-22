@@ -92,24 +92,20 @@ export class Gestion_TicketsComponent implements OnInit {
   }
 
   // Funcion que va a colocar en la card de la parte de la derecha la informacion del ticket seleccionado
-  async ticketSelccionado(data : any){
+  ticketSelccionado(data : any){
     this.imagenesTicket = [];
-    this.ticketSeleccionado = {
-      Codigo : data.codigo,
-      Fecha : data.fecha,
-      Estado : data.estado,
-      Descripcion : data.descripcionTotal,
-    }
-    let datos = await this.ticketService.Get_Id(this.ticketSeleccionado.Codigo).toPromise();
-    let imagenes : any = datos.ticket_NombreImagen.trim().split('|');
-    for (let i = 0; i < imagenes.length; i++) {
-      if (imagenes[i] != '') {
-        this.ticketService.Get_ImagenesTicket(imagenes[i].trim(), datos.ticket_RutaImagen).subscribe(datos_img => {
-          this.imagenesTicket.length == 0 ? this.imagenesTicket = [datos_img.body] : this.imagenesTicket.push(datos_img.body);
-          this.imagenesTicket = this.imagenesTicket.filter((item) => item != undefined);
-        });
+    this.ticketSeleccionado = { Codigo : data.codigo, Fecha : data.fecha, Estado : data.estado, Descripcion : data.descripcionTotal, }
+    this.ticketService.Get_Id(this.ticketSeleccionado.Codigo).subscribe(datos => {
+      let imagenes : any = datos.ticket_NombreImagen.trim().split('|');
+      for (let i = 0; i < imagenes.length; i++) {
+        if (imagenes[i] != '') {
+          this.ticketService.Get_ImagenesTicket(imagenes[i].trim(), datos.ticket_RutaImagen).subscribe(datos_img => {
+            this.imagenesTicket.length == 0 ? this.imagenesTicket = [datos_img.body] : this.imagenesTicket.push(datos_img.body);
+            this.imagenesTicket = this.imagenesTicket.filter((item) => item != undefined);
+          });
+        }
       }
-    }
+    });
   }
 
   // Funcion que va a quitar de la card el ticket deseleccionado
