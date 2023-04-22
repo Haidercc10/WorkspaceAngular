@@ -169,14 +169,14 @@ export class ReportePedidos_ZeusComponent implements OnInit {
             "cliente": datos.cliente,
             "producto": datos.producto,
             "id_Producto": datos.id_Producto,
-            "cant_Pedida": datos.cant_Pedida,
-            "cant_Pendiente": datos.cant_Pendiente,
-            "cant_Facturada": datos.cant_Facturada,
-            "existencias": datos.existencias,
+            "cant_Pedida": datos.cant_Pedida.toFixed(2),
+            "cant_Pendiente": datos.cant_Pendiente.toFixed(2),
+            "cant_Facturada": datos.cant_Facturada.toFixed(2),
+            "existencias": datos.existencias.toFixed(2),
             "presentacion": datos.presentacion,
             "estado": datos.estado,
             "vendedor": datos.vendedor,
-            "precioUnidad" : this.formatonumeros(datos.precioUnidad.toFixed(2)),
+            "precioUnidad" : datos.precioUnidad.toFixed(2),
             "orden_Compra_CLiente": datos.orden_Compra_CLiente,
             "costo_Cant_Pendiente": datos.costo_Cant_Pendiente.toFixed(2),
             "costo_Cant_Total": datos.costo_Cant_Total.toFixed(2),
@@ -254,11 +254,27 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         });
 
         this.columnas = [
-          { header: 'Precio U.', field: 'precioUnidad', type : 'number' },
-          { header: 'OC Cliente', field: 'orden_Compra_CLiente'},
-          { header: 'Fecha Creación', field: 'fecha_Creacion', type : 'date'},
-          { header: 'Fecha Entrega', field: 'fecha_Entrega',  type : 'date'},
+          { header: 'Pedido', field: 'consecutivo', tipo: '' },
+          { header: 'Cliente', field: 'cliente', tipo: '' },
+          { header: 'Id Producto', field: 'id_Producto', tipo: '' },
+          { header: 'Producto', field: 'producto', tipo: '' },
+          { header: 'Cant. Pedida', field: 'cant_Pedida', tipo: 'numero' },
+          { header: 'Pendiente', field: 'cant_Pendiente', tipo: 'numero' },
+          { header: 'Facturada', field: 'cant_Facturada', tipo: 'numero' },
+          { header: 'Stock', field: 'existencias', tipo: 'numero' },
+          { header: 'Und', field: 'presentacion', tipo: '' },
+          { header: 'Estado', field: 'estado', tipo: '' },
+          { header: 'Vendedor', field: 'vendedor', tipo: '' },
+          { header: 'OT', field: 'OT', tipo: '' },
+          { header: 'Proceso Actual', field: 'Proceso_OT', tipo: '' },
+          { header: 'Total Pendiente', field: 'costo_Cant_Pendiente', tipo: 'numero' },
+          { header: 'Total', field: 'costo_Cant_Total', tipo: 'numero' },
+          { header: 'Precio U.', field: 'precioUnidad', tipo: 'numero' },
+          { header: 'OC Cliente', field: 'orden_Compra_CLiente', tipo: '' },
+          { header: 'Fecha Creación', field: 'fecha_Creacion', tipo: '' },
+          { header: 'Fecha Entrega', field: 'fecha_Entrega', tipo: '' },
         ];
+        this.columnasSeleccionada = this.columnas
         this.ArrayDocumento[i].children.push(dataPedidos);
         this.ArrayDocumento.sort((a,b) => Number(a.data.consecutivo) - Number(b.data.consecutivo));
         this.ArrayDocumento.sort((a,b) => Number(b.data.ExistenciaMayor) - Number(a.data.ExistenciaMayor));
@@ -1074,7 +1090,6 @@ export class ReportePedidos_ZeusComponent implements OnInit {
         break;
       }
     });
-
   }
 
   // Funcion que genera la tabla donde se mostrará la información de los productos pedidos
