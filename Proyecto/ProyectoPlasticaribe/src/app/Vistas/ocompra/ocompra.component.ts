@@ -56,6 +56,7 @@ export class OcompraComponent implements OnInit {
   mpSeleccionada : any [];
   edicionOrdenCompra : boolean = false;
   llave : string = 'pdf';
+  ordenCreada : number;
 
   constructor(private frmBuilder : FormBuilder,
                 @Inject(SESSION_STORAGE) private storage: WebStorageService,
@@ -272,6 +273,7 @@ export class OcompraComponent implements OnInit {
     let ordenCompra : number = this.FormOrdenCompra.value.ConsecutivoOrden;
     this.dtOrdenCompraService.GetOrdenCompra(ordenCompra).subscribe(datos_orden => {
       if (datos_orden.length > 0) {
+        this.ordenCreada = ordenCompra
         this.edicionOrdenCompra = true;
         this.FormOrdenCompra.reset();
         this.FormMateriaPrima.reset();
@@ -340,7 +342,11 @@ export class OcompraComponent implements OnInit {
       TpDoc_Id : 'OCMP',
       Oc_Observacion : this.FormOrdenCompra.value.Observacion == null ? '' : (this.FormOrdenCompra.value.Observacion).toUpperCase(),
     }
-    this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => { this.crearDtOrdenCompra(datos_ordenCompra.oc_Id); }, error => {
+    this.ordenCompraService.insert_OrdenCompra(info).subscribe(datos_ordenCompra => {
+      this.ordenCreada = datos_ordenCompra.oc_Id;
+      this.mostrarEleccion(0, 'pdf')
+      this.crearDtOrdenCompra(datos_ordenCompra.oc_Id);
+    }, error => {
       this.mostrarError(`Error`, `¡Error al crear la orden de compra!`);
       this.cargando = false;
     });
@@ -376,15 +382,14 @@ export class OcompraComponent implements OnInit {
   GuardadoExitoso(){
     this.actualizarPrecioMatPrimas();
     this.actualizarPrecioTintas();
-    setTimeout(() => { this.limpiarTodo(); }, 3500);
+    setTimeout(() => { this.limpiarTodo(); }, 3000);
   }
 
   //Buscar informacion de la orden de compra creada
   buscarinfoOrdenCompra(){
     this.onReject();
     this.cargando = true;
-    let ordenCompra : number = this.FormOrdenCompra.value.ConsecutivoOrden;
-    this.dtOrdenCompraService.GetOrdenCompra(ordenCompra).subscribe(datos_orden => {
+    this.dtOrdenCompraService.GetOrdenCompra(this.ordenCreada).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         let info : any = {
           Id : 0,
@@ -417,8 +422,7 @@ export class OcompraComponent implements OnInit {
   // Funcion que se encargará de poner la informcaion en el PDF y generarlo
   generarPDF(){
     let nombre : string = this.storage.get('Nombre');
-    let ordenCompra : number = this.FormOrdenCompra.value.ConsecutivoOrden;
-    this.dtOrdenCompraService.GetOrdenCompra(ordenCompra).subscribe(datos_orden => {
+    this.dtOrdenCompraService.GetOrdenCompra(this.ordenCreada).subscribe(datos_orden => {
       for (let i = 0; i < datos_orden.length; i++) {
         const pdfDefinicion : any = {
           info: {
@@ -614,7 +618,8 @@ export class OcompraComponent implements OnInit {
         }
         const pdf = pdfMake.createPdf(pdfDefinicion);
         pdf.open();
-        this.cargando = false;
+        this.ordenCreada = 0;
+        this.limpiarTodo();
         break;
       }
     }, error => { this.mostrarError(`Error`, `¡No se pudo obtener la información de la última orden de compra creada!`); });
@@ -757,6 +762,7 @@ export class OcompraComponent implements OnInit {
             TpDoc_Id : 'OCMP',
             Oc_Observacion : (observacion).toUpperCase(),
           }
+          this.ordenCreada = this.FormOrdenCompra.value.ConsecutivoOrden;
           this.ordenCompraService.putId_OrdenCompra(this.FormOrdenCompra.value.ConsecutivoOrden, info).subscribe(datos_ordenCompra => { this.editarDtOrdenCompa(); }, error => {
             this.mostrarError(`Error`, `¡Error al Editar la Orden de Compra!`);
             this.cargando = false;
@@ -819,5 +825,7 @@ export class OcompraComponent implements OnInit {
   }
 
   /** Función para quitar mensaje de elección */
-  onReject = () => this.messageService.clear(this.llave);
+  onReject(){
+    this.messageService.clear(this.llave);
+  }
 }

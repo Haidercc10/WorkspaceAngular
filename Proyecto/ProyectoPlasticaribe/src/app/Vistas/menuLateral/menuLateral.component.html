@@ -612,7 +612,7 @@
     </ng-container>
 
     <!-- PEDIDOS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60 || ValidarRol == 61">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample5" role="button" (click)="clickIcon5()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir5; then thenTemplate; else elseTemplate"></ng-container>
@@ -638,7 +638,7 @@
             </a>
           </div> -->
 
-          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60">
+          <div class="mb-2 sangria" *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 60 || ValidarRol == 61">
             <a class="fst-normal" data-bs-toggle="" href="/Pedidos-Zeus" role="button" aria-expanded="false">
               <i class="pi pi-shopping-bag font-size-15" style="margin-right: 2%;"></i>
               Ver Pedidos
@@ -652,7 +652,7 @@
     </ng-container>
 
     <!-- PRODUCTOS -->
-    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 60">
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 61">
       <li>
         <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample6" role="button" (click)="clickIcon6()" aria-expanded="false" aria-controls="collapseExample">
           <ng-container *ngIf="subir6; then thenTemplate; else elseTemplate"></ng-container>
@@ -665,7 +665,7 @@
           <b>Productos</b>
         </a>
         <div class="collapse" id="collapseExample6">
-          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 60">
+          <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 60 || ValidarRol == 61">
               <div class="mb-2 sangria">
               <a class="fst-normal" data-bs-toggle="" href="/inventario-productos-terminados" role="button" aria-expanded="false" aria-controls="">
                 <i class="pi pi-box font-size-15" style="margin-right: 2%;"></i>
@@ -774,6 +774,39 @@
           <div class="mb-2 sangria">
             <hr>
           </div>
+        </div>
+      </li>
+    </ng-container>
+
+    <!-- TICKETS -->
+    <ng-container *ngIf="ValidarRol == 1 || ValidarRol == 2 || ValidarRol == 3 || ValidarRol == 4 || ValidarRol == 5 || ValidarRol == 6 || ValidarRol == 7 || ValidarRol == 8 || ValidarRol == 9 || ValidarRol == 10 || ValidarRol == 11 || ValidarRol == 12 || ValidarRol == 13 || ValidarRol == 59 || ValidarRol == 60">
+      <li>
+        <a class="fw-normal" data-bs-toggle="collapse" href="#collapseExample16" role="button" (click)="clickIcon16()" aria-expanded="false" aria-controls="collapseExample">
+          <ng-container *ngIf="subir16; then thenTemplate; else elseTemplate"></ng-container>
+          <ng-template #thenTemplate>
+            <i class="pi pi-angle-down" style="margin-right: 3%;"></i>
+          </ng-template>
+          <ng-template #elseTemplate>
+            <i class="pi pi-angle-up" style="margin-right: 3%;"></i>
+          </ng-template>
+          <b>Tickets</b>
+        </a>
+        <div class="collapse" id="collapseExample16">
+          <div class="mb-2 sangria">
+            <a class="fst-normal" data-bs-toggle="" href="/Tickets" role="button" aria-expanded="false" aria-controls="">
+              <i class="pi pi-ticket font-size-15" style="margin-right: 2%;"></i>
+              Creación de Tickets
+            </a>
+          </div>
+          <ng-container *ngIf="ValidarRol == 1">
+            <div class="mb-2 sangria">
+              <a class="fst-normal" data-bs-toggle="" href="/Gestion-Tickets" role="button" aria-expanded="false" aria-controls="">
+                <i class="pi pi-wrench font-size-15" style="margin-right: 2%;"></i>
+                Gestionar Tickets
+              </a>
+            </div>
+          </ng-container>
+          <div class="mb-2 sangria"> <hr> </div>
         </div>
       </li>
     </ng-container>

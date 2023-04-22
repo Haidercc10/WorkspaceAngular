@@ -294,6 +294,9 @@ export class Orden_MaquilaComponent implements OnInit {
             this.dtOrdenMaquilaService.delete(datos_orden[i]).subscribe(datos_eliminados => {
               for (let i = 0; i < this.materiasPrimasSeleccionadas.length; i++) {
                 if (this.materiasPrimasSeleccionadas[i].Id == data.Id) {
+                  this.sumarMateriaPrima(this.materiasPrimasSeleccionadas[i].Id_Mp, this.materiasPrimasSeleccionadas[i].Cantidad);
+                  this.sumarTinta(this.materiasPrimasSeleccionadas[i].Id_Tinta,this.materiasPrimasSeleccionadas[i].Cantidad );
+                  this.sumarBopp(this.materiasPrimasSeleccionadas[i].Id_Bopp, this.materiasPrimasSeleccionadas[i].Cantidad);
                   this.materiasPrimasSeleccionadas.splice(i, 1);
                   this.catidadTotalPeso -= data.Cantidad;
                   this.cantidadTotalPrecio -= data.SubTotal;
@@ -353,6 +356,9 @@ export class Orden_MaquilaComponent implements OnInit {
         UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
         DtOM_PrecioUnitario : parseFloat(this.materiasPrimasSeleccionadas[i].Precio),
       }
+      this.restarMateriaPrima(this.materiasPrimasSeleccionadas[i].Id_Mp, this.materiasPrimasSeleccionadas[i].Cantidad);
+      this.restarTinta(this.materiasPrimasSeleccionadas[i].Id_Tinta, this.materiasPrimasSeleccionadas[i].Cantidad);
+      this.restarBopp(this.materiasPrimasSeleccionadas[i].Id_Bopp, this.materiasPrimasSeleccionadas[i].Cantidad);
       this.dtOrdenMaquilaService.insert(info).subscribe(datos => { error = false; },
       error => { this.mostrarError(`Error`, `¡Ocurrió un error al guardar los detalles de la orden de maquila!`); error = true;});
     }
@@ -399,11 +405,161 @@ export class Orden_MaquilaComponent implements OnInit {
             UndMed_Id : this.materiasPrimasSeleccionadas[i].Und_Medida,
             DtOM_PrecioUnitario : parseFloat(this.materiasPrimasSeleccionadas[i].Precio),
           }
+          this.restarMateriaPrima(this.materiasPrimasSeleccionadas[i].Id_Mp, this.materiasPrimasSeleccionadas[i].Cantidad);
+          this.restarTinta(this.materiasPrimasSeleccionadas[i].Id_Tinta, this.materiasPrimasSeleccionadas[i].Cantidad);
+          this.restarBopp(this.materiasPrimasSeleccionadas[i].Id_Bopp, this.materiasPrimasSeleccionadas[i].Cantidad);
           this.dtOrdenMaquilaService.insert(info).subscribe(datos => { error = false; }, error => { this.mostrarError(`Error`, `¡Ocurrió un error al editar los detalles de la Orden de Maquila!`); });
         }
-      }, error => { this.mostrarError(``); error = true; });
+      }, error => {
+        this.mostrarError(``);
+        error = true;
+      });
     }
-    if(!error) setTimeout(() => { this.mostrarEleccion(`edicion`, id); }, this.materiasPrimasSeleccionadas.length * 10);
+    if(!error) setTimeout(() => {
+      this.mostrarEleccion(`edicion`, id);
+    }, this.materiasPrimasSeleccionadas.length * 10);
+  }
+
+  // Funcion que va a restar del inventario de materia prima
+  restarMateriaPrima(id : number, cantidad : number){
+    if (id != 84) {
+      this.materiaPrimaService.srvObtenerListaPorId(id).subscribe(datos => {
+        let info : any = {
+          MatPri_Id : datos.matPri_Id,
+          MatPri_Nombre: datos.matPri_Nombre,
+          MatPri_Descripcion: datos.matPri_Descripcion,
+          MatPri_Stock : datos.matPri_Stock - cantidad,
+          UndMed_Id: datos.undMed_Id,
+          CatMP_Id: datos.catMP_Id,
+          MatPri_Precio: datos.matPri_Precio,
+          TpBod_Id: datos.tpBod_Id,
+          MatPri_Fecha : datos.matPri_Fecha,
+          MatPri_Hora : datos.matPri_Hora,
+        }
+        this.materiaPrimaService.srvActualizar(id, info).subscribe(datosActualizados => { });
+      });
+    }
+  }
+
+  // Funcion que va a restar del inventario de tintas
+  restarTinta(id : number, cantidad : number){
+    if (id != 2001) {
+      this.tintasService.srvObtenerListaPorId(id).subscribe(datos => {
+        let info : any = {
+          Tinta_Id: datos.tinta_Id,
+          Tinta_Nombre: datos.tinta_Nombre,
+          Tinta_Descripcion: datos.tinta_Descripcion,
+          Tinta_CodigoHexadecimal : datos.tinta_CodigoHexadecimal,
+          Tinta_Stock: (datos.tinta_Stock - cantidad),
+          UndMed_Id : datos.undMed_Id,
+          Tinta_Precio: datos.tinta_Precio,
+          CatMP_Id : datos.catMP_Id,
+          TpBod_Id : datos.tpBod_Id,
+          Tinta_InvInicial : datos.tinta_InvInicial,
+          tinta_FechaIngreso : datos.tinta_FechaIngreso,
+          tinta_Hora : datos.tinta_Hora,
+        }
+        this.tintasService.srvActualizar(id, info).subscribe(datosactualizados => { });
+      });
+    }
+  }
+
+  // Funcion que va a restar del inventario de  bopp
+  restarBopp(id : number, cantidad : number){
+    if (id != 449) {
+      this.boppService.srvObtenerListaPorId(id).subscribe(datos => {
+        let info : any = {
+          BOPP_Id: datos.bopP_Id,
+          BOPP_Nombre: datos.bopP_Nombre,
+          BOPP_Descripcion: datos.bopP_Descripcion,
+          BOPP_Serial: datos.bopP_Seria,
+          BOPP_CantidadMicras: datos.bopP_CantidadMicras,
+          undMed_Id: datos.undMed_Id,
+          catMP_Id: datos.catMP_Id,
+          bopP_Precio: datos.bopP_Precio,
+          tpBod_Id: datos.tpBod_Id,
+          bopP_FechaIngreso: datos.bopP_FechaIngreso,
+          bopP_Hora: datos.bopP_Hora,
+          bopP_Ancho: datos.bopP_Ancho,
+          bopP_Stock: (datos.bopP_Stock - cantidad),
+          undMed_Kg: datos.undMed_Kg,
+          bopP_CantidadInicialKg: datos.bopP_CantidadInicialKg,
+          usua_Id: datos.usua_Id,
+        }
+        this.boppService.srvActualizar(id, info).subscribe(dato_Actualizado => {  });
+      });
+    }
+  }
+
+  // Funcion que va a sumar del inventario de materia prima
+  sumarMateriaPrima(id : number, cantidad : number){
+    if (id != 84) {
+      this.materiaPrimaService.srvObtenerListaPorId(id).subscribe(datos => {
+        let info : any = {
+          MatPri_Id : datos.matPri_Id,
+          MatPri_Nombre: datos.matPri_Nombre,
+          MatPri_Descripcion: datos.matPri_Descripcion,
+          MatPri_Stock : datos.matPri_Stock + cantidad,
+          UndMed_Id: datos.undMed_Id,
+          CatMP_Id: datos.catMP_Id,
+          MatPri_Precio: datos.matPri_Precio,
+          TpBod_Id: datos.tpBod_Id,
+          MatPri_Fecha : datos.matPri_Fecha,
+          MatPri_Hora : datos.matPri_Hora,
+        }
+        this.materiaPrimaService.srvActualizar(id, info).subscribe(datosActualizados => { });
+      });
+    }
+  }
+
+  // Funcion que va a sumar del inventario de tintas
+  sumarTinta(id : number, cantidad : number){
+    if (id != 2001) {
+      this.tintasService.srvObtenerListaPorId(id).subscribe(datos => {
+        let info : any = {
+          Tinta_Id: datos.tinta_Id,
+          Tinta_Nombre: datos.tinta_Nombre,
+          Tinta_Descripcion: datos.tinta_Descripcion,
+          Tinta_CodigoHexadecimal : datos.tinta_CodigoHexadecimal,
+          Tinta_Stock: (datos.tinta_Stock + cantidad),
+          UndMed_Id : datos.undMed_Id,
+          Tinta_Precio: datos.tinta_Precio,
+          CatMP_Id : datos.catMP_Id,
+          TpBod_Id : datos.tpBod_Id,
+          Tinta_InvInicial : datos.tinta_InvInicial,
+          tinta_FechaIngreso : datos.tinta_FechaIngreso,
+          tinta_Hora : datos.tinta_Hora,
+        }
+        this.tintasService.srvActualizar(id, info).subscribe(datosactualizados => { });
+      });
+    }
+  }
+
+  // Funcion que va a sumar del inventario de  bopp
+  sumarBopp(id : number, cantidad : number){
+    if (id != 449) {
+      this.boppService.srvObtenerListaPorId(id).subscribe(datos => {
+        let info : any = {
+          BOPP_Id: datos.bopP_Id,
+          BOPP_Nombre: datos.bopP_Nombre,
+          BOPP_Descripcion: datos.bopP_Descripcion,
+          BOPP_Serial: datos.bopP_Seria,
+          BOPP_CantidadMicras: datos.bopP_CantidadMicras,
+          undMed_Id: datos.undMed_Id,
+          catMP_Id: datos.catMP_Id,
+          bopP_Precio: datos.bopP_Precio,
+          tpBod_Id: datos.tpBod_Id,
+          bopP_FechaIngreso: datos.bopP_FechaIngreso,
+          bopP_Hora: datos.bopP_Hora,
+          bopP_Ancho: datos.bopP_Ancho,
+          bopP_Stock: (datos.bopP_Stock + cantidad),
+          undMed_Kg: datos.undMed_Kg,
+          bopP_CantidadInicialKg: datos.bopP_CantidadInicialKg,
+          usua_Id: datos.usua_Id,
+        }
+        this.boppService.srvActualizar(id, info).subscribe(dato_Actualizado => {  });
+      });
+    }
   }
 
   // Funcion que va a consultar la informacion de la Orden de maquila creada, información que se usará para crear un PDF

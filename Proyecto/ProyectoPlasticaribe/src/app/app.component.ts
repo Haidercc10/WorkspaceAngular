@@ -81,6 +81,9 @@ export class AppComponent implements OnInit{
       medium: 'Medio',
       weak: 'Debil',
       noFilter: 'Sin Filtros',
+      choose: 'Elegir',
+      upload: 'Cargar',
+      cancel: 'Cancelar'
     });
   }
 
