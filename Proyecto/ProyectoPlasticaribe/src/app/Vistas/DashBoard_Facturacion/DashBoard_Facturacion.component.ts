@@ -115,7 +115,8 @@ export class DashBoard_FacturacionComponent implements OnInit {
       this.zeusService.GetFacturacionMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalFacuturadoMes = datos_facturacion; });
       this.zeusService.GetIvaVentaMensual(this.primerDiaMes, this.today).subscribe(datos_facturacion => { this.totalIvaVentaMes = datos_facturacion; });
       for (let i = 0; i < 12; i++) {
-        this.zeusService.GetFacturacionTodosMeses(i+ 1, this.anoSeleccionado).subscribe(datos_facturacion => {
+        let mes : string = `${i + 1}`.length == 1 ? `0${i + 1}` : `${i + 1}`;
+        this.zeusService.GetFacturacionTodosMeses(mes, this.anoSeleccionado).subscribe(datos_facturacion => {
           if (i == 0) this.totalFacturado1 = datos_facturacion;
           if (i == 1) this.totalFacturado2 = datos_facturacion;
           if (i == 2) this.totalFacturado3 = datos_facturacion;

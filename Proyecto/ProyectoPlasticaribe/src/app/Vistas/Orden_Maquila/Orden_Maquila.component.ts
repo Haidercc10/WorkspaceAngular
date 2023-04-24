@@ -120,7 +120,6 @@ export class Orden_MaquilaComponent implements OnInit {
     this.cantidadTotalPrecio = 0;
     this.catidadTotalPeso = 0;
     this.edidcionOrdenMaquila = false;
-    this.itemSeleccionado = null;
     this.generarConsecutivo();
     this.onReject();
     this.llave = 'pdf';
@@ -365,6 +364,7 @@ export class Orden_MaquilaComponent implements OnInit {
     if(!error) {
       this.itemSeleccionado = id;
       this.mostrarEleccion(`pdf`, id, );
+      this.limpiarTodo();
     }
   }
 
@@ -417,6 +417,7 @@ export class Orden_MaquilaComponent implements OnInit {
     }
     if(!error) setTimeout(() => {
       this.mostrarEleccion(`edicion`, id);
+      this.limpiarTodo();
     }, this.materiasPrimasSeleccionadas.length * 10);
   }
 

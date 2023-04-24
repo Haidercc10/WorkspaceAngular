@@ -1,0 +1,23 @@
+<p-toast position="center" [preventOpenDuplicates]="true"></p-toast>
+
+<div class="fondo">
+  <div class="row" *ngIf="ValidarRol == 1">
+    <div class="p-4 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <p-card header="Facturación Mensual">
+        <p-toolbar>
+          <div class="p-toolbar-group-start">
+            <h5>¡Elige el año y vendedor que deseas graficar y presione el botón!</h5>
+          </div>
+          <div class="p-toolbar-group-center">
+            <p-dropdown class="mr-2" [options]="anios" [(ngModel)]="anioSeleccionado"></p-dropdown>
+            <p-dropdown class="mr-2" [options]="vendedores" optionValue="usua_Id" optionLabel="usua_Nombre" [(ngModel)]="vendedorSeleccionado"></p-dropdown>
+            <button class="mr-2" pButton pTooltip="Graficar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-chart-bar" class="p-button-rounded p-button-danger" (click)="consultarFacturacionVendedor()"></button>
+            <button class="mr-2" pButton pTooltip="Limpiar Tabla" tooltipPosition="bottom" pRipple type="button" icon="pi pi-eraser" class="p-button-rounded p-button-secondary" (click)="graficarDatos()"></button>
+          </div>
+        </p-toolbar>
+
+        <p-chart type="line" width="100%" height="500px" [data]="facturasData" [options]="facturasOptions" *ngIf="!cargando"></p-chart>
+      </p-card>
+    </div>
+  </div>
+</div>

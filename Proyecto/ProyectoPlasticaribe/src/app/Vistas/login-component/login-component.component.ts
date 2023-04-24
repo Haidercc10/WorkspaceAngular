@@ -39,7 +39,7 @@ export class LoginComponentComponent implements OnInit {
                             private authenticationContaZeusService : authentication_ContaZeus,
                               private authenticationBagPro : authentication_BagPro,
                                 private http : HttpClient,
-                                  private messageService: MessageService) {
+                                  private messageService: MessageService,) {
 
     if (!this.storage.get('Token')) localStorage.clear();
     if ((this.storage.get('Token')
