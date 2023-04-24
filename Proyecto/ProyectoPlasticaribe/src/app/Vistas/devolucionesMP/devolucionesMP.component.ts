@@ -103,7 +103,9 @@ export class DevolucionesMPComponent implements OnInit {
       this.devolucionMPService.srvObtenerConsultaMov2(ot).subscribe(datos_devolucion => {
         for (let j = 0; j < datos_devolucion.length; j++) {
           for (let i = 0; i < this.materiasPrimas.length; i++) {
-            if (this.materiasPrimas[i].Id == datos_devolucion[j].matPri_Id) {
+            if (this.materiasPrimas[i].Id == datos_devolucion[j].matPri_Id ||
+                  this.materiasPrimas[i].Id == datos_devolucion[j].bopP_Id ||
+                    this.materiasPrimas[i].Id == datos_devolucion[j].tinta_Id) {
               this.materiasPrimas[i].Cantidad -= datos_devolucion[j].dtDevMatPri_CantidadDevuelta;
               this.materiasPrimas[i].Cantidad_Oculta -= datos_devolucion[j].dtDevMatPri_CantidadDevuelta;
               this.materiasPrimas[i].Cantidad_Devuelta = this.materiasPrimas[i].Cantidad;

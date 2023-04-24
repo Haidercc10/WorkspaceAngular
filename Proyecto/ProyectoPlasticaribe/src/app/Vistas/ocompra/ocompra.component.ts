@@ -174,7 +174,7 @@ export class OcompraComponent implements OnInit {
 
   //Funcion que va a mostrar el nombre de la materia prima
   cambiarNombreMateriaPrima(){
-    let id : number = this.FormMateriaPrima.value.Nombre;
+    let id : number = this.FormMateriaPrima.value.Nombre || this.FormMateriaPrima.value.Id;
     this.materiaPrimaService.getInfoMpTintaBopp(id).subscribe(datos_materiaPrima => {
       for (let i = 0; i < datos_materiaPrima.length; i++) {
         this.FormMateriaPrima.patchValue({
@@ -375,6 +375,7 @@ export class OcompraComponent implements OnInit {
         this.mostrarError('No se mostrará la informacion del PDF');
       });
     }
+    if(!error) this.mostrarEleccion(0, 'pdf');
   }
 
   // Funcion que mostrará el mensaje de que todo el proceso de guardado fue exitoso

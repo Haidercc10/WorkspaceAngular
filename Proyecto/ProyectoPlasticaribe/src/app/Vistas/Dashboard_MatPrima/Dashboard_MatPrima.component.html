@@ -1,5 +1,11 @@
 
-<div class="container-fluid" style="background-image: linear-gradient(to bottom right, rgb(217, 241, 255) , rgb(192, 229, 255));">
+
+<div class="d-flex justify-content-center overlay" *ngIf="cargando">
+  <div style="margin: auto;">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+<div class="container-fluid" style="background-image: linear-gradient(to bottom right, rgb(217, 241, 255) , rgb(192, 229, 255));" *ngIf="!cargando">
 
   <div class="mb-4">
     <div class="row g-4">
@@ -18,15 +24,15 @@
               <ng-template pTemplate="header">
                 <tr>
                   <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
-                  <th scope="col" pSortableColumn="nombre" style="min-width: 60%; max-width: 60%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
-                  <th scope="col" pSortableColumn="cantidad" style="min-width: 30%; max-width: 30%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
+                  <th scope="col" pSortableColumn="nombre" style="min-width: 50%; max-width: 50%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
+                  <th scope="col" pSortableColumn="cantidad" style="min-width: 40%; max-width: 40%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
                 <tr class="font-size-12" pTooltip="Cantidad de asignaciones {{stock.asignaciones}}">
                   <td style="min-width: 10%; max-width: 10%">{{rowIndex + 1}}</td>
-                  <td style="min-width: 60%; max-width: 60%"><b><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/{{stock.imagen}}" alt=""> {{stock.nombre}}</b></td>
-                  <td style="min-width: 30%; max-width: 30%"><b>{{stock.cantidad | number : '1.2-2'}}</b> </td>
+                  <td style="min-width: 50%; max-width: 50%"><b><img style="width: 30px; height: 30px;" src="assets/Iconos_Menu/{{stock.imagen}}" alt=""> {{stock.nombre}}</b></td>
+                  <td style="min-width: 40%; max-width: 40%"><b>{{stock.cantidad | number : '1.2-2'}}</b> </td>
                 </tr>
               </ng-template>
           </p-table>
@@ -54,41 +60,53 @@
       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 col-xxl-5">
         <p-card>
           <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i class="pi pi-box"></i> Inventario de Materias Primas</h2>
-            <p-table
-            [value]="inventarioMateriaPrima"
-            [scrollable]="true"
-            scrollHeight="300px"
-            styleClass="p-datatable-sm">
-              <ng-template pTemplate="header">
-                <tr>
-                  <th scope="col" style="min-width: 20%; max-width: 20%" class="font-size-13">N°</th>
-                  <th scope="col" pSortableColumn="nombre" style="min-width: 30%; max-width: 30%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
-                  <th scope="col" pSortableColumn="estado"  style="min-width: 20%; max-width: 20%" class="font-size-13">Estado<p-sortIcon field="estado"></p-sortIcon></th>
-                  <th scope="col" pSortableColumn="actual" style="min-width: 15%; max-width: 15%" class="font-size-13">Actual<p-sortIcon field="actual"></p-sortIcon></th>
-                  <th scope="col" pSortableColumn="inicial" style="min-width: 15%; max-width: 15%" class="font-size-13">Inicial<p-sortIcon field="inicial"></p-sortIcon></th>
-                </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
-                <tr class="font-size-12">
-                  <td style="min-width: 20%; max-width: 20%">{{rowIndex + 1}}</td>
-                  <td style="min-width: 30%; max-width: 30%"><b>{{stock.nombre}}</b></td>
-                  <ng-container *ngIf="stock.estado == 'Sin stock'">
-                    <td style="min-width: 20%; max-width: 20%"><span class="badge bg-danger1">{{stock.estado}}</span></td>
-                  </ng-container>
-                  <ng-container *ngIf="stock.estado == 'Bajo'">
-                    <td style="min-width: 20%; max-width: 20%"><span class="badge bg-secondary1">{{stock.estado}}</span></td>
-                  </ng-container>
-                  <ng-container *ngIf="stock.estado == 'Medio'">
-                    <td style="min-width: 20%; max-width: 20%"><span class="badge bg-warning1">{{stock.estado}}</span></td>
-                  </ng-container>
-                  <ng-container *ngIf="stock.estado == 'Alto'">
-                    <td style="min-width: 20%; max-width: 20%"><span class="badge bg-success1">{{stock.estado}}</span></td>
-                  </ng-container>
-                  <td style="min-width: 15%; max-width: 15%">{{stock.actual | number : '1.2-2'}}</td>
-                  <td style="min-width: 15%; max-width: 15%">{{stock.inicial | number : '1.2-2'}}</td>
-                </tr>
-              </ng-template>
-            </p-table>
+            <ng-container *ngIf="inventarioMateriaPrima.length > 0; then Tabla5; else Texto5"></ng-container>
+             <ng-template #Tabla5>
+              <p-table
+                [value]="inventarioMateriaPrima"
+                [scrollable]="true"
+                scrollHeight="300px"
+                styleClass="p-datatable-sm">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th scope="col" style="min-width: 20%; max-width: 20%" class="font-size-13">N°</th>
+                      <th scope="col" pSortableColumn="nombre" style="min-width: 30%; max-width: 30%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
+                      <th scope="col" pSortableColumn="estado"  style="min-width: 20%; max-width: 20%" class="font-size-13">Estado<p-sortIcon field="estado"></p-sortIcon></th>
+                      <th scope="col" pSortableColumn="actual" style="min-width: 15%; max-width: 15%" class="font-size-13">Actual<p-sortIcon field="actual"></p-sortIcon></th>
+                      <th scope="col" pSortableColumn="inicial" style="min-width: 15%; max-width: 15%" class="font-size-13">Inicial<p-sortIcon field="inicial"></p-sortIcon></th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
+                    <tr class="font-size-12">
+                      <td style="min-width: 20%; max-width: 20%">{{rowIndex + 1}}</td>
+                      <td style="min-width: 30%; max-width: 30%"><b>{{stock.nombre}}</b></td>
+                      <ng-container *ngIf="stock.estado == 'Sin stock'">
+                        <td style="min-width: 20%; max-width: 20%"><span class="badge bg-danger1">{{stock.estado}}</span></td>
+                      </ng-container>
+                      <ng-container *ngIf="stock.estado == 'Bajo'">
+                        <td style="min-width: 20%; max-width: 20%"><span class="badge bg-secondary1">{{stock.estado}}</span></td>
+                      </ng-container>
+                      <ng-container *ngIf="stock.estado == 'Medio'">
+                        <td style="min-width: 20%; max-width: 20%"><span class="badge bg-warning1">{{stock.estado}}</span></td>
+                      </ng-container>
+                      <ng-container *ngIf="stock.estado == 'Alto'">
+                        <td style="min-width: 20%; max-width: 20%"><span class="badge bg-success1">{{stock.estado}}</span></td>
+                      </ng-container>
+                      <td style="min-width: 15%; max-width: 15%">{{stock.actual | number : '1.2-2'}}</td>
+                      <td style="min-width: 15%; max-width: 15%">{{stock.inicial | number : '1.2-2'}}</td>
+                    </tr>
+                  </ng-template>
+              </p-table>
+             </ng-template>
+             <ng-template #Texto5>
+              <div class="container advertencia">
+                <div class="mb-3">
+                  <img src="assets/Iconos_Menu/advertencia.png">
+                </div>
+                <h4>No existen materias primas creadas actualmente!</h4>
+              </div>
+             </ng-template>
+
         </p-card>
       </div>
 
@@ -113,16 +131,16 @@
               <ng-template pTemplate="header">
                 <tr>
                   <th scope="col" style="min-width: 10%; max-width: 10%" class="font-size-13">N°</th>
-                  <th scope="col" style="min-width: 40%; max-width: 40%" pSortableColumn="nombre" class="font-size-13">Nombre<p-sortIcon style="width: 10px; height: 10px;" field="nombre"></p-sortIcon></th>
-                  <th scope="col" style="min-width: 30%; max-width: 30%" pSortableColumn="asignaciones" class="font-size-13">Asignaciones<p-sortIcon field="asignaciones"></p-sortIcon></th>
+                  <th scope="col" style="min-width: 35%; max-width: 35%" pSortableColumn="nombre" class="font-size-13">Nombre<p-sortIcon style="width: 10px; height: 10px;" field="nombre"></p-sortIcon></th>
+                  <th scope="col" style="min-width: 35%; max-width: 35%" pSortableColumn="asignaciones" class="font-size-13">Asignaciones<p-sortIcon field="asignaciones"></p-sortIcon></th>
                   <th scope="col" style="min-width: 20%; max-width: 20%" pSortableColumn="cantidad" class="font-size-13">Cant.<p-sortIcon field="cantidad"></p-sortIcon></th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-mp let-rowIndex="rowIndex">
                 <tr class="font-size-12" >
                   <td style="min-width: 10%; max-width: 10%; text-align: center;">{{rowIndex + 1}}</td>
-                  <td style="min-width: 40%; max-width: 40%"><b>{{mp.nombre}}</b></td>
-                  <td style="min-width: 30%; max-width: 30%; text-align: center;"><b>{{mp.asignaciones}}</b></td>
+                  <td style="min-width: 35%; max-width: 35%"><b>{{mp.nombre}}</b></td>
+                  <td style="min-width: 35%; max-width: 35%; text-align: center;"><b>{{mp.asignaciones}}</b></td>
                   <td style="min-width: 20%; max-width: 20%; text-align: center;">{{mp.cantidad | number : '1.2-2'}} Kg</td>
                 </tr>
               </ng-template>
@@ -241,7 +259,7 @@
                   <tr>
                     <th scope="col" style="min-width: 30%; max-width: 30%" class="font-size-13">N°</th>
                     <th scope="col" pSortableColumn="nombre" style="min-width: 70%; max-width: 70%" class="font-size-13">Nombre<p-sortIcon field="nombre"></p-sortIcon></th>
-                    <th scope="col" pSortableColumn="cantidad" style="min-width: 30%; max-width: 30%" class="font-size-13">Cantidad<p-sortIcon field="cantidad"></p-sortIcon></th>
+                    <th scope="col" pSortableColumn="cantidad" style="min-width: 30%; max-width: 30%" class="font-size-13">Cant.<p-sortIcon field="cantidad"></p-sortIcon></th>
                   </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-stock let-rowIndex="rowIndex">
